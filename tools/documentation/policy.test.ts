@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, it as test } from "@effect/vitest";
+import { Array, HashMap, HashSet, Schema } from "effect";
 
 import { inspectDocumentation } from "./policy.js";
 import { PublicPageAcceptanceRecord } from "./schemas.js";
@@ -116,19 +117,25 @@ describe("documentation policy", () => {
         },
       ],
       ownerPolicy,
-      rootScripts: new Set(["verification"]),
-      workspaceScripts: new Map([
-        ["packages/api", { name: "api-group", scripts: new Set<string>() }],
+      rootScripts: HashSet.fromIterable(["verification"]),
+      workspaceScripts: HashMap.fromIterable([
+        [
+          "packages/api",
+          { name: "api-group", scripts: HashSet.empty<string>() },
+        ],
         [
           "packages/api/http",
           {
             name: "@taxkit/api-http",
-            scripts: new Set(["test", "test:openapi"]),
+            scripts: HashSet.fromIterable(["test", "test:openapi"]),
           },
         ],
         [
           "packages/docs-content",
-          { name: "@taxkit/docs-content", scripts: new Set(["build"]) },
+          {
+            name: "@taxkit/docs-content",
+            scripts: HashSet.fromIterable(["build"]),
+          },
         ],
       ]),
     });
@@ -144,36 +151,42 @@ describe("documentation policy", () => {
         },
       ],
       ownerPolicy,
-      rootScripts: new Set(),
-      workspaceScripts: new Map([
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.fromIterable([
         [
           "packages/api/http",
           {
             name: "@taxkit/api-http",
-            scripts: new Set(["test", "test:openapi"]),
+            scripts: HashSet.fromIterable(["test", "test:openapi"]),
           },
         ],
         [
           "packages/docs-content",
-          { name: "@taxkit/docs-content", scripts: new Set(["build"]) },
+          {
+            name: "@taxkit/docs-content",
+            scripts: HashSet.fromIterable(["build"]),
+          },
         ],
       ]),
     });
     expect(
-      report.diagnostics.some(
+      Array.some(
+        report.diagnostics,
         (item) =>
           item.invariant === "owner-policy" && item.owner === "api-owner"
       )
     ).toBe(true);
     expect(
-      report.diagnostics.some(
+      Array.some(
+        report.diagnostics,
         (item) =>
           item.invariant === "lifecycle-successor" &&
           item.target === "docs/old.md"
       )
     ).toBe(true);
     expect(
-      report.diagnostics.every(
+      Array.every(
+        report.diagnostics,
         (item) =>
           item.owner.length > 0 &&
           item.target.length > 0 &&
@@ -196,18 +209,21 @@ describe("documentation policy", () => {
         },
       ],
       ownerPolicy,
-      rootScripts: new Set(),
-      workspaceScripts: new Map([
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.fromIterable([
         [
           "packages/api/http",
           {
             name: "@taxkit/api-http",
-            scripts: new Set(["test", "test:openapi"]),
+            scripts: HashSet.fromIterable(["test", "test:openapi"]),
           },
         ],
         [
           "packages/docs-content",
-          { name: "@taxkit/docs-content", scripts: new Set(["build"]) },
+          {
+            name: "@taxkit/docs-content",
+            scripts: HashSet.fromIterable(["build"]),
+          },
         ],
       ]),
     });
@@ -226,24 +242,27 @@ describe("documentation policy", () => {
         { path: "packages/docs-content/package.json", text: "{}" },
       ],
       ownerPolicy,
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.public).toBe(2);
     expect(
-      report.diagnostics.some(
+      Array.some(
+        report.diagnostics,
         (item) =>
           item.target === "apps/docs/package.json" &&
           item.invariant === "workspace-readme"
       )
     ).toBe(true);
     expect(
-      report.diagnostics.some(
+      Array.some(
+        report.diagnostics,
         (item) => item.target === "packages/docs-content/content/reference.mdx"
       )
     ).toBe(false);
     expect(
-      report.diagnostics.every(
+      Array.every(
+        report.diagnostics,
         (item) =>
           item.invariant !== "maintainer-metadata" ||
           item.target !== "packages/docs-content/content/reference.mdx"
@@ -261,8 +280,8 @@ describe("documentation policy", () => {
         },
       ],
       ownerPolicy,
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -281,7 +300,7 @@ describe("documentation policy", () => {
       "packages/docs-content/navigation.json"
     );
     const report = inspectDocumentation({
-      acceptanceRecords: new Map([
+      acceptanceRecords: HashMap.fromIterable([
         ["docs/documentation-audit/accepted-reference.json", acceptedReference],
         [
           "docs/documentation-audit/accepted-navigation.json",
@@ -289,7 +308,8 @@ describe("documentation policy", () => {
         ],
       ]),
       files: [
-        ...completeOwnerFiles.filter(
+        ...Array.filter(
+          completeOwnerFiles,
           (file) => file.path !== "packages/docs-content/navigation.json"
         ),
         {
@@ -302,11 +322,15 @@ describe("documentation policy", () => {
         },
         {
           path: "docs/documentation-audit/accepted-reference.json",
-          text: JSON.stringify(acceptedReference),
+          text: Schema.encodeSync(
+            Schema.fromJsonString(PublicPageAcceptanceRecord)
+          )(acceptedReference),
         },
         {
           path: "docs/documentation-audit/accepted-navigation.json",
-          text: JSON.stringify(acceptedNavigation),
+          text: Schema.encodeSync(
+            Schema.fromJsonString(PublicPageAcceptanceRecord)
+          )(acceptedNavigation),
         },
       ],
       ownerPolicy: {
@@ -328,23 +352,29 @@ describe("documentation policy", () => {
           },
         },
       },
-      rootScripts: new Set(),
-      workspaceScripts: new Map([
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.fromIterable([
         [
           "packages/api/http",
           {
             name: "@taxkit/api-http",
-            scripts: new Set(["test", "test:openapi"]),
+            scripts: HashSet.fromIterable(["test", "test:openapi"]),
           },
         ],
         [
           "packages/docs-content",
-          { name: "@taxkit/docs-content", scripts: new Set(["build"]) },
+          {
+            name: "@taxkit/docs-content",
+            scripts: HashSet.fromIterable(["build"]),
+          },
         ],
       ]),
     });
     expect(
-      report.diagnostics.filter((item) => item.invariant === "owner-policy")
+      Array.filter(
+        report.diagnostics,
+        (item) => item.invariant === "owner-policy"
+      )
     ).toEqual([]);
   });
 
@@ -358,8 +388,8 @@ describe("documentation policy", () => {
         },
       ],
       ownerPolicy,
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -396,8 +426,8 @@ describe("documentation policy", () => {
           },
         },
       },
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -437,8 +467,8 @@ describe("documentation policy", () => {
           },
         },
       },
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -454,7 +484,7 @@ describe("documentation policy", () => {
       "packages/docs-content/content/other.mdx"
     );
     const report = inspectDocumentation({
-      acceptanceRecords: new Map([[record, wrongTarget]]),
+      acceptanceRecords: HashMap.fromIterable([[record, wrongTarget]]),
       files: [
         ...completeOwnerFiles,
         {
@@ -463,7 +493,9 @@ describe("documentation policy", () => {
         },
         {
           path: record,
-          text: JSON.stringify(wrongTarget),
+          text: Schema.encodeSync(
+            Schema.fromJsonString(PublicPageAcceptanceRecord)
+          )(wrongTarget),
         },
       ],
       ownerPolicy: {
@@ -478,8 +510,8 @@ describe("documentation policy", () => {
           },
         },
       },
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -496,7 +528,7 @@ describe("documentation policy", () => {
       "packages/docs-content/content/reference.mdx"
     );
     const report = inspectDocumentation({
-      acceptanceRecords: new Map([[record, staleAcceptance]]),
+      acceptanceRecords: HashMap.fromIterable([[record, staleAcceptance]]),
       files: [
         ...completeOwnerFiles,
         {
@@ -505,7 +537,9 @@ describe("documentation policy", () => {
         },
         {
           path: record,
-          text: JSON.stringify(staleAcceptance),
+          text: Schema.encodeSync(
+            Schema.fromJsonString(PublicPageAcceptanceRecord)
+          )(staleAcceptance),
         },
       ],
       ownerPolicy: {
@@ -520,8 +554,8 @@ describe("documentation policy", () => {
           },
         },
       },
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -539,7 +573,7 @@ describe("documentation policy", () => {
       "packages/docs-content/content/reference.mdx"
     );
     const report = inspectDocumentation({
-      acceptanceRecords: new Map([
+      acceptanceRecords: HashMap.fromIterable([
         [firstRecord, acceptedReference],
         [secondRecord, acceptedReference],
       ]),
@@ -549,8 +583,18 @@ describe("documentation policy", () => {
           path: "packages/docs-content/content/reference.mdx",
           text: "---\nstatus: published\n---",
         },
-        { path: firstRecord, text: JSON.stringify(acceptedReference) },
-        { path: secondRecord, text: JSON.stringify(acceptedReference) },
+        {
+          path: firstRecord,
+          text: Schema.encodeSync(
+            Schema.fromJsonString(PublicPageAcceptanceRecord)
+          )(acceptedReference),
+        },
+        {
+          path: secondRecord,
+          text: Schema.encodeSync(
+            Schema.fromJsonString(PublicPageAcceptanceRecord)
+          )(acceptedReference),
+        },
       ],
       ownerPolicy: {
         ...ownerPolicy,
@@ -571,8 +615,8 @@ describe("documentation policy", () => {
           },
         },
       },
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -589,7 +633,7 @@ describe("documentation policy", () => {
       "packages/docs-content/content/reference.mdx"
     );
     const report = inspectDocumentation({
-      acceptanceRecords: new Map([[record, sharedAcceptance]]),
+      acceptanceRecords: HashMap.fromIterable([[record, sharedAcceptance]]),
       files: [
         ...completeOwnerFiles,
         {
@@ -602,7 +646,9 @@ describe("documentation policy", () => {
         },
         {
           path: record,
-          text: JSON.stringify(sharedAcceptance),
+          text: Schema.encodeSync(
+            Schema.fromJsonString(PublicPageAcceptanceRecord)
+          )(sharedAcceptance),
         },
       ],
       ownerPolicy: {
@@ -618,8 +664,8 @@ describe("documentation policy", () => {
           },
         },
       },
-      rootScripts: new Set(),
-      workspaceScripts: new Map(),
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.empty(),
     });
     expect(report.diagnostics).toContainEqual(
       expect.objectContaining({
@@ -644,23 +690,27 @@ describe("documentation policy", () => {
         },
       ],
       ownerPolicy,
-      rootScripts: new Set(),
-      workspaceScripts: new Map([
+      rootScripts: HashSet.empty(),
+      workspaceScripts: HashMap.fromIterable([
         [
           "packages/api/http",
           {
             name: "@taxkit/api-http",
-            scripts: new Set(["test", "test:openapi"]),
+            scripts: HashSet.fromIterable(["test", "test:openapi"]),
           },
         ],
         [
           "packages/docs-content",
-          { name: "@taxkit/docs-content", scripts: new Set(["build"]) },
+          {
+            name: "@taxkit/docs-content",
+            scripts: HashSet.fromIterable(["build"]),
+          },
         ],
       ]),
     });
     expect(
-      report.diagnostics.filter(
+      Array.filter(
+        report.diagnostics,
         (item) => item.invariant === "local-bun-command"
       )
     ).toEqual([
@@ -669,7 +719,10 @@ describe("documentation policy", () => {
       }),
     ]);
     expect(
-      report.diagnostics.some((item) => item.invariant === "relative-link")
+      Array.some(
+        report.diagnostics,
+        (item) => item.invariant === "relative-link"
+      )
     ).toBe(false);
   });
 
@@ -683,16 +736,20 @@ describe("documentation policy", () => {
         ),
       ],
       ownerPolicy,
-      rootScripts: new Set(["absent"]),
-      workspaceScripts: new Map([
+      rootScripts: HashSet.fromIterable(["absent"]),
+      workspaceScripts: HashMap.fromIterable([
         [
           "packages/docs-content",
-          { name: "@taxkit/docs-content", scripts: new Set(["build"]) },
+          {
+            name: "@taxkit/docs-content",
+            scripts: HashSet.fromIterable(["build"]),
+          },
         ],
       ]),
     });
     expect(
-      report.diagnostics.filter(
+      Array.filter(
+        report.diagnostics,
         (item) => item.invariant === "local-bun-command"
       )
     ).toEqual([

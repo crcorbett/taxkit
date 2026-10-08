@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Array as EffectArray, Schema } from "effect";
 
 export const targetCommit = "a8a58882cd6c5f8003d31dc0c0567d78093597b9";
 export const failedCandidateDigest =
@@ -55,11 +55,11 @@ export const derivedExclusions: readonly {
     path: hgi206Paths.candidate,
     reason: "Candidate is bound last to final source and evidence hashes.",
   },
-  ...receiptPaths.map((path) => ({
+  ...EffectArray.map(receiptPaths, (path) => ({
     path,
     reason: "Derived receipt binds the source digest and bounded-detail hash.",
   })),
-  ...detailPaths.map((path) => ({
+  ...EffectArray.map(detailPaths, (path) => ({
     path,
     reason: "Derived bounded detail is hashed by its journey receipt.",
   })),
@@ -342,11 +342,7 @@ const EpochSkill = Schema.Struct({
   sourceRevision: NonEmpty,
 });
 
-export const expectedEpochSkills: readonly {
-  readonly sha256: string;
-  readonly sourceId: string;
-  readonly sourceRevision: string;
-}[] = [
+export const expectedEpochSkills: readonly (typeof EpochSkill.Type)[] = [
   {
     sha256: "6f2028152fd4c16f882f604b53d2906b06c336597113de67a778fbe9b9236016",
     sourceId: "codex-global:prd-implementer",

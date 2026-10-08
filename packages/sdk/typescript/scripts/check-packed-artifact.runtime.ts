@@ -3,7 +3,6 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import {
   Array as EffectArray,
   Console,
-  Data,
   Effect,
   HashSet,
   Match,
@@ -14,37 +13,25 @@ import {
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-import { ChildProcess } from "effect/unstable/process";
+import { ChildProcess } from "effect/process";
 
-interface CommandResult {
-  readonly commandLine: string;
-  readonly cwd: string;
-  readonly exitCode: number;
-  readonly stderr: string;
-  readonly stdout: string;
-}
+import { ConditionalPackageExportTarget, DependencyRecord } from "./schemas.js";
 
-class PackedArtifactCommandError extends Data.TaggedError(
-  "PackedArtifactCommandError"
-)<{
-  readonly result: CommandResult;
-}> {}
-
-class PackedArtifactValidationError extends Data.TaggedError(
-  "PackedArtifactValidationError"
-)<{
-  readonly message: string;
-}> {}
-
-const PackageExportTarget = Schema.Struct({
-  default: Schema.optional(Schema.String),
-  source: Schema.optional(Schema.String),
-  types: Schema.optional(Schema.String),
-});
-
+class PackedArtifactCommandError extends Schema.TaggedError<PackedArtifactCommandError>()(
+  "PackedArtifactCommandError",
+  {
+    exitCode: Schema.Option(Schema.Finite),
+    reason: Schema.Literals(["start-or-read", "exit", "output-limit"]),
+    stage: Schema.String,
+  }
+) {}
+class PackedArtifactValidationError extends Schema.TaggedError<PackedArtifactValidationError>()(
+  "PackedArtifactValidationError",
+  { message: Schema.String }
+) {}
 const PackageManifest = Schema.Struct({
-  dependencies: Schema.Record(Schema.String, Schema.String),
-  exports: Schema.Record(Schema.String, PackageExportTarget),
+  dependencies: DependencyRecord,
+  exports: Schema.Record(Schema.String, ConditionalPackageExportTarget),
 });
 
 const sdkRootUrl = new URL("..", import.meta.url);
@@ -68,10 +55,31 @@ const runCommand = (
         stdin: "ignore",
         stdout: "pipe",
       });
-      const [stdout, stderr, exitCode] = yield* Effect.all(
+      const [stdout, , exitCode] = yield* Effect.all(
         [
-          Stream.mkString(Stream.decodeText(handle.stdout)),
-          Stream.mkString(Stream.decodeText(handle.stderr)),
+          handle.stdout.pipe(
+            Stream.mapAccum(
+              () => 0,
+              (previousBytes, chunk) => {
+                const bytes = previousBytes + chunk.byteLength;
+                return [bytes, [{ bytes, chunk }]] as const;
+              }
+            ),
+            Stream.mapEffect(({ bytes, chunk }) =>
+              bytes > 1_048_576
+                ? Effect.fail(
+                    new PackedArtifactCommandError({
+                      exitCode: Option.none(),
+                      reason: "output-limit",
+                      stage: label,
+                    })
+                  )
+                : Effect.succeed(chunk)
+            ),
+            Stream.decodeText,
+            Stream.mkString
+          ),
+          Stream.runDrain(handle.stderr),
           handle.exitCode,
         ],
         { concurrency: "unbounded" }
@@ -81,21 +89,21 @@ const runCommand = (
         commandLine,
         cwd,
         exitCode: Number(exitCode),
-        stderr,
         stdout,
-      } satisfies CommandResult;
+      };
     }).pipe(
-      Effect.mapError(
-        (cause) =>
-          new PackedArtifactCommandError({
-            result: {
-              commandLine: `${label}: ${commandLine}`,
-              cwd,
-              exitCode: 1,
-              stderr: String(cause),
-              stdout: "",
-            },
-          })
+      Effect.mapError((failure) =>
+        Match.value(failure).pipe(
+          Match.tag("PackedArtifactCommandError", (error) => error),
+          Match.orElse(
+            () =>
+              new PackedArtifactCommandError({
+                exitCode: Option.none(),
+                reason: "start-or-read",
+                stage: label,
+              })
+          )
+        )
       )
     );
 
@@ -104,14 +112,16 @@ const runCommand = (
       Match.orElse(() =>
         Effect.fail(
           new PackedArtifactCommandError({
-            result,
+            exitCode: Option.some(result.exitCode),
+            reason: "exit",
+            stage: label,
           })
         )
       )
     );
-  });
+  }).pipe(Effect.scoped);
 
-const PackedArtifactProgram = Effect.gen(function* checkPackedArtifact() {
+export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
   const sdkRootPath = yield* path.fromFileUrl(sdkRootUrl);
@@ -123,9 +133,11 @@ const PackedArtifactProgram = Effect.gen(function* checkPackedArtifact() {
     (tempPath) =>
       fs.remove(tempPath, { force: true, recursive: true }).pipe(
         Effect.tap(() => Console.info(`Cleanup result: removed ${tempPath}`)),
-        Effect.catchCause((cause) =>
-          Console.error(
-            `Cleanup result: failed to remove ${tempPath}: ${String(cause)}`
+        Effect.catchCause(() =>
+          Effect.die(
+            new PackedArtifactValidationError({
+              message: "Failed to remove the temporary SDK check folder.",
+            })
           )
         )
       )
@@ -148,7 +160,7 @@ const PackedArtifactProgram = Effect.gen(function* checkPackedArtifact() {
     ["pm", "pack", "--destination", artifactRootPath, "--quiet"],
     sdkRootPath
   );
-  const tarballPath = yield* Schema.decodeUnknownEffect(Schema.NonEmptyString)(
+  const tarballPath = yield* Schema.decodeEffect(Schema.NonEmptyString)(
     packOutput.stdout.trim()
   ).pipe(
     Effect.mapError(
@@ -181,21 +193,30 @@ const PackedArtifactProgram = Effect.gen(function* checkPackedArtifact() {
   const packageManifest = yield* fs
     .readFileString(path.join(smokePackageRootPath, "package.json"))
     .pipe(
-      Effect.flatMap(
-        Schema.decodeUnknownEffect(Schema.fromJsonString(PackageManifest))
-      ),
       Effect.mapError(
-        (cause) =>
+        () =>
           new PackedArtifactValidationError({
-            message: `Failed to decode packed SDK package.json: ${cause.message}`,
+            message: "Failed to read packed SDK package.json.",
           })
+      ),
+      Effect.flatMap((source) =>
+        Schema.decodeEffect(Schema.fromJsonString(PackageManifest))(
+          source
+        ).pipe(
+          Effect.mapError(
+            () =>
+              new PackedArtifactValidationError({
+                message: "Failed to decode packed SDK package.json.",
+              })
+          )
+        )
       )
     );
   const packedFileSet = HashSet.fromIterable(packedFiles);
   const exportFailures = EffectArray.flatMap(
     EffectRecord.toEntries(packageManifest.exports),
     ([exportPath, exportTarget]) => {
-      const sourceFailures = Option.fromNullishOr(exportTarget.source).pipe(
+      const sourceFailures = exportTarget.source.pipe(
         Option.match({
           onNone: () => [],
           onSome: () => [
@@ -206,19 +227,21 @@ const PackedArtifactProgram = Effect.gen(function* checkPackedArtifact() {
       const targetFailures = EffectArray.flatMap(
         ["types", "default"] as const,
         (condition) =>
-          Option.fromNullishOr(exportTarget[condition]).pipe(
-            Option.match({
-              onNone: () => [
-                `${exportPath} is missing a ${condition} export target.`,
-              ],
-              onSome: (target) =>
-                HashSet.has(packedFileSet, target.replace(/^\.\//u, ""))
-                  ? []
-                  : [
-                      `${exportPath} ${condition} export points to ${target}, which is absent from the packed artifact.`,
-                    ],
-            })
-          )
+          EffectRecord.get(exportTarget, condition)
+            .pipe(Option.flatten)
+            .pipe(
+              Option.match({
+                onNone: () => [
+                  `${exportPath} is missing a ${condition} export target.`,
+                ],
+                onSome: (target) =>
+                  HashSet.has(packedFileSet, target.replace(/^\.\//u, ""))
+                    ? []
+                    : [
+                        `${exportPath} ${condition} export points to ${target}, which is absent from the packed artifact.`,
+                      ],
+              })
+            )
       );
 
       return EffectArray.appendAll(sourceFailures, targetFailures);
@@ -282,8 +305,22 @@ assert.equal(typeof au.pay.takeHomePay, "function", "AU SDK import");
 assert.equal(typeof auEffect.createClient, "function", "AU Effect SDK import");
 assert.ok(schemas.CalculatorRunRequest, "schemas request import");
 assert.ok(schemas.CalculatorServiceError, "schemas service error import");
+assert.equal(new schemas.CalculatorCapacityExceeded().code, "calculation-capacity", "checked capacity error import");
+assert.equal(new schemas.CalculatorOperationTimedOut().code, "calculation-timeout", "checked work timeout import");
+assert.equal(new schemas.CalculatorRateLimited().code, "rate-limited", "canonical native rate failure import");
+assert.equal(new schemas.CalculatorRateLimited().retry, "wait-then-try-manually", "canonical manual native rate retry");
+assert.equal(new schemas.CalculatorAdmissionUnavailable().code, "calculation-admission-unavailable", "canonical native admission failure import");
 assert.ok(schemas.TaxKitCalculationError, "schemas SDK error import");
 assert.ok(testing.AuPayTakeHomeCalculation, "testing import");
+assert.ok(schemas.TaxKitClientDisposedError, "closed-client error import");
+assert.ok(schemas.TaxKitClientDisposeError, "disposal error import");
+const client = TaxKit.createClient(au.modules.pay2025_26);
+assert.equal(typeof client.dispose, "function", "caller-owned disposal");
+await client.dispose();
+await client.dispose();
+const closed = await client.calculations.safe.calculate(testing.AuPayTakeHomeCalculation, {});
+assert.equal(closed._tag, "TaxKitFailure", "closed client safe result");
+assert.equal(closed.error.error._tag, "TaxKitClientDisposedError", "closed client error");
 `
   );
   yield* runCommand(
@@ -298,23 +335,31 @@ assert.ok(testing.AuPayTakeHomeCalculation, "testing import");
     `Packed SDK artifact check passed: ${path.basename(tarballPath)} (${packedFiles.length} files)`
   );
 }).pipe(
-  Effect.scoped,
+  Effect.mapError((error) =>
+    Match.value(error).pipe(
+      Match.tag(
+        "PlatformError",
+        () =>
+          new PackedArtifactValidationError({
+            message: "SDK check filesystem operation failed.",
+          })
+      ),
+      Match.orElse((failure) => failure)
+    )
+  ),
   Effect.tapErrorTag("PackedArtifactCommandError", (error) =>
     Console.error(
-      [
-        `Command failed: ${error.result.commandLine}`,
-        `cwd: ${error.result.cwd}`,
-        `exitCode: ${error.result.exitCode}`,
-        error.result.stdout,
-        error.result.stderr,
-      ].join("\n")
+      `Command failed: ${error.stage} (${error.reason}; exitCode: ${error.exitCode.pipe(Option.match({ onNone: () => "unavailable", onSome: String }))}).`
     )
   ),
   Effect.tapErrorTag("PackedArtifactValidationError", (error) =>
     Console.error(error.message)
-  )
+  ),
+  Effect.scoped
 );
 
-BunRuntime.runMain(
-  PackedArtifactProgram.pipe(Effect.provide(BunServices.layer))
-);
+if (import.meta.main) {
+  BunRuntime.runMain(
+    checkPackedArtifact.pipe(Effect.provide(BunServices.layer))
+  );
+}

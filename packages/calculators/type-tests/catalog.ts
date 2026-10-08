@@ -20,3 +20,6 @@ defineCalculatorCatalogEntry({
   // @ts-expect-error A selected schema can only pair with its own typed continuation.
   calculate: annualTaxContinuation,
 });
+
+// @ts-expect-error Catalogue entries expose their checked continuation only.
+void takeHomeDefinition.program;

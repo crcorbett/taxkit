@@ -1,0 +1,140 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "be1fcc43cfd9201f209354b317f8182cc3e9fafd",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR proof separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Native FileSystem/Path and exact Bun command runtime replace raw Bun/Promise/process/console script operations",
+    "Pinned TypeScript 6 compatibility parser owns inline static reference inspection; TypeScript 7 compilation retained",
+    "Immutable findings; preserved server/test/generated/non-file exclusions; browser runtime expression/file rejection",
+    "Closed safe operation errors for root/list/stat/read/existence failures",
+    "Native checker fixtures included in default docs tests; compiler includes checker/fixtures/test configuration",
+    "Canonical strict rules for all three adopted files, rejected neighbour and exact runtime selector"
+  ],
+  "checks": [
+    {
+      "command": "focused native checker tests and actual source command",
+      "outcome": "pass; twelve native cases; actual source passes",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-imports-tests-hidden.log",
+        "/private/tmp/taxkit-local-toolchain/docs-imports-command-hidden.log"
+      ]
+    },
+    {
+      "command": "actual canonical lint corpus",
+      "outcome": "pass; 315 cases = 310 retained + three accepted files + rejected neighbour + exact runtime selector",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-imports-policy-tests-corrected.log"
+    },
+    {
+      "command": "compiler and unused-code profiles",
+      "outcome": "pass; app/scripts project and both profiles; no new unused-code exclusion",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-imports-app-types-first.log",
+        "/private/tmp/taxkit-local-toolchain/docs-imports-types-inline.log",
+        "/private/tmp/taxkit-local-toolchain/docs-imports-knip-first.log",
+        "/private/tmp/taxkit-local-toolchain/docs-imports-knip-production-first.log"
+      ]
+    },
+    {
+      "command": "frozen install, complete tests and build",
+      "outcome": "pass; 792 installs/1020 packages, selected versions unchanged; 23 test tasks with 21 matching caches; 15 build tasks with 13 matching caches",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-imports-install-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/docs-imports-all-tests-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/docs-imports-all-build-qualified.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass; all 21 Quality cases, all ten isolated faults, fresh source-only docs (234.05 seconds); 176 deployment-tool, 21 skill and 16 evaluation cases; 24 compiler tasks, 22 matching caches; both unused-code profiles; 24 SDK and two web Chromium cases replayed from matching unchanged-input caches",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-imports-verification-qualified.log"
+    }
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "apps/docs/scripts/check-import-boundaries.runtime.ts",
+        "apps/docs/scripts/check-import-boundaries.runtime.test.ts",
+        "apps/docs/vitest.scripts.config.ts",
+        "apps/docs/package.json",
+        "apps/docs/tsconfig.scripts.json",
+        "bun.lock",
+        "knip.json",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "apps/docs/README.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Checking command, native fixtures, strict scope and documentation move together"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "source policy and direct-reference claim",
+        "selected versions and parser/compiler split",
+        "production routes/runtime and browser bundle",
+        "public/generated content",
+        "tax results",
+        "historical proof",
+        "canonical skills/digests",
+        "docs/product-specs/clean-slate-foundation.md"
+      ],
+      "reason": "Local checker migration changes no product or retained tax calculation"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "Changeset",
+        "runbook procedure",
+        "CI workflow",
+        "provider state"
+      ],
+      "reason": "Private unversioned app checking only; existing command names/authority unchanged"
+    }
+  ],
+  "recovery": {
+    "attempts": [
+      {
+        "outcome": "failed then corrected lint corpus",
+        "observed": "two cases failed: missing negative-fixture strict selector and extra unrelated builtin rule in exact runtime selector; all assertions retained in correction",
+        "logs": [
+          "/private/tmp/taxkit-local-toolchain/docs-imports-policy-tests.log",
+          "/private/tmp/taxkit-local-toolchain/docs-imports-policy-tests-corrected.log"
+        ]
+      }
+    ],
+    "rollback": "Revert this complete slice; no provider or version operation"
+  },
+  "limitations": [
+    "Direct static references/existing runtime-expression pattern only; no complete transitive import graph claim",
+    "TypeScript 6 compatibility API parses source; compilation stays TypeScript 7.0.2",
+    "Focused mocks do not establish browser/Worker or hosted behaviour",
+    "Remaining docs/web/infrastructure and semantic/readonly review unfinished",
+    "Medicare correction requires separate bounded decision",
+    "Current browser results replay matching unchanged-input caches; earlier actual API/SDK consumer proof belongs to parent #117",
+    "Non-fatal shared-cache access warning and retained compiler suggestions/unstable-API warnings do not change successful command exits"
+  ],
+  "non_claims": [
+    "No merge, deployment, publication, provider apply or version application",
+    "No hosted qualification of this later checker revision",
+    "No completion of DEV-73 or DEV-74\u201381"
+  ]
+}

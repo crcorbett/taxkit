@@ -1,0 +1,58 @@
+import { assert, it } from "@effect/vitest";
+import { __DOMAIN_SYMBOL__UnavailableError } from "__DOMAIN_PACKAGE__/errors";
+import { __DOMAIN_SYMBOL__ApiOrigin, __DOMAIN_SYMBOL__Id } from "__DOMAIN_PACKAGE__/schemas";
+import { __DOMAIN_SYMBOL__Service } from "__DOMAIN_PACKAGE__/service";
+import { Cause, Effect, Exit, Fiber, Layer, Ref, Result, Schema, Stream } from "effect";
+import * as TestClock from "effect/testing/TestClock";
+import { HttpClient, HttpServerResponse } from "effect/unstable/http";
+import { __SYMBOL__ClientLive } from "../src/client/live.layer.js";
+const origin = __DOMAIN_SYMBOL__ApiOrigin.make("https://api.example.com");
+const clientLayer = (transport: HttpClient.HttpClient) => __SYMBOL__ClientLive({ baseUrl: origin }).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)));
+
+it.effect("bounds stalled headers and bodies with one total deadline", () => Effect.gen(function* () {
+  const phases: readonly ("headers" | "body")[] = ["headers", "body"];
+  yield* Effect.forEach(phases, (phase) => Effect.gen(function* () {
+    const cancelled = yield* Ref.make(false);
+    const stalled = Effect.never.pipe(Effect.onInterrupt(() => Ref.set(cancelled, true)));
+    const transport = HttpClient.make((request) => phase === "headers" ? stalled :
+      Effect.succeed(HttpServerResponse.toClientResponse(HttpServerResponse.stream(Stream.fromEffect(stalled), {
+        headers: { "content-type": "application/json" },
+      }), { request })).pipe(Effect.delay("3 seconds")));
+    yield* Effect.gen(function* () {
+      const service = yield* __DOMAIN_SYMBOL__Service;
+      const operations: readonly ("get" | "list")[] = ["get", "list"];
+      yield* Effect.forEach(operations, (operation) => Effect.gen(function* () {
+        yield* Ref.set(cancelled, false);
+        const finished = yield* Ref.make(false);
+        const read = operation === "get" ? service.get(__DOMAIN_SYMBOL__Id.make("missing")).pipe(Effect.asVoid) : service.list().pipe(Effect.asVoid);
+        const pending = yield* read.pipe(Effect.result, Effect.tap(() => Ref.set(finished, true)), Effect.forkChild({ startImmediately: true }));
+        yield* TestClock.adjust("9 seconds");
+        assert.isFalse(yield* Ref.get(finished));
+        assert.isFalse(yield* Ref.get(cancelled));
+        yield* TestClock.adjust("1 second");
+        const result = yield* Fiber.join(pending);
+        assert.isTrue(Result.isFailure(result));
+        if (Result.isFailure(result)) {
+          assert.isTrue(Schema.is(__DOMAIN_SYMBOL__UnavailableError)(result.failure));
+          if (Schema.is(__DOMAIN_SYMBOL__UnavailableError)(result.failure)) assert.strictEqual(result.failure.operation, operation);
+        }
+        assert.isTrue(yield* Ref.get(cancelled));
+      }), { concurrency: 1, discard: true });
+    }).pipe(Effect.provide(clientLayer(transport)));
+  }), { concurrency: 1, discard: true });
+}));
+
+it.effect("preserves earlier caller interruption and releases work", () => Effect.gen(function* () {
+  const cancelled = yield* Ref.make(false);
+  const transport = HttpClient.make(() => Effect.never.pipe(Effect.onInterrupt(() => Ref.set(cancelled, true))));
+  yield* Effect.gen(function* () {
+    const service = yield* __DOMAIN_SYMBOL__Service;
+    const pending = yield* service.get(__DOMAIN_SYMBOL__Id.make("missing")).pipe(Effect.forkChild({ startImmediately: true }));
+    yield* TestClock.adjust("1 second");
+    yield* Fiber.interrupt(pending);
+    const exit = yield* Fiber.await(pending);
+    assert.isTrue(Exit.isFailure(exit));
+    if (Exit.isFailure(exit)) assert.isTrue(Cause.hasInterrupts(exit.cause));
+    assert.isTrue(yield* Ref.get(cancelled));
+  }).pipe(Effect.provide(clientLayer(transport)));
+}));

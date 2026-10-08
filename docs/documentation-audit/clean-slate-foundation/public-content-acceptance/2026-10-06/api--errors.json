@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "a4e7c16005c191584b9bf0699727f14381b11bf79ed28f6c15f5e0bc675e0d5c",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/api/errors.mdx"
+}

@@ -1,30 +1,23 @@
 import "@tanstack/react-start/server-only";
-import { createTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
-import { Effect, Layer, ManagedRuntime } from "effect";
-import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
+import { CalculatorHostTelemetryLive } from "@taxkit/api-rpc/host-telemetry";
+import { env } from "cloudflare:workers";
+import { ConfigProvider, Layer, ManagedRuntime } from "effect";
+import { FetchHttpClient } from "effect/http";
 
-import { TaxKitWebConfigError } from "./config";
-import {
-  TaxKitWebServerConfig,
-  TaxKitWebServerConfigProviderLive,
-} from "./config.server";
+import { WebsiteAnalyticsRelayLive } from "./analytics/relay/relay.adapter.layer";
+import { WebsiteServerLive } from "./live.server.layer";
 
-const TaxKitApiClientLive = Layer.unwrap(
-  Effect.gen(function* makeTaxKitApiClientLive() {
-    const config = yield* TaxKitWebServerConfig;
-    return createTaxKitApiClientLayer({ baseUrl: config.httpApi.baseUrl });
-  }).pipe(
-    Effect.mapError(
-      (cause) =>
-        new TaxKitWebConfigError({
-          cause,
-          message: `Invalid TaxKit web server config: ${cause.message}`,
-        })
+// One server runner per loaded Worker module. Each incoming server function
+// supplies its request signal; no request constructs a Layer or another runner.
+export const appRuntime = ManagedRuntime.make(
+  Layer.mergeAll(
+    WebsiteServerLive(env.TAXKIT_API).pipe(
+      Layer.provide(ConfigProvider.layer(ConfigProvider.fromUnknown(env)))
+    ),
+    CalculatorHostTelemetryLive("website"),
+    WebsiteAnalyticsRelayLive.pipe(
+      Layer.provide(FetchHttpClient.layer),
+      Layer.provide(ConfigProvider.layer(ConfigProvider.fromUnknown(env)))
     )
   )
-).pipe(
-  Layer.provide(FetchHttpClient.layer),
-  Layer.provide(TaxKitWebServerConfigProviderLive)
 );
-
-export const appRuntime = ManagedRuntime.make(TaxKitApiClientLive);

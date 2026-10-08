@@ -1,20 +1,13 @@
 import { Effect, Schema } from "effect";
 
 import { ReleaseReadinessCliError } from "./errors.js";
-import { ReleaseReadinessCli } from "./schemas.js";
-
-const decodeCliInput = (args: readonly string[]) => {
-  if (args.length === 0) {
-    return { mode: "candidate" };
-  }
-  if (args.length === 1 && args[0] === "--ci") {
-    return { mode: "ci" };
-  }
-  return { mode: "invalid" };
-};
+import { ReleaseReadinessCliArguments } from "./schemas.js";
 
 export const decodeReleaseReadinessCli = (args: readonly string[]) =>
-  Schema.decodeUnknownEffect(ReleaseReadinessCli)(decodeCliInput(args)).pipe(
+  Schema.decodeUnknownEffect(ReleaseReadinessCliArguments)(args).pipe(
+    Effect.map((accepted) => ({
+      mode: accepted.length === 0 ? ("candidate" as const) : ("ci" as const),
+    })),
     Effect.mapError(
       () => new ReleaseReadinessCliError({ target: "release:check arguments" })
     )

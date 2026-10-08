@@ -1,6 +1,7 @@
+import { CalculationError } from "@taxkit/core/errors";
 import { sumLedgerComponents } from "@taxkit/core/ledger";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Option } from "effect";
 
 import {
   IncomeTaxComponentFact,
@@ -34,11 +35,13 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
     const medicareLevy = yield* MedicareLevyComponentFact;
 
     const components = [incomeTax, lito, medicareLevy] as const;
-    const rawLiability = sumLedgerComponents(components);
+    const rawLiability = yield* sumLedgerComponents(components);
 
     const trace = TraceNode.make({
       children: [incomeTax.trace, lito.trace, medicareLevy.trace],
-      formula: "liability = incomeTax - lito + medicareLevy",
+      formula: Option.some(
+        Option.some("liability = incomeTax - lito + medicareLevy")
+      ),
       inputs: {
         incomeTaxCents: incomeTax.amount.cents,
         litoCents: lito.amount.cents,
@@ -51,5 +54,12 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
     });
 
     return new AnnualTaxLedger({ components, rawLiability, trace });
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Annual tax could not produce a supported total.",
+        })
+    )
+  )
 );

@@ -1,10 +1,10 @@
 {
   "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
   "spec": "docs/product-specs/clean-slate-foundation.md",
-  "title": "Clean slate TaxKit foundation — proposed implementation slices",
-  "status": "proposed",
-  "last_reviewed": "2026-10-03",
-  "authority": "Planning only; final shared understanding is required before implementation. External mutation needs the separate concrete authority envelope.",
+  "title": "Clean slate TaxKit foundation \u2014 implementation slices",
+  "status": "in_progress",
+  "last_reviewed": "2026-10-08",
+  "authority": "Cooper explicitly authorised implementation, reviewable commits, pushes, draft PRs and routine Linear tracking on 2026-10-04. On 2026-10-07 Cooper separately authorised native TaxKit Preview and Production deployments from this Mac after exact source, plans, credentials, recovery and readback are qualified, and approved the existing Production token permission change. Merge, package version application, publication, credential creation and unrelated provider changes remain outside this authority; new provider operations require their concrete approval boundary. The sibling SPEC and active plan retain the authority and dated delivery receipts. On 2026-10-08 Cooper postponed PostHog and confirmed bounded review/handover: review drafts, resolve material findings, inspect package notes and local release/packed-consumer proof, record PostHog/metrics deferrals and the separately approved Medicare scope, and deliver commits, pushes, draft PRs and routine Linear tracking. This handover excludes merge, package version application, publication, deployment, billing upgrades, credentials and provider changes; it does not accept T010 or the full rebuild.",
   "principles": [
     "Retain tax rules/results and their proof while replacing application foundations.",
     "Use immutable Schema-derived values and declarative, pipe-first Effect workflows across all owned apps/packages/tests/scripts/infrastructure; no local mutation, imperative loops or helper sprawl. Necessary state has a scoped React/Effect owner and pure updates.",
@@ -14,7 +14,7 @@
     "Each task is pending until its actual postconditions and applicable checks pass. Proposed tasks do not authorise cloud changes."
   ],
   "globalVerification": {
-    "commitPolicy": "Commit only coherent passed slices; do not publish, merge, version-release or deploy from this planning authority.",
+    "commitPolicy": "Commit coherent passed slices and prepare draft PRs under the 2026-10-04 implementation request. Native TaxKit Preview and Production deployments from this Mac use Cooper's separate 2026-10-07 grant and require exact qualified source, reviewed plans, credentials, recovery and independent readback. Do not merge, apply package versions, publish, create credentials or make unrelated provider changes without separate concrete authority.",
     "requiredBeforeFinalPR": [
       "bun run verification",
       "bun run test",
@@ -81,7 +81,8 @@
         "tsconfig*",
         "knip*.json",
         "tools/oxlint/**",
-        "tools/skills/**",
+        "docs/skills.md",
+        "docs/skill-profiles/**",
         ".agents/skills/**",
         "AGENTS.md",
         ".github/workflows/**",
@@ -181,7 +182,7 @@
     {
       "id": "CSF-T001",
       "title": "Record the handover, retained work and baseline",
-      "status": "pending",
+      "status": "completed",
       "type": "foundation",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -210,7 +211,9 @@
         "bun run verification",
         "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
       ],
-      "browserVerification": [],
+      "browserVerification": [
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
+      ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
         "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
@@ -227,12 +230,16 @@
         "Other work is integrated or explicitly outside the write scope; cloud ownership is not inferred from local Git.",
         "The previous install failure is diagnosed or remains a named prerequisite; no green closeout claim hides it."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/retention-manifest.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-baseline.json"
+      ]
     },
     {
       "id": "CSF-T002",
       "title": "Qualify current versions, exports and strict enforcement",
-      "status": "pending",
+      "status": "completed",
       "type": "foundation",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -247,15 +254,15 @@
       "scope": [
         "Resolve current official releases, including stable Effect module paths, then qualify one exact Bun/TypeScript/React/Atom/Alchemy/tooling graph in a fresh scratch fixture before integrating it.",
         "Qualify the proposed exact Scheduler peer-metadata correction, or use a newer upstream fix. Preserve valid tax outputs; update package exports/types/imports and versioning consequences deliberately.",
-        "Adopt the complete canonical 0.6.0 repository skills and declared TaxKit profiles/receipts, including the required Linear skill folder and Claude link without creating provider projects/issues. Merge all eleven portable strict Effect rules, including no-imperative-collections, and workspace-export direction into the actual lint config across source/tests/tools/config/infrastructure. Reuse baseline mutation/loop/collection checks; add only evidenced gaps and readonly-value checks. Exact Promise-returning/runtime host exceptions do not exempt other constructs.",
+        "Resolve the latest published Commonplace development-workflows plugin through docs/skills.md and read the TaxKit profiles alongside it. Preserve repository-specific skills, including the Linear folder and Claude link, without creating provider projects/issues. Historical copied-skill receipts retain their original identities and do not choose the current plugin version. Merge all eleven portable strict Effect rules, including no-imperative-collections, and workspace-export direction into the actual lint config across source/tests/tools/config/infrastructure. Reuse baseline mutation/loop/collection checks; add only evidenced gaps and readonly-value checks. Exact Promise-returning/runtime host exceptions do not exempt other constructs.",
         "Extend actual-command positive/negative fixtures under moved paths; assert admitted file counts, exit codes and expected rules. Prove removing/disabling required rules or broadening exact assignment/method exceptions fails the verifier. Refresh Turbo read/input/cache ownership, Knip inventories and CI commands; keep explicit generated/vendor exclusions.",
         "Qualify canonical rejection of let/var, assignments/writes/delete/updates, loops, native array traversal including forEach and mutators/constructors, transient Effect collection modes, switch and manual tag checks. Use existing restrictions and focused corrections for Object/Reflect writes, mutable class/contract values, WeakMap/WeakSet and demonstrated destructured/local aliases. Computed member access is already rejected by no-unchecked-index. Accept persistent collections, pure immutable Effect-managed state and qualified Alchemy Output operations. Preserve/qualify stronger lexical runtime callback/reference checks outside exact hosts. Review helper purpose, Schema ownership and pipe/flat-program call graphs separately; lint alone is not semantic proof.",
         "Cover owned .ts/.tsx/.js/.jsx/.mjs/.cjs files, including retained JavaScript policy tools, in actual lint scope; convert to checked TypeScript where necessary instead of treating the scaffold TypeScript-only override as complete. Executable MDX expressions/imports remain with the existing content-policy owner."
       ],
       "outputs": [
         "package.json, bun.lock, turbo.json, tsconfig*, oxlint.config.ts, oxfmt.config.ts, Knip config and .github/workflows/quality.yml",
-        "tools/oxlint/** policy/fixtures, tools/effect-language-service/** and tools/skills/canonical-skill-baseline.json",
-        "Canonical .agents/skills/** copies with explicit local profiles; AGENTS.md, README.md and affected package READMEs",
+        "tools/oxlint/** policy/fixtures, tools/effect-language-service/**, docs/skills.md and docs/skill-profiles/**",
+        "Latest published shared-plugin lookup and explicit local profiles; retained repository-specific .agents/skills/**, AGENTS.md, README.md and affected package READMEs",
         "Qualified version receipt, any exact-version patches/**, applicable .changeset/*.md and owning standards/architecture"
       ],
       "implementationPrompt": "Read the proposed/accepted SPEC and its current/target/test call graphs before editing. Implement only this named slice after final shared understanding and its task prerequisites are settled. Use immutable canonical Schema-derived values, brands/errors/Config, closed named services, separate live/test Layers and application-owned execution. Keep lazy flat Effects and pipes where linear data flow is clearer; no local mutation, imperative loops, helper sprawl or generic callbacks. Necessary changing state has an explicit React/Effect owner and pure updates. Exact host exceptions admit only their required construct. Change owning docs, READMEs, exports, enforcement and operational pointers in the same slice. Report any design mismatch and update the SPEC/tasks before acceptance. Use bounded independent factual research/review only where authorised and justified.",
@@ -265,7 +272,7 @@
         "bun run lint",
         "bun run test:oxlint",
         "bun run check:effect-language-service",
-        "bun run test:skills",
+        "bun run test:harness-governance",
         "bun run check:harness-governance",
         "bun run check-types",
         "bun run test",
@@ -274,7 +281,8 @@
         "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
       ],
       "browserVerification": [
-        "Qualify Atom server rendering/hydration, scheduled/cancelled updates, rapid input changes, strict-mode remount and final disposal on the selected React/Scheduler graph."
+        "Qualify Atom server rendering/hydration, scheduled/cancelled updates, rapid input changes, strict-mode remount and final disposal on the selected React/Scheduler graph.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -293,12 +301,48 @@
         "Retained valid calculations produce unchanged golden results; breaking interfaces have an appropriate Changeset.",
         "No owned application, domain, test, script or infrastructure workflow retains forbidden mutation or imperative loops. Every necessary host construct has an exact owner/containment/test/removal record; copied reference templates do not provide an escape for executable owned code."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-stable-dependency-qualification.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-version-observations.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-medicare-scope-conflict.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-canonical-skills.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-atom-qualification.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-quality-workflow-boundaries.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-lint-binding-policies.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-lint-route-policy.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-enforcement-canaries.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-lexical-policy-gaps.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-documentation-tools.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-evaluation-tools.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-artifacts.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-credentials.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-workflow-checks.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-receipt-policies.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-lint-file-deadlines.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-retained-deployment-proof.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-deployment-inventory-checks.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-typed-lint-policies.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-release-script-boundaries.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-checking-scripts.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-api-app-boundaries.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-docs-import-checker.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-docs-runtime-tests.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-quality-fixture-deadlines.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-docs-app-hosts.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-infrastructure-native-tests.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-web-app-hosts.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-hosted-docs-native-proof.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-built-worker-proof.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-owned-source-coverage.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json"
+      ]
     },
     {
       "id": "CSF-T003",
       "title": "Prove one native API and Website path",
-      "status": "pending",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -315,7 +359,8 @@
         "Implement the Q9-agreed native Effect RPC in packages/api/rpc with shared calculator/content Schemas, thin handlers and private generated client Layers. Use native JSON serialisation and explicitly select HTTP POST rather than the native server WebSocket default. Keep the public HTTP adapter separate and call the same named application operation.",
         "Qualify checked semantic client errors, malformed-reply handling, safe RPC expected/defect/protocol replies, contract version agreement, credential/redirect/origin policy, one whole-response deadline and earlier caller interruption. Recheck every native fatal/global defect path and unknown-tag/invalid-envelope bypass as well as per-procedure encoding; an outer HTTP reporter, custom procedure defect Schema or codecFor hook alone is insufficient privacy proof. Qualify supported ingress treatment or an exact reviewed native correction where required.",
         "Use native instance/request lifetimes, matching-stage service binding/public address, one Website server runner and a React-owned browser Atom graph; no extra backend runner or Effect Context through TanStack. Bind each host's own origin from native Cloudflare.Worker.URL and cross-host addresses from native resource Outputs, decoded once at application ingress. Missing Outputs fail checked configuration without guessed or concatenated addresses.",
-        "Select native Stack.secrets/Doppler at the infrastructure root with explicit stage/precedence; qualify bindings without applying a cloud plan."
+        "Select native Stack.secrets/Doppler at the infrastructure root with explicit stage/precedence; qualify bindings without applying a cloud plan.",
+        "Explicitly disable unqualified platform log/trace collection on both calculator hosts; qualify the declared policy in native plans and actual local state. T009 separately owns safe exported native tracing and CSF-009 remains unmet until its export/privacy proof or a reviewed design change."
       ],
       "outputs": [
         "apps/api/src/**, apps/web/src/**, packages/api/rpc/**, packages/api/http/src/** and packages/infrastructure/src/** native composition",
@@ -337,7 +382,8 @@
         "Exercise initial render and client navigation against the matching local API.",
         "Check actual post-initialisation Worker startup, browser CORS, full response decoding, slow headers/stalled bodies, abort, route change and unmount.",
         "Inspect the production browser bundle for server/Alchemy/provider credentials or live domain implementations.",
-        "Use the actual generated RPC client and native POST/JSON server through browser URL and private server binding. Prove expected error/hydration round-trip, bad valid-JSON reply, unrelated adapter defect, version skew, malformed envelopes/unknown tags/invalid IDs, sensitive sentinels in all native reply/log/trace paths, and abort during complete body decoding."
+        "Use the actual generated RPC client and native POST/JSON server through browser URL and private server binding. Prove expected error/hydration round-trip, bad valid-JSON reply, unrelated adapter defect, version skew, malformed envelopes/unknown tags/invalid IDs, sensitive sentinels in all native reply/log/trace paths, and abort during complete body decoding.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -354,14 +400,27 @@
         "A real calculator works through the separate apps; no frontend backend fallback exists.",
         "No package/app domain code constructs a runtime or builds a live Layer mid-operation.",
         "The same-stage origin/binding and deadline/cancellation claims have runtime evidence.",
-        "Website RPC, HTTP and later MCP reuse one checked application operation. Native RPC wire privacy and failure classification have source/version-matched proof, not assumed defaults or handwritten protocol framing."
+        "Website RPC, HTTP and later MCP reuse one checked application operation. Native RPC wire privacy and failure classification have source/version-matched proof, not assumed defaults or handwritten protocol framing.",
+        "Native plans and actual local resource state contain the explicitly disabled platform collection policy. This is bounded containment, not safe exported tracing; T009 retains that requirement."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-contract.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-api-host.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-app-graph.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-failures.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-trace-containment.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json"
+      ]
     },
     {
       "id": "CSF-T004",
       "title": "Finish calculator pages and the fresh package interface",
-      "status": "pending",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -401,7 +460,8 @@
       "browserVerification": [
         "Exercise each supported calculator with representative valid and invalid values, all states, keyboard/focus and accessible result announcements.",
         "Check latest-input-wins, cancelled calculations, navigation/unmount cleanup, no saved figures and no figures in URL/history/share metadata.",
-        "Prove explicit Calculate, stale-answer indication and cancellation on edits, accessible expandable breakdown/assumptions/sources and supported-year visibility, without exporting input or trace values to telemetry."
+        "Prove explicit Calculate, stale-answer indication and cancellation on edits, accessible expandable breakdown/assumptions/sources and supported-year visibility, without exporting input or trace values to telemetry.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -419,12 +479,32 @@
         "Unsupported years and expected failures have checked visible outcomes; UI copy does not imply wider tax support.",
         "Packed consumers use only public exports and dispose the new caller-owned client; fresh interfaces are versioned deliberately."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-04-sdk-client-lifetime.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-stale-calculator-answer.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-take-home-explanation.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculator-pages.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-request-body-policy.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-client-response-policy.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-05-calculation-work-policy.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-closed-rpc-operations.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-request-operation-protections.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-schema-owners.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-fallible-domain-values.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-parameter-table-relationships.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-core-ambient-type-portability.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-absence-owners.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-shared-rate-admission.json"
+      ]
     },
     {
       "id": "CSF-T005",
       "title": "Replace public docs and all discovery representations",
-      "status": "pending",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -439,15 +519,17 @@
       "scope": [
         "Review the retained authored pages and navigation for finished content and source fidelity, recording exact publication acceptance and excluding unfinished drafts from public search.",
         "Implement one accepted content/page catalogue. Website owns HTML and browser-safe generated presentation exports; dynamic page/navigation/source/search/Markdown/image services belong to the backend and checked client contract. Generated static sitemap/robots/agent indexes/Markdown/OG assets need no extra API.",
-        "Generate useful deterministic 1200x630 page OG images from checked public page metadata with the selected current Takumi/font graph; never incorporate calculation values.",
+        "Generate useful deterministic 1200x630 page OG images from checked public page metadata with the exact build-only Takumi 2.14.0 WebAssembly/embedded-font graph; never incorporate calculation values.",
         "Retire apps/docs and replaced rendering/build paths once equivalent local journeys and retained source/artifact identities are proved; update current owners and preserve addressability of history/old useful URLs.",
         "Replace hard-coded apps/docs browser/cache/quality paths in tools/quality-workflow/** and .github/workflows/quality.yml; update the docs browser command in packages/scripts/src/release-readiness/schemas.ts and current owners in docs/verification/repository-harness-profile.json.",
         "Apply Q13: processed Markdown exposes only accepted public pages/reference content. Personal report downloads are outside this release; calculation answers remain temporary and visible on screen or through the agreed agent tools. Any public-content cache uses an owned readonly structured key with installed Equal/Hash semantics, not JSON; prove equivalent reconstructed keys, distinct address fields and last-reader cancellation cleanup where a shared cache is needed."
       ],
       "outputs": [
+        "packages/content/** compiled canonical page/navigation/errors and accepted catalogue service; docs-content preserves compatibility re-exports.",
         "packages/docs-content/** authored/status/navigation/generated owners and any justified retained docs-fumadocs bridge",
-        "apps/web HTML/docs presentation, generated static discovery/image assets and old-route redirect map",
-        "apps/api dynamic page/navigation/search/processed-Markdown/image services and packages/api/http checked contracts/clients; owning content package preserves prose, links, tables and examples",
+        "packages/docs-examples/** checked source/compiler/runtime owner; preserve the four retained integration templates and their output/error expectations.",
+        "apps/web HTML/docs presentation, generated static discovery/image assets and original-address disposition map and deliberate default-entry change",
+        "apps/api dynamic page/navigation/search/processed-Markdown services and packages/api/http checked contracts/clients; owning content package preserves prose, links, tables and examples",
         "tools/documentation/owner-policy.json exact public acceptance records and generated edges",
         "Public/app/package READMEs, docs/architecture/frontend.md, content-and-posts.md, package-ownership.md and applicable runbook/command pointers",
         "tools/quality-workflow/**, .github/workflows/quality.yml, package.json/Turbo command wiring, packages/scripts/src/release-readiness/schemas.ts and docs/verification/repository-harness-profile.json"
@@ -464,7 +546,8 @@
       ],
       "browserVerification": [
         "Verify public docs/navigation, search, Markdown negotiation/explicit links, crawler-readable rendering, canonicals and share previews on actual local routes.",
-        "Check draft exclusion, no raw JSX/imports in processed Markdown, valid image output/size/cache, mobile/keyboard behaviour and old useful URL redirects."
+        "Check draft exclusion and removal of authored MDX syntax while preserving useful fenced code examples; valid image output/size/cache, mobile/keyboard behaviour and old useful URL redirects.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -484,12 +567,31 @@
         "Finished pages are explicitly accepted, unfinished pages do not enter public discovery, and valid public content retains source attribution.",
         "The replacement covers the retired app's useful journeys and historical evidence remains addressable."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-checked-docs-source-owner.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-compiled-content-contract.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-native-docs-catalogue-source.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-page-copy-review.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-docs-links.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-http.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-docs-connection.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-search.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement.json"
+      ]
     },
     {
       "id": "CSF-T006",
       "title": "Add remote MCP and visible browser agent tools",
-      "status": "pending",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -526,7 +628,9 @@
       "browserVerification": [
         "Exercise browser tools with the supported experimental browser/agent when available, including visible form changes and results.",
         "Verify fallback in an unsupported browser, cleanup after navigation, cancellation and equivalent results to manual UI/API.",
-        "Run a real MCP client for each advertised adapter: current-version per-request metadata/list/read/call; older-version initialise/session/list/read/call. Prove version/header agreement, unsupported versions, origins/rates, real Worker session routing/expiry, streaming cancellation and cleanup; persist no tax figures in session metadata."
+        "Run a real MCP client for each advertised adapter: current-version per-request metadata/list/read/call; older-version initialise/session/list/read/call. Prove version/header agreement, unsupported versions, origins/rates, real Worker session routing/expiry, streaming cancellation and cleanup; persist no tax figures in session metadata. The older candidate uses one fixed-name native object per stage, at most 32 initialisation attempts per ten-minute host generation and 32 concurrent requests with immediate refusal. Native alarm expiry must release actual held work without another request; stale IDs receive 404 and a fresh official-client handshake must work. Existing-ID initialise refusal is native-owned and must preserve current conversations and allocation bounds. Prove wrong-conversation cancellation isolation and immediate place reuse, plus interleaved HTTP/modern/older rate admission with caller-supplied private key replacement. Preserve the distinct modern TCP-abort pre-response cleanup limit rather than treating in-process or older cancellation as its proof.",
+        "Restore checked server form/report/error through a paused first React render and completed hydration with a separate client registry; preserve retained answers and guidance without replay, then prove the next explicit request uses the restored form.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -544,12 +648,15 @@
         "Remote and browser tools have actual caller evidence; lack of a supported browser is recorded as a proof gap, never a passed agent journey.",
         "Anonymous access has bounded work and no required account or stored calculation."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json"
+      ]
     },
     {
       "id": "CSF-T007",
       "title": "Prepare DNS, domain and secret provider plans",
-      "status": "pending",
+      "status": "completed",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -584,7 +691,9 @@
         "bun run verification",
         "Appropriate Changeset for package-facing work; explicit no-Changeset rationale otherwise."
       ],
-      "browserVerification": [],
+      "browserVerification": [
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
+      ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
         "Inspect mutation/reassignment/loops/native mutators, readonly values, unsafe casts, raw provider/client escapes, nested runtimes and helper/module purpose. Verify actual-command rejected and accepted fixtures at the actual paths; exact host exceptions cannot silently disable other policy.",
@@ -601,12 +710,18 @@
         "Doppler precedence, runtime binding and separate credential purposes have checked proof without secret values in output.",
         "All cloud mutations remain unexecuted until the concrete plan has the required named authority; DNS/TLS/registrar readback is separate from apply success."
       ],
-      "commitAfterPassing": true
+      "commitAfterPassing": true,
+      "evidence": [
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-domains.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json"
+      ]
     },
     {
       "id": "CSF-T008",
       "title": "Implement minimal PostHog traffic and calculator analytics",
-      "status": "pending",
+      "status": "in_progress",
       "type": "vertical-slice",
       "acceptedFindingIds": [],
       "requirementIds": [
@@ -619,7 +734,8 @@
       ],
       "goal": "Only the documented events and fields leave the app; no persistent browser identity or consent dialogue is introduced.",
       "scope": [
-        "Manage retained TaxKit Production and shared Preview projects through a private Alchemy Resource/Provider and current Distilled PostHog, with checked organisation/region/ownership and safe management failures.",
+        "Deferred by Cooper on 8 October 2026. Preserve the qualified single-project draft #169 with collection off; do not create projects, change billing, implement the browser sender or activate tracking until Cooper explicitly resumes. Status retains started, incomplete work; no completion is claimed.",
+        "Manage one retained TaxKit project shared by Production and controlled Previews through a private Alchemy Resource/Provider and current Distilled PostHog, with checked organisation/region/ownership and safe management failures. Filter events by project, application and exact stage; filters do not isolate access within the project.",
         "Implement explicit pageviews in a private React-owned browser service and one successful hosted-calculation event owner in the backend application; honour a checked browser opt-out without linking identities.",
         "Use a synchronous final-enrichment allowlist, memory-only persistence, explicit DNT and disabled automatic/replay/person features. Local and ordinary Preview capture stay off; no consent dialog.",
         "Implement the bounded same-origin event relay and native backend capture through owned Effect HTTP. Qualify actual current SDK transport/disposal and no duplicate events; retain best-effort delivery limits."
@@ -644,7 +760,8 @@
       "browserVerification": [
         "Inspect actual latest-SDK batches for only accepted page/calculator properties, no amounts/results/queries and no extra SDK endpoints.",
         "Prove initial/client navigation counts including A-to-B-to-A, one successful-use event per action across UI/WebMCP/API/MCP, no event on failure/cancellation, and backend browser opt-out.",
-        "Check denied storage, DNT before/after acquisition, ordinary Preview/development off, cleanup and relay size/deadline/status/redirect failures."
+        "Check denied storage, DNT before/after acquisition, ordinary Preview/development off, cleanup and relay size/deadline/status/redirect failures.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -680,6 +797,7 @@
       ],
       "goal": "Exactly the three existing datasets are used; no retained foreign resource or retention setting is changed.",
       "scope": [
+        "Deferred by Cooper on 6 October 2026 because the metrics approach may change. Keep collection disabled and revisit the design before resuming; this task remains pending and incomplete.",
         "Reference Site's three retained dataset outputs from CooperCorbettSiteCloudflare/prod, never declare/adopt/change them; provision only TaxKit-owned retained ingest token, destination and dashboards under a reviewed plan.",
         "Use one canonical TaxKit identity/query owner and explicit native Worker mapping; separate logs/traces revision/request fields from bounded metric labels. Implement the SPEC's minimum request/calculation logs, named service spans, request/calculation counters and millisecond histograms with the stated boundaries; never label root-span/flush duration visitor response time.",
         "Keep one qualified native trace owner and event-scoped native Effect log/metric exporters with correct endpoints/Protobuf/header, bounded host completion and safe warning projections.",
@@ -705,7 +823,8 @@
       "browserVerification": [
         "Check actual request/render/response/cancellation lifetime and flush ownership without delaying or failing normal pages for telemetry.",
         "Send synthetic marker figures through valid POSTs, rejected URLs/queries and upstream failures; inspect all signal payloads for leaks.",
-        "Reconcile sequential and burst logs/metrics, parented safe spans and exact project/app/stage filters; record sampling/series/delivery limits."
+        "Reconcile sequential and burst logs/metrics, parented safe spans and exact project/app/stage filters; record sampling/series/delivery limits.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",
@@ -751,8 +870,9 @@
       ],
       "goal": "Final accepted requirements, impacted owners, versioning and retained historical identities are reconciled without hidden failed checks.",
       "scope": [
+        "Cooper authorised an independent bounded review/handover subset on 8 October 2026: review existing draft source and comments, reconcile material findings, inspect package Changesets/fixed train, run local release and packed-consumer checks, and record PostHog/metrics deferrals and the separately approved Medicare correction in draft #168. This subset does not satisfy deferred T008/T009, accept T010, integrate the separate tax correction or authorise merge/versioning/publication/deployment/provider changes.",
         "Resolve remaining owner/pointer contradictions and remove only qualified obsolete app/wiring/tool paths listed in the retention manifest; preserve source history, binary evidence, deployed recovery identity and unrelated work.",
-        "Finish changed package Changesets and nine-package fixed-train implications; retain local packed/downstream/release evidence without publishing packages.",
+        "Finish changed package Changesets and the current ten-package fixed-train implications, including @taxkit/content, as owned by .changeset/config.json and docs/standards/versioning.md; retain local packed/downstream/release evidence without applying package versions or publishing packages.",
         "Update current journey inventory for each calculator path, docs/discovery, SDK consumer, remote/browser agents and analytics/telemetry privacy. Obtain one fresh independent review and reconcile material findings.",
         "Run complete local checks and deliver a concrete version-matched provider plan for final approval. Once separately authorised, apply controlled Preview, read back exact artifacts/events/signals/domains and teardown safely before a separately approved Production cutover.",
         "Retain safe bounded receipts for accepted/failed/no-op outcomes and a rollback to the recorded previous artifact. Close the active plan only when its accepted outcome is actually achieved."
@@ -768,7 +888,7 @@
         "bun run check:docs",
         "bun run check:runbooks",
         "bun run check:repository-paths",
-        "bun run test:skills",
+        "bun run test:harness-governance",
         "bun run format:check",
         "bun run lint",
         "bun run check-types",
@@ -785,7 +905,8 @@
       "browserVerification": [
         "Run all accepted local journeys on the final source/artifact, including crawler-visible docs, calculator forms, MCP/WebMCP and analytics privacy.",
         "After explicit provider authority, verify exact Preview artifact identity and independent PostHog/Axiom readback; verify DNS/TLS/canonical www/API behaviour after any approved domain apply.",
-        "Keep Production, package publication and future returning-visitor accuracy outside any local-only proof."
+        "Keep Production, package publication and future returning-visitor accuracy outside any local-only proof.",
+        "Leave the annual calculator, force actual native browser garbage collection and return; visible fields, shared form and retained stale report must still agree without another RPC request or replacement page description."
       ],
       "qualityAudits": [
         "Review this slice's actual call graph, package/export direction, canonical Schemas/types/brands/errors/Config, live/test/runtime separation and boundary decode/encode.",

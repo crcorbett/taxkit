@@ -1,6 +1,10 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import {
+  Cents,
+  audFromCents,
+  multiplyCentsByDecimal,
+} from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
@@ -33,14 +37,16 @@ const findBracket = (
 ): Effect.Effect<IncomeTaxBracket, CalculationError> => {
   const bracket = Array.findFirst(
     Array.reverse(brackets),
-    (b) => incomeCents > b.thresholdCents
+    (b) =>
+      incomeCents > b.thresholdCents ||
+      (incomeCents === 0 && b.thresholdCents === 0)
   );
 
   return Option.match(bracket, {
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `taxkit/rules-au-income-tax: no income tax bracket covers income=${incomeCents} cents`,
+          message: "No income tax bracket covers the amount.",
         })
       ),
     onSome: Effect.succeed,
@@ -63,17 +69,20 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
 
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
-    const taxCents =
-      bracket.baseTaxCents +
-      multiplyCentsByDecimal(
-        incomeCents - bracket.thresholdCents,
-        bracket.rate
-      );
-    const taxAmount = aud(taxCents);
+    const taxableExcess = yield* Cents.makeEffect(
+      incomeCents - bracket.thresholdCents
+    );
+    const marginalTax = yield* multiplyCentsByDecimal(
+      taxableExcess,
+      bracket.rate
+    );
+    const taxAmount = yield* audFromCents(bracket.baseTaxCents + marginalTax);
 
     const trace = TraceNode.make({
       children: [],
-      formula: "tax = baseTaxCents + round(rate * (income - threshold))",
+      formula: Option.some(
+        Option.some("tax = baseTaxCents + round(rate * (income - threshold))")
+      ),
       inputs: {
         baseTaxCents: bracket.baseTaxCents,
         bracketThresholdCents: bracket.thresholdCents,
@@ -82,7 +91,7 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
         tableYear: table.year,
       },
       result: taxAmount.cents,
-      rounding: "round-to-nearest-cent",
+      rounding: Option.some(Option.some("round-to-nearest-cent")),
       ruleId: IncomeTaxRuleId,
       sources: [table.source],
       title: "Income tax at marginal rates",
@@ -97,5 +106,12 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
       trace,
     });
     return component;
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Income tax could not produce a supported amount.",
+        })
+    )
+  )
 );

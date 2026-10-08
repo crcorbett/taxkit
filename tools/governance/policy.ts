@@ -1,3 +1,5 @@
+import { Array as EffectArray, HashSet, Option, Order, Record } from "effect";
+
 import { GovernanceFinding } from "./schemas.js";
 import type {
   AcceptedFindings,
@@ -16,6 +18,7 @@ const expectedJourneyIds = [
   "taxkit-http-api",
   "taxkit-docs-runtime",
   "taxkit-release-closure",
+  "taxkit-native-website",
 ];
 const requiredExternalBoundaries = [
   "hosted CI",
@@ -51,7 +54,7 @@ const hasExactMembers = (
   expected: readonly string[]
 ) =>
   actual.length === expected.length &&
-  expected.every((member) => actual.includes(member));
+  EffectArray.every(expected, (member) => actual.includes(member));
 
 const inspectAuditCrosswalk = ({
   accepted,
@@ -62,17 +65,24 @@ const inspectAuditCrosswalk = ({
   GovernanceInputs,
   "accepted" | "findings" | "specSource" | "tasks"
 >): readonly GovernanceFinding[] => {
-  const findingIds = findings.findings.map((entry) => entry.id);
-  const acceptedIds = accepted.entries.map((entry) => entry.findingId);
-  const taskIds = new Set(tasks.tasks.map((task) => task.id));
-  const invalidEntries = accepted.entries.filter(
+  const findingIds = EffectArray.map(findings.findings, (entry) => entry.id);
+  const acceptedIds = EffectArray.map(
+    accepted.entries,
+    (entry) => entry.findingId
+  );
+  const taskIds = HashSet.fromIterable(
+    EffectArray.map(tasks.tasks, (task) => task.id)
+  );
+  const invalidEntries = EffectArray.filter(
+    accepted.entries,
     (entry) =>
-      !entry.requirementIds.every((id) =>
+      !EffectArray.every(entry.requirementIds, (id) =>
         specSource.includes(`### \`${id}\``)
       ) ||
-      !entry.taskIds.every((id) => taskIds.has(id)) ||
-      !entry.taskIds.every((id) =>
-        tasks.tasks.some(
+      !EffectArray.every(entry.taskIds, (id) => HashSet.has(taskIds, id)) ||
+      !EffectArray.every(entry.taskIds, (id) =>
+        EffectArray.some(
+          tasks.tasks,
           (task) =>
             task.id === id && task.acceptedFindingIds.includes(entry.findingId)
         )
@@ -108,13 +118,14 @@ const inspectProfile = (
     profile.criticalJourneyOwner ===
       "docs/verification/critical-journeys.json" &&
     profile.representativeJobs.length === expectedJourneyIds.length &&
-    expectedJourneyIds.every((id) =>
-      profile.representativeJobs.some((job) =>
-        job.owningPaths.some((owner) => owner.endsWith(`#${id}`))
+    EffectArray.every(expectedJourneyIds, (id) =>
+      EffectArray.some(profile.representativeJobs, (job) =>
+        EffectArray.some(job.owningPaths, (owner) => owner.endsWith(`#${id}`))
       )
     ) &&
     commandValues.includes("bun run check:harness-governance") &&
-    profile.exclusions.some(
+    EffectArray.some(
+      profile.exclusions,
       (entry) => entry.includes("public") && entry.includes("copy")
     )
     ? []
@@ -131,7 +142,7 @@ const inspectExternalClaims = ({
   profile,
 }: Pick<GovernanceInputs, "profile">): readonly GovernanceFinding[] => {
   const source = profile.nonClaims.join(" ");
-  return requiredExternalBoundaries.every((boundary) =>
+  return EffectArray.every(requiredExternalBoundaries, (boundary) =>
     source.toLowerCase().includes(boundary.toLowerCase())
   )
     ? []
@@ -147,8 +158,9 @@ const inspectExternalClaims = ({
 const inspectJourneys = (
   journeys: CriticalJourneyInventory
 ): readonly GovernanceFinding[] => {
-  const ids = journeys.journeys.map((journey) => journey.id);
-  const invalid = journeys.journeys.some(
+  const ids = EffectArray.map(journeys.journeys, (journey) => journey.id);
+  const invalid = EffectArray.some(
+    journeys.journeys,
     (journey) =>
       journey.authority !== "none" ||
       journey.oracle.length === 0 ||
@@ -160,7 +172,7 @@ const inspectJourneys = (
         finding(
           "critical-journey",
           "docs/verification/critical-journeys.json",
-          "Restore the five retained TaxKit journeys with local authority, owning commands, oracles, and non-claims."
+          "Restore the six current TaxKit journeys with local authority, owning commands, oracles, and non-claims; preserve historical snapshots separately."
         ),
       ];
 };
@@ -168,12 +180,18 @@ const inspectJourneys = (
 const inspectVerificationGraph = (
   manifest: RootPackageManifest
 ): readonly GovernanceFinding[] => {
-  const verification = manifest.scripts["verification"] ?? "";
+  const verification = Record.get(manifest.scripts, "verification").pipe(
+    Option.getOrElse(() => "")
+  );
   const occurrences =
     verification.split("bun run check:harness-governance").length - 1;
-  return manifest.scripts["check:harness-governance"] !== undefined &&
-    manifest.scripts["test:harness-governance"] !== undefined &&
-    manifest.scripts["check:harness-governance:types"] !== undefined &&
+  return Option.isSome(
+    Record.get(manifest.scripts, "check:harness-governance")
+  ) &&
+    Option.isSome(Record.get(manifest.scripts, "test:harness-governance")) &&
+    Option.isSome(
+      Record.get(manifest.scripts, "check:harness-governance:types")
+    ) &&
     occurrences === 1
     ? []
     : [
@@ -188,14 +206,21 @@ const inspectVerificationGraph = (
 export const inspectGovernance = (
   inputs: GovernanceInputs
 ): readonly GovernanceFinding[] =>
-  [
-    ...inspectAuditCrosswalk(inputs),
-    ...inspectProfile(inputs.profile),
-    ...inspectExternalClaims(inputs),
-    ...inspectJourneys(inputs.journeys),
-    ...inspectVerificationGraph(inputs.manifest),
-  ].toSorted((left, right) =>
-    `${left.invariant}:${left.target}`.localeCompare(
-      `${right.invariant}:${right.target}`
-    )
+  EffectArray.sort(
+    [
+      ...inspectAuditCrosswalk(inputs),
+      ...inspectProfile(inputs.profile),
+      ...inspectExternalClaims(inputs),
+      ...inspectJourneys(inputs.journeys),
+      ...inspectVerificationGraph(inputs.manifest),
+    ],
+    Order.make<GovernanceFinding>((left, right) => {
+      const comparison = `${left.invariant}:${left.target}`.localeCompare(
+        `${right.invariant}:${right.target}`
+      );
+      if (comparison < 0) {
+        return -1;
+      }
+      return comparison > 0 ? 1 : 0;
+    })
   );

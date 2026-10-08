@@ -1,33 +1,22 @@
 {
   "$schema": "./node_modules/knip/schema.json",
-  "ignoreWorkspaces": ["apps/web", "packages/tsconfig"],
+  "ignoreWorkspaces": ["packages/tsconfig"],
   "ignoreIssues": {
     "packages/api/http/src/client/service.ts": ["duplicates"],
-    "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"],
-    "packages/scripts/src/release-readiness/live.layer.ts": ["exports"]
+    "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"]
   },
   "workspaces": {
     ".": {
-      "entry": ["alchemy.run.ts!"],
+      "entry": [
+        "alchemy.run.ts!",
+        "alchemy.apps.run.ts!",
+        "alchemy.apps.local.run.ts!",
+        "alchemy.posthog.run.ts!"
+      ],
       "project": ["alchemy.run.ts!"]
     },
-    "apps/docs": {
-      "entry": [
-        "src/router.tsx!",
-        "src/server.ts!",
-        "src/routes/**/*.{ts,tsx}!",
-        "vite.config.ts!"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}!",
-        "!src/**/*.test.ts!",
-        "!src/**/*.type-test.ts!",
-        "vite.config.ts!"
-      ],
-      "vite": false
-    },
     "apps/api": {
-      "entry": ["src/index.ts!"],
+      "entry": ["src/index.ts!", "src/worker.ts!"],
       "project": ["src/**/*.ts!"]
     },
     "packages/api/http": {
@@ -81,7 +70,9 @@
         "src/schemas.ts!",
         "src/server.ts!",
         "src/service.ts!",
-        "src/validate.runtime.ts!"
+        "src/validate.runtime.ts!",
+        "src/catalogue-index.runtime.ts!",
+        "src/catalogue-source.layer.ts!"
       ],
       "project": [
         ".source/browser.ts!",
@@ -90,7 +81,8 @@
         "src/**/*.ts!",
         "!src/**/*.test.ts!",
         "!src/test.layer.ts!"
-      ]
+      ],
+      "ignoreDependencies": ["vite/client"]
     },
     "packages/docs-fumadocs": {
       "entry": [
@@ -157,6 +149,51 @@
     "packages/testing": {
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.ts!"]
+    },
+    "packages/api/rpc": {
+      "entry": [
+        "src/group.ts!",
+        "src/handlers.ts!",
+        "src/service.ts!",
+        "src/server.ts!",
+        "src/live.layer.ts!",
+        "src/schemas.ts!",
+        "src/errors.ts!",
+        "src/request-boundary.ts!",
+        "src/host-telemetry.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
+    },
+    "apps/web": {
+      "entry": [
+        "src/router.tsx!",
+        "src/server.ts!",
+        "src/routes/**/*.{ts,tsx}!",
+        "vite.config.ts!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "!src/**/*.test.ts!",
+        "!src/**/*.browser.test.tsx!",
+        "vite.config.ts!"
+      ],
+      "vite": false,
+      "ignoreDependencies": ["cloudflare"],
+      "ignoreExportsUsedInFile": true
+    },
+    "packages/docs-examples": {
+      "entry": ["src/**/*.ts!"],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/content": {
+      "entry": [
+        "src/schemas.ts!",
+        "src/errors.ts!",
+        "src/service.ts!",
+        "src/live.layer.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
     }
-  }
+  },
+  "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]
 }

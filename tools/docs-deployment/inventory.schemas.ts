@@ -1,5 +1,5 @@
 import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 const DocsDeploymentLogicalResourceId = Schema.Literal("DocsWebsite").pipe(
   Schema.brand("taxkit/DocsDeploymentLogicalResourceId")
@@ -98,3 +98,21 @@ export class DocsDeploymentInventoryDisagreementError extends Schema.TaggedError
     findings: Schema.NonEmptyArray(Schema.NonEmptyString),
   }
 ) {}
+
+export class DocsDeploymentInventoryOutputError extends Schema.TaggedError<DocsDeploymentInventoryOutputError>()(
+  "DocsDeploymentInventoryOutputError",
+  { reason: Schema.Literals(["encode", "write"]) }
+) {}
+
+export const DocsDeploymentInventoryRuntimeConfig = Schema.Struct({
+  ALCHEMY_PROFILE: Schema.String.pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed("default"))
+  ),
+  ALCHEMY_STATE_STORE_CREDENTIALS_JSON: Schema.OptionFromOptionalKey(
+    Schema.RedactedFromValue(Schema.String)
+  ),
+  CI: Schema.Literals(["1", "true"]),
+  TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT: Schema.OptionFromOptionalKey(
+    Schema.String
+  ),
+});

@@ -1,0 +1,2525 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-web-app-owner",
+  "observedAt": "2026-10-06T16:48:08.600803+00:00",
+  "status": "Local Website documentation page/navigation connection qualified; whole T005 remains in progress",
+  "baseHead": "049b04ff9b71e8705507e819ba3ea31f8c9fa64e",
+  "actorAuthority": {
+    "principal": "Cooper",
+    "reviewer": "Codex",
+    "operation": "Approved CSF-T005 implementation, local checks, commits, pushes and continuation of draft PR 155",
+    "environment": "Built local workerd/Chromium API and Website pair",
+    "approvalBoundary": "No merge, publication, deployment or provider apply"
+  },
+  "outcome": [
+    "The Website composes four named documentation operations over its private binding and renders 61 accepted pages through browser-safe compiled presentation.",
+    "The materialised native HTTP request preserves JSON byte bodies, binding receiver and signal; returned native Responses are immediately checked and provider diagnostics discarded.",
+    "The data-free native page GET carries only a bounded checked public header; original SSR pathnames determine page identity. Only generated settings/page URLs are admitted.",
+    "Dedicated route restoration precedes route-owned result matching and sidebar/article composition. Native missing pages return HTML 404; expected failures have fixed recoverable guidance.",
+    "Compiled Markdown and frontmatter must match the checked API page at preload and display. Three controlled cold native mismatches fail safely.",
+    "Internal links retain router navigation, deliberate heading focus, a unique current-page marker, phone disclosure, keyboard table scrolling and ordinary no-JavaScript reading."
+  ],
+  "impact": {
+    "changeRequired": [
+      "Website app/client/config/native-loader/route/presentation/build ownership",
+      "Exact lint selectors and actual command fixtures",
+      "Website/content/RPC READMEs, frontend/API/content/package/testing architecture",
+      "SPEC/task/active-plan pointers, existing native critical journey and this receipt",
+      "Effect services architecture: the typed route context supplies both named settings/catalogue and documentation-page transports"
+    ],
+    "preserve": [
+      "61 accepted authored pages, navigation, 64 historical review records, 62 active bindings and four integration templates",
+      "Calculator contract and retained tax outputs; Medicare decision remains unresolved",
+      "Historical docs app/procedures and immutable receipts",
+      "Disabled collection and explicit metrics deferral"
+    ],
+    "notApplicable": [
+      "No new runbook command or deployment/recovery operation: existing local native procedure is extended",
+      "No new Changeset: private app consumers/tests only; existing package contract Changeset retained",
+      "No provider/credentials/registry/publication/CI workflow change"
+    ]
+  },
+  "priorFailureAndRecovery": [
+    "Actual cold mismatch SSR first failed through a request body stream associated with an earlier Cloudflare request. The generic installed Fetcher adapter creates that stream; installed Effect HttpClientRequest.toWeb preserves the original bytes. The app now uses that native conversion and attached binding fetch. Fresh native mismatches return safe HTML and checked errors. No dependency upgrade or alternate RPC protocol was introduced.",
+    "A naive browser-code canary matched PublicCalculatorService.calculate in accepted public documentation prose. The test now positively requires @taxkit/calculators/PublicCalculatorService in the actual API bundle and excludes that executable Context identity from browser output.",
+    "TanStack parent-route link activation produced more than one current-page marker; exact link matching restores unique page semantics.",
+    "Earlier test locators used a guessed SDK address and an absent authored link. They now select the actual accepted /sdk/typescript-sdk and Plain SDK destinations; no source content was changed.",
+    "The first diagram desktop screenshot retained mobile table-focus scroll position. All four supplemental captures now explicitly start at document top.",
+    "First full verification passed all32 real workflow checks but stopped at Knip: WebsiteDocsPageView was exported despite being used only within its owning Schema module. It is now private; no runtime shape or external package contract changed. The complete corrected qualification is separate from that failed attempt.",
+    "Second full verification passed workflow/Knip/types but stopped before standalone browser assertions: the route tree followed the docs route static loader import into Cloudflare and native server-only code. Application getRouter now supplies the named page loader through the existing typed RouterContext pattern beside settings. The page route imports no loader implementation. Focused standalone browser tests pass all20 cases without aliases, mocks of server modules or an extra compiler plugin; native production transport proof remains separate."
+  ],
+  "focusedChecks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.62,
+      "log": "/private/tmp/dev76-website-docs-native-l-format.log"
+    },
+    {
+      "stage": "native",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 90.43,
+      "log": "/private/tmp/dev76-website-docs-native-l-native.log"
+    },
+    {
+      "stage": "install",
+      "command": [
+        "bun",
+        "install"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev76-website-docs-focus-a-install.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "log": "/private/tmp/dev76-website-docs-focus-a-format.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.92,
+      "log": "/private/tmp/dev76-website-docs-focus-a-web-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.78,
+      "log": "/private/tmp/dev76-website-docs-focus-a-lint.log"
+    },
+    {
+      "stage": "frozen-install",
+      "command": [
+        "bun",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev76-website-docs-focus-a-frozen-install.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.61,
+      "log": "/private/tmp/dev76-website-docs-focus-a-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev76-website-docs-focus-a-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev76-website-docs-focus-a-runbooks.log"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.25,
+      "log": "/private/tmp/dev76-website-docs-focus-a-paths.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.78,
+      "log": "/private/tmp/dev76-website-docs-focus-a-lint.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.0,
+      "log": "/private/tmp/dev76-website-docs-focus-a-web-types.log"
+    },
+    {
+      "stage": "oxlint-tests",
+      "command": [
+        "bun",
+        "run",
+        "test:oxlint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 66.18,
+      "log": "/private/tmp/dev76-website-docs-focus-a-oxlint-tests.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.61,
+      "log": "/private/tmp/dev76-website-docs-focus-b-format.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.94,
+      "log": "/private/tmp/dev76-website-docs-focus-b-web-types.log"
+    },
+    {
+      "stage": "web-unit",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "log": "/private/tmp/dev76-website-docs-focus-b-web-unit.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.01,
+      "log": "/private/tmp/dev76-website-docs-focus-b-lint.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "log": "/private/tmp/dev76-website-docs-focus-b-format.log"
+    },
+    {
+      "stage": "docs-validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.21,
+      "log": "/private/tmp/dev76-website-docs-focus-b-docs-validate.log"
+    },
+    {
+      "stage": "build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 7.43,
+      "log": "/private/tmp/dev76-website-docs-focus-b-build.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "log": "/private/tmp/dev76-website-docs-focus-c-format.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.95,
+      "log": "/private/tmp/dev76-website-docs-focus-c-web-types.log"
+    },
+    {
+      "stage": "web-unit",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.34,
+      "log": "/private/tmp/dev76-website-docs-focus-c-web-unit.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.93,
+      "log": "/private/tmp/dev76-website-docs-focus-c-lint.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.61,
+      "log": "/private/tmp/dev76-website-docs-focus-c-format.log"
+    },
+    {
+      "stage": "knip",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.64,
+      "log": "/private/tmp/dev76-website-docs-focus-c-knip.log"
+    },
+    {
+      "stage": "knip-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.93,
+      "log": "/private/tmp/dev76-website-docs-focus-c-knip-production.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.99,
+      "log": "/private/tmp/dev76-website-docs-focus-c-web-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.84,
+      "log": "/private/tmp/dev76-website-docs-focus-c-lint.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.59,
+      "log": "/private/tmp/dev76-website-docs-focus-d-format.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.96,
+      "log": "/private/tmp/dev76-website-docs-focus-d-web-types.log"
+    },
+    {
+      "stage": "web-unit",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.35,
+      "log": "/private/tmp/dev76-website-docs-focus-d-web-unit.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.1,
+      "log": "/private/tmp/dev76-website-docs-focus-d-lint.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.56,
+      "log": "/private/tmp/dev76-website-docs-focus-d-format.log"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.01,
+      "log": "/private/tmp/dev76-website-docs-focus-d-web-types.log"
+    },
+    {
+      "stage": "web-browser",
+      "command": [
+        "bun",
+        "run",
+        "web:test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.71,
+      "log": "/private/tmp/dev76-website-docs-focus-d-web-browser.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.5,
+      "log": "/private/tmp/dev76-website-docs-focus-e-format.log"
+    },
+    {
+      "stage": "lint-types",
+      "command": [
+        "bun",
+        "run",
+        "check:oxlint:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev76-website-docs-focus-e-lint-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.01,
+      "log": "/private/tmp/dev76-website-docs-focus-e-lint.log"
+    },
+    {
+      "stage": "lint-fixtures",
+      "command": [
+        "bun",
+        "run",
+        "test:oxlint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 65.73,
+      "log": "/private/tmp/dev76-website-docs-focus-e-lint-fixtures.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.52,
+      "log": "/private/tmp/dev76-website-docs-focus-e-format.log"
+    },
+    {
+      "stage": "knip",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.61,
+      "log": "/private/tmp/dev76-website-docs-focus-e-knip.log"
+    },
+    {
+      "stage": "knip-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.92,
+      "log": "/private/tmp/dev76-website-docs-focus-e-knip-production.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.01,
+      "log": "/private/tmp/dev76-website-docs-focus-e-lint.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "log": "/private/tmp/dev76-website-docs-focus-e-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "log": "/private/tmp/dev76-website-docs-focus-e-runbooks.log"
+    },
+    {
+      "stage": "worker-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check:worker-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.53,
+      "log": "/private/tmp/dev76-website-docs-focus-e-worker-types.log"
+    },
+    {
+      "stage": "build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.89,
+      "log": "/private/tmp/dev76-website-docs-focus-e-build.log"
+    },
+    {
+      "stage": "native",
+      "command": [
+        "bun",
+        "run",
+        "web:test:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 101.54,
+      "log": "/private/tmp/dev76-website-docs-focus-e-native.log"
+    }
+  ],
+  "fullQualification": {
+    "status": "Passed",
+    "checks": [
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.57,
+        "log": "/private/tmp/dev76-website-docs-full-c-format.log"
+      },
+      {
+        "stage": "all-tests",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 83.25,
+        "log": "/private/tmp/dev76-website-docs-full-c-all-tests.log"
+      },
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 649.13,
+        "log": "/private/tmp/dev76-website-docs-full-c-verification.log"
+      },
+      {
+        "stage": "compiled-node",
+        "command": [
+          "node",
+          "/private/tmp/dev76-content-rpc-compiled-node-probe.mjs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.22,
+        "log": "/private/tmp/dev76-website-docs-full-c-compiled-node.log"
+      }
+    ],
+    "sourceIdentities": [
+      {
+        "path": "apps/web/README.md",
+        "sha256": "e1ac0564757f7d5de818a04d8ff31aad0335695525d593e50ec3f785d3c5d794",
+        "bytes": 21315
+      },
+      {
+        "path": "apps/web/package.json",
+        "sha256": "fb8c489c410fbbe4532e8f8d46bc8d5e9da34e4acaf8e08803ca5c2a68cf2213",
+        "bytes": 2198
+      },
+      {
+        "path": "apps/web/scripts/native-pair-build.runtime.ts",
+        "sha256": "3376098e00b16bef404d4f2dc7d9f280d869b23ae5fc9dd38ec0c3aac971faa4",
+        "bytes": 17276
+      },
+      {
+        "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "sha256": "2b52e5cab5c1d7156177883727bcccb9ed31971e5500022ecc1c91dafed40786",
+        "bytes": 17376
+      },
+      {
+        "path": "apps/web/src/lib/config.boundary.test.ts",
+        "sha256": "7fbc589640f4168e204a53ebc70d9c99b5c14ee6e9429c1212047361de864b73",
+        "bytes": 3043
+      },
+      {
+        "path": "apps/web/src/lib/config.server.ts",
+        "sha256": "8efbcf4dffd630a72ebfe5f9150ba344a88a45ac7413381a213d3c9b3de15b7f",
+        "bytes": 1868
+      },
+      {
+        "path": "apps/web/src/lib/docs/components.tsx",
+        "sha256": "7a424f687699e4b672e5e6f5360e014594bc6efa6591966f3f84ac17b43182a5",
+        "bytes": 3291
+      },
+      {
+        "path": "apps/web/src/lib/docs/errors.ts",
+        "sha256": "b6bbab7de20cc52ef1e4b5a5e959fd7cd3ced5db0bde323b567558baec84f16f",
+        "bytes": 533
+      },
+      {
+        "path": "apps/web/src/lib/docs/mdx.boundary.tsx",
+        "sha256": "7efcc5e0249fc5b258bf367f5354dd3d7ac3615b7763b9b802c0873d23218173",
+        "bytes": 2282
+      },
+      {
+        "path": "apps/web/src/lib/docs/page.view.tsx",
+        "sha256": "9ff7a422914f9da0d9d7909b7c77cfd24e931912fbb1b1fab6cbc417dc8f9b37",
+        "bytes": 2057
+      },
+      {
+        "path": "apps/web/src/lib/docs/route-boundary.ts",
+        "sha256": "fdf6ce8220ffe3d1bd6e815a988a4060dba08e8ff295604e5a7a6194ddaa573a",
+        "bytes": 583
+      },
+      {
+        "path": "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+        "sha256": "36ec166612352ae8aa45e4e5e3a2ea57f54225220dd61e8c6127648f03acc600",
+        "bytes": 4154
+      },
+      {
+        "path": "apps/web/src/lib/live.server.layer.ts",
+        "sha256": "ee70d63a580c34e3bd7b2a16df9baa4453adfcdaea5640229bea02dcb3ae7dce",
+        "bytes": 8898
+      },
+      {
+        "path": "apps/web/src/lib/loaders.server.ts",
+        "sha256": "39ed7de44f629bca8db6f1fe05cef8d979da60b540e7487e0ac5f7e584eedad4",
+        "bytes": 4031
+      },
+      {
+        "path": "apps/web/src/lib/loaders.ts",
+        "sha256": "ba4f83f2bf4eea37b97339afccab949abc14f1c67fef7b39b1aa52902de77416",
+        "bytes": 1672
+      },
+      {
+        "path": "apps/web/src/lib/route-context.ts",
+        "sha256": "c438412c461211a06e7bf5e0aa37ed986d8673111b24b0f345cb5bd32c2ca106",
+        "bytes": 217
+      },
+      {
+        "path": "apps/web/src/lib/schemas.ts",
+        "sha256": "ebd4c178384fbd3a0e3191ae15feb97f8614bb0f0ef17455269239c2bb83d5a6",
+        "bytes": 3090
+      },
+      {
+        "path": "apps/web/src/lib/service.server.ts",
+        "sha256": "d45708ce1c735f574d75a0d399d6ad37d5c465cdbd4e11801518f3dac44da7be",
+        "bytes": 1735
+      },
+      {
+        "path": "apps/web/src/routeTree.gen.ts",
+        "sha256": "fbcd5bd6b7f793b63a578ece5c4300776e671170b8873abff9d193b156a39220",
+        "bytes": 3806
+      },
+      {
+        "path": "apps/web/src/router.tsx",
+        "sha256": "2680d7f962bb9fc3777e1501ed7a9a7f49a093f4eba54a76b072a5d69fa1d6ff",
+        "bytes": 679
+      },
+      {
+        "path": "apps/web/src/routes/$.tsx",
+        "sha256": "2f2383dd9adcaaa64944acebfd867a427aedca46b30d337e76da66ec9a5b8e71",
+        "bytes": 2472
+      },
+      {
+        "path": "apps/web/src/routes/__root.tsx",
+        "sha256": "4092bc9020b3a9314599a0a12f55e7dcf8e4155e3ac302af4758234fe27b0dfd",
+        "bytes": 5273
+      },
+      {
+        "path": "apps/web/src/server.ts",
+        "sha256": "669da00729f22cd8b00ea1dcc4cf478be21aed11539de3c9f126dc31378aa802",
+        "bytes": 8195
+      },
+      {
+        "path": "apps/web/src/styles.css",
+        "sha256": "79c3834a0e88ff1a45a3cbfffef7fec11d740526e60c477d9a2334667e52eb83",
+        "bytes": 5551
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "62d1012366d7f47046725cc57156f358457c81e63983fa2fc8b8db2b5b267955",
+        "bytes": 70314
+      },
+      {
+        "path": "apps/web/vite.config.ts",
+        "sha256": "48e4bd46801541242bf830b43fc70449f706f85e4351514c062264ac61eb9bfd",
+        "bytes": 1715
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "e9c95bc4c984c65f3ec88c0f360bbbedd5bc89611d221e2844ebd519f706f556",
+        "bytes": 286626
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "8e0d9c5b2708fc14806fbdc2c2f34be922d0504f3710ec8368e8b20f269a42eb",
+        "bytes": 30996
+      },
+      {
+        "path": "docs/architecture/content-and-posts.md",
+        "sha256": "6bb1f8c872597ace80f1041eac80f5488ff8cf882a7caa635e7037ad4ae339e1",
+        "bytes": 7582
+      },
+      {
+        "path": "docs/architecture/frontend.md",
+        "sha256": "20399d334778f75df5bc7da1f73a8a0e3b11ce2188ff2d002149cfcbf03c96c4",
+        "bytes": 25363
+      },
+      {
+        "path": "docs/architecture/package-ownership.md",
+        "sha256": "a17008da7c545a8eb1d6357b4655a5b7eb1d0879c1b71a80be63be564e4e1049",
+        "bytes": 14343
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "e910dd6db33140e57a2aa1cb2b92fb3a22bcece9072fc034558274207c175787",
+        "bytes": 92910
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "1d8019636308913711336aa92014febdd76d3a4fcd0293c1594514e58c8a18fb",
+        "bytes": 270954
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "5bf1c60aec7ef95b6f802d410b0ddc0d00b4d9bdd3c7324811aac5502c3784a5",
+        "bytes": 67689
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "66ad56782902eb7e47e98ffe6fe60fda93cddf3993461f802b5d6faa0fc02d72",
+        "bytes": 73318
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "29cba9f99dfc866744140ecced2be3fed359d72f2c6dd2a34b2ff8b3257f824d",
+        "bytes": 19391
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "be71992be788c0a7cdaac08694f806ab2a346be213fdaff690b40548a0ef6dcf",
+        "bytes": 57130
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "5776e362278c245aa9a32f2035d6ee915e1cb241a1e880775eec3d615c8dafef",
+        "bytes": 15063
+      },
+      {
+        "path": "packages/docs-content/README.md",
+        "sha256": "471c31b54db282230f98871ff32d5bbbae146fa4e4d6494c659c85aaa5706520",
+        "bytes": 15317
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "04b170b5f836ae17f3a26840569a40d299fb427d324abef0aa34433d77a79ffc",
+        "bytes": 87169
+      }
+    ],
+    "frozenSourcesUnchanged": true
+  },
+  "catalogueIdentity": {
+    "path": "packages/docs-content/.source/public-catalogue.json",
+    "sha256": "6f3d3beb055c2d5d83ba5abeb9feef3fb8da51188f077e9181685f8f708c26b6",
+    "bytes": 235703
+  },
+  "preservedSources": {
+    "authoredPages": 61,
+    "reviewRecords": 64,
+    "activeBindings": 62,
+    "unchangedNavigation": true,
+    "unchangedOwnerPolicy": true,
+    "identities": [
+      {
+        "path": "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+        "sha256": "9db4a01ae8c5d2dcd611503263c83e5467b8ccd98352215dc5e0eba098e6dfef",
+        "bytes": 1864
+      },
+      {
+        "path": "packages/docs-content/content/api/endpoints.mdx",
+        "sha256": "320bd61fa331248549545a7d15f98c4c4b75a9e96207a3eef695b1c78e656d07",
+        "bytes": 4311
+      },
+      {
+        "path": "packages/docs-content/content/api/errors.mdx",
+        "sha256": "92f3e6d9ec1bd6a73192e22422c3fb31dbcd67013830f4b3ff0b59cb658f4fd4",
+        "bytes": 4560
+      },
+      {
+        "path": "packages/docs-content/content/api/index.mdx",
+        "sha256": "a3b1aa5756347db8dac15081575a21b91a546d3af9dc5c6abf407cd48a3f4855",
+        "bytes": 807
+      },
+      {
+        "path": "packages/docs-content/content/api/openapi-reference.mdx",
+        "sha256": "25f9f5564e3e14f9946f5e68760351a46aa7ca7fe4cef44021685e539b4b70fa",
+        "bytes": 1509
+      },
+      {
+        "path": "packages/docs-content/content/api/overview.mdx",
+        "sha256": "c11e2f06e3513a515dbb68fee8c0027ebe1ddd7e7680dbf5deb06a01fb3c857b",
+        "bytes": 2632
+      },
+      {
+        "path": "packages/docs-content/content/concepts/calculators.mdx",
+        "sha256": "c69961d6d10464ed3afba49251021eb39c8c4fe5c8ad1c1bc39255f17f7aabe9",
+        "bytes": 1026
+      },
+      {
+        "path": "packages/docs-content/content/concepts/diagnostics.mdx",
+        "sha256": "65f316c6357190e820f79d00e4daea2dcc02010252e724ab99c0d9f712a6b1b2",
+        "bytes": 1583
+      },
+      {
+        "path": "packages/docs-content/content/concepts/facts.mdx",
+        "sha256": "d14e50dc2408260cb7c1a2d1e28115f751fef7b40ec4d3842a7317e51c7735ee",
+        "bytes": 1169
+      },
+      {
+        "path": "packages/docs-content/content/concepts/index.mdx",
+        "sha256": "79d1c27541668881705f920fe16f3405d47d338e330fa092625929d0a5ef17b6",
+        "bytes": 768
+      },
+      {
+        "path": "packages/docs-content/content/concepts/jurisdictions-and-tax-years.mdx",
+        "sha256": "feaac55e94ef3c3a41bbde5c1b678bc44a56b76a2d2291794d70b4737705f6e9",
+        "bytes": 1022
+      },
+      {
+        "path": "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+        "sha256": "2a5b9d282b3c295c7eb8bcc8c8c4fc83c4eeaf77dfe009e8af0b2ee771a6a26b",
+        "bytes": 2083
+      },
+      {
+        "path": "packages/docs-content/content/concepts/reports.mdx",
+        "sha256": "c3cf071c2e90e45259eea1dd16663269dfe609518c525dd95b103f9d74ba9643",
+        "bytes": 1485
+      },
+      {
+        "path": "packages/docs-content/content/concepts/rules.mdx",
+        "sha256": "4a549fd191715afd80e02631ee51f4fd02711993c791b25fd252edee3e60abd7",
+        "bytes": 1044
+      },
+      {
+        "path": "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+        "sha256": "8a0cefafbd2583d881084852913f89bf2071acc4c78933ce0714a4dfb772db9a",
+        "bytes": 1682
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-calculator.mdx",
+        "sha256": "1c66cfbbca806d8d50a2e187f6531de3ecb94976b28caf0fab7797b44e469d53",
+        "bytes": 2297
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-fact.mdx",
+        "sha256": "cd3341b9b80f7bbb06a722c9731e9f6d22694f53c6581baaa9c1678f230cc229",
+        "bytes": 2955
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-rule.mdx",
+        "sha256": "77c91fa5911cd7c7c40a74e955de69afa4dfd8fef5d9e363fb585cfb1e05c61a",
+        "bytes": 2562
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-tax-year.mdx",
+        "sha256": "476302737871c9d91401f32daaed5251dd5bab2bc7a241a473a466b4a1306c71",
+        "bytes": 2224
+      },
+      {
+        "path": "packages/docs-content/content/contributing/backward-compatibility.mdx",
+        "sha256": "78cfacf9e0441d7e7667cf25c605be88bf813c7fa5c6fe14723003dbddc31249",
+        "bytes": 1972
+      },
+      {
+        "path": "packages/docs-content/content/contributing/changesets.mdx",
+        "sha256": "2b9fe8f2d0194c0df425ec513760e183fe2dbf923a7943060ec4565427824ff8",
+        "bytes": 1265
+      },
+      {
+        "path": "packages/docs-content/content/contributing/effect-service-standards.mdx",
+        "sha256": "f05022bb6f8b26b22b1db47c7c29dcb7a414307c9a327fe50c717db70ef504a2",
+        "bytes": 1651
+      },
+      {
+        "path": "packages/docs-content/content/contributing/fix-an-incorrect-result.mdx",
+        "sha256": "fc961d4a7e9b04576acb635c15937767248c93f7fe7a53c16ec7ea952fcdc598",
+        "bytes": 1714
+      },
+      {
+        "path": "packages/docs-content/content/contributing/index.mdx",
+        "sha256": "e9581f62b2fc53b28910f3b48c479d820d5126fad810cf8c75e9be691f1cd84d",
+        "bytes": 1932
+      },
+      {
+        "path": "packages/docs-content/content/contributing/naming-and-schema-standards.mdx",
+        "sha256": "99d659c2a5e27f128015f280e1a5636e2f0b05c2f2d4b9a5248a898ef99650ac",
+        "bytes": 2349
+      },
+      {
+        "path": "packages/docs-content/content/contributing/pr-evidence-checklist.mdx",
+        "sha256": "c5941244ef6faa658dac6035fe8848894874528af4a42802be2273c783f32710",
+        "bytes": 1731
+      },
+      {
+        "path": "packages/docs-content/content/contributing/review-expectations.mdx",
+        "sha256": "d671e77b1266717c63677aa945527acb8f2fc142dc4efb55e23071670d2e8cdc",
+        "bytes": 1491
+      },
+      {
+        "path": "packages/docs-content/content/contributing/source-citation-standards.mdx",
+        "sha256": "a2fd278a5eb1924f3b51a0fccb106f28c6250f4513d4d378bc09081ad3ae882d",
+        "bytes": 1439
+      },
+      {
+        "path": "packages/docs-content/content/contributing/testing-standards.mdx",
+        "sha256": "12cc13473961edcad4e9d6ea161349709c337f47baa148af55ef9b3a880a6c06",
+        "bytes": 2493
+      },
+      {
+        "path": "packages/docs-content/content/contributing/what-are-you-changing.mdx",
+        "sha256": "9f39955bb9c85dd724860cb73da15d07fe7af171ef2bf7efa43183027c785100",
+        "bytes": 3752
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+        "sha256": "3205ef76fc5d9fe332aa90e3d6aecaf41484a83a47f4b73814e9bff5aaaed215",
+        "bytes": 2748
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx",
+        "sha256": "be7ac205e3642533c230b3b8aa7c0abbdd797a3afc119b37c17eb4e7de25dcc6",
+        "bytes": 3504
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+        "sha256": "a05d4a9135331e1c63b6ae15156988fee9877247d31fefc30c8501c5c93a27c0",
+        "bytes": 1969
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+        "sha256": "9703d92b814d88a249d18f33c2436883d18489f7ca442d71cf92755aa9c573bf",
+        "bytes": 1946
+      },
+      {
+        "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+        "sha256": "58ab2d9106459198fe43df2a89a23b82c0e4cae8d7481b3e37d94984ddc1b0ea",
+        "bytes": 2485
+      },
+      {
+        "path": "packages/docs-content/content/guides/index.mdx",
+        "sha256": "5d0d52d5cb051d2515a8840a2730695ee8491de59649d7a9ab920ea139cfbccd",
+        "bytes": 944
+      },
+      {
+        "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+        "sha256": "6e76472d153685544c14068f700575df466e1ecb6e199eade2ca0792c7dedead",
+        "bytes": 2374
+      },
+      {
+        "path": "packages/docs-content/content/guides/show-calculator-help-to-users.mdx",
+        "sha256": "8682d9a24885eb3ebb04604f412c53a6210bbeb41c5d6ba361c8256c72d5c4ed",
+        "bytes": 2482
+      },
+      {
+        "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+        "sha256": "75570a690ddfdd9321189495a305a6ac548c4c54ca46259ce3d0f4575bcfd3d2",
+        "bytes": 2307
+      },
+      {
+        "path": "packages/docs-content/content/reference/api.mdx",
+        "sha256": "5cf3ab9773e5374c89557911a5dde97ecf49b96faf7c698627a3992f2607cd40",
+        "bytes": 2856
+      },
+      {
+        "path": "packages/docs-content/content/reference/changelog.mdx",
+        "sha256": "3b24fdcfc2810cf440c0ef2d5cbd9132c14f0b8942888e8f432c0bd529979606",
+        "bytes": 1853
+      },
+      {
+        "path": "packages/docs-content/content/reference/errors.mdx",
+        "sha256": "594dfc43871e441d229418e83f8cd042afda9141b1e73394cefac7d36d5f559d",
+        "bytes": 4160
+      },
+      {
+        "path": "packages/docs-content/content/reference/examples.mdx",
+        "sha256": "e56e7f44679062a0287c7719b171c547b099877d1410f4acf32bc177ee27c5b2",
+        "bytes": 2783
+      },
+      {
+        "path": "packages/docs-content/content/reference/index.mdx",
+        "sha256": "a8223193b6322f55137ae8d78523451ba653c05c0e163e1264809972f24c0052",
+        "bytes": 650
+      },
+      {
+        "path": "packages/docs-content/content/reference/release-notes.mdx",
+        "sha256": "585e4b90b5e0486ba4aaee9cb5e29c525c9135d6b99f04da6e03e3550c02efca",
+        "bytes": 1575
+      },
+      {
+        "path": "packages/docs-content/content/reference/schemas.mdx",
+        "sha256": "ca2d6b20117c34eb31156f50a3871f52193085fe7a8fbd2f3dfbed59a0574428",
+        "bytes": 4773
+      },
+      {
+        "path": "packages/docs-content/content/reference/sdk.mdx",
+        "sha256": "f16f0213929f1b449a55dedfd485784be8dbd229f7da290768ed27d2f5fff968",
+        "bytes": 3875
+      },
+      {
+        "path": "packages/docs-content/content/reference/versioning.mdx",
+        "sha256": "8456023ab3c159fe4665d1606b8be796de02f1cc2ddce11ca66c8318c494f0c6",
+        "bytes": 1410
+      },
+      {
+        "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+        "sha256": "4c01cae8723987e0feb4e506207c863759c479d6745eaafedd19681c8532df9d",
+        "bytes": 4041
+      },
+      {
+        "path": "packages/docs-content/content/sdk/index.mdx",
+        "sha256": "fd48d19bbcd8e7d73bb0018cf80dabccae2c924f669a54b107425d736f2bfccb",
+        "bytes": 581
+      },
+      {
+        "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+        "sha256": "df7aac2a617cef669fe35675c1f5e104fe93409221beb490d75ebcdce4db89de",
+        "bytes": 2238
+      },
+      {
+        "path": "packages/docs-content/content/sdk/safe-sdk.mdx",
+        "sha256": "9ffccb925464ef2822ebb2ec4fdc45c23bd41a7a3f72d125f381c17d3fad87ea",
+        "bytes": 1646
+      },
+      {
+        "path": "packages/docs-content/content/sdk/schemas.mdx",
+        "sha256": "71a258e4eb47d9e9dfbe43b54edf2e84e8b836768bf457177e6f54b731d0cd97",
+        "bytes": 1856
+      },
+      {
+        "path": "packages/docs-content/content/sdk/type-safety.mdx",
+        "sha256": "98a5accb952d7f12888981d499d6fe3832c8977e3fb44f23fb9d2918a452db3f",
+        "bytes": 3589
+      },
+      {
+        "path": "packages/docs-content/content/sdk/typescript-sdk.mdx",
+        "sha256": "7adb72811cddcbe649b68a3383588e91ec1d431c92867e40631c73a576edaa25",
+        "bytes": 2354
+      },
+      {
+        "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+        "sha256": "d9e5437f4d3ebb655299da3356e852df5a3664ab100ffd9c0f3486e620fbabf8",
+        "bytes": 3008
+      },
+      {
+        "path": "packages/docs-content/content/start/index.mdx",
+        "sha256": "71cbdfd5f0c2b87428b5493a15f00dafefbb2d1628bd1babb0b76fc92f8e55ef",
+        "bytes": 616
+      },
+      {
+        "path": "packages/docs-content/content/start/install-the-sdk.mdx",
+        "sha256": "746b37c9ea5b063f3805f14e863042b8e6b2e5f6039b4fff23e144aeca04fcb4",
+        "bytes": 1901
+      },
+      {
+        "path": "packages/docs-content/content/start/overview.mdx",
+        "sha256": "a6f9a0793f8ecdf1e402753b5bd10dc3ccc19d93899ba273f3d5acde69081bb4",
+        "bytes": 2132
+      },
+      {
+        "path": "packages/docs-content/content/start/quickstart.mdx",
+        "sha256": "15608d28a074ade562346b5b6eea66d870ed66daee3ef47b6c61a226c10518d5",
+        "bytes": 1980
+      },
+      {
+        "path": "packages/docs-content/content/start/run-your-first-calculation.mdx",
+        "sha256": "94735e5de1330cf5b947e6fdefc671eaf3a71ca3378c58dc419a6ddb1268affb",
+        "bytes": 1837
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--authentication-and-deployment-assumptions.json",
+        "sha256": "2dd20a7bf566c0665ceedea4884a1dc24decf3ba29e7448114c9c099aa9037cd",
+        "bytes": 308
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--endpoints.json",
+        "sha256": "3a75bed7f14d39af0076f0b180bbdcbf8f9a3c8471f20765e2bbb1e7e1edb6ea",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--errors.json",
+        "sha256": "eb6fdace6c3b7a7fb0ef647c75159110e00de5ea1d5e990a6c7b1c38ba0ef80d",
+        "bytes": 273
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--index.json",
+        "sha256": "b3ad39cdb57517462951c60b4cd19f79ad5ec758f1f736a1738abae0729c9b2e",
+        "bytes": 272
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--openapi-reference.json",
+        "sha256": "77a8049bd277045642883c9b2101f867fdb762aa7d30a50ca614256bc6d9dafb",
+        "bytes": 284
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--overview.json",
+        "sha256": "ddcd6d99a15a42c74801cf4eaace83351456c47deb883c1570c8ea510a571ac7",
+        "bytes": 275
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--calculators.json",
+        "sha256": "ec18ee1e21358d3574654603f63199f7caf49664fd31b50ee2e0a4949b971870",
+        "bytes": 283
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--diagnostics.json",
+        "sha256": "29f10cba9f070b14ec6442828f5fcd04652b1903a5910d6c3ebc7ed505048425",
+        "bytes": 283
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--facts.json",
+        "sha256": "eb91aced242788d65e9a6ac8c2b45d02beb72c6042ecf697e2c5dbefa715f17a",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--index.json",
+        "sha256": "9dec252f5137d39938376d30a314837f7527ac65acd04abbad26bbc5f0ce6091",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--jurisdictions-and-tax-years.json",
+        "sha256": "eff47512d5113bdb1685ccf2af52e9696a876c0e58fa34c202473fa2a39780a5",
+        "bytes": 299
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--money-and-branded-values.json",
+        "sha256": "ae83889f9f43ad6adb2ccd572290ecb873b3dfa23fd71c3348e53b339f76745c",
+        "bytes": 296
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--reports.json",
+        "sha256": "24e0e0ecfa90393c24447d44d9d69e13105936b4bb6bf9f78853026f737b46a5",
+        "bytes": 279
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--rules.json",
+        "sha256": "bfffe4084ba3e373fcd4565e22309c62835b4efd3dae561454c7cc6b5c73c67e",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--sdk-http-api-and-calculators-service-boundary.json",
+        "sha256": "6fbcd5bdce1abd5c1dea48d7d4115b0f21dd9ebbd614ab3611aa5879352cda48",
+        "bytes": 317
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-calculator.json",
+        "sha256": "e78cc0f684e4cc407b1486c37c21582ef7bfcb8355c024d9710f8e04b2a50f10",
+        "bytes": 292
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-fact.json",
+        "sha256": "a89f3ac90b5daf918b77a2e062fbca3d3aaad77342a958326407b926ea6f933b",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-rule.json",
+        "sha256": "efd77a1ea5f6fcaad61bbbe0550432b6c511ea93fce091814d680e5d9fb3cd99",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-tax-year.json",
+        "sha256": "b72f27858e16cd9d11c230dd85401d13f73fcf7279435ec869596ac6f0412f47",
+        "bytes": 290
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--backward-compatibility.json",
+        "sha256": "551d71b346a546e518e245d99a93c2b6a1b1182c0645a05a01bfcd39cf69ccad",
+        "bytes": 298
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--changesets.json",
+        "sha256": "ddde01ccb784f0f4d0bffd512967af62478dddde478ad1a98632d53d9e5e647e",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--effect-service-standards.json",
+        "sha256": "5aff8d6bde5c63affe832b125ecc31c211a2d8d98828fcee95c3ad381556b813",
+        "bytes": 300
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--fix-an-incorrect-result.json",
+        "sha256": "08931b073acddf617917e0c761bb8d543b49c9b7d634096c32e0eb5fea970adb",
+        "bytes": 299
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--index.json",
+        "sha256": "68ce439f81d9f4edf05be56333e733ed0c07a61996044df9878e24bfc0309b1b",
+        "bytes": 281
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--naming-and-schema-standards.json",
+        "sha256": "907df619587ed8e16de7bb51bd8813ffe5b1c12d5b6657d71c4eba36bec73166",
+        "bytes": 303
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--pr-evidence-checklist.json",
+        "sha256": "a30c26264880dbc14b6e42f98cb5a4e8ec947129fc1f18352e5dcb61a95884f6",
+        "bytes": 297
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--review-expectations.json",
+        "sha256": "e277eae428651a97f4dee3ad5127c1076a2dde213b63619bb51a0850d7229bd2",
+        "bytes": 295
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--source-citation-standards.json",
+        "sha256": "f222f4bf21002847f8b0272f6b138c0325d8a848a9d6830c8b0327f7545070c8",
+        "bytes": 301
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--testing-standards.json",
+        "sha256": "a79ccea61db9ab81f6df6e3d095c36ee8b6eef209b7e86e2a7acf8b868470f44",
+        "bytes": 293
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--what-are-you-changing.json",
+        "sha256": "fe50bfeb6a67b444615ae1e373bd2a23baa196bde59e57ccddd91fe7995f8bec",
+        "bytes": 297
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--build-a-browser-app-with-the-http-api.json",
+        "sha256": "a77ca7af74ebbcb0aa3e5e9faa3b6b3cab39e21817e743ab622f32eb9a334fab",
+        "bytes": 307
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--build-a-server-route-with-the-sdk.json",
+        "sha256": "2597e8b0be7880da1ac4fb99652899c2e06f25f5db5d32e338397a66344fb622",
+        "bytes": 303
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--calculate-annual-income-tax.json",
+        "sha256": "6463dfa13a976569f8e657fd4f9a289f899781de66e8b125d5751dd51c7245b6",
+        "bytes": 297
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--calculate-australian-take-home-pay.json",
+        "sha256": "0e5c53640548677310a60638ae4b94788fe4ebce4d1b0895d3e673d5e70bd37b",
+        "bytes": 304
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--handle-validation-errors.json",
+        "sha256": "bcd5c6f6b92a8f56163d374b6f7d71b032bb6b08896f0dd9bca01f3192045bc6",
+        "bytes": 294
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--index.json",
+        "sha256": "4e9c363db90c08693768c3e30fb3bdbc9f5a7cc93c04172f240bcb7e1a23bedd",
+        "bytes": 275
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--migrate-from-raw-http-to-sdk.json",
+        "sha256": "2b4a9c2bc5bd53168cd5bb7b5d61cac83430cc99133f4f731a84e62daeda48b7",
+        "bytes": 298
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--show-calculator-help-to-users.json",
+        "sha256": "e73aaf8cd384b0d1082225166222b18aba90801c2e620ab2e2070151748a4ad0",
+        "bytes": 299
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--test-your-integration.json",
+        "sha256": "ae52c92b2abd53410e3159f81bfaa4aa3c9488e006de5a6afac5188c99936d86",
+        "bytes": 291
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/navigation.json",
+        "sha256": "f2a0812c8bdb06ec53854ed7a770b2a36dbe803d4177247a240625f6bd970690",
+        "bytes": 266
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--api.json",
+        "sha256": "fdbb72c149a9981bbd7f32b253c7d3fdbd3d746b1a26e71e77f3234db93eb4d2",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--changelog.json",
+        "sha256": "3cff11b6242f7541da82a7450517102bd3ba26089d8f740f61ebae5b99a92db6",
+        "bytes": 282
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--errors.json",
+        "sha256": "70ed821d566c17efbfcd9a26834a8eca33a74cecd0a449ba271e07842b987f38",
+        "bytes": 279
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--examples.json",
+        "sha256": "edc9b664109e236d1beef804e2d803c4e43514c7d134cd60a10c2ebc65f993a3",
+        "bytes": 281
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--index.json",
+        "sha256": "8434693444a32923fd79a834b6ed9ed3ddac69b8062c6838f7df5f896da43245",
+        "bytes": 278
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--release-notes.json",
+        "sha256": "1008047e7392a6f3433e411dbe04c06727eaef239e7ca89b85170876bf84441e",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--schemas.json",
+        "sha256": "53f3b5e393c667745cba206ec9a1beb5cd9c994998d266abec1443d28f2947b7",
+        "bytes": 280
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--sdk.json",
+        "sha256": "4969a08cd84c803757ab11b63866faf378e8171368b9a8d6e70bcbd0f7659eeb",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--versioning.json",
+        "sha256": "6192aa02d834ad5428ebc023e0cc5d1b7d6b7da99c1c6ab734af4b14038c8524",
+        "bytes": 283
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--effect-sdk.json",
+        "sha256": "569eff10002812c53e63776da2dad71ce5efde86012218e14987f45826e19f12",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--index.json",
+        "sha256": "6bb4d7cc3d7479b26dfb293e914adc30085d7675446f39a48375ae7817743d63",
+        "bytes": 272
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--plain-sdk.json",
+        "sha256": "94d047ee0cd9f14f04a1d030a0be791b60830ea5cbf67567a3e977c300e9bbee",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--safe-sdk.json",
+        "sha256": "41408858ecaedc82a575a823b29c87345aa7d6dd6bbea04b6fe7c206afec19aa",
+        "bytes": 275
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--schemas.json",
+        "sha256": "c73ceb7779b325c273ae0d2bd1fe1df495ef08a6a1549c12d94d75d988668075",
+        "bytes": 274
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--type-safety.json",
+        "sha256": "4e163ee06b4ed81432f00a44a5eea70abeac51c813f26b3695bd794d1b284914",
+        "bytes": 278
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--typescript-sdk.json",
+        "sha256": "3cb8f3d94e83d1d7b652cd57784e63a64466a82da1840d9ceadc896383712475",
+        "bytes": 281
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--choose-sdk-or-api.json",
+        "sha256": "95abd27bfe147bb1e0384001a7585957cb40046547db4c89af3170602fe84262",
+        "bytes": 286
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--index.json",
+        "sha256": "fa5861cc08a19dcb65d46bac3f438e5bb783550a17021db4a2ef4c85cea0d1e5",
+        "bytes": 274
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--install-the-sdk.json",
+        "sha256": "d2794e9aedd35cd5201351262bfe076853991f3e2eda7bf0bd2e99e09f40e835",
+        "bytes": 284
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--overview.json",
+        "sha256": "a02066dc9e97f3dbda0e879e735856fa9d2239b1869d2836fbcb623e8e65efd3",
+        "bytes": 277
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--quickstart.json",
+        "sha256": "9e0df988d887e48885a3f56a5bccaee93af2744f95faa82632518e4615e18094",
+        "bytes": 279
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--run-your-first-calculation.json",
+        "sha256": "b0ffc097048deea35f626d7476cdbbcd2625016b7a2ce4088ae8cf928085879b",
+        "bytes": 295
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--endpoints.json",
+        "sha256": "9059b5b57e1b17331dce81a456cd50166d3167c877713862e8935980baf1c0b5",
+        "bytes": 276
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--errors.json",
+        "sha256": "54923b94566f0530217b2095b5cc557b36e9215c74833bcf5739df675ccb49a7",
+        "bytes": 273
+      },
+      {
+        "path": "packages/docs-content/navigation.json",
+        "sha256": "702af16f496d9dd5ad2b32caba525a7c1250d4166cb82ad201728a171d0a78c2",
+        "bytes": 15433
+      },
+      {
+        "path": "tools/documentation/owner-policy.json",
+        "sha256": "75c342c96118899eb11cd9c3bd2fa36ba98c8b6fd832e40d9190083e9b75bd54",
+        "bytes": 16702
+      }
+    ],
+    "retainedIntegrationTemplates": [
+      {
+        "path": "packages/docs-examples/src/node-server.ts",
+        "sha256": "615696a109f00a22c8b7adeeca0d23a0e3b0c3598cb03c8d374db5c60fedb908",
+        "bytes": 2000
+      },
+      {
+        "path": "packages/docs-examples/src/browser-http.ts",
+        "sha256": "bc7f0cb75b61ccd87e98a6f4e4c7c797e83bec1651c0fce1587a73deeb973862",
+        "bytes": 1157
+      },
+      {
+        "path": "packages/docs-examples/src/effect.ts",
+        "sha256": "a1bbc04ec1a8bbb31b52b8a9a22b591d5ffaf4e484da4f6e461eaadb3ec6619a",
+        "bytes": 1061
+      },
+      {
+        "path": "packages/docs-examples/src/error-handling.ts",
+        "sha256": "77616e6e6803778d226f1e7911cfbaf15300e611582a136dcfa1ba4f149aa570",
+        "bytes": 825
+      }
+    ]
+  },
+  "environment": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "host": "Local macOS arm64; compiled Node and workerd/Chromium checks",
+    "upstreamReferences": {
+      "effect": "92f48401426694eb1d9d0552b2f7514b3978e7f4 (v3 reference only; installed v4 source/types own compatibility)",
+      "alchemy": "Installed beta.80 source/types; beta.75 reference clone 808ef694b2e742a2bb76cb301da371e71421fa57"
+    }
+  },
+  "limitations": [
+    "Search interaction, discovery files, Markdown negotiation, share images and retirement of the old documentation app remain unfinished T005 work.",
+    "Local built proof establishes no deployed/publicly available page, publication or external consumer.",
+    "Metrics remain deferred; disabled collection is retained and safe exported tracing is unfinished.",
+    "Controlled failure claims are bounded to the named local tests; no upstream cancellation or all-framework-error-path claim."
+  ],
+  "rollback": "Restore qualified parent 049b04ff9b71e8705507e819ba3ea31f8c9fa64e while preserving accepted sources and prior receipts.",
+  "task": "CSF-T005 / DEV-76",
+  "readingReview": {
+    "reviewer": "Fresh independent impeccable_finish_reviewer",
+    "disposition": "ship",
+    "reviewScope": "All four validated supplied captures and page/rendering source; reading/navigation extension only",
+    "contract": "Fresh agent used supplied Impeccable degraded finish-review contract; screenshots/source only, no inherited build history",
+    "reportPath": "/private/tmp/dev76-website-docs-finish-review.md",
+    "reportSha256": "2742e01cd53393e748bfa1d9ca74b45b016621bb825dbc3f5898e6c07e07ef35",
+    "report": "disposition: ship\nInputs: PRODUCT.md, DESIGN.md, an approved comp, a measured spec/diff and a quality card were not supplied; the brief makes these unnecessary for this bounded extension of the existing site. The test file was sampled. Review used the supplied degraded review contract, screenshots and source only.\n\n## persistence\nPass within the supplied scope. The route, shared document components, page view, styles and browser checks contain the rendering and navigation work. The brief retains the existing visual system and explicitly rules out new PRODUCT.md or DESIGN.md files. No new visual world, comp round or concept roll was required. All four required captures exist, show the document top, match their named page and width, and contain no blank or broken regions.\n\n## fidelity\n| Element or promise | Result | Evidence |\n| --- | --- | --- |\n| TYPE | match | Inter/system text, clear heading sizes, comfortable body spacing and monospace used for code. This follows the retained type direction. |\n| MATERIAL | match | Plain document surfaces, restrained borders and a genuine geometric diagram. No imitation physical material or invented asset requirement. |\n| GROUND | match | The source specifies pale #f8fafc, dark #172033 and blue article links; the captures show that field and contrast. |\n| Purpose | match | The document itself leads: actual title, introduction, instructions and links. |\n| Existing visual system | match | The accepted pale, quiet documentation style is retained across both pages and widths. |\n| Reading order | match | Navigation precedes the article; headings, code and next steps remain in the authored order. |\n| First viewport | match | Both captured phone and desktop views expose the document title and useful opening copy. |\n| Page form and navigation | match | The article has a 72ch maximum width, a desktop sidebar and a native phone disclosure. The current page is distinguished. Focus treatment is clearly visible. |\n| Diagram and table on phone | adaptation | Diagram lettering becomes too small to read on the phone. The readable table directly below preserves the same decisions and destinations. Its labelled scroll region keeps all columns accessible without widening the page, as allowed by the supplied phone-access evidence. |\n| Truth and scope | match | No added commercial claims, synthetic examples or new decorative images were found. The review covers page rendering and navigation only; it does not claim that search, discovery, share images, metrics or old-app retirement are complete. |\n\n## ceiling\nReached for the supplied Read-mode extension. Clear type, useful spacing, ordinary links, controlled line length and visible keyboard focus support reading. No quality card or unused decorative device establishes a higher requirement for this slice. The screenshots show no material craft-floor issue under the retained direction. The parent reports that the existing UI hook found no issues; no second detector ran.\n\n## material_fixes\nNone.\n\n## keep\nKeep the authored content and tax information, quiet reading layout, useful phone table, native navigation controls and clear keyboard focus.\n",
+    "hook": "UI edit hook reported no issues; no second detector run",
+    "limitations": [
+      "Small phone diagram lettering is unreadable at the full-fit scale; equivalent information is present in the readable labelled table immediately below.",
+      "No approved comp/new visual world; incumbent ordinary extension contract applies."
+    ]
+  },
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-desktop.png",
+      "sha256": "653b446948feaed665dc423cd2a9593d338fbbf4ecac0f283c15209c785e8a0c",
+      "bytes": 255635,
+      "reviewedCopy": ".alchemy/native-pair/screenshots/reviewed/docs-desktop.png"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-mobile.png",
+      "sha256": "2d4e82cf3a7d43239eaf390a222953d31de7c77e82cf19bf1edf8e9be4babd5d",
+      "bytes": 216877,
+      "reviewedCopy": ".alchemy/native-pair/screenshots/reviewed/docs-mobile.png"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-diagram-desktop.png",
+      "sha256": "34be2968577e465dbb8138f7a7398d1e6460c19a6d5bde8828085b69e0acb5fc",
+      "bytes": 284215,
+      "reviewedCopy": ".alchemy/native-pair/screenshots/reviewed/docs-diagram-desktop.png"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-diagram-mobile.png",
+      "sha256": "d4afa74561abbc3dc530389551d1918e2f353766c7c8f05a1599772ff0df0e7b",
+      "bytes": 236806,
+      "reviewedCopy": ".alchemy/native-pair/screenshots/reviewed/docs-diagram-mobile.png"
+    }
+  ],
+  "designDocumentation": {
+    "reviewer": "Fresh independent impeccable_documenter",
+    "outcome": "Ordinary incumbent-system extension; no new design guide required",
+    "reportPath": "/private/tmp/dev76-website-docs-design-documentation.md",
+    "reportSha256": "df7b84de88e3974e2831e22c010d230040c43b2770a771c9746a5237f1d089b8",
+    "report": "# DEV-76 / CSF-T005 design documentation check\n\nDate: 7 October 2026. Mode: Read. Outcome: preserve the existing design.\n\nOnly this temporary report was written. No repository file, design guide,\nprovider or public site was changed by this pass.\n\nThe new documentation pages extend the existing Website. The stylesheet at\nHEAD and the working stylesheet have the same original 184 lines; the diff\nonly adds document styles. The background, main text, font stack, top\nnavigation, form styles and keyboard focus colour remain as they were.\n\n## Five-line system summary\n\n1. Palette: pale background (#f8fafc), dark text (#172033), quieter navigation text (#526071), light borders (#d6dde7), inherited blue focus (#2563eb), and document links in darker blue (#075985).\n2. Type: the existing Inter/system font stack; article text (1.0625rem, line height 1.75); page title (clamp(2rem, 4vw, 3rem), line height 1.15); navigation and tables (0.9375rem); code blocks (0.875rem, line height 1.6).\n3. Layout: article width capped at 72ch, meaning about 72 characters per line; a 17rem desktop sidebar; one column below 52rem; a native collapsible navigation list on phones.\n4. Surfaces: plain background, thin borders, rounded code blocks (0.375rem), locally scrolling code and tables, and no added shadows or decorative imagery.\n5. Named rules: no existing named visual rules were found and none were invented; preserve authored reading order, ordinary links, clear current-page marking and visible keyboard focus.\n\n## Evidence checked\n\nRepository root: `<repository-root>`.\nBase HEAD: `049b04ff9b71e8705507e819ba3ea31f8c9fa64e`.\nThe checked artifact includes uncommitted work; HEAD alone does not identify it.\n\nThe operating instructions read were:\n\n- `<installed-impeccable-skill>/reference/document.md`, in full.\n- `<installed-impeccable-skill>/agents/impeccable_documenter.toml`.\n- `<installed-impeccable-skill>/reference/degraded/documenter.md` for comparison with the shipped role. This pass used the actual delegated documenter role; no inline substitution was needed.\n- The supplied repository `AGENTS.md` instructions, `docs/README.md`, `docs/architecture/frontend.md`, and the repository-local docs-maintainer skill, profile and its document-class, change-impact and proof references.\n- Current documentation-route notes in `apps/web/README.md`, `docs/architecture/content-and-posts.md` and the active clean-slate plan.\n\nThe product source sampled was:\n\n| Source | SHA-256 at this pass | Observation |\n| --- | --- | --- |\n| `apps/web/src/styles.css` | `79c3834a0e88ff1a45a3cbfffef7fec11d740526e60c477d9a2334667e52eb83` | Compared with `git show HEAD:apps/web/src/styles.css` and its actual diff. All original rules are preserved; document rules are appended. |\n| `apps/web/src/routes/$.tsx` | `3dd5b7088e0052b7976d5c671ba1ee3a9b38cfbe853cc0f8bc6f732659608610` | Sidebar and article remain visible in the route composition; loading, missing-page and unavailable states have clear copy; the article ends with a Markdown link. |\n| `apps/web/src/lib/docs/components.tsx` | `7a424f687699e4b672e5e6f5360e014594bc6efa6591966f3f84ac17b43182a5` | Internal page links retain navigation behaviour and deliberate heading focus. The table has a labelled, keyboard-focusable scroll area. |\n| `apps/web/src/lib/docs/page.view.tsx` | `9ff7a422914f9da0d9d7909b7c77cfd24e931912fbb1b1fab6cbc417dc8f9b37` | Native details/summary navigation, checked page labels and explicit current-page marking. |\n| `apps/web/src/lib/docs/mdx.boundary.tsx` | `7efcc5e0249fc5b258bf367f5354dd3d7ac3615b7763b9b802c0873d23218173` | Uses compiled authored pages, checks their text and metadata against the accepted page, and supplies fixed reload guidance for mismatches. |\n\nFour saved local captures were visually inspected. Their hashes match the\ncurrent dated receipt:\n\n| Capture under `.alchemy/native-pair/screenshots/` | SHA-256 |\n| --- | --- |\n| `docs-desktop.png` | `653b446948feaed665dc423cd2a9593d338fbbf4ecac0f283c15209c785e8a0c` |\n| `docs-mobile.png` | `2d4e82cf3a7d43239eaf390a222953d31de7c77e82cf19bf1edf8e9be4babd5d` |\n| `docs-diagram-desktop.png` | `34be2968577e465dbb8138f7a7398d1e6460c19a6d5bde8828085b69e0acb5fc` |\n| `docs-diagram-mobile.png` | `d4afa74561abbc3dc530389551d1918e2f353766c7c8f05a1599772ff0df0e7b` |\n\nThe Quickstart and the \u201cWhat are you changing?\u201d page show their titles and\nopening text at the top. The desktop sidebar, phone disclosure, underlined\ndocument links, code blocks, table and keyboard focus match the source. No\nblank or broken page region was observed in these captures.\n\nThe independent reviewer report at\n`/private/tmp/dev76-website-docs-finish-review.md` was read. Its SHA-256 is\n`2742e01cd53393e748bfa1d9ca74b45b016621bb825dbc3f5898e6c07e07ef35`.\nIt records `disposition: ship` and no material fixes for this reading and\nnavigation extension.\n\nBefore reading product source, this pass checked\n`/private/tmp/dev76-website-docs-focus-a-results.jsonl`: `oxlint-tests` had\nfinished with exit code 0. This respected the temporary source-replacement\nwarning supplied with the task.\n\nThe saved native test log\n`/private/tmp/dev76-website-docs-native-l-native.log` records 7 passing test\nfiles, 11 passing cases and exit code 0. This pass read that result; it did not\nrerun the tests or operate a live browser. The dated source receipt at\n`docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json`\nrecords 61 accepted pages, preserved navigation, retained integration\ntemplates and retained calculator outputs. This design pass sampled two pages\nand did not independently audit every content hash or tax result.\n\n## Documentation decision\n\n| Surface | Decision | Reason |\n| --- | --- | --- |\n| Existing Website visual system | Preserve | The original stylesheet is unchanged and the accepted brief requires an ordinary extension. |\n| PRODUCT.md, DESIGN.md and `.impeccable/design.json` | Preserve absence | A repository search found no matching design files. No new visual identity or system change was approved, so the documenter role does not require their creation. Missing files are context, not a failure. |\n| Authored pages, navigation, examples and tax figures | Preserve | The supplied scope retains these owners; no content change was authorised for this pass. |\n| Website README, frontend/content architecture and active T005 work | Preserve | These existing owners already describe the page connection and its unfinished work. This pass adds no durable implementation rule. |\n| Generated references, API/SDK contract, release notes and Changesets | N/A | This pass changes no package, public contract, generator, version or release claim. |\n| Runbooks, provider state, credentials, CI and publication | N/A | No operational action or external change is part of this pass. |\n| This isolated evidence report | Change required | The delegated task explicitly requests a record of the design check at this exact temporary path. |\n\n## Limits and existing missing context\n\nNo PRODUCT.md, DESIGN.md, approved visual comp, quality card or approved system\nchange was supplied. The incumbent source and explicit Read-mode extension\nbrief give enough context for this check. No new brand metaphor, invented\ndesign rule or replacement design file was introduced.\n\nThe diagram lettering is too small to read when fitted to the phone width.\nThe readable table directly below gives the same choices and destinations;\nthe reviewer accepted that solution. Small diagram lettering is recorded as a\nlocal limitation, not a design rule for future pages to copy.\n\nThe dated receipt currently still calls full qualification and fresh review\npending, while its embedded reviewer result says ship. This pre-existing\nrecord mismatch was reported to the parent agent for the existing closeout\nwork. It was not repaired by this read-only design pass. No other material\nvisual drift was found in the sampled source or captures.\n\nSearch, discovery files, Markdown negotiation, share images and retirement of\nthe old documentation app remain unfinished T005 work. Metrics remain\ndeferred. This report establishes no deployment, public availability,\npublication, complete repository qualification or external consumer result.\n\n```yaml\ncandidate:\n  source: The five sampled source files, incumbent HEAD stylesheet, four saved captures and named review/test records listed above.\n  provenance: Delegated Impeccable documenter read-only comparison.\n  freshness: Checked on 7 October 2026; source and capture hashes are listed above.\n  classification: Supporting local design evidence; no system change.\n  audience: Parent agent and Cooper.\n  attachedEvidence: The exact source, capture, review and test paths listed above.\n  proposedSemanticOwner: Existing Website source and frontend/content architecture; no new owner proposed.\n  targetRevision: Base 049b04ff9b71e8705507e819ba3ea31f8c9fa64e plus the sampled uncommitted source hashes above.\n  unresolvedContradictions: Existing receipt says qualification/review pending while its embedded reviewer result says ship.\n  responsibleReviewer: Parent agent for this supporting report; independent finish reviewer for the supplied ship decision.\n  publisherIdentity: Unknown; no publication is requested or authorised by this pass.\n  publicationStatus: Not published; isolated temporary report only.\n  revocationQuarantine: Disregard this report if any sampled source changes; repeat the comparison before reuse.\n  lastKnownGoodRecovery: Retain incumbent source; this pass has no repository mutation to roll back.\n  postPublicationReadback: N/A; this pass performs no publication.\n```\n\nNot made into a rule or repaired: the phone diagram's tiny text and the existing\npending receipt wording, because this pass only records the accepted design\nextension and leaves the owning closeout work with the parent agent.\n",
+    "writeBoundary": "Temporary report only; repository design files preserved",
+    "laterCorrectionReview": "Styles, MDX components and rendered composition are unchanged. A later route loader correction uses the typed application router context; no visual system change.",
+    "reportProjection": {
+      "kind": "Portable copy with two private root paths replaced by descriptive markers",
+      "originalReportSha256": "df7b84de88e3974e2831e22c010d230040c43b2770a771c9746a5237f1d089b8",
+      "projectedReportSha256": "b037e54b468e89c996c128f3c11a40a5700069bbb358c4c049fe082caa526b96",
+      "unchanged": "Findings, source identities, review disposition and limits"
+    }
+  },
+  "parentAudit": {
+    "reviewer": "Codex under Cooper approved T005 implementation authority",
+    "decision": "Accepted bounded Website page/navigation slice with complete local qualification; whole T005 remains in progress",
+    "findings": [
+      "One owning application runtime; named docs client operations remain separate from private calculator admission.",
+      "Native byte request adapter keeps binding receiver and signal; response decoded immediately; safe tagged errors discard provider diagnostics.",
+      "Dedicated route decoder and direct first consumers; visible route composition and readonly focused leaves; no generic wrapper/provider or browser runner.",
+      "Installed MDX compiler and browser-safe presentation imports; body/metadata/module mismatches have actual cold native proof.",
+      "Exact lint decoder/class-factory admissions with neighbouring renderer/runtime/encoder restrictions exercised by 591 actual-command tests.",
+      "Source-built fault fixtures restore exact API/live-layer owners; real native HTML and Chromium prevent checked-value-only imitation.",
+      "Retained source/template/tax outputs and disabled collection remain; no new package export contract, Changeset or external operation."
+    ]
+  },
+  "failedQualification": [
+    {
+      "stage": "all-tests",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 97.05,
+      "log": "/private/tmp/dev76-website-docs-full-a-all-tests.log"
+    },
+    {
+      "stage": "verification",
+      "command": [
+        "bun",
+        "run",
+        "verification"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 542.19,
+      "log": "/private/tmp/dev76-website-docs-full-a-verification.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "log": "/private/tmp/dev76-website-docs-full-b-format.log"
+    },
+    {
+      "stage": "all-tests",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 83.29,
+      "log": "/private/tmp/dev76-website-docs-full-b-all-tests.log"
+    },
+    {
+      "stage": "verification",
+      "command": [
+        "bun",
+        "run",
+        "verification"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 545.43,
+      "log": "/private/tmp/dev76-website-docs-full-b-verification.log"
+    }
+  ],
+  "failedQualificationSourceIdentities": [
+    {
+      "path": "apps/web/README.md",
+      "sha256": "e6289d8cb1cedcab1e27a606240618346ec09ed2ddf1b8cc1a1902d33a9a4652",
+      "bytes": 20939
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "fb8c489c410fbbe4532e8f8d46bc8d5e9da34e4acaf8e08803ca5c2a68cf2213",
+      "bytes": 2198
+    },
+    {
+      "path": "apps/web/scripts/native-pair-build.runtime.ts",
+      "sha256": "3376098e00b16bef404d4f2dc7d9f280d869b23ae5fc9dd38ec0c3aac971faa4",
+      "bytes": 17276
+    },
+    {
+      "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+      "sha256": "2b52e5cab5c1d7156177883727bcccb9ed31971e5500022ecc1c91dafed40786",
+      "bytes": 17376
+    },
+    {
+      "path": "apps/web/src/lib/config.boundary.test.ts",
+      "sha256": "7fbc589640f4168e204a53ebc70d9c99b5c14ee6e9429c1212047361de864b73",
+      "bytes": 3043
+    },
+    {
+      "path": "apps/web/src/lib/config.server.ts",
+      "sha256": "8efbcf4dffd630a72ebfe5f9150ba344a88a45ac7413381a213d3c9b3de15b7f",
+      "bytes": 1868
+    },
+    {
+      "path": "apps/web/src/lib/docs/components.tsx",
+      "sha256": "7a424f687699e4b672e5e6f5360e014594bc6efa6591966f3f84ac17b43182a5",
+      "bytes": 3291
+    },
+    {
+      "path": "apps/web/src/lib/docs/errors.ts",
+      "sha256": "b6bbab7de20cc52ef1e4b5a5e959fd7cd3ced5db0bde323b567558baec84f16f",
+      "bytes": 533
+    },
+    {
+      "path": "apps/web/src/lib/docs/mdx.boundary.tsx",
+      "sha256": "7efcc5e0249fc5b258bf367f5354dd3d7ac3615b7763b9b802c0873d23218173",
+      "bytes": 2282
+    },
+    {
+      "path": "apps/web/src/lib/docs/page.view.tsx",
+      "sha256": "9ff7a422914f9da0d9d7909b7c77cfd24e931912fbb1b1fab6cbc417dc8f9b37",
+      "bytes": 2057
+    },
+    {
+      "path": "apps/web/src/lib/docs/route-boundary.ts",
+      "sha256": "fdf6ce8220ffe3d1bd6e815a988a4060dba08e8ff295604e5a7a6194ddaa573a",
+      "bytes": 583
+    },
+    {
+      "path": "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+      "sha256": "c733d31fa9c4e70f1efaf72efe105217796eaf3e5044e521ae9aa839861947c7",
+      "bytes": 3780
+    },
+    {
+      "path": "apps/web/src/lib/live.server.layer.ts",
+      "sha256": "ee70d63a580c34e3bd7b2a16df9baa4453adfcdaea5640229bea02dcb3ae7dce",
+      "bytes": 8898
+    },
+    {
+      "path": "apps/web/src/lib/loaders.server.ts",
+      "sha256": "39ed7de44f629bca8db6f1fe05cef8d979da60b540e7487e0ac5f7e584eedad4",
+      "bytes": 4031
+    },
+    {
+      "path": "apps/web/src/lib/loaders.ts",
+      "sha256": "ba4f83f2bf4eea37b97339afccab949abc14f1c67fef7b39b1aa52902de77416",
+      "bytes": 1672
+    },
+    {
+      "path": "apps/web/src/lib/schemas.ts",
+      "sha256": "7c533f421f4159ec1a2475fe5aacfd9a42756ee750710a632a9977cdc9da59da",
+      "bytes": 3097
+    },
+    {
+      "path": "apps/web/src/lib/service.server.ts",
+      "sha256": "d45708ce1c735f574d75a0d399d6ad37d5c465cdbd4e11801518f3dac44da7be",
+      "bytes": 1735
+    },
+    {
+      "path": "apps/web/src/routeTree.gen.ts",
+      "sha256": "fbcd5bd6b7f793b63a578ece5c4300776e671170b8873abff9d193b156a39220",
+      "bytes": 3806
+    },
+    {
+      "path": "apps/web/src/routes/$.tsx",
+      "sha256": "3dd5b7088e0052b7976d5c671ba1ee3a9b38cfbe853cc0f8bc6f732659608610",
+      "bytes": 2515
+    },
+    {
+      "path": "apps/web/src/routes/__root.tsx",
+      "sha256": "4092bc9020b3a9314599a0a12f55e7dcf8e4155e3ac302af4758234fe27b0dfd",
+      "bytes": 5273
+    },
+    {
+      "path": "apps/web/src/server.ts",
+      "sha256": "669da00729f22cd8b00ea1dcc4cf478be21aed11539de3c9f126dc31378aa802",
+      "bytes": 8195
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "sha256": "79c3834a0e88ff1a45a3cbfffef7fec11d740526e60c477d9a2334667e52eb83",
+      "bytes": 5551
+    },
+    {
+      "path": "apps/web/test/native-pair.boundary.test.ts",
+      "sha256": "62d1012366d7f47046725cc57156f358457c81e63983fa2fc8b8db2b5b267955",
+      "bytes": 70314
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "sha256": "48e4bd46801541242bf830b43fc70449f706f85e4351514c062264ac61eb9bfd",
+      "bytes": 1715
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "e9c95bc4c984c65f3ec88c0f360bbbedd5bc89611d221e2844ebd519f706f556",
+      "bytes": 286626
+    },
+    {
+      "path": "docs/architecture/api-and-sdk.md",
+      "sha256": "8e0d9c5b2708fc14806fbdc2c2f34be922d0504f3710ec8368e8b20f269a42eb",
+      "bytes": 30996
+    },
+    {
+      "path": "docs/architecture/content-and-posts.md",
+      "sha256": "6bb1f8c872597ace80f1041eac80f5488ff8cf882a7caa635e7037ad4ae339e1",
+      "bytes": 7582
+    },
+    {
+      "path": "docs/architecture/frontend.md",
+      "sha256": "7e099f0b224b5f68e935776fd90d8088f18de34eb7bf278a1099e897ce5ca8f4",
+      "bytes": 24987
+    },
+    {
+      "path": "docs/architecture/package-ownership.md",
+      "sha256": "a17008da7c545a8eb1d6357b4655a5b7eb1d0879c1b71a80be63be564e4e1049",
+      "bytes": 14343
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "sha256": "e910dd6db33140e57a2aa1cb2b92fb3a22bcece9072fc034558274207c175787",
+      "bytes": 92910
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "sha256": "2742e50a29161bc608eae8c7c3d97ea1e1e63b2f23402900abbc4bfe7e2b8a91",
+      "bytes": 270478
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "5bf1c60aec7ef95b6f802d410b0ddc0d00b4d9bdd3c7324811aac5502c3784a5",
+      "bytes": 67689
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "66ad56782902eb7e47e98ffe6fe60fda93cddf3993461f802b5d6faa0fc02d72",
+      "bytes": 73318
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "29cba9f99dfc866744140ecced2be3fed359d72f2c6dd2a34b2ff8b3257f824d",
+      "bytes": 19391
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "be71992be788c0a7cdaac08694f806ab2a346be213fdaff690b40548a0ef6dcf",
+      "bytes": 57130
+    },
+    {
+      "path": "packages/api/rpc/README.md",
+      "sha256": "5776e362278c245aa9a32f2035d6ee915e1cb241a1e880775eec3d615c8dafef",
+      "bytes": 15063
+    },
+    {
+      "path": "packages/docs-content/README.md",
+      "sha256": "471c31b54db282230f98871ff32d5bbbae146fa4e4d6494c659c85aaa5706520",
+      "bytes": 15317
+    },
+    {
+      "path": "tools/oxlint/portable-rules.test.ts",
+      "sha256": "04b170b5f836ae17f3a26840569a40d299fb427d324abef0aa34433d77a79ffc",
+      "bytes": 87169
+    }
+  ],
+  "failedQualificationSourceIdentitiesB": [
+    {
+      "path": "apps/web/README.md",
+      "sha256": "e6289d8cb1cedcab1e27a606240618346ec09ed2ddf1b8cc1a1902d33a9a4652",
+      "bytes": 20939
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "fb8c489c410fbbe4532e8f8d46bc8d5e9da34e4acaf8e08803ca5c2a68cf2213",
+      "bytes": 2198
+    },
+    {
+      "path": "apps/web/scripts/native-pair-build.runtime.ts",
+      "sha256": "3376098e00b16bef404d4f2dc7d9f280d869b23ae5fc9dd38ec0c3aac971faa4",
+      "bytes": 17276
+    },
+    {
+      "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+      "sha256": "2b52e5cab5c1d7156177883727bcccb9ed31971e5500022ecc1c91dafed40786",
+      "bytes": 17376
+    },
+    {
+      "path": "apps/web/src/lib/config.boundary.test.ts",
+      "sha256": "7fbc589640f4168e204a53ebc70d9c99b5c14ee6e9429c1212047361de864b73",
+      "bytes": 3043
+    },
+    {
+      "path": "apps/web/src/lib/config.server.ts",
+      "sha256": "8efbcf4dffd630a72ebfe5f9150ba344a88a45ac7413381a213d3c9b3de15b7f",
+      "bytes": 1868
+    },
+    {
+      "path": "apps/web/src/lib/docs/components.tsx",
+      "sha256": "7a424f687699e4b672e5e6f5360e014594bc6efa6591966f3f84ac17b43182a5",
+      "bytes": 3291
+    },
+    {
+      "path": "apps/web/src/lib/docs/errors.ts",
+      "sha256": "b6bbab7de20cc52ef1e4b5a5e959fd7cd3ced5db0bde323b567558baec84f16f",
+      "bytes": 533
+    },
+    {
+      "path": "apps/web/src/lib/docs/mdx.boundary.tsx",
+      "sha256": "7efcc5e0249fc5b258bf367f5354dd3d7ac3615b7763b9b802c0873d23218173",
+      "bytes": 2282
+    },
+    {
+      "path": "apps/web/src/lib/docs/page.view.tsx",
+      "sha256": "9ff7a422914f9da0d9d7909b7c77cfd24e931912fbb1b1fab6cbc417dc8f9b37",
+      "bytes": 2057
+    },
+    {
+      "path": "apps/web/src/lib/docs/route-boundary.ts",
+      "sha256": "fdf6ce8220ffe3d1bd6e815a988a4060dba08e8ff295604e5a7a6194ddaa573a",
+      "bytes": 583
+    },
+    {
+      "path": "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+      "sha256": "c733d31fa9c4e70f1efaf72efe105217796eaf3e5044e521ae9aa839861947c7",
+      "bytes": 3780
+    },
+    {
+      "path": "apps/web/src/lib/live.server.layer.ts",
+      "sha256": "ee70d63a580c34e3bd7b2a16df9baa4453adfcdaea5640229bea02dcb3ae7dce",
+      "bytes": 8898
+    },
+    {
+      "path": "apps/web/src/lib/loaders.server.ts",
+      "sha256": "39ed7de44f629bca8db6f1fe05cef8d979da60b540e7487e0ac5f7e584eedad4",
+      "bytes": 4031
+    },
+    {
+      "path": "apps/web/src/lib/loaders.ts",
+      "sha256": "ba4f83f2bf4eea37b97339afccab949abc14f1c67fef7b39b1aa52902de77416",
+      "bytes": 1672
+    },
+    {
+      "path": "apps/web/src/lib/schemas.ts",
+      "sha256": "ebd4c178384fbd3a0e3191ae15feb97f8614bb0f0ef17455269239c2bb83d5a6",
+      "bytes": 3090
+    },
+    {
+      "path": "apps/web/src/lib/service.server.ts",
+      "sha256": "d45708ce1c735f574d75a0d399d6ad37d5c465cdbd4e11801518f3dac44da7be",
+      "bytes": 1735
+    },
+    {
+      "path": "apps/web/src/routeTree.gen.ts",
+      "sha256": "fbcd5bd6b7f793b63a578ece5c4300776e671170b8873abff9d193b156a39220",
+      "bytes": 3806
+    },
+    {
+      "path": "apps/web/src/routes/$.tsx",
+      "sha256": "3dd5b7088e0052b7976d5c671ba1ee3a9b38cfbe853cc0f8bc6f732659608610",
+      "bytes": 2515
+    },
+    {
+      "path": "apps/web/src/routes/__root.tsx",
+      "sha256": "4092bc9020b3a9314599a0a12f55e7dcf8e4155e3ac302af4758234fe27b0dfd",
+      "bytes": 5273
+    },
+    {
+      "path": "apps/web/src/server.ts",
+      "sha256": "669da00729f22cd8b00ea1dcc4cf478be21aed11539de3c9f126dc31378aa802",
+      "bytes": 8195
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "sha256": "79c3834a0e88ff1a45a3cbfffef7fec11d740526e60c477d9a2334667e52eb83",
+      "bytes": 5551
+    },
+    {
+      "path": "apps/web/test/native-pair.boundary.test.ts",
+      "sha256": "62d1012366d7f47046725cc57156f358457c81e63983fa2fc8b8db2b5b267955",
+      "bytes": 70314
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "sha256": "48e4bd46801541242bf830b43fc70449f706f85e4351514c062264ac61eb9bfd",
+      "bytes": 1715
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "e9c95bc4c984c65f3ec88c0f360bbbedd5bc89611d221e2844ebd519f706f556",
+      "bytes": 286626
+    },
+    {
+      "path": "docs/architecture/api-and-sdk.md",
+      "sha256": "8e0d9c5b2708fc14806fbdc2c2f34be922d0504f3710ec8368e8b20f269a42eb",
+      "bytes": 30996
+    },
+    {
+      "path": "docs/architecture/content-and-posts.md",
+      "sha256": "6bb1f8c872597ace80f1041eac80f5488ff8cf882a7caa635e7037ad4ae339e1",
+      "bytes": 7582
+    },
+    {
+      "path": "docs/architecture/frontend.md",
+      "sha256": "7e099f0b224b5f68e935776fd90d8088f18de34eb7bf278a1099e897ce5ca8f4",
+      "bytes": 24987
+    },
+    {
+      "path": "docs/architecture/package-ownership.md",
+      "sha256": "a17008da7c545a8eb1d6357b4655a5b7eb1d0879c1b71a80be63be564e4e1049",
+      "bytes": 14343
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "sha256": "e910dd6db33140e57a2aa1cb2b92fb3a22bcece9072fc034558274207c175787",
+      "bytes": 92910
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "sha256": "2742e50a29161bc608eae8c7c3d97ea1e1e63b2f23402900abbc4bfe7e2b8a91",
+      "bytes": 270478
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "5bf1c60aec7ef95b6f802d410b0ddc0d00b4d9bdd3c7324811aac5502c3784a5",
+      "bytes": 67689
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "66ad56782902eb7e47e98ffe6fe60fda93cddf3993461f802b5d6faa0fc02d72",
+      "bytes": 73318
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "29cba9f99dfc866744140ecced2be3fed359d72f2c6dd2a34b2ff8b3257f824d",
+      "bytes": 19391
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "be71992be788c0a7cdaac08694f806ab2a346be213fdaff690b40548a0ef6dcf",
+      "bytes": 57130
+    },
+    {
+      "path": "packages/api/rpc/README.md",
+      "sha256": "5776e362278c245aa9a32f2035d6ee915e1cb241a1e880775eec3d615c8dafef",
+      "bytes": 15063
+    },
+    {
+      "path": "packages/docs-content/README.md",
+      "sha256": "471c31b54db282230f98871ff32d5bbbae146fa4e4d6494c659c85aaa5706520",
+      "bytes": 15317
+    },
+    {
+      "path": "tools/oxlint/portable-rules.test.ts",
+      "sha256": "04b170b5f836ae17f3a26840569a40d299fb427d324abef0aa34433d77a79ffc",
+      "bytes": 87169
+    }
+  ],
+  "sourceIdentities": [
+    {
+      "path": "apps/web/README.md",
+      "sha256": "e1ac0564757f7d5de818a04d8ff31aad0335695525d593e50ec3f785d3c5d794",
+      "bytes": 21315
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "fb8c489c410fbbe4532e8f8d46bc8d5e9da34e4acaf8e08803ca5c2a68cf2213",
+      "bytes": 2198
+    },
+    {
+      "path": "apps/web/scripts/native-pair-build.runtime.ts",
+      "sha256": "3376098e00b16bef404d4f2dc7d9f280d869b23ae5fc9dd38ec0c3aac971faa4",
+      "bytes": 17276
+    },
+    {
+      "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+      "sha256": "2b52e5cab5c1d7156177883727bcccb9ed31971e5500022ecc1c91dafed40786",
+      "bytes": 17376
+    },
+    {
+      "path": "apps/web/src/lib/config.boundary.test.ts",
+      "sha256": "7fbc589640f4168e204a53ebc70d9c99b5c14ee6e9429c1212047361de864b73",
+      "bytes": 3043
+    },
+    {
+      "path": "apps/web/src/lib/config.server.ts",
+      "sha256": "8efbcf4dffd630a72ebfe5f9150ba344a88a45ac7413381a213d3c9b3de15b7f",
+      "bytes": 1868
+    },
+    {
+      "path": "apps/web/src/lib/docs/components.tsx",
+      "sha256": "7a424f687699e4b672e5e6f5360e014594bc6efa6591966f3f84ac17b43182a5",
+      "bytes": 3291
+    },
+    {
+      "path": "apps/web/src/lib/docs/errors.ts",
+      "sha256": "b6bbab7de20cc52ef1e4b5a5e959fd7cd3ced5db0bde323b567558baec84f16f",
+      "bytes": 533
+    },
+    {
+      "path": "apps/web/src/lib/docs/mdx.boundary.tsx",
+      "sha256": "7efcc5e0249fc5b258bf367f5354dd3d7ac3615b7763b9b802c0873d23218173",
+      "bytes": 2282
+    },
+    {
+      "path": "apps/web/src/lib/docs/page.view.tsx",
+      "sha256": "9ff7a422914f9da0d9d7909b7c77cfd24e931912fbb1b1fab6cbc417dc8f9b37",
+      "bytes": 2057
+    },
+    {
+      "path": "apps/web/src/lib/docs/route-boundary.ts",
+      "sha256": "fdf6ce8220ffe3d1bd6e815a988a4060dba08e8ff295604e5a7a6194ddaa573a",
+      "bytes": 583
+    },
+    {
+      "path": "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+      "sha256": "36ec166612352ae8aa45e4e5e3a2ea57f54225220dd61e8c6127648f03acc600",
+      "bytes": 4154
+    },
+    {
+      "path": "apps/web/src/lib/live.server.layer.ts",
+      "sha256": "ee70d63a580c34e3bd7b2a16df9baa4453adfcdaea5640229bea02dcb3ae7dce",
+      "bytes": 8898
+    },
+    {
+      "path": "apps/web/src/lib/loaders.server.ts",
+      "sha256": "39ed7de44f629bca8db6f1fe05cef8d979da60b540e7487e0ac5f7e584eedad4",
+      "bytes": 4031
+    },
+    {
+      "path": "apps/web/src/lib/loaders.ts",
+      "sha256": "ba4f83f2bf4eea37b97339afccab949abc14f1c67fef7b39b1aa52902de77416",
+      "bytes": 1672
+    },
+    {
+      "path": "apps/web/src/lib/route-context.ts",
+      "sha256": "c438412c461211a06e7bf5e0aa37ed986d8673111b24b0f345cb5bd32c2ca106",
+      "bytes": 217
+    },
+    {
+      "path": "apps/web/src/lib/schemas.ts",
+      "sha256": "ebd4c178384fbd3a0e3191ae15feb97f8614bb0f0ef17455269239c2bb83d5a6",
+      "bytes": 3090
+    },
+    {
+      "path": "apps/web/src/lib/service.server.ts",
+      "sha256": "d45708ce1c735f574d75a0d399d6ad37d5c465cdbd4e11801518f3dac44da7be",
+      "bytes": 1735
+    },
+    {
+      "path": "apps/web/src/routeTree.gen.ts",
+      "sha256": "fbcd5bd6b7f793b63a578ece5c4300776e671170b8873abff9d193b156a39220",
+      "bytes": 3806
+    },
+    {
+      "path": "apps/web/src/router.tsx",
+      "sha256": "2680d7f962bb9fc3777e1501ed7a9a7f49a093f4eba54a76b072a5d69fa1d6ff",
+      "bytes": 679
+    },
+    {
+      "path": "apps/web/src/routes/$.tsx",
+      "sha256": "2f2383dd9adcaaa64944acebfd867a427aedca46b30d337e76da66ec9a5b8e71",
+      "bytes": 2472
+    },
+    {
+      "path": "apps/web/src/routes/__root.tsx",
+      "sha256": "4092bc9020b3a9314599a0a12f55e7dcf8e4155e3ac302af4758234fe27b0dfd",
+      "bytes": 5273
+    },
+    {
+      "path": "apps/web/src/server.ts",
+      "sha256": "669da00729f22cd8b00ea1dcc4cf478be21aed11539de3c9f126dc31378aa802",
+      "bytes": 8195
+    },
+    {
+      "path": "apps/web/src/styles.css",
+      "sha256": "79c3834a0e88ff1a45a3cbfffef7fec11d740526e60c477d9a2334667e52eb83",
+      "bytes": 5551
+    },
+    {
+      "path": "apps/web/test/native-pair.boundary.test.ts",
+      "sha256": "62d1012366d7f47046725cc57156f358457c81e63983fa2fc8b8db2b5b267955",
+      "bytes": 70314
+    },
+    {
+      "path": "apps/web/vite.config.ts",
+      "sha256": "48e4bd46801541242bf830b43fc70449f706f85e4351514c062264ac61eb9bfd",
+      "bytes": 1715
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "e9c95bc4c984c65f3ec88c0f360bbbedd5bc89611d221e2844ebd519f706f556",
+      "bytes": 286626
+    },
+    {
+      "path": "docs/architecture/api-and-sdk.md",
+      "sha256": "8e0d9c5b2708fc14806fbdc2c2f34be922d0504f3710ec8368e8b20f269a42eb",
+      "bytes": 30996
+    },
+    {
+      "path": "docs/architecture/content-and-posts.md",
+      "sha256": "6bb1f8c872597ace80f1041eac80f5488ff8cf882a7caa635e7037ad4ae339e1",
+      "bytes": 7582
+    },
+    {
+      "path": "docs/architecture/frontend.md",
+      "sha256": "20399d334778f75df5bc7da1f73a8a0e3b11ce2188ff2d002149cfcbf03c96c4",
+      "bytes": 25363
+    },
+    {
+      "path": "docs/architecture/package-ownership.md",
+      "sha256": "a17008da7c545a8eb1d6357b4655a5b7eb1d0879c1b71a80be63be564e4e1049",
+      "bytes": 14343
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "sha256": "e910dd6db33140e57a2aa1cb2b92fb3a22bcece9072fc034558274207c175787",
+      "bytes": 92910
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "sha256": "1d8019636308913711336aa92014febdd76d3a4fcd0293c1594514e58c8a18fb",
+      "bytes": 270954
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "sha256": "5bf1c60aec7ef95b6f802d410b0ddc0d00b4d9bdd3c7324811aac5502c3784a5",
+      "bytes": 67689
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "66ad56782902eb7e47e98ffe6fe60fda93cddf3993461f802b5d6faa0fc02d72",
+      "bytes": 73318
+    },
+    {
+      "path": "docs/verification/critical-journeys.json",
+      "sha256": "29cba9f99dfc866744140ecced2be3fed359d72f2c6dd2a34b2ff8b3257f824d",
+      "bytes": 19391
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "be71992be788c0a7cdaac08694f806ab2a346be213fdaff690b40548a0ef6dcf",
+      "bytes": 57130
+    },
+    {
+      "path": "packages/api/rpc/README.md",
+      "sha256": "5776e362278c245aa9a32f2035d6ee915e1cb241a1e880775eec3d615c8dafef",
+      "bytes": 15063
+    },
+    {
+      "path": "packages/docs-content/README.md",
+      "sha256": "471c31b54db282230f98871ff32d5bbbae146fa4e4d6494c659c85aaa5706520",
+      "bytes": 15317
+    },
+    {
+      "path": "tools/oxlint/portable-rules.test.ts",
+      "sha256": "04b170b5f836ae17f3a26840569a40d299fb427d324abef0aa34433d77a79ffc",
+      "bytes": 87169
+    }
+  ],
+  "compiledNodeOutputIdentity": {
+    "path": "/private/tmp/dev76-website-docs-full-c-compiled-node.log",
+    "sha256": "1a8f818b067927b727c9c853b80fbd4ee5eee7ea84834956a9c000b9194325f9"
+  },
+  "compiledEntryIdentities": [
+    {
+      "path": ".alchemy/native-pair/bundles/TaxKitApi/worker.js",
+      "sha256": "f819fd9797f86293262e7e5040c8d50a72dccee2487d46b2710896dead278647",
+      "bytes": 3777431
+    },
+    {
+      "path": ".alchemy/native-pair/bundles/TaxKitApiDocsBody/worker.js",
+      "sha256": "d83cd6d0ee317bad2cb9889fbb7d254f7eca713ddefee921f93350a6eb14b032",
+      "bytes": 3777648
+    },
+    {
+      "path": ".alchemy/native-pair/bundles/TaxKitApiDocsMetadata/worker.js",
+      "sha256": "39d212f162296b781bb228fceff5e3e9c0a0f131eb69ad4db09153654b539975",
+      "bytes": 3777663
+    },
+    {
+      "path": ".alchemy/native-pair/bundles/TaxKitApiDocsMissingModule/worker.js",
+      "sha256": "f71e80eeaf6c7971790efd8a5b48dbc7328f68cba160a0e335022c4205a465b5",
+      "bytes": 3777728
+    },
+    {
+      "path": "apps/web/dist/server/server.js",
+      "sha256": "b3d8cce6fd89a79616a5b0c6bcf016d3882a2145cb045c14a5bfdee0f9527751",
+      "bytes": 712654
+    }
+  ],
+  "compiledEntryIdentityScope": "Selected real native entry files only; source identities, built HTML and actual native/browser assertions own the broader local claim.",
+  "finalBuiltCaptures": [
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-desktop.png",
+      "sha256": "653b446948feaed665dc423cd2a9593d338fbbf4ecac0f283c15209c785e8a0c",
+      "bytes": 255635,
+      "sameAsReviewedBytes": true
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-mobile.png",
+      "sha256": "2d4e82cf3a7d43239eaf390a222953d31de7c77e82cf19bf1edf8e9be4babd5d",
+      "bytes": 216877,
+      "sameAsReviewedBytes": true
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-diagram-desktop.png",
+      "sha256": "34be2968577e465dbb8138f7a7398d1e6460c19a6d5bde8828085b69e0acb5fc",
+      "bytes": 284215,
+      "sameAsReviewedBytes": true
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/docs-diagram-mobile.png",
+      "sha256": "d4afa74561abbc3dc530389551d1918e2f353766c7c8f05a1599772ff0df0e7b",
+      "bytes": 236806,
+      "sameAsReviewedBytes": true
+    }
+  ],
+  "captureScope": "Fresh reviewer inspected the named preserved copies from the same frozen UI/test source; subsequent full qualification writes supplemental captures through the same tested document-top procedure. No later visual code change.",
+  "finalDocumentationUpdates": [
+    {
+      "path": "docs/architecture/effect-services.md",
+      "reason": "Final owner accounting corrects the earlier one-transport description; documentary clarification only, with no code/test/config change",
+      "sha256": "5e858956dfc950c44791c09abdbaf5563946b9f30528b8f4c0ce6df18220f45b",
+      "proof": "Final metadata format/documentation/runbook/path checks qualify this post-run wording update; the40 frozen implementation/owner paths stay unchanged."
+    }
+  ],
+  "finalMetadataChecks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.61,
+      "log": "/private/tmp/dev76-website-docs-final-meta-a-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "log": "/private/tmp/dev76-website-docs-final-meta-a-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "log": "/private/tmp/dev76-website-docs-final-meta-a-runbooks.log"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.25,
+      "log": "/private/tmp/dev76-website-docs-final-meta-a-paths.log"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.27,
+      "log": "/private/tmp/dev76-website-docs-final-meta-a-changesets.log"
+    },
+    {
+      "stage": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev76-website-docs-final-meta-a-whitespace.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.58,
+      "log": "/private/tmp/dev76-website-docs-final-meta-b-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "log": "/private/tmp/dev76-website-docs-final-meta-b-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev76-website-docs-final-meta-b-runbooks.log"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.25,
+      "log": "/private/tmp/dev76-website-docs-final-meta-b-paths.log"
+    },
+    {
+      "stage": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev76-website-docs-final-meta-b-whitespace.log"
+    }
+  ],
+  "hostedPortabilityCorrection": {
+    "failedHead": "7647642d8e87c3b8123c70fac93ee9afe4c2a1a1",
+    "failedRun": "https://github.com/crcorbett/taxkit/actions/runs/37499683409/job/112393172341",
+    "finding": "Embedded design report contained private machine paths. The receipt was untracked during local path checks and was only added afterwards.",
+    "recovery": "Replace those paths in the embedded portable copy; preserve the original isolated report and both hashes. Stage new receipt owners before the final tracked-file check.",
+    "preventionOwner": "docs/architecture/testing-and-quality.md tracked-file check contract",
+    "codeAndReadingEvidence": "No application, source catalogue, generated bundle or capture changed; earlier full local qualification and reading review retain their exact limited scope.",
+    "status": "Corrected staged receipt passes format, tracked paths, documentation, runbooks and whitespace checks; corrected-commit hosted qualification remains separate",
+    "focusedChecks": [
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.49,
+        "log": "/private/tmp/dev76-portable-receipt-a-format.log"
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.27,
+        "log": "/private/tmp/dev76-portable-receipt-a-paths.log"
+      },
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.28,
+        "log": "/private/tmp/dev76-portable-receipt-a-docs.log"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "log": "/private/tmp/dev76-portable-receipt-a-runbooks.log"
+      },
+      {
+        "stage": "whitespace",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "log": "/private/tmp/dev76-portable-receipt-a-whitespace.log"
+      }
+    ]
+  }
+}

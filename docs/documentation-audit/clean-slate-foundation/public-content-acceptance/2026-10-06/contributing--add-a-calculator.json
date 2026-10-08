@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "1c66cfbbca806d8d50a2e187f6531de3ecb94976b28caf0fab7797b44e469d53",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/contributing/add-a-calculator.mdx"
+}

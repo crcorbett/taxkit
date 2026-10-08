@@ -7,7 +7,8 @@
       "taxkit-sdk-packed",
       "taxkit-http-api",
       "taxkit-docs-runtime",
-      "taxkit-release-closure"
+      "taxkit-release-closure",
+      "taxkit-native-website"
     ]
   },
   "nonClaim": "A passing local governance gate does not prove remote Git, hosted CI, registry, release, deployment, provider, production, public-site, or external-consumer state."

@@ -1,4 +1,5 @@
 export {
+  CurrentReleaseJourneyInventory,
   ReleaseAcceptedAttemptSummary,
   ReleaseJourneyInventory,
   ReleaseProofPacket,

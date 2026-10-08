@@ -12,10 +12,10 @@ import { Context, Schema } from "effect";
  *
  * @example
  * ```ts
- * import { audDollars } from "@taxkit/core/primitives"
+ * import { Cents, aud } from "@taxkit/core/primitives"
  * import { AnnualTaxableIncome } from "@taxkit/rules-au-income-tax/facts"
  *
- * const income = new AnnualTaxableIncome({ income: audDollars(95_000) })
+ * const income = new AnnualTaxableIncome({ income: aud(Cents.make(9_500_000)) })
  * ```
  */
 export class AnnualTaxableIncome extends Schema.TaggedClass<AnnualTaxableIncome>()(

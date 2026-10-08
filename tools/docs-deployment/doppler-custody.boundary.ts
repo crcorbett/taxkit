@@ -62,38 +62,39 @@ export const checkDopplerCustody = (
         (selected, entry) => {
           const [scope, options] = entry;
           const normalizedScope = `${path.resolve(scope)}${path.sep}`;
-          const scopedToken = options.token;
-          if (
-            scopedToken === undefined ||
-            scopedToken.length === 0 ||
-            !root.startsWith(normalizedScope)
-          ) {
+          const scopedToken = Option.fromNullishOr(options.token).pipe(
+            Option.filter((value) => value.length > 0)
+          );
+          if (!root.startsWith(normalizedScope)) {
             return selected;
           }
-          return Option.match(selected, {
-            onNone: () =>
-              Option.some({
-                scopeLength: normalizedScope.length,
-                token: scopedToken,
-              }),
-            onSome: (current) =>
-              normalizedScope.length > current.scopeLength
-                ? Option.some({
+          return Option.match(scopedToken, {
+            onNone: () => selected,
+            onSome: (candidate) =>
+              Option.match(selected, {
+                onNone: () =>
+                  Option.some({
                     scopeLength: normalizedScope.length,
-                    token: scopedToken,
-                  })
-                : selected,
+                    token: candidate,
+                  }),
+                onSome: (current) =>
+                  normalizedScope.length > current.scopeLength
+                    ? Option.some({
+                        scopeLength: normalizedScope.length,
+                        token: candidate,
+                      })
+                    : selected,
+              }),
           });
         }
       ),
       (selected) => selected.token
     );
-    const selectedToken = yield* Option.match(token, {
-      onNone: () =>
-        Effect.fail(new DopplerCustodyError({ reason: "scoped-token" })),
-      onSome: Effect.succeed,
-    });
-    yield* Schema.decodeUnknownEffect(KeyringReference)(selectedToken).pipe(
+    const selectedToken = yield* token.pipe(
+      Effect.fromOption,
+      Effect.mapError(() => new DopplerCustodyError({ reason: "scoped-token" }))
+    );
+    yield* Schema.decodeEffect(KeyringReference)(selectedToken).pipe(
       Effect.mapError(
         () => new DopplerCustodyError({ reason: "system-keyring-reference" })
       )

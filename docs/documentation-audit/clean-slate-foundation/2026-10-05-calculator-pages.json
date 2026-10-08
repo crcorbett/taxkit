@@ -1,0 +1,399 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "catalogue bootstrap, calculator page state, submission correlation, report presentation or native proof change",
+  "outcome": "locally qualified calculator-page candidate; hosted candidate proof and draft review pending",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native API/Website and Chromium",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-calculator-pages",
+    "baseCommit": "cd03dd81694098d79a214650727ad3ee69f70f8d",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "files": [
+        {
+          "path": "apps/web/README.md",
+          "sha256": "78644de5e30e9324f25d676a0a381aa84da9097898eaf14275c361e7af25ff6c"
+        },
+        {
+          "path": "apps/web/package.json",
+          "sha256": "edbd088657fc77ebad25839174ad2d9f1b17a40ebb61cd4d7750a86ad4eedce0"
+        },
+        {
+          "path": "apps/web/src/lib/calculator-page-result.view.tsx",
+          "sha256": "b82d15d8fb145794f94c0d941cb328d162be25e9240a9322567f3a64bbc14018"
+        },
+        {
+          "path": "apps/web/src/lib/calculator-page.container.tsx",
+          "sha256": "51ccada5366599117c243eb6b47712529e301b3e4f53b8f165633271c10b0864"
+        },
+        {
+          "path": "apps/web/src/lib/calculator-page.view.tsx",
+          "sha256": "74de36780638e9eb6cd02dce3e9016a727326a164b96cd494d48b8dd8f162c1e"
+        },
+        {
+          "path": "apps/web/src/lib/calculator.atoms.ts",
+          "sha256": "838d5c6fc0fcc839e2be48a3e86a54b4bba637fd45df4d359d27c939d258e581"
+        },
+        {
+          "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+          "sha256": "c767439a6fe8d0186af3057c9e6a34892d1fa0b3267f2e661cf9b29234a151a4"
+        },
+        {
+          "path": "apps/web/src/lib/form.boundary.test.ts",
+          "sha256": "abf916f6b924e95ff248fc6541080b24abc41323a026fe1981786ddc358812b0"
+        },
+        {
+          "path": "apps/web/src/lib/form.boundary.ts",
+          "sha256": "b31a78df4fd671a4ce7160fd6ecc1a702b06257cc35a6c7cdf374b68f4bf91f5"
+        },
+        {
+          "path": "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+          "sha256": "846bab75bcb845782de3026ab2a7660ecf510125a945c213e6bb337e4a38d101"
+        },
+        {
+          "path": "apps/web/src/lib/live.server.layer.ts",
+          "sha256": "3445cea6c08316bdc3b5f45e983f0e186d16b75ef9eee8b88a35ccb85acbe391"
+        },
+        {
+          "path": "apps/web/src/lib/loaders.server.ts",
+          "sha256": "5d4cb22fc53d092f60f470f086c8f00aa20ad72da3f30c8b6d4a610083364740"
+        },
+        {
+          "path": "apps/web/src/lib/loaders.ts",
+          "sha256": "f0c17766c8dd426a6012db292531159b68d0193d49d10c9646c9fe2f551d0026"
+        },
+        {
+          "path": "apps/web/src/lib/schemas.ts",
+          "sha256": "ede31e86990d697252bb5ee9ac696865c77744feab9f01027a00654713cd43dc"
+        },
+        {
+          "path": "apps/web/src/lib/service.server.ts",
+          "sha256": "7ad26ce28185739039bf5f00848a8ef713ec8633b3cd0f4c6c2fb02ddae65c26"
+        },
+        {
+          "path": "apps/web/src/lib/take-home.container.tsx",
+          "sha256": "b91b7b1ee7f5b2c0b0005847237801f2ee53578f0d3400fc78e681976616e638"
+        },
+        {
+          "path": "apps/web/src/routeTree.gen.ts",
+          "sha256": "54465c36b611079874ec3640496cc0892f0d3197b97b21d1d2eaec9d46032e73"
+        },
+        {
+          "path": "apps/web/src/routes/__root.tsx",
+          "sha256": "a8bd0a61f014cadeefc8ba6d89f371012a4e6dd27579fa7962c4b417af4e2190"
+        },
+        {
+          "path": "apps/web/src/routes/agents.tsx",
+          "sha256": "e54c129c54ffb795a6142f270820099b80ab57d066dcb8a0b3a7a2cb44d42eed"
+        },
+        {
+          "path": "apps/web/src/routes/calculators.$calculatorId.tsx",
+          "sha256": "95eaf7e976aab8667fc1edf269853ca7d69177dc6662a25b0b4e9878c4aa6912"
+        },
+        {
+          "path": "apps/web/src/server.ts",
+          "sha256": "f77fc7116b1399691a94b0ea01d2be5ca79c9ba0734258a0e8b7c2a744eaec8d"
+        },
+        {
+          "path": "apps/web/src/styles.css",
+          "sha256": "29cccc394a94193867566ee2d397139da134bc73e137bbc3b01172ea0f780cc9"
+        },
+        {
+          "path": "apps/web/test/native-pair.boundary.test.ts",
+          "sha256": "b47010e3287417eaf91a4f39c530f95b9e488dd846cfa79cf62bff05adfac2f0"
+        },
+        {
+          "path": "bun.lock",
+          "sha256": "b59059b58448167aeaebfcfa7ce5fbdc393e599d95788c01179c7004c5b7601b"
+        },
+        {
+          "path": "docs/architecture/effect-services.md",
+          "sha256": "a0d7b03372f0fabcd522701817cff63a06ebab52556d2b3375496fdbeec21273"
+        },
+        {
+          "path": "docs/architecture/frontend.md",
+          "sha256": "429e9adffff2a2dcbca023081e8d086a91b6a1eae91336d4554b9d5cd2e90857"
+        },
+        {
+          "path": "docs/architecture/testing-and-quality.md",
+          "sha256": "21a72a69d3b840f4e540ee2ab2951d9b59da3882102f9b0597cb058b61b3c7c0"
+        },
+        {
+          "path": "docs/documentation-audit/README.md",
+          "sha256": "ac23e3ab8f91d6c22fef7e9e974d20d1525e2dc350ada5a0a88d50ecf1cef6d1"
+        },
+        {
+          "path": "docs/exec-plans/active/clean-slate-foundation.md",
+          "sha256": "3fa12b45477259c41048541673cbca6d0594439827e091c79aed6698800288b4"
+        },
+        {
+          "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+          "sha256": "25193422e96c258805293a4f33eea264249c67152c6b5570297849418a485d55"
+        },
+        {
+          "path": "docs/standards/tooling.md",
+          "sha256": "7dbdfdea4165c81a8c8413b68894a33cb615c022204e902a6df011d38d2aeb87"
+        },
+        {
+          "path": "docs/verification/critical-journeys.json",
+          "sha256": "325901a12ec237e88d6009230e009d3f355623b4866ea9ce28c563397f436624"
+        },
+        {
+          "path": "oxlint.config.ts",
+          "sha256": "0425b328dcb818f9cba0c52ffb3df7c4f6d8dfc98964e74afab28dbc4aebda29"
+        },
+        {
+          "path": "tools/oxlint/portable-rules.test.ts",
+          "sha256": "6d527da9dbf158973e1ab51c5a2fddf4a69c06fe25090657c14bc58430465927"
+        }
+      ],
+      "sha256": "9119b44f50262b5ae71998e5765c1b8dfef58cd270ea84c2568985be16d52af6",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this receipt to avoid self hashing."
+    }
+  },
+  "implementation": [
+    "Root bootstrap reads and restores checked catalogue metadata; navigation comes from canonical IDs/titles/context.",
+    "Withholding and annual routes have independent temporary state, explicit Calculate, stale answers and operation interruption. React retains the weakly cached family description while mounted.",
+    "Saved submission whole-record check correlates calculator identity, form and successful response/report identity.",
+    "All standard form POST paths select the canonical calculator and use the same private operation.",
+    "Report-only leaves display ledger breakdown, subtractive offsets, assumptions/year and HTTPS sources without recomputation.",
+    "Annual retained Medicare limitation is visible; developer/agent routes link to existing API docs/OpenAPI/catalogue.",
+    "Containers seed checked saved forms once through useAtomInitialValues before reading; the root provider seeds settings only."
+  ],
+  "proof": [
+    {
+      "command": "bun run --filter=web test",
+      "outcome": "9 fresh checks pass, including invalid annual number and saved identity/form rejection."
+    },
+    {
+      "command": "bun run --filter=web test:browser",
+      "outcome": "12 fresh browser checks pass in 3.54s before full verification; final full command freshly repeats all 12 in 3.10s."
+    },
+    {
+      "command": "focused source-built native pair test",
+      "outcome": "Pass after mounted-family correction: all three known answers, independent pages, stale results, explanations/sources and no-JavaScript forms in 6.62s."
+    },
+    {
+      "command": "strengthened focused source-built native pair test",
+      "outcome": "Pass in 9.76s: distinct 1654 weekly withholding and 30000 annual saved forms, actual private HTML, hydrated fields, report and no replay. Final complete native suite below extends failed/invalid and keyboard proof."
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "Pass: 777 installs, 1001 packages, no lock changes in 920ms."
+    },
+    {
+      "command": "lint, full app/package types and documentation checks",
+      "outcome": "Pass: lint zero errors; 27 type tasks (one fresh, 26 cached); docs/runbooks/root format/Changeset status and whitespace before full qualification."
+    },
+    {
+      "command": "bun run test",
+      "outcome": "Pass: 473 fresh actual CLI lint cases including 409 portable in 82.92s; 27 app/package tasks (one fresh, 26 cached). Changed Website nine tests freshly pass."
+    },
+    {
+      "command": "bun run build",
+      "outcome": "Pass: 16 tasks, one fresh and 15 cached in 2.382s."
+    },
+    {
+      "command": "bun run --filter=api smoke",
+      "outcome": "Pass: 12 tasks, one fresh and 11 cached in 652ms; actual HTTP/external consumer smoke."
+    },
+    {
+      "command": "bun run sdk:check-packed-artifact; bun run sdk:validate-downstream",
+      "outcome": "Pass: seven fully cached tasks in 30ms and 32ms respectively. Public SDK inputs unchanged; cached retained-contract evidence, not freshly executed new consumer proof."
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "Pass exit zero: 32 fresh Quality cases including 13 isolated copies in 581.05s, both unused-code checks, 27 type tasks (one fresh, 26 cached), cached 24 SDK browser cases, fresh 12 Website browser cases in 3.10s, actual Worker declarations, fresh native builds and all six native tests in 50.96s. New-page journey includes failed/invalid attempts retaining old answers, keyboard disclosure/Calculate, distinct private saved form HTML/hydration and no replay."
+    },
+    {
+      "command": "inspect four final native screenshots",
+      "outcome": "Pass: default and distinct restored withholding/annual pages; visible year/Medicare limitation, spaced controls, readable report breakdown/source links and keyboard focus."
+    }
+  ],
+  "failedAttempts": [
+    {
+      "stage": "initial type check",
+      "observed": "Bootstrap spread included native Response without checked fields; conditional form Effects had incompatible inference.",
+      "recovery": "Select only named encoded fields and annotate the canonical form union before mapping checked errors; types pass."
+    },
+    {
+      "stage": "initial lint and fixture editing",
+      "observed": "Nested conditions, manually constructed tag and unqualified chained host fill found. One mechanical edit selected the wrong route block and placed host fixtures in a string-path table.",
+      "recovery": "Simplify closed branching; use a structural owning form Schema; qualify exact locator receivers at their test path and move fixtures into the actual host table. Correct route block before native rebuild."
+    },
+    {
+      "stage": "initial native page test",
+      "observed": "Withholding Calculate leaves an empty output; five other native tests pass. The more informative focused oracle repeats the empty result with no visible alert.",
+      "recovery": "React useMemo retains the Atom.family grouping description while mounted; fresh native build and focused test pass."
+    },
+    {
+      "stage": "distinct saved form hydration",
+      "observed": "Correct server HTML hydrates to the default amount. Keeping the grouping descriptor in the root is insufficient; prior default-example checks could not detect this.",
+      "recovery": "Seed the checked form at its feature owner through the supported useAtomInitialValues hook; remove root form seeding. Stronger actual private POST/HTML/hydrated-field/no-replay oracle passes in 9.76s."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "surface": "Website implementation and generated routes",
+      "owners": [
+        "apps/web/src",
+        "apps/web/package.json",
+        "bun.lock",
+        "apps/web/README.md"
+      ],
+      "postcondition": "All three supported pages use the real API with independent transient state and standard HTML forms; route tree regenerated by Vite."
+    },
+    {
+      "decision": "Change required",
+      "surface": "exact browser-host qualification",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/standards/tooling.md"
+      ],
+      "postcondition": "Only two exact typed locator receivers gain fill admission at native test path; actual CLI rejects neighbouring application use."
+    },
+    {
+      "decision": "Change required",
+      "surface": "durable ownership and proof routing",
+      "owners": [
+        "docs/architecture/frontend.md",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/verification/critical-journeys.json",
+        "docs/documentation-audit/README.md"
+      ],
+      "postcondition": "Current page behaviour and bounded proof described; whole T004 remains incomplete."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "retained tax/package/provider/operational contracts",
+      "owners": [
+        "packages/core",
+        "packages/rules",
+        "packages/calculators",
+        "packages/api/http",
+        "packages/api/rpc",
+        "packages/sdk",
+        "packages/docs-content",
+        "packages/infrastructure",
+        ".agents/skills",
+        ".github/workflows",
+        "docs/runbooks",
+        "docs/operations"
+      ],
+      "reason": "No rule/result, public HTTP/OpenAPI/SDK/MDX, infrastructure, skill/CI or consequential operation change."
+    },
+    {
+      "decision": "N/A",
+      "surface": "Changeset and public generated snapshots",
+      "reason": "Private Website presentation/dependency and scoped test admission only; no public package contract, version, publication or HTTP/OpenAPI/MDX snapshot change."
+    }
+  ],
+  "limitations": [
+    "Complete T004 package/transport/domain qualification and DEV-76–81 remain open.",
+    "No Medicare correction or current-law correctness claim; retained rule references are not legal verification.",
+    "No provider, deployment, publication, remote MCP or exported telemetry proof.",
+    "Linear lookup cannot currently find DEV-75 by saved UUID or identifier; no tracking mutation attempted."
+  ],
+  "rollback": {
+    "identity": "cd03dd81694098d79a214650727ad3ee69f70f8d",
+    "action": "Revert this page slice; scoped fixtures close local resources. No provider action."
+  },
+  "parentHostedProof": {
+    "pullRequest": 139,
+    "headCommit": "cd03dd81694098d79a214650727ad3ee69f70f8d",
+    "runId": 37267118835,
+    "jobId": 111626168020,
+    "outcome": "success",
+    "completedAt": "2026-10-05T05:37:20Z",
+    "limitation": "Exact parent head only; current page candidate has no hosted proof."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for supported calculator pages; whole T004 incomplete",
+    "remaining": "Hosted exact candidate checks and draft review; complete transport/domain/package requirements and later tasks.",
+    "observations": [
+      "Canonical catalogue drives navigation; one API operation owns each answer and report leaves do not recalculate.",
+      "Checked saved whole-record identity, form and report correlation; supported feature-owned form seed preserves distinct values after hydration.",
+      "React retains mounted atom descriptions and containers interrupt on edits/unmount; exact host receiver additions preserve neighbouring application rejection.",
+      "Stronger distinct-value native oracle prevents earlier default-only restoration false green.",
+      "Tax rules, public HTTP/OpenAPI/SDK/MDX, infrastructure and disabled telemetry policy preserved."
+    ]
+  },
+  "environment": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "node": "v24.16.0",
+    "bun": "1.4.2",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and this receipt only after full verification; executable sources unchanged.",
+    "verification": "Pass: docs/runbooks/root format/Changeset status after evidence update; receipt-only documentation and whitespace checks repeated before commit."
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 71,
+      "sha256": "dbc5ca33088ef5db3b824c5b0292cb87bd9b9b6c5a594f4dd2cd6de869ff2104"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 19,
+      "sha256": "b73adf6146bd7c2c6c175a212ca38428f5f30c0b62bf6e09ff826427a5743fcb"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 8,
+      "sha256": "8544fefa5407782f0066b40d9751f17d9619a61f98e81798e2eb5c6abd091aa0"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 19,
+      "sha256": "c7c68c3733ec613ad05a5e62641560014ce9167aa0cfe60c2e0b9cdbfb7f1f87"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "2e9d9550ebef0604a8b9ec5f555e5b006c2467c8b919e33185abd2b2d20b7a75"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "4e7552f4f94f0ba833491b3607819bc581c0a9b7f2152306e0b745dfd55bd4f8"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "3a16d6e8f25dcd6a2b4572f74895444e3808103d2f445d4490c31c6252ef9e91"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "376336cce0ee7051a5d0eb50703b7ccc8e0e2a7242eb63e8acab02d5f6592aa4"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular file under each named root."
+}

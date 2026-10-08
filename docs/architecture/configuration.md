@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-08-28
-source_of_truth: docs
-confidence: medium
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-configuration-owner
+last_reviewed: 2026-10-08
+review_trigger: config Schema, namespace, source selection or secret custody change
 ---
 
 # Configuration
@@ -30,7 +32,7 @@ Doppler is the owner for TaxKit's operator-set credentials and their related
 environment identities. It is not the owner for host-created values, GitHub
 event data, Alchemy-generated state credentials or TaxKit evidence paths.
 
-The current environment map is:
+The repository-defined environment map is:
 
 | Purpose | Config | Values |
 | --- | --- | --- |
@@ -65,80 +67,93 @@ the reviewer-protected Production environment. Preview and Production select
 `taxkit/ci` separately for their exact provider-free Turbo consumers after
 cache saves, while teardown stays local-cache-only and cannot fetch `ci`.
 
-The TaxKit Doppler project/configs and three GitHub bridges are established.
-Direct Turbo and Cloudflare GitHub entries have been removed after merged-main
-replacement proof. No implemented workflow or supported recovery path falls
-back to a direct value.
+The earlier Doppler implementation recorded establishment of the project,
+configs and GitHub bridges, and removal of direct Turbo/Cloudflare entries after
+replacement proof. That is historical provider evidence, not a fresh readback
+from this checkout. Current source has no supported direct-value fallback;
+provider custody and availability require the separate operational readback
+owned by the [authority model](../operations/authority-model.md).
 
-## Pattern
+## Current package and app pattern
 
-Package exports schema, type and a config fragment:
+The [HTTP package config owner](../../packages/api/http/src/config.ts) exports
+`TaxKitHttpApiClientConfigSchema`, its derived type and the keyed server/browser
+config fragments. Its Schema uses `Schema.URLFromString`, so the encoded base
+URL is a string and the canonical value is a `URL`. The fragment reads the
+named URL through native `Config.URL` and constructs the owning Schema value.
+Its `Config.nested` namespaces are `TAXKIT_API` and `VITE_TAXKIT_API`.
 
-```ts
-import { Config, Schema } from "effect";
+The Website now uses the RPC origin owner rather than the retained HTTP
+client configuration. [Server settings](../../apps/web/src/lib/config.server.ts)
+read `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` through `Config.schema`.
+Native resource addresses come from the app graph, with `Worker.URL` for self
+and the peer Output for the other host. Config receives runtime binding values;
+missing/deferred outputs do not become guessed URLs.
 
-export const ServiceConfigSchema = Schema.Struct({
-  baseUrl: Schema.URLFromString,
-});
+`TAXKIT_API` is a native SDK Fetcher object. Its methods are not string-tree
+configuration, so an owning Schema checks that object separately before the
+private live Layer adapts it. The application service exposes named operations,
+never the native object. The adapter preserves its receiver and unrelated
+adapter defects. Settings errors contain only fixed safe fields.
 
-export type ServiceConfig = Schema.Schema.Type<typeof ServiceConfigSchema>;
+## Retained analytics project configuration
 
-export interface ServiceConfigFragment {
-  readonly service: ServiceConfig;
-}
+The separate `TaxKitPostHog/prod` candidate reads only `taxkit/prd` through
+native Doppler secrets, with shell application settings disabled. Its checked
+`POSTHOG_ORGANISATION_ID` and redacted `POSTHOG_MANAGEMENT_KEY` have no defaults;
+the US management host is fixed in the private adapter. Management credentials
+are deployment-only and never Worker bindings or browser settings. Current
+application analytics remain configured off; declaring project resources does
+not enable collection. The [infrastructure owner](../../packages/infrastructure/README.md#retained-posthog-project-candidate)
+describes deferred acquisition and native lifecycle bounds.
+One retained project ID and capture token serve Production and controlled
+Previews. Checked application configuration still requires the matching
+collection mode and exact event stage; ordinary Previews and local collection
+remain off. Report filters use those event labels rather than separate projects.
 
-export const ServiceConfigFragment = {
-  service: Config.schema(ServiceConfigSchema),
-} satisfies Config.Wrap<ServiceConfigFragment>;
+The Website relay reuses the analytics package's checked runtime mode, numeric
+project ID, region, stage and redacted capture token plus `WEBSITE_PUBLIC_ORIGIN`.
+The existing server host supplies these through `ConfigProvider.fromUnknown(env)`.
+Off requires no analytics key; invalid enabled settings produce a named failure
+only on the relay route. Native output fixtures pack the numeric project ID as
+a number, preserving the actual Alchemy Output contract. Management/query keys
+are never Website settings or bindings. Current deployments remain off.
 
-export const ServiceServerEnvConfigFragment = {
-  service: Config.schema(ServiceConfigSchema).pipe(Config.nested("SERVICE")),
-} satisfies Config.Wrap<ServiceConfigFragment>;
+## Browser configuration boundary
 
-export const ServiceViteEnvConfigFragment = {
-  service: Config.schema(ServiceConfigSchema).pipe(
-    Config.nested("VITE_SERVICE")
-  ),
-} satisfies Config.Wrap<ServiceConfigFragment>;
-```
+The root TanStack server function returns Schema-encoded public settings only.
+The root route restores the branded API origin and seeds the React Atom registry.
+The public settings atom stays alive for that registry's lifetime, including an
+idle form. Disposing the registry clears its values. No binding, credential or
+Effect Context is serialised to the browser.
 
-App composes package config fragments into app config:
+[Vite configuration](../../apps/web/vite.config.ts) sets `envPrefix: []`. There
+is no public origin build constant or browser ambient environment read. The
+local Wrangler fixture owns test names/origins and generated Worker types;
+Alchemy's apps graph owns runtime resource bindings. The saved native pair test
+checks the actual browser call and audits its built files separately from
+provider/deployed configuration.
 
-```ts
-import { ServiceServerEnvConfigFragment } from "@owner/service/config";
-import { Config } from "effect";
+## Schema-owned settings
 
-export const AppServerConfig = Config.all({
-  ...ServiceServerEnvConfigFragment,
-});
-```
+Use `Config.schema` with the owning Schema when loading semantic settings,
+including provider identities, credentials, stages and checked command inputs.
+[API app config](../../apps/api/src/config.ts) is another current example: the
+host and port are checked by their owners; optional `API_PORT` falls back to
+`PORT` only when absent. An invalid supplied primary value remains an error.
 
-Runtime module provides values through a runtime source and generic naming
-convention:
+The native API Worker candidate uses `apps/api/src/worker.config.ts` and the
+origin Schemas in the app's `schemas.ts`. Native planning leaves resource
+addresses deferred; first incoming runtime use decodes and caches the bound
+API/website origins once. Own origin is bound by native `Worker.URL`, while the
+website origin must be a matching resource Output. Missing or invalid values
+produce a fixed Config error and an empty unavailable response. No fallback
+address, extra backend runtime or request-time Layer construction is used.
 
-```ts
-import { ConfigProvider } from "effect";
-
-export const AppServerConfigProviderLive = ConfigProvider.layer(
-  ConfigProvider.fromEnv().pipe(ConfigProvider.constantCase)
-);
-```
-
-This maps a schema key such as `baseUrl` to `SERVICE_BASE_URL`.
-
-For Vite client env, use the same Effect env provider shape over
-`import.meta.env`:
-
-```ts
-export const AppClientConfigProviderLive = ConfigProvider.layer(
-  ConfigProvider.fromEnv({ env: import.meta.env }).pipe(
-    ConfigProvider.constantCase
-  )
-);
-```
-
-When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
-`VITE_SERVICE_BASE_URL`.
+Configuration modules own defaults and selection. Service contracts receive
+canonical checked values. Raw credentials use `Schema.RedactedFromValue` at
+string ingress; unwrap only at final construction of the private provider
+client, never merely for a brand or diagnostic.
 
 ## Guardrails
 
@@ -160,9 +175,8 @@ When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
   config fragment.
 - Keep one-off config error transformation inline at the runtime callsite.
 - Use Effect `Config`, `ConfigProvider`, `Schema`, `Layer` and platform
-  runtime primitives for configuration. Do not parse `process.env` or
-  `import.meta.env` by hand when an Effect config/schema composition can own
-  the shape.
+  runtime primitives for configuration. Keep representation ingress at its
+  exact config owner, and select only explicitly public keys for browser builds.
 - Provider credentials and other semantic values use owner-named Schemas with
   `Config.schema`; use `Schema.Redacted` or `Schema.RedactedFromValue` according
   to the actual ingress representation. Do not expose primitive config values
@@ -177,3 +191,48 @@ When composed with `ServiceViteEnvConfigFragment`, this maps `baseUrl` to
 - [Package ownership](./package-ownership.md)
 - [API and SDK](./api-and-sdk.md)
 - [Frontend](./frontend.md)
+
+
+## Native app root secret selection
+
+`alchemy.apps.run.ts` selects native `Stack.secrets` using the infrastructure
+package's `apps-secrets.boundary.ts`. Checked `prod` selects `taxkit/prd`,
+`pr-N` selects `taxkit/stg_preview`, and `dev_identity` selects `taxkit/dev`.
+Bad stages fail with a fixed Config error before profile, credential or HTTP
+access. An explicitly disabled native `Secrets.ProcessEnv` entry keeps ambient
+application keys from overriding the selected provider. Native profile/credential
+selection keeps its own upstream semantics.
+
+The precedence test replaces the remote Doppler Layer with checked fixture
+providers and runs real native Stack configuration. It proves ordering and
+ambient suppression, not Doppler download or credential access. Native Stack
+also rejects `--env-file` when the root declares secrets. The existing docs
+fetch bridge and its empty env-file remain their own operating contract; no
+current docs command selects the candidate app root.
+
+The separate `alchemy.apps.local.run.ts` root selects only disposable local
+app development, without the cloud secret stack. Its owned comment-only env
+file prevents loading ambient `.env` application values. The root command sets
+an isolated local `ALCHEMY_HOME` and passes source/no-env options through native
+Bun children. The saved test instead scrubs the process environment and scopes
+an empty profile directory. Alchemy creates an empty default profile directory
+but no credential JSON. These local bookkeeping files do not establish cloud
+credential custody. The [Website README](../../apps/web/README.md) owns setup;
+the current docs secret bridge remains separate.
+
+## Calculator platform logging and tracing
+
+`apps/api/src/worker.ts` owns the API's disabled platform collection policy;
+`packages/infrastructure/src/apps-stack.ts` supplies that policy to the native
+API and declares the Website's disabled policy. Both set global/log/trace
+collection and persistence to false, invocation logs to false and sampling to
+zero. The standalone Website config owns the matching Wrangler representation.
+This explicit state avoids Alchemy's default invocation logs. Automatic URL
+fields sit outside the fixed application logging policy, so that formatter
+alone cannot establish privacy for platform records.
+
+These settings are checked in native plans and saved local CLI resources.
+Cloudflare upload metadata, retained storage and safe exports require separate
+readback. T009 owns safe exported tracing and remains unmet; no competing trace
+exporter is admitted. The docs app's existing logging policy remains separately
+owned.

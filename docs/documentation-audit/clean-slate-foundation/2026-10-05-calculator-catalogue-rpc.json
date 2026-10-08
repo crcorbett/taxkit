@@ -1,0 +1,345 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "named catalogue RPC contract, codecs, operation lifetime or native proof changes",
+  "outcome": "locally qualified named catalogue RPC candidate; hosted candidate proof and draft review pending",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native API/Website and Chromium",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-calculator-catalogue",
+    "baseCommit": "48dcf8e657130da5a85a3a36db1c2dd974e62126",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "files": [
+        {
+          "path": ".changeset/calculator-catalogue-rpc.md",
+          "sha256": "8a06acd1f9bbded89e2024f1be38b4455a5199ed5202364315981d097c71b0ae"
+        },
+        {
+          "path": "apps/api/README.md",
+          "sha256": "4147619692f2599598f669ea6a6be2799a0490ffe49da3fd5ff20b1d09f03c73"
+        },
+        {
+          "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+          "sha256": "ca6a672a467cfe703c1cdfe77eacaa67f57dac2d2bda921029d52d6a953b543e"
+        },
+        {
+          "path": "apps/web/test/native-pair.boundary.test.ts",
+          "sha256": "d12e5dc4113bb708a257b6018aabb5080aa6c24d7b154e9b72f0c58e815786e5"
+        },
+        {
+          "path": "docs/architecture/api-and-sdk.md",
+          "sha256": "6c1e979139dea541177e3d9c1788b619b862ce2bfd1d3ae3abe7ab84148f1890"
+        },
+        {
+          "path": "docs/architecture/effect-services.md",
+          "sha256": "34bb88312de5e478d1ae140fda4593f81bdbc8f98ab379827fe540bf01bbb13e"
+        },
+        {
+          "path": "docs/architecture/package-ownership.md",
+          "sha256": "04d02247a0276c1aea2a7867700b141451253167bce9bf91c37364a5c22a2f5d"
+        },
+        {
+          "path": "docs/architecture/testing-and-quality.md",
+          "sha256": "9d179ec13cd573c556309093f8563deddd25a3a69a6ebd1d57ac7d8f3773e1f1"
+        },
+        {
+          "path": "docs/documentation-audit/README.md",
+          "sha256": "f24b17981e3b2826ee35dd5fb889816194ea0dcfcfda4b2184011e6364933c49"
+        },
+        {
+          "path": "docs/exec-plans/active/clean-slate-foundation.md",
+          "sha256": "cd8b9f2d8644e331749b062c9978593326886b60f93bfb3c2647434cfe3f95d4"
+        },
+        {
+          "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+          "sha256": "590d64dd9f24e8037dbb10e68433f99972729f6a2308f8e22edf2c383a735280"
+        },
+        {
+          "path": "docs/verification/critical-journeys.json",
+          "sha256": "2562886b860e069c516c9e1367550791d02278e885a41cca1192bef30bec9bac"
+        },
+        {
+          "path": "packages/api/rpc/README.md",
+          "sha256": "85db1823030d04f29e68bda03f6153e85c3373ddc01647a5f7d24dd62233b89b"
+        },
+        {
+          "path": "packages/api/rpc/src/group.ts",
+          "sha256": "3c9c56a39d8f407d99832d8993ded8d0f986f8ce530de11b8c7a9b84623ec4f4"
+        },
+        {
+          "path": "packages/api/rpc/src/handlers.ts",
+          "sha256": "8254731cab45513b9370a4b85e6e921f8ae75365c6109e0aa8f3a513f6f0ead8"
+        },
+        {
+          "path": "packages/api/rpc/src/live.layer.ts",
+          "sha256": "e290826e3d0ee932d7d149b038a6cb536a17b6d35c5af5efaa70529a9b7fabdd"
+        },
+        {
+          "path": "packages/api/rpc/src/schemas.ts",
+          "sha256": "921a054a72d832362915310649bc04292337a80562afcd66d660bf41bd580a6f"
+        },
+        {
+          "path": "packages/api/rpc/src/server-serialization.boundary.ts",
+          "sha256": "e5f583a60b501a445113fde8f8d52f82f09c47c20b719440e5f0132e52698ddf"
+        },
+        {
+          "path": "packages/api/rpc/src/service.ts",
+          "sha256": "54280abc07f88e29191acea6bbe61b44bafd4ef2fa4302d5327603838517b485"
+        },
+        {
+          "path": "packages/api/rpc/src/test.layer.ts",
+          "sha256": "6e351a553feec7013aadca157b359ab9e61dfdc45dddf5adb2356c68bdf18a5d"
+        },
+        {
+          "path": "packages/api/rpc/test/deadline.test.ts",
+          "sha256": "f93fbf0349e3f2a6f8885531e6e0546d93daf1b72a357072ad4670e4d664e03b"
+        },
+        {
+          "path": "packages/api/rpc/test/handlers.test.ts",
+          "sha256": "814a4b5c9065f915b12944cf29e4290dc8d69b6e33af2759364f0a22ebf419b3"
+        }
+      ],
+      "sha256": "406a7e2f85642a0f279275336355f8aaf803a171facc7a7a6d627ece0f4be008",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this receipt to avoid self hashing."
+    }
+  },
+  "implementation": [
+    "Closed ListCalculators native RPC delegates once to PublicCalculatorService.listCalculators using canonical MetadataQuery and CalculatorCatalogResponse.",
+    "Native envelope allows only Calculate and ListCalculators; two native exit Schemas share the owning decode-failure marker.",
+    "Each named client operation retains its own native receive-loop scope, complete five-second deadline, checked failures and credential/redirect/tracing policy. No generic callback or browser engine."
+  ],
+  "proof": [
+    {
+      "command": "bun run --filter=@taxkit/api-rpc test",
+      "outcome": "36 fresh tests pass in 492ms after type correction; catalogue titles/IDs/contexts, version skew, damaged JSON/shape, both operations deadline/interruption/scope/fetch policy checked."
+    },
+    {
+      "command": "bun run --filter=@taxkit/api-rpc check-types",
+      "outcome": "Pass after test-only success branches discard unused values."
+    },
+    {
+      "command": "bun run web:test:native-pair",
+      "outcome": "Pass: fresh native builds and all six tests in 42.27s. Actual built API catalogue read returns all three IDs and repeats after idle; existing form/private/browser/errors/cancellation/development proof preserved."
+    },
+    {
+      "command": "remove ListCalculators native exit decode marker and run damaged-shape oracle",
+      "outcome": "Rejected: one failed and 24 skipped; malformed catalogue reply becomes SchemaError defect instead of the required checked invalid response. Driver restores exact source bytes."
+    },
+    {
+      "command": "restored focused RPC tests",
+      "outcome": "All 36 tests freshly pass in 517ms."
+    },
+    {
+      "command": "bun run web:test:browser",
+      "outcome": "12 fresh browser checks pass in 2.97s; 13 tasks, four fresh and nine cached."
+    },
+    {
+      "command": "lint, full app/package types and docs",
+      "outcome": "Pass after mechanical corrections; all 27 type tasks fresh in 5.924s."
+    },
+    {
+      "command": "bun run test",
+      "outcome": "Pass: fresh 470 actual CLI lint cases including 406 portable in 56.56s; 27 app/package tasks, 16 fresh and 11 cached in 16.533s."
+    },
+    {
+      "command": "bun run build with provisioned browser path",
+      "outcome": "Pass: 16 tasks, four fresh and 12 cached in 4.325s. Initial failed build separately retained."
+    },
+    {
+      "command": "bun run --filter=api smoke",
+      "outcome": "Fresh actual HTTP routes/external temp consumer/cleanup pass."
+    },
+    {
+      "command": "bun run sdk:check-packed-artifact",
+      "outcome": "Fresh packed SDK 46-file import smoke/cleanup passes; six cached prerequisites."
+    },
+    {
+      "command": "bun run sdk:validate-downstream",
+      "outcome": "Fresh external temp workspace install/types/runtime/exports/browser bundle/cleanup passes; six cached prerequisites."
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "Pass exit 0: 32 fresh Quality cases including 13 isolated copies in 474.10s, both unused-code checks, 27 type tasks (16 fresh, 11 cached), 24 fresh SDK browser checks, actual Worker declarations, fresh native builds and six native tests in 39.99s. Website 12 browser cases replay in this command; fresh 2.97s check recorded above."
+    }
+  ],
+  "failedAttempts": [
+    {
+      "stage": "initial test type check",
+      "observed": "Test-only selected calculation/catalogue Effects have different success types at Effect.flip; runtime tests pass but types fail.",
+      "recovery": "Discard unused success separately inside each selected branch, without casts or policy exception; focused types and tests pass."
+    },
+    {
+      "stage": "initial docs/lint checks",
+      "observed": "Mechanical documentation edit reused API README text for the testing architecture owner; relative-link checks reject three copied links. New fixture object order and an unnecessary decoder in saved native test are rejected by lint.",
+      "recovery": "Restore the testing architecture exactly from the parent, append only the intended catalogue section, reorder fixture keys and construct the known local origin through its owning Schema. No lint admission change."
+    },
+    {
+      "stage": "negative-check driver assertion",
+      "observed": "The deliberately broken reply test fails as expected, but the driver first expects the wrong error text and therefore fails its own assertion. Exact source restoration still occurs.",
+      "recovery": "Match the observed SchemaError and one-failure/24-skipped oracle; repeated driver passes, then restored 36 tests pass."
+    },
+    {
+      "stage": "initial root build environment",
+      "observed": "Browser path omitted from command; docs MDX build cannot find Chromium at the default user cache. 15 tasks pass and docs build fails.",
+      "recovery": "Rerun with the already provisioned PLAYWRIGHT_BROWSERS_PATH; all 16 tasks pass. No installation or code change."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "surface": "named private RPC and exact qualification",
+      "owners": [
+        "packages/api/rpc/src",
+        "packages/api/rpc/test",
+        "packages/api/rpc/README.md",
+        "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "apps/web/test/native-pair.boundary.test.ts",
+        ".changeset/calculator-catalogue-rpc.md"
+      ],
+      "postcondition": "Canonical catalogue through declared procedure; operation-specific failure/lifetime/native proof."
+    },
+    {
+      "decision": "Change required",
+      "surface": "durable ownership and proof routing",
+      "owners": [
+        "apps/api/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/verification/critical-journeys.json",
+        "docs/documentation-audit/README.md"
+      ],
+      "postcondition": "New operation and proof ceiling described; T004 incomplete."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "retained rules/results and unrelated interfaces/policy",
+      "owners": [
+        "packages/core",
+        "packages/rules",
+        "packages/calculators",
+        "packages/api/http",
+        "packages/sdk",
+        "packages/docs-content",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "packages/infrastructure",
+        ".agents/skills",
+        "oxlint.config.ts",
+        ".github/workflows",
+        "docs/runbooks",
+        "docs/operations"
+      ],
+      "reason": "No tax results, public HTTP/OpenAPI/SDK/MDX, existing form/runtime, provider, lint/skill/CI or operation change."
+    },
+    {
+      "decision": "N/A",
+      "surface": "public generated snapshots",
+      "reason": "Private RPC addition reuses canonical query/result; no HTTP/OpenAPI or public MDX change."
+    }
+  ],
+  "limitations": [
+    "Homepage catalogue consumption and other calculator pages still pending.",
+    "Complete T004 package/transport/domain qualification and DEV-76\u201381 remain open.",
+    "No tax rule or Medicare correction; retained source references do not establish current law.",
+    "No provider, deployment, publication or exported trace proof."
+  ],
+  "rollback": {
+    "identity": "48dcf8e657130da5a85a3a36db1c2dd974e62126",
+    "action": "Revert this private catalogue operation slice; scoped fixtures stop local resources. No provider operation."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for named catalogue connection; whole T004 incomplete",
+    "remaining": "Hosted exact candidate checks and draft review; homepage consumption, other pages and complete T004 requirements.",
+    "observations": [
+      "Canonical list service called directly; no second catalogue or browser engine.",
+      "Two declared procedure exits have native codec identity qualification, actual broken-shape removal failure and exact restoration.",
+      "Both operations have deadline, interruption, scope and fetch-policy checks; built Worker catalogue succeeds twice across idle.",
+      "Original package scaffold/config receipt preserved as history; manifests/exports/configuration unchanged."
+    ]
+  },
+  "parentHostedProof": {
+    "pullRequest": 138,
+    "headCommit": "48dcf8e657130da5a85a3a36db1c2dd974e62126",
+    "runId": 37264804942,
+    "jobId": 111619227474,
+    "outcome": "success",
+    "completedAt": "2026-10-05T04:58:45Z",
+    "limitation": "Exact parent head only; this unpushed catalogue candidate has no hosted proof."
+  },
+  "environment": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "node": "v24.16.0",
+    "bun": "1.4.2",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and this receipt only after full verification; executable sources unchanged.",
+    "verification": "Pass: docs/runbooks/root format/Changeset status and whitespace after evidence update; receipt-only docs repeated before commit."
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 71,
+      "sha256": "dbc5ca33088ef5db3b824c5b0292cb87bd9b9b6c5a594f4dd2cd6de869ff2104"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 14,
+      "sha256": "e6db0792785637f53387faeaa6e79f01147a3f7aaeda77efc2df3447407fe046"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 3,
+      "sha256": "0deb81290a70b6ab01f155469be4a34abdbb697351855e461dd1470680d35fdf"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 14,
+      "sha256": "ce6f8c5ef0ccf04af97a53b896364bc4e6ddd65fbeddd8755392adcd74c6f2f1"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "2e9d9550ebef0604a8b9ec5f555e5b006c2467c8b919e33185abd2b2d20b7a75"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "4e7552f4f94f0ba833491b3607819bc581c0a9b7f2152306e0b745dfd55bd4f8"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "3a16d6e8f25dcd6a2b4572f74895444e3808103d2f445d4490c31c6252ef9e91"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "376336cce0ee7051a5d0eb50703b7ccc8e0e2a7242eb63e8acab02d5f6592aa4"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular file under each named root."
+}

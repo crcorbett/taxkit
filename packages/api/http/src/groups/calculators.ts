@@ -1,4 +1,9 @@
 import {
+  CalculatorCapacityExceeded,
+  CalculatorRateLimited,
+  CalculatorAdmissionUnavailable,
+  CalculatorOperationTimedOut,
+  CalculatorRequestError,
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorGraphResponse,
@@ -22,7 +27,12 @@ import {
   HttpApiGroup,
   HttpApiSchema,
   OpenApi,
-} from "effect/unstable/httpapi";
+} from "effect/http-api";
+
+import {
+  CalculatorRequestBodyTimedOut,
+  CalculatorRequestBodyTooLarge,
+} from "../schemas.js";
 
 export {
   CalculatorCatalog,
@@ -49,13 +59,60 @@ export {
   type CalculatorCatalogEntry,
 } from "@taxkit/calculators";
 
+const CalculatorApiRequestErrorEnvelope = Schema.Struct({
+  error: CalculatorRequestError,
+}).pipe(HttpApiSchema.status("BadRequest"));
+
+const CalculatorApiTimeoutEnvelope = Schema.Struct({
+  error: CalculatorOperationTimedOut,
+}).pipe(HttpApiSchema.status("GatewayTimeout"));
+const CalculatorApiMetadataErrorEnvelopes = [
+  CalculatorApiRequestErrorEnvelope,
+  CalculatorApiTimeoutEnvelope,
+] as const;
+
+const CalculatorApiErrorEnvelopes = [
+  CalculatorApiRequestErrorEnvelope,
+  Schema.Struct({ error: CalculatorRateLimited }).pipe(
+    HttpApiSchema.encodeToWithHeaders(
+      {
+        body: Schema.Struct({ error: CalculatorRateLimited }).pipe(
+          HttpApiSchema.status(429)
+        ),
+        headers: { "retry-after": Schema.Literal("60") },
+      },
+      {
+        decode: ({ body }) => body,
+        encode: (body) => ({ body, headers: { "retry-after": "60" as const } }),
+      }
+    )
+  ),
+  Schema.Struct({ error: CalculatorAdmissionUnavailable }).pipe(
+    HttpApiSchema.status("ServiceUnavailable")
+  ),
+  Schema.Struct({ error: CalculatorCapacityExceeded }).pipe(
+    HttpApiSchema.status("ServiceUnavailable")
+  ),
+  Schema.Struct({ error: CalculatorOperationTimedOut }).pipe(
+    HttpApiSchema.status("GatewayTimeout")
+  ),
+  Schema.Struct({ error: CalculatorRequestBodyTimedOut }).pipe(
+    HttpApiSchema.status(408)
+  ),
+  Schema.Struct({ error: CalculatorRequestBodyTooLarge }).pipe(
+    HttpApiSchema.status(413)
+  ),
+] as const;
+
 export const CalculatorApiErrorEnvelope = Schema.Struct({
   error: CalculatorServiceError,
-}).pipe(HttpApiSchema.status("BadRequest"));
+});
 
 export type CalculatorApiErrorEnvelope = typeof CalculatorApiErrorEnvelope.Type;
 
-export class CalculatorApiErrorEnvelopeData extends Data.Class<CalculatorApiErrorEnvelope> {}
+export class CalculatorApiErrorEnvelopeData<
+  E extends CalculatorServiceError = CalculatorServiceError,
+> extends Data.Class<CalculatorApiErrorEnvelope & { readonly error: E }> {}
 
 const CalculatorParams = Schema.Struct({
   calculatorId: CalculatorId,
@@ -65,11 +122,13 @@ const GetJurisdictionsEndpoint = HttpApiEndpoint.get(
   "getJurisdictions",
   "/jurisdictions",
   {
+    error: CalculatorApiTimeoutEnvelope,
     success: JurisdictionsResponse,
   }
 ).annotate(OpenApi.Description, "List supported public API jurisdictions.");
 
 const GetTaxYearsEndpoint = HttpApiEndpoint.get("getTaxYears", "/tax-years", {
+  error: CalculatorApiTimeoutEnvelope,
   query: MetadataQuery,
   success: TaxYearsResponse,
 }).annotate(
@@ -81,6 +140,7 @@ const ListCalculatorsEndpoint = HttpApiEndpoint.get(
   "listCalculators",
   "/calculators",
   {
+    error: CalculatorApiTimeoutEnvelope,
     query: MetadataQuery,
     success: CalculatorCatalogResponse,
   }
@@ -90,7 +150,7 @@ const GetCalculatorEndpoint = HttpApiEndpoint.get(
   "getCalculator",
   "/calculators/:calculatorId",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiMetadataErrorEnvelopes,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorCatalogItem,
@@ -101,7 +161,7 @@ const GetCalculatorSchemaEndpoint = HttpApiEndpoint.get(
   "getCalculatorSchema",
   "/calculators/:calculatorId/schema",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiMetadataErrorEnvelopes,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorSchemaResponse,
@@ -115,7 +175,7 @@ const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
   "getCalculatorGraph",
   "/calculators/:calculatorId/graph",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiMetadataErrorEnvelopes,
     params: CalculatorParams,
     query: MetadataQuery,
     success: CalculatorGraphResponse,
@@ -129,7 +189,7 @@ const CalculateEndpoint = HttpApiEndpoint.post(
   "calculate",
   "/calculators/:calculatorId/calculate",
   {
-    error: CalculatorApiErrorEnvelope,
+    error: CalculatorApiErrorEnvelopes,
     params: CalculatorParams,
     payload: CalculatorRunRequest,
     query: CalculationQuery,
@@ -141,6 +201,7 @@ const CalculateEndpoint = HttpApiEndpoint.post(
 );
 
 const ListFactsEndpoint = HttpApiEndpoint.get("listFacts", "/facts", {
+  error: CalculatorApiTimeoutEnvelope,
   query: DescriptorFilterQuery,
   success: FactsResponse,
 }).annotate(
@@ -149,6 +210,7 @@ const ListFactsEndpoint = HttpApiEndpoint.get("listFacts", "/facts", {
 );
 
 const ListRulesEndpoint = HttpApiEndpoint.get("listRules", "/rules", {
+  error: CalculatorApiTimeoutEnvelope,
   query: DescriptorFilterQuery,
   success: RulesResponse,
 }).annotate(

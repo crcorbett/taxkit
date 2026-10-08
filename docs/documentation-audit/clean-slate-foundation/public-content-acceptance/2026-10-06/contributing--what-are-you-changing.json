@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "9f39955bb9c85dd724860cb73da15d07fe7af171ef2bf7efa43183027c785100",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/contributing/what-are-you-changing.mdx"
+}

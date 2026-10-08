@@ -1,7 +1,7 @@
 ---
 title: "Release notes"
 description: "Write public release notes from applied changelogs and pending Changesets."
-status: "draft"
+status: "published"
 ---
 
 # Release notes
@@ -19,22 +19,24 @@ Use sources in this order:
 4. Public docs pages when the release changes SDK, API or contribution
    behaviour.
 
-Do not describe unreleased package behaviour as available unless the package
-manifest, source export and verification evidence exist.
+Describe local changes as unreleased until you have a receipt for the exact
+published package or deployed API. Package manifests, source exports and local
+checks establish implementation; they do not establish public availability.
 
 ## Release note shape
 
 ```md
-# Version 0.0.1
+# Version 1.0.0 (unpublished)
 
 ## Changed
 
-- Added public calculator metadata and execution routes.
-- Added the standalone Bun API runtime.
+- Changed package names to `@taxkit/*`.
+- Changed runtime configuration names to the `TAXKIT_` prefix.
 
 ## Migration notes
 
-No migration is required for first release consumers.
+Update package imports and runtime configuration names. Packages remain
+private and unpublished.
 ```
 
 ## Review checklist

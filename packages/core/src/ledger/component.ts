@@ -1,6 +1,7 @@
-import { Array, Match, Schema } from "effect";
+import { Effect, Match, Schema } from "effect";
 
-import { aud, Money, moneyAdd, moneySub } from "../primitives/money.js";
+import type { InvalidMoneyValue } from "../primitives/errors.js";
+import { aud, Cents, Money, moneyAdd, moneySub } from "../primitives/money.js";
 import { TraceNode } from "../trace/node.js";
 
 /**
@@ -66,44 +67,11 @@ export const ComponentStatus = Schema.Literals([
 export type ComponentStatus = typeof ComponentStatus.Type;
 
 /**
- * A labelled calculation amount with trace evidence and total semantics.
+ * Canonical schema for a labelled amount, its trace and total semantics.
  *
  * @since 0.1.0
  */
-export interface LedgerComponent {
-  readonly _tag: "LedgerComponent";
-  readonly id: ComponentId;
-  readonly label: string;
-  readonly amount: Money;
-  readonly effect: ComponentEffect;
-  readonly status: ComponentStatus;
-  readonly trace: TraceNode;
-}
-
-/**
- * Encoded representation of a ledger component for persistence or transport.
- *
- * @since 0.1.0
- */
-export interface LedgerComponentEncoded {
-  readonly _tag: "LedgerComponent";
-  readonly id: string;
-  readonly label: string;
-  readonly amount: typeof Money.Encoded;
-  readonly effect: typeof ComponentEffect.Encoded;
-  readonly status: typeof ComponentStatus.Encoded;
-  readonly trace: typeof TraceNode.Encoded;
-}
-
-/**
- * Schema codec for ledger components.
- *
- * @since 0.1.0
- */
-export const LedgerComponent: Schema.Codec<
-  LedgerComponent,
-  LedgerComponentEncoded
-> = Schema.TaggedStruct("LedgerComponent", {
+export const LedgerComponent = Schema.TaggedStruct("LedgerComponent", {
   amount: Money,
   effect: ComponentEffect,
   id: ComponentId,
@@ -111,6 +79,20 @@ export const LedgerComponent: Schema.Codec<
   status: ComponentStatus,
   trace: TraceNode,
 });
+
+/**
+ * A labelled calculation amount with trace evidence and total semantics.
+ *
+ * @since 0.1.0
+ */
+export type LedgerComponent = typeof LedgerComponent.Type;
+
+/**
+ * Encoded representation of a ledger component for persistence or transport.
+ *
+ * @since 0.1.0
+ */
+export type LedgerComponentEncoded = typeof LedgerComponent.Encoded;
 
 /**
  * Returns whether a component should be applied to the ledger total.
@@ -134,16 +116,20 @@ export const isComponentContributing = (c: LedgerComponent): boolean =>
  */
 export const sumLedgerComponents = (
   components: readonly LedgerComponent[]
-): Money =>
-  Array.reduce(components, aud(0), (acc, c) => {
-    if (!isComponentContributing(c)) {
-      return acc;
-    }
+): Effect.Effect<Money, InvalidMoneyValue> =>
+  Effect.reduce(
+    components,
+    () => aud(Cents.make(0)),
+    (acc, component) => {
+      if (!isComponentContributing(component)) {
+        return Effect.succeed(acc);
+      }
 
-    return Match.value(c.effect).pipe(
-      Match.when("additive", () => moneyAdd(acc, c.amount)),
-      Match.when("subtractive", () => moneySub(acc, c.amount)),
-      Match.when("informational", () => acc),
-      Match.exhaustive
-    );
-  });
+      return Match.value(component.effect).pipe(
+        Match.when("additive", () => moneyAdd(acc, component.amount)),
+        Match.when("subtractive", () => moneySub(acc, component.amount)),
+        Match.when("informational", () => Effect.succeed(acc)),
+        Match.exhaustive
+      );
+    }
+  );

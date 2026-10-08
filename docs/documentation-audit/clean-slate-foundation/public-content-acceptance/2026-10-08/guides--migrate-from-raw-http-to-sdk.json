@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-07T22:42:22Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "d97f8f46f356c71a6c7921a32552b0bb958ced3648d0221dfd94dbcdd3bd2389",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx"
+}

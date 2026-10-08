@@ -1,4 +1,4 @@
-import { Array, Schema } from "effect";
+import { Array, Match, Schema } from "effect";
 
 export const releaseExcerptLimit = 4096;
 
@@ -107,10 +107,10 @@ export class CiReleaseReadinessReport extends Schema.TaggedClass<CiReleaseReadin
   }
 ) {}
 
-export const ReleaseReadinessCli = Schema.Struct({
-  mode: Schema.Literals(["candidate", "ci"]),
-});
-export type ReleaseReadinessCli = typeof ReleaseReadinessCli.Type;
+export const ReleaseReadinessCliArguments = Schema.Union([
+  Schema.Tuple([]),
+  Schema.Tuple([Schema.Literal("--ci")]),
+]);
 
 export const ReleaseAttemptReceipt = Schema.Struct({
   attemptId: ReleaseAttemptId,
@@ -282,6 +282,21 @@ export const ReleaseJourneyInventory = Schema.Struct({
 });
 export type ReleaseJourneyInventory = typeof ReleaseJourneyInventory.Type;
 
+// The retained HGI-203 packet keeps its exact five-journey Schema above.
+// Current inventory explicitly adds the native Website without changing history.
+export const CurrentReleaseJourneyInventory = Schema.Struct({
+  ...ReleaseJourneyInventory.fields,
+  journeys: Schema.Tuple([
+    ...ReleaseJourneyInventory.fields.journeys.elements,
+    Schema.Struct({
+      ...CriticalJourneyFields,
+      id: Schema.Literal("taxkit-native-website"),
+    }),
+  ]),
+});
+export type CurrentReleaseJourneyInventory =
+  typeof CurrentReleaseJourneyInventory.Type;
+
 const JourneyResultFields = {
   evidencePath: RelativeEvidencePath,
   status: Schema.Literals(["passed", "failed", "inconclusive"]),
@@ -414,11 +429,11 @@ export const createReleaseReadinessPlan = (
     label: "Public API smoke evidence",
   }),
   new ReleaseCheck({
-    args: ["run", "docs:test:browser"],
+    args: ["run", "web:test:native-pair"],
     command: "bun",
     cwd: workspaceRoot,
     id: "docs-browser",
-    label: "Documentation browser evidence",
+    label: "Built native Website and documentation evidence",
   }),
   new ReleaseCheck({
     args: ["run", "changeset:status"],
@@ -434,7 +449,7 @@ export const makeReleaseReadinessPlan = (workspaceRoot: string) =>
   createReleaseReadinessPlan(workspaceRoot);
 
 export const renderReleaseReadinessReport = (
-  report: ReleaseReadinessReport
+  report: ReleaseReadinessReport | CiReleaseReadinessReport
 ): string =>
   Array.prepend(
     Array.map(
@@ -442,5 +457,17 @@ export const renderReleaseReadinessReport = (
       (outcome) =>
         `PASS [${outcome.check.id}] target=${outcome.check.label}; stdout=${outcome.stdoutDetail?.path ?? "none"} (${outcome.stdoutDetail?.sha256 ?? "unavailable"}); stderr=${outcome.stderrDetail?.path ?? "none"} (${outcome.stderrDetail?.sha256 ?? "unavailable"})`
     ),
-    `Release readiness passed ${report.outcomes.length} ordered checks once; postcondition=local candidate checks passed; nonclaim=no publication, tag, release, deployment or provider mutation.`
+    Match.value(report).pipe(
+      Match.tag(
+        "ReleaseReadinessReport",
+        (value) =>
+          `Release readiness passed ${value.outcomes.length} ordered checks once; postcondition=local candidate checks passed; nonclaim=no publication, tag, release, deployment or provider mutation.`
+      ),
+      Match.tag(
+        "CiReleaseReadinessReport",
+        (value) =>
+          `CI release graph passed ${value.outcomes.length} ordered checks; postcondition=repository checks passed for this CI revision; nonclaim=no candidate, attempt receipt, publication, tag, release, deployment or provider mutation.`
+      ),
+      Match.exhaustive
+    )
   ).join("\n");

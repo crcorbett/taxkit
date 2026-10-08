@@ -1,7 +1,7 @@
+export { CalculationEngineLive } from "./engine/live.layer.js";
 export {
   CalculationDiagnostics,
   CalculationEngine,
-  CalculationEngineLive,
   type CalculationEngineService,
   type CalculationRequest,
   type CalculationResult,
@@ -42,6 +42,7 @@ export {
   Currency,
   Money,
   aud,
+  audFromCents,
   audDollars,
   moneyAdd,
   moneyEquals,
@@ -53,6 +54,7 @@ export {
   roundMoney,
 } from "./primitives/rounding.js";
 export {
+  AustralianTaxYear,
   DateInterval,
   IsoDate,
   australianTaxYearInterval,
@@ -96,3 +98,9 @@ export {
   sourceChecksum,
   type TraceNodeEncoded,
 } from "./trace/node.js";
+
+export {
+  InvalidCalendarValue,
+  InvalidDecimalValue,
+  InvalidMoneyValue,
+} from "./primitives/errors.js";

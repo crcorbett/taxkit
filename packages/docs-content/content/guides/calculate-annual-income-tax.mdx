@@ -1,13 +1,13 @@
 ---
 title: "Calculate annual income tax"
 description: "Run the AU annual income tax calculator with a branded money value."
-status: "draft"
+status: "published"
 ---
 
 # Calculate annual income tax
 
-Use this guide when you need the current Australian annual income tax report
-from TypeScript.
+Use this guide to run the retained Australian 2025–26 annual income tax
+calculator from TypeScript.
 
 ## Before you start
 
@@ -25,11 +25,11 @@ from TypeScript.
 ## Example
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 console.log({
@@ -51,19 +51,25 @@ Expected output:
 }
 ```
 
-The liability value is cents. `1958800` means $19,588.00.
+The liability value is cents. `1958800` means $19,588.00. This example is
+unchanged in rules-au-income-tax/1.0.1, which corrects the 2025–26 Medicare
+thresholds to $28,011 and $35,013. The annual calculator covers the resident
+income-tax rates, low income tax offset and single-person Medicare levy without
+the seniors and pensioners tax offset. Family reductions, exemptions, surcharge
+and student loan repayments are not included. This example is not a complete
+tax-return assessment or proof that a deployed installation has been updated.
 
 ## Handle errors
 
 Use `TaxKit.safe.calculate` when you need a result value:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 if (result._tag === "TaxKitFailure") {

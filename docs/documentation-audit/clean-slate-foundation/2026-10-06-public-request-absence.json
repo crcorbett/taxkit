@@ -1,0 +1,974 @@
+{
+  "document_type": "verification-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "request contracts, consumer proof, candidate or qualification change",
+  "outcome": "Pass for local public request absence owners and consumers; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operation": "local implementation, reviewable commits, pushes and draft PRs",
+    "repository": "crcorbett/taxkit",
+    "environment": "local aac7 checkout",
+    "approvalBoundary": "No merge, deployment, publication, provider apply or credential changes"
+  },
+  "candidate": {
+    "branch": "codex/dev-75-request-absence-owners",
+    "base": "facca8306d3d37fce40f09d988ba080d596bb07b",
+    "receiptRevision": "source hashes recorded before complete checks",
+    "qualifiedSources": [
+      {
+        "path": ".changeset/public-request-absence.md",
+        "sha256": "90683084f25e6a568a8077816ad0f311830766cacbed2d801189fc6ff63f194e"
+      },
+      {
+        "path": "apps/api/README.md",
+        "sha256": "45b21456920dba6f1f2483451f5b04ff86990f323b3ee658fa2c6d585a991632"
+      },
+      {
+        "path": "apps/api/scripts/routes.ts",
+        "sha256": "0df7bdede81488882222b51014b78f0fc9e00db0159e8b573ecaa5da08634b36"
+      },
+      {
+        "path": "apps/api/scripts/smoke-boundaries.test.ts",
+        "sha256": "c8a289ef194cb5ace37b41990d5e5e8a7304aed1bf813fd9ca033e8c5a586e78"
+      },
+      {
+        "path": "apps/api/test/worker.boundary.test.ts",
+        "sha256": "5115f868d8391debde169dc25f9ffb1664c942baa4de8eb8b6c6f20aca04a7bf"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "603eeb5d509c7cc8996270651e7630befbd012c301ad2d05abc4c37cf6950465"
+      },
+      {
+        "path": "apps/web/src/lib/form.boundary.ts",
+        "sha256": "c63c423418fc1496b8af5879db89a8d32b5a3c1dbc5deba308c786d60c06d880"
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "21628551e1759de9ae7996fb51e6e297736c95715bd367aff5cceb426eced4bb"
+      },
+      {
+        "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "sha256": "037e0034f5f2a50ecf5fa5ef222e921111f6db97eaa1fd222968f10e4feb684b"
+      },
+      {
+        "path": "apps/web/vitest.browser.config.ts",
+        "sha256": "03d6bef2c80853c0cd696aaa75e08c0fc09452460889a97dd9fcce1a9b4903bf"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "6626c7e072cc70d0dfcac5d301676c7ec6abf795b1ff3bacc13f47a8f82744d4"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "6f77788acff89ce76eb60f6166cfd0182ee2ef0a688b3313dd76b560d16ac5a3"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "bc4db87229ada77f94deb5282bb913b8506e5b383ada7ed7d2347daa8702fb78"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "fc9e6da421ddbb519de9281b6ef5e70efac0ae9e627a3c22058a170689f89068"
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json",
+        "sha256": "54b64eed422393b01f99fbd872387703e1b66d166246418e171470e28724f894"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "d55721846dfd0c4fdec46f0c68deede166ea790bf9dbbda4a2537b5b4335f8c5"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "e408fee759f26594a526fe2785e780536244eb22db49b8c9693bd946b1f5a261"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "ad8f700e451093ec20ff5ed91717c0e9f3f3558940a30b6d740bbdbb40934066"
+      },
+      {
+        "path": "docs/standards/code-patterns.md",
+        "sha256": "48d83eccd0c275c2f8ab77f3fcd0c4984bb3fa5c34ecc39d472933cf2f9b35f9"
+      },
+      {
+        "path": "packages/api/http/README.md",
+        "sha256": "8d9b648ab201451c3a9b85e515dc0a7abfbcfa3700b26de9e7473c6437b30d49"
+      },
+      {
+        "path": "packages/api/http/__tests__/public-calculation-api.test.ts",
+        "sha256": "b6bb1c53d48de3bf3dfa38880b7e1209baddde66cd72a34771e3c62854dd9a4f"
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "1698d7c2d2c2c26532e7b0f53057ac544bf582ab8811746b8ca123b987b1c1ab"
+      },
+      {
+        "path": "packages/api/rpc/src/__testing__/fixtures.ts",
+        "sha256": "5b13096e739c2edfab7ee82f616573a30b6f2f70cd7932885298d1dc7b82df05"
+      },
+      {
+        "path": "packages/api/rpc/test/handlers.test.ts",
+        "sha256": "becab26420fa7bf60e0dd649ebe479baa8f4d0fb6e1b506de5e31a2c99967e60"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "80b14c17ee7baa216abc5e6aa1022a83de3a8492cfba22521bfcd18befdb607b"
+      },
+      {
+        "path": "packages/calculators/__tests__/calculation-work.test.ts",
+        "sha256": "bf93e8dcf20f54f95c348a3257279d866d9775c8f4dac40e1e0d9957e42dc4af"
+      },
+      {
+        "path": "packages/calculators/__tests__/public-calculator-service.test.ts",
+        "sha256": "29ccb8bee2cd389dfdd130916a99e2ffe00f649dec5e78e76adc5aae848279b5"
+      },
+      {
+        "path": "packages/calculators/package.json",
+        "sha256": "f12656e7cc7bf7b2d53b7bb6abcdf21b864bf5e9e186a30eada2beb4dcbf4b78"
+      },
+      {
+        "path": "packages/calculators/src/errors.ts",
+        "sha256": "1fd694df6c7e32d90dba4d4ee1c609998434e1efe8b4356ee000a5070217ffdd"
+      },
+      {
+        "path": "packages/calculators/src/live.layer.ts",
+        "sha256": "b478d4cb9168fef0849ffec73d664406af6442632a6a1bded328df103c052909"
+      },
+      {
+        "path": "packages/calculators/src/metadata.ts",
+        "sha256": "577b78692c8993793e56ccbc35d926e7bc968e683019d402b06945f312446cfb"
+      },
+      {
+        "path": "packages/calculators/src/schemas.ts",
+        "sha256": "4d4f1c66b0e1a7f22b81cbb1089fbaaa433b68e2bc6d43d8b6c5d7489535010a"
+      },
+      {
+        "path": "packages/calculators/tsconfig.test.json",
+        "sha256": "2eb21f53114ff2fe25e916473f86a713838ffe6bddfa9e1f051a5793be47819c"
+      },
+      {
+        "path": "packages/docs-content/README.md",
+        "sha256": "9547cc353d545e1c6563d3e55a4ee17763a4ce046171729f9d3bf6a508919035"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/diagnostics.mdx",
+        "sha256": "8a1579c60f9c47fd34cbcc893bda00c28ea1a416ef3b2e385aed956bdd47ff5b"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+        "sha256": "23c2de0a247b6355403a1cce09c15e679b460c1fc5d5d22c802ff9ff91c8777d"
+      },
+      {
+        "path": "packages/docs-content/content/reference/schemas.mdx",
+        "sha256": "dcf33309cb623daaf45da24f3fc90f3009d42562461ee276c463ddf0ad3e482a"
+      },
+      {
+        "path": "packages/docs-content/content/reference/sdk.mdx",
+        "sha256": "1f3b4440cb0ef70529ac4351e9373fd3fbfad8c23b2746a92eb4df131d5cc5ac"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+        "sha256": "8b2a64e448e7d412885d5fe17a5da2170abdcb44b2c8666fc72c99ed32997e8d"
+      },
+      {
+        "path": "packages/docs-content/examples/browser-http.ts",
+        "sha256": "bc7f0cb75b61ccd87e98a6f4e4c7c797e83bec1651c0fce1587a73deeb973862"
+      },
+      {
+        "path": "packages/docs-content/examples/effect.ts",
+        "sha256": "a1bbc04ec1a8bbb31b52b8a9a22b591d5ffaf4e484da4f6e461eaadb3ec6619a"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "87a63d91785d48c1b4bf8650175f3eeebd3b0e86bee4d7ba4e188bb5800b1174"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "6fa141e5baac57ade13bf112037ef0ddbfaea022e2c613cface83b3db33f509a"
+      },
+      {
+        "path": "packages/sdk/typescript/src/effect.test.ts",
+        "sha256": "95d055917e3e46589ebf853ebc17917f4188d79d456fd34f07925cb88709c173"
+      },
+      {
+        "path": "packages/sdk/typescript/src/effect.ts",
+        "sha256": "c3b178f657a931e199b2988dc52fc0c7c32f28a051685efd7a353b8213081425"
+      },
+      {
+        "path": "packages/sdk/typescript/src/index.test.ts",
+        "sha256": "7def5c6102faca1f4645f62e08d8aa7b739ba9880a769c96213422597c6c7c5d"
+      },
+      {
+        "path": "packages/sdk/typescript/type-tests/effect-client.test.ts",
+        "sha256": "dcb9b16d3238502c94408522bf55bba7bd56dc896e1d9f79d03c31dbcdae174a"
+      }
+    ]
+  },
+  "contracts": [
+    "Canonical nested Option owners preserve missing, explicit undefined and present values, including false permission.",
+    "SDK aliases derive constructor inputs; options construct once, selected calculator owns facts, output uses checked Type.",
+    "Typed service fixtures are included in the calculator compiler project.",
+    "Wire/OpenAPI/tax/source records retain the original expectations.",
+    "Adversarial unknown native JSON fixtures encode known request payloads through the canonical HTTP/RPC codecs before wrapping them."
+  ],
+  "documentationImpact": {
+    "decision": "Change required",
+    "changed": [
+      "Calculator/SDK/HTTP/RPC and API/Website/content package READMEs",
+      "Effect/API/testing architecture and code-pattern standards",
+      "Public Effect/browser HTTP templates and matching guides/references",
+      "Calculator test compiler project and package check-types scope",
+      "Packed consumer declaration/runtime checks, SPEC/tasks/plan/audit, major Changeset",
+      "Website browser qualification forces fresh explicitly bundled workspace RPC source; matching README/testing owner",
+      "API app fixtures: canonical request encoding before unknown/adversarial JSON; API README and testing owner"
+    ],
+    "preserved": [
+      "HTTP/RPC/OpenAPI representations and snapshots",
+      "Tax formulas, amounts, rounding, authored tables and source records",
+      "Public MDX/navigation lifecycle decisions",
+      "Toolchain/dependencies/lockfile/CI/skills and runtime codec/execution permissions",
+      "Medicare decision and zero-income behaviour"
+    ],
+    "notApplicable": [
+      "New runbooks",
+      "Provider/registry/credential operations"
+    ]
+  },
+  "compatibilityOracles": {
+    "requests": 24,
+    "errorAndMetadataForms": 22,
+    "actualReports": 36,
+    "actualInputErrors": 36,
+    "earlierMetadataReplies": 22,
+    "baseline": "Original hashes/key expectations embedded in genuine packed consumer before candidate qualification; never regenerated from candidate.",
+    "originalFiles": [
+      {
+        "path": "/private/tmp/dev75-request-absence-prototype/results.json",
+        "sha256": "160981f973a5b3a50585bfe4b6594c3aaea5d09ecee09f015b29b4a079695311"
+      },
+      {
+        "path": "/private/tmp/dev75-request-absence-original-errors.json",
+        "sha256": "a1b0f608e3dc2f7f2253a7bf6286262f7221d927d9d748d57a93d808ecf76664"
+      },
+      {
+        "path": "/private/tmp/dev75-request-absence-original-actual-runs.json",
+        "sha256": "2a5e31f045e284369152e768ebbf2680a6e02b92778264ec8a54546a44567461"
+      },
+      {
+        "path": "/private/tmp/dev75-request-absence-original-http.json",
+        "sha256": "6e7923b38581b3182f8da3d3a99763c97ea380b2a0811b0da7fded1c1fa0c8e2"
+      },
+      {
+        "path": "/private/tmp/dev75-request-absence-original-rpc.json",
+        "sha256": "b2d4b820713e7ce48e022c43e829d25f5429a270e9287c11deaded0109f8c365"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "stage": "release-ci-graph",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 660.13,
+      "log": "/private/tmp/dev75-request-v4-full-release-ci-graph.log",
+      "mode": "local CI graph",
+      "orderedChecks": [
+        "verification",
+        "test",
+        "build",
+        "docs-validation",
+        "packed-artifact",
+        "downstream-consumer",
+        "api-smoke",
+        "docs-browser",
+        "changeset-status"
+      ],
+      "nonClaim": "No release attempt, publication or provider operation",
+      "cacheBasis": "Repository Turbo content-keyed cache reused the preceding successful same-candidate workspace tests/build where applicable; workflow and built native qualification ran fresh."
+    }
+  ],
+  "attemptHistory": [
+    {
+      "prefix": "dev75-request-absence-v8",
+      "outcome": "SDK Promise rejection test decoded an already checked error as wire; corrected to Schema Type, unchanged safe error assertions."
+    },
+    {
+      "prefix": "dev75-request-absence-v9",
+      "outcome": "RPC unknown-JSON fixture sent domain Options without encoding; corrected to canonical request encoder, unchanged safe bytes/log assertions."
+    },
+    {
+      "prefix": "dev75-request-absence-v11",
+      "outcome": "Packed runtime negative input needed an explicit expected-error Type bypass; diagnostic confirms TS2353 on the deliberate privateSource fixture. Original report/error hashes unchanged."
+    },
+    {
+      "name": "help-default first removal",
+      "outcome": "Failed at SDK build before packing, correcting the proposed packed-stage expectation. Source restored; receipt names actual owner stage."
+    },
+    {
+      "name": "First complete local graph",
+      "exitCode": 1,
+      "durationSeconds": 717.08,
+      "failedStage": "verification / Website Chromium calculator request",
+      "cause": "Explicitly optimised workspace RPC dependency kept pre-migration Schema.optional fields while checked form source supplied new Options. Source and genuine packed tests had passed, but browser used the old dependency cache.",
+      "earliestOwnerCorrection": "apps/web/vitest.browser.config.ts optimizeDeps.force true; native Vite pre-bundling rebuilds included workspace source each run.",
+      "evidence": [
+        {
+          "path": "/private/tmp/dev75-request-full-release-ci-graph.log",
+          "sha256": "885f49f813ed2e2156f373a68d571a2e19f1e136c0dac0f6843f6d1c7ba9f277"
+        },
+        {
+          "path": "tmp/release-readiness/verification-stdout-OV9j8K/930280f72955.log",
+          "sha256": "de162c255b84993b51e299c3cf3a719717fe4d0f7e96aae43a17d642ef7de0e4"
+        }
+      ],
+      "observedPostcondition": "19 Website Chromium tests pass after fresh optimisation; compiled cache contains canonical OptionFromOptionalKey request fields.",
+      "nonClaim": "Failed full graph did not reach native app tests or later eight release stages."
+    },
+    {
+      "name": "Second complete local graph",
+      "exitCode": 1,
+      "durationSeconds": 555.75,
+      "failedStage": "verification / built shared calculation-work fixture",
+      "cause": "Seven-member RPC batch and public HTTP body encoded checked request Options with the unknown JSON fixture instead of their canonical request codecs, so admission failed before work reached the pool.",
+      "earliestOwnerCorrection": "Use CalculatorRpcPayload encoder for the batch payload and JSON CalculatorRunRequest encoder for the HTTP body. Original capacity/timeout/privacy/warning/cleanup assertions stay unchanged.",
+      "evidence": [
+        {
+          "path": "/private/tmp/dev75-request-v2-full-release-ci-graph.log",
+          "sha256": "2517e2a4a8382fef7f513f9510c5d3ff2d46371f07d26568e8e3f9e37a31d465"
+        },
+        {
+          "path": "tmp/release-readiness/verification-stdout-mHW2pp/105ccb993053.log",
+          "sha256": "c45f32ffc84a0ba1ad2264248fdc48b69bb1aecbf4e94fb82c4af233d156a456"
+        }
+      ],
+      "observed": "Six native tests pass; shared-work fixture fails on fixed Error rather than eight reached Warn events.",
+      "nonClaim": "No full graph or seven-native acceptance."
+    },
+    {
+      "name": "Native fixture correction preparation",
+      "outcomes": [
+        "First focused suite used CalculatorRunRequest from the RPC re-export which does not export it; import corrected to owning calculators/schemas.",
+        "First file-only invocation used repository cwd and found zero tests; run from apps/web with the owning native config."
+      ],
+      "nonClaim": "Neither failed preparation qualifies the corrected fixture."
+    },
+    {
+      "name": "Third complete local graph",
+      "exitCode": 1,
+      "durationSeconds": 616.45,
+      "lastSuccessfulStage": "verification, including all seven native cases",
+      "failedStage": "Workspace API app tests",
+      "cause": "API app work-pool/exact-body-limit/defect fixtures serialised domain requests through unknown JSON instead of their owning codecs.",
+      "earliestOwnerCorrection": "Known NativeRequest frame/array and CalculatorRunRequest body encoders; malformed tag/id mutations occur after canonical encoding.",
+      "evidence": [
+        {
+          "path": "/private/tmp/dev75-request-v3-full-release-ci-graph.log",
+          "sha256": "ab51e353bcd12bc9379b174586d0a356b28a27318c627722885dff80d48e82a5"
+        },
+        {
+          "path": "tmp/release-readiness/verification-stdout-gn5y7E/1dc4bb1704e2.log",
+          "sha256": "8bcb4dca780907a3bebd860403476c1b0a4d48b23166657ff711ab5b53cb6144"
+        },
+        {
+          "path": "tmp/release-readiness/test-stdout-5o16Sj/418624825c7a.log",
+          "sha256": "c5cbc00d505e2df53b5fcc5506de250926430295cbfb6c8f62df9b2382e332c7"
+        }
+      ],
+      "observed": "59 API app tests pass, three fail; existing error/work/body/privacy assertions retained.",
+      "nonClaim": "No complete nine-stage acceptance."
+    }
+  ],
+  "removalControls": [
+    {
+      "name": "raw-context-test",
+      "path": "packages/calculators/__tests__/public-calculator-service.test.ts",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/calculators",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.46,
+      "log": "/private/tmp/dev75-request-removal-raw-context-test.log",
+      "sha256": "c725d2b07fd20687badab98bddfd9cf21d32fc7318759a339cdbff9bae4322f2",
+      "oracle": "error TS2322",
+      "sourceRestored": true
+    },
+    {
+      "name": "whole-union-before-help",
+      "path": "packages/sdk/typescript/src/effect.ts",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/sdk",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.68,
+      "log": "/private/tmp/dev75-request-removal-whole-union-before-help.log",
+      "sha256": "399092d0c540e45f7604f72cc99cb5146cc11b3e0c38a0858729768f876e2cc5",
+      "oracle": "Expected selected calculator help",
+      "sourceRestored": true
+    },
+    {
+      "name": "help-default",
+      "path": "packages/calculators/src/schemas.ts",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/sdk",
+        "validate:downstream"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.1,
+      "log": "/private/tmp/dev75-request-removal-help-default.log",
+      "sha256": "e7eb95a0fcef58e76b18df0b1de1e365e0828c84f0a808f64168afef8ec20312",
+      "oracle": "build @taxkit/sdk",
+      "sourceRestored": true
+    },
+    {
+      "name": "packed-wire-help",
+      "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/sdk",
+        "validate:downstream"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 5.56,
+      "log": "/private/tmp/dev75-request-removal-packed-wire-help.log",
+      "sha256": "1173dd1e395fb3f45a58f02f639a77f6f5457431057c6e8d3c40f8d560616854",
+      "oracle": "typecheck downstream SDK examples",
+      "sourceRestored": true
+    }
+  ],
+  "limitations": [
+    "This qualifies the local candidate; its committed immutable head still requires hosted Linux Quality.",
+    "T004 and remaining DEV-76 to DEV-81 unfinished.",
+    "Trusted rate identity/limits and remaining domain review unfinished.",
+    "Local proof does not establish hosted, merged, deployed, provider or published state."
+  ],
+  "rollback": {
+    "operation": "Revert this request absence commit after it exists; base draft #150 retains the previous domain slice.",
+    "identity": "facca8306d3d37fce40f09d988ba080d596bb07b"
+  },
+  "parentAudit": {
+    "actor": "Primary implementation owner",
+    "status": "Pass for local request absence slice",
+    "sourceReview": [
+      "Optional field Schemas are the Type and representation owners, with native constructor defaults.",
+      "Metadata maps checked descriptor Options; no conditional shaping or private input reflection.",
+      "SDK derives generic constructor inputs and constructs only context/help; selected calculator facts retain guided error decoding.",
+      "Fixture changes follow canonical Types or explicit Type/representation boundaries; original expected values and OpenAPI snapshot unchanged.",
+      "Public templates and actual consumers use rule-owned brands; raw HTTP JSON examples remain ordinary representations.",
+      "Calculator compiler now owns service/work fixtures; actual removal fails TS2322.",
+      "Packed expectations use pre-change hashes and key identity; no candidate regeneration.",
+      "Runtime/lint permissions and dependency versions remain unchanged.",
+      "Website browser pre-bundling previously ignored workspace source changes without lockfile changes. Qualification now rebuilds explicitly included RPC source; no production Vite or runtime policy change.",
+      "Built shared-work fixture now encodes canonical requests before unknown JSON framing. The same existing warning, pool, timeout, cleanup and privacy oracles qualify the intended operation path.",
+      "Focused built native work fixture passes unchanged original warning/capacity/timeout/cleanup/privacy assertions after canonical request encoding.",
+      "API work/body/defect tests encode the canonical frame and HTTP body; bad envelope tag/id mutations follow a valid encoded request so the intended fault remains isolated.",
+      "Final primary-owner diff review confirms raw HTTP representations remain separate from canonical Options, selected-fact validation remains with its calculator, and fixture/config corrections preserve the original oracles. No additional required defect was found in this request slice."
+    ],
+    "qualification": {
+      "orderedStages": 9,
+      "workflowCases": 32,
+      "workflowSeconds": 469.15,
+      "lintCases": 512,
+      "coreCases": 65,
+      "ruleCases": 52,
+      "calculatorCases": 37,
+      "apiAppCases": 62,
+      "sdkCases": 58,
+      "httpCases": 17,
+      "rpcCases": 217,
+      "nativeCases": 7,
+      "nativeSeconds": 77.67,
+      "packedRequestForms": 24,
+      "packedErrorMetadataForms": 22,
+      "packedReports": 36,
+      "packedInputErrors": 36,
+      "earlierMetadataHashes": 22,
+      "tablePeriodSourceHashes": 15,
+      "removalControls": 4,
+      "restoredSourceCount": 47
+    }
+  },
+  "focusedChecks": [
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.55,
+      "log": "/private/tmp/dev75-request-absence-v10-types.log"
+    },
+    {
+      "stage": "sdk-test",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/sdk",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.51,
+      "log": "/private/tmp/dev75-request-absence-v10-sdk-test.log"
+    },
+    {
+      "stage": "rpc-test",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/api-rpc",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "log": "/private/tmp/dev75-request-absence-v10-rpc-test.log"
+    },
+    {
+      "stage": "downstream",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/sdk",
+        "validate:downstream"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.82,
+      "log": "/private/tmp/dev75-request-absence-v12-downstream.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.39,
+      "log": "/private/tmp/dev75-request-absence-v13-lint.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.34,
+      "log": "/private/tmp/dev75-request-absence-v13-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev75-request-absence-v13-runbooks.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.31,
+      "log": "/private/tmp/dev75-request-absence-v13-types.log"
+    },
+    {
+      "stage": "sdk-test",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/sdk",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.52,
+      "log": "/private/tmp/dev75-request-absence-v13-sdk-test.log"
+    },
+    {
+      "stage": "docs-content",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.22,
+      "log": "/private/tmp/dev75-request-absence-v13-docs-content.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "log": "/private/tmp/dev75-request-absence-v13-changeset.log"
+    },
+    {
+      "stage": "web-browser",
+      "command": [
+        "bun",
+        "run",
+        "web:test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.91,
+      "log": "/private/tmp/dev75-request-browser-refresh-web-browser.log"
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.native.config.ts",
+        "test/native-rpc-failures.boundary.test.ts"
+      ],
+      "cwd": "apps/web",
+      "exitCode": 0,
+      "durationSeconds": 20.26,
+      "log": "/private/tmp/dev75-request-native-focused-v2.log",
+      "sha256": "ab75104fdf8e472f51dbd9a0da25f4405f35625faf26b42d925a26153c64919a",
+      "postcondition": "Two real built-Worker tests pass, including seven RPC plus one HTTP place, excess work, timeouts, cleanup and private warnings."
+    },
+    {
+      "stage": "api-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "api",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.66,
+      "log": "/private/tmp/dev75-request-api-fixture-fix-api-tests.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.08,
+      "log": "/private/tmp/dev75-request-api-fixture-fix-types.log"
+    },
+    {
+      "stage": "workspace-test",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 86.0,
+      "log": "/private/tmp/dev75-request-workspace-fixture-fix-workspace-test.log"
+    },
+    {
+      "stage": "build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.0,
+      "log": "/private/tmp/dev75-request-workspace-fixture-fix-build.log"
+    },
+    {
+      "stage": "downstream",
+      "command": [
+        "bun",
+        "run",
+        "--filter",
+        "@taxkit/sdk",
+        "validate:downstream"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.35,
+      "log": "/private/tmp/dev75-request-workspace-fixture-fix-downstream.log"
+    },
+    {
+      "stage": "api-smoke",
+      "command": [
+        "bun",
+        "run",
+        "api:smoke"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.57,
+      "log": "/private/tmp/dev75-request-workspace-fixture-fix-api-smoke.log"
+    }
+  ],
+  "parentHosted": {
+    "pr": 150,
+    "head": "facca8306d3d37fce40f09d988ba080d596bb07b",
+    "run": 37408781152,
+    "job": 112092261901,
+    "conclusion": "success",
+    "completedAt": "2026-10-06T03:46:36Z",
+    "nonClaim": "Parent success does not qualify current request candidate."
+  },
+  "references": [
+    {
+      "url": "https://vite.dev/config/dep-optimization-options#optimizedeps-force",
+      "claim": "force ignores cached optimised dependencies",
+      "localOwner": "Installed vite/dist/node/index.d.ts admits force boolean; actual rebuilt browser cache and 19 tests confirm behaviour."
+    }
+  ],
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Pinned local tooling and unchanged lockfile/dependency versions.",
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 167,
+      "sha256": "61b5187dde162e5b74df7e0b6c1d0fdfa3ede4421c061d7140bb03c3ed50f768"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "df1541f8c231c5238332bc083d4e0d3bbc0e8e567d4015c3d516878f9a3da011"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "1415d1770be4894fbe017fe7b1f280e26381a8c629edc49d0d4b47940dbc8949"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "50b8367f8bac83073e907cb22273882a15a7d8f9bcc9f8957e90cbc9b442d9d9"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "34a2c986dabdf938c4b0de34cc7a9a97ee514190db3ad803efb138e8ec6ab712"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "73e52ab40409703fd05e9d564dcdfd87d990c8e130b5ed387a514eefd53caece"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "25ef401156e0bec07db3dc0fdfd708c3d435be642efd26c7a212c00b420e5881"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "8e3175a7fd13bc37f5bba368c05753af7333f453554499444ea5ed11002f4f15"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "bde1ac258d9c0a2a1696249a755862fa4edc5a378285b2c7d4cbbb9b182f9c1d"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously inspected parent image"
+    }
+  ],
+  "qualifiedLogDigests": [
+    {
+      "check": "verification",
+      "path": "tmp/release-readiness/verification-stdout-fPV9aP/2dbb77042d3d.log",
+      "sha256": "0d1e536dd5631e91cc8ce14f3964a28389cb76360f3af74e6664a906c44b83a7"
+    },
+    {
+      "check": "test",
+      "path": "tmp/release-readiness/test-stdout-WnIE47/e39d1851b5ac.log",
+      "sha256": "a3e3f83db251d2019c81e468d8d341010438cb3a7443b2f34549ff291a34b4de"
+    },
+    {
+      "check": "full-wrapper",
+      "path": "/private/tmp/dev75-request-v4-full-release-ci-graph.log",
+      "sha256": "811bbc34050ba2431ad76cceb3b04fdbfd7d9c809ff39d3f02d626f02bc9d51d"
+    }
+  ],
+  "postconditions": {
+    "compatibility": "Original request/error/metadata own keys and hashes, 36 reports, 36 input errors and earlier tax/table/source expectations pass in genuine packed consumers. OpenAPI snapshot unchanged.",
+    "types": "Canonical request/metadata/error Option Types and constructor defaults appear in genuine packed declarations; calculator test fixtures join their owning compiler.",
+    "privacy": "Rejected input/paths retain original negative assertions; guided selected-calculator errors remain intact.",
+    "restoration": "All 47 staged files restore exact source bytes; API Worker, lockfile and OpenAPI snapshot match unchanged parent.",
+    "screenshots": "All four images match inspected parent bytes.",
+    "scope": "Trusted rate identity/limits, remaining domain review, T004 and DEV-76 to DEV-81 remain unfinished."
+  },
+  "postCheckChanges": {
+    "scope": "Plan and receipt only",
+    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
+  },
+  "hostedCorrection": {
+    "originalHead": "1b85440f844858a96a91172014a10afb87aa452c",
+    "runId": 37414462610,
+    "jobId": 112109888774,
+    "conclusion": "FAILURE",
+    "completedAt": "2026-10-06T04:52:42Z",
+    "diagnosis": "Linux TS2307: Website native RPC fixture imported @taxkit/calculators/schemas without a declared Website dependency. Local checkout resolved it indirectly.",
+    "repair": "Reuse CalculatorRpcPayload.fields.request.fields.payload from the existing declared @taxkit/api-rpc owner. Its field is the identical canonical CalculatorRunRequest Schema.",
+    "documentationImpact": {
+      "decision": "Change required",
+      "surface": "Dated request proof records hosted failure/correction separately",
+      "preserve": "Package/app dependency graph, contract, existing tax/privacy/cleanup expected values, commands, lockfile, public docs and runtime behaviour unchanged."
+    },
+    "qualification": "Focused compiler/lint/docs/runbooks/format and exact schema/fixture-byte checks pass. Corrected immutable hosted Linux head and complete combined domain candidate remain pending.",
+    "focusedChecks": [
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "x",
+          "oxfmt",
+          "apps/web/test/native-rpc-failures.boundary.test.ts"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.29,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-format.log"
+      },
+      {
+        "stage": "web-types",
+        "command": [
+          "bun",
+          "run",
+          "--filter",
+          "web",
+          "check-types"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 2.19,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-web-types.log"
+      },
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.56,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-docs.log"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.22,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-runbooks.log"
+      },
+      {
+        "stage": "lint",
+        "command": [
+          "bun",
+          "run",
+          "lint"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 10.51,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-lint.log"
+      },
+      {
+        "stage": "format-check",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 2.84,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v1-format-check.log"
+      },
+      {
+        "stage": "schema-identity",
+        "command": [
+          "bun",
+          "--conditions=source",
+          "/private/tmp/dev75-alchemy-rate-probe/schema-owner-equivalence.ts"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.1,
+        "log": "/private/tmp/dev75-request-151-linux-correction-v2-schema-identity.log"
+      }
+    ],
+    "schemaIdentityProof": {
+      "sameSchemaObject": true,
+      "identicalBytes": true,
+      "sha256": "2f0aa8abc456e98cde692a8b1059d61a4d54e232ab5e51d10c0072a023891954"
+    },
+    "correctedSourceSha256": "954326c7a6ee60d33a06272b30f0ca1936ab22c751048d49b17b5d6f3c7dc0a1",
+    "changeset": "N/A: fixture import/owning field correction only; no public export, runtime contract or package version consequence."
+  }
+}

@@ -40,22 +40,30 @@ const DeploymentJourney = Schema.Struct({
 });
 
 export const DeploymentJourneyInventory = Schema.Struct({
+  historicalInventory: Schema.Literal(
+    "docs/evidence/deployments/retired-docs-operations-2c5ffd40/docs-deployment-journeys.json"
+  ),
   journeys: Schema.Tuple([
     DeploymentJourney,
     DeploymentJourney,
     DeploymentJourney,
     DeploymentJourney,
   ]),
+  lifecycle: Schema.Literal("retired"),
   owner: Schema.Literal("taxkit-docs-deployment-proof-owner"),
+  retirementRecord: Schema.Literal(
+    "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
+  ),
   reviewTrigger: Schema.NonEmptyString,
   schemaVersion: Schema.Literal(1),
 });
 export type DeploymentJourneyInventory = typeof DeploymentJourneyInventory.Type;
 
 /**
- * The receipt Schemas below are retained historical evidence decoders. Current
- * workflow admission uses DeploymentPlanReceipt, inventory.schemas.ts and
- * workflow-receipts.schemas.ts, which admit only the native Website resource.
+ * The receipt Schemas below are retained historical evidence decoders. Retained
+ * workflow tooling uses DeploymentPlanReceipt, inventory.schemas.ts and
+ * workflow-receipts.schemas.ts for the retired Website resource. The native
+ * replacement uses NativeAppsPlanProjection; no writer is enabled here.
  */
 
 const AuthorityOperation = Schema.Literals([
@@ -249,6 +257,107 @@ export const DeploymentPlanProjection = Schema.Struct({
   schemaVersion: Schema.Literal(2),
 });
 export type DeploymentPlanProjection = typeof DeploymentPlanProjection.Type;
+
+// Version three is the replacement app graph. Earlier projection and receipt
+// Schemas retain their exact historical identities and digest representation.
+export const NativeAppsPlanAction = Schema.Literals([
+  "create",
+  "update",
+  "adopted",
+  "noop",
+]);
+export const NativeAppsPlanBinding = Schema.Struct({
+  action: Schema.Literals(["create", "update", "noop"]),
+  logicalId: Schema.Literals([
+    "TaxKitApi/API_PUBLIC_ORIGIN",
+    "TaxKitApi/CALCULATOR_HOST_MODE",
+    "TaxKitApi/CALCULATOR_RATE_LIMIT",
+    "TaxKitApi/TaxKitMcpSessions",
+    "TaxKitApi/WEBSITE_PUBLIC_ORIGIN",
+    "TaxKitWebsite/API_PUBLIC_ORIGIN",
+    "TaxKitWebsite/CALCULATOR_HOST_MODE",
+    "TaxKitWebsite/TAXKIT_API",
+    "TaxKitWebsite/WEBSITE_PUBLIC_ORIGIN",
+  ]),
+});
+const NativeApiPlanResource = Schema.Struct({
+  action: NativeAppsPlanAction,
+  logicalId: Schema.Literal("TaxKitApi"),
+  resourceType: Schema.Literal("Cloudflare.Worker"),
+});
+const NativeWebsitePlanResource = Schema.Struct({
+  action: NativeAppsPlanAction,
+  logicalId: Schema.Literal("TaxKitWebsite"),
+  resourceType: Schema.Literal("Cloudflare.Worker"),
+});
+const NativeZonePlanResource = Schema.Struct({
+  // The existing zone must be adopted or refreshed, never created here.
+  action: Schema.Literals(["update", "adopted", "noop"]),
+  logicalId: Schema.Literal("TaxKitProductionZone"),
+  resourceType: Schema.Literal("Cloudflare.Zone.Zone"),
+});
+const NativeDnsSettingsPlanResource = Schema.Struct({
+  action: NativeAppsPlanAction,
+  logicalId: Schema.Literal("TaxKitProductionDnsSettings"),
+  resourceType: Schema.Literal("Cloudflare.DNS.ZoneSettings"),
+});
+export const NativeAppsPlanResource = Schema.Union([
+  NativeApiPlanResource,
+  NativeWebsitePlanResource,
+  NativeZonePlanResource,
+  NativeDnsSettingsPlanResource,
+]);
+export const NativeAppsPlanProviderIdentity = Schema.Struct({
+  accountId: Schema.Literal("f9f94270a4a5af8af7010d891020922d"),
+  alchemyPatchSha256: Sha256,
+  alchemySourceCommit: Schema.Literal(
+    "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04"
+  ),
+  alchemyVersion: Schema.Literal("2.0.0-beta.80"),
+});
+export const NativeAppsProductionDns = Schema.Struct({
+  removalPolicy: Schema.Literal("retain"),
+  zoneId: Schema.Literal("15103853342ab9f18f7894b7fae39c39"),
+  zoneName: Schema.Literal("taxkit.dev"),
+});
+const NativeAppsPlanFields = {
+  bindings: Schema.Array(NativeAppsPlanBinding),
+  candidate: DeploymentPlanProjection.fields.candidate,
+  configSha256: Sha256,
+  provider: NativeAppsPlanProviderIdentity,
+  redaction: DeploymentPlanProjection.fields.redaction,
+  schemaVersion: Schema.Literal(3),
+  stack: Schema.Literal("TaxKitAppsCloudflare"),
+} as const;
+export const NativeAppsPlanProjection = Schema.Union([
+  Schema.Struct({
+    ...NativeAppsPlanFields,
+    domains: Schema.Tuple([]),
+    logicalResources: Schema.Tuple([
+      NativeApiPlanResource,
+      NativeWebsitePlanResource,
+    ]),
+    productionDns: Schema.Literal("unmanaged"),
+    stage: DocsDeploymentStage.check(Schema.isPattern(/^pr-/u)),
+  }),
+  Schema.Struct({
+    ...NativeAppsPlanFields,
+    domains: Schema.Tuple([
+      Schema.Literal("taxkit.dev"),
+      Schema.Literal("www.taxkit.dev"),
+      Schema.Literal("api.taxkit.dev"),
+    ]),
+    logicalResources: Schema.Tuple([
+      NativeApiPlanResource,
+      NativeDnsSettingsPlanResource,
+      NativeZonePlanResource,
+      NativeWebsitePlanResource,
+    ]),
+    productionDns: NativeAppsProductionDns,
+    stage: Schema.Literal("prod"),
+  }),
+]);
+export type NativeAppsPlanProjection = typeof NativeAppsPlanProjection.Type;
 
 export const DeploymentPlanReceipt = Schema.Struct({
   acceptedBy: Schema.NonEmptyString,
@@ -1257,4 +1366,9 @@ export class DocsDeploymentInputError extends Schema.TaggedError<DocsDeploymentI
 export class DocsDeploymentPolicyError extends Schema.TaggedError<DocsDeploymentPolicyError>()(
   "DocsDeploymentPolicyError",
   { findings: Schema.NonEmptyArray(Schema.NonEmptyString) }
+) {}
+
+export class DocsDeploymentRecordDigestError extends Schema.TaggedError<DocsDeploymentRecordDigestError>()(
+  "DocsDeploymentRecordDigestError",
+  { reason: Schema.Literals(["encode", "digest"]) }
 ) {}

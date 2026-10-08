@@ -1,7 +1,7 @@
 ---
 title: "Add a fact"
 description: "Add a canonical fact with schema, descriptor, ownership and tests."
-status: "draft"
+status: "published"
 ---
 
 # Add a fact
@@ -28,7 +28,7 @@ Describe the fact before you code:
 - whether it is an input fact, derived fact or parameter fact
 - the source that proves the fact is tax-significant
 - the schema-backed value and branded fields it needs
-- the `Context.Tag` that provides the value
+- the `Context.Service` that provides the value
 - the descriptor title, authority policy and question metadata
 - which calculators will accept or derive it
 
@@ -40,16 +40,24 @@ owning `FactId`, schema, descriptor, constructor or service tag.
 Define the fact in the owning package and keep the descriptor beside the
 package-owned rule or scenario input that uses it.
 
+This example shows the existing gross-pay fact. For a new fact, use the
+name, schema and service key owned by its rule package.
+
 ```ts
+import { Money } from "@taxkit/core/primitives";
+import { PayPeriod } from "@taxkit/rules-au-pay/facts";
+import { Context, Schema } from "effect";
+
+// This illustrates the existing fact definition. A new fact needs its own
+// rule-owned name, schema, service key and descriptor.
 export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
   amount: Money,
   period: PayPeriod,
 }) {}
 
-export class GrossPayFact extends Context.Tag("taxkit/fact/GrossPay")<
-  GrossPayFact,
-  GrossPay
->() {}
+export class GrossPayFact extends Context.Service<GrossPayFact, GrossPay>()(
+  "taxkit/rules-au-pay/fact/GrossPay"
+) {}
 ```
 
 Use schema-owned optional fields with `Option` and `Match` when the fact has

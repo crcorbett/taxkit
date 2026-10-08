@@ -1,6 +1,7 @@
+import { CalculationError } from "@taxkit/core/errors";
 import { moneySub } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Option } from "effect";
 
 import { GrossPayFact, NetPay, NetPayFact } from "../facts/pay.js";
 import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
@@ -22,11 +23,13 @@ export const NetPayLive = Layer.effect(NetPayFact)(
     const gross = yield* GrossPayFact;
     const ledger = yield* PayWithholdingsLedgerFact;
 
-    const netAmount = moneySub(gross.amount, ledger.total);
+    const netAmount = yield* moneySub(gross.amount, ledger.total);
 
     const trace = TraceNode.make({
       children: [ledger.trace],
-      formula: "net = gross - withholdingsLedger.total",
+      formula: Option.some(
+        Option.some("net = gross - withholdingsLedger.total")
+      ),
       inputs: {
         grossCents: gross.amount.cents,
         withholdingsTotalCents: ledger.total.cents,
@@ -42,5 +45,12 @@ export const NetPayLive = Layer.effect(NetPayFact)(
       period: gross.period,
       trace,
     });
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Net pay could not produce a supported amount.",
+        })
+    )
+  )
 );

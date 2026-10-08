@@ -27,6 +27,7 @@ import {
   inspectResumePreflightReceipt,
   inspectScreenshotImageDigest,
 } from "./policy.js";
+import { readRetiredDocsSourceBundle } from "./retired-source.boundary.js";
 import {
   DeploymentAuthorityPreflightReceipt,
   DeploymentAuthorityCapabilityReceipt,
@@ -48,6 +49,7 @@ import {
   DeploymentResumePreflightReceipt,
   DeploymentHostedProofReceipt,
   DeploymentScreenshotManifest,
+  DocsDeploymentInputError,
   DocsDeploymentPolicyError,
 } from "./schemas.js";
 
@@ -55,6 +57,7 @@ const repositoryRootUrl = new URL("../..", import.meta.url);
 
 export const checkDocsDeployment = (repositoryRoot: string) =>
   Effect.gen(function* checkDocsDeploymentProgram() {
+    yield* readRetiredDocsSourceBundle(repositoryRoot);
     const [
       inventory,
       receipt,
@@ -266,6 +269,46 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         `${productionEvidenceRoot}/rollback-successor-production-screenshot-mobile-c99984c.json`,
       ],
     } as const;
+    const successorMobileManifestPath = yield* Effect.fromOption(
+      Array.get(productionRollbackPaths.successorScreenshotManifestPaths, 1)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new DocsDeploymentInputError({
+            target: "successor-mobile-manifest-path",
+          })
+      )
+    );
+    const successorDesktopManifestPath = yield* Effect.fromOption(
+      Array.get(productionRollbackPaths.successorScreenshotManifestPaths, 0)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new DocsDeploymentInputError({
+            target: "successor-desktop-manifest-path",
+          })
+      )
+    );
+    const restoredMobileManifestPath = yield* Effect.fromOption(
+      Array.get(productionRollbackPaths.restoredScreenshotManifestPaths, 1)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new DocsDeploymentInputError({
+            target: "restored-mobile-manifest-path",
+          })
+      )
+    );
+    const restoredDesktopManifestPath = yield* Effect.fromOption(
+      Array.get(productionRollbackPaths.restoredScreenshotManifestPaths, 0)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new DocsDeploymentInputError({
+            target: "restored-desktop-manifest-path",
+          })
+      )
+    );
     const production = yield* Effect.all({
       initialDesktop: readDeploymentJson(
         repositoryRoot,
@@ -299,7 +342,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
       ),
       restoredDesktop: readDeploymentJson(
         repositoryRoot,
-        productionRollbackPaths.restoredScreenshotManifestPaths[0],
+        restoredDesktopManifestPath,
         DeploymentScreenshotManifest
       ),
       restoredHosted: readDeploymentJson(
@@ -309,7 +352,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
       ),
       restoredMobile: readDeploymentJson(
         repositoryRoot,
-        productionRollbackPaths.restoredScreenshotManifestPaths[1],
+        restoredMobileManifestPath,
         DeploymentScreenshotManifest
       ),
       restoredPlan: readDeploymentJson(
@@ -334,7 +377,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
       ),
       successorDesktop: readDeploymentJson(
         repositoryRoot,
-        productionRollbackPaths.successorScreenshotManifestPaths[0],
+        successorDesktopManifestPath,
         DeploymentScreenshotManifest
       ),
       successorHosted: readDeploymentJson(
@@ -344,7 +387,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
       ),
       successorMobile: readDeploymentJson(
         repositoryRoot,
-        productionRollbackPaths.successorScreenshotManifestPaths[1],
+        successorMobileManifestPath,
         DeploymentScreenshotManifest
       ),
       successorPlan: readDeploymentJson(
@@ -718,20 +761,20 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
       ),
     });
     return [
-      ...inspectDeploymentOwners(inventory, receipt),
+      ...(yield* inspectDeploymentOwners(inventory, receipt)),
       ...inspectAuthorityCapabilityReceipt(capabilityReceipt),
       ...inspectCredentialCapabilityReceipt(credentialCapabilityReceipt),
       ...inspectGitAuthorityReceipt(gitAuthority),
       ...inspectGitReadbackReceipt(gitReadback),
       ...inspectProviderPreflightReceipt(providerPreflight, gitReadback),
-      ...inspectDeploymentPlanReceipt(plan),
+      ...(yield* inspectDeploymentPlanReceipt(plan)),
       ...inspectGitReadbackReceipt(latestGitReadback),
       ...inspectResumePreflightReceipt(
         resumePreflight,
         latestGitReadback,
         successorPlan
       ),
-      ...inspectDeploymentPlanReceipt(successorPlan),
+      ...(yield* inspectDeploymentPlanReceipt(successorPlan)),
       ...inspectGitReadbackReceipt(acceptedGitReadback),
       ...inspectPreviewMutationPreflight(
         deployPreflight,
@@ -740,13 +783,13 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         receipt,
         credentialReadback
       ),
-      ...inspectPreviewEvidenceChain(
+      ...(yield* inspectPreviewEvidenceChain(
         acceptedGitReadback,
         acceptedPlan,
         providerReadback,
         hostedProof,
         [desktopScreenshot, mobileScreenshot]
-      ),
+      )),
       ...inspectScreenshotImageDigest(desktopScreenshot, desktopImageSha256),
       ...inspectScreenshotImageDigest(mobileScreenshot, mobileImageSha256),
       ...inspectPreviewMutationPreflight(
@@ -757,7 +800,11 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         credentialReadback,
         providerReadback
       ),
-      ...inspectPreviewTeardownReceipt(teardown, destroyPlan, providerReadback),
+      ...(yield* inspectPreviewTeardownReceipt(
+        teardown,
+        destroyPlan,
+        providerReadback
+      )),
       ...inspectInitialProductionPreflight(
         production.initialPreflight,
         production.initialPlan,
@@ -767,14 +814,14 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         credentialReadback,
         production.initialProvider
       ),
-      ...inspectProductionEvidenceChain(
+      ...(yield* inspectProductionEvidenceChain(
         production.initialPlan,
         production.initialProvider,
         production.initialHosted,
         [production.initialDesktop, production.initialMobile],
         "production",
         "create"
-      ),
+      )),
       ...inspectGitReadbackReceipt(production.successorPreviewGit),
       ...inspectPreviewMutationPreflight(
         production.successorPreviewPreflight,
@@ -783,13 +830,13 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         receipt,
         production.successorPreviewCredential
       ),
-      ...inspectPreviewEvidenceChain(
+      ...(yield* inspectPreviewEvidenceChain(
         production.successorPreviewGit,
         production.successorPreviewPlan,
         production.successorPreviewProvider,
         production.successorPreviewHosted,
         [production.successorPreviewDesktop, production.successorPreviewMobile]
-      ),
+      )),
       ...inspectPreviewMutationPreflight(
         production.successorPreviewPredestroy,
         production.successorPreviewGit,
@@ -798,11 +845,11 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         production.successorPreviewCredential,
         production.successorPreviewProvider
       ),
-      ...inspectPreviewTeardownReceipt(
+      ...(yield* inspectPreviewTeardownReceipt(
         production.successorPreviewTeardown,
         production.successorPreviewDestroyPlan,
         production.successorPreviewProvider
-      ),
+      )),
       ...inspectProductionMutationPreflight(
         production.successorPreflight,
         production.successorPlan,
@@ -810,14 +857,14 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         production.successorProvider,
         production.successorPreviewCredential
       ),
-      ...inspectProductionEvidenceChain(
+      ...(yield* inspectProductionEvidenceChain(
         production.successorPlan,
         production.successorProvider,
         production.successorHosted,
         [production.successorDesktop, production.successorMobile],
         "production",
         "update"
-      ),
+      )),
       ...inspectProductionMutationPreflight(
         production.restoredPreflight,
         production.restoredPlan,
@@ -825,14 +872,14 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         production.restoredProvider,
         credentialReadback
       ),
-      ...inspectProductionEvidenceChain(
+      ...(yield* inspectProductionEvidenceChain(
         production.restoredPlan,
         production.restoredProvider,
         production.restoredHosted,
         [production.restoredDesktop, production.restoredMobile],
         "rollback",
         "update"
-      ),
+      )),
       ...inspectProductionRollbackReceipt(
         production.rollbackReceipt,
         production.initialProvider,
@@ -845,7 +892,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         productionRollbackPaths
       ),
       ...inspectGitReadbackReceipt(current.git),
-      ...inspectDeploymentPlanReceipt(current.previewPlan),
+      ...(yield* inspectDeploymentPlanReceipt(current.previewPlan)),
       ...inspectDeploymentPlanActions(current.previewPlan, "create"),
       ...inspectPreviewMutationPreflight(
         current.previewPreflight,
@@ -854,13 +901,13 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         receipt,
         current.credential
       ),
-      ...inspectPreviewEvidenceChain(
+      ...(yield* inspectPreviewEvidenceChain(
         current.git,
         current.previewPlan,
         current.previewProvider,
         current.previewHosted,
         [current.previewDesktop, current.previewMobile]
-      ),
+      )),
       ...inspectScreenshotImageDigest(
         current.previewDesktop,
         currentImageDigests.previewDesktop
@@ -877,12 +924,12 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         current.credential,
         current.previewProvider
       ),
-      ...inspectPreviewTeardownReceipt(
+      ...(yield* inspectPreviewTeardownReceipt(
         current.previewTeardown,
         current.previewDestroyPlan,
         current.previewProvider
-      ),
-      ...inspectDeploymentPlanReceipt(current.productionPlan),
+      )),
+      ...(yield* inspectDeploymentPlanReceipt(current.productionPlan)),
       ...inspectDeploymentPlanActions(current.productionPlan, "update"),
       ...inspectProductionMutationPreflight(
         current.productionPreflight,
@@ -891,14 +938,14 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         current.productionProvider,
         current.credential
       ),
-      ...inspectProductionEvidenceChain(
+      ...(yield* inspectProductionEvidenceChain(
         current.productionPlan,
         current.productionProvider,
         current.productionHosted,
         [current.productionDesktop, current.productionMobile],
         "production",
         "update"
-      ),
+      )),
       ...inspectScreenshotImageDigest(
         current.productionDesktop,
         currentImageDigests.productionDesktop
@@ -907,7 +954,7 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         current.productionMobile,
         currentImageDigests.productionMobile
       ),
-      ...inspectDeploymentPlanReceipt(current.rollbackPlan),
+      ...(yield* inspectDeploymentPlanReceipt(current.rollbackPlan)),
       ...inspectDeploymentPlanActions(current.rollbackPlan, "update"),
       ...inspectProductionMutationPreflight(
         current.rollbackPreflight,
@@ -916,14 +963,14 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         current.rollbackProvider,
         current.rollbackCredential
       ),
-      ...inspectProductionEvidenceChain(
+      ...(yield* inspectProductionEvidenceChain(
         current.rollbackPlan,
         current.rollbackProvider,
         current.rollbackHosted,
         [current.rollbackDesktop, current.rollbackMobile],
         "rollback",
         "update"
-      ),
+      )),
       ...inspectScreenshotImageDigest(
         current.rollbackDesktop,
         currentImageDigests.rollbackDesktop
@@ -964,12 +1011,12 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         production.restoredMobile,
         productionImageDigests.restoredMobile
       ),
-      ...inspectPreviewHostedEvidenceChain(
+      ...(yield* inspectPreviewHostedEvidenceChain(
         currentEpoch.previewPlan,
         currentEpoch.previewProvider,
         currentEpoch.previewHosted,
         [currentEpoch.previewDesktop, currentEpoch.previewMobile]
-      ),
+      )),
       ...inspectScreenshotImageDigest(
         currentEpoch.previewDesktop,
         currentEpochImageDigests.previewDesktop
@@ -978,19 +1025,19 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         currentEpoch.previewMobile,
         currentEpochImageDigests.previewMobile
       ),
-      ...inspectPreviewWorkflowTeardownReceipt(
+      ...(yield* inspectPreviewWorkflowTeardownReceipt(
         currentEpoch.previewTeardown,
         currentEpoch.previewDestroyPlan,
         currentEpoch.previewProvider
-      ),
-      ...inspectProductionEvidenceChain(
+      )),
+      ...(yield* inspectProductionEvidenceChain(
         currentEpoch.productionPlan,
         currentEpoch.productionProvider,
         currentEpoch.productionHosted,
         [currentEpoch.productionDesktop, currentEpoch.productionMobile],
         "production",
         "update"
-      ),
+      )),
       ...inspectScreenshotImageDigest(
         currentEpoch.productionDesktop,
         currentEpochImageDigests.productionDesktop
@@ -999,14 +1046,14 @@ export const checkDocsDeployment = (repositoryRoot: string) =>
         currentEpoch.productionMobile,
         currentEpochImageDigests.productionMobile
       ),
-      ...inspectProductionEvidenceChain(
+      ...(yield* inspectProductionEvidenceChain(
         currentEpoch.rollbackPlan,
         currentEpoch.rollbackProvider,
         currentEpoch.rollbackHosted,
         [currentEpoch.rollbackDesktop, currentEpoch.rollbackMobile],
         "rollback",
         "update"
-      ),
+      )),
       ...inspectScreenshotImageDigest(
         currentEpoch.rollbackDesktop,
         currentEpochImageDigests.rollbackDesktop
@@ -1023,7 +1070,7 @@ const program = Effect.gen(function* docsDeploymentMain() {
   const repositoryRoot = yield* path.fromFileUrl(repositoryRootUrl);
   const findings = yield* checkDocsDeployment(repositoryRoot);
   yield* Console.info(
-    `Docs deployment validation: journeys=4; historicalPreflightReceipts=11; currentEpochPreflightReceipts=4; gitAuthorityReceipts=1; historicalGitReadbackReceipts=5; currentEpochGitReadbackReceipts=1; historicalPlanReceipts=11; currentEpochPlanReceipts=6; historicalProviderReadbackReceipts=6; currentEpochProviderReadbackReceipts=3; historicalHostedProofReceipts=6; currentEpochHostedProofReceipts=3; historicalScreenshotManifests=12; currentEpochScreenshotManifests=6; historicalTeardownReceipts=3; currentEpochTeardownReceipts=1; workflowTeardownReceipts=1; rollbackReceipts=1; failedApplyReceipts=1; violations=${findings.length}; providerReadOperations=45; providerMutations=14.`
+    `Retained docs deployment receipt validation: journeys=4; historicalPreflightReceipts=11; currentEpochPreflightReceipts=4; gitAuthorityReceipts=1; historicalGitReadbackReceipts=5; currentEpochGitReadbackReceipts=1; historicalPlanReceipts=11; currentEpochPlanReceipts=6; historicalProviderReadbackReceipts=6; currentEpochProviderReadbackReceipts=3; historicalHostedProofReceipts=6; currentEpochHostedProofReceipts=3; historicalScreenshotManifests=12; currentEpochScreenshotManifests=6; historicalTeardownReceipts=3; currentEpochTeardownReceipts=1; workflowTeardownReceipts=1; rollbackReceipts=1; failedApplyReceipts=1; violations=${findings.length}; providerReadOperations=45; providerMutations=14.`
   );
   return yield* Array.match(findings, {
     onEmpty: () => Effect.void,
@@ -1031,6 +1078,11 @@ const program = Effect.gen(function* docsDeploymentMain() {
       Effect.fail(new DocsDeploymentPolicyError({ findings: nonEmpty })),
   });
 }).pipe(
+  Effect.tapErrorTag("DocsDeploymentRecordDigestError", (error) =>
+    Console.error(
+      `FAIL [record-digest] reason=${error.reason}; recovery=repair the saved record or local digest service.`
+    )
+  ),
   Effect.tapErrorTag("DocsDeploymentInputError", (error) =>
     Console.error(
       `FAIL [deployment-input] target=${error.target}; recovery=repair the Schema-decoded owner or retained receipt.`
@@ -1043,6 +1095,8 @@ const program = Effect.gen(function* docsDeploymentMain() {
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

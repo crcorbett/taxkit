@@ -54,6 +54,11 @@
       "source": "./src/handlers/live.ts",
       "types": "./dist/handlers/live.d.ts",
       "default": "./dist/handlers/live.js"
+    },
+    "./request-boundary": {
+      "source": "./src/request-boundary.ts",
+      "types": "./dist/request-boundary.d.ts",
+      "default": "./dist/request-boundary.js"
     }
   },
   "publishConfig": {
@@ -93,13 +98,17 @@
       "./handlers/live": {
         "types": "./dist/handlers/live.d.ts",
         "default": "./dist/handlers/live.js"
+      },
+      "./request-boundary": {
+        "types": "./dist/request-boundary.d.ts",
+        "default": "./dist/request-boundary.js"
       }
     },
     "access": "public"
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run",
     "test:openapi": "vitest run __tests__/openapi-snapshot.test.ts",
     "update-openapi-snapshot": "UPDATE_TAXKIT_OPENAPI_SNAPSHOT=true vitest run __tests__/openapi-snapshot.test.ts",
@@ -107,13 +116,15 @@
   },
   "dependencies": {
     "@taxkit/calculators": "workspace:*",
+    "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
-    "@taxkit/sdk": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
     "@taxkit/rules-au-pay": "workspace:*",
+    "@taxkit/sdk": "workspace:*",
     "@taxkit/testing": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:",

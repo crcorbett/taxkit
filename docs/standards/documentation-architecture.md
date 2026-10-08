@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-31
-source_of_truth: docs
-confidence: medium
+document_type: standard
+lifecycle: current
+authority: canonical
+owner: repository-maintainers
+last_reviewed: 2026-10-06
+review_trigger: documentation ownership or public source boundaries change
 ---
 
 # Documentation architecture
@@ -68,7 +70,7 @@ Use these homes unless a spec chooses a different implementation path:
 
 | Content | Home |
 | --- | --- |
-| Public MDX pages | `apps/docs` or chosen docs content root |
+| Public MDX pages | `packages/docs-content/content` |
 | Developer docs style | `docs/standards/*` |
 | Package-local docs | package `README.md` |
 | Architecture | `docs/architecture/*` |
@@ -99,8 +101,7 @@ Production: HTTP calculate
 
 HTTP caller
   -> @taxkit/api-http route contract
-    -> @taxkit/sdk/effect calculateRunRequest
-      -> PublicCalculatorService.calculate
+    -> PublicCalculatorService.calculate
 ```
 
 Prefer Mermaid flowcharts for branching decisions:

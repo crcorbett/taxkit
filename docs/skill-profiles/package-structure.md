@@ -19,3 +19,18 @@ review_trigger: repository paths, commands, or plugin routing change
 - Verification: focused package commands, `bun run verification`; for release-facing work run `bun run release:check` (including SDK packed/downstream checks)
 - Architecture routes: `docs/architecture/package-ownership.md`, `docs/architecture/package-boundaries.md`, `docs/architecture/effect-services.md`, and `docs/architecture/testing-and-quality.md`
 - Preserve unrelated work; never overwrite it.
+
+## Clean-slate compatibility and implementation
+
+The local root manifest and lockfile select stable Effect 4.0.0 and TypeScript
+7.0.2. Canonical skill templates may retain their upstream rc.117 qualification;
+that reference snapshot does not downgrade TaxKit or prove an app/provider
+migration. Check installed exports and the active clean-slate plan before use.
+
+Shared workflow skills are selected through `docs/skills.md` from the latest
+installed plugin. The removed local collection and its 0.6.1 receipt remain
+historical evidence; they do not select today's plugin or qualify TaxKit's
+stable dependency graph. Repository validators stay independent of a user's
+plugin installation. Use the retained task receipts and direct source checks
+for the implementation's current acceptance and limits. Use its task receipts for current acceptance; the
+upstream skill receipt alone does not prove runtime behaviour.

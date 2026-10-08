@@ -1,28 +1,42 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@taxkit/core/graph";
+import { ParameterEffectivePeriod } from "@taxkit/core/parameters";
 import type { AnyRuleDescriptor } from "@taxkit/core/rules";
 import { AnnualTaxableIncomeDescriptor } from "@taxkit/rules-au-income-tax/facts";
 import { AuAnnualTaxRuleDescriptors } from "@taxkit/rules-au-income-tax/rule-pack";
+import { Array as EffectArray, Effect, Schema, Option } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
-  rules.map((rule) => ({
-    id: rule.id,
-    parameters: (rule.parameters ?? []).map((parameter) => ({
-      effectivePeriod: parameter.effectivePeriod,
-      id: parameter.id,
-      source: parameter.source.kind,
-      sourceArtifact: parameter.sourceArtifact
-        ? {
-            checksum: parameter.sourceArtifact.checksum,
-            retrievedOn: parameter.sourceArtifact.retrievedOn,
-            rowCount: parameter.sourceArtifact.extract.rowCount,
-          }
-        : undefined,
-    })),
-    provides: rule.provides.map((fact) => fact.id),
-    requires: rule.requires.map((fact) => fact.id),
-    sources: rule.sources.map((source) => source.kind),
-  }));
+  Effect.forEach(rules, (rule) =>
+    Effect.gen(function* () {
+      const parameters = yield* Effect.forEach(rule.parameters, (parameter) =>
+        Schema.encodeEffect(ParameterEffectivePeriod)(
+          parameter.effectivePeriod
+        ).pipe(
+          Effect.map((effectivePeriod) => ({
+            effectivePeriod,
+            id: parameter.id,
+            source: parameter.source.kind,
+            sourceArtifact: parameter.sourceArtifact.pipe(
+              Option.map((artifact) => ({
+                checksum: artifact.checksum,
+                retrievedOn: artifact.retrievedOn,
+                rowCount: artifact.extract.rowCount,
+              })),
+              Option.getOrUndefined
+            ),
+          }))
+        )
+      );
+      return {
+        id: rule.id,
+        parameters,
+        provides: EffectArray.map(rule.provides, (fact) => fact.id),
+        requires: EffectArray.map(rule.requires, (fact) => fact.id),
+        sources: EffectArray.map(rule.sources, (source) => source.kind),
+      };
+    })
+  );
 
 describe("AU annual tax rule graph", () => {
   it("validates the annual tax rule graph", () => {
@@ -35,11 +49,20 @@ describe("AU annual tax rule graph", () => {
   });
 
   it("surfaces caller question metadata on annual input facts", () => {
-    expect(AnnualTaxableIncomeDescriptor.question?.inputKind).toBe("money");
+    expect(
+      AnnualTaxableIncomeDescriptor.question.pipe(
+        Option.map((question) => question.inputKind),
+        Option.getOrUndefined
+      )
+    ).toBe("money");
   });
 
-  it("captures descriptor snapshots for the published annual tax rule pack", () => {
-    expect(rulePackSnapshot(AuAnnualTaxRuleDescriptors)).toMatchInlineSnapshot(`
+  it.effect(
+    "captures descriptor snapshots for the published annual tax rule pack",
+    () =>
+      Effect.gen(function* () {
+        expect(yield* rulePackSnapshot(AuAnnualTaxRuleDescriptors))
+          .toMatchInlineSnapshot(`
       [
         {
           "id": "taxkit/rules-au-income-tax/rule/IncomeTax",
@@ -104,10 +127,10 @@ describe("AU annual tax rule graph", () => {
                 "toExclusive": "2026-07-01",
               },
               "id": "taxkit/rules-au-income-tax/parameter/AtoMedicareLevyTable",
-              "source": "ato-publication",
+              "source": "legislation",
               "sourceArtifact": {
-                "checksum": "sha256:d3b8ab27d44a3b0dc9d84b81c09a5f1af0cfa197f9f96deab47d19362195c987",
-                "retrievedOn": "2026-05-12",
+                "checksum": "sha256:8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67",
+                "retrievedOn": "2026-10-08",
                 "rowCount": 1,
               },
             },
@@ -119,7 +142,7 @@ describe("AU annual tax rule graph", () => {
             "taxkit/rules-au-income-tax/fact/AnnualTaxableIncome",
           ],
           "sources": [
-            "ato-publication",
+            "legislation",
           ],
         },
         {
@@ -137,5 +160,6 @@ describe("AU annual tax rule graph", () => {
         },
       ]
     `);
-  });
+      })
+  );
 });

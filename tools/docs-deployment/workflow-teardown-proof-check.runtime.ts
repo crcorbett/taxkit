@@ -32,10 +32,12 @@ export const checkWorkflowTeardownProof = Effect.gen(
       !readback.stateStageAbsent ||
       !readback.providerWorkerAbsent
     ) {
-      return yield* new WorkflowCheckMismatchError({
-        check,
-        invariant: "exact-stage-state-provider-absence",
-      });
+      return yield* Effect.fail(
+        new WorkflowCheckMismatchError({
+          check,
+          invariant: "exact-stage-state-provider-absence",
+        })
+      );
     }
 
     yield* Console.log(
@@ -58,6 +60,8 @@ const program = checkWorkflowTeardownProof.pipe(
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

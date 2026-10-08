@@ -1,0 +1,448 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "core trace/ledger Schema, types or codec change",
+  "outcome": "Pass for local trace/ledger Schema ownership; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-domain-schema-owners",
+    "baseCommit": "72c8f42041ae942ef67a1327d6dc69ab1fb6d12c",
+    "sources": [
+      {
+        "path": ".changeset/schema-owned-trace-ledger.md",
+        "sha256": "4d549f2920047ed41ebf6de7219c55d74901fa1d3974340012c1d1c5f72e29b9"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "d4c1c06874a4c8dcbd9155d48e19b2a9e877ac859b296e934f39818003fbf01e"
+      },
+      {
+        "path": "docs/architecture/graph-trace-ledgers.md",
+        "sha256": "c109699b14a42830c05a0ddcd32333fe860aa0514280c9723561bee77b01469f"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "a0341338a89647031069fe848c79e9e4a3c10ebb32e5729a5770b1415b0568ca"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "4460ea6f2c55a848b4847db9cf61cb41ff4072d2b7021896cf38b06dc90052f9"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "d611fbee64105866d03b8a5751f63442682d5658146a79a0d30e164fe29df9e9"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "b1eb33562b87c3c4a8a054cca3b84044e5fda7a3eddbae1ebdae054e2845da85"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "b9204ff2288676cc3eb7a2cde0eded9c3e886489cb67cb3365add1ba6c1e24ed"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "231a59ea6dbefaf112e07ad3da2dcbde438f729cce93170e51381a5498a28cd8"
+      },
+      {
+        "path": "packages/core/src/ledger/component.ts",
+        "sha256": "abcd28ab03538464815d97204a48a24020870ee396eaeada8cf52292e6ed11df"
+      },
+      {
+        "path": "packages/core/src/trace/node.ts",
+        "sha256": "dda0b04f0d3a8cbe877b6126daedfc9936f76689f309db0acb0f19c52778fdcf"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "fbd5bf5c6cf698578430823864f975f53811b77b7a389106b5783bb9b13cf46a"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "command": "bun run release:check -- --ci",
+      "mode": "report-only CI graph",
+      "exit": 0,
+      "seconds": 745.19,
+      "orderedChecks": [
+        "verification",
+        "test",
+        "build",
+        "docs-validation",
+        "packed-artifact",
+        "downstream-consumer",
+        "api-smoke",
+        "docs-browser",
+        "changeset-status"
+      ],
+      "nonClaim": "No immutable release attempt, publication or provider operation"
+    }
+  ],
+  "compatibility": {
+    "samples": [
+      {
+        "name": "missing",
+        "bytes": 250,
+        "sha256": "443bc683ec92b015e6d97214c7bce740e7f68b7238a11f1061eb85085f9c6406"
+      },
+      {
+        "name": "present",
+        "bytes": 565,
+        "sha256": "bc5c274c12b36d99cba250d258f690b0afb019a2b95f53a19cf761138cbc3c32"
+      },
+      {
+        "name": "explicit-undefined",
+        "bytes": 250,
+        "sha256": "443bc683ec92b015e6d97214c7bce740e7f68b7238a11f1061eb85085f9c6406"
+      },
+      {
+        "name": "ledger",
+        "bytes": 739,
+        "sha256": "478fb92f8b07ed0feb584d276c2a875ef17374d424f5e9b140e3039c4cfad351"
+      }
+    ],
+    "observation": "Original/current exact bytes, key order, omitted and explicitly undefined optional-key presence and round trips match. Fresh genuine packed consumer proves public aliases/recursive brands/JSON inputs and results, all four historical encodings/round trips, optional-key presence and AUD-only currency admission."
+  },
+  "limitations": [
+    "Open-interface declaration merging is deliberately replaced by canonical type aliases.",
+    "No semantic Option migration or constructor/table invariant completion claimed.",
+    "No rate limiter, whole T004 acceptance, Medicare correction, external consumer/public availability or provider operation proved."
+  ],
+  "failedOrCorrectedAttempts": [
+    "Initial standalone codec probe imported direct Effect source while core used the installed distribution; Money decoding failed. Corrected to the actual package export; baseline and candidate probes pass identically.",
+    "The first field-order removal control correctly failed at packed runtime, but the outside harness expected a suppressed raw error. Classification now matches the safe named downstream phase; both field-order and JSON-input controls fail at their intended runtime/typecheck phases and restore source exactly. No production error output was broadened.",
+    "One wrapper invocation used nonexistent check:format; corrected to the repository-owned format:check command. The first restored downstream call replayed cache; a forced fresh downstream run follows."
+  ],
+  "negativeControls": [
+    {
+      "control": "field-order",
+      "exitCode": 1,
+      "seconds": 3.62,
+      "expectedReason": "Command failed: run downstream SDK examples",
+      "reasonMatched": true,
+      "sourceRestored": true
+    },
+    {
+      "control": "json-input",
+      "exitCode": 1,
+      "seconds": 3.37,
+      "expectedReason": "Command failed: typecheck downstream SDK examples",
+      "reasonMatched": true,
+      "sourceRestored": true
+    }
+  ],
+  "focusedEvidence": {
+    "workflowCases": 32,
+    "workflowSeconds": 514.33,
+    "nativeCases": 7,
+    "nativeSeconds": 84.41,
+    "lintCorpusCases": 480,
+    "sourceRestoration": "All 13 staged files match their pre-check bytes; unchanged API worker matches parent Git source",
+    "checks": [
+      {
+        "stage": "lint",
+        "command": [
+          "bun",
+          "run",
+          "lint"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 5.83,
+        "log": "/private/tmp/dev75-schema-focused-lint.log"
+      },
+      {
+        "stage": "types",
+        "command": [
+          "bun",
+          "run",
+          "check-types"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 4.61,
+        "log": "/private/tmp/dev75-schema-focused-types.log"
+      },
+      {
+        "stage": "core-tests",
+        "command": [
+          "bun",
+          "run",
+          "--filter=@taxkit/core",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.4,
+        "log": "/private/tmp/dev75-schema-focused-core-tests.log"
+      },
+      {
+        "stage": "http-tests",
+        "command": [
+          "bun",
+          "run",
+          "--filter=@taxkit/api-http",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.59,
+        "log": "/private/tmp/dev75-schema-focused-http-tests.log"
+      },
+      {
+        "stage": "rpc-tests",
+        "command": [
+          "bun",
+          "run",
+          "--filter=@taxkit/api-rpc",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.85,
+        "log": "/private/tmp/dev75-schema-focused-rpc-tests.log"
+      },
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.3,
+        "log": "/private/tmp/dev75-schema-focused-docs.log"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.15,
+        "log": "/private/tmp/dev75-schema-focused-runbooks.log"
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.48,
+        "log": "/private/tmp/dev75-schema-focused-format.log"
+      },
+      {
+        "stage": "downstream",
+        "command": [
+          "bun",
+          "run",
+          "sdk:validate-downstream"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 3.75,
+        "log": "/private/tmp/dev75-schema-focused-downstream.log"
+      }
+    ],
+    "restoredFreshDownstream": [
+      {
+        "stage": "downstream-fresh",
+        "command": [
+          "bun",
+          "run",
+          "sdk:validate-downstream",
+          "--force"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 4.01,
+        "log": "/private/tmp/dev75-schema-restored-v2-downstream-fresh.log"
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.53,
+        "log": "/private/tmp/dev75-schema-restored-v2-format.log"
+      }
+    ]
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Pinned local tooling and unchanged installed graph; actual native version qualification remains in the full verification owner",
+  "parentHostedProof": {
+    "pullRequest": 146,
+    "headCommit": "72c8f42041ae942ef67a1327d6dc69ab1fb6d12c",
+    "runId": 37393720058,
+    "jobId": 112044577422,
+    "completedAt": "2026-10-06T00:40:15Z",
+    "outcome": "success",
+    "readbackDate": "2026-10-06",
+    "limitation": "Parent only; current candidate hosted checks pending"
+  },
+  "documentationImpact": {
+    "Change required": [
+      "Core README and graph/trace/ledger owner; Effect and testing architecture",
+      "Genuine packed downstream consumer; current SPEC/tasks/plan/audit and dated receipt",
+      "Major core Changeset for replacing extensible interfaces with aliases"
+    ],
+    "Preserve": [
+      "Tax/source/golden values and Medicare decision",
+      "Historical codecs/optional representation; HTTP/RPC/OpenAPI and browser behaviour",
+      "Package paths/toolchain/skills/lint permissions/CI/infrastructure/telemetry"
+    ],
+    "N/A": [
+      "No new runbook/command/operational procedure",
+      "No public MDX/editorial publication change"
+    ]
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 119,
+      "sha256": "906146f3f391bc414261ad5ffc7034d229bf1ecfcc951618b5c72e57643f8dae"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "a5ea43ac0da9e83723f153fb30b9f3da97d7044ab3a481a3e9148920eecbe8b1"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "93596e6fe55bf9454c523ab41b8e2df859e17544da713bce6aeb8ec0199861c9"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "ba9f9e03830f0b64199bf9ae53daff2c385238415ce8a512bfe4085005d43dca"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "3f88d91b1f8bb17858255ac3b855be05cfd464156dfa3444323136ccc951536a"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "5364ed6a765642a53571ea7affbc3762b7c140c4979b0f1b8f0da0ba344f68fd"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "75537e90d0ba8835e38ba28459812f8baf7a80f29055efd951dcb1f8d2480bf3"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "453ae70d12a0ae3c3f3d4df644af6a4186c72fe5e7de79305c2218db9b5e6c13"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "97c3f8f1783e0e750a9b40f8cfaf529907e32a016f68ee4aab0749e0dda8c3a3"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously inspected parent image"
+    }
+  ],
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for local canonical field/type ownership with historical packed-consumer proof",
+    "remaining": "Money/date fallible constructors, semantic Option values, whole-table invariants, trusted rate limiting, whole T004 and later tasks"
+  },
+  "rollback": {
+    "identity": "72c8f42041ae942ef67a1327d6dc69ab1fb6d12c",
+    "action": "Revert the complete slice together before any separately authorised release; no provider operation to undo"
+  },
+  "postconditions": {
+    "verification": "Complete compiler/lint/format/unused-code and all 32 workflow cases pass; SDK/website browser and all seven built Worker cases pass",
+    "tests": "Complete prescribed root tests pass, including 480 real lint cases",
+    "consumers": "Genuine packed artifact/downstream typecheck, runtime, public exports and browser bundle pass",
+    "native": "Nine output inventories captured immediately after verification, before later root build; four screenshot hashes match inspected parent captures",
+    "restoration": "All 13 candidate files match pre-check hashes and unchanged API worker matches parent Git source"
+  },
+  "qualifiedLogDigests": [
+    {
+      "check": "verification",
+      "path": "tmp/release-readiness/verification-stdout-MQbgB5/77391bdcef98.log",
+      "sha256": "28a0d8931ca8327b5ab6f7a3e8f4b18cda9b1006dea85730dc145cf7ebf38138"
+    },
+    {
+      "check": "test",
+      "path": "tmp/release-readiness/test-stdout-BPYeEW/57928895a962.log",
+      "sha256": "41add214f75a873cb569a61c08244e9da843ffd286637d1681b9eef7b7ea4283"
+    }
+  ],
+  "linearReadback": {
+    "issue": "DEV-75",
+    "uuid": "e9824311-b9a1-44af-a163-d36d1ad340f6",
+    "status": "Backlog",
+    "commentsAtPreWrite": 0,
+    "commentsAfterApprovedWrite": 1,
+    "commentId": "6a17034d-46f9-4450-821e-d5534c34df7c",
+    "operation": "Cooper explicitly approved the prepared comment; saved content independently read back",
+    "limitation": "Issue status/description/dependencies not changed; current implementation remains active in the repository task ledger"
+  },
+  "medicareDecisionReadback": {
+    "issue": "DEV-73",
+    "comments": 44,
+    "hasNextPage": false,
+    "decisionComment": "db7b8f4f-c061-4e79-b12a-4cecd54be0e1",
+    "resolvedAt": null,
+    "outcome": "No newer correction decision found; retained source/results preserved"
+  },
+  "postCheckChanges": {
+    "scope": "Plan and receipt only",
+    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
+  }
+}

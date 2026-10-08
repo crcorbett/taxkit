@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-core-owner
+last_reviewed: 2026-10-06
+review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
 # Core
@@ -34,15 +36,63 @@ HTTP handlers or filesystem adapters.
 ## Guardrails
 
 - Use Effect Schema for boundary values and derive exported types from
-  canonical schemas.
+  canonical schemas. `LedgerComponent` and its encoded alias are inferred from
+  their owning Schema. `TraceNode` keeps a local recursive children relation;
+  its remaining type and encoded fields come from one shared field Schema.
+  The exported type aliases cannot be extended by interface declaration merging.
+  Their existing encoded field order, omitted/undefined keys and nested values
+  remain unchanged and are checked by the genuine packed consumer.
+- Trace formula/rounding and question help text use nested Options: None means
+  a missing encoded key, Some(None) means a present undefined key, and
+  Some(Some(value)) means a value. Use `Option.flatten` when both missing forms
+  mean no content. Their codecs preserve all original bytes and key presence.
+  The trace constructor retains inferred ordinary field requirements and derives
+  recursive child constructor input from those same fields; it does not widen
+  all constructor input to unknown.
+- `CalculationError.cause` uses the same nested Option owner and defaults to
+  missing when omitted from its constructor. Its codec retains the original
+  missing, undefined, null and opaque diagnostic values. Those legacy values
+  are not safe telemetry; the current rule errors omit them.
+- Fact, parameter and rule descriptors derive ordinary fields from private
+  Schemas. Their generic value Schema, service key and Layer relations remain
+  explicit. Fact questions and source artifacts are Options; their constructor
+  inputs still accept checked values or an omitted question/artifact.
+  Rule parameters are always an array, defaulting to empty. Duplicate-provider
+  permission is an Option that preserves explicit false. Service tuple types
+  read each descriptor key's native `Identifier`, including empty tuples.
+- The calculation engine contract lives in `calculation-engine.ts`; its
+  implementation lives in `live.layer.ts`. Root and engine package entrypoints
+  retain `CalculationEngineLive`. Validation issues still default to empty.
 - Reuse canonical schemas, branded ids and constructors. Do not redeclare
   canonical fields such as `id: string` in consumers.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
   `Context`, `Layer`, `Record`, `Result` and `Exit` where they fit.
-- Keep money and rounding explicit.
+- Keep money and rounding explicit. `aud` takes already checked `Cents` and
+  returns Money directly. Use `audFromCents` or `audDollars` when a number needs
+  checking; they return Effects with `InvalidMoneyValue`. Addition, subtraction,
+  money rounding, exact decimal conversion and ledger totals check each new
+  constrained amount and return that error when it cannot fit safe whole cents.
+  `taxRate` and `decimalCoefficient` return `InvalidDecimalValue` for strings
+  the installed decimal parser rejects. Their existing valid values and rounding
+  stay unchanged; the parser's existing empty-string-as-zero case is retained.
+  Decimal-to-cent rounding checks extreme exponents before constructing powers:
+  oversized non-zero results fail, and tiny amounts round to zero.
 - Use `IsoDate` and `isoDate` for effective-period and source-retrieval dates.
   Both paths enforce one real Gregorian-calendar `YYYY-MM-DD` invariant;
   malformed dates and impossible dates such as `2026-02-29` are rejected.
+  `DateInterval` owns the whole-record start-before-end check, so direct Schema
+  decoding and the convenience constructor both reject empty/reversed intervals.
+  `isoDate`, `dateInterval` and `australianTaxYearInterval` return Effects with
+  `InvalidCalendarValue`. The Australian helper checks the full year label,
+  including its matching next-year suffix and representable July boundaries.
+  Generic `TaxYear` remains an open identifier.
+  The interval's end is `Option<Option<IsoDate>>`: outer None keeps a missing
+  key, Some(None) keeps a present undefined key, and Some(Some(date)) keeps an
+  end date. Flatten it when both absence forms mean no end. The owning codec
+  preserves the original bytes and key presence; both its decoded and encoded
+  forms enforce start-before-end. An absent end is unbounded.
+- `Money` admits AUD only. Arithmetic consumes checked Money values; currency
+  admission belongs to that Schema rather than a duplicate arithmetic guard.
 - Use package-owned descriptors and tagged errors.
 - Keep engine inputs separate from application state.
 - Add tests and explicit package exports with each new public subpath.
@@ -54,6 +104,12 @@ bun run --filter=@taxkit/core check-types
 bun run --filter=@taxkit/core test
 bun run --filter=@taxkit/core build
 ```
+
+`check-types` includes source and deterministic tests. The build uses its
+separate source-only configuration, preserving the existing `dist` paths.
+Core requests no automatically loaded type packages (`types: []`). Its source
+and tests use explicit imports, so a clean build does not depend on Node types
+being available through another workspace package.
 
 ## Packaging
 
@@ -68,3 +124,9 @@ artifact and its concrete dependency ranges.
 - `docs/architecture/facts.md`
 - `docs/architecture/rules-and-parameters.md`
 - `docs/architecture/graph-trace-ledgers.md`
+
+## Browser Schema entrypoints
+
+The browser-safe `@taxkit/core/engine/schemas` entrypoint owns `CalculationDiagnostics` without importing the live engine. Existing core/engine/root exports re-export the same class.
+
+The [transport architecture](../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.

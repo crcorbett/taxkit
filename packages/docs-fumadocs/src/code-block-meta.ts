@@ -1,35 +1,32 @@
+import type { ShikiTransformer, ShikiTransformerContext } from "@shikijs/core";
 import { Option, Schema } from "effect";
 
 import { FumadocsCodeBlockMeta } from "./schemas.ts";
 
-interface CodeBlockNode {
-  readonly properties: Record<
-    string,
-    boolean | number | string | null | undefined | readonly (number | string)[]
-  >;
-}
-
-interface CodeBlockOptions {
-  readonly lang?: string | undefined;
-  readonly meta?: typeof Schema.Unknown.Type;
-}
+type CodeBlockNode = Parameters<NonNullable<ShikiTransformer["pre"]>>[0];
+type CodeBlockOptions = Pick<
+  ShikiTransformerContext["options"],
+  "lang" | "meta"
+>;
 
 export const applyCodeBlockMeta = (
   node: CodeBlockNode,
   options: CodeBlockOptions
-): void => {
-  Schema.decodeUnknownOption(FumadocsCodeBlockMeta)(options.meta).pipe(
+): CodeBlockNode => {
+  const titled = Schema.decodeUnknownOption(FumadocsCodeBlockMeta)(
+    options.meta
+  ).pipe(
     Option.flatMap((meta) => Option.fromUndefinedOr(meta.title)),
-    Option.map((title) => {
-      node.properties["data-title"] = title;
-      return title;
+    Option.match({
+      onNone: () => node.properties,
+      onSome: (title) => ({ ...node.properties, "data-title": title }),
     })
   );
-
-  Option.fromUndefinedOr(options.lang).pipe(
-    Option.map((language) => {
-      node.properties["data-language"] = language;
-      return language;
+  const properties = Option.fromUndefinedOr(options.lang).pipe(
+    Option.match({
+      onNone: () => titled,
+      onSome: (language) => ({ ...titled, "data-language": language }),
     })
   );
+  return { ...node, properties };
 };

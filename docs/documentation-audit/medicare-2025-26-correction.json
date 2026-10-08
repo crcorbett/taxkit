@@ -1,0 +1,340 @@
+{
+  "schemaVersion": 1,
+  "kind": "annual-medicare-correction-qualification",
+  "observedAtUtc": "2026-10-08T01:19:55.135509+00:00",
+  "status": "accepted-local-correction",
+  "tasks": [
+    "MCR-001",
+    "MCR-002"
+  ],
+  "owner": "taxkit-au-income-tax-owner",
+  "actor": "Codex acting under Cooper Corbett’s 8 October correction authority",
+  "invariant": "Enacted 2025-26 single-person non-SAPTO Medicare limits and exact-zero nil-band admission; positive-income tax, LITO, PAYG and take-home algorithms preserved.",
+  "authority": {
+    "operation": "separate source/test/documentation correction, commits and existing draft PR update",
+    "pullRequest": "https://github.com/crcorbett/taxkit/pull/168",
+    "excluded": [
+      "TaxKit merge",
+      "version application",
+      "package publication",
+      "provider operation",
+      "deployment",
+      "acceptance of the larger TaxKit rebuild"
+    ]
+  },
+  "source": {
+    "correctionCommit": "0d82b82d1c48079fc4b8e2ec96abadfe12999789",
+    "correctionTree": "2b8e798edccd78a3cdb549df2bb9e966ed274a57",
+    "parent": "da94a2f736b07210bf27b8b467f5d74304d35456",
+    "testRecoveryCommit": "557b4e524ead6f469e92150360a9e8a451c37cdd",
+    "testRecoveryTree": "d6f907b56ed998acd58f3c3fe5c8032ef1ff1b8c",
+    "testRecoveryOnlyChange": {
+      "path": "apps/web/test/native-pair.boundary.test.ts",
+      "before": "$1,465.80",
+      "after": "$1,386.90"
+    },
+    "approvedAdadSource": "0d82b82d1c48079fc4b8e2ec96abadfe12999789",
+    "adadSourceApprovalNotExtended": true,
+    "selectedObjectsIdentical": [
+      {
+        "path": "packages/core",
+        "approvedObject": "eb61f8af4051739aa7603b0891e7e8f26bfc1bee",
+        "testSuccessorObject": "eb61f8af4051739aa7603b0891e7e8f26bfc1bee"
+      },
+      {
+        "path": "packages/rules/au/income-tax",
+        "approvedObject": "86d1bfe4d4b3050acfbb4b0a3315916263c9222f",
+        "testSuccessorObject": "86d1bfe4d4b3050acfbb4b0a3315916263c9222f"
+      },
+      {
+        "path": "packages/testing",
+        "approvedObject": "27190852ae8bf50739ba7d28f3016db9a61120fb",
+        "testSuccessorObject": "27190852ae8bf50739ba7d28f3016db9a61120fb"
+      },
+      {
+        "path": "bun.lock",
+        "approvedObject": "bb7a53c59e5f53618374a0c87ff2b780ab84684e",
+        "testSuccessorObject": "bb7a53c59e5f53618374a0c87ff2b780ab84684e"
+      },
+      {
+        "path": "package.json",
+        "approvedObject": "99a5628e853f645e0554d583d9a928a4af9495ea",
+        "testSuccessorObject": "99a5628e853f645e0554d583d9a928a4af9495ea"
+      },
+      {
+        "path": "tsconfig.base.json",
+        "approvedObject": "1076aea7d2ab217bb0e62412be269494daf23548",
+        "testSuccessorObject": "1076aea7d2ab217bb0e62412be269494daf23548"
+      }
+    ],
+    "limits": "Identical selected source objects do not imply identical complete trees, compiled artifacts or deployment."
+  },
+  "runtime": {
+    "bun": "1.4.2",
+    "effect": "4.0.0",
+    "effectPlatforms": "4.0.0",
+    "effectVitest": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "vitest": "5.0.3",
+    "typescript": "7.0.2",
+    "lockSha256": "24fe67e0d7d86a308c4d365d1fad4697c2c5d2d5e5c763a5823f1cdd9c7a9abd",
+    "dependencyUpgrade": false,
+    "skill": "Commonplace development-workflows0.6.9, live manifest and matching published release verified 8 October"
+  },
+  "legalSource": {
+    "url": "https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf",
+    "retrievedOn": "2026-10-08",
+    "sha256": "8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67",
+    "provisions": "Schedule5 items3,5,14; Medicare Levy Act section7(2) includes the phase-in limit",
+    "year": "2025-26",
+    "thresholdCents": 2801100,
+    "phaseInLimitCents": 3501300,
+    "shadeInRate": "10%",
+    "fullRate": "2%"
+  },
+  "rulesetEdition": "rules-au-income-tax/1.0.1",
+  "oracles": [
+    {
+      "incomeCents": 3000000,
+      "incomeTaxCents": 188800,
+      "litoCents": 70000,
+      "medicareCents": 19890,
+      "liabilityCents": 138690
+    },
+    {
+      "incomeCents": 3501300,
+      "medicareCents": 70020
+    },
+    {
+      "incomeCents": 3501400,
+      "medicareCents": 70028
+    },
+    {
+      "incomeCents": 8000000,
+      "medicareCents": 160000,
+      "liabilityCents": 1638800
+    },
+    {
+      "incomeCents": 9000000,
+      "medicareCents": 180000,
+      "liabilityCents": 1958800
+    }
+  ],
+  "checks": [
+    {
+      "command": "bun run test",
+      "source": "0d82b82d1c48079fc4b8e2ec96abadfe12999789",
+      "exitCode": 0,
+      "observed": "31 successful Turbo tasks; root663 Oxlint tests included",
+      "artifact": {
+        "name": "adad-taxkit-test-source-commit.log",
+        "sha256": "db2ef66e925cb6281ade191e40978262254ec9cc33f39d9b85f5515553815d8d",
+        "bytes": 96501,
+        "retention": "private local diagnostic; bounded observations retained here"
+      }
+    },
+    {
+      "command": "bun run build",
+      "source": "0d82b82d1c48079fc4b8e2ec96abadfe12999789",
+      "exitCode": 0,
+      "observed": "18 successful Turbo tasks",
+      "artifact": {
+        "name": "adad-taxkit-build-source-commit.log",
+        "sha256": "e441f96cefcbee2c47625ad6ba57e9feb4009161c446c158a231d5b7f4d43978",
+        "bytes": 108363,
+        "retention": "private local diagnostic; bounded observations retained here"
+      }
+    },
+    {
+      "command": "annual package tests",
+      "source": "correction source before final commit; unchanged implementation at0d82",
+      "exitCode": 0,
+      "observed": "21 annual tests including exact zero, one cent, tax-free threshold, legal limits, negative-income error and provenance",
+      "artifact": {
+        "name": "adad-taxkit-annual-ready.log",
+        "sha256": "895d7e6f4f30affeb7fd39318115b5cf9c7a70bc212f0a1b6299e7bc7dc3882d",
+        "bytes": 246,
+        "retention": "private local diagnostic; bounded observations retained here"
+      }
+    },
+    {
+      "command": "root check-types and lint",
+      "exitCode": 0,
+      "observed": "31 compiler tasks;552 source files and585 lint rules,0 warnings/errors",
+      "artifacts": [
+        {
+          "name": "adad-taxkit-types-ready.log",
+          "sha256": "b355507dda55ed0e58a89f8354670f361c6a91dd09c9f4d0f0bcd7e11f12a09f",
+          "bytes": 364088,
+          "retention": "private local diagnostic; bounded observations retained here"
+        },
+        {
+          "name": "adad-taxkit-lint-ready.log",
+          "sha256": "d5142c6db745f2b117a36e85cfe0bc55c335947a76c1e45d4dfe2520aff16fd1",
+          "bytes": 923,
+          "retention": "private local diagnostic; bounded observations retained here"
+        }
+      ]
+    },
+    {
+      "command": "HTTP test:openapi",
+      "exitCode": 0,
+      "observed": "1 snapshot test",
+      "artifact": {
+        "name": "adad-taxkit-openapi-final.log",
+        "sha256": "1b6197e001332f3048650326a990275c4e5964a528936df284ccb3a75b1facb1",
+        "bytes": 268,
+        "retention": "private local diagnostic; bounded observations retained here"
+      }
+    },
+    {
+      "command": "bun run sdk:check-packed-artifact and bun run sdk:validate-downstream",
+      "exitCode": 0,
+      "observed": "Real packed public consumer; seven downstream tasks; original historical digests preserved with narrowly scoped complete Medicare fragment comparison; unrelated date/amount/version negatives reject",
+      "artifacts": [
+        {
+          "name": "adad-taxkit-packed-final.log",
+          "sha256": "e7c918841c5e69fd646e82d0c4bdd0923cf77d8b117ea62686e18a6b91b2d8d2",
+          "bytes": 3832,
+          "retention": "private local diagnostic; bounded observations retained here"
+        },
+        {
+          "name": "adad-taxkit-downstream-bounded.log",
+          "sha256": "6129a017e424aaf18e4c322ddc9ca28595ba4155096d290fc06da2ec1c409c26",
+          "bytes": 13359,
+          "retention": "private local diagnostic; bounded observations retained here"
+        }
+      ]
+    },
+    {
+      "command": "bun run docs:validate",
+      "exitCode": 0,
+      "observed": "Four corrected current public guides with newly checked acceptance source hashes",
+      "artifact": {
+        "name": "adad-taxkit-docs-validate-closeout.log",
+        "sha256": "3322433d6dcb713bf22159d683756926d69c1073d568320dce795c944f07426c",
+        "bytes": 2317,
+        "retention": "private local diagnostic; bounded observations retained here"
+      }
+    },
+    {
+      "command": "bun run verification",
+      "source": "557b4e524ead6f469e92150360a9e8a451c37cdd",
+      "workingTreeAtRun": "clean",
+      "exitCode": 0,
+      "observed": "Complete ordered aggregate passed; quality-workflow34 tests in675.38seconds; SDK/web browser, both unused-code profiles, compiler, docs/runbook checks and all11 native browser files/22tests passed; native tests143.34seconds",
+      "artifact": {
+        "name": "adad-taxkit-verification-native-oracle-final.log",
+        "sha256": "2e8bf100d11b9a81072be6f57225a6b3fefe9bf66a8c95bde3dcfcc89109c33b",
+        "bytes": 614310,
+        "retention": "private local diagnostic; bounded observations retained here"
+      }
+    }
+  ],
+  "review": {
+    "correction": "Fresh independent review by /root/medicare_correction_review accepted the legal table, inclusive edge, exact-zero admission and bounded historical comparison after its generic date/amount replacement was removed.",
+    "testOnlyRecovery": {
+      "reviewer": "/root/medicare_correction_review",
+      "outcome": "accepted",
+      "observedAtUtc": "2026-10-08T01:03:52Z",
+      "artifact": {
+        "name": "adad-taxkit-native-oracle-review-20261008.json",
+        "sha256": "db0f2605b137f6d2f6e6763a99dc06a054c245b05e6dede74743d6cba147a828",
+        "bytes": 3528,
+        "retention": "private local diagnostic; bounded observations retained here"
+      }
+    },
+    "adadProofCondition": "Independent /root/cf012_engine_review confirmed selected-source equality and that CF-012 does not require adopting the unrelated test-recovery checkpoint. Adad’s own mandatory source/foundation/engine qualification remains separate."
+  },
+  "failedHistory": [
+    {
+      "outcome": "failed; recovered",
+      "name": "adad-taxkit-medicare-verification.log",
+      "reason": "DocsCatalogue.readAcceptance rejected the current page acceptance records during the docs-content build; build, Knip and the aggregate ended with exit 1. The acceptance records were corrected and the later full aggregate passed."
+    },
+    {
+      "outcome": "failed; recovered",
+      "name": "adad-taxkit-medicare-verification-final.log",
+      "reason": "New boundary test TS4111 property access; corrected and later compiler/aggregate passed."
+    },
+    {
+      "outcome": "interrupted; not passed",
+      "name": "adad-taxkit-verification-source-commit.log",
+      "reason": "Concurrent root portable-rule mutation tests changed a live source; stopped and rerun without concurrent root mutations."
+    },
+    {
+      "outcome": "failed; recovered unchanged source",
+      "reason": "One isolated assignment-admission test exceeded its existing300-second deadline. No deadline or source was loosened. Isolated host retry passed in150.99seconds; subsequent full quality suites passed all34 cases.",
+      "artifacts": [
+        {
+          "name": "adad-taxkit-verification-serial.log",
+          "sha256": "195c3904785db5d4fe786565b342ef562fe07aafbe8a8ae7d74696f35a3e452a",
+          "bytes": 77038,
+          "retention": "private local diagnostic; bounded observations retained here"
+        },
+        {
+          "name": "adad-taxkit-assignment-recovery-host.log",
+          "sha256": "73e65025844bb1976004b3c9da9e3b99abe22628a7f9a1b3cda3c9b357eb91ef",
+          "bytes": 182,
+          "retention": "private local diagnostic; bounded observations retained here"
+        }
+      ]
+    },
+    {
+      "outcome": "failed; superseded by test-only recovery",
+      "source": "0d82b82d1c48079fc4b8e2ec96abadfe12999789",
+      "reason": "Last native browser saved-form assertion still expected old $30k annual result. This exact clean0d82 full aggregate did not pass.",
+      "artifact": {
+        "name": "adad-taxkit-verification-recovery.log",
+        "sha256": "c9c400b482dfe315f675536a0eeb50132097ef499e8369e02f28a39498a82693",
+        "bytes": 621199,
+        "retention": "private local diagnostic; bounded observations retained here"
+      },
+      "successor": "557b4e524ead6f469e92150360a9e8a451c37cdd"
+    }
+  ],
+  "documentationImpact": {
+    "Change required": [
+      "annual parameter/version/trace tests",
+      "core exact-zero bracket policy and neighbours",
+      "canonical API/SDK edition and exact fingerprints",
+      "four public guides and checked acceptance records",
+      "annual README and architecture",
+      "SPEC/tasks/active plan/evidence",
+      "existing Changesets and API Unreleased note"
+    ],
+    "Preserve": [
+      "positive-income tax/LITO/PAYG/take-home algorithms",
+      "manifests and lock",
+      "original historical response digests",
+      "CI and skills",
+      "telemetry/infrastructure",
+      "earlier discrepancy evidence"
+    ],
+    "N/A": [
+      "provider and credential mutation"
+    ]
+  },
+  "recovery": "Revert only the bounded correction/test/doc commits to the recorded parent; preserve the larger draft rebuild. No deployed state was changed.",
+  "postconditions": [
+    "Correct enacted Medicare parameters and source hash retained.",
+    "Zero income returns nil tax; positive-income algorithms retained.",
+    "Canonical annual report/error contracts and edition checked across real package consumers.",
+    "Test-recovery checkpoint completes full local checks.",
+    "Original failed0d82 aggregate remains distinctly recorded; approved adad pin is unchanged."
+  ],
+  "limitations": [
+    "Resident single-person non-SAPTO annual scope and retained nearest-cent rounding only.",
+    "No complete tax-return, family, exemptions, surcharge, student-loan, residency-variation or other-year correctness claim.",
+    "No current-source hosted CI, TaxKit merge/publication/provider/deployment, complete broader rebuild acceptance, adad runtime enablement or new Preview/Production proof.",
+    "Adad qualification uses Bun1.3.14 and remains separately owned."
+  ],
+  "omittedDetail": "Bounded private diagnostic artifact names, byte lengths and SHA-256 identities are recorded per check. Raw process output, credentials, home paths and unrelated session history are omitted.",
+  "redBeforeZeroCorrection": {
+    "name": "adad-taxkit-zero-before.log",
+    "sha256": "1af81999410db2f00a0b085bf9bf224f08914cf98be3955965a8921c46513055",
+    "bytes": 2775,
+    "observed": "Annual zero-income test failed before exact-zero nil-band correction; later annual tests and independent adad boundary checks passed.",
+    "outcome": "expected red failure before fix; preserved"
+  }
+}

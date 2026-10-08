@@ -1,0 +1,131 @@
+{
+  "document_type": "acceptance-review",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "native connection acceptance, task dependencies or qualified artifact changes",
+  "outcome": "accept CSF-T003 locally; later work and exact candidate hosted result remain separate",
+  "actor": "primary implementation owner under Cooper authorised implementation/qualification/commit/push/draft PR scope",
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-74-native-trace-containment",
+    "baseCommit": "b3d759504f8dcdbb9dfea6d5521d98646dc0317b",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceReviewInventory": {
+      "fileCount": 16,
+      "sortedEntriesSha256": "40f2e427fe3b9add0d2549c4359006f39409f61ddf56907630d4b68ad149f069"
+    }
+  },
+  "sourceInventoryAlgorithm": "sha256 of compact key-sorted JSON array of sorted repository-relative path and file sha256 for the named native application/composition owners; no self hashing.",
+  "criteria": [
+    {
+      "criterion": "A real calculator works through separate apps with no frontend backend fallback.",
+      "outcome": "Pass locally",
+      "sourceOwners": [
+        "apps/api/src/worker.application.ts",
+        "apps/web/src/server.ts",
+        "apps/web/src/lib/live.server.layer.ts",
+        "packages/api/rpc/src/handlers.ts"
+      ],
+      "evidence": [
+        "Real workerd private binding and exact browser POST /rpc return retained 1301-dollar result; no initial/replayed calculation.",
+        "Actual generated client/HTTP handler share PublicCalculatorService.calculate. Built browser rejects engine/live-provider markers; injected damaged/fatal backend replies produce checked failures rather than a local calculation."
+      ]
+    },
+    {
+      "criterion": "No domain operation creates a runtime or builds a live Layer mid-operation.",
+      "outcome": "Pass on the active native path",
+      "sourceOwners": [
+        "apps/api/src/worker.ts",
+        "apps/api/src/worker.application.ts",
+        "apps/web/src/lib/runtime.server.ts",
+        "apps/web/src/lib/calculator.atoms.ts"
+      ],
+      "evidence": [
+        "API composition provides calculator Layer at native entry and builds fixed telemetry once in native instance scope before router construction; request handling builds no live Layer or ManagedRuntime.",
+        "Website has one server ManagedRuntime; browser Atom runtime describes work for React registry ownership and creates no module runner."
+      ]
+    },
+    {
+      "criterion": "Same-stage origins/binding and deadline/cancellation have runtime evidence.",
+      "outcome": "Pass locally with bounded cancellation claim",
+      "evidence": [
+        "Actual local/native resources supply self/peer origins and private API binding; absent/invalid values fail checked config without guessed addresses.",
+        "Native client complete five-second deadline covers slow headers and unfinished actual encoded reply. Real browser requestfailed observations establish abort on deadline, editing and browser Back.",
+        "Real CLI startup, browser/private calculations, both source reloads and exact restoration, local mode/source/profile readback and actual refused connections on shutdown pass."
+      ],
+      "limitation": "Caller/browser abort does not prove upstream artificial delayed response cancellation; mock plan is not real provider convergence."
+    },
+    {
+      "criterion": "Website RPC and public HTTP share one checked application operation; native wire privacy/failure classification is source/version matched.",
+      "outcome": "Pass on the named paths and installed versions",
+      "evidence": [
+        "Actual generated POST/JSON protocol and canonical request/report Schemas are used; no handwritten replacement framing.",
+        "Version/expected failures, global/procedure/fatal replies, malformed input/identity/batches, damaged valid JSON and independent adapter defects have native tests and safeguard-removal proof.",
+        "Native request reader enforces one-MiB bytes/total read time and closes readers on failure/cancellation; fixed host reports require positive events without private sentinel/value messages."
+      ],
+      "limitation": "MCP calls are future T006 work; no complete tracing/export claim."
+    },
+    {
+      "criterion": "Native plans and real saved local resources contain explicitly disabled platform collection.",
+      "outcome": "Pass as declared containment",
+      "evidence": [
+        "Actual mock Plan resource properties and saved actual local CLI state contain false global/log/invocation/persistence/trace flags and zero sampling.",
+        "Removing API graph observability fails actual local-state Schema after runtime checks; exact restoration passes.",
+        "Wrangler accepts matching standalone policy; generated declarations unchanged."
+      ],
+      "limitation": "No Cloudflare upload metadata, retained platform storage or exported rows were read."
+    }
+  ],
+  "requirementOwnership": {
+    "T003": "first app connection, native failure/privacy paths, caller cancellation, local development and explicit disabled-platform containment; completed locally",
+    "T009": "safe exported native tracing, automatic field suppression and retained Cloudflare/Axiom row proof; pending",
+    "CSF-009": "unmet",
+    "reason": "Avoid circular dependency from T003 to later T009 while preserving every safe tracing/privacy requirement. No claim that safe native spans survive disabled tracing; reviewed design change required if native privacy cannot be met."
+  },
+  "currentQualification": {
+    "tests": "467 lint cases, all 27 fresh app/package test tasks",
+    "build": "16 tasks, 11 unchanged cached",
+    "apiSmoke": "Fresh HTTP smoke and temporary consumer; cleanup passes",
+    "verification": "Complete pass: 32 Quality cases/13 isolated copies in 453.92s, docs/runbooks/skills/enforcement/both unused-code graphs/all types, 24 fresh SDK and 8 fresh Web browser cases, actual Wrangler declarations, six fresh native tests in 37.17s",
+    "postCheckChanges": "Documentation/evidence/task lifecycle only; post-check docs/runbooks/root format/Changeset status/whitespace pass. No application/configuration changes."
+  },
+  "hostedState": {
+    "parentPullRequest": 135,
+    "parentHead": "b3d759504f8dcdbb9dfea6d5521d98646dc0317b",
+    "run": 37254770742,
+    "job": 111589383583,
+    "outcome": "failure",
+    "observed": "Restored heading timed out at 15 seconds.",
+    "candidateCorrection": "Non-polling watcher and 100-ms spacing preserve original deadlines and both page assertions; direct watcher reproduction plus saved native suite pass.",
+    "limitation": "No exact new candidate hosted result yet; failed parent remains failed."
+  },
+  "evidence": [
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-contract.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-api-host.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-app-graph.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-rpc-failures.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json",
+    "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-trace-containment.json"
+  ],
+  "retainedInvariants": [
+    "No tax result, rule, HTTP/OpenAPI, SDK public interface or authored content change in this slice.",
+    "No provider/credential/dataset/DNS mutation, deployment, publication or merge.",
+    "No additional SDK patch, competing tracer or widened lint exception.",
+    "External Linear state unchanged under existing automatic approval-review hold; repo-local task status is separate."
+  ],
+  "limitations": [
+    "Local acceptance and a draft do not establish deployed/public availability or complete persistent goal.",
+    "DEV-75\u201381 and safe exported native traces remain unfinished.",
+    "Medicare result changes remain on Cooper decision; retained golden values are unchanged."
+  ],
+  "rollback": {
+    "identity": "b3d759504f8dcdbb9dfea6d5521d98646dc0317b",
+    "action": "Revert current containment/qualification slice and reopen T003 acceptance. No provider recovery authorised."
+  },
+  "nextOwner": "CSF-T004 / DEV-75 implementation; continue remaining independent approved work while exact candidate hosted checks run."
+}

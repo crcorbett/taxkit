@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "taskId": "HGI-204",
   "owner": "taxkit-runbook-contract-owner",
-  "reviewTrigger": "release command, Changesets, package graph, HGI-203 evidence, recovery, or authority-boundary change",
+  "reviewTrigger": "release command, Changesets, package graph, HGI-203 evidence, native app/domain plan, recovery, or authority-boundary change",
   "acceptedHandoff": {
     "packet": "docs/evidence/releases/HGI-203-local.json",
     "historicalJourneyInventory": "docs/evidence/releases/HGI-203-critical-journeys.json",
@@ -175,6 +175,15 @@
             "RELEASE_ATTEMPT_SHA256"
           ],
           "executeInDryRun": false
+        },
+        {
+          "scriptOwner": "root",
+          "script": "web:test:native-pair",
+          "argv": ["bun", "run", "web:test:native-pair"],
+          "invocation": "bun run web:test:native-pair",
+          "requiredAuthority": "local-proof",
+          "requiredEnvironment": [],
+          "executeInDryRun": false
         }
       ],
       "evidencePaths": [
@@ -317,7 +326,8 @@
       "evidencePaths": [
         "docs/evidence/releases/HGI-203-accepted-attempt.json",
         "docs/evidence/releases/HGI-203-failed-attempts.json",
-        "docs/operations/authority-model.md"
+        "docs/operations/authority-model.md",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json"
       ],
       "stopOperations": [
         "versioning",
@@ -350,7 +360,12 @@
       "evidencePaths": [
         "docs/verification/docs-deployment-journeys.json",
         "docs/evidence/deployments/README.md",
-        "docs/operations/authority-model.md"
+        "docs/operations/authority-model.md",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-operation-handover.json"
       ],
       "stopOperations": [
         "versioning",

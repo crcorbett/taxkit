@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "78cfacf9e0441d7e7667cf25c605be88bf813c7fa5c6fe14723003dbddc31249",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/contributing/backward-compatibility.mdx"
+}

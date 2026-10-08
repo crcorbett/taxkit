@@ -1,13 +1,14 @@
 ---
 title: "Build a browser app with the HTTP API"
-description: "Call the calculator API from a browser when you cannot import the SDK."
-status: "draft"
+description: "Call the calculator API from a browser when calculation should run on a server."
+status: "published"
 ---
 
 # Build a browser app with the HTTP API
 
-Use this guide when a browser client needs a calculator result and cannot run
-the TypeScript SDK in-process.
+Use this guide when a browser client needs the server to run a calculation.
+The browser-safe SDK can run calculations on the device instead; compare the
+choices in [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx).
 
 ## Before you start
 
@@ -17,46 +18,51 @@ the TypeScript SDK in-process.
 
 ## Steps
 
-1. Build a `CalculatorRunRequest` JSON body.
-2. Send it to the calculate endpoint.
-3. Check `response.ok`.
-4. Render either the report or `CalculatorApiErrorEnvelope.error`.
+1. Supply your API base URL as a `URL` value.
+2. Construct canonical facts and explicit context/help Options for the typed API client.
+3. Run the returned Effect at your application host.
+4. Render the report or handle its typed failure channel.
 
 ## Example
 
 ```ts
-const response = await fetch(
-  "http://127.0.0.1:4000/api/v1/calculators/au.pay.take-home/calculate",
-  {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      facts: {
-        grossPay: {
-          _tag: "GrossPay",
-          amount: { _tag: "Money", cents: 346200, currency: "AUD" },
-          period: "fortnightly",
+import { createTaxKitApiClient } from "@taxkit/api-http/client";
+import { audFromCents } from "@taxkit/core/primitives";
+import { GrossPay } from "@taxkit/rules-au-pay";
+import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { Effect, Option } from "effect";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
+
+export const calculateTakeHomePay = (baseUrl: URL) =>
+  Effect.gen(function* () {
+    const client = yield* createTaxKitApiClient({ baseUrl });
+    const amount = yield* audFromCents(346_200);
+    return yield* client.calculatorApi.calculate({
+      params: { calculatorId: AuPayTakeHomeCalculation.calculatorId },
+      payload: {
+        facts: {
+          grossPay: new GrossPay({
+            amount,
+            period: "fortnightly",
+          }),
+          taxFreeThresholdClaimed: true,
         },
-        taxFreeThresholdClaimed: true,
+        jurisdiction: Option.some(
+          Option.some(AuPayTakeHomeCalculation.jurisdiction)
+        ),
+        taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
       },
-      jurisdiction: "AU",
-      taxYear: "2025-26",
-    }),
-  }
-);
-
-const body = await response.json();
-
-if (!response.ok) {
-  console.error(body.error.message);
-} else {
-  console.log(body.report.netPay.cents);
-}
+      query: { help: Option.some(Option.some("errors")) },
+    });
+  }).pipe(Effect.provide(FetchHttpClient.layer));
 ```
 
 ## Verify the result
 
-Expected output:
+Call `calculateTakeHomePay(new URL("http://127.0.0.1:4000"))` for your local
+API, or supply your deployed URL explicitly. The example has no default server
+and reads no browser environment variables. The returned response contains
+`report.netPay.cents` with the expected value:
 
 ```txt
 270600

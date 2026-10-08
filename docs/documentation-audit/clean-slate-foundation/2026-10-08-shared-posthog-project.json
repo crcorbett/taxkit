@@ -1,0 +1,384 @@
+{
+  "documentType": "execution-evidence",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-analytics-owner",
+  "observedAt": "2026-10-07T23:55:22Z",
+  "task": "CSF-T008",
+  "issue": "DEV-79",
+  "baseSource": "cc11c6aa04665b4014d14953cd2c1379373b2ef7",
+  "sourceBranch": "codex/dev-79-shared-posthog-project",
+  "status": "local-qualified-collection-off",
+  "authorityEnvelope": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, checks, commit, push, draft PR and routine Linear tracking",
+    "resource": "TaxKit T008 single shared project graph and fresh independent-review corrections",
+    "environment": "local checkout only",
+    "approvalBoundary": "provider plan, credential mutation, apply and activation require their own reviewed authority",
+    "receipt": "this dated record",
+    "rollback": "revert this slice; collection remains off; no provider deletion",
+    "readback": "local source/test/GitHub/Linear readbacks, each recorded only when executed"
+  },
+  "desiredGraph": {
+    "stack": "TaxKitPostHog",
+    "stage": "prod",
+    "resource": "TaxKitProject",
+    "name": "TaxKit",
+    "marker": "taxkit:posthog:shared:v1",
+    "region": "us",
+    "projects": 1,
+    "outputs": [
+      "projectId"
+    ],
+    "removalPolicy": "retain",
+    "ephemeralGraphs": "refuse"
+  },
+  "collection": {
+    "enabled": false,
+    "environments": [
+      "production",
+      "controlled-preview"
+    ],
+    "eventFilters": [
+      "project=taxkit",
+      "application=web|api",
+      "stage=prod|exact pr-N"
+    ],
+    "accessIsolation": false
+  },
+  "providerCapacity": {
+    "userReport": "adad test removed to free one slot",
+    "initialRead": "six projects remained visible in US Cooper after fresh reload",
+    "currentCapacityConfirmed": false,
+    "latestRead": "Known project 645344 redirects to project-pending-deletion; visible notice schedules deletion for October 10, 2026 at 10:43 AM. Current Cooper list still has six projects.",
+    "pendingDeletionProjectId": 645344,
+    "scheduledDeletionAsDisplayed": "October 10, 2026 at 10:43 AM",
+    "readbackUrl": "https://us.posthog.com/project/645344/project-pending-deletion"
+  },
+  "independentReview": {
+    "source": "cc11c6aa04665b4014d14953cd2c1379373b2ef7",
+    "reportSha256": "76b3ed6c49c8882db48b0504aee4a639062b6c05991a0cfe0db20a2e70ccf497",
+    "findings": [
+      "F1 P2 deterministic abort on unread rejection/redirect replies",
+      "F2 P3 native backend 204 response disposition"
+    ],
+    "corrections": "scope the actual clients/management attempt and handle native EmptyBodyError only on successful backend status",
+    "correctedSourceReview": "no remaining material issue in the 15 frozen reviewed source/test files",
+    "correctedReportSha256": "96157be470901901cedef6694af2b2f1bade8cec0d8f018f3fa3b20ee4b87a9c",
+    "reviewedFreezeSha256": "cb6280200a949cb7f2d2971ac719b3b08c0105853059822d61014e8befadb512",
+    "subsequentChange": "relocate the unchanged three marker-refusal assertions from project graph tests to the existing management input-boundary test; no runtime or lint rule changes; adjust only the unrelated native cancellation fixture total budget after two exact 45-second timeouts; bounded follow-up review pending",
+    "relocationAddendum": "All 15 hashes/modes match qualified subset; exactly two test files change, three assertions are byte-identical and the other 13 source hashes/modes are unchanged. No new issue proved.",
+    "qualifiedFreezeSha256": "8522a499fde47d89d26669179327d97454276908c98e25e7fdfb9e4fb88a3e32",
+    "finalFreezeSha256": "b644d5994db95757cc69a4cbcc06c8af5cc376049658e0559233c8a797aedde9",
+    "nativeBudgetReviewArtifact": "dev79-shared-native-budget-review.md",
+    "nativeBudgetReviewSha256": "0e62b0445f9632c6c4b9a6252b0e4b9ff1152ab73eb963f5786aa2f16cd1cb97"
+  },
+  "compatibility": {
+    "effect": "4.0.0 installed source/types",
+    "alchemy": "2.0.0-beta.80 installed source/types",
+    "effectReference": "92f48401426694eb1d9d0552b2f7514b3978e7f4",
+    "alchemyReference": "808ef694b2e742a2bb76cb301da371e71421fa57",
+    "upgrade": false
+  },
+  "checks": [
+    {
+      "stage": "analytics",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/analytics",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 8.33,
+      "logArtifact": "dev79-shared-focused-local-analytics.log",
+      "logSha256": "065d143e0ff526d6fd66a8cfd6501cf5fd4e134edf215485b4c5027dc8a4b86c",
+      "bytesRead": 754
+    },
+    {
+      "stage": "relay",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test",
+        "src/lib/analytics/relay/relay.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.78,
+      "logArtifact": "dev79-shared-focused-local-relay.log",
+      "logSha256": "aadbcb954b93b2884b765992e6f986a8b413f6e5ee88e64810d054ddfe0fbfa0",
+      "bytesRead": 322
+    },
+    {
+      "stage": "infra",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/infrastructure",
+        "test",
+        "src/posthog"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.27,
+      "logArtifact": "dev79-shared-corrected-infra.log",
+      "logSha256": "bcce49b11fa56d4b59c4a4e40ed1b46ec1e7b116bc9bdd4558d908681cb631ed",
+      "bytesRead": 527
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 24.19,
+      "logArtifact": "dev79-shared-corrected-lint.log",
+      "logSha256": "729af78969849c74770d15645846ef4e6136768eee1dadc0fe8431bc0277e66d",
+      "bytesRead": 953
+    },
+    {
+      "stage": "test",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 234.54,
+      "logArtifact": "dev79-shared-full-test.log",
+      "logSha256": "a9b410b86d0aab2159ab417cd404e88a8c173e746a2dc4301dc287710a6cf638",
+      "bytesRead": 113436
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 18.67,
+      "logArtifact": "dev79-shared-full-types.log",
+      "logSha256": "e921c80cef87a2a115df795e673ff3050af88661a573c424206b402efbd229f6",
+      "bytesRead": 367420
+    },
+    {
+      "stage": "build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 17.94,
+      "logArtifact": "dev79-shared-full-build.log",
+      "logSha256": "f314c149132a6428d5b311b9732a4e112cd46c8cf63583375f8f09b4b049b2fc",
+      "bytesRead": 110322
+    },
+    {
+      "stage": "native-cancellation",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "test/native-cancellation.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 47.32,
+      "logArtifact": "dev79-shared-native-budget-native-cancellation.log",
+      "logSha256": "615facd960cf1c8cf42aeb9f42159cca7c5dfaf6d28f0d2c90e2e99a8b47cd59",
+      "bytesRead": 439
+    },
+    {
+      "stage": "verification",
+      "command": [
+        "bun",
+        "run",
+        "verification"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 957.81,
+      "logArtifact": "dev79-shared-final-verification.log",
+      "logSha256": "fd644dcde9b5cfd12f54ec071add3200fa8db9182853547ddd39620525b02274",
+      "bytesRead": 620292
+    }
+  ],
+  "impact": {
+    "changeRequired": [
+      "SPEC/T008 scope",
+      "active plan",
+      "infrastructure/analytics/Website READMEs",
+      "configuration/deployment/testing/Effect architecture",
+      "dated evidence",
+      "private infrastructure and analytics Changeset"
+    ],
+    "preserve": [
+      "five runbooks",
+      "root routes/export maps",
+      "HTTP/OpenAPI/SDK/public content",
+      "critical journeys",
+      "old proof",
+      "skills/lint/CI rules",
+      "deferred metrics",
+      "retained tax results"
+    ],
+    "notApplicable": [
+      "generated regeneration",
+      "dependency upgrade",
+      "version consumption",
+      "provider apply",
+      "credential mutation",
+      "collection activation",
+      "publication"
+    ]
+  },
+  "nonClaims": [
+    "project capacity",
+    "current management credentials",
+    "live native single-project plan",
+    "provider resource creation/settings/state",
+    "browser sender acceptance",
+    "stored events",
+    "live Cloudflare socket abort",
+    "new delivery",
+    "T008/T010 acceptance"
+  ],
+  "failedAttempts": [
+    {
+      "stage": "restricted focused infrastructure tests",
+      "reason": "existing loopback test server could not start under restricted execution",
+      "recovery": "approved local execution passed the same focused suites"
+    },
+    {
+      "stage": "first complete verification",
+      "exitCode": 1,
+      "durationSeconds": 49.8,
+      "reason": "new invalid-marker decode assertion was in project graph test outside the existing decoder boundary list",
+      "recovery": "move the unchanged assertion to management.boundary.test.ts; do not expand lint permissions",
+      "logArtifact": "dev79-shared-full-verification.log",
+      "logSha256": "06c7475b9bfedc3e6e797995986638c9cfb8754d8af24908650cda1ab8a1ae7f"
+    },
+    {
+      "stage": "verification",
+      "exitCode": 1,
+      "durationSeconds": 1280.36,
+      "reason": "Whole-fixture 45-second timeout expired after three sequential RPC deadline checks and editing cancellation, as departure began",
+      "recovery": "65-second whole-Effect and 70-second runner budgets; individual request, alert and cancellation limits are unchanged",
+      "logArtifact": "dev79-shared-qualified-verification.log",
+      "logSha256": "d5612c9e5ebb361301becf1530dd46692c6c4249267d3602eddc1eaa14afc6f3"
+    },
+    {
+      "stage": "native-cancellation",
+      "exitCode": 1,
+      "durationSeconds": 46.79,
+      "reason": "Whole-fixture 45-second timeout expired after three sequential RPC deadline checks and editing cancellation, as departure began",
+      "recovery": "65-second whole-Effect and 70-second runner budgets; individual request, alert and cancellation limits are unchanged",
+      "logArtifact": "dev79-shared-native-focused-native-cancellation.log",
+      "logSha256": "81238323aca625067835aae5b03c561e2a871f520ec8c57817008f2623402cbf"
+    }
+  ],
+  "qualifiedAt": "2026-10-08T01:04:45.997919+00:00",
+  "sourceQualification": {
+    "baseSource": "cc11c6aa04665b4014d14953cd2c1379373b2ef7",
+    "sourceFreezeArtifact": "dev79-shared-project-final-source-freeze.json",
+    "sourceFreezeSha256": "b644d5994db95757cc69a4cbcc06c8af5cc376049658e0559233c8a797aedde9",
+    "frozenIdentities": 1801,
+    "proofMetadataOnlyExclusions": [
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-08-shared-posthog-project.json"
+    ],
+    "unchangedOtherIdentities": 1799,
+    "scope": "Corrected 39 project tests and full lint, focused native cancellation proof, then complete verification on the final frozen source. The native fixture total budget changes only; all individual bounds are unchanged. Root test/type/build passed before relocating three unchanged assertions; runtime/graph implementations are byte-identical and the moved tests pass at their real boundary."
+  },
+  "nativeCancellationFixture": {
+    "totalEffectSeconds": 65,
+    "runnerSeconds": 70,
+    "directDeadlines": "Two native calls must fail with the checked deadline error at 9500 <= elapsed < 12000 ms",
+    "browserLimits": "Existing 12-second alert and editing/departure three-second aborted-request observations are unchanged",
+    "limitation": "The first browser deadline aborted-request queue has only the aggregate fixture bound; this is not separately timed browser deadline-abort latency or upstream artificial-stream cancellation proof"
+  },
+  "checkedSourceSubset": {
+    "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "f4f9faa0604a8405916b231ee1abb42c8f1ad057f94c81235b0f3e4b151e1ba0"
+    },
+    "apps/web/src/lib/analytics/relay/relay.boundary.test.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "d2f946dc40d9c92c15ad3730a2a7bcfc2d0265edc79130961a852ae779689d01"
+    },
+    "packages/analytics/src/live.layer.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "87585b55497f4ae468766273b981ab6422f6ee94cb5c321151f8412c48f1fa6f"
+    },
+    "packages/analytics/test/service.test.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "1b522a10f6717bab5dd38acf3b2c7708e063c2fe9ff2e181da14fef6cb1890a2"
+    },
+    "packages/infrastructure/src/posthog/errors.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "7957e03fc8973215049256881b8eca51d651d7554211abeb7eda384687caf4d5"
+    },
+    "packages/infrastructure/src/posthog/index.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "510a220443351fd29db9db897609ee7cfcfd4b9fdfac5e86e3cd1d23e8fdb109"
+    },
+    "packages/infrastructure/src/posthog/management.adapter.layer.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "8feac7019ac9beec89e11607fe54c3f04f09d0026848a4a743b334c021f85276"
+    },
+    "packages/infrastructure/src/posthog/management.boundary.test.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "fca5ed27989b823b23581559ccd3b6d32aba95a8f308dc6d6694bb963a814a75"
+    },
+    "packages/infrastructure/src/posthog/projects.live.layer.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "3285fd71e85381865e90676482a546cff32a074541c79e371d47da9c5e0ca330"
+    },
+    "packages/infrastructure/src/posthog/projects.provider.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "c3bcb701e0594729a0c099b75f0b3fb84d755d97c07410b3810fb9c7bc08be1c"
+    },
+    "packages/infrastructure/src/posthog/projects.test.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "9bf1c66867d5d72f50d1b23c6a78f3c57b720a2a9b8bdbc05b86794b7b7c7002"
+    },
+    "packages/infrastructure/src/posthog/schemas.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "bf73fe3731c31fed0fbdaf8b8595d5c09c42448358da9afa43f7e8ad4795c953"
+    },
+    "packages/infrastructure/src/posthog/service.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "2ee57b8bcc209135f2d0dc131a8425719e2f58a2fd8235fe32a5aa92b9fa72d4"
+    },
+    "packages/infrastructure/src/posthog/stack.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "d53b15defa06772d1069949484fb173f724200ed7b9240b85e93bb8988c8e048"
+    },
+    "packages/infrastructure/src/posthog/test.layer.ts": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "3f4bae6ab5ad5b025f47ccde1444f31b24bd710a59f68b8835e08b7e7400be06"
+    },
+    "apps/web/test/native-cancellation.boundary.test.ts": {
+      "sha256": "5c18f4830264b8feda8ce62e262ff77f77e5904c18eb7fe990bfa2e7a52a6106",
+      "mode": 420
+    }
+  }
+}

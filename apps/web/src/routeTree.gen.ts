@@ -10,33 +10,79 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as AgentsRouteImport } from './routes/agents'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as CalculatorsCalculatorIdRouteImport } from './routes/calculators.$calculatorId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsRoute = AgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculatorsCalculatorIdRoute = CalculatorsCalculatorIdRouteImport.update({
+  id: '/calculators/$calculatorId',
+  path: '/calculators/$calculatorId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/agents': typeof AgentsRoute
+  '/search': typeof SearchRoute
+  '/calculators/$calculatorId': typeof CalculatorsCalculatorIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/agents': typeof AgentsRoute
+  '/search': typeof SearchRoute
+  '/calculators/$calculatorId': typeof CalculatorsCalculatorIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
+  '/agents': typeof AgentsRoute
+  '/search': typeof SearchRoute
+  '/calculators/$calculatorId': typeof CalculatorsCalculatorIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/$' | '/agents' | '/search' | '/calculators/$calculatorId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/$' | '/agents' | '/search' | '/calculators/$calculatorId'
+  id:
+    | '__root__'
+    | '/'
+    | '/$'
+    | '/agents'
+    | '/search'
+    | '/calculators/$calculatorId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
+  AgentsRoute: typeof AgentsRoute
+  SearchRoute: typeof SearchRoute
+  CalculatorsCalculatorIdRoute: typeof CalculatorsCalculatorIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +94,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents': {
+      id: '/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculators/$calculatorId': {
+      id: '/calculators/$calculatorId'
+      path: '/calculators/$calculatorId'
+      fullPath: '/calculators/$calculatorId'
+      preLoaderRoute: typeof CalculatorsCalculatorIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
+  AgentsRoute: AgentsRoute,
+  SearchRoute: SearchRoute,
+  CalculatorsCalculatorIdRoute: CalculatorsCalculatorIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,11 +1,4 @@
-import {
-  Array as EffectArray,
-  Effect,
-  Match,
-  Option,
-  Ref,
-  Result,
-} from "effect";
+import { Array as EffectArray, Effect, Match, Option, Result } from "effect";
 
 import {
   CiReleaseCheckFailedError,
@@ -17,7 +10,6 @@ import type {
   ReleaseCheck,
   ReleaseCommandOutcome,
   ReleaseDetailArtifact,
-  ReleaseTerminalState,
   ReleaseAttemptId,
 } from "./schemas.js";
 import { CiReleaseReadinessReport, ReleaseReadinessReport } from "./schemas.js";
@@ -32,17 +24,22 @@ const collectDetailArtifacts = (
       : Result.succeed({ path: detail.path, sha256: detail.sha256 })
   );
 
-const makeAttemptReceipt = (input: {
-  readonly attemptId: ReleaseAttemptId;
-  readonly candidate: ReleaseCandidateIdentity;
-  readonly detailArtifacts: ReleaseAttemptReceipt["detailArtifacts"];
-  readonly failedCheck: ReleaseAttemptReceipt["failedCheck"];
-  readonly lastSuccessfulCheck: ReleaseAttemptReceipt["lastSuccessfulCheck"];
-  readonly observedExitCode: number | null;
-  readonly provenance: string;
-  readonly target: string;
-  readonly terminalState: ReleaseTerminalState;
-}): ReleaseAttemptReceipt => ({
+const makeAttemptReceipt = (
+  input: Readonly<
+    Pick<
+      ReleaseAttemptReceipt,
+      | "attemptId"
+      | "candidate"
+      | "detailArtifacts"
+      | "failedCheck"
+      | "lastSuccessfulCheck"
+      | "observedExitCode"
+      | "provenance"
+      | "target"
+      | "terminalState"
+    >
+  >
+): ReleaseAttemptReceipt => ({
   attemptId: input.attemptId,
   candidate: input.candidate,
   detailArtifacts: input.detailArtifacts,
@@ -107,13 +104,11 @@ export const runReleaseReadiness = (
 ) =>
   Effect.gen(function* releaseReadinessProgram() {
     const commandRunner = yield* ReleaseCommandRunner;
-    const completed = yield* Ref.make<readonly ReleaseCommandOutcome[]>([]);
-
-    yield* Effect.forEach(
+    const completed = yield* Effect.reduce(
       checks,
-      (check) =>
+      () => EffectArray.empty<ReleaseCommandOutcome>(),
+      (priorOutcomes, check) =>
         Effect.gen(function* runReleaseCheck() {
-          const priorOutcomes = yield* Ref.get(completed);
           const commandTarget = [check.command, ...check.args].join(" ");
           const outcome = yield* commandRunner.execute(check).pipe(
             Effect.catchTag("ReleaseCommandExecutionError", (error) =>
@@ -140,7 +135,7 @@ export const runReleaseReadiness = (
 
           return yield* Match.value(outcome.terminalState).pipe(
             Match.when("success", () =>
-              Ref.update(completed, EffectArray.append(outcome))
+              Effect.succeed(EffectArray.append(priorOutcomes, outcome))
             ),
             Match.orElse(() =>
               Effect.fail(
@@ -164,26 +159,23 @@ export const runReleaseReadiness = (
               )
             )
           );
-        }),
-      { concurrency: 1 }
+        })
     );
 
     return new ReleaseReadinessReport({
       attemptId,
-      outcomes: yield* Ref.get(completed),
+      outcomes: completed,
     });
   });
 
 export const runCiReleaseReadiness = (checks: readonly ReleaseCheck[]) =>
   Effect.gen(function* runCiReleaseReadinessProgram() {
     const commandRunner = yield* ReleaseCommandRunner;
-    const completed = yield* Ref.make<readonly ReleaseCommandOutcome[]>([]);
-
-    yield* Effect.forEach(
+    const completed = yield* Effect.reduce(
       checks,
-      (check) =>
+      () => EffectArray.empty<ReleaseCommandOutcome>(),
+      (priorOutcomes, check) =>
         Effect.gen(function* runCiReleaseCheck() {
-          const priorOutcomes = yield* Ref.get(completed);
           const target = [check.command, ...check.args].join(" ");
           const outcome = yield* commandRunner.execute(check).pipe(
             Effect.catchTag("ReleaseCommandExecutionError", (error) =>
@@ -201,22 +193,25 @@ export const runCiReleaseReadiness = (checks: readonly ReleaseCheck[]) =>
             )
           );
           if (outcome.terminalState !== "success") {
-            return yield* new CiReleaseCheckFailedError({
-              failedCheck: check.id,
-              lastSuccessfulCheck: lastSuccessfulCheck(priorOutcomes),
-              observedExitCode: outcome.exitCode,
-              stderrExcerpt: outcome.stderrExcerpt,
-              stdoutExcerpt: outcome.stdoutExcerpt,
-              target,
-              terminalState: outcome.terminalState,
-            });
+            return yield* Effect.fail(
+              new CiReleaseCheckFailedError({
+                failedCheck: check.id,
+                lastSuccessfulCheck: lastSuccessfulCheck(priorOutcomes),
+                observedExitCode: outcome.exitCode,
+                stderrExcerpt: outcome.stderrExcerpt,
+                stdoutExcerpt: outcome.stdoutExcerpt,
+                target,
+                terminalState: outcome.terminalState,
+              })
+            );
           }
-          return yield* Ref.update(completed, EffectArray.append(outcome));
-        }),
-      { concurrency: 1 }
+          return yield* Effect.succeed(
+            EffectArray.append(priorOutcomes, outcome)
+          );
+        })
     );
     return new CiReleaseReadinessReport({
       mode: "ci",
-      outcomes: yield* Ref.get(completed),
+      outcomes: completed,
     });
   });

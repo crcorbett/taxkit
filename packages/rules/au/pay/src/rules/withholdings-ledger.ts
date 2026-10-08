@@ -1,10 +1,11 @@
+import { CalculationError } from "@taxkit/core/errors";
 import {
   isComponentContributing,
   sumLedgerComponents,
 } from "@taxkit/core/ledger";
 import type { LedgerComponent } from "@taxkit/core/ledger";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Effect, Layer } from "effect";
+import { Array as EffectArray, Effect, Layer, Option } from "effect";
 
 import { GrossPayFact } from "../facts/pay.js";
 import type { PayPeriod } from "../facts/pay.js";
@@ -37,25 +38,37 @@ export const PayWithholdingsLedgerRuleId = RuleId.make(
 export const buildPayWithholdingsLedger = (
   components: readonly LedgerComponent[],
   period: PayPeriod
-): PayWithholdingsLedger => {
-  const total = sumLedgerComponents(components);
-  const trace = TraceNode.make({
-    children: components.map((c) => c.trace),
-    formula:
-      "total = sum(active additive components) - sum(active subtractive components)",
-    inputs: {
-      activeComponentIds: components
-        .filter(isComponentContributing)
-        .map((c) => c.id),
-      componentIds: components.map((c) => c.id),
-    },
-    result: total.cents,
-    ruleId: PayWithholdingsLedgerRuleId,
-    sources: [],
-    title: "Pay-withholdings ledger (sum of active components)",
-  });
-  return new PayWithholdingsLedger({ components, period, total, trace });
-};
+): Effect.Effect<PayWithholdingsLedger, CalculationError> =>
+  Effect.gen(function* () {
+    const total = yield* sumLedgerComponents(components);
+    const trace = TraceNode.make({
+      children: EffectArray.map(components, (c) => c.trace),
+      formula: Option.some(
+        Option.some(
+          "total = sum(active additive components) - sum(active subtractive components)"
+        )
+      ),
+      inputs: {
+        activeComponentIds: EffectArray.map(
+          EffectArray.filter(components, isComponentContributing),
+          (c) => c.id
+        ),
+        componentIds: EffectArray.map(components, (c) => c.id),
+      },
+      result: total.cents,
+      ruleId: PayWithholdingsLedgerRuleId,
+      sources: [],
+      title: "Pay-withholdings ledger (sum of active components)",
+    });
+    return new PayWithholdingsLedger({ components, period, total, trace });
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Pay withholding could not produce a supported total.",
+        })
+    )
+  );
 
 /**
  * Base aggregator: PAYG only.
@@ -71,6 +84,6 @@ export const PayWithholdingsLedgerLive = Layer.effect(
   Effect.gen(function* () {
     const gross = yield* GrossPayFact;
     const payg = yield* PaygWithholdingComponentFact;
-    return buildPayWithholdingsLedger([payg], gross.period);
+    return yield* buildPayWithholdingsLedger([payg], gross.period);
   })
 );

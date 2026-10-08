@@ -1,22 +1,23 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators";
+import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Effect, Layer } from "effect";
-import * as HttpRouter from "effect/unstable/http/HttpRouter";
-import * as HttpServer from "effect/unstable/http/HttpServer";
-import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
-import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
+import { HttpApiBuilder, HttpApiScalar } from "effect/http-api";
+import * as HttpRouter from "effect/http/HttpRouter";
+import * as HttpServer from "effect/http/HttpServer";
+import * as HttpServerResponse from "effect/http/HttpServerResponse";
 
 import { TaxKitApi } from "../api.js";
 import { CalculatorApiHandlerLive } from "../handlers/calculators.js";
+import { ContentApiHandlerLive } from "../handlers/content.js";
 import { HealthHandlerLive } from "../handlers/health.js";
 import { taxKitOpenApiSpec } from "../openapi.js";
+import { withCalculatorRequestBodyLimit } from "../request-boundary.js";
 
 const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
-  Layer.provide(HealthHandlerLive),
-  HttpRouter.provideRequest(
-    PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
-  )
+  Layer.provide(ContentApiHandlerLive),
+  Layer.provide(HealthHandlerLive)
 );
 
 const DocsRouteLayer = HttpApiScalar.layer(TaxKitApi, {
@@ -29,11 +30,21 @@ const OpenApiRouteLayer = HttpRouter.add(
   Effect.succeed(HttpServerResponse.jsonUnsafe(taxKitOpenApiSpec))
 );
 
-export const ApiRoutesLive = Layer.mergeAll(
+// Hosts supply their shared application service and origin policy. Retain the
+// existing standalone Layer below for existing Bun and in-process consumers.
+export const ApiRoutesLayer = Layer.mergeAll(
   ApiRoutes,
   DocsRouteLayer,
   OpenApiRouteLayer
-).pipe(
-  Layer.provide(HttpServer.layerServices),
+).pipe(Layer.provide(HttpServer.layerServices));
+
+export const ApiRoutesLive = ApiRoutesLayer.pipe(
+  HttpRouter.provideRequest(
+    PublicCalculatorServiceBounded.pipe(
+      Layer.provide(PublicCalculatorServiceLive),
+      Layer.provide(CalculationEngineLive)
+    )
+  ),
+  Layer.provide(HttpRouter.middleware(withCalculatorRequestBodyLimit).layer),
   Layer.provide(HttpRouter.cors())
 );

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Linear"
+  short_description: "Connect Linear product updates to engineering changelogs"
+  default_prompt: "Use $linear to keep this project's issues, relationships and product updates current alongside implementation, engineering changelogs and verified releases."

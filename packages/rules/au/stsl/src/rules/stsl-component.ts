@@ -1,7 +1,9 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
-  aud,
+  Cents,
+  Money,
+  audFromCents,
   decimalDollarsToCents,
   multiplyCentsByDecimal,
   roundCentsToDollar,
@@ -52,7 +54,7 @@ const findRow = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `taxkit/rules-au-stsl: no STSL row covers weekly formula cents=${weeklyFormulaCents}`,
+          message: "No STSL row covers the amount.",
         })
       ),
     onSome: Effect.succeed,
@@ -81,7 +83,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     if (!stslDebt.enabled) {
       const trace = TraceNode.make({
         children: [taxable.trace],
-        formula: "stsl = 0 (opted out)",
+        formula: Option.some(Option.some("stsl = 0 (opted out)")),
         inputs: baseTraceInputs,
         result: 0,
         ruleId: StslComponentRuleId,
@@ -89,7 +91,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         title: "STSL withholding (opt-out - component disabled)",
       });
       const component = LedgerComponent.make({
-        amount: aud(0),
+        amount: new Money({ cents: Cents.make(0), currency: "AUD" }),
         effect: "additive",
         id: StslComponentId,
         label: "STSL withholding",
@@ -103,9 +105,16 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     const weeklyCents = taxable.amount.cents * weeklyFactor;
     const weeklyFormulaCents = Math.floor(weeklyCents / 100) * 100 + 99;
     const row = yield* findRow(table, weeklyFormulaCents);
-    const weeklyWithholdingCentsRaw =
-      multiplyCentsByDecimal(weeklyFormulaCents, row.a) -
-      decimalDollarsToCents(row.bDollars);
+    const checkedWeeklyFormulaCents =
+      yield* Cents.makeEffect(weeklyFormulaCents);
+    const multiplied = yield* multiplyCentsByDecimal(
+      checkedWeeklyFormulaCents,
+      row.a
+    );
+    const subtracted = yield* decimalDollarsToCents(row.bDollars);
+    const weeklyWithholdingCentsRaw = yield* Cents.makeEffect(
+      multiplied - subtracted
+    );
     const weeklyWithholdingCentsRounded = roundCentsToDollar(
       weeklyWithholdingCentsRaw,
       "ato-withholding-rounding"
@@ -116,7 +125,9 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
         children: [taxable.trace],
-        formula: "stsl = 0 (Schedule 8 component rounds to zero)",
+        formula: Option.some(
+          Option.some("stsl = 0 (Schedule 8 component rounds to zero)")
+        ),
         inputs: {
           ...baseTraceInputs,
           a: BigDecimal.format(row.a),
@@ -125,13 +136,13 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
           weeklyFormulaCents,
         },
         result: 0,
-        rounding: "ato-withholding-rounding",
+        rounding: Option.some(Option.some("ato-withholding-rounding")),
         ruleId: StslComponentRuleId,
         sources: [table.source],
         title: "STSL withholding (zero component)",
       });
       const component = LedgerComponent.make({
-        amount: aud(0),
+        amount: new Money({ cents: Cents.make(0), currency: "AUD" }),
         effect: "additive",
         id: StslComponentId,
         label: "STSL withholding",
@@ -141,7 +152,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       return component;
     }
 
-    const periodWithholding = aud(
+    const periodWithholding = yield* audFromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period
@@ -150,8 +161,11 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
 
     const trace = TraceNode.make({
       children: [taxable.trace],
-      formula:
-        "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period",
+      formula: Option.some(
+        Option.some(
+          "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period"
+        )
+      ),
       inputs: {
         ...baseTraceInputs,
         a: BigDecimal.format(row.a),
@@ -161,7 +175,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         weeklyWithholdingCentsRaw,
       },
       result: periodWithholding.cents,
-      rounding: "ato-withholding-rounding",
+      rounding: Option.some(Option.some("ato-withholding-rounding")),
       ruleId: StslComponentRuleId,
       sources: [table.source],
       title: "STSL withholding (Schedule 8)",
@@ -176,5 +190,12 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       trace,
     });
     return component;
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "STSL withholding could not produce a supported amount.",
+        })
+    )
+  )
 );

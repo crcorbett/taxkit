@@ -1,7 +1,7 @@
 ---
 title: "Add a rule"
 description: "Add a source-backed rule with parameter services, descriptors and golden tests."
-status: "draft"
+status: "published"
 ---
 
 # Add a rule
@@ -34,14 +34,18 @@ Before implementation, write down:
 ## Implementation
 
 Rules are Effect `Layer`s. Parameter tables are services, not imported
-globals.
+globals. The existing Schedule 1 parameter file uses this definition:
 
 ```ts
-export const AtoSchedule1_2025_26_Live = Layer.succeed(
-  AtoSchedule1Table,
-  schedule1_2025_26
-);
+export const AtoSchedule1_2025_26_Live =
+  Layer.succeed(AtoSchedule1Table)(table2025_26);
 ```
+
+This is an excerpt from
+[the owning parameter source](../../../rules/au/pay/src/parameters/schedule1.ts).
+That file imports `Layer`, defines `AtoSchedule1Table` and checks `table2025_26`
+with its owning schema. The excerpt needs those definitions; it is not a
+complete application example.
 
 Keep algorithm code separate from yearly data. Most tax-year updates should
 add schema-validated parameter data and golden tests without rewriting the

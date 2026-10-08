@@ -3,7 +3,7 @@ document_type: deployment-evidence-index
 lifecycle: current
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-07
 review_trigger: docs deployment candidate, provider, stage, URL, proof, screenshot, teardown or rollback receipt change
 ---
 
@@ -11,6 +11,17 @@ review_trigger: docs deployment candidate, provider, stage, URL, proof, screensh
 
 This route owns dated, sanitized observations for the docs Worker deployment.
 It never turns an earlier observation into current provider truth.
+
+## Retained old documentation source and operation
+
+The old app workspace and writer workflows are retired in the current checkout.
+The [retention manifest](../../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json)
+identifies the strict original-source bundle, original workflow and operation
+records, useful page addresses and provider recovery pointers. The original
+receipts below remain dated historical observations with their original IDs.
+The [current runbook](../../runbooks/docs-deployment.md) owns provider-free
+inspection and the stop before any separately approved hosted recovery.
+Retained source is not an active app or a complete executable deployment snapshot.
 
 ## 2026-10-03 Production hosted-proof investigation
 
@@ -375,7 +386,7 @@ requalification for this candidate or the report-only Alchemy state boundary.
 ## 2026-08-10 local bridge-retirement parity correction
 
 Committed candidate `24ce5de1c565107276e9524b8e9203b14cab9580` reran the
-canonical `bun run --filter=docs test:cloudflare-built` proof after adding the
+canonical the historical `docs` app’s `test:cloudflare-built` command proof after adding the
 retained Nitro parity oracles that were absent from the prior receipt. The
 receipt is `2026-08-10-local-bridge-retirement/receipt.json` and records
 passing mobile navigation disclosure, reduced-motion suppression, pending
@@ -613,7 +624,7 @@ billing, release, publication, byte promotion or future provider state.
 The local Cloudflare/workerd bridge-retirement receipt
 `2026-08-10-local-bridge-retirement/receipt.json` is bound to committed
 candidate `0791de2206fd241ead69e144742f48b6daa4318d`. The canonical
-`bun run --filter=docs test:cloudflare-built` command passed all retained Nitro
+the historical `docs` app’s `test:cloudflare-built` command command passed all retained Nitro
 parity oracles and the receipt records no provider, hosted, public, release or
 domain claim.
 

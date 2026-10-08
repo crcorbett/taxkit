@@ -3,8 +3,6 @@
   "ignore": ["docs/**", "apps/web/src/routeTree.gen.ts"],
   "ignoreDependencies": ["@taxkit/tsconfig"],
   "ignoreIssues": {
-    "apps/web/src/lib/route-runtime.ts": ["types"],
-    "packages/api/http/src/client/in-process.layer.ts": ["exports"],
     "packages/api/http/src/client/service.ts": ["duplicates"],
     "packages/api/http/src/groups/health.ts": ["exports", "types"]
   },
@@ -28,7 +26,12 @@
         "tools/docs-deployment/inventory.runtime.ts",
         "tools/docs-deployment/local-doppler.runtime.ts",
         "tools/docs-deployment/workflow-artifact.runtime.ts",
-        "tools/docs-deployment/*.test.ts"
+        "tools/docs-deployment/*.test.ts",
+        "alchemy.apps.run.ts",
+        "alchemy.apps.local.run.ts",
+        "alchemy.posthog.run.ts",
+        "tools/documentation/catalogue.runtime.ts",
+        "tools/docs-deployment/workflow-evidence.runtime.ts"
       ],
       "project": [
         "*.json",
@@ -36,13 +39,26 @@
         "tools/effect-language-service/**/*.ts",
         "tools/repository-paths/**/*.ts",
         "tools/quality-workflow/**/*.ts",
-        "tools/docs-deployment/**/*.ts"
+        "tools/docs-deployment/**/*.ts",
+        "tools/documentation/catalogue*.ts"
       ],
-      "ignoreDependencies": ["typescript"]
+      "ignoreDependencies": ["typescript", "@effect/language-service"]
     },
     "apps/api": {
-      "entry": ["src/index.ts"],
-      "project": ["src/**/*.ts"],
+      "entry": [
+        "src/index.ts",
+        "src/worker.ts",
+        "scripts/smoke-public-routes.runtime.ts",
+        "scripts/**/*.test.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": [
+        "src/**/*.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts",
+        "vitest.config.ts"
+      ],
       "ignoreDependencies": ["@taxkit/tsconfig"]
     },
     "apps/web": {
@@ -50,32 +66,25 @@
         "src/router.tsx",
         "src/server.ts",
         "src/routes/**/*.{ts,tsx}",
-        "vite.config.ts"
-      ],
-      "project": ["src/**/*.{ts,tsx}", "vite.config.ts"],
-      "ignoreDependencies": ["@tanstack/router-plugin", "@taxkit/tsconfig"]
-    },
-    "apps/docs": {
-      "entry": [
-        "scripts/**/*.{ts,tsx}",
-        "src/lib/docs/route-boundary.type-test.ts",
+        "vite.config.ts",
         "src/**/*.test.ts",
-        "src/**/*.server.ts",
-        "src/router.tsx",
-        "src/server.ts",
-        "src/routes/**/*.{ts,tsx}",
-        "vitest.server.config.ts",
-        "vite.config.ts"
+        "vitest.config.ts",
+        "vitest.browser.config.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts",
+        "src/**/*.browser.test.tsx",
+        "vitest.native.config.ts"
       ],
       "project": [
-        "scripts/**/*.{ts,tsx}",
-        "test/**/*.ts",
         "src/**/*.{ts,tsx}",
-        "vitest.server.config.ts",
-        "vite.config.ts"
+        "vite.config.ts",
+        "vitest.config.ts",
+        "vitest.browser.config.ts",
+        "scripts/**/*.ts",
+        "test/**/*.ts",
+        "vitest.native.config.ts"
       ],
-      "ignore": ["examples/**/*.ts", "src/routeTree.gen.ts"],
-      "ignoreDependencies": ["@taxkit/tsconfig"]
+      "ignoreDependencies": ["@taxkit/tsconfig", "cloudflare"]
     },
     "packages/core": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
@@ -112,7 +121,9 @@
         "src/test.layer.ts",
         "src/validate.runtime.ts",
         "src/**/*.test.ts",
-        "vitest.config.ts"
+        "vitest.config.ts",
+        "src/catalogue-index.runtime.ts",
+        "src/catalogue-source.layer.ts"
       ],
       "project": ["source.config.ts", "src/**/*.ts", "vitest.config.ts"],
       "ignoreDependencies": ["@shikijs/core", "@taxkit/tsconfig", "typescript"]
@@ -140,9 +151,18 @@
         "src/au-effect.ts",
         "src/schemas/index.ts",
         "src/testing/index.ts",
-        "scripts/check-import-boundaries.ts"
+        "scripts/check-import-boundaries.runtime.ts",
+        "scripts/**/*.test.ts",
+        "src/**/*.test.ts",
+        "vitest*.config.ts",
+        "type-tests/**/*.ts"
       ],
-      "project": ["src/**/*.ts", "scripts/**/*.ts"],
+      "project": [
+        "src/**/*.ts",
+        "scripts/**/*.ts",
+        "vitest*.config.ts",
+        "type-tests/**/*.ts"
+      ],
       "ignoreDependencies": ["@types/bun"]
     },
     "packages/scripts": {
@@ -162,6 +182,40 @@
     },
     "packages/rules/au/stsl": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/api/rpc": {
+      "entry": [
+        "src/group.ts",
+        "src/handlers.ts",
+        "src/service.ts",
+        "src/server.ts",
+        "src/live.layer.ts",
+        "src/test.layer.ts",
+        "src/schemas.ts",
+        "src/errors.ts",
+        "src/__testing__/fixtures.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/docs-examples": {
+      "entry": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
+      "ignoreDependencies": ["typescript"]
+    },
+    "packages/content": {
+      "entry": [
+        "src/schemas.ts",
+        "src/errors.ts",
+        "src/service.ts",
+        "src/live.layer.ts",
+        "src/test.layer.ts",
+        "src/__testing__/*.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     }
   }

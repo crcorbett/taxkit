@@ -13,7 +13,7 @@ const StateStoreCredentialsJson = Schema.fromJsonString(
 );
 
 const decodeCredentials = (source: string) =>
-  Schema.decodeUnknownEffect(StateStoreCredentialsJson, {
+  Schema.decodeEffect(StateStoreCredentialsJson, {
     onExcessProperty: "error",
   })(source).pipe(Effect.option);
 
@@ -31,10 +31,7 @@ export const readDocsDeploymentStateStoreCredentials = (
       Effect.map(Option.some),
       Effect.catchTag("PlatformError", (error) =>
         Match.value(error.reason).pipe(
-          Match.when(
-            (reason) => reason._tag === "NotFound",
-            () => Effect.succeed(Option.none<string>())
-          ),
+          Match.tag("NotFound", () => Effect.succeed(Option.none<string>())),
           Match.orElse(
             () =>
               new DocsDeploymentInventoryReadError({
@@ -44,17 +41,18 @@ export const readDocsDeploymentStateStoreCredentials = (
         )
       )
     );
-    const fileJsonObject = yield* Option.match(fileContents, {
-      onNone: () => Effect.succeed(false),
+    const fileJson = yield* Option.match(fileContents, {
+      onNone: () => Effect.succeed(Option.none<typeof Schema.Unknown.Type>()),
       onSome: (source) =>
-        Schema.decodeUnknownEffect(JsonValue)(source).pipe(
-          Effect.map(Predicate.isObject),
-          Effect.catch(() => Effect.succeed(false))
-        ),
+        Schema.decodeEffect(JsonValue)(source).pipe(Effect.option),
     });
-    const fileCredentials = yield* Option.match(fileContents, {
+    const fileJsonObject = Option.exists(fileJson, Predicate.isObject);
+    const fileCredentials = yield* Option.match(fileJson, {
       onNone: () => Effect.succeed(Option.none()),
-      onSome: decodeCredentials,
+      onSome: (value) =>
+        Schema.decodeUnknownEffect(DocsDeploymentStateStoreCredentials, {
+          onExcessProperty: "error",
+        })(value).pipe(Effect.option),
     });
 
     if (Option.isSome(fileCredentials)) {

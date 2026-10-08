@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "94735e5de1330cf5b947e6fdefc671eaf3a71ca3378c58dc419a6ddb1268affb",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/start/run-your-first-calculation.mdx"
+}

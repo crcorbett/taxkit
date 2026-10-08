@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: package-root
-confidence: high
+document_type: package-guide
+lifecycle: current
+authority: canonical
+owner: repository-maintainers
+last_reviewed: 2026-10-06
+review_trigger: package contracts or generated-source boundaries change
 ---
 
 # @taxkit/docs-fumadocs
@@ -31,18 +33,30 @@ collection locations, routes, app layout or runtime execution.
 | `@taxkit/docs-fumadocs/render` | Browser-safe generic picture and code-block primitives. |
 
 The live Layer is the only boundary that accepts generated-provider
-representations. It wraps provider throws and promises, decodes each value
-through the package Schemas and exposes only canonical service values and safe
-tagged errors. Consumers call named service operations; they do not pass
+representations. Its named adapter operations return Effects with
+`FumadocsSourceLoadError` failures. The generated collection owner translates
+its SDK calls into that channel; the live Layer decodes each successful value
+through the package Schemas and maps failures to safe service errors. Consumers call named service operations; they do not pass
 callbacks or receive raw provider pages.
+
+The Shiki `pre` transformer returns a replacement HAST node with decoded
+metadata. It preserves the input node; the installed Shiki transformer contract
+consumes the returned node.
+
+`sharedMdxOptions` exposes its known remark-plugin callback through the
+installed SDK type. Collection owners can prepend their own compiler plugin and
+retain the existing plugins, Mermaid processing and highlighting options
+without inspecting a runtime union. TaxKit's page-link policy remains in
+docs-content; the reusable package does not acquire navigation or source roots.
 
 ## Build ordering
 
 `source`, `types` and `default` package conditions point to source and compiled
-artifacts explicitly. The named docs-content generation task depends on this
-package build. Direct docs-content generation/tests, docs app types/build and
-both Knip commands therefore compile this package before config loading and
-never depend on stale pre-existing `dist`.
+artifacts explicitly. Turbo owns this package build before docs-content generation, tests and type
+checks, app builds and both Knip commands. Docs-content leaf commands do not
+rebuild a dependency while another task is using its output. Use the root
+`docs:catalogue` command or a filtered Turbo task to prepare the dependency
+graph; direct leaf commands require that preparation.
 
 ```txt
 bun run --filter=@taxkit/docs-fumadocs test

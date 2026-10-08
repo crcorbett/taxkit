@@ -1,32 +1,33 @@
 ---
 title: "Overview"
 description: "Learn where to start with the TaxKit SDK and HTTP API."
-status: "draft"
+status: "published"
 ---
 
 # Overview
 
 Use TaxKit when you need source-backed tax calculations from TypeScript or
 over HTTP. Start with the TypeScript SDK when your application can import
-TaxKit packages. Use the HTTP API when the caller is a browser, another
-language or a service boundary that should not run the SDK in-process.
+TaxKit packages. Use the HTTP API when the caller uses another language or
+the calculation should run on a server. Browser applications can use either
+HTTP or the browser-safe SDK entrypoints.
 
 ## Choose your first path
 
-| You need to                                          | Start with                                        |
-| ---------------------------------------------------- | ------------------------------------------------- |
-| Run one calculation from TypeScript                  | [Quickstart](./quickstart.mdx)                    |
-| Add TaxKit to a server application                   | [Plain SDK](../sdk/plain-sdk.mdx)                 |
-| Return typed success or failure values               | [Safe SDK](../sdk/safe-sdk.mdx)                   |
-| Compose TaxKit inside an Effect application          | [Effect SDK](../sdk/effect-sdk.mdx)               |
-| Call TaxKit from a browser or non-TypeScript service | [Choose SDK or HTTP API](./choose-sdk-or-api.mdx) |
+| You need to                                 | Start with                                        |
+| ------------------------------------------- | ------------------------------------------------- |
+| Run one calculation from TypeScript         | [Quickstart](./quickstart.mdx)                    |
+| Add TaxKit to a server application          | [Plain SDK](../sdk/plain-sdk.mdx)                 |
+| Return typed success or failure values      | [Safe SDK](../sdk/safe-sdk.mdx)                   |
+| Compose TaxKit inside an Effect application | [Effect SDK](../sdk/effect-sdk.mdx)               |
+| Choose where browser calculations run       | [Choose SDK or HTTP API](./choose-sdk-or-api.mdx) |
 
 ## How the public surfaces fit
 
 ```ts
-Production: public integration surfaces
+Public integration surfaces
 
-TypeScript application
+TypeScript application on a server or in a browser
   -> @taxkit/sdk plain facade
     -> calculator service
 
@@ -34,10 +35,9 @@ Effect application or in-process transport
   -> @taxkit/sdk/effect
     -> calculator service
 
-Browser or non-TypeScript caller
+Caller using HTTP
   -> HTTP API
-    -> @taxkit/sdk/effect
-      -> calculator service
+    -> calculator service
 ```
 
 The SDK and API use the same calculator-owned schemas and branded values. This

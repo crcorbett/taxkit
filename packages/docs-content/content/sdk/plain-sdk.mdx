@@ -1,34 +1,35 @@
 ---
 title: "Plain SDK"
 description: "Call TaxKit from Promise-based TypeScript applications."
-status: "draft"
+status: "published"
 ---
 
 # Plain SDK
 
-Use the plain SDK for server-side TypeScript applications that want typed
-inputs and reports without managing Effect services.
+Use the plain SDK for TypeScript applications that want typed inputs and
+reports without managing Effect services. The root and AU entrypoints also
+support browser calculations on the device.
 
 ## Call a helper
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
 ## Call the generic facade
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
@@ -38,19 +39,29 @@ the descriptor you pass.
 ## Use a module-scoped client
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const client = au.createClient();
 
-const report = await client.calculations.calculate(
-  au.calculations.annualIncomeTax,
-  { taxableIncome: aud(9_000_000) }
-);
+try {
+  const report = await client.calculations.calculate(
+    au.calculations.annualIncomeTax,
+    { taxableIncome: aud(Cents.make(9_000_000)) }
+  );
+} finally {
+  await client.dispose();
+}
 ```
 
 Module-scoped clients keep the selected calculator modules explicit. Type tests
 cover incompatible calculator/module pairs.
+
+Each client owns its resources. Await `dispose()` when you finish, including
+when a calculation fails. Closing stops pending calculations and waits for
+cleanup. You can safely call it again. Closing one client leaves other clients
+usable. Calls on a closed client fail with `TaxKitClientDisposedError` detail.
+The direct helpers above handle their own cleanup before returning.
 
 ## When to use another surface
 

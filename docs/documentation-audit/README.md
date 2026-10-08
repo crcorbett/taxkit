@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-08
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -27,10 +27,29 @@ dependency choices; they prove no install, build, package compatibility,
 provider change or deployment. The original observation is retained separately
 from the later measurement/image research.
 The latest review binds the current proposal, all settled Q1–Q13 answers and
-the installed 0.6.0 skill baseline. Q14 final shared understanding remains
-pending before implementation. Earlier reviews remain unchanged for their
+the installed 0.6.0 skill baseline. The historical Q14 hold was superseded by Cooper's 4 October implementation request; the current SPEC and active plan record
+that authority. Earlier reviews remain unchanged for their
 original drafts, digests and then-current baseline; they do not prove the
 current proposal or installed enforcement.
+
+Clean slate implementation evidence:
+
+- [8 October bounded Medicare and exact-zero correction](medicare-2025-26-correction.json): accepted local correction, separately identified test recovery and source-approval limits.
+
+- [Retention manifest](clean-slate-foundation/retention-manifest.json)
+- [4 October baseline checks](clean-slate-foundation/2026-10-04-baseline.json)
+- [4 October version observations](clean-slate-foundation/2026-10-04-version-observations.json)
+- [4 October partial dependency qualification](clean-slate-foundation/2026-10-04-stable-dependency-qualification.json)
+- [4 October canonical skill adoption and provisional strict-policy inventory](clean-slate-foundation/2026-10-04-canonical-skills.json)
+- [4 October Medicare scope conflict](clean-slate-foundation/2026-10-04-medicare-scope-conflict.json)
+- [5 October foundation acceptance review](clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
+- [6 October shared native calculation admission and local T004 closeout](clean-slate-foundation/2026-10-06-shared-rate-admission.json)
+- [6 October checked docs source owner and draft-review candidate](clean-slate-foundation/2026-10-06-checked-docs-source-owner.json)
+
+The baseline and the 4 October Medicare conflict are retained historical
+observations. Cooper approved the bounded correction on 8 October; its separate
+receipt above records the changed annual scope and local proof. Earlier
+provider evidence does not qualify this correction or adad deployment.
 
 Entire session history setup evidence:
 
@@ -354,3 +373,173 @@ At audit time, check that:
    source exports and verification exist.
 6. Keep this audit updated when new package roots, docs buckets or public
    surfaces are added.
+
+- [Native RPC contract](clean-slate-foundation/2026-10-05-native-rpc-contract.json): T003
+  native transport/package progress, narrow browser Schema ownership and explicit
+  pending app-host proof.
+
+- [Native API host candidate](clean-slate-foundation/2026-10-05-native-api-host.json):
+  actual native local Worker, shared HTTP/RPC calculation, origin/body policy and
+  request cleanup proof; connected Website and complete tracing remain pending.
+
+
+- [Native two-app graph](clean-slate-foundation/2026-10-05-native-app-graph.json):
+  native source/default planner correction, mock-only plan classification,
+  same-resource origins/binding and root secret selection; real Website and
+  provider operations remain unqualified.
+
+
+- [Native Website candidate](clean-slate-foundation/2026-10-05-native-website.json):
+  real private binding and direct browser RPC, idle/repeated request correction,
+  form/hydration/cleanup and built import proof. T003 and full exported tracing
+  remain unfinished; local tests do not establish deployment.
+
+The [native Website settings-failure candidate](clean-slate-foundation/2026-10-05-native-website-failures.json) records short-marker ingress proof, controlled native internal failure, source restoration and remaining T003 limits.
+
+The [native RPC failure candidate](clean-slate-foundation/2026-10-05-native-rpc-failures.json) records actual built global/procedure/fatal replies, damaged-reply classification through the Website binding and Chromium, safeguard removal checks and remaining T003 limits.
+
+The [native cancellation candidate](clean-slate-foundation/2026-10-05-native-cancellation.json)
+records complete headers/body deadlines, actual browser abort on editing and
+route departure, removal checks and numeric log-metadata correction. Upstream
+cancellation, the development pair and safe exported tracing remain unproved.
+
+The [native local development candidate](clean-slate-foundation/2026-10-05-native-local-development.json)
+records actual CLI startup, local matching bindings, source reload/restoration,
+browser/private calculations and shutdown. Later T003 acceptance below separates the unmet T009 safe exported
+telemetry; local development is not provider or deployment proof.
+
+The [native platform containment candidate](clean-slate-foundation/2026-10-05-native-trace-containment.json)
+records disabled calculator platform logs/traces, real local-state and removal
+proof, the failed parent hosted source-restoration check and its bounded timing
+correction. T009 safe exported tracing remains unmet.
+
+The [native connection acceptance review](clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json)
+accepts T003 locally against its named criteria and bounded source/runtime
+proof. T009 safe exports and DEV-75–81 remain separate unfinished work.
+
+The [previous calculator answer candidate](clean-slate-foundation/2026-10-05-stale-calculator-answer.json)
+records T004's visible out-of-date answer, explicit recalculation, failed/invalid
+retry and server-submission hydration behaviour. Other calculator pages and
+T004's remaining interface/transport work remain unfinished.
+
+
+The [take-home explanation candidate](clean-slate-foundation/2026-10-05-take-home-explanation.json)
+records expandable report-owned breakdown, assumptions, supported year and
+source references, keyboard expansion and bounded link presentation. T004
+remains in progress for the other pages and complete package/transport work.
+
+
+The [calculator catalogue RPC candidate](clean-slate-foundation/2026-10-05-calculator-catalogue-rpc.json)
+records the named catalogue connection, canonical query/result ownership and
+operation-specific codec/lifetime checks. Homepage consumption, remaining
+calculator pages and complete T004 qualification remain open.
+
+
+The [catalogue-backed calculator pages candidate](clean-slate-foundation/2026-10-05-calculator-pages.json)
+records separate withholding/annual page state, checked catalogue navigation,
+real native/browser/HTML-form results and the visible retained Medicare limit.
+Complete T004 package/transport/domain qualification remains open.
+
+The [native request size-policy candidate](clean-slate-foundation/2026-10-05-request-body-policy.json)
+records the common 64 KiB byte limit, exact-limit valid requests, multi-byte and
+stream-tail rejection, source release and actual built HTTP/RPC/form admission.
+Complete T004 transport/domain/package qualification remains open.
+
+The [private client response candidate](clean-slate-foundation/2026-10-05-client-response-policy.json)
+records checked status failures, byte admission, complete deadlines, request
+cleanup and manual retry guidance. Its local proof remains separate from the
+hosted parent correction and unfinished T004/MCP/provider work.
+
+
+The [shared calculation work candidate](clean-slate-foundation/2026-10-05-calculation-work-policy.json)
+records the eight-calculation pool and five-second operation policy, checked
+HTTP/RPC failures, native/browser/SDK proof and remaining T004 limits. It does
+not establish rate identity, MCP, deployment or publication.
+
+
+The [complete closed RPC candidate](clean-slate-foundation/2026-10-06-closed-rpc-operations.json)
+records the nine named canonical operations, shared reply/lifetime policy, old
+revision rejection and native metadata proof. Whole T004 and later tasks remain
+active; this record establishes no provider or public release state.
+
+
+The [shared request and operation protection candidate](clean-slate-foundation/2026-10-06-request-operation-protections.json)
+records standalone/native body admission, checked JSON/HTML request errors,
+metadata operation budgets, status contracts and bounded consumer/runtime proof.
+It does not complete per-client rate policy, T004 or the rebuild.
+
+
+The [canonical trace/ledger field-owner candidate](clean-slate-foundation/2026-10-06-domain-schema-owners.json)
+records schema-derived aliases, the bounded recursive annotation, historical
+codec compatibility and packed consumer proof. It does not complete the wider
+domain audit or request-rate policy.
+
+The [fallible money/calendar candidate](clean-slate-foundation/2026-10-06-fallible-domain-values.json)
+records checked constructors and derived amounts, date Option compatibility,
+unchanged authored tables and local consumer proof. Wider domain review and
+request-rate policy remain active work.
+
+The [parameter-table relationship candidate](clean-slate-foundation/2026-10-06-parameter-table-relationships.json)
+records row and whole-table checks, saved/decoded coverage, focused constructor
+and packed-consumer tests and unchanged historical table/source bytes. Full
+current-candidate qualification and wider T004 acceptance remain separate.
+
+The [Core ambient-type portability correction](clean-slate-foundation/2026-10-06-core-ambient-type-portability.json)
+records the clean-install failure, isolated reproduction and empty compiler
+type-package setting. Local checks and exact hosted readback remain separate;
+this correction changes no runtime or tax behaviour.
+
+
+The [domain absence-owner candidate](clean-slate-foundation/2026-10-06-domain-absence-owners.json)
+records changed Core/descriptor domain types, retained trace/question and public
+metadata representations, service tuple inference, SDK Type narrowing and
+separate engine implementation. Its local qualification does not accept all
+public request absence, rate limiting, T004 or external operations.
+
+
+The [public request absence candidate](clean-slate-foundation/2026-10-06-public-request-absence.json)
+records canonical request/metadata/error Types, selected calculator guidance,
+checked service fixtures and original representation/report compatibility.
+Local and hosted qualification remain separate; rate work and T004 stay active.
+
+
+The [domain contract candidate](clean-slate-foundation/2026-10-06-domain-contract-closeout.json)
+records the remaining Core diagnostic Option owner and removal of the unused
+catalogue program field, original compatibility forms and owning/packed checks.
+Its qualification does not complete rate policy, T004 or external operations.
+
+
+The [native MCP candidate](clean-slate-foundation/2026-10-07-native-mcp.json)
+records actual official-client application and built local Worker proof,
+shared work/admission ownership, safe failures and bounded response cleanup.
+Older session support, network cancellation, browser tools and setup content
+remain T006 work; metrics remain deferred. Local proof establishes no deployed
+endpoint, provider state, publication or complete task acceptance.
+
+The [visible browser tools candidate](clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
+records page-owned commands/state, native Chrome caller equality, cancellation
+and route cleanup, safe unsupported-host behaviour, corrected saved-form seeding
+and exact lint admissions. Its native protocol caller is controlled by the test;
+it establishes no autonomous model session, deployment or general browser support.
+T006 still includes older remote sessions, remote cancellation and public setup;
+metrics remain deferred.
+
+
+The [native domain/plan candidate](clean-slate-foundation/2026-10-07-native-domains.json)
+records Production-only zone/settings/domain declarations, the actual native
+formatter's checked two-app/Production projections and the corrected shared
+redirect read fallback. Its [provider readback](clean-slate-foundation/2026-10-07-domain-provider-readback.json)
+retains successful existing-profile GETs. Local mock/source/compiled proof is
+separate from live plans, real secret custody, apply and public availability.
+
+The [native source-plan follow-up](clean-slate-foundation/2026-10-07-native-source-plan.json)
+records the existing command's calculated tracked-source identity, clean-candidate
+and changed-byte refusals, optional hash agreement and protected stage-local
+outputs. It preserves historical receipt bytes and writer stops. Qualification
+and metadata readback are bounded local observations; native bootstrap/provider
+receipts, worktree custody and live plans remain separate unfinished work.
+
+The [native cloud preparation](clean-slate-foundation/2026-10-07-native-cloud-preparation.json)
+records existing TaxKit credential reuse, independent state version/access,
+namespace isolation and real diagnostic native planning. Full qualification and
+Preview/Production apply/readback remain separate results.

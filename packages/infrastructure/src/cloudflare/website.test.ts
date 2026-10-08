@@ -1,52 +1,70 @@
-import { readFile } from "node:fs/promises";
+import { describe, expect, it } from "@effect/vitest";
+import type { MemoOptions } from "alchemy/Command/Memo";
+import { Array, Effect, Exit, Schema } from "effect";
 
-import { Effect, Schema } from "effect";
-import { describe, expect, it } from "vitest";
-
-import { DocsDeploymentStage } from "../stage";
+import { DocsDeploymentStage } from "../stage.js";
 import {
   decodeDocsCloudflareStackStage,
-  docsWorkerAssetHeaders,
+  docsWorkerMemo,
   docsWorkerObservability,
-} from "./website";
+} from "./website.js";
 
 const decodeDocsDeploymentStage =
   Schema.decodeUnknownEffect(DocsDeploymentStage);
 
 describe("docs Cloudflare stack policy", () => {
-  it.each(["prod", "pr-1", "pr-214"])(
+  it.effect("requires copying readonly memo arrays at Alchemy input", () =>
+    Effect.gen(function* () {
+      // @ts-expect-error The provider's include field requires a fresh writable array.
+      const mutableInclude: MemoOptions["include"] = docsWorkerMemo.include;
+      const workspace = yield* Effect.fromOption(
+        Array.head(docsWorkerMemo.workspaces)
+      );
+      // @ts-expect-error Nested workspace arrays also require a fresh boundary copy.
+      const mutableWorkspaceInclude: MemoOptions["include"] = workspace.include;
+      expect(mutableInclude).toBe(docsWorkerMemo.include);
+      expect(mutableWorkspaceInclude).toBe(workspace.include);
+    })
+  );
+  it.effect.each(["prod", "pr-1", "pr-214"])(
     "accepts the owned deployment stage %s",
-    (stage) => {
-      expect(Effect.runSync(decodeDocsDeploymentStage(stage))).toBe(stage);
-    }
+    (stage) =>
+      Effect.gen(function* () {
+        expect(yield* decodeDocsDeploymentStage(stage)).toBe(stage);
+      })
   );
 
-  it.each(["", "preview", "pr-0", "pr-01", "prod-2"])(
+  it.effect.each(["", "preview", "pr-0", "pr-01", "prod-2"])(
     "rejects the unowned deployment stage %s",
-    (stage) => {
-      expect(Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag).toBe(
-        "Failure"
-      );
-    }
+    (stage) =>
+      Effect.gen(function* () {
+        expect(
+          Exit.isFailure(yield* Effect.exit(decodeDocsDeploymentStage(stage)))
+        ).toBe(true);
+      })
   );
 
-  it.each(["dev_cooper", "dev_taxkit-maintainer", "dev_ci_user"])(
+  it.effect.each(["dev_cooper", "dev_taxkit-maintainer", "dev_ci_user"])(
     "accepts the local-only stack stage %s",
-    (stage) => {
-      expect(Effect.runSync(decodeDocsCloudflareStackStage(stage))).toBe(stage);
-      expect(Effect.runSyncExit(decodeDocsDeploymentStage(stage))._tag).toBe(
-        "Failure"
-      );
-    }
+    (stage) =>
+      Effect.gen(function* () {
+        expect(yield* decodeDocsCloudflareStackStage(stage)).toBe(stage);
+        expect(
+          Exit.isFailure(yield* Effect.exit(decodeDocsDeploymentStage(stage)))
+        ).toBe(true);
+      })
   );
 
-  it.each(["dev", "dev_", "dev user", "development_cooper"])(
+  it.effect.each(["dev", "dev_", "dev user", "development_cooper"])(
     "rejects the invalid local stack stage %s",
-    (stage) => {
-      expect(
-        Effect.runSyncExit(decodeDocsCloudflareStackStage(stage))._tag
-      ).toBe("Failure");
-    }
+    (stage) =>
+      Effect.gen(function* () {
+        expect(
+          Exit.isFailure(
+            yield* Effect.exit(decodeDocsCloudflareStackStage(stage))
+          )
+        ).toBe(true);
+      })
   );
 
   it("keeps built-in logs bounded and traces disabled", () => {
@@ -65,14 +83,5 @@ describe("docs Cloudflare stack policy", () => {
         persist: false,
       },
     });
-  });
-
-  it("keeps immutable asset headers in the Vite public input", async () => {
-    const headers = await readFile(
-      new URL("../../../../apps/docs/public/_headers", import.meta.url),
-      "utf-8"
-    );
-
-    expect(headers).toBe(docsWorkerAssetHeaders);
   });
 });

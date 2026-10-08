@@ -1,7 +1,7 @@
 ---
 title: "Calculate Australian take-home pay"
 description: "Run the AU take-home pay calculator with canonical gross pay facts."
-status: "draft"
+status: "published"
 ---
 
 # Calculate Australian take-home pay
@@ -12,7 +12,7 @@ The SDK path keeps the calculation in-process and avoids HTTP transport.
 ## Before you start
 
 - Install the SDK with [Install the SDK](../start/install-the-sdk.mdx).
-- Use a server-side or build-time TypeScript runtime.
+- Use a TypeScript runtime that can import the SDK.
 - Represent money in cents with `aud`.
 
 ## Steps
@@ -20,18 +20,19 @@ The SDK path keeps the calculation in-process and avoids HTTP transport.
 1. Import `aud`, `GrossPay` and the AU SDK helper.
 2. Build the canonical gross pay fact.
 3. Call `au.pay.takeHomePay`.
-4. Handle expected failures with the safe helper when user input is not trusted.
+4. Check user input before the call and handle calculation failures with the
+   safe helper.
 
 ## Example
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.pay.takeHomePay({
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: aud(Cents.make(165_400)),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -55,12 +56,13 @@ This matches the current SDK test fixture for weekly gross pay of $1,654.00.
 
 ## Handle errors
 
-Use the safe helper when input crosses an untyped boundary:
+Check untrusted input as shown in [Handle validation errors](./handle-validation-errors.mdx).
+Then use the safe helper when you want expected calculation failures as values:
 
 ```ts
 const result = await au.pay.safe.takeHomePay({
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: aud(Cents.make(165_400)),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,

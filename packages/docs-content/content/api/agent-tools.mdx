@@ -1,0 +1,104 @@
+---
+title: "Agent connection guide"
+description: "Connect remote AI tools to TaxKit or use the calculator visible in a supporting browser."
+status: "published"
+---
+
+# Agent connection guide
+
+TaxKit offers tools for discovering calculators, checking their input fields,
+running a calculation and reading documentation. They use the same calculator
+and documentation services as the website and HTTP API. No TaxKit account or API
+key is required.
+
+## Connect a remote AI app
+
+1. Open your app's MCP server settings. MCP lets an AI app call tools offered by
+   another service.
+2. Add a server called **TaxKit**, using **Streamable HTTP**.
+3. Enter `https://api.taxkit.dev/mcp` as its address.
+4. Let the app discover the tools, then ask it to list the supported calculators.
+5. Read the chosen calculator's input fields before sending any figures. Check
+   the returned tax year, assumptions, breakdown and sources with the answer.
+
+For a preview or your own installation, use the address shown on that website's
+**For agents** page. Keep the website and API in the same environment.
+
+The endpoint offers protocol versions `2026-07-28` and `2025-11-25`. The newer
+version sends its version and method information on each request. The older
+version first starts a conversation and then sends its session ID. Let your
+client handle those headers and messages; changing the version label alone does
+not change the protocol. Other versions are refused.
+
+## Remote tools
+
+| Tool                           | Use                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `taxkit_list_calculators`      | Find supported calculators and their facts.                              |
+| `taxkit_get_calculator_schema` | Read the selected calculator's input fields, outputs, rules and sources. |
+| `taxkit_calculate`             | Send checked facts and read the returned report.                         |
+| `taxkit_docs_navigation`       | Find the accepted public documentation pages.                            |
+| `taxkit_find_docs`             | Search those pages with up to 100 characters.                            |
+| `taxkit_read_doc`              | Read a discovered page, including its processed Markdown.                |
+
+Use the tool's discovered input definition rather than guessing field names or
+units. Calculation inputs are checked. TaxKit does not save personal reports or
+repeat a failed calculation automatically.
+
+## Browser tools
+
+WebMCP is an [experimental browser feature](https://developer.chrome.com/docs/ai/webmcp/).
+TaxKit detects support when a calculator is open. A supporting browser agent can
+use `taxkit_find_calculators`, `taxkit_read_calculator`,
+`taxkit_fill_calculator`, `taxkit_calculate_visible_form` and
+`taxkit_read_result` on that page.
+
+Filling the form changes the fields you can see. Calculating presses the same
+Calculate command as manual use. Editing a field stops unfinished browser work
+and marks the old answer out of date. Read the waiting state, message and
+out-of-date marker before using an answer. Leaving the calculator removes its
+tools and stops its unfinished browser work.
+
+TaxKit's tests exercise native tool calls in Chromium 153 with WebMCP enabled.
+That does not mean every browser or AI app supports these tools. Ordinary
+browsers keep the usual forms and buttons. A remote MCP connection does not
+provide control of the browser page.
+
+## Limits and failed calls
+
+- Calculations use the existing anonymous allowance: 60 calls per 60 seconds.
+  Cloudflare applies it approximately at each location; it is not a global quota.
+  Each application instance admits up to eight calculations without queuing.
+- A calculation has a five-second work limit. POST bodies are limited to 64 KiB
+  and five seconds to read. Complete MCP replies are limited to 2 MiB and ten
+  seconds.
+- Modern remote cancellation stops the client. On the tested Worker runtime,
+  server calculation work can continue until its five-second limit. Prompt
+  server cleanup before the reply starts is not guaranteed.
+- An older client's cancellation notification stops only its own conversation's
+  call and releases that calculation's place. Older conversations share a host
+  with at most 32 initialisation attempts and 32 concurrent requests during its
+  ten-minute lifetime. A late connection has only the remaining time. Expiry or
+  host eviction returns 404; start a fresh conversation.
+- Calls without an Origin header are accepted. Browser calls must use this
+  installation's configured website origin; other supplied origins are refused.
+  This is a browser origin check, not a login system.
+- When a call is refused or times out, read its fixed error code and guidance.
+  Retry only after checking the cause. Subscriptions, resumed streams and saved
+  conversations across host eviction are not offered.
+
+Annual income-tax reports identify rules-au-income-tax/1.0.1. That edition uses
+the enacted 2025–26 Medicare thresholds of $28,011 and $35,013 for a single
+person not entitled to the seniors and pensioners tax offset. Family reductions,
+exemptions and the Medicare levy surcharge are not modelled. Take-home pay and
+PAYG withholding use separate rules. Check the returned rule version and source;
+these source changes do not establish that an installation has been updated.
+
+## Read documentation without tools
+
+Accepted documentation pages have a **Read as Markdown** link. The website's
+`/llms.txt` lists accepted pages and `/llms-full.txt` includes their processed
+bodies. These files contain documentation, not your calculation reports.
+
+For ordinary HTTP integration, use [API overview](./overview.mdx),
+[OpenAPI reference](./openapi-reference.mdx) and [Endpoints](./endpoints.mdx).

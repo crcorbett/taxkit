@@ -1,4 +1,9 @@
 export {
+  CalculatorAdmissionUnavailable,
+  CalculatorCapacityExceeded,
+  CalculatorOperationTimedOut,
+  CalculatorMetadataError,
+  CalculatorRateLimited,
   CalculatorRunFacts,
   CalculatorRunReport,
   CalculatorRunRequest,
@@ -9,6 +14,8 @@ export {
 } from "@taxkit/calculators/schemas";
 export {
   TaxKitCalculationError,
+  TaxKitClientDisposedError,
+  TaxKitClientDisposeError,
   TaxKitFailure,
   TaxKitSchemaDecodeError,
   TaxKitSuccess,

@@ -9,6 +9,7 @@ import {
   Match,
   Option,
   Order,
+  Record,
   Schema,
 } from "effect";
 import type { Effect as EffectType } from "effect";
@@ -26,12 +27,16 @@ import type {
   DocsNavigationLeaf,
   DocsValidationResult,
 } from "../schemas.js";
+import {
+  checkedSnippetBindings,
+  validateCheckedSnippet,
+} from "./checked-snippets.js";
 import { validateMdxComponentPolicy } from "./mdx-component-policy.js";
 
 const { join, resolve } = nodePath;
 const docsRoot = "packages/docs-content";
 const contentRoot = "packages/docs-content/content";
-const examplesRoot = "packages/docs-content/examples";
+const examplesRoot = "packages/docs-examples/src";
 const navigationSource = "packages/docs-content/navigation.json";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
@@ -64,15 +69,17 @@ const openApiReferenceSource = DocsSourcePath.make(
 const openApiReferenceRequiredText = [
   "/api/docs/openapi.json",
   "/api/v1/calculators/{calculatorId}/calculate",
-  "Accepted exclusion",
+  "CalculatorRunRequest",
+  "__snapshots__/openapi.json",
+  "bun run --filter=@taxkit/api-http test:openapi",
 ] as const;
 
 const examplesReferenceRequiredText = [
-  "../../examples/browser-http.ts",
-  "../../examples/effect.ts",
-  "../../examples/error-handling.ts",
-  "../../examples/node-server.ts",
-  "bun run --filter=docs check-examples",
+  "../../../docs-examples/src/browser-http.ts",
+  "../../../docs-examples/src/effect.ts",
+  "../../../docs-examples/src/error-handling.ts",
+  "../../../docs-examples/src/node-server.ts",
+  "bun run --filter=@taxkit/docs-examples check-examples",
 ] as const;
 
 const contentSourcePath = (path: string) =>
@@ -151,7 +158,7 @@ const decodeFrontmatter = (
           )
         ),
       onSome: (match) =>
-        Option.fromNullishOr(match.groups?.["body"]).pipe(
+        Record.get(match.groups ?? {}, "body").pipe(
           Option.match({
             onNone: () =>
               Effect.fail(
@@ -164,11 +171,14 @@ const decodeFrontmatter = (
               ),
             onSome: (body) =>
               parseFrontmatterBody(source, body).pipe(
-                Effect.flatMap(Schema.decodeUnknownEffect(DocsPageFrontmatter)),
-                Effect.mapError((error) =>
-                  globalThis.Array.isArray(error)
-                    ? error
-                    : frontmatterIssue(source, error.message)
+                Effect.flatMap((candidate) =>
+                  Schema.decodeUnknownEffect(DocsPageFrontmatter)(
+                    candidate
+                  ).pipe(
+                    Effect.mapError((error) =>
+                      frontmatterIssue(source, error.message)
+                    )
+                  )
                 )
               ),
           })
@@ -188,7 +198,7 @@ const checkPattern = (
       onSome: (match) =>
         EffectArray.of(
           new DocsValidationIssue({
-            message: `${label}: ${match[0]}`,
+            message: `${label}: ${EffectArray.head(match).pipe(Option.getOrElse(() => ""))}`,
             path: [source],
           })
         ),
@@ -268,7 +278,7 @@ const validateLocalLinkTarget = (
       () => Effect.succeed(EffectArray.empty<DocsValidationIssue>())
     ),
     Match.orElse((value) =>
-      Option.fromNullishOr(value.split("#")[0]).pipe(
+      EffectArray.head(value.split("#")).pipe(
         Option.filter((withoutAnchor) => withoutAnchor.length > 0),
         Option.match({
           onNone: () =>
@@ -302,7 +312,7 @@ const validateLocalLinks = (source: DocsSourcePath, absolutePath: string) =>
       Effect.forEach(
         EffectArray.fromIterable(markdown.matchAll(relativeLinkPattern)),
         (match) =>
-          Option.fromNullishOr(match.groups?.["target"]).pipe(
+          Record.get(match.groups ?? {}, "target").pipe(
             Option.match({
               onNone: () =>
                 Effect.succeed(EffectArray.empty<DocsValidationIssue>()),
@@ -336,7 +346,7 @@ const listMdxSources: EffectType.Effect<
 > = collectMdxPaths(absoluteContentRoot).pipe(
   Effect.flatMap((paths) => Effect.forEach(paths, contentSourcePath)),
   Effect.mapError(() => sourceError()),
-  Effect.map((paths) => paths.toSorted(Order.String))
+  Effect.map((paths) => EffectArray.sort(paths, Order.String))
 );
 
 export { getNavigation } from "../navigation.js";
@@ -365,12 +375,15 @@ const validateNavigationCoversSources = (
   sources: readonly DocsSourcePath[]
 ) =>
   EffectArray.map(
-    EffectArray.fromIterable(
-      HashSet.difference(
-        HashSet.fromIterable(sources),
-        navigationSourceSet(navigation)
-      )
-    ).toSorted(Order.String),
+    EffectArray.sort(
+      EffectArray.fromIterable(
+        HashSet.difference(
+          HashSet.fromIterable(sources),
+          navigationSourceSet(navigation)
+        )
+      ),
+      Order.String
+    ),
     missingNavigationIssue
   );
 
@@ -483,12 +496,26 @@ const validateOpenApiReference = (
     )
   );
 
+const validateCheckedSnippets = Effect.forEach(
+  checkedSnippetBindings,
+  (binding) =>
+    Effect.all({
+      example: readText(join(absoluteExamplesRoot, binding.example)),
+      page: readText(join(absoluteDocsRoot, binding.page)),
+    }).pipe(
+      Effect.map(({ example, page }) =>
+        validateCheckedSnippet(binding.page, page, example)
+      )
+    )
+).pipe(Effect.map(EffectArray.flatten));
+
 const validateReferenceIntegration = Effect.all({
+  checkedSnippetIssues: validateCheckedSnippets,
   exampleIssues: validateExamplesReference(exampleReferenceSource),
   openApiIssues: validateOpenApiReference(openApiReferenceSource),
 }).pipe(
-  Effect.map(({ exampleIssues, openApiIssues }) =>
-    EffectArray.flatten([exampleIssues, openApiIssues])
+  Effect.map(({ checkedSnippetIssues, exampleIssues, openApiIssues }) =>
+    EffectArray.flatten([checkedSnippetIssues, exampleIssues, openApiIssues])
   ),
   Effect.mapError(() => sourceError())
 );

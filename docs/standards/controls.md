@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-ci-release-maintainer
-last_reviewed: 2026-08-24
+last_reviewed: 2026-10-07
 review_trigger: public boundary, workflow, action, release graph, or repeated-review finding change
 ---
 
@@ -19,11 +19,40 @@ Quality graph a second time. There are deliberately no path filters, so a new
 or renamed release boundary cannot be skipped. The preceding bootstrap steps
 materialise complete `main` comparison history, resolve cache identities,
 perform a frozen Bun install and install Chromium plus its system packages
-through the app-local Playwright executable; a shallow checkout, cached
+through `apps/web/node_modules/.bin/playwright`; a shallow checkout, cached
 `node_modules`, skipped install or floating browser-tool resolution fails
-policy. The Schema-decoded workflow,
+policy. The `docs-browser` release check uses the freshly built native
+API/Website command `bun run web:test:native-pair`; the old docs browser
+command and Playwright path cannot supply current replacement proof. The
+Schema-decoded workflow,
 control register and negative corpus are owned by `tools/quality-workflow/` and
 run through `bun run check:quality-workflow`.
+
+`bun run test:quality-workflow` runs the policy cases and six isolated
+release-boundary mutations through Bun-hosted Effect Vitest. Each mutation
+runs its real owning command. Scoped temporary clones retain relative symbolic
+links and clean up on success, failure and interruption; child processes and
+the loopback-port reservation have the same lifetime owner. Syntax inspection
+uses immutable traversal and checked record/array access. The root verification
+also runs `bun run check:quality-workflow:types`, covering the policy and tests.
+This changes local checking, not CI permissions or provider authority.
+
+The same scoped runner also executes six clean-slate enforcement mutations
+from `fixtures/strict-enforcement-defects.json`. Each changes only the copied
+lint configuration and runs the real `test:oxlint:task` verifier. Removed/disabled
+required rules, broadened synthetic assignment/method admissions, a removed
+whole-source selector and a wildcard fixture exclusion must fail. The latter
+two changes run the same real verifier and retain their exact scope/exclusion
+failure messages.
+The fixture Schema admits exactly the six named modes; each named test asserts
+the complete ordered corpus and selects exactly one fixture. All twelve deliberate
+faults have independent scoped repository copies, results and finite five-minute
+test deadlines. The source-only documentation check is a separate named test,
+with a temporary Git index and no package build before or after its command.
+Grouping a growing lint corpus under one shared deadline previously timed out
+on the hosted runner; the deadline length and all rejection assertions remain. The target and command are fixed in code. Synthetic
+canary exceptions admit no production source. Retain the existing five-control
+register and six release-boundary oracles; this adds attached T002 proof.
 
 Every eligible deterministic command under that graph is a Turbo task. Quality
 binds the Vercel team cache as read/write on all configured events.
@@ -204,3 +233,13 @@ workers.dev URL. The failed beta.64 runs remain historical non-claims. The
 deployment register therefore has four established entries; none establishes
 custom-domain, DNS, billing, release, publication, byte-promotion or current
 public-domain claims.
+
+## Current old-docs retirement controls
+
+The old docs workspace and writer workflows are retired. Their exact previous
+sources and controls remain under the retained-source manifest, and existing
+invalid-code checks remain active. Current writer-stop checks decode the real
+workflow shape and execute its permission-free stop script. Native process
+checks reject the old root, development and receipt-writer commands before
+provider planning. Historical receipt controls keep their original resource
+and workflow identities. New native provider operations belong DEV-81.

@@ -1,0 +1,315 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "take-home result explanation, report/trace presentation, source links or keyboard expansion changes",
+  "outcome": "locally qualified bounded take-home explanation candidate; hosted candidate proof and draft review pending",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native Workers and Chromium",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-take-home-explanation",
+    "baseCommit": "8e4236e1a9c596c3a5d3762d3ac1d4c150393edf",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "files": [
+        {
+          "path": "apps/web/README.md",
+          "sha256": "a07543c586f898136375876e43c542839c9a5d1fd675a017bb79ff02957fc0c3"
+        },
+        {
+          "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+          "sha256": "11fdf3154fb86fb95c643d3d23683f4f04b2fd6ea8544a0c0ea0d0db1e732de2"
+        },
+        {
+          "path": "apps/web/src/lib/take-home-result.view.tsx",
+          "sha256": "b66d7a9b71e012e7a246f0111afcada9168d2fc3d2a3bfe77126b7ba7e0209f1"
+        },
+        {
+          "path": "apps/web/src/lib/take-home.container.tsx",
+          "sha256": "4a6269e131fe06778f18fc092e51a5057a717993947cb808b4a89ff6f291980d"
+        },
+        {
+          "path": "apps/web/src/lib/take-home.view.tsx",
+          "sha256": "ae94021833b717a0e3eb800e43860ca61a7a06964c08e4f21688abe8c4a5a61e"
+        },
+        {
+          "path": "apps/web/src/styles.css",
+          "sha256": "8ff41e4b031a31e9ea8f0185f1547de6351edacda66a0a3ebd3caa7a2a6e2e58"
+        },
+        {
+          "path": "apps/web/test/native-pair.boundary.test.ts",
+          "sha256": "aad37a2763f3ec53db8c514c09aedfa86298b2529b219d3422fe8055c79f3aab"
+        },
+        {
+          "path": "docs/architecture/frontend.md",
+          "sha256": "577dec564f10cb3bf27b7fc09bd551f0ab667e23a6a3862b33534fe9ee3af061"
+        },
+        {
+          "path": "docs/architecture/testing-and-quality.md",
+          "sha256": "a153192bb707a42f953ee9dacc9f6230a301083293a395678a3df71a4fde98da"
+        },
+        {
+          "path": "docs/documentation-audit/README.md",
+          "sha256": "f233e2943fcdbb5f37111d40bba9dabe66bf0187b402764c521e5302bc97df73"
+        },
+        {
+          "path": "docs/exec-plans/active/clean-slate-foundation.md",
+          "sha256": "0d0b87ca8c05d3a2bda1ea4af106e01ea12bef1406355ad82a70643ba4319aea"
+        },
+        {
+          "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+          "sha256": "715fa99d5c7b74a6b07a8e067632dafe8eb08a446c7e2e9f6fa8ba31f803c9eb"
+        },
+        {
+          "path": "docs/verification/critical-journeys.json",
+          "sha256": "e646e18dbba8c3ea54c7c9a7aa383a9ce1382535607b6deb566662ed995f19cd"
+        }
+      ],
+      "sha256": "387db11fff8343d1d073e39e24c69d443d78be0f1fa17b9db6a13efe5e1dd476",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this receipt to avoid self hashing."
+    }
+  },
+  "parentHostedProof": {
+    "pullRequest": 137,
+    "headCommit": "8e4236e1a9c596c3a5d3762d3ac1d4c150393edf",
+    "runId": 37260854862,
+    "jobId": 111607580162,
+    "outcome": "success",
+    "limitation": "Exact parent head passed; no hosted proof yet for this unpushed candidate.",
+    "completedAt": "2026-10-05T04:06:19Z"
+  },
+  "implementation": [
+    "Focused readonly result leaf renders the main answer and stale warning plus native details for breakdown, assumptions, supported year and sources.",
+    "All amounts, period, threshold choice and source references come from the checked report and recorded trace; current form edits cannot rewrite an old answer explanation.",
+    "Record.get and Option matching handle absent/unrecognised trace scale without inferring a threshold choice.",
+    "Valid HTTPS source references become links through URL.canParse plus HTTPS restriction; other general SourceRef references remain text. No new domain Schema or ingress contract.",
+    "No atom/client/runtime/storage/route/public package contract change; actual native no-JavaScript rendering shares the leaf. Pending-error display correction stays in the existing policy container.",
+    "Policy container hides previous request failure/interruption while a new request is waiting; form validation errors remain immediate. Successful saved-result navigation uses an actual private POST and real document connection, not synthetic captured HTML."
+  ],
+  "proof": [
+    {
+      "command": "initial complete native API/Website suite",
+      "outcome": "Pass: six tests in 41.98s, including collapsed details, keyboard Enter expansion, actual 1654-dollar gross/taxable and 353-dollar withholding values, exact ATO link and retained details after edits."
+    },
+    {
+      "command": "real private POST saved navigation and distinct native browser recovery",
+      "outcome": "Pass in 5.15s. Hydration makes no replay; after stale edit/controlled failure, one real RPC returns 1425 dollars for 2000 dollars weekly with threshold unclaimed; gross/taxable, 575-dollar withholding and recorded assumption update, stale warning clears."
+    },
+    {
+      "command": "remove container waiting check and run pending-retry browser oracle",
+      "outcome": "Rejected: actual old alert remains rendered during pending retry; one failed, 11 skipped in 2.03s. Exact source bytes restored in finally."
+    },
+    {
+      "command": "restored bun run web:test:browser",
+      "outcome": "Pass: 12 fresh browser checks in 3.00s; 13 tasks, 11 cached prerequisites and two fresh."
+    },
+    {
+      "command": "focused Website types/lint, docs/runbooks/root format",
+      "outcome": "Pass on restored source."
+    },
+    {
+      "command": "bun run test",
+      "outcome": "Pass: 470 fresh actual CLI cases including 406 portable in 59.97s; 27 app/package tasks, one fresh and 26 cached in 616ms."
+    },
+    {
+      "command": "bun run build",
+      "outcome": "Pass: 16 cached tasks in 229ms. Fresh native builds occur separately in complete verification."
+    },
+    {
+      "command": "bun run api:smoke then bun run --filter=api smoke",
+      "outcome": "First command passed from cache (12 tasks); direct app command freshly passed actual HTTP routes, temporary external consumer and cleanup without Turbo replay."
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "Pass, exit 0: 32 fresh Quality cases including 13 isolated copies in 520.83s, both unused-code checks, 27 type tasks (one fresh, 26 cached), actual Worker declaration checks, fresh native builds and all six native tests in 47.46s. SDK 24 and Website 12 browser checks replay from cache in this command; restored Website checks were freshly run above."
+    }
+  ],
+  "failedAttempts": [
+    {
+      "stage": "initial type/lint checks",
+      "observed": "URLString is internal rather than an exported Schema; unchecked trace record index rejected.",
+      "recovery": "Use Record.get with Option handling; preserve all enforcement."
+    },
+    {
+      "stage": "first link browser checks",
+      "observed": "Encoded URL Schema only checks annotated text, so malformed https:// becomes a link.",
+      "recovery": "Platform URL validity plus HTTPS restriction; negative source-reference fixtures remain required."
+    },
+    {
+      "stage": "mechanical correction",
+      "observed": "Formatted multi-line Schema guard was not replaced by the first textual edit; type checks catch the missing Schema import and browser cases fail.",
+      "recovery": "Replace exact guard, inspect source, rerun types/browser checks."
+    },
+    {
+      "stage": "distinct successful RPC after synthetic saved-document fulfillment",
+      "observed": "Repeated native browser attempts time out at the 1425-dollar result. Exact private/public Worker calls return 200 with the expected report; browser console reports loopback permission denied by Local Network Access. Controlled mock response works but subsequent real fetch fails. Diagnostic code is removed.",
+      "recovery": "Successful saved navigation continues to actual Website private POST with original form and one-use route override; one-use unavailable response then real success pass. No browser security/permission or transport change. Earlier synthetic fixture proves display/hydration and intercepted failure only."
+    },
+    {
+      "stage": "temporary diagnostic only",
+      "observed": "One mechanical source selector did not match and one diagnostic used Response.status as a method; both attempts stayed failed and had no acceptance claim.",
+      "recovery": "Inspect exact formatted source and native Response contract; remove all temporary diagnostic code before qualification."
+    },
+    {
+      "stage": "post-check formatting invocation",
+      "observed": "Explicit receipt/Markdown write targets are excluded by repository formatting rules, so the invocation reports no target; it changes no files.",
+      "recovery": "The owning whole-repository format check passes; preserve the excluded document format and run docs/runbook validation."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "surface": "private result rendering and native/browser qualification",
+      "owners": [
+        "apps/web/src/lib/take-home.view.tsx",
+        "apps/web/src/lib/take-home-result.view.tsx",
+        "apps/web/src/styles.css",
+        "apps/web/test/native-pair.boundary.test.ts",
+        "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "apps/web/src/lib/take-home.container.tsx"
+      ],
+      "postcondition": "Actual report explanation expands by keyboard, retains report amounts/assumptions after form edits and renders only valid HTTPS links. Old request alert stays hidden during a pending retry; actual saved POST navigation permits real subsequent RPC."
+    },
+    {
+      "decision": "Change required",
+      "surface": "current behaviour and proof routes",
+      "owners": [
+        "apps/web/README.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/verification/critical-journeys.json",
+        "docs/documentation-audit/README.md"
+      ],
+      "postcondition": "Q11 bounded implementation described at durable owners; T004 incomplete and parent hosted status distinguished."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "canonical contracts, lifetimes, operations and enforcement",
+      "owners": [
+        "packages/core",
+        "packages/rules",
+        "packages/calculators",
+        "packages/api",
+        "packages/sdk",
+        "packages/docs-content",
+        "apps/web/src/lib/calculator.atoms.ts",
+        "apps/api",
+        "apps/docs",
+        "packages/infrastructure",
+        "alchemy.apps.run.ts",
+        "alchemy.apps.local.run.ts",
+        ".agents/skills",
+        "oxlint.config.ts",
+        ".github/workflows",
+        "docs/runbooks",
+        "docs/operations"
+      ],
+      "reason": "No rules/results, public Schema/export/HTTP/OpenAPI/SDK/MDX, runtime/client, platform configuration, skill, lint-policy or operation change."
+    },
+    {
+      "decision": "N/A",
+      "surface": "Changeset",
+      "reason": "Private app rendering and qualification only, no published package interface."
+    }
+  ],
+  "limitations": [
+    "T004 remains in progress for the other calculators, complete package/interface/transport/domain qualification and final review.",
+    "Report source references are retained rule evidence, not current-law or live ATO-site verification.",
+    "The three source fixtures qualify link/absence rendering, not tax correctness.",
+    "No provider, deployment, publication or exported safe-trace proof.",
+    "Medicare decision unresolved; retained results unchanged."
+  ],
+  "rollback": {
+    "identity": "8e4236e1a9c596c3a5d3762d3ac1d4c150393edf",
+    "action": "Revert this private app slice; exact source fixtures restore and scoped local processes stop. No provider operation."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for bounded take-home explanation and retry-display slice; whole T004 incomplete",
+    "observations": [
+      "Presentation-only leaf; no duplicate tax calculation or live browser engine.",
+      "Old report trace controls changing threshold assumptions; absent scale implies no choice.",
+      "Keyboard expansion and actual canonical native answer prevent decorative-only explanation from passing.",
+      "Earlier saved-document fixture lacked a real successful recovery oracle; physical private POST and distinct subsequent success now qualify that boundary. Previous-error waiting correction is a separate policy-container issue."
+    ],
+    "remaining": "Exact candidate hosted checks and draft review; other calculator pages, complete T004 interface/transport/domain qualification and DEV-76–81 remain unfinished."
+  },
+  "references": [
+    {
+      "url": "https://developer.chrome.com/blog/local-network-access?hl=en",
+      "claim": "Chrome Local Network Access can restrict public-to-loopback requests; exact synthetic-navigation cause comes from local before/after browser evidence, not an explicit statement in this article."
+    }
+  ],
+  "environment": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "node": "v24.16.0",
+    "bun": "1.4.2",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and this receipt only after full verification; executable sources unchanged.",
+    "verification": "Pass: docs/runbooks/root format/Changeset status and whitespace after evidence updates; receipt-only docs repeated before commit."
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 71,
+      "sha256": "2e99e6d704cc14caccebf0d63663d5e0b8acfe31582c1944ebb4be5bbe498534"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 14,
+      "sha256": "1e4e10e300c1a4b460ba9289024fba9c07a45452b43bba618eca257c4a4c031f"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 3,
+      "sha256": "1682e046cb05ebf9df7b8086e97cc0134dec4bc1cc08492dd238f42d19e02c8a"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 14,
+      "sha256": "f35e87345bccb7cadddddd50b9c9d157a1b1fc77f7cbe6be26553e35838a8262"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "57f03295bccc40314378c9061fc283be52538eab75efc52673510734cf27a8a7"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "4cd8c58b7fe7940c7169d1924aaabd60c63f85b8708bcbfe0d02524f69f008b2"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "c13962c1c74969daef0aff2948c50569ddeec9ef94c3f677e0387e473bdb0044"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "5c602294c0630779e8b37405b1fa20479f391ad8f162bb37365582d30f2f280a"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular file under each named root."
+}

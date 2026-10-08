@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-07T08:33:44Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "20afcb45152de5660b3adb5354fb4b113cf0ab8e210fdf4d34ea812d63514ca7",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/navigation.json"
+}

@@ -1,0 +1,1639 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "primitive constructors, date codecs, arithmetic, rules or examples change",
+  "outcome": "Pass for local fallible money/decimal/calendar values and safe derived arithmetic; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-fallible-domain-values",
+    "baseCommit": "390c3cd143ac31f787b646b8795b59bc66df2cbc",
+    "sources": [
+      {
+        "path": ".changeset/fallible-money-calendar.md",
+        "sha256": "8b202fc9be8c49033f93e4bdc8b7008061a5a83c95dd241c3cca3c79a2879026"
+      },
+      {
+        "path": "apps/api/scripts/routes.ts",
+        "sha256": "798a408a6fa25913d9e224b8bcf691ce8a7ebe0b5450aed9a932a1099abb9dbf"
+      },
+      {
+        "path": "apps/api/scripts/smoke-boundaries.test.ts",
+        "sha256": "b3973d8b35e7f1efb18eaef2a7bc8ff49e9d4895749b00d53111210656e6e53f"
+      },
+      {
+        "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "sha256": "9ad03745f5d36a9f97c439bceaca1e99430bcf150093665080e4a388a32c2d9b"
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "b0359b899c30a2b4a62de9c1847a816ec5527777bdb8dcd252bd8a410051f39a"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "6206e0505cfc07b75fce32b88ccd6b9a65d8c138adfea25a92ed0c5be6dfc9e1"
+      },
+      {
+        "path": "docs/architecture/graph-trace-ledgers.md",
+        "sha256": "3f45ea65241a6acacf3420fcde2ea2f7e7172a5c630b3533553d85fa650c20f1"
+      },
+      {
+        "path": "docs/architecture/rules-and-parameters.md",
+        "sha256": "1e09224d6e1672370ac78c1237fc9420ad5e7c61f5f2c4801e6b665015186a84"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "19c810040832b119e5a1e0e4fa64f4319ab251456da8168650cf9c7efd4e4824"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "65f356c53fca073e76b4f720937ed697e0b12b53bf218e286531235477460fe8"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "d6de8539162f6061b45de48fe0f3f307d73e96b62a2a4461c78f03902ff521f7"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "d8238511893ce8cb71d0968022dbb5c95536b646d3fb2cf3e5d8c82f2b8cdaea"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "1914fb9678e5d35ae7f9103bc0257acdbe680afbcff435276db3e201fb29e355"
+      },
+      {
+        "path": "docs/standards/documentation-writing.md",
+        "sha256": "96ea36bdfc573d05410c8a1f8ccb0d5a46e30e660d1ab557c546c04c8729074d"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "15dc0ce43fd84a3c36fa9115b2cd3d02e2add058bf027c4df177583463e1ab2e"
+      },
+      {
+        "path": "packages/api/http/__tests__/public-calculation-api.test.ts",
+        "sha256": "db51f932620bb29f2bd15133924c211060a5148b8988dc82588476b88f2aa4af"
+      },
+      {
+        "path": "packages/api/rpc/src/__testing__/fixtures.ts",
+        "sha256": "76d7af12e7c55a2e838539c1e80b1dca69ec1a9a8c069110de1dbee257147b7b"
+      },
+      {
+        "path": "packages/calculators/__tests__/calculation-work.test.ts",
+        "sha256": "be842666063f1f6b5e8691a145d997ad67f99f5fbdc7a8c1e0875d600530cb5d"
+      },
+      {
+        "path": "packages/calculators/__tests__/public-calculator-service.test.ts",
+        "sha256": "816b66eba0de45a094488bcdeea62d353fe7d28579bb032d09326a1b2d7ebaa8"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "3be2424e4ab57f638cf59afe80a318dba482f39238d739914fc82ebabf1d7521"
+      },
+      {
+        "path": "packages/core/package.json",
+        "sha256": "80042373b3e808beee5963d618b8659e5754cc562119f289ae7873cf02b30caf"
+      },
+      {
+        "path": "packages/core/src/graph/rule-graph.ts",
+        "sha256": "50ac8fbae7f6ffb88014d5a5990f1d0812cc9029a25420e4c2840f6e7336fd45"
+      },
+      {
+        "path": "packages/core/src/index.ts",
+        "sha256": "4bad506ad7995b9db87c254faef5ffed16e5441b8bccfd83dad7d5d6d5a9e0c8"
+      },
+      {
+        "path": "packages/core/src/ledger/component.ts",
+        "sha256": "e8304368580f1159cf679e862332ba633e6e72167c60c451f49461027059e450"
+      },
+      {
+        "path": "packages/core/src/parameters/descriptor.ts",
+        "sha256": "65f93f5348bdfd9a84d69c5979f1c839b9c7d5492034ca5d6a1c3df6e1b93772"
+      },
+      {
+        "path": "packages/core/src/primitives/date.ts",
+        "sha256": "01c80dbc76c081072ffb97aa615a807108261a3f95c4c4bb585c6ee044a6424c"
+      },
+      {
+        "path": "packages/core/src/primitives/errors.ts",
+        "sha256": "d8928ed4b713a20c7bee4ad11109fccd3158717ee5dbff896c950294bd601afb"
+      },
+      {
+        "path": "packages/core/src/primitives/index.ts",
+        "sha256": "35e5fb10bbe3fb04ab6d85e9792325a67fd4f17722baf29a70f530d41e75f30b"
+      },
+      {
+        "path": "packages/core/src/primitives/money.ts",
+        "sha256": "858fdda31d5207baaf809ac40c49aee35a93bd9146e6627376ec1a45c5c30653"
+      },
+      {
+        "path": "packages/core/src/primitives/rounding.ts",
+        "sha256": "ce86dd7a7aead01eac11ded6f3a0f60c5e03efc3c66772d9a2c13fc729d609cb"
+      },
+      {
+        "path": "packages/core/src/primitives/tax.ts",
+        "sha256": "f6fc59fce404f6fb555ed41f3a19a4abdc904811cddecb64c351ffdeba2ffc01"
+      },
+      {
+        "path": "packages/core/test/date.test.ts",
+        "sha256": "128c87119869904759c02467d01883a7e20eca1d4934f069624932b6485e20ff"
+      },
+      {
+        "path": "packages/core/test/money.test.ts",
+        "sha256": "573425c7b015f128cdf3395a5a93c863f4b41b742c6748136ec9736e49f5e222"
+      },
+      {
+        "path": "packages/core/tsconfig.build.json",
+        "sha256": "e2217c9b3b66ffa46f49fe557754845f339bc67fe6cc89cebf957a7596cf5cfe"
+      },
+      {
+        "path": "packages/core/tsconfig.json",
+        "sha256": "a28d81bcfe345b0971c514192ac268652176c8eaaa1c8b3d46e54bd86bac43d9"
+      },
+      {
+        "path": "packages/docs-content/README.md",
+        "sha256": "d9c37be86c4eae89b1060bbf62694d95926818b29d18c5dd0a6e25f8de0a52d5"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/facts.mdx",
+        "sha256": "1f04c34beb48d095a440378cf83580d496ce1bffeeea68a8f71e1e266b639943"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+        "sha256": "7174765029fffee20ef5e3be83534f8c4b14afd8c7818eab6862bd13cc156917"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/reports.mdx",
+        "sha256": "ee01630caf2ca244e9220567b5036511d76b55a5e6a4b4cfbf4f6ef082fccaa8"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+        "sha256": "ca00c1043b7a5ee9acbf7a83967fddc454146d1432d8501d8652d6fa70d5038e"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx",
+        "sha256": "0855263494fa492ffaf70b3f89d5236cffb6ed39ac755dbd64239777f772a0d5"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+        "sha256": "ed043b2bd3997face8730a85d77f33e1f9f2f8fe6c64a139ede2c8729644eee7"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+        "sha256": "e45eaa92b1c5684822f44a696d0bd8c31e56d69255455cc9e54b24b7adf496dd"
+      },
+      {
+        "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+        "sha256": "cb977a7b6b40905c3893c2a7657b15e310989260b5ca53794b326bd78bed54f3"
+      },
+      {
+        "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+        "sha256": "01163bf73271c5136fbc8260055fb66954404bb4c54b3801261542b6429d3de1"
+      },
+      {
+        "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+        "sha256": "0c44abafd2e51dd9eea702352dbf50e1d1181e1829c1dc63922f417e836e8c02"
+      },
+      {
+        "path": "packages/docs-content/content/reference/sdk.mdx",
+        "sha256": "81547abcf0f6c6048df5d05ec95a67aec90b47f26ccc43493f6ab33ca24a1f6a"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+        "sha256": "c241bac198e34b38dc70756a2d1080f0e255718463a6b754ebd78e7ea8e2d7b4"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+        "sha256": "d536fd323b56bbe30a2a07d9c10d91bef4c5ef23af87a9346a2c8c2728954b5a"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/safe-sdk.mdx",
+        "sha256": "352722a84d73233aa71811fedd01edb5854a95d2127c2aaacd495029a2ea6cd1"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/type-safety.mdx",
+        "sha256": "17fc46dc9c875af7d805488e019b1875b0c80d1fb72a9c83daf94054721e53aa"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/typescript-sdk.mdx",
+        "sha256": "7e44eb92a2244fb44157b9f69903478a70b39728e4d41717d10d31c792d30d8f"
+      },
+      {
+        "path": "packages/docs-content/content/start/install-the-sdk.mdx",
+        "sha256": "df1f4fe5ef62ad0eec275fb4471fa99ed75f850e15e4a4e4c82fba04654cfabd"
+      },
+      {
+        "path": "packages/docs-content/content/start/quickstart.mdx",
+        "sha256": "85d4889b0a595e07c97a23458fc93c69c1e8729f5112e727e32fe37eca537a17"
+      },
+      {
+        "path": "packages/docs-content/content/start/run-your-first-calculation.mdx",
+        "sha256": "b2bd83edba89c207a6b9193fe0ce9cb6254d93676b589beef3b4a3c278719c26"
+      },
+      {
+        "path": "packages/docs-content/examples/browser-http.ts",
+        "sha256": "d85f2a195b6b7bc69e8b5438522a2710349d71a4a8b1b8e99e2510d6e3c57f14"
+      },
+      {
+        "path": "packages/docs-content/examples/effect.ts",
+        "sha256": "8ce551aa1d508267ee211d88a7bcd5883941ba8fdb8e371be9ea9f5a8f2b29a5"
+      },
+      {
+        "path": "packages/docs-content/examples/error-handling.ts",
+        "sha256": "77616e6e6803778d226f1e7911cfbaf15300e611582a136dcfa1ba4f149aa570"
+      },
+      {
+        "path": "packages/docs-content/examples/node-server.ts",
+        "sha256": "615696a109f00a22c8b7adeeca0d23a0e3b0c3598cb03c8d374db5c60fedb908"
+      },
+      {
+        "path": "packages/rules/au/income-tax/README.md",
+        "sha256": "67a3df0c44e99cea7441d9581ea03700a6030768d72037a5f859f72d7aca0634"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/calculator/annual-tax.ts",
+        "sha256": "53724dced811b1655efba155f200a3361582d66653268d3695c1857d43c2ca03"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/facts/income.ts",
+        "sha256": "50f91cb21707bd342a7adda3df981377e0790eaa5bee5d6a88176e7174e44bfe"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/income-tax-table.ts",
+        "sha256": "1f041b31f1b8c9365ab097fc4faf0f967c7151467d3a3db2b211b982fecfdce9"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/lito-table.ts",
+        "sha256": "c8993a7ed77e0bfd004e9d93780d7f701df080519020ed59f07a6772c90418e0"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/medicare-levy-table.ts",
+        "sha256": "6000b9e4888fcab224a585ddfea28d23188f295faa340e4bcd9a3a208a618d15"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/annual-tax-ledger.ts",
+        "sha256": "d8ccd6480b2018f7a7921e54865f2c2960cecc5f45404e73aad0cdf6aed06fdd"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/income-tax.ts",
+        "sha256": "fe4b0592d054ad3fc14af4b0f26b58b9adb166a60d8270cf3930cc046c3b5673"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/lito.ts",
+        "sha256": "08923de3ed8702667fb373fa33c3c952f2675b6a6dda392b89c8272b8ab2615d"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/medicare-levy.ts",
+        "sha256": "d5673e8ba3a702018cf164becc882bb3eae9856493d019442e3cfa25f946fd6c"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/annual-tax.test.ts",
+        "sha256": "f9a3251ca00dd9a5623e9c786b3a488fb5bf7dc3636f6d2b0d9dfe595306cd9b"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/rule-graph.test.ts",
+        "sha256": "21aa20974cfcfc89eab703cd5ebc52a6692d4bb8999b9200d20fddc0d51c5c87"
+      },
+      {
+        "path": "packages/rules/au/pay/README.md",
+        "sha256": "76c4b85826afaabdf5aface6587a5321c0b1dc369ff239cf15f7d7f3a7e8e7a2"
+      },
+      {
+        "path": "packages/rules/au/pay/src/facts/pay.ts",
+        "sha256": "49ddeed21ab45ae61833c62dc14a4105e43b8fd5edfa808d0b904b3d905ab73d"
+      },
+      {
+        "path": "packages/rules/au/pay/src/facts/sacrifice.ts",
+        "sha256": "ce4542795f9841ba5fdcbad0533cd135d456e404a4b0f4050aadd1ecc90b39b6"
+      },
+      {
+        "path": "packages/rules/au/pay/src/parameters/schedule1.ts",
+        "sha256": "3c7480416e02cf263372bb41cfbc8f97b33adfe1b24d034d15b7d119ca29d825"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/net-pay.ts",
+        "sha256": "047ced68dc19ccd040056a3d3dec58f58f6a3028abf55dd744fe3c355bef3104"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/payg-withholding.ts",
+        "sha256": "bd3948455020d8c72ce5028bddef7de6ff47d9a3a2d818bf24b845dddbdc7642"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/taxable-pay-with-sacrifice.ts",
+        "sha256": "a491b80bee898c8ef6195fa0de39184bfa90693b6bb4b12cbc2b70a3d238fecb"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/withholdings-ledger.ts",
+        "sha256": "e8573d7b2705b987cbaaa5e9d5145755eaa427cd29fe1b3a4f41436ed79e657a"
+      },
+      {
+        "path": "packages/rules/au/pay/test/rule-graph.test.ts",
+        "sha256": "264f805f484222d998a679b853f872b1111708b4ed968717b35b4dbfc177d9ce"
+      },
+      {
+        "path": "packages/rules/au/pay/test/take-home-pay.test.ts",
+        "sha256": "2ad5955801b54a8769bff2b04b4cbb0548ced9493a6142ee0ce90f52183922df"
+      },
+      {
+        "path": "packages/rules/au/stsl/README.md",
+        "sha256": "ceb322e8599e6ffd50389a5a74d0a32af3912b1953b873df0b04b22ab8708e4d"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/parameters/stsl-table.ts",
+        "sha256": "0439f695a82fa718929a28171d4b75ddf2e77840ea85e192e77c0c1414df8859"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/rules/stsl-component.ts",
+        "sha256": "33cd46173be9db73cce36a0270f03b458e859c33f08d155dafd0124c350768b3"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/rules/withholdings-ledger-with-stsl.ts",
+        "sha256": "1cbd8a3dd9a81bdb2b29d4dfa4b76ccf3ae818b3d38514192798b78ae4b3d8a4"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/rule-graph.test.ts",
+        "sha256": "ce581a7edc8e3a33ce0d71ee8354210ac2c2dd7c3fcd58ed03b0d639c96e3aad"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
+        "sha256": "109d341e21c4058aa6fd032407522f8ac6fd414d578aba22f7315ce10aee8f2d"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "d40f5bddbd53598444aa853e4b3110b94ff0e6940a980f9e4770cf34f460d80e"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "a2c94b0a38e1d72c99b7d204822e5a25be500cc033fdef49596a5331baab1094"
+      },
+      {
+        "path": "packages/sdk/typescript/src/au.test.ts",
+        "sha256": "1092f95aaad0227abdab64c2de6c37f1035402af0f85fb5cc4f0371aa3929649"
+      },
+      {
+        "path": "packages/sdk/typescript/src/client-lifetime.test.ts",
+        "sha256": "55a5fc6c78b55a2aaf3188f158fa3b0783eabf2412e010a6d46f91386a67fca2"
+      },
+      {
+        "path": "packages/sdk/typescript/src/effect.test.ts",
+        "sha256": "26479fa3e70357eda7e857eed344b4175e0acb86bef76e21788affb3ea2a84fd"
+      },
+      {
+        "path": "packages/sdk/typescript/src/index.test.ts",
+        "sha256": "7caf671e8711e8e78d383b86155c102b9f0b0d4c5558b97eca2903f49f9ddead"
+      },
+      {
+        "path": "packages/sdk/typescript/type-tests/effect-client.test.ts",
+        "sha256": "4a7b72404d1b7ec988f15a3985520a7b91e3e17012f0dd5080f3580d20b7f165"
+      },
+      {
+        "path": "packages/sdk/typescript/type-tests/plain-client.test.ts",
+        "sha256": "e6649ecd937e8f5ca9a872f3157f4d6993bcae401c77770e90a7afa17bc4923c"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "25297e1e30b91c4a353caa833ba084f99060845467fa18b10664bc862519ed9f"
+      }
+    ],
+    "sourcePolicy": "Bind final candidate source hashes after qualification; exclude this self-referential receipt and identify final plan updates separately.",
+    "qualifiedSources": [
+      {
+        "path": ".changeset/fallible-money-calendar.md",
+        "sha256": "8b202fc9be8c49033f93e4bdc8b7008061a5a83c95dd241c3cca3c79a2879026"
+      },
+      {
+        "path": "apps/api/scripts/routes.ts",
+        "sha256": "798a408a6fa25913d9e224b8bcf691ce8a7ebe0b5450aed9a932a1099abb9dbf"
+      },
+      {
+        "path": "apps/api/scripts/smoke-boundaries.test.ts",
+        "sha256": "b3973d8b35e7f1efb18eaef2a7bc8ff49e9d4895749b00d53111210656e6e53f"
+      },
+      {
+        "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "sha256": "9ad03745f5d36a9f97c439bceaca1e99430bcf150093665080e4a388a32c2d9b"
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "b0359b899c30a2b4a62de9c1847a816ec5527777bdb8dcd252bd8a410051f39a"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "6206e0505cfc07b75fce32b88ccd6b9a65d8c138adfea25a92ed0c5be6dfc9e1"
+      },
+      {
+        "path": "docs/architecture/graph-trace-ledgers.md",
+        "sha256": "3f45ea65241a6acacf3420fcde2ea2f7e7172a5c630b3533553d85fa650c20f1"
+      },
+      {
+        "path": "docs/architecture/rules-and-parameters.md",
+        "sha256": "1e09224d6e1672370ac78c1237fc9420ad5e7c61f5f2c4801e6b665015186a84"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "19c810040832b119e5a1e0e4fa64f4319ab251456da8168650cf9c7efd4e4824"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "65f356c53fca073e76b4f720937ed697e0b12b53bf218e286531235477460fe8"
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-fallible-domain-values.json",
+        "sha256": "0ff4d492d7c868aba9217307b0ee40c6bbac34927bed74cd8b0e11681a56c15f"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "9a4641580c02e565aa09eb67c7324328331e63a64799e6075d6d6f64e298ac0d"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "d8238511893ce8cb71d0968022dbb5c95536b646d3fb2cf3e5d8c82f2b8cdaea"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "1914fb9678e5d35ae7f9103bc0257acdbe680afbcff435276db3e201fb29e355"
+      },
+      {
+        "path": "docs/standards/documentation-writing.md",
+        "sha256": "96ea36bdfc573d05410c8a1f8ccb0d5a46e30e660d1ab557c546c04c8729074d"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "15dc0ce43fd84a3c36fa9115b2cd3d02e2add058bf027c4df177583463e1ab2e"
+      },
+      {
+        "path": "packages/api/http/__tests__/public-calculation-api.test.ts",
+        "sha256": "db51f932620bb29f2bd15133924c211060a5148b8988dc82588476b88f2aa4af"
+      },
+      {
+        "path": "packages/api/rpc/src/__testing__/fixtures.ts",
+        "sha256": "76d7af12e7c55a2e838539c1e80b1dca69ec1a9a8c069110de1dbee257147b7b"
+      },
+      {
+        "path": "packages/calculators/__tests__/calculation-work.test.ts",
+        "sha256": "be842666063f1f6b5e8691a145d997ad67f99f5fbdc7a8c1e0875d600530cb5d"
+      },
+      {
+        "path": "packages/calculators/__tests__/public-calculator-service.test.ts",
+        "sha256": "816b66eba0de45a094488bcdeea62d353fe7d28579bb032d09326a1b2d7ebaa8"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "3be2424e4ab57f638cf59afe80a318dba482f39238d739914fc82ebabf1d7521"
+      },
+      {
+        "path": "packages/core/package.json",
+        "sha256": "80042373b3e808beee5963d618b8659e5754cc562119f289ae7873cf02b30caf"
+      },
+      {
+        "path": "packages/core/src/graph/rule-graph.ts",
+        "sha256": "50ac8fbae7f6ffb88014d5a5990f1d0812cc9029a25420e4c2840f6e7336fd45"
+      },
+      {
+        "path": "packages/core/src/index.ts",
+        "sha256": "4bad506ad7995b9db87c254faef5ffed16e5441b8bccfd83dad7d5d6d5a9e0c8"
+      },
+      {
+        "path": "packages/core/src/ledger/component.ts",
+        "sha256": "e8304368580f1159cf679e862332ba633e6e72167c60c451f49461027059e450"
+      },
+      {
+        "path": "packages/core/src/parameters/descriptor.ts",
+        "sha256": "65f93f5348bdfd9a84d69c5979f1c839b9c7d5492034ca5d6a1c3df6e1b93772"
+      },
+      {
+        "path": "packages/core/src/primitives/date.ts",
+        "sha256": "01c80dbc76c081072ffb97aa615a807108261a3f95c4c4bb585c6ee044a6424c"
+      },
+      {
+        "path": "packages/core/src/primitives/errors.ts",
+        "sha256": "d8928ed4b713a20c7bee4ad11109fccd3158717ee5dbff896c950294bd601afb"
+      },
+      {
+        "path": "packages/core/src/primitives/index.ts",
+        "sha256": "35e5fb10bbe3fb04ab6d85e9792325a67fd4f17722baf29a70f530d41e75f30b"
+      },
+      {
+        "path": "packages/core/src/primitives/money.ts",
+        "sha256": "858fdda31d5207baaf809ac40c49aee35a93bd9146e6627376ec1a45c5c30653"
+      },
+      {
+        "path": "packages/core/src/primitives/rounding.ts",
+        "sha256": "ce86dd7a7aead01eac11ded6f3a0f60c5e03efc3c66772d9a2c13fc729d609cb"
+      },
+      {
+        "path": "packages/core/src/primitives/tax.ts",
+        "sha256": "f6fc59fce404f6fb555ed41f3a19a4abdc904811cddecb64c351ffdeba2ffc01"
+      },
+      {
+        "path": "packages/core/test/date.test.ts",
+        "sha256": "128c87119869904759c02467d01883a7e20eca1d4934f069624932b6485e20ff"
+      },
+      {
+        "path": "packages/core/test/money.test.ts",
+        "sha256": "573425c7b015f128cdf3395a5a93c863f4b41b742c6748136ec9736e49f5e222"
+      },
+      {
+        "path": "packages/core/tsconfig.build.json",
+        "sha256": "e2217c9b3b66ffa46f49fe557754845f339bc67fe6cc89cebf957a7596cf5cfe"
+      },
+      {
+        "path": "packages/core/tsconfig.json",
+        "sha256": "a28d81bcfe345b0971c514192ac268652176c8eaaa1c8b3d46e54bd86bac43d9"
+      },
+      {
+        "path": "packages/docs-content/README.md",
+        "sha256": "d9c37be86c4eae89b1060bbf62694d95926818b29d18c5dd0a6e25f8de0a52d5"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/facts.mdx",
+        "sha256": "1f04c34beb48d095a440378cf83580d496ce1bffeeea68a8f71e1e266b639943"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+        "sha256": "7174765029fffee20ef5e3be83534f8c4b14afd8c7818eab6862bd13cc156917"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/reports.mdx",
+        "sha256": "ee01630caf2ca244e9220567b5036511d76b55a5e6a4b4cfbf4f6ef082fccaa8"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+        "sha256": "ca00c1043b7a5ee9acbf7a83967fddc454146d1432d8501d8652d6fa70d5038e"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx",
+        "sha256": "0855263494fa492ffaf70b3f89d5236cffb6ed39ac755dbd64239777f772a0d5"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+        "sha256": "ed043b2bd3997face8730a85d77f33e1f9f2f8fe6c64a139ede2c8729644eee7"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+        "sha256": "e45eaa92b1c5684822f44a696d0bd8c31e56d69255455cc9e54b24b7adf496dd"
+      },
+      {
+        "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+        "sha256": "cb977a7b6b40905c3893c2a7657b15e310989260b5ca53794b326bd78bed54f3"
+      },
+      {
+        "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+        "sha256": "01163bf73271c5136fbc8260055fb66954404bb4c54b3801261542b6429d3de1"
+      },
+      {
+        "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+        "sha256": "0c44abafd2e51dd9eea702352dbf50e1d1181e1829c1dc63922f417e836e8c02"
+      },
+      {
+        "path": "packages/docs-content/content/reference/sdk.mdx",
+        "sha256": "81547abcf0f6c6048df5d05ec95a67aec90b47f26ccc43493f6ab33ca24a1f6a"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+        "sha256": "c241bac198e34b38dc70756a2d1080f0e255718463a6b754ebd78e7ea8e2d7b4"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+        "sha256": "d536fd323b56bbe30a2a07d9c10d91bef4c5ef23af87a9346a2c8c2728954b5a"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/safe-sdk.mdx",
+        "sha256": "352722a84d73233aa71811fedd01edb5854a95d2127c2aaacd495029a2ea6cd1"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/type-safety.mdx",
+        "sha256": "17fc46dc9c875af7d805488e019b1875b0c80d1fb72a9c83daf94054721e53aa"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/typescript-sdk.mdx",
+        "sha256": "7e44eb92a2244fb44157b9f69903478a70b39728e4d41717d10d31c792d30d8f"
+      },
+      {
+        "path": "packages/docs-content/content/start/install-the-sdk.mdx",
+        "sha256": "df1f4fe5ef62ad0eec275fb4471fa99ed75f850e15e4a4e4c82fba04654cfabd"
+      },
+      {
+        "path": "packages/docs-content/content/start/quickstart.mdx",
+        "sha256": "85d4889b0a595e07c97a23458fc93c69c1e8729f5112e727e32fe37eca537a17"
+      },
+      {
+        "path": "packages/docs-content/content/start/run-your-first-calculation.mdx",
+        "sha256": "b2bd83edba89c207a6b9193fe0ce9cb6254d93676b589beef3b4a3c278719c26"
+      },
+      {
+        "path": "packages/docs-content/examples/browser-http.ts",
+        "sha256": "d85f2a195b6b7bc69e8b5438522a2710349d71a4a8b1b8e99e2510d6e3c57f14"
+      },
+      {
+        "path": "packages/docs-content/examples/effect.ts",
+        "sha256": "8ce551aa1d508267ee211d88a7bcd5883941ba8fdb8e371be9ea9f5a8f2b29a5"
+      },
+      {
+        "path": "packages/docs-content/examples/error-handling.ts",
+        "sha256": "77616e6e6803778d226f1e7911cfbaf15300e611582a136dcfa1ba4f149aa570"
+      },
+      {
+        "path": "packages/docs-content/examples/node-server.ts",
+        "sha256": "615696a109f00a22c8b7adeeca0d23a0e3b0c3598cb03c8d374db5c60fedb908"
+      },
+      {
+        "path": "packages/rules/au/income-tax/README.md",
+        "sha256": "67a3df0c44e99cea7441d9581ea03700a6030768d72037a5f859f72d7aca0634"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/calculator/annual-tax.ts",
+        "sha256": "53724dced811b1655efba155f200a3361582d66653268d3695c1857d43c2ca03"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/facts/income.ts",
+        "sha256": "50f91cb21707bd342a7adda3df981377e0790eaa5bee5d6a88176e7174e44bfe"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/income-tax-table.ts",
+        "sha256": "1f041b31f1b8c9365ab097fc4faf0f967c7151467d3a3db2b211b982fecfdce9"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/lito-table.ts",
+        "sha256": "c8993a7ed77e0bfd004e9d93780d7f701df080519020ed59f07a6772c90418e0"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/medicare-levy-table.ts",
+        "sha256": "6000b9e4888fcab224a585ddfea28d23188f295faa340e4bcd9a3a208a618d15"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/annual-tax-ledger.ts",
+        "sha256": "d8ccd6480b2018f7a7921e54865f2c2960cecc5f45404e73aad0cdf6aed06fdd"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/income-tax.ts",
+        "sha256": "fe4b0592d054ad3fc14af4b0f26b58b9adb166a60d8270cf3930cc046c3b5673"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/lito.ts",
+        "sha256": "08923de3ed8702667fb373fa33c3c952f2675b6a6dda392b89c8272b8ab2615d"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/medicare-levy.ts",
+        "sha256": "d5673e8ba3a702018cf164becc882bb3eae9856493d019442e3cfa25f946fd6c"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/annual-tax.test.ts",
+        "sha256": "f9a3251ca00dd9a5623e9c786b3a488fb5bf7dc3636f6d2b0d9dfe595306cd9b"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/rule-graph.test.ts",
+        "sha256": "21aa20974cfcfc89eab703cd5ebc52a6692d4bb8999b9200d20fddc0d51c5c87"
+      },
+      {
+        "path": "packages/rules/au/pay/README.md",
+        "sha256": "76c4b85826afaabdf5aface6587a5321c0b1dc369ff239cf15f7d7f3a7e8e7a2"
+      },
+      {
+        "path": "packages/rules/au/pay/src/facts/pay.ts",
+        "sha256": "49ddeed21ab45ae61833c62dc14a4105e43b8fd5edfa808d0b904b3d905ab73d"
+      },
+      {
+        "path": "packages/rules/au/pay/src/facts/sacrifice.ts",
+        "sha256": "ce4542795f9841ba5fdcbad0533cd135d456e404a4b0f4050aadd1ecc90b39b6"
+      },
+      {
+        "path": "packages/rules/au/pay/src/parameters/schedule1.ts",
+        "sha256": "3c7480416e02cf263372bb41cfbc8f97b33adfe1b24d034d15b7d119ca29d825"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/net-pay.ts",
+        "sha256": "047ced68dc19ccd040056a3d3dec58f58f6a3028abf55dd744fe3c355bef3104"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/payg-withholding.ts",
+        "sha256": "bd3948455020d8c72ce5028bddef7de6ff47d9a3a2d818bf24b845dddbdc7642"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/taxable-pay-with-sacrifice.ts",
+        "sha256": "a491b80bee898c8ef6195fa0de39184bfa90693b6bb4b12cbc2b70a3d238fecb"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/withholdings-ledger.ts",
+        "sha256": "e8573d7b2705b987cbaaa5e9d5145755eaa427cd29fe1b3a4f41436ed79e657a"
+      },
+      {
+        "path": "packages/rules/au/pay/test/rule-graph.test.ts",
+        "sha256": "264f805f484222d998a679b853f872b1111708b4ed968717b35b4dbfc177d9ce"
+      },
+      {
+        "path": "packages/rules/au/pay/test/take-home-pay.test.ts",
+        "sha256": "2ad5955801b54a8769bff2b04b4cbb0548ced9493a6142ee0ce90f52183922df"
+      },
+      {
+        "path": "packages/rules/au/stsl/README.md",
+        "sha256": "ceb322e8599e6ffd50389a5a74d0a32af3912b1953b873df0b04b22ab8708e4d"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/parameters/stsl-table.ts",
+        "sha256": "0439f695a82fa718929a28171d4b75ddf2e77840ea85e192e77c0c1414df8859"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/rules/stsl-component.ts",
+        "sha256": "33cd46173be9db73cce36a0270f03b458e859c33f08d155dafd0124c350768b3"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/rules/withholdings-ledger-with-stsl.ts",
+        "sha256": "1cbd8a3dd9a81bdb2b29d4dfa4b76ccf3ae818b3d38514192798b78ae4b3d8a4"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/rule-graph.test.ts",
+        "sha256": "ce581a7edc8e3a33ce0d71ee8354210ac2c2dd7c3fcd58ed03b0d639c96e3aad"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
+        "sha256": "109d341e21c4058aa6fd032407522f8ac6fd414d578aba22f7315ce10aee8f2d"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "d40f5bddbd53598444aa853e4b3110b94ff0e6940a980f9e4770cf34f460d80e"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "a2c94b0a38e1d72c99b7d204822e5a25be500cc033fdef49596a5331baab1094"
+      },
+      {
+        "path": "packages/sdk/typescript/src/au.test.ts",
+        "sha256": "1092f95aaad0227abdab64c2de6c37f1035402af0f85fb5cc4f0371aa3929649"
+      },
+      {
+        "path": "packages/sdk/typescript/src/client-lifetime.test.ts",
+        "sha256": "55a5fc6c78b55a2aaf3188f158fa3b0783eabf2412e010a6d46f91386a67fca2"
+      },
+      {
+        "path": "packages/sdk/typescript/src/effect.test.ts",
+        "sha256": "26479fa3e70357eda7e857eed344b4175e0acb86bef76e21788affb3ea2a84fd"
+      },
+      {
+        "path": "packages/sdk/typescript/src/index.test.ts",
+        "sha256": "7caf671e8711e8e78d383b86155c102b9f0b0d4c5558b97eca2903f49f9ddead"
+      },
+      {
+        "path": "packages/sdk/typescript/type-tests/effect-client.test.ts",
+        "sha256": "4a7b72404d1b7ec988f15a3985520a7b91e3e17012f0dd5080f3580d20b7f165"
+      },
+      {
+        "path": "packages/sdk/typescript/type-tests/plain-client.test.ts",
+        "sha256": "e6649ecd937e8f5ca9a872f3157f4d6993bcae401c77770e90a7afa17bc4923c"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "25297e1e30b91c4a353caa833ba084f99060845467fa18b10664bc862519ed9f"
+      }
+    ]
+  },
+  "implementation": [
+    "Pure aud requires checked Cents; new audFromCents checks arbitrary numbers through InvalidMoneyValue.",
+    "Dollar construction, arithmetic, rounding, exact decimal conversion and ledger totals return Effects with checked errors.",
+    "Rules map expected amount failures to fixed CalculationError messages; buildPayWithholdingsLedger returns an Effect.",
+    "DateInterval end Option levels preserve missing keys, explicit undefined keys and finite dates; both representations share one ordering predicate.",
+    "Australian year helper validates the entire label and both representable July boundaries; absent interval end is unbounded.",
+    "Core tests are included in the existing type command; source-only build output and installed dependency versions are retained.",
+    "Public literal examples use checked cents; browser/server fences match package-owned programs.",
+    "Exact decimal-to-cent rounding bounds powers for admitted extreme exponents, rejecting oversized non-zero results and rounding tiny values to zero without a BigInt defect."
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "packages/core/README.md",
+        "packages/rules/au/pay/README.md",
+        "packages/rules/au/income-tax/README.md",
+        "packages/rules/au/stsl/README.md",
+        "packages/sdk/typescript/README.md",
+        "packages/docs-content/README.md"
+      ],
+      "reason": "Changed public constructor/domain types, checked errors, rule helper return type, consumer checks and examples."
+    },
+    {
+      "decision": "Change required",
+      "owners": [
+        "docs/architecture/effect-services.md",
+        "docs/architecture/rules-and-parameters.md",
+        "docs/architecture/graph-trace-ledgers.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/standards/documentation-writing.md",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "packages/core/tsconfig.json",
+        "packages/core/tsconfig.build.json",
+        "packages/core/package.json",
+        "bun.lock"
+      ],
+      "reason": "Canonical error and date representations, derived-value checks, compiler coverage and narrowly tested encoding/decoding admissions."
+    },
+    {
+      "decision": "Change required",
+      "owners": [
+        "docs/product-specs/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/README.md",
+        ".changeset/fallible-money-calendar.md"
+      ],
+      "reason": "Current implementation direction, dated proof and deliberate major interface changes."
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "tax tables/source artifacts/golden results",
+        "HTTP/RPC/OpenAPI encoded contracts",
+        "public MDX/navigation lifecycle",
+        "installed dependency versions",
+        "canonical skills",
+        "CI/release commands",
+        "provider/credential configuration"
+      ],
+      "reason": "No tax correction, publication, new command, dependency upgrade, provider operation or broad policy exception."
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "operational runbooks",
+        "deployment/publication/registry proof"
+      ],
+      "reason": "No new operation or consequential external mutation."
+    }
+  ],
+  "compatibility": {
+    "tableComparisons": 15,
+    "tables": [
+      {
+        "name": "income-tax",
+        "hashes": {
+          "table": "9258a71a24c9a26dd43466a4940c7140a023ccff846969b1247a59ddd2e16aad",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "39297168ce7bad1fed76c32eae48841eaeebb71f32a479c63c472e0d66204c90"
+        }
+      },
+      {
+        "name": "lito",
+        "hashes": {
+          "table": "5c6a5944cf83fea770c887e4fedc5da7d7c6bb1540c885232692a83e701eb872",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "1c9681f9ac534e9a8fe638f01b7f09f18955b60a3a019858085aa373aefe6002"
+        }
+      },
+      {
+        "name": "medicare-levy",
+        "hashes": {
+          "table": "a4c9271a2d82c7f403ca1819f59937c21e036bf0da978c45c250051b4a856cf8",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "502caaaebe081be3b6abbc7dedf20daccf66acaa060089e017ff3dbf498d23e2"
+        }
+      },
+      {
+        "name": "schedule1",
+        "hashes": {
+          "table": "b0799054e0f0f792b3aad2ba0571f88f6aeee8f100eb02cdca96fc81c33ce645",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "e6cc36f12b35c22c206f9f4e7b0aadee5cc5752f399c88569ac3590d871cbc34"
+        }
+      },
+      {
+        "name": "stsl",
+        "hashes": {
+          "table": "ca94be8c2b5818381824d4a4f100789a35794312c5a00984ea1e83a8bfc366fe",
+          "period": "ce72cb303a5db02f62aefe810e606ce988084bb990b0153cbd3b1d89ae186e36",
+          "artifact": "4981834012bdbb02e22b0aab02e7fb2208cd80e81c400b1bf01147a2b8f6135b"
+        }
+      }
+    ],
+    "baselineSha256": "38059246863e2577cf96f5991aec8eb1b439c58fdd718fc7827203c0329c4f9e",
+    "finalComparison": "All five table values, effective periods and source-artifact encodings equal the saved actual pre-change bytes.",
+    "baselineMethod": "Seven original Core source files temporarily restored from parent Git, probe run with installed Effect, all candidate bytes restored in finally before other work.",
+    "historicalDateForms": [
+      "missing end key",
+      "present undefined end key",
+      "finite end key"
+    ],
+    "goldenPolicy": "Existing expected results and rule descriptor snapshots retained."
+  },
+  "negativeControls": [
+    {
+      "control": "derived-guard",
+      "exitCode": 1,
+      "durationSeconds": 0.37,
+      "expectedReason": "returns the owned failure for overflow during",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "2a6344f230bdc9cb40975795b6cf007688f5b1213b895af9e4cade2657e1c3bd",
+      "log": "/private/tmp/dev75-domain-control-v2-derived-guard.log"
+    },
+    {
+      "control": "encoded-ordering",
+      "exitCode": 1,
+      "durationSeconds": 0.37,
+      "expectedReason": "checks real dates and start-before-end in the interval owner",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "4ca6768fb326a411152f0ae2d10fa1ad46800b015be62b65584ecd742431d67d",
+      "log": "/private/tmp/dev75-domain-control-v2-encoded-ordering.log"
+    },
+    {
+      "control": "key-presence",
+      "exitCode": 1,
+      "durationSeconds": 0.37,
+      "expectedReason": "preserves all historical optional-end representations and bytes",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "4ca6768fb326a411152f0ae2d10fa1ad46800b015be62b65584ecd742431d67d",
+      "log": "/private/tmp/dev75-domain-control-v2-key-presence.log"
+    },
+    {
+      "control": "year-suffix",
+      "exitCode": 1,
+      "durationSeconds": 0.38,
+      "expectedReason": "rejects a wrong or unrepresentable Australian year 2025-27",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "4ca6768fb326a411152f0ae2d10fa1ad46800b015be62b65584ecd742431d67d",
+      "log": "/private/tmp/dev75-domain-control-v2-year-suffix.log"
+    },
+    {
+      "control": "exponent-guard",
+      "exitCode": 1,
+      "durationSeconds": 0.64,
+      "expectedReason": "handles admitted extreme exponents without constructing enormous powers",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "0a69462fe08c47b5d1e73f68989f524181565aaa622914efbdd34eb43310af0a",
+      "log": "/private/tmp/dev75-domain-control-v2-exponent-guard.log"
+    }
+  ],
+  "lintControls": {
+    "newCases": 20,
+    "allowed": 7,
+    "rejected": 13,
+    "postcondition": "Exact date ingress and deterministic primitive/rule-snapshot egress only; neighbours and runtime execution remain rejected.",
+    "qualified": true
+  },
+  "focusedChecks": [
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.43,
+      "log": "/private/tmp/dev75-domain-focus-v5-types.log"
+    },
+    {
+      "stage": "core-test",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.44,
+      "log": "/private/tmp/dev75-domain-focus-v5-core-test.log"
+    },
+    {
+      "stage": "rule-test",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/rules-au-*",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.41,
+      "log": "/private/tmp/dev75-domain-focus-v6-rule-test.log"
+    },
+    {
+      "stage": "calculator-test",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/calculators",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.47,
+      "log": "/private/tmp/dev75-domain-focus-v6-calculator-test.log"
+    },
+    {
+      "stage": "examples",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-content",
+        "check-examples"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.28,
+      "log": "/private/tmp/dev75-domain-focus-v6-examples.log"
+    },
+    {
+      "stage": "http-test",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/api-http",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.59,
+      "log": "/private/tmp/dev75-domain-focus-v6-http-test.log"
+    },
+    {
+      "stage": "downstream",
+      "command": [
+        "bun",
+        "run",
+        "sdk:validate-downstream",
+        "--",
+        "--force"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.87,
+      "log": "/private/tmp/dev75-domain-focus-v6-downstream.log"
+    },
+    {
+      "stage": "restored-core",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev75-domain-restored-v1-restored-core.log"
+    },
+    {
+      "stage": "frozen-install",
+      "command": [
+        "bun",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.42,
+      "log": "/private/tmp/dev75-domain-restored-v1-frozen-install.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "log": "/private/tmp/dev75-domain-preflight-v1-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.18,
+      "log": "/private/tmp/dev75-domain-preflight-v1-runbooks.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.52,
+      "log": "/private/tmp/dev75-domain-preflight-v2-lint.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.49,
+      "log": "/private/tmp/dev75-domain-preflight-v2-types.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.43,
+      "log": "/private/tmp/dev75-domain-preflight-v2-format.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.29,
+      "log": "/private/tmp/dev75-domain-preflight-v2-changeset.log"
+    },
+    {
+      "stage": "lint-tests",
+      "command": [
+        "bun",
+        "run",
+        "test:oxlint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 56.81,
+      "log": "/private/tmp/dev75-domain-preflight-v2-lint-tests.log"
+    },
+    {
+      "stage": "core-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.22,
+      "log": "/private/tmp/dev75-domain-exponents-v1-core-types.log"
+    },
+    {
+      "stage": "core-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.41,
+      "log": "/private/tmp/dev75-domain-exponents-v1-core-tests.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.5,
+      "log": "/private/tmp/dev75-domain-pregraph-v1-lint.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.64,
+      "log": "/private/tmp/dev75-domain-pregraph-v1-types.log"
+    },
+    {
+      "stage": "core-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev75-domain-pregraph-v1-core-tests.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev75-domain-pregraph-v1-docs.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.45,
+      "log": "/private/tmp/dev75-domain-pregraph-v1-format.log"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.03,
+      "log": "/private/tmp/dev75-domain-pregraph-v1-diff.log"
+    },
+    {
+      "stage": "web-browser",
+      "command": [
+        "bun",
+        "run",
+        "web:test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 7.08,
+      "log": "/private/tmp/dev75-domain-url-restored-v1-web-browser.log"
+    },
+    {
+      "stage": "api-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.72,
+      "log": "/private/tmp/dev75-domain-url-restored-v1-api-tests.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.38,
+      "log": "/private/tmp/dev75-domain-url-pregraph-v1-lint.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.45,
+      "log": "/private/tmp/dev75-domain-url-pregraph-v1-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.28,
+      "log": "/private/tmp/dev75-domain-url-pregraph-v1-docs.log"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev75-domain-url-pregraph-v1-diff.log"
+    }
+  ],
+  "parentHosted": {
+    "pullRequest": "https://github.com/crcorbett/taxkit/pull/147",
+    "headCommit": "390c3cd143ac31f787b646b8795b59bc66df2cbc",
+    "workflow": "Quality",
+    "runId": 37396296951,
+    "jobId": 112052955973,
+    "conclusion": "SUCCESS",
+    "completedAt": "2026-10-06T01:15:11Z",
+    "limitation": "Qualifies the parent only."
+  },
+  "failedAttempts": [
+    "Initial tests assumed toEncoded retained an Option-side check; the codec was corrected rather than dropping the encoded ordering assertion.",
+    "Initial tests assumed BigDecimal encoded as a string and rejected an empty string. Actual installed codec/parser semantics were retained.",
+    "Initial lint/type attempts identified numeric grouping, error class ownership/import placement, missing error type after a local edit and a misplaced expected-type-error comment; corrected before qualification.",
+    "Outside numeric formatting altered source labels and literal JSON digits. Restored; exact baseline table/source bytes and unchanged snapshot expectations retained.",
+    "First derived-guard removal triggered failure during test module loading before the named assertion. Source restored. A lazy controlled defect then failed the intended overflow assertion; no production error output widened.",
+    "Initial full CI-mode local graph failed after 494.51 seconds at the browser settings test: an outside numeric-formatting edit had also grouped digits inside two URL strings. Both original URL ports restored; changed quoted strings checked for equivalent accidental grouping. The initial artifact watcher saw a completion marker for a failed verification; its inventory is retained as unqualified and is not native-build proof."
+  ],
+  "limitations": [
+    "Local slice accepted by the primary implementation owner; current candidate hosted checks and reviewer acceptance remain separate.",
+    "Whole-table relationships, remaining semantic absence/service ownership and rate identity/limiting unfinished; T004 remains active.",
+    "Medicare correction decision unresolved; retained thresholds unchanged.",
+    "No merge, deployment, publication, provider or registry proof."
+  ],
+  "rollback": "Discard/revert this local candidate or its eventual commit; no provider or data migration exists.",
+  "nextOwner": "TaxKit implementation owner for complete qualification and wider T004; Cooper for the separately bounded Medicare decision.",
+  "failedQualification": {
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 494.51,
+    "wrapperLog": "/private/tmp/dev75-domain-full-release-ci-graph.log",
+    "verificationLog": "tmp/release-readiness/verification-stdout-LQiPFv/d58d15ea91f1.log",
+    "verificationSha256": "49d449d9f3bd1097c66393854c99090e3b7de74a9ac0804a8c02dd514dbec4a9",
+    "failedBoundary": "web:test:browser \u2014 retains checked settings while the form is idle, then attempts its request",
+    "unqualifiedArtifactInventory": "/private/tmp/dev75-domain-failed-unqualified-artifacts.json",
+    "nativeVerificationReached": false
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "mode": "local CI graph",
+      "exitCode": 0,
+      "durationSeconds": 686.09,
+      "orderedChecks": [
+        "verification",
+        "test",
+        "build",
+        "docs-validation",
+        "packed-artifact",
+        "downstream-consumer",
+        "api-smoke",
+        "docs-browser",
+        "changeset-status"
+      ],
+      "nonClaim": "No immutable release attempt, publication or provider operation"
+    }
+  ],
+  "focusedEvidence": {
+    "workflowCases": 32,
+    "workflowSeconds": 472.14,
+    "nativeCases": 7,
+    "nativeSeconds": 80.38,
+    "lintCorpusCases": 500,
+    "coreCases": 59,
+    "websiteBrowserCases": 19,
+    "sdkBrowserCases": 24,
+    "sourceRestoration": "All 97 staged files match pre-check bytes; unchanged API worker matches parent Git source",
+    "qualifiedSources": {
+      ".changeset/fallible-money-calendar.md": "8b202fc9be8c49033f93e4bdc8b7008061a5a83c95dd241c3cca3c79a2879026",
+      "apps/api/scripts/routes.ts": "798a408a6fa25913d9e224b8bcf691ce8a7ebe0b5450aed9a932a1099abb9dbf",
+      "apps/api/scripts/smoke-boundaries.test.ts": "b3973d8b35e7f1efb18eaef2a7bc8ff49e9d4895749b00d53111210656e6e53f",
+      "apps/web/src/lib/calculator.boundary.browser.test.tsx": "9ad03745f5d36a9f97c439bceaca1e99430bcf150093665080e4a388a32c2d9b",
+      "bun.lock": "b0359b899c30a2b4a62de9c1847a816ec5527777bdb8dcd252bd8a410051f39a",
+      "docs/architecture/effect-services.md": "6206e0505cfc07b75fce32b88ccd6b9a65d8c138adfea25a92ed0c5be6dfc9e1",
+      "docs/architecture/graph-trace-ledgers.md": "3f45ea65241a6acacf3420fcde2ea2f7e7172a5c630b3533553d85fa650c20f1",
+      "docs/architecture/rules-and-parameters.md": "1e09224d6e1672370ac78c1237fc9420ad5e7c61f5f2c4801e6b665015186a84",
+      "docs/architecture/testing-and-quality.md": "19c810040832b119e5a1e0e4fa64f4319ab251456da8168650cf9c7efd4e4824",
+      "docs/documentation-audit/README.md": "65f356c53fca073e76b4f720937ed697e0b12b53bf218e286531235477460fe8",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-06-fallible-domain-values.json": "0ff4d492d7c868aba9217307b0ee40c6bbac34927bed74cd8b0e11681a56c15f",
+      "docs/exec-plans/active/clean-slate-foundation.md": "9a4641580c02e565aa09eb67c7324328331e63a64799e6075d6d6f64e298ac0d",
+      "docs/product-specs/clean-slate-foundation.md": "d8238511893ce8cb71d0968022dbb5c95536b646d3fb2cf3e5d8c82f2b8cdaea",
+      "docs/product-specs/clean-slate-foundation.tasks.json": "1914fb9678e5d35ae7f9103bc0257acdbe680afbcff435276db3e201fb29e355",
+      "docs/standards/documentation-writing.md": "96ea36bdfc573d05410c8a1f8ccb0d5a46e30e660d1ab557c546c04c8729074d",
+      "oxlint.config.ts": "15dc0ce43fd84a3c36fa9115b2cd3d02e2add058bf027c4df177583463e1ab2e",
+      "packages/api/http/__tests__/public-calculation-api.test.ts": "db51f932620bb29f2bd15133924c211060a5148b8988dc82588476b88f2aa4af",
+      "packages/api/rpc/src/__testing__/fixtures.ts": "76d7af12e7c55a2e838539c1e80b1dca69ec1a9a8c069110de1dbee257147b7b",
+      "packages/calculators/__tests__/calculation-work.test.ts": "be842666063f1f6b5e8691a145d997ad67f99f5fbdc7a8c1e0875d600530cb5d",
+      "packages/calculators/__tests__/public-calculator-service.test.ts": "816b66eba0de45a094488bcdeea62d353fe7d28579bb032d09326a1b2d7ebaa8",
+      "packages/core/README.md": "3be2424e4ab57f638cf59afe80a318dba482f39238d739914fc82ebabf1d7521",
+      "packages/core/package.json": "80042373b3e808beee5963d618b8659e5754cc562119f289ae7873cf02b30caf",
+      "packages/core/src/graph/rule-graph.ts": "50ac8fbae7f6ffb88014d5a5990f1d0812cc9029a25420e4c2840f6e7336fd45",
+      "packages/core/src/index.ts": "4bad506ad7995b9db87c254faef5ffed16e5441b8bccfd83dad7d5d6d5a9e0c8",
+      "packages/core/src/ledger/component.ts": "e8304368580f1159cf679e862332ba633e6e72167c60c451f49461027059e450",
+      "packages/core/src/parameters/descriptor.ts": "65f93f5348bdfd9a84d69c5979f1c839b9c7d5492034ca5d6a1c3df6e1b93772",
+      "packages/core/src/primitives/date.ts": "01c80dbc76c081072ffb97aa615a807108261a3f95c4c4bb585c6ee044a6424c",
+      "packages/core/src/primitives/errors.ts": "d8928ed4b713a20c7bee4ad11109fccd3158717ee5dbff896c950294bd601afb",
+      "packages/core/src/primitives/index.ts": "35e5fb10bbe3fb04ab6d85e9792325a67fd4f17722baf29a70f530d41e75f30b",
+      "packages/core/src/primitives/money.ts": "858fdda31d5207baaf809ac40c49aee35a93bd9146e6627376ec1a45c5c30653",
+      "packages/core/src/primitives/rounding.ts": "ce86dd7a7aead01eac11ded6f3a0f60c5e03efc3c66772d9a2c13fc729d609cb",
+      "packages/core/src/primitives/tax.ts": "f6fc59fce404f6fb555ed41f3a19a4abdc904811cddecb64c351ffdeba2ffc01",
+      "packages/core/test/date.test.ts": "128c87119869904759c02467d01883a7e20eca1d4934f069624932b6485e20ff",
+      "packages/core/test/money.test.ts": "573425c7b015f128cdf3395a5a93c863f4b41b742c6748136ec9736e49f5e222",
+      "packages/core/tsconfig.build.json": "e2217c9b3b66ffa46f49fe557754845f339bc67fe6cc89cebf957a7596cf5cfe",
+      "packages/core/tsconfig.json": "a28d81bcfe345b0971c514192ac268652176c8eaaa1c8b3d46e54bd86bac43d9",
+      "packages/docs-content/README.md": "d9c37be86c4eae89b1060bbf62694d95926818b29d18c5dd0a6e25f8de0a52d5",
+      "packages/docs-content/content/concepts/facts.mdx": "1f04c34beb48d095a440378cf83580d496ce1bffeeea68a8f71e1e266b639943",
+      "packages/docs-content/content/concepts/money-and-branded-values.mdx": "7174765029fffee20ef5e3be83534f8c4b14afd8c7818eab6862bd13cc156917",
+      "packages/docs-content/content/concepts/reports.mdx": "ee01630caf2ca244e9220567b5036511d76b55a5e6a4b4cfbf4f6ef082fccaa8",
+      "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx": "ca00c1043b7a5ee9acbf7a83967fddc454146d1432d8501d8652d6fa70d5038e",
+      "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx": "0855263494fa492ffaf70b3f89d5236cffb6ed39ac755dbd64239777f772a0d5",
+      "packages/docs-content/content/guides/calculate-annual-income-tax.mdx": "ed043b2bd3997face8730a85d77f33e1f9f2f8fe6c64a139ede2c8729644eee7",
+      "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx": "e45eaa92b1c5684822f44a696d0bd8c31e56d69255455cc9e54b24b7adf496dd",
+      "packages/docs-content/content/guides/handle-validation-errors.mdx": "cb977a7b6b40905c3893c2a7657b15e310989260b5ca53794b326bd78bed54f3",
+      "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx": "01163bf73271c5136fbc8260055fb66954404bb4c54b3801261542b6429d3de1",
+      "packages/docs-content/content/guides/test-your-integration.mdx": "0c44abafd2e51dd9eea702352dbf50e1d1181e1829c1dc63922f417e836e8c02",
+      "packages/docs-content/content/reference/sdk.mdx": "81547abcf0f6c6048df5d05ec95a67aec90b47f26ccc43493f6ab33ca24a1f6a",
+      "packages/docs-content/content/sdk/effect-sdk.mdx": "c241bac198e34b38dc70756a2d1080f0e255718463a6b754ebd78e7ea8e2d7b4",
+      "packages/docs-content/content/sdk/plain-sdk.mdx": "d536fd323b56bbe30a2a07d9c10d91bef4c5ef23af87a9346a2c8c2728954b5a",
+      "packages/docs-content/content/sdk/safe-sdk.mdx": "352722a84d73233aa71811fedd01edb5854a95d2127c2aaacd495029a2ea6cd1",
+      "packages/docs-content/content/sdk/type-safety.mdx": "17fc46dc9c875af7d805488e019b1875b0c80d1fb72a9c83daf94054721e53aa",
+      "packages/docs-content/content/sdk/typescript-sdk.mdx": "7e44eb92a2244fb44157b9f69903478a70b39728e4d41717d10d31c792d30d8f",
+      "packages/docs-content/content/start/install-the-sdk.mdx": "df1f4fe5ef62ad0eec275fb4471fa99ed75f850e15e4a4e4c82fba04654cfabd",
+      "packages/docs-content/content/start/quickstart.mdx": "85d4889b0a595e07c97a23458fc93c69c1e8729f5112e727e32fe37eca537a17",
+      "packages/docs-content/content/start/run-your-first-calculation.mdx": "b2bd83edba89c207a6b9193fe0ce9cb6254d93676b589beef3b4a3c278719c26",
+      "packages/docs-content/examples/browser-http.ts": "d85f2a195b6b7bc69e8b5438522a2710349d71a4a8b1b8e99e2510d6e3c57f14",
+      "packages/docs-content/examples/effect.ts": "8ce551aa1d508267ee211d88a7bcd5883941ba8fdb8e371be9ea9f5a8f2b29a5",
+      "packages/docs-content/examples/error-handling.ts": "77616e6e6803778d226f1e7911cfbaf15300e611582a136dcfa1ba4f149aa570",
+      "packages/docs-content/examples/node-server.ts": "615696a109f00a22c8b7adeeca0d23a0e3b0c3598cb03c8d374db5c60fedb908",
+      "packages/rules/au/income-tax/README.md": "67a3df0c44e99cea7441d9581ea03700a6030768d72037a5f859f72d7aca0634",
+      "packages/rules/au/income-tax/src/calculator/annual-tax.ts": "53724dced811b1655efba155f200a3361582d66653268d3695c1857d43c2ca03",
+      "packages/rules/au/income-tax/src/facts/income.ts": "50f91cb21707bd342a7adda3df981377e0790eaa5bee5d6a88176e7174e44bfe",
+      "packages/rules/au/income-tax/src/parameters/income-tax-table.ts": "1f041b31f1b8c9365ab097fc4faf0f967c7151467d3a3db2b211b982fecfdce9",
+      "packages/rules/au/income-tax/src/parameters/lito-table.ts": "c8993a7ed77e0bfd004e9d93780d7f701df080519020ed59f07a6772c90418e0",
+      "packages/rules/au/income-tax/src/parameters/medicare-levy-table.ts": "6000b9e4888fcab224a585ddfea28d23188f295faa340e4bcd9a3a208a618d15",
+      "packages/rules/au/income-tax/src/rules/annual-tax-ledger.ts": "d8ccd6480b2018f7a7921e54865f2c2960cecc5f45404e73aad0cdf6aed06fdd",
+      "packages/rules/au/income-tax/src/rules/income-tax.ts": "fe4b0592d054ad3fc14af4b0f26b58b9adb166a60d8270cf3930cc046c3b5673",
+      "packages/rules/au/income-tax/src/rules/lito.ts": "08923de3ed8702667fb373fa33c3c952f2675b6a6dda392b89c8272b8ab2615d",
+      "packages/rules/au/income-tax/src/rules/medicare-levy.ts": "d5673e8ba3a702018cf164becc882bb3eae9856493d019442e3cfa25f946fd6c",
+      "packages/rules/au/income-tax/test/annual-tax.test.ts": "f9a3251ca00dd9a5623e9c786b3a488fb5bf7dc3636f6d2b0d9dfe595306cd9b",
+      "packages/rules/au/income-tax/test/rule-graph.test.ts": "21aa20974cfcfc89eab703cd5ebc52a6692d4bb8999b9200d20fddc0d51c5c87",
+      "packages/rules/au/pay/README.md": "76c4b85826afaabdf5aface6587a5321c0b1dc369ff239cf15f7d7f3a7e8e7a2",
+      "packages/rules/au/pay/src/facts/pay.ts": "49ddeed21ab45ae61833c62dc14a4105e43b8fd5edfa808d0b904b3d905ab73d",
+      "packages/rules/au/pay/src/facts/sacrifice.ts": "ce4542795f9841ba5fdcbad0533cd135d456e404a4b0f4050aadd1ecc90b39b6",
+      "packages/rules/au/pay/src/parameters/schedule1.ts": "3c7480416e02cf263372bb41cfbc8f97b33adfe1b24d034d15b7d119ca29d825",
+      "packages/rules/au/pay/src/rules/net-pay.ts": "047ced68dc19ccd040056a3d3dec58f58f6a3028abf55dd744fe3c355bef3104",
+      "packages/rules/au/pay/src/rules/payg-withholding.ts": "bd3948455020d8c72ce5028bddef7de6ff47d9a3a2d818bf24b845dddbdc7642",
+      "packages/rules/au/pay/src/rules/taxable-pay-with-sacrifice.ts": "a491b80bee898c8ef6195fa0de39184bfa90693b6bb4b12cbc2b70a3d238fecb",
+      "packages/rules/au/pay/src/rules/withholdings-ledger.ts": "e8573d7b2705b987cbaaa5e9d5145755eaa427cd29fe1b3a4f41436ed79e657a",
+      "packages/rules/au/pay/test/rule-graph.test.ts": "264f805f484222d998a679b853f872b1111708b4ed968717b35b4dbfc177d9ce",
+      "packages/rules/au/pay/test/take-home-pay.test.ts": "2ad5955801b54a8769bff2b04b4cbb0548ced9493a6142ee0ce90f52183922df",
+      "packages/rules/au/stsl/README.md": "ceb322e8599e6ffd50389a5a74d0a32af3912b1953b873df0b04b22ab8708e4d",
+      "packages/rules/au/stsl/src/parameters/stsl-table.ts": "0439f695a82fa718929a28171d4b75ddf2e77840ea85e192e77c0c1414df8859",
+      "packages/rules/au/stsl/src/rules/stsl-component.ts": "33cd46173be9db73cce36a0270f03b458e859c33f08d155dafd0124c350768b3",
+      "packages/rules/au/stsl/src/rules/withholdings-ledger-with-stsl.ts": "1cbd8a3dd9a81bdb2b29d4dfa4b76ccf3ae818b3d38514192798b78ae4b3d8a4",
+      "packages/rules/au/stsl/test/rule-graph.test.ts": "ce581a7edc8e3a33ce0d71ee8354210ac2c2dd7c3fcd58ed03b0d639c96e3aad",
+      "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts": "109d341e21c4058aa6fd032407522f8ac6fd414d578aba22f7315ce10aee8f2d",
+      "packages/sdk/typescript/README.md": "d40f5bddbd53598444aa853e4b3110b94ff0e6940a980f9e4770cf34f460d80e",
+      "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts": "a2c94b0a38e1d72c99b7d204822e5a25be500cc033fdef49596a5331baab1094",
+      "packages/sdk/typescript/src/au.test.ts": "1092f95aaad0227abdab64c2de6c37f1035402af0f85fb5cc4f0371aa3929649",
+      "packages/sdk/typescript/src/client-lifetime.test.ts": "55a5fc6c78b55a2aaf3188f158fa3b0783eabf2412e010a6d46f91386a67fca2",
+      "packages/sdk/typescript/src/effect.test.ts": "26479fa3e70357eda7e857eed344b4175e0acb86bef76e21788affb3ea2a84fd",
+      "packages/sdk/typescript/src/index.test.ts": "7caf671e8711e8e78d383b86155c102b9f0b0d4c5558b97eca2903f49f9ddead",
+      "packages/sdk/typescript/type-tests/effect-client.test.ts": "4a7b72404d1b7ec988f15a3985520a7b91e3e17012f0dd5080f3580d20b7f165",
+      "packages/sdk/typescript/type-tests/plain-client.test.ts": "e6649ecd937e8f5ca9a872f3157f4d6993bcae401c77770e90a7afa17bc4923c",
+      "tools/oxlint/portable-rules.test.ts": "25297e1e30b91c4a353caa833ba084f99060845467fa18b10664bc862519ed9f"
+    }
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Pinned local tooling and unchanged installed dependency versions; one Core dev-dependency declaration adds already-installed @effect/vitest.",
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 135,
+      "sha256": "ac962fe2aaef23938d36e66accbcd6860514f3ccbca19e94b0d6f84c6b5fa4af"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "cdd504adf1cb2c106af202e254845da2d9f6742c824d7a003239707450ae9fe9"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "37dfb635d9c3fd46d4906553293fc05f24a9ddf14f3a464341023f9b50b635b5"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "e5a63db7cd80aeb6aba4b7661ed86367ae95f7abf78d88486e728c67a638ffc2"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "dad6ba72f61080b8c8af4708d606a4e7eb290784a0faaf13e386962f37757c4b"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "5cc8a56e249e1f1fc8b15733f9ef38680e146838c7caf0b4166b67f01d8fdeb2"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "1d19560050db114f57fa2f4ec95faa56a910a377988352cf3e63c7f8abf3c171"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "d7da3f7c986dc649b3af83b2100b9efdb30cfa9f39e54ce035786e63c5e71d3f"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "aea2aae1c62cd750e1a1e40c046576169fc972103e370cf0e0ac81fc518301de"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously inspected parent image"
+    }
+  ],
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for checked constructor/derived arithmetic/calendar codec slice",
+    "basis": [
+      "Safe fixed named error codecs and genuine packed compile/runtime assertions",
+      "All 15 original table/period/source encodings and unchanged tax/snapshot expectations",
+      "Five deliberate removals fail their named checks; full current candidate passes",
+      "Exact decoder/encoder admissions with 20 real CLI controls and no added runtime permission",
+      "Canonical examples/owners/major Changesets updated together"
+    ],
+    "remaining": "Whole-table relationships, remaining semantic absence/service ownership, trusted non-logged rate identity/limiting, whole T004 and later tasks"
+  },
+  "postconditions": {
+    "verification": "All prescribed compiler/lint/format/unused-code, 32 workflow, browser and seven built Worker checks pass",
+    "tests": "Root tests pass, including all 500 real lint cases and 59 Core tests",
+    "consumers": "Fresh genuine packed artifact/downstream typecheck, public exports, safe error codecs, historical encodings and browser bundle pass",
+    "native": "Nine inventories captured after successful verification, before later root build; four screenshots match inspected parent bytes",
+    "restoration": "All 97 staged candidate files and unchanged API worker source are restored exactly",
+    "tax": "Retained tables/source records/golden results and unresolved Medicare thresholds unchanged"
+  },
+  "qualifiedLogDigests": [
+    {
+      "check": "verification",
+      "path": "tmp/release-readiness/verification-stdout-GaOKU4/529f306d8406.log",
+      "sha256": "b5d78e10708ec9e45b2b9e20d5d58289fc1eed04beca0eeaa7c409bd9abca7af"
+    },
+    {
+      "check": "test",
+      "path": "tmp/release-readiness/test-stdout-K4bF2Z/a766ae585c45.log",
+      "sha256": "32c9d2a96b61d1d9fc4a9ea91c41d44da45b267190952606d15d0aaf5ecf2cf6"
+    },
+    {
+      "check": "full-wrapper",
+      "path": "/private/tmp/dev75-domain-full-v2-release-ci-graph.log",
+      "sha256": "811bbc34050ba2431ad76cceb3b04fdbfd7d9c809ff39d3f02d626f02bc9d51d"
+    }
+  ],
+  "postCheckChanges": {
+    "scope": "Plan and receipt only",
+    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
+  }
+}

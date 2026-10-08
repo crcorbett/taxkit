@@ -47,12 +47,12 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@shikijs/core": "4.0.2",
-    "@shikijs/transformers": "^4.0.2",
-    "@standard-schema/spec": "^1.1.0",
+    "@shikijs/core": "4.5.0",
+    "@shikijs/transformers": "4.5.0",
+    "@standard-schema/spec": "1.1.0",
     "effect": "catalog:",
-    "fumadocs-core": "^16.8.3",
-    "fumadocs-mdx": "^14.3.1",
+    "fumadocs-core": "16.16.0",
+    "fumadocs-mdx": "15.4.6",
     "react": "catalog:",
     "remark-mermaidjs": "7.0.0"
   },

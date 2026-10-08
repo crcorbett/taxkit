@@ -1,6 +1,5 @@
-import { describe, expect, test } from "bun:test";
-
-import { Array, Option } from "effect";
+import { describe, expect, it as test } from "@effect/vitest";
+import { Array as EffectArray, Array, Option } from "effect";
 
 import {
   decodeReadableRepositoryText,
@@ -67,7 +66,9 @@ describe("repository path policy", () => {
     expect(Array.map(findings, (finding) => finding.line)).toEqual([
       1, 2, 3, 4, 5,
     ]);
-    expect(findings.every((finding) => !("match" in finding))).toBe(true);
+    expect(
+      EffectArray.every(findings, (finding) => !("match" in finding))
+    ).toBe(true);
   });
 
   test("accepts portable references and ordinary prose", () => {
@@ -96,9 +97,12 @@ describe("repository path policy", () => {
     );
 
     expect(findings).toHaveLength(1);
-    expect(findings[0]?.file).toBe(RepositoryRelativeFile.make(file));
-    expect(findings[0]?.line).toBe(2);
-    expect(findings[0]?.category).toBe("tilde-checkout-path");
+    const finding = Array.head(findings).pipe(
+      Option.getOrElse(() => expect.fail("Expected a path finding"))
+    );
+    expect(finding.file).toBe(RepositoryRelativeFile.make(file));
+    expect(finding.line).toBe(2);
+    expect(finding.category).toBe("tilde-checkout-path");
   });
 
   test("treats NUL-containing and malformed UTF-8 payloads as binary", () => {

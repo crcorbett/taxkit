@@ -1,88 +1,43 @@
-import { fileURLToPath } from "node:url";
-
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
-  CalculatorCatalogResponse,
-  CalculatorRunRequest,
-  CalculatorRunResponse,
-} from "@taxkit/api-http";
-import { aud } from "@taxkit/core/primitives";
-import { GrossPay } from "@taxkit/rules-au-pay";
-import {
   Array,
+  Config,
   Console,
-  Data,
   Effect,
   Layer,
   Match,
   Option,
-  Schedule,
   Schema,
   Stream,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-import * as HttpBody from "effect/unstable/http/HttpBody";
-import * as HttpClient from "effect/unstable/http/HttpClient";
-import type * as HttpClientResponse from "effect/unstable/http/HttpClientResponse";
-import { ChildProcess } from "effect/unstable/process";
+import { ChildProcess } from "effect/process";
 
-import { ApiServerConfigSourceSchema } from "../src/schemas.js";
+import {
+  checkApiCalculation,
+  checkApiCatalog,
+  checkApiOpenApi,
+  checkApiPublicContent,
+  waitForApiHealth,
+} from "./routes.js";
+import {
+  ApiSmokeArguments,
+  ApiSmokeConsumerError,
+  ApiSmokeConsumerEvidence,
+  ApiSmokeConsumerManifest,
+  ApiSmokeConsumerParameters,
+  ApiSmokeSettings,
+  ApiSmokeValidationError,
+} from "./schemas.js";
 
-const smokeHost = "127.0.0.1";
-const smokePort = Schema.decodeUnknownOption(ApiServerConfigSourceSchema)({
-  host: smokeHost,
-  port: Number(process.env["TAXKIT_API_SMOKE_PORT"] ?? 4173),
-}).pipe(
-  Option.map(({ port }) => port),
-  Option.getOrElse(() => {
-    throw new Error("TAXKIT_API_SMOKE_PORT must be a valid TCP port.");
-  })
-);
-const smokeOrigin = `http://${smokeHost}:${smokePort}`;
-const takeHomeCalculatorId = "au.pay.take-home";
-const annualTaxCalculatorId = "au.income-tax.annual";
-const appRootUrl = new URL("..", import.meta.url);
-const repoRootUrl = new URL("../..", appRootUrl);
-const appRoot = fileURLToPath(appRootUrl);
-const repoRoot = fileURLToPath(repoRootUrl);
-const simulateDownstreamFailure = Array.contains(
-  process.argv,
-  "--simulate-downstream-failure"
-);
-
-interface DownstreamConsumerCommandResult {
-  readonly commandLine: string;
-  readonly cwd: string;
-  readonly exitCode: number;
-  readonly stderr: string;
-  readonly stdout: string;
-}
-
-class SmokeRouteError extends Data.TaggedError("SmokeRouteError")<{
-  readonly cause?: unknown;
-  readonly message: string;
-  readonly route: string;
-  readonly status?: number;
-}> {}
-
-class DownstreamConsumerError extends Data.TaggedError(
-  "DownstreamConsumerError"
-)<{
-  readonly message: string;
-  readonly result?: DownstreamConsumerCommandResult;
-}> {}
-
-const routeUrl = (path: string) => new URL(path, smokeOrigin).toString();
-
+// This string is the deliberately plain JavaScript consumer outside the repo.
+// Its fetch/Promise/JSON behaviour proves consumption without TaxKit internals.
 const externalConsumerScript = (
-  simulateFailure: boolean
-) => `const origin = ${JSON.stringify(smokeOrigin)};
-const takeHomeCalculatorId = ${JSON.stringify(takeHomeCalculatorId)};
-const annualTaxCalculatorId = ${JSON.stringify(annualTaxCalculatorId)};
-const simulateFailure = ${JSON.stringify(simulateFailure)};
+  parameters: string
+) => `const { origin, takeHomeCalculatorId, annualTaxCalculatorId, simulateFailure } = ${parameters};
 
 const routeEvidence = [];
 
@@ -179,7 +134,7 @@ assert(
 );
 assert(
   annualTaxCalculation.report?.rulePackVersion ===
-    "rules-au-income-tax/1.0.0",
+    "rules-au-income-tax/1.0.1",
   "Annual-tax calculate route returned the wrong ruleset version."
 );
 
@@ -207,68 +162,31 @@ if (simulateFailure) {
 }
 `;
 
-const writeExternalConsumerWorkspace = (
-  fs: FileSystem.FileSystem,
-  path: Path.Path,
-  workspacePath: string,
-  simulateFailure: boolean
-) =>
-  Effect.all(
-    [
-      fs.writeFileString(
-        path.join(workspacePath, "package.json"),
-        `${JSON.stringify(
-          {
-            name: "taxkit-api-downstream-consumer",
-            private: true,
-            scripts: {
-              smoke: "bun consumer.mjs",
-            },
-            type: "module",
-          },
-          null,
-          2
-        )}\n`
-      ),
-      fs.writeFileString(
-        path.join(workspacePath, "consumer.mjs"),
-        externalConsumerScript(simulateFailure)
-      ),
-    ],
-    { concurrency: "unbounded" }
-  );
-
-const validateWorkspaceLocation = (
-  path: Path.Path,
-  repoRootPath: string,
-  workspacePath: string
-) => {
-  const relativeToRepo = path.relative(repoRootPath, workspacePath);
-
-  return Match.value(
-    !relativeToRepo.startsWith("..") && !path.isAbsolute(relativeToRepo)
-  ).pipe(
-    Match.when(true, () =>
-      Effect.fail(
-        new DownstreamConsumerError({
-          message: `Temp workspace must be outside the repo: ${workspacePath}`,
+export const loadApiSmokeSettings = (args: readonly string[]) =>
+  Effect.gen(function* () {
+    const options = yield* Schema.decodeUnknownEffect(ApiSmokeArguments)(args);
+    const port = yield* Config.schema(
+      ApiSmokeSettings.fields.port,
+      "TAXKIT_API_SMOKE_PORT"
+    ).pipe(Config.withDefault(4173));
+    return ApiSmokeSettings.make({
+      port,
+      simulateDownstreamFailure: Array.isReadonlyArrayNonEmpty(options),
+    });
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new ApiSmokeValidationError({
+          message: "Invalid API smoke settings or arguments.",
         })
-      )
-    ),
-    Match.orElse(() => Effect.succeed(workspacePath))
+    )
   );
-};
 
-const runExternalConsumer = (workspacePath: string) =>
-  Effect.gen(function* runExternalConsumerCommand() {
-    const command = "bun";
-    const args = ["run", "smoke"] as const;
-    const commandLine = Array.prepend(args, command).join(" ");
-
-    yield* Console.info(`$ ${commandLine}`);
-
-    const result = yield* Effect.gen(function* runChildProcess() {
-      const handle = yield* ChildProcess.make(command, args, {
+const runExternalConsumer = (workspacePath: string, origin: string) =>
+  Effect.gen(function* () {
+    yield* Console.info("$ bun run smoke");
+    const result = yield* Effect.gen(function* () {
+      const handle = yield* ChildProcess.make("bun", ["run", "smoke"], {
         cwd: workspacePath,
         extendEnv: true,
         forceKillAfter: "2 seconds",
@@ -276,329 +194,234 @@ const runExternalConsumer = (workspacePath: string) =>
         stdin: "ignore",
         stdout: "pipe",
       });
-      const [stdout, stderr, exitCode] = yield* Effect.all(
+      const [stdout, , exitCode] = yield* Effect.all(
         [
-          Stream.mkString(Stream.decodeText(handle.stdout)),
-          Stream.mkString(Stream.decodeText(handle.stderr)),
+          handle.stdout.pipe(
+            Stream.mapAccum(
+              () => 0,
+              (previous, chunk) => {
+                const bytes = previous + chunk.byteLength;
+                return [bytes, [{ bytes, chunk }]] as const;
+              }
+            ),
+            Stream.mapEffect(({ bytes, chunk }) =>
+              bytes > 1_048_576
+                ? Effect.fail(
+                    new ApiSmokeConsumerError({
+                      exitCode: Option.none(),
+                      reason: "output-limit",
+                    })
+                  )
+                : Effect.succeed(chunk)
+            ),
+            Stream.decodeText,
+            Stream.mkString
+          ),
+          Stream.runDrain(handle.stderr),
           handle.exitCode,
         ],
         { concurrency: "unbounded" }
       );
-
-      return {
-        commandLine,
-        cwd: workspacePath,
-        exitCode: Number(exitCode),
-        stderr,
-        stdout,
-      } satisfies DownstreamConsumerCommandResult;
+      return { exitCode, stdout };
     }).pipe(
-      Effect.mapError(
-        (cause) =>
-          new DownstreamConsumerError({
-            message: `Failed to run external temp-workspace HTTP consumer: ${String(cause)}`,
-          })
-      )
-    );
-
-    return yield* Match.value(result.exitCode).pipe(
-      Match.when(0, () =>
-        Effect.gen(function* externalConsumerPassed() {
-          const output = result.stdout.trim();
-          yield* Match.value(output.length).pipe(
-            Match.when(0, () => Effect.void),
-            Match.orElse(() => Console.info(output))
-          );
-          yield* Console.info("External temp-workspace HTTP consumer passed");
-
-          return result;
-        })
-      ),
-      Match.orElse(() =>
-        Effect.fail(
-          new DownstreamConsumerError({
-            message: "External temp-workspace HTTP consumer failed.",
-            result,
-          })
-        )
-      )
-    );
-  });
-
-const requireOkResponse = (
-  route: string,
-  response: HttpClientResponse.HttpClientResponse
-) =>
-  Match.value(response.status).pipe(
-    Match.when(
-      (status) => status >= 200 && status < 300,
-      () => Effect.succeed(response)
-    ),
-    Match.orElse((status) =>
-      Effect.fail(
-        new SmokeRouteError({
-          message: `Expected a 2xx response from ${route}`,
-          route,
-          status,
-        })
-      )
-    )
-  );
-
-const decodeRouteJson = <RouteSchema extends Schema.Top>(
-  route: string,
-  response: HttpClientResponse.HttpClientResponse,
-  schema: RouteSchema
-) =>
-  requireOkResponse(route, response).pipe(
-    Effect.flatMap((okResponse) =>
-      okResponse.json.pipe(
-        Effect.mapError(
-          (cause) =>
-            new SmokeRouteError({
-              cause,
-              message: `Failed to read JSON from ${route}`,
-              route,
-            })
-        )
-      )
-    ),
-    Effect.flatMap((body) =>
-      Schema.decodeUnknownEffect(schema)(body).pipe(
-        Effect.mapError(
-          (cause) =>
-            new SmokeRouteError({
-              cause,
-              message: `Failed to decode JSON from ${route}`,
-              route,
-            })
-        )
-      )
-    )
-  );
-
-const getRouteJson = <RouteSchema extends Schema.Top>(
-  path: string,
-  schema: RouteSchema
-) => {
-  const route = `GET ${path}`;
-
-  return HttpClient.get(routeUrl(path), { acceptJson: true }).pipe(
-    Effect.mapError(
-      (cause) =>
-        new SmokeRouteError({
-          cause,
-          message: `Failed to call ${route}`,
-          route,
-        })
-    ),
-    Effect.flatMap((response) => decodeRouteJson(route, response, schema))
-  );
-};
-
-const postRouteJson = <RouteSchema extends Schema.Top>(
-  path: string,
-  body: Schema.Json,
-  schema: RouteSchema
-) => {
-  const route = `POST ${path}`;
-
-  return HttpBody.json(body).pipe(
-    Effect.mapError(
-      (cause) =>
-        new SmokeRouteError({
-          cause,
-          message: `Failed to encode JSON for ${route}`,
-          route,
-        })
-    ),
-    Effect.flatMap((httpBody) =>
-      HttpClient.post(routeUrl(path), {
-        acceptJson: true,
-        body: httpBody,
-        headers: { "content-type": "application/json" },
-      })
-    ),
-    Effect.mapError(
-      (cause) =>
-        new SmokeRouteError({
-          cause,
-          message: `Failed to call ${route}`,
-          route,
-        })
-    ),
-    Effect.flatMap((response) => decodeRouteJson(route, response, schema))
-  );
-};
-
-const calculateRequestBody = Schema.decodeUnknownEffect(CalculatorRunRequest)({
-  facts: {
-    grossPay: new GrossPay({
-      amount: aud(346_200),
-      period: "fortnightly",
-    }),
-    taxFreeThresholdClaimed: true,
-  },
-  jurisdiction: "AU",
-  taxYear: "2025-26",
-}).pipe(
-  Effect.flatMap(Schema.encodeUnknownEffect(CalculatorRunRequest)),
-  Effect.flatMap(Schema.decodeUnknownEffect(Schema.Json)),
-  Effect.mapError(
-    (cause) =>
-      new SmokeRouteError({
-        cause,
-        message: "Failed to prepare the canonical calculate smoke payload",
-        route: `POST /api/v1/calculators/${takeHomeCalculatorId}/calculate`,
-      })
-  )
-);
-
-const waitForHealth = getRouteJson("/api/health", Schema.Json).pipe(
-  Effect.retry(
-    Schedule.max([Schedule.spaced("250 millis"), Schedule.recurs(40)])
-  ),
-  Effect.mapError(
-    (cause) =>
-      new SmokeRouteError({
-        cause,
-        message: `Timed out waiting for ${smokeOrigin}/api/health`,
-        route: "GET /api/health",
-      })
-  )
-);
-
-const ApiProcess = ChildProcess.make("bun", ["src/index.ts"], {
-  cwd: appRoot,
-  env: {
-    API_HOST: smokeHost,
-    API_PORT: String(smokePort),
-  },
-  extendEnv: true,
-  forceKillAfter: "2 seconds",
-  killSignal: "SIGTERM",
-  stderr: "inherit",
-  stdin: "ignore",
-  stdout: "inherit",
-});
-
-const SmokeProgram = Effect.gen(function* smokePublicRoutes() {
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
-  const apiProcess = yield* ApiProcess;
-
-  yield* Console.info(
-    `Started apps/api smoke process on ${smokeOrigin} (pid ${apiProcess.pid})`
-  );
-
-  yield* waitForHealth;
-  yield* Console.info("GET /api/health passed");
-
-  const catalog = yield* getRouteJson(
-    "/api/v1/calculators",
-    CalculatorCatalogResponse
-  );
-  yield* Array.findFirst(
-    catalog.calculators,
-    (calculator) => calculator.calculatorId === takeHomeCalculatorId
-  ).pipe(
-    Option.match({
-      onNone: () =>
-        Effect.fail(
-          new SmokeRouteError({
-            message: `Calculator catalog did not include ${takeHomeCalculatorId}`,
-            route: "GET /api/v1/calculators",
-          })
-        ),
-      onSome: () => Console.info("GET /api/v1/calculators passed"),
-    })
-  );
-
-  const payload = yield* calculateRequestBody;
-  const calculation = yield* postRouteJson(
-    `/api/v1/calculators/${takeHomeCalculatorId}/calculate`,
-    payload,
-    CalculatorRunResponse
-  );
-
-  yield* Match.value(calculation.calculator.calculatorId).pipe(
-    Match.when(takeHomeCalculatorId, () =>
-      Console.info(
-        `POST /api/v1/calculators/${takeHomeCalculatorId}/calculate passed`
-      )
-    ),
-    Match.orElse((calculatorId) =>
-      Effect.fail(
-        new SmokeRouteError({
-          message: `Calculate response returned ${calculatorId}`,
-          route: `POST /api/v1/calculators/${takeHomeCalculatorId}/calculate`,
-        })
-      )
-    )
-  );
-
-  yield* getRouteJson("/api/docs/openapi.json", Schema.Json);
-  yield* Console.info("GET /api/docs/openapi.json passed");
-
-  const workspacePath = yield* Effect.acquireRelease(
-    fs.makeTempDirectory({
-      prefix: "taxkit-api-downstream-",
-    }),
-    (tempPath) =>
-      fs.remove(tempPath, { force: true, recursive: true }).pipe(
-        Effect.tap(() => Console.info(`Cleanup result: removed ${tempPath}`)),
-        Effect.catchCause((cause) =>
-          Console.error(
-            `Cleanup result: failed to remove ${tempPath}: ${String(cause)}`
+      Effect.mapError((failure) =>
+        Match.value(failure).pipe(
+          Match.tag("ApiSmokeConsumerError", (error) => error),
+          Match.orElse(
+            () =>
+              new ApiSmokeConsumerError({
+                exitCode: Option.none(),
+                reason: "start-or-read",
+              })
           )
         )
-      )
-  );
+      ),
+      Effect.timeoutOrElse({
+        duration: "30 seconds",
+        orElse: () =>
+          Effect.fail(
+            new ApiSmokeConsumerError({
+              exitCode: Option.none(),
+              reason: "timeout",
+            })
+          ),
+      })
+    );
 
-  yield* validateWorkspaceLocation(path, repoRoot, workspacePath);
-  yield* Console.info(
-    `Created external temp HTTP consumer workspace at ${workspacePath}`
-  );
-  yield* writeExternalConsumerWorkspace(
-    fs,
-    path,
-    workspacePath,
-    simulateDownstreamFailure
-  );
-  yield* runExternalConsumer(workspacePath);
-}).pipe(
-  Effect.scoped,
-  Effect.ensuring(Console.info("apps/api smoke process stopped")),
-  Effect.catchTag("DownstreamConsumerError", (error) =>
-    Console.error(
-      [
-        error.message,
-        Option.fromNullishOr(error.result).pipe(
-          Option.match({
-            onNone: () => "",
-            onSome: (result) =>
-              [
-                `Command failed: ${result.commandLine}`,
-                `cwd: ${result.cwd}`,
-                `exitCode: ${result.exitCode}`,
-                result.stdout,
-                result.stderr,
-              ].join("\n"),
-          })
-        ),
-      ].join("\n")
-    ).pipe(
-      Effect.flatMap(() =>
-        Effect.sync(() => {
-          process.exitCode = 1;
+    if (result.exitCode !== 0) {
+      return yield* Effect.fail(
+        new ApiSmokeConsumerError({
+          exitCode: Option.some(Number(result.exitCode)),
+          reason: "exit",
         })
+      );
+    }
+    const evidence = yield* Schema.decodeEffect(
+      Schema.fromJsonString(ApiSmokeConsumerEvidence)
+    )(result.stdout).pipe(
+      Effect.mapError(
+        () =>
+          new ApiSmokeConsumerError({
+            exitCode: Option.some(0),
+            reason: "evidence",
+          })
       )
-    )
-  )
-);
+    );
+    const expectedRoutes = [
+      "GET /api/health",
+      "GET /api/v1/calculators",
+      "POST /api/v1/calculators/au.pay.take-home/calculate",
+      "POST /api/v1/calculators/au.income-tax.annual/calculate",
+      "GET /api/docs/openapi.json",
+    ];
+    if (
+      evidence.origin !== origin ||
+      !Array.makeEquivalence<string>((a, b) => a === b)(
+        evidence.routeEvidence,
+        expectedRoutes
+      )
+    ) {
+      return yield* Effect.fail(
+        new ApiSmokeConsumerError({
+          exitCode: Option.some(0),
+          reason: "evidence",
+        })
+      );
+    }
+    yield* Console.info("External temp-workspace HTTP consumer passed");
+  }).pipe(Effect.scoped);
 
-BunRuntime.runMain(
-  SmokeProgram.pipe(
-    Effect.provide(Layer.mergeAll(BunServices.layer, BunHttpClient.layer))
-  )
-);
+export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const path = yield* Path.Path;
+    const appRoot = yield* path.fromFileUrl(new URL("..", import.meta.url));
+    const repoRoot = path.resolve(appRoot, "../..");
+    const origin = `http://127.0.0.1:${settings.port}`;
+    const apiProcess = yield* ChildProcess.make("bun", ["src/index.ts"], {
+      cwd: appRoot,
+      env: { API_HOST: "127.0.0.1", API_PORT: String(settings.port) },
+      extendEnv: true,
+      forceKillAfter: "2 seconds",
+      killSignal: "SIGTERM",
+      stderr: "inherit",
+      stdin: "ignore",
+      stdout: "inherit",
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new ApiSmokeValidationError({
+            message: "Failed to start the API smoke process.",
+          })
+      )
+    );
+    yield* Console.info(
+      `Started apps/api smoke process on ${origin} (pid ${apiProcess.pid})`
+    );
+    yield* waitForApiHealth(origin);
+    yield* Console.info("GET /api/health passed");
+    yield* checkApiCatalog(origin);
+    yield* Console.info("GET /api/v1/calculators passed");
+    yield* checkApiCalculation(origin);
+    yield* Console.info(
+      "POST /api/v1/calculators/au.pay.take-home/calculate passed"
+    );
+    yield* checkApiOpenApi(origin);
+    yield* Console.info("GET /api/docs/openapi.json passed");
+    yield* checkApiPublicContent(origin);
+    yield* Console.info(
+      "Public documentation page, navigation, search and Markdown passed"
+    );
+
+    const workspacePath = yield* Effect.acquireRelease(
+      fs.makeTempDirectory({ prefix: "taxkit-api-downstream-" }),
+      (tempPath) =>
+        fs.remove(tempPath, { force: true, recursive: true }).pipe(
+          Effect.tap(() => Console.info(`Cleanup result: removed ${tempPath}`)),
+          Effect.catchCause(() =>
+            Effect.die(
+              new ApiSmokeValidationError({
+                message:
+                  "Failed to remove the external HTTP consumer workspace.",
+              })
+            )
+          )
+        )
+    );
+    const relative = path.relative(repoRoot, workspacePath);
+    if (!relative.startsWith("..") && !path.isAbsolute(relative)) {
+      return yield* Effect.fail(
+        new ApiSmokeValidationError({
+          message: "Temp workspace must be outside the repo.",
+        })
+      );
+    }
+    yield* Console.info(
+      `Created external temp HTTP consumer workspace at ${workspacePath}`
+    );
+    const parameters = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ApiSmokeConsumerParameters)
+    )({
+      annualTaxCalculatorId: "au.income-tax.annual",
+      origin,
+      simulateFailure: settings.simulateDownstreamFailure,
+      takeHomeCalculatorId: "au.pay.take-home",
+    });
+    const manifest = yield* Schema.encodeEffect(
+      Schema.fromJsonString(ApiSmokeConsumerManifest, { space: 2 })
+    )({
+      name: "taxkit-api-downstream-consumer",
+      private: true,
+      scripts: { smoke: "bun consumer.mjs" },
+      type: "module",
+    });
+    yield* Effect.all(
+      [
+        fs.writeFileString(
+          path.join(workspacePath, "package.json"),
+          `${manifest}\n`
+        ),
+        fs.writeFileString(
+          path.join(workspacePath, "consumer.mjs"),
+          externalConsumerScript(parameters)
+        ),
+      ],
+      { concurrency: "unbounded" }
+    );
+    yield* runExternalConsumer(workspacePath, origin);
+  }).pipe(
+    Effect.mapError((failure) =>
+      Match.value(failure).pipe(
+        Match.tags({
+          ApiSmokeConsumerError: (error) => error,
+          ApiSmokeRouteError: (error) => error,
+          ApiSmokeValidationError: (error) => error,
+        }),
+        Match.orElse(
+          () =>
+            new ApiSmokeValidationError({
+              message: "Failed to prepare the external HTTP consumer.",
+            })
+        )
+      )
+    ),
+    Effect.tapErrorTag("ApiSmokeValidationError", (error) =>
+      Console.error(error.message)
+    ),
+    Effect.tapErrorTag("ApiSmokeConsumerError", (error) =>
+      Console.error(
+        `External HTTP consumer failed (${error.reason}; exitCode: ${Option.getOrElse(error.exitCode, () => "unavailable")}).`
+      )
+    ),
+    Effect.scoped,
+    Effect.ensuring(Console.info("apps/api smoke process stopped"))
+  );
+
+if (import.meta.main) {
+  BunRuntime.runMain(
+    loadApiSmokeSettings(Array.drop(process.argv, 2)).pipe(
+      Effect.flatMap(checkApiPublicRoutes),
+      Effect.provide(Layer.mergeAll(BunServices.layer, BunHttpClient.layer))
+    )
+  );
+}

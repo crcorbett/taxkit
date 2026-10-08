@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-au-pay-owner
+last_reviewed: 2026-10-06
+review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
 # Australian Pay Rules
@@ -29,6 +31,15 @@ runtime manifest reads.
   `Schema`, `Data`, `Record`, `Result` and `Exit` where they fit.
 - Do not mirror canonical IDs or fact shapes as local `string` or DTO fields.
 - Keep official Schedule 1 parameters separate from algorithms.
+- Schedule 1 checks inclusive weekly row bounds and multipliers from zero to
+  one. Each supported scale starts at zero, covers adjacent cents and has only
+  its final bound open. The saved and decoded table forms share the same
+  coverage check. Signed dollar coefficients remain valid, including the
+  retained negative coefficient; both authored years stay unchanged.
+- Derived money and ledger amounts use the core fallible constructors. An
+  unsupported amount returns a safe `CalculationError` through the Effect
+  error channel. `buildPayWithholdingsLedger` now returns an Effect; callers
+  yield its result. Retained Schedule 1 values and known pay results are unchanged.
 
 ## Commands
 
@@ -48,3 +59,23 @@ tarball validated by the SDK-owned strict downstream gate.
 - `docs/architecture/rules-and-parameters.md`
 - `docs/architecture/calculators.md`
 - `docs/standards/code-patterns.md`
+
+## Browser Schema entrypoints
+
+Use `@taxkit/rules-au-pay/schemas` for canonical calculator metadata, `TakeHomePayReport`, `PayWithholdingsLedger` and `TakeHomeScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
+
+The [transport architecture](../../../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
+
+
+The salary-sacrifice fact module imports canonical fact definitions through
+`@taxkit/core/facts`, keeping the full calculation engine out of browser fact
+consumers. The Website's native built-import test qualifies this distinction;
+retained rules, report values and public fact exports are unchanged.
+
+
+Trace formula and rounding values now use Core's nested Option contract. Use
+the owning trace codec for transport or saved snapshots, and `Option.flatten`
+to read content when missing and undefined mean the same thing. Descriptor
+questions/source artifacts use Option and rule parameters are total arrays.
+See the [Core owner](../../../core/README.md). Existing formulas, tax amounts,
+source records and snapshot expectations are unchanged.

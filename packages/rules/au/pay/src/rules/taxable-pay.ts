@@ -1,5 +1,5 @@
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Option } from "effect";
 
 import { GrossPayFact, TaxablePay, TaxablePayFact } from "../facts/pay.js";
 
@@ -27,7 +27,7 @@ export const TaxablePayLive = Layer.effect(TaxablePayFact)(
 
     const trace = TraceNode.make({
       children: [],
-      formula: "taxable = gross",
+      formula: Option.some(Option.some("taxable = gross")),
       inputs: {
         grossCents: gross.amount.cents,
         period: gross.period,

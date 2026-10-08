@@ -1,0 +1,40 @@
+import { DocsSearchResult } from "@taxkit/content/schemas";
+import { ByteSize, Duration, Schema } from "effect";
+
+export const McpResponseLimit = ByteSize.mebibytes(2);
+export const McpResponseDeadline = Duration.seconds(10);
+export const McpSessionLifetime = Duration.minutes(10);
+export const McpSessionInitialisationLimit = 32;
+export const McpSessionRequestLimit = 32;
+export const McpSessionId = Schema.String.check(Schema.isUUID(4)).pipe(
+  Schema.brand("McpSessionId")
+);
+export const McpDocsSearchResponse = Schema.Struct({
+  results: Schema.Array(DocsSearchResult),
+});
+
+// This transport vocabulary deliberately carries no provider cause, submitted
+// values or calculation report. The owning calculator errors stay unchanged.
+export class McpToolUnavailable extends Schema.TaggedClass<McpToolUnavailable>()(
+  "McpToolUnavailable",
+  {
+    code: Schema.Literals([
+      "invalid-calculation",
+      "rate-limited",
+      "capacity-exceeded",
+      "operation-timeout",
+      "service-unavailable",
+    ]),
+    message: Schema.tag("The tool could not complete this request."),
+    retry: Schema.Literals([
+      "check-input-before-retrying",
+      "wait-then-try-manually",
+      "try-again-manually",
+    ]),
+  }
+) {}
+
+export class McpResponseTooLarge extends Schema.TaggedError<McpResponseTooLarge>()(
+  "McpResponseTooLarge",
+  {}
+) {}

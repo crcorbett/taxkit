@@ -1,0 +1,261 @@
+{
+  "schemaVersion": "1",
+  "status": "passed",
+  "claim": "The exact combination of all 81 recorded open TaxKit PR heads and preserved main changes passes all nine local release checks before the authorised repository merge tracked by PR #171.",
+  "target": "crcorbett/taxkit main; integration branch codex/merge-all-20261008",
+  "candidateIdentity": "44a5e236460a74285c3894195184a7865371e92b",
+  "actor": "Cooper Corbett approves; Codex executes through GitHub account crcorbett",
+  "authorityReceipt": "Direct human instruction in this chat on 8 October 2026: Merge everything. Approval covers all 81 open TaxKit drafts, ready conversion, conflict resolution, commits/pushes and repository merges for this task. Local checks follow Cooper's earlier direction. No package publication, version application, new deployment, billing, credentials, provider mutation or adad source/enablement change is included.",
+  "environment": "Local Mac validation; GitHub crcorbett/taxkit repository merge; Personal Taxkit Linear tracking",
+  "journeyIds": [
+    "taxkit-calculator-direct",
+    "taxkit-sdk-packed",
+    "taxkit-http-api",
+    "taxkit-docs-runtime",
+    "taxkit-release-closure",
+    "taxkit-native-website"
+  ],
+  "observations": [
+    "Fresh open inventory: 81 drafts. The 80-head reviewed rebuild stack remains unchanged; separate Medicare #168 stays at 2051a9870d2ede97ab30d72597c4bc2c90b20d53.",
+    "Main already contains merged #140 and #153 at b2923793790975dbf619674ed59c768402e8d7d6. Repository allows merge commits and has no active ruleset or protected-main requirement at readback.",
+    "Local merges resolve 60 main conflicts by preserving approved shared-plugin removals and stable rebuilt toolchain/Effect-native six-journey checks; the one Medicare plan conflict combines the dated scopes. No calculator rule was hand-edited during conflict resolution.",
+    "Published Commonplace development-workflows manifest and matching release both report 0.6.10; this is the loaded installation. The unauthenticated web source returned 404; authenticated primary GitHub reads verified the manifest and release.",
+    "Documentation impact: Change required for current checking architecture, profile, plugin profiles, retired task commands and active plan. Preserve accepted runtime/public content/Changesets, six journey oracles, original historical evidence, Entire settings, PostHog/metrics deferrals and consumer/provider limits. N/A for dependency or new tax/provider design changes.",
+    "The initial focused docs check failed on two references to the retired skill command. The corrected owner passed docs, governance types/tests/runtime. Frozen install, docs/runbooks/format/lint also passed before the complete graph.",
+    "The first complete combined-source report at 12b6d7d765dc7c645e1034b967b1c33fd605528e stopped at verification in 7.31 seconds: the historical receipt checker still referenced the removed sha256 helper. Its existing runGit returns bytes; the resolved call uses the existing typed hashEpochBytes operation. The focused epoch type check now passes. No calculator source changed.",
+    "The second report at 8cb46fca8f06e1c24fdd6b93293aabe70d35395a stopped at verification in 29.96 seconds. Two historical CLI cases still expected failure messages from before #140. The actual old checkers correctly refuse current source: the removed shared-skill input and changed historical source-artifact identity. Only those two expected diagnostics changed; nonzero refusal, bounded output, safe paths, recovery and invalid-option assertions remain. The full historical suite and Knip pass.",
+    "The third report at 2a27c43d06626a8f1725538cda810d70efe975f7 stopped at verification in 73.14 seconds. Formatting rejected the changed historical test oracle line. The repository formatter corrected only that line wrapping; format:check now passes. The combined release graph remains unqualified until a complete passing report.",
+    "The fourth report at 7ab9f80a14fda2ceec76b19c10b9ff623b3ab929 stopped in 36.79 seconds at the isolated release-workflow suite: 13 temporary offline fixture installs were blocked by the restricted shell (Bun tempdir EPERM). Earlier source/check/format stages passed. This is an execution-environment failure; no assertion or source was changed. The same full graph will run with approved local shell access.",
+    "The fifth graph ran with approved local access and reached real offline-installed fixture tests. One documentation CLI JSON success case exceeded its default five-second test timeout. The owning full graph was deliberately stopped after that confirmed nested test failure; it has no normal exit or complete report. Only the four process cases now use a finite 15-second test budget; all expected exit codes, safe output, Schema-decoded receipt fields, invalid options and failure assertions are preserved. The focused documentation suite (46 cases) and formatting pass. Documentation impact: Preserve the actual documentation command contract; N/A for public/package/provider semantics; Change required for this dated evidence.",
+    "The sixth full report at 7fc58b39bfa349675c7010920f88621c917d8f41 ended with exit 1 after 1283.31 seconds. Canonical verification passed, including all 34 isolated release-workflow cases and all 22 built native app cases. The subsequent test stage passed 661 Oxlint cases and failed two fixtures for tools/skills, which #140 intentionally removed. Remove only that retired-host positive/negative pair and its unused exact lint admission/path; all active host cases, ten strict rules and historical input records remain. Documentation impact: Change required for the dated merge proof; Preserve every active runtime/lint/package contract; N/A for new public or provider behaviour.",
+    "The retired-host recovery passes all 661 remaining Oxlint cases in 74.24 seconds, formatting and lint. A transient API test-file replacement was traced to the existing scoped lint fixture test and independently restored to its original tracked bytes; no unrelated edit was included. Current testing architecture, SPEC and T002 routing now follow #140: latest published shared-plugin lookup plus local profiles and retained repository-specific skills, with the exact old receipt retained as history. Task statuses, dependencies, verification requirements and acceptance conditions are unchanged. Focused docs, runbooks and formatting pass.",
+    "The final complete local report at 44a5e236460a74285c3894195184a7865371e92b passed all nine ordered checks once with true zero exits in 1080.48 seconds. Both native app runs passed all 22 cases; isolated workflow tests passed all 34. Packed SDK and strict downstream checks were real cache-miss executions. All 18 exact report-selected log digests were independently read and matched; all 1712 frozen source identities matched before proof-only closeout.",
+    "Integration draft #171 was created and read back at head 44a5e236460a74285c3894195184a7865371e92b targeting main. The GitHub connector returned a collaborator validation error before creating a PR; a fresh no-existing-PR readback preceded creation with authenticated local repository owner crcorbett. The created PR is attached to this chat. PR creation and eventual merge state are owned by that live PR readback, not by local test output."
+  ],
+  "postconditions": [
+    "All 81 recorded original PR heads are ancestors of the qualified integration candidate; the already merged #140/#153 main changes remain ancestors.",
+    "All nine combined-source local release checks passed. All 18 selected log digests and all 1712 frozen source identities matched at qualification closeout.",
+    "Current docs and task intent preserve the approved shared-plugin migration. T008 remains in_progress, T009 and T010 pending; their statuses, blockers and acceptance conditions are not completed by merging."
+  ],
+  "detailArtifacts": [
+    {
+      "path": "taxkit-merge-open-prs.json",
+      "sha256": "5fbbc370b8b556ce862017a2249e54add5b8743b0828694da8f28fd0272ebca7"
+    },
+    {
+      "path": "taxkit-merge-main-before.json",
+      "sha256": "c41d79690615f8ec198fcf6b35456e76cde305d868695a53a549de196dc2d612"
+    },
+    {
+      "path": "taxkit-merge-plugin-manifest.json",
+      "sha256": "911a5b3d432208bf67a19338b8682dd213be9f76edf70abee7052e24e0c81fbc"
+    },
+    {
+      "path": "taxkit-merge-commonplace-releases.jsonl",
+      "sha256": "ded0bf7631d30f11195b97662d290e57fe974021d8f39dab75f97875ca440bc5"
+    },
+    {
+      "path": "taxkit-merge-preflight-results.jsonl",
+      "sha256": "8e1d90f2820000e31a0b985359270ad7ae75c2a6a3408cc251be17bb3e937a12"
+    },
+    {
+      "path": "taxkit-merge-preflight-recovery-results.jsonl",
+      "sha256": "157946ab35dc6c5179d21cf511dc8d0d42fe72bb06f86a91b75a880f3c40d065"
+    },
+    {
+      "path": "taxkit-merge-qualified-preflight-results.jsonl",
+      "sha256": "5856be6f1fd4672bcce7800e40ab7567a7931cd4b723659a23e3283cf052e17b"
+    },
+    {
+      "path": "taxkit-merge-final-results.jsonl",
+      "sha256": "7bbc183b30fb772422c1ff289cee45ced7d6d950d4ab6d252b20fbbb0d15760b"
+    },
+    {
+      "path": "taxkit-merge-final-release-report.log",
+      "sha256": "48b62e0e38d44e94474f615f6f5436c5770ebc1968918ae97ea715295cd2ae96"
+    },
+    {
+      "path": "taxkit-merge-epoch-diagnostic-results.jsonl",
+      "sha256": "e87a769c6560d545a270e71ffd959ddfde2c31399c115237224ee5d36e7dddbd"
+    },
+    {
+      "path": "taxkit-merge-epoch-recovery-results.jsonl",
+      "sha256": "cd9e58bb6947d4088207918cdd0dd948db389a5406fcfb65caeb484b5728e6f4"
+    },
+    {
+      "path": "taxkit-merge-recovered-results.jsonl",
+      "sha256": "3ef1d89757f585dba41ef2532f8586ed7fe6dd77f2fab38285e1916e52e98433"
+    },
+    {
+      "path": "taxkit-merge-recovered-release-report.log",
+      "sha256": "87c2c13a6102c3eb7c20ad15f43b19648e54bff1c0ad6eacd6f1aefcae606782"
+    },
+    {
+      "path": "taxkit-merge-historical-recovery-results.jsonl",
+      "sha256": "1d26aa46b04386cbedeafbe07931a1c3a6f9081707772790d000d835fbbb2951"
+    },
+    {
+      "path": "taxkit-merge-qualified-results.jsonl",
+      "sha256": "ea85694e3ef8de5f85e985f2ca6b039bb241a9fa2868a9ce065d6ae609bf3e2b"
+    },
+    {
+      "path": "taxkit-merge-qualified-release-report.log",
+      "sha256": "98f1aaac9c9e69891976c68fb11aad67c06ed9ab32732b003a40eaf811b19bca"
+    },
+    {
+      "path": "taxkit-merge-format-recovery-results.jsonl",
+      "sha256": "716279f4a0e6b6eb8d651f434dc1c4b80b1c367e2c903cd85d6885eae716ba07"
+    },
+    {
+      "path": "taxkit-merge-complete-results.jsonl",
+      "sha256": "3ba58b5395f5f3adee5662337d9e8ca18c90e43431ef56b49ae714305fc958e5"
+    },
+    {
+      "path": "taxkit-merge-complete-release-report.log",
+      "sha256": "c0e63d4ae36e0d80b26c05c9e3d07311119274c569d1658200b6311cce65a0cd"
+    },
+    {
+      "path": "taxkit-merge-complete-source-freeze.json",
+      "sha256": "daadc29a263d1e9c694e266ffaaf04bd69c3acbee12af28119d4431f5c711385"
+    },
+    {
+      "path": "taxkit-merge-local-qualified-interruption.json",
+      "sha256": "5da415c4315f440df26c32846ae694c966b1fb549f23a5bca1c1069ce9b170ed"
+    },
+    {
+      "path": "taxkit-merge-command-timeout-recovery-results.jsonl",
+      "sha256": "3080aff8366a496cddecb4c58186e75f7e0b5ae6243cfb073f60f5fe7df707be"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stdout-GulsJD/70e0c6de34f6.log",
+      "sha256": "41710caaa1409a617875a6f3dcb522696e873b8f011e65eb39a1ec38d62e3c90"
+    },
+    {
+      "path": "taxkit-merge-accepted-results.jsonl",
+      "sha256": "eaeea7453f971bbc4617ba0d4f67a50185d1721b4385ac351f46c64f143c8b7a"
+    },
+    {
+      "path": "taxkit-merge-accepted-release-report.log",
+      "sha256": "ac6d6209f796259329c56c80056b5c18ab785cd5288786aaf6689e8e940529ee"
+    },
+    {
+      "path": "taxkit-merge-accepted-source-freeze.json",
+      "sha256": "476541db6aae3d677d2236959b51b50fa0f3f16307d9c886ab47fc983e7b8500"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stdout-fphTQL/987ac8f0aff7.log",
+      "sha256": "61b3770ebe71feddf87df79d5ee2693e3e82b8de18d321d4a42d0935fb55217c"
+    },
+    {
+      "path": "taxkit-merge-retired-fixture-recovery-results.jsonl",
+      "sha256": "7e4ad52e6c325290b682e8fc320090ec0c65af60d20e634e7b859bad0f071214"
+    },
+    {
+      "path": "taxkit-merge-owner-recovery-results.jsonl",
+      "sha256": "fecc18bbd690cf74ca737e8bf38697d067a636c08a5a1ddc783bd06f55ec242a"
+    },
+    {
+      "path": "taxkit-merge-final-qualified-results.jsonl",
+      "sha256": "f11cba6d3ace75e7cb95eb9e7ffafd8ff28bf151b471855e0839011885e0297c"
+    },
+    {
+      "path": "taxkit-merge-final-qualified-release-report.log",
+      "sha256": "1d9f37d98244a4ea50758630fbd8bfc44aae4efa70fe8a4e6e7d57cf82e4747d"
+    },
+    {
+      "path": "taxkit-merge-final-qualified-source-freeze.json",
+      "sha256": "c8b39e50b0e68adb2e02937f83317f360dd9494d8302a5dc9f8b36a9d8ae687a"
+    },
+    {
+      "path": "taxkit-merge-passing-evidence.json",
+      "sha256": "d9f4101d671f6cf5d9918f5f1a4e62f62b8b29c657c7cab8ceaab6d89d5b427c"
+    },
+    {
+      "path": "taxkit-merge-integration-pr-created.json",
+      "sha256": "3e9ea997595444fc941afef9007358a1e616ebf4adf9c2c32e10053827cdc87b"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stdout-pORQWS/92d9c44f30f0.log",
+      "sha256": "db0aa93fd83eb26692af3d7e638e6972f7631eacdc46cd7240f41ba682882e7f"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stderr-F3MLNd/c689e9d0e916.log",
+      "sha256": "f4163ad802da7ba8e0532ad1922c12c5b8268fef8d3b62c2e1d095c797c47eb5"
+    },
+    {
+      "path": "tmp/release-readiness/test-stdout-Ny9pY3/93d3252c6e59.log",
+      "sha256": "6071d5ac68fd4f5559364326579f8e60ae4d9266c41dd7936cc834685f68ead7"
+    },
+    {
+      "path": "tmp/release-readiness/test-stderr-pb1g4o/a2fde794d974.log",
+      "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8"
+    },
+    {
+      "path": "tmp/release-readiness/build-stdout-PTtoGf/eb9868f89541.log",
+      "sha256": "19a40c1b9fb723de2b5c55f58a57e2abff6aa4553b9a6aa6bca31c4e4f7f1262"
+    },
+    {
+      "path": "tmp/release-readiness/build-stderr-d6nIP2/73c2cf33b461.log",
+      "sha256": "844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07"
+    },
+    {
+      "path": "tmp/release-readiness/docs-validation-stdout-Q4jciG/afa75b5fe9ae.log",
+      "sha256": "98e42d5d187c07347ce87d5780087681b0fe29255e9d8dd359a816442c6deb47"
+    },
+    {
+      "path": "tmp/release-readiness/docs-validation-stderr-9d3Csi/9d92b2eeee21.log",
+      "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697"
+    },
+    {
+      "path": "tmp/release-readiness/packed-artifact-stdout-rBwwjK/07c4113bfc32.log",
+      "sha256": "6f616e6a42e3a112b3a2a7d328a6aa5f4b076e4143fd4126500ce181fbf8168c"
+    },
+    {
+      "path": "tmp/release-readiness/packed-artifact-stderr-n6qtEM/fefa6525c010.log",
+      "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7"
+    },
+    {
+      "path": "tmp/release-readiness/downstream-consumer-stdout-Rz2RCL/8c1f2edc30f1.log",
+      "sha256": "976a5fefd4ec89b0f8a8ffaf9d9112d7fdb4be19dcea19afc7fcc4429cadf522"
+    },
+    {
+      "path": "tmp/release-readiness/downstream-consumer-stderr-x6dqlI/9d2b53d39ed6.log",
+      "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9"
+    },
+    {
+      "path": "tmp/release-readiness/api-smoke-stdout-dzI7GJ/a83627aa94f8.log",
+      "sha256": "73e16494c83bee108b99601ba8f11a305397e0625f809e4a00c365473a3b9e68"
+    },
+    {
+      "path": "tmp/release-readiness/api-smoke-stderr-XtEO07/dcafbe7ce93f.log",
+      "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87"
+    },
+    {
+      "path": "tmp/release-readiness/docs-browser-stdout-qvXbSv/36ea5b2bf26a.log",
+      "sha256": "f89e8dca1bfd5dc9b22f62c669c1e8ab893f7e924a6155531fee76b5db40f68d"
+    },
+    {
+      "path": "tmp/release-readiness/docs-browser-stderr-bOLsvt/b7bc46eb3547.log",
+      "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4"
+    },
+    {
+      "path": "tmp/release-readiness/changeset-status-stdout-1g3S6h/74ca38dd0467.log",
+      "sha256": "050be18a07b4b98bcac45050ec8d544326e05785d9af17fc287353a05375dd5e"
+    },
+    {
+      "path": "tmp/release-readiness/changeset-status-stderr-cv7Sgw/8e5b040cc080.log",
+      "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3"
+    }
+  ],
+  "limitations": [
+    "The passed claim is local combined-source qualification. GitHub PR #171 and independent current main/PR readback own the repository merge outcome; no hosted CI success is claimed.",
+    "Final closeout changes only this receipt and the active plan to record completed qualification. Focused docs/runbook/path/format/Changeset checks cover those metadata edits; the full report remains bound to the exact qualified semantic source.",
+    "Merging does not complete T008/T009 or full T010 acceptance. Collection remains off."
+  ],
+  "nonClaims": [
+    "No hosted CI success, package release/publication, package version application, new Preview/Production deployment, provider or credential mutation is claimed.",
+    "The exact adad source exception remains 0d82b82d1c48079fc4b8e2ec96abadfe12999789. No independent adad consumer acceptance or calculation enablement is claimed."
+  ],
+  "rollbackOrRecovery": "Before external merge, discard or revert only this isolated integration branch to the retained handover parent. After merge, prepare a reviewed revert of the actual main merge commit with first-parent selection, preserving the immutable source and receipts. Do not force-push main or change providers.",
+  "observedAt": "2026-10-08T08:07:22.138099+00:00"
+}

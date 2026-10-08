@@ -1,0 +1,1543 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-content-owner",
+  "observedAt": "2026-10-06T11:51:10Z",
+  "task": "CSF-T005 / DEV-76",
+  "status": "Shared compiler link presentation qualified locally; whole T005 remains in progress",
+  "baseHead": "a151e51e8a30247526fa93412df046955846eca4",
+  "actorAuthority": {
+    "principal": "Cooper",
+    "operation": "Local implementation, review, tests, commit, push and draft PR under the approved continuation plan",
+    "environment": "Local checkout, compiler, workerd and Chromium; no provider operation"
+  },
+  "outcome": [
+    "The installed Fumadocs compiler maps parsed link and reference-definition nodes once for HTML and processed Markdown without editing authored pages, parsed input trees or code examples.",
+    "Checked navigation owns page addresses, including section indexes. Relative repository references use one immutable Git revision; all 34 distinct source destinations exist in that revision.",
+    "The plugin preserves external URLs, anchors, queries and fragments and rejects unowned page addresses, unset source paths and paths outside the repository.",
+    "The exact synchronous source.config.ts navigation decoder admission preserves throwing-codec, encoding, Effect-runner and neighbouring-module rejections.",
+    "Native Node configuration uses the required JSON import attribute and the four exact source-only ESNext compiler profiles. Root and compiled public package module settings remain unchanged.",
+    "Both the independent native source and retained Vite source use this compiler policy. All 61 native processed pages and compiled HTML bodies have matching canonical page/source destinations."
+  ],
+  "impact": {
+    "changeRequired": [
+      "docs-content compiler/source configuration, Schema, focused tests and README",
+      "docs-fumadocs callback type and README",
+      "retained docs README and exact source-only compiler profiles",
+      "content architecture, exact decoder admission, actual CLI fixtures and installed dependency declarations/lock",
+      "patch Changeset, active plan/task evidence and this receipt"
+    ],
+    "preserve": [
+      "All 61 authored MDX bytes and draft statuses, draft navigation and empty acceptance bindings",
+      "Retained tax algorithms, fixture results and original integration templates",
+      "Cooper metrics deferral",
+      "Package ownership, generated/cache inputs and CI routing",
+      "Historical source/copy/compiler receipts"
+    ],
+    "notApplicable": [
+      "Runbook procedure changes",
+      "Provider operations, deployment and registry publication",
+      "Runtime content cache or new public route"
+    ]
+  },
+  "sourceIdentities": [
+    {
+      "path": ".changeset/compiled-public-docs-links.md",
+      "sha256": "c91dbad2c27e93846e4088225fe1909893e7e8cc8d5c0a30620fc70e8d7555d1"
+    },
+    {
+      "path": "apps/docs/README.md",
+      "sha256": "ffcbe725bd023a474995ce9589ea4608b868a71fc9697a2d0aaba08a979d9379"
+    },
+    {
+      "path": "apps/docs/tsconfig.json",
+      "sha256": "862f33346cb8c64912ec54bb9508ba6019e96deb13c6c04ed8252a67aaae6deb"
+    },
+    {
+      "path": "apps/docs/tsconfig.scripts.json",
+      "sha256": "f68b65bdde1a68e6add08d2f5617a1a59a5056d5ca4f811422206818537ce114"
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "e728c06b368effb1542ce76a23dcaf26f71ce91cb2d4333ecaba183968a1c765"
+    },
+    {
+      "path": "docs/architecture/content-and-posts.md",
+      "sha256": "8408c749b009c3ee1c8926ca801f777d0128f63ad17275f61dd00d0df97fab70"
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "sha256": "bb8a387fa2dd7e134e0514b9e3d15f593b080c766836e6fff017d61ca8b4b5cd"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "3e22fbd1b803745d9e5e377c0410e6fc9558022373d372b47736a8963f610434"
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "55c16d94597849a0b7ca1ca576c2c05f25ff5eb5712925ba788c50443621e56b"
+    },
+    {
+      "path": "packages/docs-content/README.md",
+      "sha256": "ee3d712e95e53259c8102bbf62e4ffeb777edb30e648e1e4fb4a4c42555c75e7"
+    },
+    {
+      "path": "packages/docs-content/package.json",
+      "sha256": "19d0d311ae94c9bb42e342e2a1fa0222f351ddeeb5381d10e9c8f6266403d34e"
+    },
+    {
+      "path": "packages/docs-content/source.config.ts",
+      "sha256": "05dd63f478f8431f0dc2202e56f3809ad6eebf1bba629b14009354e5896446af"
+    },
+    {
+      "path": "packages/docs-content/src/public-links.boundary.test.ts",
+      "sha256": "e7ecd70e8de09d4e51daf25b6ea34b4eddbdf2b3152360840b2e47bfb36ddc93"
+    },
+    {
+      "path": "packages/docs-content/src/public-links.boundary.ts",
+      "sha256": "aab0dd8e75bb2a5501e0fdb7517a113598b37033bb93dca6e1ae2d5e83a4f410"
+    },
+    {
+      "path": "packages/docs-content/src/public-links.schema.ts",
+      "sha256": "8d69822325521286b07108f78c95db46d92f07bf06791fff63e9042cbda9166a"
+    },
+    {
+      "path": "packages/docs-content/tsconfig.json",
+      "sha256": "86d97d995065c49471023a00ba69ad13fdd40a76a2a08e48e6e24e054ecd83f0"
+    },
+    {
+      "path": "packages/docs-fumadocs/README.md",
+      "sha256": "e58639f4762dafa19a9de56e843ec2412a52b1a23fb16ec029aa63f835b3a9e0"
+    },
+    {
+      "path": "packages/docs-fumadocs/src/config.ts",
+      "sha256": "28f3353bb2a781d1a43c374eb00de9e1e4e12f954aa0fd1bb0204675be94bbb3"
+    },
+    {
+      "path": "tools/documentation/tsconfig.json",
+      "sha256": "22eda2da5833c6b1f9d2c3d7dd00d73f0b33a893526f99ae69ee1c0f1ffd32e2"
+    },
+    {
+      "path": "tools/oxlint/portable-rules.test.ts",
+      "sha256": "2d1acd10dfdb934e5857023fb98592e1772ca2f064eb00315a5c50fb4f280af2"
+    }
+  ],
+  "checks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.4,
+      "log": "/private/tmp/dev76-links-focus-a-format.log"
+    },
+    {
+      "stage": "validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.58,
+      "log": "/private/tmp/dev76-links-focus-a-validate.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "log": "/private/tmp/dev76-links-focus-a-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev76-links-focus-a-runbooks.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.27,
+      "log": "/private/tmp/dev76-links-focus-a-changeset.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-content",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.31,
+      "log": "/private/tmp/dev76-links-focus-a-types.log"
+    },
+    {
+      "stage": "oxlint-tests",
+      "command": [
+        "bun",
+        "run",
+        "test:oxlint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 62.52,
+      "log": "/private/tmp/dev76-links-focus-a-oxlint-tests.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev76-links-l-format.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-content",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "log": "/private/tmp/dev76-links-l-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.54,
+      "log": "/private/tmp/dev76-links-l-lint.log"
+    },
+    {
+      "stage": "docs-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-content",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.92,
+      "log": "/private/tmp/dev76-links-l-docs-tests.log"
+    },
+    {
+      "stage": "fumadocs-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-fumadocs",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.54,
+      "log": "/private/tmp/dev76-links-l-fumadocs-tests.log"
+    },
+    {
+      "stage": "native-all-pages",
+      "command": [
+        "bun",
+        "--conditions=source",
+        "run",
+        "/private/tmp/dev76-native-public-links-probe.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.56,
+      "log": "/private/tmp/dev76-links-l-native-all-pages.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "log": "/private/tmp/dev76-links-build-c-format.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.34,
+      "log": "/private/tmp/dev76-links-build-c-types.log"
+    },
+    {
+      "stage": "docs-tool-types",
+      "command": [
+        "bun",
+        "run",
+        "check:docs:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.28,
+      "log": "/private/tmp/dev76-links-build-c-docs-tool-types.log"
+    },
+    {
+      "stage": "build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.14,
+      "log": "/private/tmp/dev76-links-build-c-build.log"
+    },
+    {
+      "stage": "docs-browser",
+      "command": [
+        "bun",
+        "run",
+        "--filter=docs",
+        "test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.71,
+      "log": "/private/tmp/dev76-links-build-c-docs-browser.log"
+    },
+    {
+      "stage": "built-docs",
+      "command": [
+        "bun",
+        "run",
+        "--filter=docs",
+        "test:built"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 9.49,
+      "log": "/private/tmp/dev76-links-build-c-built-docs.log"
+    },
+    {
+      "stage": "native-all-pages",
+      "command": [
+        "bun",
+        "--conditions=source",
+        "run",
+        "/private/tmp/dev76-native-public-metadata-probe.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.57,
+      "log": "/private/tmp/dev76-links-native-final-a-native-all-pages.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "log": "/private/tmp/dev76-links-final-verification-a-format.log"
+    },
+    {
+      "stage": "verification",
+      "command": [
+        "bun",
+        "run",
+        "verification"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 595.73,
+      "log": "/private/tmp/dev76-links-final-verification-a-verification.log"
+    },
+    {
+      "stage": "all-tests",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 91.06,
+      "log": "/private/tmp/dev76-links-final-verification-a-all-tests.log"
+    },
+    {
+      "stage": "html-all-pages",
+      "command": [
+        "bun",
+        "--conditions=source",
+        "run",
+        "/private/tmp/dev76-html-public-links-probe.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.34,
+      "log": "/private/tmp/dev76-links-final-verification-a-html-all-pages.log"
+    }
+  ],
+  "nativeAndHtmlPages": [
+    {
+      "path": "/api/authentication-and-deployment-assumptions",
+      "source": "content/api/authentication-and-deployment-assumptions.mdx",
+      "status": "draft",
+      "processedSha256": "ad485956f0fc55e958348d8888244133aff161c14744a5bbd42ec7b6e67b649c",
+      "processedBytes": 1893,
+      "htmlCompilerSource": "api/authentication-and-deployment-assumptions.mdx",
+      "htmlSha256": "5a5c89ff2121ceadb2d2ef9ddff45e249af428b117a4c21e2d884a786dc94e30",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/api/endpoints",
+      "source": "content/api/endpoints.mdx",
+      "status": "draft",
+      "processedSha256": "6693b678b3dc08e24d7a5679f30736a4a44fd2cdf038de3c7d5b8792706bc732",
+      "processedBytes": 3039,
+      "htmlCompilerSource": "api/endpoints.mdx",
+      "htmlSha256": "63426f475a441ebd77a559460d400e8b3a1cfdbf36b203d561f89293e867d7e6",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/api/errors",
+      "source": "content/api/errors.mdx",
+      "status": "draft",
+      "processedSha256": "048918ceead2f0f07ec90b30cb8a46d47e7cec8d19ee7ae93ea19a8d3754bc9e",
+      "processedBytes": 3527,
+      "htmlCompilerSource": "api/errors.mdx",
+      "htmlSha256": "ceace9685049d4181bc56508de3be3d913de451e9c716c984594fc72601edab9",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/api",
+      "source": "content/api/index.mdx",
+      "status": "draft",
+      "processedSha256": "a7275eeaa250d5220458c82ea0eef76ef9d2b79f9fb9bb9339e5025b45f24231",
+      "processedBytes": 703,
+      "htmlCompilerSource": "api/index.mdx",
+      "htmlSha256": "e5b83b6b34247682824395bfa71b8885d336dd46249e1979a97da4b30b0e1e63",
+      "canonicalPageLinkCount": 8,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/api/openapi-reference",
+      "source": "content/api/openapi-reference.mdx",
+      "status": "draft",
+      "processedSha256": "c5debfb9dd4e8ea709bdcc32ea2e4e7e13c05817e1001b466120e7d106dc9f29",
+      "processedBytes": 1643,
+      "htmlCompilerSource": "api/openapi-reference.mdx",
+      "htmlSha256": "0dfeb1f083fd3239a16f69c456506d4554518a06d9a6f430816b59530a388838",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/api/overview",
+      "source": "content/api/overview.mdx",
+      "status": "draft",
+      "processedSha256": "9ad5ffa8fb5d95d7f579e1b4d160378e9cb6015eefa2f68228adf2783b7dcc16",
+      "processedBytes": 2581,
+      "htmlCompilerSource": "api/overview.mdx",
+      "htmlSha256": "239c6e070ebed4855ab1e6f9e77b2d162d45b322a4002cdb94727d205a249a8a",
+      "canonicalPageLinkCount": 9,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/calculators",
+      "source": "content/concepts/calculators.mdx",
+      "status": "draft",
+      "processedSha256": "515075d09b5c85617a61e1f081e96c5d9dc4679115b401ae8874359ee31fae55",
+      "processedBytes": 1049,
+      "htmlCompilerSource": "concepts/calculators.mdx",
+      "htmlSha256": "1d3c50f222ee4acc6d39e7b3927518cb4573880694640d2678124f83bda585c5",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/diagnostics",
+      "source": "content/concepts/diagnostics.mdx",
+      "status": "draft",
+      "processedSha256": "2392b0fb458b8a4a7cd5e1d327f40f69ff7eedeee63ee634a19565045a6de49a",
+      "processedBytes": 1610,
+      "htmlCompilerSource": "concepts/diagnostics.mdx",
+      "htmlSha256": "a069c333bb3d9f759e38b6ceeb0f54120e5aae9624f1e730d038937947227c5a",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/facts",
+      "source": "content/concepts/facts.mdx",
+      "status": "draft",
+      "processedSha256": "a04e3287dd2e94c39c04988c8ce05b99e94ced66604b4497eff7f1ed12817e95",
+      "processedBytes": 1203,
+      "htmlCompilerSource": "concepts/facts.mdx",
+      "htmlSha256": "00b08329b86d1aa78c7e08cb0405f44fc242f3438f0b9c34960218391eb25015",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts",
+      "source": "content/concepts/index.mdx",
+      "status": "draft",
+      "processedSha256": "2ab426461a0810e0ca644c8cee837d1a91e23db490e57ad60938fd8d6af9aeea",
+      "processedBytes": 684,
+      "htmlCompilerSource": "concepts/index.mdx",
+      "htmlSha256": "4be02ace3c4a2bb948d29419574bce2c3d7f8070fb45d308609f217efbf507e8",
+      "canonicalPageLinkCount": 11,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/jurisdictions-and-tax-years",
+      "source": "content/concepts/jurisdictions-and-tax-years.mdx",
+      "status": "draft",
+      "processedSha256": "f79ba9961856f2d84d6746e3025c79c66cece77eb6fabea7171013198c6c8757",
+      "processedBytes": 1032,
+      "htmlCompilerSource": "concepts/jurisdictions-and-tax-years.mdx",
+      "htmlSha256": "fd843b1631da0e41cea1333dae292df6212c306efdab92ffb314a5419bdd9014",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/money-and-branded-values",
+      "source": "content/concepts/money-and-branded-values.mdx",
+      "status": "draft",
+      "processedSha256": "8a9dd323867c7ef40dabc6ebce37b7a6f3d7f06534804a972495a5bd0df2bd27",
+      "processedBytes": 2129,
+      "htmlCompilerSource": "concepts/money-and-branded-values.mdx",
+      "htmlSha256": "36ecd929e5159baf9ceaae8c3f19289063c40dab841057c4fe3e8f8ee1262995",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/reports",
+      "source": "content/concepts/reports.mdx",
+      "status": "draft",
+      "processedSha256": "2bee9b7782f2c517b58887d34804b838bdaba7550674473287e49c7bf924cfed",
+      "processedBytes": 1501,
+      "htmlCompilerSource": "concepts/reports.mdx",
+      "htmlSha256": "f1cf1bfb318a0ceef88db1d3a1cf2bdeac15a169662877076cffb23d815ff5c3",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/rules",
+      "source": "content/concepts/rules.mdx",
+      "status": "draft",
+      "processedSha256": "4f40b53a60433df0d53f7256e5fbc5922188d46fd8d7bab9188b798458e0b366",
+      "processedBytes": 1084,
+      "htmlCompilerSource": "concepts/rules.mdx",
+      "htmlSha256": "ad45cd13db26db34dbf45bdebe2301061cd502bdf2e60664af7c82fe83adaf66",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/concepts/sdk-http-api-and-calculators-service-boundary",
+      "source": "content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+      "status": "draft",
+      "processedSha256": "f799635501ec79b597fa5599f42fa5dfed276bafc654f98bf173bd3631486a97",
+      "processedBytes": 1688,
+      "htmlCompilerSource": "concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+      "htmlSha256": "946c01b112bfbee56b2def5ad3c347daa4f26d1bcaf249536f81813fa5593c1c",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/add-a-calculator",
+      "source": "content/contributing/add-a-calculator.mdx",
+      "status": "draft",
+      "processedSha256": "45c18b5f4a43f382f27944d57a2a4a0c1d355ee2d2229fa6e567885e49418fb4",
+      "processedBytes": 2388,
+      "htmlCompilerSource": "contributing/add-a-calculator.mdx",
+      "htmlSha256": "b59da1991d87089de43d346361a9833bbfe7d6d917c545daf0f8759a50345834",
+      "canonicalPageLinkCount": 1,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/add-a-fact",
+      "source": "content/contributing/add-a-fact.mdx",
+      "status": "draft",
+      "processedSha256": "37d5d05e2417a3ea576e3a92957da0164d33527e885531265cc4a4b5577b406c",
+      "processedBytes": 3072,
+      "htmlCompilerSource": "contributing/add-a-fact.mdx",
+      "htmlSha256": "a3f9507a65dfa3392834e57159d87f120007f3c378560fcb019c1bb2ea344190",
+      "canonicalPageLinkCount": 1,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/add-a-rule",
+      "source": "content/contributing/add-a-rule.mdx",
+      "status": "draft",
+      "processedSha256": "669489b4759c1812cdf46f4095523858bdc8492916e607a962c5bb445b090d47",
+      "processedBytes": 2756,
+      "htmlCompilerSource": "contributing/add-a-rule.mdx",
+      "htmlSha256": "289b477856e4cb712b6ad4a7999f72adae6d89dd2b60a29aba04cd08fba2a63c",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 3,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/add-a-tax-year",
+      "source": "content/contributing/add-a-tax-year.mdx",
+      "status": "draft",
+      "processedSha256": "f16abc6e93d61a8142dc8bb9ab2d6c9029e898fe0f1ea77a09c2a6ae0e3fda6a",
+      "processedBytes": 2311,
+      "htmlCompilerSource": "contributing/add-a-tax-year.mdx",
+      "htmlSha256": "377c8d5e1d3d85eec5438777ec3d86beb9a174b17245080abfc999318cd68d63",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/backward-compatibility",
+      "source": "content/contributing/backward-compatibility.mdx",
+      "status": "draft",
+      "processedSha256": "58246dd9810bb1c4cba8615ef4123f70ca125f2b3837c39603e18ff63f88a6dd",
+      "processedBytes": 1983,
+      "htmlCompilerSource": "contributing/backward-compatibility.mdx",
+      "htmlSha256": "9c5a8959a0c977ec019b23b3fdfe101cfeee34b610f55befb99ed186ac1f5152",
+      "canonicalPageLinkCount": 0,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/changesets",
+      "source": "content/contributing/changesets.mdx",
+      "status": "draft",
+      "processedSha256": "7c6f82ba4b8d7bba7531a97bcbf821e988ea710d63c950073f2a51223f659d41",
+      "processedBytes": 1226,
+      "htmlCompilerSource": "contributing/changesets.mdx",
+      "htmlSha256": "a3abbc3dfe17009fc42275db9fe1834de7bffbda5f96049f59878acf6e83b7d0",
+      "canonicalPageLinkCount": 1,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/effect-service-standards",
+      "source": "content/contributing/effect-service-standards.mdx",
+      "status": "draft",
+      "processedSha256": "c275d8c16fb2d8f4284a1b9367febe772f0bbce4198da161d054e994670d3b0c",
+      "processedBytes": 1666,
+      "htmlCompilerSource": "contributing/effect-service-standards.mdx",
+      "htmlSha256": "36ff390b22ff9f7f67e9a16dff79feb9a30022662cafb167b43775d82853f30e",
+      "canonicalPageLinkCount": 0,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/fix-an-incorrect-result",
+      "source": "content/contributing/fix-an-incorrect-result.mdx",
+      "status": "draft",
+      "processedSha256": "c71fe4eac025fd9c9f219e6d29281419a13a95d89550debcd5dd09bba7654d58",
+      "processedBytes": 1653,
+      "htmlCompilerSource": "contributing/fix-an-incorrect-result.mdx",
+      "htmlSha256": "05fa236276e7acaf024b02ff3964a6e682c836091d853489378156d5cd24d935",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing",
+      "source": "content/contributing/index.mdx",
+      "status": "draft",
+      "processedSha256": "7ae290c99e03008734305e27c466ca1c329105781a1b7d79ce047939d6947e65",
+      "processedBytes": 23839,
+      "htmlCompilerSource": "contributing/index.mdx",
+      "htmlSha256": "dad1689df954ae76ed6f872b32033a065a40e9f23367a7834e131f26824c3c56",
+      "canonicalPageLinkCount": 17,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/naming-and-schema-standards",
+      "source": "content/contributing/naming-and-schema-standards.mdx",
+      "status": "draft",
+      "processedSha256": "da14470e01578fab1972cd7d286df625a7ccd32175ce1ef6945dcc42fe19995f",
+      "processedBytes": 2439,
+      "htmlCompilerSource": "contributing/naming-and-schema-standards.mdx",
+      "htmlSha256": "e926af70f5e2d66a7c6eebebaeeaa56023688807eeb955116b65e9c0df3482af",
+      "canonicalPageLinkCount": 0,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/pr-evidence-checklist",
+      "source": "content/contributing/pr-evidence-checklist.mdx",
+      "status": "draft",
+      "processedSha256": "058aed6171330cf8514cbc818fe7e452ca7ba116df1cc3a014ca596c3f2953b4",
+      "processedBytes": 1653,
+      "htmlCompilerSource": "contributing/pr-evidence-checklist.mdx",
+      "htmlSha256": "49bff1ef2d734986e0753d24543b684b2301562edab73ac2b8c635227ce4f24b",
+      "canonicalPageLinkCount": 1,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/review-expectations",
+      "source": "content/contributing/review-expectations.mdx",
+      "status": "draft",
+      "processedSha256": "8a97ffe8f6ecd4a883e3be94fe019e161d5a1ab81223c7a540dd85285d0cd295",
+      "processedBytes": 1498,
+      "htmlCompilerSource": "contributing/review-expectations.mdx",
+      "htmlSha256": "f81de5c7d0c8e9bdda5711c8fc67fd32be262d574e2e43431d1458ddea113431",
+      "canonicalPageLinkCount": 0,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/source-citation-standards",
+      "source": "content/contributing/source-citation-standards.mdx",
+      "status": "draft",
+      "processedSha256": "1525e89ae98a13e5eacbcfae77ecf5d30bbf176487cc60590a13d091a1f5f3bd",
+      "processedBytes": 1511,
+      "htmlCompilerSource": "contributing/source-citation-standards.mdx",
+      "htmlSha256": "98b437229d375ac45a1f0d2aa58109257a144da5d44f7c526188e7e817afb2f0",
+      "canonicalPageLinkCount": 0,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/testing-standards",
+      "source": "content/contributing/testing-standards.mdx",
+      "status": "draft",
+      "processedSha256": "c7ebf9bdccfc18534cbf45895e37b3ac5effdf4316c3c42c7b695c421d94a444",
+      "processedBytes": 2572,
+      "htmlCompilerSource": "contributing/testing-standards.mdx",
+      "htmlSha256": "024bc71361acb899de5d6c5a0fa64a3b56afcb05c1a94a2bcda2e2cdb0a87e9b",
+      "canonicalPageLinkCount": 0,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/contributing/what-are-you-changing",
+      "source": "content/contributing/what-are-you-changing.mdx",
+      "status": "draft",
+      "processedSha256": "6a2e732f73bc752b9f9e9f979b78a8d304dfa0769c7885c3c35c02893ed14914",
+      "processedBytes": 25091,
+      "htmlCompilerSource": "contributing/what-are-you-changing.mdx",
+      "htmlSha256": "27c48deef8234e7a432dffa091ad337921ff13fafdd14698517e94d3856e88ba",
+      "canonicalPageLinkCount": 8,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/build-a-browser-app-with-the-http-api",
+      "source": "content/guides/build-a-browser-app-with-the-http-api.mdx",
+      "status": "draft",
+      "processedSha256": "f81604b47583192b6851895ffb3f436692cd581b79a0d2aaf5810ebaaca79335",
+      "processedBytes": 2685,
+      "htmlCompilerSource": "guides/build-a-browser-app-with-the-http-api.mdx",
+      "htmlSha256": "1ee343c5d11443a4580948bfac61eb9451962ab243bb7d87e4230016aba0f7f3",
+      "canonicalPageLinkCount": 5,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/build-a-server-route-with-the-sdk",
+      "source": "content/guides/build-a-server-route-with-the-sdk.mdx",
+      "status": "draft",
+      "processedSha256": "e11efdb0600bddb087c737400d5323353f3c230029c1ef34131ecda5a991f505",
+      "processedBytes": 3461,
+      "htmlCompilerSource": "guides/build-a-server-route-with-the-sdk.mdx",
+      "htmlSha256": "2ed0f732f2960345d01f59cba2700bf0e9b853d28bd87194a8fcd447b8fce76b",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/calculate-annual-income-tax",
+      "source": "content/guides/calculate-annual-income-tax.mdx",
+      "status": "draft",
+      "processedSha256": "174693db088115e50725b405718e5d392053472c7399178bfdf9caa7ec508fec",
+      "processedBytes": 1924,
+      "htmlCompilerSource": "guides/calculate-annual-income-tax.mdx",
+      "htmlSha256": "4221840c87cb73e325ca76c5d261e7ee3872a4565ca1d8c726cdaf752d085660",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/calculate-australian-take-home-pay",
+      "source": "content/guides/calculate-australian-take-home-pay.mdx",
+      "status": "draft",
+      "processedSha256": "a93395c1862b16230d0b520deffd6ee1f32a41637eb9d51812a10f568c26d0e4",
+      "processedBytes": 1903,
+      "htmlCompilerSource": "guides/calculate-australian-take-home-pay.mdx",
+      "htmlSha256": "e2647bb222dd254069961a3b0a24f2b362d3a968221eb8f9cc3699f2a9639af7",
+      "canonicalPageLinkCount": 5,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/handle-validation-errors",
+      "source": "content/guides/handle-validation-errors.mdx",
+      "status": "draft",
+      "processedSha256": "8505641a6cfe47b223a82610202fea23c9ce62e7ca86181b080d7f3a5c1e5255",
+      "processedBytes": 2446,
+      "htmlCompilerSource": "guides/handle-validation-errors.mdx",
+      "htmlSha256": "3f2fb02090b45eb52cc8c80b3b89975b9f5c1dc0c2097f4fd8812e13ccc51a45",
+      "canonicalPageLinkCount": 6,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides",
+      "source": "content/guides/index.mdx",
+      "status": "draft",
+      "processedSha256": "345d9ec2ac4749aa5498ce4ee4d954e414cc268dae754f8fa9da98d112a9536e",
+      "processedBytes": 842,
+      "htmlCompilerSource": "guides/index.mdx",
+      "htmlSha256": "20147c611ece92faf9f4fe0aa6f320790ce2fffe7c7245e69866efbf748eb24d",
+      "canonicalPageLinkCount": 11,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/migrate-from-raw-http-to-sdk",
+      "source": "content/guides/migrate-from-raw-http-to-sdk.mdx",
+      "status": "draft",
+      "processedSha256": "f57cff29e63341fd9be57194cc745c8ef37b10610d911748e5c5f29cd5689550",
+      "processedBytes": 2329,
+      "htmlCompilerSource": "guides/migrate-from-raw-http-to-sdk.mdx",
+      "htmlSha256": "9785a2dc8203ec479cc28fc9ff3d78d459cb2b6d689e2ca3a75bd8182842f66e",
+      "canonicalPageLinkCount": 5,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/show-calculator-help-to-users",
+      "source": "content/guides/show-calculator-help-to-users.mdx",
+      "status": "draft",
+      "processedSha256": "aad69f58af244e665a4ec48bd110caf1ae83d732a7aaad528ff8aa51eed755cb",
+      "processedBytes": 2447,
+      "htmlCompilerSource": "guides/show-calculator-help-to-users.mdx",
+      "htmlSha256": "26ca7fce204692a63db1a2b25dbcdb736425918a707b452e893b18fe664066e1",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/guides/test-your-integration",
+      "source": "content/guides/test-your-integration.mdx",
+      "status": "draft",
+      "processedSha256": "499adddf0ef2530588c8fb4eee9b7e559be7d2fca192fa75d072560a9001a5e4",
+      "processedBytes": 2274,
+      "htmlCompilerSource": "guides/test-your-integration.mdx",
+      "htmlSha256": "baad063a10a7dd52cb4d6c38fe6c932ea4181001ab63c82d3a023877ddcc9fbc",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/api",
+      "source": "content/reference/api.mdx",
+      "status": "draft",
+      "processedSha256": "f90ecf2a2c2ddd6bfa61107575d47fa6959b6030b693f8765aa6d5a262b581f1",
+      "processedBytes": 3029,
+      "htmlCompilerSource": "reference/api.mdx",
+      "htmlSha256": "3e7f9efc26a8cecdc0d89772734ba0a76caee1c2165981508761330b15fc2bbb",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 3,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/changelog",
+      "source": "content/reference/changelog.mdx",
+      "status": "draft",
+      "processedSha256": "ddc519c0e44205ad8c71b19287bb973e7d83de0bc1f040f83b359c3d3a2367b7",
+      "processedBytes": 2248,
+      "htmlCompilerSource": "reference/changelog.mdx",
+      "htmlSha256": "bf1a4ce41e2ee242682d3d82182f526d8f090922b4202b01d9b6212fb1c7a733",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 2,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/errors",
+      "source": "content/reference/errors.mdx",
+      "status": "draft",
+      "processedSha256": "d8dce8ced96f2ee39b391d5de9db7e220e52ff830639a23f3cc11dcc78789098",
+      "processedBytes": 4339,
+      "htmlCompilerSource": "reference/errors.mdx",
+      "htmlSha256": "9aea11a74336acf9e349d5e1267349dc0ed8ab8f887869447a2e6207781151fa",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 3,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/examples",
+      "source": "content/reference/examples.mdx",
+      "status": "draft",
+      "processedSha256": "d6fb9cf729b709c743bfe7b7409c3f4ffacf45dcbfe8bf2fd0402c92fdc4e738",
+      "processedBytes": 3642,
+      "htmlCompilerSource": "reference/examples.mdx",
+      "htmlSha256": "fa565bd5ece489c4131696986f625b3a5fb87a3fff06baf78099acc2221b154b",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 9,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference",
+      "source": "content/reference/index.mdx",
+      "status": "draft",
+      "processedSha256": "b5164bc09fcfd65b0b9736282ca933a89c62ec264c95523e6b759b803c1a534a",
+      "processedBytes": 574,
+      "htmlCompilerSource": "reference/index.mdx",
+      "htmlSha256": "a023285f6d11b7c8131a6e29ab9a5bc88012f178b51c3dad19326c0d4e19c52b",
+      "canonicalPageLinkCount": 11,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/release-notes",
+      "source": "content/reference/release-notes.mdx",
+      "status": "draft",
+      "processedSha256": "d944576bd44482dab4f0e1d890fdd626700a366cfd17bbdd0c88eca8699871ee",
+      "processedBytes": 1601,
+      "htmlCompilerSource": "reference/release-notes.mdx",
+      "htmlSha256": "be68625a1a1afaeca79937d5fb722ae45350204b4fa4cc76a15bdc85342447a0",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/schemas",
+      "source": "content/reference/schemas.mdx",
+      "status": "draft",
+      "processedSha256": "37a95991b8c8c3a3f984deb1496b510653fcc4e3d479000d5dff431b5ee58037",
+      "processedBytes": 4979,
+      "htmlCompilerSource": "reference/schemas.mdx",
+      "htmlSha256": "42f7760b6f2e12e0741ebe94a9edaa2c6e2a41a8de4c7bea1efa61e7caa3c362",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 3,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/sdk",
+      "source": "content/reference/sdk.mdx",
+      "status": "draft",
+      "processedSha256": "863cff6798f5ab2d2cf936b2d5b10f06e291bc59d1abd874c8d713a5d2ba7717",
+      "processedBytes": 4031,
+      "htmlCompilerSource": "reference/sdk.mdx",
+      "htmlSha256": "3b187bdc2c1585af66b6004609c6d9d160c97601fa76e282a3230b992ff33665",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 3,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/reference/versioning",
+      "source": "content/reference/versioning.mdx",
+      "status": "draft",
+      "processedSha256": "61b5695d3bf43e4c5da59803f7cdec37ec25ea95160a3e484351e75f44425dca",
+      "processedBytes": 1362,
+      "htmlCompilerSource": "reference/versioning.mdx",
+      "htmlSha256": "a11183c11fc3f8b6cec52cea51975fb5a6ec6873e23f828db6f622d736e63a87",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/sdk/effect-sdk",
+      "source": "content/sdk/effect-sdk.mdx",
+      "status": "draft",
+      "processedSha256": "b7273b85f4aa37008f4973f6b71a68b559a8ef12a1d9f2160105c106cc75fb9d",
+      "processedBytes": 4038,
+      "htmlCompilerSource": "sdk/effect-sdk.mdx",
+      "htmlSha256": "3335c8de9744e43c9a3d64917d875bf11a99836d07d16325958a6dfc49f610da",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/sdk",
+      "source": "content/sdk/index.mdx",
+      "status": "draft",
+      "processedSha256": "dccc7fbb89d521f0e596a9c6a10ac454fa7e0ade5f9be9b41c85388072c6f891",
+      "processedBytes": 451,
+      "htmlCompilerSource": "sdk/index.mdx",
+      "htmlSha256": "df9488cd8364c8e01bdebc2ea6b76125baa7c37b5767e9c5647644928d1f3a83",
+      "canonicalPageLinkCount": 9,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/sdk/plain-sdk",
+      "source": "content/sdk/plain-sdk.mdx",
+      "status": "draft",
+      "processedSha256": "5aeb7cb87205dc9a0cc419f0bbef2de50c7aa1b69eabe9a3338bd698183e4603",
+      "processedBytes": 2246,
+      "htmlCompilerSource": "sdk/plain-sdk.mdx",
+      "htmlSha256": "33b03aaeb8b8c24b553fdc49d798c0869b7f013e2427a47f3396ebce94247065",
+      "canonicalPageLinkCount": 5,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/sdk/safe-sdk",
+      "source": "content/sdk/safe-sdk.mdx",
+      "status": "draft",
+      "processedSha256": "42d7ad9f49f38b397757e0c8e11db07f1302e004ebb406ddfb1183685d40974f",
+      "processedBytes": 1619,
+      "htmlCompilerSource": "sdk/safe-sdk.mdx",
+      "htmlSha256": "902ad6273fa15b0d34d30513757d93533cdd478b44f224ab7cc0fffc00effdac",
+      "canonicalPageLinkCount": 4,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/sdk/schemas",
+      "source": "content/sdk/schemas.mdx",
+      "status": "draft",
+      "processedSha256": "0d2eadda769a576a694af368bb4546bd39a213277cd41b0d9b0b606453ba848f",
+      "processedBytes": 1822,
+      "htmlCompilerSource": "sdk/schemas.mdx",
+      "htmlSha256": "fa52f761247f90811f63e4db88f844717c276802a86e4913c3c6ec7c90ab18e8",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/sdk/type-safety",
+      "source": "content/sdk/type-safety.mdx",
+      "status": "draft",
+      "processedSha256": "fb3c825e1fc18ccd3e34ef5c24f48e77cd3d40c9d61bfd2f61212633f8a10e9b",
+      "processedBytes": 3649,
+      "htmlCompilerSource": "sdk/type-safety.mdx",
+      "htmlSha256": "7c2f0d086fc95ce0b15101a94e49b2ff3482fd4c5c7e3da4c083d40334ee5aef",
+      "canonicalPageLinkCount": 5,
+      "repositoryLinkCount": 1,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/sdk/typescript-sdk",
+      "source": "content/sdk/typescript-sdk.mdx",
+      "status": "draft",
+      "processedSha256": "f8c92a7b57bddada95640ca0924d78d790c15fdd5d99bc8cb45f4f822af63109",
+      "processedBytes": 2318,
+      "htmlCompilerSource": "sdk/typescript-sdk.mdx",
+      "htmlSha256": "04c7aaccd6e8dea005c2f365932c0271e80f654d80234044e042a7afe42a5950",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/start/choose-sdk-or-api",
+      "source": "content/start/choose-sdk-or-api.mdx",
+      "status": "draft",
+      "processedSha256": "af76502eccb482f7381a4b91e69ed408cf31af33a9c4160f111ea6db17e23710",
+      "processedBytes": 26316,
+      "htmlCompilerSource": "start/choose-sdk-or-api.mdx",
+      "htmlSha256": "5d9727b77db45c3334a2bc4e7ada26aaaabf3811829a00f778483bea238ea36c",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/start",
+      "source": "content/start/index.mdx",
+      "status": "draft",
+      "processedSha256": "69de333559111956f32058d3e9f694ee7e64d8567d12243af805aa87c5e311ac",
+      "processedBytes": 497,
+      "htmlCompilerSource": "start/index.mdx",
+      "htmlSha256": "f8e9ce3b9744a6f305a42f5f1a14dc42b56fd0773720aba7711a4bb55444ea57",
+      "canonicalPageLinkCount": 8,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/start/install-the-sdk",
+      "source": "content/start/install-the-sdk.mdx",
+      "status": "draft",
+      "processedSha256": "06a28906d14105780e8f26985b1c8421c9e28882daf3163b151c111d0c8c68d5",
+      "processedBytes": 1860,
+      "htmlCompilerSource": "start/install-the-sdk.mdx",
+      "htmlSha256": "9c52e0af7ea10d13578c1958f0d01b287c22c385190b4f83f15a23956c039965",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/start/overview",
+      "source": "content/start/overview.mdx",
+      "status": "draft",
+      "processedSha256": "1e0cfbcb9cb1cbe0ca9d323479dbaced8b1afb93732592d942ac856d4fbe222a",
+      "processedBytes": 2129,
+      "htmlCompilerSource": "start/overview.mdx",
+      "htmlSha256": "9a487c81490ceeca3353219622fbfc3619cb2c1e3a1ed36f39914d631ad1b1b7",
+      "canonicalPageLinkCount": 8,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/start/quickstart",
+      "source": "content/start/quickstart.mdx",
+      "status": "draft",
+      "processedSha256": "3af0f3a245cfc88cc6d4a8a28edb4839068b4300857b2ec33480f10c41dd7138",
+      "processedBytes": 1961,
+      "htmlCompilerSource": "start/quickstart.mdx",
+      "htmlSha256": "3359fff01957c91a64219fdb015741b82e8bf123f25626296b77d2cb7c31a1a1",
+      "canonicalPageLinkCount": 3,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    },
+    {
+      "path": "/start/run-your-first-calculation",
+      "source": "content/start/run-your-first-calculation.mdx",
+      "status": "draft",
+      "processedSha256": "564c2cd02b8ed2ab7fe8e954a753261c63f56e1e0dd5907b68ccb60936700daf",
+      "processedBytes": 1840,
+      "htmlCompilerSource": "start/run-your-first-calculation.mdx",
+      "htmlSha256": "cb3449d7d68b7051520ff43db62fbe7b7105334c65752f321a4ea49c1feff448",
+      "canonicalPageLinkCount": 2,
+      "repositoryLinkCount": 0,
+      "result": "HTML and processed Markdown destinations agree; no unresolved page/source link or raw source syntax"
+    }
+  ],
+  "linkTotals": {
+    "canonicalPageOccurrences": 244,
+    "repositoryOccurrences": 57,
+    "distinctRepositoryDestinations": 34
+  },
+  "pinnedRepositoryReadback": {
+    "revision": "a151e51e8a30247526fa93412df046955846eca4",
+    "pageCount": 61,
+    "pageLinkCount": 244,
+    "repositoryLinkOccurrences": 57,
+    "uniqueRepositoryLinks": 34,
+    "checks": [
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/CHANGELOG.md",
+        "path": "CHANGELOG.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/apps/api/CHANGELOG.md",
+        "path": "apps/api/CHANGELOG.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/apps/api/README.md",
+        "path": "apps/api/README.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/apps/api/src/server.ts",
+        "path": "apps/api/src/server.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/api-and-sdk.md",
+        "path": "docs/architecture/api-and-sdk.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/calculators.md",
+        "path": "docs/architecture/calculators.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/effect-services.md",
+        "path": "docs/architecture/effect-services.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/facts.md",
+        "path": "docs/architecture/facts.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/graph-trace-ledgers.md",
+        "path": "docs/architecture/graph-trace-ledgers.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/package-ownership.md",
+        "path": "docs/architecture/package-ownership.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/rules-and-parameters.md",
+        "path": "docs/architecture/rules-and-parameters.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/testing-and-quality.md",
+        "path": "docs/architecture/testing-and-quality.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/architecture/testing-and-validation.md",
+        "path": "docs/architecture/testing-and-validation.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/docs/standards/documentation-review.md",
+        "path": "docs/standards/documentation-review.md",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/api/http/__snapshots__/openapi.json",
+        "path": "packages/api/http/__snapshots__/openapi.json",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/api/http/src/api.ts",
+        "path": "packages/api/http/src/api.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/api/http/src/groups/calculators.ts",
+        "path": "packages/api/http/src/groups/calculators.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/calculators/src/errors.ts",
+        "path": "packages/calculators/src/errors.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/calculators/src/schemas.ts",
+        "path": "packages/calculators/src/schemas.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/api-error-envelope.ts",
+        "path": "packages/docs-examples/src/api-error-envelope.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/browser-http.ts",
+        "path": "packages/docs-examples/src/browser-http.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/calculator-help.ts",
+        "path": "packages/docs-examples/src/calculator-help.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/define-gross-pay-fact.ts",
+        "path": "packages/docs-examples/src/define-gross-pay-fact.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/effect.ts",
+        "path": "packages/docs-examples/src/effect.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/error-handling.ts",
+        "path": "packages/docs-examples/src/error-handling.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/node-server.ts",
+        "path": "packages/docs-examples/src/node-server.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/src/validate-external-input.ts",
+        "path": "packages/docs-examples/src/validate-external-input.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/docs-examples/test/integration.example.test.ts",
+        "path": "packages/docs-examples/test/integration.example.test.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/rules/au/pay/src/parameters/schedule1.ts",
+        "path": "packages/rules/au/pay/src/parameters/schedule1.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/sdk/typescript/src/au.ts",
+        "path": "packages/sdk/typescript/src/au.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/sdk/typescript/src/effect.ts",
+        "path": "packages/sdk/typescript/src/effect.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/sdk/typescript/src/errors.ts",
+        "path": "packages/sdk/typescript/src/errors.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/sdk/typescript/src/index.ts",
+        "path": "packages/sdk/typescript/src/index.ts",
+        "exitCode": 0
+      },
+      {
+        "url": "https://github.com/crcorbett/taxkit/blob/a151e51e8a30247526fa93412df046955846eca4/packages/sdk/typescript/src/schemas/index.ts",
+        "path": "packages/sdk/typescript/src/schemas/index.ts",
+        "exitCode": 0
+      }
+    ]
+  },
+  "retainedDocsBuiltProof": {
+    "receiptPath": "tmp/docs-cloudflare/local-workerd-receipt.json",
+    "sha256": "4762fd03d9bfc8530b40dbac7c841c246f38706bf76346edb184078759ab9bfb",
+    "candidate": {
+      "assetsSha256": "01b9f0797fd4d75fb734e37bf46b04a0883bf13ba90ee84bd3b10aeaa5e3b9d8",
+      "deploymentInputSha256": "f6890bdf5f2d8b12659dc8104840c908990ee2a99395e2c627f689549a94c5bb",
+      "sourceCommit": "a151e51e8a30247526fa93412df046955846eca4",
+      "workerModulesSha256": "1722b491f3536dc642d8993cb673ced7a385f9e56c911c0e833c68eb57948ad9",
+      "worktreeQualifiedBeforeCommit": true
+    },
+    "dependencies": {
+      "cloudflareVitePlugin": "1.62.5",
+      "workerd": "1.20261001.1",
+      "wrangler": "4.147.0"
+    },
+    "oracles": {
+      "accessibility": "passed",
+      "assetCacheHeaders": "passed",
+      "assets": "passed",
+      "clientNavigationWithoutDocumentReload": "passed",
+      "clientNotFound": "passed",
+      "concurrentRequestIsolation": "passed",
+      "consoleAndPageErrors": "passed",
+      "directNotFound": "passed",
+      "hydration": "passed",
+      "malformedServerFunction": "passed",
+      "mobileNavigationDisclosure": "passed",
+      "pendingNavigation": "passed",
+      "recoverableError": "passed",
+      "reducedMotion": "passed",
+      "serverFunctionTransport": "passed",
+      "ssr": "passed"
+    },
+    "nonClaims": [
+      "Local workerd does not prove a Cloudflare account, provider deployment, workers.dev URL, remote state, Preview, Production or rollback.",
+      "The startup observation is local workerd evidence; provider startup validation remains required."
+    ],
+    "environment": "Local retained docs app; replacement Website and hosted deployment are not qualified by this receipt"
+  },
+  "earlierCopyHostedQuality": {
+    "head": "a151e51e8a30247526fa93412df046955846eca4",
+    "conclusion": "success",
+    "completedAt": "2026-10-06T11:17:11Z",
+    "runId": 37453265100,
+    "jobId": 112234633059,
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37453265100/job/112234633059",
+    "nonClaim": "The new link commit has its own hosted checks after push."
+  },
+  "retainedAttempts": [
+    {
+      "checks": [
+        {
+          "stage": "frozen-install",
+          "command": [
+            "bun",
+            "install",
+            "--frozen-lockfile",
+            "--ignore-scripts"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 0.03,
+          "log": "/private/tmp/dev76-links-full-a-frozen-install.log"
+        },
+        {
+          "stage": "verification",
+          "command": [
+            "bun",
+            "run",
+            "verification"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 604.39,
+          "log": "/private/tmp/dev76-links-full-a-verification.log"
+        },
+        {
+          "stage": "all-tests",
+          "command": [
+            "bun",
+            "run",
+            "test"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 30.12,
+          "log": "/private/tmp/dev76-links-full-a-all-tests.log"
+        },
+        {
+          "stage": "build",
+          "command": [
+            "bun",
+            "run",
+            "build"
+          ],
+          "exitCode": 1,
+          "durationSeconds": 0.69,
+          "log": "/private/tmp/dev76-links-full-a-build.log"
+        }
+      ],
+      "result": "Verification and tests passed before the final native build rejected the missing JSON import attribute; this earlier verification does not qualify the corrected module profiles."
+    },
+    {
+      "checks": [
+        {
+          "stage": "format",
+          "command": [
+            "bun",
+            "run",
+            "format"
+          ],
+          "exitCode": 0,
+          "durationSeconds": 0.37,
+          "log": "/private/tmp/dev76-links-build-b-format.log"
+        },
+        {
+          "stage": "types",
+          "command": [
+            "bun",
+            "run",
+            "check-types"
+          ],
+          "exitCode": 1,
+          "durationSeconds": 3.75,
+          "log": "/private/tmp/dev76-links-build-b-types.log"
+        }
+      ],
+      "result": "The first corrected module profile left the retained script and importing documentation typechecks on ES2022. Correcting those exact consumers passed global types, build and the new full verification."
+    },
+    {
+      "result": "Focused experiments corrected portable callback declarations and the VFile getter mismatch. The missing-path case initially failed on the real undefined getter and now passes with an Option. No failure was hidden by a policy exemption."
+    }
+  ],
+  "publicLifecycle": {
+    "authoredPages": 61,
+    "draftPages": 61,
+    "navigationStatus": "draft",
+    "acceptanceRecords": 0
+  },
+  "nonClaims": [
+    "These checks qualify link presentation, not publication acceptance or public availability.",
+    "Explicit page/navigation acceptance, replacement Website/API routes, discovery, share images and old-app retirement remain unfinished T005 work.",
+    "Local retained-app workerd and browser tests do not establish replacement routes, provider state, Preview, Production or rollback.",
+    "Retained annual results do not establish current-law Medicare correctness; Cooper scope decision remains unresolved.",
+    "Metrics and exported telemetry remain deferred."
+  ],
+  "rollback": "Revert this bounded link/configuration commit and regenerate through the owning MDX command; preserve prior source/copy/compiler evidence and authored pages.",
+  "finalMetadataChecks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.36,
+      "log": "/private/tmp/dev76-links-final-metadata-a-format.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.28,
+      "log": "/private/tmp/dev76-links-final-metadata-a-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev76-links-final-metadata-a-runbooks.log"
+    },
+    {
+      "stage": "docs-validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.2,
+      "log": "/private/tmp/dev76-links-final-metadata-a-docs-validate.log"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.25,
+      "log": "/private/tmp/dev76-links-final-metadata-a-changesets.log"
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.42,
+      "log": "/private/tmp/dev76-links-final-metadata-a-format-check.log"
+    },
+    {
+      "stage": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev76-links-final-metadata-a-diff-check.log"
+    }
+  ]
+}

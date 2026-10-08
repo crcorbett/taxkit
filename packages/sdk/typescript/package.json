@@ -68,16 +68,18 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
-    "check-boundaries": "bun run scripts/check-import-boundaries.ts",
+    "check-boundaries": "bun run scripts/check-import-boundaries.runtime.ts",
     "check-packed-artifact": "bun run scripts/check-packed-artifact.runtime.ts",
     "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit && tsc -p scripts/tsconfig.json --noEmit",
     "test": "vitest run",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+    "clean": "rm -rf dist .turbo *.tsbuildinfo",
+    "test:browser": "vitest run --config vitest.browser.config.ts"
   },
   "dependencies": {
     "@taxkit/calculators": "workspace:*",
+    "@taxkit/core": "workspace:*",
     "@taxkit/rules-au-income-tax": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
     "effect": "catalog:"
@@ -85,10 +87,11 @@
   "devDependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/vitest": "catalog:",
-    "@taxkit/core": "workspace:*",
     "@taxkit/testing": "workspace:*",
     "@types/bun": "catalog:",
+    "@vitest/browser-playwright": "5.0.3",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "4c01cae8723987e0feb4e506207c863759c479d6745eaafedd19681c8532df9d",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/sdk/effect-sdk.mdx"
+}

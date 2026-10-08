@@ -3,6 +3,7 @@
   "include": ["./src/**/*.ts", "./.source/**/*.ts", "./source.config.ts"],
   "compilerOptions": {
     "allowImportingTsExtensions": true,
+    "module": "ESNext",
     "strictNullChecks": true
   }
 }

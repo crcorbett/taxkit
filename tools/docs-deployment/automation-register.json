@@ -57,7 +57,9 @@
         "Alchemy or Cloudflare version change",
         "state or credential change",
         "failed apply or teardown"
-      ]
+      ],
+      "sourceStatus": "retired",
+      "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
     },
     "lock": {
       "cancelInProgress": false,
@@ -143,7 +145,9 @@
         "Alchemy or Cloudflare version change",
         "state or credential change",
         "failed deploy or rollback"
-      ]
+      ],
+      "sourceStatus": "retired",
+      "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
     },
     "lock": {
       "cancelInProgress": false,
@@ -229,7 +233,9 @@
         "stage naming change",
         "state or credential change",
         "failed destroy"
-      ]
+      ],
+      "sourceStatus": "retired",
+      "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
     },
     "lock": {
       "cancelInProgress": false,

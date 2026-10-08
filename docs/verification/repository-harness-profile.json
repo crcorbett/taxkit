@@ -113,9 +113,9 @@
     {
       "id": "TAXKIT-DOCS-RUNTIME",
       "consumer": "Local documentation-site reader",
-      "acceptedOutcome": "Validated content renders and the browser harness observes navigation, server functions, recoverable errors, and clean console behavior.",
+      "acceptedOutcome": "The freshly built native API/Website renders accepted pages and proves private calls, navigation, search, discovery, Markdown, images, keyboard/focus/landmarks/contrast/reduced motion and safe recovery.",
       "owningPaths": [
-        "apps/docs/",
+        "apps/web/",
         "packages/docs-content/",
         "packages/docs-fumadocs/",
         "docs/verification/critical-journeys.json#taxkit-docs-runtime"
@@ -129,6 +129,16 @@
         "packages/scripts/src/release-readiness/",
         "docs/verification/critical-journeys.json#taxkit-release-closure"
       ]
+    },
+    {
+      "id": "TAXKIT-NATIVE-WEBSITE",
+      "consumer": "Local Website reader and calculator user",
+      "acceptedOutcome": "The native API and Website artifacts support private form and public browser calculations with checked settings, hydration, interruption and safe browser imports.",
+      "owningPaths": [
+        "apps/web/",
+        "packages/api/rpc/",
+        "docs/verification/critical-journeys.json#taxkit-native-website"
+      ]
     }
   ],
   "criticalJourneyOwner": "docs/verification/critical-journeys.json",
@@ -137,8 +147,9 @@
     "The local release-readiness graph grants no versioning, Git, registry, release, deployment, provider, public-site, or recovery authority.",
     "The existing Quality workflow invokes bun run release:check -- --ci for pull requests and main-branch pushes; that graph begins with root verification and remains the sole hosted CI route.",
     "Exactly five operational runbooks and docs/operations/authority-model.md remain the repeatable operation and authority owners.",
-    "The separate four-entry docs deployment journey owner and dated deployment receipts never alter the five local release journeys or historical HGI/HFI evidence.",
-    "Repository validators work from a clean clone. Agents separately look up the latest plugin through docs/skills.md."
+    "The current six local journeys include the native Website. The separate four-entry docs deployment journey owner and dated deployment receipts grant no additional authority; historical five-journey HGI/HFI evidence remains unchanged.",
+    "Repository validators work from a clean clone. Agents separately look up the latest plugin through docs/skills.md.",
+    "Current docs-browser release checking and Quality Playwright bootstrap select apps/web. The old apps/docs workspace and writers are retired with verified retained sources; new provider operations remain T010 work; no historical packet or provider target is reinterpreted."
   ],
   "exclusions": [
     "Dependency, build, cache, generated route, temporary, binary, and vendored trees are excluded from readable corpus accounting.",

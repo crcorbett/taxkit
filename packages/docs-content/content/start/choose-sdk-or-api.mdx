@@ -1,25 +1,26 @@
 ---
 title: "Choose SDK or HTTP API"
 description: "Choose the right TaxKit integration surface for your application."
-status: "draft"
+status: "published"
 ---
 
 # Choose SDK or HTTP API
 
 Choose the SDK when your application can import TypeScript packages. Choose the
-HTTP API when you need a network boundary, a browser-safe caller or a
-non-TypeScript integration.
+HTTP API when the calculation should run on the server or the caller cannot
+import TypeScript packages. The SDK's root, AU and schema entrypoints also
+support browser callers; those calculations run on the caller's device.
 
 ## Choose by environment
 
-| Environment                                      | Choose     | Why                                                                                                             |
-| ------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------- |
-| Server-side TypeScript application               | Plain SDK  | You get typed calculator inputs and reports without HTTP transport.                                             |
-| TypeScript application that wants typed failures | Safe SDK   | You get `TaxKit.safe.calculate` result values.                                                                  |
-| Effect application                               | Effect SDK | You can compose `calculateRunRequest`, `calculateReportRequest` and `calculateReport` with services and layers. |
-| Browser application                              | HTTP API   | You avoid importing server-side calculation packages into the browser.                                          |
-| Non-TypeScript backend                           | HTTP API   | You can use JSON and generated OpenAPI reference.                                                               |
-| Generated endpoint contract                      | HTTP API   | OpenAPI owns endpoint shape and status codes.                                                                   |
+| Environment                                      | Choose          | Why                                                                                                             |
+| ------------------------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------- |
+| Server-side TypeScript application               | Plain SDK       | You get typed calculator inputs and reports without HTTP transport.                                             |
+| TypeScript application that wants typed failures | Safe SDK        | You get `TaxKit.safe.calculate` result values.                                                                  |
+| Effect application                               | Effect SDK      | You can compose `calculateRunRequest`, `calculateReportRequest` and `calculateReport` with services and layers. |
+| Browser application                              | HTTP API or SDK | HTTP sends the request to the server; the browser-safe SDK calculates on the device.                            |
+| Non-TypeScript backend                           | HTTP API        | You can use JSON and generated OpenAPI reference.                                                               |
+| Generated endpoint contract                      | HTTP API        | OpenAPI owns endpoint shape and status codes.                                                                   |
 
 ## Recommended paths
 
@@ -28,7 +29,9 @@ flowchart TD
   Start["Where will the caller run?"]
   ServerTs["Server-side TypeScript"]
   EffectApp["Effect application"]
-  Browser["Browser or another language"]
+  Browser["Browser"]
+  AnotherLanguage["Another language"]
+  Location["Where should the browser calculation run?"]
   PlainSdk["Use the plain SDK"]
   EffectSdk["Use the Effect SDK"]
   HttpApi["Use the HTTP API"]
@@ -36,13 +39,17 @@ flowchart TD
   Start --> ServerTs
   Start --> EffectApp
   Start --> Browser
+  Start --> AnotherLanguage
   ServerTs --> PlainSdk
   EffectApp --> EffectSdk
-  Browser --> HttpApi
+  Browser --> Location
+  Location -->|"On the device"| PlainSdk
+  Location -->|"On a server"| HttpApi
+  AnotherLanguage --> HttpApi
 ```
 
-The HTTP API is a thin transport over the SDK and calculator service. It should
-not contain calculator business logic that is missing from the SDK path.
+The HTTP API calls the calculator service directly. The SDK calls the same
+service in-process. Keep tax logic in the shared calculator and rule packages.
 
 ## Next steps
 

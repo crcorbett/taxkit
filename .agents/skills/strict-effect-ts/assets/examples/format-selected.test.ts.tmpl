@@ -1,0 +1,51 @@
+import { assert, describe, expectTypeOf, it } from "@effect/vitest";
+import { Effect, Schema } from "effect";
+import { checkedGetPage, InvalidPageRequestError, InvalidPageResponseError, MarkdownText, PageAccessError, PageFormat, PageId, PageRequest, PageResponse, PageTitle, PageUnavailableError } from "./format-selected.js";
+import type { PageInput } from "./format-selected.js";
+
+const id = PageId.make("example");
+const data = PageResponse.cases.data.make({ format: "data", page: { id, title: PageTitle.make("Example") } });
+const markdown = PageResponse.cases.markdown.make({ format: "markdown", markdown: MarkdownText.make("# Example") });
+const getPage = checkedGetPage({ getPage: ({ format }) => Effect.succeed(format === "data" ? data : markdown) });
+
+describe("checked format selection", () => {
+  it.effect("defaults to data and keeps exact literal return types", () => Effect.gen(function* () {
+    const request = yield* Schema.decodeUnknownEffect(PageRequest)({ id });
+    assert.strictEqual(request.format, "data");
+    const defaultResult = yield* getPage({ id });
+    expectTypeOf(defaultResult).toEqualTypeOf<typeof PageResponse.cases.data.Type>();
+    assert.strictEqual(defaultResult.page.title, "Example");
+    const selected = yield* getPage({ id, format: "markdown" });
+    expectTypeOf(selected).toEqualTypeOf<typeof PageResponse.cases.markdown.Type>();
+    assert.strictEqual(selected.markdown, "# Example");
+  }));
+  it.effect("narrows a runtime union by its format field", () => Effect.gen(function* () {
+    const format: PageFormat = yield* Schema.decodeUnknownEffect(PageFormat)("markdown");
+    const input: PageInput = { id, format };
+    const result = yield* getPage(input);
+    expectTypeOf(result).toEqualTypeOf<PageResponse>();
+    if (result.format === "markdown") {
+      assert.strictEqual(result.markdown, "# Example");
+    } else {
+      assert.strictEqual(result.page.title, "Example");
+    }
+  }));
+  it.effect("rejects a valid response for the wrong requested format", () => Effect.gen(function* () {
+    const wrong = checkedGetPage({ getPage: () => Effect.succeed(markdown) });
+    const error = yield* wrong({ id }).pipe(Effect.flip);
+    assert.isTrue(Schema.is(InvalidPageResponseError)(error));
+  }));
+  it.effect("rejects malformed response data", () => Effect.gen(function* () {
+    const invalid = checkedGetPage({ getPage: () => Effect.succeed({ format: "data", page: { id, title: "" } }) });
+    const error = yield* invalid({ id }).pipe(Effect.flip);
+    assert.isTrue(Schema.is(InvalidPageResponseError)(error));
+  }));
+  it.effect("preserves a declared tagged failure", () => Effect.gen(function* () {
+    const unavailable = checkedGetPage({ getPage: () => Effect.fail(new PageUnavailableError()) });
+    const error = yield* unavailable({ id }).pipe(Effect.flip);
+    assert.isTrue(Schema.is(PageUnavailableError)(error));
+    const encoded = yield* Schema.encodeEffect(PageAccessError)(new InvalidPageRequestError());
+    const decoded = yield* Schema.decodeEffect(PageAccessError)(encoded);
+    assert.instanceOf(decoded, InvalidPageRequestError);
+  }));
+});

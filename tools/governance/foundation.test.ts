@@ -1,6 +1,5 @@
-import { describe, expect, it } from "bun:test";
-
-import { Result, Schema } from "effect";
+import { describe, expect, it } from "@effect/vitest";
+import { Array as EffectArray, Result, Schema } from "effect";
 
 import acceptedJson from "../../docs/documentation-audit/harness-foundation/accepted-findings.json";
 import findingsJson from "../../docs/documentation-audit/harness-foundation/audit-findings.json";
@@ -38,7 +37,7 @@ describe("harness foundation schemas", () => {
       Result.isFailure(
         Schema.decodeUnknownResult(AcceptedFindings)({
           ...acceptedJson,
-          entries: acceptedJson.entries.map((entry) =>
+          entries: EffectArray.map(acceptedJson.entries, (entry) =>
             entry.findingId === "HE-001"
               ? { ...entry, requirementIds: [], taskIds: [] }
               : entry

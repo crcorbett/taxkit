@@ -1,0 +1,135 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-05",
+  "issue": "DEV-73",
+  "parent_revision": "cd5b2a8dec1fdd53375486852485a898215d9ede",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "repository": "crcorbett/taxkit",
+    "environment": "local pinned macOS/Bun/Chromium; no provider operation"
+  },
+  "implemented": [
+    "Canonical whole-source selector covers six extensions across current/future owned root/app/tool/config files",
+    "Five exact unexecuted lint-only inputs preserve isolated host/binding-rule contexts; neighbouring files remain strict",
+    "Actual six-extension and five-neighbour admission/rejection controls with exact file count and expected rules",
+    "Valid CommonJS positive/negative fixtures, separately from ESM syntax",
+    "Two new isolated real-verifier mutations reject removed whole-source coverage and broadened fixture exclusions; existing controls/deadlines preserved"
+  ],
+  "checks": [
+    {
+      "command": "native lint/Quality compiler projects",
+      "outcome": "pass",
+      "logs": [
+        "owned-source-qualified-lint-types.log",
+        "owned-source-qualified-quality-types.log"
+      ]
+    },
+    {
+      "command": "bun run lint / explicit Git-owned canonical CLI inventory",
+      "outcome": "pass: 397 admitted owned source paths, zero warnings/errors or inventory diagnostics; all staged additions included",
+      "logs": [
+        "owned-source-root-lint.log",
+        "2026-10-05-canonical-owned-source-inventory.json",
+        "2026-10-05-canonical-owned-source-inventory.stderr"
+      ]
+    },
+    {
+      "command": "bun run test:oxlint / bun run test",
+      "outcome": "401 actual CLI lint cases pass; all 24 package tasks, 23 matching caches; unchanged docs script/server cases 53/19 rerun",
+      "logs": [
+        "owned-source-cli-tests-qualified.log",
+        "owned-source-root-tests.log"
+      ]
+    },
+    {
+      "command": "bun run build",
+      "outcome": "all 15 tasks pass, matching caches; no app/package implementation change",
+      "logs": [
+        "owned-source-root-build.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "32 Quality cases pass, including 13 isolated checks in 360.78 seconds; new source/exclusion regressions fail the real verifier with exact intended messages; 206 deployment-tool, 21 skill and 16 evaluation cases; both Knip profiles and all 24 compiler tasks pass; unchanged SDK/browser 24 and web/browser four matching caches",
+      "logs": [
+        "owned-source-full-verification.log"
+      ]
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass: unchanged 792 installs/1020 packages; native compiler replacement hash matches",
+      "logs": [
+        "owned-source-frozen-install.log"
+      ]
+    }
+  ],
+  "documentation_impact": {
+    "Change required": [
+      "oxlint.config.ts",
+      "tools/oxlint/portable-rules.test.ts",
+      "tools/quality-workflow/schemas.ts",
+      "tools/quality-workflow/release-boundary.test.ts",
+      "tools/quality-workflow/fixtures/strict-enforcement-defects.json",
+      "docs/architecture/testing-and-quality.md",
+      "docs/standards/controls.md",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json"
+    ],
+    "Preserve": [
+      "All canonical rule severities and narrow runtime/codec/assignment/method admissions",
+      "Explicit generated/vendor exclusions and MDX expression owner",
+      "Canonical skills/digests, installed dependencies, public content, historical evidence, provider state and retained tax results"
+    ],
+    "N/A": {
+      "Changeset": "repository tooling only; no package contract change",
+      "runbook/provider operation": "same local verification commands; no consequential operation",
+      "new public/generated output": "unchanged"
+    }
+  },
+  "fixture_containment": {
+    "paths": [
+      "tools/oxlint/fixtures/bun-accepted.ts",
+      "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
+      "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
+      "tools/oxlint/fixtures/effect-accepted.ts",
+      "tools/oxlint/fixtures/effect-unrelated-accepted.ts"
+    ],
+    "purpose": "unexecuted source inputs read by the actual lint corpus to isolate separate binding/host rules",
+    "owner": "tools/oxlint/portable-rules.test.ts",
+    "compiler_boundary": "tools/oxlint/tsconfig.json includes only ./*.ts, outside fixtures directory",
+    "removal": "retire exact exclusions when their isolated rule fixtures are retired; no workflow host admission"
+  },
+  "recovery": {
+    "failed_observations": [
+      "Initial new test object was unsorted, corrected",
+      "Initial CommonJS corpus used ESM imports and failed the strict diagnostic Schema before rule assertions; replaced with valid CommonJS fixtures",
+      "Initial corpus extension edit duplicated two expected IDs; corrected before isolated verification"
+    ],
+    "rollback": "revert this complete slice to parent revision",
+    "resume_trigger": "finish local qualification and parent semantic review before accepting T002; then DEV-74\u201381",
+    "next_owner": "TaxKit implementation owner"
+  },
+  "limitations": [
+    "Final T002 semantic/acceptance review remains pending; this receipt qualifies source enforcement, not all later interface/application design",
+    "No merge/deployment/publication/provider apply/version application",
+    "DEV-73 remains in progress; Medicare separate"
+  ],
+  "postconditions": [
+    "All supported owned source extensions have canonical strict coverage",
+    "Exactly five unexecuted fixture inputs retain separate rule contexts; both exact-list and real-neighbour controls preserve containment",
+    "Actual CommonJS parse succeeds before rule oracles; parser failure is not relabelled as strict-policy rejection",
+    "Removed coverage or wildcard fixture exclusions fail the complete real verifier in separate copies",
+    "Existing deadlines, six release-boundary oracles, five-control register, canonical rule severities and exact host/codec/method/assignment admissions remain",
+    "No application/package/tax/provider implementation changes"
+  ],
+  "logs_location": "Task-local pinned-toolchain directory, portable basenames only",
+  "parent_hosted_quality": {
+    "run_id": 37212184618,
+    "commit": "cd5b2a8dec1fdd53375486852485a898215d9ede",
+    "conclusion": "success",
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37212184618",
+    "scope": "parent draft #125 only"
+  }
+}

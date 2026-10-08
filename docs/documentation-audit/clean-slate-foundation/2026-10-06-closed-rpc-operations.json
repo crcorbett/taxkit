@@ -1,0 +1,410 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "closed RPC operation set, reply codec or client lifetime change",
+  "outcome": "Pass for local complete closed RPC operation set; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-closed-rpc-operations",
+    "baseCommit": "ded95d387f244f427c8349feba8fdd342274be42",
+    "sources": [
+      {
+        "path": ".changeset/closed-calculator-rpc-operations.md",
+        "sha256": "93e585e215da534e75af84145ad3d1e01e1238aa45341a0c667972f88938fe4c"
+      },
+      {
+        "path": "apps/api/README.md",
+        "sha256": "fd5c0b0f02888b63a49ad71fa630d0ad30f0af45eec64f8169ec4caf1d86f797"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "6078049c850f132db8703a606f8bb53ea96765ee7d7fb1e9b4be65ca65e7a159"
+      },
+      {
+        "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "sha256": "29187fba66e7526b49391e0bda4152edc1409824bb1ecb7c29a1a761891ba5fc"
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "f59c718c7343a09b63e117f658deddb79ee1387057a08d7660af5391e3a7406f"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "848000bc37bcf77df5008a58cb7993222804165c8a930f4a4fd748816d9216cf"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "eae21daf12c1461181f573d3880db47aa9817eeae5a52b67499ea150eede4bcb"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "89cafa82d8a43d4aaf9735b1f066749cf32dd13f832e643e24e70aa87f04a6e2"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "d7993835c9c4d2d5405b2187189b71cff3b15f9c30371682641861dea2cf7b00"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "481574798fad81631a08411f503e42e432b717c43ff6c1087066f55bb85d76cb"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "254085848936a7299d5accf43b797ee247152a6fbff12e9b5d3e8a8772c009e6"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "4f52706b57e255a95683364e6322893b8835fddc796cc06aa932758c05507f81"
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "3331bd556256ebe0e1b0f32235f20aeec807f063dc262af80b3e3d51fbf9daa2"
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "47626f0fe88ccaad7b465fb19e9d47dd955bb9f23fdf65f6ec82b1b71ce03273"
+      },
+      {
+        "path": "packages/api/rpc/src/__testing__/fixtures.ts",
+        "sha256": "fd03b0c59dd5935698c60f7322cf3d101e3bafe3e12b8acf415c6c3e446d094b"
+      },
+      {
+        "path": "packages/api/rpc/src/client-response.boundary.ts",
+        "sha256": "50c14bbb2344f06f9cf94fc1391db553e6e1515bc01ef2546bb9b3a8567f0966"
+      },
+      {
+        "path": "packages/api/rpc/src/group.ts",
+        "sha256": "8068d7aaf3ac2052046dbce2af12f0d81b79ba30ff0db95409c528ec4b0641b4"
+      },
+      {
+        "path": "packages/api/rpc/src/handlers.ts",
+        "sha256": "e3fa6470c858e92923b6a27683c739a77493de3253e3ebd0f942c1fff241ff4f"
+      },
+      {
+        "path": "packages/api/rpc/src/live.layer.ts",
+        "sha256": "3b7111516d440d2da8208c3bdbd769f1d34790586c4653cc7b3f2b7fd9eb2932"
+      },
+      {
+        "path": "packages/api/rpc/src/schemas.ts",
+        "sha256": "564a187d144da5153929dbf096e53c0f91eabe7399088e0c6a35418c6ae5d504"
+      },
+      {
+        "path": "packages/api/rpc/src/server-serialization.boundary.ts",
+        "sha256": "9f0be9c30f8d3a174668c8f35d1c6d7d1782b8915ea393c4f7b64fb15da478c8"
+      },
+      {
+        "path": "packages/api/rpc/src/service.ts",
+        "sha256": "93cc426685e37dd5e655bfe318a5d04280b09baeb70172a378713b654aa133d5"
+      },
+      {
+        "path": "packages/api/rpc/src/test.layer.ts",
+        "sha256": "c06a9bc309b46968e29f70373cc94233a2008b316991758812f2f96ea94a2af6"
+      },
+      {
+        "path": "packages/api/rpc/test/deadline.test.ts",
+        "sha256": "05a55f603ef3a572323dad71e0c7b7afc9f108fd5dffe24a3e8662e464890ae2"
+      },
+      {
+        "path": "packages/api/rpc/test/handlers.test.ts",
+        "sha256": "4bb511b52c8f39bc08028f588aa6480c2af27037f747932e9cd3fd1c45d3b54e"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "4b36b7db050dfa396640bbff52abf1e251589a061c3872861a97775c1f57ee35"
+      }
+    ]
+  },
+  "operations": [
+    "Calculate",
+    "GetCalculator",
+    "GetCalculatorGraph",
+    "GetCalculatorSchema",
+    "ListCalculators",
+    "ListFacts",
+    "ListJurisdictions",
+    "ListRules",
+    "ListTaxYears"
+  ],
+  "rpcVersion": "3",
+  "abstractionAdmission": {
+    "owner": "existing private RPC client and handlers",
+    "policy": "operation-scoped generated native client, complete-response deadline/fetch/safe-failure policy; safe request-error projection",
+    "consumers": "nine named client methods; four request-error handlers",
+    "substitution": "existing explicit test Layer and controlled native HTTP transport",
+    "simplerCallGraph": "named method -> concrete Effect policy -> native RPC; no generic raw-client callback/runtime/Layer escape"
+  },
+  "documentationImpact": {
+    "Change required": [
+      "RPC/app/calculator READMEs; API/Effect/testing architecture",
+      "SPEC/tasks/plan/journey/audit router and dated receipt",
+      "major private RPC Changeset"
+    ],
+    "Preserve": [
+      "tax/source/golden/Medicare",
+      "HTTP/OpenAPI/local SDK; body/work/rate policy",
+      "content/provider/infrastructure/telemetry/skills/CI/lint permissions"
+    ],
+    "N/A": [
+      "runbooks/command policy unchanged",
+      "generated public references unchanged"
+    ]
+  },
+  "focusedEvidence": {
+    "rpcTests": 208,
+    "durationSeconds": 0.783,
+    "compiler": "Focused and root types passed on corrected source",
+    "lint": "Root lint passed, no exception changes",
+    "nativeTests": 7,
+    "nativeDurationSeconds": 74.63,
+    "nativeBuildAndTestSeconds": 80.37,
+    "sourceRestoration": "All four negative controls restored exact original bytes; native fault-builder restoration passed"
+  },
+  "failedAttempts": [
+    {
+      "boundary": "metadata membership oracle",
+      "observation": "ListRules immutable collection has a different existing iteration order from schema rules",
+      "resolution": "Preserve production order; check complete membership and length"
+    },
+    {
+      "boundary": "Vitest asymmetric matcher type",
+      "observation": "arrayContaining requires mutable array input while calculator response is readonly",
+      "resolution": "Effect Array.fromIterable copies only the expected list at the framework boundary; no production mutation"
+    },
+    {
+      "boundary": "first root lint",
+      "observation": "15 sorting/type-only import findings in expanded fixtures and live Layer",
+      "resolution": "Scoped existing lint fixer sorted keys and made the canonical expected-error import type-only; root lint and compiler pass, no permission changed"
+    }
+  ],
+  "remaining": [
+    "exact hosted candidate checks and draft review",
+    "trusted non-logged rate identity/limiter",
+    "standalone HTTP body admission and metadata operation budget",
+    "MCP and whole T004 acceptance",
+    "Medicare decision"
+  ],
+  "nonClaims": [
+    "No tax correction/current-law proof",
+    "No forced remote Worker cancellation or CPU pre-emption",
+    "No merge, deployment, publication or provider apply"
+  ],
+  "sourceRemovalControls": [
+    {
+      "control": "deadline",
+      "observed": "expected focused failure",
+      "exit": 1,
+      "seconds": 0.62,
+      "test": "one deadline includes stalled headers for getCalculatorSchema",
+      "restoredSha256": "564a187d144da5153929dbf096e53c0f91eabe7399088e0c6a35418c6ae5d504"
+    },
+    {
+      "control": "version",
+      "observed": "expected focused failure",
+      "exit": 1,
+      "seconds": 0.46,
+      "test": "rejects old revision 2 before getCalculatorSchema",
+      "restoredSha256": "e3fa6470c858e92923b6a27683c739a77493de3253e3ebd0f942c1fff241ff4f"
+    },
+    {
+      "control": "ingress",
+      "observed": "expected focused failure",
+      "exit": 1,
+      "seconds": 0.46,
+      "test": "reads the complete metadata contract through native HTTP RPC",
+      "restoredSha256": "9f0be9c30f8d3a174668c8f35d1c6d7d1782b8915ea393c4f7b64fb15da478c8"
+    },
+    {
+      "control": "decoder",
+      "observed": "expected focused failure",
+      "exit": 1,
+      "seconds": 0.46,
+      "test": "classifies a broken schema reply to getCalculatorSchema",
+      "restoredSha256": "3b7111516d440d2da8208c3bdbd769f1d34790586c4653cc7b3f2b7fd9eb2932"
+    }
+  ],
+  "checks": [
+    {
+      "command": "bun run test",
+      "exit": 0,
+      "seconds": 87.33
+    },
+    {
+      "command": "bun run build",
+      "exit": 0,
+      "seconds": 0.08
+    },
+    {
+      "command": "bun run docs:validate",
+      "exit": 0,
+      "seconds": 0.21
+    },
+    {
+      "command": "bun run api:smoke",
+      "exit": 0,
+      "seconds": 0.47
+    },
+    {
+      "command": "bun run sdk:check-packed-artifact",
+      "exit": 0,
+      "seconds": 0.25
+    },
+    {
+      "command": "bun run sdk:validate-downstream",
+      "exit": 0,
+      "seconds": 2.96
+    },
+    {
+      "command": "bun run --filter=@taxkit/sdk check-packed-artifact",
+      "exit": 0,
+      "seconds": 0.18
+    },
+    {
+      "command": "bun run --filter=@taxkit/sdk validate:downstream",
+      "exit": 0,
+      "seconds": 2.51
+    },
+    {
+      "command": "bun run changeset:status",
+      "exit": 0,
+      "seconds": 0.26
+    },
+    {
+      "command": "bun run verification",
+      "exit": 0,
+      "seconds": 578.42
+    }
+  ],
+  "postconditions": {
+    "workspaceTests": "27 tasks: 16 fresh, 11 cached; all 208 RPC cases pass; actual CLI corpus 475",
+    "build": "Pre-build 16 tasks: seven fresh, nine cached; final root build reuses those 16 qualified outputs",
+    "apiSmoke": "one fresh/eleven cached; live health/catalogue/calculation/OpenAPI and genuine isolated external HTTP consumer",
+    "sdk": "Each exact root check one fresh/six cached; direct packed/downstream scripts fresh and clean isolated workspaces. Public SDK interface preserved.",
+    "verification": "32 fresh isolated workflow cases in 470.85 seconds; lint, format, both unused-code checks, compiler and complete prescribed checks pass",
+    "browser": "24 SDK and 19 Website cases; engine markers remain absent from actual Website client",
+    "native": "Fresh original/fault Worker builds; seven tests over five files in 75.19 seconds, including the seven new metadata calls against actual API artifact",
+    "sourceRestoration": "All 27 staged files byte-identical to the pre-check source snapshot",
+    "screenshots": "Four newly captured images match previously inspected parent images byte-for-byte"
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "parentHostedProof": {
+    "pullRequest": 144,
+    "headCommit": "ded95d387f244f427c8349feba8fdd342274be42",
+    "runId": 37386080486,
+    "jobId": 112019569943,
+    "completedAt": "2026-10-05T23:22:36Z",
+    "outcome": "success",
+    "readbackDate": "2026-10-06",
+    "limitation": "Parent proof only; current candidate hosted result pending"
+  },
+  "rollback": {
+    "identity": "ded95d387f244f427c8349feba8fdd342274be42",
+    "action": "Revert this complete closed-operation slice and its revision together before any separately authorised release. No provider operation."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for local closed-operation contract, scope/policy reuse and evidence",
+    "remaining": "Whole T004, later tasks, exact hosted candidate/draft review and separate Medicare decision"
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and receipt only; implementation bytes preserved after full closeout",
+    "verification": "Docs/runbooks/root format/Changeset/whitespace rerun before commit"
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 103,
+      "sha256": "b9ec79c8397c52b9a4bae6ba1a3ebaa80a6ea14fb9a0959f38e889c967bb593c"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "640189d5ed9ba7e331a57a220e017772a48ebeed8da0a0db45cc883aee822486"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "d2a62f98ae376528ccc036895a0ceaa63a9d5b48596a2d4f0d39ad7c1ce421cd"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "55b6653b344516d02084398b5c5c4523832b52f32c9886ae8964b50c0153800e"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "9044ba3a14b6005809c919915735345b9b28a8069c6992c4550c85b9bda9b3a3"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "bf26dc83a3e5cf8d6ec04ec0529f320c240c22d719e332da74a8cdd561ddbc19"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "4da9643865d9f880af3548a23e61d4b18f1aae620985197246276516619fd48c"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "baf0b47ebd237b7db425d1742231e59b22d926a477c78e5e7d197458fdde1af6"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "293a9601699345879a9c965b348497b2b59f8aab9d0b25af8b8fac4866c35acd"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously viewed parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously viewed parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously viewed parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously viewed parent image"
+    }
+  ]
+}

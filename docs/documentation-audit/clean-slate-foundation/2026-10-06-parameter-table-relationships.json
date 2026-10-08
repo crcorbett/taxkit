@@ -1,0 +1,776 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "row/table relationship, codec or consumer proof change",
+  "outcome": "Pass for local row/table relationships and historical packed representations; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-parameter-table-checks",
+    "baseCommit": "02c813f2d082a13ccbe38e52f350aa43bca8bb84",
+    "sources": [
+      {
+        "path": ".changeset/parameter-table-relationships.md",
+        "sha256": "73e70c846c3614da51e59120ae255f0cb5bfe092feed622823d6626b1f517209"
+      },
+      {
+        "path": "docs/architecture/rules-and-parameters.md",
+        "sha256": "9bce7c67531d17458d3561cf04d6dd53b391ddcc116b8214fd2b92a1b64f1bc9"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "97654946186af69205079152adece3c320de52005028b763c6ec1e48edc3df6d"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "f922b7f60682c4e4ed68e193d3001b0f32e05df1c4c9b7553fb38c29b653ed2b"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "66c42cf5b671bc24f39b1b2cec2f4bf22683724dc63d27631a76b88591c43021"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "59b640e212256e7c5c3ca45e1ff4465a3108e6d7cb29fc9d3e6f7bf3cdbff6ee"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "f97eba8db8cc240a0876d3de2c85247047ce78c6f01cf15a3849e050a63e4fb9"
+      },
+      {
+        "path": "packages/rules/au/income-tax/README.md",
+        "sha256": "2ae426069f6fec605259230288b3443fff6fb62b2d9bf046b970bf875f0b5b3d"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/income-tax-table.ts",
+        "sha256": "87db3e420dd78619c155069e381d4dd83892b87756c733758cc4f51708297f92"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/lito-table.ts",
+        "sha256": "65c0081ece775661a05d75cee5d5f734f9c3084de1922d4dc87328fc3005f3ed"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/medicare-levy-table.ts",
+        "sha256": "796357f5d17de9e78927a2af3c748b5a1c865019a67b8a31842dff146b21ec51"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/parameter-tables.test.ts",
+        "sha256": "75af001765e5d60dd59d515df2ea4d55f38746a5814425900fd0018918e6502c"
+      },
+      {
+        "path": "packages/rules/au/pay/README.md",
+        "sha256": "479f9fc7b131a32d669287dc21676f55225ba8745fe0a3406e59fdf6fa36c19c"
+      },
+      {
+        "path": "packages/rules/au/pay/src/parameters/schedule1.ts",
+        "sha256": "c60fc3bd19d5ad68802941773c8b6687ed611deea074ed4446ace261de5938f7"
+      },
+      {
+        "path": "packages/rules/au/pay/test/parameter-tables.test.ts",
+        "sha256": "501409590100280d3f3c38755b4c0981a63c130a277410054cc9fdbee4f54510"
+      },
+      {
+        "path": "packages/rules/au/stsl/README.md",
+        "sha256": "c92eb71c7ad838207a55dfd52f45f8b68ee8f2d60e9f8a471d4a029cd5e1f708"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/parameters/stsl-table.ts",
+        "sha256": "11c126810dcddea27d3e4bd3f538907fd1a973fd0a99215ccccab8d2d41cc61d"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/parameter-tables.test.ts",
+        "sha256": "38443cb0e301470882c04b2ac48c5ed1683e8e0be3b22084c6e3ff9da37236a7"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "55d0affa94838905bfe56592cf687d1c233d33beccf3376ae5c0feae297c2382"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "63f0b8e72e099d9c9b4d0321da7d67f9b7e826edf60cb9e5975f8eb0d03d4af3"
+      }
+    ],
+    "qualifiedSources": [
+      {
+        "path": ".changeset/parameter-table-relationships.md",
+        "sha256": "73e70c846c3614da51e59120ae255f0cb5bfe092feed622823d6626b1f517209"
+      },
+      {
+        "path": "docs/architecture/rules-and-parameters.md",
+        "sha256": "9bce7c67531d17458d3561cf04d6dd53b391ddcc116b8214fd2b92a1b64f1bc9"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "97654946186af69205079152adece3c320de52005028b763c6ec1e48edc3df6d"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "f922b7f60682c4e4ed68e193d3001b0f32e05df1c4c9b7553fb38c29b653ed2b"
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-parameter-table-relationships.json",
+        "sha256": "82060537b1ccea666c4cd66e44558565a26fbfb496d71afe87ee28015974e202"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "1a03fb26f280593fdccbf78851db56337ae49e0b352d83eb11a553c811cb02cb"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "59b640e212256e7c5c3ca45e1ff4465a3108e6d7cb29fc9d3e6f7bf3cdbff6ee"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "f97eba8db8cc240a0876d3de2c85247047ce78c6f01cf15a3849e050a63e4fb9"
+      },
+      {
+        "path": "packages/rules/au/income-tax/README.md",
+        "sha256": "2ae426069f6fec605259230288b3443fff6fb62b2d9bf046b970bf875f0b5b3d"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/income-tax-table.ts",
+        "sha256": "87db3e420dd78619c155069e381d4dd83892b87756c733758cc4f51708297f92"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/lito-table.ts",
+        "sha256": "65c0081ece775661a05d75cee5d5f734f9c3084de1922d4dc87328fc3005f3ed"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/parameters/medicare-levy-table.ts",
+        "sha256": "796357f5d17de9e78927a2af3c748b5a1c865019a67b8a31842dff146b21ec51"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/parameter-tables.test.ts",
+        "sha256": "75af001765e5d60dd59d515df2ea4d55f38746a5814425900fd0018918e6502c"
+      },
+      {
+        "path": "packages/rules/au/pay/README.md",
+        "sha256": "479f9fc7b131a32d669287dc21676f55225ba8745fe0a3406e59fdf6fa36c19c"
+      },
+      {
+        "path": "packages/rules/au/pay/src/parameters/schedule1.ts",
+        "sha256": "c60fc3bd19d5ad68802941773c8b6687ed611deea074ed4446ace261de5938f7"
+      },
+      {
+        "path": "packages/rules/au/pay/test/parameter-tables.test.ts",
+        "sha256": "501409590100280d3f3c38755b4c0981a63c130a277410054cc9fdbee4f54510"
+      },
+      {
+        "path": "packages/rules/au/stsl/README.md",
+        "sha256": "c92eb71c7ad838207a55dfd52f45f8b68ee8f2d60e9f8a471d4a029cd5e1f708"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/parameters/stsl-table.ts",
+        "sha256": "11c126810dcddea27d3e4bd3f538907fd1a973fd0a99215ccccab8d2d41cc61d"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/parameter-tables.test.ts",
+        "sha256": "38443cb0e301470882c04b2ac48c5ed1683e8e0be3b22084c6e3ff9da37236a7"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "55d0affa94838905bfe56592cf687d1c233d33beccf3376ae5c0feae297c2382"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "63f0b8e72e099d9c9b4d0321da7d67f9b7e826edf60cb9e5975f8eb0d03d4af3"
+      }
+    ]
+  },
+  "documentationImpact": {
+    "Change required": [
+      "Three rules package READMEs and rules/testing architecture",
+      "Genuine packed consumer and SDK README",
+      "Current SPEC/tasks/plan/audit and dated receipt",
+      "Three major rule Changesets for stricter public parameter admission"
+    ],
+    "Preserve": [
+      "Authored table/source bytes and known tax goldens",
+      "Unresolved Medicare thresholds and supported years",
+      "Generic core decimals and signed Schedule 1 dollar coefficients",
+      "HTTP/RPC/OpenAPI, rate/body/work policy, UI behaviour",
+      "Toolchain/dependency versions, commands, skills, lint admissions"
+    ],
+    "N/A": [
+      "No operational runbook or new command",
+      "No public editorial lifecycle change",
+      "No external operation or publication"
+    ]
+  },
+  "compatibility": {
+    "baselineSha256": "38059246863e2577cf96f5991aec8eb1b439c58fdd718fc7827203c0329c4f9e",
+    "historicalComparisons": 15,
+    "samples": [
+      {
+        "name": "income-tax",
+        "hashes": {
+          "table": "9258a71a24c9a26dd43466a4940c7140a023ccff846969b1247a59ddd2e16aad",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "39297168ce7bad1fed76c32eae48841eaeebb71f32a479c63c472e0d66204c90"
+        }
+      },
+      {
+        "name": "lito",
+        "hashes": {
+          "table": "5c6a5944cf83fea770c887e4fedc5da7d7c6bb1540c885232692a83e701eb872",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "1c9681f9ac534e9a8fe638f01b7f09f18955b60a3a019858085aa373aefe6002"
+        }
+      },
+      {
+        "name": "medicare-levy",
+        "hashes": {
+          "table": "a4c9271a2d82c7f403ca1819f59937c21e036bf0da978c45c250051b4a856cf8",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "502caaaebe081be3b6abbc7dedf20daccf66acaa060089e017ff3dbf498d23e2"
+        }
+      },
+      {
+        "name": "schedule1",
+        "hashes": {
+          "table": "b0799054e0f0f792b3aad2ba0571f88f6aeee8f100eb02cdca96fc81c33ce645",
+          "period": "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25",
+          "artifact": "e6cc36f12b35c22c206f9f4e7b0aadee5cc5752f399c88569ac3590d871cbc34"
+        }
+      },
+      {
+        "name": "stsl",
+        "hashes": {
+          "table": "ca94be8c2b5818381824d4a4f100789a35794312c5a00984ea1e83a8bfc366fe",
+          "period": "ce72cb303a5db02f62aefe810e606ce988084bb990b0153cbd3b1d89ae186e36",
+          "artifact": "4981834012bdbb02e22b0aab02e7fb2208cd80e81c400b1bf01147a2b8f6135b"
+        }
+      }
+    ],
+    "scope": "Five table values, effective periods and source artifacts; no baseline regeneration"
+  },
+  "focusedChecks": [
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.54,
+      "log": "/private/tmp/dev75-table-owner-v3-lint.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.64,
+      "log": "/private/tmp/dev75-table-owner-v3-types.log"
+    },
+    {
+      "stage": "rules",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/rules-au-*",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.98,
+      "log": "/private/tmp/dev75-table-owner-v3-rules.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.65,
+      "log": "/private/tmp/dev75-table-consumer-v1-lint.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.71,
+      "log": "/private/tmp/dev75-table-consumer-v1-types.log"
+    },
+    {
+      "stage": "downstream",
+      "command": [
+        "bun",
+        "run",
+        "sdk:validate-downstream",
+        "--",
+        "--force"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.4,
+      "log": "/private/tmp/dev75-table-consumer-v2-downstream.log"
+    },
+    {
+      "stage": "rules-restored",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/rules-au-*",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.97,
+      "log": "/private/tmp/dev75-table-pregraph-v1-rules-restored.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.53,
+      "log": "/private/tmp/dev75-table-pregraph-v1-lint.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.42,
+      "log": "/private/tmp/dev75-table-pregraph-v1-types.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.42,
+      "log": "/private/tmp/dev75-table-pregraph-v1-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.16,
+      "log": "/private/tmp/dev75-table-pregraph-v1-runbooks.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.57,
+      "log": "/private/tmp/dev75-table-pregraph-v1-format.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.27,
+      "log": "/private/tmp/dev75-table-pregraph-v1-changeset.log"
+    }
+  ],
+  "negativeControls": [
+    {
+      "control": "saved-coverage",
+      "exitCode": 1,
+      "durationSeconds": 1.71,
+      "expectedReason": "rejects gaps, overlaps and open middle bounds in the saved table representation",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "87db3e420dd78619c155069e381d4dd83892b87756c733758cc4f51708297f92",
+      "log": "/private/tmp/dev75-table-control-saved-coverage.log",
+      "failedTestLines": [
+        "@taxkit/rules-au-income-tax test:  FAIL  test/parameter-tables.test.ts > IncomeTaxTable owned relationships > rejects gaps, overlaps and open middle bounds in the saved table representation"
+      ],
+      "failurePhase": "intended owning assertion"
+    },
+    {
+      "control": "decoded-coverage",
+      "exitCode": 1,
+      "durationSeconds": 0.49,
+      "expectedReason": "rejects gaps, overlaps and open middle bounds in the saved table representation",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "87db3e420dd78619c155069e381d4dd83892b87756c733758cc4f51708297f92",
+      "log": "/private/tmp/dev75-table-control-decoded-coverage.log",
+      "failedTestLines": [
+        "@taxkit/rules-au-income-tax test:  FAIL  test/parameter-tables.test.ts > IncomeTaxTable owned relationships > rejects gaps, overlaps and open middle bounds in the saved table representation"
+      ],
+      "failurePhase": "intended owning assertion"
+    },
+    {
+      "control": "row-rate",
+      "exitCode": 1,
+      "durationSeconds": 0.47,
+      "expectedReason": "rejects malformed brackets in construction and saved representation",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "87db3e420dd78619c155069e381d4dd83892b87756c733758cc4f51708297f92",
+      "log": "/private/tmp/dev75-table-control-row-rate.log",
+      "failedTestLines": [
+        "@taxkit/rules-au-income-tax test:  FAIL  test/parameter-tables.test.ts > IncomeTaxTable owned relationships > rejects malformed brackets in construction and saved representation"
+      ],
+      "failurePhase": "intended owning assertion"
+    },
+    {
+      "control": "second-scale",
+      "exitCode": 1,
+      "durationSeconds": 0.85,
+      "expectedReason": "rejects gaps, overlaps and open middle bounds in the saved table representation",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "c60fc3bd19d5ad68802941773c8b6687ed611deea074ed4446ace261de5938f7",
+      "log": "/private/tmp/dev75-table-control-second-scale.log",
+      "failedTestLines": [
+        "@taxkit/rules-au-pay test:  FAIL  test/parameter-tables.test.ts > Schedule1Table owned relationships > rejects gaps, overlaps and open middle bounds in the saved table representation"
+      ],
+      "failurePhase": "intended owning assertion"
+    },
+    {
+      "control": "medicare-order",
+      "exitCode": 1,
+      "durationSeconds": 0.58,
+      "expectedReason": "rejects invalid threshold and rate relationships without correcting retained values",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "796357f5d17de9e78927a2af3c748b5a1c865019a67b8a31842dff146b21ec51",
+      "log": "/private/tmp/dev75-table-control-medicare-order.log",
+      "failedTestLines": [
+        "@taxkit/rules-au-income-tax test:  FAIL  test/parameter-tables.test.ts > MedicareLevyTable owned relationships > rejects invalid threshold and rate relationships without correcting retained values"
+      ],
+      "failurePhase": "intended owning assertion"
+    }
+  ],
+  "failedAttempts": [
+    "Initial array-of-class checks vanished under Schema.toEncoded; corrected with a saved/decoded codec using one shared predicate; no assertion dropped.",
+    "Outside prototype initial dependency lookup failed; corrected temporary workspace links only.",
+    "Initial lint attempts found property ordering in decimal bound options and new test fixtures; corrected without policy changes.",
+    "First genuine packed consumer failed typecheck because its empty ambient-types list excludes Bun globals. Outside extracted-fixture diagnostic confirmed 15 Bun name errors. Added an explicit bun/CryptoHasher import to that generated external fixture; its configuration stayed unchanged.",
+    "Initial outside fixture extractor assumed a TypeScript JavaScript compiler module absent from installed TypeScript 7. Corrected extraction outside the repository; no dependency changed."
+  ],
+  "limitations": [
+    "Local slice accepted by primary implementation owner; current candidate hosted checks and reviewer acceptance remain separate.",
+    "Parent #148 hosted clean-build failure requires the separately prepared Core ambient-type correction.",
+    "Remaining semantic absence/service ownership and rate identity/limiting unfinished; T004 remains active.",
+    "Medicare decision unresolved; thresholds and existing zero-income behaviour retained.",
+    "No merge, deployment, publication, provider or registry proof."
+  ],
+  "rollback": "Revert this complete local slice; no provider/data migration exists.",
+  "nextOwner": "TaxKit implementation owner for complete local qualification and wider T004; Cooper for the separately bounded Medicare decision.",
+  "focusedCases": {
+    "newOwningTests": 10,
+    "invalidRowOrTableCases": 60,
+    "constructorAndRepresentationRejectionAssertions": 120,
+    "packedHistoricalHashAssertions": 15,
+    "packedInvalidConstructorTypedDecodeEncodedDecodeAssertions": 15,
+    "additionalPositiveCases": [
+      "single-cent inclusive range",
+      "tiny exponent rate/multiplier",
+      "legitimate negative Schedule 1 dollar coefficient",
+      "both authored Schedule 1 years",
+      "interleaved supported scales"
+    ],
+    "policy": "No new runtime/decoder/encoder admission or lint configuration change"
+  },
+  "implementation": {
+    "fields": "Canonical Cents/TaxRate/DecimalCoefficient/SourceRef/TaxYear reused; no primitive/DTO mirror",
+    "rows": "Whole checked Struct supplied to existing TaggedClass; tags/fields/order unchanged",
+    "coverage": "Saved arrays derived from canonical row Schema; same check on saved and decoded forms through decodeTo; inferred owning Encoded type",
+    "medicare": "Ordered non-negative thresholds and positive levy no greater than shade-in, both <= one; no continuity or correction",
+    "limits": "Generic decimal brands and signed dollar coefficients stay open; authored coefficients unchanged"
+  },
+  "parentHosted": {
+    "pullRequest": "https://github.com/crcorbett/taxkit/pull/148",
+    "headCommit": "02c813f2d082a13ccbe38e52f350aa43bca8bb84",
+    "runId": 37401147145,
+    "jobId": 112068388626,
+    "status": "COMPLETED",
+    "conclusion": "FAILURE",
+    "completedAt": "2026-10-06T02:04:28Z",
+    "observedFailure": "Core build inherits explicit Node ambient types absent from clean hosted install: TS2688 Cannot find type definition file for node",
+    "localDiagnostic": "Outside isolated resolution reproduces original build and test-typecheck failures; types: [] passes both without added dependencies",
+    "nextOwner": "Primary implementation owner for separate corrective slice",
+    "limitation": "Parent hosted failure remains; this local candidate does not establish hosted success"
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "mode": "local CI graph",
+      "exitCode": 0,
+      "durationSeconds": 663.63,
+      "orderedChecks": [
+        "verification",
+        "test",
+        "build",
+        "docs-validation",
+        "packed-artifact",
+        "downstream-consumer",
+        "api-smoke",
+        "docs-browser",
+        "changeset-status"
+      ],
+      "nonClaim": "No immutable release attempt, publication or provider operation"
+    }
+  ],
+  "focusedEvidence": {
+    "workflowCases": 32,
+    "workflowSeconds": 461.42,
+    "nativeCases": 7,
+    "nativeSeconds": 78.16,
+    "lintCorpusCases": 500,
+    "coreCases": 59,
+    "ruleCases": 52,
+    "sourceRestoration": "All 21 staged files match pre-check bytes; unchanged API worker matches parent Git source",
+    "qualifiedSources": {
+      ".changeset/parameter-table-relationships.md": "73e70c846c3614da51e59120ae255f0cb5bfe092feed622823d6626b1f517209",
+      "docs/architecture/rules-and-parameters.md": "9bce7c67531d17458d3561cf04d6dd53b391ddcc116b8214fd2b92a1b64f1bc9",
+      "docs/architecture/testing-and-quality.md": "97654946186af69205079152adece3c320de52005028b763c6ec1e48edc3df6d",
+      "docs/documentation-audit/README.md": "f922b7f60682c4e4ed68e193d3001b0f32e05df1c4c9b7553fb38c29b653ed2b",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-06-parameter-table-relationships.json": "82060537b1ccea666c4cd66e44558565a26fbfb496d71afe87ee28015974e202",
+      "docs/exec-plans/active/clean-slate-foundation.md": "1a03fb26f280593fdccbf78851db56337ae49e0b352d83eb11a553c811cb02cb",
+      "docs/product-specs/clean-slate-foundation.md": "59b640e212256e7c5c3ca45e1ff4465a3108e6d7cb29fc9d3e6f7bf3cdbff6ee",
+      "docs/product-specs/clean-slate-foundation.tasks.json": "f97eba8db8cc240a0876d3de2c85247047ce78c6f01cf15a3849e050a63e4fb9",
+      "packages/rules/au/income-tax/README.md": "2ae426069f6fec605259230288b3443fff6fb62b2d9bf046b970bf875f0b5b3d",
+      "packages/rules/au/income-tax/src/parameters/income-tax-table.ts": "87db3e420dd78619c155069e381d4dd83892b87756c733758cc4f51708297f92",
+      "packages/rules/au/income-tax/src/parameters/lito-table.ts": "65c0081ece775661a05d75cee5d5f734f9c3084de1922d4dc87328fc3005f3ed",
+      "packages/rules/au/income-tax/src/parameters/medicare-levy-table.ts": "796357f5d17de9e78927a2af3c748b5a1c865019a67b8a31842dff146b21ec51",
+      "packages/rules/au/income-tax/test/parameter-tables.test.ts": "75af001765e5d60dd59d515df2ea4d55f38746a5814425900fd0018918e6502c",
+      "packages/rules/au/pay/README.md": "479f9fc7b131a32d669287dc21676f55225ba8745fe0a3406e59fdf6fa36c19c",
+      "packages/rules/au/pay/src/parameters/schedule1.ts": "c60fc3bd19d5ad68802941773c8b6687ed611deea074ed4446ace261de5938f7",
+      "packages/rules/au/pay/test/parameter-tables.test.ts": "501409590100280d3f3c38755b4c0981a63c130a277410054cc9fdbee4f54510",
+      "packages/rules/au/stsl/README.md": "c92eb71c7ad838207a55dfd52f45f8b68ee8f2d60e9f8a471d4a029cd5e1f708",
+      "packages/rules/au/stsl/src/parameters/stsl-table.ts": "11c126810dcddea27d3e4bd3f538907fd1a973fd0a99215ccccab8d2d41cc61d",
+      "packages/rules/au/stsl/test/parameter-tables.test.ts": "38443cb0e301470882c04b2ac48c5ed1683e8e0be3b22084c6e3ff9da37236a7",
+      "packages/sdk/typescript/README.md": "55d0affa94838905bfe56592cf687d1c233d33beccf3376ae5c0feae297c2382",
+      "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts": "63f0b8e72e099d9c9b4d0321da7d67f9b7e826edf60cb9e5975f8eb0d03d4af3"
+    }
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Pinned local toolchain and unchanged installed dependency graph",
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 151,
+      "sha256": "0a73bee65829e5ce6969c4a731677135460783a7c2b72ac634a32bafa374584e"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "cdd504adf1cb2c106af202e254845da2d9f6742c824d7a003239707450ae9fe9"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "37dfb635d9c3fd46d4906553293fc05f24a9ddf14f3a464341023f9b50b635b5"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "e5a63db7cd80aeb6aba4b7661ed86367ae95f7abf78d88486e728c67a638ffc2"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "784c95fd2c88ccb5d5e879a8be282e27bbcc41b2fcaecbd514c32d8faa672519"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "d83915902be2781a9c00f0742cf192dd916318ea5a01355b45a603b73642f178"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "1bec3fb332f87746cc46e012e11f0c7e3172296c338db7cb1f199667a401436a"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "b8fac71dbdcbee51037e91f8d36b17a033e5efae7fbfa39570732a27fd096fcb"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "15258326170da389ab3813577778b2d9956cc9d1f29e497631b9877fb3d84a4c"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously inspected parent image"
+    }
+  ],
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for checked row/table relationship slice",
+    "basis": [
+      "Whole-row and whole-table checks survive both decoded and saved representations",
+      "All 15 historical table/period/source hashes and retained tax goldens",
+      "Five deliberate removals fail intended owning assertions and restore exact sources",
+      "Genuine packed public constructor and both decoding boundaries reject 15 invalid inputs",
+      "No new runtime, decoder, encoder or lint-policy admission; canonical owners and major Changesets updated"
+    ],
+    "remaining": "Core ambient-type portability correction, remaining semantic absence/service ownership, trusted rate identity/limiting, whole T004 and later tasks"
+  },
+  "postconditions": {
+    "verification": "All prescribed checks, 32 workflow tests, browser checks and seven native built Worker cases pass locally",
+    "tests": "Root tests pass, including 500 real lint cases, 59 Core cases and 52 rule cases",
+    "consumers": "Fresh genuine packed/downstream typecheck/runtime rejects invalid tables and preserves all 15 historical hashes",
+    "native": "Nine inventories captured after successful verification, before later root build; four screenshots match inspected parent bytes",
+    "restoration": "All 21 staged files and unchanged API worker are restored exactly",
+    "tax": "Retained tables/source records/golden results, existing zero-income behaviour and unresolved Medicare thresholds unchanged"
+  },
+  "qualifiedLogDigests": [
+    {
+      "check": "verification",
+      "path": "tmp/release-readiness/verification-stdout-FYRIQt/1b930e759aff.log",
+      "sha256": "2c829620ea7b1b911988e276c26cd46eee417874b0428a62f36cca4f8df7e25e"
+    },
+    {
+      "check": "test",
+      "path": "tmp/release-readiness/test-stdout-h0rYMI/8c6dea6c3b3e.log",
+      "sha256": "e0a5de450bb2131d3679ceb3e9674fb066f85c9119b4138c3b350bc82b9865d7"
+    },
+    {
+      "check": "full-wrapper",
+      "path": "/private/tmp/dev75-table-full-release-ci-graph.log",
+      "sha256": "811bbc34050ba2431ad76cceb3b04fdbfd7d9c809ff39d3f02d626f02bc9d51d"
+    }
+  ],
+  "postCheckChanges": {
+    "scope": "Plan and receipt only",
+    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
+  },
+  "finalChecks": [
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.34,
+      "log": "/private/tmp/dev75-table-final-v1-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev75-table-final-v1-runbooks.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.41,
+      "log": "/private/tmp/dev75-table-final-v1-format.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.19,
+      "log": "/private/tmp/dev75-table-final-v1-changeset.log"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.01,
+      "log": "/private/tmp/dev75-table-final-v1-diff.log"
+    }
+  ]
+}

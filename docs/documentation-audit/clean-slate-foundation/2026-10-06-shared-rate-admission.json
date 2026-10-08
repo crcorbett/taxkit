@@ -1,0 +1,712 @@
+{
+  "document_type": "proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "Calculation admission, native host, SDK/HTTP/RPC error or namespace changes; complete qualification or hosted readback",
+  "outcome": "Pass for local shared native calculation admission; T004 locally complete, hosted head separate",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "scope": "Approved DEV-75 implementation, local checks, commits/pushes/draft PRs; no merge/deploy/publication/provider/credential operation",
+    "reviewer": "Primary implementation owner",
+    "metricsSteering": "6 October: defer metrics/telemetry approach work and proceed with other tasks; T009 stays pending"
+  },
+  "candidate": {
+    "branch": "codex/dev-75-shared-rate-limits",
+    "base": "0a8b823685a2a4aa453f8a4bccd624f4be976931",
+    "receiptRevision": "Frozen functional sources before supporting plan/task/evidence closeout",
+    "qualifiedSources": [
+      {
+        "path": ".changeset/native-calculation-rate-admission.md",
+        "sha256": "b82ddb37f9a91f5c7ce015ef241a914fa1a4845a882d848f13cbca4502cf93c7"
+      },
+      {
+        "path": "alchemy.apps.local.run.ts",
+        "sha256": "82ed6f16050c7cb5e1e1caa5e13e0d1834dc9cb25e1c7b81505c526bff918241"
+      },
+      {
+        "path": "apps/api/README.md",
+        "sha256": "383d92557be03f50601ee8a9f9de1c6dc4be77b393dd942b4dc681d60d40d4fe"
+      },
+      {
+        "path": "apps/api/src/worker-admission.layer.ts",
+        "sha256": "c8385c8ef9bbf92edfa7a05bc1e67a4966db2924a11d165d763da6daca30b5ad"
+      },
+      {
+        "path": "apps/api/src/worker.application.ts",
+        "sha256": "da30fde350fc1abf33aa859fc89f7c3db1935f64d10e05a9c91929045b3551e0"
+      },
+      {
+        "path": "apps/api/src/worker.ts",
+        "sha256": "7c7ea54062166d1816f2a881f7d5875c2a4fb48c2f46f8736d8be077f1ba72f5"
+      },
+      {
+        "path": "apps/api/test/rate-admission.boundary.test.ts",
+        "sha256": "f4d4ed75915715f892c7ccf0d00f115cc60758206ff4cefe9ef5027fd8ca3aaa"
+      },
+      {
+        "path": "apps/api/test/worker-admission.boundary.test.ts",
+        "sha256": "933b04e7c83b237247db73c7e427a3476fb60fb8b0e1baeab2d3264a616e676e"
+      },
+      {
+        "path": "apps/api/test/worker.boundary.test.ts",
+        "sha256": "9f4dc572c1ada5927a21fa2d1ca6245b507593f7574bf8e279d21833837d3ec6"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "ca459d44682887799204c556144086a6f40f890e5d0c6130636f344a44df2bcd"
+      },
+      {
+        "path": "apps/web/scripts/native-pair-build.runtime.ts",
+        "sha256": "c74552ccbc427fe1ede71d7670abafdda8fbccccae588f4a9897e426204abba7"
+      },
+      {
+        "path": "apps/web/src/lib/calculation-failure.ts",
+        "sha256": "78e2a0368b363cb55f22b70009e5e4b05445e7cd1474cd35947d5b899eeca99d"
+      },
+      {
+        "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "sha256": "96b4aef8adf10a98fbaea8db0c3f2be520fdb7ba97245048c9e29419b2983442"
+      },
+      {
+        "path": "apps/web/src/lib/config.boundary.test.ts",
+        "sha256": "c507845ba5ad92f944b77371acafacf748489b7bedafa4a6629420cac56b5741"
+      },
+      {
+        "path": "apps/web/src/lib/config.server.ts",
+        "sha256": "7d10d99eae16a064be3c568ea616075b27c3ba6b890a593d9211ba8df3b0a639"
+      },
+      {
+        "path": "apps/web/src/lib/live.server.layer.ts",
+        "sha256": "8d39c1776f56ffa9aea6879452fd457260cdfe794aee1fae53c9cc16771b737c"
+      },
+      {
+        "path": "apps/web/src/server.ts",
+        "sha256": "f2e369cb3b2e0945c24b9f9b58dda498d720da0cc3310ba6ef39dfb12520ad6a"
+      },
+      {
+        "path": "apps/web/test/native-cancellation.boundary.test.ts",
+        "sha256": "d6c0971eb2d1cb3516c5691b3495c6a15abddeeef557d3717f2fd436ba12c11a"
+      },
+      {
+        "path": "apps/web/test/native-local-development.boundary.test.ts",
+        "sha256": "e799118ff439636125e2333bc2dff1f557672ff3515abb7be1f7b1136f04fd0f"
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "b087c7acd568d214e57d0b0d8c572298e7839f5dd29b9283b2bc0c73d1c57247"
+      },
+      {
+        "path": "apps/web/test/native-rate-provider.boundary.test.ts",
+        "sha256": "364cb08dd136e52a72d193c75ef025d3de9f9f0f89876f99eb9778da5c5f4dab"
+      },
+      {
+        "path": "apps/web/test/native-rate.boundary.test.ts",
+        "sha256": "6f9c72fb16e41a472964c9b65dfa8d39917091f619677a4727168a3507f77163"
+      },
+      {
+        "path": "apps/web/test/native-rate.fixture.ts",
+        "sha256": "3d85a27e94c06e35c43848b8ad5c7ee4cfd1d49b4edf142bd3567f6947fa2118"
+      },
+      {
+        "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "sha256": "9987b10c16c8bcea6916e653236937d0b7fc2b39cf5a8cb37a302a9a225022f2"
+      },
+      {
+        "path": "apps/web/vitest.native.config.ts",
+        "sha256": "3b6cf7c12626d1524b5852228dc8a04db87a521e4a3785e5150e396f13508fdc"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "331b3b1dd6bdc9352d3374321a1f2a87b09a54e4f2f86babd345ed698321b3fd"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "51551f49f694b1ffb959e30d94dbe4348159804ae2be12aaa6e146737a6bc4d4"
+      },
+      {
+        "path": "docs/architecture/frontend.md",
+        "sha256": "ccc5068356fc39fd9898f54853d98c98ec31e0565d2e25d2edf00af6cd39ca55"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "ede4ee4a91fb1d2eaa6fcd89f4876d14d60614ed32fb22a9e5d1cfb281b3d73a"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "21d7d3f648e3c874fdfdb91a5eb05e0d3eaeb1eb7e88e00c51138d32cac59415"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "3fa93cc94ef9479ad572560ec504716ae60172fe3a7904494da7280339a00931"
+      },
+      {
+        "path": "packages/api/http/README.md",
+        "sha256": "8ff4c7985362d4c731ea0cca6f12118a9751c95bc290d0d4d025666450590f52"
+      },
+      {
+        "path": "packages/api/http/__snapshots__/openapi.json",
+        "sha256": "5fd22d774077a14f3ae80930336e688c4f2bb57995c50bc0d2cbb2d7e3d7cf62"
+      },
+      {
+        "path": "packages/api/http/src/groups/calculators.ts",
+        "sha256": "346f966b0256cfb55f9b958b154d0e986be79f24fa95d9edc71d321ada0d9c90"
+      },
+      {
+        "path": "packages/api/http/src/handlers/calculators.ts",
+        "sha256": "5237333f6063cb5a760e454eb93a415cb5f8225efe5511b842890f1032e9f271"
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "8e14da81898fba2ffbca816210f1dac1415e23c3259a1aa03643bc8ae91d2b86"
+      },
+      {
+        "path": "packages/api/rpc/package.json",
+        "sha256": "8d1b52846f4d808215f5dcacc00df624f0a3d3b7e2b557755031063902e7ab88"
+      },
+      {
+        "path": "packages/api/rpc/src/client-response.boundary.ts",
+        "sha256": "d905d4987505ca6d69db1ddbcf8a56227c708f8852355c0bb4df9a96270be48e"
+      },
+      {
+        "path": "packages/api/rpc/src/errors.ts",
+        "sha256": "8a4e3c4c0011ca34233935d7cee802aaa0a4f3ba2446739b7d6a8f51ca68d3f2"
+      },
+      {
+        "path": "packages/api/rpc/src/handlers.ts",
+        "sha256": "e509079fad6fb8d7f102172793a56c832385c168db6aa4e02f958796a3db7789"
+      },
+      {
+        "path": "packages/api/rpc/src/rate-identity.boundary.ts",
+        "sha256": "91cdc5dfadce2b8cc74bad94ee75634dbaa6c2c7b18b5fbca4d28ed1004ed6dd"
+      },
+      {
+        "path": "packages/api/rpc/src/schemas.ts",
+        "sha256": "744d94508a93ada8be94c58abe1bdf0ed42ce6c61b0a0aa742ced611bd244d39"
+      },
+      {
+        "path": "packages/api/rpc/test/handlers.test.ts",
+        "sha256": "ec76b1223695bfa3efb714b04670dbbc576c3ad1fc7dcae49c2226ec0356c366"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "67f6486687818a949da24cc57833138cac788895e50978c62754d7b354747b36"
+      },
+      {
+        "path": "packages/calculators/__tests__/calculation-admission.test.ts",
+        "sha256": "783f05398adf70ca1b6f4717fd87411ad7452bba3e5c58dffc551e72498e00a1"
+      },
+      {
+        "path": "packages/calculators/package.json",
+        "sha256": "47b11445d982a0c493ac3d918a21518f162b88540bdf4d9e15225212823f14e7"
+      },
+      {
+        "path": "packages/calculators/src/admission.layer.ts",
+        "sha256": "3e601d1a27ffada8bf0adea03ea58bc70e3e882d574551e23f43f6a86c8c2237"
+      },
+      {
+        "path": "packages/calculators/src/admission.schemas.ts",
+        "sha256": "5db03ecb2b85c0f12f07007701953f7e76385b406ac29cdb9b5b8abd70e17234"
+      },
+      {
+        "path": "packages/calculators/src/admission.service.ts",
+        "sha256": "9a5ec67e7b70730f9f1530a65ef4e34f5057d02757e136f327bb28013bda3efd"
+      },
+      {
+        "path": "packages/calculators/src/index.ts",
+        "sha256": "3482850223b4fa93c5fd6d07a5c137190d04530eb89188ec5181d4c5a0a699ea"
+      },
+      {
+        "path": "packages/calculators/src/schemas.ts",
+        "sha256": "adee9c7a7d4ee06f8ec5b46d7feb8024616541f9ec4e9ac8a84da198a4ee3746"
+      },
+      {
+        "path": "packages/docs-content/content/api/errors.mdx",
+        "sha256": "c4db74b445242466c9ca343221d1b2d95e7efd3a1f938a2229baeca7d5ac29fb"
+      },
+      {
+        "path": "packages/infrastructure/README.md",
+        "sha256": "a41df13bef170915c15cddb6974617ae5f33f59680f69cfdd85af7af6cc159ac"
+      },
+      {
+        "path": "packages/infrastructure/src/apps-stack.test.ts",
+        "sha256": "713f63301530fa3262305e02ae33a4a856c48d6f679b4e38572ecb4096c51bea"
+      },
+      {
+        "path": "packages/infrastructure/src/apps-stack.ts",
+        "sha256": "ec77307a459b8870340a5df7591bc8e1afd0b9283ac8eb4646bb03081fc019b9"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "8e8297f6149dcd7fcc39f572e5a00ff07786ec0603b9b28977b503f5f7c2f9f8"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+        "sha256": "bbaa0e9af2e90482fe8fb0c641388c1fa4a6a5295114c605c07106c228419ce0"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "38ff01a2e0d98bbe57929670ff3ac1fe88ee37636dd20958bbe0cc30154655c5"
+      },
+      {
+        "path": "packages/sdk/typescript/src/schemas/index.ts",
+        "sha256": "c925083b3b21f3f324741e0bc95f83eef1c08c1da846f3b913bbb28432845de4"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "2086c4ed9754a9b91cca18aa253aad356f648456e4e85471073eacd9fc02ad56"
+      }
+    ]
+  },
+  "contracts": {
+    "admission": "One native API-owned 60/60 RateLimit binding below the five-second bounded calculator service; HTTP, RPC and Website private calls share a checked canonical connection key; batch members each consume one unit",
+    "identity": "Cloudflare connection header only for direct edge requests; forwarded Worker calls rejected; no arbitrary forwarded header fallback. Website binding-only method passes checked identity separately from request JSON",
+    "privacy": "Redacted IP Schema with ordinary encoding disabled; fixed rate/unavailable code, message and manual-retry fields; provider replies decoded and raw failures contained",
+    "publicReplies": "HTTP 429 with Retry-After 60; unavailable admission HTTP 503. RPC revision 4 carries canonical calculator errors. No automatic retry",
+    "configuration": "Required checked positive decimal CALCULATOR_RATE_NAMESPACE with no cloud default. Native graph defaults to edge; guarded disposable local root selects local-emulator and isolated namespace 10075, requiring HTTP loopback origin",
+    "metadata": "No allowance unit; actual missing/invalid/throwing native binding tests retain metadata success",
+    "scope": "Direct engine, local SDK and standalone Bun retain their existing policy; no tax algorithm or saved-oracle change",
+    "nativeRpc": "Installed native RPC adapter; explicit AbortSignal is omitted because the pinned runtime rejects serialisation. Local cancellation and server work/reply budgets remain; no remote cancellation claim"
+  },
+  "documentationImpact": {
+    "Change required": [
+      "Calculator admission/errors/exports and README",
+      "HTTP error owner and generated OpenAPI snapshot",
+      "RPC errors/revision/workspace-only host identity export and README",
+      "API/Web/infrastructure native configuration and READMEs",
+      "SDK schema facade, packed runtime/declaration consumers and README",
+      "API/SDK, Effect and frontend architecture",
+      "Draft public errors guidance, major package Changeset, exact lint ingress fixtures, active SPEC/task/plan and proof pointers"
+    ],
+    "Preserve": [
+      "Tax algorithms and original source/table/request/report/error compatibility oracles",
+      "Lockfile, dependency/tool versions, skill assets, agent instructions, standards, CI and provider state"
+    ],
+    "N/A": "The existing five runbooks own docs/release/consumer/recovery; native app cloud delivery remains T010/DEV-81. Required Config/pre-apply readback stays with infrastructure owner. No topology change or operational procedure is added"
+  },
+  "compatibilityOracles": {
+    "basis": "Retained original genuine packed/source expectations from the accepted preceding domain/request/table receipts; no regeneration",
+    "observations": {
+      "verification": [],
+      "test": [
+        "//:test:documentation:task:       Tests  41 passed (41)",
+        "//:test:repository-paths:task:       Tests  11 passed (11)",
+        "//:test:docs-boundaries:task: docs test:       Tests  54 passed (54)",
+        "//:test:docs-boundaries:task: docs test:       Tests  19 passed (19)",
+        "//:test:oxlint:task:       Tests  534 passed (534)",
+        "@taxkit/testing:test:       Tests  5 passed (5)",
+        "@taxkit/core:test:       Tests  66 passed (66)",
+        "@taxkit/rules-au-pay:test:       Tests  20 passed (20)",
+        "@taxkit/rules-au-income-tax:test:       Tests  18 passed (18)",
+        "@taxkit/rules-au-stsl:test:       Tests  14 passed (14)",
+        "@taxkit/scripts:test:       Tests  60 passed (60)",
+        "@taxkit/calculators:test:       Tests  41 passed (41)",
+        "@taxkit/docs-fumadocs:test:       Tests  6 passed (6)",
+        "@taxkit/sdk:test:       Tests  58 passed (58)",
+        "@taxkit/api-http:test:       Tests  17 passed (17)",
+        "web:test:       Tests  9 passed (9)",
+        "api:test:       Tests  83 passed (83)",
+        "@taxkit/api-rpc:test:       Tests  217 passed (217)",
+        "@taxkit/docs-content:test:       Tests  13 passed (13)",
+        "@taxkit/infrastructure:test:       Tests  32 passed (32)",
+        "docs:test:       Tests  54 passed (54)",
+        "docs:test:       Tests  19 passed (19)"
+      ],
+      "build": [],
+      "docs-validation": [],
+      "packed-artifact": [],
+      "downstream-consumer": [
+        "@taxkit/sdk:validate:downstream: Typecheck result: passed: bun run typecheck",
+        "@taxkit/sdk:validate:downstream: Runtime SDK result: passed: bun run runtime; bun run runtime:exports",
+        "@taxkit/sdk:validate:downstream: Runtime release blockers: none"
+      ],
+      "api-smoke": [],
+      "docs-browser": [
+        "docs:test:browser:       Tests  7 passed (7)"
+      ],
+      "changeset-status": []
+    },
+    "nativeScreenshots": "All four images match inspected parent bytes",
+    "taxAndLockUnchanged": true
+  },
+  "checks": [
+    {
+      "stage": "release-graph",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 661.41,
+      "log": "/private/tmp/dev75-rate-v49-release-graph.log"
+    }
+  ],
+  "orderedChecks": [
+    "verification",
+    "test",
+    "build",
+    "docs-validation",
+    "packed-artifact",
+    "downstream-consumer",
+    "api-smoke",
+    "docs-browser",
+    "changeset-status"
+  ],
+  "qualifiedLogDigests": [
+    {
+      "stage": "verification",
+      "path": "tmp/release-readiness/verification-stdout-pwpk4b/7469ae2c1fbc.log",
+      "sha256": "480f2dfd5fed3f14f336ef1f5c571a1afc1a362e89d5f5ce6613f0b40db174a8"
+    },
+    {
+      "stage": "test",
+      "path": "tmp/release-readiness/test-stdout-Plxtnj/a7cca65f13db.log",
+      "sha256": "082a2afa6796b90cf99503f4ddb53000aae737cf8212f775f9481fc8c34c5065"
+    },
+    {
+      "stage": "build",
+      "path": "tmp/release-readiness/build-stdout-VBZNV7/1ecab42b39c8.log",
+      "sha256": "95e26b634085e4cf1c0b78022877dfe0ab0363248c7db6f936f2b0d84d9af176"
+    },
+    {
+      "stage": "docs-validation",
+      "path": "tmp/release-readiness/docs-validation-stdout-HBSAP0/a0d9b4b00317.log",
+      "sha256": "1937ebb9b20d1ac15779cd9242deade56a05b80b0366edc6dd93a3f6ca289735"
+    },
+    {
+      "stage": "packed-artifact",
+      "path": "tmp/release-readiness/packed-artifact-stdout-9sggIQ/14429813231a.log",
+      "sha256": "443182c3a11c9e1d3d27eff47ac80522b8c065d2d0c4499ce7fb7507e3ce8f0e"
+    },
+    {
+      "stage": "downstream-consumer",
+      "path": "tmp/release-readiness/downstream-consumer-stdout-xS9g0m/1a9df1c63811.log",
+      "sha256": "836f0cc03fa6eb6efd4280ee36a77568f5e1d3ee0ddcc76e5255322db3a1069f"
+    },
+    {
+      "stage": "api-smoke",
+      "path": "tmp/release-readiness/api-smoke-stdout-oVvrrq/2e986e2535c3.log",
+      "sha256": "328b421db507d89db72947031d9bc269e87ec2e2afdd31847d453d96d5325d1f"
+    },
+    {
+      "stage": "docs-browser",
+      "path": "tmp/release-readiness/docs-browser-stdout-SQBONW/5f11c07a8ea1.log",
+      "sha256": "c2792cdffef24f5d218f4c698943894be0ced1f7a7cebc8c812e569b4a8056bf"
+    },
+    {
+      "stage": "changeset-status",
+      "path": "tmp/release-readiness/changeset-status-stdout-rCjzkl/9f036d4772f4.log",
+      "sha256": "4708dfc99c4a4b5297e9690856923f110a739867c198682014d110ceb4ec760f"
+    }
+  ],
+  "removalControls": [
+    {
+      "control": "provider-reply-validation",
+      "owner": "apps/api/src/worker-admission.layer.ts",
+      "build": {
+        "command": [
+          "bun",
+          "run",
+          "--filter=web",
+          "build:native-pair"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 6.64,
+        "log": "/private/tmp/dev75-rate-negative-provider-reply-validation-build.log"
+      },
+      "test": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--config",
+          "vitest.native.config.ts",
+          "test/native-rate-provider.boundary.test.ts",
+          "-t",
+          "invalid"
+        ],
+        "exitCode": 1,
+        "durationSeconds": 1.17,
+        "log": "/private/tmp/dev75-rate-negative-provider-reply-validation-test.log"
+      },
+      "expectedFailure": true,
+      "restored": true,
+      "sha256": "c8385c8ef9bbf92edfa7a05bc1e67a4966db2924a11d165d763da6daca30b5ad"
+    },
+    {
+      "control": "rate-rejection",
+      "owner": "packages/calculators/src/admission.layer.ts",
+      "build": {
+        "command": [
+          "bun",
+          "run",
+          "--filter=web",
+          "build:native-pair"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 6.73,
+        "log": "/private/tmp/dev75-rate-negative-rate-rejection-build.log"
+      },
+      "test": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--config",
+          "vitest.native.config.ts",
+          "test/native-rate.boundary.test.ts"
+        ],
+        "exitCode": 1,
+        "durationSeconds": 1.23,
+        "log": "/private/tmp/dev75-rate-negative-rate-rejection-test.log"
+      },
+      "expectedFailure": true,
+      "restored": true,
+      "sha256": "3e601d1a27ffada8bf0adea03ea58bc70e3e882d574551e23f43f6a86c8c2237"
+    }
+  ],
+  "attemptHistory": [
+    {
+      "stage": "packed",
+      "command": [
+        "bun",
+        "run",
+        "sdk:check-packed-artifact"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.24,
+      "log": "/private/tmp/dev75-rate-v42-packed.log"
+    },
+    {
+      "stage": "downstream",
+      "command": [
+        "bun",
+        "run",
+        "sdk:validate-downstream"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.12,
+      "log": "/private/tmp/dev75-rate-v43-downstream.log"
+    },
+    {
+      "stage": "lint-fixtures",
+      "command": [
+        "bun",
+        "run",
+        "test:oxlint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 58.15,
+      "log": "/private/tmp/dev75-rate-v44-lint-fixtures.log"
+    },
+    {
+      "stage": "knip-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.86,
+      "log": "/private/tmp/dev75-rate-v46-knip-production.log"
+    },
+    {
+      "stage": "api-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.1,
+      "log": "/private/tmp/dev75-rate-v47-api-types.log"
+    }
+  ],
+  "diagnosis": "Initial native private calls rejected transferred AbortSignal; omit it without experimental flags or dependency upgrades. A rate test crossed the fixed minute reset; its burst now starts outside the final five seconds, retaining rejection assertions. Packed smoke exposed omitted SDK facade exports; add canonical exports. Type test incorrectly treated inherited Error.cause as absent; test that the public constructor rejects provider causes instead. Exact-path lint fixtures needed normal blank lines after imports. Production unused-export check prompted private namespace Schema and executable composition of the provider Layer at the Worker root; invalid Config test now invokes the real admission factory and asserts ConfigError. All final checks pass.",
+  "parentAudit": {
+    "actor": "Primary implementation owner",
+    "status": "Pass for local DEV-75/T004 closeout with preceding accepted slices",
+    "reviewedPaths": [
+      ".changeset/native-calculation-rate-admission.md",
+      "alchemy.apps.local.run.ts",
+      "apps/api/README.md",
+      "apps/api/src/worker-admission.layer.ts",
+      "apps/api/src/worker.application.ts",
+      "apps/api/src/worker.ts",
+      "apps/api/test/rate-admission.boundary.test.ts",
+      "apps/api/test/worker-admission.boundary.test.ts",
+      "apps/api/test/worker.boundary.test.ts",
+      "apps/web/README.md",
+      "apps/web/scripts/native-pair-build.runtime.ts",
+      "apps/web/src/lib/calculation-failure.ts",
+      "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+      "apps/web/src/lib/config.boundary.test.ts",
+      "apps/web/src/lib/config.server.ts",
+      "apps/web/src/lib/live.server.layer.ts",
+      "apps/web/src/server.ts",
+      "apps/web/test/native-cancellation.boundary.test.ts",
+      "apps/web/test/native-local-development.boundary.test.ts",
+      "apps/web/test/native-pair.boundary.test.ts",
+      "apps/web/test/native-rate-provider.boundary.test.ts",
+      "apps/web/test/native-rate.boundary.test.ts",
+      "apps/web/test/native-rate.fixture.ts",
+      "apps/web/test/native-rpc-failures.boundary.test.ts",
+      "apps/web/vitest.native.config.ts",
+      "docs/architecture/api-and-sdk.md",
+      "docs/architecture/effect-services.md",
+      "docs/architecture/frontend.md",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.md",
+      "oxlint.config.ts",
+      "packages/api/http/README.md",
+      "packages/api/http/__snapshots__/openapi.json",
+      "packages/api/http/src/groups/calculators.ts",
+      "packages/api/http/src/handlers/calculators.ts",
+      "packages/api/rpc/README.md",
+      "packages/api/rpc/package.json",
+      "packages/api/rpc/src/client-response.boundary.ts",
+      "packages/api/rpc/src/errors.ts",
+      "packages/api/rpc/src/handlers.ts",
+      "packages/api/rpc/src/rate-identity.boundary.ts",
+      "packages/api/rpc/src/schemas.ts",
+      "packages/api/rpc/test/handlers.test.ts",
+      "packages/calculators/README.md",
+      "packages/calculators/__tests__/calculation-admission.test.ts",
+      "packages/calculators/package.json",
+      "packages/calculators/src/admission.layer.ts",
+      "packages/calculators/src/admission.schemas.ts",
+      "packages/calculators/src/admission.service.ts",
+      "packages/calculators/src/index.ts",
+      "packages/calculators/src/schemas.ts",
+      "packages/docs-content/content/api/errors.mdx",
+      "packages/infrastructure/README.md",
+      "packages/infrastructure/src/apps-stack.test.ts",
+      "packages/infrastructure/src/apps-stack.ts",
+      "packages/sdk/typescript/README.md",
+      "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+      "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+      "packages/sdk/typescript/src/schemas/index.ts",
+      "tools/oxlint/portable-rules.test.ts"
+    ],
+    "basis": [
+      "Native admission remains separate from tax execution and executable host composition",
+      "Checked identity is request-scoped and never a report fact, URL or analytics identity",
+      "Canonical errors retain fixed safe fields across HTTP/RPC/SDK and browser/HTML manual guidance",
+      "Exact lint admissions preserve encoder/runtime/nearby-owner rejection; no broad exemption or dependency upgrade",
+      "Actual built native tests prove shared allowance, IPv6 aliases, batch units, another key, metadata independence, safe provider failures and captured-log privacy",
+      "Both implementation removal controls fail at retained native assertions and restore exact source bytes",
+      "All nine ordered checks pass; 60 frozen sources restore exactly; retained tax/lock and four screenshots unchanged",
+      "Documentation owners, generated snapshot, Changeset and metrics deferral are aligned"
+    ]
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Installed unchanged dependency graph and pinned local toolchain used by this qualification; no upgrade",
+  "artifactAlgorithm": "sha256 of newline-joined sorted relative path, NUL, file sha256 pairs, with trailing newline",
+  "artifactCaptureBoundary": "After complete verification and its built native tests, before the later workspace production build",
+  "artifactCapturedAt": "2026-10-06T07:34:29.019256+00:00",
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 199,
+      "sha256": "0e60b74b663e0cbe85939dad7523372e6dfc20da060cd234f92ffd2157e43137"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "1f2cf2a6e2ee4229237268b26f84f057a212996b5a9b36ed2ceb692e75624eb3"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "300d62d0526ea714a0ea527e54763da8d4d2fb632fcbed3f66ef5d389c763501"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "df701ce2a8d91f1214a761b2515c0353d822955bc3948a4d3deba18cc0fb0cff"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "9d33c3314dc83683380bafd1bd41db06a3decb7358382f391a36d295e086cdc0"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "208ec0dc69768e5717f072ae1e6193cf3d914ad3f7fbd071cb1ad39768876536"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "34ebd859756b10884d1b0ebaf91187cc928497af3e64d96ccce7664cdb8d2cef"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "a3f8e04506d67d03ce41a235688b244af2e6f751164512d75a3295eef247bf4c"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "ad246f53aea518dd62bfd303dc33766b72702f2de4df4c6061dcabba590b1374"
+    }
+  ],
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "matchesParent": true
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "matchesParent": true
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "matchesParent": true
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "matchesParent": true
+    }
+  ],
+  "postCheckChanges": "Supporting task/plan/receipt/audit-pointer closeout only; owning documentation/format/Changeset checks follow. No functional source or oracle change.",
+  "limitations": [
+    "Local candidate only; hosted immutable-head Quality remains a separate observation",
+    "Cloudflare limiter is approximate and location-local; no exact global quota claim",
+    "Real Cloudflare edge identity, account-wide namespace uniqueness, uploaded settings and cloud operation require separately authorised provider readback",
+    "No guarantee that cancelling a private call stops remote work; local cancellation and bounded API work/reply remain",
+    "T009 metrics/telemetry approach is deferred; DEV-76 and remaining authorised tasks are incomplete",
+    "Medicare correction remains outside bounded authority pending Cooper decision; no current-law tax correctness claim",
+    "No merge, deployment, publication, provider or credential operation"
+  ],
+  "upstreamReferences": {
+    "alchemy": "Reviewed upstream beta.75 RpcAsync and receiving installed beta.80 RateLimit/BindingLayer/RuntimeContext/RpcAsync/Plan source; installed version owns compatibility",
+    "effect": "Reviewed upstream ConfigProvider tests and receiving installed Effect 4.0.0 Schema/NetAddress/Config types and implementation; no upgrade",
+    "cloudflare": [
+      "https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/",
+      "https://developers.cloudflare.com/fundamentals/reference/http-headers/",
+      "https://github.com/cloudflare/workerd/blob/main/src/workerd/io/compatibility-date.capnp"
+    ]
+  },
+  "rollback": "Revert this complete semantic slice while retaining dated evidence; no provider rollback is needed because no provider operation occurred."
+}

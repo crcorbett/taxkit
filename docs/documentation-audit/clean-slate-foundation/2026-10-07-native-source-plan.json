@@ -1,0 +1,900 @@
+{
+  "document_type": "verification-evidence",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-infrastructure-proof-owner",
+  "observedOn": "2026-10-07",
+  "task": "CSF-T007",
+  "baseCommit": "54dea58097ed9b409a1c202c6b416368273cb410",
+  "branch": "codex/dev-78-source-bound-plan-evidence",
+  "scope": "Local native plan source identity, matching optional digests and protected stage-local outputs",
+  "qualification": "all nine ordered local release checks passed",
+  "nonClaims": [
+    "No live cloud plan or provider apply",
+    "No credential or scope change",
+    "No native bootstrap/provider receipt",
+    "No provider account or current worktree secret custody qualification",
+    "No hosted availability",
+    "No generated/dependency/environment/provider coverage in source manifest",
+    "No proof of caller-supplied plan origin"
+  ],
+  "checks": [
+    {
+      "stage": "lint-fix",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "--fix",
+        "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.56,
+      "log": "dev78-source-plan-focused-i-lint-fix.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.09,
+      "log": "dev78-source-plan-focused-i-format.log",
+      "logSha256": "431b75e195ef77ff4e71a0f6f0be5ef48a9d9177c6b1258c58291174c18fcc40"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check:docs-deployment-tools:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.89,
+      "log": "dev78-source-plan-focused-i-types.log",
+      "logSha256": "90060ea48abd6012bf2b0e362677b227a116fe9f52bc2d7bece379303e362d02"
+    },
+    {
+      "stage": "focused",
+      "command": [
+        "bun",
+        "--bun",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/docs-deployment/workflow-plan-projection.runtime.test.ts",
+        "tools/docs-deployment/workflow-plan-projection.test.ts",
+        "tools/docs-deployment/workflow-evidence.test.ts",
+        "tools/docs-deployment/retirement.refusal.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 9.28,
+      "log": "dev78-source-plan-focused-i-focused.log",
+      "logSha256": "6870f4bbaed5e9f5538342d53fd164b48bc63557ab609324f7efe3328be7dc1c"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.58,
+      "log": "dev78-source-plan-focused-i-lint.log",
+      "logSha256": "f0168306d571083df140bc2ee9d96282fd6c7cc41692180f84d71b50c1bf574a"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "tools/quality-workflow/policy.ts",
+        "tools/quality-workflow/policy.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "log": "dev78-source-plan-final-focused-a-format.log",
+      "logSha256": "81236c070e4176a27e31b3c15feb7dc06165244e83c4d774d35e9489c8477c1b"
+    },
+    {
+      "stage": "quality-types",
+      "command": [
+        "bun",
+        "run",
+        "check:quality-workflow:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.4,
+      "log": "dev78-source-plan-final-focused-a-quality-types.log",
+      "logSha256": "35f98d0b6a568dcbad0d173960831b362367478d42ddeb0ebe334025b562be4d"
+    },
+    {
+      "stage": "quality-policy",
+      "command": [
+        "bun",
+        "--bun",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/quality-workflow/policy.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.64,
+      "log": "dev78-source-plan-final-focused-a-quality-policy.log",
+      "logSha256": "4a1566dbf41e0c4c75f0f7504020650a90607cbfece659f8c032616ae7fa4cfe"
+    },
+    {
+      "stage": "quality",
+      "command": [
+        "bun",
+        "run",
+        "check:quality-workflow"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.26,
+      "log": "dev78-source-plan-final-focused-a-quality.log",
+      "logSha256": "b5a8778faadb79f1450bfc0a923bd0448cefd1ba30bc3492620d4d734c75ebd3"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "dev78-source-plan-final-focused-a-docs.log",
+      "logSha256": "a2fc69df71493a46d52d3216fc67bc103b83e6a145ef723c56a94be668da9745"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.16,
+      "log": "dev78-source-plan-final-focused-a-runbooks.log",
+      "logSha256": "f481c9a754916b99f31746c330ddcfee06007184d8e243a1a0de341a928901ed"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "dev78-source-plan-final-focused-a-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "log": "dev78-source-plan-owners-b-runbooks.log",
+      "logSha256": "04c2f1ac0a3eed6e4abd1060923cb9d7eed5f542dabd90a3ea6cecd2ebcde5bd"
+    },
+    {
+      "stage": "paths",
+      "command": [
+        "bun",
+        "run",
+        "check:repository-paths"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "log": "dev78-source-plan-owners-b-paths.log",
+      "logSha256": "40f6f7c7091d515fc175993611b6263315cb9f4bd50c80be330920771027f1a0"
+    },
+    {
+      "stage": "deployment",
+      "command": [
+        "bun",
+        "run",
+        "check:docs-deployment"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.19,
+      "log": "dev78-source-plan-owners-b-deployment.log",
+      "logSha256": "bf98e16f89625b7b67b226abbc504956bbbdff05a7f264cf8fc665e21bae8d11"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "dev78-source-plan-owners-b-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "install",
+      "command": [
+        "bun",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.44,
+      "log": "dev78-source-plan-whole-a-install.log",
+      "logSha256": "7693c6ae7dfb7b1cb400bd2f3adaf131bfe315d912b85de5de01b0af81a91176"
+    },
+    {
+      "stage": "release-graph",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 951.84,
+      "log": "dev78-source-plan-whole-a-release-graph.log",
+      "logSha256": "ae3a4b1cc4b7a774622284327216fef221d7092cf728de2e527eb1264a815940"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.01,
+      "log": "dev78-source-plan-whole-a-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceIdentity": [
+    {
+      "path": ".github/workflows/quality.yml",
+      "mode": "100644",
+      "gitBlob": "8c77899cff0fbf6bef44257c7f4277d28c8b4908",
+      "sha256": "679b8bb76dc255be8979400399caf2cba771d9adcc96abbdedf656c3dbfde238"
+    },
+    {
+      "path": "docs/architecture/deployment.md",
+      "mode": "100644",
+      "gitBlob": "50e81e029ee0fadb8739d17b6df9a85bc5c3101c",
+      "sha256": "b330fc49e21c27c69d4bf571052c6680c4008bc69b8b11398de3d1ea22e6e0d5"
+    },
+    {
+      "path": "docs/architecture/testing-and-quality.md",
+      "mode": "100644",
+      "gitBlob": "1d6287aec4c4eabf725ebc49d233bc17d72cc261",
+      "sha256": "a7c3b6e42e46f9f588a541743303f61841c7a57489eb990deae90116e77a7bfc"
+    },
+    {
+      "path": "docs/documentation-audit/README.md",
+      "mode": "100644",
+      "gitBlob": "17eb00fc70c1143bd7ff043f52c18e4ce1570dfa",
+      "sha256": "05e0d1b491ca10030f6b3a6ada11e29a4c28d3b94796c6137090a8bfba92a775"
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "mode": "100644",
+      "gitBlob": "f04a8c546655fe8f1b4f70e964682416c1a42498",
+      "sha256": "146460c17b1399e8c117671bc99b354ce7c600eb876d3ce4ce88355f0ecc327f"
+    },
+    {
+      "path": "docs/operations/authority-model.md",
+      "mode": "100644",
+      "gitBlob": "8409acadfd5b80e956cccaef2f392f453b32391e",
+      "sha256": "df60f133067cbebfffb2e23d4262a1fcdad79d812f48b389eb6a577849f29416"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.md",
+      "mode": "100644",
+      "gitBlob": "ce3f00d26f19a6a1158ae5c640d2b8cb97a979f4",
+      "sha256": "0bf7f6e22b95c76a784c587ddc2ae253970b60bdcc819e5dc3e59b8fe011b8a1"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "mode": "100644",
+      "gitBlob": "c609de52e1eb993c64a28387e357f741ffdf8ac3",
+      "sha256": "4aca75d8a66f37926e56f7e52ffa06e852fcb9e7d5ebf5c9832ca14579c42e1a"
+    },
+    {
+      "path": "docs/runbooks/docs-deployment.md",
+      "mode": "100644",
+      "gitBlob": "8d9590644f5b03e4e04c9356a0eea510e6efc4a0",
+      "sha256": "c50e6c04150a3e5fa6ab334d935dadb5c7856e7e6bd858856312eaf902bedfcb"
+    },
+    {
+      "path": "packages/infrastructure/README.md",
+      "mode": "100644",
+      "gitBlob": "0a7687f2525a31a82840683fc51f3786519306e3",
+      "sha256": "5fbd8c6e3497eb79e7bf824b883a66585d57682f339823aa774b1924041a6bf0"
+    },
+    {
+      "path": "tools/docs-deployment/README.md",
+      "mode": "100644",
+      "gitBlob": "3557eb3949260afffa4fbe930597c44d2a06e460",
+      "sha256": "4e2b26211c6de394d45ba52cc8d1ff8fb13fad46a7b1ff5aa3a6a2d3a266712f"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-evidence.schemas.ts",
+      "mode": "100644",
+      "gitBlob": "1cc338d88aa05372574a34f0d6e9b7c0cd61c471",
+      "sha256": "c4585b85bdf1d9bc4a117b33722a24b5bd236793febc6140145506cdbbb030dc"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-evidence.ts",
+      "mode": "100644",
+      "gitBlob": "f2925337a116fdccfa051add375746d2ed987e7c",
+      "sha256": "387141ed94b2a79e3186b2a7881f28ef31bce13c52dab9c2810b2ddbf62cfefe"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-plan-projection.runtime.test.ts",
+      "mode": "100644",
+      "gitBlob": "fde579ce55707cb9c1809518de9c146dc051dac6",
+      "sha256": "2840d6a2d823899a3a84bcb311c1cf1a3cb7f1203ee73eeaf70bacbd7d94cb05"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-plan-projection.runtime.ts",
+      "mode": "100644",
+      "gitBlob": "abd73e76b5bff9159fcafe71122c74e0dcaa388f",
+      "sha256": "dace20f479b20bcbffb25b1d8244477f6888afb87d9927bcec4881736b37f250"
+    },
+    {
+      "path": "tools/docs-deployment/workflow-plan-projection.ts",
+      "mode": "100644",
+      "gitBlob": "7d38757270b13f1faac6605f36d929dbb32dfaed",
+      "sha256": "8f41706de6c8b75770925eeac3c05038d0b24cc88cbcf9b5a0cb1b3deb167d0f"
+    },
+    {
+      "path": "tools/documentation/runbook-contract.json",
+      "mode": "100644",
+      "gitBlob": "2ebc984ea903cab8d61c18dcf346ae3584a6c68a",
+      "sha256": "c600ebb87b0b56e883e284a5665c854887f6526cd40de90140be3aca68f154b4"
+    },
+    {
+      "path": "tools/quality-workflow/policy.test.ts",
+      "mode": "100644",
+      "gitBlob": "b4bda079fe3c68b757aa71b25a570752353e4826",
+      "sha256": "912f3b4af9cfcd7066e9f83fe625643e05994eb7906fbd94af5af8c9515c6e15"
+    },
+    {
+      "path": "tools/quality-workflow/policy.ts",
+      "mode": "100644",
+      "gitBlob": "98f584fd0905605b49b61cf13b5dfc096ca8a7ca",
+      "sha256": "ce17f3a6c44878b3b8eb0010d2723d2eefd16031528e45ee42e96d4cf3be1df5"
+    }
+  ],
+  "operationAuthority": {
+    "principal": "Cooper",
+    "operation": "local implementation, checked commits, push and draft PR",
+    "environment": "repository checkout",
+    "providerApply": false,
+    "mergeDeployPublish": false,
+    "rollback": "reviewed repository revert; preserve ignored local files",
+    "scope": "This receipt records repository implementation; subsequent native Preview and Production authority is recorded under localExecutionDirection."
+  },
+  "focusedCases": {
+    "nativePlanAndRetainedCompatibility": 92,
+    "qualityPolicy": 21
+  },
+  "retainedAttempts": [
+    {
+      "prefix": "dev78-source-plan-focused-a",
+      "failedStage": "lint",
+      "reason": "new fixture style and declaration order"
+    },
+    {
+      "prefix": "dev78-source-plan-focused-c",
+      "failedStage": "lint",
+      "reason": "ordinary test text decoding; corrected by reusing owning checked Git reader"
+    },
+    {
+      "prefix": "dev78-source-plan-focused-f",
+      "failedStage": "lint-fix",
+      "reason": "nested ternary"
+    },
+    {
+      "prefix": "dev78-source-plan-focused-g",
+      "failedStage": "types",
+      "reason": "automatic undefined-return style fix inferred void"
+    },
+    {
+      "prefix": "dev78-source-plan-owners-a",
+      "failedStage": "runbooks",
+      "reason": "new sidecar evidence path was absent from runbook text"
+    },
+    {
+      "prefix": "dev78-source-plan-freeze-a-initial",
+      "failedStage": "capture",
+      "reason": "tracked directory symlink cannot be read as file; corrected by checking indexed blob bytes and link text against working tree"
+    },
+    {
+      "prefix": "dev78-source-plan-real-cli-a",
+      "failedStage": "private script assertion",
+      "reason": "private results script expected a prefix on the successful digest; native command succeeded"
+    },
+    {
+      "prefix": "dev78-source-plan-real-cli-b",
+      "failedStage": "private script assertion",
+      "reason": "private results script expected wrong failure wording; both success cases passed and native wrong-digest refusal was correct"
+    }
+  ],
+  "commonplaceGuidance": {
+    "version": "0.6.7",
+    "revision": "c1e08a8a8c257fd2ddb9fc913c75ce5f016f27fc",
+    "source": "plugins/development-workflows/skills/alchemy-iac/references/operations/authority-plan-apply.md",
+    "instruction": "Run the same full checks and authorised native deployments locally when CI is unavailable",
+    "receivingDependenciesAndVendoredSkillsUnchanged": true
+  },
+  "hostedRun": {
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37580219079",
+    "head": "54dea58097ed9b409a1c202c6b416368273cb410",
+    "conclusion": "cancelled",
+    "annotation": "The job has exceeded the maximum execution time of 30m0s",
+    "passedBeforeCancellation": [
+      "verification",
+      "test",
+      "build",
+      "docs-validation",
+      "packed-artifact",
+      "downstream-consumer",
+      "api-smoke"
+    ],
+    "activeAtCancellation": "docs-browser",
+    "fullHostedSuccess": false,
+    "logSha256": "37e879b0503bf2df9fb9bb0519f74a9db3f8adb7a76d5390cdb0aad0b9dea15e"
+  },
+  "localExecutionDirection": {
+    "principal": "Cooper",
+    "reportedGitHubAvailability": "out of credits",
+    "observedTimeoutKeptSeparate": true,
+    "githubRerun": false,
+    "billingChange": false,
+    "cloudApply": "authorised from this Mac after exact target, source, credentials, native plan, recovery and readback are qualified; not executed",
+    "previewAndProductionAuthorisedByCooper": true
+  },
+  "sourceCoverage": {
+    "configurationFiles": 11,
+    "roots": [
+      ".gitignore",
+      "alchemy.apps.run.ts",
+      "apps/api",
+      "apps/web",
+      "packages",
+      "patches",
+      "tools",
+      "package.json",
+      "bun.lock",
+      "turbo.json",
+      "tsconfig*.json",
+      "oxlint.config.ts",
+      "oxfmt.config.ts",
+      "vitest*.ts"
+    ],
+    "sourceCaptureDeadlineSeconds": 20,
+    "optionalCallerHashesMustAgree": true,
+    "installedAlchemyVersion": "2.0.0-beta.80",
+    "installedDependencyBytesValidatedByManifest": false,
+    "planOriginEstablished": false,
+    "partialLocalWritePossible": true
+  },
+  "documentationImpact": {
+    "changeRequired": [
+      "deployment tools and native identity Schemas",
+      "deployment architecture and infrastructure README",
+      "Quality workflow/policy/tests and testing architecture",
+      "runbook/authority sidecar",
+      "SPEC/tasks/active plan",
+      "dated proof/audit pointer"
+    ],
+    "preserve": [
+      "historical receipt identities/bytes and writer stops",
+      "public app/package/API/SDK/content contracts",
+      "tax results and metrics deferral",
+      "provider resources and existing credentials"
+    ],
+    "changeset": "N/A: private local tools and CI budget; no public package contract change"
+  },
+  "preparedAt": "2026-10-07T06:48:31.822390+00:00",
+  "qualifiedCommit": "195b20885c4b56e253456585864e80e5c72fd7b7",
+  "qualifiedTree": "0af2d5e537747ca3a8f599325272d7af6ff739a6",
+  "wholeLocalGraph": {
+    "observedAt": "2026-10-07T07:06:27.661324+00:00",
+    "sourceCount": 1742,
+    "stagedTree": "0af2d5e537747ca3a8f599325272d7af6ff739a6",
+    "sourceCaptureMethod": "Index staged before whole check launch; every working byte/link independently equals its indexed Git blob",
+    "allWorkingBytesMatchedBeforeAndAfter": true,
+    "excludedLocalProofFile": "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json",
+    "checks": [
+      {
+        "check": "verification",
+        "target": "Canonical repository verification",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/verification-stdout-gVH5xQ/28ef88cfe681.log",
+            "sha256": "01ed8c0490fea611bef1656dee3fd4b3763ff097014d9c5f18771459c2697208",
+            "bytesRead": 548041,
+            "testSummaries": [
+              "//:test:docs-deployment:task:  Test Files  22 passed (22)",
+              "//:test:docs-deployment:task:       Tests  273 passed (273)",
+              "//:test:skills:task:  Test Files  1 passed (1)",
+              "//:test:skills:task:       Tests  21 passed (21)",
+              "Test Files  3 passed (3)",
+              "Tests  16 passed (16)",
+              "//:test:quality-workflow:task:  Test Files  2 passed (2)",
+              "//:test:quality-workflow:task:       Tests  34 passed (34)",
+              "@taxkit/sdk:test:browser:  Test Files  4 passed (4)",
+              "@taxkit/sdk:test:browser:       Tests  26 passed (26)",
+              "web:test:browser:  Test Files  3 passed (3)",
+              "web:test:browser:       Tests  21 passed (21)",
+              "web test:native-pair:  Test Files  9 passed (9)",
+              "web test:native-pair:       Tests  14 passed (14)"
+            ]
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/verification-stderr-pJL9yc/3f576068ba05.log",
+            "sha256": "59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca",
+            "bytesRead": 2118,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "test",
+        "target": "Workspace tests including the direct calculator journey",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/test-stdout-rp95EC/be6b4bda84d0.log",
+            "sha256": "9d142f6128330ae257046ea5fe161d5b1e43d5398e75479659aeb34e3b3f2777",
+            "bytesRead": 87569,
+            "testSummaries": [
+              "@taxkit/docs-content:test:  Test Files  5 passed (5)",
+              "@taxkit/docs-content:test:       Tests  24 passed (24)",
+              "@taxkit/calculators:test:  Test Files  3 passed (3)",
+              "@taxkit/calculators:test:       Tests  41 passed (41)",
+              "@taxkit/rules-au-stsl:test:  Test Files  3 passed (3)",
+              "@taxkit/rules-au-stsl:test:       Tests  14 passed (14)",
+              "@taxkit/sdk:test:  Test Files  5 passed (5)",
+              "@taxkit/sdk:test:       Tests  58 passed (58)",
+              "@taxkit/api-http:test:  Test Files  4 passed (4)",
+              "@taxkit/api-http:test:       Tests  29 passed (29)",
+              "@taxkit/docs-examples:test:  Test Files  3 passed (3)",
+              "@taxkit/docs-examples:test:       Tests  9 passed (9)",
+              "@taxkit/api-rpc:test:  Test Files  4 passed (4)",
+              "@taxkit/api-rpc:test:       Tests  332 passed (332)",
+              "api:test:  Test Files  7 passed (7)",
+              "api:test:       Tests  98 passed (98)",
+              "web:test:  Test Files  5 passed (5)",
+              "web:test:       Tests  58 passed (58)",
+              "@taxkit/infrastructure:test:  Test Files  3 passed (3)",
+              "@taxkit/infrastructure:test:       Tests  37 passed (37)"
+            ]
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/test-stderr-vBATpE/2d02f87a8d18.log",
+            "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8",
+            "bytesRead": 216,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "build",
+        "target": "Workspace production builds",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/build-stdout-gTdxLy/a2169f50590d.log",
+            "sha256": "ac7f5df2630ac6f2132a4e9ab7b0f5c22770c92ffb2d75f352e97dd74ba66fd7",
+            "bytesRead": 92852,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/build-stderr-JM2765/2a26dc597d2a.log",
+            "sha256": "844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07",
+            "bytesRead": 137,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "docs-validation",
+        "target": "Documentation content validation",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/docs-validation-stdout-UVn0Mp/35927a404f0f.log",
+            "sha256": "7778663895babc7bfa86513d04743c83d3685a7caef14a5be48d89301c963190",
+            "bytesRead": 2312,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/docs-validation-stderr-mh6RgJ/9906afb32bfd.log",
+            "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697",
+            "bytesRead": 51,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "packed-artifact",
+        "target": "Focused SDK packed artifact proof",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/packed-artifact-stdout-Ju00o6/dce2a1deabf6.log",
+            "sha256": "feb01f7e07e869320003474654eddcaea3bf88b6dc01eb362c8d454dcae8ab13",
+            "bytesRead": 3781,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/packed-artifact-stderr-xGxys2/3c15fabb8588.log",
+            "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7",
+            "bytesRead": 55,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "downstream-consumer",
+        "target": "Strict downstream package proof",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/downstream-consumer-stdout-6fYD6u/13d2e4202da8.log",
+            "sha256": "fdf7c2d8fd9f7c22abd358458838f4db7b22362dc8cb7148129d3f4bce78efe4",
+            "bytesRead": 13368,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/downstream-consumer-stderr-XmTMkq/377b526d0ca0.log",
+            "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9",
+            "bytesRead": 53,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "api-smoke",
+        "target": "Public API smoke evidence",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/api-smoke-stdout-3IdGeL/6f1420365777.log",
+            "sha256": "6e6796693407cc00f12c0e3744366fad4fa1b54846015400534b9a68466bb4a8",
+            "bytesRead": 64329,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/api-smoke-stderr-py83F8/6a54d5adb9d5.log",
+            "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87",
+            "bytesRead": 31,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "docs-browser",
+        "target": "Built native Website and documentation evidence",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/docs-browser-stdout-t9YVgW/b0222acd7b13.log",
+            "sha256": "73537e1162fd92d167bdcb4b016c9fa53e31cedcfc4cd5c4a19dbc85bf94a6bc",
+            "bytesRead": 75957,
+            "testSummaries": [
+              "web test:native-pair:  Test Files  9 passed (9)",
+              "web test:native-pair:       Tests  14 passed (14)"
+            ]
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/docs-browser-stderr-Kp382Q/2647c8efabd7.log",
+            "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4",
+            "bytesRead": 82,
+            "testSummaries": []
+          }
+        ]
+      },
+      {
+        "check": "changeset-status",
+        "target": "Pending release train status",
+        "exitCode": 0,
+        "details": [
+          {
+            "role": "stdout",
+            "path": "tmp/release-readiness/changeset-status-stdout-vIXGFU/03f9e773cf28.log",
+            "sha256": "e834233f90dc5813b23869a32496a58563ba0e4014cab32bb3eda12fc7ce0e08",
+            "bytesRead": 10039,
+            "testSummaries": []
+          },
+          {
+            "role": "stderr",
+            "path": "tmp/release-readiness/changeset-status-stderr-LrFppe/a10dd66e8b20.log",
+            "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3",
+            "bytesRead": 37,
+            "testSummaries": []
+          }
+        ]
+      }
+    ],
+    "detailCount": 18,
+    "allDetailBytesReadAndDigestsMatched": true
+  },
+  "fullSourceManifestSha256": "a08a519560698cd08f3f7e7979acccb59061c9e0800b69ac4ea440d2857b8051",
+  "realCheckoutCli": {
+    "observedAt": "2026-10-07T07:09:52.881675+00:00",
+    "cases": [
+      {
+        "case": "preview",
+        "stage": "pr-214",
+        "exitCode": 0,
+        "candidateCommit": "195b20885c4b56e253456585864e80e5c72fd7b7",
+        "homeStayedEmpty": true,
+        "planOrigin": "tracked local mock-provider fixture; no cloud plan claim",
+        "suppliedSourceHashes": "none",
+        "identitySha256": "ff67a325032b2b925a434474c8bd5b1bfa401b59bb6a474497e27ddb7554e519",
+        "projectionSha256": "fcefce2858ac5bfc9133265d667706613ef2d8f33096723a59715fb77e8dd7b6",
+        "sourceCount": 770,
+        "actualPatchDigestMatched": true
+      },
+      {
+        "case": "production",
+        "stage": "prod",
+        "exitCode": 0,
+        "candidateCommit": "195b20885c4b56e253456585864e80e5c72fd7b7",
+        "homeStayedEmpty": true,
+        "planOrigin": "tracked local mock-provider fixture; no cloud plan claim",
+        "suppliedSourceHashes": "none",
+        "identitySha256": "ff67a325032b2b925a434474c8bd5b1bfa401b59bb6a474497e27ddb7554e519",
+        "projectionSha256": "86e32571bfe56aa18804a5e006185e12c4b6a560627e91e088e70b574a51f3c1",
+        "sourceCount": 770,
+        "actualPatchDigestMatched": true
+      },
+      {
+        "case": "wrong-digest",
+        "stage": "pr-214",
+        "exitCode": 1,
+        "candidateCommit": "195b20885c4b56e253456585864e80e5c72fd7b7",
+        "homeStayedEmpty": true,
+        "planOrigin": "tracked local mock-provider fixture; no cloud plan claim",
+        "suppliedSourceHashes": "wrong configuration hash only",
+        "safeRefusal": true
+      }
+    ]
+  },
+  "nativeCredentialMetadata": {
+    "dopplerCliCustodyForCurrentWorktree": "failed: scoped-token",
+    "nativeProfiles": [
+      {
+        "name": "default",
+        "CloudflareConfiguredMethodOnly": true,
+        "dopplerProviderPresent": false
+      },
+      {
+        "name": "adad-foundation-local",
+        "dopplerProviderPresent": true,
+        "storedTokenPresent": true,
+        "method": "api-token",
+        "fileMode": "0600",
+        "scopePurposeAndValidityQualified": false
+      }
+    ],
+    "valuesPrintedOrExported": false,
+    "credentialOrScopeChanged": false,
+    "cloudPlanAttempted": false
+  },
+  "boundedWorkerRead": {
+    "observedAt": "2026-10-07T06:53:17.290812+00:00",
+    "operation": "Worker script search page one",
+    "exactAccount": "f9f94270a4a5af8af7010d891020922d",
+    "exitCode": 0,
+    "providerMutation": false,
+    "replyShape": "array",
+    "scriptCount": 44,
+    "limitation": "CLI array exposes no total-page metadata; page one only; no binding/namespace completeness claim"
+  },
+  "completedLocalQualificationAt": "2026-10-07T07:12:44.494578+00:00",
+  "documentationOnlyCloseout": {
+    "paths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-source-plan.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "qualifiedCodeAndConfigurationUnchanged": true,
+    "focusedChecks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.87,
+        "log": "/private/tmp/dev78-source-plan-closeout-a-docs.log",
+        "logSha256": "c78d9ca88ac380b3883fbe1c98c2500c0fc2b18e181cc793d86f292243bc66b5"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.19,
+        "log": "/private/tmp/dev78-source-plan-closeout-a-runbooks.log",
+        "logSha256": "5f32a22fefca55b2b4cf5ae9935d4e804851e2a3b504e8a4892af2155dec4796"
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.59,
+        "log": "/private/tmp/dev78-source-plan-closeout-a-paths.log",
+        "logSha256": "8df40731e56c3cc0dbaf4903d4fecca8400238375bc9d1b80a2f433d63052d69"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.03,
+        "log": "/private/tmp/dev78-source-plan-closeout-a-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  }
+}

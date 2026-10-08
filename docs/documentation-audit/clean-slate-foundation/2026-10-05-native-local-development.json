@@ -1,0 +1,282 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "native local root, CLI selection, local Worker version, Vite ownership, reload or shutdown changes",
+  "outcome": "qualified local native development sub-slice; T003 remains in progress",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local development implementation and qualification",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native Worker/Vite/browser",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-74-native-local-dev",
+    "baseCommit": "554ee3c10fefaaa943ba157841edba8d62ae942b",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "fileCount": 26,
+      "sortedEntriesSha256": "12c5386ca9efbb7b12bd9150c3a81589e467f576efe2e200a038635f62f598d5",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this post-check receipt to avoid self-hashing."
+    }
+  },
+  "environment": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "workerdOverride": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "parentHostedProof": {
+    "pullRequest": 134,
+    "headCommit": "554ee3c10fefaaa943ba157841edba8d62ae942b",
+    "runId": 37250859036,
+    "jobId": 111577989697,
+    "outcome": "success",
+    "completedAt": "2026-10-05T01:35:21Z",
+    "limitation": "Parent only; current candidate not yet pushed."
+  },
+  "implementation": [
+    "Separate TaxKitAppsLocal root uses the same native app graph, local state and native context/mode/development-stage checks before graph declaration.",
+    "Root development command builds API dependencies, uses an owned empty env file, isolated local profile directory and inherited Bun source/no-env options.",
+    "Fresh Vite ConfigProvider observes native plugin injection; supported Cloudflare/Bridge runtime export keeps development tools out of Worker SSR.",
+    "Root workerd override matches current app compatibility and the existing standalone native fixture; no additional SDK patch.",
+    "Saved existing native suite owns real public CLI startup, dynamically read resource URLs, client validation before source edits, no initial/replayed calculation, private/direct browser calculations, both source reloads, exact restoration, local state/profile readback and scoped process shutdown."
+  ],
+  "proof": [
+    {
+      "command": "saved native-local-development test after exact restoration",
+      "outcome": "Pass: actual local CLI journey and rejected plan/stage; browser validation precedes edits; true connection refusal confirms shutdown. Exact-restoration finalisers are registered before writing either source."
+    },
+    {
+      "command": "remove inherited Bun source selection from the saved actual CLI fixture",
+      "outcome": "Saved actual API source reload check fails at its 15-second deadline; exact fixture restore then both checks pass in 14.64 seconds."
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "Pass: 777 installs across 1001 packages; lock unchanged."
+    },
+    {
+      "command": "focused exact-source lint and Website typecheck",
+      "outcome": "Pass after correcting named regex result ingress and option ordering."
+    },
+    {
+      "command": "bun run check:docs; bun run check:runbooks",
+      "outcome": "Pass before final receipt closeout; repeated full verification pending."
+    },
+    {
+      "command": "exact root bun run dev command",
+      "outcome": "API health and Website HTML 200; retained private calculation and one actual Chromium RPC return 1301 dollars; no initial calculation/page errors; no credential JSON files in isolated profile location; both printed resource ports refuse connections after owned SIGINT shutdown."
+    },
+    {
+      "command": "bun run test",
+      "outcome": "Pass: 467 actual CLI lint cases including 403 portable cases; all 27 package/app test tasks freshly executed, zero cached."
+    },
+    {
+      "command": "bun run build",
+      "outcome": "Pass: all 16 build tasks, 11 unchanged tasks cached."
+    },
+    {
+      "command": "bun run api:smoke",
+      "outcome": "Pass: fresh standalone HTTP smoke and separate temporary consumer; 11 prerequisite builds cached."
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "Pass: full docs/runbooks/strict/skills/types; 32 quality cases including 13 isolated copied-workspace checks in 428.92 seconds; both unused-code graphs; 24 fresh SDK browser cases, 8 fresh Website browser cases, actual Wrangler declarations; all six fresh native tests in 35.94 seconds."
+    },
+    {
+      "command": "post-check docs/runbooks/Changeset status/format/whitespace",
+      "outcome": "Pass after final setup-note correction and bounded receipt; receipt-only docs check repeated before commit."
+    }
+  ],
+  "failedAttempts": [
+    {
+      "stage": "first real native start",
+      "observed": "Stale default ConfigProvider missed Vite injection and doubled Cloudflare plugins; older SDK runtime rejected compatibility date.",
+      "recovery": "Fresh ConfigProvider and root workerd override."
+    },
+    {
+      "stage": "second real native start",
+      "observed": "SDK reported ready but Worker SSR imported development tooling through broad Cloudflare barrel and failed require.resolve.",
+      "recovery": "Use the explicit public runtime-only Cloudflare/Bridge export; actual health/HTML/browser checks required."
+    },
+    {
+      "stage": "first API reload observation",
+      "observed": "CLI launcher dropped its source condition; state selected compiled API entry and source edit never appeared.",
+      "recovery": "Inherit BUN_OPTIONS through native child processes; actual source selection and response reload passed."
+    },
+    {
+      "stage": "first diagnostic browser click",
+      "observed": "Click before hydration used HTML form and failed exact browser-RPC assertion.",
+      "recovery": "Retain actual RPC assertion and prove client validation before saved live edits."
+    },
+    {
+      "stage": "saved attempts 1-3",
+      "observed": "Empty native default profile directory contradicted an over-narrow logs-only expectation; early source edit raced hydration; reload closed old API socket.",
+      "recovery": "Require no credential files, prove client validation first, and poll until an actual successful marked/restored response."
+    },
+    {
+      "stage": "first rejected-stage saved attempt",
+      "observed": "Native dev keeps its watcher alive after a failed stack import, so awaiting command exit timed out.",
+      "recovery": "Observe the fixed rejection before resource declaration and let the child scope close the watcher; plan still requires nonzero exit."
+    },
+    {
+      "stage": "first full test command",
+      "observed": "Local Chromium location omitted from the shell environment, so docs browser launch checks failed before reaching their expected cases.",
+      "recovery": "Repeat with the provisioned PLAYWRIGHT_BROWSERS_PATH; all owning tests pass."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "surface": "private commands/config/dependencies",
+      "owners": [
+        "package.json",
+        "bun.lock",
+        "alchemy.apps.local.run.ts",
+        "tools/apps-local/no-local-env",
+        "tsconfig.alchemy.json",
+        "apps/web/vite.config.ts",
+        "apps/web/vitest.native.config.ts"
+      ],
+      "postcondition": "real native pair uses correct source and local engine with one native plugin"
+    },
+    {
+      "decision": "Change required",
+      "surface": "entry points and architecture",
+      "owners": [
+        "README.md",
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "packages/infrastructure/README.md",
+        "docs/architecture/deployment.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/configuration.md",
+        "docs/architecture/testing-and-quality.md"
+      ],
+      "postcondition": "current pair setup replaces stale browser origin environment instructions; docs cloud path remains separately owned"
+    },
+    {
+      "decision": "Change required",
+      "surface": "lint and proof",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/verification/critical-journeys.json",
+        "docs/documentation-audit/README.md",
+        "knip.json",
+        "knip.production.json"
+      ],
+      "postcondition": "exact fixture decoder and Playwright fill admitted; encoder and runtime execution remain rejected; existing journey extended"
+    },
+    {
+      "decision": "Change required",
+      "surface": "active intent",
+      "owners": [
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "postcondition": "T003 records bounded development progress and remains in progress"
+    },
+    {
+      "decision": "Preserve",
+      "surface": "public contracts and retained results",
+      "owners": [
+        "packages/api/http",
+        "packages/api/rpc",
+        "packages/sdk/typescript",
+        "packages/rules",
+        "packages/docs-content"
+      ],
+      "reason": "No tax, SDK, RPC/HTTP/OpenAPI or public content contract changed."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "cloud/deployment/release/skills",
+      "owners": [
+        "alchemy.run.ts",
+        "alchemy.apps.run.ts",
+        "docs/runbooks",
+        "docs/operations",
+        "tools/docs-deployment",
+        ".agents/skills",
+        ".github/workflows"
+      ],
+      "reason": "No cloud operation, docs secret bridge, release procedure, canonical policy or hosted command admission changed."
+    },
+    {
+      "decision": "N/A",
+      "surface": "Changeset",
+      "reason": "Private app development, local dependency selection and fixtures only; no package-facing published interface."
+    }
+  ],
+  "limitations": [
+    "No cloud credentials, state, provider plan/apply, deployment or publication established.",
+    "Shared API dependency package edits require their owning rebuild; native reload of compiled exports is not an additional package watcher.",
+    "Local stage is disposable and must not be run beside another watcher of the same checkout.",
+    "Full safe exported telemetry, all calculator pages and DEV-75\u201381 remain unfinished.",
+    "Retained tax results remain unchanged pending Cooper Medicare decision."
+  ],
+  "rollback": {
+    "identity": "554ee3c10fefaaa943ba157841edba8d62ae942b",
+    "action": "Revert this local development slice and use prior saved built-native journey. Source swaps restore exact original files and process scopes stop owned children. No provider recovery action is authorised."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "accept local development sub-slice after passed checks and final docs readback",
+    "observations": [
+      "Native CLI readiness alone is insufficient: actual HTTP/private/browser calculations are required.",
+      "Saved source-removal check fails the actual API response observation rather than trusting Vite readiness.",
+      "Scoped exact source restoration is registered before each write; process scopes stop children and require actual ECONNREFUSED from both resource ports.",
+      "The local root rejects plan and wrong-stage declarations; native dev watcher persistence is explicitly handled.",
+      "No wider SDK/runtime/encoder permission, additional SDK patch, public package contract or provider operation."
+    ],
+    "remaining": "T003 exported native telemetry and later DEV-75\u201381; Medicare correction remains bounded unresolved scope."
+  },
+  "artifacts": {
+    "api": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "fileCount": 71,
+      "sortedEntriesSha256": "31297c2c39de699b153fb24a761029403d1a94b6e1e67ef6c8d10c22ad24107d"
+    },
+    "websiteServer": {
+      "root": "apps/web/dist/server",
+      "fileCount": 14,
+      "sortedEntriesSha256": "a51542e3ccf808141c35ccaaa5b2ef106b04ebc9375fb0c19637be3493013a89"
+    },
+    "websiteClient": {
+      "root": "apps/web/dist/client",
+      "fileCount": 3,
+      "sortedEntriesSha256": "a66451a8dbd77574e4e49e561594f581b9284884c560cfa4dd954ed0c369f6fa"
+    },
+    "settingsDefect": {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "fileCount": 14,
+      "sortedEntriesSha256": "55a4dfca9e2da77305fca315d81e5e3545a37f5e7e0d54235e445da8984b0bff"
+    }
+  },
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative file path and file sha256; every regular file under each named root.",
+  "postCheckChanges": {
+    "paths": [
+      "apps/api/README.md",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-local-development.json"
+    ],
+    "reason": "Final passed proof and one stale standalone setup note; no runtime or configuration changes.",
+    "verification": "Post-check docs/runbooks/Changeset status/format and whitespace pass."
+  }
+}

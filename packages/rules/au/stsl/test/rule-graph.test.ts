@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@taxkit/core/graph";
+import { ParameterEffectivePeriod } from "@taxkit/core/parameters";
 import type { AnyRuleDescriptor } from "@taxkit/core/rules";
 import {
   GrossPayDescriptor,
@@ -12,26 +13,39 @@ import {
 } from "@taxkit/rules-au-pay/rule-pack";
 import { StslDebtDescriptor } from "@taxkit/rules-au-stsl/facts";
 import { AuStslRuleDescriptors } from "@taxkit/rules-au-stsl/rule-pack";
+import { Array as EffectArray, Effect, Schema, Option } from "effect";
 
 const rulePackSnapshot = (rules: readonly AnyRuleDescriptor[]) =>
-  rules.map((rule) => ({
-    id: rule.id,
-    parameters: (rule.parameters ?? []).map((parameter) => ({
-      effectivePeriod: parameter.effectivePeriod,
-      id: parameter.id,
-      source: parameter.source.kind,
-      sourceArtifact: parameter.sourceArtifact
-        ? {
-            checksum: parameter.sourceArtifact.checksum,
-            retrievedOn: parameter.sourceArtifact.retrievedOn,
-            rowCount: parameter.sourceArtifact.extract.rowCount,
-          }
-        : undefined,
-    })),
-    provides: rule.provides.map((fact) => fact.id),
-    requires: rule.requires.map((fact) => fact.id),
-    sources: rule.sources.map((source) => source.kind),
-  }));
+  Effect.forEach(rules, (rule) =>
+    Effect.gen(function* () {
+      const parameters = yield* Effect.forEach(rule.parameters, (parameter) =>
+        Schema.encodeEffect(ParameterEffectivePeriod)(
+          parameter.effectivePeriod
+        ).pipe(
+          Effect.map((effectivePeriod) => ({
+            effectivePeriod,
+            id: parameter.id,
+            source: parameter.source.kind,
+            sourceArtifact: parameter.sourceArtifact.pipe(
+              Option.map((artifact) => ({
+                checksum: artifact.checksum,
+                retrievedOn: artifact.retrievedOn,
+                rowCount: artifact.extract.rowCount,
+              })),
+              Option.getOrUndefined
+            ),
+          }))
+        )
+      );
+      return {
+        id: rule.id,
+        parameters,
+        provides: EffectArray.map(rule.provides, (fact) => fact.id),
+        requires: EffectArray.map(rule.requires, (fact) => fact.id),
+        sources: EffectArray.map(rule.sources, (source) => source.kind),
+      };
+    })
+  );
 
 describe("AU STSL rule graph", () => {
   it("validates the composed PAYG + STSL rule graph", () => {
@@ -53,11 +67,20 @@ describe("AU STSL rule graph", () => {
   });
 
   it("surfaces caller question metadata on STSL input facts", () => {
-    expect(StslDebtDescriptor.question?.inputKind).toBe("boolean");
+    expect(
+      StslDebtDescriptor.question.pipe(
+        Option.map((question) => question.inputKind),
+        Option.getOrUndefined
+      )
+    ).toBe("boolean");
   });
 
-  it("captures descriptor snapshots for the published STSL rule pack", () => {
-    expect(rulePackSnapshot(AuStslRuleDescriptors)).toMatchInlineSnapshot(`
+  it.effect(
+    "captures descriptor snapshots for the published STSL rule pack",
+    () =>
+      Effect.gen(function* () {
+        expect(yield* rulePackSnapshot(AuStslRuleDescriptors))
+          .toMatchInlineSnapshot(`
       [
         {
           "id": "taxkit/rules-au-stsl/rule/StslComponent",
@@ -102,5 +125,6 @@ describe("AU STSL rule graph", () => {
         },
       ]
     `);
-  });
+      })
+  );
 });

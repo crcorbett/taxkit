@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-08-20
-source_of_truth: package-readme
-confidence: high
+document_type: package-guide
+lifecycle: current
+authority: supporting
+owner: taxkit-scripts-owner
+last_reviewed: 2026-10-07
+review_trigger: command, release graph, proof schema or orchestration change
 ---
 
 # Scripts
@@ -61,10 +63,19 @@ failure:
 5. `bun run sdk:check-packed-artifact`
 6. `bun run sdk:validate-downstream`
 7. `bun run api:smoke`
-8. `bun run docs:test:browser`
+8. `bun run web:test:native-pair`
 9. `bun run changeset:status`
 
-The nine checks and their order are unchanged. Their deterministic root,
+The nine check identities and their order are retained. The `docs-browser`
+check now freshly builds and runs all native API/Website tests, including the
+accepted documentation reader journey. It does not select the old docs app.
+Historical HGI-203 packets, command outcomes and five-journey Schemas retain
+their original bytes; presentation never substitutes this new command for an
+old attempt. `docs:test:browser` still names the retained legacy app while its
+deployment/recovery procedure is being replaced; it is outside the current
+release graph.
+
+Their deterministic root,
 workspace and app/package leaves now use Turbo tasks, while
 `@taxkit/scripts` remains the live sequential orchestrator and records each
 real exit code. Turbo may replay a correct local or remote result; it does not
@@ -92,7 +103,13 @@ a temporary receipt file or provider observation to replay. The provider-free
 docs build uses the normal cacheable `docs#build` task.
 
 Each invocation records its exact executable, arguments and true exit code in a
-schema-backed outcome. Complete stdout and stderr are streamed through a
+schema-backed outcome.
+CI-mode output renders those returned outcomes directly: each `PASS` line
+names the exact sanitised stdout/stderr path and SHA-256. Collect evidence
+from these returned identities, then verify the files and hashes. Never select
+a latest file from the detail directory: tests can create newer files with
+the same check ID. This adds bounded output only; CI still creates no candidate
+or attempt receipt. Candidate-mode presentation keeps its existing text. Complete stdout and stderr are streamed through a
 cross-chunk redactor into unique ignored files under `tmp/release-readiness`;
 the default receipt includes only bounded excerpts, repository-relative paths
 and SHA-256 digests. Absolute macOS and Linux home-directory prefixes, Windows
@@ -154,9 +171,11 @@ root release:check
   -> Turbo-backed root and package-owned commands
 ```
 
-`runReleaseReadiness` is the primary linear Effect program. The service
-contract and live layer depend only on the Effect `ChildProcessSpawner`
-capability. The Bun runtime entrypoint resolves the repository root with
+`runReleaseReadiness` is the primary linear Effect program. The service exposes
+one named, closed `execute` Effect. The live Layer captures
+`ChildProcessSpawner`, FileSystem, Path and Crypto at construction; callers do
+not supply those services for each command. The Bun runtime entrypoint resolves
+the repository root with
 `Path.fromFileUrl`, composes `BunServices.layer`, and is the only place that
 provides the host implementation or executes the completed Effect.
 `runCiReleaseReadiness` is the separate report-only program: it uses the command
@@ -181,11 +200,11 @@ reject malformed journeys, incomplete packets, escaping paths, missing files
 and mismatched candidate/detail digests. Run the focused route with `bun run
 test:release-readiness`.
 
-The production Knip profile has exact `exports` exceptions only for
-`evidence.boundary.ts` and `live.layer.ts`: their exported decoder, verifier and
-stream-redactor seams are executed by production code and directly exercised by
-the focused tests, but are intentionally absent from the package public export
-map. The normal Knip graph, package index and focused tests remain the owners for
+The production Knip profile has one exact release-script `exports` exception
+for `evidence.boundary.ts`: its decoder/verifier operations are directly tested
+while the package export map exposes only the three handoff Schemas. The live
+runner and its private `output-redaction.ts` owner have no export exception.
+The normal Knip graph, package index and focused tests remain the owners for
 all other unused exports.
 
 The package root does not expose proof internals or a generic digest helper.
@@ -196,11 +215,27 @@ live-source conditions plus `types` and `default` build conditions, so
 repository tooling and direct Bun tests resolve live source while built
 consumers resolve declarations and JavaScript.
 
+All eleven canonical strict rules apply to package source, tests and config.
+Only `present.runtime.ts` and `release-readiness.runtime.ts` may execute the
+completed Effect. Real-command fixtures check each admitted file and reject
+neighbouring invalid code; exact configuration assertions protect those two
+runtime paths. The output processor uses a private Ref and pure immutable
+transitions for each stream. It preserves credential/home-path redaction across
+chunks, complete detail files and the separate 4096-character excerpt limit.
+Sequential Effect accumulation preserves the nine-command order and stops at
+the same first failure. Hashing uses Effect Crypto with a safe named error;
+Schema encoding preserves the attempt/presentation representation and immutable
+write policy. Controlled native-service fixtures prove stream/process failures,
+digest errors and interruption cleanup; the existing real process test still
+reads back both complete sanitised streams. Real CLI tests prove invalid
+arguments and retained packet failures return nonzero before any release check.
+
 ## Local proof boundary
 
 [`../../docs/verification/critical-journeys.json`](../../docs/verification/critical-journeys.json)
-owns exactly five consumer-visible journeys: calculator direct use, packed SDK,
-HTTP API, docs runtime and release closure. The initial retained packet is
+owns six current consumer-visible journeys: calculator direct use, packed SDK,
+HTTP API, docs runtime, release closure and the native Website. The accepted
+HGI-203 snapshot retains its original five. The initial retained packet is
 [`../../docs/evidence/releases/HGI-203-local.json`](../../docs/evidence/releases/HGI-203-local.json).
 Both are local evidence only: they do not prove npm publication, a tag, a
 release, deployment, provider state, deployed SSR/hydration or public
@@ -230,3 +265,11 @@ experiments in the default documentation route.
 - `docs/architecture/testing-and-quality.md`
 - `docs/design-docs/abstraction-admission.md`
 - `docs/standards/versioning.md`
+
+
+`ReleaseJourneyInventory` preserves the exact historical five-journey HGI-203
+shape. `CurrentReleaseJourneyInventory` additionally requires the native Website
+journey in today's inventory. The current reader and runbook check use that
+current Schema; historical packet verification keeps the retained Schema and
+original digest. Adding a current journey does not qualify it as part of the old
+accepted release or establish a new release attempt.

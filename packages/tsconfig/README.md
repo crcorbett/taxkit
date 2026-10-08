@@ -10,6 +10,11 @@ confidence: medium
 Shared TypeScript configuration package for TaxKit workspace packages and
 apps.
 
+The root compiler is TypeScript 7.0.2 with the native `@effect/tsgo` integration.
+Host tools explicitly select Bun types; browser packages keep their own host
+type selection. TypeScript 7 no longer accepts `baseUrl`; existing relative
+`paths` mappings own aliases directly.
+
 ## Scope
 
 `@taxkit/tsconfig` owns reusable TypeScript config exports for the monorepo.

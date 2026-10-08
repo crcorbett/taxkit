@@ -3,7 +3,7 @@ document_type: documentation-router
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-10-07
 review_trigger: any maintainer/public docs class, root route, SPEC, plan, runbook, proof, evidence, or lifecycle change
 ---
 
@@ -13,7 +13,10 @@ This is the sole router for maintainer-document type, lifecycle, truth layers,
 and semantic ownership. Root `README.md` is the public repository entry point;
 `AGENTS.md` is the short task map; `docs/architecture/README.md` is the current
 architecture route. Public documentation content is a separate product surface
-owned by `apps/docs` and the docs packages.
+owned by the replacement `apps/web`, backend content contracts and docs
+packages. The old `apps/docs` workspace is retired. Its tombstone routes to the verified
+source bundle and dated provider recovery records; no provider operation is
+authorised by that retained history.
 
 ## Truth layers
 
@@ -51,11 +54,11 @@ lifecycle; migrate it only when its owner is materially revised.
 | Standards | [`standards/README.md`](standards/README.md) | Current durable engineering/documentation rules. |
 | Current intent | [`product-specs/index.md`](product-specs/index.md) and [`exec-plans/active/README.md`](exec-plans/active/README.md) | Only genuinely active work; implemented/history stays inventory. |
 | Completed history | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) | Historical provenance, never default policy. |
-| Public docs product | [`../apps/docs/README.md`](../apps/docs/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
+| Public docs product | [`../apps/web/README.md`](../apps/web/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
 | Repeatable release/deployment/recovery operations | [`runbooks/README.md`](runbooks/README.md) and [`operations/authority-model.md`](operations/authority-model.md) | Exactly five target-owned procedures; stop consequential operations when principal, candidate, target or receipt is unknown. |
 | CI controls and recurring automation | [`standards/controls.md`](standards/controls.md) and [`operations/automation-register.md`](operations/automation-register.md) | Quality workflow admission, release-graph controls, and report-only candidate boundaries; neither route grants external authority. |
 | Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-critical-journeys.json`](evidence/releases/HGI-203-critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | The current inventory owns evolving journeys. Accepted HGI-203 retains the exact historical five-journey snapshot and bounded local proof that its immutable packet observed; HGI-204 validates both epochs without attributing current changes to the old attempt. Raw logs and secrets are never durable proof. |
-| Harness foundation and requalification | [`verification/repository-harness-profile.json`](verification/repository-harness-profile.json), [`documentation-audit/harness-foundation/accepted-findings.json`](documentation-audit/harness-foundation/accepted-findings.json), [`verification/harness-epochs.md`](verification/harness-epochs.md), and [`verification/effectiveness.md`](verification/effectiveness.md) | The TaxKit profile, accepted HE crosswalk, content-addressed skill receipt and focused gate own the implemented baseline. Current epoch `HFI-004-2026-07-24` qualifies fail-closed candidate `7c8a96e`; HGI-206 remains previous history. Neither establishes external state. |
+| Harness foundation and requalification | [`verification/repository-harness-profile.json`](verification/repository-harness-profile.json), [`documentation-audit/harness-foundation/accepted-findings.json`](documentation-audit/harness-foundation/accepted-findings.json), [`verification/harness-epochs.md`](verification/harness-epochs.md), and [`verification/effectiveness.md`](verification/effectiveness.md) | The TaxKit profile, accepted HE crosswalk, content-addressed skill receipt and focused gate own the implemented baseline. Last accepted epoch `HFI-004-2026-07-24` qualifies saved candidate `7c8a96e`; HGI-206 remains previous history. The active clean-slate plan owns pending qualification of today's graph. Neither saved epoch establishes current-checkout or external state. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |
 
@@ -86,9 +89,21 @@ identity.
 It checks maintainer metadata, links, documented commands, workspace README
 coverage, public/maintainer separation, accepted public-status representation,
 and generated-source edges with bounded diagnostics and a JSON detail receipt.
+The command accepts `--json`; failed checks return a nonzero exit after the
+report is saved. Effect CLI owns option parsing.
 `draft` means authored, locally renderable, visibly labelled candidate content;
 `published` means explicitly accepted current public documentation. Neither
 status proves runtime or external availability.
+
+Acceptance-record Schemas live in `@taxkit/content`. The docs tool explicitly
+selects source exports so it can run in a fresh checkout before package builds.
+Version-two records include the reviewed source hash, which this check verifies;
+version-one records retain their historical contract. The local accepted
+catalogue builder, `bun run docs:catalogue`, requires version two, checks source
+bytes before and after compilation, and writes generated output only when
+accepted pages and matching navigation exist. It does not accept pages or
+establish publication by running. See
+[`../packages/docs-content/README.md`](../packages/docs-content/README.md).
 
 `bun run check:runbooks` Schema-decodes the canonical runbook contract, the
 current journey inventory and the exact historical HGI-203 journey snapshot,

@@ -1,6 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Config, Console, Effect, Match } from "effect";
+import { Config, Console, Effect, Match, Option } from "effect";
 
 import { readWorkflowReceipt } from "./workflow-check.boundary.js";
 import {
@@ -24,11 +24,12 @@ export const checkWorkflowInput = Effect.gen(function* workflowInputCheck() {
     "input-receipt",
     DeploymentWorkflowInputReadback
   );
-  const expectedPrNumber =
-    config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER === undefined ||
-    config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER === ""
-      ? null
-      : config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER;
+  const expectedPrNumber = Option.fromNullishOr(
+    config.TAXKIT_WORKFLOW_INPUT_PR_NUMBER
+  ).pipe(
+    Option.filter((value) => value !== ""),
+    Option.getOrNull
+  );
   if (
     input.candidateCommit !== config.TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT ||
     input.workflowCommit !== config.TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT ||

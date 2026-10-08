@@ -1,8 +1,13 @@
 import { describe, expect, it } from "@effect/vitest";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import {
+  CalculationQuery,
+  MetadataQuery,
+  CalculatorOperationTimedOut,
+} from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents, audFromCents } from "@taxkit/core/primitives";
 import {
   AuPayCalculatorId,
   GrossPay,
@@ -15,7 +20,22 @@ import {
 } from "@taxkit/sdk/au/effect";
 import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
 import { expectAt } from "@taxkit/testing";
-import { Array, Cause, Effect, Exit, Layer, Option, Schema } from "effect";
+import {
+  Array,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Match,
+  Option,
+  Schema,
+} from "effect";
+import {
+  HttpClientRequest,
+  HttpRouter,
+  HttpServerRequest,
+  HttpServerResponse,
+} from "effect/http";
 
 import { TaxKitApiInProcessClientLive } from "../src/client/server.layer.js";
 import { TaxKitHttpApiService } from "../src/client/service.js";
@@ -25,13 +45,15 @@ import {
   CalculatorRunResponse,
   CalculatorServiceError,
 } from "../src/groups/calculators.js";
+import { TaxKitApiRoutesLayer } from "../src/server.js";
+import { ContentTestLive } from "./content.fixture.js";
 
 const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
 
 const TestLive = Layer.mergeAll(
-  TaxKitApiInProcessClientLive,
+  TaxKitApiInProcessClientLive.pipe(Layer.provide(ContentTestLive)),
   PublicCalculatorServiceTestLive
 );
 
@@ -41,15 +63,68 @@ const secretSentinel = "taxkit-secret-sentinel";
 const privatePathSentinel = "/private/taxkit-sentinel/http-input.json";
 
 const grossPayFacts = (
-  cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  amount: Money,
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) => ({
-  grossPay: new GrossPay({ amount: aud(cents), period }),
+  grossPay: new GrossPay({ amount, period }),
   taxFreeThresholdClaimed,
 });
 
 describe("TaxKit public calculation HTTP API", () => {
+  it.effect.each([
+    "/api/v1/jurisdictions",
+    "/api/v1/tax-years",
+    "/api/v1/calculators",
+    "/api/v1/calculators/au.pay.take-home",
+    "/api/v1/calculators/au.pay.take-home/schema",
+    "/api/v1/calculators/au.pay.take-home/graph",
+    "/api/v1/facts",
+    "/api/v1/rules",
+  ])("declares and encodes a checked metadata timeout at %s", (pathname) =>
+    Effect.gen(function* () {
+      const live = yield* PublicCalculatorService;
+      const service = Layer.succeed(
+        PublicCalculatorService,
+        PublicCalculatorService.of({
+          ...live,
+          getCalculator: () => Effect.fail(new CalculatorOperationTimedOut()),
+          getCalculatorGraph: () =>
+            Effect.fail(new CalculatorOperationTimedOut()),
+          getCalculatorSchema: () =>
+            Effect.fail(new CalculatorOperationTimedOut()),
+          listCalculators: () => Effect.fail(new CalculatorOperationTimedOut()),
+          listFacts: () => Effect.fail(new CalculatorOperationTimedOut()),
+          listJurisdictions: () =>
+            Effect.fail(new CalculatorOperationTimedOut()),
+          listRules: () => Effect.fail(new CalculatorOperationTimedOut()),
+          listTaxYears: () => Effect.fail(new CalculatorOperationTimedOut()),
+        })
+      );
+      // HttpApiBuilder captures services while constructing handlers. Supply
+      // the controlled implementation there, rather than a later request override.
+      const handler = yield* HttpRouter.toHttpEffect(TaxKitApiRoutesLayer).pipe(
+        Effect.provide(ContentTestLive),
+        Effect.provide(service)
+      );
+      const request = HttpClientRequest.get(
+        `http://taxkit.internal${pathname}`
+      );
+      const response = yield* handler.pipe(
+        Effect.provideService(
+          HttpServerRequest.HttpServerRequest,
+          HttpServerRequest.fromClientRequest(request)
+        )
+      );
+      expect(response.status).toBe(504);
+      expect(
+        yield* Schema.decodeUnknownEffect(CalculatorApiErrorEnvelope)(
+          yield* HttpServerResponse.toClientResponse(response, { request }).json
+        )
+      ).toEqual({ error: new CalculatorOperationTimedOut() });
+    }).pipe(Effect.provide(PublicCalculatorServiceTestLive), Effect.scoped)
+  );
+
   it.effect("pins the health route fixture", () =>
     Effect.gen(function* () {
       const client = yield* TaxKitHttpApiService;
@@ -68,16 +143,20 @@ describe("TaxKit public calculation HTTP API", () => {
       Effect.gen(function* () {
         const client = yield* TaxKitHttpApiService;
         const service = yield* PublicCalculatorService;
-        const query = {
+        const context = {
           jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
           taxYear: AuPayTakeHomeCalculation.taxYear,
         };
+        const query = MetadataQuery.make({
+          jurisdiction: Option.some(Option.some(context.jurisdiction)),
+          taxYear: Option.some(Option.some(context.taxYear)),
+        });
         const response = yield* client.calculatorApi.listCalculators({
           query,
         });
         const serviceResponse = yield* service.listCalculators(query);
         const decoded = yield* Schema.decodeUnknownEffect(
-          CalculatorCatalogResponse
+          Schema.toType(CalculatorCatalogResponse)
         )(response);
         const takeHomeCalculator = expectAt(
           Array.filter(
@@ -89,7 +168,7 @@ describe("TaxKit public calculation HTTP API", () => {
 
         expect(decoded).toEqual(serviceResponse);
         expect(takeHomeCalculator.calculatorId).toBe(takeHomeCalculatorId);
-        expect(takeHomeCalculator.context).toEqual(query);
+        expect(takeHomeCalculator.context).toEqual(context);
         expect(takeHomeCalculator.inputFactIds).toEqual([
           GrossPayDescriptor.id,
           TaxFreeThresholdClaimedDescriptor.id,
@@ -101,18 +180,24 @@ describe("TaxKit public calculation HTTP API", () => {
   it.effect("pins calculate success through SDK full-run parity", () =>
     Effect.gen(function* () {
       const client = yield* TaxKitHttpApiService;
-      const facts = grossPayFacts(346_200, "fortnightly", true);
+      const facts = grossPayFacts(
+        yield* audFromCents(346_200),
+        "fortnightly",
+        true
+      );
       const response = yield* client.calculatorApi.calculate({
         params: {
           calculatorId: takeHomeCalculatorId,
         },
         payload: {
           facts,
-          jurisdiction: "AU",
-          taxYear: "2025-26",
+          jurisdiction: Option.some(
+            Option.some(AuPayTakeHomeCalculation.jurisdiction)
+          ),
+          taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
         },
         query: {
-          help: "errors",
+          help: Option.some(Option.some("errors")),
         },
       });
       const sdkResponse = yield* calculateSdkRunRequest(
@@ -120,22 +205,28 @@ describe("TaxKit public calculation HTTP API", () => {
         {
           payload: {
             facts,
-            jurisdiction: "AU",
-            taxYear: "2025-26",
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         }
       );
-      const decoded = yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
-        response
-      );
+      const decoded = yield* Schema.decodeUnknownEffect(
+        Schema.toType(CalculatorRunResponse)
+      )(response);
 
+      const takeHomeReport = Match.value(response.report).pipe(
+        Match.tag("TakeHomePayReport", (report) => report),
+        Match.orElse(() => expect.fail("Expected take-home report"))
+      );
       expect(response.calculator.calculatorId).toBe("au.pay.take-home");
       expect(response.report._tag).toBe("TakeHomePayReport");
-      expect(response.report.rulePackVersion).toBe("rules-au-pay/1.0.0");
+      expect(takeHomeReport.rulePackVersion).toBe("rules-au-pay/1.0.0");
       expect(decoded).toEqual(sdkResponse);
       expect(response).toEqual(sdkResponse);
-      expect(response.report.withholdingsTotal.cents).toBe(75_600);
-      expect(response.report.netPay.cents).toBe(270_600);
+      expect(takeHomeReport.withholdingsTotal.cents).toBe(75_600);
+      expect(takeHomeReport.netPay.cents).toBe(270_600);
       expect(response.diagnostics.graphIssues.length).toBe(0);
 
       const annualTaxResponse = yield* client.calculatorApi.calculate({
@@ -143,17 +234,26 @@ describe("TaxKit public calculation HTTP API", () => {
           calculatorId: annualTaxCalculatorId,
         },
         payload: {
-          facts: { taxableIncome: aud(9_000_000) },
-          jurisdiction: "AU",
-          taxYear: "2025-26",
+          facts: {
+            taxableIncome: new Money({
+              cents: Cents.make(9_000_000),
+              currency: "AUD",
+            }),
+          },
+          jurisdiction: Option.some(
+            Option.some(AuPayTakeHomeCalculation.jurisdiction)
+          ),
+          taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
         },
-        query: {},
+        query: CalculationQuery.make({}),
       });
 
-      expect(annualTaxResponse.report._tag).toBe("AnnualTaxReport");
-      expect(annualTaxResponse.report.rulePackVersion).toBe(
-        "rules-au-income-tax/1.0.0"
+      const annualReport = Match.value(annualTaxResponse.report).pipe(
+        Match.tag("AnnualTaxReport", (report) => report),
+        Match.orElse(() => expect.fail("Expected annual tax report"))
       );
+      expect(annualTaxResponse.report._tag).toBe("AnnualTaxReport");
+      expect(annualReport.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
     }).pipe(Effect.provide(TestLive))
   );
 
@@ -165,7 +265,10 @@ describe("TaxKit public calculation HTTP API", () => {
         const service = yield* PublicCalculatorService;
         const invalidFacts = {
           rejectedSource: `${secretSentinel}:${privatePathSentinel}`,
-          taxableIncome: aud(9_000_000),
+          taxableIncome: new Money({
+            cents: Cents.make(9_000_000),
+            currency: "AUD",
+          }),
         };
         const exit = yield* client.calculatorApi
           .calculate({
@@ -174,34 +277,46 @@ describe("TaxKit public calculation HTTP API", () => {
             },
             payload: {
               facts: invalidFacts,
-              jurisdiction: "AU",
-              taxYear: "2025-26",
+              jurisdiction: Option.some(
+                Option.some(AuPayTakeHomeCalculation.jurisdiction)
+              ),
+              taxYear: Option.some(
+                Option.some(AuPayTakeHomeCalculation.taxYear)
+              ),
             },
             query: {
-              help: "errors",
+              help: Option.some(Option.some("errors")),
             },
           })
           .pipe(Effect.exit);
         const sdkExit = yield* calculateSdkRunRequest(
           AuPayTakeHomeCalculation,
           {
-            help: "errors",
+            help: Option.some(Option.some("errors")),
             payload: {
               // @ts-expect-error runtime parity covers invalid external input after the typed boundary is bypassed.
               facts: invalidFacts,
-              jurisdiction: "AU",
-              taxYear: "2025-26",
+              jurisdiction: Option.some(
+                Option.some(AuPayTakeHomeCalculation.jurisdiction)
+              ),
+              taxYear: Option.some(
+                Option.some(AuPayTakeHomeCalculation.taxYear)
+              ),
             },
           }
         ).pipe(Effect.exit);
         const serviceExit = yield* service
           .calculate({
             calculatorId: takeHomeCalculatorId,
-            help: "errors",
+            help: Option.some(Option.some("errors")),
             payload: {
               facts: invalidFacts,
-              jurisdiction: "AU",
-              taxYear: "2025-26",
+              jurisdiction: Option.some(
+                Option.some(AuPayTakeHomeCalculation.jurisdiction)
+              ),
+              taxYear: Option.some(
+                Option.some(AuPayTakeHomeCalculation.taxYear)
+              ),
             },
           })
           .pipe(Effect.exit);
@@ -238,12 +353,17 @@ describe("TaxKit public calculation HTTP API", () => {
           0
         );
         const envelope = yield* Schema.decodeUnknownEffect(
-          CalculatorApiErrorEnvelope
+          Schema.toType(CalculatorApiErrorEnvelope)
         )(failure.error);
-        const calculatorError = yield* Schema.decodeUnknownEffect(
-          CalculatorServiceError
+        const decodedCalculatorError = yield* Schema.decodeUnknownEffect(
+          Schema.toType(CalculatorServiceError)
         )(envelope.error);
-        const inputHelp = Option.fromNullishOr(calculatorError.help).pipe(
+        const calculatorError = Match.value(decodedCalculatorError).pipe(
+          Match.tag("CalculatorInputDecodeError", (error) => error),
+          Match.orElse(() => expect.fail("Expected calculator input error"))
+        );
+        const inputHelp = calculatorError.help.pipe(
+          Option.flatten,
           Option.match({
             onNone: Array.empty,
             onSome: (help) => help,
@@ -261,8 +381,11 @@ describe("TaxKit public calculation HTTP API", () => {
           "Invalid calculator input value"
         );
         expect(expectAt(inputHelp, 0).factId).toBe(GrossPayDescriptor.id);
-        expect(JSON.stringify(envelope)).not.toContain(secretSentinel);
-        expect(JSON.stringify(envelope)).not.toContain(privatePathSentinel);
+        const serializedEnvelope = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CalculatorApiErrorEnvelope)
+        )(envelope);
+        expect(serializedEnvelope).not.toContain(secretSentinel);
+        expect(serializedEnvelope).not.toContain(privatePathSentinel);
       }).pipe(Effect.provide(TestLive))
   );
 });

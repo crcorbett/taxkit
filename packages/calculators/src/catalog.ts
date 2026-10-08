@@ -52,7 +52,6 @@ import type {
   HelpMode,
 } from "./schemas.js";
 
-type CalculatorProgram = Effect.Effect<unknown, unknown, unknown>;
 type UntrustedCalculatorFacts = typeof Schema.Unknown.Type;
 
 type CalculatorExecution = (
@@ -91,7 +90,6 @@ export interface CalculatorCatalogEntry {
   readonly rulePackLayer: Layer.Any;
   readonly supportedHelpModes: readonly HelpMode[];
   readonly title: string;
-  readonly program?: CalculatorProgram;
 }
 
 class CalculatorContextData extends Data.Class<CalculatorContext> {}
@@ -166,7 +164,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
       PayWithholdingsLedgerDescriptor,
       PaygWithholdingComponentDescriptor,
     ],
-    program: CalculateTakeHomePay,
     reportSchema: TakeHomePayReport,
     reportSchemaName: "TakeHomePayReport",
     ruleDescriptors: AuTakeHomePayRuleDescriptors,
@@ -196,7 +193,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
       PaygWithholdingComponentDescriptor,
       PayWithholdingsLedgerDescriptor,
     ],
-    program: CalculatePayWithholdings,
     reportSchema: PayWithholdingsLedger,
     reportSchemaName: "PayWithholdingsLedger",
     ruleDescriptors: [
@@ -226,7 +222,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     inputFacts: [AnnualTaxableIncomeDescriptor],
     inputSchema: AnnualTaxScenarioInputSchema,
     outputFacts: [AnnualTaxLedgerDescriptor],
-    program: CalculateAnnualTax,
     reportSchema: AnnualTaxReport,
     reportSchemaName: "AnnualTaxReport",
     ruleDescriptors: AuAnnualTaxRuleDescriptors,

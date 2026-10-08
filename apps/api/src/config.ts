@@ -1,6 +1,15 @@
-import { Config, ConfigProvider, Context, Effect, Layer, Schema } from "effect";
+import {
+  Config,
+  Context,
+  Effect,
+  Layer,
+  Option,
+  Schema,
+  SchemaTransformation,
+} from "effect";
 
 import {
+  ApiServerConfigError,
   ApiServerConfigSchema,
   ApiServerConfigSourceSchema,
   ApiServerTcpAddressSchema,
@@ -15,23 +24,36 @@ export class ApiServerConfig extends Context.Service<
   ApiServerConfigService
 >()("@taxkit/api/ServerConfig") {}
 
-const ApiServerConfigSource = Config.all({
-  host: Config.String("API_HOST").pipe(Config.withDefault(defaultHost)),
-  port: Config.Port("API_PORT").pipe(
-    Config.orElse(() => Config.Port("PORT")),
-    Config.withDefault(defaultPort)
-  ),
-});
-
-const loadApiServerConfig = ApiServerConfigSource.parse(
-  ConfigProvider.fromEnv()
-).pipe(
-  Effect.flatMap((source) =>
-    Schema.decodeUnknownEffect(ApiServerConfigSourceSchema)({
-      host: source.host.trim() || defaultHost,
-      port: source.port,
+const HostEnvironmentValue = Schema.String.pipe(
+  Schema.decodeTo(
+    ApiServerConfigSourceSchema.fields.host,
+    SchemaTransformation.transform({
+      decode: (host) => host.trim() || defaultHost,
+      encode: (host) => host,
     })
+  )
+);
+
+// Config resolves the caller's provider. The live application uses the native
+// environment provider; tests substitute it without changing ambient settings.
+const loadApiServerConfig = Config.all({
+  host: Config.schema(HostEnvironmentValue, "API_HOST").pipe(
+    Config.withDefault(defaultHost)
   ),
+  port: Config.schema(ApiServerConfigSourceSchema.fields.port, "API_PORT").pipe(
+    Config.option,
+    Config.flatMap(
+      Option.match({
+        onNone: () =>
+          Config.schema(ApiServerConfigSourceSchema.fields.port, "PORT").pipe(
+            Config.withDefault(defaultPort)
+          ),
+        onSome: Config.succeed,
+      })
+    )
+  ),
+}).pipe(
+  Effect.mapError(() => new ApiServerConfigError({ operation: "settings" })),
   Effect.map((source) =>
     ApiServerConfigSchema.make({
       address: ApiServerTcpAddressSchema.make({

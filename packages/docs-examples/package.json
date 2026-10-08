@@ -1,0 +1,29 @@
+{
+  "name": "@taxkit/docs-examples",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "check-examples": "tsc --noEmit",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.build.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@taxkit/api-http": "workspace:*",
+    "@taxkit/calculators": "workspace:*",
+    "@taxkit/core": "workspace:*",
+    "@taxkit/rules-au-pay": "workspace:*",
+    "@taxkit/sdk": "workspace:*",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "@taxkit/content": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

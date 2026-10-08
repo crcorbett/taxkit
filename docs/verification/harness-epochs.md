@@ -3,13 +3,13 @@ document_type: harness-evaluation-epoch
 lifecycle: current
 authority: canonical
 owner: taxkit-harness-owner
-last_reviewed: 2026-07-24
+last_reviewed: 2026-10-04
 review_trigger: worker, host, tool, runtime, skill, public-boundary, or release-graph change
 ---
 
 # Harness evaluation epochs
 
-The current worker-visible TaxKit epoch is `HFI-004-2026-07-24`, qualified
+The last accepted TaxKit harness epoch is `HFI-004-2026-07-24`, qualified
 against candidate `7c8a96e35ed59e4f78490d229cbfdcf21ea18ec0`, tree
 `637bc0e2145ea24be7b2a72d507f9f99a43e5a72`, from migration base
 `8695c018accf4c4abb7e803c631c5120f90e52b2`. Git reproduces 135 changed
@@ -31,7 +31,7 @@ epoch verifier also distinguishes required epoch/effectiveness owner changes
 from preserved HGI evidence. Any source, receipt, review, or target mismatch
 fails closed.
 
-The five current journeys are calculator, packed SDK consumer, HTTP API,
+The five historical HFI-004 journeys are calculator, packed SDK consumer, HTTP API,
 documentation runtime, and report-only release readiness. Their command,
 boundary oracle, receipt and recovery owner live in the scenario contract.
 Those commands establish local observations only; they never establish hosted
@@ -76,3 +76,27 @@ review accepted this proportional profile/runbook requalification. It is not
 a successor HFI epoch: HFI-004 remains the accepted current harness epoch.
 Any worker, host, tool, runtime, skill receipt, repository profile, validator,
 journey, target or authority change requires requalification.
+
+
+## Clean-slate checking-tool migration — 2026-10-04
+
+The accepted clean-slate work changes the installed dependency/skill graph and
+checking code. Retained HFI-004 and HGI-206 receipts remain proof of their saved
+candidates. They do not qualify the current checkout. Current local checks and
+remaining acceptance are tracked by the [active plan](../exec-plans/active/clean-slate-foundation.md)
+and its [evaluation-tools receipt](../documentation-audit/clean-slate-foundation/2026-10-04-evaluation-tools.json).
+No historical hashes, candidate IDs, scenario records or review receipts are
+rewritten to make the old verifiers pass.
+
+Both old commands retain their current nonzero failure identity: HGI-206 stops
+on its missing historical active-owner source, and the foundation epoch stops
+on the changed canonical skill receipt projection. Their command boundaries
+print bounded repair messages without raw error stacks or private paths.
+Unknown options also fail. Pure policy fixtures use saved declared hashes to
+check accepted and rejected bindings; those fixtures are not fresh source proof.
+Actual source qualification for the rebuilt product remains pending.
+
+The current inventory also includes `taxkit-native-website`. Current governance
+and release readers check all six named journeys. This addition does not alter
+the saved HFI-004 scenarios, hashes or failure identity, and does not qualify a
+new foundation epoch.

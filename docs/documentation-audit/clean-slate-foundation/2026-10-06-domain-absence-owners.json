@@ -1,0 +1,1123 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "Trace/question/descriptor/engine/SDK domain contract or owning codec change",
+  "outcome": "Pass for local domain absence owners, service tuple inference and SDK domain-report narrowing; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR creation"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-domain-absence-owners",
+    "baseCommit": "5fd1ebbb13455bfef86fc27dab9c88e53fcf1385",
+    "sources": [
+      {
+        "path": ".changeset/domain-absence-owners.md",
+        "sha256": "47fbd36510f6fe4a02197b4c58520c03a967c8654985bf9f3fff4077be85d869"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "114272525e0b2461c33c1bd164f9530985660fd604c76f8125fcee4c941ebfa3"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "a59cc258b60d3b5d30867951f411c003fc513c9d3c0c28bf16dad7c07e7f7403"
+      },
+      {
+        "path": "docs/architecture/facts.md",
+        "sha256": "3a32aa10f555c72b91c6ff3559c269a8dc020fd47a1d3533cffefd9d804e6d00"
+      },
+      {
+        "path": "docs/architecture/graph-trace-ledgers.md",
+        "sha256": "9c908008d353e640b7a08846493d8f039bbc7cad1e116ce708ae68fbdf6669e5"
+      },
+      {
+        "path": "docs/architecture/rules-and-parameters.md",
+        "sha256": "41e222642ca549008b0d7663c336a44e1a482c86dc0a38c57b388542b663dc2b"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "e8f8f9ba5df2f8e46a2edaf8156b8ce456f83b15f067575c2aef89efafa157b6"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "243d819285dab0c8cf821119a4425508c6204c41c0bf61f1ffd96cd942927068"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "0eab51c36f7ed0b8c0c8d713fb4c5a64f5772a82a8032a71b6959de3be0092ad"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "317746d20f38406aff2c45ec5070061566c30769c6041bef21da4e1803ab6521"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "ed645acabf70bb8372300374b491bbb78dae8f56c3508aa50e16d5e4e814ebaf"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "1dd64fe7705bc58d9ab91d3eb2f4bc86305341f28059834c209170bbc8fce983"
+      },
+      {
+        "path": "packages/api/http/README.md",
+        "sha256": "9cc403d390dc46a0421c3c32e3dbb4f0309e44046d331824ac5fc0309244528d"
+      },
+      {
+        "path": "packages/api/http/__tests__/public-calculation-api.test.ts",
+        "sha256": "53f71f10f445f5dfb41bf29b5e10c8c8e7521f11c485008108bc08bbd86e5fd1"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "456067c541004b64e0bca250a53a0610050f5b32b82e23c782818fbedbe6691b"
+      },
+      {
+        "path": "packages/calculators/src/errors.ts",
+        "sha256": "0fe72812044cb2cf8ba0e449710ada89cd514d5b0978f98d3d2363b563da893d"
+      },
+      {
+        "path": "packages/calculators/src/metadata.ts",
+        "sha256": "4578b3443e03f6be513db3e9997aa3d88e3331c8e99b308991e6ed9f4a622e7d"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "3726356c99aaa5d03ec78e65aeb37ff29d6891eac3c0c9c0fb07117a5c3450d1"
+      },
+      {
+        "path": "packages/core/src/engine/calculation-engine.ts",
+        "sha256": "a74905cfc07612829040107983c974a1ed45b347cbb8603aff2c3a2b524ee752"
+      },
+      {
+        "path": "packages/core/src/engine/index.ts",
+        "sha256": "63ed382364c43f4ecfc2acea1369dc084f5a63dc76ce0c39c4964597aae7a7e7"
+      },
+      {
+        "path": "packages/core/src/engine/live.layer.ts",
+        "sha256": "4bdae6e16a70bebef1638ec747525fc7c587057571c6f1bd6d44f093099c23f4"
+      },
+      {
+        "path": "packages/core/src/facts/descriptor.ts",
+        "sha256": "f0992c9ba0375407e10452cd2a0b652f7bf42e2bed078246cec964d9e54bd0df"
+      },
+      {
+        "path": "packages/core/src/graph/rule-graph.ts",
+        "sha256": "ef291b2e622d5dbef11183f02b1be485c251a7d23811e4983223fcbdf800441c"
+      },
+      {
+        "path": "packages/core/src/index.ts",
+        "sha256": "d5b1cc6f0d9787632d8e9124b1b761278cb3c106f6d0142e2f17f67facedd54f"
+      },
+      {
+        "path": "packages/core/src/parameters/descriptor.ts",
+        "sha256": "137c853ccfd0fea5aa8b1fc69dd5a10e65a739141dbe41d6ae528f81ddaa7020"
+      },
+      {
+        "path": "packages/core/src/rules/descriptor.ts",
+        "sha256": "b3ac29ddf152ff0e2c19c5ad3b578e868db8b6099d0bd8c553a8d5c5469153c2"
+      },
+      {
+        "path": "packages/core/src/trace/node.ts",
+        "sha256": "cfc2153b9df1228446e3e8a6b175746b3df0f2d912efb204a48fb3182d4cf75f"
+      },
+      {
+        "path": "packages/core/test/domain-absence.boundary.test.ts",
+        "sha256": "4734581b342505e23ff6328d4c682ec6e775b7ea45cda223f26b71bab1e05550"
+      },
+      {
+        "path": "packages/rules/au/income-tax/README.md",
+        "sha256": "3ae878f7bfe6bc683e7f45c6d3077bb5f42a4033719a10e842892c750c913fe8"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/annual-tax-ledger.ts",
+        "sha256": "635e1bd188b05f706342bfa27d6b11a268b10aa79d0d3bcc9f3a4bca80d37dd4"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/income-tax.ts",
+        "sha256": "ec4fd9cf35647293a240ab58c67a2b072d63a39636762e98c76e45af3fec6cdb"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/lito.ts",
+        "sha256": "607974a7da211ca6ef853f2521bb29dd5f2fee6bf606add6e47eeee759f37208"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/medicare-levy.ts",
+        "sha256": "71519394e4d26070afabb9afabc621477b0350735e9eb2912c687237342cc60a"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/annual-tax.test.ts",
+        "sha256": "231343b62505fa3a3a9f2d1f7f253a3c6f5747d78e2fb4b27c9760a720273f7a"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/rule-graph.test.ts",
+        "sha256": "d3aff79fa35702870a65b86fd6837c5be46fecfa6e116b2fee8ea3b02ff57d33"
+      },
+      {
+        "path": "packages/rules/au/pay/README.md",
+        "sha256": "b49f81f5e52411855c2395437d2b4e828d53c8bf26275630635920d7a597e26c"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/net-pay.ts",
+        "sha256": "c1998f8d6c6d6046875e3434b6a3372631ae850a516577f8e721e10940fc7d66"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/payg-withholding.ts",
+        "sha256": "82e511a71dc265cf5734edf2f1698d703e0193c162cec16e1577df00ef0b1c9c"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/taxable-pay-with-sacrifice.ts",
+        "sha256": "1164e158caa79863947f10523a4db7e7baf0e9edb331ab9f3084b8b67b812aa8"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/taxable-pay.ts",
+        "sha256": "f092ee07a6c8eb55ef0e7f156693569459f67816020a57707c795a652aa61d3f"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/withholdings-ledger.ts",
+        "sha256": "b3bf1f2b254eec103206e02b936092035faf7b4d6a7d3a7a3e257d7e63cb9aa5"
+      },
+      {
+        "path": "packages/rules/au/pay/test/rule-graph.test.ts",
+        "sha256": "6632731340650a9e44309ccdad504927e7c6e98042cef541cfec1790b087a3a0"
+      },
+      {
+        "path": "packages/rules/au/pay/test/take-home-pay.test.ts",
+        "sha256": "9033176ea59d0a926da4befb50cc9218fa9dd77fcaaecdc620ba38ada7d5a538"
+      },
+      {
+        "path": "packages/rules/au/stsl/README.md",
+        "sha256": "51ce63eb56718d07c735e2f0b55eba40405bdfbd23b7b4ed46306d02773fc335"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/rules/stsl-component.ts",
+        "sha256": "8b72791f97f1d96db44f5ab166acd2584957c47d3b2be2b4e96844eb3d6d54f6"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/rule-graph.test.ts",
+        "sha256": "5aa7777b65d74fc2f4dc78d3d1d6dda3b0119e627a23ae57faf8417d37e531af"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
+        "sha256": "abf4099c297768e408b37d45119b56b6b9d32687a128745e567b73f0ddc7ae68"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "e4d72932eee5f380ab0716e8fe3da68e00604bd200624826d5476818dfbdec01"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "3c0ecd277983b7d017207fb77464720b7895257746983ccd6238807c953d0f10"
+      },
+      {
+        "path": "packages/sdk/typescript/src/effect.test.ts",
+        "sha256": "26bb980f30eb969bc000ee6cd07faa789b7e61741def7647a08d2145f446d9fe"
+      },
+      {
+        "path": "packages/sdk/typescript/src/types.ts",
+        "sha256": "8501d4c8e0574a3c01a8f6165aac3c6159690e066c9c86c4a4045ca6fe0e4bd0"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "ebd69e1992db688029457b8e3534c7c6fb6de8f38b67ab3fef309243386b84d1"
+      }
+    ],
+    "qualifiedSources": [
+      {
+        "path": ".changeset/domain-absence-owners.md",
+        "sha256": "47fbd36510f6fe4a02197b4c58520c03a967c8654985bf9f3fff4077be85d869"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "114272525e0b2461c33c1bd164f9530985660fd604c76f8125fcee4c941ebfa3"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "a59cc258b60d3b5d30867951f411c003fc513c9d3c0c28bf16dad7c07e7f7403"
+      },
+      {
+        "path": "docs/architecture/facts.md",
+        "sha256": "3a32aa10f555c72b91c6ff3559c269a8dc020fd47a1d3533cffefd9d804e6d00"
+      },
+      {
+        "path": "docs/architecture/graph-trace-ledgers.md",
+        "sha256": "9c908008d353e640b7a08846493d8f039bbc7cad1e116ce708ae68fbdf6669e5"
+      },
+      {
+        "path": "docs/architecture/rules-and-parameters.md",
+        "sha256": "41e222642ca549008b0d7663c336a44e1a482c86dc0a38c57b388542b663dc2b"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "e8f8f9ba5df2f8e46a2edaf8156b8ce456f83b15f067575c2aef89efafa157b6"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "243d819285dab0c8cf821119a4425508c6204c41c0bf61f1ffd96cd942927068"
+      },
+      {
+        "path": "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-absence-owners.json",
+        "sha256": "13a73baf62d62ea37ddd8de7b0cfcc8eaa2eb190f4d3b503ab9ff5d409e26a61"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "c72917138446cd45eec2a1fc308602673cba3ce6324bb652f4be772644d5a317"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "317746d20f38406aff2c45ec5070061566c30769c6041bef21da4e1803ab6521"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "ed645acabf70bb8372300374b491bbb78dae8f56c3508aa50e16d5e4e814ebaf"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "1dd64fe7705bc58d9ab91d3eb2f4bc86305341f28059834c209170bbc8fce983"
+      },
+      {
+        "path": "packages/api/http/README.md",
+        "sha256": "9cc403d390dc46a0421c3c32e3dbb4f0309e44046d331824ac5fc0309244528d"
+      },
+      {
+        "path": "packages/api/http/__tests__/public-calculation-api.test.ts",
+        "sha256": "53f71f10f445f5dfb41bf29b5e10c8c8e7521f11c485008108bc08bbd86e5fd1"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "456067c541004b64e0bca250a53a0610050f5b32b82e23c782818fbedbe6691b"
+      },
+      {
+        "path": "packages/calculators/src/errors.ts",
+        "sha256": "0fe72812044cb2cf8ba0e449710ada89cd514d5b0978f98d3d2363b563da893d"
+      },
+      {
+        "path": "packages/calculators/src/metadata.ts",
+        "sha256": "4578b3443e03f6be513db3e9997aa3d88e3331c8e99b308991e6ed9f4a622e7d"
+      },
+      {
+        "path": "packages/core/README.md",
+        "sha256": "3726356c99aaa5d03ec78e65aeb37ff29d6891eac3c0c9c0fb07117a5c3450d1"
+      },
+      {
+        "path": "packages/core/src/engine/calculation-engine.ts",
+        "sha256": "a74905cfc07612829040107983c974a1ed45b347cbb8603aff2c3a2b524ee752"
+      },
+      {
+        "path": "packages/core/src/engine/index.ts",
+        "sha256": "63ed382364c43f4ecfc2acea1369dc084f5a63dc76ce0c39c4964597aae7a7e7"
+      },
+      {
+        "path": "packages/core/src/engine/live.layer.ts",
+        "sha256": "4bdae6e16a70bebef1638ec747525fc7c587057571c6f1bd6d44f093099c23f4"
+      },
+      {
+        "path": "packages/core/src/facts/descriptor.ts",
+        "sha256": "f0992c9ba0375407e10452cd2a0b652f7bf42e2bed078246cec964d9e54bd0df"
+      },
+      {
+        "path": "packages/core/src/graph/rule-graph.ts",
+        "sha256": "ef291b2e622d5dbef11183f02b1be485c251a7d23811e4983223fcbdf800441c"
+      },
+      {
+        "path": "packages/core/src/index.ts",
+        "sha256": "d5b1cc6f0d9787632d8e9124b1b761278cb3c106f6d0142e2f17f67facedd54f"
+      },
+      {
+        "path": "packages/core/src/parameters/descriptor.ts",
+        "sha256": "137c853ccfd0fea5aa8b1fc69dd5a10e65a739141dbe41d6ae528f81ddaa7020"
+      },
+      {
+        "path": "packages/core/src/rules/descriptor.ts",
+        "sha256": "b3ac29ddf152ff0e2c19c5ad3b578e868db8b6099d0bd8c553a8d5c5469153c2"
+      },
+      {
+        "path": "packages/core/src/trace/node.ts",
+        "sha256": "cfc2153b9df1228446e3e8a6b175746b3df0f2d912efb204a48fb3182d4cf75f"
+      },
+      {
+        "path": "packages/core/test/domain-absence.boundary.test.ts",
+        "sha256": "4734581b342505e23ff6328d4c682ec6e775b7ea45cda223f26b71bab1e05550"
+      },
+      {
+        "path": "packages/rules/au/income-tax/README.md",
+        "sha256": "3ae878f7bfe6bc683e7f45c6d3077bb5f42a4033719a10e842892c750c913fe8"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/annual-tax-ledger.ts",
+        "sha256": "635e1bd188b05f706342bfa27d6b11a268b10aa79d0d3bcc9f3a4bca80d37dd4"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/income-tax.ts",
+        "sha256": "ec4fd9cf35647293a240ab58c67a2b072d63a39636762e98c76e45af3fec6cdb"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/lito.ts",
+        "sha256": "607974a7da211ca6ef853f2521bb29dd5f2fee6bf606add6e47eeee759f37208"
+      },
+      {
+        "path": "packages/rules/au/income-tax/src/rules/medicare-levy.ts",
+        "sha256": "71519394e4d26070afabb9afabc621477b0350735e9eb2912c687237342cc60a"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/annual-tax.test.ts",
+        "sha256": "231343b62505fa3a3a9f2d1f7f253a3c6f5747d78e2fb4b27c9760a720273f7a"
+      },
+      {
+        "path": "packages/rules/au/income-tax/test/rule-graph.test.ts",
+        "sha256": "d3aff79fa35702870a65b86fd6837c5be46fecfa6e116b2fee8ea3b02ff57d33"
+      },
+      {
+        "path": "packages/rules/au/pay/README.md",
+        "sha256": "b49f81f5e52411855c2395437d2b4e828d53c8bf26275630635920d7a597e26c"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/net-pay.ts",
+        "sha256": "c1998f8d6c6d6046875e3434b6a3372631ae850a516577f8e721e10940fc7d66"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/payg-withholding.ts",
+        "sha256": "82e511a71dc265cf5734edf2f1698d703e0193c162cec16e1577df00ef0b1c9c"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/taxable-pay-with-sacrifice.ts",
+        "sha256": "1164e158caa79863947f10523a4db7e7baf0e9edb331ab9f3084b8b67b812aa8"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/taxable-pay.ts",
+        "sha256": "f092ee07a6c8eb55ef0e7f156693569459f67816020a57707c795a652aa61d3f"
+      },
+      {
+        "path": "packages/rules/au/pay/src/rules/withholdings-ledger.ts",
+        "sha256": "b3bf1f2b254eec103206e02b936092035faf7b4d6a7d3a7a3e257d7e63cb9aa5"
+      },
+      {
+        "path": "packages/rules/au/pay/test/rule-graph.test.ts",
+        "sha256": "6632731340650a9e44309ccdad504927e7c6e98042cef541cfec1790b087a3a0"
+      },
+      {
+        "path": "packages/rules/au/pay/test/take-home-pay.test.ts",
+        "sha256": "9033176ea59d0a926da4befb50cc9218fa9dd77fcaaecdc620ba38ada7d5a538"
+      },
+      {
+        "path": "packages/rules/au/stsl/README.md",
+        "sha256": "51ce63eb56718d07c735e2f0b55eba40405bdfbd23b7b4ed46306d02773fc335"
+      },
+      {
+        "path": "packages/rules/au/stsl/src/rules/stsl-component.ts",
+        "sha256": "8b72791f97f1d96db44f5ab166acd2584957c47d3b2be2b4e96844eb3d6d54f6"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/rule-graph.test.ts",
+        "sha256": "5aa7777b65d74fc2f4dc78d3d1d6dda3b0119e627a23ae57faf8417d37e531af"
+      },
+      {
+        "path": "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
+        "sha256": "abf4099c297768e408b37d45119b56b6b9d32687a128745e567b73f0ddc7ae68"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "e4d72932eee5f380ab0716e8fe3da68e00604bd200624826d5476818dfbdec01"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "3c0ecd277983b7d017207fb77464720b7895257746983ccd6238807c953d0f10"
+      },
+      {
+        "path": "packages/sdk/typescript/src/effect.test.ts",
+        "sha256": "26bb980f30eb969bc000ee6cd07faa789b7e61741def7647a08d2145f446d9fe"
+      },
+      {
+        "path": "packages/sdk/typescript/src/types.ts",
+        "sha256": "8501d4c8e0574a3c01a8f6165aac3c6159690e066c9c86c4a4045ca6fe0e4bd0"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "ebd69e1992db688029457b8e3534c7c6fb6de8f38b67ab3fef309243386b84d1"
+      }
+    ]
+  },
+  "contracts": {
+    "trace": "Formula and rounding are nested Options; historical key identity, field order and bytes retained; ordinary and recursive constructor fields derive from one owner.",
+    "question": "Help text is nested Option; missing, explicit undefined and present string retain historical representations.",
+    "descriptors": "Private Schemas own ordinary metadata; genuine generic value/schema/key/Layer relations remain explicit. Question/artifact absence uses Option; constructor omitted/undefined meanings retained. Rule parameter array defaults to empty; explicit false permission retained.",
+    "serviceInference": "Tuple requirements derive from native key Identifier, preserving empty tuple meaning and real fact/parameter services.",
+    "engine": "Contract and live Layer split into separate modules with existing root/engine public exports preserved; optional validation issues retain empty collection meaning.",
+    "sdk": "Selected-output narrowing validates Schema.toType of the canonical domain report instead of decoding encoded report fields again."
+  },
+  "documentationImpact": {
+    "decision": "Change required",
+    "changed": [
+      "Core/calculator/rules/SDK package owners",
+      "Effect/fact/rule/graph/API/testing architecture",
+      "active SPEC/tasks/plan/audit and major Changeset",
+      "exact test decoder/encoder permissions and actual CLI controls",
+      "HTTP package fixtures and README: validate decoded client values against Schema Type"
+    ],
+    "preserved": [
+      "runtime execution permissions",
+      "authored tables/source records",
+      "tax formulas/amounts/rounding/golden snapshots",
+      "HTTP/RPC/OpenAPI encoded contracts and public MDX/navigation status",
+      "toolchain/dependencies/lockfile/commands/CI/canonical skills",
+      "unresolved Medicare decision"
+    ],
+    "notApplicable": [
+      "new runbooks",
+      "provider/registry/credential operations",
+      "public content lifecycle decisions"
+    ],
+    "publicContentBasis": "No public example constructs trace/question/descriptor fields directly; owning codecs retain JSON representations. Existing generated OpenAPI, examples and full docs checks remain required."
+  },
+  "compatibilityOracles": {
+    "originalMetadataFileSha256": "0d7e78e93bdcbea9e14983de938aa1f3a70097a12f361a8a9bc6dd26f38e1b97",
+    "metadataResponses": [
+      {
+        "name": "listCalculators/missing",
+        "sha256": "6e200f212e679b62fa58877df8bae5f537aa22b6fc7996547faae4e883f21edf"
+      },
+      {
+        "name": "listTaxYears/missing",
+        "sha256": "620a9e823c74ff266ce38ff560eb09a31048ff1382b1e744aada0b49e440ae81"
+      },
+      {
+        "name": "listFacts/missing",
+        "sha256": "305b21ede52932c1c0ea9387819711fa05a5efac1e089e9c98b1acdf974ea730"
+      },
+      {
+        "name": "listRules/missing",
+        "sha256": "77f7351f528043060b3996fa20c2cb0e6f189908818479e91c3c5597e79997a3"
+      },
+      {
+        "name": "listCalculators/undefined",
+        "sha256": "6e200f212e679b62fa58877df8bae5f537aa22b6fc7996547faae4e883f21edf"
+      },
+      {
+        "name": "listTaxYears/undefined",
+        "sha256": "620a9e823c74ff266ce38ff560eb09a31048ff1382b1e744aada0b49e440ae81"
+      },
+      {
+        "name": "listFacts/undefined",
+        "sha256": "305b21ede52932c1c0ea9387819711fa05a5efac1e089e9c98b1acdf974ea730"
+      },
+      {
+        "name": "listRules/undefined",
+        "sha256": "77f7351f528043060b3996fa20c2cb0e6f189908818479e91c3c5597e79997a3"
+      },
+      {
+        "name": "listCalculators/present",
+        "sha256": "6e200f212e679b62fa58877df8bae5f537aa22b6fc7996547faae4e883f21edf"
+      },
+      {
+        "name": "listTaxYears/present",
+        "sha256": "620a9e823c74ff266ce38ff560eb09a31048ff1382b1e744aada0b49e440ae81"
+      },
+      {
+        "name": "listFacts/present",
+        "sha256": "305b21ede52932c1c0ea9387819711fa05a5efac1e089e9c98b1acdf974ea730"
+      },
+      {
+        "name": "listRules/present",
+        "sha256": "77f7351f528043060b3996fa20c2cb0e6f189908818479e91c3c5597e79997a3"
+      },
+      {
+        "name": "listJurisdictions",
+        "sha256": "e9233758a746baf68f5838dcbfc1e6d789117dbbe5af2ebf7a0b7f4eb5d13d0b"
+      },
+      {
+        "name": "getCalculator/au.income-tax.annual",
+        "sha256": "61d982b8efe98aa551fdb83880b0d447460a70f10c066b2b57e2c12978864e6d"
+      },
+      {
+        "name": "getCalculatorSchema/au.income-tax.annual",
+        "sha256": "81da58b15dc6b354d5fb75371cb8164c6288dfc7843c07e8ef5c9a08b0b9f691"
+      },
+      {
+        "name": "getCalculatorGraph/au.income-tax.annual",
+        "sha256": "22ab7c276d183c4c8caa196a5a74df7f88f91f5887dbefb288955647d1121a1e"
+      },
+      {
+        "name": "getCalculator/au.pay.take-home",
+        "sha256": "cbc540e189918ca9a24e6b336d4a6fded7f6d8023014bb05ef158061ed621f5b"
+      },
+      {
+        "name": "getCalculatorSchema/au.pay.take-home",
+        "sha256": "c3eac30389f6336c1f29c91ef3fc88221f19970a228c2df61850b1f2b4fd4b75"
+      },
+      {
+        "name": "getCalculatorGraph/au.pay.take-home",
+        "sha256": "5d9362ac324909440e4f401a9d557a2a03b54e8e19f5555bf72cc59d193fe0e6"
+      },
+      {
+        "name": "getCalculator/au.pay.withholdings",
+        "sha256": "8ce477da37e564900c2e775f413c4ec17afefc6c86675d9511e90235e2d70c86"
+      },
+      {
+        "name": "getCalculatorSchema/au.pay.withholdings",
+        "sha256": "2f148ef2589d7dabd9e202d871080dc3e7d25c3955ebcb8d6989b1c4bea3d6f1"
+      },
+      {
+        "name": "getCalculatorGraph/au.pay.withholdings",
+        "sha256": "ed25422a9681dec33092ee1d18fb26a59c6a98a825570a24b1e2875f2b15dfdb"
+      }
+    ],
+    "traceQuestionForms": 6,
+    "packedQuestionForms": 3,
+    "preservedPackedExpectations": "Four original trace/ledger fixtures and 15 original table/effective-period/source SHA-256 values; no regenerated expected bytes or snapshots."
+  },
+  "removalControls": [
+    {
+      "control": "trace-undefined-state",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.64,
+      "expectedReason": "preserves trace key identity and historical bytes in all three forms",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "cfc2153b9df1228446e3e8a6b175746b3df0f2d912efb204a48fb3182d4cf75f",
+      "log": "/private/tmp/dev75-absence-control-trace-undefined-state.log",
+      "logSha256": "75b80d671bac500d3149f66a122130e454ecb45f738c5368d3f1f18bce25e100"
+    },
+    {
+      "control": "question-undefined-state",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.38,
+      "expectedReason": "preserves question help key identity and historical bytes in all three forms",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "f0992c9ba0375407e10452cd2a0b652f7bf42e2bed078246cec964d9e54bd0df",
+      "log": "/private/tmp/dev75-absence-control-question-undefined-state.log",
+      "logSha256": "bc1b4386f8eaa41b98f84c0179eec240286b552e4f0b6b16cf80fdfb43abc6af"
+    },
+    {
+      "control": "permission-default",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.38,
+      "expectedReason": "reports multiple unpermitted providers and preserves the explicit permission",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "ef291b2e622d5dbef11183f02b1be485c251a7d23811e4983223fcbdf800441c",
+      "log": "/private/tmp/dev75-absence-control-permission-default.log",
+      "logSha256": "8622ad7393d50c5dcdc3f4c074cc61e102c03009dd9672be4cc5d8addfcfce00"
+    },
+    {
+      "control": "sdk-type-narrowing",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/sdk",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.55,
+      "expectedReason": "narrows canonical reports without decoding their wire form again",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "8501d4c8e0574a3c01a8f6165aac3c6159690e066c9c86c4a4045ca6fe0e4bd0",
+      "log": "/private/tmp/dev75-absence-control-sdk-type-narrowing.log",
+      "logSha256": "aecc4be695f624c6b9359ef18334d08d593b54303eaffac41d429a1e16803a27"
+    },
+    {
+      "control": "tuple-services",
+      "command": [
+        "bun",
+        "run",
+        "sdk:validate-downstream",
+        "--force"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.62,
+      "expectedReason": "typecheck downstream SDK examples (exit; exitCode: 1)",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "b3ac29ddf152ff0e2c19c5ad3b578e868db8b6099d0bd8c553a8d5c5469153c2",
+      "log": "/private/tmp/dev75-absence-control-tuple-services.log",
+      "logSha256": "aed7bb28fc899479a65c43a4244104de1a4dfa51ec230418f675308ae0f82f76"
+    },
+    {
+      "control": "trace-make-input",
+      "command": [
+        "bun",
+        "run",
+        "sdk:validate-downstream",
+        "--force"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.29,
+      "expectedReason": "typecheck downstream SDK examples (exit; exitCode: 1)",
+      "reasonMatched": true,
+      "sourceRestored": true,
+      "restoredSha256": "cfc2153b9df1228446e3e8a6b175746b3df0f2d912efb204a48fb3182d4cf75f",
+      "log": "/private/tmp/dev75-absence-control-trace-make-input.log",
+      "logSha256": "b393b2248d200cdb6f91755241b117a9c73da70570f68e4d7f6375d2eee3f9d0"
+    }
+  ],
+  "neutralControl": {
+    "change": "OptionFromOptionalKey to OptionFromOptional with inner undefined codec unchanged",
+    "outcome": "Tests still pass; this replacement preserves these representations and is not counted as a removal failure."
+  },
+  "checks": [
+    {
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "mode": "local CI graph",
+      "exitCode": 0,
+      "durationSeconds": 650.81,
+      "orderedChecks": [
+        "verification",
+        "test",
+        "build",
+        "docs-validation",
+        "packed-artifact",
+        "downstream-consumer",
+        "api-smoke",
+        "docs-browser",
+        "changeset-status"
+      ],
+      "nonClaim": "No release attempt, publication or provider operation"
+    }
+  ],
+  "limitations": [
+    "This qualifies the local candidate; its immutable committed head has not yet passed hosted Linux Quality.",
+    "Parent #149 exact hosted success is separately recorded and does not establish the new candidate hosted result.",
+    "Broader public request absence/domain error review and trusted rate identity/limiting remain unfinished; T004 active.",
+    "No tax formula/data correction; Medicare decision and retained zero-income behaviour unchanged.",
+    "No merge, deployment, publication, provider or registry proof.",
+    "The two packed removal controls establish failure at the real declaration stage; their wrapper exposes a bounded stage error rather than raw compiler issues."
+  ],
+  "rollback": "Revert only this local slice on its named branch; no external resource state changes are included.",
+  "parentHosted": {
+    "pullRequest": "https://github.com/crcorbett/taxkit/pull/149",
+    "headSha": "5fd1ebbb13455bfef86fc27dab9c88e53fcf1385",
+    "runId": 37404351740,
+    "jobId": 112078530836,
+    "status": "completed",
+    "conclusion": "success",
+    "completedAt": "2026-10-06T02:52:03Z",
+    "nonClaim": "This accepts the parent hosted run, not the current uncommitted absence candidate."
+  },
+  "focusedChecks": [
+    {
+      "stage": "core",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/core",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.54,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-core.log"
+    },
+    {
+      "stage": "sdk",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/sdk",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.54,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-sdk.log"
+    },
+    {
+      "stage": "consumer",
+      "command": [
+        "bun",
+        "run",
+        "sdk:validate-downstream",
+        "--force"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.94,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-consumer.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.24,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-lint.log"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.11,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-types.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.31,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-runbooks.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.44,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-format.log"
+    },
+    {
+      "stage": "changeset",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.27,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-changeset.log"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev75-absence-pregraph-v1-diff.log"
+    },
+    {
+      "stage": "http",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/api-http",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.68,
+      "log": "/private/tmp/dev75-absence-http-fix-http.log"
+    },
+    {
+      "stage": "rpc",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/api-rpc",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.82,
+      "log": "/private/tmp/dev75-absence-http-fix-rpc.log"
+    },
+    {
+      "stage": "calculators",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/calculators",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.46,
+      "log": "/private/tmp/dev75-absence-http-fix-calculators.log"
+    }
+  ],
+  "attemptHistory": [
+    {
+      "outcome": "Failed; no candidate acceptance",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 659.62,
+      "lastSuccessfulStage": "verification",
+      "successfulVerification": {
+        "workflowCases": 32,
+        "nativeCases": 7
+      },
+      "failedStage": "test",
+      "reason": "Two HTTP fixtures decoded already decoded client responses/errors as their wire representations; nested trace/question Options rejected.",
+      "correction": "Validate typed client output with Schema.toType of the canonical owners. Raw HTTP JSON ingress continues to decode the wire representation; expected tax/error/sentinel/OpenAPI values stay unchanged.",
+      "resume": "Focused HTTP/RPC/calculator checks pass; fresh complete graph required.",
+      "logDigests": [
+        {
+          "path": "/private/tmp/dev75-absence-full-release-ci-graph.log",
+          "sha256": "fb33953958aa1c3e32cc5cba10082e78a36b390133f9f7187709dd2b1856f690"
+        },
+        {
+          "path": "tmp/release-readiness/test-stdout-KgTZVV/41a2fc2e5e85.log",
+          "sha256": "2de5d9b3587522f85ecb7542b92b9a40275693aac074ce5da33e657fc244a942"
+        }
+      ],
+      "nonClaim": "No later graph stages or hosted current-head success are established by this attempt."
+    }
+  ],
+  "focusedEvidence": {
+    "workflowCases": 32,
+    "workflowSeconds": 455.52,
+    "nativeCases": 7,
+    "nativeSeconds": 77.86,
+    "lintCorpusCases": 512,
+    "newCodecAdmissionCases": 12,
+    "coreCases": 65,
+    "newCoreCases": 6,
+    "ruleCases": 52,
+    "sdkCases": 57,
+    "httpCases": 17,
+    "rpcCases": 217,
+    "calculatorCases": 37,
+    "newSdkCases": 1,
+    "deliberateRemovals": 6,
+    "packedNegativeTypeAssertions": 6,
+    "savedMetadataResponses": 22,
+    "httpFixtureCorrection": "Typed HTTP client results validate against canonical Schema Type; raw JSON still decodes representation, with unchanged expected tax/error values",
+    "sourceRestoration": "All 53 staged files match their pre-check hashes; API Worker and lockfile source match unchanged parent",
+    "qualifiedSources": {
+      ".changeset/domain-absence-owners.md": "47fbd36510f6fe4a02197b4c58520c03a967c8654985bf9f3fff4077be85d869",
+      "docs/architecture/api-and-sdk.md": "114272525e0b2461c33c1bd164f9530985660fd604c76f8125fcee4c941ebfa3",
+      "docs/architecture/effect-services.md": "a59cc258b60d3b5d30867951f411c003fc513c9d3c0c28bf16dad7c07e7f7403",
+      "docs/architecture/facts.md": "3a32aa10f555c72b91c6ff3559c269a8dc020fd47a1d3533cffefd9d804e6d00",
+      "docs/architecture/graph-trace-ledgers.md": "9c908008d353e640b7a08846493d8f039bbc7cad1e116ce708ae68fbdf6669e5",
+      "docs/architecture/rules-and-parameters.md": "41e222642ca549008b0d7663c336a44e1a482c86dc0a38c57b388542b663dc2b",
+      "docs/architecture/testing-and-quality.md": "e8f8f9ba5df2f8e46a2edaf8156b8ce456f83b15f067575c2aef89efafa157b6",
+      "docs/documentation-audit/README.md": "243d819285dab0c8cf821119a4425508c6204c41c0bf61f1ffd96cd942927068",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-06-domain-absence-owners.json": "13a73baf62d62ea37ddd8de7b0cfcc8eaa2eb190f4d3b503ab9ff5d409e26a61",
+      "docs/exec-plans/active/clean-slate-foundation.md": "c72917138446cd45eec2a1fc308602673cba3ce6324bb652f4be772644d5a317",
+      "docs/product-specs/clean-slate-foundation.md": "317746d20f38406aff2c45ec5070061566c30769c6041bef21da4e1803ab6521",
+      "docs/product-specs/clean-slate-foundation.tasks.json": "ed645acabf70bb8372300374b491bbb78dae8f56c3508aa50e16d5e4e814ebaf",
+      "oxlint.config.ts": "1dd64fe7705bc58d9ab91d3eb2f4bc86305341f28059834c209170bbc8fce983",
+      "packages/api/http/README.md": "9cc403d390dc46a0421c3c32e3dbb4f0309e44046d331824ac5fc0309244528d",
+      "packages/api/http/__tests__/public-calculation-api.test.ts": "53f71f10f445f5dfb41bf29b5e10c8c8e7521f11c485008108bc08bbd86e5fd1",
+      "packages/calculators/README.md": "456067c541004b64e0bca250a53a0610050f5b32b82e23c782818fbedbe6691b",
+      "packages/calculators/src/errors.ts": "0fe72812044cb2cf8ba0e449710ada89cd514d5b0978f98d3d2363b563da893d",
+      "packages/calculators/src/metadata.ts": "4578b3443e03f6be513db3e9997aa3d88e3331c8e99b308991e6ed9f4a622e7d",
+      "packages/core/README.md": "3726356c99aaa5d03ec78e65aeb37ff29d6891eac3c0c9c0fb07117a5c3450d1",
+      "packages/core/src/engine/calculation-engine.ts": "a74905cfc07612829040107983c974a1ed45b347cbb8603aff2c3a2b524ee752",
+      "packages/core/src/engine/index.ts": "63ed382364c43f4ecfc2acea1369dc084f5a63dc76ce0c39c4964597aae7a7e7",
+      "packages/core/src/engine/live.layer.ts": "4bdae6e16a70bebef1638ec747525fc7c587057571c6f1bd6d44f093099c23f4",
+      "packages/core/src/facts/descriptor.ts": "f0992c9ba0375407e10452cd2a0b652f7bf42e2bed078246cec964d9e54bd0df",
+      "packages/core/src/graph/rule-graph.ts": "ef291b2e622d5dbef11183f02b1be485c251a7d23811e4983223fcbdf800441c",
+      "packages/core/src/index.ts": "d5b1cc6f0d9787632d8e9124b1b761278cb3c106f6d0142e2f17f67facedd54f",
+      "packages/core/src/parameters/descriptor.ts": "137c853ccfd0fea5aa8b1fc69dd5a10e65a739141dbe41d6ae528f81ddaa7020",
+      "packages/core/src/rules/descriptor.ts": "b3ac29ddf152ff0e2c19c5ad3b578e868db8b6099d0bd8c553a8d5c5469153c2",
+      "packages/core/src/trace/node.ts": "cfc2153b9df1228446e3e8a6b175746b3df0f2d912efb204a48fb3182d4cf75f",
+      "packages/core/test/domain-absence.boundary.test.ts": "4734581b342505e23ff6328d4c682ec6e775b7ea45cda223f26b71bab1e05550",
+      "packages/rules/au/income-tax/README.md": "3ae878f7bfe6bc683e7f45c6d3077bb5f42a4033719a10e842892c750c913fe8",
+      "packages/rules/au/income-tax/src/rules/annual-tax-ledger.ts": "635e1bd188b05f706342bfa27d6b11a268b10aa79d0d3bcc9f3a4bca80d37dd4",
+      "packages/rules/au/income-tax/src/rules/income-tax.ts": "ec4fd9cf35647293a240ab58c67a2b072d63a39636762e98c76e45af3fec6cdb",
+      "packages/rules/au/income-tax/src/rules/lito.ts": "607974a7da211ca6ef853f2521bb29dd5f2fee6bf606add6e47eeee759f37208",
+      "packages/rules/au/income-tax/src/rules/medicare-levy.ts": "71519394e4d26070afabb9afabc621477b0350735e9eb2912c687237342cc60a",
+      "packages/rules/au/income-tax/test/annual-tax.test.ts": "231343b62505fa3a3a9f2d1f7f253a3c6f5747d78e2fb4b27c9760a720273f7a",
+      "packages/rules/au/income-tax/test/rule-graph.test.ts": "d3aff79fa35702870a65b86fd6837c5be46fecfa6e116b2fee8ea3b02ff57d33",
+      "packages/rules/au/pay/README.md": "b49f81f5e52411855c2395437d2b4e828d53c8bf26275630635920d7a597e26c",
+      "packages/rules/au/pay/src/rules/net-pay.ts": "c1998f8d6c6d6046875e3434b6a3372631ae850a516577f8e721e10940fc7d66",
+      "packages/rules/au/pay/src/rules/payg-withholding.ts": "82e511a71dc265cf5734edf2f1698d703e0193c162cec16e1577df00ef0b1c9c",
+      "packages/rules/au/pay/src/rules/taxable-pay-with-sacrifice.ts": "1164e158caa79863947f10523a4db7e7baf0e9edb331ab9f3084b8b67b812aa8",
+      "packages/rules/au/pay/src/rules/taxable-pay.ts": "f092ee07a6c8eb55ef0e7f156693569459f67816020a57707c795a652aa61d3f",
+      "packages/rules/au/pay/src/rules/withholdings-ledger.ts": "b3bf1f2b254eec103206e02b936092035faf7b4d6a7d3a7a3e257d7e63cb9aa5",
+      "packages/rules/au/pay/test/rule-graph.test.ts": "6632731340650a9e44309ccdad504927e7c6e98042cef541cfec1790b087a3a0",
+      "packages/rules/au/pay/test/take-home-pay.test.ts": "9033176ea59d0a926da4befb50cc9218fa9dd77fcaaecdc620ba38ada7d5a538",
+      "packages/rules/au/stsl/README.md": "51ce63eb56718d07c735e2f0b55eba40405bdfbd23b7b4ed46306d02773fc335",
+      "packages/rules/au/stsl/src/rules/stsl-component.ts": "8b72791f97f1d96db44f5ab166acd2584957c47d3b2be2b4e96844eb3d6d54f6",
+      "packages/rules/au/stsl/test/rule-graph.test.ts": "5aa7777b65d74fc2f4dc78d3d1d6dda3b0119e627a23ae57faf8417d37e531af",
+      "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts": "abf4099c297768e408b37d45119b56b6b9d32687a128745e567b73f0ddc7ae68",
+      "packages/sdk/typescript/README.md": "e4d72932eee5f380ab0716e8fe3da68e00604bd200624826d5476818dfbdec01",
+      "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts": "3c0ecd277983b7d017207fb77464720b7895257746983ccd6238807c953d0f10",
+      "packages/sdk/typescript/src/effect.test.ts": "26bb980f30eb969bc000ee6cd07faa789b7e61741def7647a08d2145f446d9fe",
+      "packages/sdk/typescript/src/types.ts": "8501d4c8e0574a3c01a8f6165aac3c6159690e066c9c86c4a4045ca6fe0e4bd0",
+      "tools/oxlint/portable-rules.test.ts": "ebd69e1992db688029457b8e3534c7c6fb6de8f38b67ab3fef309243386b84d1"
+    }
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "environmentBasis": "Pinned local tooling and unchanged lockfile/dependency versions.",
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 167,
+      "sha256": "2e6b21fa3394bfa92b55286ad09d8cb8c68b92cf823a504b3572177147829ceb"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "f61bb7c98acdd8c7a1e8768b8a9d0bf1c9e0d074b3d3e0218900c9d57d433a4f"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "9846b7286fbe45801c1b922e5c3bf63aee07547aa8a279b2d263e9a469071fc3"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "23634ff699af142f7815e41292c785f7ae5a40f4c3ff76840cd10585a4e4509d"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "41c42b3f34083b28e54145d9b09362ff88af8d5d415e4d98a38d1230484a151c"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "cc8226d1eb85f8ac1a5937940a26f9e4d5bdeb2880f9bffdfddae77bdb2b1e19"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "0b9eda8de4aac5c0a6617cc7e826ef5dd4575f191b6e939477ef6e7801e37077"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "3d84773d46ded656a4f77189c447024abbc858c753cb70b10764bdb941ed6c29"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "1b384cfaa4ab361824412718547805c4abefcf1204f2492734d84adf727576e3"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously inspected parent image"
+    }
+  ],
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for local domain absence slice",
+    "basis": [
+      "Canonical fields and constructor recursion derive from their Schema owners; genuine generic relations remain explicit",
+      "Nested trace/question Options preserve historical own-key identity and bytes; descriptors retain their old absent meaning and explicit false",
+      "Native service Identifier lookup preserves empty tuple meaning and actual input/parameter requirements; genuine packed declaration checks reject incorrect combinations",
+      "SDK validates the selected domain report Type rather than decoding representation values twice; actual regression and removal checks prove the distinction",
+      "Six deliberate removals fail at intended owning tests/packed compile stage and restore exact bytes; twelve actual CLI cases retain narrow codecs and runtime rejection",
+      "Complete current nine-stage graph, native HTTP/RPC/browser reports, original snapshots/codec expectations and 22 saved metadata responses pass",
+      "HTTP typed client fixtures validate canonical Schema Type; raw JSON ingress decoders and original amount/error/secret checks stay unchanged",
+      "Changed durable owners, task pointers and eight major package Changesets align with the public Type changes"
+    ],
+    "remaining": "Current-head hosted outcome, broader public request absence/domain error review, trusted rate identity/limiting and wider tasks"
+  },
+  "postconditions": {
+    "domain": "Trace/question/descriptor absent values are explicit; rule parameter collections are total; ordinary fields have one Schema owner",
+    "serviceInference": "Fact/parameter tuples retain their native service identifiers, including empty tuple meaning",
+    "sdk": "Canonical domain reports validate without applying wire decoding again; malformed report Type is still rejected",
+    "fullGraph": "All nine stages pass, including 32 workflow, 512 lint, 65 Core, 52 rule, 57 SDK and seven native cases",
+    "compatibility": "Saved tax snapshots and all 22 actual metadata response fingerprints remain unchanged; original trace/ledger, question and table/source expectations pass in genuine packed consumers",
+    "restoration": "All 53 staged files restored exactly; API Worker source and lockfile match parent",
+    "screenshots": "All four native screenshots match the inspected parent bytes"
+  },
+  "qualifiedLogDigests": [
+    {
+      "check": "verification",
+      "path": "tmp/release-readiness/verification-stdout-YX7ZOO/f643456e7259.log",
+      "sha256": "3e30926ce3e60033822b28aba89dfdb3edaaae31bebc75b5bee292ed015af722"
+    },
+    {
+      "check": "test",
+      "path": "tmp/release-readiness/test-stdout-WBcfg1/e7320177b39e.log",
+      "sha256": "125fe089c31158380c4c57b56b67763033fe6f42f0c7d853620080f696c1e7bf"
+    },
+    {
+      "check": "full-wrapper",
+      "path": "/private/tmp/dev75-absence-v2-full-release-ci-graph.log",
+      "sha256": "811bbc34050ba2431ad76cceb3b04fdbfd7d9c809ff39d3f02d626f02bc9d51d"
+    }
+  ],
+  "postCheckChanges": {
+    "scope": "Plan and receipt only",
+    "checks": "Docs/runbooks/format/Changeset/whitespace repeated before commit"
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "calculator platform collection policy, native state checks or local source-restoration changes",
+  "outcome": "qualified local platform containment and source-restoration candidate; T003 accepted locally",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation and qualification",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native plan/Worker/Vite/browser",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-74-native-trace-containment",
+    "baseCommit": "b3d759504f8dcdbb9dfea6d5521d98646dc0317b",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "fileCount": 20,
+      "sortedEntriesSha256": "2d8d35c37b7e11b596d5f6f4c55dae44f333e6c8340724b01bc11d95d08073a8",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this post-check receipt and linked acceptance review to avoid cross/self hashing."
+    }
+  },
+  "environment": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "wrangler": "4.147.0",
+    "workerdOverride": "1.20261001.1",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "parentHostedProof": {
+    "pullRequest": 135,
+    "headCommit": "b3d759504f8dcdbb9dfea6d5521d98646dc0317b",
+    "runId": 37254770742,
+    "jobId": 111589383583,
+    "outcome": "failure",
+    "completedAt": "2026-10-05T02:34:15Z",
+    "observed": "Restored Website heading not visible at original 15-second deadline.",
+    "limitation": "Parent local checks passed; failed hosted attempt remains failed. Candidate correction not yet pushed."
+  },
+  "implementation": [
+    "API app-owned disabled policy supplied to its default Worker and native API graph; Website graph and standalone Wrangler config explicitly disable global/log/invocation/trace collection, persistence and sampling.",
+    "Actual planned resources and saved real CLI local resources require those disabled fields.",
+    "Fixed app reports remain in use; docs policy/shared dataset owners stay unchanged. No replacement tracer.",
+    "Real local test selects Linux-style non-polling watcher and separates visible edit from exact restoration by 100 milliseconds; both original visible assertions and deadlines remain.",
+    "SPEC/tasks separate T003 connection/local containment from T009 safe exported tracing; CSF-009 stays unmet."
+  ],
+  "proof": [
+    {
+      "command": "infrastructure typecheck and owning API build then direct infrastructure tests",
+      "outcome": "Pass: 32 infrastructure tests after rebuilding API export."
+    },
+    {
+      "command": "saved real native CLI local test",
+      "outcome": "Pass: both real CLI checks; disabled collection fields observed in actual saved local resources."
+    },
+    {
+      "command": "remove only API native graph observability property",
+      "outcome": "Actual real CLI local-state Schema rejects missing observability after runtime journey; exact graph restoration followed by both saved tests passes."
+    },
+    {
+      "command": "direct pinned Vite non-polling watcher experiment",
+      "outcome": "Immediate change/restore emits one change event; 100-millisecond spacing emits both events. Polling on macOS emits both without that spacing."
+    },
+    {
+      "command": "saved real CLI test with non-polling watcher and spacing",
+      "outcome": "Pass: two tests in 16.52 seconds; exact restoration run passes again in 12.66 seconds."
+    },
+    {
+      "command": "Wrangler generate:worker-types",
+      "outcome": "Pass: accepts standalone disabled policy; generated declarations unchanged."
+    },
+    {
+      "command": "focused source lint; Website typecheck; docs/runbooks",
+      "outcome": "Pass after Schema field-key ordering correction; no new exception."
+    },
+    {
+      "command": "bun run test",
+      "outcome": "Pass: 467 actual CLI lint cases including 403 portable; all 27 fresh app/package test tasks, zero cached."
+    },
+    {
+      "command": "bun run build",
+      "outcome": "Pass: 16 tasks, 11 unchanged cached."
+    },
+    {
+      "command": "bun run api:smoke",
+      "outcome": "Pass: fresh HTTP smoke and temporary consumer; scopes clean up."
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "Pass: complete repository checks, 32 Quality cases and 13 isolated copies in 453.92s, both unused-code graphs and all types, 24 fresh SDK/8 fresh Website browser cases, actual Wrangler declarations; six fresh native tests in 37.17s."
+    },
+    {
+      "command": "post-check docs/runbooks/root format/Changeset status/whitespace",
+      "outcome": "Pass after task acceptance/current-owner reconciliation; application/configuration remains exactly qualified."
+    }
+  ],
+  "failedAttempts": [
+    {
+      "stage": "direct infrastructure tests before app rebuild",
+      "observed": "Older compiled API export lacked new app-owned policy; actual API graph properties failed checks.",
+      "recovery": "Build owning API then tests pass; README documents direct-test prerequisite."
+    },
+    {
+      "stage": "create graph-removal driver",
+      "observed": "Local ENOSPC before creating/executing driver; no source replacement occurred.",
+      "recovery": "Fresh disk readback showed sufficient space without any deletion by this task; retry/restoration pass. No cause inferred."
+    },
+    {
+      "stage": "parent hosted Quality",
+      "observed": "Restored heading timed out; other five native tests passed.",
+      "recovery": "Pinned source/direct non-polling watcher reproduction supports rapid-save suppression. Saved fixture now spaces writes and exercises that watcher. Hosted correction still pending."
+    },
+    {
+      "stage": "remove spacing from saved real CLI fixture locally",
+      "observed": "Both tests happened to pass without spacing; not a deterministic saved removal failure.",
+      "recovery": "Restore fixture exactly; both pass. Keep direct watcher reproduction separate from real-app observations."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "surface": "private app/native resource configuration and qualification",
+      "owners": [
+        "apps/api/src/worker.ts",
+        "packages/infrastructure/src/apps-stack.ts",
+        "packages/infrastructure/src/apps-stack.test.ts",
+        "apps/web/wrangler.jsonc",
+        "apps/web/test/native-local-development.boundary.test.ts"
+      ],
+      "postcondition": "Actual graph/local resource policies explicitly disabled; both real source updates remain required."
+    },
+    {
+      "decision": "Change required",
+      "surface": "app entry points and durable architecture",
+      "owners": [
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "packages/infrastructure/README.md",
+        "docs/architecture/configuration.md",
+        "docs/architecture/deployment.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/effect-services.md",
+        "packages/api/rpc/README.md"
+      ],
+      "postcondition": "Default platform URL records, explicit containment, app build prerequisite and watcher timing explained with bounded claims."
+    },
+    {
+      "decision": "Change required",
+      "surface": "active intent and proof routing",
+      "owners": [
+        "docs/product-specs/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/verification/critical-journeys.json",
+        "docs/documentation-audit/README.md"
+      ],
+      "postcondition": "T003 bounded containment separated from unmet T009 exported tracing; failed parent hosted proof retained."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "public interfaces, results and content",
+      "owners": [
+        "packages/api/http",
+        "packages/api/rpc",
+        "packages/sdk/typescript",
+        "packages/rules",
+        "packages/docs-content"
+      ],
+      "reason": "No calculator, HTTP/RPC/OpenAPI, SDK or public content contract changed."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "docs/provider/release/skills/enforcement",
+      "owners": [
+        "apps/docs",
+        "alchemy.run.ts",
+        "alchemy.apps.run.ts",
+        "docs/runbooks",
+        "docs/operations",
+        "tools/docs-deployment",
+        ".agents/skills",
+        ".github/workflows",
+        "oxlint.config.ts"
+      ],
+      "reason": "Separate docs resource policy, datasets, credentials, command authority and canonical rules unchanged; no new lint exception."
+    },
+    {
+      "decision": "Preserve",
+      "surface": "generated Website declarations",
+      "owners": [
+        "apps/web/src/worker-runtime.generated.d.ts"
+      ],
+      "reason": "Actual Wrangler regeneration passes without content change."
+    },
+    {
+      "decision": "N/A",
+      "surface": "Changeset",
+      "reason": "Private resource policy and local proof only; no published package-facing interface."
+    }
+  ],
+  "limitations": [
+    "No Cloudflare upload metadata, account state, exported rows, deployment or publication proof.",
+    "Disabled collection is containment; CSF-009 safe native exported tracing remains unmet in T009. No claim that safe native spans survive disabled tracing.",
+    "Parent hosted failure is not fixed until a new exact candidate hosted run passes.",
+    "Caller/browser abort does not establish upstream cancellation.",
+    "Medicare decision and later DEV-75\u201381 remain open; retained results unchanged."
+  ],
+  "rollback": {
+    "identity": "b3d759504f8dcdbb9dfea6d5521d98646dc0317b",
+    "action": "Revert this private policy/fixture slice. Exact source finalisers and child scopes remain active. No provider recovery action authorised."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "accept bounded local containment and T003 connection after complete source/runtime checks",
+    "observations": [
+      "Policies checked on actual graph/local state rather than only constants.",
+      "Application log formatting cannot qualify automatic platform URL fields.",
+      "T009 export proof remains required; T003 cannot be kept in a circular dependency on its later task.",
+      "Watcher timing correction preserves both visible reload assertions and exact restoration; deterministic direct watcher evidence is separate from nondeterministic real-app removal."
+    ],
+    "remaining": "Exact candidate hosted correction, draft review, T009 safe exports, Medicare decision and DEV-75\u201381."
+  },
+  "acceptanceReview": "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json",
+  "postCheckChanges": {
+    "reason": "Passed proof, task acceptance and remaining current documentation pointers only; no application/configuration changes.",
+    "verification": "Pass: post-check docs/runbooks/root format/Changeset status and whitespace; receipt-only docs repeated before commit."
+  },
+  "artifacts": {
+    "api": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "fileCount": 71,
+      "sortedEntriesSha256": "2e99e6d704cc14caccebf0d63663d5e0b8acfe31582c1944ebb4be5bbe498534"
+    },
+    "websiteServer": {
+      "root": "apps/web/dist/server",
+      "fileCount": 14,
+      "sortedEntriesSha256": "a51542e3ccf808141c35ccaaa5b2ef106b04ebc9375fb0c19637be3493013a89"
+    },
+    "websiteClient": {
+      "root": "apps/web/dist/client",
+      "fileCount": 3,
+      "sortedEntriesSha256": "a66451a8dbd77574e4e49e561594f581b9284884c560cfa4dd954ed0c369f6fa"
+    },
+    "settingsDefect": {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "fileCount": 14,
+      "sortedEntriesSha256": "55a4dfca9e2da77305fca315d81e5e3545a37f5e7e0d54235e445da8984b0bff"
+    },
+    "TaxKitApiRpcDefect": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "fileCount": 39,
+      "sortedEntriesSha256": "57f03295bccc40314378c9061fc283be52538eab75efc52673510734cf27a8a7"
+    },
+    "TaxKitApiInvalidReply": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "fileCount": 39,
+      "sortedEntriesSha256": "4cd8c58b7fe7940c7169d1924aaabd60c63f85b8708bcbfe0d02524f69f008b2"
+    },
+    "TaxKitApiStalledHeaders": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "fileCount": 39,
+      "sortedEntriesSha256": "c13962c1c74969daef0aff2948c50569ddeec9ef94c3f677e0387e473bdb0044"
+    },
+    "TaxKitApiStalledBody": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "fileCount": 39,
+      "sortedEntriesSha256": "5c602294c0630779e8b37405b1fa20479f391ad8f162bb37365582d30f2f280a"
+    }
+  },
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular file under each named root.",
+  "localExperimentDetails": [
+    {
+      "name": "dev74-native-reload-watcher.mjs",
+      "sha256": "8209250369cb09f24138aff46306a68b8df5b0b1dae45abf4b92ae2695c97ac4"
+    },
+    {
+      "name": "dev74-native-reload-watcher.log",
+      "sha256": "89ab2d06687dc0c867edfb62380547d0ba6a01ce3ed71177a72ed716c515ae28"
+    },
+    {
+      "name": "dev74-native-trace-policy-removal.py",
+      "sha256": "907060629c66f24e9e5c53b7bc02666d17a91cb75edb2cdb1cf320f5edf9f833"
+    },
+    {
+      "name": "dev74-native-trace-policy-removal.log",
+      "sha256": "efc29553d6fa49332598b5b57b0f7c1a14d0202a4f4975ffe0e4dc557954d36a"
+    },
+    {
+      "name": "dev74-native-restore-spacing-removal.log",
+      "sha256": "5ae3a2c1e4bb6334f52057bc66d0f5cfe00bc5ba59b75c3a08d92ca91ba3db88"
+    }
+  ],
+  "detailLocation": "Local /private/tmp; bounded outcomes retained here, raw local details are not portable or external proof."
+}

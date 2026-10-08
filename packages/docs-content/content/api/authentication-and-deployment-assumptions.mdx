@@ -1,7 +1,7 @@
 ---
 title: "Authentication and deployment assumptions"
 description: "Understand the current HTTP API deployment boundary before you call it."
-status: "draft"
+status: "published"
 ---
 
 # Authentication and deployment assumptions
@@ -12,8 +12,9 @@ reference.
 
 ## Current assumptions
 
-The current API runtime is `apps/api`. It serves the reusable HTTP contract
-from `@taxkit/api-http` and exposes local defaults on `127.0.0.1:4000`.
+The API app is `apps/api`. It serves the reusable HTTP contract from
+`@taxkit/api-http`. The standalone process uses `127.0.0.1:4000` by default;
+the native local API and website pair has addresses supplied by its launcher.
 
 There is no public authentication contract in this documentation slice. Treat
 authentication, tenant routing and public hosting as application-owned until a
@@ -21,8 +22,12 @@ future API deployment spec defines them.
 
 ## Local routes
 
-Local development uses the API app or the portless route described in
-`apps/api/README.md`:
+For the native API and website pair, run `bun run dev` from the repository
+root. The launcher prints both local addresses. See the
+[API app README](../../../../apps/api/README.md) for this route and its build
+requirements.
+
+For the retained standalone API process, use:
 
 ```sh
 bun run --filter=api start
@@ -30,7 +35,7 @@ curl http://127.0.0.1:4000/api/health
 curl http://127.0.0.1:4000/api/docs/openapi.json
 ```
 
-If you run through portless, use:
+To run that standalone process through Portless, use:
 
 ```sh
 bun run --filter=api dev

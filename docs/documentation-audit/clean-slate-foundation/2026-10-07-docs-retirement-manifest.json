@@ -1,0 +1,747 @@
+{
+  "schemaVersion": 1,
+  "documentType": "retention-manifest",
+  "lifecycle": "current",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "observedAt": "2026-10-06T22:39:52.909080+00:00",
+  "status": "Local repository retirement qualified against frozen staged source; final proof metadata is checked separately. No provider or default-branch replacement claim.",
+  "principal": "Cooper",
+  "implementationReviewer": "Codex primary owner",
+  "authorityBasis": "Approved clean-slate implementation request and current CSF-T005 scope; reversible local source/wiring changes, tested commit/push and draft PR155 only.",
+  "sourceCommit": "5d5544d0af639b430d53536c9bfbbbf9e37e8516",
+  "originalBaseline": "docs/documentation-audit/clean-slate-foundation/retention-manifest.json",
+  "archive": {
+    "path": "docs/evidence/deployments/retired-docs-source-5d5544d0.json",
+    "bytes": 301937,
+    "sha256": "2c75e33caf57be0aba650c7b48107058fe5a6e7d60c269b18eacccd74f6b525c",
+    "sourceCount": 49,
+    "identities": [
+      {
+        "path": "apps/docs/README.md",
+        "bytes": 22888,
+        "sha256": "ffcbe725bd023a474995ce9589ea4608b868a71fc9697a2d0aaba08a979d9379"
+      },
+      {
+        "path": "apps/docs/package.json",
+        "bytes": 2109,
+        "sha256": "3b46adf0a9595321c36405204a279e043191285fb2fc7a02bc4785b2880ee02a"
+      },
+      {
+        "path": "apps/docs/public/_headers",
+        "bytes": 63,
+        "sha256": "97c465063299ec4303b7e9d50a3a48a001a038ef85271d11df753b1c9fb93b81"
+      },
+      {
+        "path": "apps/docs/scripts/check-import-boundaries.runtime.test.ts",
+        "bytes": 5495,
+        "sha256": "42f212f98f91bd078fa1b7056d0fa08723983d77d656c324f2d4323dc01d2b35"
+      },
+      {
+        "path": "apps/docs/scripts/check-import-boundaries.runtime.ts",
+        "bytes": 5268,
+        "sha256": "356f639ff8bf17a42a79169032fb0253c7b83e52dc03390629d69fa692446084"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-built-browser.live.test.ts",
+        "bytes": 9331,
+        "sha256": "c94d7b4035096028e3c0259e22ee623f1a77679f100ab4e901618f6e971a2105"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-built-browser.live.ts",
+        "bytes": 30612,
+        "sha256": "d7c7ed881ba3cd6ea25a213e6975af1a7239eed0e42e88d99a1514cb055e0cd8"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-built-proof.boundary.test.ts",
+        "bytes": 9431,
+        "sha256": "5eac7fa88870ac69602230bacebc174c4c9e6e598417a63d0d452cc58a38f584"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
+        "bytes": 6471,
+        "sha256": "158d7fe97380e478a92a9b0db6117988809f72cb9d4acb0864a4abd9206a4d1d"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-built-proof.live.layer.test.ts",
+        "bytes": 10063,
+        "sha256": "d0a7c9b557f357dd5508aab058b08001d89e4b2fd6d7472d89b178345c44a2df"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+        "bytes": 35911,
+        "sha256": "e19612f3f61b1fa0fa27715af71a2c3e03bc3dbaebf6a82e458d96b654111f11"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-hosted-proof.boundary.test.ts",
+        "bytes": 11230,
+        "sha256": "aadf780c634bdbc4bced098d6323cf86801acb0606e1f540df2ffe2cb0b01c73"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+        "bytes": 13087,
+        "sha256": "05f13ef51292617b56c91e6368110df8929a3356f20c1d17e2458c4c7ca832d4"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-hosted-proof.live.layer.test.ts",
+        "bytes": 8431,
+        "sha256": "2bad84a3c35a519a576b2e8d6bb270aec447c8d579d350373cb5f136fb9ad7c6"
+      },
+      {
+        "path": "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+        "bytes": 29620,
+        "sha256": "7348b9590be0cfc43301483b1b8139d833a5103f89fff6417753785fe1fa6bf3"
+      },
+      {
+        "path": "apps/docs/scripts/test-cloudflare-built.tsx",
+        "bytes": 4883,
+        "sha256": "58aba6d204f498d4cfcae544da3712bbaca50a600951d87bef5779f8732422ae"
+      },
+      {
+        "path": "apps/docs/scripts/test-cloudflare-hosted.propagation.test.ts",
+        "bytes": 6802,
+        "sha256": "235ba5205213e9fbfaf0ae172bbd14fe5fa122a4d53c8ef1b068a3aaebd32499"
+      },
+      {
+        "path": "apps/docs/scripts/test-cloudflare-hosted.tsx",
+        "bytes": 1169,
+        "sha256": "ab1e04a4a8e3b7112f2501d2dd678c8e982adba03e8cf56e0f802c795d95ce62"
+      },
+      {
+        "path": "apps/docs/src/components/docs-route-states.tsx",
+        "bytes": 1553,
+        "sha256": "9f7b98d03b42e144ae20fd125c49414130ab13c1f671119d33ef79298ac69c88"
+      },
+      {
+        "path": "apps/docs/src/lib/docs/errors.ts",
+        "bytes": 448,
+        "sha256": "23a6eded68c2b58e5567a6a2df428d7e50fd54e96cdd9fce51ead9466ae1a54d"
+      },
+      {
+        "path": "apps/docs/src/lib/docs/loaders.server.ts",
+        "bytes": 2191,
+        "sha256": "8fc8914bfdf66a38dc873441d33eab859ce4b8a204996670af1810561a5a3225"
+      },
+      {
+        "path": "apps/docs/src/lib/docs/loaders.ts",
+        "bytes": 763,
+        "sha256": "9ad03f9cd05e37c716c8794e87c214ea9ef92eb545a8357ba2d323fdd8cd9a83"
+      },
+      {
+        "path": "apps/docs/src/lib/docs/route-boundary.browser.test.tsx",
+        "bytes": 8823,
+        "sha256": "a7e12f62164175e249c0c25318e0fd7126ddd42eb847095e00ae45ef06f7ada5"
+      },
+      {
+        "path": "apps/docs/src/lib/docs/route-boundary.test.ts",
+        "bytes": 6426,
+        "sha256": "4bb212b36d7af1b0a35d4060b1ff2d3b5e2ffb4b1ed44a1bec31c908e9fe45b9"
+      },
+      {
+        "path": "apps/docs/src/lib/docs/route-boundary.ts",
+        "bytes": 5791,
+        "sha256": "8fb854a777ad79565657dcb86daec5fd4dfd13102ce9060f300be133deca9858"
+      },
+      {
+        "path": "apps/docs/src/lib/docs/route-boundary.type-test.ts",
+        "bytes": 598,
+        "sha256": "f8753b7ed3801bb733c7ab185d62fc46e3b71887d02b27f7c8f4dd8945ba1f07"
+      },
+      {
+        "path": "apps/docs/src/lib/mdx/client-loader.tsx",
+        "bytes": 1089,
+        "sha256": "430092ab3aa31fad75c9565db2a774a703b31aa50ceb22d9d1bf491048c1367c"
+      },
+      {
+        "path": "apps/docs/src/lib/mdx/components.server.test.ts",
+        "bytes": 1082,
+        "sha256": "74dab5d82a09ea3066196a7512b8fea679f405c51f5f6b90c93f0f6b2968251d"
+      },
+      {
+        "path": "apps/docs/src/lib/mdx/components.tsx",
+        "bytes": 1926,
+        "sha256": "3792c83e44a4bf6b0886c03f3e28536d6afeb5eec7e78777103d62d88b5eef16"
+      },
+      {
+        "path": "apps/docs/src/lib/mdx/link-destination.ts",
+        "bytes": 875,
+        "sha256": "5ead0213c70b00c3bce3179ca5df0ae3d417f7584843eba87f6fe7b60031ef5a"
+      },
+      {
+        "path": "apps/docs/src/lib/navigation-focus.ts",
+        "bytes": 453,
+        "sha256": "db96f20a0533b99706592e3515a57f6211e35ebb52fd9227bf8cc54d0735788d"
+      },
+      {
+        "path": "apps/docs/src/lib/runtime-factory.server.test.ts",
+        "bytes": 4539,
+        "sha256": "9e1d9af8f727102293c6504aef385bccd38ecda926f596b473b76fbcd8879729"
+      },
+      {
+        "path": "apps/docs/src/lib/runtime-factory.server.ts",
+        "bytes": 1505,
+        "sha256": "a1a7bd0f6b6b1f3d8934177e773e56ea955aa167965708884e791b6f57169f72"
+      },
+      {
+        "path": "apps/docs/src/lib/runtime.server.ts",
+        "bytes": 872,
+        "sha256": "0285f555d921c4035b7cf924ff8c53c33076f0ecab69550df78fa650d12a063c"
+      },
+      {
+        "path": "apps/docs/src/lib/use-hydrated.ts",
+        "bytes": 265,
+        "sha256": "a8237afcb6fed5c80fe7cab7ebdfcbed4cd55dc40c41c65eb4de6b562abd9a7c"
+      },
+      {
+        "path": "apps/docs/src/routeTree.gen.ts",
+        "bytes": 2234,
+        "sha256": "595d8b3e1137b97aa4dd2d5cc27f7064a462d32a45bbd00f9494b793f719766d"
+      },
+      {
+        "path": "apps/docs/src/router.tsx",
+        "bytes": 403,
+        "sha256": "f573daeb14c645db3edaba576209cdd4964f608e9df444b18f2eff35df44b593"
+      },
+      {
+        "path": "apps/docs/src/routes/$.tsx",
+        "bytes": 6957,
+        "sha256": "4f2c69897fe6fe80ab9ebfe52785fb565e8f5342f42d0da62eca3663130e55c0"
+      },
+      {
+        "path": "apps/docs/src/routes/__root.tsx",
+        "bytes": 1946,
+        "sha256": "c74fab065628a125c822041b03c7d57f206f7e85b9649c07013c0c43c0ce598b"
+      },
+      {
+        "path": "apps/docs/src/routes/index.tsx",
+        "bytes": 2542,
+        "sha256": "7377b73981a57fcefc116cdc1bbd421c5bef02b56c6da12384265673181e837e"
+      },
+      {
+        "path": "apps/docs/src/server.ts",
+        "bytes": 2071,
+        "sha256": "255f7952de24c9e2074d7e961d2be8bc19bafcf792fd817e2712f298c5f57b9d"
+      },
+      {
+        "path": "apps/docs/src/styles.css",
+        "bytes": 6354,
+        "sha256": "dcde91aafde168ef50389e39464a7078bd7712bd60917a6c718eb712a861c9b0"
+      },
+      {
+        "path": "apps/docs/tsconfig.json",
+        "bytes": 373,
+        "sha256": "862f33346cb8c64912ec54bb9508ba6019e96deb13c6c04ed8252a67aaae6deb"
+      },
+      {
+        "path": "apps/docs/tsconfig.scripts.json",
+        "bytes": 1170,
+        "sha256": "f68b65bdde1a68e6add08d2f5617a1a59a5056d5ca4f811422206818537ce114"
+      },
+      {
+        "path": "apps/docs/vite.config.ts",
+        "bytes": 1930,
+        "sha256": "9fa58b2379d368c1f53e7a894365868111f647d7214d94103cde683362ef3480"
+      },
+      {
+        "path": "apps/docs/vitest.browser.config.ts",
+        "bytes": 605,
+        "sha256": "161a3d6a0ea88435ef57b136310a1e3894ddcdc1a9d1c72c89b86c7bd69f339f"
+      },
+      {
+        "path": "apps/docs/vitest.scripts.config.ts",
+        "bytes": 715,
+        "sha256": "5fc9770d0ec9e2de3c08e4868b9addcafd31feacb2062c3ed65695688f62cc09"
+      },
+      {
+        "path": "apps/docs/vitest.server.config.ts",
+        "bytes": 529,
+        "sha256": "f9ccf58226262a21af59df3170d704b18c292e8b6177825ac9e3039db940388c"
+      },
+      {
+        "path": "apps/docs/wrangler.jsonc",
+        "bytes": 217,
+        "sha256": "56f03b26e06f1e537ed18a5ea284d126bf7ad9bc0b9214f4a18856b08549b28b"
+      }
+    ],
+    "reader": "tools/docs-deployment/retired-source.boundary.ts",
+    "check": "bun run check:docs-deployment",
+    "scope": "Strict read-only data verification and historical source lookup; actual reconstruction is confined to test-owned temporary directories."
+  },
+  "fullHistoricalContext": [
+    {
+      "path": "package.json",
+      "sha256": "3d0677a3feb40ebc6dd8fc618dff5e23fdcce510520b72adc4f3a41f112b8205",
+      "bytes": 12217,
+      "sourceCommit": "5d5544d0af639b430d53536c9bfbbbf9e37e8516"
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "e9c95bc4c984c65f3ec88c0f360bbbedd5bc89611d221e2844ebd519f706f556",
+      "bytes": 286626,
+      "sourceCommit": "5d5544d0af639b430d53536c9bfbbbf9e37e8516"
+    },
+    {
+      "path": "alchemy.run.ts",
+      "sha256": "7faaaf1eade7a2154b6e98a3b472d42c11b5673038e68146a9ab4b93a7bbe11d",
+      "bytes": 753,
+      "sourceCommit": "5d5544d0af639b430d53536c9bfbbbf9e37e8516"
+    },
+    {
+      "path": "packages/infrastructure/src/stack.ts",
+      "sha256": "ffde00705b1efe5108ffe79bf080cc7a04622538c262c851a28d9011f37bf849",
+      "bytes": 1699,
+      "sourceCommit": "5d5544d0af639b430d53536c9bfbbbf9e37e8516"
+    },
+    {
+      "path": "packages/infrastructure/src/cloudflare/website.ts",
+      "sha256": "853984a5981f75f724d67b60bb206bc94a8c6867fcfe3778ff6450df86500a82",
+      "bytes": 1561,
+      "sourceCommit": "5d5544d0af639b430d53536c9bfbbbf9e37e8516"
+    }
+  ],
+  "currentPublicUrlDispositions": [
+    {
+      "oldPath": "/start",
+      "replacementPath": "/start",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/start/overview",
+      "replacementPath": "/start/overview",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/start/quickstart",
+      "replacementPath": "/start/quickstart",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/start/install-the-sdk",
+      "replacementPath": "/start/install-the-sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/start/run-your-first-calculation",
+      "replacementPath": "/start/run-your-first-calculation",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/start/choose-sdk-or-api",
+      "replacementPath": "/start/choose-sdk-or-api",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/sdk",
+      "replacementPath": "/sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/sdk/typescript-sdk",
+      "replacementPath": "/sdk/typescript-sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/sdk/plain-sdk",
+      "replacementPath": "/sdk/plain-sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/sdk/safe-sdk",
+      "replacementPath": "/sdk/safe-sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/sdk/effect-sdk",
+      "replacementPath": "/sdk/effect-sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/sdk/schemas",
+      "replacementPath": "/sdk/schemas",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/sdk/type-safety",
+      "replacementPath": "/sdk/type-safety",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/api",
+      "replacementPath": "/api",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/api/overview",
+      "replacementPath": "/api/overview",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/api/authentication-and-deployment-assumptions",
+      "replacementPath": "/api/authentication-and-deployment-assumptions",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/api/errors",
+      "replacementPath": "/api/errors",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/api/openapi-reference",
+      "replacementPath": "/api/openapi-reference",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/api/endpoints",
+      "replacementPath": "/api/endpoints",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides",
+      "replacementPath": "/guides",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/calculate-australian-take-home-pay",
+      "replacementPath": "/guides/calculate-australian-take-home-pay",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/calculate-annual-income-tax",
+      "replacementPath": "/guides/calculate-annual-income-tax",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/handle-validation-errors",
+      "replacementPath": "/guides/handle-validation-errors",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/show-calculator-help-to-users",
+      "replacementPath": "/guides/show-calculator-help-to-users",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/build-a-server-route-with-the-sdk",
+      "replacementPath": "/guides/build-a-server-route-with-the-sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/build-a-browser-app-with-the-http-api",
+      "replacementPath": "/guides/build-a-browser-app-with-the-http-api",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/test-your-integration",
+      "replacementPath": "/guides/test-your-integration",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/guides/migrate-from-raw-http-to-sdk",
+      "replacementPath": "/guides/migrate-from-raw-http-to-sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts",
+      "replacementPath": "/concepts",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/calculators",
+      "replacementPath": "/concepts/calculators",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/facts",
+      "replacementPath": "/concepts/facts",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/rules",
+      "replacementPath": "/concepts/rules",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/jurisdictions-and-tax-years",
+      "replacementPath": "/concepts/jurisdictions-and-tax-years",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/money-and-branded-values",
+      "replacementPath": "/concepts/money-and-branded-values",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/reports",
+      "replacementPath": "/concepts/reports",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/diagnostics",
+      "replacementPath": "/concepts/diagnostics",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/concepts/sdk-http-api-and-calculators-service-boundary",
+      "replacementPath": "/concepts/sdk-http-api-and-calculators-service-boundary",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing",
+      "replacementPath": "/contributing",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/what-are-you-changing",
+      "replacementPath": "/contributing/what-are-you-changing",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/add-a-fact",
+      "replacementPath": "/contributing/add-a-fact",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/add-a-rule",
+      "replacementPath": "/contributing/add-a-rule",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/add-a-calculator",
+      "replacementPath": "/contributing/add-a-calculator",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/add-a-tax-year",
+      "replacementPath": "/contributing/add-a-tax-year",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/fix-an-incorrect-result",
+      "replacementPath": "/contributing/fix-an-incorrect-result",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/testing-standards",
+      "replacementPath": "/contributing/testing-standards",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/source-citation-standards",
+      "replacementPath": "/contributing/source-citation-standards",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/naming-and-schema-standards",
+      "replacementPath": "/contributing/naming-and-schema-standards",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/effect-service-standards",
+      "replacementPath": "/contributing/effect-service-standards",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/backward-compatibility",
+      "replacementPath": "/contributing/backward-compatibility",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/changesets",
+      "replacementPath": "/contributing/changesets",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/pr-evidence-checklist",
+      "replacementPath": "/contributing/pr-evidence-checklist",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/contributing/review-expectations",
+      "replacementPath": "/contributing/review-expectations",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference",
+      "replacementPath": "/reference",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/sdk",
+      "replacementPath": "/reference/sdk",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/schemas",
+      "replacementPath": "/reference/schemas",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/errors",
+      "replacementPath": "/reference/errors",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/api",
+      "replacementPath": "/reference/api",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/examples",
+      "replacementPath": "/reference/examples",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/changelog",
+      "replacementPath": "/reference/changelog",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/versioning",
+      "replacementPath": "/reference/versioning",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    },
+    {
+      "oldPath": "/reference/release-notes",
+      "replacementPath": "/reference/release-notes",
+      "disposition": "same accepted public page URL; actual built Website HTML, canonical and share-image address qualified by the retirement receipt"
+    }
+  ],
+  "rootDisposition": {
+    "oldPath": "/",
+    "currentPath": "/",
+    "decision": "Approved default take-home calculator replaces old documentation landing; documentation entry remains /start."
+  },
+  "preserve": {
+    "acceptedInputs": 127,
+    "catalogueIdentity": {
+      "path": "packages/docs-content/.source/public-catalogue.json",
+      "sha256": "6f3d3beb055c2d5d83ba5abeb9feef3fb8da51188f077e9181685f8f708c26b6",
+      "bytes": 235703
+    },
+    "sharedRenderingAndSource": [
+      "packages/docs-fumadocs/render actual Website components",
+      "packages/docs-content source config/build adapter and authored inputs"
+    ],
+    "historicalAndBinaryEvidence": "Preserve all original historical receipts, source snapshots, screenshots, failed attempts and initial retention baseline unchanged.",
+    "ignoredOldAppEntries": {
+      "count": 258,
+      "families": [
+        "dist",
+        "node_modules",
+        ".turbo",
+        ".vitest",
+        ".wrangler"
+      ],
+      "decision": "Leave all physically in place; no folder cleanup. Private metadata inventory contains no file contents.",
+      "boundary": "Generated/untracked local files are not deployment evidence."
+    },
+    "taxAndMetrics": "Retained tax results and Medicare decision; collection disabled and metrics deferred."
+  },
+  "retire": {
+    "trackedAppSources": "Only the 49 named original apps/docs files; replace its README with a truthful successor tombstone after source verification.",
+    "currentBuildWiring": "Remove the old app workspace and root build/test/dev aliases, app-specific Knip/lint selection and current routes to obsolete source.",
+    "currentProviderWriters": "Retire the old default Stack and old writer routes with a provider-free refusal; retain old resource identity and historical tool/receipt proof. Do not point old authority at native resources."
+  },
+  "recovery": {
+    "sourceOnly": "Use the exact verified bundle for source inspection or an isolated reconstruction. The original Git revision retains full context; the bundle alone is not a complete rebuild/deploy checkout.",
+    "deployedRecord": "docs/evidence/deployments/2026-10-03-production-hosted-proof-investigation/receipt.json",
+    "providerIdentity": "TaxKitDocsCloudflare/prod/DocsWebsite",
+    "operationOwner": "docs/runbooks/docs-deployment.md",
+    "providerAuthority": "No provider recovery granted. A future exact provider operation must be separately approved against its named original resource and source/artifact identity."
+  },
+  "acceptancePostconditions": [
+    "All 49 archived source texts, sizes and hashes match original Git bytes; strict native reconstruction and missing/tamper/size refusals pass.",
+    "Every accepted old page address has the same proved current Website destination; the approved root disposition is explicit.",
+    "No active old app workspace/build/source or writer dependency remains; missing current source never passes through an archive fallback.",
+    "Old entry/writer refusal occurs before credential fetch, remote state, plan or provider mutation; no successful empty graph exists.",
+    "Current owners, runbooks, exact controls, journey/history routes and permitted skill profiles agree; final full repository and release qualification pass."
+  ],
+  "nonClaims": [
+    "Local source retirement is qualified; this does not establish default-branch or hosted replacement.",
+    "No complete historical rebuild, fresh deployed/provider state, exercised rollback, native provider operation, merge, deployment, publication, credential action or deferred metrics implementation."
+  ],
+  "retainedWorkflowSources": [
+    {
+      "sourcePath": ".github/workflows/docs-preview.yml",
+      "retainedPath": "docs/evidence/deployments/retired-docs-workflows-2c5ffd40/docs-preview.yml.txt",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 21730,
+      "sha256": "98d3a50d4fb4c84f4473753a5a68898a45a88f9cc5f4c46b7a8bca763514dfc4"
+    },
+    {
+      "sourcePath": ".github/workflows/docs-production.yml",
+      "retainedPath": "docs/evidence/deployments/retired-docs-workflows-2c5ffd40/docs-production.yml.txt",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 28756,
+      "sha256": "bf3cf5f97ca6dbc32d7b797e19ef5faeae9ca9eb4a3d6e4f7ee98de040a5fa8e"
+    },
+    {
+      "sourcePath": ".github/workflows/docs-preview-teardown.yml",
+      "retainedPath": "docs/evidence/deployments/retired-docs-workflows-2c5ffd40/docs-preview-teardown.yml.txt",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 20088,
+      "sha256": "1c0c7a7a74fdcea6dfac01c6371c8301315200ae01754fdcbf90440466b10252"
+    },
+    {
+      "sourcePath": ".github/workflows/docs-production-hosted-verify.yml",
+      "retainedPath": "docs/evidence/deployments/retired-docs-workflows-2c5ffd40/docs-production-hosted-verify.yml.txt",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 5361,
+      "sha256": "82b880c5dc12c78e2fb0761545655984349e6857bd7711686508f685212682c9"
+    }
+  ],
+  "oldOperationStartupLimit": "The installed Alchemy CLI creates local logs and an empty default profile before Stack import. The static retirement marker refuses before session providers, remote state and planning; it does not promise zero local writes.",
+  "retainedOperationOwners": [
+    {
+      "sourcePath": "tools/docs-deployment/automation-register.json",
+      "retainedPath": "docs/evidence/deployments/retired-docs-operations-2c5ffd40/automation-register.json",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 11970,
+      "sha256": "4d7e153db305960439c70b4040a6b8f7c4add2127836799443ffc46b02ba5c86"
+    },
+    {
+      "sourcePath": "tools/docs-deployment/controls.json",
+      "retainedPath": "docs/evidence/deployments/retired-docs-operations-2c5ffd40/controls.json",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 4485,
+      "sha256": "e60807ec265c918efb6b94478fd2792cddc638b06b24ebe59d6dbef4b51e366b"
+    },
+    {
+      "sourcePath": "docs/verification/docs-deployment-journeys.json",
+      "retainedPath": "docs/evidence/deployments/retired-docs-operations-2c5ffd40/docs-deployment-journeys.json",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 2797,
+      "sha256": "f152a1909404db8113d9c02d701be7c0183da4c8b1949e904a2f4989138a3263"
+    },
+    {
+      "sourcePath": "docs/runbooks/docs-deployment.md",
+      "retainedPath": "docs/evidence/deployments/retired-docs-operations-2c5ffd40/docs-deployment.md.txt",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 20864,
+      "sha256": "1da409682f370d6d08390b91a0ea92d2d120cd3e1943c2bbce7e35a0c0fc4aa7"
+    },
+    {
+      "sourcePath": "package.json",
+      "retainedPath": "docs/evidence/deployments/retired-docs-operations-2c5ffd40/package.json",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 12217,
+      "sha256": "3d0677a3feb40ebc6dd8fc618dff5e23fdcce510520b72adc4f3a41f112b8205"
+    },
+    {
+      "sourcePath": "tools/docs-deployment/local-doppler.runtime.ts",
+      "retainedPath": "docs/evidence/deployments/retired-docs-operations-2c5ffd40/local-doppler.runtime.ts.txt",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 1487,
+      "sha256": "a4c11099ca5721c272d418ed4aa9b79084e8456a32168d7cfc06ab512fb82f53"
+    },
+    {
+      "sourcePath": "tools/docs-deployment/workflow-evidence.runtime.ts",
+      "retainedPath": "docs/evidence/deployments/retired-docs-operations-2c5ffd40/workflow-evidence.runtime.ts.txt",
+      "sourceCommit": "2c5ffd40b695cfe4d66284481e9136fd407dd5ff",
+      "bytes": 3273,
+      "sha256": "b24c40807715bc063a199e3b1c5627d397ee2ca7870ac2ecb8eeb5ba9e23a495"
+    }
+  ],
+  "qualifiedAt": "2026-10-06T23:30:26.439183+00:00",
+  "qualificationReceipt": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement.json"
+}

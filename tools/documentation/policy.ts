@@ -1,4 +1,5 @@
-import { Array, Order, Record } from "effect";
+import { Array, HashMap, HashSet, Option, Order, Record, pipe } from "effect";
+import { sort } from "effect/Array";
 
 import {
   DocumentationDiagnostic,
@@ -14,14 +15,14 @@ import type {
 export type DocumentationFile = Readonly<{ path: string; text: string }>;
 export type WorkspaceScripts = Readonly<{
   name?: string;
-  scripts: ReadonlySet<string>;
+  scripts: HashSet.HashSet<string>;
 }>;
 export type DocumentationInspection = Readonly<{
-  acceptanceRecords?: ReadonlyMap<string, PublicPageAcceptanceRecord | null>;
+  acceptanceRecords?: HashMap.HashMap<string, PublicPageAcceptanceRecord>;
   files: readonly DocumentationFile[];
   ownerPolicy: OwnerPolicy;
-  rootScripts: ReadonlySet<string>;
-  workspaceScripts: ReadonlyMap<string, WorkspaceScripts>;
+  rootScripts: HashSet.HashSet<string>;
+  workspaceScripts: HashMap.HashMap<string, WorkspaceScripts>;
 }>;
 
 const markdownLink = /\[[^\]]*\]\((?<target>[^\s)]+)(?:\s+[^)]*)?\)/gu;
@@ -51,138 +52,182 @@ const diagnostic = (
 const isUnder = (path: string, root: string): boolean =>
   path === root || path.startsWith(`${root}/`);
 
-const metadata = (text: string): ReadonlyMap<string, string> => {
-  const block = /^---\r?\n(?<body>[\s\S]*?)\r?\n---(?:\r?\n|$)/u.exec(text)
-    ?.groups?.["body"];
-  return new Map(
-    globalThis.Array.from(
-      (block ?? "").matchAll(/^(?<key>[a-z_]+):\s*(?<value>\S.*)$/gmu),
+const metadata = (text: string): HashMap.HashMap<string, string> => {
+  const block = Record.get(
+    /^---\r?\n(?<body>[\s\S]*?)\r?\n---(?:\r?\n|$)/u.exec(text)?.groups ?? {},
+    "body"
+  ).pipe(Option.getOrElse(() => ""));
+  return HashMap.fromIterable(
+    Array.map(
+      Array.fromIterable(
+        block.matchAll(/^(?<key>[a-z_]+):\s*(?<value>\S.*)$/gmu)
+      ),
       (entry) => {
-        const value = entry.groups?.["value"] ?? "";
+        const value = Record.get(entry.groups ?? {}, "value").pipe(
+          Option.getOrElse(() => "")
+        );
         const quoted =
           /^(?:"(?<doubleQuoted>[\s\S]*)"|'(?<singleQuoted>[\s\S]*)')$/u.exec(
             value
-          );
+          )?.groups ?? {};
         return [
-          entry.groups?.["key"] ?? "",
-          quoted?.groups?.["doubleQuoted"] ??
-            quoted?.groups?.["singleQuoted"] ??
-            value,
-        ];
+          Record.get(entry.groups ?? {}, "key").pipe(
+            Option.getOrElse(() => "")
+          ),
+          Record.get(quoted, "doubleQuoted").pipe(
+            Option.flatMap(Option.fromNullishOr),
+            Option.orElse(() =>
+              Record.get(quoted, "singleQuoted").pipe(
+                Option.flatMap(Option.fromNullishOr)
+              )
+            ),
+            Option.getOrElse(() => value)
+          ),
+        ] as const;
       }
     )
   );
 };
 
-const relativeTarget = (source: string, target: string): string => {
-  const parts = source.split("/");
-  parts.pop();
-  for (const part of target.split("/")) {
-    if (part === "." || part === "") {
-      continue;
+const relativeTarget = (source: string, target: string): string =>
+  Array.reduce(
+    target.split("/"),
+    Array.dropRight(source.split("/"), 1),
+    (parts, part) => {
+      if (part === "." || part === "") {
+        return parts;
+      }
+      return part === ".."
+        ? Array.dropRight(parts, 1)
+        : Array.append(parts, part);
     }
-    if (part === "..") {
-      parts.pop();
-    } else {
-      parts.push(part);
-    }
-  }
-  return parts.join("/");
-};
+  ).join("/");
 
 const ownerForMaintainer = (policy: OwnerPolicy, path: string): string =>
-  policy.maintainer.rootEntrypoints.includes(path)
+  Array.contains(policy.maintainer.rootEntrypoints, path)
     ? "taxkit-documentation-owner"
     : "maintainer-document-owner";
 
 const localScriptsFor = (
-  workspaceScripts: ReadonlyMap<string, WorkspaceScripts>,
+  workspaceScripts: HashMap.HashMap<string, WorkspaceScripts>,
   path: string
-): ReadonlySet<string> => {
-  const [matchingRoot] = globalThis.Array.from(workspaceScripts.keys())
-    .filter((root) => isUnder(path, root))
-    .toSorted((left, right) => right.length - left.length);
-  return matchingRoot
-    ? (workspaceScripts.get(matchingRoot)?.scripts ?? new Set<string>())
-    : new Set<string>();
-};
+): HashSet.HashSet<string> =>
+  pipe(
+    Array.fromIterable(HashMap.keys(workspaceScripts)),
+    Array.filter((root) => isUnder(path, root)),
+    sort(
+      Order.flip(Order.mapInput(Order.Number, (root: string) => root.length))
+    ),
+    Array.head,
+    Option.flatMap((root) => HashMap.get(workspaceScripts, root)),
+    Option.map((workspace) => workspace.scripts),
+    Option.getOrElse(() => HashSet.empty<string>())
+  );
 
 const filteredScriptsFor = (
-  workspaceScripts: ReadonlyMap<string, WorkspaceScripts>,
+  workspaceScripts: HashMap.HashMap<string, WorkspaceScripts>,
   filter: string
-): ReadonlySet<string> => {
+): HashSet.HashSet<string> => {
   if (/^<[^>]+>$/u.test(filter)) {
-    return new Set(
-      globalThis.Array.from(workspaceScripts.values()).flatMap((workspace) =>
-        globalThis.Array.from(workspace.scripts)
+    return HashSet.fromIterable(
+      Array.flatMap(
+        Array.fromIterable(HashMap.values(workspaceScripts)),
+        (workspace) => Array.fromIterable(workspace.scripts)
       )
     );
   }
-  const selected = globalThis.Array.from(workspaceScripts.entries()).find(
+  return Array.findFirst(
+    Array.fromIterable(workspaceScripts),
     ([root, workspace]) =>
-      workspace.name === filter || root.split("/").at(-1) === filter
+      workspace.name === filter ||
+      Array.last(root.split("/")).pipe(Option.contains(filter))
+  ).pipe(
+    Option.map(([, workspace]) => workspace.scripts),
+    Option.getOrElse(() => HashSet.empty<string>())
   );
-  return selected?.[1].scripts ?? new Set<string>();
 };
 
 const isMissingRelativeTarget = (
-  target: string | undefined,
+  target: string,
   sourcePath: string,
-  paths: ReadonlySet<string>
-): target is string =>
-  target !== undefined &&
+  paths: HashSet.HashSet<string>
+): boolean =>
   target.length > 0 &&
   !target.startsWith("/") &&
   !target.startsWith("#") &&
   !/^[a-z][a-z0-9+.-]*:/iu.test(target) &&
-  !paths.has(relativeTarget(sourcePath, target));
+  !HashSet.has(paths, relativeTarget(sourcePath, target));
 
 const inspectCurrentOwnerReferences = (
   inspection: DocumentationInspection,
   file: DocumentationFile,
-  paths: ReadonlySet<string>
+  paths: HashSet.HashSet<string>
 ): readonly DocumentationDiagnostic[] => {
-  const result: DocumentationDiagnostic[] = [];
   const prose = file.text
     .replaceAll(/```[\s\S]*?```/gu, "")
     .replaceAll(/`[^`]*`/gu, "");
-  for (const match of prose.matchAll(markdownLink)) {
-    const matchedTarget = match.groups?.["target"];
-    const target = matchedTarget?.split("#")[0];
-    if (isMissingRelativeTarget(target, file.path, paths)) {
-      result.push(
-        diagnostic(
-          "relative-link",
-          ownerForMaintainer(inspection.ownerPolicy, file.path),
-          file.path,
-          `repair relative link target ${target}`
-        )
-      );
-    }
-  }
   const localScripts = localScriptsFor(inspection.workspaceScripts, file.path);
-  for (const match of file.text.matchAll(bunRun)) {
-    const filter = match.groups?.["filter"];
-    const command = match.groups?.["command"];
-    const commandScripts = filter
-      ? filteredScriptsFor(inspection.workspaceScripts, filter)
-      : localScripts;
-    const commandExists = filter
-      ? commandScripts.has(command ?? "")
-      : inspection.rootScripts.has(command ?? "") ||
-        commandScripts.has(command ?? "");
-    if (command && !commandExists) {
-      result.push(
-        diagnostic(
-          "local-bun-command",
-          "repository-script-owner",
-          file.path,
-          `document an existing local bun script instead of bun run ${filter ? `--filter=${filter} ` : ""}${command}`
+  return [
+    ...Array.flatMap(
+      Array.fromIterable(prose.matchAll(markdownLink)),
+      (match) =>
+        Record.get(match.groups ?? {}, "target").pipe(
+          Option.flatMap((target) => Array.head(target.split("#"))),
+          Option.match({
+            onNone: () => [],
+            onSome: (target) =>
+              isMissingRelativeTarget(target, file.path, paths)
+                ? [
+                    diagnostic(
+                      "relative-link",
+                      ownerForMaintainer(inspection.ownerPolicy, file.path),
+                      file.path,
+                      `repair relative link target ${target}`
+                    ),
+                  ]
+                : [],
+          })
         )
-      );
-    }
-  }
-  return result;
+    ),
+    ...Array.flatMap(
+      Array.fromIterable(file.text.matchAll(bunRun)),
+      (match) => {
+        const filter = Record.get(match.groups ?? {}, "filter").pipe(
+          Option.flatMap(Option.fromNullishOr)
+        );
+        const commandScripts = Option.match(filter, {
+          onNone: () => localScripts,
+          onSome: (value) =>
+            filteredScriptsFor(inspection.workspaceScripts, value),
+        });
+        return Record.get(match.groups ?? {}, "command").pipe(
+          Option.match({
+            onNone: () => [],
+            onSome: (command) => {
+              const exists =
+                HashSet.has(commandScripts, command) ||
+                (Option.isNone(filter) &&
+                  HashSet.has(inspection.rootScripts, command));
+              const prefix = Option.match(filter, {
+                onNone: () => "",
+                onSome: (value) => `--filter=${value} `,
+              });
+              return exists
+                ? []
+                : [
+                    diagnostic(
+                      "local-bun-command",
+                      "repository-script-owner",
+                      file.path,
+                      `document an existing local bun script instead of bun run ${prefix}${command}`
+                    ),
+                  ];
+            },
+          })
+        );
+      }
+    ),
+  ];
 };
 
 export const classifyDocumentationPath = (
@@ -193,12 +238,12 @@ export const classifyDocumentationPath = (
     return DocumentationPathClass.make("workspace-manifest");
   }
   if (
-    policy.public.roots.some((root) => isUnder(path, root)) ||
+    Array.some(policy.public.roots, (root) => isUnder(path, root)) ||
     path === policy.public.navigation.path
   ) {
     return DocumentationPathClass.make("public");
   }
-  if (policy.sdkDocs.roots.some((root) => isUnder(path, root))) {
+  if (Array.some(policy.sdkDocs.roots, (root) => isUnder(path, root))) {
     return DocumentationPathClass.make("authored-sdk");
   }
   if (
@@ -208,10 +253,11 @@ export const classifyDocumentationPath = (
     return DocumentationPathClass.make("generated");
   }
   if (
-    policy.maintainer.rootEntrypoints.includes(path) ||
-    (policy.maintainer.roots.some((root) => isUnder(path, root)) &&
+    Array.contains(policy.maintainer.rootEntrypoints, path) ||
+    (Array.some(policy.maintainer.roots, (root) => isUnder(path, root)) &&
       /\.(?:md|html)$/u.test(path)) ||
-    (/(?:^|\/)README\.md$/u.test(path) && !policy.sdkDocs.roots.includes(path))
+    (/(?:^|\/)README\.md$/u.test(path) &&
+      !Array.contains(policy.sdkDocs.roots, path))
   ) {
     return DocumentationPathClass.make("maintainer");
   }
@@ -221,63 +267,65 @@ export const classifyDocumentationPath = (
 const inspectMaintainer = (
   inspection: DocumentationInspection,
   file: DocumentationFile,
-  paths: ReadonlySet<string>
+  paths: HashSet.HashSet<string>
 ): readonly DocumentationDiagnostic[] => {
-  const result: DocumentationDiagnostic[] = [];
   const fields = metadata(file.text);
   if (
-    inspection.ownerPolicy.maintainer.snapshotExemptions.some(
+    Array.some(
+      inspection.ownerPolicy.maintainer.snapshotExemptions,
       (item) => item.path === file.path
     )
   ) {
-    return result;
+    return [];
   }
   const required =
-    fields.has("status") && !fields.has("lifecycle")
+    HashMap.has(fields, "status") && !HashMap.has(fields, "lifecycle")
       ? legacyMetadata
       : lifecycleMetadata;
-  for (const key of required) {
-    if (!fields.has(key)) {
-      result.push(
-        diagnostic(
-          "maintainer-metadata",
-          ownerForMaintainer(inspection.ownerPolicy, file.path),
-          file.path,
-          `add frontmatter ${key}`
-        )
-      );
-    }
-  }
-  if (
-    (fields.get("lifecycle") === "tombstone" ||
-      fields.get("lifecycle") === "superseded") &&
-    !fields.has("successor")
-  ) {
-    result.push(
-      diagnostic(
-        "lifecycle-successor",
-        ownerForMaintainer(inspection.ownerPolicy, file.path),
-        file.path,
-        "add a successor pointer"
-      )
-    );
-  }
+  const lifecycle = HashMap.get(fields, "lifecycle");
+  const diagnostics = [
+    ...Array.flatMap(required, (key) =>
+      HashMap.has(fields, key)
+        ? []
+        : [
+            diagnostic(
+              "maintainer-metadata",
+              ownerForMaintainer(inspection.ownerPolicy, file.path),
+              file.path,
+              `add frontmatter ${key}`
+            ),
+          ]
+    ),
+    ...((Option.contains(lifecycle, "tombstone") ||
+      Option.contains(lifecycle, "superseded")) &&
+    !HashMap.has(fields, "successor")
+      ? [
+          diagnostic(
+            "lifecycle-successor",
+            ownerForMaintainer(inspection.ownerPolicy, file.path),
+            file.path,
+            "add a successor pointer"
+          ),
+        ]
+      : []),
+  ];
   const isCurrentOwner =
-    fields.get("lifecycle") === "current" ||
-    fields.get("lifecycle") === "proposed" ||
-    fields.get("status") === "canonical";
-  if (!isCurrentOwner) {
-    return result;
-  }
-  return [...result, ...inspectCurrentOwnerReferences(inspection, file, paths)];
+    Option.contains(lifecycle, "current") ||
+    Option.contains(lifecycle, "proposed") ||
+    HashMap.get(fields, "status").pipe(Option.contains("canonical"));
+  return isCurrentOwner
+    ? [
+        ...diagnostics,
+        ...inspectCurrentOwnerReferences(inspection, file, paths),
+      ]
+    : diagnostics;
 };
 
 const inspectOwners = (
   inspection: DocumentationInspection,
-  paths: ReadonlySet<string>
+  paths: HashSet.HashSet<string>
 ): readonly DocumentationDiagnostic[] => {
   const policy = inspection.ownerPolicy;
-  const result: DocumentationDiagnostic[] = [];
   const required = [
     policy.public.navigation,
     {
@@ -295,197 +343,227 @@ const inspectOwners = (
       path,
     })),
   ];
-  for (const binding of required) {
-    if (!paths.has(binding.path)) {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          binding.owner,
-          binding.path,
-          "restore the owner-policy target or update the policy in the same accepted slice"
-        )
-      );
-    }
-    if (
-      binding.command &&
-      !localScriptsFor(inspection.workspaceScripts, binding.path).has(
+  return [
+    ...Array.flatMap(required, (binding) => [
+      ...(HashSet.has(paths, binding.path)
+        ? []
+        : [
+            diagnostic(
+              "owner-policy",
+              binding.owner,
+              binding.path,
+              "restore the owner-policy target or update the policy in the same accepted slice"
+            ),
+          ]),
+      ...(binding.command &&
+      !HashSet.has(
+        localScriptsFor(inspection.workspaceScripts, binding.path),
         binding.command
       )
-    ) {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          binding.owner,
-          binding.path,
-          `declare existing workspace command ${binding.command}`
-        )
-      );
-    }
-  }
-  if (
-    paths.has(policy.openApi.snapshot.path) &&
-    (!paths.has(policy.openApi.source.path) ||
-      !paths.has(policy.openApi.test.path))
-  ) {
-    result.push(
-      diagnostic(
-        "generated-source-owner",
-        policy.openApi.source.owner,
-        policy.openApi.snapshot.path,
-        "restore the package-owned OpenAPI source and snapshot test"
-      )
-    );
-  }
-  if (
-    !paths.has(policy.fumadocs.source.path) ||
-    !paths.has(policy.fumadocs.build.path)
-  ) {
-    result.push(
-      diagnostic(
-        "generated-source-owner",
-        policy.fumadocs.source.owner,
-        policy.fumadocs.generatedRoot,
-        "restore Fumadocs source and build ownership"
-      )
-    );
-  }
-  return result;
+        ? [
+            diagnostic(
+              "owner-policy",
+              binding.owner,
+              binding.path,
+              `declare existing workspace command ${binding.command}`
+            ),
+          ]
+        : []),
+    ]),
+    ...(HashSet.has(paths, policy.openApi.snapshot.path) &&
+    (!HashSet.has(paths, policy.openApi.source.path) ||
+      !HashSet.has(paths, policy.openApi.test.path))
+      ? [
+          diagnostic(
+            "generated-source-owner",
+            policy.openApi.source.owner,
+            policy.openApi.snapshot.path,
+            "restore the package-owned OpenAPI source and snapshot test"
+          ),
+        ]
+      : []),
+    ...(!HashSet.has(paths, policy.fumadocs.source.path) ||
+    !HashSet.has(paths, policy.fumadocs.build.path)
+      ? [
+          diagnostic(
+            "generated-source-owner",
+            policy.fumadocs.source.owner,
+            policy.fumadocs.generatedRoot,
+            "restore Fumadocs source and build ownership"
+          ),
+        ]
+      : []),
+  ];
 };
 
 const inspectPublicStatus = (
   inspection: DocumentationInspection
 ): readonly DocumentationDiagnostic[] => {
-  const result: DocumentationDiagnostic[] = [];
   const policy = inspection.ownerPolicy;
-  const allowedStatuses = new Set<string>(
+  const allowedStatuses = HashSet.fromIterable(
     Record.keys(policy.public.statusDecision.statuses)
   );
-  const navigation = inspection.files.find(
+  const navigation = Array.findFirst(
+    inspection.files,
     (file) => file.path === policy.public.navigation.path
   );
-  const publicFiles = inspection.files.filter(
+  const publicFiles = Array.filter(
+    inspection.files,
     (file) =>
-      policy.public.roots.some((root) => isUnder(file.path, root)) &&
+      Array.some(policy.public.roots, (root) => isUnder(file.path, root)) &&
       file.path.endsWith(".mdx")
   );
-  const acceptedRecords = new Map<string, string>();
-  const recordPaths = new Set<string>();
-  const statusFor = (file: DocumentationFile): string | null =>
+  const statusFor = (file: DocumentationFile): Option.Option<string> =>
     file.path === policy.public.navigation.path
-      ? (() => {
-          const status = /"status"\s*:\s*"(?<status>[^"]+)"/u.exec(file.text)
-            ?.groups?.["status"];
-          return status ?? null;
-        })()
-      : (metadata(file.text).get("status") ?? null);
-
-  for (const binding of policy.public.statusDecision.acceptanceRecords) {
-    if (acceptedRecords.has(binding.path)) {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          policy.public.statusDecision.owner,
-          binding.path,
-          "keep exactly one accepted-record binding for each published public path"
+      ? Record.get(
+          /"status"\s*:\s*"(?<status>[^"]+)"/u.exec(file.text)?.groups ?? {},
+          "status"
         )
-      );
-    } else {
-      acceptedRecords.set(binding.path, binding.record);
-    }
-    if (recordPaths.has(binding.record)) {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          policy.public.statusDecision.owner,
-          binding.record,
-          "bind each accepted record to exactly one published public path"
-        )
-      );
-    } else {
-      recordPaths.add(binding.record);
-    }
-  }
-
-  for (const file of [...publicFiles, ...(navigation ? [navigation] : [])]) {
-    const status = statusFor(file);
-    if (!status || !allowedStatuses.has(status)) {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          policy.public.statusDecision.owner,
-          file.path,
-          "use a public status represented by the accepted public lifecycle policy"
-        )
-      );
-    }
-    if (status === "published" && !acceptedRecords.has(file.path)) {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          policy.public.statusDecision.owner,
-          file.path,
-          "bind this published public path to an addressable accepted record"
-        )
-      );
-    }
-  }
-  for (const binding of policy.public.statusDecision.acceptanceRecords) {
-    const publicFile = inspection.files.find(
-      (file) => file.path === binding.path
-    );
-    const recordFile = inspection.files.find(
-      (file) => file.path === binding.record
-    );
-    if (recordFile) {
-      const acceptanceRecord =
-        inspection.acceptanceRecords?.get(binding.record) ?? null;
-      if (!acceptanceRecord) {
-        result.push(
-          diagnostic(
-            "owner-policy",
-            policy.public.statusDecision.owner,
-            binding.record,
-            "replace this file with a valid accepted page-level record"
+      : HashMap.get(metadata(file.text), "status");
+  const bindings = Array.reduce(
+    policy.public.statusDecision.acceptanceRecords,
+    {
+      acceptedRecords: HashMap.empty<string, string>(),
+      diagnostics: Array.empty<DocumentationDiagnostic>(),
+      recordPaths: HashSet.empty<string>(),
+    },
+    (snapshot, binding) => ({
+      acceptedRecords: HashMap.has(snapshot.acceptedRecords, binding.path)
+        ? snapshot.acceptedRecords
+        : HashMap.set(snapshot.acceptedRecords, binding.path, binding.record),
+      diagnostics: [
+        ...snapshot.diagnostics,
+        ...(HashMap.has(snapshot.acceptedRecords, binding.path)
+          ? [
+              diagnostic(
+                "owner-policy",
+                policy.public.statusDecision.owner,
+                binding.path,
+                "keep exactly one accepted-record binding for each published public path"
+              ),
+            ]
+          : []),
+        ...(HashSet.has(snapshot.recordPaths, binding.record)
+          ? [
+              diagnostic(
+                "owner-policy",
+                policy.public.statusDecision.owner,
+                binding.record,
+                "bind each accepted record to exactly one published public path"
+              ),
+            ]
+          : []),
+      ],
+      recordPaths: HashSet.add(snapshot.recordPaths, binding.record),
+    })
+  );
+  return [
+    ...bindings.diagnostics,
+    ...Array.flatMap(
+      [...publicFiles, ...Option.toArray(navigation)],
+      (file) => {
+        const status = statusFor(file);
+        return [
+          ...(Option.exists(status, (value) =>
+            HashSet.has(allowedStatuses, value)
           )
-        );
-      } else if (acceptanceRecord.targetPath !== binding.path) {
-        result.push(
-          diagnostic(
-            "owner-policy",
-            policy.public.statusDecision.owner,
-            binding.record,
-            `bind the accepted record targetPath exactly to ${binding.path}`
-          )
-        );
+            ? []
+            : [
+                diagnostic(
+                  "owner-policy",
+                  policy.public.statusDecision.owner,
+                  file.path,
+                  "use a public status represented by the accepted public lifecycle policy"
+                ),
+              ]),
+          ...(Option.contains(status, "published") &&
+          !HashMap.has(bindings.acceptedRecords, file.path)
+            ? [
+                diagnostic(
+                  "owner-policy",
+                  policy.public.statusDecision.owner,
+                  file.path,
+                  "bind this published public path to an addressable accepted record"
+                ),
+              ]
+            : []),
+        ];
       }
-    } else {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          policy.public.statusDecision.owner,
-          binding.record,
-          "restore the addressable accepted record or remove its published-path binding"
-        )
-      );
-    }
-    if (!publicFile || statusFor(publicFile) !== "published") {
-      result.push(
-        diagnostic(
-          "owner-policy",
-          policy.public.statusDecision.owner,
-          binding.path,
-          "remove the stale accepted-record binding or restore the exact published public path"
-        )
-      );
-    }
-  }
-  return result;
+    ),
+    ...Array.flatMap(
+      policy.public.statusDecision.acceptanceRecords,
+      (binding) => {
+        const publicFile = Array.findFirst(
+          inspection.files,
+          (file) => file.path === binding.path
+        );
+        const recordFile = Array.findFirst(
+          inspection.files,
+          (file) => file.path === binding.record
+        );
+        return [
+          ...Option.match(recordFile, {
+            onNone: () => [
+              diagnostic(
+                "owner-policy",
+                policy.public.statusDecision.owner,
+                binding.record,
+                "restore the addressable accepted record or remove its published-path binding"
+              ),
+            ],
+            onSome: () =>
+              HashMap.get(
+                inspection.acceptanceRecords ??
+                  HashMap.empty<string, PublicPageAcceptanceRecord>(),
+                binding.record
+              ).pipe(
+                Option.match({
+                  onNone: () => [
+                    diagnostic(
+                      "owner-policy",
+                      policy.public.statusDecision.owner,
+                      binding.record,
+                      "replace this file with a valid accepted page-level record"
+                    ),
+                  ],
+                  onSome: (acceptanceRecord) =>
+                    acceptanceRecord.targetPath === binding.path
+                      ? []
+                      : [
+                          diagnostic(
+                            "owner-policy",
+                            policy.public.statusDecision.owner,
+                            binding.record,
+                            `bind the accepted record targetPath exactly to ${binding.path}`
+                          ),
+                        ],
+                })
+              ),
+          }),
+          ...(Option.exists(publicFile, (file) =>
+            statusFor(file).pipe(Option.contains("published"))
+          )
+            ? []
+            : [
+                diagnostic(
+                  "owner-policy",
+                  policy.public.statusDecision.owner,
+                  binding.path,
+                  "remove the stale accepted-record binding or restore the exact published public path"
+                ),
+              ]),
+        ];
+      }
+    ),
+  ];
 };
 
 export const inspectDocumentation = (
   inspection: DocumentationInspection
 ): DocumentationReport => {
-  const paths = new Set(Array.map(inspection.files, (file) => file.path));
+  const paths = HashSet.fromIterable(
+    Array.map(inspection.files, (file) => file.path)
+  );
   const diagnostics = [
     ...inspectOwners(inspection, paths),
     ...inspectPublicStatus(inspection),
@@ -496,7 +574,7 @@ export const inspectDocumentation = (
       );
       if (pathClass === "workspace-manifest") {
         const readme = file.path.replace(/package\.json$/u, "README.md");
-        return paths.has(readme)
+        return HashSet.has(paths, readme)
           ? []
           : [
               diagnostic(

@@ -1,5 +1,12 @@
+import { Array as EffectArray, Option, Record, Schema } from "effect";
+
 const strictAppBoundaryPaths = [
+  "apps/docs/scripts/cloudflare-built-proof.boundary.ts",
+  "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+  "apps/docs/scripts/cloudflare-built-browser.live.ts",
+  "apps/docs/scripts/test-cloudflare-built.tsx",
   "apps/docs/scripts/cloudflare-hosted-proof.boundary.ts",
+  "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
   "apps/docs/scripts/test-cloudflare-hosted.tsx",
   "apps/docs/src/lib/runtime-factory.server.ts",
   "apps/docs/src/lib/runtime.server.ts",
@@ -20,24 +27,36 @@ const strictAppBoundaryPaths = [
   "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ] as const;
 
-export type StrictAppBoundaryPath = (typeof strictAppBoundaryPaths)[number];
-export type StrictAppBoundarySources = Readonly<
-  Record<StrictAppBoundaryPath, string>
->;
+export const StrictAppBoundaryPath = Schema.Literals(strictAppBoundaryPaths);
+export type StrictAppBoundaryPath = typeof StrictAppBoundaryPath.Type;
+export const StrictAppBoundarySources = Schema.Record(
+  StrictAppBoundaryPath,
+  Schema.String
+);
+export type StrictAppBoundarySources = typeof StrictAppBoundarySources.Type;
 
-export interface StrictAppBoundaryFinding {
-  readonly invariant:
-    | "credential-boundary"
-    | "host-ingress"
-    | "hosted-proof-boundary"
-    | "local-doppler-boundary"
-    | "raw-concurrency"
-    | "runtime-owner"
-    | "runtime-probe"
-    | "workflow-artifact-boundary"
-    | "workflow-boundary";
-  readonly path: StrictAppBoundaryPath;
-}
+export const StrictAppBoundaryFinding = Schema.Struct({
+  invariant: Schema.Literals([
+    "built-proof-boundary",
+    "credential-boundary",
+    "host-ingress",
+    "hosted-proof-boundary",
+    "local-doppler-boundary",
+    "raw-concurrency",
+    "runtime-owner",
+    "runtime-probe",
+    "workflow-artifact-boundary",
+    "workflow-boundary",
+  ]),
+  path: StrictAppBoundaryPath,
+});
+export type StrictAppBoundaryFinding = typeof StrictAppBoundaryFinding.Type;
+
+// Missing source is inspected as empty: required ownership patterns fail closed.
+export const readStrictAppBoundarySource = (
+  sources: StrictAppBoundarySources,
+  path: StrictAppBoundaryPath
+): string => Record.get(sources, path).pipe(Option.getOrElse(() => ""));
 
 const workflowEvidenceRuntimePath =
   "tools/docs-deployment/workflow-evidence.runtime.ts" as const;
@@ -47,7 +66,8 @@ const hostedProofHostPath =
   "apps/docs/scripts/test-cloudflare-hosted.tsx" as const;
 const localDopplerRuntimePath =
   "tools/docs-deployment/local-doppler.runtime.ts" as const;
-const workflowRuntimePaths = strictAppBoundaryPaths.filter(
+const workflowRuntimePaths = EffectArray.filter(
+  strictAppBoundaryPaths,
   (path) =>
     path.includes("workflow-") &&
     path !== workflowEvidenceRuntimePath &&
@@ -61,15 +81,14 @@ const finding = (
 ): StrictAppBoundaryFinding => ({ invariant, path });
 
 const includesAny = (source: string, values: readonly string[]): boolean =>
-  values.some((value) => source.includes(value));
+  EffectArray.some(values, (value) => source.includes(value));
 
 const includesEvery = (source: string, values: readonly string[]): boolean =>
-  values.every((value) => source.includes(value));
+  EffectArray.every(values, (value) => source.includes(value));
 
 const inspectGenericBoundaries = (
   sources: StrictAppBoundarySources
-): StrictAppBoundaryFinding[] => {
-  const findings: StrictAppBoundaryFinding[] = [];
+): readonly StrictAppBoundaryFinding[] => {
   const hostIngressPatterns = [
     "process.env",
     "Bun.file",
@@ -86,78 +105,218 @@ const inspectGenericBoundaries = (
     'concurrency: "unbounded"',
   ] as const;
 
-  for (const path of strictAppBoundaryPaths) {
-    const source = sources[path];
-    const applicableHostIngressPatterns = hostIngressPatterns.filter(
-      (pattern) =>
-        !(
-          (path === hostedProofHostPath && pattern.includes("node:fs")) ||
-          (path === localDopplerRuntimePath && pattern === "process.env")
-        )
-    );
-    if (includesAny(source, applicableHostIngressPatterns)) {
-      findings.push(finding("host-ingress", path));
-    }
-    if (includesAny(source, runtimeExecutionPatterns)) {
-      findings.push(finding("runtime-owner", path));
-    }
-    if (includesAny(source, rawConcurrencyPatterns)) {
-      findings.push(finding("raw-concurrency", path));
-    }
-  }
-  return findings;
+  return EffectArray.flatMap(strictAppBoundaryPaths, (path) => {
+    const source = readStrictAppBoundarySource(sources, path);
+    const isWorkerExecutionHost =
+      path === "apps/docs/src/server.ts" &&
+      source.match(/\bEffect\.runPromise\(/gu)?.length === 1 &&
+      !source.includes("Effect.runSync");
+    return [
+      ...(includesAny(source, hostIngressPatterns)
+        ? [finding("host-ingress", path)]
+        : []),
+      ...(includesAny(source, runtimeExecutionPatterns) &&
+      !isWorkerExecutionHost
+        ? [finding("runtime-owner", path)]
+        : []),
+      ...(includesAny(source, rawConcurrencyPatterns)
+        ? [finding("raw-concurrency", path)]
+        : []),
+    ];
+  });
 };
 
 const inspectHostedProofBoundary = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
-  const boundary = sources[hostedProofBoundaryPath];
-  const host = sources[hostedProofHostPath];
-  const validBoundary = includesEvery(boundary, [
-    "Config.schema(",
-    "Effect.acquireRelease(",
-    "Effect.tryPromise({",
-    "HostedProofConfigurationError",
-    "HostedProofExecutionError",
-    "HostedProofEvidenceError",
-  ]);
+  const boundary = readStrictAppBoundarySource(
+    sources,
+    hostedProofBoundaryPath
+  );
+  const host = readStrictAppBoundarySource(sources, hostedProofHostPath);
+  const live = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts"
+  );
+  const validBoundary =
+    includesEvery(boundary, [
+      "Config.schema(",
+      "Context.Service<",
+      "verifyHostedDeployment",
+      "Schema.encodeEffect(",
+      "HostedProofConfigurationError",
+      "HostedProofExecutionError",
+      "HostedProofEvidenceError",
+    ]) &&
+    !includesAny(boundary, [
+      "CloudflareHostedProofHost",
+      "BrowserHandle",
+      "instanceof",
+      "Promise<",
+    ]);
+  const validLive =
+    includesEvery(live, [
+      "const acquireBrowser = Effect.acquireRelease(",
+      "Effect.tryPromise({",
+      "chromium.launch(",
+      "CloudflareHostedProofLive",
+      "Layer.effect(",
+      "verifyHostedDeployment:",
+      "verifyAssetPropagation:",
+      "Queue.offerUnsafe(",
+      "Ref.update",
+      "HostedProofProbe.makeEffect(",
+    ]) &&
+    !includesAny(live, [
+      "Promise.all",
+      "async ",
+      "instanceof",
+      "CloudflareHostedProofHost",
+      "Effect.runPromise",
+      "Effect.runSync",
+    ]);
   const validHost =
     includesEvery(host, [
-      "runCloudflareHostedProof(",
-      "chromium.launch(",
+      "runCloudflareHostedProof.pipe(",
+      "CloudflareHostedProofLive",
       "BunRuntime.runMain(program)",
-    ]) && !includesAny(host, ["process.env", "Number.parseInt("]);
+    ]) &&
+    !includesAny(host, ["process.env", "Number.parseInt(", "chromium.launch("]);
 
-  return validBoundary && validHost
+  return validBoundary && validLive && validHost
     ? []
     : [finding("hosted-proof-boundary", hostedProofBoundaryPath)];
 };
 
+const inspectBuiltProofBoundary = (
+  sources: StrictAppBoundarySources
+): readonly StrictAppBoundaryFinding[] => {
+  const boundaryPath = "apps/docs/scripts/cloudflare-built-proof.boundary.ts";
+  const boundary = readStrictAppBoundarySource(sources, boundaryPath);
+  const live = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/cloudflare-built-proof.live.layer.ts"
+  );
+  const browser = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/cloudflare-built-browser.live.ts"
+  );
+  const host = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/scripts/test-cloudflare-built.tsx"
+  );
+  const valid =
+    includesEvery(boundary, [
+      "Context.Service<",
+      "verifyBuiltDeployment",
+      "BuiltProofReceipt",
+      "BuiltProofResult",
+      "Schema.TaggedError",
+      "HostedProofSha256",
+    ]) &&
+    !includesAny(boundary, ["BrowserHandle", "Promise<", "instanceof"]) &&
+    includesEvery(live, [
+      "Config.schema(LocalEnvironment)",
+      "LocalCloudflareBuiltProof.of",
+      "Effect.context<",
+      "ChildProcess.make(",
+      "Stream.mapAccum(",
+      "1_048_576",
+      "67_108_864",
+      "10_000",
+      "Effect.scoped",
+      'duration: "5 minutes"',
+      "if (Number(exit) !== 0)",
+      "waitForDescendantExit(",
+      "readArtifactBytes(",
+      "Crypto.Crypto",
+      "new Uint8Array([0])",
+      '"--dry-run"',
+      '"--local"',
+      "BuiltProofReceipt.makeEffect(",
+    ]) &&
+    !includesAny(live, [
+      "Bun.spawn",
+      "async ",
+      "JSON.stringify",
+      "process.env",
+      "createHash(",
+    ]) &&
+    includesEvery(browser, [
+      "Effect.acquireRelease(",
+      "chromium.launch(",
+      "value.close()",
+      "Queue.offerUnsafe(",
+      "capacity: 1024",
+      'strategy: "dropping"',
+      "Queue.size(overflow)",
+      "page.off(",
+      "Effect.forkScoped",
+      "Fiber.interrupt(routeWorker)",
+      'data: Buffer.from("{")',
+      'duration: "2 minutes"',
+      "BuiltBrowserObservation.makeEffect(",
+    ]) &&
+    !includesAny(browser, [
+      "async ",
+      "Promise.all",
+      "Effect.runPromise",
+      "Effect.runSync",
+      "createHash(",
+    ]) &&
+    includesEvery(host, [
+      "Command.make(",
+      'Flag.Boolean("screenshots")',
+      "runCloudflareBuiltProof",
+      "BunRuntime.runMain(",
+      "Schema.encodeEffect(",
+      "proof.verifyBuiltDeployment(",
+      "const saved = yield* fs.readFileString(receiptPath)",
+      "if (saved !==",
+      "receipt.screenshots.length !==",
+      "LocalCloudflareBuiltProofLive",
+    ]) &&
+    !includesAny(host, [
+      "chromium.launch(",
+      "process.env",
+      "Bun.file",
+      "JSON.stringify",
+    ]);
+  return valid ? [] : [finding("built-proof-boundary", boundaryPath)];
+};
+
 const inspectWorkflowBoundaries = (
   sources: StrictAppBoundarySources
-): StrictAppBoundaryFinding[] => {
-  const findings: StrictAppBoundaryFinding[] = [];
-  const requiredPatterns = [
-    "Config.schema(",
-    "readWorkflowReceipt(",
-    "BunRuntime.runMain(program)",
-  ] as const;
+): readonly StrictAppBoundaryFinding[] => {
+  const requiredPatterns = ["Config.schema(", "readWorkflowReceipt("] as const;
 
-  for (const path of workflowRuntimePaths) {
-    if (!includesEvery(sources[path], requiredPatterns)) {
-      findings.push(finding("workflow-boundary", path));
-    }
-  }
-  if (
-    !includesEvery(sources[workflowEvidenceRuntimePath], [
-      "Config.schema(",
-      "runWorkflowEvidence",
-      "BunRuntime.runMain(program)",
-    ])
-  ) {
-    findings.push(finding("workflow-boundary", workflowEvidenceRuntimePath));
-  }
-  return findings;
+  return [
+    ...EffectArray.flatMap(workflowRuntimePaths, (path) =>
+      includesEvery(
+        readStrictAppBoundarySource(sources, path),
+        requiredPatterns
+      ) &&
+      includesAny(readStrictAppBoundarySource(sources, path), [
+        "BunRuntime.runMain(program)",
+        "BunRuntime.runMain(program, { disableErrorReporting: true })",
+      ])
+        ? []
+        : [finding("workflow-boundary", path)]
+    ),
+    ...(includesEvery(
+      readStrictAppBoundarySource(sources, workflowEvidenceRuntimePath),
+      ["Config.schema(", "runWorkflowEvidence"]
+    ) &&
+    includesAny(
+      readStrictAppBoundarySource(sources, workflowEvidenceRuntimePath),
+      [
+        "BunRuntime.runMain(program)",
+        "BunRuntime.runMain(program, { disableErrorReporting: true })",
+      ]
+    )
+      ? []
+      : [finding("workflow-boundary", workflowEvidenceRuntimePath)]),
+  ];
 };
 
 const inspectWorkflowArtifactBoundary = (
@@ -166,8 +325,8 @@ const inspectWorkflowArtifactBoundary = (
   const runtimePath =
     "tools/docs-deployment/workflow-artifact.runtime.ts" as const;
   const servicePath = "tools/docs-deployment/workflow-artifact.ts" as const;
-  const runtime = sources[runtimePath];
-  const service = sources[servicePath];
+  const runtime = readStrictAppBoundarySource(sources, runtimePath);
+  const service = readStrictAppBoundarySource(sources, servicePath);
   const valid =
     includesEvery(runtime, [
       "Config.schema(WorkflowArtifactConfig)",
@@ -191,16 +350,19 @@ const inspectCredentialBoundary = (
 ): readonly StrictAppBoundaryFinding[] => {
   const boundaryPath =
     "tools/docs-deployment/inventory-credentials.boundary.ts" as const;
-  const credentialBoundary = sources[boundaryPath];
-  const inventoryRuntime =
-    sources["tools/docs-deployment/inventory.runtime.ts"];
+  const credentialBoundary = readStrictAppBoundarySource(sources, boundaryPath);
+  const inventoryRuntime = readStrictAppBoundarySource(
+    sources,
+    "tools/docs-deployment/inventory.runtime.ts"
+  );
   const boundaryRequirements = [
     "FileSystem.FileSystem",
     "Schema.fromJsonString(",
     'onExcessProperty: "error"',
   ] as const;
   const runtimeRequirements = [
-    "Config.unwrap(",
+    "Config.schema(",
+    "DocsDeploymentInventoryRuntimeConfig",
     "readDocsDeploymentStateStoreCredentials(",
   ] as const;
 
@@ -218,10 +380,13 @@ const inspectLocalDopplerBoundary = (
   const custodyRuntimePath =
     "tools/docs-deployment/doppler-custody.runtime.ts" as const;
   const commandPath = "tools/docs-deployment/local-doppler.ts" as const;
-  const custody = sources[custodyPath];
-  const custodyRuntime = sources[custodyRuntimePath];
-  const command = sources[commandPath];
-  const runtime = sources[localDopplerRuntimePath];
+  const custody = readStrictAppBoundarySource(sources, custodyPath);
+  const custodyRuntime = readStrictAppBoundarySource(
+    sources,
+    custodyRuntimePath
+  );
+  const command = readStrictAppBoundarySource(sources, commandPath);
+  const runtime = readStrictAppBoundarySource(sources, localDopplerRuntimePath);
   const valid =
     includesEvery(custody, [
       "FileSystem.FileSystem",
@@ -245,7 +410,9 @@ const inspectLocalDopplerBoundary = (
     !command.includes("process.env") &&
     includesEvery(runtime, [
       "checkDopplerCustody(",
-      'runLocalDocsWithDoppler("doppler", process.env)',
+      'runLocalDocsWithDoppler("doppler", environment)',
+      "readLocalDopplerEnvironment(",
+      "ConfigProvider.fromEnv(",
       "disableErrorReporting: true",
     ]);
 
@@ -256,9 +423,15 @@ const inspectDocsRuntimeBoundary = (
   sources: StrictAppBoundarySources
 ): readonly StrictAppBoundaryFinding[] => {
   const factoryPath = "apps/docs/src/lib/runtime-factory.server.ts" as const;
-  const runtimeFactory = sources[factoryPath];
-  const runtimeComposition = sources["apps/docs/src/lib/runtime.server.ts"];
-  const serverAdapter = sources["apps/docs/src/server.ts"];
+  const runtimeFactory = readStrictAppBoundarySource(sources, factoryPath);
+  const runtimeComposition = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/src/lib/runtime.server.ts"
+  );
+  const serverAdapter = readStrictAppBoundarySource(
+    sources,
+    "apps/docs/src/server.ts"
+  );
   const forbiddenFactoryPatterns = [
     "globalThis.crypto",
     "randomUUID",
@@ -266,9 +439,20 @@ const inspectDocsRuntimeBoundary = (
   ] as const;
   const factoryRequirements = ["Context.Service", "Ref.make("] as const;
   const adapterRequirements = [
-    "docsRuntime.runPromise(",
+    "fetch: (request: Request)",
+    "Effect.runPromise(",
+    "Promise.resolve(startHandler(request))",
+    "return response;",
+    "const context = yield* docsRuntime.contextEffect;",
     "readDocsRuntimeProbe",
-    "Schema.encodeUnknownEffect(",
+    "Effect.provide(context)",
+    "Schema.encodeEffect(DocsRuntimeProbeSnapshot)",
+    "name !== runtimeProofResponseHeader",
+    "name !== runtimeProofIsolateHeader",
+    "new Response(response.body",
+    "status: response.status",
+    "statusText: response.statusText",
+    "{ signal: request.signal }",
   ] as const;
   const valid =
     !/^let\s+/mu.test(runtimeFactory) &&
@@ -277,7 +461,9 @@ const inspectDocsRuntimeBoundary = (
     runtimeComposition.includes("Random.nextIntBetween(") &&
     runtimeComposition.match(/createDocsRuntime\(/gu)?.length === 1 &&
     runtimeComposition.match(/createDocsRuntimeProbeLayer\(/gu)?.length === 1 &&
-    includesEvery(serverAdapter, adapterRequirements);
+    includesEvery(serverAdapter, adapterRequirements) &&
+    serverAdapter.indexOf("const context = yield* docsRuntime.contextEffect;") >
+      serverAdapter.indexOf("return response;");
 
   return valid ? [] : [finding("runtime-probe", factoryPath)];
 };
@@ -289,6 +475,7 @@ export const inspectStrictAppBoundaries = (
   ...inspectWorkflowBoundaries(sources),
   ...inspectWorkflowArtifactBoundary(sources),
   ...inspectHostedProofBoundary(sources),
+  ...inspectBuiltProofBoundary(sources),
   ...inspectCredentialBoundary(sources),
   ...inspectLocalDopplerBoundary(sources),
   ...inspectDocsRuntimeBoundary(sources),

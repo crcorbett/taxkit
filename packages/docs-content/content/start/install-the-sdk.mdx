@@ -1,7 +1,7 @@
 ---
 title: "Install the SDK"
 description: "Install the target TypeScript SDK packages and understand the current release status."
-status: "draft"
+status: "published"
 ---
 
 # Install the SDK
@@ -36,12 +36,12 @@ Effect facade and schema re-exports.
 ## Verify an import
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 console.log(report.liability.cents);

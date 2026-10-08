@@ -1,0 +1,549 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-content-owner",
+  "observedAt": "2026-10-06T10:57:03Z",
+  "task": "CSF-T005 / DEV-76",
+  "status": "Public copy corrections qualified; whole T005 remains in progress",
+  "baseHead": "bd9df35a22e3395bba1cb4134cdbbae8c4f5d458",
+  "actorAuthority": {
+    "principal": "Cooper",
+    "actor": "Codex",
+    "operation": "Approved local implementation, review, tests, commits, pushes and draft PRs",
+    "environment": "local; no provider operation"
+  },
+  "outcome": [
+    "Sixteen named source corrections retain draft status and all expected tax fixtures.",
+    "Two copied external-input fences use one compiled source owner.",
+    "The OpenAPI source check requires the actual snapshot/test pointers beside its endpoint and request-schema references.",
+    "Both current HTTP error JSON examples pass the owning CalculatorApiErrorEnvelope decoder with excess fields rejected."
+  ],
+  "impact": {
+    "changeRequired": [
+      "Sixteen public MDX pages",
+      "Docs-content validation policy and package README",
+      "Docs-content patch Changeset",
+      "Active plan, task evidence and this receipt"
+    ],
+    "preserve": [
+      "All 61 authored draft statuses and empty acceptance bindings",
+      "Original integration-template bytes and tax calculations",
+      "Retained docs runtime and historical evidence",
+      "Metrics deferral and dependency versions"
+    ],
+    "notApplicable": [
+      "Runbook procedure changes",
+      "Provider, deployment, publication or credential operations"
+    ]
+  },
+  "pageReviews": [
+    {
+      "path": "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+      "baseSha256": "21d7ec0db402b4e4ee197d444cf876788a32145fd80b0ab4de54f794a200b283",
+      "sourceSha256": "2d06b3b54e31ee95d66efb41fa0667f74ffdd1fd4500d01fbb98e1c040bbc327",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Separate the native root dev pair from the retained standalone and Portless commands; confirm both against the API manifest and README."
+    },
+    {
+      "path": "packages/docs-content/content/api/openapi-reference.mdx",
+      "baseSha256": "273f9a4c40ac9d143cf3b46d6b79dd2674f41d3c122a1848e122434fe475653e",
+      "sourceSha256": "2cdcf06f7493799ec1c2301b7e9f6141ef3305e6b3c35507be069f2d10797b94",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Route reference readers to the generated HTTP document, the actual checked snapshot and its existing regeneration test; remove internal validation policy from the public task."
+    },
+    {
+      "path": "packages/docs-content/content/api/overview.mdx",
+      "baseSha256": "bb5b43f82df9fecca45973aecdec7ca1ba224dae08156bf5889f8e71e4abc047",
+      "sourceSha256": "0da6de0157ef8b9911e1b0bfb7495c95431a4c95c928d5278e44792b5d580f55",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Describe browser HTTP and device-side SDK choices without claiming browsers cannot import the SDK."
+    },
+    {
+      "path": "packages/docs-content/content/concepts/reports.mdx",
+      "baseSha256": "ee01630caf2ca244e9220567b5036511d76b55a5e6a4b4cfbf4f6ef082fccaa8",
+      "sourceSha256": "08a5f782ecfef10ca86da6bf67ac2f02c9fb1db625fc430827558a95c356c595",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Label the annual report output as a retained 2025-26 fixture and link its pending Medicare review limitation."
+    },
+    {
+      "path": "packages/docs-content/content/contributing/add-a-rule.mdx",
+      "baseSha256": "d7e16881d21e92d67f691f594f69efdc18013922cc97d37a406166de297b4609",
+      "sourceSha256": "6074cf1069234dc03c52b9f1c8f8348df74e6bae60d4e83797e2db67b190a26a",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Match the actual curried Schedule 1 Layer definition and identify the private surrounding definitions needed by this excerpt."
+    },
+    {
+      "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+      "baseSha256": "23c2de0a247b6355403a1cce09c15e679b460c1fc5d5d22c802ff9ff91c8777d",
+      "sourceSha256": "b5600514743f21f099a5f6058432cced30554cb94e35b3ed9d22ba8dd6fbcf95",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Describe HTTP as the choice for a server calculation and link the browser SDK alternative."
+    },
+    {
+      "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+      "baseSha256": "ed043b2bd3997face8730a85d77f33e1f9f2f8fe6c64a139ede2c8729644eee7",
+      "sourceSha256": "c04c6e6933f922cf01f382e59bf8f3c6b3b17e480860ba499c7f3e3d9dec0f43",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Scope the example to the retained 2025-26 calculator and make the current-law proof limitation explicit."
+    },
+    {
+      "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+      "baseSha256": "e45eaa92b1c5684822f44a696d0bd8c31e56d69255455cc9e54b24b7adf496dd",
+      "sourceSha256": "c0df00d8f577a106b8c0c9fab0dc3adc8268766b50eee919ba5b84ffdd55bbdf",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Allow a compatible TypeScript runtime and distinguish external-input checks from safe calculation failure handling."
+    },
+    {
+      "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+      "baseSha256": "3631355f4d8e717d61adb2c542be3f6997953599b0055efae7b5e790cd4e1449",
+      "sourceSha256": "c04191263dbe79000d287e5c88125f1b1a5137d3094fabf6b63d67a8ad72e2e4",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Require the owning input decoder before typed calculation; keep the already checked complete source fence."
+    },
+    {
+      "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+      "baseSha256": "9ae617a01f379241d45a106c176b84a3d0aec89a36acf0d0360d1dca4b31925e",
+      "sourceSha256": "e7d150f389b38ee3fc6c42fe8770f485c776fb8f5a925bf5696c45023de76f7b",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Scope the equal annual result to the retained fixture and link the Medicare review limitation."
+    },
+    {
+      "path": "packages/docs-content/content/reference/errors.mdx",
+      "baseSha256": "58549e267ef302e1852345d72aff31e8f4ccdad7037978b658b13da274a44703",
+      "sourceSha256": "21850516becc49655946a4071dc22eafa0cdc7031af65fc60cc8e0da336410a2",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Restore calculator identity and issue tags in the canonical HTTP example; document the client-closed error and separate disposal error."
+    },
+    {
+      "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+      "baseSha256": "8b2a64e448e7d412885d5fe17a5da2170abdcb44b2c8666fc72c99ed32997e8d",
+      "sourceSha256": "d8d05eecabb969d4e904ab7129cff7cc51c6e915250017b8c06b1c39def241a1",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Describe caller-owned plain client cleanup and direct helper cleanup without implying a package-global runtime."
+    },
+    {
+      "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+      "baseSha256": "d536fd323b56bbe30a2a07d9c10d91bef4c5ef23af87a9346a2c8c2728954b5a",
+      "sourceSha256": "49744fa9c9a132c62ad90fdf61c845e010b53ea5ed2c38c7e0cb6917a1bfba8e",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Describe the implemented browser-safe root and AU entrypoints beside server calls."
+    },
+    {
+      "path": "packages/docs-content/content/sdk/type-safety.mdx",
+      "baseSha256": "17fc46dc9c875af7d805488e019b1875b0c80d1fb72a9c83daf94054721e53aa",
+      "sourceSha256": "cd78477c196b3f662b8a3d856e26f39a080a68624a7169917296266f7011805c",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Replace the non-compiling runtime example with the complete checked external-input program; retain the intentional compile-time rejected input."
+    },
+    {
+      "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+      "baseSha256": "38feb2ee0543826abdf285e8c40d643da5f8df250f042b4ece8dee7faf31605f",
+      "sourceSha256": "991769a3e79f90571406b618cc2289fb09ffffdc9e2bef87370616f8aa09605a",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Give browser callers both device and server choices in the diagram, matching the prose and current SDK surface."
+    },
+    {
+      "path": "packages/docs-content/content/start/overview.mdx",
+      "baseSha256": "7c3818ebc10e25715ea62123451ad839715d9f9148f100e69532da485f0845fa",
+      "sourceSha256": "47b2d11161cdbd55a144991d4ec062df04e5e66bc3e4b88cff858b4f782eda92",
+      "lifecycle": "draft",
+      "decision": "Source correction reviewed; publication acceptance remains separate",
+      "review": "Align browser choices and caller diagrams with the shared calculator service and current private SDK status."
+    }
+  ],
+  "sourceIdentities": [
+    {
+      "path": ".changeset/reviewed-public-docs-guidance.md",
+      "sha256": "f90cf4815a2451575661a454e2929a14f056195677975a10b33690f6dbc3c1e2"
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "sha256": "2e9e2bdbea7e343e63bfddd097dc21cfbfe3ecbe76ca04d3084f8f17d319998f"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "40b828694170acfd9018e5aebbec15a49c2bb231d2b120e585ec51d41a10c29b"
+    },
+    {
+      "path": "packages/docs-content/README.md",
+      "sha256": "de797f1dc51fe68fd24dfa023db21d62667ff82751976c08a2297d1277d418d4"
+    },
+    {
+      "path": "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+      "sha256": "2d06b3b54e31ee95d66efb41fa0667f74ffdd1fd4500d01fbb98e1c040bbc327"
+    },
+    {
+      "path": "packages/docs-content/content/api/openapi-reference.mdx",
+      "sha256": "2cdcf06f7493799ec1c2301b7e9f6141ef3305e6b3c35507be069f2d10797b94"
+    },
+    {
+      "path": "packages/docs-content/content/api/overview.mdx",
+      "sha256": "0da6de0157ef8b9911e1b0bfb7495c95431a4c95c928d5278e44792b5d580f55"
+    },
+    {
+      "path": "packages/docs-content/content/concepts/reports.mdx",
+      "sha256": "08a5f782ecfef10ca86da6bf67ac2f02c9fb1db625fc430827558a95c356c595"
+    },
+    {
+      "path": "packages/docs-content/content/contributing/add-a-rule.mdx",
+      "sha256": "6074cf1069234dc03c52b9f1c8f8348df74e6bae60d4e83797e2db67b190a26a"
+    },
+    {
+      "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+      "sha256": "b5600514743f21f099a5f6058432cced30554cb94e35b3ed9d22ba8dd6fbcf95"
+    },
+    {
+      "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+      "sha256": "c04c6e6933f922cf01f382e59bf8f3c6b3b17e480860ba499c7f3e3d9dec0f43"
+    },
+    {
+      "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+      "sha256": "c0df00d8f577a106b8c0c9fab0dc3adc8268766b50eee919ba5b84ffdd55bbdf"
+    },
+    {
+      "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+      "sha256": "c04191263dbe79000d287e5c88125f1b1a5137d3094fabf6b63d67a8ad72e2e4"
+    },
+    {
+      "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+      "sha256": "e7d150f389b38ee3fc6c42fe8770f485c776fb8f5a925bf5696c45023de76f7b"
+    },
+    {
+      "path": "packages/docs-content/content/reference/errors.mdx",
+      "sha256": "21850516becc49655946a4071dc22eafa0cdc7031af65fc60cc8e0da336410a2"
+    },
+    {
+      "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+      "sha256": "d8d05eecabb969d4e904ab7129cff7cc51c6e915250017b8c06b1c39def241a1"
+    },
+    {
+      "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+      "sha256": "49744fa9c9a132c62ad90fdf61c845e010b53ea5ed2c38c7e0cb6917a1bfba8e"
+    },
+    {
+      "path": "packages/docs-content/content/sdk/type-safety.mdx",
+      "sha256": "cd78477c196b3f662b8a3d856e26f39a080a68624a7169917296266f7011805c"
+    },
+    {
+      "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+      "sha256": "991769a3e79f90571406b618cc2289fb09ffffdc9e2bef87370616f8aa09605a"
+    },
+    {
+      "path": "packages/docs-content/content/start/overview.mdx",
+      "sha256": "47b2d11161cdbd55a144991d4ec062df04e5e66bc3e4b88cff858b4f782eda92"
+    },
+    {
+      "path": "packages/docs-content/src/validation/checked-snippets.ts",
+      "sha256": "f1a4bba8bcf9fde8438b10707dd938a8598f85ade07e27eefc4db0dbe040f9db"
+    },
+    {
+      "path": "packages/docs-content/src/validation/policy.ts",
+      "sha256": "abe3809e887b55d3821a8db47a56646b38b0d7cfb3af95207b26739e5b698f1a"
+    }
+  ],
+  "checks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev76-page-review-c-format.log"
+    },
+    {
+      "stage": "docs-validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.37,
+      "log": "/private/tmp/dev76-page-review-c-docs-validate.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.31,
+      "log": "/private/tmp/dev76-page-review-c-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "log": "/private/tmp/dev76-page-review-c-runbooks.log"
+    },
+    {
+      "stage": "examples-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-examples",
+        "check-examples"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.2,
+      "log": "/private/tmp/dev76-page-review-c-examples-types.log"
+    },
+    {
+      "stage": "docs-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-content",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.91,
+      "log": "/private/tmp/dev76-page-review-c-docs-tests.log"
+    },
+    {
+      "stage": "verification",
+      "command": [
+        "bun",
+        "run",
+        "verification"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 596.86,
+      "log": "/private/tmp/dev76-page-review-c-verification.log"
+    },
+    {
+      "stage": "root-tests",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 91.38,
+      "log": "/private/tmp/dev76-page-review-c-root-tests.log"
+    },
+    {
+      "stage": "root-build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.41,
+      "log": "/private/tmp/dev76-page-review-c-root-build.log"
+    },
+    {
+      "stage": "docs-browser",
+      "command": [
+        "bun",
+        "run",
+        "--filter=docs",
+        "test:browser"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.68,
+      "log": "/private/tmp/dev76-page-review-c-docs-browser.log"
+    },
+    {
+      "stage": "docs-built",
+      "command": [
+        "bun",
+        "run",
+        "--filter=docs",
+        "test:built"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 11.93,
+      "log": "/private/tmp/dev76-page-review-built-a-docs-built.log"
+    }
+  ],
+  "retainedDocsBuiltProof": {
+    "receiptPath": "tmp/docs-cloudflare/local-workerd-receipt.json",
+    "sha256": "46acf4047be0a5c4178ed01806a5db56cc52cdfa26ce8a29c82402d73aa91c3f",
+    "candidate": {
+      "assetsSha256": "c2c9c9db84eb1754f5cb4909954ca9cc07b295e40f4349a2ae5011db638cdd4a",
+      "deploymentInputSha256": "ea90d3c7a4985c18bf5e03bb5f3b2931fe2a5c1837b0a4ca596280611e632e45",
+      "sourceCommit": "bd9df35a22e3395bba1cb4134cdbbae8c4f5d458",
+      "workerModulesSha256": "1686e11855c09e1fd65bc9e9cb36ad3b1c6c63599526c1787925137f719fddc0",
+      "worktreeQualifiedBeforeCommit": true
+    },
+    "dependencies": {
+      "cloudflareVitePlugin": "1.62.5",
+      "workerd": "1.20261001.1",
+      "wrangler": "4.147.0"
+    },
+    "oracles": {
+      "accessibility": "passed",
+      "assetCacheHeaders": "passed",
+      "assets": "passed",
+      "clientNavigationWithoutDocumentReload": "passed",
+      "clientNotFound": "passed",
+      "concurrentRequestIsolation": "passed",
+      "consoleAndPageErrors": "passed",
+      "directNotFound": "passed",
+      "hydration": "passed",
+      "malformedServerFunction": "passed",
+      "mobileNavigationDisclosure": "passed",
+      "pendingNavigation": "passed",
+      "recoverableError": "passed",
+      "reducedMotion": "passed",
+      "serverFunctionTransport": "passed",
+      "ssr": "passed"
+    },
+    "nonClaims": [
+      "Local workerd does not prove a Cloudflare account, provider deployment, workers.dev URL, remote state, Preview, Production or rollback.",
+      "The startup observation is local workerd evidence; provider startup validation remains required."
+    ],
+    "environment": "Local workerd and Chromium; retained docs app, not replacement Website or hosted deployment"
+  },
+  "earlierSourceHostedQuality": {
+    "head": "bd9df35a22e3395bba1cb4134cdbbae8c4f5d458",
+    "conclusion": "success",
+    "completedAt": "2026-10-06T10:52:14Z",
+    "runId": 37450554220,
+    "jobId": 112225805294,
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37450554220/job/112225805294",
+    "nonClaim": "The new copy-review commit has its own hosted checks after push."
+  },
+  "retainedAttempts": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.36,
+      "log": "/private/tmp/dev76-page-review-b-format.log"
+    },
+    {
+      "stage": "docs-validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.37,
+      "log": "/private/tmp/dev76-page-review-b-docs-validate.log"
+    }
+  ],
+  "diagnosticProbe": {
+    "command": "Pinned Bun with source selection; temporary host reads the two actual JSON fences and uses the API owning Schema",
+    "result": "Both accepted",
+    "failedAttempt": "The first temporary probe imported Effect source directly beside the installed runtime and failed on optional help decoding. Selecting the same installed dist entry as package imports passed without changing the source examples or API contracts."
+  },
+  "publicLifecycle": {
+    "authoredPages": 61,
+    "draftPages": 61,
+    "acceptanceRecords": 0,
+    "navigationStatus": "draft"
+  },
+  "nonClaims": [
+    "These corrections do not accept pages, publish packages or establish public availability.",
+    "Full T005 routes, browser-safe replacement presentation, usable public and Markdown links, discovery and share images remain unfinished.",
+    "Rendered retained-docs checks do not qualify replacement Website routes.",
+    "Fixture results do not prove current-law Medicare correctness; Cooper's scope decision remains unresolved.",
+    "Metrics and exported telemetry are deferred, not completed."
+  ],
+  "rollback": "Revert this bounded source-correction commit; preserve earlier native compiler/contracts and historical evidence. Regenerate MDX through its owning command.",
+  "finalMetadataChecks": [
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.31,
+      "log": "/private/tmp/dev76-page-review-final-b-docs.log"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev76-page-review-final-b-runbooks.log"
+    },
+    {
+      "stage": "docs-validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.06,
+      "log": "/private/tmp/dev76-page-review-final-b-docs-validate.log"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset",
+        "status",
+        "--verbose"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.19,
+      "log": "/private/tmp/dev76-page-review-final-b-changesets.log"
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.44,
+      "log": "/private/tmp/dev76-page-review-final-b-format-check.log"
+    },
+    {
+      "stage": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev76-page-review-final-b-diff-check.log"
+    }
+  ]
+}

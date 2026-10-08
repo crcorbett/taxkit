@@ -1,0 +1,36 @@
+import { assert, it } from "@effect/vitest";
+import { Array, Effect, Option, Result, Schema } from "effect";
+import { __SYMBOL__Id, __SYMBOL__Item, __SYMBOL__Name } from "../src/schemas.js";
+
+it.effect("shares checked brands and rejects invalid fixture values at ingress", () =>
+  Effect.gen(function* () {
+    const id = yield* __SYMBOL__Id.makeEffect("example");
+    const name = yield* __SYMBOL__Name.makeEffect("Example");
+    const item = yield* __SYMBOL__Item.makeEffect({ id, name });
+    const reply = Schema.Struct({ item: __SYMBOL__Item });
+    const wire = yield* Schema.encodeEffect(reply)({ item });
+    assert.deepEqual(yield* Schema.decodeUnknownEffect(reply)(wire), { item });
+    yield* Effect.forEach([
+      { id: "", name: "Example" },
+      { id: "example", name: "" },
+      { id: "example", name: " Example " },
+      { id: "example", name: "x".repeat(201) },
+    ], (input) => Schema.decodeUnknownEffect(__SYMBOL__Item)(input).pipe(
+      Effect.result,
+      Effect.tap((result) => Effect.sync(() => assert.isTrue(Result.isFailure(result)))),
+    ), { concurrency: 1, discard: true });
+    const failed = yield* __SYMBOL__Name.makeEffect("").pipe(Effect.result);
+    assert.isTrue(Result.isFailure(failed));
+  }),
+);
+
+it.effect("keeps source omission and null distinct while consumers use Option", () =>
+  Effect.gen(function* () {
+    const Source = Schema.Struct({ name: Schema.OptionFromOptionalKey(Schema.OptionFromNullOr(__SYMBOL__Name)) });
+    const raw: ReadonlyArray<{ readonly name?: string | null }> = [{}, { name: null }, { name: "Example" }];
+    const values = yield* Effect.forEach(raw, (input) => Schema.decodeUnknownEffect(Source)(input), { concurrency: 1 });
+    const encoded = yield* Effect.forEach(values, (value) => Schema.encodeEffect(Source)(value), { concurrency: 1 });
+    assert.deepEqual(encoded, raw);
+    assert.deepEqual(Array.map(values, (value) => Option.getOrElse(Option.flatten(value.name), () => "absent")), ["absent", "absent", "Example"]);
+  }),
+);

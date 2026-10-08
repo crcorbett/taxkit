@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 /**
  * A domain error raised when a tax calculation cannot be completed.
@@ -8,7 +8,10 @@ import { Schema } from "effect";
 export class CalculationError extends Schema.TaggedError<CalculationError>()(
   "CalculationError",
   {
-    cause: Schema.optional(Schema.Unknown),
+    // Legacy diagnostic data remains opaque; its codec preserves key identity.
+    cause: Schema.OptionFromOptionalKey(
+      Schema.OptionFromUndefinedOr(Schema.Unknown)
+    ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
     message: Schema.String,
   }
 ) {}

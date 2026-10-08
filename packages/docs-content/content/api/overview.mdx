@@ -1,15 +1,15 @@
 ---
 title: "API overview"
-description: "Use HTTP as a thin transport over the SDK and calculator boundary."
-status: "draft"
+description: "Use HTTP to call the shared calculator service."
+status: "published"
 ---
 
 # API overview
 
-Use the HTTP API when the caller cannot import the TypeScript SDK, such as a
-browser client, another language runtime or a service that needs an OpenAPI
-contract. If your caller can run TypeScript in-process, start with the
-[plain SDK](../sdk/plain-sdk.mdx).
+Use the HTTP API when the calculation should run on a server, the caller uses
+another language or you need an OpenAPI contract. A browser can also use the
+SDK's browser-safe entrypoints to calculate on the device. Compare the choices
+in [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx).
 
 ## Use HTTP when
 
@@ -17,29 +17,30 @@ contract. If your caller can run TypeScript in-process, start with the
 | ------------------------------------------ | -------------------------------------------- |
 | Server-side TypeScript calculation         | [Plain SDK](../sdk/plain-sdk.mdx)            |
 | Effect application or in-process transport | [Effect SDK](../sdk/effect-sdk.mdx)          |
-| Browser or non-TypeScript caller           | HTTP API                                     |
+| Browser calculation on a server            | HTTP API                                     |
+| Browser calculation on the device          | [Plain SDK](../sdk/plain-sdk.mdx)            |
+| Non-TypeScript caller                      | HTTP API                                     |
 | Generated endpoint contract                | [OpenAPI reference](./openapi-reference.mdx) |
 
 ## Runtime model
 
-The API does not own tax logic. It decodes transport input, calls the same SDK
-and calculator service boundary as an in-process consumer, then returns the
+The API does not own tax logic. It decodes transport input, calls the same
+calculator service as an in-process SDK consumer, then returns the
 service result or an HTTP error envelope.
 
 ```ts
-Production: HTTP calculate
+HTTP calculate
 
 HTTP caller
   -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> CalculationEngine
+      -> PublicCalculatorService.calculate
+        -> CalculationEngine
       -> CalculatorApiErrorEnvelope for expected service errors
 ```
 
-The calculate route proves the public call graph by using
-`calculateRunRequest`. It still validates facts against the selected
+The calculate route calls `PublicCalculatorService.calculate` directly.
+The service validates facts against the selected
 calculator, so a payload accepted by the generic HTTP schema can fail if it is
 for a different calculator.
 

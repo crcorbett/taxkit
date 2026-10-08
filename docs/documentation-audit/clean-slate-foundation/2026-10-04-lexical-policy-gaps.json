@@ -1,0 +1,122 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "852d246249a42d3a9eef29d80537fa2267630078",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Extend native collection identity to Map/Set/WeakMap/WeakSet global, local, destructured and assigned aliases",
+    "Reject eight Object/Reflect write operations, including captures, callbacks, forwarded methods and nested destructured exports through the shared lexical tracker",
+    "Separate runner-reference captures/exports/callbacks from existing direct-call policy; preserve exact host boundaries",
+    "Qualify installed callback/context runner variants and named/namespace Node runtime imports alongside Bun",
+    "Persistent identity map indexes actual host Reference objects; global built-ins require global scope and empty definitions, reads exclude declarations/write-only identifiers",
+    "Apply three gap corrections incrementally on already migrated strict paths; no canonical asset or broad host permission changed",
+    "One exact new test-only decoding admission owns Schema-decoded external CLI output; no production decoder admission changed"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/binding-tracker.js",
+        "tools/oxlint/effect-rules.js",
+        "tools/oxlint/taxkit-rules.js",
+        "tools/oxlint/lexical-policy.test.ts",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json"
+      ],
+      "reason": "Evidenced binding/runtime/write gaps and actual-command proof"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "packages/**",
+        "apps/**",
+        "AGENTS.md",
+        ".github/workflows/**",
+        "tools/quality-workflow/fixtures/**"
+      ],
+      "reason": "Canonical asset identity, old CLI counts, tax/package behaviour, exact runtime boundaries, hosted authority and ten mutation oracles"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public docs",
+        "operational runbooks",
+        "provider state"
+      ],
+      "reason": "Root checking policy only; no versioned package or external operation"
+    }
+  ],
+  "verification": [
+    {
+      "command": "installed-CLI baseline calculator-scope probe",
+      "result": "one file; only unrelated style findings. Renamed weak constructors, Object/Reflect writes and exported runner reference had no owning diagnostic; not a combined-baseline acceptance claim"
+    },
+    {
+      "command": "focused actual CLI gap cases",
+      "result": "26 passed, including twelve installed runner variants and zero-exit persistent collection/Ref-managed state fixture; captures and later invocation have distinct expected diagnostics"
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed on pinned Bun 1.4.2; no dependency or lockfile changes"
+    },
+    {
+      "command": "bun run check:oxlint:types:task",
+      "result": "passed for tests, shared CLI and configuration; static JavaScript qualification remains pending"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed, all 126 actual CLI cases and 22 successful unchanged package tasks; matching package caches reused"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed, 15 successful unchanged-input tasks with matching caches"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed: types, lint, format, docs/runbooks, 21 skill cases, all 21 Quality cases and all ten isolated mutations; unchanged two-test Chromium proof reused matching cache"
+    },
+    {
+      "command": "hosted Quality run 37182416078",
+      "result": "SUCCESS at exact parent 852d246249a42d3a9eef29d80537fa2267630078; new draft hosted proof is separate"
+    },
+    {
+      "command": "final docs/format/diff checks",
+      "result": "required after receipt finalisation before commit"
+    }
+  ],
+  "recovery_observations": [
+    "Initial alias tracker missed host-defined globals because they resolve to Variable objects instead of null. Installed Oxlint Variable/Reference types and real fixtures qualified global-scope/no-definition recognition",
+    "Initial reference listener counted write-only declaration identifiers twice. Use host isRead() to separate reads; kept every expected count unchanged",
+    "Initial global activation exposed 22 additional legacy host/reference diagnostics. New corrections are explicitly incremental on migrated strict paths; remaining hosts require their own migration rather than broader exceptions",
+    "A duplicate imported/local syntax-name binding prevented plugin loading while extending writer callbacks. Removed the extra import, then all 26 focused and 126 full CLI cases passed."
+  ],
+  "limitations": [
+    "DEV-73 and DEV-74\u201381 remain unfinished",
+    "Other paths, readonly mutable class/domain/contract proof, static JavaScript qualification and semantic/lifetime review remain pending",
+    "Lexical aliases and static member paths are qualified; this is not arbitrary object/dataflow inference",
+    "Existing SDK runtime lifetime and unqualified test-host references remain pending migration",
+    "Medicare correction still awaits Cooper scope decision",
+    "No canonical asset, tax result or production admission changed",
+    "No merge, release, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete root-policy slice; no provider state changed"
+}

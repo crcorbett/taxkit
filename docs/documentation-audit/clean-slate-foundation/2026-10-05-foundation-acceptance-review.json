@@ -1,0 +1,262 @@
+{
+  "document_type": "acceptance-review-receipt",
+  "date": "2026-10-05",
+  "issue": "DEV-73",
+  "parent_revision": "d9abbb374cec0232636d5eb82696ab1548c6189b",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "repository": "crcorbett/taxkit",
+    "environment": "pinned local Bun/native TypeScript/Chromium; no provider operation"
+  },
+  "implemented": [
+    "Extend safe inline Promise rejection mapping to all six owned source extensions, preserving the exact strict-only fixture exclusions and all other host admissions",
+    "Inline browser Promise error mappings in both private proof adapters without changing their closed errors or observations",
+    "Six actual-command path canaries require exactly one missing mapping diagnostic with an accepted inline mapping in the same file",
+    "Refresh the native service, fact, rule, configuration and package guides against current owning code; distinguish historical provider claims and proposed tax features",
+    "Narrow the pending-navigation route interceptor to the same-origin /_serverFn/** transport; unrelated script/assets are not intercepted",
+    "Actual browser cases include a late script asset and both screenshot/no-screenshot paths",
+    "Refresh two repository-local skill profiles and their independent overlay hashes; canonical upstream trees/digests remain unchanged"
+  ],
+  "semantic_review": [
+    {
+      "paths": [
+        "packages/core/src/facts/descriptor.ts",
+        "packages/core/src/rules/descriptor.ts",
+        "packages/core/src/primitives",
+        "packages/rules/au/pay/src/facts",
+        "packages/rules/au/pay/src/parameters",
+        "packages/rules/au/pay/src/rules",
+        "packages/rules/au/income-tax/src",
+        "packages/rules/au/stsl/src"
+      ],
+      "finding": "Canonical Schema values and branded identities remain at their owners; generic fact/rule descriptors preserve service/value inference rather than duplicate an ordinary DTO. Persistent collections and readonly fields replace mutation. Fixed 2025\u201326 rates and golden outcomes are retained.",
+      "next_owner": "T004 owns the deliberate fresh calculator/SDK interfaces; Medicare correction remains a separate unresolved decision."
+    },
+    {
+      "paths": [
+        "packages/calculators/src/catalog.ts",
+        "packages/calculators/src/live.layer.ts",
+        "packages/core/src/engine/calculation-engine.ts",
+        "packages/rules/au/pay/src/calculator/take-home-pay.boundary.ts",
+        "packages/rules/au/income-tax/src/calculator/annual-tax.boundary.ts"
+      ],
+      "finding": "The generic catalogue constructor couples the selected Schema and typed continuation before heterogeneous storage erases that type. Internal continuations use FromInput scenario constructors, not the public unknown-input decoders. The engine supplies deterministic fact/rule Layers; it neither constructs a ManagedRuntime nor acquires a live provider in domain logic. Named calculator service operations own graph validation, execution and report projection.",
+      "next_owner": "T003 composes application/provider runtimes; T004 reviews the fresh public interfaces and reports."
+    },
+    {
+      "paths": [
+        "packages/sdk/typescript/src/client.runtime.ts",
+        "packages/sdk/typescript/src/types.ts",
+        "packages/sdk/typescript/src/effect.ts",
+        "packages/api/http/src/client",
+        "packages/api/http/src/server",
+        "apps/api/src"
+      ],
+      "finding": "Each plain SDK client owns its native runtime, shared disposal result and scoped calls. One-shot helpers close their temporary client. Descriptor dispatch restores erased reports with the selected owning Schema. HTTP handlers delegate to the calculator service; private fetch adapters restore their checked client result. No raw provider client or generic provider callback is exposed. Actual interrupted/failed/concurrent disposal and browser tests qualify these lifetimes.",
+      "next_owner": "T003 adds a shared native RPC contract; T004 expands UI and deliberately changes public package interfaces."
+    },
+    {
+      "paths": [
+        "apps/docs/src/lib/docs",
+        "apps/docs/src/lib/runtime-factory.server.ts",
+        "apps/docs/src/server.ts",
+        "apps/web/src/lib",
+        "apps/web/src/routes/index.tsx",
+        "apps/web/vite.config.ts",
+        "packages/docs-content/src",
+        "packages/docs-fumadocs/src"
+      ],
+      "finding": "Docs producer/loader transport and route consumers keep their separate representation boundaries; browser leaves receive canonical values. The web scaffold uses module-owned native server/browser runtimes and a route context limited to the two native run methods; route abort interrupts HTTP. Public browser config includes only the build-selected HTTP URL. Generated Fumadocs values cross a closed named service before TaxKit content decoding. React/Effect own changing state and resource disposal.",
+      "next_owner": "T003 introduces the same-stage calculator app; T005 replaces the old docs host and discovery ownership."
+    },
+    {
+      "paths": [
+        "apps/docs/scripts/cloudflare-built-proof.live.layer.ts",
+        "apps/docs/scripts/cloudflare-built-browser.live.ts",
+        "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+        "packages/scripts/src/release-readiness",
+        "packages/sdk/typescript/scripts",
+        "tools/docs-deployment",
+        "tools/documentation",
+        "tools/quality-workflow",
+        "tools/oxlint"
+      ],
+      "finding": "Native FileSystem/HTTP/Crypto/ChildProcess/Queue/Ref/Scope own I/O and changing observations. Child output has fixed limits, subprocesses are released and receipt writing follows cleanup/readback. Private Playwright callbacks enqueue bounded observations; no Page leaves the adapter. The wider Promise-mapping rule exposed extracted catch callbacks in two adapters; this slice corrects them inline. Codecs remain at file/process/config/provider/transport or intentional fixture ingress and explicit egress.",
+      "next_owner": "Later app/infrastructure slices must reuse these checked boundaries; the historical proof packet is retained."
+    },
+    {
+      "paths": [
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "tools/quality-workflow/release-boundary.test.ts",
+        "packages/infrastructure/src",
+        "alchemy.run.ts",
+        "tools/skills/canonical-skill-baseline.json",
+        ".agents/skills"
+      ],
+      "finding": "All owned source extensions receive the canonical strict rules; five exact unexecuted lint inputs are excluded only from that strict override. Runtime/Promise host permissions do not allow assignments, loops or native mutators. Synthetic assignment/method permissions exist only at one generated canary path with rejected neighbours. Alchemy native memo/input ownership and readonly Output options are qualified; copied canonical skill/vendor/generated files retain explicit exclusions.",
+      "next_owner": "T003/T007 replace the one-docs-resource graph; the current graph does not prove a paired app, domain, DNS, secret or provider change."
+    }
+  ],
+  "checks": [
+    {
+      "command": "bun run test:oxlint:task / native lint compiler",
+      "outcome": "pass: 407 real CLI cases and checked source types",
+      "logs": [
+        "foundation-review-cli-tests.log",
+        "foundation-review-lint-types-qualified.log"
+      ]
+    },
+    {
+      "command": "native compiler for extracted guide snippets",
+      "outcome": "pass: five actual guide excerpts with their owning imports and exact workspace source mappings; no snippet executed",
+      "logs": [
+        "foundation-review-guide-examples.log"
+      ]
+    },
+    {
+      "command": "bun run test",
+      "outcome": "pass: all 24 package tasks, 23 matching caches; changed native docs scripts executed",
+      "logs": [
+        "foundation-review-root-tests.log"
+      ]
+    },
+    {
+      "command": "bun run build",
+      "outcome": "pass: all 15 tasks, 14 matching caches; corrected invocation supplies the existing pinned Chromium path",
+      "logs": [
+        "foundation-review-root-build-qualified.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass before the narrow routing/profile correction: all 32 Quality cases, including 13 isolated cases in 370.37 seconds; superseded by the corrected-candidate result below",
+      "logs": [
+        "foundation-review-full-verification.log"
+      ]
+    },
+    {
+      "command": "bun run --filter=docs test:scripts / native docs scripts compiler / root lint",
+      "outcome": "pass after routing correction: 54 native script cases, including five browser cases with late assets, screenshots/no screenshots and interrupted-body cleanup; all 397 owned sources pass canonical lint",
+      "logs": [
+        "foundation-review-corrected-native-tests.log",
+        "foundation-review-corrected-docs-types.log",
+        "foundation-review-corrected-root-lint.log"
+      ]
+    },
+    {
+      "command": "bun run verification (corrected candidate)",
+      "outcome": "pass: 32 Quality cases including 13 isolated cases in 381.59 seconds; 206 deployment cases, 21 skill cases, 16 evaluation cases, both Knip checks, all 24 type tasks, 24 SDK browser cases and four website browser cases. Matching Turbo caches remain identified in the log.",
+      "logs": [
+        "foundation-review-corrected-full-verification.log"
+      ]
+    },
+    {
+      "command": "bun run test (corrected candidate)",
+      "outcome": "pass: all 24 tasks, 23 matching caches; changed docs scripts execute all 54 cases and 19 server cases; retained calculator golden checks pass",
+      "logs": [
+        "foundation-review-corrected-root-tests.log"
+      ]
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass: Bun 1.4.2 checks 792 installs across 1020 packages with no changes; native compiler replacement hash matches",
+      "logs": [
+        "foundation-review-final-frozen.log"
+      ]
+    },
+    {
+      "command": "bun run build (final candidate)",
+      "outcome": "pass: all 15 tasks, 14 matching caches; changed docs build executes with the existing pinned Chromium path supplied",
+      "logs": [
+        "foundation-review-final-build.log"
+      ]
+    },
+    {
+      "command": "bun run --filter=docs test:cloudflare-built -- --screenshots; then the same command without screenshots",
+      "outcome": "pass sequentially after the route correction: actual built workerd and Chromium check initial rendering, immutable assets, absent navigation document loads, three server-function requests, malformed JSON and scoped interruption cleanup; no browser diagnostics. Screenshots run saves desktop/mobile captures; default run saves none. Both runs check receipt cleanup/readback.",
+      "logs": [
+        "foundation-review-corrected-real-worker-screenshots.log",
+        "foundation-review-corrected-real-worker-default.log"
+      ]
+    }
+  ],
+  "documentation_impact": {
+    "Change required": [
+      "docs/architecture/effect-services.md",
+      "docs/architecture/facts.md",
+      "docs/architecture/rules-and-parameters.md",
+      "docs/architecture/configuration.md",
+      "docs/architecture/package-boundaries.md",
+      "docs/architecture/README.md",
+      "docs/architecture/testing-and-quality.md",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json",
+      "docs/documentation-audit/README.md",
+      "oxlint.config.ts",
+      "tools/oxlint/portable-rules.test.ts",
+      "apps/docs/scripts/cloudflare-built-browser.live.ts",
+      "apps/docs/scripts/cloudflare-hosted-proof.live.layer.ts",
+      ".agents/skills/docs-maintainer/references/repository-profile.md",
+      ".agents/skills/package-structure/references/repository-profile.md",
+      "tools/skills/canonical-skill-baseline.json",
+      "apps/docs/scripts/cloudflare-built-browser.live.test.ts"
+    ],
+    "Preserve": [
+      "Canonical upstream skill trees/digests and explicit fixture containment; local profile overlays have independent refreshed hashes",
+      "All previous failed/historical evidence and the retained source manifest",
+      "Package manifests/exports, dependencies, generated outputs, public MDX/navigation and all retained tax results",
+      "Existing narrow host/codec/runtime permissions and the fixed release train"
+    ],
+    "N/A": {
+      "Changeset": "Private proof scripts, lint enforcement and maintainer guides only; no package-facing contract change",
+      "runbook/provider operation": "No command, provider target or procedure changed; no external apply",
+      "new public/generated documentation": "No public content or generated API contract changed"
+    }
+  },
+  "limitations": [
+    "T002 local completion criteria and required checks pass. Review, hosted qualification of this new commit, merging and provider changes remain separate; T003 through T010 remain unimplemented.",
+    "Local source/runtime proof is not deployment, provider, registry publication or hosted calculator proof",
+    "The companion adad qualification remains exactly 59b0a36ff1bc6f95501734ee65d789a4f5a37fcc; later SDK changes are not qualified there",
+    "Linear comment mutation remains blocked by automatic approval review pending the exact requested user approval; no tracking write is claimed",
+    "CommonJS source is in rule scope; canonical Effect binding analysis follows static imports and aliases. Dynamic/interprocedural imports require semantic review; there is no owned CommonJS Effect workflow in the qualified inventory"
+  ],
+  "recovery": {
+    "failed_observations": [
+      "The wider Promise selector correctly rejected extracted catch functions in both browser proof adapters; safe errors were preserved and their mapping inlined",
+      "Initial config-assertion compiler inference required explicit string keys and Option.exists rather than a narrowed literal Option.contains",
+      "Guide snippet compiler fixture initially needed exact workspace source paths because root isolated dependencies do not link those packages",
+      "An initial build invocation omitted the configured Chromium path and failed with missing browser executable; the correctly configured invocation passed without an installation change",
+      "Repeated built-Worker package invocations failed at route.continue. A temporary diagnostic printed only phase labels and bounded booleans, then restored source. The actual failing route was a script, not a server function: alreadyHandled=true, targetClosed=false, expectedAbort=false. Narrowing interception to the intended RPC path fixes this interference; no browser error is suppressed",
+      "Temporary diagnostic runs and the direct entrypoint pass are separate observations, not accepted substitutes for the exact package command"
+    ],
+    "rollback": "Revert the complete slice to its parent revision; retain previous qualified and failed receipts"
+  },
+  "non_claims": [
+    "No merge, deployment, publication, version application or provider mutation",
+    "No Medicare result correction",
+    "No completed DEV-74\u201381 task or hosted new calculator"
+  ],
+  "previous_hosted_check": {
+    "workflow_run": 37213423930,
+    "head": "d9abbb374cec0232636d5eb82696ab1548c6189b",
+    "conclusion": "success",
+    "url": "https://github.com/crcorbett/taxkit/actions/runs/37213423930",
+    "limit": "Qualifies the previous owned-source coverage candidate, not this uncommitted correction"
+  },
+  "qualified_source": {
+    "parent_revision": "d9abbb374cec0232636d5eb82696ab1548c6189b",
+    "working_tree_changes_included": true,
+    "qualification_before_commit": true,
+    "scope": "All staged source/config/profile changes; subsequent proof/task status edits receive focused documentation checks"
+  },
+  "task_acceptance": {
+    "task": "CSF-T002",
+    "status": "completed locally",
+    "basis": "Exact installed graph, actual source/CLI coverage and negative mutations, retained calculator golden results, native lifetimes/browser evidence and path-evidenced semantic review across the cumulative draft stack",
+    "next_task": "CSF-T003",
+    "external_tracking": "DEV-73 status write is not claimed; automatic approval review remains unresolved"
+  }
+}

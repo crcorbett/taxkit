@@ -1,0 +1,257 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "native settings transport, failure matcher, source fixture or checked artifact changes",
+  "outcome": "qualified local Website settings payload/internal/address failure sub-slice; CSF-T003 remains in progress",
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-74-native-failure-paths",
+    "baseCommit": "3e15c9f919cf275cff95b6061939d71f6e6fe4cb",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "fileCount": 21,
+      "sortedEntriesSha256": "bbbb34619d8d9deea66143e10f1955d903fe721674bb04c1080de7dc8be09311",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and working-file sha256; deleted paths use null; excludes this post-check receipt to avoid self-hashing."
+    }
+  },
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation and controlled test builds",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native Worker/browser proof",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "findings": [
+    {
+      "finding": "Native framework JSON failure reflected a short request marker in the actual Website response.",
+      "owner": "apps/web/src/server.ts",
+      "correction": "Configure one explicit data-free settings function base; reject query input with empty 400 and non-GET with empty 405/Allow GET before framework parsing.",
+      "source": "Installed start-client-core 1.170.34 serialises no payload for a function with no data or client Context; start-server-core 1.169.39 parses supplied payload and serialises errors."
+    },
+    {
+      "finding": "Long privacy marker falsely passed because the native JSON preview truncated it.",
+      "owner": "apps/web/test/native-pair.boundary.test.ts",
+      "correction": "Use short PRIVATE9 marker; derive real function identity from the native generated resolver and require valid settings success as positive control."
+    },
+    {
+      "finding": "Native unexpected internal settings failure could be serialised through the framework instead of the owning host error matcher.",
+      "owner": "apps/web/src/lib/loaders.server.ts",
+      "correction": "Match Cause with native HTTP failure policy, safely report it and return native Response before framework error serialisation; preserve expected checked result encoding."
+    },
+    {
+      "finding": "Draft #131 hosted Quality failed because the native Website test builder resolved api/worker without a direct Website dependency. An existing local root symlink hid the missing declaration.",
+      "owner": "apps/web/package.json and bun.lock",
+      "correction": "Declare api as a Website workspace dev dependency; no package version changes.",
+      "hostedRun": {
+        "pullRequest": 131,
+        "headCommit": "3e15c9f919cf275cff95b6061939d71f6e6fe4cb",
+        "runId": 37230650554,
+        "jobId": 111519396418,
+        "outcome": "failure: Cannot find package api in native source builder"
+      }
+    },
+    {
+      "finding": "Unknown native function IDs did not appear in the response but were reflected in TanStack native logs.",
+      "owner": "apps/web/src/lib/loaders.ts and apps/web/src/server.ts",
+      "correction": "Admit the settings function native generated URL exactly; unknown IDs, extra path parts and missing IDs receive empty 404 before lookup/logging. No copied build ID or replacement resolver.",
+      "redProof": "Actual built Worker returned 500 with nonreflecting 53-byte response, but native logs contained PRIVATE9."
+    }
+  ],
+  "proof": [
+    {
+      "command": "bun run web:test:native-pair",
+      "outcome": "pass: ordinary native pair plus controlled internal-defect Worker; valid data-free settings, fixed empty 400/405/500 responses, positive website.runtime.event and no marker in fault response/logs"
+    },
+    {
+      "command": "temporary removal of the settings reply boundary; actual native rebuild and saved fault test; exact restoration and fresh normal/fault build/tests",
+      "outcome": "pass: removal reflects PRIVATE9 and its exact response assertion fails; restore current source byte-for-byte and both native tests pass"
+    },
+    {
+      "command": "focused actual lint and Website types",
+      "outcome": "pass after scoped source-restoration finaliser uses Effect.orDie; full checks still pending"
+    },
+    {
+      "command": "bun run test; bun run build; bun run verification before dependency correction",
+      "outcome": "pass: 455 actual CLI cases, 27 package/app test tasks, 16 build tasks; full verification includes native normal and settings-defect Workers. This run predates the declared dependency correction."
+    },
+    {
+      "command": "fresh isolated checkout with no node_modules: install, frozen install and bun run web:test:native-pair after declared api dev dependency",
+      "outcome": "pass: 742 installed packages; frozen lock unchanged; both actual native Worker tests pass. Independent fresh dependency resolution removes the local symlink assumption."
+    },
+    {
+      "command": "bun run verification after declared API dependency",
+      "outcome": "pass: full corrected graph, both unused-code inventories, all compiler tasks, real Chromium SDK/Website and normal/internal-fault native Workers. Predates the additional exact function-address check."
+    },
+    {
+      "command": "remove generated-address check; native rebuild, real unknown-address log capture and saved native tests; byte restoration and fresh native rebuild/tests",
+      "outcome": "pass: removed check reflects PRIVATE9 in native logs and saved 404 test fails with status 500; exact restoration makes both normal/internal-defect tests pass."
+    },
+    {
+      "command": "bun run test with provisioned Chromium; bun run api:smoke",
+      "outcome": "pass: 455 actual CLI cases and all 27 package/app tasks; local separate-process HTTP consumer smoke passes. Full final build/verification pending."
+    },
+    {
+      "command": "bun run verification after exact native function-address correction",
+      "outcome": "pass: docs/runbooks/repository paths, all compiler tasks, both unused-code inventories, 32 Quality cases including 13 isolated cases, 24 SDK and 8 Website Chromium tests, actual Wrangler generated declarations and both fresh native normal/internal-defect Worker tests."
+    },
+    {
+      "command": "bun run build with provisioned Chromium after root source-replacement tests finish",
+      "outcome": "pass: all 16 build tasks; no source change required for the browser-path omission."
+    }
+  ],
+  "nativeFixture": {
+    "owner": "apps/web/scripts/native-pair-build.runtime.ts",
+    "changedSource": "apps/web/src/lib/live.server.layer.ts",
+    "injectedOperation": "settings: Effect.die(\"PRIVATE9\")",
+    "ignoredOutput": ".alchemy/native-pair/settings-defect/server",
+    "restoration": "Scoped FileSystem finaliser restores exact original source before ordinary native build; no production test flag or replacement protocol.",
+    "oracle": "Actual output must contain injected die operation; actual native function response and positive safe log must match.",
+    "localPort": 4198,
+    "binding": "Self binding is a genuine native Fetcher capability; the settings operation never performs a calculation or backend request."
+  },
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "paths": [
+        "apps/web/src/lib/config.ts",
+        "apps/web/src/server.ts",
+        "apps/web/src/lib/loaders.server.ts",
+        "apps/web/vite.config.ts",
+        "apps/web/scripts/native-pair-build.runtime.ts",
+        "apps/web/test/native-pair.boundary.test.ts",
+        "apps/web/test/native-settings-failure.boundary.test.ts",
+        "apps/web/vitest.native.config.ts",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "apps/web/package.json",
+        "bun.lock",
+        "apps/web/src/lib/loaders.ts"
+      ],
+      "reason": "Explicit ingress/reply owner and bounded real fault proof; exact encoder permission retains runtime restriction."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "apps/web/README.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/verification/critical-journeys.json",
+        "docs/product-specs/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/README.md"
+      ],
+      "reason": "Native data-free transport, request-local receive-loop clarification, scoped source mutation and bounded evidence."
+    },
+    {
+      "decision": "Preserve",
+      "paths": [
+        "public HTTP/OpenAPI/RPC wire",
+        "historical HGI/HFI artifacts and receipts",
+        ".agents/skills",
+        ".claude/skills",
+        "docs/runbooks",
+        "retained tax results"
+      ],
+      "reason": "No public transport, old proof, canonical skill, operation authority or tax-rule changes."
+    },
+    {
+      "decision": "N/A",
+      "paths": [
+        "Changeset",
+        "public MDX/navigation",
+        "provider/deployment/publication records"
+      ],
+      "reason": "Private Website/host/test work; no public-package change or consequential operation."
+    }
+  ],
+  "limitations": [
+    "Only the named data-free settings transport and injected internal settings defect are qualified; every native framework/global/fatal/trace path is not yet qualified.",
+    "Complete native development pair, cancellation and remaining T003 proof are unfinished.",
+    "Native RPC tracing remains disabled as containment; safe exported tracing remains required later work.",
+    "Local structured console checks do not establish provider log or trace ingestion privacy.",
+    "Long-marker pass and initial removal test stopped at unexpected native status 200; neither was marker-absence proof. Reordered exact short-marker inspection produced the accepted removal failure.",
+    "Draft #131 hosted run 37230650554 failed on the undeclared API build dependency. Fresh local installation proves the correction; hosted success of this follow-up is not yet claimed."
+  ],
+  "rollback": "Revert this private Website failure sub-slice to 3e15c9f919cf275cff95b6061939d71f6e6fe4cb; no external state changed.",
+  "nonClaims": [
+    "No complete CSF-T003/DEV-74 acceptance or overall goal completion.",
+    "No merge, deployment, publication, provider apply, Preview/Production or current external telemetry proof.",
+    "No confirmed Linear update; earlier automatic review restriction remains pending."
+  ],
+  "failedAttempts": [
+    {
+      "command": "repeat bun run test/build without PLAYWRIGHT_BROWSERS_PATH",
+      "outcome": "failure: root docs browser tests and Mermaid documentation build could not locate installed Chromium; did not establish source regressions.",
+      "correction": "Repeat with provisioned browser path; root tests and all 16 builds pass. Builds run after source-replacement tests finish."
+    }
+  ],
+  "parentAudit": {
+    "reviewer": "primary TaxKit implementation owner",
+    "outcome": "bounded Website failure sub-slice reviewed; complete T003 acceptance remains pending",
+    "observations": [
+      "Native generated settings URL owns function identity; no copied build ID, replacement resolver or protocol framing.",
+      "Checked expected settings results remain encoded through the canonical transport Schema. Unexpected Causes use the existing native matcher, safe reporter and native Response.",
+      "One server ManagedRuntime remains the host owner. No new runner or Layer construction occurs inside application operations.",
+      "Scoped source fixture compiles actual native artifacts, removes only its command-owned ignored output and restores exact original bytes before the normal build. Tests require the injected operation and positive safe reporting.",
+      "Exact encoding admission and actual CLI runtime-rejection canaries remain narrow; canonical skills and historical proofs are preserved.",
+      "API dev dependency is explicit in the private Website manifest and frozen workspace lock; a fresh isolated installation qualifies resolution separately from an existing checkout."
+    ]
+  },
+  "environment": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "miniflare": "5.20261001.0-alpha",
+    "browser": "provisioned Chromium through PLAYWRIGHT_BROWSERS_PATH",
+    "authority": "local native Worker and browser only"
+  },
+  "artifacts": {
+    "api": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "fileCount": 55,
+      "sortedEntriesSha256": "b3ae13e383f7230a84c171045ed05ec6bba4f12b9b5860087cb69e472547cf24"
+    },
+    "websiteServer": {
+      "root": "apps/web/dist/server",
+      "fileCount": 28,
+      "sortedEntriesSha256": "6b8a3c8ccd59c7664137401e20c908a119eb10676fbdec4a4c35dac26a75eb78"
+    },
+    "browser": {
+      "root": "apps/web/dist/client",
+      "fileCount": 3,
+      "sortedEntriesSha256": "f7167d259efd52a7e26887dfc943797d56db5f37719051280a2475b6b63678dd"
+    },
+    "settingsDefect": {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "fileCount": 28,
+      "sortedEntriesSha256": "fb98077091875bf38cd52818d2f41d402cfbff78c66390e48246941ce85bfbab"
+    }
+  },
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted repository-relative file paths and file sha256; every regular file under each named artifact root.",
+  "postCheckChanges": {
+    "paths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website-failures.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "scope": "Post-check receipt and active-plan closeout only; qualified application/test/dependency/artifact bytes unchanged.",
+    "checks": [
+      "bun run check:docs",
+      "bun run check:runbooks",
+      "bun run changeset:status",
+      "git diff --cached --check"
+    ]
+  }
+}

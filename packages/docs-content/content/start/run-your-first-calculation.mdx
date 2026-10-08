@@ -1,7 +1,7 @@
 ---
 title: "Run your first calculation"
 description: "Run a copyable SDK script with canonical money input values."
-status: "draft"
+status: "published"
 ---
 
 # Run your first calculation
@@ -17,11 +17,11 @@ or adapt the imports after the SDK is published.
 ## Create a script
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 console.log({
@@ -37,7 +37,7 @@ schema from `@taxkit/core/primitives`, created with the `aud` constructor.
 Pass integer cents rather than floating point dollars.
 
 ```ts
-aud(9_000_000); // AUD 90,000.00
+aud(Cents.make(9_000_000)); // AUD 90,000.00
 ```
 
 ## Use the generic facade
@@ -45,12 +45,12 @@ aud(9_000_000); // AUD 90,000.00
 Australian helpers call the same generic facade that other SDK consumers use:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 

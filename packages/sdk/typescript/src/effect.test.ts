@@ -1,11 +1,21 @@
 import { describe, expect, it } from "@effect/vitest";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { CalculatorServiceError } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Cause, Effect, Exit, Layer } from "effect";
+import {
+  Array as EffectArray,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Match,
+  Option,
+  Schema,
+} from "effect";
 
 import { calculateReport, calculateRunRequest } from "./effect.js";
 import {
@@ -19,7 +29,7 @@ const ServiceLive = PublicCalculatorServiceLive.pipe(
 
 const takeHomeFacts = {
   grossPay: new GrossPay({
-    amount: aud(165_400),
+    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
     period: "weekly",
   }),
   taxFreeThresholdClaimed: true,
@@ -30,6 +40,46 @@ const privatePathSentinel = "/private/taxkit-sentinel/effect-sdk-input.json";
 
 describe("Effect SDK facade", () => {
   it.effect(
+    "keeps selected-calculator help when omitted options use defaults",
+    () =>
+      Effect.gen(function* () {
+        const error = yield* calculateRunRequest(AuPayTakeHomeCalculation, {
+          help: Option.some(Option.some("errors")),
+          payload: {
+            facts: {
+              // @ts-expect-error rejected external input must still reach the selected calculator decoder.
+              grossPay: `${secretSentinel}:${privatePathSentinel}`,
+              taxFreeThresholdClaimed: true,
+            },
+          },
+        }).pipe(Effect.flip);
+        yield* Match.value(error).pipe(
+          Match.tag("CalculatorInputDecodeError", (failure) =>
+            Effect.gen(function* () {
+              expect(
+                EffectArray.map(failure.issues, (issue) => issue.path)
+              ).toContainEqual(["grossPay"]);
+              expect(
+                failure.help.pipe(
+                  Option.flatten,
+                  Option.map((help) => help.length)
+                )
+              ).toEqual(Option.some(2));
+              const wire = yield* Schema.encodeEffect(
+                Schema.toCodecJson(CalculatorServiceError)
+              )(failure);
+              expect(wire).not.toContain(secretSentinel);
+              expect(wire).not.toContain(privatePathSentinel);
+            })
+          ),
+          Match.orElse(() =>
+            Effect.sync(() => expect.fail("Expected selected calculator help"))
+          )
+        );
+      }).pipe(Effect.provide(ServiceLive))
+  );
+
+  it.effect(
     "returns the full canonical calculator run response with decoded report",
     () =>
       Effect.gen(function* () {
@@ -37,16 +87,21 @@ describe("Effect SDK facade", () => {
         const sdkResult = yield* calculateRunRequest(AuPayTakeHomeCalculation, {
           payload: {
             facts: takeHomeFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
         const serviceResult = yield* service.calculate({
           calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          help: Option.none(),
           payload: {
             facts: takeHomeFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
 
@@ -67,10 +122,13 @@ describe("Effect SDK facade", () => {
         );
         const serviceResult = yield* service.calculate({
           calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          help: Option.none(),
           payload: {
             facts: takeHomeFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
 
@@ -83,7 +141,10 @@ describe("Effect SDK facade", () => {
       const service = yield* PublicCalculatorService;
       const invalidFacts = {
         rejectedSource: `${secretSentinel}:${privatePathSentinel}`,
-        taxableIncome: aud(9_000_000),
+        taxableIncome: new Money({
+          cents: Cents.make(9_000_000),
+          currency: "AUD",
+        }),
       };
       const sdkExit = yield* calculateReport(
         AuPayTakeHomeCalculation,
@@ -93,10 +154,13 @@ describe("Effect SDK facade", () => {
       const serviceExit = yield* service
         .calculate({
           calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+          help: Option.none(),
           payload: {
             facts: invalidFacts,
-            jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-            taxYear: AuPayTakeHomeCalculation.taxYear,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         })
         .pipe(Effect.exit);
@@ -106,22 +170,65 @@ describe("Effect SDK facade", () => {
 
       if (Exit.isFailure(sdkExit) && Exit.isFailure(serviceExit)) {
         const sdkFailure = expectAt(
-          sdkExit.cause.reasons.filter(Cause.isFailReason),
+          EffectArray.filter(sdkExit.cause.reasons, Cause.isFailReason),
           0
         );
         const serviceFailure = expectAt(
-          serviceExit.cause.reasons.filter(Cause.isFailReason),
+          EffectArray.filter(serviceExit.cause.reasons, Cause.isFailReason),
           0
         );
 
         expect(sdkFailure.error).toEqual(serviceFailure.error);
         expect(sdkFailure.error._tag).toBe("CalculatorInputDecodeError");
-        expect(JSON.stringify(sdkFailure.error)).not.toContain(secretSentinel);
-        expect(JSON.stringify(sdkFailure.error)).not.toContain(
-          privatePathSentinel
+        const encodedError = yield* Match.value(sdkFailure.error).pipe(
+          Match.tag("SchemaError", () =>
+            Effect.sync(() => expect.fail("Expected calculator input error"))
+          ),
+          Match.orElse((error) =>
+            Schema.encodeEffect(Schema.toCodecJson(CalculatorServiceError))(
+              error
+            )
+          )
         );
+        expect(encodedError).not.toContain(secretSentinel);
+        expect(encodedError).not.toContain(privatePathSentinel);
       }
     }).pipe(Effect.provide(ServiceLive))
+  );
+
+  it.effect(
+    "narrows canonical reports without decoding their wire form again",
+    () =>
+      Effect.gen(function* () {
+        const service = yield* PublicCalculatorService;
+        const response = yield* service.calculate({
+          calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          help: Option.none(),
+          payload: {
+            facts: takeHomeFacts,
+            jurisdiction: Option.some(
+              Option.some(AuPayTakeHomeCalculation.jurisdiction)
+            ),
+            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
+          },
+        });
+        const report = yield* AuPayTakeHomeCalculation.decodeOutput(
+          response.report
+        );
+        expect(report).toEqual(response.report);
+        const encoded = yield* Schema.encodeEffect(
+          AuPayTakeHomeCalculation.outputSchema
+        )(report);
+        const wireAsDomain = yield* AuPayTakeHomeCalculation.decodeOutput(
+          encoded
+        ).pipe(Effect.exit);
+        expect(Exit.isFailure(wireAsDomain)).toBe(true);
+        const malformed = yield* AuPayTakeHomeCalculation.decodeOutput({
+          ...report,
+          trace: { ...report.trace, formula: secretSentinel },
+        }).pipe(Effect.exit);
+        expect(Exit.isFailure(malformed)).toBe(true);
+      }).pipe(Effect.provide(ServiceLive))
   );
 
   it.effect(
@@ -129,11 +236,14 @@ describe("Effect SDK facade", () => {
     () =>
       Effect.gen(function* () {
         const report = yield* calculateReport(AuAnnualIncomeTaxCalculation, {
-          taxableIncome: aud(9_000_000),
+          taxableIncome: new Money({
+            cents: Cents.make(9_000_000),
+            currency: "AUD",
+          }),
         });
 
         expect(report._tag).toBe("AnnualTaxReport");
-        expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
+        expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
         expect(report.liability.cents).toBe(1_958_800);
       }).pipe(Effect.provide(ServiceLive))
   );

@@ -8,7 +8,9 @@
     "recovery": "Repair the exact candidate/default-branch binding and issue a new attempt.",
     "retirementCondition": "A stronger accepted workflow identity policy replaces exact-SHA and trusted-source enforcement.",
     "reviewTrigger": "Workflow trigger, checkout, candidate, Quality or principal change.",
-    "signal": "A docs deployment workflow candidate is selected."
+    "signal": "A docs deployment workflow candidate is selected.",
+    "sourceStatus": "retained-historical-control",
+    "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
   },
   {
     "evidence": "bun run check:docs-deployment-automation",
@@ -19,7 +21,9 @@
     "recovery": "Restore the non-cancellable stage lock and equal canonical plan contract.",
     "retirementCondition": "A stronger provider-aware distributed lock replaces the repository orchestration lock.",
     "reviewTrigger": "Concurrency, plan, environment credential admission, Alchemy state or provider readback change.",
-    "signal": "A Preview, Production or teardown mutation is requested."
+    "signal": "A Preview, Production or teardown mutation is requested.",
+    "sourceStatus": "retained-historical-control",
+    "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
   },
   {
     "evidence": "bun run check:docs-deployment-automation",
@@ -30,7 +34,9 @@
     "recovery": "Stop, retain the receipt and return to reviewed default-branch code plus manual exact-stage recovery.",
     "retirementCondition": "A stronger accepted Preview lifecycle owner preserves default-branch and exact-stage proof.",
     "reviewTrigger": "PR-close trigger, checkout, stage derivation, destroy or absence-readback change.",
-    "signal": "A same-repository pull request closes."
+    "signal": "A same-repository pull request closes.",
+    "sourceStatus": "retained-historical-control",
+    "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
   },
   {
     "evidence": "bun run check:docs-deployment-automation",
@@ -41,7 +47,9 @@
     "recovery": "Retain the reconciliation stop, preserve the source artifact and rerun the read-only workflow_run reconciler against the exact completed run.",
     "retirementCondition": "A stronger provider-independent receipt reconciler preserves completed-run, artifact, source/input and failure-readback coverage.",
     "reviewTrigger": "Workflow_run trigger, receipt schema/checker, artifact naming, source checkout or external-state promotion change.",
-    "signal": "A named Preview, Production or teardown workflow completes."
+    "signal": "A named Preview, Production or teardown workflow completes.",
+    "sourceStatus": "retained-historical-control",
+    "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
   },
   {
     "evidence": "bun run test:docs-deployment",
@@ -52,6 +60,8 @@
     "recovery": "Remove the Doppler, remote and GitHub cache bindings, retain frozen installation and Chromium setup, then rerun the exact local-cache-only workflow path.",
     "retirementCondition": "A stronger deployment acceleration control preserves exact source, live authority checks and cache-free recovery.",
     "reviewTrigger": "Doppler action/config, Turbo task, remote binding, cache action, key, path, install order, workflow event, credential, receipt upload or proof-boundary change.",
-    "signal": "A deployment or receipt workflow restores, executes or saves accelerated repository work."
+    "signal": "A deployment or receipt workflow restores, executes or saves accelerated repository work.",
+    "sourceStatus": "retained-historical-control",
+    "retirementRecord": "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json"
   }
 ]

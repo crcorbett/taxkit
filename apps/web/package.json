@@ -6,26 +6,57 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "TAXKIT_API_BASE_URL=$(portless get api.taxkit) VITE_TAXKIT_API_BASE_URL=$(portless get api.taxkit) portless run --name taxkit vite dev",
+    "dev": "portless run --name taxkit vite dev",
     "build": "vite build",
     "check-types": "tsc --noEmit",
-    "clean": "rm -rf .output .tanstack .turbo node_modules/.vite"
+    "clean": "rm -rf .tanstack .turbo .wrangler dist node_modules/.vite",
+    "test:browser": "vitest run --config vitest.browser.config.ts",
+    "test": "bun --bun vitest run",
+    "generate:worker-types": "wrangler types src/worker-runtime.generated.d.ts --include-env true --include-runtime true --strict-vars false --config wrangler.jsonc",
+    "check:worker-types": "wrangler types src/worker-runtime.generated.d.ts --include-env true --include-runtime true --strict-vars false --config wrangler.jsonc --check",
+    "build:native-pair": "cd ../.. && turbo run build --filter=api && bun --conditions=source run apps/web/scripts/native-pair-build.runtime.ts",
+    "test:native-pair": "node node_modules/vitest/vitest.mjs run --config vitest.native.config.ts"
   },
   "dependencies": {
+    "@effect/atom-react": "4.0.0",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
+    "@taxkit/analytics": "workspace:*",
     "@taxkit/api-http": "workspace:*",
+    "@taxkit/api-rpc": "workspace:*",
+    "@taxkit/content": "workspace:*",
+    "@taxkit/core": "workspace:*",
+    "@taxkit/docs-content": "workspace:*",
+    "@taxkit/docs-fumadocs": "workspace:*",
+    "@taxkit/rules-au-income-tax": "workspace:*",
+    "@taxkit/rules-au-pay": "workspace:*",
+    "alchemy": "catalog:",
     "effect": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
+    "@effect/platform-bun": "catalog:",
+    "@effect/platform-node": "catalog:",
+    "@effect/vitest": "catalog:",
+    "@modelcontextprotocol/client": "2.3.1",
+    "@takumi-rs/wasm": "2.14.0",
+    "@taxkit/calculators": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
-    "nitro": "catalog:",
+    "@vitest/browser-playwright": "5.0.3",
+    "api": "workspace:*",
+    "fumadocs-mdx": "15.4.6",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "scheduler": "0.28.0",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "webmcp-types": "0.1.10",
+    "wrangler": "catalog:"
   }
 }

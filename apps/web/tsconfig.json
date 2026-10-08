@@ -1,8 +1,18 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.browser.config.ts",
+    "scripts/**/*.ts",
+    "test/**/*.ts",
+    "vitest.native.config.ts"
+  ],
   "compilerOptions": {
-    "baseUrl": ".",
+    "module": "ESNext",
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "allowImportingTsExtensions": true,
     "noEmit": true,
@@ -10,6 +20,7 @@
     "paths": {
       "#/*": ["./src/*"]
     },
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node"],
+    "customConditions": ["bun", "source"]
   }
 }

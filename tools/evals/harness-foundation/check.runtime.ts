@@ -5,16 +5,19 @@ import {
   Console,
   Effect,
   Match,
+  Option,
   Record as EffectRecord,
   Stream,
   Schema,
 } from "effect";
+import { Command } from "effect/cli";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import { CriticalJourneyInventory } from "../../governance/schemas.js";
 import {
+  hashEpochBytes,
   decodeGitText,
   readEpochJson,
   repositoryRootFromUrl,
@@ -107,11 +110,6 @@ const externalBoundaries = [
   "external-consumer",
 ];
 
-const sha256 = (source: string | Uint8Array) =>
-  Effect.sync(() =>
-    new Bun.CryptoHasher("sha256").update(source).digest("hex")
-  );
-
 const readHash = (repositoryRoot: string, target: string) =>
   Effect.gen(function* readEpochArtifactHash() {
     const fileSystem = yield* FileSystem.FileSystem;
@@ -119,7 +117,7 @@ const readHash = (repositoryRoot: string, target: string) =>
     const bytes = yield* fileSystem
       .readFile(path.join(repositoryRoot, target))
       .pipe(Effect.mapError(() => new EpochInputError({ target })));
-    return yield* sha256(bytes);
+    return yield* hashEpochBytes(bytes);
   });
 
 const runGit = (
@@ -170,7 +168,7 @@ const hasExactMembers = (
   expected: readonly string[]
 ) =>
   actual.length === expected.length &&
-  expected.every((member) => actual.includes(member));
+  Array.every(expected, (member) => Array.contains(actual, member));
 
 const manifestMatchesSkillReceipt = (
   manifest: SourceManifest,
@@ -181,8 +179,9 @@ const manifestMatchesSkillReceipt = (
   const extras = EffectRecord.toEntries(receipt.extras);
   return (
     manifest.skills.length === skills.length &&
-    skills.every(([id, expected]) =>
-      manifest.skills.some(
+    Array.every(skills, ([id, expected]) =>
+      Array.some(
+        manifest.skills,
         (actual) =>
           actual.id === id &&
           actual.entryCount === expected.entryCount &&
@@ -190,15 +189,17 @@ const manifestMatchesSkillReceipt = (
       )
     ) &&
     manifest.overlays.length === overlays.length &&
-    overlays.every((expected) =>
-      manifest.overlays.some(
+    Array.every(overlays, (expected) =>
+      Array.some(
+        manifest.overlays,
         (actual) =>
           actual.path === expected.path && actual.sha256 === expected.sha256
       )
     ) &&
     manifest.extras.length === extras.length &&
-    extras.every(([id, expected]) =>
-      manifest.extras.some(
+    Array.every(extras, ([id, expected]) =>
+      Array.some(
+        manifest.extras,
         (actual) =>
           actual.id === id &&
           actual.classification === expected.classification &&
@@ -214,23 +215,28 @@ const scenariosMatchCriticalJourneys = (
   inventory: CriticalJourneyInventory
 ) =>
   hasExactMembers(
-    inventory.journeys.map((journey) => journey.id),
+    Array.map(inventory.journeys, (journey) => journey.id),
     requiredJourneyIds
   ) &&
-  scenarios.journeys.every((scenario) => {
-    const canonical = inventory.journeys.find(
+  Array.every(scenarios.journeys, (scenario) =>
+    Array.findFirst(
+      inventory.journeys,
       (journey) => journey.id === scenario.id
-    );
-    return (
-      canonical !== undefined &&
-      scenario.command === expectedJourneyCommands[scenario.id] &&
-      scenario.owner === `${criticalJourneyOwnerPath}#${scenario.id}` &&
-      scenario.oracle === canonical.oracle &&
-      canonical.nonClaims.some(
-        (nonClaim) => nonClaim.trim() === scenario.nonClaim.trim()
+    ).pipe(
+      Option.exists(
+        (canonical) =>
+          EffectRecord.get(expectedJourneyCommands, scenario.id).pipe(
+            Option.contains(scenario.command)
+          ) &&
+          scenario.owner === `${criticalJourneyOwnerPath}#${scenario.id}` &&
+          scenario.oracle === canonical.oracle &&
+          Array.some(
+            canonical.nonClaims,
+            (nonClaim) => nonClaim.trim() === scenario.nonClaim.trim()
+          )
       )
-    );
-  });
+    )
+  );
 
 export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
   // oxlint-disable-next-line complexity -- each evidence identity, preserved surface, clock, and non-claim is an explicit fail-closed epoch invariant.
@@ -299,7 +305,7 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       "candidate-changed-paths"
     );
     const changedPaths = yield* restoreChangedPaths(changedPathBytes);
-    const changedPathDigest = yield* sha256(changedPathBytes);
+    const changedPathDigest = yield* hashEpochBytes(changedPathBytes);
 
     yield* requireInvariant(
       actualTree === candidateTree &&
@@ -319,8 +325,9 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       "Recompute the NUL-delimited migration path inventory from Git and refresh the candidate evidence."
     );
     yield* requireInvariant(
-      !changedPaths.some((target) =>
-        forbiddenMigrationPrefixes.some(
+      !Array.some(changedPaths, (target) =>
+        Array.some(
+          forbiddenMigrationPrefixes,
           (prefix) => target === prefix || target.startsWith(prefix)
         )
       ),
@@ -330,7 +337,7 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
     );
     yield* requireInvariant(
       hasExactMembers(
-        manifest.artifacts.map((artifact) => artifact.path),
+        Array.map(manifest.artifacts, (artifact) => artifact.path),
         requiredSourceArtifacts
       ),
       "source-artifact-coverage",
@@ -353,7 +360,7 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
               repositoryRoot,
               ["show", `${candidateCommit}:${artifact.path}`],
               artifact.path
-            ).pipe(Effect.flatMap(sha256));
+            ).pipe(Effect.flatMap(hashEpochBytes));
             return { actual, artifact };
           }
           const actual = yield* readHash(repositoryRoot, artifact.path);
@@ -362,7 +369,8 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       { concurrency: 4 }
     );
     yield* requireInvariant(
-      manifestArtifactHashes.every(
+      Array.every(
+        manifestArtifactHashes,
         ({ actual, artifact }) => actual === artifact.sha256
       ),
       "source-artifact-identity",
@@ -370,7 +378,10 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       "Restore every profile, receipt, validator, journey, and scenario artifact to its recorded digest."
     );
 
-    const scenarioJourneyIds = scenarios.journeys.map((journey) => journey.id);
+    const scenarioJourneyIds = Array.map(
+      scenarios.journeys,
+      (journey) => journey.id
+    );
     yield* requireInvariant(
       hasExactMembers(scenarioJourneyIds, requiredJourneyIds),
       "scenario-coverage",
@@ -386,11 +397,12 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
     yield* requireInvariant(
       receipts.length === scenarios.journeys.length &&
         hasExactMembers(
-          receipts.map(({ receipt }) => receipt.journeyId),
+          Array.map(receipts, ({ receipt }) => receipt.journeyId),
           requiredJourneyIds
         ) &&
-        receipts.every(({ receipt, target }) =>
-          scenarios.journeys.some(
+        Array.every(receipts, ({ receipt, target }) =>
+          Array.some(
+            scenarios.journeys,
             (journey) =>
               journey.id === receipt.journeyId &&
               journey.command === receipt.command &&
@@ -439,8 +451,9 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         candidate.scenario.path === epochPaths.scenarios &&
         candidate.scenario.sha256 === scenarioHash &&
         candidate.failedAttempts.length === failedHashes.length &&
-        failedHashes.every((actual) =>
-          candidate.failedAttempts.some(
+        Array.every(failedHashes, (actual) =>
+          Array.some(
+            candidate.failedAttempts,
             (expected) =>
               expected.path === actual.path && expected.sha256 === actual.sha256
           )
@@ -448,8 +461,9 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         candidate.independentReview.path === epochPaths.independentReview &&
         candidate.independentReview.sha256 === reviewHash &&
         candidate.receipts.length === receiptHashes.length &&
-        receiptHashes.every((actual) =>
-          candidate.receipts.some(
+        Array.every(receiptHashes, (actual) =>
+          Array.some(
+            candidate.receipts,
             (expected) =>
               expected.journeyId === actual.journeyId &&
               expected.path === actual.path &&
@@ -465,12 +479,16 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         review.candidateCommit === candidateCommit &&
         review.findings.length === 0 &&
         hasExactMembers(
-          review.checks.map((check) => check.name),
+          Array.map(review.checks, (check) => check.name),
           independentReviewCheckNames
         ) &&
         review.reviewer.identity !== manifest.epoch.worker &&
-        review.reviewer.workerIndependentOf.includes(manifest.epoch.worker) &&
-        receipts.every(
+        Array.contains(
+          review.reviewer.workerIndependentOf,
+          manifest.epoch.worker
+        ) &&
+        Array.every(
+          receipts,
           ({ receipt }) =>
             Date.parse(receipt.observedAt) <= Date.parse(review.observedAt)
         ) &&
@@ -497,10 +515,10 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
       ...candidate.nonClaims,
       ...review.nonClaims,
       ...validation.nonClaims,
-      ...receipts.map(({ receipt }) => receipt.nonClaim),
+      ...Array.map(receipts, ({ receipt }) => receipt.nonClaim),
     ].join(" ");
     yield* requireInvariant(
-      externalBoundaries.every((boundary) =>
+      Array.every(externalBoundaries, (boundary) =>
         nonClaimSource.toLowerCase().includes(boundary.toLowerCase())
       ),
       "external-non-claims",
@@ -513,7 +531,7 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
         validation.candidate.path === epochPaths.candidate &&
         validation.candidate.sha256 === candidateHash &&
         hasExactMembers(
-          validation.checks.map((check) => check.name),
+          Array.map(validation.checks, (check) => check.name),
           validationCheckNames
         ) &&
         validation.noChangeset.includes(
@@ -526,7 +544,10 @@ export const checkHarnessFoundationEpoch = (repositoryRoot: string) =>
 
     return {
       changedPaths: changedPaths.length,
-      journeyIds: receipts.map(({ receipt }): JourneyId => receipt.journeyId),
+      journeyIds: Array.map(
+        receipts,
+        ({ receipt }): JourneyId => receipt.journeyId
+      ),
       sourceManifestHash,
     };
   });
@@ -553,10 +574,24 @@ const program = Effect.gen(function* harnessFoundationEpochMain() {
       `FAIL [${error.invariant}] target=${error.target}; recovery=${error.recovery}`
     )
   ),
-  Effect.provide(BunServices.layer)
+  Effect.scoped
+);
+
+const command = Command.make(
+  "check-harness-foundation-epoch",
+  {},
+  () => program
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(
+      Command.run(command, {
+        renderErrors: false,
+        version: "repository-local",
+      }).pipe(Effect.provide(BunServices.layer)),
+      { disableErrorReporting: true }
+    )
+  ),
   Match.orElse(() => false)
 );

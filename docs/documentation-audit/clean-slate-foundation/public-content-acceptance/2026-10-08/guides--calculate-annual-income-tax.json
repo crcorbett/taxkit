@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-07T22:42:22Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "d95c42dcc16b58c8b949978714ab31ca5dbbda8813cb68808ef7df57c8ecd51d",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx"
+}

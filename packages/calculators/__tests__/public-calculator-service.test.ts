@@ -1,15 +1,31 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngineLive } from "@taxkit/core";
-import { aud } from "@taxkit/core/primitives";
+import { Money, Cents, audFromCents } from "@taxkit/core/primitives";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax";
 import {
   AuPayCalculatorId as PayCalculatorId,
   GrossPay,
+  AuPayJurisdiction,
+  AuPayTaxYear,
 } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Cause, Effect, Exit, Layer } from "effect";
+import {
+  Array as EffectArray,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Match,
+  Option,
+  Result,
+  Schema,
+} from "effect";
 
 import { PublicCalculatorServiceLive } from "../src/live.layer.js";
+import {
+  CalculatorInputDecodeError,
+  CalculatorServiceError,
+} from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
 
 const ServiceLive = PublicCalculatorServiceLive.pipe(
@@ -17,16 +33,12 @@ const ServiceLive = PublicCalculatorServiceLive.pipe(
 );
 
 const grossPayFacts = (
-  cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  amount: Money,
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) => ({
-  grossPay: new GrossPay({ amount: aud(cents), period }),
+  grossPay: new GrossPay({ amount, period }),
   taxFreeThresholdClaimed,
-});
-
-const taxableIncomeFacts = (cents: number) => ({
-  taxableIncome: aud(cents),
 });
 
 const secretSentinel = "taxkit-secret-sentinel";
@@ -34,52 +46,119 @@ const privatePathSentinel = "/private/taxkit-sentinel/input.json";
 
 const calculateTakeHome = (
   cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) =>
   Effect.gen(function* () {
     const service = yield* PublicCalculatorService;
-    return yield* service.calculate({
+    const response = yield* service.calculate({
       calculatorId: PayCalculatorId.make("au.pay.take-home"),
+      help: Option.none(),
       payload: {
-        facts: grossPayFacts(cents, period, taxFreeThresholdClaimed),
-        jurisdiction: "AU",
-        taxYear: "2025-26",
+        facts: grossPayFacts(
+          yield* audFromCents(cents),
+          period,
+          taxFreeThresholdClaimed
+        ),
+        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
       },
     });
+    const report = Match.value(response.report).pipe(
+      Match.tag("TakeHomePayReport", (value) => value),
+      Match.orElse(() => expect.fail("Expected TakeHomePayReport"))
+    );
+    return { ...response, report };
   }).pipe(Effect.provide(ServiceLive));
 
 const calculateWithholdings = (
   cents: number,
-  period: "fortnightly" | "monthly" | "weekly",
+  period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) =>
   Effect.gen(function* () {
     const service = yield* PublicCalculatorService;
-    return yield* service.calculate({
+    const response = yield* service.calculate({
       calculatorId: PayCalculatorId.make("au.pay.withholdings"),
+      help: Option.none(),
       payload: {
-        facts: grossPayFacts(cents, period, taxFreeThresholdClaimed),
-        jurisdiction: "AU",
-        taxYear: "2025-26",
+        facts: grossPayFacts(
+          yield* audFromCents(cents),
+          period,
+          taxFreeThresholdClaimed
+        ),
+        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
       },
     });
+    const report = Match.value(response.report).pipe(
+      Match.tag("PayWithholdingsLedger", (value) => value),
+      Match.orElse(() => expect.fail("Expected PayWithholdingsLedger"))
+    );
+    return { ...response, report };
   }).pipe(Effect.provide(ServiceLive));
 
 const calculateAnnualTax = (cents: number) =>
   Effect.gen(function* () {
     const service = yield* PublicCalculatorService;
-    return yield* service.calculate({
+    const response = yield* service.calculate({
       calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
+      help: Option.none(),
       payload: {
-        facts: taxableIncomeFacts(cents),
-        jurisdiction: "AU",
-        taxYear: "2025-26",
+        facts: { taxableIncome: yield* audFromCents(cents) },
+        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
+        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
       },
     });
+    const report = Match.value(response.report).pipe(
+      Match.tag("AnnualTaxReport", (value) => value),
+      Match.orElse(() => expect.fail("Expected AnnualTaxReport"))
+    );
+    return { ...response, report };
   }).pipe(Effect.provide(ServiceLive));
 
 describe("PublicCalculatorService", () => {
+  it.effect.each(["au.pay.take-home", "au.pay.withholdings"] as const)(
+    "returns a safe calculation failure for a derived amount too large in %s",
+    (calculatorId) =>
+      Effect.gen(function* () {
+        const service = yield* PublicCalculatorService;
+        const result = yield* service
+          .calculate({
+            calculatorId: PayCalculatorId.make(calculatorId),
+            help: Option.none(),
+            payload: {
+              facts: grossPayFacts(
+                new Money({
+                  cents: Cents.make(Number.MAX_SAFE_INTEGER),
+                  currency: "AUD",
+                }),
+                "weekly",
+                true
+              ),
+              jurisdiction: Option.some(
+                Option.some(AuPayJurisdiction.make("AU"))
+              ),
+              taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+            },
+          })
+          .pipe(Effect.result);
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          const error = Match.value(result.failure).pipe(
+            Match.tag("CalculationError", (value) => value),
+            Match.orElse(() => expect.fail("Expected calculation error"))
+          );
+          expect(error._tag).toBe("CalculationError");
+          const encoded = yield* Schema.encodeEffect(
+            Schema.fromJsonString(CalculatorServiceError)
+          )(error);
+          expect(encoded).toBe(
+            '{"_tag":"CalculationError","message":"PAYG withholding could not produce a supported amount."}'
+          );
+        }
+      }).pipe(Effect.provide(ServiceLive))
+  );
   it.effect("runs varied take-home pay journeys", () =>
     Effect.gen(function* () {
       const nurse = yield* calculateTakeHome(165_400, "weekly", true);
@@ -149,7 +228,7 @@ describe("PublicCalculatorService", () => {
         const student = yield* calculateAnnualTax(1_500_000);
         expect(student.report._tag).toBe("AnnualTaxReport");
         expect(student.report.rulePackVersion).toBe(
-          "rules-au-income-tax/1.0.0"
+          "rules-au-income-tax/1.0.1"
         );
         expect(student.report.rawLiability.cents).toBe(-70_000);
         expect(student.report.liability.cents).toBe(0);
@@ -180,13 +259,18 @@ describe("PublicCalculatorService", () => {
       const exit = yield* service
         .calculate({
           calculatorId: PayCalculatorId.make("au.pay.take-home"),
-          help: "errors",
+          help: Option.some(Option.some("errors")),
           payload: {
             facts: {
-              taxableIncome: aud(9_000_000),
+              taxableIncome: new Money({
+                cents: Cents.make(9_000_000),
+                currency: "AUD",
+              }),
             },
-            jurisdiction: "AU",
-            taxYear: "2025-26",
+            jurisdiction: Option.some(
+              Option.some(AuPayJurisdiction.make("AU"))
+            ),
+            taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
           },
         })
         .pipe(Effect.exit);
@@ -194,16 +278,26 @@ describe("PublicCalculatorService", () => {
       expect(Exit.isFailure(exit)).toBe(true);
       if (Exit.isFailure(exit)) {
         const failure = expectAt(
-          exit.cause.reasons.filter(Cause.isFailReason),
+          EffectArray.filter(exit.cause.reasons, Cause.isFailReason),
           0
         );
 
-        expect(failure.error._tag).toBe("CalculatorInputDecodeError");
-        expect(expectAt(failure.error.issues, 0).path).toEqual(["grossPay"]);
-        expect(expectAt(failure.error.issues, 0).message).toBe(
+        const error = Match.value(failure.error).pipe(
+          Match.tag("CalculatorInputDecodeError", (value) => value),
+          Match.orElse(() => expect.fail("Expected calculator input error"))
+        );
+        expect(error._tag).toBe("CalculatorInputDecodeError");
+        expect(expectAt(error.issues, 0).path).toEqual(["grossPay"]);
+        expect(expectAt(error.issues, 0).message).toBe(
           "Invalid calculator input value"
         );
-        expect(failure.error.help?.length).toBe(2);
+        expect(
+          error.help.pipe(
+            Option.flatten,
+            Option.map((help) => help.length),
+            Option.getOrElse(() => 0)
+          )
+        ).toBe(2);
       }
     }).pipe(Effect.provide(ServiceLive))
   );
@@ -216,14 +310,17 @@ describe("PublicCalculatorService", () => {
         const exit = yield* service
           .calculate({
             calculatorId: PayCalculatorId.make("au.pay.take-home"),
+            help: Option.none(),
             payload: {
               facts: {
                 // @ts-expect-error runtime safety coverage bypasses the typed boundary.
                 grossPay: `${secretSentinel}:${privatePathSentinel}`,
                 taxFreeThresholdClaimed: true,
               },
-              jurisdiction: "AU",
-              taxYear: "2025-26",
+              jurisdiction: Option.some(
+                Option.some(AuPayJurisdiction.make("AU"))
+              ),
+              taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
             },
           })
           .pipe(Effect.exit);
@@ -231,14 +328,20 @@ describe("PublicCalculatorService", () => {
         expect(Exit.isFailure(exit)).toBe(true);
         if (Exit.isFailure(exit)) {
           const failure = expectAt(
-            exit.cause.reasons.filter(Cause.isFailReason),
+            EffectArray.filter(exit.cause.reasons, Cause.isFailReason),
             0
           );
-          const rendered = JSON.stringify(failure.error);
+          const error = Match.value(failure.error).pipe(
+            Match.tag("CalculatorInputDecodeError", (value) => value),
+            Match.orElse(() => expect.fail("Expected calculator input error"))
+          );
+          const rendered = yield* Schema.encodeEffect(
+            Schema.fromJsonString(CalculatorInputDecodeError)
+          )(error);
 
-          expect(failure.error._tag).toBe("CalculatorInputDecodeError");
-          expect(expectAt(failure.error.issues, 0).path).toEqual(["grossPay"]);
-          expect(expectAt(failure.error.issues, 0).message).toBe(
+          expect(error._tag).toBe("CalculatorInputDecodeError");
+          expect(expectAt(error.issues, 0).path).toEqual(["grossPay"]);
+          expect(expectAt(error.issues, 0).message).toBe(
             "Invalid calculator input value"
           );
           expect(rendered).not.toContain(secretSentinel);

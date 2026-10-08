@@ -1,0 +1,58 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "b854aad61e9e8cd07c061584cd2ccbae5e85fc8b",
+  "implemented": [
+    "Bun-hosted Effect Vitest for repository-path and governance suites, without Promise runner wrappers",
+    "Immutable governance collection construction, Option lookups and missing entries, Schema-owned canonical digest string quoting",
+    "All eleven canonical strict rules for repository-path and governance source/tests",
+    "Exact runtime admissions only for the two executable check.runtime.ts owners, with configuration assertions and actual CLI path coverage"
+  ],
+  "verification": [
+    {
+      "command": "bun run test:repository-paths:task",
+      "result": "11 tests passed"
+    },
+    {
+      "command": "bun run test:harness-governance",
+      "result": "15 tests passed; accepted skill tree and overlay hashes unchanged"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed including 70 real-command lint cases and retained calculator tests"
+    },
+    {
+      "command": "bun run check:harness-governance:types && bun run check:repository-paths:types && bun run check:oxlint:types",
+      "result": "passed"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed after correcting a missing comparator brace; no rule weakened"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed, 15 cached tasks; production dependency graph unchanged"
+    }
+  ],
+  "inventory": {
+    "observed_files": 349,
+    "remaining_strict_diagnostics_before_additional_host_qualification": 1550,
+    "counts": {
+      "no-promise-workflow": 656,
+      "no-imperative-collections": 500,
+      "no-unchecked-index": 180,
+      "no-runtime-outside-boundary": 112,
+      "no-unchecked-json": 76,
+      "no-native-work": 26
+    },
+    "nonclaim": "Provisional actual-command inventory including host and fixture reconciliation; not a confirmed defect count or proof of whole-repository compliance."
+  },
+  "limitations": [
+    "Other tool/app/package strict migration and semantic audits remain unfinished",
+    "No dependency graph change; previous frozen-install qualification retained",
+    "No tax outputs, Medicare parameters, OpenAPI snapshots or canonical skill hashes changed",
+    "No merge, deployment, publication or provider apply"
+  ],
+  "recovery": "Revert the complete slice; provider state is unchanged"
+}

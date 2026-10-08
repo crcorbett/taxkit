@@ -1,7 +1,7 @@
 ---
 title: "Endpoints"
 description: "Find the current HTTP routes and route field detail to OpenAPI."
-status: "draft"
+status: "published"
 ---
 
 # Endpoints
@@ -12,20 +12,24 @@ response detail.
 
 ## Current routes
 
-| Method | Path                                          | Purpose                                                        |
-| ------ | --------------------------------------------- | -------------------------------------------------------------- |
-| `GET`  | `/api/health`                                 | Check the API process.                                         |
-| `GET`  | `/api/docs`                                   | Open the generated Scalar reference viewer.                    |
-| `GET`  | `/api/docs/openapi.json`                      | Read the generated OpenAPI document.                           |
-| `GET`  | `/api/v1/jurisdictions`                       | List supported public API jurisdictions.                       |
-| `GET`  | `/api/v1/tax-years`                           | List supported tax years, optionally filtered by jurisdiction. |
-| `GET`  | `/api/v1/calculators`                         | List calculator catalog entries.                               |
-| `GET`  | `/api/v1/calculators/:calculatorId`           | Get one calculator catalog entry.                              |
-| `GET`  | `/api/v1/calculators/:calculatorId/schema`    | Get fact, rule and report schema metadata.                     |
-| `POST` | `/api/v1/calculators/:calculatorId/calculate` | Run one calculator through `calculateRunRequest`.              |
-| `GET`  | `/api/v1/calculators/:calculatorId/graph`     | Get graph edges and validation diagnostics.                    |
-| `GET`  | `/api/v1/facts`                               | List canonical fact descriptors.                               |
-| `GET`  | `/api/v1/rules`                               | List canonical rule descriptors.                               |
+| Method | Path                                           | Purpose                                                        |
+| ------ | ---------------------------------------------- | -------------------------------------------------------------- |
+| `GET`  | `/api/health`                                  | Check the API process.                                         |
+| `GET`  | `/api/docs`                                    | Open the generated Scalar reference viewer.                    |
+| `GET`  | `/api/docs/openapi.json`                       | Read the generated OpenAPI document.                           |
+| `GET`  | `/api/v1/jurisdictions`                        | List supported public API jurisdictions.                       |
+| `GET`  | `/api/v1/tax-years`                            | List supported tax years, optionally filtered by jurisdiction. |
+| `GET`  | `/api/v1/calculators`                          | List calculator catalog entries.                               |
+| `GET`  | `/api/v1/calculators/:calculatorId`            | Get one calculator catalog entry.                              |
+| `GET`  | `/api/v1/calculators/:calculatorId/schema`     | Get fact, rule and report schema metadata.                     |
+| `POST` | `/api/v1/calculators/:calculatorId/calculate`  | Run one calculator through the calculator service.             |
+| `GET`  | `/api/v1/calculators/:calculatorId/graph`      | Get graph edges and validation diagnostics.                    |
+| `GET`  | `/api/v1/facts`                                | List canonical fact descriptors.                               |
+| `GET`  | `/api/v1/rules`                                | List canonical rule descriptors.                               |
+| `GET`  | `/api/v1/docs/navigation`                      | Read public documentation navigation.                          |
+| `GET`  | `/api/v1/docs/page?path=/start/quickstart`     | Read one public page as JSON.                                  |
+| `GET`  | `/api/v1/docs/search?term=Quickstart`          | Search public documentation.                                   |
+| `GET`  | `/api/v1/docs/markdown?path=/start/quickstart` | Read one public page as Markdown.                              |
 
 ## Calculate
 
@@ -56,6 +60,23 @@ and `report.netPay.cents: 270600`.
 
 If the request fails, read `CalculatorApiErrorEnvelope.error` and handle the
 underlying `CalculatorServiceError`.
+
+## Read public documentation
+
+Use `path` to select a page address from navigation, such as
+`/start/quickstart`. The path accepts up to 256 characters. The page route
+returns the page title, description and Markdown in a JSON object. The Markdown
+route returns the same page text with `content-type: text/markdown`.
+
+```sh
+curl 'http://127.0.0.1:4000/api/v1/docs/markdown?path=/start/quickstart'
+```
+
+Search with a `term` of 1 to 100 characters. Each search returns up to 20
+results, with a page address, title and excerpt of up to 240 characters.
+Use the navigation route to read the section and page links.
+
+See [API errors](./errors.mdx) for missing-page and invalid-query replies.
 
 ## Related pages
 

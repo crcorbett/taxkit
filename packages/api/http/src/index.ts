@@ -1,4 +1,11 @@
 export { TaxKitApi } from "./api.js";
+export { HealthResponse } from "./groups/health.js";
+export {
+  DocsPageQuery,
+  DocsSearchQuery,
+  DocsPageUnavailable,
+  DocsSearchUnavailable,
+} from "./groups/content.js";
 export {
   CalculatorCatalog,
   CalculatorCatalogItem,

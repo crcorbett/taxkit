@@ -29,10 +29,12 @@ export const checkWorkflowPlan = Effect.gen(function* workflowPlanCheck() {
     DeploymentPlanReceipt
   );
   const { projection } = plan;
-  const projectionDigest = yield* workflowSha256(
-    check,
-    stringifyWorkflowPlanProjection(projection)
+  const encoded = yield* stringifyWorkflowPlanProjection(projection).pipe(
+    Effect.mapError(
+      () => new WorkflowCheckInputError({ check, target: "plan-projection" })
+    )
   );
+  const projectionDigest = yield* workflowSha256(check, encoded);
   const requireReplan = config.TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN === "1";
 
   if (
@@ -69,6 +71,8 @@ const program = checkWorkflowPlan.pipe(
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () =>
+    BunRuntime.runMain(program, { disableErrorReporting: true })
+  ),
   Match.orElse(() => false)
 );

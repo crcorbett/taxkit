@@ -12,7 +12,9 @@ Shared test helpers for TaxKit workspace packages.
 ## Scope
 
 `@taxkit/testing` owns reusable test-only helpers such as `expectAt` for
-safe indexed assertions without non-null assertions.
+safe indexed assertions without non-null assertions. It uses checked Effect
+Array/Option lookup, preserves present values including null, and reports
+missing or undefined entries through the test framework assertion.
 
 ## Guardrails
 
@@ -25,6 +27,7 @@ safe indexed assertions without non-null assertions.
 ## Commands
 
 ```sh
+bun run --filter=@taxkit/testing test
 bun run --filter=@taxkit/testing check-types
 bun run --filter=@taxkit/testing build
 ```

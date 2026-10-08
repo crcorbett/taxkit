@@ -1,0 +1,145 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "4a1abfc00caf9493d22b1ca8e19eb364c5c4ab14",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR proof separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Typed native route corpus retains all six original representation/failure groups",
+    "Owning Schemas construct branded fixtures; native codecs and Schema predicate replace throwing encoders/constructor assertion; exact negative-wire encoding admission retained",
+    "Scoped actual managed-runtime factory/context/disposal proves one construction/reuse and release after success, failure, interruption",
+    "Native FileSystem/Path inspect production owner; tests need no runtime admission",
+    "Canonical rules on factory/tests/server config; rejected neighbour and exact factory selector",
+    "Default docs owner includes corpus once; source and server-source resolution preserved"
+  ],
+  "checks": [
+    {
+      "command": "focused server tests/compiler/lint",
+      "outcome": "pass; 19 server cases including six route groups/four runtime cases; final repository checks pending",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-native-tests-release.log",
+        "/private/tmp/taxkit-local-toolchain/docs-native-types-release.log",
+        "/private/tmp/taxkit-local-toolchain/docs-native-lint-release.log"
+      ]
+    },
+    {
+      "command": "actual canonical lint corpus",
+      "outcome": "pass; 321 = 315 retained + four accepted files + rejected neighbour + exact factory selector",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-native-policy-tests.log"
+    },
+    {
+      "command": "frozen install and complete tests/build",
+      "outcome": "pass; 792 installs/1020 packages unchanged; 321 actual lint cases in corrected full test run; 23 test tasks, 22 matching caches; 15 build tasks, 14 matching caches",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/docs-native-install-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/docs-native-all-tests-corrected.log",
+        "/private/tmp/taxkit-local-toolchain/docs-native-all-build-qualified.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass; 21 Quality cases/all ten isolated faults/fresh source-only docs (217.07 seconds); 176 deployment-tool, 21 skill, 16 evaluation cases; compiler and both unused-code profiles; matching unchanged-input Chromium caches for 24 SDK/two web cases",
+      "log": "/private/tmp/taxkit-local-toolchain/docs-native-verification-qualified.log"
+    }
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "apps/docs/src/lib/docs/route-boundary.test.ts",
+        "apps/docs/src/lib/runtime-factory.server.test.ts",
+        "apps/docs/vitest.server.config.ts",
+        "apps/docs/package.json",
+        "package.json",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "apps/docs/README.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Native test/command/compiler/strict ownership and durable explanation move together"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "runtime implementation",
+        "route representations/failure semantics",
+        "public/generated content",
+        "dependency selections",
+        "tax rules/results",
+        "historical evidence",
+        "canonical skills/digests",
+        "docs/product-specs/clean-slate-foundation.md"
+      ],
+      "reason": "Test migration changes no product or retained calculation"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "Changeset",
+        "runbook procedure",
+        "CI workflow",
+        "provider state"
+      ],
+      "reason": "Private unversioned docs app, test-only work; consequential authority and command names unchanged"
+    }
+  ],
+  "recovery": {
+    "attempts": [
+      {
+        "outcome": "failed focused tests/compiler/lint then corrected",
+        "observed": "Nonexistent TaggedError.is replaced by owning Schema.is; missing braces, shadowing and remaining raw loop corrected; all assertions retained",
+        "logs": [
+          "/private/tmp/taxkit-local-toolchain/docs-native-tests-first.log",
+          "/private/tmp/taxkit-local-toolchain/docs-native-types-first.log",
+          "/private/tmp/taxkit-local-toolchain/docs-native-lint-first.log"
+        ]
+      },
+      {
+        "outcome": "failed complete tests, corrected exact encoding permission",
+        "observed": "Removing all test boundary permissions also removed required egress for two native encoders that deliberately construct invalid wire examples; exact encoding permission restored, decoding/runtime/throwing-codec admissions remain removed",
+        "logs": [
+          "/private/tmp/taxkit-local-toolchain/docs-native-all-tests-qualified.log"
+        ]
+      }
+    ],
+    "rollback": "Revert complete slice; no provider/version operation"
+  },
+  "limitations": [
+    "Native tests prove local lifetime and representation contracts, not Worker/browser/hosted behaviour",
+    "Remaining docs/web/infrastructure and semantic/readonly review unfinished",
+    "Medicare correction requires separate bounded decision",
+    "Current SDK/web browser proof uses matching unchanged-input caches; product code unchanged in this test slice",
+    "Default-sandbox docs/runbook/format tasks may report non-fatal shared-cache IO access warnings after success"
+  ],
+  "non_claims": [
+    "No merge, deployment, publication, provider apply or version application",
+    "No hosted qualification of this later test revision",
+    "No completion of DEV-73 or DEV-74\u201381"
+  ],
+  "remaining_inventory": {
+    "scope": "Actual installed CLI, canonical scope provisionally widened over 383 scanned source files; not confirmed defect count",
+    "diagnostics": 400,
+    "groups": {
+      "apps": 383,
+      "tools": 10,
+      "infrastructure": 7
+    },
+    "log": "/private/tmp/taxkit-local-toolchain/docs-native-owned-strict-inventory.json"
+  }
+}

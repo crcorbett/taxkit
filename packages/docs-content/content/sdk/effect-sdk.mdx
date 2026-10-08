@@ -1,7 +1,7 @@
 ---
 title: "Effect SDK"
 description: "Compose TaxKit calculations in Effect applications and in-process transports."
-status: "draft"
+status: "published"
 ---
 
 # Effect SDK
@@ -33,19 +33,29 @@ Report-only helpers
 ## Return the full run response
 
 Use `calculateRunRequest` when you need the canonical `CalculatorRunResponse`
-shape with a descriptor-decoded report type.
+shape with a descriptor-decoded report type. Omitted request fields use their
+Schema defaults. Explicit context and help use nested Options: outer `None`
+means a missing key, `Some(None)` means a present undefined key and
+`Some(Some(value))` means a present value. JSON clients keep the usual optional
+fields; the codec handles this conversion.
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/core/primitives";
 import { calculateRunRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
+import { Effect, Option } from "effect";
 
-const effect = calculateRunRequest(AuAnnualIncomeTaxCalculation, {
-  payload: {
-    facts: { taxableIncome: aud(9_000_000) },
-    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
-    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
-  },
+const effect = Effect.gen(function* () {
+  const taxableIncome = yield* audFromCents(9_000_000);
+  return yield* calculateRunRequest(AuAnnualIncomeTaxCalculation, {
+    payload: {
+      facts: { taxableIncome },
+      jurisdiction: Option.some(
+        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
+      ),
+      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
+    },
+  });
 });
 ```
 
@@ -55,35 +65,41 @@ Use `calculateReportRequest` when you have a full request payload but only need
 the report.
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/core/primitives";
 import { calculateReportRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
+import { Effect, Option } from "effect";
 
-const effect = calculateReportRequest(AuAnnualIncomeTaxCalculation, {
-  payload: {
-    facts: { taxableIncome: aud(9_000_000) },
-    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
-    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
-  },
+const effect = Effect.gen(function* () {
+  const taxableIncome = yield* audFromCents(9_000_000);
+  return yield* calculateReportRequest(AuAnnualIncomeTaxCalculation, {
+    payload: {
+      facts: { taxableIncome },
+      jurisdiction: Option.some(
+        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
+      ),
+      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
+    },
+  });
 });
 ```
 
 Use `calculateReport` when you already have descriptor-typed facts:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 
 const effect = calculateReport(AuAnnualIncomeTaxCalculation, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
 ## Use an Effect client
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { createClient } from "@taxkit/sdk/effect";
 import {
   AuIncomeTax2025_26Module,
@@ -94,14 +110,15 @@ const client = createClient(AuIncomeTax2025_26Module);
 
 const effect = client.calculations.calculateReport(
   AuAnnualIncomeTaxCalculation,
-  { taxableIncome: aud(9_000_000) }
+  { taxableIncome: aud(Cents.make(9_000_000)) }
 );
 ```
 
 ## Requirements
 
-Effect helpers require `PublicCalculatorService` in the environment. The plain
-SDK provides its own runtime. The Effect SDK leaves service provision to the
+Effect helpers require `PublicCalculatorService` in the environment. Each
+plain SDK client owns its runtime and must be disposed when finished; direct
+helpers clean up before returning. The Effect SDK leaves service provision to the
 consumer so application layers and tests can choose the calculator service
 implementation.
 

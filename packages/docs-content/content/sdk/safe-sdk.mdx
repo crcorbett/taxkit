@@ -1,7 +1,7 @@
 ---
 title: "Safe SDK"
 description: "Return typed success or failure values from SDK calculations."
-status: "draft"
+status: "published"
 ---
 
 # Safe SDK
@@ -12,12 +12,12 @@ rejected Promises.
 ## Call `TaxKit.safe.calculate`
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 if (result._tag === "TaxKitSuccess") {
@@ -35,11 +35,11 @@ The result is either `TaxKitSuccess` with the calculator report or
 ## Call AU safe helpers
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const result = await au.incomeTax.safe.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
@@ -47,7 +47,9 @@ const result = await au.incomeTax.safe.annual({
 
 Use the safe facade when your application already models expected failures as
 data, or when you want to handle schema decode errors in the same branch as
-calculation failures.
+calculation failures. A client that has been closed returns `TaxKitFailure` with
+`TaxKitClientDisposedError` in `result.error.error`. Await `client.dispose()` when
+finished; the [Plain SDK](./plain-sdk.mdx) shows a `try`/`finally` example.
 
 Use `TaxKit.calculate` when rejected Promises fit your existing control flow.
 

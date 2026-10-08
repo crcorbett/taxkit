@@ -6,7 +6,260 @@
       "owner": "packages/docs-content-public-doc-owner"
     },
     "statusDecision": {
-      "acceptanceRecords": [],
+      "acceptanceRecords": [
+        {
+          "path": "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--authentication-and-deployment-assumptions.json"
+        },
+        {
+          "path": "packages/docs-content/content/api/endpoints.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--endpoints.json"
+        },
+        {
+          "path": "packages/docs-content/content/api/errors.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--errors.json"
+        },
+        {
+          "path": "packages/docs-content/content/api/index.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/api--index.json"
+        },
+        {
+          "path": "packages/docs-content/content/api/openapi-reference.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--openapi-reference.json"
+        },
+        {
+          "path": "packages/docs-content/content/api/overview.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/api--overview.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/calculators.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--calculators.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/diagnostics.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--diagnostics.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/facts.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--facts.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/index.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--index.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/jurisdictions-and-tax-years.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--jurisdictions-and-tax-years.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--money-and-branded-values.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/reports.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/concepts--reports.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/rules.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--rules.json"
+        },
+        {
+          "path": "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/concepts--sdk-http-api-and-calculators-service-boundary.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/add-a-calculator.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-calculator.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/add-a-fact.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-fact.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/add-a-rule.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-rule.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/add-a-tax-year.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--add-a-tax-year.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/backward-compatibility.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--backward-compatibility.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/changesets.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--changesets.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/effect-service-standards.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--effect-service-standards.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/fix-an-incorrect-result.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--fix-an-incorrect-result.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/index.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--index.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/naming-and-schema-standards.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--naming-and-schema-standards.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/pr-evidence-checklist.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--pr-evidence-checklist.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/review-expectations.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--review-expectations.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/source-citation-standards.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--source-citation-standards.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/testing-standards.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--testing-standards.json"
+        },
+        {
+          "path": "packages/docs-content/content/contributing/what-are-you-changing.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/contributing--what-are-you-changing.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--build-a-browser-app-with-the-http-api.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--build-a-server-route-with-the-sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/guides--calculate-annual-income-tax.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--calculate-australian-take-home-pay.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--handle-validation-errors.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/index.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--index.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/guides--migrate-from-raw-http-to-sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/show-calculator-help-to-users.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--show-calculator-help-to-users.json"
+        },
+        {
+          "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/guides--test-your-integration.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/api.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--api.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/changelog.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--changelog.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/errors.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--errors.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/examples.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--examples.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/index.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--index.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/release-notes.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--release-notes.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/schemas.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--schemas.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/reference/versioning.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/reference--versioning.json"
+        },
+        {
+          "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--effect-sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/sdk/index.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--index.json"
+        },
+        {
+          "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--plain-sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/sdk/safe-sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--safe-sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/sdk/schemas.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--schemas.json"
+        },
+        {
+          "path": "packages/docs-content/content/sdk/type-safety.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--type-safety.json"
+        },
+        {
+          "path": "packages/docs-content/content/sdk/typescript-sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/sdk--typescript-sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--choose-sdk-or-api.json"
+        },
+        {
+          "path": "packages/docs-content/content/start/index.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--index.json"
+        },
+        {
+          "path": "packages/docs-content/content/start/install-the-sdk.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--install-the-sdk.json"
+        },
+        {
+          "path": "packages/docs-content/content/start/overview.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--overview.json"
+        },
+        {
+          "path": "packages/docs-content/content/start/quickstart.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--quickstart.json"
+        },
+        {
+          "path": "packages/docs-content/content/start/run-your-first-calculation.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-06/start--run-your-first-calculation.json"
+        },
+        {
+          "path": "packages/docs-content/navigation.json",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-07/navigation.json"
+        },
+        {
+          "path": "packages/docs-content/content/api/agent-tools.mdx",
+          "record": "docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-08/api--agent-tools.json"
+        }
+      ],
       "path": "docs/documentation-audit/hgi-207/public-mdx-lifecycle.json",
       "owner": "taxkit-product-owner",
       "semantics": "accepted-public-lifecycle",

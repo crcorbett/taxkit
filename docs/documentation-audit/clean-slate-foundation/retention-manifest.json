@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "8ed03f0e1a96d2cc258b68935b9f9be443666e1b",
+  "observedAt": "2026-10-04",
+  "repository": "crcorbett/taxkit",
+  "authority": "Cooper implementation request; no deletion, merge, deploy or provider mutation performed.",
+  "retention": [
+    {
+      "surface": "tax rules and known results",
+      "paths": [
+        "packages/core",
+        "packages/calculators",
+        "packages/rules/au"
+      ],
+      "decision": "Preserve",
+      "owner": "TaxKit domain maintainer",
+      "removalGate": "Retain all tax behaviour; interface/dependency changes require old/new known-result comparison.",
+      "recovery": "Restore named paths from 8ed03f0e1a96d2cc258b68935b9f9be443666e1b; provider recovery follows docs/runbooks/docs-deployment.md with separate authority.",
+      "sourceTrees": [
+        {
+          "path": "packages/core",
+          "object": "de77f2e0573ff553246a9f4568ce383b34009174"
+        },
+        {
+          "path": "packages/calculators",
+          "object": "83c2f0063022a843701b712b11ab88b4968f0ab6"
+        },
+        {
+          "path": "packages/rules/au",
+          "object": "0993790adda7128879b73fbd84223df6cc81ae27"
+        }
+      ],
+      "trackedEntries": 124
+    },
+    {
+      "surface": "authored content",
+      "paths": [
+        "packages/docs-content"
+      ],
+      "decision": "Preserve",
+      "owner": "TaxKit content owner",
+      "removalGate": "Retain source; accept publication per page in T005.",
+      "recovery": "Restore named paths from 8ed03f0e1a96d2cc258b68935b9f9be443666e1b; provider recovery follows docs/runbooks/docs-deployment.md with separate authority.",
+      "sourceTrees": [
+        {
+          "path": "packages/docs-content",
+          "object": "034721fd185dd0f37cdc3bc8264caa6a9875cdd5"
+        }
+      ],
+      "trackedEntries": 89
+    },
+    {
+      "surface": "historical and binary evidence",
+      "paths": [
+        "docs/evidence",
+        "docs/documentation-audit",
+        "docs/exec-plans/completed"
+      ],
+      "decision": "Preserve",
+      "owner": "TaxKit evidence owner",
+      "removalGate": "Never delete or rewrite historical claims.",
+      "recovery": "Restore named paths from 8ed03f0e1a96d2cc258b68935b9f9be443666e1b; provider recovery follows docs/runbooks/docs-deployment.md with separate authority.",
+      "sourceTrees": [
+        {
+          "path": "docs/evidence",
+          "object": "c347f6c7b70b9a22984c09bb523bd7d9062cf78d"
+        },
+        {
+          "path": "docs/documentation-audit",
+          "object": "a7f9342264aac93824cb981dcb4c6481b340accc"
+        },
+        {
+          "path": "docs/exec-plans/completed",
+          "object": "0a2ecf53e595b864bfb620fb581c8b938024ead8"
+        }
+      ],
+      "trackedEntries": 427
+    },
+    {
+      "surface": "old docs runtime",
+      "paths": [
+        "apps/docs",
+        "packages/docs-fumadocs"
+      ],
+      "decision": "Replace after proof",
+      "owner": "TaxKit frontend owner",
+      "removalGate": "T005 proves replacement content/rendering and old URL dispositions before T010 removes wiring.",
+      "recovery": "Restore named paths from 8ed03f0e1a96d2cc258b68935b9f9be443666e1b; provider recovery follows docs/runbooks/docs-deployment.md with separate authority.",
+      "sourceTrees": [
+        {
+          "path": "apps/docs",
+          "object": "48e76bb5652b97080765c8c37101397c63e90bcd"
+        },
+        {
+          "path": "packages/docs-fumadocs",
+          "object": "acc3e4f4a94613ec29cda35fb4c731260179ee79"
+        }
+      ],
+      "trackedEntries": 55
+    },
+    {
+      "surface": "starter website and API",
+      "paths": [
+        "apps/web",
+        "apps/api",
+        "packages/api/http",
+        "packages/sdk/typescript"
+      ],
+      "decision": "Replace after proof",
+      "owner": "TaxKit application owner",
+      "removalGate": "T003/T004 retain HTTP contract and qualify new interfaces before retirement.",
+      "recovery": "Restore named paths from 8ed03f0e1a96d2cc258b68935b9f9be443666e1b; provider recovery follows docs/runbooks/docs-deployment.md with separate authority.",
+      "sourceTrees": [
+        {
+          "path": "apps/web",
+          "object": "0b07741206c2b2d27969186862f147f1f47a5c98"
+        },
+        {
+          "path": "apps/api",
+          "object": "e8c345805de9f554b6b57c54ae6ef4bf4f3e76fd"
+        },
+        {
+          "path": "packages/api/http",
+          "object": "971d398048881b1875f321a51e847975a711bfa1"
+        },
+        {
+          "path": "packages/sdk/typescript",
+          "object": "ff3e6c1bb451abc180c3a921b44aeecf0de5e421"
+        }
+      ],
+      "trackedEntries": 76
+    },
+    {
+      "surface": "infrastructure and release tooling",
+      "paths": [
+        "alchemy.run.ts",
+        "packages/infrastructure",
+        "tools/docs-deployment",
+        ".github/workflows",
+        "packages/scripts",
+        ".changeset"
+      ],
+      "decision": "Replace after proof",
+      "owner": "TaxKit infrastructure maintainer",
+      "removalGate": "T007/T010 require exact reviewed plan, rollback and separate provider authority.",
+      "recovery": "Restore named paths from 8ed03f0e1a96d2cc258b68935b9f9be443666e1b; provider recovery follows docs/runbooks/docs-deployment.md with separate authority.",
+      "sourceTrees": [
+        {
+          "path": "alchemy.run.ts",
+          "object": "28b899006e1bb9745b2ffa127c6993ea58b68a80"
+        },
+        {
+          "path": "packages/infrastructure",
+          "object": "f25acfd84450c955dfd2eb525d04b8f46496fb30"
+        },
+        {
+          "path": "tools/docs-deployment",
+          "object": "bdf7b4568fb6f118c43efdcede0c975bda00666f"
+        },
+        {
+          "path": ".github/workflows",
+          "object": "a26969303718b7a397f34c05fbfaee517c653446"
+        },
+        {
+          "path": "packages/scripts",
+          "object": "3832e3806453db7585900f1a902a5348fa0e1e4c"
+        },
+        {
+          "path": ".changeset",
+          "object": "532320b1ce51f1b96ae598845571fdbaa9f3532d"
+        }
+      ],
+      "trackedEntries": 102
+    }
+  ],
+  "supportedScope": {
+    "jurisdiction": "AU",
+    "taxYear": "2025-26",
+    "calculators": [
+      "au.pay.take-home",
+      "au.pay.withholdings",
+      "au.income-tax.annual"
+    ],
+    "payScope": "PAYG only",
+    "knownResultOwner": "packages/calculators/__tests__/public-calculator-service.test.ts",
+    "sourceTestBlob": "9bc57f2a6f1fe751c58f26a55c0a678ff88f694f",
+    "examples": [
+      {
+        "calculator": "au.pay.take-home",
+        "grossPayCents": 165400,
+        "period": "weekly",
+        "thresholdClaimed": true,
+        "netPayCents": 130100,
+        "withholdingsCents": 35300
+      },
+      {
+        "calculator": "au.pay.withholdings",
+        "grossPayCents": 950000,
+        "period": "monthly",
+        "thresholdClaimed": false,
+        "withholdingsCents": 275600
+      },
+      {
+        "calculator": "au.income-tax.annual",
+        "taxableIncomeCents": 6700000,
+        "liabilityCents": 1222800
+      }
+    ]
+  },
+  "handover": {
+    "completedCommit": "ae63107",
+    "recoveryReceipt": "docs/evidence/deployments/2026-10-03-production-hosted-proof-investigation/receipt.json",
+    "productionCandidate": "84d65144938b7b8b25672f070e790b74ec09237d",
+    "deploymentId": "0a18a513-450a-4213-8418-bb65fc8fbabd",
+    "versionId": "6456470d-0f8d-4d5b-b5b2-521e1306bd32",
+    "hostedVerificationRun": 37096642146,
+    "limitation": "Historical receipt, not fresh provider readback. Original deploy run failed; independent hosted recovery passed; rollback unexercised."
+  },
+  "publicContract": {
+    "packages": "Retained private 1.0.0 manifests and nine-package fixed train; no registry publication inferred.",
+    "httpOwner": "packages/api/http/__snapshots__/openapi.json",
+    "urlInventoryOwners": [
+      "packages/docs-content/navigation.json",
+      "packages/docs-content/content",
+      "docs/verification/critical-journeys.json"
+    ],
+    "retirementGate": "T005 must map every old public route to a proved replacement or explicit disposition. Nothing removed in T001."
+  },
+  "nonClaims": [
+    "No new dependency graph qualified",
+    "No cloud or registry state changed",
+    "No new compatibility revision for adad yet"
+  ]
+}

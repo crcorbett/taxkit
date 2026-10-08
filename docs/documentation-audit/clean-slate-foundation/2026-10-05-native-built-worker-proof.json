@@ -1,0 +1,256 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-05",
+  "issue": "DEV-73",
+  "parent_revision": "b2a556c8818a83fdfe97d79709bbda0d89b4b8db",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "repository": "crcorbett/taxkit",
+    "environment": "local pinned macOS/Bun/Chromium; no provider apply",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "version application",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Native Command and closed named LocalCloudflareBuiltProof service with Schema-owned options/errors/full receipt/manifest",
+    "Native Config filtered environment, filesystem, HTTP, Crypto, child-process bounded streams, monotonic time, scoped cleanup and finite deadlines",
+    "Private Playwright adapter with immutable Ref observations, bounded callback queues and actual browser failures/interruption",
+    "Preserved local Wrangler arguments, command aliases, sorted path/NUL/content/NUL digest bytes, sixteen assertions and original receipt fields",
+    "Exact canonical strict selectors/runtime/codec admissions, actual CLI fixtures and source counterexamples"
+  ],
+  "checks": [
+    {
+      "command": "focused native compiler / root lint",
+      "outcome": "pass; all private adapters/entry/fixtures included, 396 owned lint files, zero warnings/errors",
+      "logs": [
+        "built-native-final-app-types-qualified.log",
+        "built-native-policy-types-corrected.log",
+        "built-native-lint-types.log",
+        "built-native-qualified-root-lint.log"
+      ]
+    },
+    {
+      "command": "bun run test",
+      "outcome": "pass: 24 package tasks, 23 matching caches; 53 docs script and 19 server cases; 378 actual CLI lint cases",
+      "logs": [
+        "built-native-root-tests.log"
+      ]
+    },
+    {
+      "command": "strict source contract controls",
+      "outcome": "40 native cases pass, including 15 deliberate built-proof bypasses",
+      "logs": [
+        "built-native-source-contracts.log"
+      ]
+    },
+    {
+      "command": "reversible actual malformed body mutation",
+      "outcome": "old string fails exact HTTP body assertion: observed quoted valid JSON string instead of raw broken JSON; original adapter restored",
+      "logs": [
+        "built-native-malformed-body-mutation.log"
+      ]
+    },
+    {
+      "command": "bun run build",
+      "outcome": "pass: 15 tasks, 14 matching caches",
+      "logs": [
+        "built-native-root-build.log"
+      ]
+    },
+    {
+      "command": "bun run --filter=docs test:cloudflare-built -- --screenshots",
+      "outcome": "pass: real generated local Worker/Chromium; all sixteen outcome assertions, nine concurrent requests, one shared context, three browser server functions, zero document reloads/diagnostics; both screenshots and manifest saved after cleanup",
+      "logs": [
+        "built-native-qualified-worker-proof.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass: 30 Quality cases including 11 isolated checks, 263.91 seconds; 206 deployment-tool, 21 skill, 16 evaluation cases; both unused-code profiles; 24 compiler tasks (23 matching caches); SDK/browser 24 and web/browser four matching caches",
+      "logs": [
+        "built-native-full-verification.log"
+      ]
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "pass: unchanged selected graph; 792 installs/1020 packages; native compiler patch retained",
+      "logs": [
+        "built-native-frozen-install.log"
+      ]
+    },
+    {
+      "command": "independent process readback",
+      "outcome": "no task Worker/Wrangler/Chromium/test process remains after successful scope cleanup; inspection shell itself excluded"
+    },
+    {
+      "command": "fresh actual CLI inventory with strict rules applied to all Git-owned source paths",
+      "outcome": "396 admitted files including staged additions; ten contextual diagnostics only in five deliberate lint inputs, zero remaining owned application/tool workflow diagnostics; inventory exit 1 is retained rather than relabelled as a passing lint command",
+      "logs": [
+        "2026-10-05-git-owned-strict-inventory-after-built.json",
+        "2026-10-05-git-owned-strict-inventory-after-built.stderr"
+      ]
+    }
+  ],
+  "documentation_impact": {
+    "Change required": [
+      "apps/docs/README.md",
+      "docs/architecture/testing-and-quality.md",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/product-specs/clean-slate-foundation.tasks.json",
+      "oxlint.config.ts",
+      "tools/oxlint/portable-rules.test.ts",
+      "tools/docs-deployment/strict-boundaries.policy.ts",
+      "tools/docs-deployment/strict-boundaries.contract.test.ts",
+      "apps/docs/tsconfig.scripts.json",
+      "apps/docs/vitest.scripts.config.ts"
+    ],
+    "Preserve": [
+      "public content/runtime",
+      "installed dependencies and lockfile",
+      "command/output/screenshot paths and historical receipts",
+      "canonical skills/digests",
+      "provider state and all retained tax results"
+    ],
+    "N/A": {
+      "Changeset": "private unversioned app; no package-facing change",
+      "new runbook or provider operation": "same local-only command and authority boundary",
+      "generated/public content": "unchanged"
+    }
+  },
+  "recovery": {
+    "failed_observations": [
+      "Initial real-browser failure remains unexplained; subsequent phase-logged and unlogged screenshot runs pass",
+      "Removing temporary logging initially left a syntax error; corrected and retained",
+      "Initial native test APIs/types/tuple readback and formatted replacement mismatches corrected before acceptance",
+      "Initial controlled browser count expected three; fixture has two actual browser fetches plus separate malformed POST",
+      "Initial pending-response interruption fixture lacked its own scope; corrected to scope the interrupted operation",
+      "Initial growing-file fixture used unavailable Stream.repeatValue; installed native Stream.range owns the corrected fixture"
+    ],
+    "rollback": "revert this complete slice to parent revision",
+    "resume_trigger": "finish this slice and remaining T002 semantic/enforcement review, then DEV-74\u201381 in accepted order",
+    "next_owner": "TaxKit implementation owner"
+  },
+  "limitations": [
+    "Final canonical whole-source scope/fixture containment and broader T002 semantic review remain pending",
+    "Local fixtures are not generated Worker/provider proof",
+    "No live Workers URL/provider apply/deployment/merge/publication/version application",
+    "Playwright has no AbortSignal; cleanup is proven separately through actual pending HTTP retirement",
+    "DEV-73 and DEV-74\u201381 remain unfinished; Medicare separate"
+  ],
+  "postconditions": [
+    "Same three native candidate hashes as parent legacy orchestration",
+    "Actual process output overflow interrupts and closes the observed child",
+    "Five-minute total deadline releases native process scope",
+    "Native artifact byte-stream cap survives understated growing-file metadata",
+    "Private browser diagnostics/queue overflow fail safely; actual pending response retires on scoped interruption",
+    "No receipt write after a late cleanup defect; saved bytes checked against owning Schema encoding",
+    "Mandatory local qualification passes; local proof is separate from hosted Quality/provider proof"
+  ],
+  "logs_location": "Task-local pinned-toolchain directory; portable basenames only",
+  "local_worker_observation": {
+    "browser": {
+      "name": "Chromium",
+      "version": "153.0.8010.12"
+    },
+    "candidate": {
+      "assetsSha256": "96eb38299fe83d1d4ed5267756fa63cd38af6846801f25e59a445e650718cfd5",
+      "deploymentInputSha256": "26617f31ef188e7359c2e718590ce0ad4000d91ab1c3d856e8b1df7791cf37fe",
+      "sourceCommit": "b2a556c8818a83fdfe97d79709bbda0d89b4b8db",
+      "workerModulesSha256": "45d7650bd1fddbcea50e5470708993a8cb450d235816ee3238fe44a31dab97f2",
+      "worktreeQualifiedBeforeCommit": true
+    },
+    "dependencies": {
+      "cloudflareVitePlugin": "1.62.5",
+      "workerd": "1.20261001.1",
+      "wrangler": "4.147.0"
+    },
+    "evidenceClass": "local-workerd",
+    "filesystem": {
+      "isolatedOutputOnlyExecution": true,
+      "nodeFileSystemModules": [
+        "assets/policy-DAVKzKc6.js",
+        "assets/runtime.server-DggjVMoy.js"
+      ],
+      "providerCredentialEnvironmentAllowed": false,
+      "requestTimePolicyImportObserved": false
+    },
+    "limits": {
+      "firstResponseRequestMs": 211.98,
+      "gzipUploadBytes": 572293.12,
+      "localProcessStartToFirstResponseMs": 840.59,
+      "rawServerModuleBytes": 3373988,
+      "rawUploadBytes": 3373987.84,
+      "workerSizeLimitBytes": 3145728
+    },
+    "nonClaims": [
+      "Local workerd does not prove a Cloudflare account, provider deployment, workers.dev URL, remote state, Preview, Production or rollback.",
+      "The startup observation is local workerd evidence; provider startup validation remains required."
+    ],
+    "oracles": {
+      "accessibility": "passed",
+      "assetCacheHeaders": "passed",
+      "assets": "passed",
+      "clientNavigationWithoutDocumentReload": "passed",
+      "clientNotFound": "passed",
+      "concurrentRequestIsolation": "passed",
+      "consoleAndPageErrors": "passed",
+      "directNotFound": "passed",
+      "hydration": "passed",
+      "malformedServerFunction": "passed",
+      "mobileNavigationDisclosure": "passed",
+      "pendingNavigation": "passed",
+      "recoverableError": "passed",
+      "reducedMotion": "passed",
+      "serverFunctionTransport": "passed",
+      "ssr": "passed"
+    },
+    "owner": "DCD-001 local Cloudflare built-app harness",
+    "runtime": {
+      "concurrentRequestsPassed": 9,
+      "observedConstructionCount": 1,
+      "observedDescendantCount": 4,
+      "observedIsolateId": "rfmzphmjgt-gadjh5756u",
+      "observedWorkerdDescendantCount": 2,
+      "perRequestConstructionPatternAbsent": true
+    },
+    "schemaVersion": 1,
+    "screenshots": [
+      {
+        "kind": "desktop",
+        "path": "screenshots/desktop.png",
+        "sha256": "e8b75dbfa8cdd95fe3a1f85da53c71214376c99e4ee9e28691de25d0f2ed3d23",
+        "viewport": {
+          "deviceScaleFactor": 1,
+          "height": 1000,
+          "width": 1440
+        }
+      },
+      {
+        "kind": "mobile",
+        "path": "screenshots/mobile.png",
+        "sha256": "498d5168e46cfe6e6e2fd19ccb28207cb8d4cd9cf4464a41e2979399dde272ae",
+        "viewport": {
+          "deviceScaleFactor": 1,
+          "height": 844,
+          "width": 390
+        }
+      }
+    ]
+  },
+  "dependency_contract": {
+    "Bun": "1.4.2",
+    "Effect": "4.0.0",
+    "TypeScript": "7.0.2",
+    "effect_tsgo": "0.48.0",
+    "Playwright": "1.63.0",
+    "Chromium": "153.0.8010.12",
+    "dependency_changes": "none"
+  }
+}

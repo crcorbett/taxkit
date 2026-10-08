@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-recovery-operation-owner
-last_reviewed: 2026-07-30
+last_reviewed: 2026-10-07
 review_trigger: release evidence, recovery target, Git/provider topology, or authority change
 ---
 
@@ -61,6 +61,37 @@ reviewer rule and fixed `prod` lock remain intact; never substitute
 Doppler-only. Direct Turbo or Cloudflare GitHub values must not be recreated.
 
 ## Evidence and postcondition
+
+### Native domain partial failure
+
+The dated preparation read is retained at
+`docs/documentation-audit/clean-slate-foundation/2026-10-07-domain-provider-readback.json`.
+
+The replacement `TaxKitAppsCloudflare` graph and its version-three plan keep
+the existing Production zone/settings retained. Preview omits them. Never use
+Production stack destruction as rollback, or transfer an old `DocsWebsite`
+receipt to the replacement pair. Identify both previous app artifacts and
+their exact Worker/class/binding/domain identities first.
+
+The native Worker provider uploads its script before reading shared redirect
+rules. Its narrow patch stops rule replacement on an access/read failure; it
+does not undo that earlier script upload. Preserve the failed receipt and last
+successful step, then read script versions, bindings, attachments and shared
+rules independently. Prepare only the smallest source-bound recovery under
+separate approval, preserving foreign rules, DNS, registrar and DNSSEC state.
+The [deployment runbook](docs-deployment.md) owns the exact targets and readback.
+No cloud rollback is qualified by the local fixture checks.
+
+The dated native cloud and agent guide delivery receipts retain the previously
+qualified sources, exact app versions and protected domain identities. For a
+native rollback, prepare both apps from that exact accepted source, use the
+existing state/credential selection and qualify a fresh plan under the
+deployment runbook. Preserve the retained zone, DNS settings, domain ownership
+and foreign rules. Do not destroy the Production stack or shared state store.
+After a separately approved redeploy, independently check both app versions,
+their self/peer bindings, domain/DNS/redirect state and the actual public
+journeys. A proposed source-bound recovery is not an executed rollback or
+proof that provider planning will converge to no changes.
 
 Read-only diagnosis produces a bounded incident record with artifact identity,
 environment, authority, observed evidence, failed invariant, recovery proposal,

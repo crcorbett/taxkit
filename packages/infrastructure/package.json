@@ -5,9 +5,9 @@
   "type": "module",
   "exports": {
     "./stack": {
-      "source": "./src/stack.ts",
-      "types": "./src/stack.ts",
-      "default": "./src/stack.ts"
+      "source": "./src/retired-stack.schemas.ts",
+      "types": "./src/retired-stack.schemas.ts",
+      "default": "./src/retired-stack.schemas.ts"
     },
     "./stage": {
       "source": "./src/stage.ts",
@@ -18,18 +18,38 @@
       "source": "./src/cloudflare/website.ts",
       "types": "./src/cloudflare/website.ts",
       "default": "./src/cloudflare/website.ts"
+    },
+    "./apps-stack": {
+      "source": "./src/apps-stack.ts",
+      "types": "./src/apps-stack.ts",
+      "default": "./src/apps-stack.ts"
+    },
+    "./apps-secrets": {
+      "source": "./src/apps-secrets.boundary.ts",
+      "types": "./src/apps-secrets.boundary.ts",
+      "default": "./src/apps-secrets.boundary.ts"
+    },
+    "./posthog": {
+      "source": "./src/posthog/index.ts",
+      "types": "./src/posthog/index.ts",
+      "default": "./src/posthog/index.ts"
     }
   },
   "scripts": {
     "build": "tsc --noEmit",
     "check-types": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "bun --bun vitest run"
   },
   "dependencies": {
+    "@distilled.cloud/posthog": "1.0.0-rc.13",
+    "@taxkit/analytics": "workspace:*",
     "alchemy": "catalog:",
+    "api": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-bun": "catalog:",
+    "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

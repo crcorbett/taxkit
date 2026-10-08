@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-09-09
+last_reviewed: 2026-10-08
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -21,14 +21,23 @@ contains the proposed package map and dependency direction.
 Current implemented code lives in:
 
 - `apps/api`
-- `apps/docs`
 - `apps/web`
 - `packages/core`
 - `packages/calculators`
+- `packages/content`
+- `packages/analytics`
 - `packages/docs-content`
+- `packages/docs-examples`
 - `packages/docs-fumadocs`
 - `packages/api/http`
-- `packages/sdk/typescript`
+- `packages/api/rpc`
+: Private compiled native Effect RPC transport. It owns separately versioned
+  calculator and documentation procedures, thin named service handlers, checked POST/JSON ingress and
+  caller-scoped private client Layers. Calculator/content Schemas remain with
+  their existing owners. Explicit test-only composition is separate; no app
+  runtime or backend fallback belongs here. T003 app-host composition is locally accepted; T009 exported tracing remains open.
+
+`packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
@@ -85,7 +94,10 @@ for production-only runtime helpers.
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
 schemas, thin server handlers, OpenAPI, typed HTTP clients and HTTP
-status/transport annotations. Client and Layer constructors use `create*`;
+status/transport annotations. Its narrow `request-boundary` export also owns the
+shared streamed HTTP-body admission used by the RPC and native app hosts. The
+RPC package depends inward on that export and retains its compatibility alias;
+the HTTP package has no RPC runtime dependency. Client and Layer constructors use `create*`;
 deprecated `make*` aliases remain at the export owner for compatibility.
 
 `packages/calculators`
@@ -110,57 +122,107 @@ packed-artifact checks. Its strict downstream validator may orchestrate the
 nine-package release closure and materialize package-declared publication
 exports in temporary tarballs, but package manifests and exports remain owned
 by their packages. It must not depend on `@taxkit/api-http`; HTTP
-transports consume the SDK rather than the reverse. Its Effect entrypoint owns
+transports call the calculator service directly; the SDK is a test-only
+comparison dependency of the HTTP package. Its Effect entrypoint owns
 request-preserving calculator helpers such as `calculateRunRequest`,
 `calculateReportRequest` and `calculateReport`, while reusing
 calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
 
 `apps/web`
-: Current scaffold app. It proves the runtime boundary and health endpoint
-while a future product workflow is still unscoped.
+: Native TanStack Website candidate. It owns form presentation/commands, the
+  server runner and React Atom registry. The private server binding and checked
+  public browser address reach the separate API through native RPC. The root
+  restores encoded outcomes. Tax rules and calculations remain package/API-owned;
+  the three calculator pages and bounded T003 connection are locally qualified.
+  The same app owns checked documentation page loaders, app-specific MDX
+  composition, navigation/focus, search and responsive reading. Its server
+  returns checked backend discovery documents at their conventional addresses.
+  Both Markdown representations and generated share images are locally
+  qualified. Current release documentation checking selects this app.
+  The old `apps/docs` workspace and writer workflows are retired; its
+  verified original source and dated recovery records remain addressable.
 
 `apps/docs`
-: Implemented public documentation app. It owns TanStack Start routes, the
-  docs app shell, route loaders, navigation presentation and app-local
-  MDX component composition, Schema-decoded build target, Cloudflare Vite
-  configuration, static-asset headers and local built-Worker proof. It
-  consumes package-owned content and Fumadocs helpers, but does not own
-  canonical frontmatter, navigation, generated source or reusable Fumadocs
-  integration contracts. It composes and executes one module-scoped
-  server-only managed runtime; browser code restores encoded route transport
-  and does not own an Effect runtime.
+: Retirement tombstone only. The strict historical source bundle retains all
+  49 original files. The deployment runbook owns inspection and separately
+  approved recovery, rather than an active old workspace.
 
 Root `alchemy.run.ts`
-: Repository deployment composition for the docs app. It owns Cloudflare
-  providers and remote state, decodes the stage, and calls the private
-  infrastructure package. It is not an application runtime owner.
+: Static retirement record which the actual Alchemy importer refuses before
+  session providers, remote state and planning. It declares no empty graph.
 
 `packages/infrastructure`
-: Private source-only owner of the `TaxKitDocsCloudflare` stack identity,
-  deployment stage Schema and one `Cloudflare.Website.Vite("DocsWebsite")`
-  resource policy. Its outputs remain Alchemy Outputs until the deployment
-  boundary resolves them. The docs app has no runtime dependency on it;
-  app-local proof scripts independently assert expected built settings.
+: Private source-only owner of the native API/Website graph and stage/secret
+  selection, plus the separate retained PostHog project candidate through the
+  explicit `./posthog` export and `alchemy.posthog.run.ts`. Its private management
+  adapter contains Distilled; application packages do not receive that client
+  or its management credentials. The old `./stack` export is now the typed retirement marker.
+  Pure retained old stage/resource metadata remains for historical receipt
+  decoding. New provider operations belong DEV-81 and cannot inherit old IDs
+  or approvals.
 
 `tools/docs-deployment`
-: Repository-local Schema, policy and command boundary for docs deployment
-  authority, stable journey inventory and sanitized dated receipts. It owns no
-  provider-generic framework, raw client, app runtime or reusable package. The
-  current validator performs no provider operation.
+: Read-only historical receipt, source and policy checks. Retired writer CLI
+  and workflow paths stop before configuration or credential fetch. Native
+  process tests qualify the stops separately from historical source inspection.
 
 `apps/api`
-: Current standalone Bun API runtime. It owns process config, startup,
-shutdown and platform serving for the implemented API app.
+: API application owner. It retains standalone Bun config/startup/shutdown
+and adds the native Alchemy Worker candidate for active DEV-74. The native
+instance owns one router and calculator service; incoming requests own body
+limits, dispatch and cleanup. HTTP and RPC share the named calculator service operations.
+The private `api/worker` export supplies native composition to the infrastructure
+graph. The Website uses its private binding for SSR and checked public origin
+for browser RPC; T003 is locally accepted by its dated connection acceptance review.
+T009 exported tracing and provider/deployment proof remain open.
+
+`packages/content`
+: Private compiled owner of canonical docs page/navigation contracts, source
+  errors, the accepted public catalogue Schema and `ContentService`. Application
+  composition injects one checked catalogue; the service reads accepted pages,
+  navigation and bounded search without filesystem or runtime execution. This
+  owner does not perform source acceptance or compile MDX. HTTP and native RPC
+  content groups consume this compiled contract instead of the source-only
+  Fumadocs collection. The public path refinement and fixed page/search errors
+  have one owner here. `ContentDiscovery` and its separate live/test composition
+  derive the four discovery documents from the same catalogue and deferred
+  checked stage settings. Shared public-origin policy and distinct Website
+  identity live in its Schema owner; RPC retains a distinct API identity.
+
+`packages/analytics`
+: Private compiled owner of checked page/calculator events, collection policy,
+  settings, safe errors and named browser/backend service contracts. Its native
+  backend capture Layer has one bounded HTTP attempt. The application owns
+  execution, best-effort delivery and successful-use placement; the Website
+  owns its private browser SDK and relay; infrastructure owns retained provider
+  projects. Calculators, rules and the local SDK have no analytics dependency.
+  T008 application and provider qualification remain in progress; package tests
+  alone do not prove browser privacy or ingestion.
 
 `packages/docs-content`
 : Implemented private source-only content package. It owns TaxKit docs
-  authored MDX, navigation, examples, frontmatter, meta, validation issues,
-  tagged docs errors, `DocsContentService`, the Fumadocs `source.config.ts`
-  and the generated `.source/*` boundary. Navigation decoding is independent
+  authored MDX, authored navigation, meta, validation issues,
+  validation errors, `DocsContentService`, the Fumadocs `source.config.ts`
+  and the generated `.source/*` boundary. Its schema/error exports retain
+  compatibility re-exports from `@taxkit/content`. Navigation decoding is independent
   of the Node-only validation module. Validation and generated raw-text access
   may read MDX files only through their explicit non-runtime operations; app
   routes use processed generated content through the service and client
   exports. Service interfaces use the precise `Contract` suffix.
+  The independent native MDX index and `./catalogue-source` Layer belong only
+  to the local accepted-catalogue builder. Request/browser code consumes its
+  checked generated representation; it must not initialise that compiler.
+  The package build emits the accepted JSON catalogue; `./public-catalogue`
+  exports that value without importing the source compiler or live Layers.
+
+`packages/docs-examples`
+: Private owner of the four retained integration templates, additional checked
+  public snippet sources and their
+  compiler/runtime checks. It depends on HTTP, SDK and calculator contracts.
+  Those dependencies stay outside docs-content so HTTP can consume content
+  contracts without a circular build graph. It has no exports, generated
+  content, service runtime or publication entrypoint. Its standard compiler
+  build emits the templates without exporting a runtime package.
 
 `packages/docs-fumadocs`
 : Implemented private reusable package for generic Fumadocs integration. It
@@ -197,7 +259,8 @@ belongs in apps or explicitly server-only package exports.
 - Keep repository path classification and safe reporting in
   `tools/repository-paths`; do not move it into package orchestration or browser
   code.
-- Keep app-specific MDX components in `apps/docs`; promote only generic,
+- Keep replacement app-specific MDX components in `apps/web`; old components
+  remain with the retained legacy app until retirement. Promote only generic,
   repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
   TaxKit UI primitives to `packages/ui`.
 - Do not add flat engine packages once nested domain or rule ownership exists.
@@ -207,12 +270,19 @@ belongs in apps or explicitly server-only package exports.
   call package-owned services, but reusable calculator lookup, metadata
   transformation, graph assembly, calculation dispatch and expected error
   shaping belong in service packages such as `packages/calculators`. The
-  current calculate handler is thinner still: it selects the SDK descriptor for
-  the route calculator id, calls `@taxkit/sdk/effect` `calculateRunRequest`
-  once, and maps only transport envelopes.
+  current calculate handler supplies the checked route ID, body and query to
+  `PublicCalculatorService.calculate` once and maps only transport envelopes.
 
 ## Related docs
 
 - [Package boundaries](./package-boundaries.md)
 - [Effect services](./effect-services.md)
 - [API and SDK](./api-and-sdk.md)
+
+
+`@taxkit/infrastructure` also owns the separate native app candidate graph and
+root secret selection through explicit source-only exports. It consumes the
+API's named app export rather than reaching through a workspace filesystem
+path. Engine, HTTP and RPC packages have no infrastructure dependency. The API
+app retains ownership of native request/instance behaviour; root composition
+retains provider and state selection.

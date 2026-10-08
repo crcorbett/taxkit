@@ -1,7 +1,7 @@
 ---
 title: "Show calculator help to users"
 description: "Use calculator schema and error help to guide user input."
-status: "draft"
+status: "published"
 ---
 
 # Show calculator help to users
@@ -25,21 +25,31 @@ for the selected calculator.
 ## Example
 
 ```ts
-const calculatorId = "au.pay.take-home";
+import { TaxKitHttpApiService } from "@taxkit/api-http/client";
+import { createTaxKitApiClientLayer } from "@taxkit/api-http/client/live";
+import { HelpQuery } from "@taxkit/calculators/schemas";
+import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { Array, Effect, Layer, Option } from "effect";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
 
-const schemaResponse = await fetch(
-  `http://127.0.0.1:4000/api/v1/calculators/${calculatorId}/schema?help=schema`
-);
+export const loadCalculatorHelp = Effect.gen(function* () {
+  const client = yield* TaxKitHttpApiService;
+  const query = yield* HelpQuery.makeEffect({
+    help: Option.some(Option.some("schema")),
+  });
+  const schema = yield* client.calculatorApi.getCalculatorSchema({
+    params: { calculatorId: AuPayTakeHomeCalculation.calculatorId },
+    query,
+  });
+  return Array.map(schema.inputFacts, (fact) => `${fact.id}: ${fact.title}`);
+});
 
-if (!schemaResponse.ok) {
-  throw new Error("Could not load calculator schema");
-}
-
-const schema = await schemaResponse.json();
-
-console.log(
-  schema.inputFacts.map(
-    (fact: { id: string; title: string }) => `${fact.id}: ${fact.title}`
+// Your application supplies the public API origin and owns Effect execution.
+export const program = loadCalculatorHelp.pipe(
+  Effect.provide(
+    createTaxKitApiClientLayer({ baseUrl: "http://127.0.0.1:4000" }).pipe(
+      Layer.provide(FetchHttpClient.layer)
+    )
   )
 );
 ```
@@ -51,23 +61,11 @@ threshold claim used by the take-home pay calculator.
 
 ## Handle errors
 
-When calculate fails, request error help:
-
-```ts
-const response = await fetch(
-  `http://127.0.0.1:4000/api/v1/calculators/${calculatorId}/calculate?help=errors`,
-  {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ facts: {} }),
-  }
-);
-
-if (!response.ok) {
-  const body = await response.json();
-  console.error(body.error.help ?? body.error.issues);
-}
-```
+Let the typed client's expected error channel reach your application error
+handler. Display the checked issue paths or descriptor help from an input
+decode failure; [API errors](../api/errors.mdx) explains the envelope and other
+server failures. A calculation call with `help=errors` returns field help when
+its checked request facts do not match the selected calculator.
 
 ## Related pages
 

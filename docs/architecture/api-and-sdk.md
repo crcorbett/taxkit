@@ -1,11 +1,21 @@
 ---
-status: canonical
-last_reviewed: 2026-06-25
-source_of_truth: docs
-confidence: high
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-api-sdk-owner
+last_reviewed: 2026-10-08
+review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
 # API and SDK
+
+The active T008 candidate adds minimal analytics only in the native API app.
+The Website supplies fresh browser or original HTML preferences through the
+shared private header boundary. Its checked flag carries allow/deny without browser identity and
+cannot bypass normal calculator admission. One app decorator collects catalogue
+ID/name after success. Pure calculators and SDK package calls remain free of
+analytics. The [API README](../../apps/api/README.md#analytics-candidate) owns
+the current bounded collector, background delivery design and remaining proof.
 
 TaxKit should publish a reusable API app server and TypeScript SDK around the
 open-source calculation engine.
@@ -26,6 +36,18 @@ that owns host/port config, process startup through
 shutdown through Effect interruption and scoped layer finalizers. It delegates
 API contracts, handlers, schemas and generated docs to `packages/api/http`.
 
+API settings use the caller's native ConfigProvider and owning port/host
+Schemas. Missing ports use `PORT` and then 4000; an invalid present `API_PORT`
+fails with a bounded settings error. Hosts retain trimming and blank fallback.
+The app's smoke command has named native HTTP operations, the public
+`HealthResponse` Schema and existing calculator Schemas. Request deadlines
+include headers and body decoding (health 15 seconds including retries, other
+routes five seconds). It checks the OpenAPI calculate path and then runs a
+plain JavaScript consumer outside the checkout. That command has a 30-second
+limit, scoped lifetime, checked route evidence and bounded output/error
+reporting. Failed cleanup remains a failure, including alongside failed work.
+These checks establish local app/consumer behaviour only.
+
 The current implemented API surface is:
 
 ```txt
@@ -41,9 +63,13 @@ POST /api/v1/calculators/:calculatorId/calculate
 GET /api/v1/calculators/:calculatorId/graph
 GET /api/v1/facts
 GET /api/v1/rules
+GET /api/v1/docs/navigation
+GET /api/v1/docs/page?path=/start/quickstart
+GET /api/v1/docs/search?term=Quickstart
+GET /api/v1/docs/markdown?path=/start/quickstart
 ```
 
-`apps/web` consumes this API over HTTP. It must not mount the canonical API or
+`apps/web` consumes the separate API through native RPC. It must not mount the canonical API or
 import server-only `@taxkit/api-http` exports.
 
 API process entrypoints should be Effect programs run with
@@ -76,9 +102,10 @@ config schema.
 generation, typed HTTP clients, server route layers and thin handler adapters.
 Reusable calculator catalog entries, metadata transformations, graph assembly
 and schema-error shaping live in `@taxkit/calculators`. The calculate route
-executes through the request-preserving `@taxkit/sdk/effect`
-`calculateRunRequest` helper as a normal in-process consumer, proving the
-public SDK boundary without making the SDK depend on HTTP transport code.
+calls the supplied `PublicCalculatorService` directly and maps its checked
+result to the HTTP response. SDK parity is proved by the package tests and
+packed-consumer checks; the production HTTP handler does not execute through
+the SDK.
 
 `@taxkit/api-http/config` exports the package-owned HTTP API client config
 schema, type and keyed config fragment. Apps compose that fragment into their
@@ -96,6 +123,18 @@ group or an owning package schema module. If downstream code needs the type,
 export it from the same module as a schema-derived type. Do not hand-write DTO
 interfaces or duplicate response shapes in handlers, clients or apps.
 
+The public documentation group uses canonical `@taxkit/content` page,
+navigation and search Schemas. Its thin handlers call `ContentService` and
+return the same processed page body for Markdown. Both API hosts inject a
+checked build-time JSON catalogue, without importing the MDX compiler into
+requests. Page queries are bounded public addresses; search terms and result
+sizes retain the content owner's limits. Missing-page and source-search
+failures have fixed typed 404/503 replies; native invalid queries return empty
+400 replies. These routes contain public documentation, never personal reports.
+The HTTP server Layers and native in-process client require supplied content.
+The latter runs native request Effects in caller-owned scopes and does not
+create an additional web-handler runner.
+
 Route-only HTTP envelopes, query schemas and status annotations stay in
 `@taxkit/api-http`. HTTP-facing names such as
 `CalculatorApiErrorEnvelope` stay in the transport package because they
@@ -109,22 +148,15 @@ The final calculate-route production graph is:
 ```ts
 Production: HTTP calculate
 
-apps/api Bun process
-  -> TaxKitServerLayer
+API host (retained Bun or native Worker candidate)
+  -> TaxKitApiRoutesLayer
     -> CalculatorApiHandlerLive
-      -> sdkCalculationFor(params.calculatorId)
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> selected CalculatorCatalogEntry.inputSchema decode
-          -> constructor-closed typed scenario continuation
-          -> CalculationEngine
-            -> rule package scenario layer
-            -> official rule pack layer
-            -> calculator program
-          -> CalculatorRunResponseData
-        -> descriptor output decode for response.report
-        -> typed CalculatorRunResponse with narrowed report
-      -> CalculatorApiErrorEnvelope on CalculatorServiceError
+      -> PublicCalculatorService.calculate({ calculatorId, payload, ...query })
+        -> selected CalculatorCatalogEntry.inputSchema decode
+        -> constructor-closed typed scenario continuation
+        -> CalculationEngine and owning rule/scenario Layers
+        -> CalculatorRunResponseData
+      -> existing CalculatorApiErrorEnvelope on expected service failure
 ```
 
 Metadata routes stay direct service adapters until a broader SDK catalog
@@ -163,14 +195,13 @@ Report-only helpers
 The matching test graph is:
 
 ```ts
-Tests: HTTP over SDK
+Tests: HTTP compared with SDK
 
 HTTP API tests
   -> TaxKitApiInProcessClientLive
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorServiceLive
-          -> CalculationEngineLive
+      -> PublicCalculatorServiceLive
+        -> CalculationEngineLive
   -> success response equals SDK full-run response
   -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
 ```
@@ -290,6 +321,39 @@ client guidance. Help output should be generated from canonical schemas, fact
 descriptors, rule descriptors, graph diagnostics and source references instead
 of hand-written route-specific DTOs.
 
+## Native API Worker candidate
+
+The active DEV-74 change adds `apps/api/src/worker.ts`, a native Alchemy
+Worker class and `.make` entry. Its instance initialisation constructs one
+router and acquires one calculator service for both `TaxKitApiRoutesLayer`
+and `TaxKitRpcHttpLayer`. `HttpRouter.toHttpEffect` returns the incoming
+request Effect; it does not create a backend ManagedRuntime.
+
+The host leaves resource addresses deferred during native planning and
+decodes/caches their bound values through Config on first incoming use.
+Absent or invalid origins return an empty 503; no address is invented. Native
+`Worker.URL` supplies its own address; infrastructure composition must supply
+the matching website Output before the app graph is accepted. Native CORS
+uses its supported origin predicate: the selected version's single-element
+array form emits a fixed allow-origin value even for unrelated origins.
+The predicate omits that header for an unrelated request. Only `content-type`
+is allowed for the current JSON client, with credentials disabled.
+
+POST bodies are read through the native Effect stream with a 64-KiB limit
+and a total five-second read deadline, before native JSON decoding. Oversized
+and stalled requests return checked JSON 413/408 guidance with the same CORS policy.
+The selected native web-request reader does not use `MaxBodySize`, so merely
+providing that reference would not enforce this limit. Native request
+conversion retains headers, method, path and remote address.
+
+The root installs a closed logger and error reporter before router construction
+and incoming dispatch. Console egress contains a fixed event, time and severity;
+raw native messages, Causes and arbitrary annotations do not escape this
+adapter. Full native trace/export proof remains pending. The native Worker
+candidate does not establish deployed availability. The T003 acceptance review
+qualifies the complete local connection; T009 retains safe native trace exports.
+The retained Bun entry and public HTTP/OpenAPI contract remain available.
+
 ## TypeScript SDK facade
 
 The current private SDK package lives under:
@@ -316,7 +380,7 @@ If the unscoped package name is unavailable at first publish, continue with
 It owns:
 
 - direct in-process calculation facade
-- plain TypeScript `TaxKit.create(...)` client factory and
+- plain TypeScript `TaxKit.createClient(...)` client factory and
   `TaxKit.{method}` generic helpers
 - Effect-native `./effect` entrypoint
 - jurisdiction-specific opt-in subpaths such as `./au`
@@ -329,8 +393,9 @@ It owns:
 The SDK must not import `@taxkit/api-http`, server handlers or Node-only
 modules from browser-safe entrypoints. It also must not expose Effect runtime
 types from the plain TypeScript entrypoint. HTTP clients and OpenAPI transport
-helpers stay in `@taxkit/api-http`, which depends on the SDK rather than the
-reverse.
+helpers stay in `@taxkit/api-http`. The SDK is a test-only comparison
+dependency of the HTTP package; the production HTTP adapter calls the owning
+calculator service directly.
 
 The plain facade maps typed calculator failures, output Schema failures and
 unexpected defects into stable SDK-owned messages. It preserves a typed
@@ -338,6 +403,64 @@ unexpected defects into stable SDK-owned messages. It preserves a typed
 `Cause.pretty` text, rejected values or private paths into either safe results
 or rejected Promises. Effect consumers continue to receive the typed error
 channel directly.
+
+Plain clients have caller-owned lifetimes. `createClient` creates one private,
+lazy ManagedRuntime per client, and `dispose(): Promise<void>` interrupts pending
+work/startup and awaits finalisation. An Effect Ref marks the client closed;
+an Effect Deferred shares cleanup completion with repeated or overlapping
+calls. Closing one client does not close another. Closed calculation calls have
+checked `TaxKitClientDisposedError` detail; cleanup defects produce the safe
+`TaxKitClientDisposeError`. The private `client.runtime.ts` is the exact Promise
+and execution host. Actual work is interruptible inside its client scope; public
+outcome conversion is protected so raw interruption errors do not escape.
+
+One-shot generic and AU helpers provide the calculator Layer in a temporary
+Effect scope and clean up before settling. They do not create a ManagedRuntime.
+Both plain paths reuse `calculateReport`; dispatch and output decoding have one
+owner. The Effect interface remains caller-composed and creates no runtime.
+These lifetime changes fulfil part of the accepted fresh interface work; they
+do not establish the later calculator UI, transport limits or whole-task acceptance.
+
+## Native website RPC (T003 locally accepted)
+
+`@taxkit/api-rpc` owns all nine named calculator-service procedures over canonical
+calculator request/result/query/metadata Schemas. Its native server mounts POST
+`/rpc` with JSON; handlers delegate to the corresponding
+named `PublicCalculatorService` operation.
+The protocol lives in the caller's Layer scope; each named operation acquires and
+releases its native generated client's receive loop. Expected
+calculator failures project to fixed reasons, while version disagreement,
+unavailable transport, invalid replies and a complete-response deadline remain
+separate checked failures. Independent adapter defects remain defects.
+
+Native parser ingress checks procedure tags, bounded identities/batches/headers
+and a 64-KiB UTF-8 input before dispatch. Native per-procedure and global defect
+encoding use a fixed value. The client marks only the native exit reply decoder;
+it does not classify every SchemaError as an invalid response. Installed Effect
+4.0.0 source and actual wire tests qualify these hooks. RPC APIs remain unstable.
+
+The [package README](../../packages/api/rpc/README.md) owns its explicit exports
+and current proof limits. The native API/Website candidates now consume it.
+The saved Website pair check exercises actual built artifacts, repeated private
+binding calls, an idle browser form, exact browser CORS and no-JavaScript POST.
+The saved native RPC failure check also runs malformed envelopes, procedure
+decoding, expected/version errors and an injected fatal operation in actual
+Workers. A damaged valid-JSON reply crosses the real private binding and
+restores a checked error in Chromium without replay. Fixed host log events are
+required as positive controls. The native cancellation test runs the real
+calculation/encoder before controlled twelve-second header/body delays. The
+generated client must hit its ten-second deadline; Chromium must abort on the
+deadline, editing and browser Back leaving the form. This establishes caller
+cancellation, with no upstream Worker cancellation claim. Native local development
+is separately qualified; T009 safe exported tracing remains in progress.
+Public HTTP/OpenAPI keeps its existing contract and shared application operation.
+
+Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and
+report/input definitions have separate canonical modules; old entrypoints
+re-export the same definitions. Browser transport imports therefore avoid live
+engine/calculator/rule-pack modules. This changes export ownership, not tax
+rules or retained report values. It does not change the SDK's deliberate local
+calculation composition.
 
 ## Export boundaries
 
@@ -352,7 +475,12 @@ targets and `files` limits the tarball. Because Bun resolves workspace and
 catalogue dependency protocols during packing but does not apply
 `publishConfig.exports`, the SDK-owned strict validator stages that declared
 publication view and Bun-packs it again. Acceptance is based on the final
-tarball manifest, clean installation and public-entrypoint imports.
+tarball manifest, clean installation and public-entrypoint imports. The
+validator decodes the staged manifest once through a Schema that preserves
+uninterpreted metadata, then encodes the declared publication view. Optional
+dependency keys remain absent when originally absent; staged JSON key order is
+not an artifact-byte guarantee. Each process has a scope, bounded stdout and
+safe operational failures. A failed cleanup also fails validation.
 
 ```json
 {
@@ -388,18 +516,21 @@ tarball manifest, clean installation and public-entrypoint imports.
 `.` should expose the plain, jurisdiction-neutral `TaxKit` facade. `./effect`
 should expose the Effect-native `TaxKit` facade used by HTTP handlers.
 Jurisdiction subpaths such as `./au` and `./au/effect` should expose local
-Layer-backed modules, calculation descriptors and thin convenience clients
-without making the root bundle import those rules. `./schemas` must be
+typed modules, calculation descriptors and thin convenience clients. The current
+plain root uses the default public calculator catalog, which includes the AU
+rules through the calculator live Layer. The root does not directly import AU
+descriptors; module selection limits client types rather than removing unselected
+rules from that default catalog or proving a smaller bundle. `./schemas` must be
 browser-safe and re-export calculator-owned `CalculatorRun*` schemas and
 `CalculatorServiceError` without duplicating them. `./testing` may expose
 test-only descriptors and helpers for consumers validating type behaviour.
 
 ## Fumadocs site
 
-The public docs site lives under:
+The current local documentation reader lives under:
 
 ```txt
-apps/docs
+apps/web
 ```
 
 Reusable docs content and Fumadocs integration live under:
@@ -417,3 +548,194 @@ The docs app should document:
 - API reference
 - SDK usage
 - contribution guide for official rule tables and golden tests
+
+
+The private catalogue procedure delegates to
+`PublicCalculatorService.listCalculators` with the canonical `MetadataQuery`
+and `CalculatorCatalogResponse`. It carries no calculation facts. Native
+envelope admission derives its allowed tags from the owning nine-procedure group;
+each operation retains the same checked version, safe defect handling, body
+limits, whole-response deadline, native client scope and fetch policy. The
+private reply decoder marks only the group's owning native exit Schemas; an
+unrelated adapter Schema error remains a defect. Public HTTP/OpenAPI and SDK
+interfaces do not change. The Website consumes this catalogue through its existing server application.
+
+The native body reader and RPC byte admission share
+`CalculatorRequestBodyLimit` from `@taxkit/api-http/request-boundary`: 64 KiB.
+The RPC export preserves its original four-symbol compatibility alias.
+The API applies it to public HTTP and native RPC POST, and the Website applies
+it before decoding any supported standard HTML calculator form. At exactly
+the limit, valid JSON still reaches the same named calculation operation;
+exceeding it releases the source before its remaining tail is consumed.
+The retained standalone HTTP server mounts the same admission middleware.
+Oversized/stalled bodies return fixed Schema-owned 413/408 JSON guidance; native
+Website forms select fixed HTML guidance and a link back to the calculators.
+The five-second total reader budget also rejects late synchronous completion.
+Custom route/RPC-only hosts must supply request admission at their composition.
+The native rate policy is described below; whole T004 qualification remains active.
+
+The private RPC client owns one ten-second complete-response deadline and a
+2 MiB byte cap for all nine closed JSON replies. Its concrete native HTTP adapter
+scopes each request through status validation and bounded stream reading before
+reusing native Response/Protocol/exit codecs. HTTP 408, 413 and 429 have distinct
+checked errors with fixed codes, literal safe messages and manual retry guidance;
+no rejected body or raw HTTP cause reaches the page. Both calculator containers
+share safe guidance for current and restored checked failures without replay.
+The public SDK and standalone HTTP server retain their separate contracts.
+
+## Shared calculation work limits
+
+The [calculator-owned policy](../../packages/calculators/README.md#shared-calculation-work-limits)
+supplies one eight-calculation pool and five-second operation budget to the native HTTP/RPC
+instance and one per standalone HTTP router. Calculation errors use separately
+declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
+methods declare checked 504 timeouts without using calculation places. RPC revision 3 preserves the canonical fixed capacity and
+timeout errors. Website forms request manual retry. SDK Schemas re-export these
+errors, while local SDK execution keeps its caller-owned lifetime and tax results.
+The owning package records cleanup and CPU proof limits. The native rate policy
+and qualified MCP operations are described below; T006 retains the observed
+modern five-second remote cleanup limit.
+
+
+The [complete RPC contract](../../packages/api/rpc/README.md#complete-named-operation-contract)
+keeps the nine application methods closed and named. The existing group is the
+single source for native tag admission and owned reply-decoder identities.
+Its private operation transformation owns native receive-loop cleanup and safe
+transport policy over an already constructed Effect. It is not a client callback
+escape. Public HTTP/OpenAPI and local SDK operations keep their existing owners.
+
+
+SDK descriptor output narrowing checks `Schema.toType(outputSchema)` because
+the calculator service already returns a domain report. Applying the transport
+decoder again fails once trace fields are Options. HTTP/RPC representations
+still encode/decode through their owning codecs. The packed consumer compares
+22 saved metadata responses and the original trace/ledger bytes while its
+declarations expose the new Core Option types and checked constructor inputs.
+
+
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+SDK constructor-input aliases retain the selected descriptor facts relation.
+The SDK checks context/help through their owning Schemas and leaves facts to
+the selected calculator decoder. HTTP/RPC use canonical Types internally and
+representation codecs at serialisation. Their existing wire/OpenAPI fields and
+values remain the compatibility contract.
+
+
+Core calculation errors now retain diagnostic-key identity through nested
+Options. Current rule errors omit diagnostics; historical opaque/null values
+remain codec values and are not safe telemetry. Catalogue entries use their
+checked selected continuation without the unused generic `program` field.
+The fresh package declarations change deliberately; retained HTTP/RPC, report,
+metadata and table/source values stay fixed. The active plan and domain-contract
+receipt own qualification; native rate admission below still needs whole-slice
+qualification before T004 can close.
+
+
+## Native calculation rate admission
+
+The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP/RPC/private Website calls share an allowance and each batch member takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance; RPC revision 4 preserves the same errors. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities to the published RPC exports.
+
+### Native documentation RPC
+
+The same API POST endpoint mounts five documentation procedures through
+`TaxKitPublicRpcGroup`, composed with the unchanged nine-procedure calculator
+group. Documentation has its own `DocsRpcClient` and revision 2; calculator
+revision 4 and its required client methods are preserved. The server requires
+the calculator, content lookup and discovery services, supplied once at API
+composition. The content handlers
+reuse the generated accepted catalogue and canonical values; they run no
+calculation and take no calculator allowance.
+
+Both private client groups share the native scoped 2 MiB response reader, then
+project its private marker into their own errors. Documentation calls have a
+ten-second complete-response deadline, caller cancellation, credential/redirect
+and tracing policy, checked version skew and decoder-only invalid-reply marker.
+Their fixed page/search/discovery errors and path bounds belong to `@taxkit/content`.
+Page/search failures and public page paths are shared with HTTP. Native fatal defects retain the existing safe global
+literal; procedure defects use the declared documentation literal. Defects stay
+defects. The Website now supplies that client over its private binding and
+uses browser-safe compiled MDX presentation. Its native GET loader transports
+only a bounded public page identity; original SSR pathnames own page selection.
+There is no authored-source fallback in the Website. Its `/search` form uses
+the same named `searchDocs` operation, term and result limits. Browser native
+GET carries an ASCII URI component header; original SSR words cannot be
+overridden by that header. Empty words skip the operation. The private app
+connection preserves the four public HTTP content routes. The fifth named
+documentation call changes the private documentation revision. It returns a
+closed discovery document derived from accepted content and the API application's
+checked, lazy cached stage settings; the client checks its returned file path
+against the requested one. Shared origin validation has separate API/Website
+identities. The Website serves the four conventional files without reading MDX
+source or constructing another runtime.
+
+
+The Website's same-page Markdown HTTP policy delegates to the existing named
+`getMarkdown` client operation. Explicit Website `.md` links and weighted
+Accept selection add no public API endpoint, private RPC operation or revision.
+The checked original page identity selects the accepted processed body. Native
+HTTP composition keeps the same caller scope, deadline and safe failures;
+[frontend architecture](frontend.md#replacement-website-markdown) owns the
+Website's representation and response-header policy.
+
+
+## Native remote MCP candidate
+
+The native API adds the app-owned `/mcp` adapter using installed Effect
+`McpServer`, `Tool` and `Toolkit`. Its six named tools use canonical calculator
+and accepted-content Schemas, delegating to the same captured services as
+HTTP/RPC. Successful reports and processed Markdown are existing domain values;
+fixed transport failures contain no submitted facts or underlying causes.
+The safe reporter remains the single application error owner.
+
+Modern `2026-07-28` is composed in the native Worker; older `2025-11-25`
+is composed in one app-owned, fixed-name Durable Object per stage. The SDK owns
+its generated class, binding and runtime composition. Native Effect owns message
+parsing, session IDs, version/header agreement and notification matching. The
+plain/in-process composition remains modern-only.
+
+The API owns original connection identity, streamed POST admission and total
+reply bounds. Its private object forwarding replaces a caller-supplied key
+header with the checked original capability, separately from JSON. Native rate
+admission is common to both adapters and HTTP/RPC, subject to the provider's
+location and approximation contract. Each application isolate has its own
+captured eight-place calculation pool and five-second work budget; no global
+pool is claimed.
+
+Older host lifetime is ten minutes from first admission, with 32 initialisation
+attempts and 32 concurrent requests without a queue. Expiry closes the entire
+native protocol scope, releasing its in-memory sessions and work. The native
+alarm owns unattended expiry; an incoming time check also refuses old IDs.
+Clients need a fresh handshake after 404, including after a runtime eviction;
+no conversation resumption is promised. The native adapter itself rejects
+initialise carrying an existing ID before registration, preserving existing
+conversations and their exhausted allocation allowance. Native alarm bookkeeping
+is the only storage operation; neither client metadata nor figures are persisted.
+
+Host registration excludes the first caller's request, rate key and stop signal.
+Replies retain native JSON/SSE framing, bounded to 2 MiB and ten seconds. No
+subscription, GET stream, termination or resumption contract is added. Older
+network cancellation is conversation-scoped and immediately releases actual
+work. The modern real-network pre-response abort still relies on the existing
+five-second work budget; earlier in-process cancellation does not prove prompt
+remote cleanup. Public setup explains this limit rather than promising prompt
+modern cancellation. The accepted [agent guide](../../packages/docs-content/content/api/agent-tools.mdx)
+owns connection steps, the discovered tool names, input-first use, older expiry
+and experimental browser support. The Website's `/agents` route derives its
+remote MCP address from checked same-stage API settings and links that guide;
+processed Markdown and documentation discovery reuse the accepted catalogue.
+
+The memory-only native source builder consumes computed SDK exports from the
+actual app declaration, refusing provider/credential/network access. Tests must
+load the generated native class and use actual clients and platform alarms,
+rather than substitute bindings or handwritten frames. See the
+[API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate),
+[session candidate record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
+and [browser owner](frontend.md#page-owned-browser-tools).
+Current app-owned transport changes do not change a published package export or
+the SDK lifetime contract.

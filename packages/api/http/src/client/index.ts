@@ -1,6 +1,6 @@
 import type * as EffectTypes from "effect/Effect";
-import type { HttpClient } from "effect/unstable/http/HttpClient";
-import { HttpApiClient } from "effect/unstable/httpapi";
+import { HttpApiClient } from "effect/http-api";
+import type { HttpClient } from "effect/http/HttpClient";
 
 import { TaxKitApi } from "../api.js";
 

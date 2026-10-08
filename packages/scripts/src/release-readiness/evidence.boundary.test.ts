@@ -1,6 +1,14 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, FileSystem } from "effect";
+import {
+  Array as EffectArray,
+  Crypto,
+  Effect,
+  FileSystem,
+  PlatformError,
+  Result,
+  Schema,
+} from "effect";
 import * as Path from "effect/Path";
 
 import {
@@ -19,7 +27,11 @@ import {
   verifyNewReleaseCandidateIdentity,
   verifyReleaseEvidence,
 } from "./evidence.boundary.js";
-import { ReleaseAttemptId } from "./schemas.js";
+import {
+  ReleaseAttemptId,
+  ReleaseAcceptedAttemptSummary,
+  ReleaseJourneyInventory,
+} from "./schemas.js";
 import type { ReleaseAttemptReceipt } from "./schemas.js";
 
 const workspaceRootUrl = new URL("../../../..", import.meta.url);
@@ -97,35 +109,61 @@ describe("release evidence boundary", () => {
           workspaceRoot
         ).pipe(Effect.flip);
 
-        expect(inventory.journeys).toHaveLength(5);
+        expect(inventory.journeys).toHaveLength(6);
         expect(packet.taskId).toBe("HGI-203");
         expect(currentVerification._tag).toBe("ReleaseEvidenceDecodeError");
       }).pipe(Effect.provide(BunServices.layer))
   );
 
-  for (const field of [
+  it.effect(
+    "separates the current native journey from the immutable historical shape",
+    () =>
+      Effect.gen(function* () {
+        const { historicalInventoryText, inventoryText } =
+          yield* readEvidenceTexts;
+        const historical = yield* Schema.decodeEffect(
+          Schema.fromJsonString(ReleaseJourneyInventory)
+        )(historicalInventoryText);
+        expect(historical.journeys).toHaveLength(5);
+        const expandedHistory = yield* Schema.decodeEffect(
+          Schema.fromJsonString(ReleaseJourneyInventory)
+        )(inventoryText).pipe(Effect.result);
+        expect(Result.isFailure(expandedHistory)).toBe(true);
+        const missingNative = yield* decodeReleaseJourneyInventory(
+          historicalInventoryText
+        ).pipe(Effect.flip);
+        expect(missingNative._tag).toBe("ReleaseEvidenceDecodeError");
+        const unknownNative = yield* decodeReleaseJourneyInventory(
+          inventoryText.replace(
+            "taxkit-native-website",
+            "taxkit-native-unknown"
+          )
+        ).pipe(Effect.flip);
+        expect(unknownNative._tag).toBe("ReleaseEvidenceDecodeError");
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+
+  it.effect.each([
     "startingState",
     "oracle",
     "expectedSideEffects",
     "preservedInvariants",
     "evidence",
     "nonClaims",
-  ]) {
-    it.effect(`rejects a critical journey without ${field}`, () =>
-      Effect.gen(function* testMissingCriticalJourneyField() {
-        const { inventoryText } = yield* readEvidenceTexts;
-        const malformed = inventoryText.replace(
-          `"${field}":`,
-          `"removed${field}":`
-        );
+  ])("rejects a critical journey without %s", (field) =>
+    Effect.gen(function* testMissingCriticalJourneyField() {
+      const { inventoryText } = yield* readEvidenceTexts;
+      const malformed = inventoryText.replace(
+        `"${field}":`,
+        `"removed${field}":`
+      );
 
-        const error = yield* decodeReleaseJourneyInventory(malformed).pipe(
-          Effect.flip
-        );
-        expect(error._tag).toBe("ReleaseEvidenceDecodeError");
-      }).pipe(Effect.provide(BunServices.layer))
-    );
-  }
+      const error = yield* decodeReleaseJourneyInventory(malformed).pipe(
+        Effect.flip
+      );
+      expect(error._tag).toBe("ReleaseEvidenceDecodeError");
+    }).pipe(Effect.provide(BunServices.layer))
+  );
 
   it.effect("rejects duplicate, unknown and reordered journey identities", () =>
     Effect.gen(function* testJourneyIdentityFailures() {
@@ -190,7 +228,7 @@ describe("release evidence boundary", () => {
     }).pipe(Effect.provide(BunServices.layer))
   );
 
-  for (const field of [
+  it.effect.each([
     "candidate",
     "packageDigests",
     "buildDigests",
@@ -200,22 +238,17 @@ describe("release evidence boundary", () => {
     "docsEvidence",
     "limitations",
     "rollback",
-  ]) {
-    it.effect(`rejects a proof packet without ${field}`, () =>
-      Effect.gen(function* testMissingProofField() {
-        const { packetText } = yield* readEvidenceTexts;
-        const malformed = packetText.replace(
-          `"${field}":`,
-          `"removed${field}":`
-        );
+  ])("rejects a proof packet without %s", (field) =>
+    Effect.gen(function* testMissingProofField() {
+      const { packetText } = yield* readEvidenceTexts;
+      const malformed = packetText.replace(`"${field}":`, `"removed${field}":`);
 
-        const error = yield* decodeReleaseProofPacket(malformed).pipe(
-          Effect.flip
-        );
-        expect(error._tag).toBe("ReleaseEvidenceDecodeError");
-      }).pipe(Effect.provide(BunServices.layer))
-    );
-  }
+      const error = yield* decodeReleaseProofPacket(malformed).pipe(
+        Effect.flip
+      );
+      expect(error._tag).toBe("ReleaseEvidenceDecodeError");
+    }).pipe(Effect.provide(BunServices.layer))
+  );
 
   it.effect("rejects escaping paths and mismatched retained digests", () =>
     Effect.gen(function* testReleaseEvidenceIntegrityFailures() {
@@ -234,7 +267,8 @@ describe("release evidence boundary", () => {
         ...packet,
         attempt: {
           ...packet.attempt,
-          detailArtifacts: packet.attempt.detailArtifacts.map(
+          detailArtifacts: EffectArray.map(
+            packet.attempt.detailArtifacts,
             (artifact, index) =>
               index === 0 ? { ...artifact, sha256: zeroSha256 } : artifact
           ),
@@ -274,14 +308,19 @@ describe("release evidence boundary", () => {
         `${"0".repeat(64)}  z.txt\n${"0".repeat(64)}  a.txt\n`,
       ];
 
-      for (const manifest of cases) {
-        yield* fileSystem.writeFileString(absoluteManifest, manifest);
-        const error = yield* verifyCandidateContentManifest(workspaceRoot, {
-          path: manifestPath,
-          sha256: yield* sha256Text(manifest),
-        }).pipe(Effect.flip);
-        expect(error._tag).toBe("ReleaseEvidenceDecodeError");
-      }
+      yield* Effect.forEach(
+        cases,
+        (manifest) =>
+          Effect.gen(function* verifyMalformedManifest() {
+            yield* fileSystem.writeFileString(absoluteManifest, manifest);
+            const error = yield* verifyCandidateContentManifest(workspaceRoot, {
+              path: manifestPath,
+              sha256: yield* sha256Text(manifest),
+            }).pipe(Effect.flip);
+            expect(error._tag).toBe("ReleaseEvidenceDecodeError");
+          }),
+        { discard: true }
+      );
     }).pipe(Effect.provide(BunServices.layer))
   );
 
@@ -329,28 +368,31 @@ describe("release evidence boundary", () => {
           limitation: "Synthetic clone-safety fixture.",
           nonClaim: "No external operation.",
           observedExitCode: 0,
-          outcomes: [
-            "verification",
-            "test",
-            "build",
-            "docs-validation",
-            "packed-artifact",
-            "downstream-consumer",
-            "api-smoke",
-            "docs-browser",
-            "changeset-status",
-          ].map((check) => ({
-            check,
-            exitCode: 0,
-            stderr: {
-              path: `tmp/release-readiness/${check}-stderr.log`,
-              sha256: zeroSha256,
-            },
-            stdout: {
-              path: `tmp/release-readiness/${check}-stdout.log`,
-              sha256: zeroSha256,
-            },
-          })),
+          outcomes: EffectArray.map(
+            [
+              "verification",
+              "test",
+              "build",
+              "docs-validation",
+              "packed-artifact",
+              "downstream-consumer",
+              "api-smoke",
+              "docs-browser",
+              "changeset-status",
+            ],
+            (check) => ({
+              check,
+              exitCode: 0,
+              stderr: {
+                path: `tmp/release-readiness/${check}-stderr.log`,
+                sha256: zeroSha256,
+              },
+              stdout: {
+                path: `tmp/release-readiness/${check}-stdout.log`,
+                sha256: zeroSha256,
+              },
+            })
+          ),
           postcondition: "The durable summary remains readable.",
           receiptPath: "tmp/release-readiness/missing-receipt.json",
           receiptSha256: zeroSha256,
@@ -359,7 +401,13 @@ describe("release evidence boundary", () => {
           taskId: "HGI-203",
           terminalState: "success",
         };
-        const summaryText = JSON.stringify(summary);
+        const summaryText = yield* Schema.encodeEffect(
+          Schema.fromJsonString(ReleaseAcceptedAttemptSummary)
+        )(
+          yield* Schema.decodeUnknownEffect(ReleaseAcceptedAttemptSummary)(
+            summary
+          )
+        );
         const absoluteSummaryPath = path.join(
           workspaceRoot,
           acceptedSummaryPath
@@ -533,3 +581,44 @@ describe("release evidence boundary", () => {
     }).pipe(Effect.provide(BunServices.layer))
   );
 });
+
+it.effect.each([
+  ["", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+  ["abc", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"],
+  [
+    'café\n"\\',
+    "40bbdb9524f868a02ded230eede9270f0abc9647312cccb2baa898f4c46ce112",
+  ],
+] as const)("preserves SHA-256 text bytes for %s", ([text, digest]) =>
+  sha256Text(text).pipe(
+    Effect.tap((actual) =>
+      Effect.sync(() => expect(actual).toBe(`sha256:${digest}`))
+    ),
+    Effect.provide(BunServices.layer)
+  )
+);
+
+it.effect("maps a digest failure to a closed error without secret text", () =>
+  Effect.gen(function* testReleaseDigestFailure() {
+    const error = yield* sha256Text("safe text").pipe(
+      Effect.provideService(
+        Crypto.Crypto,
+        Crypto.make({
+          digest: () =>
+            Effect.fail(
+              PlatformError.badArgument({
+                description: "TAXKIT_SECRET_SENTINEL",
+                method: "digest",
+                module: "Crypto",
+              })
+            ),
+          randomBytes: (size) => new Uint8Array(size),
+        })
+      ),
+      Effect.flip
+    );
+    expect(error._tag).toBe("ReleaseEvidenceDigestError");
+    expect(error.operation).toBe("sha256-release-text");
+    expect(String(error)).not.toContain("TAXKIT_SECRET_SENTINEL");
+  })
+);

@@ -1,7 +1,7 @@
 ---
 title: "API errors"
-description: "Handle expected calculator service failures returned by the HTTP API."
-status: "draft"
+description: "Handle expected calculator and public documentation failures returned by the HTTP API."
+status: "published"
 ---
 
 # API errors
@@ -31,45 +31,48 @@ The HTTP API wraps expected calculator service failures in
 
 Expected failures stay in the service error channel. The current public union
 includes calculator input decode failures, unsupported calculator errors,
-unsupported calculator context errors and calculation errors.
+unsupported calculator context errors and calculation errors. Those request
+failures use HTTP 400. A busy calculation server returns HTTP 503 with
+`CalculatorCapacityExceeded`. An operation that exceeds five seconds returns
+HTTP 504 with `CalculatorOperationTimedOut`. Both include a fixed `code`,
+`message` and `retry: "try-again-manually"`. Display the message and let the
+caller choose when to retry; do not automatically repeat calculations.
+
+The server shares eight active calculation places across HTTP and RPC. Each
+calculation in a batch takes a place. This budget does not claim that a
+JavaScript timer can forcibly stop synchronous CPU work. Current per-client
+rate admission in the native API adds 60 calculations per minute per checked
+connection address across HTTP, RPC and Website forms. Every batch calculation
+counts separately; metadata reads do not count. A rejected calculation returns
+HTTP 429 with `CalculatorRateLimited` and `Retry-After: 60`. Missing/invalid
+connection identity or a failed limiter returns HTTP 503 with
+`CalculatorAdmissionUnavailable`. Both contain fixed safe guidance and manual
+retry fields. These native limits are approximate and local to a Cloudflare
+location, rather than an exact worldwide quota. The standalone Bun server
+keeps its existing work policy.
 
 ## Handle an error response
 
 ```ts
-type ApiErrorEnvelope = {
-  error: {
-    _tag: string;
-    message: string;
-    issues?: ReadonlyArray<{ path: ReadonlyArray<string>; message: string }>;
-  };
-};
+import { CalculatorApiErrorEnvelope } from "@taxkit/api-http";
+import { Effect, Schema } from "effect";
+import type { HttpClientResponse } from "effect/http/HttpClientResponse";
 
-const response = await fetch(
-  "http://127.0.0.1:4000/api/v1/calculators/au.pay.take-home/calculate",
-  {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      facts: {
-        taxableIncome: { _tag: "Money", cents: 9000000, currency: "AUD" },
-      },
-      jurisdiction: "AU",
-      taxYear: "2025-26",
-    }),
-  }
-);
-
-if (!response.ok) {
-  const body = (await response.json()) as ApiErrorEnvelope;
-  console.error(body.error._tag, body.error.message);
-  for (const issue of body.error.issues ?? []) {
-    console.error(issue.path.join("."), issue.message);
-  }
-}
+// A response from an HTTP request is untrusted until its owning Schema checks it.
+export const readCalculatorError = (response: HttpClientResponse) =>
+  response.json.pipe(
+    Effect.flatMap(Schema.decodeUnknownEffect(CalculatorApiErrorEnvelope))
+  );
 ```
 
-Expected output for this shape is a `CalculatorInputDecodeError` because annual
-income facts are not valid facts for `au.pay.take-home`.
+Call `readCalculatorError` with the failed calculation response from an Effect
+HTTP client. The returned `body.error` has the owning calculator error type.
+If the response does not match that contract, decoding returns a Schema error.
+
+For typed HTTP-client calls, endpoint error bodies are already checked; use the
+error channel shown in [Build a browser app](../guides/build-a-browser-app-with-the-http-api.mdx).
+Do not maintain another error-envelope type or force an unchecked JSON value
+into one with a cast.
 
 ## Add help
 
@@ -81,6 +84,21 @@ POST /api/v1/calculators/au.pay.take-home/calculate?help=errors
 
 The help data comes from canonical fact descriptors. Do not maintain a
 separate application copy of calculator fields.
+
+## Public documentation errors
+
+The documentation routes return their own error JSON. Read `_tag` and
+`message` directly; these replies do not use `CalculatorApiErrorEnvelope`.
+
+| Status | `_tag`                  | Message                                            | What to do                             |
+| ------ | ----------------------- | -------------------------------------------------- | -------------------------------------- |
+| `404`  | `DocsPageUnavailable`   | `The documentation page was not found.`            | Choose a page address from navigation. |
+| `503`  | `DocsSearchUnavailable` | `Documentation search is temporarily unavailable.` | Try your search again later.           |
+
+Both the page JSON and Markdown routes return the same missing-page error.
+A missing or invalid `path` or `term` returns an empty HTTP 400 reply. Check
+that you supplied the required query and used the limits in
+[Endpoints](./endpoints.mdx).
 
 ## Related pages
 

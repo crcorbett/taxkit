@@ -1,0 +1,707 @@
+{
+  "documentType": "qualification-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-web-app-owner",
+  "observedAt": "2026-10-07T15:20:27.151986+00:00",
+  "task": "CSF-T008",
+  "outcome": "complete-local-qualification-pass-collection-off",
+  "branch": "codex/dev-79-bounded-event-relay",
+  "baseCommit": "51b02abc3d7f5053b25f8b51fc4a9f0363164feb",
+  "principal": "Cooper Corbett",
+  "authorityBasis": "Approved implementation continuation, local checks and reviewable drafts. This slice does not deploy, create credentials, change PostHog resources or activate collection.",
+  "postconditions": [
+    "Existing server runtime owns the private fixed-origin POST /ingest/e/ relay; no extra Worker or domain API.",
+    "Complete unchanged bodies each obey 65536-byte bounds with a failing crossing-chunk path.",
+    "A single five-second scope covers ingress, headers and reply; late headers do not renew it.",
+    "Only the selected gzip/JSON Fetch formats and a canonical retry_count from 0 to 10 are admitted.",
+    "Caller cookie/auth/forwarded-IP/trace headers are stripped; native tracing and redirect following are disabled.",
+    "Provider status and checked bounded numeric retry advice survive; no upstream Location or cookie survives.",
+    "DNT and denied policy refuse before body read or upstream request.",
+    "Configured off needs no key; invalid enabled configuration is a checked failure on the relay only.",
+    "No relay retry, queue, direct-send fallback or persistent request state."
+  ],
+  "documentationImpact": {
+    "changeRequired": [
+      "Website README and frontend/configuration/Effect/testing owners",
+      "exact decoder/raw-fetch lint admission and actual-command fixtures",
+      "native test inventory",
+      "active plan and this receipt"
+    ],
+    "preserve": [
+      "accepted browser sender SPEC pending decision",
+      "deployed source 42610a5c25d4b03bb2d36ab75985a66b15ca17d3",
+      "pure tax and published SDK contracts",
+      "provider/token/state owners",
+      "five runbooks",
+      "deferred metrics"
+    ],
+    "notApplicable": {
+      "changeset": "Private app transport changes no published package contract.",
+      "providerReadback": "No provider operation occurs in this relay slice."
+    }
+  },
+  "checks": [
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "x",
+        "oxfmt",
+        "-c",
+        "oxfmt.config.ts",
+        "--write",
+        "apps/web/src/lib/analytics/relay/relay.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "logArtifact": "dev79-relay-lifetimes-format.log",
+      "logSha256": "46a50ff92c50d378b24802251f6952c2620c63224d761c02d45410a8498df07c"
+    },
+    {
+      "stage": "test",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test",
+        "src/lib/analytics/relay/relay.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.42,
+      "logArtifact": "dev79-relay-lifetimes-test.log",
+      "logSha256": "bc8c702bbbd306a9dbb94daefac1e5df9f5c0956f34c200713b9eb1e65c875f3"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.06,
+      "logArtifact": "dev79-relay-lifetimes-types.log",
+      "logSha256": "0adcfb8520c1c0db578f4dea39c72c33157d083a395628fc7b426afc71ff8709"
+    },
+    {
+      "stage": "native",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "test/native-relay.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.24,
+      "logArtifact": "dev79-relay-native-four-native.log",
+      "logSha256": "e89905485b2c96865ddf64da4baa0ea1f2a4c6f71e4357c83f67302c9ed6849a"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.17,
+      "logArtifact": "dev79-relay-native-four-types.log",
+      "logSha256": "458ef9634c6cb233154e0020d1acc31adf8356ff644a9ce5638becc7e283522e"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "--deny-warnings",
+        "apps/web/src/lib/analytics/relay",
+        "apps/web/src/lib/runtime.server.ts",
+        "apps/web/src/server.ts",
+        "apps/web/test/native-relay.boundary.test.ts",
+        "oxlint.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "logArtifact": "dev79-relay-native-four-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "admission",
+      "command": [
+        "bun",
+        "--bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 4.72,
+      "logArtifact": "dev79-relay-seventh-admission.log",
+      "logSha256": "6fc73209650e5b2f4b0570111050925e7971612d593069c436dd149851a5d7f3"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.23,
+      "logArtifact": "dev79-relay-private-schema-fix-types.log",
+      "logSha256": "0adcfb8520c1c0db578f4dea39c72c33157d083a395628fc7b426afc71ff8709"
+    },
+    {
+      "stage": "unit",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test",
+        "src/lib/analytics/relay/relay.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.42,
+      "logArtifact": "dev79-relay-private-schema-fix-unit.log",
+      "logSha256": "3f2682b702f2fa39f6737dcdf1a11b4ffded6b8f2629f713cc1a86f9c883e526"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.01,
+      "logArtifact": "dev79-relay-private-schema-fix-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "frozen-install",
+      "command": [
+        "bun",
+        "--no-env-file",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "logArtifact": "dev79-relay-dependency-closeout-frozen-install.log",
+      "logSha256": "f04aac8706623bc2ffc479e141f5ed8d53cb1a2e72ddd6bd313a3be847b76bc2"
+    }
+  ],
+  "focusedCaseCounts": {
+    "effectBoundary": 25,
+    "builtWebsite": 4,
+    "actualLint": 42
+  },
+  "sdkProtocol": {
+    "sdk": "posthog-js@1.438.2",
+    "syntheticOnly": true,
+    "observations": [
+      {
+        "mode": "gzip-batch",
+        "attempts": 1,
+        "formats": [
+          {
+            "gzip": true,
+            "mediaType": "text/plain",
+            "query": ""
+          }
+        ],
+        "retryEventIdentityPreserved": false,
+        "noBrowserStorage": true
+      },
+      {
+        "mode": "json-batch",
+        "attempts": 1,
+        "formats": [
+          {
+            "gzip": false,
+            "mediaType": "application/json",
+            "query": ""
+          }
+        ],
+        "retryEventIdentityPreserved": false,
+        "noBrowserStorage": true
+      },
+      {
+        "mode": "gzip-retry",
+        "attempts": 2,
+        "formats": [
+          {
+            "gzip": true,
+            "mediaType": "text/plain",
+            "query": ""
+          },
+          {
+            "gzip": true,
+            "mediaType": "text/plain",
+            "query": "retry_count=1"
+          }
+        ],
+        "retryEventIdentityPreserved": true,
+        "noBrowserStorage": true
+      }
+    ],
+    "probeSha256": "100d6353e512357d1861f451ffd3aaecff9996e5637639148912c8002e09dc1a",
+    "sdkIdentity": {
+      "sdk": "posthog-js@1.438.2",
+      "integrityVerified": true,
+      "tarball": "https://registry.npmjs.org/posthog-js/-/posthog-js-1.438.2.tgz",
+      "sha256": "a4d5138663a01b063525f34a0c6b64296934fa9bbd25ec968b5a4fbf51d0d1c4"
+    },
+    "doesNotQualifyDoNotTrackQueueDiscard": true
+  },
+  "failedAttempts": [
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.14,
+      "logArtifact": "dev79-relay-first-types.log",
+      "logSha256": "25a533fc995207629bbd640cad9f71e31277e0cd0ad74bbe51eeab0914d1a438"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "--deny-warnings",
+        "apps/web/src/lib/analytics/relay",
+        "apps/web/src/lib/runtime.server.ts",
+        "apps/web/src/server.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.41,
+      "logArtifact": "dev79-relay-second-lint.log",
+      "logSha256": "486696756bcba05147790878e1c7fbda44295642e847dc8bfd4b6ce5cd1659f6"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.08,
+      "logArtifact": "dev79-relay-third-types.log",
+      "logSha256": "9820e84d897fef7101c96d1c0e0a69b75be093cda8481055ba01d0b4e44b7857"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "--deny-warnings",
+        "apps/web/src/lib/analytics/relay",
+        "apps/web/src/lib/runtime.server.ts",
+        "apps/web/src/server.ts",
+        "oxlint.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.39,
+      "logArtifact": "dev79-relay-fourth-lint.log",
+      "logSha256": "f4bcbe2aec27cf74f6ac6e2e271ebaf19ca77354a2eb8f68d2c4209a54fff19e"
+    },
+    {
+      "stage": "admission",
+      "command": [
+        "bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "tools/oxlint/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.11,
+      "logArtifact": "dev79-relay-fifth-admission.log",
+      "logSha256": "06c6800e75b813263db5c1fa2b65a57914ab30af50d0fc536e5d11de60a86e50"
+    },
+    {
+      "stage": "admission",
+      "command": [
+        "bun",
+        "--bun",
+        "x",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 4.74,
+      "logArtifact": "dev79-relay-sixth-admission.log",
+      "logSha256": "5fe9479be7a2c5f4ec7d1cab62243d35b114d467feb96e93fa2db738c8be46f5"
+    },
+    {
+      "stage": "lint-fix",
+      "command": [
+        "bun",
+        "x",
+        "oxlint",
+        "-c",
+        "oxlint.config.ts",
+        "--fix",
+        "apps/web/test/native-relay.boundary.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.27,
+      "logArtifact": "dev79-relay-native-one-lint-fix.log",
+      "logSha256": "62a8c9de78048e9529495068332b1bfe2543db8db54c4ae741b387bd7481575f"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 1.08,
+      "logArtifact": "dev79-relay-native-two-types.log",
+      "logSha256": "240e604fe9a97f15aa871f3ee0ff432fb54bd3c73dcb4cc1318f4954432fef6f"
+    },
+    {
+      "stage": "native",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "test/native-relay.boundary.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.6,
+      "logArtifact": "dev79-relay-native-three-native.log",
+      "logSha256": "b168b951fd1ba5217389fdac625ad0857037043762865a3e0c8148034c73d0ee"
+    },
+    {
+      "stage": "release-graph",
+      "command": [
+        "bun",
+        "run",
+        "release:check",
+        "--",
+        "--ci"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 540.55,
+      "logArtifact": "dev79-relay-full-one-release-graph.log",
+      "logSha256": "122f8844bc505ba85a7a2352438d360036f1f20b662c808c985d450b26dad0ca"
+    }
+  ],
+  "failureExplanation": [
+    "Receiving installed Effect 4 APIs and native fixture types replaced initially mistyped optional/match/socket/request APIs; no dependency was upgraded.",
+    "The first standalone lint command named a nonexistent config and ran no cases; the repository command owner then supplied the actual config.",
+    "An actual negative fetch fixture initially passed because the older broad app host permission omitted this new folder; its exact raw-fetch ban now rejects it.",
+    "The first native enabled fixture packed a string project ID instead of the actual numeric Output. It correctly failed configuration. The numeric fixture passes without relaxing runtime validation.",
+    "The first complete graph stopped at Knip after 34 isolated workflow tests: WebsiteRelayRetryCount was unnecessarily exported although used only in its Schema owner. Keeping it private corrected the implementation without changing admission. Focused checks and a fresh complete nine-check graph then passed."
+  ],
+  "limitations": [
+    "Browser sender choice remains pending. Protocol bytes do not qualify SDK queue discard, disposal or delivery after DNT withdrawal.",
+    "Relay does not decompress or rebuild fields; its byte bound is not a decompressed event bound. The future browser sender owns the event allowlist.",
+    "Only the deliberately minimal Fetch profile is qualified. Beacon/form fallback and automatic SDK features/routes refuse.",
+    "No PostHog key/project, real capacity/inventory, stored event, controlled collection activation, new app deployment, merge or publication.",
+    "Header stripping is proved at application and native test boundaries. Cloudflare documents provider-added subrequest headers; final hosted PostHog recipient headers and stored fields still need the separately approved controlled Preview proof before any broader privacy claim."
+  ],
+  "custody": "Raw synthetic SDK probes and qualification logs remain private on this Mac; this receipt records artefact basenames and digests, with no real secret values.",
+  "sourceQualificationCommit": "40849c822ae5c49bf5c7be858374c30aa5f1abdc",
+  "completeLocalQualification": {
+    "observedAt": "2026-10-07T15:19:07.663264+00:00",
+    "sourceCommit": "40849c822ae5c49bf5c7be858374c30aa5f1abdc",
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "mode": "local-report-only-ci-mode",
+    "exitCode": 0,
+    "durationSeconds": 904.38,
+    "logArtifact": "dev79-relay-full-two-release-graph.log",
+    "logSha256": "d088e5e5ab97547a1b5fbaf21ac8ca8359e72705855fc4575f6c7cf8409d07d6",
+    "outcomes": [
+      {
+        "id": "verification",
+        "target": "Canonical repository verification",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/verification-stdout-tgZic7/2f77b5f3c1c1.log",
+            "sha256": "sha256:3b0c6cd75e8edd81a9630ffbbade81fa2f394e332e487a788770ff647818cf72"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/verification-stderr-hfMa0t/29d9dc8cec01.log",
+            "sha256": "sha256:59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca"
+          }
+        }
+      },
+      {
+        "id": "test",
+        "target": "Workspace tests including the direct calculator journey",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/test-stdout-5ITrYy/b99e2274a43d.log",
+            "sha256": "sha256:b1e800acee7ff6656fc304e970220e3aa619a3457bc5e2332741cc0a89564ac0"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/test-stderr-GS9BEY/3c9bbc84f84f.log",
+            "sha256": "sha256:a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8"
+          }
+        }
+      },
+      {
+        "id": "build",
+        "target": "Workspace production builds",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/build-stdout-I4q81t/200e3033a207.log",
+            "sha256": "sha256:511475d621ecdb1cde6384aab6a679e3f450e75c175a4e581949b785f62a4586"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/build-stderr-C8aKwe/fccd4683a5b8.log",
+            "sha256": "sha256:c7ae53061ae01873a9768eadfdff2c192fb4acbd5744d4eb0741e66c8469a052"
+          }
+        }
+      },
+      {
+        "id": "docs-validation",
+        "target": "Documentation content validation",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-validation-stdout-0DVBoP/d9c362ff55f5.log",
+            "sha256": "sha256:18530ffbc1600137484832c55714d4e93a4c68dbe4e12c8f3b2dfcb4a240b311"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-validation-stderr-RUlzsQ/1c7182093343.log",
+            "sha256": "sha256:fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697"
+          }
+        }
+      },
+      {
+        "id": "packed-artifact",
+        "target": "Focused SDK packed artifact proof",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/packed-artifact-stdout-t9g9lb/07d79e8a13e7.log",
+            "sha256": "sha256:918db5bb841fe809f3a7bf61ead1fe63c838435ecfde4eb906c2bbfc64002d50"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/packed-artifact-stderr-BoD9Kn/619ff830d00e.log",
+            "sha256": "sha256:06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7"
+          }
+        }
+      },
+      {
+        "id": "downstream-consumer",
+        "target": "Strict downstream package proof",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/downstream-consumer-stdout-cn0yOV/32a19d329cc2.log",
+            "sha256": "sha256:8fd9db89e10f38cd4ecf866fdb293d768b94f347b57c9a7ee5d87606883d9e2b"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/downstream-consumer-stderr-8cJthQ/f8e759dbfcbe.log",
+            "sha256": "sha256:d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9"
+          }
+        }
+      },
+      {
+        "id": "api-smoke",
+        "target": "Public API smoke evidence",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/api-smoke-stdout-PuFBf3/1dd63ace2a42.log",
+            "sha256": "sha256:286cfdeafc5f2a9cb50a88d8a6670610f6e955cce70a20d033394cdfd3c8595d"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/api-smoke-stderr-mJPAzp/edf83e6c08df.log",
+            "sha256": "sha256:1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87"
+          }
+        }
+      },
+      {
+        "id": "docs-browser",
+        "target": "Built native Website and documentation evidence",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-browser-stdout-xeaemU/9e9fb90de7d9.log",
+            "sha256": "sha256:328b5ff65ea984e145130ad588b269e54a91d4f1cea6312ef4cea39320309f9b"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-browser-stderr-mi7PuS/eb3dc10b3b96.log",
+            "sha256": "sha256:781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4"
+          }
+        }
+      },
+      {
+        "id": "changeset-status",
+        "target": "Pending release train status",
+        "exitCode": 0,
+        "details": {
+          "stdout": {
+            "path": "tmp/release-readiness/changeset-status-stdout-wce6DM/1b2047d59f1f.log",
+            "sha256": "sha256:03bdfef2470f0e3f100478f67ffed454f0ae420a00cc4e9948565fbcc0c4fa12"
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/changeset-status-stderr-rX0tp4/acceca1712c1.log",
+            "sha256": "sha256:26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3"
+          }
+        }
+      }
+    ],
+    "detailDigestsVerified": 18,
+    "nativeCaseCount": 22,
+    "nativeFileCount": 11,
+    "nativeConfiguredFiles": [
+      "test/native-pair.boundary.test.ts",
+      "test/native-analytics.boundary.test.ts",
+      "test/native-relay.boundary.test.ts",
+      "test/native-mcp.boundary.test.ts",
+      "test/native-browser-tools.boundary.test.ts",
+      "test/native-rate.boundary.test.ts",
+      "test/native-rate-provider.boundary.test.ts",
+      "test/native-rpc-failures.boundary.test.ts",
+      "test/native-cancellation.boundary.test.ts",
+      "test/native-settings-failure.boundary.test.ts",
+      "test/native-local-development.boundary.test.ts"
+    ],
+    "nativeConfigSha256": "30dd9b4e1cef0f220ef482f0b2d071cea46dbaab265328a132094f67af061d3e",
+    "frozenIdentitiesUnchanged": 1797,
+    "frozenManifestSha256": "5c985ed400ca5bf3fc58426eddc9acf2bfa60bd7ab31d06404f762e4a511b5a7",
+    "providerMutation": false,
+    "hostedGitHubResult": false
+  },
+  "primaryReview": {
+    "outcome": "bounded relay implementation accepted locally",
+    "callGraph": "existing Website ManagedRuntime -> private native request service -> checked metadata/policy -> complete bounded body -> one fixed-origin HttpClient attempt -> complete bounded reply -> native response",
+    "receivingCompatibility": "Installed Effect 4 and Alchemy beta.80 types/source; no dependency upgrade. Private retry Schema remains owned by its query codec.",
+    "ownership": "One existing server runner; HttpClient captured in the live Layer; per-request scope/deadline; safe tagged reason-only failures; no caller capabilities or requirements escape to a domain package.",
+    "proof": "25 focused relay cases, four built relay modes within the complete 22-case native suite, 42 actual CLI admission cases, actual SDK protocol fixtures, and all nine local release commands.",
+    "nonclaim": "No browser sender choice, PostHog resource/credential/activation or final hosted recipient header proof."
+  },
+  "hostedHeaderProofLimit": {
+    "observedAt": "2026-10-07T15:08:52.797070+00:00",
+    "sourceCommit": "40849c822ae5c49bf5c7be858374c30aa5f1abdc",
+    "finding": "Application-header stripping does not establish final hosted recipient headers.",
+    "source": "https://developers.cloudflare.com/fundamentals/reference/http-headers/",
+    "sourceUpdated": "2026-05-05",
+    "observedDocumentContract": "Cloudflare documents platform-added headers on Worker subrequests, including destination-dependent network address headers.",
+    "inference": "A new minimal request and the local Miniflare/Bun header oracle qualify application output. They do not prove the final live PostHog recipient headers after Cloudflare processing. No real capture is active, so no visitor disclosure is observed or claimed.",
+    "owner": "CSF-T008 controlled Preview provider privacy readback before activation",
+    "preserve": "App remains off; no extra endpoint, header hack, transform setting or provider operation is introduced.",
+    "postconditionRequired": "Qualify final hosted carrier headers and actual stored event fields under the separately approved controlled Preview operation. Retained project anonymize_ips true and geoip-disable are not claimed to prove transport suppression."
+  },
+  "proofReaderRecovery": "The initial private reader expected file names and the package test command in Vitest summary output. Actual output omits them. The final reader independently checks all 18 exact returned detail digests, true child exits, 22 cases/11 files, frozen command owners and the complete explicit 11-file native config; no repository check was relaxed or rerun to recover output.",
+  "rollback": "Revert this private relay slice to the qualified preceding source 51b02abc3d7f5053b25f8b51fc4a9f0363164feb. Any hosted recovery uses a new reviewed exact-source native plan; current deployed source remains 42610a5c25d4b03bb2d36ab75985a66b15ca17d3 at this qualification boundary.",
+  "proofCloseout": {
+    "metadataOnlyPaths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-08-website-event-relay.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "remainingFrozenIdentitiesUnchanged": 1795,
+    "checks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.32,
+        "logArtifact": "dev79-relay-qualified-closeout-docs.log",
+        "logSha256": "d41dfe6c6406f063ba1599c5b4cef7b33472926cc93428c6a76ff801d3ae29c0"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.13,
+        "logArtifact": "dev79-relay-qualified-closeout-runbooks.log",
+        "logSha256": "332600dbc0830587011575ddca079029b0dd5ad66115c7681b155488322b693b"
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.25,
+        "logArtifact": "dev79-relay-qualified-closeout-paths.log",
+        "logSha256": "121d41f5f6e2017f10bcdfed6c1f2293facb498eb6f6a15d70e5ebcb761a8e07"
+      },
+      {
+        "stage": "format-check",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.55,
+        "logArtifact": "dev79-relay-qualified-closeout-format-check.log",
+        "logSha256": "49f4b0e1056f47a7757fc77d475ad5d6a8fbd0f607094d9f28a47797fd7935cb"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "logArtifact": "dev79-relay-qualified-closeout-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "checksPending": false
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "0b1954276b335791783e885a238bdd8d294686b6",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Persistent HashMaps/HashSets, checked selections and pure findings preserve original ordering and authority/plan/provider/hosted/run/input checks",
+    "Aggregate evidence model derives from owning field Schemas; provider variants use their owning predicates; wire nulls retained",
+    "Command reuses qualified file JSON/SHA-256 boundary with safe automation errors, serial reads and retained same-ID precedence",
+    "Eight retained automation cases use Effect Vitest and fail on missing fixture selection; five new scoped command cases",
+    "All eleven strict rules on six adopted files and a rejected neighbour; one exact runtime admission; former raw Bun/decode/test execution exceptions removed"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "tools/docs-deployment/automation*.ts",
+        "tools/docs-deployment/workflow-receipts.schemas.ts",
+        "tools/docs-deployment/README.md",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json"
+      ],
+      "reason": "Local checking, typed receipt/input ownership and enforcement changed"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "docs/evidence/**",
+        "docs/documentation-audit historical receipts",
+        "tools/docs-deployment/*register.json",
+        "tools/docs-deployment/controls.json",
+        "tools/docs-deployment/fixtures/**",
+        ".github/workflows/**",
+        "docs/runbooks/**",
+        "packages/**",
+        "apps/**",
+        "bun.lock"
+      ],
+      "reason": "Saved bytes, original authority/identities/oracles, exports, tax results and operational procedures"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public content",
+        "provider state"
+      ],
+      "reason": "Root local tools only; no package-facing or provider operation"
+    }
+  ],
+  "baseline_observations": [
+    "Actual added automation*.ts strict selectors produced 103 findings before migration; scoped observation, not whole-repository defect count/trend. Shared receipt Schema adoption was added afterwards"
+  ],
+  "verification": [
+    {
+      "command": "focused types/lint, deployment tests, actual lint fixtures and retained-record check",
+      "result": "passed: 142 deployment-tool cases (137 retained, five added), 151 lint-suite cases; six actual accepted files, rejected neighbour and sole exact runtime assertion. Retained-record command validates three saved automations/five controls/three saved established entries; this is not a current provider readback"
+    },
+    {
+      "command": "frozen install, complete tests, build and verification",
+      "result": "passed: frozen install (790 installs, 1020 packages, unchanged lock), complete tests, 15-task build and full verification; 21 Quality cases/all ten isolated mutations, 21 skill cases and fresh source-only documentation check passed. Matching unchanged-input package/build and two Chromium check caches reused"
+    }
+  ],
+  "limitations": [
+    "DEV-73 and downstream tasks unfinished; broader retained plan/digest policy, inventory service/root checking, SDK, app/config/infrastructure, checked JavaScript and readonly/Schema/lifetime review pending",
+    "Synthetic tests and saved receipt checks make no provider requests; establishment counts describe saved records only",
+    "Medicare correction awaits Cooper scope decision",
+    "No merge, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete slice; no provider, registry or deployment state changes"
+}

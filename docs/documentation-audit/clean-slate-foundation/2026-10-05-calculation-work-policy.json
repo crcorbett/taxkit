@@ -1,0 +1,490 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "calculation work limits or transport composition change",
+  "outcome": "Pass for local shared calculation work policy; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-calculation-work-policy",
+    "baseCommit": "9ca78ccb22b99fda32f55ca67329ad930b55685a",
+    "sources": [
+      {
+        "path": ".changeset/calculation-work-policy.md",
+        "sha256": "49a6612cf44a6a905d43170309824741ac1d9e3582e16e0e03caddd8c82589bd"
+      },
+      {
+        "path": "apps/api/README.md",
+        "sha256": "3afba09bc31f42c5c3d038f1c28d39559365ff1ed3b7e95f68514935e958b68d"
+      },
+      {
+        "path": "apps/api/src/worker.ts",
+        "sha256": "d5e4c5ccbf3a86e0061331d18f0430f1877a2da3567b89dda664501f2b0d676a"
+      },
+      {
+        "path": "apps/api/test/worker.boundary.test.ts",
+        "sha256": "120a95df621bfe34dd5c0e19c647da3ba6dbf9d59e544a5718c67c48741507c1"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "27d57b97d08e846fee43e56ef47f5ab90f0a14504ed1a4ef296e2ca1748d5ab1"
+      },
+      {
+        "path": "apps/web/scripts/native-pair-build.runtime.ts",
+        "sha256": "8194d078883fb560aed337eac0572d26ce11baee8d5dba832c2c1cd1eaf8d327"
+      },
+      {
+        "path": "apps/web/src/lib/calculation-failure.ts",
+        "sha256": "29b0e703db049f64d45c30ef5ce9915dd78e0e5c9937f5370849ae5533e72022"
+      },
+      {
+        "path": "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "sha256": "a3fa1f628aeee793c9c518a1b5e0fb203dea593a5248b4866412208740df5fa1"
+      },
+      {
+        "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "sha256": "9f668e6146eef6059caab274881246f36f01dfcc361b9b68aee9aac5347112d3"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "b07596e2ce0453a313f255c8c398a66858732052426bd36278ebf9190edf92f8"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "b0c6c73f14dc51acb4021021d69d3bc032f75ff5cc966b34f51e6c1e724f8414"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "5134d2815f70ca2cf5d2a1e566239c43d6eb150f511599e240a12dad1b374905"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "74de9ce1a1154110d0984fd96498367ded40d1ea5ecd54e918165ef8a70a3928"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "4a7163bbd162bfb90fb7ddc978f888fd6d8459f9e36e540daf0166d296be5290"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "040ed0ceedabb0af1f1ee18888cfcaa59184628e445ab4a707cd5b135c666edb"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "cdc1cf58e179363314956f3757aca8ed393e1950a85aa6b4fa2af020f1ffd5ce"
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "1270516f105f67bb3d47d198a0f240debe960694088cffa1f8ceb23544e5f612"
+      },
+      {
+        "path": "packages/api/http/README.md",
+        "sha256": "9fb34631b28e80b3a02e04a92610c0e77c4456e6d00133f31c189b0ce15b65d0"
+      },
+      {
+        "path": "packages/api/http/__snapshots__/openapi.json",
+        "sha256": "234bc84309205bda5c1411b40bc454e5711f05e95f0ded922e793a4991a6ddc6"
+      },
+      {
+        "path": "packages/api/http/src/groups/calculators.ts",
+        "sha256": "5e0b0457d63fa0fbe2ae51e4b4d61d755ebdf7a95a9f720b7f25390409600333"
+      },
+      {
+        "path": "packages/api/http/src/handlers/calculators.ts",
+        "sha256": "094c5fd447c13d3834d72ca9f6dfb93f41ed089fa3f28c9e864f0b19c2a2ba2c"
+      },
+      {
+        "path": "packages/api/http/src/server/live.layer.ts",
+        "sha256": "d83e0a90979f3dbce7530ac439d6cdcde61a84ac8a9c918736e4ca14ab4c8bd5"
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "9757d5fd50a40735eef14920cc5634b9db5872ca098d168d42a908d81b6acf11"
+      },
+      {
+        "path": "packages/api/rpc/src/__testing__/fixtures.ts",
+        "sha256": "fd79ae1cc0f8fd82692ad578f3e314fc839a430fb5d1df618ef410e51e485a0c"
+      },
+      {
+        "path": "packages/api/rpc/src/errors.ts",
+        "sha256": "ee678e64107d4ce7bcdfa60ddd06be6cafcf02ed17b3f70f0a896cacfb4add2d"
+      },
+      {
+        "path": "packages/api/rpc/src/handlers.ts",
+        "sha256": "8f60bafea2ea6558fc71c22cfe6b7c89255c2677cd1a6911b2a88bc4c90ae7b9"
+      },
+      {
+        "path": "packages/api/rpc/src/schemas.ts",
+        "sha256": "4d6bd265a7ac7ef4c2133c05d739c40abc140e965db83fa02ca2443204ce165b"
+      },
+      {
+        "path": "packages/api/rpc/test/handlers.test.ts",
+        "sha256": "575d45cd47d9928460cbb98064061f610b4ead541f5fab518baaed583bf87fa5"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "98c520d5fe5d46d139c17364236510ec46ab1bc61c72177c219884b905b65024"
+      },
+      {
+        "path": "packages/calculators/__tests__/calculation-work.test.ts",
+        "sha256": "536dd7f83a5d4a51524f4013248dcb91d2fd8cce0e0d19154f3430e94db5f2e7"
+      },
+      {
+        "path": "packages/calculators/package.json",
+        "sha256": "b9f8dfe020d8fb8d871379607aeb9d498ac8de737a1d3a6ca51e3b3eb77cfde1"
+      },
+      {
+        "path": "packages/calculators/src/index.ts",
+        "sha256": "cf641e179c5733021af82b088b028735e187734e083f852ba4d5155b3956c527"
+      },
+      {
+        "path": "packages/calculators/src/schemas.ts",
+        "sha256": "04a016902b70850d83e8846f0b62e5dcd5149d39260aa324032720f217680648"
+      },
+      {
+        "path": "packages/calculators/src/service.ts",
+        "sha256": "e7d2b0d3d2ffe6efcf77aa8c402ff7b9dac91ec7efaf41e422a15acd34a3893b"
+      },
+      {
+        "path": "packages/calculators/src/work.layer.ts",
+        "sha256": "5c101fb86173e5705445bb3213b84a80800ad85a66d35f939d852442f25afffa"
+      },
+      {
+        "path": "packages/docs-content/content/api/errors.mdx",
+        "sha256": "d3215c8f1e9dfc31e2e6a2062161ea88b8dc31048de52d818809165d8392ac75"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "0344d71c942c846605a8dc55575911a63fee9aaef323efa6b7dbb238ec9baf54"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+        "sha256": "bf6060e371c2ef307d92b536cc4494c69d77f0983a38af9344616b8828f5730b"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "4f23d6b2274c5e26812d2dc650ffa3c21419f4e56d4d0f735cbf749d77f10b19"
+      },
+      {
+        "path": "packages/sdk/typescript/src/schemas/index.ts",
+        "sha256": "cf764dc168bc561ecba1ce91a09b084d3cf4a023c80eb5844c06a0f76eb5366a"
+      }
+    ]
+  },
+  "remaining": [
+    "trusted non-logged client rate identity and rate limiter",
+    "standalone HTTP request body admission",
+    "remaining closed named operations and MCP",
+    "whole T004 acceptance",
+    "Medicare decision"
+  ],
+  "nonClaims": [
+    "JavaScript timer cannot pre-empt synchronous CPU work; uninterruptible work/finalisers may delay response",
+    "No forced remote Worker cancellation",
+    "No merge, deployment, publication or provider apply"
+  ],
+  "abstractionAdmission": {
+    "owner": "@taxkit/calculators application service",
+    "policy": "one shared calculation capacity pool, scoped operation budget and fixed checked failures",
+    "consumers": [
+      "native API HTTP/RPC instance",
+      "standalone HTTP router"
+    ],
+    "substitution": "production policy over controlled test service at the existing contract",
+    "simplerCallGraph": "host -> bounded existing calculator service -> live engine; no competing service or package"
+  },
+  "policy": {
+    "activeCalculations": 8,
+    "operationBudgetSeconds": 5,
+    "queue": "none; excess work fails immediately",
+    "rpcVersion": "2",
+    "statuses": {
+      "capacity": 503,
+      "operationTimeout": 504,
+      "existingRequestErrors": 400
+    },
+    "metadataUsesCalculationPlace": false,
+    "localSdkUsesServerPool": false
+  },
+  "documentationImpact": {
+    "Change required": [
+      "calculator/API/RPC/SDK/app ownership, exports and READMEs",
+      "effect/API/testing architecture",
+      "draft API error copy and generated OpenAPI snapshot",
+      "journey, active SPEC/tasks/plan and dated evidence"
+    ],
+    "Preserve": [
+      "tax algorithms, source, golden results and unresolved Medicare decision",
+      "content lifecycle/navigation",
+      "infrastructure/provider identities",
+      "telemetry containment",
+      "skills, lint exceptions and CI"
+    ],
+    "N/A": [
+      "runbooks and command policy unchanged; no operational procedure",
+      "public MDX generator/publication; error copy remains authored draft"
+    ]
+  },
+  "focusedEvidence": {
+    "calculatorTests": 11,
+    "rpcTests": 56,
+    "apiTests": 62,
+    "nativeCorrectedTests": 2,
+    "nativeCorrectedDurationSeconds": 12.88,
+    "sourceNegativeControls": [
+      "budget 5 -> 6 seconds fails explicit cleanup assertion",
+      "capacity 8 -> 9 fails immediate-completion assertion",
+      "late-result >= -> > fails boundary-timeout assertion"
+    ],
+    "sourceRestored": true,
+    "openapiCalculateStatuses": [
+      200,
+      400,
+      503,
+      504
+    ],
+    "openapiMetadataDetailStatuses": [
+      200,
+      400
+    ]
+  },
+  "failedAttempts": [
+    {
+      "boundary": "HTTP test representation",
+      "observation": "JSON-value codec result supplied as a body instead of encoded JSON text returned 400",
+      "resolution": "Use the existing test JSON-text boundary for canonical payload"
+    },
+    {
+      "boundary": "HTTP error declaration and TypeScript",
+      "observation": "Single union hid member status annotations; generic class could not extend a union of object records",
+      "resolution": "Separate native endpoint response Schemas; schema-derived envelope type with narrowed generic member"
+    },
+    {
+      "boundary": "CORS unit observation",
+      "observation": "Raw application response had no deferred pre-response CORS header",
+      "resolution": "Do not claim raw application response proves sent headers; actual native bridge checks 503/504 CORS"
+    },
+    {
+      "boundary": "native warning fixture",
+      "observation": "Installed logger severity is Warn, not Warning; one native test failed while six passed",
+      "resolution": "Use installed safe severity; no production logging change"
+    },
+    {
+      "boundary": "native browser fixture",
+      "observation": "Eight operations reached; test timed out waiting for a button incorrectly named Calculate take-home pay",
+      "resolution": "Use actual exact Calculate button; corrected two native tests pass"
+    },
+    {
+      "boundary": "generic package validator",
+      "observation": "Direct legacy package scan rejected ignored .turbo log with a personal path; isolated tracked/untracked source copy reports missing package-structure.render.json",
+      "resolution": "Preserve ignored logs; report generic scaffold validation as unqualified for pre-existing calculator layout. Repository-owned exports, types, tests and actual consumer proof qualify this slice."
+    },
+    {
+      "boundary": "interrupted full qualification",
+      "observation": "Prior full-run handle and temporary logs were unavailable on 6 October; no full pass was inferred",
+      "resolution": "Restored repository-pinned Bun 1.4.2 and installed Playwright Chromium 1243; frozen install checked 777 installs/1001 packages without changes; restart verified missing handle only"
+    },
+    {
+      "boundary": "fresh root tests after RPC revision change",
+      "observation": "55 RPC cases passed; the old mismatch fixture sent revision 2, which is now valid. Turbo interrupted other running tasks after the failure",
+      "resolution": "Both mismatch procedures explicitly send old revision 1. Focused RPC passes all 56 cases; full closeout repeated on the corrected source"
+    },
+    {
+      "boundary": "full verification unused-export check",
+      "observation": "After all 32 Quality workflow cases passed, Knip rejected three unnecessary new HTTP-adapter re-exports. Later types/browser/native steps were not reached.",
+      "resolution": "Remove only the redundant adapter re-exports; canonical calculator/SDK error exports remain. Repeat full qualification on corrected source."
+    }
+  ],
+  "skillValidation": {
+    "inspection": "existing compiled Effect service variant; narrow work implementation export",
+    "ecosystem": "passed existing .agents/skills scan",
+    "genericPackageValidator": "unqualified: pre-existing calculator package has no generic rendering receipt; no scaffold receipt fabricated"
+  },
+  "consumerProofScope": [
+    "SDK named checked work errors from packed artifact",
+    "isolated downstream declarations and default runtime for @taxkit/calculators/work",
+    "retained SDK values compared with the explicitly bounded Effect service"
+  ],
+  "checks": [
+    {
+      "command": "bun run test",
+      "exit": 0,
+      "seconds": 87.55
+    },
+    {
+      "command": "bun run build",
+      "exit": 0,
+      "seconds": 3.25
+    },
+    {
+      "command": "bun run docs:validate",
+      "exit": 0,
+      "seconds": 0.22
+    },
+    {
+      "command": "bun run api:smoke",
+      "exit": 0,
+      "seconds": 0.48
+    },
+    {
+      "command": "bun run sdk:check-packed-artifact",
+      "exit": 0,
+      "seconds": 0.25
+    },
+    {
+      "command": "bun run sdk:validate-downstream",
+      "exit": 0,
+      "seconds": 2.96
+    },
+    {
+      "command": "bun run --filter=@taxkit/sdk check-packed-artifact",
+      "exit": 0,
+      "seconds": 0.18
+    },
+    {
+      "command": "bun run --filter=@taxkit/sdk validate:downstream",
+      "exit": 0,
+      "seconds": 2.67
+    },
+    {
+      "command": "bun run changeset:status",
+      "exit": 0,
+      "seconds": 0.25
+    },
+    {
+      "command": "bun run verification",
+      "exit": 0,
+      "seconds": 555.87
+    }
+  ],
+  "postconditions": {
+    "workspaceTests": "27 fresh workspace tasks; calculator 11, RPC 56, API 62; actual CLI 475 cases",
+    "build": "16 tasks: five fresh, eleven cached",
+    "apiSmoke": "one fresh smoke task/eleven cached dependencies; health, catalogue, calculation, OpenAPI and isolated external HTTP consumer",
+    "rootSdkChecks": "Each root SDK check one fresh/six cached; actual 46-file packed import and isolated install/types/runtime/exports/browser bundle/cleanup",
+    "directSdkChecks": "Fresh direct package scripts; named errors and calculators/work declaration/default runtime exercised from genuine packed dependency closure",
+    "qualityWorkflow": "32 cases, 447.21 seconds; isolated copied-source controls",
+    "browser": "24 SDK cases and 19 Website cases, fresh browser tasks",
+    "native": "Fresh fault/normal Worker builds then seven tests over five files, 76.46 seconds; actual shared eight-place pool, HTTP/RPC, CORS, SSR/browser and cleanup",
+    "sourceRestoration": "41 staged files match pre-check SHA-256 byte-for-byte",
+    "screenshots": "All four fresh images inspected; retained answers, supported year, breakdown control and Medicare caveat preserved"
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12",
+    "frozenInstall": "777 installs/1001 packages checked, no changes"
+  },
+  "parentHostedProof": {
+    "pullRequest": 143,
+    "headCommit": "9ca78ccb22b99fda32f55ca67329ad930b55685a",
+    "runId": 37301629784,
+    "jobId": 111735465300,
+    "completedAt": "2026-10-05T11:35:09Z",
+    "outcome": "success",
+    "readbackDate": "2026-10-06",
+    "limitation": "Parent proof only; current candidate hosted result pending"
+  },
+  "rollback": {
+    "identity": "9ca78ccb22b99fda32f55ca67329ad930b55685a",
+    "action": "Revert this shared work-policy slice; no provider operation. Major package/RPC contract changes must be reverted together before any separate release."
+  },
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for bounded local shared calculation work policy",
+    "remaining": "Whole T004, exact hosted candidate checks and review, later tasks and separate Medicare decision"
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and this receipt only after full qualification; executable source unchanged",
+    "verification": "Docs/runbooks/root format/Changeset status/whitespace rerun before commit"
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 103,
+      "sha256": "a1bb00a7bcbf5b71229e097ac7b9373be0459326ed389d88d5982a8aee66f474"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "0770dc0e1d1df44a1778c0e91a891ae59fd1781fae3bcffcefba9dcca5651374"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "1e3d98cd3c73c2393e54aec7d5050d9ca5da2032d70f43265df554e823a5a3a9"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "afc6dabf868563d2a055180e13682790ecc2a17c58f8dc4f708665c0544de604"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "f95b121c4d7b9ac6e24f14b739969b63ea22a12b2f6e62200b205b6cc2541158"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "95e2432bbf3958776a85f6620dff46933eca9223b9b3ce3f89c056c23fed189f"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "c783d202907f8122490663523912f0775f210da9714f131cbb656f1e1c0cf555"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "201fd78a39fac753d55f28b84e4b764cec62a25a8a961c3eca4a009097129e47"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "81b0f9393d5be89135538e7f5fcee4f3f9f804124e21083936e1acc43059dea6"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423"
+    }
+  ]
+}

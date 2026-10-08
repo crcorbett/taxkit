@@ -1,3 +1,5 @@
+import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
+import { DocsWebsiteOrigin } from "@taxkit/content/schemas";
 import { Schema } from "effect";
 
 const ApiServerHostSchema = Schema.NonEmptyString;
@@ -26,3 +28,15 @@ export const ApiServerConfigSchema = Schema.Struct({
 export type ApiServerConfigService = Schema.Schema.Type<
   typeof ApiServerConfigSchema
 >;
+
+export class ApiServerConfigError extends Schema.TaggedError<ApiServerConfigError>()(
+  "ApiServerConfigError",
+  { operation: Schema.Literal("settings") }
+) {}
+
+export const ApiWorkerSettings = Schema.Struct({
+  apiOrigin: CalculatorRpcOrigin,
+  websiteOrigin: DocsWebsiteOrigin,
+});
+
+export type ApiWorkerSettings = typeof ApiWorkerSettings.Type;

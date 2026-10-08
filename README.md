@@ -3,7 +3,7 @@ document_type: repository-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-repository-maintainers
-last_reviewed: 2026-10-01
+last_reviewed: 2026-10-07
 review_trigger: contributor setup, repository entry points, or supported commands change
 ---
 
@@ -13,8 +13,8 @@ TaxKit is the public monorepo for the open-source tax engine, API, SDK and
 documentation site.
 
 The repo is early, but the main public integration surfaces now exist. The
-implemented surface is a standalone Bun API app, a TanStack Start web scaffold
-that calls that API, a Fumadocs-backed docs app, an Effect HTTP API package
+implemented surface includes the retained standalone Bun API and a native
+API/Website candidate with a take-home-pay form, accepted documentation in the same Website, an Effect HTTP API package
 with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, a private
@@ -28,11 +28,12 @@ validation, but it is not published yet.
 
 - [apps/api](./apps/api/README.md): standalone Bun process that owns API
   startup, listening config and Effect runtime teardown for `/api/*`.
-- [apps/docs](./apps/docs/README.md): TanStack Start public documentation app
-  that renders MDX through package-owned docs content and reusable Fumadocs
-  helpers.
-- [apps/web](./apps/web/README.md): TanStack Start app that loads health data
-  from `apps/api` through server/client runtime boundaries.
+- [apps/docs](./apps/docs/README.md): retirement tombstone and retained-source
+  recovery route; no active documentation workspace.
+- [apps/web](./apps/web/README.md): Native TanStack Website candidate with a take-home form,
+  private server binding and direct checked browser RPC to the API. It also
+  renders accepted documentation, search, discovery, Markdown and share images
+  and owns the current release documentation journey.
 - [packages/api/http](./packages/api/http/README.md): Effect HTTP API contract,
   generated docs, public calculator routes, thin handler adapters, server
   handler exports and browser-safe client exports.
@@ -135,11 +136,10 @@ and the [setup spec](./docs/product-specs/entire-session-history.md).
 
 ```sh
 bun install
+bun run dev
 bun run --filter=api dev
 bun run --filter=web dev
-bun run --filter=docs dev
 bun run check:doppler-custody
-bun run --filter=docs test:cloudflare-built
 bun run check:repository-paths
 bun run check:harness-governance
 bun run check:docs
@@ -150,20 +150,22 @@ bun run changeset
 bun run version-repo
 ```
 
-`bun run --filter=api dev` serves the API through portless at
-`https://api.taxkit.localhost`. `bun run --filter=web dev` injects that
-portless URL into `TAXKIT_API_BASE_URL` and `VITE_TAXKIT_API_BASE_URL` before
-serving the web app at `https://taxkit.localhost`. `bun run --filter=docs dev`
-is the credentialed, Alchemy-managed Cloudflare development path. It requires a
-repository-scoped Doppler login and an authorised `taxkit/dev` config, runs the
-pass/fail-only `bun run check:doppler-custody` check first during onboarding,
-and starts only a local `dev_<user>` Alchemy stage. It does not authorise or
-prove a provider change. Use `bun run --filter=docs dev:vite` for the fast,
-credential-free docs app at `https://docs.taxkit.localhost`. `bun run
---filter=docs test:cloudflare-built` builds the exact Cloudflare target and
-exercises an isolated copy of its Worker/assets under local workerd; it does
-not access provider credentials or prove a deployment. `bun run
-check:repository-paths` rejects machine-local checkout references in tracked
+`bun run dev` builds the API dependencies, then starts the native API and
+Website together using `alchemy.apps.local.run.ts`. Alchemy prints both local
+addresses and supplies the matching browser origin and private server binding.
+It uses local state and an isolated local profile directory; it requires no
+Cloudflare or Doppler login. App source edits reload automatically. After
+editing a shared package, rebuild that package before expecting its compiled
+API exports to change. Stop the pair with Ctrl-C.
+
+`bun run --filter=api dev` retains the separate Bun HTTP process through
+portless at `https://api.taxkit.localhost`. The [Website README](./apps/web/README.md)
+owns its standalone fixture, generated types and native checks. Use `bun run
+web:test:native-pair` for the saved built and live development journeys.
+Documentation development uses the native Website and API pair above. The
+old documentation workspace and writer workflows are retired; their exact
+source and recovery records are linked from the [retirement tombstone](./apps/docs/README.md).
+`bun run check:repository-paths` rejects machine-local checkout references in tracked
 readable text without printing the matched private value. `bun run check:docs`
 checks maintainer metadata, links, documented commands, workspace README
 coverage, public/maintainer path separation, and generated-source ownership.
@@ -265,12 +267,14 @@ open docs/repo-status-outline.html
 - `apps/api` is the API runtime owner. It creates one process-lifetime
   `ManagedRuntime`, serves `packages/api/http` through Bun and disposes scoped
   resources on shutdown.
-- `apps/docs` is the docs runtime owner. It consumes `@taxkit/docs-content`
-  and `@taxkit/docs-fumadocs` rather than owning canonical frontmatter,
-  navigation or reusable Fumadocs internals.
-- `apps/web/src/lib/runtime.server.ts` and
-  `apps/web/src/lib/runtime.client.ts` own the web SSR and browser client
-  runtimes. They call the standalone API over HTTP.
+- `apps/web` owns the replacement documentation reader over the accepted
+  backend catalogue and compiled MDX. Canonical page fields and reusable
+  Fumadocs internals remain package-owned. `apps/docs` is a
+  retirement tombstone; exact original source and deployed recovery identities
+  remain historical evidence.
+- `apps/web/src/lib/runtime.server.ts` owns one server runner. React's Atom
+  registry owns browser execution and cleanup. Both use native RPC to the
+  separate API; the Website contains no calculation fallback.
 - `@taxkit/api-http/client` and `@taxkit/api-http/client/live` are
   browser-safe.
 - `@taxkit/api-http/client/server`, `@taxkit/api-http/server` and handler

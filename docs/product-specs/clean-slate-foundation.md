@@ -1,27 +1,59 @@
 ---
 document_type: product-spec
-lifecycle: proposed
+lifecycle: current
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-08
 review_trigger: rebuild scope, interview answer, version selection, or implementation admission
 ---
 
 # Clean slate for the TaxKit website and API
 
-This is the proposed rebuild contract and design interview record. It records
-the requested direction, decisions and ordered acceptance checks. It awaits the
-grilling skill's final shared-understanding confirmation; it is not deployment
-approval. The [sibling tasks](./clean-slate-foundation.tasks.json) remain proposed.
+This is the accepted implementation contract and design interview record.
+Cooper explicitly requested implementation on 4 October 2026, superseding the
+prior whole-design Q14 admission hold. Q1–Q13 remain settled. The
+[sibling tasks](./clean-slate-foundation.tasks.json) and
+[active plan](../exec-plans/active/clean-slate-foundation.md) track actual progress.
+The original implementation authority includes reviewable commits and draft
+PRs. Cooper subsequently authorised native TaxKit Preview and Production
+deployments from this Mac on 7 October after exact source, plans, credentials,
+recovery and readback are qualified, and separately approved the existing
+Production token permission change. The active plan and dated delivery receipts
+record those operations. Merge, publication, credential creation and unrelated
+provider changes remain outside that authority; new provider operations need
+their concrete approval boundary.
+
+On 8 October Cooper postponed PostHog and confirmed a bounded review and
+handover as the next goal. The earlier metrics deferral still applies. This
+handover reviews the existing drafts, resolves material findings, checks
+Changesets and local release/packed-SDK evidence, and records both deferrals.
+It includes commits, pushes, draft PRs and routine Linear tracking. It does not
+merge, apply package versions, publish, deploy, upgrade billing, create
+credentials or change providers. T008 and T009 remain incomplete; this work
+does not accept T010 or close the full rebuild.
+
+The Medicare choice is resolved separately: Cooper approved the narrow
+2025–26 annual correction on 8 October, as recorded in
+[DEV-68](https://linear.app/coopers-personal/issue/DEV-68/cf-012-qualify-a-correct-effect-v4-taxkit-revision)
+and [draft #168](https://github.com/crcorbett/taxkit/pull/168). Its separate
+[accepted scope](https://github.com/crcorbett/taxkit/blob/557b4e524ead6f469e92150360a9e8a451c37cdd/docs/product-specs/medicare-2025-26-correction.md)
+owns that correction and its qualification. The dated handover did not include
+that separate correction. Cooper's later 8 October "Merge everything" instruction
+authorises including #168 in the repository merge after combined local checks;
+it adds no deployment or adad enablement authority.
 
 ## Agreed direction
 
 Keep the TaxKit calculation packages, tax rules and calculation results. Rebuild
 the website and application wiring using the repository structure, Alchemy and
 strict Effect TypeScript skill requirements originally requested from
-development-workflows 0.5.1. The installed successor is now 0.6.0; use its
-complete canonical baseline and qualify its stricter rules with TaxKit's
-existing checks. Earlier dated research retains its original skill version.
+development-workflows 0.5.1. Resolve current shared guidance through
+[the latest published plugin lookup](../skills.md) and read the local profiles
+alongside it. The copied 0.6.1 baseline at
+`91a47d9fdde8aad214a0ab12742517cce344b709` remains dated history; it does not
+select today's plugin. The qualified repository enforcement and installed
+dependency graph own compatibility. Earlier research retains its original
+skill version.
 Keeping packages allows edits needed for current dependencies. Cooper allowed
 a fresh package and SDK interface in Q3; keep the tax rules and calculation
 results while replacing the public interface deliberately.
@@ -79,8 +111,9 @@ browser agent -> page-owned WebMCP tools -> the same website commands
 backend API -> existing calculator contracts and rule packages
 human docs page -> checked API page/navigation -> accepted content contract
   -> Website HTML with browser-safe generated presentation components
-dynamic search, Markdown, content or images -> native API -> owning content/image service
-generated sitemap/robots/agent indexes/static Markdown/OG -> accepted catalogue assets
+dynamic search, Markdown or content -> native API -> owning content service
+sitemap/robots/agent indexes -> backend accepted catalogue + checked deferred stage origins
+generated static OG -> Website build-only renderer -> accepted catalogue assets
 browser pageview -> private PostHog browser service -> bounded Website relay
 successful hosted calculation -> API application event owner -> PostHog capture
 request observations -> safe log/metric exporters and qualified native spans
@@ -139,6 +172,17 @@ source loader, RPC server or backend fallback. Calculator facts go only in
 bounded bodies; reports live only in the current calculation/page state.
 Credentials are omitted and unexpected redirects rejected for public browser
 calls. Actual native request headers determine the tested CORS allowlist.
+The Website's native settings and documentation page server functions are GET
+requests with no data or client Context. Their explicit build/ingress route
+uses the native generated function URLs and rejects unknown or extended
+addresses with empty 404 before native lookup/logging. It rejects query
+payloads, content-type input and unsupported methods before parsing. Page
+navigation carries only the canonical bounded public page identity in an
+explicit header; original SSR pathnames own page selection. Calculations remain
+body-only form/RPC requests.
+Expected settings errors keep their checked result. Unexpected settings failures
+use the native HTTP failure matcher and safe host reporter, then return the
+native empty response before TanStack can log or serialise an arbitrary error.
 
 Version the RPC contract and qualify a checked compatibility boundary so
 independently activated Website/API Workers fail safely during version skew.
@@ -150,9 +194,12 @@ establishes any existing public consumer/version before selecting its successor.
 Private client Layers distinguish expected calculation errors, unavailable
 transport, incompatible contract and malformed replies. Keep one total budget
 through headers and decoded body; preserve earlier caller interruption and
-close abandoned bodies. Root-owned RPC/client resources survive individual
-request cleanup and are released at their actual host/browser lifetime. Native
-API handlers run in the incoming Effect fibre with no extra ManagedRuntime.
+close abandoned bodies. Host-owned protocol configuration remains available
+across requests. Each native RPC call acquires and releases its receive loop in
+its own scope; retaining a busy fibre from an earlier Worker request can stall
+later calls. The server runner and React registry own the named client service
+and its configuration; no calculation constructs a Layer or another runner.
+Native API handlers run in the incoming Effect fibre with no extra ManagedRuntime.
 
 Exact Effect 4.0.0 exports RPC at `effect/rpc`, while the RPC source still marks
 the APIs unstable. Requalify the older skill's invalid-reply decoder workaround,
@@ -204,11 +251,10 @@ implementation checks; selecting the design does not prove them.
 Q1–Q13 are settled. The broader analytics request supersedes the earlier
 technical-health-only Q8 recommendation. Existing supported tax years stay
 explicit; unsupported years fail rather than silently falling back to another
-year. Share images describe public pages and never a person's figures. Final
-shared understanding remains the design admission boundary.
+year. Share images describe public pages and never a person's figures. The 4 October implementation request admits the settled design.
 Cooper reopened the interview and has now accepted Q9–Q13. There are no further
-unresolved product branches in this first-release design. Q14 asks for final
-shared understanding of the complete contract before implementation. The
+unresolved product branches in this first-release design. The 4 October implementation request supersedes the former Q14
+whole-design confirmation hold. The
 stronger functional Effect requirement is already explicit user direction,
 not another permission question.
 
@@ -245,7 +291,7 @@ keeps its original authority and target; it cannot prove the replacement.
 | ID | Required outcome | Owner and acceptance |
 | --- | --- | --- |
 | CSF-001 | Keep tax behaviour while allowing a fresh interface | Core, rule and calculator owners retain known-result tests and supported-year contracts. Reject invalid input with checked failures; compare old and new valid results. Record breaking exports with appropriate Changesets. |
-| CSF-002 | Qualify current dependencies and strict repository structure | Root manifest, lock, runtime, exports, TypeScript, formatting, lint, tests, Turbo, Knip and CI select one exact qualified graph. Update canonical repository skill copies and their local profiles together. Enforce immutable/declarative owned code as well as the portable Effect baseline. No silent version downgrade or blanket exception. |
+| CSF-002 | Qualify current dependencies and strict repository structure | Root manifest, lock, runtime, exports, TypeScript, formatting, lint, tests, Turbo, Knip and CI select one exact qualified graph. Resolve current shared guidance through the latest published plugin and read its local profiles; preserve the qualified repository enforcement. Enforce immutable/declarative owned code as well as the portable Effect baseline. No silent version downgrade or blanket exception. |
 | CSF-003 | Separate native backend and standard frontend | Native Alchemy API handlers keep request work and cleanup; no backend ManagedRuntime. The Website uses one server runner and one React-owned browser Atom graph. Native RPC clients use a same-stage server binding and checked public browser URL, implementing checked named operations with a complete-response deadline, revision agreement and caller cancellation. |
 | CSF-004 | Give visitors all existing calculators | Derive forms, calculator names, input contracts and result scope from the catalogue. Use a calculator-first homepage and explicit Calculate buttons; edits invalidate old results and interrupt old work. Show the main answer with expandable existing breakdown, assumptions, supported year and sources. Route owns restoration and result matching, feature container owns commands, focused leaves show readonly values and local input state. Keyboard, focus, loading, errors and cancellation work; unmount releases work. |
 | CSF-005 | Serve anonymous API, remote MCP and browser tools | HTTP/OpenAPI and native Effect MCP reuse checked named operations. Bound bodies, work, concurrency and request rates; return checked rate-limit/error responses. WebMCP can find, read, fill, calculate and read results through visible page commands. Feature detection keeps normal browser use working. |
@@ -267,17 +313,79 @@ or an experiment about worker performance.
 Initial anonymous calculation/MCP policy is 60 work requests per minute per
 trusted, non-logged client rate key; 64 KiB request bodies; at most eight active
 calculations per Worker isolate; a five-second operation budget; and a
-ten-second complete-response client deadline. Scope and approximation of the
+ten-second complete-response client deadline. The calculator-owned bounded
+Layer supplies one pool to the native HTTP/RPC host and one per standalone HTTP
+router. Each batch calculation takes a place; excess work fails without waiting.
+Metadata does not take a calculation place; its HTTP endpoints declare 504. Checked capacity/timeout failures
+use HTTP 503/504; shared native rate failures use HTTP 429 with Retry-After 60
+and RPC revision 4. The five-second limit on all nine service operations includes
+scoped cleanup and rejects late success using monotonic elapsed time; it cannot
+force synchronous CPU pre-emption or guarantee remote cancellation. Direct
+engine/local SDK execution retains its existing lifetime and results. Scope and approximation of the
 native rate limiter must be documented. Metadata/content responses are bounded
-to 2 MiB at the client. Return checked 413/429/timeout failures with safe codes
+to 2 MiB at the client. The same 2 MiB cap applies to the private closed JSON
+RPC channel, including calculator replies and native framing: all nine calculator operations
+share the installed whole-response reader, so leaving calculator replies
+unbounded would retain the same memory risk. Exact-limit valid native replies
+for every named operation and actual built-host retained reports must pass; this
+policy does not apply to future framed MCP streams without separate proof.
+The current modern MCP candidate separately bounds complete native JSON/SSE
+replies to 2 MiB and ten seconds. Actual official-client calls cover all six
+canonical tools, built local Worker report/page equality and shared allowance;
+exact framed-byte/deadline tests cover source-stream cleanup. This adds no
+subscription or resumption contract. The native older-client candidate adds a
+fixed-name Durable Object per stage, with 32 initialisation attempts per
+ten-minute host generation and 32 concurrent requests without queuing. Its native
+alarm closes the entire protocol scope; an incoming time check also refuses
+expired IDs. No client metadata or tax figure is persisted. The existing native
+HTTP adapter refuses initialise with an existing ID before registration, so a
+reinitialisation workaround is unnecessary. Actual older clients must prove
+independent conversation IDs, cancellation isolation, immediate work-place reuse,
+common HTTP/modern/older rate admission, untouched IDs after refused reinitialise,
+automatic expiry without follow-up traffic and fresh initialise after 404. The
+calculation pool remains per application isolate, not global across Worker and
+object instances. Preserve the modern real-network negative oracle: a genuine
+outgoing TCP abort stops its caller while pre-response work remains until the
+five-second budget. T006 is locally accepted with this documented bound; its
+setup guide and both ordinary remote protocols are deployed and read back on
+Preview and Production. Older-session cancellation does not prove prompt
+modern cleanup. The
+[agent setup receipt](../documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
+records the exact checks, primary review and browser/remote proof limits.
+Return checked 413/429/timeout failures with safe codes
 and retry guidance; do not retry calculations automatically. Qualify valid
 catalogue responses and supported streaming/MCP envelopes before adopting these
 limits, and record a justified adjustment in the SPEC rather than adding an
 unlimited fallback. Rate identity is not an analytics visitor ID and must not
 be exported in logs, spans or product events.
 
+The native API alone owns the 60-calculation allowance. Public HTTP/RPC use a
+checked Cloudflare connection address; forwarded Worker calls, missing/invalid
+addresses and arbitrary forwarded headers cannot select a public key. Website
+HTML forms carry their original checked address through a binding-only named
+operation, separate from the request body. Each batch calculation consumes one
+unit; metadata consumes none. Address aliases are canonicalised and the key
+is redacted and cannot use the ordinary Schema encoder. No analytics identity
+or request-derived policy override is admitted. Cloudflare's limit is local
+to a location and approximate, not a global exact quota.
+
+`CALCULATOR_RATE_NAMESPACE` is a required positive decimal string selected by
+the operator for that account and stage. No cloud value is invented. The guarded
+disposable development root explicitly selects `local-emulator`, one shared
+loopback allowance and its isolated local namespace. Hosted composition defaults
+to `edge`; the local allowance additionally requires an HTTP loopback API origin.
+Missing hosted identity still fails safely. The native RPC does not transfer an
+explicit AbortSignal on the pinned runtime: client cancellation stops local
+waiting, while the existing API operation budget bounds remote work. No
+experimental platform flag or dependency upgrade is introduced.
+
+
 Keep owning Schemas, schema-derived types, branded identities, checked semantic
-Config, services, Layers and tagged errors. Decode unknown representations once
+Config, services, Layers and tagged errors. Core ledger types now infer from their Schema;
+recursive trace types share one field owner and annotate only children. Existing
+encoded bytes, field order and omission/undefined behaviour stay unchanged.
+This type-owner slice does not complete the remaining fallible constructors,
+semantic Option migration or table relationship checks. Decode unknown representations once
 at their true boundary and encode outward values. Keep Effects lazy and flat;
 keep one-use mapping and error logic beside the operation. Separate contracts,
 live Layers, test Layers and application execution. Provider adapters expose
@@ -350,8 +458,9 @@ decoding, mapping, error projection and matching inline. Ban dumping-ground
 `helpers`, `utils`, `common` and `shared` modules; naming a wrapper as a service
 does not give it semantic weight. Review the actual call graph in every slice.
 
-Adopt the installed 0.6.0 portable strict Effect policy at its repository-owned
-canonical skill asset. Merge into `oxlint.config.ts` and retain useful existing TaxKit,
+Retain the qualified portable strict Effect policy in `oxlint.config.ts` and
+its owned source asset. The latest shared guidance does not automatically
+change that tested policy or TaxKit's dependency graph. Retain existing TaxKit,
 MDX and workspace checks. Enable `strict-effect/no-unchecked-index`,
 `no-native-at`, `runtime-file-convention`, `tagged-error-name`,
 `error-constructor-new`, `no-promise-workflow`, `no-unsafe-option-unwrap`,
@@ -449,11 +558,16 @@ retry; do not promise exactly-once storage across provider loss or caller
 recalculation. Local package calculations do not send analytics. Visits are
 loaded-page counts, not a promise of exact returning-person counts.
 
-Manage retained TaxKit Production and one shared Preview PostHog project through
-Alchemy, following Common Practice's fixed US-region pattern, subject to the
+Manage one retained TaxKit PostHog project through Alchemy, shared by Production
+and deliberate controlled Previews. Cooper selected this single-project scope
+on 8 October 2026. Follow Common Practice's fixed US-region pattern, subject to the
 actual organisation/credentials in the reviewed provider plan. Local analytics
 is disabled. Ordinary Previews are disabled; an explicit controlled Preview
-proof can enable its Preview project. Production capture tokens are public
+proof can use the same project. Every event carries `project=taxkit`, its
+application and exact stage (`prod` or the checked `pr-N`). Production reports
+filter `stage=prod`; controlled Preview proof filters its exact stage. These
+filters separate reports, not access to event data within the project.
+The project has one stable identity and one capture token. Capture tokens are public
 write-only browser inputs; management/query credentials remain private in
 Doppler and never enter app output or bundles. No paid feature or billing
 change is required by this scope.
@@ -598,17 +712,26 @@ add minimal PostHog and safe shared Axiom telemetry, then qualify the complete
 replacement and its operational delivery. An active execution plan begins only
 after final shared understanding. A passing early slice is not final acceptance.
 
+T003 qualifies the first app connection, native failure/privacy boundaries,
+cancellation and local development. While exported telemetry remains
+unqualified, both calculator hosts explicitly disable platform logs and traces;
+T003 checks that declared containment in native plans and actual local state.
+T009 owns enabling and proving safe exported native tracing, including automatic
+fields and retained Cloudflare/Axiom rows. CSF-009 remains unmet until that proof
+or a reviewed design change exists. This separates the task owners without
+reducing the tracing or privacy requirements.
+
 | Impact surface and inspected owner | Decision | Required change, order and proof |
 | --- | --- | --- |
 | Tax rules/core/calculator owners and READMEs under `packages/core`, `packages/calculators`, `packages/rules/au/*` | Change required | Compatibility/type/input/interface corrections in T002/T004; preserve valid known results and rate tables. Owning package tests, whole test run, reviewed Changesets. |
 | RPC/HTTP/OpenAPI/SDK owners, export maps, snapshots, consumer fixtures and READMEs in `packages/api/rpc`, `packages/api/http`, `packages/sdk/typescript` | Change required | Agreed native RPC owner and named closed client operations, new lifetime/interface, current module paths and checked transport in T003/T004. Actual RPC and HTTP clients, wire privacy/version/cancellation tests, plus packed/downstream consumer proof. |
 | `apps/api`, `apps/web`, `apps/docs` and their READMEs; `docs/architecture/{package-ownership,effect-services,api-and-sdk,frontend}.md` | Change required | Native API/standard Website/React lifetime in T003/T004, agent adapters in T006. Retire the old docs app in T005 only after replacement/retention proof. Actual local/browser/agent journeys and bundle/import inspection. |
 | `packages/docs-content`, `packages/docs-fumadocs`, accepted public MDX/navigation, generated `.source`, `tools/documentation/owner-policy.json`, content architecture | Change required | One accepted publication/discovery owner in T005; exact status records, regenerated representations, source-faithful pages, processed Markdown and OG images. Content/docs/build/browser checks; never hand-edit generated output. |
-| Root manifests/lock/runtime, `turbo.json`, TypeScript, `oxlint.config.ts`, `oxfmt.config.ts`, `knip*.json`, `tools/oxlint/**`, language-service config, `tools/quality-workflow/**` and quality workflow | Change required | Exact qualified versions and the complete 0.6.0 baseline in T002; reroute inputs/scopes per later move. T005 replaces hard-coded apps/docs browser/cache paths and quality admission. Actual CLI rejected/accepted fixtures, type/lint/format/build/tests, source export/bundle audits and complete verification. |
-| `.agents/skills/**`, `tools/skills/canonical-skill-baseline.json`, `AGENTS.md`, linked `CLAUDE.md`, root/docs routes and affected standards | Change required | Complete canonical skill trees, including the required Linear skill, and local profiles teach the accepted implementation in T002 and each affected slice. Include the Linear folder/link in baseline receipts; this authorises no Linear project or issue write. Keep metadata/receipts/references coherent; test skills, harness governance and docs. Global installed skills remain outside write scope. |
+| Root manifests/lock/runtime, `turbo.json`, TypeScript, `oxlint.config.ts`, `oxfmt.config.ts`, `knip*.json`, `tools/oxlint/**`, language-service config, `tools/quality-workflow/**` and quality workflow | Change required | Exact qualified versions and the qualified portable strict Effect policy in T002; reroute inputs/scopes per later move. T005 replaces hard-coded apps/docs browser/cache paths and quality admission. Actual CLI rejected/accepted fixtures, type/lint/format/build/tests, source export/bundle audits and complete verification. |
+| `docs/skills.md`, `docs/skill-profiles/**`, retained repository-specific `.agents/skills/**`, `AGENTS.md`, linked `CLAUDE.md`, root/docs routes and affected standards | Change required | Resolve the latest published shared plugin and read local profiles in T002 and each affected slice. Preserve repository-specific Linear routing and the exact historical receipts; copied shared skill trees and their checks stay retired. Check harness governance and docs. This grants no Linear project/issue or provider mutation authority and no unrelated plugin-installation write. |
 | `alchemy.run.ts`, `packages/infrastructure`, `tools/docs-deployment/**`, deployment workflows and infrastructure README | Change required | Same-stage native pair, new graph admission, exact DNS/secrets/analytics/telemetry ownership in T003/T007/T008/T009. Current Alchemy types/tests and reviewed plans; retain ordinary native commands over a parallel verification framework. |
 | `docs/runbooks/{docs-deployment,recovery}.md`, operations authority model, `tools/documentation/runbook-contract.json` and router pointers | Change required | Replace the one-DocsWebsite procedures with exact pair/domain/secret/analytics/signal plans and recovery in the owning slice. Revise any changed procedure target/command contract together. Docs/runbook checks plus authorised independent readback. |
-| `.changeset/config.json`, changed package Changesets, SDK/release-readiness consumer graph including `packages/scripts/src/release-readiness/schemas.ts` and versioning standards | Change required | Fresh public interfaces require a major change at the affected owner; the existing nine-package fixed train takes its highest required bump. T005 replaces the old docs browser command in the release graph. Reconcile additions/removals in T002/T004/T010 and retain local release/packed proof. No package publication is part of design approval. |
+| `.changeset/config.json`, changed package Changesets, SDK/release-readiness consumer graph including `packages/scripts/src/release-readiness/schemas.ts` and versioning standards | Change required | Fresh public interfaces require a major change at the affected owner; the current ten-package fixed train, including the compiled content contract, takes its highest required bump. T005 replaces the old docs browser command in the release graph. Reconcile additions/removals in T002/T004/T010 and retain local release/packed proof. No package publication is part of design approval. |
 | `docs/verification/critical-journeys.json`, `repository-harness-profile.json`, current SPEC/tasks/ADR, active-plan indexes, bounded proof/evidence pointers | Change required | Add consumer-visible calculator, discovery, agent and privacy journeys with real oracles as their slices land. T005 replaces the current profile's apps/docs owner when retiring the app. Bind candidate/config/stage and distinguish local/provider/Production proof in T010. |
 | `docs/exec-plans/completed/**`, historical/binary `docs/evidence/**`, previous audits, Git source and deployed rollback identity | Preserve | T001 retention manifest records identity and later successor pointers before removal. No historical evidence is silently deleted, reassigned or treated as current proof. |
 | Site-owned shared datasets, their foreign stack, retention and unrelated DNS/dirty work | Preserve | TaxKit references foreign Axiom outputs; it does not adopt/edit them. Account/readback and exact plans must show this in T007/T009. |
@@ -735,11 +858,14 @@ changed in this interview, and this observation does not qualify the planned
 replacement or establish the install failure's cause. The implementation plan
 must retain and resolve this failed proof step.
 
-## Documentation impact of this interview
+## Documentation impact of the original design interview
+
+These rows retain the original interview scope. They do not describe the later
+implementation state, which is owned by the sibling tasks and active plan.
 
 | Surface | Decision | Reason and owner |
 | --- | --- | --- |
-| Proposed intent, tasks, glossary and architectural decisions | Change required | This SPEC/tasks, root CONTEXT.md, ADRs 0001/0002 and the product-spec index record all settled Q1–Q13 answers and the complete 0.6.0 functional baseline. ADR 0001 includes the agreed website RPC choice and trade-off. The glossary has no new domain term to add. Final Q14 shared understanding remains pending. |
+| Proposed intent, tasks, glossary and architectural decisions | Change required | This SPEC/tasks, root CONTEXT.md, ADRs 0001/0002 and the product-spec index record all settled Q1–Q13 answers and the complete 0.6.0 functional baseline. ADR 0001 includes the agreed website RPC choice and trade-off. The glossary has no new domain term to add. Cooper admitted implementation on 4 October; provider-plan approval remains separate. |
 | Current architecture, app/package READMEs and public docs | Preserve | Implementation has not changed. Update their earliest owners with each accepted replacement slice. |
 | Tax packages, SDK/HTTP exports, schemas, tests, examples and generated references | Preserve | No package behaviour changed during the interview. Q3 allows a fresh interface during the accepted implementation, with its required versioning and consumer proof. |
 | Commands, lint, skills, CI and runbooks | Preserve | Record desired requirements here; do not present them as installed or enforced yet. |
@@ -747,7 +873,278 @@ must retain and resolve this failed proof step.
 | Changeset | N/A | These planning documents change no installed package, export or calculation behaviour. |
 | Provider changes, publication and deployment proof | N/A | The interview performs none of these operations. |
 
-This proposed SPEC/task set now carries the downstream-impact ledger. Complete
-its final review and shared-understanding confirmation before admitting
-implementation and starting an active plan. The grilling skill requires that
-confirmation before acting on the design.
+Cooper admitted implementation of this SPEC/task set on 4 October 2026, as
+recorded in the authority section above. That admission supersedes the original
+whole-design confirmation hold; Q1–Q13 remain settled. Only a material unresolved
+product choice or a consequential operation outside the recorded authority
+needs another concrete decision.
+
+
+The current request/operation slice moves shared streamed body admission to the
+HTTP-owned export, retains the RPC compatibility alias and mounts it in the
+standalone HTTP server. Native API rejections have checked JSON 413/408 guidance;
+all native calculator form paths have fixed HTML guidance and a recovery link.
+The five-second operation policy includes lazy metadata invocation and cleanup
+at all nine methods; rate identity/limits and whole T004 acceptance remain open.
+
+The current primitive slice keeps pure `aud(Cents)` for already checked cents
+and adds fallible `audFromCents(number)`. Dollar construction, arithmetic,
+rounding, decimal and calendar helpers return owned Effect failures. Date ends
+use Option while preserving the previous encoded values and key presence.
+This deliberately changes public Type contracts and examples with major
+Changesets. Retained tax tables, source records and golden results must stay
+unchanged. The active plan and dated receipt own qualification; full table
+relationships, wider semantic absence and rate limiting remain unfinished.
+
+The parameter-table slice checks whole row/table relationships at the five
+existing owners. Saved and decoded class-row arrays share the same coverage
+check; row ranges, local rates, per-scale coverage and Medicare threshold/rate
+relationships are checked without guessed continuity or any tax-data change.
+Generic decimals and signed Schedule 1 dollar coefficients retain their meaning.
+The active plan and dated receipt own current qualification; wider semantic
+absence/service ownership, trusted rate identity/limiting and whole T004
+acceptance remain open.
+
+Core's source/test compiler configuration requests no automatic type packages.
+The source-only build inherits that empty list, so clean installs do not rely
+on another workspace supplying unused Node types. The active plan and dated
+portability receipt own this corrective slice's checks; no runtime or tax
+behaviour changes, and T004 remains active.
+
+
+Core trace/question fields now have Option owners that retain missing, present
+undefined and present-value representations. Ordinary descriptor fields derive
+from Schemas; actual service/Layer relations remain typed and rule parameter
+collections are total. Tuple inference reads the native service Identifier.
+The engine implementation is separate from its contract with public exports
+preserved. SDK report narrowing validates the selected Type rather than decoding
+a domain report again. The active plan and dated absence-owner receipt qualify
+this slice; broader public request absence and trusted rate identity/limiting
+remain active, and T004 is incomplete.
+
+
+Calculator-owned request context/help/filter and optional metadata/error fields
+now use representation-preserving nested Options. SDK aliases derive the
+constructor input while selected calculator facts keep their existing decoder.
+Calculator service/work fixtures join package type checking. Public templates
+and typed native/HTTP callers use the same owners. The active plan and dated
+[request absence receipt](../documentation-audit/clean-slate-foundation/2026-10-06-public-request-absence.json)
+own qualification; remaining domain review and trusted rate identity/limits
+keep T004 active.
+
+
+The remaining domain contract review moves Core diagnostic cause absence to
+its canonical nested Option/default owner and removes the unused erased
+calculator catalogue `program` capability. Ordinary optional constructor
+arguments retain their total empty-collection meaning; untrusted facts and
+heterogeneous Schema/Layer relations retain their explicit owners. Historical
+opaque diagnostics are codec values, with no new safe-telemetry claim. The
+[domain contract receipt](../documentation-audit/clean-slate-foundation/2026-10-06-domain-contract-closeout.json)
+and active plan own qualification; rate identity/limiting keeps T004 active.
+
+
+## Metrics deferral — 6 October 2026
+
+Cooper asked to leave metrics work for now because the approach is likely to
+change, and to proceed with the other work. CSF-T009/DEV-80 remains pending; its
+metrics/exporter/dataset/dashboard choices must be revisited before that task
+starts. This continuation does not implement or accept that prior metrics
+approach. Existing disabled collection and fixed safe failure containment stay
+in place while calculator/API and other authorised work proceed.
+
+## PostHog deferral and review handover — 8 October 2026
+
+Cooper postponed PostHog setup after reviewing the project-limit cost. Keep
+collection off and stop project creation, billing changes, browser-sender
+implementation and tracking activation until Cooper explicitly resumes that
+work. Preserve the locally qualified single-project draft #169 and its
+receipts. CSF-T008/DEV-79 remains unfinished; stage labels separate reports,
+not access to events within a shared project.
+
+The current handover may proceed independently of T008/T009. Review the exact
+draft stack and its saved review comments, inspect package compatibility notes
+and the ten-package fixed train, run the owning local release graph and packed
+consumer checks, and obtain a fresh bounded independent review. Resolve
+material findings and record source identity, actual command outcomes, remaining
+work and rollback. Preserve completed task receipts and all original acceptance
+conditions. Final rebuild acceptance still waits for the deferred requirements
+and their own exact proof; a green local report is not merge, publication,
+deployment, current-law Medicare correctness or adad qualification.
+
+
+## T005 Website search contract
+
+The replacement Website has one `/search` page with a labelled standard GET
+form and optional `term` field. Original URL words determine SSR selection;
+router query callbacks preserve literal strings rather than JSON values.
+Duplicate/unexpected keys and overlong words produce fixed checked guidance.
+Browser native GET uses a bounded ASCII URI component header and the installed
+URI Schema codec for Unicode. Empty words do not search. Nonempty words use the
+same accepted-catalogue `searchDocs` operation and its 100-character,
+twenty-result limits. Accepted titles and descriptions link to existing pages;
+no-match, loading and unavailable states stay distinct. Search works without
+JavaScript, uses the existing heading-focus policy and carries `noindex,
+follow`. No personal calculation value, second index or collection event is
+introduced. Discovery, Markdown and share images are described below; old-app retirement
+remains later T005 work. Metrics remain deferred under Cooper's latest direction.
+
+
+## T005 discovery contract
+
+The backend content owner projects `/sitemap.xml`, `/robots.txt`, `/llms.txt`
+and `/llms-full.txt` from the same accepted catalogue. Application composition
+provides lazy cached, checked API and Website stage origins; native deferred
+addresses cannot be guessed during an ordinary source build. A shared secure
+root-origin Schema retains separate semantic identities. The closed discovery
+Schema owns the exact path/media relationship and a 300,000-character body
+bound within the existing two-MiB private reply budget.
+
+The fifth documentation RPC operation uses revision 2 and checks the reply path
+against the requested one. Calculator revision 4 and four public HTTP content
+routes stay unchanged. The Website's existing runner serves checked GET files
+and explicit empty 200 HEAD with the same headers. Unexpected methods/query and
+unavailable settings/binding have empty safe 405/400/503 responses. Sitemap XML
+contains all accepted canonical addresses with no guessed modification date.
+Short agent links use the existing processed-Markdown API endpoint; the full
+index preserves all processed bodies and useful fenced code examples. No
+calculation report, second content index or collection event is introduced.
+
+The existing native journey checks actual built API/Website files, XML parsing,
+all accepted content, correct media/cache headers and safe failure paths. T005
+remains in progress for old-app retirement and replacement checks. Metrics remain deferred.
+
+
+## T005 Website Markdown contract
+
+Accepted public pages serve the existing processed body through both explicit
+Website `.md` links and same-page Accept negotiation. The visible article link
+and alternate head address identify the file. A bounded ingress-only Schema
+checks the whole preference field, quality and specificity; zero excludes a
+representation and HTML wins ties. Existing HTML Vary fields are preserved and
+Accept is added. No preference means ordinary HTML.
+
+One named native HTTP policy owns the checked original URL and representation
+headers inside the existing app runner and request scope. The captured
+`docsMarkdown` operation remains the body owner. GET/explicit empty 200 HEAD,
+UTF-8/cache/`nosniff`/Vary/canonical headers, safe method/query/missing/unavailable
+responses and browser link behaviour require actual built proof for every
+accepted page. Native functions and calculator forms retain their policy; search
+and agent landing pages do not gain report downloads. No source fallback,
+new catalogue, backend endpoint or package contract is added.
+
+The existing native journey and exact decoder CLI fixtures own qualification.
+[Markdown evidence](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
+keeps current proof separate from deployment. Whole T005 stays in progress for
+old-app retirement and replacement checks; metrics remain deferred.
+
+## T005 Website share-image contract
+
+Share assets are generated statically from the accepted catalogue before the
+Website Vite build copies public assets. The exact selected Takumi 2.14.0
+WebAssembly graph includes its embedded font; no remote font, browser renderer
+or dynamic image service is needed. Each accepted page has a checked bounded
+1200 by 630 PNG at `/og` plus its public path and `.png`. One mapping supplies
+both generation and page metadata. The scoped build program releases its native
+renderer and exposes fixed safe failures. Previous owned generated files are
+removed so withdrawal cannot leave a copied stale public asset.
+
+The checked public page/origin supplies canonical, alternate Markdown, Open
+Graph/Twitter and encoded TechArticle output. Native Schema JSON encoding and
+script escaping retain unusual public text without inventing author/date fields.
+All accepted assets and heads, deterministic generation, actual static headers,
+Chromium decoding, build-only bundle exclusion and source preservation need
+boundary-matched proof in the [image receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json).
+T005 remains in progress for old-app retirement and harness replacement; metrics
+remain deferred and retained tax results are unchanged.
+
+
+## T005 replacement-check contract
+
+Before removing the old app, current release and Quality checking select the
+replacement Website. The stable `docs-browser` check invokes the existing
+`web:test:native-pair` root owner, freshly builds both hosts and runs every
+native case. Its real reader journey adds missing skip-link, landmark,
+contrast and reduced-motion observations to accepted-page/navigation/error
+proof. No filtered subset may silently pass without a reader case.
+
+Quality's exact Playwright paths, policy and refusal corpus, current
+`taxkit-docs-runtime` journey/profile, command/package/Website guides,
+release runbook/contract and permitted local docs-maintainer profile overlay
+change together. Canonical skill assets and historical packet/attempt bytes
+remain unchanged. The old app/workspace and its operation route remain only
+until source/artifact retention and provider-procedure replacement are
+qualified; this check slice does not remove or deploy them. Evidence belongs
+to the [replacement-check receipt](../documentation-audit/clean-slate-foundation/2026-10-07-website-docs-checks.json).
+
+
+## T005 release evidence addressability
+
+The current CI-mode command must expose the exact bounded detail paths/hashes
+from its returned check outcomes. A successful wrapper does not identify a
+complete verification log when another test uses the same check ID. Preserve
+candidate-mode formatting and all immutable receipts; record any older
+detail-reference limitation separately. The existing native process fixture
+and Quality policy reject later unrelated artifacts, another result and plain
+success text. This repairs evidence selection, without a new candidate or
+attempt receipt. [Detail-output evidence](../documentation-audit/clean-slate-foundation/2026-10-07-release-detail-output.json)
+remains separate from old app retirement and metrics deferral.
+
+## T005 old-app retirement contract
+
+Retire only the old app workspace, obsolete build/test selectors, precise lint
+permissions and writer routes after replacement journeys and source identities
+are qualified. A README tombstone routes to the strict verified 49-file original
+source bundle and concrete retention manifest. Keep the initial T001 manifest,
+accepted authored inputs/catalogue and every old provider receipt unchanged.
+Keep all 61 authored page URLs; the approved default calculator replaces `/`
+and `/start` remains the docs entry. The native Worker proof must observe actual
+HTML and canonical/share metadata at each original page address.
+
+The replacement still consumes the shared Fumadocs render/config/source owners,
+so that package stays. Ignore neither missing active files nor source-policy
+failures. Historical inspections use explicit verified original sources; current
+native hosts retain actual positive/negative checks. All previous invalid-code
+canaries remain. Saved workflow, operation, journey, control and command bytes
+preserve the old contract outside default execution. The historical receipt
+algorithm qualifies its bytes in an owned temporary Git fixture, not current
+source files.
+
+The old Stack entry is a static typed marker that the actual Alchemy importer
+refuses before session providers, remote state or planning. Alchemy can create
+local logs and an empty profile earlier; proof records that limit. The four old
+writer/browser workflows admit only a manual permission-free stop, with no
+checkout, credential fetch or provider step. Actual old-development and
+receipt-writer commands stop before operation Config/custody/state work. The
+read-only historical receipt reconciler remains useful. No successful empty
+old-resource graph can invite a destroy apply.
+
+Original resource, stage, version, URL and recovery identities remain tied to
+their dated provider observations. The source bundle is not a complete rebuild
+checkout, deployed artifact, approval or exercised rollback. Ignored local
+build, dependency and state files stay physically untouched. Native provider
+operations and domains belong T010/DEV-81; metrics remain deferred. Full final
+qualification is required before whole T005 acceptance or delivery.
+
+
+### T007 native domain and plan progress — 7 October
+
+The receiving native graph now omits Production DNS/domain properties in local
+and Preview stages, and declares retained Production zone/settings plus the
+Website/API domains through native Outputs. Independent `cf` reads establish
+bounded existing zone state in the dated readback; the existing default profile
+works without creating a credential. The native shared redirect reader's broad
+fallback is reproduced and narrowed to its typed absence error, with actual
+source/compiled mock-provider proof.
+
+Version-three plan projection admits the native pair and Production-only
+adoption/settings, with exact configured account/zone and patch identity. It
+recognises native binding rows and refuses unknown, repeated, destructive or
+wrong-stage rows. The existing native projection command now calculates and
+checks tracked source identities against an unchanged clean candidate, with a
+separate native identity record and protected stage-local output paths. Optional
+caller hashes must agree. That local record excludes generated/dependency bytes,
+environment/provider state and the origin of supplied plan text. Native
+bootstrap/provider receipts and independent live no-apply plan remain pending.
+Current retired commands/workflows stay stopped; real scoped Doppler custody
+and cloud operation proof remain unfinished. This progress accepts no provider
+apply or public availability.

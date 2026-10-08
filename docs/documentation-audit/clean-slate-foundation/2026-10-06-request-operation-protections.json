@@ -1,0 +1,498 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-06",
+  "review_trigger": "request admission, metadata budget or status/export change",
+  "outcome": "Pass for local shared request and operation protections; T004 incomplete",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation/qualification",
+      "tested commit/push/draft PR"
+    ],
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-75-request-operation-protections",
+    "baseCommit": "fc22e47a083ff967efa4763c310d8fbdd7e214fe",
+    "sources": [
+      {
+        "path": ".changeset/shared-request-operation-protections.md",
+        "sha256": "5df42c8eaee9441bde45c587c58861e53b8cfffdf1ea3d71f4ccbcbd244365f8"
+      },
+      {
+        "path": "apps/api/README.md",
+        "sha256": "42c1bbbd5a06871c21c826da14f902ee4e4685bd3bff9c16ea44ae947bf1b016"
+      },
+      {
+        "path": "apps/api/test/worker.boundary.test.ts",
+        "sha256": "f41c7089d041c6d3f9ec9702272f6a195797776ad143833344f8a3c5204653bd"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "7ed8917b9cc21df9838adf02f45955da0989004e790c5e0e6cb4f5b688f930b1"
+      },
+      {
+        "path": "apps/web/package.json",
+        "sha256": "70451b45a96e178ba7dbd6b641f340a08d2c7ec2726152d7647e7ccb579d9739"
+      },
+      {
+        "path": "apps/web/scripts/native-pair-build.runtime.ts",
+        "sha256": "505b3534a9b7b4e541f5ea2d888a388ff09d569587e5499ac2c077775b25c74e"
+      },
+      {
+        "path": "apps/web/src/server.ts",
+        "sha256": "72e06b154f5ed7a66c4387744cb092c153d61af0a1c765df582772c2db8641bf"
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "ba967710556e0be7c036d065816473853f3b20b27a2fd5777e03f587e5c30ec8"
+      },
+      {
+        "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "sha256": "3ed28e6ec656366a6fe8dd670b4e6ae85b8c4bd4f516cc51082e8757b5796ed5"
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "831e1e975a6de66f8b9fdce87ef0fbb5009b66354ee15132c55d3ccd6565fc53"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "d49249eb707aa0075b5510aed618655c51996ad95768db4cbadc226c2f6b9d52"
+      },
+      {
+        "path": "docs/architecture/effect-services.md",
+        "sha256": "80c70eab3b6155e5aebcff50d8021f0595d805d6eaf7ad922654515d55dc6dd7"
+      },
+      {
+        "path": "docs/architecture/package-boundaries.md",
+        "sha256": "7add6845e0dc4da3f978612b132cc44acfb794e5532e257d6b72eb1d01c68e98"
+      },
+      {
+        "path": "docs/architecture/package-ownership.md",
+        "sha256": "5064e7905cb3940e1486b780c3212d60a3737e745f75e86479a7d66dc95c1d04"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "c82d6364b58d83989edbad72bbd47fd89819c22f2ecf6db9ffb1cba727201acb"
+      },
+      {
+        "path": "docs/documentation-audit/README.md",
+        "sha256": "3c764dfb51277406ff810d64a249c2103dbb53fac6589a8035676389060bdea6"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "f9037ee5b57e17b542d482bf19f309f83e215c2dcd2f98c5843deced59e35d60"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "db32dcaff090c138a580edbbfd462d023eecb7f14c868a2b69b566136ea19490"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "fc60fb26dc4b4815333e6c5c2017f4f9ae8b13d5558d3a5c68761aa034ca6065"
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "e1b97262399137d23bca9d428d9ba1c9452e97958befd78d0c783e1febda8caa"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "3268076017b173404fb1d0d2d378eb77621b1136a20b5fa4d4de5f888c34ed4e"
+      },
+      {
+        "path": "packages/api/http/README.md",
+        "sha256": "e707dffc9d16b5e1bbe76461f93e13274a8abf3b4e74495ea28297fea6bca270"
+      },
+      {
+        "path": "packages/api/http/__snapshots__/openapi.json",
+        "sha256": "1b7770e55c702ce7c26e5992fcbf0b4ec3e2b2ffa7028c2c795af89ccd42f395"
+      },
+      {
+        "path": "packages/api/http/__tests__/public-calculation-api.test.ts",
+        "sha256": "589259cbf5e85ac64f9a7c507753107b17c9dbdafe00c82af5ac8fc00e47074f"
+      },
+      {
+        "path": "packages/api/http/__tests__/request-body.boundary.test.ts",
+        "sha256": "ca2cd34518cbe27598ef791833067cff38f9fa7865195c8e6d6633c4a7f0a6c5"
+      },
+      {
+        "path": "packages/api/http/package.json",
+        "sha256": "1eda883865950f94aec1e59df528be847b33ea27a892bc6738b2a89a95df66cf"
+      },
+      {
+        "path": "packages/api/http/src/groups/calculators.ts",
+        "sha256": "6b21b013983c35ff1fbc94aa5806f8126cf3d780511d7b06747db8420182d8f9"
+      },
+      {
+        "path": "packages/api/http/src/handlers/calculators.ts",
+        "sha256": "911cb55d754695cfc909cb2007ada73f626accca3aa43503ddef696f1b44151c"
+      },
+      {
+        "path": "packages/api/http/src/request-boundary.ts",
+        "sha256": "12ce561747fc91e8b404d8a0951591b8b160c37daa3a921ed831263d2d5bdfc8"
+      },
+      {
+        "path": "packages/api/http/src/schemas.ts",
+        "sha256": "abbd754c8aa7930e219d9172408f043e1cab895309b745271f0c562e663f1ea4"
+      },
+      {
+        "path": "packages/api/http/src/server/live.layer.ts",
+        "sha256": "a5705ae3912a22aae9dac59b643f78bcc7ace6609056ac348a9b85f9a232a0cb"
+      },
+      {
+        "path": "packages/api/rpc/README.md",
+        "sha256": "45d896e7470d8033a0473e6da7be9ced32f108c79ad799b38ddb6344ae7351f4"
+      },
+      {
+        "path": "packages/api/rpc/package.json",
+        "sha256": "d3abf616a5cccc195bb911aa83ddda6c106bbccb1cde9d978f9565d1f02e223d"
+      },
+      {
+        "path": "packages/api/rpc/src/__testing__/fixtures.ts",
+        "sha256": "1d6344ed2e70d2ffcfc0b2dfba123ca9bed234e17998c70596cd7dde391ba8d5"
+      },
+      {
+        "path": "packages/api/rpc/src/handlers.ts",
+        "sha256": "5ca9fb4e252aecead254bc070e0d47c9414330af1f1fd47e3eb2f03e3aaca975"
+      },
+      {
+        "path": "packages/api/rpc/src/request-boundary.ts",
+        "sha256": "1ade740646e777d8a0d6abe2a7e0b08112a798705bbb3f8281293fd94cea9c25"
+      },
+      {
+        "path": "packages/api/rpc/test/handlers.test.ts",
+        "sha256": "4b4816cff53a7684f8c3eb2b9190b78d14083ded2dd87848b8bdfadaa5a68201"
+      },
+      {
+        "path": "packages/calculators/README.md",
+        "sha256": "e0fc461b090c135654b147cbbaa84d8f44a0ad5588bdb96f47a57b439ab871d7"
+      },
+      {
+        "path": "packages/calculators/__tests__/calculation-work.test.ts",
+        "sha256": "f05b22a366c9f85145c5680896196cf891fb3578648d4db83f6f0828ab06cd05"
+      },
+      {
+        "path": "packages/calculators/src/index.ts",
+        "sha256": "38825dc6a06d1b6655a21b2c412998754a6c0cb6ac8d91681db6c817cf7483fc"
+      },
+      {
+        "path": "packages/calculators/src/schemas.ts",
+        "sha256": "2f1e91d92d7ccd415b4fb7c3d7ab229bd72251fe8154d039bbfd813a50a90b6c"
+      },
+      {
+        "path": "packages/calculators/src/service.ts",
+        "sha256": "bae2a8c1a1bb3a809e568c75e42430c85b95d51d75bb655d666dfd897fb76594"
+      },
+      {
+        "path": "packages/calculators/src/work.layer.ts",
+        "sha256": "351917dbc73c0edb4de4457728f0c22d0f8e2523dad67b637ddd1dd43001734d"
+      },
+      {
+        "path": "packages/sdk/typescript/README.md",
+        "sha256": "b8dd15c46e8d52a0f3afc697c2a125c9916bd499be5fab51d0d106a32d4e6f15"
+      },
+      {
+        "path": "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "sha256": "c3e031b7bc349f34378382882c604507116e5255b2509cfada147eea3cd417ff"
+      },
+      {
+        "path": "packages/sdk/typescript/src/schemas/index.ts",
+        "sha256": "87269e6191f65fd06809422bac815426943faecdd323253280c76c9e3a5d13a1"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "7b3013ee658522f2e4f57b6a3938c75283eb61c16b4166baf549ae2a11101c54"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "command": "bun run release:check -- --ci",
+      "mode": "report-only CI graph",
+      "exit": 0,
+      "seconds": 758.84,
+      "orderedChecks": [
+        "verification",
+        "test",
+        "build",
+        "docs-validation",
+        "packed-artifact",
+        "downstream-consumer",
+        "api-smoke",
+        "docs-browser",
+        "changeset-status"
+      ],
+      "nonClaim": "No release candidate, immutable attempt receipt, publication or provider mutation"
+    }
+  ],
+  "limitations": [
+    "Per-client rate identity/limits and whole T004 acceptance unfinished.",
+    "No forced synchronous CPU pre-emption or remote Worker cancellation.",
+    "Custom route/RPC-only hosts must supply request admission.",
+    "No external availability, review acceptance, merge, deployment or publication proved."
+  ],
+  "sourceRemovalControls": [
+    {
+      "control": "body-size",
+      "owner": "packages/api/http/src/request-boundary.ts",
+      "test": "__tests__/request-body.boundary.test.ts",
+      "pattern": "guards the retained standalone",
+      "exitCode": 1,
+      "durationSeconds": 0.77,
+      "outcome": "Expected native payload parser failure after admission removal"
+    },
+    {
+      "control": "standalone-middleware",
+      "owner": "packages/api/http/src/server/live.layer.ts",
+      "test": "__tests__/request-body.boundary.test.ts",
+      "pattern": "guards the retained standalone",
+      "exitCode": 1,
+      "durationSeconds": 0.5,
+      "outcome": "Expected native payload parser failure after admission removal"
+    },
+    {
+      "control": "body-late",
+      "owner": "packages/api/http/src/request-boundary.ts",
+      "test": "__tests__/request-body.boundary.test.ts",
+      "pattern": "refuses a late synchronous body",
+      "exitCode": 1,
+      "durationSeconds": 0.51,
+      "outcome": "Expected assertion failure"
+    },
+    {
+      "control": "metadata-deadline",
+      "owner": "packages/calculators/src/work.layer.ts",
+      "test": "__tests__/calculation-work.test.ts",
+      "pattern": "bounds listFacts at five seconds",
+      "exitCode": 1,
+      "durationSeconds": 0.45,
+      "outcome": "Expected assertion failure"
+    },
+    {
+      "control": "metadata-late",
+      "owner": "packages/calculators/src/work.layer.ts",
+      "test": "__tests__/calculation-work.test.ts",
+      "pattern": "rejects late listRules",
+      "exitCode": 1,
+      "durationSeconds": 0.5,
+      "outcome": "Expected assertion failure"
+    },
+    {
+      "control": "metadata-status",
+      "owner": "packages/api/http/src/groups/calculators.ts",
+      "test": "__tests__/public-calculation-api.test.ts",
+      "pattern": "declares and encodes a checked metadata timeout",
+      "exitCode": 1,
+      "durationSeconds": 0.83,
+      "outcome": "Expected assertion failure"
+    }
+  ],
+  "packageMethodLimitation": "Generic validator rejected machine-specific ignored .turbo logs before render-contract qualification; no ignored files removed and no renderer receipt fabricated. Export/declaration/runtime and production-unused-code checks qualify the actual boundaries separately.",
+  "failedOrCorrectedAttempts": [
+    "Early key-order/import-style lint findings corrected at their files; exact new representation decoder paths admitted and obsolete RPC error-factory admission removed.",
+    "Duplicate/unused fixture body variable corrected.",
+    "Generated OpenAPI needed the repository formatter after owning regeneration.",
+    "HTTP metadata substitute initially supplied at request time; HttpApiBuilder captured the original construction service. Corrected fixture supplies the controlled service while building handlers, retaining all eight status assertions.",
+    "New testing-quality receipt link had one extra parent segment; corrected and docs rechecked.",
+    "Removal harness initially demanded an assertion for the early-body parser oracle; source restored, expected native payload parser failure classified correctly and all six controls rerun.",
+    "First native seven-case run passed six cases, then metadata final log total expected 2 but observed 4. Keep exact two Info cleanup events and independently assert all captured messages exclude private fixture/figures; corrected focused built Worker case passes. Full graph reruns all seven.",
+    "First CI-mode release graph passed verification (including all seven native cases), then root test failed one of 475 lint fixtures: the old API response decoder oracle still required rejection after its explicit admission. Corrected that exact expectation and added two admitted decoder files plus three neighbouring rejected files; runtime/encoder refusals retained. No production or lint-permission change.",
+    "First new neighbour control used config.test.ts, which is already a legitimate config decoder under existing policy. Replaced that incorrect negative fixture with the non-decoding API worker composition file; no policy permission changed.",
+    "Receipt assembly initially selected the newest verification-named log, which was a bounded release-runner unit fixture created later by root tests. Its assertion stopped before tracked edits. The evidence now uses the exact full-graph verification log, not log timestamp order."
+  ],
+  "trackingReadback": {
+    "workspaceId": "61df4cb4-17b9-464a-8bdf-1efba15600b6",
+    "projectId": "4e0eb6ef-1871-46d4-8f47-9c8f52a9c069",
+    "repositoryLink": "https://github.com/crcorbett/taxkit",
+    "issue": "DEV-75",
+    "uuid": "e9824311-b9a1-44af-a163-d36d1ad340f6",
+    "status": "Backlog",
+    "comments": 0,
+    "writeOutcome": "No update claimed; earlier automatic approval rejection pending."
+  },
+  "focusedEvidence": {
+    "calculatorWorkCases": 35,
+    "httpCases": 17,
+    "rpcCases": 217,
+    "apiCases": 62,
+    "nativeCases": 7,
+    "correctedNativeFocusedSeconds": 19.23,
+    "lintCorpusCases": 480,
+    "exactLintBoundaryCases": 45,
+    "workflowCases": 32,
+    "workflowSeconds": 532.07,
+    "sdkBrowserCases": 24,
+    "websiteBrowserCases": 19,
+    "nativeSeconds": 84.15,
+    "sourceRestoration": "All 48 staged files match pre-qualification hashes after the complete graph; native capture also matches all staged sources."
+  },
+  "environment": {
+    "bun": "1.4.2 (744846f84)",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "cloudflareVitePlugin": "1.62.5",
+    "wrangler": "4.147.0",
+    "workerd": "1.20261001.1",
+    "miniflare": "5.20261001.0-alpha",
+    "playwright": "1.63.0",
+    "chromium": "1243 / Chrome 153.0.8010.12"
+  },
+  "parentHostedProof": {
+    "pullRequest": 145,
+    "headCommit": "fc22e47a083ff967efa4763c310d8fbdd7e214fe",
+    "runId": 37388858997,
+    "jobId": 112028862698,
+    "completedAt": "2026-10-05T23:51:17Z",
+    "outcome": "success",
+    "readbackDate": "2026-10-06",
+    "limitation": "Parent only; current candidate hosted checks pending"
+  },
+  "documentationImpact": {
+    "Change required": [
+      "HTTP/RPC/calculator/SDK/app READMEs; API/Effect/package/testing architecture",
+      "Owning generated OpenAPI; exports/manifests/lockfile and genuine packed/downstream consumers",
+      "Exact decoder admissions and actual CLI controls; major Changeset",
+      "Current SPEC/tasks/plan/journey/audit router and dated receipt"
+    ],
+    "Preserve": [
+      "Tax sources, rates, golden results and Medicare decision",
+      "Closed RPC revision 3; client lifetime and supported calculator/browser behaviour",
+      "Infrastructure/provider identity, telemetry, skills, commands and CI"
+    ],
+    "N/A": [
+      "No new operational procedure or runbook change",
+      "No public editorial content or publication change"
+    ]
+  },
+  "abstractionAdmission": {
+    "owner": "existing calculator work Layer and HTTP request boundary",
+    "reuse": "one budget across nine named service operations; one body guard across retained standalone/native HTTP/RPC/form hosts; three safe metadata error projections",
+    "substitution": "existing explicit calculator test service and native controlled host builds",
+    "callGraph": "named operation -> existing budget -> checked service; body reader -> native response/request primitives -> native parser/handler",
+    "restriction": "No generic raw-client callback, nested runtime, broad host admission or mirrored transport body errors"
+  },
+  "artifacts": [
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "files": 119,
+      "sha256": "6c14baa9c97fa7b5ce68fd20f5b759058a16d93864e85d7a8659e98111f2c70e"
+    },
+    {
+      "root": "apps/web/dist/server",
+      "files": 20,
+      "sha256": "b1fb6566b9556ef3b73dbaef53203b962fc8d582d352421dc49e97767b8ef045"
+    },
+    {
+      "root": "apps/web/dist/client",
+      "files": 9,
+      "sha256": "9eae2c8f73cea0d1c17eac20f02762ac9a99b7696e12b7fbb905ee45c782a6ca"
+    },
+    {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "files": 20,
+      "sha256": "53156aa8db0a94a62540c8c6f8f0fde6980a99a7d705b0bef2f4f39339904c7c"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "files": 39,
+      "sha256": "5f6f06777e30ec8c0df57dac70fac2bff578661c33a9dd8ce94f4f74439fdf5b"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "files": 39,
+      "sha256": "53154ad0bb0060e30d8eebd06be171a556da2593ab828aaf54541a3bb1c69317"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "files": 39,
+      "sha256": "1f3b5a43743afa718316da7f3a10f5ed5f10917c3e4e6b483dc4e7a07cb70bac"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "files": 39,
+      "sha256": "e63a4a76c4cd6e2266df78a5997efaeaa8030c7e48642ebf9193f78cdd7bf578"
+    },
+    {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledWork",
+      "files": 39,
+      "sha256": "e150e8150c3f8c482fcb918021e1d1277b0a65698e3b0a26a5fdf5cd13d3cd1e"
+    }
+  ],
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted artifact-root-relative path and file sha256; every regular non-symlink file under each named root.",
+  "artifactCaptureBoundary": "Immediately after successful native verification, before later root build",
+  "screenshots": [
+    {
+      "path": ".alchemy/native-pair/screenshots/au.income-tax.annual.png",
+      "sha256": "8d3a84a41d1ea137b5a6bf0e38e4dfd3cf5a8a66f2aa4bdc4acec2949f846825",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/au.pay.withholdings.png",
+      "sha256": "70b2d3eeddb6d8b8f7795c40211097b96d950d5544d2b3d7bda974637d2a0f8b",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.income-tax.annual.png",
+      "sha256": "b809ae1f4f6a75429b4749faf6a668709021943d8e8d4153479246f2b7570058",
+      "inspection": "Exact bytes match previously inspected parent image"
+    },
+    {
+      "path": ".alchemy/native-pair/screenshots/restored-au.pay.withholdings.png",
+      "sha256": "524be44926c822d7bada1467c1b90e0861b60743bb4bef63279b06cde3583423",
+      "inspection": "Exact bytes match previously inspected parent image"
+    }
+  ],
+  "parentAudit": {
+    "owner": "primary implementation owner",
+    "outcome": "Pass for local body/metadata timeout contract and boundary-matched proof",
+    "remaining": "Trusted rate identity/limiter, whole domain/package audit, T004/later tasks and current candidate hosted/review acceptance"
+  },
+  "rollback": {
+    "identity": "fc22e47a083ff967efa4763c310d8fbdd7e214fe",
+    "action": "Revert the complete slice together before a separately authorised release; no provider change to undo"
+  },
+  "postCheckChanges": {
+    "scope": "Active plan and receipt only; all implementation bytes preserved",
+    "verification": "Docs/runbooks/root format/Changeset/whitespace repeated before commit"
+  },
+  "failedGraph": {
+    "command": "bun run release:check -- --ci",
+    "exit": 1,
+    "seconds": 717.08,
+    "lastSuccessfulCheck": "verification",
+    "failedCheck": "test",
+    "failedCases": 1,
+    "passedLintCases": 474,
+    "reason": "Old exact decoder rejection fixture disagreed with newly admitted API response test",
+    "recovery": "Correct exact fixture and add admitted/neighbour controls; full nine-check graph passes after correction"
+  },
+  "postconditions": {
+    "verification": "32 fresh workflow cases, root compiler/lint/format/unused-code checks and browser/native checks pass",
+    "tests": "480 actual CLI lint cases; complete prescribed root tests pass",
+    "build": "16 tasks: four fresh, twelve cached",
+    "consumers": "Packed artifact and downstream commands each run fresh with six cached build prerequisites; new HTTP entry point and metadata error compile and run in an isolated packed consumer; browser bundle passes",
+    "apiSmoke": "Fresh live standalone health/catalogue/calculation/OpenAPI proof and isolated external HTTP consumer; eleven cached build prerequisites",
+    "docsBrowser": "Seven Chromium cases pass fresh; ten cached build prerequisites",
+    "native": "Seven actual built Worker cases over five files; native output inventory captured before subsequent root build",
+    "sourceRestoration": "All 48 candidate files match staged pre-check snapshot; unchanged API worker matches the parent Git source after fault builds and exact CLI fixtures",
+    "screenshots": "Four byte-identical images match the previously inspected parent captures"
+  },
+  "qualifiedLogDigests": [
+    {
+      "check": "verification",
+      "path": "tmp/release-readiness/verification-stdout-Kk39q2/bd020493752c.log",
+      "sha256": "3eb007b3cac291765ec9290a3f6400485ec78520283de24c0672a70412eac4ad"
+    }
+  ]
+}

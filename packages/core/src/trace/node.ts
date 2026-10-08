@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 import { IsoDate } from "../primitives/date.js";
 import { RoundingMode } from "../primitives/rounding.js";
@@ -106,55 +106,61 @@ export class SourceArtifact extends Schema.TaggedClass<SourceArtifact>()(
 export const sourceChecksum = (value: string): SourceChecksum =>
   SourceChecksum.make(value);
 
+// The non-recursive fields have one Schema owner. Only the children relation
+// needs a local recursive annotation; its other fields are inferred here.
+const TraceNodeFields = Schema.TaggedStruct("TraceNode", {
+  formula: Schema.OptionFromOptionalKey(
+    Schema.OptionFromUndefinedOr(Schema.String)
+  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  inputs: Schema.Record(Schema.String, Schema.Json),
+  result: Schema.Json,
+  rounding: Schema.OptionFromOptionalKey(
+    Schema.OptionFromUndefinedOr(RoundingMode)
+  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  ruleId: RuleId,
+  sources: Schema.Array(SourceRef),
+  title: Schema.String,
+});
+
 /**
  * Explanation tree for a calculated value.
  *
  * @since 0.1.0
  */
-export interface TraceNode {
-  readonly _tag: "TraceNode";
-  readonly ruleId: RuleId;
-  readonly title: string;
-  readonly inputs: Readonly<Record<string, Schema.Json>>;
-  readonly formula?: string | undefined;
-  readonly result: Schema.Json;
-  readonly rounding?: RoundingMode | undefined;
-  readonly sources: readonly SourceRef[];
+export type TraceNode = typeof TraceNodeFields.Type & {
   readonly children: readonly TraceNode[];
-}
+};
 
 /**
  * Encoded representation of a trace node for persistence or transport.
  *
  * @since 0.1.0
  */
-export interface TraceNodeEncoded {
-  readonly _tag: "TraceNode";
-  readonly ruleId: string;
-  readonly title: string;
-  readonly inputs: Readonly<Record<string, Schema.Json>>;
-  readonly formula?: string | undefined;
-  readonly result: Schema.Json;
-  readonly rounding?: typeof RoundingMode.Encoded | undefined;
-  readonly sources: readonly (typeof SourceRef.Encoded)[];
+export type TraceNodeEncoded = typeof TraceNodeFields.Encoded & {
   readonly children: readonly TraceNodeEncoded[];
-}
+};
+
+type TraceNodeMakeInput = Schema.Struct.MakeIn<
+  typeof TraceNodeFields.fields
+> & {
+  readonly children: readonly TraceNodeMakeInput[];
+};
 
 /**
  * Recursive schema codec for calculation trace nodes.
  *
+ * Keep children before the remaining fields to preserve historical encoding.
+ *
  * @since 0.1.0
  */
-export const TraceNode: Schema.Codec<TraceNode, TraceNodeEncoded> =
-  Schema.TaggedStruct("TraceNode", {
-    children: Schema.Array(
-      Schema.suspend((): Schema.Codec<TraceNode, TraceNodeEncoded> => TraceNode)
-    ),
-    formula: Schema.optional(Schema.String),
-    inputs: Schema.Record(Schema.String, Schema.Json),
-    result: Schema.Json,
-    rounding: Schema.optional(RoundingMode),
-    ruleId: RuleId,
-    sources: Schema.Array(SourceRef),
-    title: Schema.String,
-  });
+export const TraceNode = Schema.TaggedStruct("TraceNode", {
+  children: Schema.Array(
+    Schema.suspend(
+      (): Schema.Codec<TraceNode, TraceNodeEncoded> & {
+        readonly "~type.make.in": TraceNodeMakeInput;
+        readonly "~type.make": TraceNodeMakeInput;
+      } => TraceNode
+    )
+  ),
+  ...TraceNodeFields.fields,
+});

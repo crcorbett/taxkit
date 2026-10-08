@@ -1,39 +1,19 @@
 import { PublicCalculatorService } from "@taxkit/calculators";
-import type { CalculatorId } from "@taxkit/calculators";
-import {
-  AuAnnualIncomeTaxCalculation,
-  AuPayTakeHomeCalculation,
-  AuPayWithholdingsCalculation,
-} from "@taxkit/sdk/au/effect";
-import { calculateRunRequest as calculateSdkRunRequest } from "@taxkit/sdk/effect";
-import type { AnySdkCalculation } from "@taxkit/sdk/effect";
-import { Array, Effect, HashMap, Option, Schema } from "effect";
-import { HttpApiBuilder } from "effect/unstable/httpapi";
+import type { CalculatorMetadataError } from "@taxkit/calculators";
+import { Effect, Match } from "effect";
+import { HttpApiBuilder } from "effect/http-api";
 
 import { TaxKitApi } from "../api.js";
 import { CalculatorApiErrorEnvelopeData } from "../groups/calculators.js";
 
-const SdkCalculations = [
-  AuPayTakeHomeCalculation,
-  AuPayWithholdingsCalculation,
-  AuAnnualIncomeTaxCalculation,
-] as const;
-
-const sdkCalculationsById = HashMap.fromIterable(
-  Array.map(
-    SdkCalculations,
-    (calculation): readonly [CalculatorId, AnySdkCalculation] => [
-      calculation.calculatorId,
-      calculation,
-    ]
-  )
-);
-
-const sdkCalculationFor = (calculatorId: CalculatorId): AnySdkCalculation =>
-  sdkCalculationsById.pipe(
-    HashMap.get(calculatorId),
-    Option.getOrThrowWith(
-      () => new Error(`Missing SDK calculation for ${calculatorId}`)
+const calculatorApiMetadataFailure = (error: CalculatorMetadataError) =>
+  Match.value(error).pipe(
+    Match.tag(
+      "CalculatorOperationTimedOut",
+      (failure) => new CalculatorApiErrorEnvelopeData({ error: failure })
+    ),
+    Match.orElse(
+      (failure) => new CalculatorApiErrorEnvelopeData({ error: failure })
     )
   );
 
@@ -47,19 +27,31 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
           Effect.gen(function* () {
             const service = yield* PublicCalculatorService;
             return yield* service.listJurisdictions();
-          })
+          }).pipe(
+            Effect.mapError(
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
+            )
+          )
         )
         .handle("getTaxYears", ({ query }) =>
           Effect.gen(function* () {
             const service = yield* PublicCalculatorService;
             return yield* service.listTaxYears(query);
-          })
+          }).pipe(
+            Effect.mapError(
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
+            )
+          )
         )
         .handle("listCalculators", ({ query }) =>
           Effect.gen(function* () {
             const service = yield* PublicCalculatorService;
             return yield* service.listCalculators(query);
-          })
+          }).pipe(
+            Effect.mapError(
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
+            )
+          )
         )
         .handle("getCalculator", ({ params, query }) =>
           Effect.gen(function* () {
@@ -68,14 +60,7 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
               calculatorId: params.calculatorId,
               ...query,
             });
-          }).pipe(
-            Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
-            )
-          )
+          }).pipe(Effect.mapError(calculatorApiMetadataFailure))
         )
         .handle("getCalculatorSchema", ({ params, query }) =>
           Effect.gen(function* () {
@@ -84,14 +69,7 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
               calculatorId: params.calculatorId,
               ...query,
             });
-          }).pipe(
-            Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
-            )
-          )
+          }).pipe(Effect.mapError(calculatorApiMetadataFailure))
         )
         .handle("getCalculatorGraph", ({ params, query }) =>
           Effect.gen(function* () {
@@ -100,28 +78,44 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
               calculatorId: params.calculatorId,
               ...query,
             });
-          }).pipe(
-            Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
-            )
-          )
+          }).pipe(Effect.mapError(calculatorApiMetadataFailure))
         )
         .handle("calculate", ({ params, payload, query }) =>
           Effect.gen(function* () {
-            const sdkCalculation = sdkCalculationFor(params.calculatorId);
-            return yield* calculateSdkRunRequest(sdkCalculation, {
+            const service = yield* PublicCalculatorService;
+            return yield* service.calculate({
+              calculatorId: params.calculatorId,
               payload,
               ...query,
-            }).pipe(Effect.catchIf(Schema.isSchemaError, Effect.die));
+            });
           }).pipe(
-            Effect.mapError(
-              (error) =>
-                new CalculatorApiErrorEnvelopeData({
-                  error,
-                })
+            Effect.mapError((error) =>
+              Match.value(error).pipe(
+                Match.tag(
+                  "CalculatorRateLimited",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.tag(
+                  "CalculatorAdmissionUnavailable",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.tag(
+                  "CalculatorCapacityExceeded",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.tag(
+                  "CalculatorOperationTimedOut",
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                ),
+                Match.orElse(
+                  (failure) =>
+                    new CalculatorApiErrorEnvelopeData({ error: failure })
+                )
+              )
             )
           )
         )
@@ -129,13 +123,21 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
           Effect.gen(function* () {
             const service = yield* PublicCalculatorService;
             return yield* service.listFacts(query);
-          })
+          }).pipe(
+            Effect.mapError(
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
+            )
+          )
         )
         .handle("listRules", ({ query }) =>
           Effect.gen(function* () {
             const service = yield* PublicCalculatorService;
             return yield* service.listRules(query);
-          })
+          }).pipe(
+            Effect.mapError(
+              (error) => new CalculatorApiErrorEnvelopeData({ error })
+            )
+          )
         )
     )
 );

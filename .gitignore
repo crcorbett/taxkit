@@ -14,3 +14,9 @@ tmp/
 
 # macOS
 .DS_Store
+
+# Vitest browser failure attachments
+.vitest/
+
+# Catalogue-derived static public documentation images
+/apps/web/public/og/

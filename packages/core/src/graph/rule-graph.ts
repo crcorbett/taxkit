@@ -51,7 +51,7 @@ const sourceKey = (source: {
   readonly reference: string;
 }) => `${source.kind}:${source.reference}`;
 const parameterInstanceKey = (parameter: AnyParameterDescriptor): string =>
-  `${parameter.id}:${sourceKey(parameter.source)}:${parameter.effectivePeriod.from}:${parameter.effectivePeriod.toExclusive ?? "open"}`;
+  `${parameter.id}:${sourceKey(parameter.source)}:${parameter.effectivePeriod.from}:${Option.flatten(parameter.effectivePeriod.toExclusive).pipe(Option.getOrElse(() => "open"))}`;
 const parametersOverlap = (
   left: AnyParameterDescriptor,
   right: AnyParameterDescriptor
@@ -88,7 +88,7 @@ const collectParameters = (
     HashMap.empty<ParameterId, readonly AnyParameterDescriptor[]>(),
     (parameters, rule) =>
       Array.reduce(
-        rule.parameters ?? Array.empty<AnyParameterDescriptor>(),
+        rule.parameters,
         parameters,
         (updatedParameters, parameter) => {
           const existing = HashMap.get(updatedParameters, parameter.id);
@@ -104,37 +104,39 @@ const collectParameters = (
 const buildDependencyGraph = (
   rules: readonly AnyRuleDescriptor[],
   providers: HashMap.HashMap<FactId, readonly AnyRuleDescriptor[]>
-): Graph.DirectedGraph<FactId, string> =>
-  Graph.directed<FactId, string>((mutable) => {
-    let nodeIndices = HashMap.empty<FactId, Graph.NodeIndex>();
-
-    for (const key of HashMap.keys(providers)) {
-      nodeIndices = HashMap.set(nodeIndices, key, Graph.addNode(mutable, key));
-    }
-
-    for (const rule of rules) {
-      for (const required of rule.requires) {
-        const requiredKey = factKey(required);
-        const sourceIndex = HashMap.get(nodeIndices, requiredKey);
-        if (Option.isNone(sourceIndex)) {
-          continue;
-        }
-
-        for (const provided of rule.provides) {
-          const providedKey = factKey(provided);
-          const targetIndex = HashMap.get(nodeIndices, providedKey);
-          if (Option.isSome(targetIndex)) {
-            Graph.addEdge(
-              mutable,
-              sourceIndex.value,
-              targetIndex.value,
-              `${requiredKey} -> ${providedKey}`
-            );
-          }
-        }
-      }
-    }
+): Graph.DirectedGraph<FactId, string> => {
+  const nodes = Array.map(
+    Array.fromIterable(HashMap.keys(providers)),
+    (data, index) => ({ data, index })
+  );
+  const nodeIndices = HashMap.fromIterable(
+    Array.map(nodes, ({ data, index }) => [data, index] as const)
+  );
+  return Graph.fromSnapshot({
+    edges: Array.map(
+      Array.flatMap(rules, (rule) =>
+        Array.flatMap(rule.requires, (required) =>
+          Array.flatMap(rule.provides, (provided) =>
+            Option.all([
+              HashMap.get(nodeIndices, factKey(required)),
+              HashMap.get(nodeIndices, factKey(provided)),
+            ]).pipe(
+              Option.map(([source, target]) => ({
+                data: `${factKey(required)} -> ${factKey(provided)}`,
+                source,
+                target,
+              })),
+              Option.toArray
+            )
+          )
+        )
+      ),
+      (edge, index) => ({ ...edge, index })
+    ),
+    nodes,
+    type: "directed",
   });
+};
 
 /**
  * Validates that selected rule descriptors can be composed for input facts.
@@ -174,7 +176,8 @@ export const validateRuleGraph = (args: {
     (issues, factProviders, factId) => {
       const duplicateProviders = Array.filter(
         factProviders,
-        (provider) => provider.allowDuplicateProvides !== true
+        (provider) =>
+          !Option.getOrElse(provider.allowDuplicateProvides, () => false)
       );
 
       return duplicateProviders.length > 1
@@ -199,7 +202,7 @@ export const validateRuleGraph = (args: {
       const sources = HashSet.fromIterable(Array.map(rule.sources, sourceKey));
 
       return Array.reduce(
-        rule.parameters ?? Array.empty(),
+        rule.parameters,
         issues,
         (updatedIssues, parameter) =>
           HashSet.has(sources, sourceKey(parameter.source))

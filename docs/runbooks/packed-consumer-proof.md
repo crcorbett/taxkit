@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: taxkit-packed-consumer-operation-owner
-last_reviewed: 2026-07-22
+last_reviewed: 2026-10-04
 review_trigger: SDK source, export map, packed file set, package manifest, or downstream fixture change
 ---
 
@@ -38,7 +38,12 @@ are outside this runbook and require separate authority.
    the package through a fresh consumer boundary.
 3. Record command, true exit, candidate/package identity and observed import
    paths. Remove transient packing directories through the command's own
-   cleanup; do not commit or preserve tarballs as canonical evidence.
+   cleanup; do not commit or preserve tarballs as canonical evidence. A cleanup
+   failure returns a failed check. If a command also failed, retain both failures
+   and the last successful step; do not treat the earlier output as acceptance.
+   Command errors report the step, reason and available child exit code rather
+   than printing captured stdout/stderr or native error details. Collected
+   stdout has a 1 MiB limit; exceeding it is a failure, never a truncated pass.
 
 ## Evidence and postcondition
 

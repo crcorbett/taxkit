@@ -1,0 +1,130 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "4cb71a3f49f6125e201603b1b132c569d43d3b2b",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR proof separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "trigger": {
+    "revision": "4a1abfc00caf9493d22b1ca8e19eb364c5c4ab14",
+    "pr": 118,
+    "run": 37200459089,
+    "outcome": "failure",
+    "observed": "Grouped four strict mutations plus fresh-source documentation expired at 301225ms against aggregate 300000ms deadline; 20/21 Quality tests passed. Log reports timeout, not assertion failure.",
+    "log": "/private/tmp/taxkit-local-toolchain/docs-imports-host-failure.log"
+  },
+  "implemented": [
+    "Independent named tests for all ten deliberate faults; each scopes its own repository copy",
+    "Same finite 300000ms deadline per case; command failure and exact oracle assertions retained",
+    "Separate fresh source-only documentation test; temporary Git index; absence of scripts/dist before and after command",
+    "Complete ordered corpus and exactly-one selected fixture asserted per test",
+    "Thirty Quality cases: nineteen policy plus eleven isolated cases"
+  ],
+  "checks": [
+    {
+      "command": "focused Quality compiler/lint",
+      "outcome": "pass",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-types-final-source.log",
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-lint-first.log"
+      ]
+    },
+    {
+      "command": "frozen install, complete tests/build",
+      "outcome": "pass; unchanged 792 installs/1020 packages; actual 321-case root lint run; 23 package test tasks and 15 build tasks replay matching unchanged-input caches",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-install-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-all-tests-qualified.log",
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-all-build-qualified.log"
+      ]
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "pass; actual 30 Quality cases, all ten isolated faults and separate fresh-source docs (257.01 seconds); four strict cases 44.725/43.934/44.871/44.444 seconds; 176 deployment-tool, 21 skill, 16 evaluation cases; both unused-code profiles; all 24 compiler tasks replay matching caches; unchanged SDK/web Chromium replay matching caches for 24/two cases",
+      "log": "/private/tmp/taxkit-local-toolchain/quality-deadlines-verification-qualified.log"
+    },
+    {
+      "command": "final docs/runbook/format/Changeset status and diff checks",
+      "outcome": "pass; no version application",
+      "logs": [
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-final-docs.log",
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-final-runbooks.log",
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-final-format.log",
+        "/private/tmp/taxkit-local-toolchain/quality-deadlines-final-changesets.log"
+      ]
+    }
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "tools/quality-workflow/release-boundary.test.ts",
+        "docs/standards/controls.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md"
+      ],
+      "reason": "Independent fault ownership, bounded deadlines and durable explanation move together"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "mutation fixture corpora/bytes",
+        "owning commands/failure oracles/recovery",
+        "CI/cache and command policy",
+        "historical proof",
+        "canonical skills/digests",
+        "selected dependencies",
+        "package exports",
+        "tax results",
+        "docs/product-specs/clean-slate-foundation.md"
+      ],
+      "reason": "Time/resource ownership correction leaves rejection requirements and product behaviour unchanged"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        "Changeset",
+        "app/public/generated content",
+        "runbook procedure",
+        "provider state"
+      ],
+      "reason": "Internal repository test scheduling only; no package-facing or consequential operation change"
+    }
+  ],
+  "recovery": {
+    "rollback": "Revert complete slice; no provider/version operation"
+  },
+  "limitations": [
+    "Local timing does not establish hosted qualification",
+    "Remaining docs/web/infrastructure and semantic/readonly review unfinished",
+    "Medicare correction requires separate bounded decision",
+    "Package test/build/compiler/SDK and web Chromium reuse matching unchanged-input caches; repository Quality test changed and actually ran",
+    "Default-sandbox docs/runbook/format/Changeset checks can report non-fatal shared-cache access warning after task success"
+  ],
+  "non_claims": [
+    "No merge, deployment, publication, provider apply or version application",
+    "No hosted qualification of later correction",
+    "No completion of DEV-73 or DEV-74\u201381"
+  ],
+  "trigger_followup": {
+    "revision": "4cb71a3f49f6125e201603b1b132c569d43d3b2b",
+    "pr": 119,
+    "run": 37201123414,
+    "outcome": "failure",
+    "observed": "Same grouped mutation deadline expired at 301155ms; 20/21 Quality cases pass; no rejection assertion failure reported",
+    "log": "/private/tmp/taxkit-local-toolchain/docs-native-host-failure.log"
+  }
+}

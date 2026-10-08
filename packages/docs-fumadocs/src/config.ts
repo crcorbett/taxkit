@@ -24,11 +24,16 @@ export const effectSchemaToStandardSchema = <
 export const transformerCodeBlockMeta = (): ShikiTransformer => ({
   name: "taxkit:docs-code-block-meta",
   pre(node) {
-    applyCodeBlockMeta(node, this.options);
+    return applyCodeBlockMeta(node, this.options);
   },
 });
 
-export const sharedMdxOptions = (): DefaultMDXOptions => ({
+export const sharedMdxOptions = (): DefaultMDXOptions & {
+  readonly remarkPlugins: Exclude<
+    DefaultMDXOptions["remarkPlugins"],
+    readonly unknown[] | undefined
+  >;
+} => ({
   rehypeCodeOptions: {
     defaultColor: false,
     themes: { dark: "github-dark", light: "github-light" },

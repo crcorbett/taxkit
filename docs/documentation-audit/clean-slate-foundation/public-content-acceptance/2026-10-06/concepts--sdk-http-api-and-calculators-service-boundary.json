@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "8a0cefafbd2583d881084852913f89bf2071acc4c78933ce0714a4dfb772db9a",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx"
+}

@@ -1,0 +1,135 @@
+{
+  "document_type": "implementation-receipt",
+  "date": "2026-10-05",
+  "task": "CSF-T003",
+  "issue": "DEV-74",
+  "status": "locally-qualified",
+  "parent_revision": "1e72f6b39bb580215f3ef985337e2d00e8f4cfec",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "repository": "crcorbett/taxkit",
+    "operation": "local implementation, tested commits, pushes and draft PRs",
+    "limit": "No merge, cloud plan/apply, deployment, publication or credential access"
+  },
+  "implemented": [
+    "Separate candidate TaxKitAppsCloudflare root declares TaxKitApi and TaxKitWebsite through explicit workspace exports; existing TaxKitDocsCloudflare operations keep their entry point",
+    "Native self URL bindings and cross-resource Outputs; null for absent addresses; the private TAXKIT_API binding points to the exact declared API resource",
+    "Native Stack.secrets checks prod/pr-N/dev_identity before Doppler construction, selects taxkit/prd/stg_preview/dev, and disables ambient application overrides",
+    "Exact Alchemy beta.80 native planner correction defers fresh and circular resource Outputs before recursive property resolution; source, default compiled implementation and generated map agree"
+  ],
+  "artifact": {
+    "alchemy": "2.0.0-beta.80",
+    "patch": "patches/alchemy@2.0.0-beta.80.patch",
+    "patch_sha256": "8ab2b7397b918f3b674d77cb9c6e78b87d80b7308a8c63be5a66988592ec87d3",
+    "patched_files": [
+      "src/Plan.ts",
+      "lib/Plan.js",
+      "lib/Plan.js.map"
+    ],
+    "map_generator": "Selected TypeScript 6 compatibility transpileModule API, ES2024/ESNext with relative extension rewrite; repository compiler stays selected TypeScript 7.0.2",
+    "entry": "alchemy.apps.run.ts",
+    "stack": "TaxKitAppsCloudflare",
+    "resources": [
+      "TaxKitApi",
+      "TaxKitWebsite"
+    ],
+    "private_binding": "TAXKIT_API",
+    "compatibility_date": "2026-10-04",
+    "installed_sha256": {
+      "src/Plan.ts": "fbe3db361039843d63f108d19611b3a0c9d3a83ecce17b76c9de5d036b8fb011",
+      "lib/Plan.js": "b3309cb05a35191bbca9354941ca981ff75c1b3606fdf2ddbcee7d5752dc4081",
+      "lib/Plan.js.map": "c9f776bd6ff155fed6481236b5038f8cebbc6e001416f05c161681e688874d9f"
+    }
+  },
+  "proof": [
+    {
+      "command": "Bun source-conditioned native Stack/Plan using the actual app graph and typed mock provider",
+      "outcome": "pass: create/noop/update, zero provider writes; missing precreate rejected with UnsatisfiedResourceCycle",
+      "logs": [
+        "dev74-native-plan-source-proof.log"
+      ],
+      "limit": "Source experiment copies the checked test composition; remote provider services are explicit fail-on-call fixtures"
+    },
+    {
+      "command": "Remove the exact installed native source/default patch, run both graph proofs, restore all original bytes in finally",
+      "outcome": "expected failure: one-second native timeout in both source and compiled entry points; exact restored source/JS/map digests verified",
+      "logs": [
+        "dev74-native-plan-negative-observations.json",
+        "dev74-native-plan-source-negative.log",
+        "dev74-native-plan-compiled-negative.log"
+      ]
+    },
+    {
+      "command": "Exact API draft GitHub readback",
+      "outcome": "pass: OPEN/DRAFT #129, head 1e72f6b39bb580215f3ef985337e2d00e8f4cfec, Quality success 37221971202",
+      "limit": "Prior API host candidate only; this graph candidate has no hosted result"
+    },
+    {
+      "command": "Infrastructure native tests/types, root composition compiler and canonical focused lint",
+      "outcome": "pass: 32 infrastructure cases, including 14 native graph/secret cases; root/app/package compiler paths and lint pass",
+      "logs": [
+        "dev74-native-graph-tests-final.log",
+        "dev74-native-graph-types-final.log",
+        "dev74-native-graph-root-types.log",
+        "dev74-native-graph-lint-final.log"
+      ]
+    },
+    {
+      "command": "API app build and independent source/default app imports",
+      "outcome": "pass: emitted native Worker declarations; both source-conditioned Bun and Node 24.16.0 default imports expose ApiWorkerInit, TaxKitApiWorker and default without running a provider operation",
+      "logs": [
+        "dev74-native-graph-api-build.log"
+      ]
+    },
+    {
+      "command": "Frozen install, full build, full root tests, bun run verification",
+      "outcome": "pass: frozen 795 installs/1021 packages; all 16 builds (zero matching caches); 27 workspace test tasks (11 matching caches), 435 fresh actual CLI lint cases; full verification including 32 Quality cases/13 isolated cases in 373.78 seconds, both unused-code inventories, 27 type tasks, 206 deployment cases, 21 skill cases, 16 evaluation cases, actual Chromium 24 SDK and four retained website cases",
+      "logs": [
+        "dev74-native-graph-frozen-final.log",
+        "dev74-native-graph-root-build-final.log",
+        "dev74-native-graph-root-tests.log",
+        "dev74-native-graph-verification.log"
+      ],
+      "limit": "Retained website scaffold browser cases do not qualify the later RPC/Atom website connection"
+    },
+    {
+      "command": "Documentation policy, five-runbook validator and git diff whitespace check",
+      "outcome": "pass: zero documentation/runbook violations; no procedure executed",
+      "logs": [
+        "dev74-native-graph-docs-initial.log",
+        "dev74-native-graph-runbooks.log"
+      ]
+    }
+  ],
+  "documentation_impact": {
+    "Change required": [
+      "API/infrastructure exports and READMEs",
+      "deployment, configuration, package ownership and testing architecture",
+      "docs runbook candidate exclusion",
+      "exact stage decoder permission and real CLI canaries",
+      "active task/plan and dated audit pointer",
+      "root native candidate, patch and locked graph"
+    ],
+    "Preserve": [
+      "current docs root, stage identities, secret-fetch procedure and provider authority",
+      "retained calculators and golden outputs",
+      "HTTP/OpenAPI and RPC contracts",
+      "canonical skills and historical evidence"
+    ],
+    "N/A": [
+      "Public MDX/navigation: no public content change",
+      "Changeset/release/version/publication: private app/infrastructure and private locked native patch only",
+      "Provider receipt and rollback: no provider operation or state change"
+    ]
+  },
+  "limitations": [
+    "Website application still uses the retained scaffold; no connected website/SSR/browser qualification",
+    "Mock provider diff classifications are not actual Cloudflare convergence or cloud plan proof",
+    "Secret precedence substitutes checked fixture ConfigProvider Layers for remote Doppler; no retrieval/auth/cache claim",
+    "No cloud state, provider plan/apply, adoption, teardown, deployment or publication",
+    "No complete native RPC fatal/exported trace proof; T003 remains in progress",
+    "Generated patch-preparation copy was retained while hashes were compared, normal Bun link restored by frozen install, then only that verified generated copy removed; initial direct source import failure was install layout, not planner proof",
+    "First full build used the default Playwright cache by mistake and failed on a missing executable; rerun with the already installed pinned browser passes. No dependency or build-policy workaround was applied."
+  ],
+  "rollback": "Revert this slice together: graph/root/exports, secret boundary, exact lint admission, native patch and lockfile. Reinstall the prior locked graph. Existing docs resource identities and public contracts are unchanged."
+}

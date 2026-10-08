@@ -1,8 +1,22 @@
-import { Array, Clock, Crypto, Effect, Encoding, Schema, Stream } from "effect";
+import {
+  Array as EffectArray,
+  Array,
+  Clock,
+  Crypto,
+  Effect,
+  HashSet,
+  Option,
+  Order,
+  Record,
+  Schema,
+  Stream,
+} from "effect";
+import { sort as sortArray } from "effect/Array";
+import { Hex } from "effect/encoding";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
-import * as ChildProcess from "effect/unstable/process/ChildProcess";
-import * as ChildProcessSpawner from "effect/unstable/process/ChildProcessSpawner";
+import * as ChildProcess from "effect/process/ChildProcess";
+import * as ChildProcessSpawner from "effect/process/ChildProcessSpawner";
 
 import type { DocsDeploymentInventoryReport } from "./inventory.schemas.js";
 import { DocsDeploymentInventoryReport as DocsDeploymentInventoryReportSchema } from "./inventory.schemas.js";
@@ -12,6 +26,8 @@ import {
   WorkflowBootstrapReceipt,
   WorkflowEvidenceConfigError,
   WorkflowEvidenceIdentity,
+  NativeWorkflowEvidenceIdentity,
+  NativeWorkflowGitSnapshot,
   WorkflowEvidenceInputReadError,
   WorkflowEvidencePlanProjectionError,
   WorkflowEvidenceProviderIdentity,
@@ -50,10 +66,136 @@ const deploymentInputRoots = [
   "packages/docs-fumadocs",
 ] as const;
 
+const nativeConfigurationFiles = [
+  "alchemy.apps.run.ts",
+  "apps/api/package.json",
+  "apps/web/package.json",
+  "apps/web/vite.config.ts",
+  "bun.lock",
+  "package.json",
+  "packages/infrastructure/package.json",
+  "packages/infrastructure/src/apps-secrets.boundary.ts",
+  "packages/infrastructure/src/apps-stack.ts",
+  "patches/alchemy@2.0.0-beta.80.patch",
+  "tsconfig.alchemy.json",
+] as const;
+
+const nativeDeploymentInputRoots = [
+  ".gitignore",
+  "alchemy.apps.run.ts",
+  "apps/api",
+  "apps/web",
+  "packages",
+  "patches",
+  "tools",
+  "package.json",
+  "bun.lock",
+  "turbo.json",
+  "tsconfig*.json",
+  "oxlint.config.ts",
+  "oxfmt.config.ts",
+  "vitest*.ts",
+] as const;
+
+export const readNativeGitSnapshot = (repositoryRoot: string) =>
+  Effect.gen(function* () {
+    const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+    const replies = yield* Effect.forEach(
+      [
+        { args: ["rev-parse", "HEAD"], role: "candidateCommit" },
+        {
+          args: ["status", "--porcelain=v1", "--untracked-files=normal"],
+          role: "status",
+        },
+        {
+          args: ["ls-files", "-z", "--", ...nativeDeploymentInputRoots],
+          role: "files",
+        },
+      ],
+      ({ role, args }) =>
+        Effect.gen(function* () {
+          const handle = yield* spawner.spawn(
+            ChildProcess.make("git", args, {
+              cwd: repositoryRoot,
+              extendEnv: true,
+              forceKillAfter: "2 seconds",
+              stderr: "pipe",
+              stdin: "ignore",
+              stdout: "pipe",
+            })
+          );
+          const [chunks, [exitCode]] = yield* Effect.all(
+            [
+              Stream.runCollect(handle.stdout),
+              Effect.zip(handle.exitCode, Stream.runDrain(handle.stderr), {
+                concurrent: true,
+              }),
+            ],
+            { concurrency: 2 }
+          );
+          if (Number(exitCode) !== 0) {
+            return yield* new WorkflowEvidenceInputReadError({
+              role: "native-git-snapshot",
+            });
+          }
+          const source = yield* Effect.try({
+            catch: () =>
+              new WorkflowEvidenceInputReadError({
+                role: "native-git-snapshot",
+              }),
+            try: () =>
+              new TextDecoder("utf-8", { fatal: true }).decode(
+                Uint8Array.from(Array.flatMap(chunks, Array.fromIterable))
+              ),
+          });
+          return [role, source] as const;
+        })
+    );
+    const values = Record.fromEntries(replies);
+    const commit = yield* Record.get(values, "candidateCommit").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+    const status = yield* Record.get(values, "status").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+    const files = yield* Record.get(values, "files").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+    return yield* Schema.decodeUnknownEffect(NativeWorkflowGitSnapshot)({
+      candidateCommit: commit.trim(),
+      files: sortArray(Order.String)(
+        Array.filter(files.split("\0"), (file) => file.length > 0)
+      ),
+      status,
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+      )
+    );
+  }).pipe(
+    Effect.catchTag(
+      "PlatformError",
+      () => new WorkflowEvidenceInputReadError({ role: "native-git-snapshot" })
+    )
+  );
+
 const sha256Bytes = (bytes: Uint8Array, role: string) =>
   Crypto.Crypto.pipe(
     Effect.flatMap((crypto) => crypto.digest("SHA-256", bytes)),
-    Effect.map(Encoding.encodeHex),
+    Effect.map(Hex.encode),
     Effect.map((digest) => digest.toLowerCase()),
     Effect.mapError(() => new WorkflowEvidenceInputReadError({ role }))
   );
@@ -127,10 +269,9 @@ const readTrackedDeploymentInputs = (repositoryRoot: string) =>
           Uint8Array.from(Array.flatMap(stdout, Array.fromIterable))
         ),
     });
-    const files = source
-      .split("\0")
-      .filter((entry) => entry.length > 0)
-      .toSorted();
+    const files = sortArray(Order.String)(
+      EffectArray.filter(source.split("\0"), (entry) => entry.length > 0)
+    );
     if (files.length === 0) {
       return yield* new WorkflowEvidenceInputReadError({
         role: "tracked-deployment-inputs",
@@ -180,6 +321,129 @@ const readText = (path: string, role: string) =>
     Effect.mapError(() => new WorkflowEvidenceInputReadError({ role }))
   );
 
+export const calculateNativeWorkflowEvidenceIdentity = (
+  repositoryRoot: string,
+  candidateCommit: WorkflowEvidenceIdentity["candidateCommit"]
+) =>
+  Effect.gen(function* () {
+    const path = yield* Path.Path;
+    const before = yield* readNativeGitSnapshot(repositoryRoot);
+    if (before.candidateCommit !== candidateCommit) {
+      return yield* new WorkflowEvidenceInputReadError({
+        role: "native-candidate-commit",
+      });
+    }
+    const required = HashSet.fromIterable<string>(nativeConfigurationFiles);
+    const included = HashSet.fromIterable(before.files);
+    if (
+      !Array.every(nativeConfigurationFiles, (file) =>
+        HashSet.has(included, file)
+      )
+    ) {
+      return yield* new WorkflowEvidenceInputReadError({
+        role: "native-configuration-inputs",
+      });
+    }
+    const installed = yield* readText(
+      path.join(repositoryRoot, "node_modules/alchemy/package.json"),
+      "native-alchemy-version"
+    ).pipe(
+      Effect.flatMap(
+        Schema.decodeEffect(
+          Schema.fromJsonString(
+            Schema.Struct({
+              name: Schema.Literal("alchemy"),
+              version: NativeWorkflowEvidenceIdentity.fields.alchemyVersion,
+            })
+          )
+        )
+      ),
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-alchemy-version" })
+      )
+    );
+    const sources = yield* Effect.forEach(
+      before.files,
+      (file) =>
+        digestFile(path.join(repositoryRoot, file), "native-source-file").pipe(
+          Effect.map((sha256) => ({ path: file, sha256 }))
+        ),
+      { concurrency: 8 }
+    );
+    const digests = Record.fromEntries(
+      Array.map(sources, (source) => [source.path, source.sha256] as const)
+    );
+    const lockfileSha256 = yield* Record.get(digests, "bun.lock").pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () => new WorkflowEvidenceInputReadError({ role: "native-lockfile" })
+      )
+    );
+    const alchemyPatchSha256 = yield* Record.get(
+      digests,
+      "patches/alchemy@2.0.0-beta.80.patch"
+    ).pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-alchemy-patch" })
+      )
+    );
+    const deploymentInputSha256 = yield* sha256Bytes(
+      new TextEncoder().encode(
+        Array.map(
+          sources,
+          (source) => `${source.sha256}  ${source.path}\n`
+        ).join("")
+      ),
+      "native-source-manifest"
+    );
+    const configSha256 = yield* sha256Bytes(
+      new TextEncoder().encode(
+        Array.map(
+          Array.filter(sources, (source) => HashSet.has(required, source.path)),
+          (source) => `${source.sha256}  ${source.path}\n`
+        ).join("")
+      ),
+      "native-configuration-manifest"
+    );
+    const after = yield* readNativeGitSnapshot(repositoryRoot);
+    if (
+      after.candidateCommit !== candidateCommit ||
+      (yield* digestManifest(repositoryRoot, after.files)) !==
+        deploymentInputSha256
+    ) {
+      return yield* new WorkflowEvidenceInputReadError({
+        role: "native-source-changed",
+      });
+    }
+    return yield* Schema.decodeUnknownEffect(NativeWorkflowEvidenceIdentity)({
+      alchemyPatchSha256,
+      alchemySourceCommit: "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+      alchemyVersion: installed.version,
+      candidateCommit,
+      configSha256,
+      deploymentInputSha256,
+      lockfileSha256,
+      schemaVersion: 2,
+      sources,
+    }).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceInputReadError({ role: "native-source-identity" })
+      )
+    );
+  }).pipe(
+    Effect.timeout("20 seconds"),
+    Effect.catchTag(
+      "TimeoutError",
+      () =>
+        new WorkflowEvidenceInputReadError({ role: "native-source-timeout" })
+    ),
+    Effect.scoped
+  );
+
 const readOwnedJson = <A>(
   path: string,
   role: string,
@@ -187,7 +451,7 @@ const readOwnedJson = <A>(
 ) =>
   readText(path, role).pipe(
     Effect.flatMap(
-      Schema.decodeUnknownEffect(Schema.fromJsonString(schema), {
+      Schema.decodeEffect(Schema.fromJsonString(schema), {
         onExcessProperty: "error",
       })
     ),
@@ -202,7 +466,7 @@ const readProviderJson = <A>(
   FileSystem.FileSystem.pipe(
     Effect.flatMap((fileSystem) => fileSystem.readFileString(path)),
     Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role })),
-    Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(schema))),
+    Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(schema))),
     Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
   );
 
@@ -214,9 +478,9 @@ const encodeAndWrite = <A>(
 ) =>
   Effect.gen(function* encodeAndWriteReceipt() {
     const fileSystem = yield* FileSystem.FileSystem;
-    const encoded = yield* Schema.encodeUnknownEffect(
-      Schema.fromJsonString(schema)
-    )(value).pipe(
+    const encoded = yield* Schema.encodeEffect(Schema.fromJsonString(schema))(
+      value
+    ).pipe(
       Effect.mapError(() => new WorkflowEvidenceReceiptWriteError({ role }))
     );
     yield* fileSystem
@@ -225,6 +489,17 @@ const encodeAndWrite = <A>(
         Effect.mapError(() => new WorkflowEvidenceReceiptWriteError({ role }))
       );
   });
+
+export const writeNativeWorkflowEvidenceIdentity = (
+  path: string,
+  identity: NativeWorkflowEvidenceIdentity
+) =>
+  encodeAndWrite(
+    path,
+    "native-source-identity",
+    NativeWorkflowEvidenceIdentity,
+    identity
+  );
 
 const appendWorkflowFile = (path: string, role: string, output: string) =>
   FileSystem.FileSystem.pipe(
@@ -287,10 +562,15 @@ const makeProjection = (
           })
       )
     );
-    const digest = yield* workflowSha256(
-      "workflow-plan",
-      stringifyWorkflowPlanProjection(projection)
-    ).pipe(
+    const encoded = yield* stringifyWorkflowPlanProjection(projection).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidencePlanProjectionError({
+            operation: config.TAXKIT_WORKFLOW_EVIDENCE_OPERATION,
+          })
+      )
+    );
+    const digest = yield* workflowSha256("workflow-plan", encoded).pipe(
       Effect.mapError(
         () =>
           new WorkflowEvidencePlanProjectionError({
@@ -308,8 +588,8 @@ export const writeBootstrapWorkflowEvidence = (
     const bootstrap = yield* Schema.decodeUnknownEffect(
       WorkflowBootstrapReceipt
     )({
-      alchemySourceCommit: "473c39591c7993a708199d0ef8f0d38416885dde",
-      alchemyVersion: "2.0.0-beta.79",
+      alchemySourceCommit: "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04",
+      alchemyVersion: "2.0.0-beta.80",
       allowedEffects: [
         "credential-refresh",
         "edge-preview-secret-read",
@@ -317,7 +597,7 @@ export const writeBootstrapWorkflowEvidence = (
       ],
       candidateCommit: config.TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT,
       limitations: [
-        "This receipt records the allowed beta.79 bootstrap effects, not which provider mutations occurred.",
+        "This receipt records the allowed beta.80 bootstrap effects, not which provider mutations occurred.",
         "State-store facts before and after bootstrap were not independently read back in this step.",
       ],
       observedAt: yield* observedAt,
@@ -457,7 +737,7 @@ export const writeReplanWorkflowEvidence = (
 const findStage = (
   inventory: DocsDeploymentInventoryReport,
   stage: WorkflowEvidenceProviderConfig["TAXKIT_WORKFLOW_EVIDENCE_STAGE"]
-) => inventory.stages.filter((entry) => entry.stage === stage);
+) => EffectArray.filter(inventory.stages, (entry) => entry.stage === stage);
 
 const SelectedWorkflowWorker = Schema.Struct({
   url: Schema.URL,
@@ -472,28 +752,57 @@ const selectWorker = (
   Effect.gen(function* selectInventoryWorker() {
     const stages = findStage(inventory, stage);
     if (allowAbsent && stages.length === 0) {
-      return null;
+      return Option.none();
     }
     if (stages.length !== 1) {
       return yield* new WorkflowEvidenceProviderDecodeError({
         role: "stage-inventory",
       });
     }
-    const [stageInventory] = stages;
-    if (
-      stageInventory === undefined ||
-      stageInventory.resources.length !== 1 ||
-      stageInventory.resources[0]?.logicalId !== "DocsWebsite" ||
-      stageInventory.resources[0].workerName === undefined ||
-      stageInventory.resources[0].workerUrl === undefined
-    ) {
+    const stageInventory = yield* Effect.fromOption(
+      EffectArray.get(stages, 0)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
+    if (stageInventory.resources.length !== 1) {
       return yield* new WorkflowEvidenceProviderDecodeError({
         role: "stage-inventory",
       });
     }
-    const [resource] = stageInventory.resources;
-    const { workerName, workerUrl } = resource;
-    const providerWorkers = inventory.providerWorkers.filter(
+    const resource = yield* Effect.fromOption(
+      EffectArray.get(stageInventory.resources, 0)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
+    if (resource.logicalId !== "DocsWebsite") {
+      return yield* new WorkflowEvidenceProviderDecodeError({
+        role: "stage-inventory",
+      });
+    }
+    const workerName = yield* Effect.fromOption(
+      Option.fromNullishOr(resource.workerName)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
+    const workerUrl = yield* Effect.fromOption(
+      Option.fromNullishOr(resource.workerUrl)
+    ).pipe(
+      Effect.mapError(
+        () =>
+          new WorkflowEvidenceProviderDecodeError({ role: "stage-inventory" })
+      )
+    );
+    const providerWorkers = EffectArray.filter(
+      inventory.providerWorkers,
       (worker) =>
         worker.stage === stage &&
         worker.logicalId === "DocsWebsite" &&
@@ -513,18 +822,29 @@ const selectWorker = (
           new WorkflowEvidenceProviderDecodeError({
             role: "stage-inventory",
           })
-      )
+      ),
+      Effect.asSome
     );
   });
 
 const latestDeployment = (deployments: WranglerDeploymentsType, role: string) =>
   Effect.gen(function* selectLatestDeployment() {
-    const latest = deployments.at(-1);
-    const deploymentId = latest?.id ?? latest?.deployment_id;
-    const versionId = latest?.versions[0]?.version_id;
-    if (deploymentId === undefined || versionId === undefined) {
-      return yield* new WorkflowEvidenceProviderDecodeError({ role });
-    }
+    const latest = yield* Effect.fromOption(EffectArray.last(deployments)).pipe(
+      Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
+    );
+    const deploymentId = yield* Effect.fromOption(
+      Option.fromNullishOr(latest.id).pipe(
+        Option.orElse(() => Option.fromNullishOr(latest.deployment_id))
+      )
+    ).pipe(
+      Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
+    );
+    const version = yield* Effect.fromOption(
+      EffectArray.get(latest.versions, 0)
+    ).pipe(
+      Effect.mapError(() => new WorkflowEvidenceProviderDecodeError({ role }))
+    );
+    const versionId = version.version_id;
     return { deploymentId, versionId };
   });
 
@@ -532,11 +852,11 @@ const requiredAfter = <A>(
   value: A | undefined,
   requirement: string
 ): Effect.Effect<A, WorkflowEvidenceConfigError> =>
-  value === undefined
-    ? Effect.fail(
-        new WorkflowEvidenceConfigError({ mode: "provider", requirement })
-      )
-    : Effect.succeed(value);
+  Effect.fromOption(Option.fromNullishOr(value)).pipe(
+    Effect.mapError(
+      () => new WorkflowEvidenceConfigError({ mode: "provider", requirement })
+    )
+  );
 
 export const writeProviderWorkflowEvidence = (
   config: WorkflowEvidenceProviderConfig
@@ -559,11 +879,13 @@ export const writeProviderWorkflowEvidence = (
       );
       const previousPath =
         config.TAXKIT_WORKFLOW_EVIDENCE_PREVIOUS_DEPLOYMENTS_PATH;
-      const previousVersionId =
-        previousPath === undefined || previousPath === ""
-          ? ""
-          : yield* readProviderJson(
-              previousPath,
+      const previousVersionId = yield* Option.fromNullishOr(previousPath).pipe(
+        Option.filter((value) => value.length > 0),
+        Option.match({
+          onNone: () => Effect.succeed(""),
+          onSome: (previousFile) =>
+            readProviderJson(
+              previousFile,
               "previous-deployments",
               WranglerDeployments
             ).pipe(
@@ -571,13 +893,18 @@ export const writeProviderWorkflowEvidence = (
                 latestDeployment(deployments, "previous-deployments")
               ),
               Effect.map((deployment) => deployment.versionId)
-            );
+            ),
+        })
+      );
       yield* appendWorkflowFile(
         outputPath,
         "github-output",
-        worker === null
-          ? "stage_present=false\nprevious_worker_name=\nprevious_version_id=\n"
-          : `stage_present=true\nprevious_worker_name=${worker.workerName}\nprevious_version_id=${previousVersionId}\n`
+        Option.match(worker, {
+          onNone: () =>
+            "stage_present=false\nprevious_worker_name=\nprevious_version_id=\n",
+          onSome: (selected) =>
+            `stage_present=true\nprevious_worker_name=${selected.workerName}\nprevious_version_id=${previousVersionId}\n`,
+        })
       );
       return;
     }
@@ -586,12 +913,18 @@ export const writeProviderWorkflowEvidence = (
       inventory,
       config.TAXKIT_WORKFLOW_EVIDENCE_STAGE,
       false
+    ).pipe(
+      Effect.flatMap((selected) =>
+        Effect.fromOption(selected).pipe(
+          Effect.mapError(
+            () =>
+              new WorkflowEvidenceProviderDecodeError({
+                role: "stage-inventory",
+              })
+          )
+        )
+      )
     );
-    if (worker === null) {
-      return yield* new WorkflowEvidenceProviderDecodeError({
-        role: "stage-inventory",
-      });
-    }
     const currentDeploymentsPath = yield* requiredAfter(
       config.TAXKIT_WORKFLOW_EVIDENCE_CURRENT_DEPLOYMENTS_PATH,
       "current-deployments-path"
@@ -607,11 +940,13 @@ export const writeProviderWorkflowEvidence = (
     );
     const previousPath =
       config.TAXKIT_WORKFLOW_EVIDENCE_PREVIOUS_DEPLOYMENTS_PATH;
-    const previousVersionId =
-      previousPath === undefined || previousPath === ""
-        ? null
-        : yield* readProviderJson(
-            previousPath,
+    const previousVersionId = yield* Option.fromNullishOr(previousPath).pipe(
+      Option.filter((value) => value.length > 0),
+      Option.match({
+        onNone: () => Effect.succeed(null),
+        onSome: (previousFile) =>
+          readProviderJson(
+            previousFile,
             "previous-deployments",
             WranglerDeployments
           ).pipe(
@@ -619,7 +954,9 @@ export const writeProviderWorkflowEvidence = (
               latestDeployment(deployments, "previous-deployments")
             ),
             Effect.map((deployment) => deployment.versionId)
-          );
+          ),
+      })
+    );
     const identityPath = yield* requiredAfter(
       config.TAXKIT_WORKFLOW_EVIDENCE_IDENTITY_PATH,
       "identity-path"
@@ -663,10 +1000,10 @@ export const writeProviderWorkflowEvidence = (
     );
     const previewPrNumberValue =
       config.TAXKIT_WORKFLOW_EVIDENCE_PREVIEW_PR_NUMBER;
-    const previewPrNumber =
-      previewPrNumberValue === undefined || previewPrNumberValue === ""
-        ? null
-        : previewPrNumberValue;
+    const previewPrNumber = Option.fromNullishOr(previewPrNumberValue).pipe(
+      Option.filter((value) => value !== ""),
+      Option.getOrNull
+    );
     if (
       identity.candidateCommit !== candidateCommit ||
       (config.TAXKIT_WORKFLOW_EVIDENCE_STAGE === "prod" &&

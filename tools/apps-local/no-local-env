@@ -1,0 +1,2 @@
+# Native app development uses local resource bindings and no application secrets.
+# Supplying this owned empty file prevents Alchemy from loading a local .env file.

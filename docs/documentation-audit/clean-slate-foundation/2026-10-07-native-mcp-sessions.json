@@ -1,0 +1,1176 @@
+{
+  "document_type": "proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-implementation-owner",
+  "last_reviewed": "2026-10-07",
+  "review_trigger": "Native conversation composition, bounded lifetime, class discovery, cancellation, alarms, rate forwarding or qualification changes",
+  "outcome": "Complete source-frozen nine-check graph C passes; older native session sub-slice locally qualified. DEV-77 remains in progress for prompt modern cleanup and public setup.",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "scope": "Approved DEV-77 local implementation/checks, tested commit/push/draft PR and routine Linear tracking",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes",
+      "memory changes"
+    ],
+    "metrics": "Deferred; collection remains disabled"
+  },
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-77-native-session-lifecycle",
+    "baseCommit": "964b7e9b839545e135476a516541e8f4750268e7",
+    "phase": "All frozen candidate sources matched after complete qualification, before proof/plan metadata closure.",
+    "sources": [
+      {
+        "path": "apps/api/README.md",
+        "sha256": "0de89660f152acfca68d29952621e97f523761ef2bf6008b07df6cef39895b62"
+      },
+      {
+        "path": "apps/api/package.json",
+        "sha256": "d33dad1fdf3f2e2ee9858eefcb7fefbe5913277b1f511697105d89f9768012ec"
+      },
+      {
+        "path": "apps/api/src/mcp-session.layer.ts",
+        "sha256": "53a697d2c2679d48ed8aeb688fd43064e2a2b83c20c3dc41863cb08a490892cd"
+      },
+      {
+        "path": "apps/api/src/mcp.schemas.ts",
+        "sha256": "f9aa41c1bac27397b0ff194abeea6b36f103265fa7469b7f8795f0a34cb177e9"
+      },
+      {
+        "path": "apps/api/src/mcp.tools.layer.ts",
+        "sha256": "8590bffc112bd0952b05bde04093439f48f6a3a2f695890eafe03a98aeee3913"
+      },
+      {
+        "path": "apps/api/src/worker.application.ts",
+        "sha256": "351b719eb7ef0804890015a95db2a5b74228d23640761fe32e72354d3fff1bfb"
+      },
+      {
+        "path": "apps/api/src/worker.ts",
+        "sha256": "0846f9c66164add10f734b167d41eecc6def8ce2827ad1e512d12cea4efdc2f1"
+      },
+      {
+        "path": "apps/web/README.md",
+        "sha256": "a8f5b8fe8530dc9fbd6d22b768453aed4655bfc25612eeb95bcd8ecd6b5c8465"
+      },
+      {
+        "path": "apps/web/package.json",
+        "sha256": "96245085fd4ccba4a0093688af0327aa9c50e15b0af360e40de527bb5989d942"
+      },
+      {
+        "path": "apps/web/scripts/native-api-source.boundary.ts",
+        "sha256": "404aa717a362ad778bf25d6aa51a501cb012a89db0baf8f0d95eeb04c0ec61d6"
+      },
+      {
+        "path": "apps/web/scripts/native-pair-build.runtime.ts",
+        "sha256": "f4b0b06955cba762eda2b29324b021a968035bc9fd67e1bd960d571a852ba673"
+      },
+      {
+        "path": "apps/web/test/native-browser-tools.boundary.test.ts",
+        "sha256": "7ca8df2eebe4daf193cc56e8624e04d1965b82ad8e641ac5b5550ad575f96454"
+      },
+      {
+        "path": "apps/web/test/native-cancellation.boundary.test.ts",
+        "sha256": "de4c123c87c68b19c0f9961dbcccb28194521ab027978b4c6b510b9ec3d03549"
+      },
+      {
+        "path": "apps/web/test/native-local-development.boundary.test.ts",
+        "sha256": "8a23c58fd9e64d233b71760415404e9429d820bc14dbd6ec09d9d49f960e4773"
+      },
+      {
+        "path": "apps/web/test/native-mcp.boundary.test.ts",
+        "sha256": "134a5060af8ba4dbf979756c8ccd73a7ff2ba649e81aae71b7e71e58a57cb7e0"
+      },
+      {
+        "path": "apps/web/test/native-mcp.fixture.ts",
+        "sha256": "af781c7523b03fb52e8ef2448f7ff3b922651744732a6245037682ac74407024"
+      },
+      {
+        "path": "apps/web/test/native-pair.boundary.test.ts",
+        "sha256": "321ee25fc5da92e107ee4aa02c05f4f98ade62432488cfd75b6d6b8302b34617"
+      },
+      {
+        "path": "apps/web/test/native-rate-provider.boundary.test.ts",
+        "sha256": "9caca8fedf6c37dacd7c64e91d1dd32870c2976c88b03cdfe8ee1431920bf557"
+      },
+      {
+        "path": "apps/web/test/native-rate.boundary.test.ts",
+        "sha256": "de38bd8d01cad54340b099ee63221680a068436b78285280a0425130ebbe72a1"
+      },
+      {
+        "path": "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "sha256": "a03f0465f8b0f95eb44caee28241bd1b6156c1c098beb6a53b1bd2b03e4af9cb"
+      },
+      {
+        "path": "apps/web/vitest.native.config.ts",
+        "sha256": "61c734c3cbd3a4493f9125fdf8b3d54ae6dbbd43a54bc998c421a023428decdc"
+      },
+      {
+        "path": "bun.lock",
+        "sha256": "b074ac52390345cccdc347bc8148256a4bb6d0baacd0ef37e6868544a5ff1f02"
+      },
+      {
+        "path": "docs/architecture/api-and-sdk.md",
+        "sha256": "afe5f5328be468b42c27e103f2e600c03cae68411509607614d47db4990bf62b"
+      },
+      {
+        "path": "docs/architecture/testing-and-quality.md",
+        "sha256": "4f3bfd22c1c9e3875d3d0f173ccfab7aaa3def64f35ede9923888b1b0a853f20"
+      },
+      {
+        "path": "docs/exec-plans/active/clean-slate-foundation.md",
+        "sha256": "a7d68f276bd97f50cf9a6e3345b4ab524967e920168dfa385368c952166469de"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.md",
+        "sha256": "aa4be57da4fe83b73bc3f10413fd520295c935f6f5183135d86bab8ae6db430d"
+      },
+      {
+        "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+        "sha256": "f1c8514894cda6dd0c40a8544ae576c3ba7c1939c60d01e8969aa417b95e118b"
+      },
+      {
+        "path": "docs/verification/critical-journeys.json",
+        "sha256": "713be55642adc98afb3759a77d6f3ba8650e4f721a1617fbe9c433b0a0d9aa9d"
+      },
+      {
+        "path": "docs/verification/repository-harness-profile.json",
+        "sha256": "8422cee3057ae44a773142e5c68491af5dbad3a17f736f305769ef0a229273a2"
+      },
+      {
+        "path": "oxlint.config.ts",
+        "sha256": "80634ba78985d052cb880d4b356b24b8ce0e61913cc231bbdc21d9333b6c3a7c"
+      },
+      {
+        "path": "package.json",
+        "sha256": "1e912e128fe268c2b1ba68c1cab384fdf1d63349db353cd62b4ba24dde6bd222"
+      },
+      {
+        "path": "packages/infrastructure/README.md",
+        "sha256": "7ff809d4ee8772b014f3719c2f70d13384e75c80ef3861436eaf06cf1120043a"
+      },
+      {
+        "path": "packages/infrastructure/package.json",
+        "sha256": "badb97f4ab5be372cfb4d8f08f295134e389b5d42e14a1dec5af193a040bafc1"
+      },
+      {
+        "path": "packages/infrastructure/src/apps-stack.test.ts",
+        "sha256": "417d3bf0cb49b94da913c5a33ad9cc7ca975fc348fd196e08107b3cf56a204ca"
+      },
+      {
+        "path": "packages/scripts/src/release-readiness/cli.ts",
+        "sha256": "81733fe41dc3f39a4885a9db70a0bd7e773575d6bf5548069ced5a453ed87e6b"
+      },
+      {
+        "path": "packages/scripts/src/release-readiness/program.ts",
+        "sha256": "8fc48035f0091ff093b62c072bebb49efc8c4fd89fbadd0611392f8642c97c46"
+      },
+      {
+        "path": "packages/scripts/src/release-readiness/schemas.ts",
+        "sha256": "59ab849b8898f8e4b83e28d816eda80dc78a41999542c2bc5f2f1b1c91cf592b"
+      },
+      {
+        "path": "tools/oxlint/portable-rules.test.ts",
+        "sha256": "5b24ae9e93abeb67b2441ebfe3c06cc24c21aba45bdefabac475e770c64362a4"
+      },
+      {
+        "path": "turbo.json",
+        "sha256": "bca84d0e64ecf8457e54378c2c7d719e556e41577fe13a3eb8b1b8775ad2b93e"
+      }
+    ]
+  },
+  "environment": {
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "bun": "1.4.2",
+    "node": "24.16.0",
+    "client": "2.3.1",
+    "miniflare": "5.20261001.0-alpha",
+    "compatibilityDate": "2026-10-04",
+    "flags": [
+      "nodejs_compat"
+    ],
+    "cloudState": "None selected or accessed; emulator namespaces only"
+  },
+  "scope": {
+    "modern": "2026-07-28 native Worker; plain/in-process composition unchanged",
+    "older": "2025-11-25 genuine native Durable Object export, one fixed-name host per stage",
+    "initialisationAttempts": 32,
+    "concurrentRequests": 32,
+    "hostLifetime": "At most ten minutes from first admission; runtime eviction may end it earlier",
+    "alarmFixtureLifetime": "1.5 seconds through a scoped actual source replacement; no product flag or copied host",
+    "persistedData": "Source uses only native alarm timestamp storage. Actual local SQL after real calculations/reads/32 conversations sees native bookkeeping and emulator name tables only; private platform metadata values are not inspected.",
+    "pool": "Eight calculations per captured application instance; no global pool across outer Worker/object isolates",
+    "rate": "Common native binding; current checked original capability replaces caller-supplied private header outside JSON"
+  },
+  "observations": [
+    "Actual clients use distinct native session IDs and list six canonical tools; calculator report and accepted processed Markdown equal HTTP.",
+    "Interleaved HTTP/modern/older calls exhaust one local allowance despite a forged private key header. Mismatched modern routing/version headers reject, wrong origins and malformed IDs refuse, and GET/DELETE are 405.",
+    "Thirty further official handshakes fill 32 attempts; the next request is 429 with Retry-After. Existing clients remain usable. Native existing-ID initialise refuses 400, preserves IDs and cannot reopen allocation.",
+    "Native SQL observes only __miniflare_do_name and _cf_METADATA tables after actual calls and 32 conversations; actual eviction makes old IDs 404, and a new official handshake works.",
+    "Eight actual older calculations fill the per-instance pool. A different conversation cannot cancel the first request; its owner cancels and releases a place within one second, a replacement enters immediately and remaining work closes.",
+    "A real outgoing modern TCP AbortSignal fires and stops that caller. There is no prompt backend place release; a replacement receives safe capacity refusal. Eight actual operations release at the five-second budget.",
+    "Thirty-two actual metadata operations fill native request capacity. A further POST is immediately 503. No new HTTP request or manual callback is made while the actual native alarm releases all 32 operations within three seconds. Old IDs then fail; a fresh official handshake lists tools.",
+    "Memory-only compilation of the actual API declaration supplies SDK-generated export inventory; provider, credential and network operations refuse. Real generated class export plus clients prevent emulator-only binding false proof.",
+    "Native graph create/no-change/update cases contain the genuine object class on the API and omit it on the Website; no provider write occurs.",
+    "All 616 actual policy cases pass after correcting an initially nonexistent neighbouring fixture target. Exact host decoder admission grants no encoder/runtime/neighbouring-service permission."
+  ],
+  "focusedChecks": [
+    {
+      "stage": "native-build",
+      "artifact": "dev77-session-candidate-u-native-build.log",
+      "sha256": "44c7245130ff6cded0a6a2a08fd72683a1872da3c50c3446402b0b53ecd7e702",
+      "exitCode": 0
+    },
+    {
+      "stage": "native-mcp",
+      "artifact": "dev77-session-candidate-ac-native-mcp.log",
+      "sha256": "57fd4ef31a7f64550c3e72f8aba6fd412cee2bd8c6dda11fd87c42eba433ab80",
+      "exitCode": 0
+    },
+    {
+      "stage": "infra-test",
+      "artifact": "dev77-session-candidate-y-infra-test.log",
+      "sha256": "9e7e4ff2f27e8081b1e2a02138c95dba1116dca61e4335bcca270e216725cb70",
+      "exitCode": 0
+    },
+    {
+      "stage": "oxlint-test",
+      "artifact": "dev77-session-candidate-ab-oxlint-test.log",
+      "sha256": "0201f0e633adb819f54bd2fa3e8bd8b3e2e78c341ee71cd045155c2a0801de77",
+      "exitCode": 0
+    },
+    {
+      "stage": "web-types",
+      "artifact": "dev77-session-candidate-z-web-types.log",
+      "sha256": "3e76533ed785191fdcf8636d59e791e2ead40aeb85114f75645b99c5abce787e",
+      "exitCode": 0
+    },
+    {
+      "stage": "lint",
+      "artifact": "dev77-session-candidate-z-lint.log",
+      "sha256": "40c17222ba6b3205a8c50dbddca796454c1ef760a0827dc075ff071849d71a3a",
+      "exitCode": 0
+    }
+  ],
+  "alarmRemovalChallenge": {
+    "status": "Passed: removed actual alarm callback fails unattended cleanup; exact source restoration and fresh normal rebuild pass",
+    "sourcePath": "apps/api/src/mcp-session.layer.ts",
+    "sourceSha256": "53a697d2c2679d48ed8aeb688fd43064e2a2b83c20c3dc41863cb08a490892cd",
+    "temporaryMutation": "Replace only alarm: () => expire with alarm: () => Effect.void",
+    "negativeObservation": "The real older lifecycle case times out at the three-second unattended cleanup wait; the separate modern case passes. No incoming request or manual alarm call occurs during that wait.",
+    "restoration": "Exact original source hash independently matches before fresh green build",
+    "results": [
+      {
+        "stage": "red-build",
+        "command": [
+          "bun",
+          "run",
+          "--filter=web",
+          "build:native-pair"
+        ],
+        "exitCode": 0,
+        "log": "dev77-session-alarm-oracle-b-red-build.log",
+        "sha256": "6f38d3fc77a1f7dcc7be53ad2b587b7b10c1e00583daad55e5dbee665b457eb2"
+      },
+      {
+        "stage": "red-native",
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--config",
+          "vitest.native.config.ts",
+          "test/native-mcp.boundary.test.ts"
+        ],
+        "exitCode": 1,
+        "log": "dev77-session-alarm-oracle-b-red-native.log",
+        "sha256": "fc0f1a6ef1ec89adbd7edc79361fea813a2de482cea678045104bfd3fd16e6f0"
+      },
+      {
+        "stage": "green-build",
+        "command": [
+          "bun",
+          "run",
+          "--filter=web",
+          "build:native-pair"
+        ],
+        "exitCode": 0,
+        "log": "dev77-session-alarm-oracle-b-green-build.log",
+        "sha256": "ed8877592fb6101fe77e5cbf6baea1416b844d993ffc743cbe1559045492b40d"
+      },
+      {
+        "stage": "green-native",
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--config",
+          "vitest.native.config.ts",
+          "test/native-mcp.boundary.test.ts"
+        ],
+        "exitCode": 0,
+        "log": "dev77-session-alarm-oracle-b-green-native.log",
+        "sha256": "0fb0be3759882eac9776099d5c7e14a77dcc530551d58c3d97490228584d7686"
+      }
+    ],
+    "positiveObservation": "Fresh normal source build succeeds; both actual native MCP cases pass",
+    "candidate": "Corrected private TypeScript declaration; actual SDK-generated native class export retained"
+  },
+  "completeQualification": {
+    "status": "Passed complete corrected graph C",
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 877.26,
+    "wrapperLogId": "dev77-session-frozen-release-c-release-graph.log",
+    "wrapperSha256": "edd7db83c09f66572264c425e04100b49d42b735eb03d29c2c616dd65f247bc7",
+    "checks": [
+      {
+        "id": "verification",
+        "target": "Canonical repository verification",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/verification-stdout-4wjccx/64301155263e.log",
+            "sha256": "58f6413b7fe0897813775addfad9fb0e4bb6bc00369712ced726e104a7cdef7a",
+            "bytes": 543564
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/verification-stderr-SDgGzO/a075d1cda3d8.log",
+            "sha256": "59504b0ca83995236774089abf8bb6719a8207c574d1bf0f530b68d2dd7badca",
+            "bytes": 2118
+          }
+        },
+        "inspectedSummary": [
+          "//:test:quality-workflow:task:  Test Files  2 passed (2)",
+          "//:test:quality-workflow:task:       Tests  32 passed (32)",
+          " Tasks:    1 successful, 1 total",
+          "@taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          " Tasks:    4 successful, 4 total",
+          "@taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          " Tasks:    4 successful, 4 total",
+          "@taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          " Tasks:    29 successful, 29 total",
+          "@taxkit/sdk:test:browser:  Test Files  4 passed (4)",
+          "@taxkit/sdk:test:browser:       Tests  26 passed (26)",
+          " Tasks:    7 successful, 7 total",
+          "@taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          "web:test:browser:  Test Files  3 passed (3)",
+          "web:test:browser:       Tests  21 passed (21)",
+          " Tasks:    14 successful, 14 total",
+          "web build:native-pair: @taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          "web build:native-pair:  Tasks:    12 successful, 12 total",
+          "web test:native-pair:  Test Files  9 passed (9)",
+          "web test:native-pair:       Tests  14 passed (14)"
+        ]
+      },
+      {
+        "id": "test",
+        "target": "Workspace tests including the direct calculator journey",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/test-stdout-3Bw3yh/35a1111f62b5.log",
+            "sha256": "e78a246b7a1ac45d6c9c6eef70cc646adca9eb3dc99f6ae72c8ef139dd821f26",
+            "bytes": 80113
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/test-stderr-N60Vz4/148dee8c5dfe.log",
+            "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8",
+            "bytes": 216
+          }
+        },
+        "inspectedSummary": [
+          "@taxkit/calculators:test:       Tests  41 passed (41)",
+          "@taxkit/docs-fumadocs:test:  Test Files  2 passed (2)",
+          "@taxkit/docs-fumadocs:test:       Tests  6 passed (6)",
+          "@taxkit/sdk:test:  Test Files  5 passed (5)",
+          "@taxkit/sdk:test:       Tests  58 passed (58)",
+          "web:test:  Test Files  5 passed (5)",
+          "web:test:       Tests  58 passed (58)",
+          "@taxkit/api-http:test:  Test Files  4 passed (4)",
+          "@taxkit/api-http:test:       Tests  29 passed (29)",
+          "@taxkit/docs-examples:test:  Test Files  3 passed (3)",
+          "@taxkit/docs-examples:test:       Tests  9 passed (9)",
+          "@taxkit/docs-content:test:  Test Files  5 passed (5)",
+          "@taxkit/docs-content:test:       Tests  24 passed (24)",
+          "@taxkit/infrastructure:test:  Test Files  2 passed (2)",
+          "@taxkit/infrastructure:test:       Tests  31 passed (31)",
+          "api:test:  Test Files  7 passed (7)",
+          "api:test:       Tests  98 passed (98)",
+          "@taxkit/api-rpc:test:  Test Files  4 passed (4)",
+          "@taxkit/api-rpc:test:       Tests  332 passed (332)",
+          " Tasks:    29 successful, 29 total"
+        ]
+      },
+      {
+        "id": "build",
+        "target": "Workspace production builds",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/build-stdout-4cBht7/fc466265163d.log",
+            "sha256": "b5fce89e1174d843c002767252b09a650bcd8dc9ee86ae05b27f686738c24683",
+            "bytes": 92149
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/build-stderr-mTsN9Q/b650b1df22dd.log",
+            "sha256": "844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07",
+            "bytes": 137
+          }
+        },
+        "inspectedSummary": [
+          "@taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          " Tasks:    17 successful, 17 total"
+        ]
+      },
+      {
+        "id": "docs-validation",
+        "target": "Documentation content validation",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-validation-stdout-qzqABX/78bf18535aab.log",
+            "sha256": "68052738a975fad9f4d33e294f2392713fa4eb348cf1e0a95c0668a26ccd84a6",
+            "bytes": 2295
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-validation-stderr-qdlQgW/0920f947b678.log",
+            "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697",
+            "bytes": 51
+          }
+        },
+        "inspectedSummary": [
+          " Tasks:    3 successful, 3 total"
+        ]
+      },
+      {
+        "id": "packed-artifact",
+        "target": "Focused SDK packed artifact proof",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/packed-artifact-stdout-4OAK4N/14e93251b3a8.log",
+            "sha256": "627230d66d76fce7c0f874f24c9ce393b8421c25d763e3f264ebf21c176ad1c6",
+            "bytes": 3764
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/packed-artifact-stderr-w0dld8/073ff48b6f4c.log",
+            "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7",
+            "bytes": 55
+          }
+        },
+        "inspectedSummary": [
+          " Tasks:    7 successful, 7 total"
+        ]
+      },
+      {
+        "id": "downstream-consumer",
+        "target": "Strict downstream package proof",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/downstream-consumer-stdout-aYDgRJ/3572950b1150.log",
+            "sha256": "b20d5b0e3b8861668b32e4fa618cc761017f645c36d04880909e9c28abe6e467",
+            "bytes": 13352
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/downstream-consumer-stderr-hALpJO/bcf805ec10fc.log",
+            "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9",
+            "bytes": 53
+          }
+        },
+        "inspectedSummary": [
+          " Tasks:    7 successful, 7 total"
+        ]
+      },
+      {
+        "id": "api-smoke",
+        "target": "Public API smoke evidence",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/api-smoke-stdout-TcV5g9/ed34c64283be.log",
+            "sha256": "3f7fb0a38b4fb72826b17b070bffd651e2f8019cd64aa7aba594d2c35ba47eee",
+            "bytes": 64312
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/api-smoke-stderr-XtIApR/21ec4827adc5.log",
+            "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87",
+            "bytes": 31
+          }
+        },
+        "inspectedSummary": [
+          "@taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          " Tasks:    13 successful, 13 total"
+        ]
+      },
+      {
+        "id": "docs-browser",
+        "target": "Built native Website and documentation evidence",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/docs-browser-stdout-2TTeHi/7136db6fc70d.log",
+            "sha256": "23b2ea57d523d6c778d84fb64f5d50c0dede4a92ed27fd852a1d9ae676af219b",
+            "bytes": 75971
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/docs-browser-stderr-XkutFj/e1f85de06fc5.log",
+            "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4",
+            "bytes": 82
+          }
+        },
+        "inspectedSummary": [
+          "web build:native-pair: @taxkit/docs-content:build: Built 61 accepted documentation pages. This local file does not prove publication or deployment.",
+          "web build:native-pair:  Tasks:    12 successful, 12 total",
+          "web test:native-pair:  Test Files  9 passed (9)",
+          "web test:native-pair:       Tests  14 passed (14)"
+        ]
+      },
+      {
+        "id": "changeset-status",
+        "target": "Pending release train status",
+        "exitCode": 0,
+        "terminalState": "success",
+        "sanitisedDetails": {
+          "stdout": {
+            "path": "tmp/release-readiness/changeset-status-stdout-LD194Y/67ef65214ac2.log",
+            "sha256": "1349e4a49ff3a600df0c37d86848b9c6aacca98f35cab9c010996cc49959687d",
+            "bytes": 10039
+          },
+          "stderr": {
+            "path": "tmp/release-readiness/changeset-status-stderr-BhSeqz/0deafc2daf1c.log",
+            "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3",
+            "bytes": 37
+          }
+        },
+        "inspectedSummary": [
+          " Tasks:    1 successful, 1 total"
+        ]
+      }
+    ],
+    "detailArtifactsInspected": 18,
+    "sourceReadback": {
+      "matched": 40,
+      "mismatches": [],
+      "afterWholeGraphBeforeClosure": true
+    },
+    "nativePair": {
+      "files": 9,
+      "tests": 14,
+      "result": "All passed in complete verification and the separate final built-app graph check"
+    },
+    "privateFreezeManifestId": "dev77-session-frozen-source-c.json",
+    "privateFreezeManifestSha256": "c5a8c7c6641d70b72b3679c7b0d85121d90218673d727f6f41a2046435099afb"
+  },
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "packages/infrastructure/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/testing-and-quality.md"
+      ],
+      "postcondition": "Explain actual adapters, native class discovery, bounded in-memory lifetimes, per-instance pools, private rate forwarding and remaining modern gap"
+    },
+    {
+      "decision": "Change required",
+      "owners": [
+        "docs/product-specs/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/verification/critical-journeys.json"
+      ],
+      "postcondition": "Current intent and stable native journey require actual class/client/alarm/capacity/cancellation and negative modern oracle; T006 stays in progress"
+    },
+    {
+      "decision": "Change required",
+      "owners": [
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "packages/infrastructure/src/apps-stack.test.ts",
+        "apps/web/scripts/native-pair-build.runtime.ts",
+        "apps/web/scripts/native-api-source.boundary.ts"
+      ],
+      "postcondition": "Exact decoder-only policy with actual CLI tests, genuine graph export assertion and supported SDK-computed class inventory"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        "packages/calculators",
+        "packages/api/http",
+        "packages/api/rpc",
+        "packages/sdk/typescript",
+        "packages/docs-content",
+        "apps/web/src/lib/browser-tools.atoms.ts",
+        ".agents/skills",
+        "docs/runbooks"
+      ],
+      "postcondition": "Canonical retained tax values, public/package contracts, browser commands, accepted content, skill method and existing operation procedures remain; provider operation still requires DEV-81 authority/receipt/rollback"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "provider publication or deployment",
+        "memory"
+      ],
+      "postcondition": "Private app/native test and command composition only, with no public package contract or publication. No Changeset or external/memory operation is authorised"
+    }
+  ],
+  "limitations": [
+    "Local qualification is established; pushed draft and exact-head hosted checks require their separate live readback.",
+    "Prompt modern real-network pre-response cleanup remains a T006 gap",
+    "Whole-host lifetime and attempt limits are shared per stage/object instance, not per client or a global rolling quota",
+    "No per-session removal, stream resumption, GET subscription or DELETE termination is advertised",
+    "Actual alarm fixture is accelerated local workerd proof, not ten-minute cloud timing",
+    "Rate policy remains approximate and local to provider location",
+    "No provider apply, cloud class/binding readback, hosted endpoint, deployment, public availability or autonomous model session is proved"
+  ],
+  "failedOrUnqualified": [
+    {
+      "finding": "Local builder originally omitted native class export, causing real older-client initialisation 503",
+      "correction": "Use memory-only actual SDK declaration compilation and require real generated export and clients"
+    },
+    {
+      "finding": "Test wrongly assumed existing-ID initialise minted another ID and would close the host",
+      "correction": "Receiving native HTTP admission explicitly refuses it before registration; remove extra workaround and assert preserved IDs/capacity"
+    },
+    {
+      "finding": "Test wrongly inferred automatic client reconnect after reinitialisation/expiry",
+      "correction": "Current IDs remain after refused reinitialise; an expired actual client call fails and a fresh official client handshakes"
+    },
+    {
+      "finding": "SQL inspection requires explicit local emulator inspection capability; querying guessed _cf_KV failed because no such table exists; platform metadata introspection is refused by its authoriser",
+      "correction": "Use supported sqlite_schema table-name observation only; do not claim private metadata contents"
+    },
+    {
+      "finding": "First policy suite failed at an invented absent neighbour path",
+      "correction": "Target the actual existing mcp-request.service.ts; all 616 cases pass"
+    },
+    {
+      "finding": "Unused TypeScript class export from its own module; SDK-generated native export is a separate owner",
+      "correction": "Keep the internal native declaration private; retain SDK registration/generated export and actual native class/client proofs; rerun full graph"
+    },
+    {
+      "finding": "Focused Vitest invoked from repository root found no files under the app-relative native include list",
+      "correction": "Run the actual focused command from apps/web; both real MCP cases pass. The empty root invocation proves no application result."
+    }
+  ],
+  "rollback": {
+    "local": "Restore the parent browser source/commit 964b7e9b839545e135476a516541e8f4750268e7; discard scoped emulator state",
+    "challenge": "Temporary source replacement must restore exact original bytes before fresh normal build",
+    "external": "None performed. Native cloud class migration/binding receipt and rollback remain DEV-81 work"
+  },
+  "primaryReview": {
+    "reviewer": "Primary implementation owner; no independent acceptance claimed",
+    "result": "Primary owner reviewed the actual source/diff, SDK graph, closed tool operations, rate forwarding, lifetime and cleanup, actual test targets, all nine full checks, all eighteen detail identities and all forty frozen source identities. Accept the local older-session sub-slice only.",
+    "checked": [
+      "Genuine SDK class export from the actual app, no provider/network/credential discovery",
+      "Native parser and session map; no mirrored protocol engine or custom JSON parser",
+      "Atomic whole-host scope expiry, automatic alarm, no-ID admission and immediate capacity refusal",
+      "First-request context omitted from registration; checked request rate identity replaces forged private header",
+      "Separate calculation pools per isolate; common approximate rate binding and original retained tax results",
+      "Actual official clients, request frames, native eviction/SQL/alarm and positive older cancellation; separate modern negative oracle",
+      "Removed application reinitialisation workaround after checking receiving HTTP admission; fresh official client required after expiry",
+      "Exact decoder-only policy, no general encoder/runtime/neighbor permissions",
+      "No public package contract/version/export or provider/collection changes",
+      "First graph unused-export failure corrected by making only the internal TypeScript declaration private; fresh genuine native class/client proof and source-matched alarm-removal challenge pass",
+      "Actual local reload targets the native served entry point and proves marker appearance, exact restoration and shutdown without extending the timeout."
+    ],
+    "limitations": [
+      "Implementing owner review is not independent acceptance",
+      "Prompt modern remote cleanup/public setup remain T006 work"
+    ]
+  },
+  "finalFocusedChecks": [
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.35,
+      "log": "dev77-session-final-focused-a-docs.log",
+      "sha256": "23a3c4caf3a2da47c0bb3b618d8d269eb2bf0970ed58b4c4b70e2f0749105535"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.13,
+      "log": "dev77-session-final-focused-a-runbooks.log",
+      "sha256": "9faad240a7e76bc4fb5d9049bf1a429256287f197033ee73601fd5cf704960d5"
+    },
+    {
+      "stage": "api-types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/api",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.26,
+      "log": "dev77-session-final-focused-a-api-types.log",
+      "sha256": "06e6e5c4bdc96a52d09d60334992c5f54ba1da329ffaeaa47a03bd85db974867"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.0,
+      "log": "dev77-session-final-focused-a-web-types.log",
+      "sha256": "f1f01fe506518ea00ffef15536cb565e24964aa051d9fd31bd97302853a83d5d"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.17,
+      "log": "dev77-session-final-focused-a-lint.log",
+      "sha256": "592dc4a5b79d8633c07dd88408b51cee21200d050f1046a5a680b05441a82b38"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "dev77-session-final-focused-a-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "exportCorrectionChecks": [
+    {
+      "stage": "knip",
+      "command": [
+        "bun",
+        "run",
+        "knip"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.05,
+      "log": "dev77-session-export-correction-a-knip.log",
+      "sha256": "e77bf40a56147965457dbc7dd89f439cc4b40ae4ed900ad437e5998d5089dc52"
+    },
+    {
+      "stage": "knip-production",
+      "command": [
+        "bun",
+        "run",
+        "knip:production"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.82,
+      "log": "dev77-session-export-correction-a-knip-production.log",
+      "sha256": "a1290b86c19f0296dc585d0c86685df49b7539e7a47cf7fdb89b12a2343942b6"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.09,
+      "log": "dev77-session-export-correction-a-lint.log",
+      "sha256": "15e8bccdae173b34fcdad1c829d81e5c9b8b64b18bdb30581c1a116ce9316dcd"
+    },
+    {
+      "stage": "types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/api",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.3,
+      "log": "dev77-session-export-correction-a-types.log",
+      "sha256": "06e6e5c4bdc96a52d09d60334992c5f54ba1da329ffaeaa47a03bd85db974867"
+    },
+    {
+      "stage": "native-build",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "build:native-pair"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 17.42,
+      "log": "dev77-session-export-correction-a-native-build.log",
+      "sha256": "cf3e4ec3df85e24718849f5f733f8bc862600c7dbcfb45f14568f8f2b179424f"
+    },
+    {
+      "stage": "native-mcp",
+      "command": [
+        "node",
+        "apps/web/node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "apps/web/vitest.native.config.ts",
+        "apps/web/test/native-mcp.boundary.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 0.25,
+      "log": "dev77-session-export-correction-a-native-mcp.log",
+      "sha256": "18eafc08d72a94f36e29a9e54a1df752bc125b058b126722b157196b8638a3c2"
+    },
+    {
+      "stage": "native-mcp",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.native.config.ts",
+        "test/native-mcp.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 9.11,
+      "log": "dev77-session-export-correction-b-native-mcp.log",
+      "sha256": "cf9abed952bf7f72fa627106183a420c2de5095ebe8ac77806f8c5a240664c82"
+    }
+  ],
+  "previousAlarmRemovalChallenge": {
+    "status": "Passed: removed actual alarm callback fails unattended cleanup; exact source restoration and fresh normal rebuild pass",
+    "sourcePath": "apps/api/src/mcp-session.layer.ts",
+    "sourceSha256": "4e475c8271191ba5e0e2100fd47a600c390ffe881055720f3e0e0597ec785693",
+    "temporaryMutation": "Replace only alarm: () => expire with alarm: () => Effect.void",
+    "negativeObservation": "The real older lifecycle case times out at the three-second unattended cleanup wait; the separate modern case passes. No incoming request or manual alarm call occurs during that wait.",
+    "restoration": "Exact original source hash independently matches before fresh green build",
+    "results": [
+      {
+        "stage": "red-build",
+        "command": [
+          "bun",
+          "run",
+          "--filter=web",
+          "build:native-pair"
+        ],
+        "exitCode": 0,
+        "log": "dev77-session-alarm-oracle-red-build.log",
+        "sha256": "de54c9a455d075d6e3e30987cd5a74589868ed7775022d32a6b14ece89d66d84"
+      },
+      {
+        "stage": "red-native",
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--config",
+          "vitest.native.config.ts",
+          "test/native-mcp.boundary.test.ts"
+        ],
+        "exitCode": 1,
+        "log": "dev77-session-alarm-oracle-red-native.log",
+        "sha256": "eb41dc5d43a3a2d28e9832fefa51c43e361912e0fb30dba599f4f15826837ac8"
+      },
+      {
+        "stage": "green-build",
+        "command": [
+          "bun",
+          "run",
+          "--filter=web",
+          "build:native-pair"
+        ],
+        "exitCode": 0,
+        "log": "dev77-session-alarm-oracle-green-build.log",
+        "sha256": "316490fd6b24436354c438bf1631fe82e4a1ab081ac77ada7a45d63412c049f7"
+      },
+      {
+        "stage": "green-native",
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--config",
+          "vitest.native.config.ts",
+          "test/native-mcp.boundary.test.ts"
+        ],
+        "exitCode": 0,
+        "log": "dev77-session-alarm-oracle-green-native.log",
+        "sha256": "785adcdfb2c88b724c3d45b507f4c7974cbf58c2b911aec33df9a813e75f2988"
+      }
+    ],
+    "positiveObservation": "Fresh normal source build succeeds; both actual native MCP cases pass"
+  },
+  "previousFailedGraph": {
+    "stage": "release-graph",
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 521.22,
+    "log": "dev77-session-frozen-release-a-release-graph.log",
+    "wrapperSha256": "c9a77f3f302051f41e5787c71946980519d0cd4990a5f2adcde7266b05d31507",
+    "failedCheck": "verification",
+    "cause": "Unused TypeScript class export from its own module; SDK-generated native export is a separate owner",
+    "detailArtifacts": [
+      {
+        "path": "tmp/release-readiness/verification-stdout-2kZRHE/7f3cc96e6617.log",
+        "sha256": "ced74528ae8bd1dfd585526beca81b2930ff45118d2e7905a39fe7f3d16f59a9",
+        "bytes": 58256
+      },
+      {
+        "path": "tmp/release-readiness/verification-stderr-ser9TX/fd3bb36ca67c.log",
+        "sha256": "c0b570431c5acb39d3a7b0b802fdc8638371e91ee644b6e76db07ad6e4fe9099",
+        "bytes": 2173
+      }
+    ],
+    "sourceReadback": {
+      "matched": 39,
+      "mismatches": []
+    },
+    "correction": "Keep the internal native declaration private; retain SDK registration/generated export and actual native class/client proofs; rerun full graph"
+  },
+  "failedGraph": {
+    "command": [
+      "bun",
+      "run",
+      "release:check",
+      "--",
+      "--ci"
+    ],
+    "exitCode": 1,
+    "durationSeconds": 681.43,
+    "wrapperLogId": "dev77-session-frozen-release-b-release-graph.log",
+    "wrapperSha256": "23bb0f8e2d9448e9424f4b1520e8e3c434ad75f29ca43f7ddfacb49c5d7e8299",
+    "sanitisedDetails": {
+      "stdout": {
+        "path": "tmp/release-readiness/verification-stdout-fVl2e2/0cfa1d09db32.log",
+        "sha256": "b0117a21f0b96ea35ce9f2eae04567bef48179602ca1c5c6ebdb7fc65d67c48e",
+        "bytes": 546642
+      },
+      "stderr": {
+        "path": "tmp/release-readiness/verification-stderr-bx1n9z/8f703721caa0.log",
+        "sha256": "6d65057b5a8693d4e2d44cece550e6a3bfd28d0e3274a825ab8389bacdd65baf",
+        "bytes": 2222
+      }
+    },
+    "sourceReadback": {
+      "matched": 39,
+      "mismatches": [],
+      "beforeCorrection": true,
+      "privateManifestId": "dev77-session-frozen-source-b.json",
+      "privateManifestSha256": "47786d1c5e98ccb3c57a5851cd3e821483c990395733af12da443cd660050e75"
+    },
+    "failure": "The native local-development reload case timed out while waiting for a test marker. Its fixture altered ApiWorkerInit, which the new native entry point no longer uses. The other thirteen native cases passed.",
+    "correction": "Point the existing reload fixture at ApiWorkerNativeInit, the real served native composition. Preserve the fifteen-second bound and the positive marker plus restoration assertions.",
+    "qualification": "No complete graph acceptance from this failed run."
+  },
+  "nativeReloadCorrection": {
+    "stage": "native-local",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--config",
+      "vitest.native.config.ts",
+      "test/native-local-development.boundary.test.ts"
+    ],
+    "exitCode": 0,
+    "durationSeconds": 12.87,
+    "log": "dev77-session-reload-correction-a-native-local.log",
+    "wrapperLogId": "dev77-session-reload-correction-a-native-local.log",
+    "wrapperSha256": "707438043a56c34c3736ac18f085101e2baa1dc6308ba7c0d45d52089ae7745c",
+    "observed": "Both actual local-development cases passed: served native Worker reload marker, exact source restoration, browser reload, application use and process shutdown; rejected stage/plan remains refused.",
+    "limitation": "Focused result only; complete corrected graph pending."
+  },
+  "nativeReloadFinalFocusedChecks": [
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "logId": "dev77-session-reload-final-focused-a-docs.log",
+      "sha256": "c4d5fa8c6fab1b4ff64a387ff35687a751b48825d5d57877ae42d98e97157a00"
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "logId": "dev77-session-reload-final-focused-a-runbooks.log",
+      "sha256": "1fde2bde8a2871860c2d22284a945fd0feb155786292af1ab452612e6fb20b64"
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--cwd",
+        "apps/web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.18,
+      "logId": "dev77-session-reload-final-focused-a-web-types.log",
+      "sha256": "b07b5aca176677d505bd4448230b248692c8881b88cc3072555b32d78febda6c"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.35,
+      "logId": "dev77-session-reload-final-focused-a-lint.log",
+      "sha256": "f240d5de48bbd75489ce34d46215f65c9f735e66e23fc575d11d057570d0abcd"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.6,
+      "logId": "dev77-session-reload-final-focused-a-format.log",
+      "sha256": "da775bb29bf716b2a3b9fbc52099e3ee1e28feb7bdfe45e97fd1dbec9ae465d8"
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "logId": "dev77-session-reload-final-focused-a-diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "artifactRetention": "Private preparation/challenge logs use portable identifiers and SHA-256; complete graph details use repository-relative ignored artifact paths. No local machine path, secret or raw provider payload is included.",
+  "metadataClosure": {
+    "checks": [
+      {
+        "stage": "frozen-install",
+        "command": [
+          "bun",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.37,
+        "logId": "dev77-session-closure-c-frozen-install.log",
+        "sha256": "6a51e08f2557fae69df7d5339362cd8d5562a090adaf66bfb8d25f4e5969441f"
+      },
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.33,
+        "logId": "dev77-session-closure-c-docs.log",
+        "sha256": "6fecaed73a805f9bd6dffe3c9b96595bdeebd88ca50bf3115525b422f43a0c61"
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.15,
+        "logId": "dev77-session-closure-c-runbooks.log",
+        "sha256": "fcbb51a2b0726a9a51155a8d4b3b95e116b28e26496ebe3274141614505f5b7a"
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.69,
+        "logId": "dev77-session-closure-c-format.log",
+        "sha256": "8046be31eef97306278f13e47102cc87159b8309f9ec9357e90d43e51e9bdb5b"
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.02,
+        "logId": "dev77-session-closure-c-diff.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "unchangedFrozenSourceIdentities": 38,
+    "changedOnly": [
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json"
+    ],
+    "postcondition": "Frozen install, docs, runbooks, formatting and diff checks pass after two-file metadata closure; all application/configuration/test identities match graph C."
+  }
+}

@@ -1,4 +1,5 @@
-import { Crypto, Effect, Encoding, Schema } from "effect";
+import { Crypto, Effect, Schema } from "effect";
+import { Hex } from "effect/encoding";
 import * as FileSystem from "effect/FileSystem";
 
 import {
@@ -29,7 +30,7 @@ export const readWorkflowReceipt = <A>(
       )
     );
 
-    return yield* Schema.decodeUnknownEffect(Schema.fromJsonString(schema), {
+    return yield* Schema.decodeEffect(Schema.fromJsonString(schema), {
       onExcessProperty: "error",
     })(source).pipe(
       Effect.mapError(
@@ -72,7 +73,7 @@ export const readWorkflowSha256 = (
           })
       )
     );
-    return Encoding.encodeHex(digest).toLowerCase();
+    return Hex.encode(digest).toLowerCase();
   });
 
 export const workflowSha256 = (
@@ -92,5 +93,5 @@ export const workflowSha256 = (
             })
         )
       );
-    return Encoding.encodeHex(digest).toLowerCase();
+    return Hex.encode(digest).toLowerCase();
   });

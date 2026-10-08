@@ -1,7 +1,7 @@
 ---
 title: "Facts"
 description: "Understand the canonical input and derived values used by calculators."
-status: "draft"
+status: "published"
 ---
 
 # Facts
@@ -18,11 +18,11 @@ not the same fact unless it matches the owning schema.
 ## How it works
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 
 const grossPay = new GrossPay({
-  amount: aud(165_400),
+  amount: aud(Cents.make(165_400)),
   period: "weekly",
 });
 ```

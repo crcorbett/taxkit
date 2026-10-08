@@ -1,0 +1,48 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "8a809208eb87d60575282290dfdd59a681fae676",
+  "implemented": [
+    "Eleven canonical strict rules across HTTP API and shared testing source/tests",
+    "Checked Array/Option lookup and framework assertion failure for expectAt",
+    "Effect FileSystem and owning Schema codecs for OpenAPI snapshot and error-envelope evidence",
+    "Explicit TypeScript test projects for API and testing packages; fix previously unchecked brand and union usage"
+  ],
+  "host_admission": {
+    "file": "packages/api/http/src/client/in-process.layer.ts",
+    "constraint": "Fetch-compatible Promise result signature only; no async/await/chains",
+    "fixture": "tools/oxlint/.generated-fetch-host.ts",
+    "proof": "Real CLI accepts exact fixture signature, rejects neighbouring signature, and rejects async/await at admitted fixture. Production adapter is an accepted strict fixture.",
+    "limitation": "Oxlint lacks stdin support; temporary exact fixture exercises the same configured admission without editing production source. Native app lifetime qualification remains open."
+  },
+  "verification": [
+    {
+      "command": "bun install --frozen-lockfile",
+      "result": "passed"
+    },
+    {
+      "command": "bun run test",
+      "result": "passed; 64 actual-command lint cases, 5 shared assertion tests, 5 API tests and retained calculator suites"
+    },
+    {
+      "command": "bun run verification",
+      "result": "passed including newly checked API/testing test projects and Chromium Atom tests"
+    },
+    {
+      "command": "bun run build",
+      "result": "passed, 15 tasks"
+    }
+  ],
+  "preserved": [
+    "Committed OpenAPI snapshot",
+    "All three 2025-26 calculator results",
+    "Medicare parameters and source provenance"
+  ],
+  "limitations": [
+    "DEV-73 broader strict migration and semantic audit remain unfinished",
+    "DEV-74\u201381 remain queued",
+    "No merge, deployment, publication or provider apply"
+  ],
+  "recovery": "Revert complete slice; no external provider state changed"
+}

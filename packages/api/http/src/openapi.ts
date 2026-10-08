@@ -1,4 +1,4 @@
-import { OpenApi } from "effect/unstable/httpapi";
+import { OpenApi } from "effect/http-api";
 
 import { TaxKitApi } from "./api.js";
 

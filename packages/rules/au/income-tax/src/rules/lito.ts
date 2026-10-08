@@ -1,6 +1,10 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { aud, multiplyCentsByDecimal } from "@taxkit/core/primitives";
+import {
+  Cents,
+  audFromCents,
+  multiplyCentsByDecimal,
+} from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
@@ -41,7 +45,7 @@ const findBracket = (
     onNone: () =>
       Effect.fail(
         new CalculationError({
-          message: `taxkit/rules-au-income-tax: no LITO bracket covers income=${incomeCents} cents`,
+          message: "No LITO bracket covers the amount.",
         })
       ),
     onSome: Effect.succeed,
@@ -69,20 +73,25 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
 
-    const rawOffsetCents =
-      bracket.fullOffsetCents -
-      multiplyCentsByDecimal(
-        incomeCents - bracket.thresholdCents,
-        bracket.phaseOutRate
-      );
+    const taxableExcess = yield* Cents.makeEffect(
+      incomeCents - bracket.thresholdCents
+    );
+    const phasedOut = yield* multiplyCentsByDecimal(
+      taxableExcess,
+      bracket.phaseOutRate
+    );
+    const rawOffsetCents = bracket.fullOffsetCents - phasedOut;
     const offsetCents = Math.max(0, rawOffsetCents);
-    const offsetAmount = aud(offsetCents);
+    const offsetAmount = yield* audFromCents(offsetCents);
     const status = offsetCents === 0 ? "zeroed" : "active";
 
     const trace = TraceNode.make({
       children: [],
-      formula:
-        "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))",
+      formula: Option.some(
+        Option.some(
+          "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))"
+        )
+      ),
       inputs: {
         bracketThresholdCents: bracket.thresholdCents,
         fullOffsetCents: bracket.fullOffsetCents,
@@ -91,7 +100,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
         tableYear: table.year,
       },
       result: offsetAmount.cents,
-      rounding: "round-to-nearest-cent",
+      rounding: Option.some(Option.some("round-to-nearest-cent")),
       ruleId: LitoRuleId,
       sources: [table.source],
       title: "Low Income Tax Offset (LITO)",
@@ -106,5 +115,12 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
       trace,
     });
     return component;
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "LITO could not produce a supported amount.",
+        })
+    )
+  )
 );

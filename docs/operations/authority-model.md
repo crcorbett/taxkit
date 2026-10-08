@@ -3,7 +3,7 @@ document_type: authority-model
 lifecycle: current
 authority: canonical
 owner: taxkit-authority-model-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-10-07
 review_trigger: identity, release, Git, registry, deployment, provider, credential, or recovery change
 ---
 
@@ -39,6 +39,50 @@ The exact machine-checked records live in
 `tools/documentation/runbook-contract.json`. That sidecar and this table must
 agree; neither grants authority. Provider/registry/deployment claims require
 current target-system readback by the authorized principal.
+
+## Current old-docs retirement boundary
+
+Native version-three plan preparation names `TaxKitAppsCloudflare`, the exact
+account and Production zone, and the retained zone/settings plus app resources.
+Preview omits Production DNS. The existing `cf` default profile supplied the
+separately authorised 7 October GETs without credential creation. That read
+capability does not authorise a native cloud plan's bootstrap effects, state
+writes, domain attachment, apply, credential change or rollback. Checked
+native source identities establish only the checked tracked-file snapshot.
+They exclude provider state, environment, generated/dependency bytes and the
+origin of supplied plan text. They do not grant bootstrap, plan or apply approval.
+The [deployment runbook](../runbooks/docs-deployment.md) owns the current native
+procedure; local proof and old receipts grant no new operation authority.
+
+Cooper's 7 October direction subsequently authorises native Preview and
+Production deployments from this Mac. The active clean-slate plan records that
+new authority; it does not broaden credentials, authorise unrelated resources or
+permit a shared-store upgrade. Bind each exact candidate, stage, account,
+resource graph, existing credential, plan, recovery and readback before apply.
+The native bridge may resolve the existing TaxKit repository-scoped CLI login in
+memory; it does not change the retired writer's custody contract or store a new
+credential. Historical approvals below remain attached to their original work.
+
+Cooper then separately approved adding `Zone DNS Settings Read`,
+`Workers Routes Write` and `Dynamic URL Redirects Write` to the existing
+Production token `taxkit-docs-production-20260831`, identity
+`35bf3c96b36551ea663e62e5739b68e9`, only for zone
+`15103853342ab9f18f7894b7fae39c39`. Independent readback preserved its full
+earlier account policy, name, active status, issue date and 18 November expiry.
+The token value, Preview token and Doppler configuration were not changed.
+The [dated cloud receipt](../documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json)
+records that exact change, its policy restoration procedure, both authorised
+native applies and provider/public readback. It creates no standing authority
+for further credential changes, shared-store upgrades or unrelated writes.
+
+The current checkout retires the old docs workspace, writer workflows and
+Alchemy Stack entry. The [retention manifest](../documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json)
+preserves exact original sources and dated provider recovery identities.
+Historical deployment, credential and reconciliation approvals below remain
+attached to their original operations. They do not authorise resuming a retired
+writer, changing an old resource ID, deleting hosted resources or applying the
+native API/Website graph. DEV-81 must supply its own approved operation and
+readback. Repository retirement changes no provider or credential state.
 
 ## 2026-08-28 — Doppler repository authority and provider stop
 

@@ -1,58 +1,26 @@
-import { afterEach, describe, expect, test } from "bun:test";
-import { Buffer } from "node:buffer";
-import { rm } from "node:fs/promises";
-import nodePath from "node:path";
+import { fileURLToPath } from "node:url";
 
-const { join } = nodePath;
-const repositoryRoot = join(import.meta.dir, "../..");
-const oxlint = join(repositoryRoot, "node_modules/.bin/oxlint");
-const temporaryFiles: string[] = [];
+import * as BunServices from "@effect/platform-bun/BunServices";
+import { describe, expect, it as test } from "@effect/vitest";
+import { Effect } from "effect";
 
-const runOxlint = (path: string) => {
-  const result = Bun.spawnSync({
-    cmd: [
-      oxlint,
-      "-c",
-      "oxlint.config.ts",
-      "--disable-nested-config",
-      "--no-error-on-unmatched-pattern",
-      path,
-    ],
-    cwd: repositoryRoot,
-    stderr: "pipe",
-    stdout: "pipe",
-  });
+import { lintFiles, writeTemporaryLintFixture } from "./cli-fixture.js";
 
-  return {
-    exitCode: result.exitCode,
-    output: `${Buffer.from(result.stdout).toString("utf-8")}${Buffer.from(result.stderr).toString("utf-8")}`,
-  };
-};
-
-const writeFixture = async (source: string) => {
-  const path = join(
-    repositoryRoot,
-    `tools/oxlint/fixtures/.generated-try-promise-${crypto.randomUUID()}.ts`
+const writeFixture = (source: string) =>
+  writeTemporaryLintFixture(
+    source,
+    "ts",
+    fileURLToPath(new URL("fixtures", import.meta.url))
   );
-
-  temporaryFiles.push(path);
-  await Bun.write(path, source);
-
-  return path;
-};
-
 const diagnostics = (output: string) =>
   output.match(/effect\(no-bare-effect-try-promise\)/gu) ?? [];
-
-afterEach(async () => {
-  await Promise.all(
-    temporaryFiles.splice(0).map((path) => rm(path, { force: true }))
-  );
-});
-
+const runOxlint = (path: string) => lintFiles([path]);
 describe("effect/no-bare-effect-try-promise", () => {
-  test("rejects canonical root, namespace, subpath, alias, destructured and reassigned calls", async () => {
-    const fixture = await writeFixture(`
+  test.effect(
+    "rejects canonical root, namespace, subpath, alias, destructured and reassigned calls",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeFixture(`
       import * as EffectRoot from "effect";
       import { Effect as Fx } from "effect";
       import { tryPromise as subpathAttempt } from "effect/Effect";
@@ -69,14 +37,16 @@ describe("effect/no-bare-effect-try-promise", () => {
       destructuredAttempt(() => Promise.resolve("destructured"));
       reassignedAttempt(() => Promise.resolve("reassigned"));
     `);
-    const result = runOxlint(fixture);
-
-    expect(result.exitCode).toBe(1);
-    expect(diagnostics(result.output)).toHaveLength(6);
-  });
-
-  test("accepts direct arrow, function and method mappings plus unrelated shadowed locals", async () => {
-    const fixture = await writeFixture(`
+        const result = yield* runOxlint(fixture);
+        expect(result.exitCode).toBe(1);
+        expect(diagnostics(result.output)).toHaveLength(6);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "accepts direct arrow, function and method mappings plus unrelated shadowed locals",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeFixture(`
       import { Effect as Fx, Schema } from "effect";
 
       class BoundaryError extends Schema.TaggedError<BoundaryError>()(
@@ -113,13 +83,17 @@ describe("effect/no-bare-effect-try-promise", () => {
       Effect.tryPromise(() => Promise.resolve("shadowed"));
       canonicalAttempt(() => Promise.resolve("cleared"));
     `);
-    const result = runOxlint(fixture);
-
-    expect(result.output).not.toContain("effect(no-bare-effect-try-promise)");
-  });
-
-  test("rejects options whose rejection mapping is not statically inline", async () => {
-    const fixture = await writeFixture(`
+        const result = yield* runOxlint(fixture);
+        expect(result.output).not.toContain(
+          "effect(no-bare-effect-try-promise)"
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+  test.effect(
+    "rejects options whose rejection mapping is not statically inline",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* writeFixture(`
       import { Effect } from "effect";
 
       const options = {
@@ -148,9 +122,9 @@ describe("effect/no-bare-effect-try-promise", () => {
         ...options,
       });
     `);
-    const result = runOxlint(fixture);
-
-    expect(result.exitCode).toBe(1);
-    expect(diagnostics(result.output)).toHaveLength(7);
-  });
+        const result = yield* runOxlint(fixture);
+        expect(result.exitCode).toBe(1);
+        expect(diagnostics(result.output)).toHaveLength(7);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
 });

@@ -39,6 +39,11 @@
       "source": "./src/rule-pack/index.ts",
       "types": "./dist/rule-pack/index.d.ts",
       "default": "./dist/rule-pack/index.js"
+    },
+    "./schemas": {
+      "source": "./src/calculator/schemas.ts",
+      "types": "./dist/calculator/schemas.d.ts",
+      "default": "./dist/calculator/schemas.js"
     }
   },
   "publishConfig": {
@@ -66,6 +71,10 @@
       "./rule-pack": {
         "types": "./dist/rule-pack/index.d.ts",
         "default": "./dist/rule-pack/index.js"
+      },
+      "./schemas": {
+        "types": "./dist/calculator/schemas.d.ts",
+        "default": "./dist/calculator/schemas.js"
       }
     },
     "access": "public"

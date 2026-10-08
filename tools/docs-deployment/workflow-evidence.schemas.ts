@@ -1,6 +1,7 @@
 import { DocsDeploymentStage } from "@taxkit/infrastructure/stage";
 import { Schema } from "effect";
 
+import { NativeAppsPlanProviderIdentity } from "./schemas.js";
 import { WorkflowPlanProjectionReason } from "./workflow-plan-projection.js";
 
 const WorkflowEvidenceCommitSha = Schema.String.check(
@@ -128,11 +129,40 @@ export const WorkflowEvidenceIdentity = Schema.Struct({
 });
 export type WorkflowEvidenceIdentity = typeof WorkflowEvidenceIdentity.Type;
 
+const NativeWorkflowSourcePath = Schema.String.check(
+  // oxlint-disable-next-line eslint/no-control-regex -- Git paths must exclude the NUL delimiter and manifest line breaks.
+  Schema.isPattern(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[^\u0000\r\n]+$/u)
+);
+
+export const NativeWorkflowGitSnapshot = Schema.Struct({
+  candidateCommit: WorkflowEvidenceIdentity.fields.candidateCommit,
+  files: Schema.NonEmptyArray(NativeWorkflowSourcePath),
+  status: Schema.Literal(""),
+});
+
+// Local tracked-source evidence only. This record grants no provider authority.
+export const NativeWorkflowEvidenceIdentity = Schema.Struct({
+  ...WorkflowEvidenceIdentity.fields,
+  alchemyPatchSha256: NativeAppsPlanProviderIdentity.fields.alchemyPatchSha256,
+  alchemySourceCommit:
+    NativeAppsPlanProviderIdentity.fields.alchemySourceCommit,
+  alchemyVersion: NativeAppsPlanProviderIdentity.fields.alchemyVersion,
+  schemaVersion: Schema.Literal(2),
+  sources: Schema.NonEmptyArray(
+    Schema.Struct({
+      path: NativeWorkflowSourcePath,
+      sha256: WorkflowEvidenceSha256,
+    })
+  ),
+});
+export type NativeWorkflowEvidenceIdentity =
+  typeof NativeWorkflowEvidenceIdentity.Type;
+
 export const WorkflowBootstrapReceipt = Schema.Struct({
   alchemySourceCommit: Schema.Literal(
-    "473c39591c7993a708199d0ef8f0d38416885dde"
+    "ef7d3077a7d196edf26fa1f3bb8bc9b0ef9fef04"
   ),
-  alchemyVersion: Schema.Literal("2.0.0-beta.79"),
+  alchemyVersion: Schema.Literal("2.0.0-beta.80"),
   allowedEffects: Schema.Tuple([
     Schema.Literal("credential-refresh"),
     Schema.Literal("edge-preview-secret-read"),
@@ -141,7 +171,7 @@ export const WorkflowBootstrapReceipt = Schema.Struct({
   candidateCommit: WorkflowEvidenceCommitSha,
   limitations: Schema.Tuple([
     Schema.Literal(
-      "This receipt records the allowed beta.79 bootstrap effects, not which provider mutations occurred."
+      "This receipt records the allowed beta.80 bootstrap effects, not which provider mutations occurred."
     ),
     Schema.Literal(
       "State-store facts before and after bootstrap were not independently read back in this step."

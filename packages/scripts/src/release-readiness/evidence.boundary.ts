@@ -1,18 +1,26 @@
 import {
   Array as EffectArray,
+  Crypto,
   Effect,
   FileSystem,
+  HashSet,
+  Option,
+  Record,
   Order,
   Schema,
 } from "effect";
+import { Hex } from "effect/encoding";
 import * as Path from "effect/Path";
 
-import { ReleaseEvidenceDecodeError } from "./errors.js";
+import {
+  ReleaseEvidenceDecodeError,
+  ReleaseEvidenceDigestError,
+} from "./errors.js";
 import {
   ReleaseAcceptedAttemptSummary,
   ReleaseAttemptReceipt,
   ReleaseEvidenceArtifact,
-  ReleaseJourneyInventory,
+  CurrentReleaseJourneyInventory,
   ReleasePresentationReceipt,
   ReleaseProofPacket,
 } from "./schemas.js";
@@ -36,27 +44,25 @@ const candidateEvidenceExclusions = [
 ] as const;
 
 export const sha256Text = (text: string) =>
-  Effect.promise(async () => {
-    const digest = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(text)
-    );
-    const hex = Array.from(new Uint8Array(digest), (byte) =>
-      byte.toString(16).padStart(2, "0")
-    ).join("");
-
-    return `sha256:${hex}`;
-  });
+  Crypto.Crypto.pipe(
+    Effect.flatMap((crypto) =>
+      crypto.digest("SHA-256", new TextEncoder().encode(text))
+    ),
+    Effect.map((digest) => `sha256:${Hex.encode(digest).toLowerCase()}`),
+    Effect.mapError(
+      () => new ReleaseEvidenceDigestError({ operation: "sha256-release-text" })
+    )
+  );
 
 export const decodeReleaseJourneyInventory = (text: string) =>
-  Schema.decodeUnknownEffect(Schema.fromJsonString(ReleaseJourneyInventory))(
-    text
-  ).pipe(
+  Schema.decodeUnknownEffect(
+    Schema.fromJsonString(CurrentReleaseJourneyInventory)
+  )(text).pipe(
     Effect.mapError(
       () =>
         new ReleaseEvidenceDecodeError({
           evidencePath: journeyInventoryPath,
-          operation: "decode-five-journey-inventory",
+          operation: "decode-current-journey-inventory",
         })
     )
   );
@@ -139,7 +145,7 @@ export const verifyNewReleaseCandidateIdentity = (
 
 const verifyRetainedArtifact = (
   workspaceRoot: string,
-  artifact: { readonly path: string; readonly sha256: string }
+  artifact: ReleaseEvidenceArtifact
 ) =>
   Effect.gen(function* verifyReleaseEvidenceArtifact() {
     const fileSystem = yield* FileSystem.FileSystem;
@@ -158,10 +164,12 @@ const verifyRetainedArtifact = (
     const actualSha256 = yield* sha256Text(content);
 
     if (actualSha256 !== artifact.sha256) {
-      return yield* new ReleaseEvidenceDecodeError({
-        evidencePath: artifact.path,
-        operation: "verify-retained-artifact-digest",
-      });
+      return yield* Effect.fail(
+        new ReleaseEvidenceDecodeError({
+          evidencePath: artifact.path,
+          operation: "verify-retained-artifact-digest",
+        })
+      );
     }
 
     return content;
@@ -169,26 +177,35 @@ const verifyRetainedArtifact = (
 
 export const verifyCandidateContentManifest = (
   workspaceRoot: string,
-  artifact: { readonly path: string; readonly sha256: string }
+  artifact: ReleaseEvidenceArtifact
 ) =>
   Effect.gen(function* verifyChangedContentManifest() {
     const manifest = yield* verifyRetainedArtifact(workspaceRoot, artifact);
-    const entries = manifest
-      .split("\n")
-      .filter((line) => line.length > 0 && !line.startsWith("#"))
-      .map((line) => {
+    const entries = EffectArray.map(
+      EffectArray.filter(
+        manifest.split("\n"),
+        (line) => line.length > 0 && !line.startsWith("#")
+      ),
+      (line) => {
         const match = /^(?<sha256>[a-f0-9]{64}) {2}(?<path>.+)$/u.exec(line);
         return match === null
           ? null
           : {
-              path: match.groups?.["path"] ?? "",
-              sha256: `sha256:${match.groups?.["sha256"] ?? ""}`,
+              path: Option.getOrElse(
+                Option.flatMap(
+                  Option.fromNullishOr(match.groups),
+                  Record.get("path")
+                ),
+                () => ""
+              ),
+              sha256: `sha256:${Option.getOrElse(Option.flatMap(Option.fromNullishOr(match.groups), Record.get("sha256")), () => "")}`,
             };
-      });
-    const malformed = entries.some((entry) => entry === null);
-    const parsedArtifacts = entries.filter(
-      (entry): entry is { readonly path: string; readonly sha256: string } =>
-        entry !== null
+      }
+    );
+    const malformed = EffectArray.some(entries, (entry) => entry === null);
+    const parsedArtifacts = EffectArray.filter(
+      entries,
+      (entry): entry is ReleaseEvidenceArtifact => entry !== null
     );
     const artifacts = yield* Effect.forEach(
       parsedArtifacts,
@@ -204,19 +221,28 @@ export const verifyCandidateContentManifest = (
         ),
       { concurrency: 1 }
     );
-    const paths = artifacts.map(({ path }) => path);
+    const paths = EffectArray.map(artifacts, ({ path }) => path);
     const sortedPaths = EffectArray.sort(paths, Order.String);
 
     if (
       malformed ||
       artifacts.length === 0 ||
-      new Set(paths).size !== paths.length ||
-      paths.some((entry, index) => entry !== sortedPaths[index])
+      HashSet.size(HashSet.fromIterable(paths)) !== paths.length ||
+      EffectArray.some(
+        paths,
+        (entry, index) =>
+          !Option.exists(
+            EffectArray.get(sortedPaths, index),
+            (sorted) => entry === sorted
+          )
+      )
     ) {
-      return yield* new ReleaseEvidenceDecodeError({
-        evidencePath: artifact.path,
-        operation: "decode-sorted-candidate-content-manifest",
-      });
+      return yield* Effect.fail(
+        new ReleaseEvidenceDecodeError({
+          evidencePath: artifact.path,
+          operation: "decode-sorted-candidate-content-manifest",
+        })
+      );
     }
     yield* Effect.forEach(
       artifacts,
@@ -229,7 +255,7 @@ export const verifyCandidateContentManifest = (
 
 export const readAndVerifyReleaseAttemptReceipt = (
   workspaceRoot: string,
-  input: { readonly path: string; readonly sha256: string }
+  input: ReleaseEvidenceArtifact
 ) =>
   Effect.gen(function* readVerifiedReleaseAttemptReceipt() {
     const artifact = yield* Schema.decodeUnknownEffect(ReleaseEvidenceArtifact)(
@@ -271,7 +297,7 @@ export const persistReleaseAttemptReceipt = (
     );
     const relativeReceiptPath = `tmp/release-readiness/${receipt.attemptId}.json`;
     const receiptPath = path.join(workspaceRoot, relativeReceiptPath);
-    const encoded = yield* Schema.encodeUnknownEffect(
+    const encoded = yield* Schema.encodeEffect(
       Schema.fromJsonString(ReleaseAttemptReceipt)
     )(receipt).pipe(
       Effect.mapError(
@@ -315,7 +341,7 @@ export const persistReleasePresentationReceipt = (
     const path = yield* Path.Path;
     const relativePath = `tmp/release-readiness/${receipt.attemptId}-presentation.json`;
     const absolutePath = path.join(workspaceRoot, relativePath);
-    const encoded = yield* Schema.encodeUnknownEffect(
+    const encoded = yield* Schema.encodeEffect(
       Schema.fromJsonString(ReleasePresentationReceipt)
     )(receipt).pipe(
       Effect.mapError(
@@ -331,10 +357,12 @@ export const persistReleasePresentationReceipt = (
     if (exists) {
       const retained = yield* fileSystem.readFileString(absolutePath);
       if (retained !== encoded) {
-        return yield* new ReleaseEvidenceDecodeError({
-          evidencePath: relativePath,
-          operation: "reject-presentation-sidecar-conflict",
-        });
+        return yield* Effect.fail(
+          new ReleaseEvidenceDecodeError({
+            evidencePath: relativePath,
+            operation: "reject-presentation-sidecar-conflict",
+          })
+        );
       }
     } else {
       yield* Effect.gen(function* writeImmutablePresentationReceipt() {
@@ -374,12 +402,17 @@ export const verifyAcceptedAttempt = (
 ) =>
   Effect.gen(function* verifyAcceptedReleaseAttempt() {
     const summary = yield* readReleaseAcceptedAttemptSummary(workspaceRoot);
-    const summaryArtifact = packet.attempt.detailArtifacts[0] ?? null;
+    const summaryArtifact = Option.getOrNull(
+      EffectArray.head(packet.attempt.detailArtifacts)
+    );
     const packetEvidencePaths = [
       packet.packedConsumerEvidence,
       packet.apiEvidence,
       packet.docsEvidence,
-      ...packet.journeyResults.map((journey) => journey.evidencePath),
+      ...EffectArray.map(
+        packet.journeyResults,
+        (journey) => journey.evidencePath
+      ),
     ];
 
     if (
@@ -391,15 +424,21 @@ export const verifyAcceptedAttempt = (
         packet.candidate.contentSha256 ||
       summary.attemptId !== packet.attempt.attemptId ||
       summary.terminalState !== packet.attempt.terminalState ||
-      packet.journeyResults.some((journey) => journey.status !== "passed") ||
-      packetEvidencePaths.some(
+      EffectArray.some(
+        packet.journeyResults,
+        (journey) => journey.status !== "passed"
+      ) ||
+      EffectArray.some(
+        packetEvidencePaths,
         (evidencePath) => evidencePath !== acceptedAttemptPath
       )
     ) {
-      return yield* new ReleaseEvidenceDecodeError({
-        evidencePath: acceptedAttemptPath,
-        operation: "bind-accepted-attempt-to-candidate",
-      });
+      return yield* Effect.fail(
+        new ReleaseEvidenceDecodeError({
+          evidencePath: acceptedAttemptPath,
+          operation: "bind-accepted-attempt-to-candidate",
+        })
+      );
     }
     if (summaryArtifact !== null) {
       yield* verifyRetainedArtifact(workspaceRoot, summaryArtifact);
@@ -431,10 +470,12 @@ export const verifyAcceptedAttempt = (
             receipt.lastSuccessfulCheck !== "changeset-status" ||
             receipt.detailArtifacts.length !== summaryDetails.length
           ) {
-            return yield* new ReleaseEvidenceDecodeError({
-              evidencePath: summary.receiptPath,
-              operation: "verify-accepted-attempt-receipt-fields",
-            });
+            return yield* Effect.fail(
+              new ReleaseEvidenceDecodeError({
+                evidencePath: summary.receiptPath,
+                operation: "verify-accepted-attempt-receipt-fields",
+              })
+            );
           }
           yield* Effect.forEach(
             EffectArray.zip(receipt.detailArtifacts, summaryDetails),
@@ -442,10 +483,12 @@ export const verifyAcceptedAttempt = (
               receiptDetail.path === summaryDetail.path &&
               receiptDetail.sha256 === summaryDetail.sha256
                 ? Effect.void
-                : new ReleaseEvidenceDecodeError({
-                    evidencePath: summary.receiptPath,
-                    operation: "verify-accepted-detail-inventory",
-                  }),
+                : Effect.fail(
+                    new ReleaseEvidenceDecodeError({
+                      evidencePath: summary.receiptPath,
+                      operation: "verify-accepted-detail-inventory",
+                    })
+                  ),
             { concurrency: 1, discard: true }
           );
 
@@ -469,22 +512,31 @@ export const verifyReleaseEvidence = (
       packet.journeyInventory !== journeyInventoryPath ||
       packet.journeyInventorySha256 !== inventorySha256
     ) {
-      return yield* new ReleaseEvidenceDecodeError({
-        evidencePath: proofPacketPath,
-        operation: "verify-journey-inventory-path-and-digest",
-      });
+      return yield* Effect.fail(
+        new ReleaseEvidenceDecodeError({
+          evidencePath: proofPacketPath,
+          operation: "verify-journey-inventory-path-and-digest",
+        })
+      );
     }
     if (
       packet.candidate.exclusions.length !==
         candidateEvidenceExclusions.length ||
-      packet.candidate.exclusions.some(
-        (entry, index) => entry !== candidateEvidenceExclusions[index]
+      EffectArray.some(
+        packet.candidate.exclusions,
+        (entry, index) =>
+          !Option.exists(
+            EffectArray.get(candidateEvidenceExclusions, index),
+            (excluded) => entry === excluded
+          )
       )
     ) {
-      return yield* new ReleaseEvidenceDecodeError({
-        evidencePath: proofPacketPath,
-        operation: "verify-candidate-evidence-exclusions",
-      });
+      return yield* Effect.fail(
+        new ReleaseEvidenceDecodeError({
+          evidencePath: proofPacketPath,
+          operation: "verify-candidate-evidence-exclusions",
+        })
+      );
     }
     yield* verifyCandidateContentManifest(workspaceRoot, {
       path: packet.candidate.contentManifest,
@@ -537,7 +589,7 @@ export const readReleaseEvidence = (workspaceRoot: string) =>
           () =>
             new ReleaseEvidenceDecodeError({
               evidencePath: journeyInventoryPath,
-              operation: "read-five-journey-inventory",
+              operation: "read-current-journey-inventory",
             })
         )
       );

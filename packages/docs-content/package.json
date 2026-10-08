@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./public-catalogue": "./.source/public-catalogue.json",
     "./errors": {
       "types": "./src/errors.ts",
       "source": "./src/errors.ts",
@@ -49,30 +50,41 @@
       "source": "./src/validate.runtime.ts",
       "default": "./src/validate.runtime.ts"
     },
-    "./source.config": "./source.config.ts"
+    "./source.config": "./source.config.ts",
+    "./catalogue-source": {
+      "types": "./src/catalogue-source.layer.ts",
+      "source": "./src/catalogue-source.layer.ts",
+      "default": "./src/catalogue-source.layer.ts"
+    }
   },
   "scripts": {
-    "build": "bun run generate",
-    "check-examples": "tsc -p tsconfig.examples.json --noEmit",
-    "check-types": "bun run --filter=@taxkit/docs-fumadocs build && tsc --noEmit && bun run check-examples",
-    "generate": "bun run --filter=@taxkit/docs-fumadocs build && fumadocs-mdx",
-    "test": "bun run --filter=@taxkit/docs-fumadocs build && vitest run --passWithNoTests",
+    "build": "bun run generate && bun --conditions=source run ../../tools/documentation/catalogue.runtime.ts",
+    "check-types": "tsc --noEmit",
+    "generate": "fumadocs-mdx && bun --conditions=source run ./src/catalogue-index.runtime.ts",
+    "test": "vitest run --passWithNoTests",
     "validate": "bun run ./src/validate.runtime.ts",
     "clean": "rm -rf .source .turbo *.tsbuildinfo"
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@taxkit/content": "workspace:*",
     "@taxkit/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
-    "fumadocs-core": "^16.8.3",
-    "fumadocs-mdx": "^14.3.1",
-    "yaml": "^2.9.0"
+    "fumadocs-core": "16.16.0",
+    "fumadocs-mdx": "15.4.6",
+    "react": "catalog:",
+    "unist-util-map": "4.0.0",
+    "yaml": "2.9.1"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
+    "@types/mdast": "4.0.4",
     "typescript": "catalog:",
+    "unified": "11.0.5",
+    "vfile": "6.0.3",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

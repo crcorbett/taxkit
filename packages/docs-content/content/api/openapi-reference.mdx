@@ -1,7 +1,7 @@
 ---
 title: "OpenAPI reference"
 description: "Use the generated OpenAPI document as the endpoint contract."
-status: "draft"
+status: "published"
 ---
 
 # OpenAPI reference
@@ -35,25 +35,24 @@ curl http://127.0.0.1:4000/api/docs/openapi.json
 ```
 
 The document should include the calculate path and `CalculatorRunRequest`
-payload schema. If a future docs app embeds generated reference pages, the
-embed should consume this generated document rather than copying endpoint
-fields by hand.
+payload schema. Use this generated document for clients and endpoint reference
+pages rather than copying endpoint fields by hand.
 
 ```txt
 /api/v1/calculators/{calculatorId}/calculate
 CalculatorRunRequest
 ```
 
-## Accepted exclusion
+## Review the contract in the repository
 
-The docs app does not fetch live OpenAPI JSON during `docs` or
-`@taxkit/docs-content` builds. That would make static docs validation depend
-on a running API process. For this slice, the accepted exclusion is a static
-reference smoke in docs-content validation: the page must name
-`/api/docs/openapi.json`, the calculate path and the generated request schema.
+You can also read the
+[checked OpenAPI snapshot](../../../api/http/__snapshots__/openapi.json).
+The API package's snapshot test regenerates the contract from its route
+definitions. Run it when changing an endpoint:
 
-A later reference slice can add an offline generated OpenAPI artifact or a
-live integration smoke that starts `apps/api` explicitly.
+```sh
+bun run --filter=@taxkit/api-http test:openapi
+```
 
 ## Related pages
 

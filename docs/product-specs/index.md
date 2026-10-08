@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-08
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,7 +21,8 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Clean slate website and API foundation](./clean-slate-foundation.md) | Proposed | Q1–Q13 settled: native website RPC, explicit Calculate, expandable existing explanation, calculator-first homepage and public-only Markdown. The complete 0.6.0 skill baseline and Cooper's immutable/declarative Effect policy require actual enforcement qualification. [Ordered tasks](./clean-slate-foundation.tasks.json) include retained tax behaviour, current qualified packages, enforceable rules, agent/discovery support, Alchemy DNS/Doppler, minimal PostHog and shared Axiom signals. Final Q14 shared understanding is pending; implementation is not yet admitted. |
+| [2025–26 annual Medicare correction](./medicare-2025-26-correction.md) | Implemented locally | MCR-001 and MCR-002 are completed with [correction evidence](../documentation-audit/medicare-2025-26-correction.json). The draft PR and exact approved adad source remain separate from adad qualification and deployment. |
+| [Clean slate website and API foundation](./clean-slate-foundation.md) | In progress | Q1–Q13 settled: native website RPC, explicit Calculate, expandable existing explanation, calculator-first homepage and public-only Markdown. The complete 0.6.0 skill baseline and Cooper's immutable/declarative Effect policy require actual enforcement qualification. [Ordered tasks](./clean-slate-foundation.tasks.json) include retained tax behaviour, current qualified packages, enforceable rules, agent/discovery support, Alchemy DNS/Doppler, minimal PostHog and shared Axiom signals. Cooper authorised implementation on 4 October. The active plan records retained work and verification; provider-plan approval remains separate. |
 | [Entire AI work history](./entire-session-history.md) | Implemented | Both agents recorded fresh sessions linked to a normal commit and push; 742 past turns imported. [Dated proof](../documentation-audit/entire-session-history/2026-10-01.json) and [draft PR #84](https://github.com/crcorbett/taxkit/pull/84) retain the public Sydney setup. |
 | [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md) | Implemented | The one-resource owner, beta.79/Effect upgrade and fixed Doppler contract are merged. [PR #86](https://github.com/crcorbett/taxkit/pull/86) closed the hosted browser-check recovery; [read-only Production check `37096642146`](https://github.com/crcorbett/taxkit/actions/runs/37096642146) passed on merged `main`. The [completed plan](../exec-plans/completed/alchemy-doppler-modernisation.md) and [task ledger](./alchemy-doppler-modernisation.tasks.json) retain the failed original run and proof limits. |
 | [Oxlint policy refresh](./oxlint-policy-refresh.md) | Implemented | The generic and Effect anti-slop policy, portable mutable-test-state rule and structural finding fixes are implemented. Candidate `48384d5` passed hosted Quality run `33375644482`; [PR #76](https://github.com/crcorbett/taxkit/pull/76) merged it as `1a0b180`, and main Quality run `33376169245` passed on that merge. No package publication or deployment was performed. |

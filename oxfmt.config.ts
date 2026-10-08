@@ -11,6 +11,7 @@ export default defineConfig({
     "README.md",
     "docs/**",
     "apps/web/src/routeTree.gen.ts",
+    "apps/web/src/worker-runtime.generated.d.ts",
     "tools/oxlint/anti-slop/**",
   ],
   // Preserve authored Markdown wrapping. Ultracite 7.10 otherwise rewrites

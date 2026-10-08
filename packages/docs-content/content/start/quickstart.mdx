@@ -1,7 +1,7 @@
 ---
 title: "Quickstart"
 description: "Install the SDK shape and run one Australian income tax calculation."
-status: "draft"
+status: "published"
 ---
 
 # Quickstart
@@ -27,17 +27,17 @@ Inside this repository, the workspace provides those packages already.
 ## Run a calculation
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 console.log(report.liability.cents);
 ```
 
-`aud(9_000_000)` represents AUD 90,000.00 as integer cents. The calculator
+`aud(Cents.make(9_000_000))` represents AUD 90,000.00 as integer cents. The calculator
 returns a typed annual income tax report.
 
 ## Expected result
@@ -55,12 +55,12 @@ console.log(report.rawLiability.cents);
 Use the safe facade when you want a typed result instead of a rejected Promise:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 if (result._tag === "TaxKitSuccess") {

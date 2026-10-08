@@ -1,0 +1,322 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation and controlled native test builds",
+      "tested commit/push/draft PR"
+    ],
+    "environment": "local native Worker/browser",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "credential changes"
+    ]
+  },
+  "environment": {
+    "bun": "1.4.2",
+    "node": "v24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "miniflare": "5.20261001.0-alpha",
+    "browser": "provisioned Chromium via PLAYWRIGHT_BROWSERS_PATH"
+  },
+  "review_trigger": "native cancellation fixtures, caller deadline, form interruption, log observation or compiler inputs change",
+  "outcome": "qualified local native headers/body deadline and browser cancellation sub-slice; T003 remains in progress",
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-74-native-cancellation",
+    "baseCommit": "29a96d6313a88e33354b8a57287d4ad124dc3efe",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "fileCount": 20,
+      "sortedEntriesSha256": "a7027096a57607569366b89bd1c983fb30af2f417013e61cf0dcabe3dfb3f366",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed repository-relative path and file sha256; excludes this post-check receipt to avoid self-hashing."
+    }
+  },
+  "parentHostedProof": {
+    "pullRequest": 133,
+    "headCommit": "29a96d6313a88e33354b8a57287d4ad124dc3efe",
+    "runId": 37246990555,
+    "jobId": 111566708865,
+    "outcome": "success",
+    "completedAt": "2026-10-05T00:32:35Z",
+    "limitation": "Parent only; no current hosted cancellation result."
+  },
+  "proof": [
+    {
+      "command": "saved native Worker/browser test and safeguard-removal runs",
+      "outcome": "All four native tests pass after exact restoration. Deadline removal returns an eight-second successful TakeHomePayReport and fails the saved expectation. Edit-interruption removal times out waiting for actual browser abort."
+    },
+    {
+      "command": "controlled native RPC-failure log capture",
+      "outcome": "Pay-like numeric timestamp metadata passes; pay value appended to an actual captured message fails the saved privacy assertion; exact test source restoration passes.",
+      "limitation": "Capture-side observation check, not a production logger leak."
+    },
+    {
+      "command": "bun install --frozen-lockfile",
+      "outcome": "Pass: 780 installs/1007 packages checked; lock unchanged."
+    },
+    {
+      "command": "bun run test",
+      "outcome": "Pass after disk recovery: 463 actual CLI lint cases; all 27 package/app tasks, 21 unchanged tasks cached."
+    },
+    {
+      "command": "bun run build",
+      "outcome": "Pass: 16 tasks; 14 unchanged tasks cached."
+    },
+    {
+      "command": "bun run api:smoke",
+      "outcome": "Pass: fresh standalone HTTP smoke and separate temporary plain consumer; 11 prerequisite builds cached."
+    },
+    {
+      "command": "bun run verification",
+      "outcome": "Pass: docs/runbooks/strict policy/types/skills/quality/unused-code/browser/actual Wrangler declarations; 32 isolated quality cases in 423.02 seconds; four fresh native tests in 24.30 seconds. Unchanged SDK browser result is validated cache, not a fresh browser run."
+    },
+    {
+      "command": "post-check bun run check:docs, check:runbooks, changeset:status, format:check and staged whitespace",
+      "outcome": "Pass after final bounded receipt and overview wording."
+    }
+  ],
+  "limitations": [
+    "T003 development pair and safe exported telemetry remain unfinished.",
+    "Caller/browser cancellation does not prove upstream cancellation.",
+    "Local Worker/browser proof does not establish a deployed or remote provider result.",
+    "Unchanged validated cache results are distinguished from fresh runtime execution."
+  ],
+  "nonClaims": [
+    "No merge, deployment, publication, provider apply or credential change.",
+    "No Medicare correction or DEV-75\u201381 completion."
+  ],
+  "nativeFixtures": {
+    "owner": "apps/web/scripts/native-pair-build.runtime.ts",
+    "source": "apps/api/src/worker.ts",
+    "delaySeconds": 8,
+    "deadlineSeconds": 5,
+    "headers": "Real calculation and native encoding, then delayed response headers.",
+    "body": "First byte of actual encoded Uint8Array response, then delayed remainder; content encoding identity prevents compression buffering.",
+    "restoration": "Scoped exact source restoration before ordinary build; fresh exact owned ignored output before each controlled compile.",
+    "ports": [
+      4201,
+      4202,
+      4203
+    ]
+  },
+  "failedAttempts": [
+    {
+      "attempt": "Deadline-removal driver expected only generic assertion/flip error strings",
+      "observed": "Saved test correctly failed on a successful TakeHomePayReport after eight seconds; source and all native artifacts restored.",
+      "correction": "Require the failing saved test plus actual report identity."
+    },
+    {
+      "attempt": "Numeric pay comparison across whole structured log",
+      "observed": "Unrelated Worker timestamp 1791160821654 contained 1654; fixed messages contained no pay value.",
+      "correction": "Compare pay values against emitted message fields; retain whole-record private text check."
+    },
+    {
+      "attempt": "Hard about:blank browser departure",
+      "observed": "Old document request-failed observation did not arrive.",
+      "correction": "Actual same-document browser Back drives route departure and React cleanup; abort observed."
+    },
+    {
+      "attempt": "Compressed prefix stalled-response experiments",
+      "observed": "Compression buffered the first byte; early scope closure inference was rejected.",
+      "correction": "Identity-encoded actual reply prefix reaches browser before delay."
+    },
+    {
+      "attempt": "Speculative installed SDK response-scope/context change",
+      "observed": "Did not change observed behaviour; all source, compiled JS and map bytes restored. Initial TypeScript 7 transpile API attempt also failed and restored.",
+      "correction": "No dependency patch accepted; native fixture fixes compression observation."
+    },
+    {
+      "attempt": "Log capture mutation on ordinary successful pair",
+      "observed": "No positive fixed log event reached that callback; mutated-message run passed and cannot qualify pay-message detection.",
+      "correction": "Use saved RPC-failure fixture with required positive API/Website log events."
+    },
+    {
+      "attempt": "Spread actual string log message as an array",
+      "observed": "Removed contiguous positive fixed event and failed its positive-control assertion.",
+      "correction": "Append pay text to intact message; the intended pay-absence assertion then fails."
+    },
+    {
+      "attempt": "First full root test run",
+      "observed": "Disk exhausted during exact lint-fixture file restoration: 462 of 463 lint cases passed, one ENOSPC failure; API Worker test file truncated. Later closeout commands did not run.",
+      "correction": "Removed only generated dependencies in two old disposable diagnostic copies; restored API test to exact HEAD bytes; recovered 2.7 GiB and reran required checks.",
+      "limitation": "Initial failed run is retained; it is not accepted proof."
+    }
+  ],
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "paths": [
+        "apps/web/scripts/native-pair-build.runtime.ts",
+        "apps/web/test/native-cancellation.boundary.test.ts",
+        "apps/web/test/native-pair.boundary.test.ts",
+        "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "apps/web/vitest.native.config.ts",
+        "oxlint.config.ts",
+        "tools/oxlint/portable-rules.test.ts"
+      ],
+      "reason": "Native deadline/cancellation proof and precise log-message observations; exact encoder/decoder/fill admissions and runtime rejection."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "packages/api/rpc/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/frontend.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/verification/critical-journeys.json",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/README.md",
+        "README.md",
+        "docs/architecture/README.md",
+        "docs/repo-status-outline.html"
+      ],
+      "reason": "Bounded caller cancellation, native fixture/observation ownership and remaining T003 work. Retire stale health-scaffold/runtime descriptions in entry-point overviews."
+    },
+    {
+      "decision": "Preserve",
+      "paths": [
+        "production API/RPC/form code",
+        "public HTTP/OpenAPI",
+        "retained rules and goldens",
+        ".agents/skills",
+        ".claude/skills",
+        "historical HGI/HFI/receipts",
+        "docs/runbooks",
+        "dependency patch/lockfile"
+      ],
+      "reason": "Temporary sources and speculative installed dependency restored; no contract, rule, provider procedure or canonical policy change."
+    },
+    {
+      "decision": "N/A",
+      "paths": [
+        "Changeset",
+        "public MDX/navigation",
+        "provider/deployment/publication records"
+      ],
+      "reason": "Private test/command/docs only; no versioned package behaviour or consequential operation."
+    }
+  ],
+  "rollback": {
+    "local": "Restore this sub-slice to base commit using reviewable targeted changes; remove only exact owned ignored proof artifacts if needed.",
+    "sourceSwaps": "Effect acquireRelease and removal drivers restore exact source bytes, then rebuild compiled dependencies/native artifacts and rerun saved tests.",
+    "external": "No provider, deployment or publication state changed."
+  },
+  "parentAudit": {
+    "reviewer": "primary TaxKit implementation owner",
+    "outcome": "Bounded source/diff/cancellation/privacy review and complete local checks pass; full T003 acceptance pending.",
+    "observations": [
+      "Controlled artifacts retain the actual calculation, encoded bytes and native framing; identity encoding makes the unfinished-body observation meaningful.",
+      "Positive ordinary calculation and required fixed log events prevent silent or unused artifacts standing in for proof.",
+      "Native deadline/edit removal checks fail and exact restoration passes.",
+      "Actual browser Back drives route departure and component cleanup; caller abort is separated from upstream continuation.",
+      "No production runner, Layer, dependency patch or broad lint exception added; new fixture has exact decoder/encoder/fill permission and rejects runtime execution.",
+      "Numeric metadata is distinguished from application messages, with positive/negative captured-message observations.",
+      "Disk-exhaustion failure and exact source recovery are retained separately from the successful rerun."
+    ]
+  },
+  "restoredSources": [
+    {
+      "path": "apps/api/src/worker.ts",
+      "sha256": "5c1750b35b51f882614a876b3d82a9e66cf588316ce5612156a935b06553430e",
+      "matchesBaseBytes": true
+    },
+    {
+      "path": "packages/api/rpc/src/live.layer.ts",
+      "sha256": "90abe8a1dc62511d2ead5c0ff179784421c04b8af23ee034a89e74bf94a5b282",
+      "matchesBaseBytes": true
+    },
+    {
+      "path": "apps/web/src/lib/calculator.atoms.ts",
+      "sha256": "07dd7a9abffddc8281e01df2dc7cd2fa793c113ecb909b03b1b7ef34b52821e6",
+      "matchesBaseBytes": true
+    },
+    {
+      "path": "apps/api/test/worker.boundary.test.ts",
+      "sha256": "015609c7476d6d728b8dd35d7d096055680917464e10a81f95365c3166f47c1f",
+      "matchesBaseBytes": true
+    }
+  ],
+  "restoredInstalledDependency": {
+    "method": "Exploration driver finally block restores and asserts SHA-256 against its captured original bytes for each file; speculative change rejected.",
+    "files": [
+      {
+        "path": "node_modules/alchemy/src/Cloudflare/Workers/HttpServer.ts",
+        "sha256": "3ebaecd75f4e5c5616803722fa677ab4eefd5ee6252c0a7adca04744b5b8e226"
+      },
+      {
+        "path": "node_modules/alchemy/lib/Cloudflare/Workers/HttpServer.js",
+        "sha256": "6720a8adeec0b6c80a4d1e15bc53626597e5d9de791d647cfbadf317bf295507"
+      },
+      {
+        "path": "node_modules/alchemy/lib/Cloudflare/Workers/HttpServer.js.map",
+        "sha256": "425f3afc3f1fc438d7340bcc608c52d1e4d374c790c4abe0c0568feba03321f9"
+      }
+    ]
+  },
+  "artifacts": {
+    "api": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "fileCount": 71,
+      "sortedEntriesSha256": "a575da3e39aa13c99a88a15ad5c302fbccf4eed6166a6c842a366588ad9051a6"
+    },
+    "apiDefect": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiRpcDefect",
+      "fileCount": 39,
+      "sortedEntriesSha256": "a5ece8372f64c3fab2b2206f51fa0fb5254b36a1336e20250ad5693004e7355c"
+    },
+    "apiInvalidReply": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiInvalidReply",
+      "fileCount": 39,
+      "sortedEntriesSha256": "11d0de8bf4fa6e006b47fab98f9b2c7f829693e1c7593d15cbc547b0c90250d8"
+    },
+    "apiStalledBody": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledBody",
+      "fileCount": 39,
+      "sortedEntriesSha256": "8e48681e4ff7b04119c4f58301e89f7bfc0c4cca3f711c5fdd544f786bd53805"
+    },
+    "apiStalledHeaders": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApiStalledHeaders",
+      "fileCount": 39,
+      "sortedEntriesSha256": "ab22a4845001b66c8b34ae4d8c03feb99be425e39650409fa12aa8e45f3d26f8"
+    },
+    "websiteServer": {
+      "root": "apps/web/dist/server",
+      "fileCount": 28,
+      "sortedEntriesSha256": "6b8a3c8ccd59c7664137401e20c908a119eb10676fbdec4a4c35dac26a75eb78"
+    },
+    "browser": {
+      "root": "apps/web/dist/client",
+      "fileCount": 3,
+      "sortedEntriesSha256": "f7167d259efd52a7e26887dfc943797d56db5f37719051280a2475b6b63678dd"
+    },
+    "settingsDefect": {
+      "root": ".alchemy/native-pair/settings-defect/server",
+      "fileCount": 28,
+      "sortedEntriesSha256": "fb98077091875bf38cd52818d2f41d402cfbff78c66390e48246941ce85bfbab"
+    }
+  },
+  "artifactAlgorithm": "sha256 of compact key-sorted JSON array of sorted repository-relative file path and file sha256; every regular file under each named artifact root.",
+  "postCheckChanges": {
+    "paths": [
+      "README.md",
+      "docs/architecture/README.md",
+      "docs/repo-status-outline.html",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json"
+    ],
+    "reason": "Final bounded proof, source/artifact hashes and stale overview wording; no runtime or configuration change.",
+    "verification": "Post-check docs/runbooks/Changeset status/format/whitespace pass before commit."
+  }
+}

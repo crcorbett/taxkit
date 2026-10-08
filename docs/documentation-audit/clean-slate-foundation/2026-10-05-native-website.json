@@ -1,0 +1,371 @@
+{
+  "document_type": "validation-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-clean-slate-implementation-owner",
+  "last_reviewed": "2026-10-05",
+  "review_trigger": "native Website candidate, transport lifetime, native build or browser proof change",
+  "outcome": "Website sub-slice locally qualified; CSF-T003 remains in progress",
+  "candidate": {
+    "repository": "crcorbett/taxkit",
+    "branch": "codex/dev-74-native-website",
+    "baseCommit": "f373345f07fd877bdf903d24a0d7eb78f5fadb85",
+    "workingTreeQualifiedBeforeCommit": true,
+    "sourceInventory": {
+      "fileCount": 84,
+      "sortedEntriesSha256": "a52c70f78debdb52ed55ef7b057880d7f8554e1e6ddc81764a09860695dd3afe",
+      "algorithm": "sha256 of compact key-sorted JSON array of sorted changed path and working-file sha256 entries; deleted paths use null; excludes this post-check receipt to avoid self-hashing"
+    }
+  },
+  "implementation": [
+    "One server ManagedRuntime and a React-owned Atom registry; no browser ManagedRuntime or serialised Effect Context.",
+    "Private native Fetcher binding for HTML form calculation, checked public API origin for direct browser POST /rpc.",
+    "Root route restores encoded submissions; container owns form commands and interruption; readonly leaf renders values.",
+    "Canonical existing take-home request/result, explicit Calculate, edit/unmount interruption, no calculation on initial page load and no-JavaScript POST.",
+    "Shared native streamed POST limit and fixed host log/reporter containment for API and Website."
+  ],
+  "findingsAndCorrections": [
+    {
+      "finding": "Native client acquired by an earlier Worker request stalled later calculations.",
+      "owner": "packages/api/rpc/src/live.layer.ts",
+      "correction": "Retain protocol configuration in the Layer; acquire/release native RPC client receive loop per calculation.",
+      "oracle": "Actual native GET followed by repeated POST across idle time."
+    },
+    {
+      "finding": "Idle initial Atom settings were reclaimed before the first calculation.",
+      "owner": "apps/web/src/lib/calculator.atoms.ts",
+      "correction": "Keep public settings alive for the React registry lifetime.",
+      "oracle": "Idle registry regression and actual browser delay before first click."
+    },
+    {
+      "finding": "Native HTTP RPC resolved its empty request path as /rpc/; redirect rejection hid it in a checked unavailable error.",
+      "owner": "packages/api/rpc/src/live.layer.ts",
+      "correction": "Native HTTP request transform sets exact /rpc.",
+      "oracle": "Assert raw resolved URL before the in-process request adapter normalises it; actual browser request URL."
+    },
+    {
+      "finding": "Disabling RPC tracing alone still allowed native HTTP b3/traceparent headers, outside the browser CORS policy.",
+      "owner": "packages/api/rpc/src/live.layer.ts",
+      "correction": "Disable native HTTP tracing for this operation too.",
+      "oracle": "Native HttpClient execute-boundary header assertions and actual browser request headers."
+    },
+    {
+      "finding": "Broad salary-sacrifice fact import loaded the calculation engine in browser output.",
+      "owner": "packages/rules/au/pay/src/facts/sacrifice.ts",
+      "correction": "Use the existing narrow core facts export.",
+      "oracle": "API artifact contains the engine service marker; every built browser JS file excludes it."
+    },
+    {
+      "finding": "Native build selected compiled RPC exports which had not yet been generated; Worker startup failed on an unresolved package import.",
+      "owner": "apps/web/package.json",
+      "correction": "Build compiled RPC dependencies before native source builders.",
+      "oracle": "Actual native Worker startup, separate from source-conditioned unit tests."
+    },
+    {
+      "finding": "Queue.takeAll waits on an empty observation queue and caused a false test timeout.",
+      "owner": "apps/web/test/native-pair.boundary.test.ts",
+      "correction": "Use non-blocking Queue.clear to assert silence.",
+      "oracle": "Saved native pair test finishes and checks zero initial requests."
+    },
+    {
+      "finding": "Runbook/current evidence reader applied the immutable five-journey historical Schema to the new six-journey inventory.",
+      "owner": "packages/scripts/src/release-readiness/schemas.ts",
+      "correction": "Separate explicit CurrentReleaseJourneyInventory from retained ReleaseJourneyInventory; use each at its own read boundary.",
+      "oracle": "Current six and historical five decode separately; missing/unknown native journey and expanded historical inventory fail."
+    },
+    {
+      "finding": "Current governance and profile still required only the five historical journeys.",
+      "owner": "tools/governance/policy.ts",
+      "correction": "Require the six named current journeys and matching profile job; keep historical HFI/HGI checkers and saved evidence unchanged.",
+      "oracle": "Current check passes; missing or substituted Website and missing profile job fail; historical failure identities remain nonzero."
+    },
+    {
+      "finding": "Wrangler generated runtime declarations contain five trailing-space lines; the final staged Git check rejected the generator-owned output.",
+      "owner": ".gitattributes",
+      "correction": "Disable only blank-at-eol checking for the exact generated declaration path; keep bytes owned by Wrangler and preserve ordinary source checks.",
+      "oracle": "Staged generated output passes; temporary ordinary source trailing-space fixture fails and is restored byte-for-byte; actual Wrangler check remains passing."
+    }
+  ],
+  "proof": [
+    {
+      "command": "bun run --filter=web test:browser",
+      "outcome": "pass: 8 Chromium cases after route restoration change"
+    },
+    {
+      "command": "bun run --filter=web test",
+      "outcome": "pass: 6 settings cases"
+    },
+    {
+      "command": "bun run --filter=api test",
+      "outcome": "pass: 58 API cases, including both fixed host logger/reporter policies"
+    },
+    {
+      "command": "bun run --filter=@taxkit/api-rpc test",
+      "outcome": "pass: 27 native RPC cases, including exact URL/HTTP header checks"
+    },
+    {
+      "command": "bun run --filter=@taxkit/infrastructure test",
+      "outcome": "pass: 32 native app graph cases after removal of browser build-time origin copies"
+    },
+    {
+      "command": "installed actual Oxlint CLI exact Website/native boundaries and exact host inventories",
+      "outcome": "pass: 70 selected cases"
+    },
+    {
+      "command": "bun run --filter=web build:native-pair then bun run --filter=web test:native-pair",
+      "outcome": "pass: actual native API/Website artifacts, private binding, idle/repeated calls, exact browser CORS, expected unavailable-error hydration without replay, edit clears answer, no-JavaScript calculation, bad input, oversized upload and built browser imports"
+    },
+    {
+      "command": "previous draft #130 hosted Quality",
+      "outcome": "pass: run 37224539934 at exact base commit f373345f07fd877bdf903d24a0d7eb78f5fadb85; not current Website candidate proof"
+    },
+    {
+      "command": "full repository build/tests/verification",
+      "outcome": "pass: 16 build tasks, 27 package/app test tasks, 452 actual CLI cases; final full verification includes fresh native pair build/test, generated Worker declarations and both unused-code inventories"
+    },
+    {
+      "command": "focused current/historical inventory tests and bun run check:runbooks",
+      "outcome": "pass: both epoch shapes and immutable historical digest policy remain separate"
+    },
+    {
+      "command": "bun run api:smoke",
+      "outcome": "pass: 12 tasks including local HTTP and separate temp-workspace consumer; both processes stopped and owned temporary workspace removed"
+    },
+    {
+      "command": "current governance, focused types/negative fixtures and saved historical command failures",
+      "outcome": "pass: six current journeys, 16 governance tests and four historical/unknown-option command cases; old HFI/HGI source acceptance is not claimed"
+    }
+  ],
+  "environment": {
+    "bun": "1.4.2",
+    "node": "24.16.0",
+    "effect": "4.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "wrangler": "4.147.0",
+    "miniflare": "5.20261001.0-alpha",
+    "workerd": "1.20261001.1",
+    "playwright": "1.63.0",
+    "compatibilityDate": "2026-10-04",
+    "compatibilityFlags": [
+      "nodejs_compat"
+    ],
+    "websiteMain": "apps/web/dist/server/server.js",
+    "apiMain": ".alchemy/native-pair/bundles/TaxKitApi/worker.js",
+    "localPorts": [
+      4196,
+      4197
+    ],
+    "generatedTypeOwner": "wrangler types via apps/web/wrangler.jsonc"
+  },
+  "documentationImpact": [
+    {
+      "decision": "Change required",
+      "paths": [
+        "apps/web/README.md",
+        "apps/api/README.md",
+        "packages/api/rpc/README.md",
+        "packages/infrastructure/README.md",
+        "packages/rules/au/pay/README.md",
+        "README.md"
+      ],
+      "reason": "Current app connection, explicit exports, source/build/generated owners and local proof commands."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "docs/architecture/frontend.md",
+        "docs/architecture/configuration.md",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/testing-and-quality.md"
+      ],
+      "reason": "Runtime, private/public transport, scope, canonical input and proof ownership."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "docs/verification/critical-journeys.json",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/README.md"
+      ],
+      "reason": "New native Website journey and bounded evidence; T003 stays in progress."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "oxlint.config.ts",
+        "oxfmt.config.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "knip.json",
+        "knip.production.json",
+        "package.json",
+        "apps/web/package.json",
+        "apps/web/tsconfig.json",
+        "bun.lock"
+      ],
+      "reason": "Exact hosts/encoding/binding/SDK-method admissions, generated file ownership and repeatable checks."
+    },
+    {
+      "decision": "Preserve",
+      "paths": [
+        "docs/runbooks",
+        "tools/documentation/runbook-contract.json",
+        "docs/operations/authority-model.md",
+        "alchemy.run.ts",
+        "apps/docs"
+      ],
+      "reason": "Existing consequential docs procedures/resources unchanged; native local builder acquires no plan, credentials or provider."
+    },
+    {
+      "decision": "Preserve",
+      "paths": [
+        ".agents/skills",
+        ".claude/skills",
+        "AGENTS.md",
+        "packages/api/http/__snapshots__/openapi.json"
+      ],
+      "reason": "Canonical skills, agent router and public HTTP wire unchanged."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        ".changeset/narrow-pay-fact-import.md"
+      ],
+      "reason": "Package-facing import correction gets a rules-au-pay patch; private Website/RPC/infra changes need no additional Changeset."
+    },
+    {
+      "decision": "N/A",
+      "paths": [
+        "public MDX/navigation",
+        "publication/version application",
+        "provider deployment receipts"
+      ],
+      "reason": "No public prose/catalogue acceptance or consequential operation in this sub-slice."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "packages/scripts/src/release-readiness/schemas.ts",
+        "packages/scripts/src/release-readiness/index.ts",
+        "packages/scripts/src/release-readiness/evidence.boundary.ts",
+        "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
+        "packages/scripts/README.md",
+        "tools/documentation/runbook-check.runtime.ts",
+        "tools/documentation/runbook-policy.test.ts",
+        ".changeset/current-native-journey.md"
+      ],
+      "reason": "Admit the named current native journey while preserving historical Schema/digests, with a scripts patch Changeset."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        "tools/governance/policy.ts",
+        "tools/governance/policy.test.ts",
+        "tools/governance/fixtures/accepted.json",
+        "docs/verification/repository-harness-profile.json",
+        "docs/verification/harness-epochs.md"
+      ],
+      "reason": "Current six-journey governance and profile ownership; historical source evidence and checker failure identities remain unchanged."
+    },
+    {
+      "decision": "Change required",
+      "paths": [
+        ".gitattributes"
+      ],
+      "reason": "Exact generated-owner whitespace policy; no ordinary source exemption."
+    }
+  ],
+  "limitations": [
+    "Local native tests use separate public/private API isolates from the same artifact, not one shared deployed instance.",
+    "Full native global/fatal/framework-console/trace paths and end-to-end cancellation remain T003 work.",
+    "Tracing is disabled on this connection for containment; required safe exported tracing is not complete.",
+    "Generated Worker declarations do not prove deployed bindings or provider configuration.",
+    "The complete native development pair and other calculator pages remain active work.",
+    "Retained results are unchanged; the Medicare correction remains a separate unresolved decision.",
+    "Installed TanStack server-function failure handling independently logs and serialises unexpected errors. This Website sub-slice does not qualify that native path; a tested correction remains T003 work."
+  ],
+  "rollback": "Revert this Website sub-slice to base f373345f07fd877bdf903d24a0d7eb78f5fadb85; no external state changed.",
+  "nonClaims": [
+    "No complete CSF-T003 or DEV-74 acceptance.",
+    "No completion of DEV-75\u201381 or the overall goal.",
+    "No cloud provider, Preview/Production, deployed URL, telemetry ingestion or registry proof.",
+    "No merge, deployment, publication, provider apply or confirmed Linear update."
+  ],
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operations": [
+      "local implementation",
+      "local tests",
+      "reviewable commit/push/draft PR"
+    ],
+    "environment": "local checkout and ephemeral workerd/Chromium",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider plan/apply",
+      "credential changes"
+    ],
+    "externalTracking": "Linear write remains held after automatic review rejection; no retry or substitute write"
+  },
+  "failedAttempts": [
+    {
+      "command": "initial full verification",
+      "outcome": "nonzero: old current governance required five journeys; corrected only current policy/profile, preserving historical records"
+    },
+    {
+      "command": "second full verification",
+      "outcome": "nonzero: negative fixture used unchecked tuple access; replaced with nonempty tuple destructuring; focused lint/types/tests and final full verification pass"
+    },
+    {
+      "command": "third full verification",
+      "outcome": "nonzero after passing 32 Quality tests: native version-skew fixture omitted required RPC protocol URL; restored URL, retained exact transform, focused RPC types/tests and final full verification pass"
+    },
+    {
+      "command": "git diff --cached --check before commit",
+      "outcome": "nonzero: five generator-owned trailing-space lines; no commit occurred; exact generated whitespace attribute and ordinary source negative oracle corrected it without editing generated bytes."
+    }
+  ],
+  "artifacts": {
+    "api": {
+      "root": ".alchemy/native-pair/bundles/TaxKitApi",
+      "fileCount": 28,
+      "sortedEntriesSha256": "d2cda10a3776639ac05e2a49eb8ad472931f2d6870e69b3b88d011f3b819e76a"
+    },
+    "websiteServer": {
+      "root": "apps/web/dist/server",
+      "fileCount": 27,
+      "sortedEntriesSha256": "215e06ccce900595ebd7a59cc938a3040da8fad0c6dac15b20beab91395e1dff"
+    },
+    "browser": {
+      "root": "apps/web/dist/client",
+      "fileCount": 2,
+      "sortedEntriesSha256": "028d100588fbdd20a2d4eec6d5e2bec61a3da4e07756986eedc394e13fcbf025"
+    },
+    "apiMain": {
+      "path": ".alchemy/native-pair/bundles/TaxKitApi/worker.js",
+      "sha256": "0d35352bfa7347ef453afbafe2920dfb40ebb57fcf40ebe433e14f3c3515c988"
+    },
+    "websiteMain": {
+      "path": "apps/web/dist/server/server.js",
+      "sha256": "71fe385bb4f03762f40073b413774815381b78b14297980e3d0d425ba25b0ebe"
+    }
+  },
+  "postCheckChanges": {
+    "paths": [
+      ".gitattributes",
+      "docs/exec-plans/active/clean-slate-foundation.md",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-05-native-website.json"
+    ],
+    "scope": "Exact generated whitespace ownership and post-check documentation only; application/test/build code and qualified artifact bytes unchanged.",
+    "checks": [
+      "git diff --cached --check",
+      "ordinary source trailing-space rejection with byte restoration",
+      "bun run --filter=web check:worker-types",
+      "bun run check:docs",
+      "bun run check:runbooks"
+    ]
+  }
+}

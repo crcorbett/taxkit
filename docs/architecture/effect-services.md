@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-07-25
-source_of_truth: docs
-confidence: medium
+document_type: architecture
+lifecycle: current
+authority: canonical
+owner: taxkit-effect-services-owner
+last_reviewed: 2026-10-08
+review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
 # Effect services
@@ -15,9 +17,31 @@ shape for deterministic tax calculation boundaries.
 This doc owns cross-package Effect service conventions. Rule-specific service
 contracts live with their owning rule packages and should link back here.
 
+The private [analytics package](../../packages/analytics/README.md) owns the
+two accepted event contracts. Its native backend Layer encodes a fixed provider
+request and maps transport failures to safe errors. The exact encoder admission
+in `oxlint.config.ts` covers that provider egress and its safe error-byte test;
+it does not admit runtime execution, raw JSON or decoding in neighbouring code.
+The package’s collection-header boundary is reused by the API and Website.
+The private `WebsiteAnalyticsRelay` exposes one native request handler with
+checked failures and no service requirements escaping its caller. Its named
+adapter captures native HttpClient once, decodes metadata at that explicit
+boundary, forwards bounded complete bytes, and owns each request scope and
+whole-operation deadline. It uses the existing server runner. Exact decoder
+permissions admit neither neighbouring decoders, raw fetch nor another runner;
+actual lint fixtures enforce those limits.
+The browser calculator transport reads its native preference at dispatch, and
+the server transport reads the current original request; neither freezes policy
+when its Layer is built. Missing server/browser hosts refuse collection.
+The application owns when to capture and which checked collection policy applies.
+The API application captures its delivery service during initialisation, then
+supplies it to each returned request operation. Worker and older MCP session
+delivery use their own native `waitUntil`; request collection remains fresh.
+T008 Website/browser composition and provider readback remain pending.
+
 ## Service shape
 
-Prefer package-owned `Context.Tag` services with explicit dependencies through
+Prefer package-owned `Context.Service` services with explicit dependencies through
 the Effect `R` channel. Do not hide rule, parameter or runtime dependencies in
 module globals.
 
@@ -61,8 +85,12 @@ JavaScript `Map`/`Set` indexes, nullable lookups, `switch`, `Object.values`,
 request-local runtime creation or hand-rolled runtime wrappers when Effect
 owns the pattern.
 
-For optional request values, use schema optionality plus `Option`/`Match` at
-the service boundary. Code MUST NOT use undefined checks and defaulting such
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year. Code MUST NOT use undefined checks and defaulting such
 as `payload.jurisdiction ?? "AU"` to invent missing calculator context.
 Missing context MUST either remain absent, be decoded by a schema that
 explicitly owns the default, or fail with a tagged expected error.
@@ -121,15 +149,36 @@ Use these six categories:
 At every boundary, record the Schema's `Type` and `Encoded` forms separately.
 Decode an unknown or representation-level value once at ingress, pass the
 canonical `Type` inward, and encode only at an explicit HTTP, provider,
-persistence, route or command egress. `Schema.make` is valid construction for
+persistence, route or command egress. The owning Schema’s `make` is valid construction for
 trusted literals; it is not evidence of runtime validation that the underlying
 Schema does not provide.
 
+Core's constrained money, date and decimal helpers return owned schema-tagged
+errors through Effects. `aud` remains pure for already checked cents; use
+`audFromCents` for a number that still needs checking. New arithmetic results
+must pass the owning fallible constructor. Rules translate those failures to
+safe calculation errors without copying the input amount or a raw Schema issue.
+The [core README](../../packages/core/README.md) owns the concrete helper and
+date Option contracts. A representation codec must retain its whole-record
+check on the encoded side when Type/Encoded transformations differ.
+
 Explicit recursive encoded contracts such as `TraceNodeEncoded`, and generic
-descriptor interfaces that preserve schema-to-continuation inference, are not
+descriptor relations that preserve schema-to-service inference, are not
 DTO mirrors. Keep them when TypeScript cannot otherwise express the recursive
 or generic relation. Do not use that exception for ordinary duplicated object
-shapes.
+shapes. The trace domain/encoded aliases infer their non-recursive fields
+from one shared Schema and annotate only children. Ledger component aliases
+are inferred directly from their owning Schema. These exported aliases replace
+open interfaces, so declaration merging is no longer an extension point; their
+historical encoded values remain the same.
+
+The calculation engine separates its service contract from its live Layer.
+Its real Effect/Layer/result relation stays generic; optional validation input
+retains its empty-collection meaning. Fact/parameter/rule metadata derives from
+private owning Schemas, with Option for meaningful absence and a total rule
+parameter array. Tuple service types derive from the native key Identifier.
+The [Core owner](../../packages/core/README.md) explains missing versus explicit
+undefined trace/question representations.
 
 ## Provider and SDK adapters
 
@@ -141,7 +190,7 @@ fields or allow an SDK result to escape unchecked.
 
 Encode canonical input at provider egress and decode `unknown` provider output
 immediately at provider ingress. Map transport and malformed-response failures
-to safe `Schema.TaggedErrorClass` values at the operation boundary. Do not use
+to safe `Schema.TaggedError` values at the operation boundary. Do not use
 `instanceof`, raw provider tags, exception objects, response bodies or secrets in
 public error contracts. Use decoded literals/tagged unions with `Match` or typed
 Effect handlers.
@@ -159,7 +208,24 @@ narrow generated-collection adapter at construction, contains unknown provider
 output plus promise and throw handling, and emits safe tagged errors.
 `@taxkit/docs-content` supplies the TaxKit collection adapter and decodes the
 generic value into its canonical content Schemas. Neither package executes a
-runtime; `apps/docs` composes the Layers and runs the server Effect.
+runtime. The accepted catalogue is built through the generated adapter;
+`apps/api` owns its checked content service and `apps/web` owns the reader
+runner and private API connection. The old app runtime is retained history.
+
+The infrastructure-owned `PostHogManagement` contract has only find, read,
+create and update operations over checked TaxKit identities. Its private
+Distilled adapter contains paging, credentials, supported privacy settings,
+bounded replies and safe failure mapping. The native resource provider and
+deterministic test Layer depend on that closed contract. Alchemy beta.80 requires
+provider registration without an error channel, so the composition Layer caches
+fallible live acquisition in the native stack scope and defers it to a lifecycle
+operation. Invalid settings remain typed failures before any request. The
+[infrastructure owner](../../packages/infrastructure/README.md) records the
+retention, limits and qualification boundaries; no app runtime receives this
+management service. Its native HTTP attempt owns deterministic abort within
+the operation's scope, including refusal before reading a redirect body. The
+SDK receives only a bounded, collected in-memory response; that response can
+outlive the completed native request without retaining its connection.
 
 Use [the repo-owned effect client wrapper skill](https://github.com/crcorbett/commonplace-plugins/blob/main/plugins/development-workflows/skills/effect-client-wrapper/SKILL.md)
 when introducing or reviewing a provider adapter. Its canonical example and
@@ -175,10 +241,41 @@ explicit disposal operation for focused tests and host lifecycle integration;
 it has no browser Effect runtime. Browser routes restore the schema-encoded
 server-function transport and render canonical values.
 
+The Website candidate owns one server runner and a React Atom registry in the
+browser. Its typed route context contains named framework settings/catalogue and
+documentation page and search transports, never an Effect runtime or Context. The root restores encoded values and passes
+checked submission state through ordinary React context. The container owns
+commands; focused leaves render readonly values. Editing and form unmount
+interrupt active work. Private binding transport belongs to the server Layer;
+public browser transport belongs to the registry. The RPC protocol Layer keeps
+configuration, while each named native client receive loop has an operation scope.
+No calculation or catalogue read builds a Layer or runner. See the [Website owner](../../apps/web/README.md).
+The SDK owns one runtime per client, with caller disposal and bounded one-shot
+helpers; see the [SDK lifetime owner](api-and-sdk.md#typescript-sdk-facade).
+
 Use `@effect/platform-bun/BunRuntime.runMain(...)` for Bun process entrypoints
 where the root Effect is the process lifecycle. Process entrypoints should
 compose config, platform layers and server layers, then let Effect
 interruption/scopes release resources.
+
+### Native API instance and request ownership
+
+The DEV-74 API candidate uses the native Alchemy Worker class and `.make`.
+`ApiWorkerApplication` constructs its router in the native instance scope and
+receives one calculator service for HTTP and RPC. It creates no ManagedRuntime.
+Each handler runs in the incoming native fibre and request scope; tests observe
+both request paths and the corresponding finalisers. The selected native
+workerd instance scope has no teardown hook, so no isolate-finaliser claim is
+made; request-coupled I/O belongs inside incoming dispatch.
+
+Origins stay deferred during native planning. A cached native Config effect
+decodes bound addresses on first incoming runtime use. HTTP/RPC handling builds no live Layer. The native MCP protocol host is
+built once on first runtime use in the existing instance scope, after addresses
+resolve; its registrations omit first-caller request capabilities. The native body stream has bounded accumulation, total read
+time and scoped cancellation. Safe logger/reporter context is built at instance
+initialisation and supplied to both native router construction and dispatch;
+T009 retains unqualified safe native trace exports. T003's local connection
+acceptance does not establish that later requirement.
 
 ## Promise boundaries
 
@@ -200,7 +297,11 @@ arrow, function or object-method implementations; do not use shorthand,
 extracted callbacks, non-function values or spread policy. Use `Effect.promise`
 only when a Promise rejection is intentionally treated as a defect. The current
 portable lint scope enforces this contract in packages, the API app and
-repository tools; website applications remain outside this rollout.
+repository tools and both website applications. The strict override covers all
+owned TypeScript and JavaScript extensions. Five unexecuted upstream lint-input
+fixtures have exact strict-only exclusions; their neighbouring files still
+receive the full policy. The [testing owner](testing-and-quality.md) records
+the coverage and actual-command rejection proof.
 
 ## Callsite error handling
 
@@ -210,11 +311,7 @@ MUST live directly beside the operation whose failure is being transformed:
 ```ts
 program.pipe(
   Effect.mapError(
-    (cause) =>
-      new BoundaryError({
-        cause,
-        message: `Failed to load boundary config: ${cause.message}`,
-      })
+    () => new BoundaryError({ message: "Boundary settings are invalid" })
   )
 );
 ```
@@ -276,8 +373,11 @@ context, then continue with the typed value in one readable `pipe` or
 `Effect.gen` program. Preserve unrelated typed errors; do not use broad
 `Effect.catchAll`, `Effect.orDie`, raw Promise control flow or nested runtime
 execution to bridge a decoder. An app entrypoint, route loader or plain SDK
-facade may run a completed Effect through its existing module-scoped runtime at
-the outer edge only.
+facade may execute a completed Effect only at its exact outer host. The plain
+SDK host has a caller-owned runtime for each client and a temporary scope for
+one-shot helpers; it has no package-global runtime. The
+[SDK lifetime owner](api-and-sdk.md#typescript-sdk-facade) explains closing,
+interruption, bounded outcomes and the separate Effect interface.
 
 Do not extract one-use fragments such as `decodePayload`, `mapDecodeError`,
 `runDecoder`, `withDecodedInput` or generic `decodeOrFail`. A shared helper is
@@ -356,7 +456,7 @@ encoded loader data, call the restore operation or run Effect runtimes.
 
 ## Guardrails
 
-- Use `Effect.Schema` for boundary and persisted values.
+- Use `Schema` from `effect` for boundary and persisted values.
 - Schemas and tagged value shapes MUST live in colocated `schemas.ts` files, or
   in the owning package's public schema module. Exported types MUST be derived
   from those schemas. Runtime and handler files should compose services and
@@ -398,3 +498,86 @@ encoded loader data, call the restore operation or run Effect runtimes.
 - [Rules and parameters](./rules-and-parameters.md)
 - [Calculators](./calculators.md)
 - [API and SDK](./api-and-sdk.md)
+
+## Shared calculation work limits
+
+The calculator-owned [bounded Layer](../../packages/calculators/README.md#shared-calculation-work-limits)
+is a real host substitution point over `PublicCalculatorService`: native API and
+standalone HTTP roots build it once over the live implementation, while focused
+tests supply controlled work at the same contract. One pool serves all native
+transports and counts individual batch calculations. Scope and semaphore release
+own cleanup on every exit. Metadata remains outside calculation capacity, while
+all nine calls share the five-second completion budget. Lazy invocation counts
+metadata construction within it. The HTTP-owned streamed body policy provides
+Schema-owned JSON errors or fixed HTML guidance at the host boundary. No
+runner or live Layer is built inside a calculation, and no transport gains a
+competing application contract. The owning package records timeout and CPU limits.
+
+
+The [RPC owner](../../packages/api/rpc/README.md#complete-named-operation-contract)
+exposes all nine existing calculator operations. Its private concrete native
+operation transformation shares scope/deadline/safe transport policy across
+those named methods; application work remains at the calculator service. No
+operation constructs a Layer or runner, and callers receive no raw client.
+
+
+## Native calculation rate admission
+
+`CalculatorAdmission` is a closed named service; its [owning contract](../../packages/calculators/README.md#native-calculation-rate-admission) and redacted key Schema live with calculators. The request Context reference carries checked identity separately from facts. `PublicCalculatorServiceRateLimited` provides calculation-only admission; the native API composes it once below bounded work. Its provider Layer, installed live Layer and mock test Layer remain separate. Native provider replies are decoded immediately and failures become fixed errors without provider causes or addresses.
+
+
+Native rate decoding is admitted at the exact original-address, private-call,
+provider-reply and host-root owners in `oxlint.config.ts`. Its exact wire and
+redacted-key fixtures have separate decoder/encoder admissions. Actual CLI
+fixtures accept those owned crossings, reject encoder execution at production
+ingress, reject runners at every admitted file and reject decoding in the
+nearby calculator admission Layer. No wildcard or new unknown-parameter
+exception is added. The Website Layer accepts the generated native Fetcher
+capability; its settings boundary checks the richer API binding once.
+
+The native documentation RPC handler Layer captures the same supplied
+`ContentService` as public HTTP. It owns no runtime or catalogue fallback. A
+separate `DocsRpcClient` provides five closed named operations over native RPC,
+with its own revision/error vocabulary and per-call resource scope. Only the
+concrete closed JSON byte reader is shared with the calculator client; no raw
+client callback or provider object enters either service contract.
+
+The native API composes `ContentDiscoveryLive` once from the checked catalogue
+and its existing cached settings Effect. Configuration remains application-owned;
+the content capability lazily reads checked addresses and returns one bounded
+document for a closed file identity. `ContentDiscovery` is contract-only;
+the live and observed test Layers remain separate. The Website reuses its
+existing runner/private client and projects the checked document to an HTTP
+body. No incoming request builds a Layer, compiler, content cache or runtime.
+
+
+Website Markdown composition uses a named HTTP policy over the existing native
+HTML Effect. Original URL and Accept ingress decode once at that exact boundary;
+checked body lookup uses the already captured app service. It owns the
+representation's response/error headers inside the host's existing runner and
+request scope. No request builds a Layer or executes another runtime. The
+policy preserves existing HTML Vary fields and expected/fatal error separation.
+Its exact decoder admission and adjacent rejected paths have actual CLI proof.
+
+### Website build-only share rendering
+
+`apps/web/scripts/docs-images.build.ts` is a lazy scoped build program, composed
+and executed by the existing Vite host with NodeServices. Filesystem catalogue
+input and private native renderer bytes are decoded at this exact ingress.
+`acquireRelease` owns the renderer's lifetime, sequential page Effects own fixed
+catalogue/render/image/write failures, and the scoped finaliser releases native
+memory. No client or runner escapes into content/page logic. The named metadata
+output module separately encodes the owning public TechArticle Schema. Exact
+lint selectors admit these crossings only; adjacent route/rendering modules
+retain their restrictions.
+
+
+Native MCP tools use `Toolkit.toLayer` and `McpServer.toolkit`; no replacement
+registry or package runner is introduced. Current HTTP cancellation enters via
+an app-private `Context.Reference<Option<AbortSignal>>`. The named lifetime
+operation races tool work against an Effect callback for the native stop event.
+Listener registration and a second aborted-state check close the early-abort
+race; losing work and its finalisers are awaited. This capability carries no
+figures or identity and never changes a calculator/content service contract.
+The [API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
+records the actual-client and built-Worker proof limits.

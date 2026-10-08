@@ -1,0 +1,903 @@
+{
+  "schemaVersion": 1,
+  "documentType": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-content-owner",
+  "observedAt": "2026-10-06T10:29:13Z",
+  "task": "CSF-T005 / DEV-76",
+  "status": "Native source producer and acceptance checks qualified locally; whole T005 remains in progress",
+  "baseHead": "dc9d0ba0cfcbe4c00a6122f6085b9396ea59e1d3",
+  "actorAuthority": {
+    "principal": "Cooper",
+    "operation": "Local implementation, tests, commit, push and draft review under the approved continuation plan",
+    "environment": "local; no provider operation"
+  },
+  "outcome": [
+    "Independent native Fumadocs index and Bun compiler connection use the same checked generated collection adapter as the retained Vite source.",
+    "The local repository builder requires version-two acceptance records with reviewed source hashes, reads decisions before loading the compiler, verifies source bytes and decisions again before output, and constructs the canonical catalogue.",
+    "Missing acceptance, zero accepted pages, changed source bytes, duplicate bindings, wrong owners or targets, outside-checkout paths, draft navigation and an accepted child under a draft section fail.",
+    "The existing version-one record representation round-trips unchanged. Regular docs checks verify version-two source hashes.",
+    "Five named copied TypeScript fences match compiled source/test owners. The four original integration templates retain their parent bytes and weekly-pay oracle.",
+    "A clean index regeneration and the actual native source connection process all 61 authored draft pages with non-empty processed Markdown.",
+    "The fresh source-only checkout documentation oracle passes after explicit source-export selection."
+  ],
+  "impact": {
+    "changeRequired": [
+      "content and docs-content contracts, compiler connection, generated outputs and READMEs",
+      "checked examples, Node ambient types and copied-fence prevention",
+      "corrected public MDX and SDK/content/package/documentation architecture",
+      "root command, workspace dependencies, generated input/type prerequisites and exact lint admissions",
+      "Changeset, active plan and this bounded receipt"
+    ],
+    "preserve": [
+      "all authored draft statuses and empty acceptance bindings",
+      "retained Vite docs app and historical receipts",
+      "tax results and original integration-template bytes",
+      "selected dependency versions and canonical skills",
+      "Cooper metrics deferral"
+    ],
+    "notApplicable": [
+      "provider operations",
+      "publication or deployment",
+      "runbook procedure changes"
+    ]
+  },
+  "sourceIdentities": [
+    {
+      "path": ".changeset/checked-docs-catalogue-builder.md",
+      "sha256": "e896dbe87f4bdee1626e45215d827e393ca4a582c4e643ef5c91ae3524147d76"
+    },
+    {
+      "path": "bun.lock",
+      "sha256": "7e3e20e1e18e9440dbbb50f84f256a647d36176d91a5476207c03de375c4d80e"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "b4bbf2ce89d1dc6540146864c2b126a517f7894c6d4b989dd1f19b6e75dd7f70"
+    },
+    {
+      "path": "docs/architecture/content-and-posts.md",
+      "sha256": "71bef5be3521747d8e771913dc5bd1a917b70c6847128d1c8f1aa47ca21933de"
+    },
+    {
+      "path": "docs/architecture/package-ownership.md",
+      "sha256": "ca03aee8b5c7ff94f166ba73f6bea2123a5b56695579a0e2d091034d736b1382"
+    },
+    {
+      "path": "docs/exec-plans/active/clean-slate-foundation.md",
+      "sha256": "acbf95327fa65e15ea2c54928388b012853c254cc6aedfd56a97f5c84d700759"
+    },
+    {
+      "path": "docs/product-specs/clean-slate-foundation.tasks.json",
+      "sha256": "b1ee48817feb1d0f0006ba2d3ec871c919985e6007bd2de2166ff5e619a976ef"
+    },
+    {
+      "path": "docs/standards/documentation-architecture.md",
+      "sha256": "3563f860b6f8aef17ebcf9cb238adca3d635bb983b235ba3514f89771700dc0b"
+    },
+    {
+      "path": "knip.json",
+      "sha256": "886eafbc87d5de9c1162a7ecbf3b3e9fd1ad393f36e29d37a2f8f3690a4ae3c9"
+    },
+    {
+      "path": "knip.production.json",
+      "sha256": "903f17c3406794ffc1d15b870c8babe1b031f51b98121088b04599d18b8fbb47"
+    },
+    {
+      "path": "oxlint.config.ts",
+      "sha256": "a2ad84115274ea8a50482393a63793ccd4c73f71634d26d3998e9b6fe4479dbb"
+    },
+    {
+      "path": "package.json",
+      "sha256": "3d0677a3feb40ebc6dd8fc618dff5e23fdcce510520b72adc4f3a41f112b8205"
+    },
+    {
+      "path": "packages/content/README.md",
+      "sha256": "3282d3e7bb8a34d3dd3b252c66266e725b41673af96907ed94bead8c0a9bb969"
+    },
+    {
+      "path": "packages/content/src/schemas.ts",
+      "sha256": "8c63f58edab72f6d113d165d809ea9d99260326e247cdcf52ff1f19aa67e754d"
+    },
+    {
+      "path": "packages/content/test/schemas.test.ts",
+      "sha256": "d3c62acae48e5216d86fa123f1f1a1596d8c071963ab455546462dd55e531da4"
+    },
+    {
+      "path": "packages/docs-content/README.md",
+      "sha256": "de1750b9899d582b56c1ccaff35483b83b392cf75f4e1385f03e6b388d8104e2"
+    },
+    {
+      "path": "packages/docs-content/content/api/errors.mdx",
+      "sha256": "148c01bf930e31a5c516e32c6a820fbb75e9caa4fc52348aed349da368d878af"
+    },
+    {
+      "path": "packages/docs-content/content/contributing/add-a-fact.mdx",
+      "sha256": "6e361a5989c73b0527000befb4089a2fe06f928000ed4f3eebc5b85b15818eba"
+    },
+    {
+      "path": "packages/docs-content/content/contributing/changesets.mdx",
+      "sha256": "88b1b3d345a8384cbb8361b80262f3515fb08072ef0d0089ac9031dda43f083f"
+    },
+    {
+      "path": "packages/docs-content/content/contributing/effect-service-standards.mdx",
+      "sha256": "c7920864e589c0f270846720a1fa9bfdd27cf31ce871057b6496038d47d7b687"
+    },
+    {
+      "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+      "sha256": "3631355f4d8e717d61adb2c542be3f6997953599b0055efae7b5e790cd4e1449"
+    },
+    {
+      "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+      "sha256": "9ae617a01f379241d45a106c176b84a3d0aec89a36acf0d0360d1dca4b31925e"
+    },
+    {
+      "path": "packages/docs-content/content/guides/show-calculator-help-to-users.mdx",
+      "sha256": "7c5d75b2d1cd98e269d446eebd3865c66813277aca511c0d1b21e019d966ccc0"
+    },
+    {
+      "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+      "sha256": "a3ad2edf8785475ca27d33fd1e6b256456592c84f97b6d989505deae8f0a2713"
+    },
+    {
+      "path": "packages/docs-content/content/reference/changelog.mdx",
+      "sha256": "4a817a1e2ef1d6332953afc32f0a4af7ae6d9acc2e2189d0ba36c93873871412"
+    },
+    {
+      "path": "packages/docs-content/content/reference/errors.mdx",
+      "sha256": "58549e267ef302e1852345d72aff31e8f4ccdad7037978b658b13da274a44703"
+    },
+    {
+      "path": "packages/docs-content/content/reference/examples.mdx",
+      "sha256": "3fec93ddb3168425e357f759d8fb4097f019560d1800a895140706b68278e098"
+    },
+    {
+      "path": "packages/docs-content/content/reference/release-notes.mdx",
+      "sha256": "988054b6232098a161cc4ac62364369e20ec451a4e760fbe692c9900911d7118"
+    },
+    {
+      "path": "packages/docs-content/content/reference/schemas.mdx",
+      "sha256": "a9678875cc9b44ef5e22c27afb1f38bda2c9084f5d031ec08754a50ac9dc19c9"
+    },
+    {
+      "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+      "sha256": "38feb2ee0543826abdf285e8c40d643da5f8df250f042b4ece8dee7faf31605f"
+    },
+    {
+      "path": "packages/docs-content/package.json",
+      "sha256": "0532bb237147f0f660485e12e87a003ea7257b0605c0e6c88173cbd0b712e09d"
+    },
+    {
+      "path": "packages/docs-content/src/catalogue-index.runtime.ts",
+      "sha256": "cb76907f93be27dbcb853d6c318366d593ba9288227de9885712e2ee5947065a"
+    },
+    {
+      "path": "packages/docs-content/src/catalogue-source.layer.ts",
+      "sha256": "28231a9ad96e5d598d94e476cb17912c03c6c4bdbf3f71343d8bdc8796c6aa71"
+    },
+    {
+      "path": "packages/docs-content/src/generated-collection.boundary.ts",
+      "sha256": "466af46af5ae8f9b506cdb2cb9baee0d5033e84f89772ddcffa3d69d614084f2"
+    },
+    {
+      "path": "packages/docs-content/src/generated-source.layer.ts",
+      "sha256": "d8bb1481a78fa6a290689c4ba01d2027d6753e80ad9a205061ed36a39474032f"
+    },
+    {
+      "path": "packages/docs-content/src/validation/checked-snippets.test.ts",
+      "sha256": "33df4ebd7f4ab5eaae2c70067448055849bbc7f9cda16e631747a06b7c65fea4"
+    },
+    {
+      "path": "packages/docs-content/src/validation/checked-snippets.ts",
+      "sha256": "b914c01d2c301b10cbb703cb07563492bb56bfee7486c180faa204a0a2ab931a"
+    },
+    {
+      "path": "packages/docs-content/src/validation/policy.ts",
+      "sha256": "d56cb61b9992f74a12db00367a8ee917530776df701373ee2ca81e1a2a5e4a61"
+    },
+    {
+      "path": "packages/docs-examples/README.md",
+      "sha256": "1869fb99293b5182a57dc3c1ae13274f7ff657bfb1a404000b112212a9c06c69"
+    },
+    {
+      "path": "packages/docs-examples/package.json",
+      "sha256": "b2140c0240a99b3874094c9877e43e30b350b88a8ff567aa93d8b7350584a174"
+    },
+    {
+      "path": "packages/docs-examples/src/api-error-envelope.ts",
+      "sha256": "376503549d8f5151c651bb4ab5ea13c920ae3f69ce49f57b634b83242530cdc5"
+    },
+    {
+      "path": "packages/docs-examples/src/calculator-help.ts",
+      "sha256": "ee989f9398f1b5ab4ab1abc4ec79617d1e387ddf1a75bd096176390f253c2174"
+    },
+    {
+      "path": "packages/docs-examples/src/define-gross-pay-fact.ts",
+      "sha256": "3899b07c95ad6534ed80e27aaa6e08282147fb9564ddcace69c9498c1135fd33"
+    },
+    {
+      "path": "packages/docs-examples/src/validate-external-input.ts",
+      "sha256": "4f1420e33450be2e74f4f32999ea0fa53df429a1cfe4f776bef98efd09106ef8"
+    },
+    {
+      "path": "packages/docs-examples/test/integration.example.test.ts",
+      "sha256": "ffc70ced5e064e31915cdc757b783afee60febb4c05a16dab59cc1207f04fe0c"
+    },
+    {
+      "path": "packages/docs-examples/test/public-guides.boundary.test.ts",
+      "sha256": "7a7eb65e0c8ca0a0b332d49b84f33f511644a643154d32b396319d9e8f1a9830"
+    },
+    {
+      "path": "packages/docs-examples/tsconfig.json",
+      "sha256": "acc9801e4b89bae57157986c830dd1cede4c7634af6512a5e2951f8c661e5da2"
+    },
+    {
+      "path": "packages/sdk/typescript/README.md",
+      "sha256": "22e3bb65a3e5d85e811ae7cd78385aef8d631c20b0e0396e3ea132eef6c5caa7"
+    },
+    {
+      "path": "tools/documentation/catalogue.build.test.ts",
+      "sha256": "7bbeb2e460751044ead1c5e15c2ae0516d98733bdd34377646b5017b0cc86157"
+    },
+    {
+      "path": "tools/documentation/catalogue.build.ts",
+      "sha256": "2f759bf2a6604327d65e66e899b46b86c2232b3362c1cc16bb6a04d86e9dfe2e"
+    },
+    {
+      "path": "tools/documentation/catalogue.policy.test.ts",
+      "sha256": "e12f9b475256a9c0e22f09129dd6016fd55aa587bc4367998d579d2ccae9f219"
+    },
+    {
+      "path": "tools/documentation/catalogue.policy.ts",
+      "sha256": "b210807c911b4f6395dc642bfe2aa5995ad602f41ab8c78cb8d3355487d12337"
+    },
+    {
+      "path": "tools/documentation/catalogue.runtime.ts",
+      "sha256": "5f707ab904e9927832fb60345783f9eccadf11c56d17a917d6669926580e9615"
+    },
+    {
+      "path": "tools/documentation/check.runtime.test.ts",
+      "sha256": "45c8dd6ff2ddc36c5b8ccdb03d9830ef2ed30611a99a7d0457d04ee0f92943be"
+    },
+    {
+      "path": "tools/documentation/check.runtime.ts",
+      "sha256": "ce256dc28b715e1096821f5595b69de674187a8bc26248b618dff60e115cc8e3"
+    },
+    {
+      "path": "tools/documentation/schemas.ts",
+      "sha256": "b99faeaea14360e01937bab4e46159c2ab82e3bfc78e24b0e87537b6b7db274c"
+    },
+    {
+      "path": "tools/documentation/tsconfig.json",
+      "sha256": "3b9a8dd4cebb765c9e3cbc662ce2d410630816cf9b4276bea81624ab65ae55f1"
+    },
+    {
+      "path": "tools/oxlint/portable-rules.test.ts",
+      "sha256": "ac2adcf4a1443140d755f05bddfa1de9ea3ca1db1dc20f0fe96f88c732f597f3"
+    },
+    {
+      "path": "turbo.json",
+      "sha256": "520c51318a27605a81c8e337b04a393181919e72e148772269006bec6aae6443"
+    }
+  ],
+  "authoredCorpus": {
+    "pages": 61,
+    "draftPages": 61,
+    "processedNonEmptyPages": 61,
+    "acceptanceRecords": 0,
+    "navigationStatus": "draft",
+    "sourceHashInventory": [
+      {
+        "path": "packages/docs-content/content/api/authentication-and-deployment-assumptions.mdx",
+        "sha256": "21d7ec0db402b4e4ee197d444cf876788a32145fd80b0ab4de54f794a200b283"
+      },
+      {
+        "path": "packages/docs-content/content/api/endpoints.mdx",
+        "sha256": "ddadd740ffdc37803f295d9afca2bdb41e843fbfbe222bef1dc9af719a84a888"
+      },
+      {
+        "path": "packages/docs-content/content/api/errors.mdx",
+        "sha256": "148c01bf930e31a5c516e32c6a820fbb75e9caa4fc52348aed349da368d878af"
+      },
+      {
+        "path": "packages/docs-content/content/api/index.mdx",
+        "sha256": "b703ce3c5eb95bcc81fe4c696ef818f38c97ee365a452f01a0f7745c9c88300d"
+      },
+      {
+        "path": "packages/docs-content/content/api/openapi-reference.mdx",
+        "sha256": "273f9a4c40ac9d143cf3b46d6b79dd2674f41d3c122a1848e122434fe475653e"
+      },
+      {
+        "path": "packages/docs-content/content/api/overview.mdx",
+        "sha256": "bb5b43f82df9fecca45973aecdec7ca1ba224dae08156bf5889f8e71e4abc047"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/calculators.mdx",
+        "sha256": "f9478d90019d8fa0038046529d58154146ed4c5ab701056cd167411f85261362"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/diagnostics.mdx",
+        "sha256": "8a1579c60f9c47fd34cbcc893bda00c28ea1a416ef3b2e385aed956bdd47ff5b"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/facts.mdx",
+        "sha256": "1f04c34beb48d095a440378cf83580d496ce1bffeeea68a8f71e1e266b639943"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/index.mdx",
+        "sha256": "c1dac9071b265fca41dfe60ebc5dee92c9a0cba2f56c8c02b1c24fff95a0b911"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/jurisdictions-and-tax-years.mdx",
+        "sha256": "5cb5e7ef153fa49b3dad26deb627629b1f7dda0a598cc57c58efa3a084f265d0"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/money-and-branded-values.mdx",
+        "sha256": "7174765029fffee20ef5e3be83534f8c4b14afd8c7818eab6862bd13cc156917"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/reports.mdx",
+        "sha256": "ee01630caf2ca244e9220567b5036511d76b55a5e6a4b4cfbf4f6ef082fccaa8"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/rules.mdx",
+        "sha256": "bb315a4935e011e99ccda5ff39c3489e186925a57c679450a25a7673d92161b9"
+      },
+      {
+        "path": "packages/docs-content/content/concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+        "sha256": "04066ae0399308fba61e5366823f181f79e87113f450a4b382a39576b885a10a"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-calculator.mdx",
+        "sha256": "d860ac86bd84cbfe1b49adf556598a904032dccabd5f8b64f21f522a774539f7"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-fact.mdx",
+        "sha256": "6e361a5989c73b0527000befb4089a2fe06f928000ed4f3eebc5b85b15818eba"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-rule.mdx",
+        "sha256": "d7e16881d21e92d67f691f594f69efdc18013922cc97d37a406166de297b4609"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/add-a-tax-year.mdx",
+        "sha256": "2564c8f45afd4fd62308ca61540aaccd045c75086a95becebfd8eaf129c04067"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/backward-compatibility.mdx",
+        "sha256": "dcf18e62b4c5170ec2c2a0a8ae1b101c986a6d5994ba02559d065a3814d5f9ab"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/changesets.mdx",
+        "sha256": "88b1b3d345a8384cbb8361b80262f3515fb08072ef0d0089ac9031dda43f083f"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/effect-service-standards.mdx",
+        "sha256": "c7920864e589c0f270846720a1fa9bfdd27cf31ce871057b6496038d47d7b687"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/fix-an-incorrect-result.mdx",
+        "sha256": "b1c2a801f3685ace5a4d6722a7c84e6bfc69be6a4d4c897ce7282c7a8f3bf112"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/index.mdx",
+        "sha256": "7d3c182e3c00c88631c5729d0546126cae3e4bb9c4016c43996551c2bc9beb07"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/naming-and-schema-standards.mdx",
+        "sha256": "446d1e8004a7b0249b8dcef814b121706756c5001f13a339bdcd40ad00eaf83f"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/pr-evidence-checklist.mdx",
+        "sha256": "ed44183576ed5a36e87c2ef526456d4c1e0f1810f079b6d3b0508675255ae45b"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/review-expectations.mdx",
+        "sha256": "d92a513593223dafb4df44970601218e5fd3b15f717511a056bbec6ff50a9541"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/source-citation-standards.mdx",
+        "sha256": "c94034c39333250f9ecadd81a5dd92eb3fd6534ce15073614d18bd19e2329ff7"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/testing-standards.mdx",
+        "sha256": "703b55f108f1eb6910c2969776f584306c0f3e9162a93cbc15146929089003a5"
+      },
+      {
+        "path": "packages/docs-content/content/contributing/what-are-you-changing.mdx",
+        "sha256": "b1cfb0f241731c330e9d640b360d5db0b1e8e26a038ed9607aba28aecfbcfe73"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-browser-app-with-the-http-api.mdx",
+        "sha256": "23c2de0a247b6355403a1cce09c15e679b460c1fc5d5d22c802ff9ff91c8777d"
+      },
+      {
+        "path": "packages/docs-content/content/guides/build-a-server-route-with-the-sdk.mdx",
+        "sha256": "0855263494fa492ffaf70b3f89d5236cffb6ed39ac755dbd64239777f772a0d5"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-annual-income-tax.mdx",
+        "sha256": "ed043b2bd3997face8730a85d77f33e1f9f2f8fe6c64a139ede2c8729644eee7"
+      },
+      {
+        "path": "packages/docs-content/content/guides/calculate-australian-take-home-pay.mdx",
+        "sha256": "e45eaa92b1c5684822f44a696d0bd8c31e56d69255455cc9e54b24b7adf496dd"
+      },
+      {
+        "path": "packages/docs-content/content/guides/handle-validation-errors.mdx",
+        "sha256": "3631355f4d8e717d61adb2c542be3f6997953599b0055efae7b5e790cd4e1449"
+      },
+      {
+        "path": "packages/docs-content/content/guides/index.mdx",
+        "sha256": "0389f7012e6cf0777ba9610cd056fe6d8f048b2f06c2f67722de59ace0d68a1f"
+      },
+      {
+        "path": "packages/docs-content/content/guides/migrate-from-raw-http-to-sdk.mdx",
+        "sha256": "9ae617a01f379241d45a106c176b84a3d0aec89a36acf0d0360d1dca4b31925e"
+      },
+      {
+        "path": "packages/docs-content/content/guides/show-calculator-help-to-users.mdx",
+        "sha256": "7c5d75b2d1cd98e269d446eebd3865c66813277aca511c0d1b21e019d966ccc0"
+      },
+      {
+        "path": "packages/docs-content/content/guides/test-your-integration.mdx",
+        "sha256": "a3ad2edf8785475ca27d33fd1e6b256456592c84f97b6d989505deae8f0a2713"
+      },
+      {
+        "path": "packages/docs-content/content/reference/api.mdx",
+        "sha256": "f0103858f4cd4d9dc718769ff6eb23b481f0e3afa009a9c65b7cfabf98f6bba5"
+      },
+      {
+        "path": "packages/docs-content/content/reference/changelog.mdx",
+        "sha256": "4a817a1e2ef1d6332953afc32f0a4af7ae6d9acc2e2189d0ba36c93873871412"
+      },
+      {
+        "path": "packages/docs-content/content/reference/errors.mdx",
+        "sha256": "58549e267ef302e1852345d72aff31e8f4ccdad7037978b658b13da274a44703"
+      },
+      {
+        "path": "packages/docs-content/content/reference/examples.mdx",
+        "sha256": "3fec93ddb3168425e357f759d8fb4097f019560d1800a895140706b68278e098"
+      },
+      {
+        "path": "packages/docs-content/content/reference/index.mdx",
+        "sha256": "3841fe1970f2569003d5fc2c56c49f65cc3852344e8f940db26deb5e774f9a93"
+      },
+      {
+        "path": "packages/docs-content/content/reference/release-notes.mdx",
+        "sha256": "988054b6232098a161cc4ac62364369e20ec451a4e760fbe692c9900911d7118"
+      },
+      {
+        "path": "packages/docs-content/content/reference/schemas.mdx",
+        "sha256": "a9678875cc9b44ef5e22c27afb1f38bda2c9084f5d031ec08754a50ac9dc19c9"
+      },
+      {
+        "path": "packages/docs-content/content/reference/sdk.mdx",
+        "sha256": "1f3b4440cb0ef70529ac4351e9373fd3fbfad8c23b2746a92eb4df131d5cc5ac"
+      },
+      {
+        "path": "packages/docs-content/content/reference/versioning.mdx",
+        "sha256": "dd6c50c4397603b2b90c0150e5549fd5e8a1251b34ffb44d94f0b2e1f1933d3f"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/effect-sdk.mdx",
+        "sha256": "8b2a64e448e7d412885d5fe17a5da2170abdcb44b2c8666fc72c99ed32997e8d"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/index.mdx",
+        "sha256": "5b26cc68ed100fc9a31da241681e3ee91c1adae68c912e8a4c32cfe24869ae7d"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/plain-sdk.mdx",
+        "sha256": "d536fd323b56bbe30a2a07d9c10d91bef4c5ef23af87a9346a2c8c2728954b5a"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/safe-sdk.mdx",
+        "sha256": "352722a84d73233aa71811fedd01edb5854a95d2127c2aaacd495029a2ea6cd1"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/schemas.mdx",
+        "sha256": "b762afaf84c9a69564848d20c0ffc865a3e96df615fbcf6788b9365a3655518f"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/type-safety.mdx",
+        "sha256": "17fc46dc9c875af7d805488e019b1875b0c80d1fb72a9c83daf94054721e53aa"
+      },
+      {
+        "path": "packages/docs-content/content/sdk/typescript-sdk.mdx",
+        "sha256": "7e44eb92a2244fb44157b9f69903478a70b39728e4d41717d10d31c792d30d8f"
+      },
+      {
+        "path": "packages/docs-content/content/start/choose-sdk-or-api.mdx",
+        "sha256": "38feb2ee0543826abdf285e8c40d643da5f8df250f042b4ece8dee7faf31605f"
+      },
+      {
+        "path": "packages/docs-content/content/start/index.mdx",
+        "sha256": "789164b5dfe43c3f26877e948fba8077788b1274f0317b5c8651ebedec84d36e"
+      },
+      {
+        "path": "packages/docs-content/content/start/install-the-sdk.mdx",
+        "sha256": "df1f4fe5ef62ad0eec275fb4471fa99ed75f850e15e4a4e4c82fba04654cfabd"
+      },
+      {
+        "path": "packages/docs-content/content/start/overview.mdx",
+        "sha256": "7c3818ebc10e25715ea62123451ad839715d9f9148f100e69532da485f0845fa"
+      },
+      {
+        "path": "packages/docs-content/content/start/quickstart.mdx",
+        "sha256": "85d4889b0a595e07c97a23458fc93c69c1e8729f5112e727e32fe37eca537a17"
+      },
+      {
+        "path": "packages/docs-content/content/start/run-your-first-calculation.mdx",
+        "sha256": "b2bd83edba89c207a6b9193fe0ce9cb6254d93676b589beef3b4a3c278719c26"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "stage": "real-source-probe",
+      "command": [
+        "bun",
+        "--conditions=source",
+        "run",
+        "/private/tmp/dev76-current-source-probe.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 2.32,
+      "log": "/private/tmp/dev76-source-owner-qualified-c-real-source-probe.log"
+    },
+    {
+      "stage": "full-verification",
+      "command": [
+        "bun",
+        "run",
+        "verification"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 592.37,
+      "log": "/private/tmp/dev76-source-owner-qualified-c-full-verification.log"
+    },
+    {
+      "stage": "root-tests",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 75.97,
+      "log": "/private/tmp/dev76-source-owner-qualified-c-root-tests.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev76-source-owner-qualified-d-format.log"
+    },
+    {
+      "stage": "root-tests",
+      "command": [
+        "bun",
+        "run",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 91.28,
+      "log": "/private/tmp/dev76-source-owner-qualified-d-root-tests.log"
+    },
+    {
+      "stage": "root-build",
+      "command": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.29,
+      "log": "/private/tmp/dev76-source-owner-qualified-d-root-build.log"
+    },
+    {
+      "stage": "changesets",
+      "command": [
+        "bun",
+        "run",
+        "changeset:status"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.24,
+      "log": "/private/tmp/dev76-source-owner-qualified-d-changesets.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint:task"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.66,
+      "log": "/private/tmp/dev76-source-owner-qualified-d-lint.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev76-cold-source-a-format.log"
+    },
+    {
+      "stage": "cold-generate",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-content",
+        "generate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.04,
+      "log": "/private/tmp/dev76-cold-source-a-cold-generate.log"
+    },
+    {
+      "stage": "docs-types",
+      "command": [
+        "bun",
+        "run",
+        "check:docs:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.43,
+      "log": "/private/tmp/dev76-cold-source-a-docs-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint:task"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.42,
+      "log": "/private/tmp/dev76-cold-source-a-lint.log"
+    },
+    {
+      "stage": "doc-tests",
+      "command": [
+        "bun",
+        "run",
+        "test:documentation:task"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.9,
+      "log": "/private/tmp/dev76-cold-source-a-doc-tests.log"
+    },
+    {
+      "stage": "content-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/content",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.38,
+      "log": "/private/tmp/dev76-cold-source-a-content-tests.log"
+    },
+    {
+      "stage": "examples-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/docs-examples",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.57,
+      "log": "/private/tmp/dev76-cold-source-a-examples-tests.log"
+    },
+    {
+      "stage": "validate",
+      "command": [
+        "bun",
+        "run",
+        "docs:validate"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.23,
+      "log": "/private/tmp/dev76-cold-source-a-validate.log"
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.48,
+      "log": "/private/tmp/dev76-source-condition-a-format.log"
+    },
+    {
+      "stage": "fresh-source-tools",
+      "command": [
+        "bun",
+        "--bun",
+        "vitest",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/quality-workflow/release-boundary.test.ts",
+        "-t",
+        "runs documentation tools in a fresh source-only checkout"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 11.49,
+      "log": "/private/tmp/dev76-source-condition-a-fresh-source-tools.log"
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.32,
+      "log": "/private/tmp/dev76-source-condition-a-docs.log"
+    },
+    {
+      "stage": "docs-types",
+      "command": [
+        "bun",
+        "run",
+        "check:docs:types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev76-source-condition-a-docs-types.log"
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint:task"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 6.01,
+      "log": "/private/tmp/dev76-source-condition-a-lint.log"
+    },
+    {
+      "stage": "independent-import-fences",
+      "command": [
+        "bun",
+        "x",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "/private/tmp/dev76-public-fence-types/tsconfig.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.21,
+      "log": "/private/tmp/dev76-public-fence-c-independent-import-fences.log"
+    }
+  ],
+  "installedCompiledConsumer": {
+    "observedAt": "2026-10-06T10:27:15Z",
+    "packageArtifact": "/private/tmp/dev76-source-packed/taxkit-content-1.0.0.tgz",
+    "artifactSha256": "77611a31d035fca88e5bf39b861c6512dfa0d9885f2e28462d594436e22ddadd",
+    "checks": [
+      {
+        "command": [
+          "bun",
+          "install",
+          "--offline",
+          "--ignore-scripts"
+        ],
+        "cwd": "/private/tmp/dev76-source-installed",
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "bun",
+          "x",
+          "tsc",
+          "--noEmit",
+          "-p",
+          "tsconfig.json"
+        ],
+        "cwd": "/private/tmp/dev76-source-installed",
+        "exitCode": 0,
+        "compiler": "7.0.2",
+        "skipLibCheck": false
+      },
+      {
+        "command": [
+          "node",
+          "probe.ts"
+        ],
+        "cwd": "/private/tmp/dev76-source-installed",
+        "exitCode": 0,
+        "node": "24.16.0",
+        "sourceConditionUsed": false
+      }
+    ],
+    "nonClaims": [
+      "Private compiled-consumer proof only; raw Bun pack retains source and test exports.",
+      "No publication is qualified or authorised."
+    ]
+  },
+  "retainedFailures": [
+    {
+      "scope": "First root all-tests attempt",
+      "result": "failed",
+      "log": "/private/tmp/dev76-source-owner-qualified-c-root-tests.log",
+      "finding": "Six new positive lint samples lacked blank import separators.",
+      "resolution": "Correct only the sample strings; final all-tests and lint pass."
+    },
+    {
+      "scope": "Example helper query and fact labels",
+      "finding": "Canonical HelpQuery and actual HTTP metadata are required; guesses were rejected by types/tests.",
+      "resolution": "Use the owning schema/defaults and actual route oracle."
+    },
+    {
+      "scope": "Example test HTTP bridge",
+      "finding": "Bun ambient fetch requires preconnect; these examples use Node/browser APIs.",
+      "resolution": "Use the already-selected Node ambient types without changing the bridge or upgrading dependencies."
+    },
+    {
+      "scope": "Compiler plugin setup",
+      "finding": "Bun plugin returns void or Promise; a direct tryPromise callback does not typecheck.",
+      "resolution": "Check the typed return once and await asynchronous setup before source import."
+    },
+    {
+      "scope": "Native diagram compilation",
+      "finding": "The local probe without PLAYWRIGHT_BROWSERS_PATH could not find Chromium.",
+      "resolution": "Use the repository browser runtime path; all 61 sources then pass."
+    },
+    {
+      "scope": "Initial full verification",
+      "result": "failed",
+      "log": "/private/tmp/dev76-source-owner-qualified-a-full-verification.log",
+      "finding": "Fresh source-only docs command selected missing compiled content.",
+      "resolution": "Explicit source condition in command and child fixtures; actual isolated oracle and final full run pass."
+    },
+    {
+      "scope": "Second full verification attempt",
+      "result": "interrupted; no completion claimed",
+      "log": "/private/tmp/dev76-source-owner-qualified-b-full-verification.log",
+      "finding": "Tool handles and descendant process were absent after deliberate turn interruption.",
+      "resolution": "Final independently observed run is dev76-source-owner-qualified-c."
+    }
+  ],
+  "supplementaryTypeProbe": {
+    "location": "/private/tmp/dev76-public-fence-types",
+    "importedFences": 44,
+    "independentCompleteFencesPassed": 41,
+    "excludedExplicitContextOrNegativeFences": [
+      "concepts/diagnostics.mdx fence 1 requires checked client/calculator/payload",
+      "sdk/type-safety.mdx fence 2 intentionally rejects wrong calculator facts",
+      "sdk/type-safety.mdx fence 4 is explicitly non-compiling invalid Money input"
+    ],
+    "nonClaim": "This temporary extraction is a review probe, not an owned parser/generator or acceptance of all authored copy."
+  },
+  "nonClaims": [
+    "Full verification passed before the whitespace-only lint-sample correction; the later all-tests, build and lint checks qualify that final fixture layout.",
+    "No authored page or navigation has been accepted or relabelled.",
+    "No replacement Website route, HTTP content group, accepted discovery or OG image has been implemented by this receipt.",
+    "No provider state, deployment, registry publication, statutory accuracy, current tax-law correctness or external availability is established.",
+    "No empty production fallback is accepted. The real catalogue command deliberately fails while no pages are accepted.",
+    "Earlier hosted success belongs to dc9d0ba0cfcbe4c00a6122f6085b9396ea59e1d3, not this unpushed candidate.",
+    "No current whole-checkout proof is attributed to historical harness or skill receipts."
+  ],
+  "rollback": "Revert this bounded implementation commit on the draft branch; retain earlier content contracts, checked templates and Vite source. Regenerate ignored source output from its owners. No provider rollback is required."
+}

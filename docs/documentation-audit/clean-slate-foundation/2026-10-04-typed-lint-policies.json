@@ -1,0 +1,95 @@
+{
+  "document_type": "migration-receipt",
+  "date": "2026-10-04",
+  "issue": "DEV-73",
+  "parent_revision": "ae8279c899e93246cbb4f7e3289ffec274bec3b2",
+  "status": "locally-qualified",
+  "authority": {
+    "principal": "Cooper Corbett",
+    "operation": "local implementation, tested commits, pushes, draft PRs and routine Linear tracking",
+    "repository": "crcorbett/taxkit",
+    "environment": "local macOS; hosted PR readback separate",
+    "excluded": [
+      "merge",
+      "deployment",
+      "publication",
+      "provider apply",
+      "Medicare correction"
+    ]
+  },
+  "implemented": [
+    "Six owned lint policies now compile as TypeScript; host types derive from Oxlint public RuleTester contract instead of copied AST models",
+    "Readonly native route observations and checked node variants preserve scoped host lifetime, persistent collections, alias/shadow/route guards and reference identity",
+    "Direct TypeScript plugin/source imports, no-emit compiler option and exact decoding/selector/fixture paths follow the new owners",
+    "Native ImportExpression listener owns dynamic imports; unreachable legacy CallExpression Import node branch removed",
+    "Identity/equality tests and actual accepted/rejected CLI fixtures cover eight adopted files"
+  ],
+  "documentation_impact": [
+    {
+      "decision": "Change required",
+      "owners": [
+        "tools/oxlint/{binding-tracker,bun-rules,effect-rules,mdx-rules,package-rules,taxkit-rules}.ts",
+        "tools/oxlint/host.types.ts",
+        "tools/oxlint/binding-tracker.test.ts",
+        "tools/oxlint/portable-rules.test.ts",
+        "tools/oxlint/tsconfig.json",
+        "oxlint.config.ts",
+        "docs/standards/tooling.md",
+        "docs/architecture/testing-and-quality.md",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json"
+      ],
+      "reason": "Local checking, typed receipt/input ownership and enforcement changed"
+    },
+    {
+      "decision": "Preserve",
+      "owners": [
+        ".agents/skills/**",
+        "docs/evidence/**",
+        "docs/documentation-audit historical receipts",
+        "tools/docs-deployment/*register.json",
+        "tools/docs-deployment/controls.json",
+        "tools/docs-deployment/fixtures/**",
+        ".github/workflows/**",
+        "docs/runbooks/**",
+        "packages/**",
+        "apps/**",
+        "bun.lock"
+      ],
+      "reason": "Saved bytes, original authority/identities/oracles, exports, tax results and operational procedures"
+    },
+    {
+      "decision": "N/A",
+      "owners": [
+        ".changeset",
+        "public content",
+        "provider state"
+      ],
+      "reason": "Root local tools only; no package-facing or provider operation"
+    }
+  ],
+  "baseline_observations": [
+    "Old six JavaScript files were absent from the compiler project, which selected only top-level TypeScript files; preliminary checkJs diagnostics were an unqualified probe, not confirmed bugs"
+  ],
+  "verification": [
+    {
+      "command": "initial verification before recording renames in Git index",
+      "result": "failed correctly: tracked-file inventory still named deleted tools/oxlint/binding-tracker.js; renames recorded locally without changing checker permissions"
+    },
+    {
+      "command": "frozen install, complete tests, build and final verification",
+      "result": "passed: 790 installs/1020 packages, unchanged lock; 245 actual lint cases (241 retained, two identity cases, two added accepted files), 176 deployment-tool cases, complete tests, 15-task build and full verification; 21 Quality cases/all ten isolated faults, fresh source-only documentation, 21 skill cases, 16 evaluation cases and both Chromium suites. Matching unchanged-input package/build/browser caches reused"
+    },
+    {
+      "command": "check:docs, check:runbooks, format:check and git diff --check",
+      "result": "passed before commit"
+    }
+  ],
+  "limitations": [
+    "DEV-73 and downstream tasks unfinished; remaining release scripts, SDK, app/config/infrastructure and readonly/Schema/helper/lifetime review pending",
+    "Synthetic tests and saved receipt checks make no provider requests; establishment counts describe saved records only",
+    "Medicare correction awaits Cooper scope decision",
+    "No merge, publication, deployment or provider apply"
+  ],
+  "recovery": "Revert the complete slice; no provider, registry or deployment state changes"
+}

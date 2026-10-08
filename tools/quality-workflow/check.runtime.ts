@@ -1,6 +1,6 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { Console, Effect, Match, Schema } from "effect";
+import { Array, Console, Effect, Match, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
@@ -33,7 +33,7 @@ export const checkQualityWorkflow = (repositoryRoot: string) =>
     const workflow = yield* fileSystem
       .readFileString(workflowPath)
       .pipe(Effect.flatMap(decodeQualityWorkflow));
-    const decodeJson = <A>(target: string, schema: Schema.Schema<A>) =>
+    const decodeJson = <A>(target: string, schema: Schema.Codec<A, unknown>) =>
       fileSystem.readFileString(path.join(repositoryRoot, target)).pipe(
         Effect.flatMap(
           Schema.decodeUnknownEffect(Schema.fromJsonString(schema), {
@@ -73,12 +73,11 @@ const program = Effect.gen(function* qualityWorkflowMain() {
   const root = yield* path.fromFileUrl(repositoryRootUrl);
   const findings = yield* checkQualityWorkflow(root);
   yield* Console.info(renderQualityWorkflowReport(findings));
-  return yield* Match.value(findings.length).pipe(
-    Match.when(0, () => Effect.void),
-    Match.orElse(() =>
-      Effect.fail(new QualityWorkflowPolicyError({ findings }))
-    )
-  );
+  return yield* Array.match(findings, {
+    onEmpty: () => Effect.void,
+    onNonEmpty: (nonEmpty) =>
+      Effect.fail(new QualityWorkflowPolicyError({ findings: nonEmpty })),
+  });
 }).pipe(
   Effect.tapErrorTag("QualityWorkflowYamlError", (error) =>
     Console.error(

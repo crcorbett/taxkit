@@ -1,7 +1,7 @@
 ---
 title: "API"
 description: "Call TaxKit over HTTP when the caller cannot import the SDK."
-status: "draft"
+status: "published"
 ---
 
 # API
@@ -16,6 +16,7 @@ contracts or OpenAPI reference material.
 - [Errors](./errors.mdx)
 - [OpenAPI reference](./openapi-reference.mdx)
 - [Endpoints](./endpoints.mdx)
+- [Agent connection guide](./agent-tools.mdx)
 
 ## Runtime graph
 
@@ -25,9 +26,8 @@ Production: HTTP calculate
 HTTP caller
   -> @taxkit/api-http route contract
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> CalculationEngine
+      -> PublicCalculatorService.calculate
+        -> CalculationEngine
 ```
 
 ## Related sections

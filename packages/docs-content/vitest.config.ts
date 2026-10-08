@@ -1,18 +1,14 @@
 import mdx from "fumadocs-mdx/vite";
+import { defaultServerConditions } from "vite";
 import { defineConfig } from "vitest/config";
 
-import * as sourceConfig from "./source.config";
+import * as sourceConfig from "./source.config.js";
 
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [
-    await mdx(sourceConfig, {
-      configPath: "source.config.ts",
-      outDir: ".source",
-    }),
+    mdx(sourceConfig, { configPath: "source.config.ts", outDir: ".source" }),
   ],
-  resolve: {
-    conditions: ["source"],
-  },
+  resolve: { conditions: ["source", ...defaultServerConditions] },
   test: {
     environment: "node",
     exclude: ["**/node_modules/**", "**/dist/**"],
@@ -21,4 +17,4 @@ export default defineConfig(async () => ({
     passWithNoTests: true,
     testTimeout: 10_000,
   },
-}));
+});

@@ -1,9 +1,9 @@
 import {
   FactQuestion,
   FactQuestionId,
-  Money,
   makeFactDescriptor,
-} from "@taxkit/core";
+} from "@taxkit/core/facts";
+import { Money } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Context, Match, Schema } from "effect";
 
@@ -73,10 +73,10 @@ export const scaleWeeklyWithholdingToPayPeriodDollars = (
  *
  * @example
  * ```ts
- * import { audDollars } from "@taxkit/core/primitives"
+ * import { Cents, aud } from "@taxkit/core/primitives"
  * import { GrossPay } from "@taxkit/rules-au-pay/facts"
  *
- * const gross = new GrossPay({ amount: audDollars(2_000), period: "fortnightly" })
+ * const gross = new GrossPay({ amount: aud(Cents.make(200_000)), period: "fortnightly" })
  * ```
  */
 export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {

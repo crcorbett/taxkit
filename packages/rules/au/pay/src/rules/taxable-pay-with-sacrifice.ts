@@ -1,7 +1,7 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { moneySub } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Option } from "effect";
 
 import { GrossPayFact, TaxablePay, TaxablePayFact } from "../facts/pay.js";
 import { SalarySacrificeFact } from "../facts/sacrifice.js";
@@ -36,11 +36,11 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
       });
     }
 
-    const taxableAmount = moneySub(gross.amount, sacrifice.amount);
+    const taxableAmount = yield* moneySub(gross.amount, sacrifice.amount);
 
     const trace = TraceNode.make({
       children: [],
-      formula: "taxable = gross - sacrifice",
+      formula: Option.some(Option.some("taxable = gross - sacrifice")),
       inputs: {
         grossCents: gross.amount.cents,
         period: gross.period,
@@ -57,5 +57,12 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
       period: gross.period,
       trace,
     });
-  })
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Taxable pay could not produce a supported amount.",
+        })
+    )
+  )
 );

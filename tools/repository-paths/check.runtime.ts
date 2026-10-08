@@ -4,7 +4,7 @@ import { Array, Console, Effect, Match, Option, Schema, Stream } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import { pipe } from "effect/Function";
 import * as Path from "effect/Path";
-import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import {
   decodeReadableRepositoryText,

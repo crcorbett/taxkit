@@ -1,0 +1,134 @@
+{
+  "document_type": "provider-readback",
+  "lifecycle": "evidence",
+  "authority": "external",
+  "owner": "taxkit-infrastructure-owner",
+  "observedAt": "2026-10-07T05:12:43.991497+00:00",
+  "principal": "Cooper Corbett",
+  "authorityBasis": "Cooper asked to check existing cf CLI connections before creating a new one. Existing login succeeded; no credential was created.",
+  "operation": "Read existing zone DNS records, DNS settings, DNSSEC, registrar and selected zone settings",
+  "cli": {
+    "name": "cf",
+    "version": "1.0.0-beta.11",
+    "profile": "default",
+    "authenticated": true,
+    "tokenValid": true,
+    "selectedReadScopes": [
+      "dns_records:read",
+      "dns_settings:read",
+      "registrar:read",
+      "zone:read",
+      "dynamic-redirect.read",
+      "zone-settings.read"
+    ]
+  },
+  "target": {
+    "accountId": "f9f94270a4a5af8af7010d891020922d",
+    "zoneId": "15103853342ab9f18f7894b7fae39c39",
+    "name": "taxkit.dev",
+    "environment": "existing Production zone"
+  },
+  "zone": {
+    "status": "active",
+    "type": "full",
+    "paused": false,
+    "nameservers": [
+      "joan.ns.cloudflare.com",
+      "kip.ns.cloudflare.com"
+    ],
+    "source": "independent Cloudflare zone lookup and registry RDAP"
+  },
+  "dnsRecords": {
+    "returnedRecords": 0,
+    "page": 1,
+    "perPage": 100,
+    "terminalEmptyPage": true,
+    "paginationMetadataExposed": false,
+    "preservation": "No existing records were returned. Re-read immediately before any authorised domain operation; retain unrelated mail and verification records added later."
+  },
+  "dnsSettings": {
+    "flattenAllCnames": false,
+    "foundationDns": false,
+    "multiProvider": false,
+    "nameserversType": "cloudflare.standard",
+    "nsTtlSeconds": 86400,
+    "secondaryOverrides": false,
+    "zoneMode": "standard",
+    "soaPreservedWithoutDeclaration": true,
+    "internalDnsPreservedWithoutDeclaration": true
+  },
+  "dnssec": {
+    "status": "disabled"
+  },
+  "registrar": {
+    "domain_name": "taxkit.dev",
+    "status": "active",
+    "created_at": "2026-10-03T05:08:24Z",
+    "expires_at": "2027-10-03T05:08:24Z",
+    "auto_renew": true,
+    "locked": true
+  },
+  "selectedZoneSettings": {
+    "always_use_https": {
+      "id": "always_use_https",
+      "value": "off",
+      "editable": true
+    },
+    "ssl": {
+      "id": "ssl",
+      "value": "full",
+      "editable": true,
+      "modified_on": null
+    },
+    "min_tls_version": {
+      "id": "min_tls_version",
+      "value": "1.0",
+      "editable": true,
+      "modified_on": null
+    },
+    "automatic_https_rewrites": {
+      "id": "automatic_https_rewrites",
+      "value": "on",
+      "editable": true
+    },
+    "ipv6": {
+      "id": "ipv6",
+      "value": "on",
+      "editable": true,
+      "modified_on": "2026-10-03T05:08:24.084181Z"
+    },
+    "http3": {
+      "id": "http3",
+      "value": "on",
+      "editable": true,
+      "modified_on": null
+    },
+    "websockets": {
+      "id": "websockets",
+      "value": "on",
+      "editable": true
+    }
+  },
+  "sharedDynamicRedirectPhase": {
+    "httpStatus": 404,
+    "code": 10003,
+    "message": "could not find entrypoint ruleset in the http_request_dynamic_redirect phase"
+  },
+  "credentialCreated": false,
+  "providerWrites": false,
+  "applicationClaims": [],
+  "limits": [
+    "CLI DNS output is an empty first page; pagination metadata is not exposed.",
+    "General zone settings are the seven selected GETs, not a complete settings catalogue.",
+    "No apply, attachment, certificate, public runtime or rollback proof.",
+    "DNSSEC remains disabled; registrar lock and automatic renewal stay as read.",
+    "No certificate or public endpoint availability is established.",
+    "The native redirect read fallback is corrected and locally qualified against mocked receiving source and compiled providers. Live native planning/apply and secret custody remain unqualified."
+  ],
+  "nextReadback": [
+    "Check exact account and zone again.",
+    "Read every DNS page and retain foreign records.",
+    "Read shared redirect rules and retain foreign rules.",
+    "After separately approved apply, read domain attachments, certificates, DNS/TLS and actual website/API behaviour independently."
+  ]
+}

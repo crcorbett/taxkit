@@ -1,8 +1,10 @@
 ---
-status: canonical
-last_reviewed: 2026-05-24
-source_of_truth: package-readme
-confidence: medium
+document_type: package-readme
+lifecycle: current
+authority: canonical
+owner: taxkit-http-api-owner
+last_reviewed: 2026-10-07
+review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
 # HTTP API
@@ -19,6 +21,11 @@ calculator schemas, catalog entries, metadata projections, graph construction,
 calculation dispatch and schema-guided expected error shaping live in
 `@taxkit/calculators`.
 
+The root export includes `HealthResponse`, the same Schema used by the health
+endpoint. The API app's smoke check uses this owner to validate the real health
+response without copying its shape. This addition preserves the health wire
+format and all existing routes.
+
 The implemented API surface is:
 
 - `GET /api/health`
@@ -33,29 +40,52 @@ The implemented API surface is:
 - `GET /api/v1/calculators/:calculatorId/graph`
 - `GET /api/v1/facts`
 - `GET /api/v1/rules`
+- `GET /api/v1/docs/navigation`
+- `GET /api/v1/docs/page?path=/start/quickstart`
+- `GET /api/v1/docs/search?term=Quickstart`
+- `GET /api/v1/docs/markdown?path=/start/quickstart`
 
-The public calculation API routes expose the reusable calculator catalog,
-canonical fact descriptors, canonical rule descriptors and graph validation
-diagnostics from `@taxkit/calculators`. Metadata handlers pass route params
-and query values to `PublicCalculatorService`. The calculate handler delegates
-one full run to `@taxkit/sdk/effect` `calculateRunRequest`, then maps tagged
-service failures into route-owned HTTP error envelopes.
+The public calculation API routes use the reusable calculator catalogue,
+fact and rule descriptors and graph diagnostics from `@taxkit/calculators`.
+Every handler, including Calculate, calls `PublicCalculatorService` directly.
+The HTTP Calculate route supplies its checked route ID, body and query to the
+same named `calculate` operation used by native RPC. Expected service failures
+keep the existing HTTP envelope. The status declarations below describe the
+additional request and operation protections.
+The SDK is a test-only comparison dependency, rather than a server dependency.
+
+`@taxkit/api-http/server` exports `TaxKitApiRoutesLayer` for application-owned
+service and CORS composition. It also retains `TaxKitServerLayer` with the
+existing calculator engine and CORS defaults for Bun and in-process consumers.
+Both server Layers require the caller's `ContentService`. API hosts supply the
+accepted build output; the HTTP package imports only the compiled content
+contracts. The native API host supplies its shared calculator service to HTTP
+and RPC.
+
+The `content` group delegates navigation, page lookup and search to that same
+content service. Markdown returns the owning processed page body as
+`text/markdown`. Page queries use checked, bounded public addresses; search
+terms have the owning 100-character limit. Missing pages return fixed typed
+JSON 404 guidance and a search-source failure returns fixed typed JSON 503
+guidance, without reflecting paths or source-error messages. Native invalid
+query responses are empty 400 replies. This surface returns accepted public
+documentation only, not personal calculation reports.
+
+`TaxKitApiInProcessClientLive` also requires supplied content. It now uses the
+native Effect HTTP client and router in the caller's Layer scope; each request
+closes its own scope. It creates no web-handler runner or Promise bridge.
+Its generated client checks the same response Schemas as remote consumers.
 
 ```ts
-Production: HTTP calculate
+HTTP calculate
 
-apps/api Bun process
-  -> TaxKitServerLayer
+API host
+  -> TaxKitApiRoutesLayer
     -> CalculatorApiHandlerLive
-      -> sdkCalculationFor(params.calculatorId)
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorService.calculate
-          -> CalculatorCatalogEntry.inputSchema decode
-          -> CalculationEngine
-          -> CalculatorRunResponseData
-        -> descriptor output decode for response.report
-        -> typed CalculatorRunResponse with narrowed report
-      -> CalculatorApiErrorEnvelope on CalculatorServiceError
+      -> PublicCalculatorService.calculate({ calculatorId, payload, ...query })
+        -> selected calculator input decode and CalculationEngine
+        -> CalculatorRunResponseData
+      -> existing CalculatorApiErrorEnvelope on expected failure
 ```
 
 ```ts
@@ -64,9 +94,8 @@ Tests: in-process HTTP client
 HTTP API tests
   -> TaxKitApiInProcessClientLive
     -> CalculatorApiHandlerLive
-      -> @taxkit/sdk/effect calculateRunRequest
-        -> PublicCalculatorServiceLive
-          -> CalculationEngineLive
+      -> PublicCalculatorServiceLive
+        -> CalculationEngineLive
   -> success response equals SDK full-run response
   -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
 ```
@@ -109,6 +138,7 @@ Export paths:
 - `@taxkit/api-http/client/live`
 - `@taxkit/api-http/client/server`
 - `@taxkit/api-http/config`
+- `@taxkit/api-http/request-boundary`
 - `@taxkit/api-http/server`
 - `@taxkit/api-http/handlers`
 - `@taxkit/api-http/handlers/live`
@@ -185,9 +215,8 @@ bun run --filter=api smoke:public-routes
 module, so a route, method, status envelope or schema-reference change flows
 through the same `OpenApi.fromApi(TaxKitApi)` call graph.
 
-Effect `4.0.0-rc.117` generates encoded component names with an `Encoded`
-suffix and nests the supported tax-year union one level deeper. The current
-snapshot records that document change. The route paths, methods, status codes
+Effect `4.0.0` retains encoded component names with an `Encoded`
+suffix and nests the supported tax-year union one level deeper. The committed snapshot is unchanged by the stable-v4 migration. The route paths, methods, status codes
 and JSON field names remain the same; the API smoke and route tests check
 their runtime behaviour.
 
@@ -237,9 +266,13 @@ surface. `__tests__/public-calculation-api.test.ts` covers:
 - schema-guided calculator input errors through `CalculatorApiErrorEnvelope`
 
 The calculate success fixture compares the HTTP response with
-`@taxkit/sdk/effect` `calculateRunRequest`. The expected input-error fixture
-decodes the transport envelope and checks that the underlying
-`CalculatorServiceError` matches the SDK and calculator service failures.
+`@taxkit/sdk/effect` `calculateRunRequest`. The typed client decodes the transport
+response once. These fixtures check the
+already decoded response and error against the owning Schema Type, including
+trace and question Options, rather than applying wire decoding a second time.
+The input-error fixture checks that the underlying `CalculatorServiceError`
+matches the SDK and calculator service failures, then encodes the canonical
+envelope to check that rejected input and private paths are absent.
 
 `apps/api` owns the live process smoke:
 
@@ -320,3 +353,77 @@ actual API tarball and imports all JavaScript public entrypoints.
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/testing-and-quality.md`
 - `docs/product-specs/documentation-improvement-roadmap.md`
+
+## Contract verification boundaries
+
+The OpenAPI snapshot test uses Effect FileSystem and the owning JSON Schema
+codec; the committed normalized snapshot remains the wire-contract oracle.
+The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
+Both test files are checked by `tsconfig.test.json` in `check-types`, including
+canonical branded identities and explicit Match narrowing of report/error unions.
+
+The in-process Fetch adapter retains its required Promise return signature in
+one exact lint admission. It contains no async orchestration or Effect runner.
+Real CLI fixtures prove adjacent files reject the signature and the admitted
+file still rejects async/await. This preserves the current host bridge pending
+the separate native app composition task; it is not native Worker lifetime proof.
+
+The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
+across HTTP and RPC, including individual batch messages, with a five-second
+operation budget for all nine service methods. Checked capacity and operation-timeout errors become HTTP
+503/504 envelopes or canonical RPC errors. Website guidance requests
+manual retry only. This is separate from the body-read and ten-second client
+budgets. Metadata does not use a calculation place. Native built proof covers a
+seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
+browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
+cannot be stopped by a JavaScript timer; a late-result check rejects it after
+control returns. The native rate policy below is implemented separately; MCP and whole T004
+qualification remain unfinished.
+
+
+## Shared request admission
+
+`@taxkit/api-http/request-boundary` owns the streamed 64 KiB POST body limit and
+five-second total read deadline. It counts encoded bytes before parsing, closes
+rejected/interrupted readers and rejects late synchronous reads after control
+returns. The retained standalone server applies it before calculator decoding;
+native API and Website hosts use the same owner. The RPC entrypoint re-exports
+its original four symbols for compatibility. Only the native API host's outer
+composition covers both HTTP and RPC; a custom route host must supply its own
+admission middleware.
+
+Fixed Schema-owned request errors use HTTP 413 (`request-too-large`, reduce the
+request) and 408 (`request-timeout`, retry manually). JSON responses use the
+`error` envelope. Website form hosts select the checked HTML policy, producing a
+fixed message and link back to the calculators without reflecting input or URLs.
+The calculation endpoint declares both statuses in OpenAPI. Every metadata
+endpoint declares 504 for the shared operation timeout; lookup failures retain
+400. Metadata never consumes a calculation place. No automatic retry is added.
+
+
+Calculator-owned context, help and filter fields use `Option<Option<A>>` in
+checked TypeScript values: `None` means a missing key, `Some(None)` means a
+present undefined key, and `Some(Some(value))` means a present value. Owning
+constructors default omitted keys to `None`. JSON and HTTP query fields retain
+their ordinary optional representation. Flatten the two absent forms only where
+they mean the same thing; do not invent a jurisdiction or tax year.
+
+Typed client calls use canonical constructor values. Raw HTTP JSON and query
+strings still encode and decode through the owning request codecs; the OpenAPI
+snapshot remains the representation contract.
+
+
+The reusable Core calculation error now has a nested Option cause in checked
+TypeScript values. Its existing HTTP representation is retained, including
+missing/undefined/null diagnostic forms. This is an absence-owner change, not
+a diagnostic sanitiser; do not export legacy diagnostic values to telemetry.
+
+
+## Native calculation rate admission
+
+The [calculator-owned rate contract](../../calculators/README.md#native-calculation-rate-admission) adds canonical rate/unavailable errors to calculation responses. The native API maps them to HTTP 429 with `Retry-After: 60` and fixed 503 guidance, using the existing error envelope. Metadata consumes no rate unit. Owning group Schemas drive generated clients and the OpenAPI snapshot; the standalone Bun host keeps its existing policy.
+
+The public page-address refinement and fixed documentation errors now belong
+to `@taxkit/content`, shared with native documentation RPC. This package retains
+its existing error exports and HTTP status/media rules. Generated OpenAPI names
+the same canonical address bound for both the request and returned page.

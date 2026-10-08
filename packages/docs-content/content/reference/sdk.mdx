@@ -1,7 +1,7 @@
 ---
 title: "SDK reference"
 description: "Find the public TypeScript SDK entrypoints and their owning package exports."
-status: "draft"
+status: "published"
 ---
 
 # SDK reference
@@ -28,23 +28,23 @@ Use `TaxKit.calculate` when you already have descriptor-typed input and want a
 Promise for the report:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
 Use the AU helper when you do not need to pass the descriptor yourself:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 ```
 
@@ -53,12 +53,12 @@ const report = await au.incomeTax.annual({
 Use `TaxKit.safe.calculate` when expected calculator failures should be values:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/core/primitives";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(9_000_000),
+  taxableIncome: aud(Cents.make(9_000_000)),
 });
 
 if (result._tag === "TaxKitSuccess") {
@@ -72,16 +72,22 @@ Use `calculateRunRequest` when you need a full `CalculatorRunResponse` with the
 descriptor-decoded report:
 
 ```ts
-import { aud } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/core/primitives";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 import { calculateRunRequest } from "@taxkit/sdk/effect";
+import { Effect, Option } from "effect";
 
-const effect = calculateRunRequest(AuAnnualIncomeTaxCalculation, {
-  payload: {
-    facts: { taxableIncome: aud(9_000_000) },
-    jurisdiction: AuAnnualIncomeTaxCalculation.jurisdiction,
-    taxYear: AuAnnualIncomeTaxCalculation.taxYear,
-  },
+const effect = Effect.gen(function* () {
+  const taxableIncome = yield* audFromCents(9_000_000);
+  return yield* calculateRunRequest(AuAnnualIncomeTaxCalculation, {
+    payload: {
+      facts: { taxableIncome },
+      jurisdiction: Option.some(
+        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
+      ),
+      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
+    },
+  });
 });
 ```
 

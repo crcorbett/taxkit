@@ -1,6 +1,9 @@
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context } from "effect";
+import type { Effect, Layer } from "effect";
 
-import { GraphValidationIssue } from "../graph/rule-graph.js";
+import type { CalculationDiagnostics } from "./schemas.js";
+
+export { CalculationDiagnostics } from "./schemas.js";
 
 /**
  * Input accepted by the core calculation engine.
@@ -14,20 +17,8 @@ import { GraphValidationIssue } from "../graph/rule-graph.js";
 export interface CalculationRequest<A, E, R> {
   readonly calculation: Effect.Effect<A, E, R>;
   readonly layer: Layer.Layer<R, E>;
-  readonly validationIssues?: readonly GraphValidationIssue[];
+  readonly validationIssues?: CalculationDiagnostics["graphIssues"];
 }
-
-/**
- * Diagnostics returned by the calculation engine.
- *
- * @since 0.1.0
- */
-export class CalculationDiagnostics extends Schema.TaggedClass<CalculationDiagnostics>()(
-  "CalculationDiagnostics",
-  {
-    graphIssues: Schema.Array(GraphValidationIssue),
-  }
-) {}
 
 /**
  * Result envelope returned by the calculation engine.
@@ -59,21 +50,3 @@ export class CalculationEngine extends Context.Service<
   CalculationEngine,
   CalculationEngineService
 >()("taxkit/core/CalculationEngine") {}
-
-/**
- * Live core calculation engine implementation.
- *
- * @since 0.1.0
- */
-export const CalculationEngineLive = Layer.succeed(CalculationEngine)({
-  run: (request) =>
-    request.calculation.pipe(
-      Effect.provide(request.layer),
-      Effect.map((report) => ({
-        diagnostics: new CalculationDiagnostics({
-          graphIssues: [...(request.validationIssues ?? [])],
-        }),
-        report,
-      }))
-    ),
-});

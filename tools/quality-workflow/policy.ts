@@ -1,10 +1,19 @@
-import { Effect, Schema } from "effect";
-import ts from "typescript";
+import ts from "@typescript/typescript6";
+import {
+  Array as EffectArray,
+  Effect,
+  HashSet,
+  Option,
+  Order,
+  Record,
+  Schema,
+} from "effect";
 import { parseDocument } from "yaml";
 
 import {
   QualityWorkflowDocument,
   QualityWorkflowFinding,
+  QualityWorkflowInputError,
   QualityWorkflowYamlError,
 } from "./schemas.js";
 import type {
@@ -60,7 +69,7 @@ const bunCachePathCommand = 'echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"';
 const playwrightCachePathCommand =
   'echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"';
 const playwrightIdentityCommand =
-  'echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d\' \' -f2)" >> "$GITHUB_OUTPUT"';
+  'echo "version=$(apps/web/node_modules/.bin/playwright --version | cut -d\' \' -f2)" >> "$GITHUB_OUTPUT"';
 const expectedBunCachePath = [
   workflowExpressionPrefix,
   "{{ steps.bun-cache-path.outputs.path }}",
@@ -105,7 +114,7 @@ const expectedRunSteps: readonly string[] = [
   "bun install --frozen-lockfile",
   playwrightCachePathCommand,
   playwrightIdentityCommand,
-  "apps/docs/node_modules/.bin/playwright install --with-deps chromium",
+  "apps/web/node_modules/.bin/playwright install --with-deps chromium",
   "bun run check:quality-workflow",
   dopplerIdentityCommand,
   "bun run release:check -- --ci",
@@ -125,7 +134,7 @@ type UntrustedWorkflowValue = typeof Schema.Unknown.Type;
 type WorkflowRecord = typeof UnknownRecord.Type;
 
 const finding = (
-  invariant: (typeof QualityWorkflowFinding.Type)["invariant"],
+  invariant: QualityWorkflowFinding["invariant"],
   target: string,
   recovery: string
 ) => new QualityWorkflowFinding({ invariant, recovery, target });
@@ -135,7 +144,7 @@ const asRecord = (value: UntrustedWorkflowValue): WorkflowRecord | null =>
 
 const hasOnly = (record: WorkflowRecord, expected: string[]) =>
   Reflect.ownKeys(record).length === expected.length &&
-  expected.every((key) => key in record);
+  EffectArray.every(expected, (key) => key in record);
 
 const unwrapExpression = (expression: ts.Expression): ts.Expression => {
   if (ts.isParenthesizedExpression(expression)) {
@@ -158,31 +167,30 @@ const callIdentity = (expression: ts.Expression): string | null => {
   return null;
 };
 
-const callExpressions = (node: ts.Node) => {
-  const calls: ts.CallExpression[] = [];
-  const visit = (child: ts.Node) => {
-    if (ts.isCallExpression(child)) {
-      calls.push(child);
-    }
-    ts.forEachChild(child, visit);
-  };
-  visit(node);
-  return calls;
-};
+// Syntax children include tokens; filtering by node kind preserves semantic traversal.
+const syntaxNodes = (node: ts.Node): readonly ts.Node[] => [
+  node,
+  ...EffectArray.flatMap(node.getChildren(), syntaxNodes),
+];
+
+const callExpressions = (node: ts.Node) =>
+  EffectArray.filter(syntaxNodes(node), ts.isCallExpression);
 
 const hasNamedImport = (
   file: ts.SourceFile,
   moduleName: string,
   importedName: string
 ) =>
-  file.statements.some(
+  EffectArray.some(
+    file.statements,
     (statement) =>
       ts.isImportDeclaration(statement) &&
       ts.isStringLiteral(statement.moduleSpecifier) &&
       statement.moduleSpecifier.text === moduleName &&
       statement.importClause?.namedBindings !== undefined &&
       ts.isNamedImports(statement.importClause.namedBindings) &&
-      statement.importClause.namedBindings.elements.some(
+      EffectArray.some(
+        statement.importClause.namedBindings.elements,
         (element) =>
           element.name.text === importedName &&
           (element.propertyName?.text ?? element.name.text) === importedName
@@ -190,40 +198,42 @@ const hasNamedImport = (
   );
 
 const hasShadowedReservedCallBinding = (file: ts.SourceFile) => {
-  const reserved = new Set([
+  const reserved = HashSet.fromIterable([
     "Console",
     "createReleaseReadinessPlan",
+    "renderReleaseReadinessReport",
     "runCiReleaseReadiness",
   ]);
-  let shadowed = false;
-  const visit = (node: ts.Node) => {
-    const namedDeclaration =
-      ts.isVariableDeclaration(node) ||
-      ts.isParameter(node) ||
-      ts.isFunctionDeclaration(node) ||
-      ts.isClassDeclaration(node);
-    if (
-      namedDeclaration &&
+  return EffectArray.some(
+    syntaxNodes(file),
+    (node) =>
+      (ts.isVariableDeclaration(node) ||
+        ts.isParameter(node) ||
+        ts.isFunctionDeclaration(node) ||
+        ts.isClassDeclaration(node)) &&
       node.name !== undefined &&
       ts.isIdentifier(node.name) &&
-      reserved.has(node.name.text)
-    ) {
-      shadowed = true;
-    }
-    ts.forEachChild(node, visit);
-  };
-  visit(file);
-  return shadowed;
+      HashSet.has(reserved, node.name.text)
+  );
 };
 
 // oxlint-disable-next-line complexity -- every trigger key and path-filter variant is checked independently so CI cannot skip a boundary.
 const inspectTrigger = (
   triggers: WorkflowRecord
 ): readonly QualityWorkflowFinding[] => {
-  const pullRequest = triggers.pull_request;
+  const pullRequest = Record.get(triggers ?? {}, "pull_request").pipe(
+    Option.getOrUndefined
+  );
   const pullRequestRecord = asRecord(pullRequest);
-  const push = asRecord(triggers.push);
-  const branches = Array.isArray(push?.branches) ? push.branches : [];
+  const push = asRecord(
+    Record.get(triggers ?? {}, "push").pipe(Option.getOrUndefined)
+  );
+  const branchValue = Record.get(push ?? {}, "branches").pipe(
+    Option.getOrUndefined
+  );
+  const branches = Schema.is(Schema.Array(Schema.Unknown))(branchValue)
+    ? branchValue
+    : [];
   const noPathFilters =
     !Object.hasOwn(triggers, "paths") &&
     !Object.hasOwn(triggers, "paths-ignore") &&
@@ -253,7 +263,7 @@ const inspectTrigger = (
 const inspectSteps = (
   steps: UntrustedWorkflowValue
 ): readonly QualityWorkflowFinding[] => {
-  if (!Array.isArray(steps)) {
+  if (!Schema.is(Schema.Array(Schema.Unknown))(steps)) {
     return [
       finding(
         "workflow-job-shape",
@@ -262,113 +272,202 @@ const inspectSteps = (
       ),
     ];
   }
-  const actionSteps = steps
-    .map(asRecord)
-    .filter((step): step is WorkflowRecord => step !== null)
-    .flatMap((step) =>
-      Schema.is(Schema.String)(step.uses) ? [step.uses] : []
-    );
-  const runSteps = steps
-    .map(asRecord)
-    .filter((step): step is WorkflowRecord => step !== null)
-    .flatMap((step) => (Schema.is(Schema.String)(step.run) ? [step.run] : []));
+  const records: readonly WorkflowRecord[] = EffectArray.filter(
+    EffectArray.map(steps, asRecord),
+    (step): step is WorkflowRecord => step !== null
+  );
+  const actionSteps = EffectArray.flatMap(records, (step: WorkflowRecord) => {
+    const value = Record.get(step, "uses").pipe(Option.getOrUndefined);
+    return Schema.is(Schema.String)(value) ? [value] : [];
+  });
+  const runSteps = EffectArray.flatMap(records, (step: WorkflowRecord) => {
+    const value = Record.get(step, "run").pipe(Option.getOrUndefined);
+    return Schema.is(Schema.String)(value) ? [value] : [];
+  });
   const validActionSteps =
     actionSteps.length === expectedActionSteps.length &&
-    actionSteps.every(
+    EffectArray.every(
+      actionSteps,
       (step) => actionPin.test(step) && expectedActionSteps.includes(step)
     ) &&
-    expectedActionSteps.every(
+    EffectArray.every(
+      expectedActionSteps,
       (step) =>
-        actionSteps.filter((actual) => actual === step).length ===
-        expectedActionSteps.filter((expected) => expected === step).length
+        EffectArray.filter(actionSteps, (actual) => actual === step).length ===
+        EffectArray.filter(expectedActionSteps, (expected) => expected === step)
+          .length
     );
   const validRunSteps =
     runSteps.length === expectedRunSteps.length &&
-    runSteps.every((step) => expectedRunSteps.includes(step)) &&
-    expectedRunSteps.every(
+    EffectArray.every(runSteps, (step) => expectedRunSteps.includes(step)) &&
+    EffectArray.every(
+      expectedRunSteps,
       (step) =>
-        runSteps.filter((actual) => actual === step).length ===
-        expectedRunSteps.filter((expected) => expected === step).length
+        EffectArray.filter(runSteps, (actual) => actual === step).length ===
+        EffectArray.filter(expectedRunSteps, (expected) => expected === step)
+          .length
     );
-  const checkoutStep = asRecord(steps[0]);
-  const checkoutWith = asRecord(checkoutStep?.with);
-  const historyStep = asRecord(steps[1]);
-  const setupStep = asRecord(steps[2]);
-  const setupWith = asRecord(setupStep?.with);
-  const bunCachePathStep = asRecord(steps[3]);
-  const bunCacheRestoreStep = asRecord(steps[4]);
-  const bunCacheRestoreWith = asRecord(bunCacheRestoreStep?.with);
-  const installStep = asRecord(steps[5]);
-  const bunCacheSaveStep = asRecord(steps[6]);
-  const bunCacheSaveWith = asRecord(bunCacheSaveStep?.with);
-  const playwrightCachePathStep = asRecord(steps[7]);
-  const playwrightIdentityStep = asRecord(steps[8]);
-  const playwrightCacheRestoreStep = asRecord(steps[9]);
-  const playwrightCacheRestoreWith = asRecord(playwrightCacheRestoreStep?.with);
-  const browserStep = asRecord(steps[10]);
-  const playwrightCacheSaveStep = asRecord(steps[11]);
-  const playwrightCacheSaveWith = asRecord(playwrightCacheSaveStep?.with);
-  const policyStep = asRecord(steps[12]);
-  const dopplerStep = asRecord(steps[13]);
-  const dopplerWith = asRecord(dopplerStep?.with);
-  const identityStep = asRecord(steps[14]);
-  const identityEnv = asRecord(identityStep?.env);
-  const trustedReleaseStep = asRecord(steps[15]);
-  const trustedReleaseEnv = asRecord(trustedReleaseStep?.env);
-  const forkReleaseStep = asRecord(steps[16]);
-  const forkReleaseEnv = asRecord(forkReleaseStep?.env);
+  const checkoutStep = asRecord(
+    EffectArray.get(steps, 0).pipe(Option.getOrUndefined)
+  );
+  const checkoutWith = asRecord(
+    Record.get(checkoutStep ?? {}, "with").pipe(Option.getOrUndefined)
+  );
+  const historyStep = asRecord(
+    EffectArray.get(steps, 1).pipe(Option.getOrUndefined)
+  );
+  const setupStep = asRecord(
+    EffectArray.get(steps, 2).pipe(Option.getOrUndefined)
+  );
+  const setupWith = asRecord(
+    Record.get(setupStep ?? {}, "with").pipe(Option.getOrUndefined)
+  );
+  const bunCachePathStep = asRecord(
+    EffectArray.get(steps, 3).pipe(Option.getOrUndefined)
+  );
+  const bunCacheRestoreStep = asRecord(
+    EffectArray.get(steps, 4).pipe(Option.getOrUndefined)
+  );
+  const bunCacheRestoreWith = asRecord(
+    Record.get(bunCacheRestoreStep ?? {}, "with").pipe(Option.getOrUndefined)
+  );
+  const installStep = asRecord(
+    EffectArray.get(steps, 5).pipe(Option.getOrUndefined)
+  );
+  const bunCacheSaveStep = asRecord(
+    EffectArray.get(steps, 6).pipe(Option.getOrUndefined)
+  );
+  const bunCacheSaveWith = asRecord(
+    Record.get(bunCacheSaveStep ?? {}, "with").pipe(Option.getOrUndefined)
+  );
+  const playwrightCachePathStep = asRecord(
+    EffectArray.get(steps, 7).pipe(Option.getOrUndefined)
+  );
+  const playwrightIdentityStep = asRecord(
+    EffectArray.get(steps, 8).pipe(Option.getOrUndefined)
+  );
+  const playwrightCacheRestoreStep = asRecord(
+    EffectArray.get(steps, 9).pipe(Option.getOrUndefined)
+  );
+  const playwrightCacheRestoreWith = asRecord(
+    Record.get(playwrightCacheRestoreStep ?? {}, "with").pipe(
+      Option.getOrUndefined
+    )
+  );
+  const browserStep = asRecord(
+    EffectArray.get(steps, 10).pipe(Option.getOrUndefined)
+  );
+  const playwrightCacheSaveStep = asRecord(
+    EffectArray.get(steps, 11).pipe(Option.getOrUndefined)
+  );
+  const playwrightCacheSaveWith = asRecord(
+    Record.get(playwrightCacheSaveStep ?? {}, "with").pipe(
+      Option.getOrUndefined
+    )
+  );
+  const policyStep = asRecord(
+    EffectArray.get(steps, 12).pipe(Option.getOrUndefined)
+  );
+  const dopplerStep = asRecord(
+    EffectArray.get(steps, 13).pipe(Option.getOrUndefined)
+  );
+  const dopplerWith = asRecord(
+    Record.get(dopplerStep ?? {}, "with").pipe(Option.getOrUndefined)
+  );
+  const identityStep = asRecord(
+    EffectArray.get(steps, 14).pipe(Option.getOrUndefined)
+  );
+  const identityEnv = asRecord(
+    Record.get(identityStep ?? {}, "env").pipe(Option.getOrUndefined)
+  );
+  const trustedReleaseStep = asRecord(
+    EffectArray.get(steps, 15).pipe(Option.getOrUndefined)
+  );
+  const trustedReleaseEnv = asRecord(
+    Record.get(trustedReleaseStep ?? {}, "env").pipe(Option.getOrUndefined)
+  );
+  const forkReleaseStep = asRecord(
+    EffectArray.get(steps, 16).pipe(Option.getOrUndefined)
+  );
+  const forkReleaseEnv = asRecord(
+    Record.get(forkReleaseStep ?? {}, "env").pipe(Option.getOrUndefined)
+  );
   const exactSteps =
     steps.length === 17 &&
     checkoutStep !== null &&
     hasOnly(checkoutStep, ["uses", "with"]) &&
-    checkoutStep.uses === checkoutAction &&
+    Record.get(checkoutStep ?? {}, "uses").pipe(Option.getOrUndefined) ===
+      checkoutAction &&
     checkoutWith !== null &&
     hasOnly(checkoutWith, ["fetch-depth"]) &&
-    checkoutWith["fetch-depth"] === 0 &&
+    Record.get(checkoutWith, "fetch-depth").pipe(Option.getOrUndefined) === 0 &&
     historyStep !== null &&
     hasOnly(historyStep, ["run"]) &&
-    historyStep.run ===
+    Record.get(historyStep ?? {}, "run").pipe(Option.getOrUndefined) ===
       "git show-ref --verify --quiet refs/heads/main || git branch --track main origin/main" &&
     setupStep !== null &&
     hasOnly(setupStep, ["uses", "with"]) &&
-    setupStep.uses ===
+    Record.get(setupStep ?? {}, "uses").pipe(Option.getOrUndefined) ===
       "oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6" &&
     setupWith !== null &&
     hasOnly(setupWith, ["bun-version-file"]) &&
-    setupWith["bun-version-file"] === ".bun-version" &&
+    Record.get(setupWith, "bun-version-file").pipe(Option.getOrUndefined) ===
+      ".bun-version" &&
     bunCachePathStep !== null &&
     hasOnly(bunCachePathStep, ["id", "run"]) &&
-    bunCachePathStep.id === "bun-cache-path" &&
-    bunCachePathStep.run === bunCachePathCommand &&
+    Record.get(bunCachePathStep ?? {}, "id").pipe(Option.getOrUndefined) ===
+      "bun-cache-path" &&
+    Record.get(bunCachePathStep ?? {}, "run").pipe(Option.getOrUndefined) ===
+      bunCachePathCommand &&
     bunCacheRestoreStep !== null &&
     hasOnly(bunCacheRestoreStep, ["id", "uses", "continue-on-error", "with"]) &&
-    bunCacheRestoreStep.id === "bun-cache-restore" &&
-    bunCacheRestoreStep.uses === cacheRestoreAction &&
-    bunCacheRestoreStep["continue-on-error"] === true &&
+    Record.get(bunCacheRestoreStep ?? {}, "id").pipe(Option.getOrUndefined) ===
+      "bun-cache-restore" &&
+    Record.get(bunCacheRestoreStep ?? {}, "uses").pipe(
+      Option.getOrUndefined
+    ) === cacheRestoreAction &&
+    Record.get(bunCacheRestoreStep, "continue-on-error").pipe(
+      Option.getOrUndefined
+    ) === true &&
     bunCacheRestoreWith !== null &&
     hasOnly(bunCacheRestoreWith, ["path", "key"]) &&
-    bunCacheRestoreWith.path === expectedBunCachePath &&
-    bunCacheRestoreWith.key === expectedBunCacheKey &&
+    Record.get(bunCacheRestoreWith ?? {}, "path").pipe(
+      Option.getOrUndefined
+    ) === expectedBunCachePath &&
+    Record.get(bunCacheRestoreWith ?? {}, "key").pipe(Option.getOrUndefined) ===
+      expectedBunCacheKey &&
     installStep !== null &&
     hasOnly(installStep, ["run"]) &&
-    installStep.run === "bun install --frozen-lockfile" &&
+    Record.get(installStep ?? {}, "run").pipe(Option.getOrUndefined) ===
+      "bun install --frozen-lockfile" &&
     bunCacheSaveStep !== null &&
     hasOnly(bunCacheSaveStep, ["uses", "if", "continue-on-error", "with"]) &&
-    bunCacheSaveStep.uses === cacheSaveAction &&
-    bunCacheSaveStep.if ===
+    Record.get(bunCacheSaveStep ?? {}, "uses").pipe(Option.getOrUndefined) ===
+      cacheSaveAction &&
+    Record.get(bunCacheSaveStep ?? {}, "if").pipe(Option.getOrUndefined) ===
       "steps.bun-cache-restore.outputs.cache-hit != 'true'" &&
-    bunCacheSaveStep["continue-on-error"] === true &&
+    Record.get(bunCacheSaveStep, "continue-on-error").pipe(
+      Option.getOrUndefined
+    ) === true &&
     bunCacheSaveWith !== null &&
     hasOnly(bunCacheSaveWith, ["path", "key"]) &&
-    bunCacheSaveWith.path === expectedBunCachePath &&
-    bunCacheSaveWith.key === expectedBunSaveKey &&
+    Record.get(bunCacheSaveWith ?? {}, "path").pipe(Option.getOrUndefined) ===
+      expectedBunCachePath &&
+    Record.get(bunCacheSaveWith ?? {}, "key").pipe(Option.getOrUndefined) ===
+      expectedBunSaveKey &&
     playwrightCachePathStep !== null &&
     hasOnly(playwrightCachePathStep, ["run"]) &&
-    playwrightCachePathStep.run === playwrightCachePathCommand &&
+    Record.get(playwrightCachePathStep ?? {}, "run").pipe(
+      Option.getOrUndefined
+    ) === playwrightCachePathCommand &&
     playwrightIdentityStep !== null &&
     hasOnly(playwrightIdentityStep, ["id", "run"]) &&
-    playwrightIdentityStep.id === "playwright-identity" &&
-    playwrightIdentityStep.run === playwrightIdentityCommand &&
+    Record.get(playwrightIdentityStep ?? {}, "id").pipe(
+      Option.getOrUndefined
+    ) === "playwright-identity" &&
+    Record.get(playwrightIdentityStep ?? {}, "run").pipe(
+      Option.getOrUndefined
+    ) === playwrightIdentityCommand &&
     playwrightCacheRestoreStep !== null &&
     hasOnly(playwrightCacheRestoreStep, [
       "id",
@@ -376,17 +475,27 @@ const inspectSteps = (
       "continue-on-error",
       "with",
     ]) &&
-    playwrightCacheRestoreStep.id === "playwright-cache-restore" &&
-    playwrightCacheRestoreStep.uses === cacheRestoreAction &&
-    playwrightCacheRestoreStep["continue-on-error"] === true &&
+    Record.get(playwrightCacheRestoreStep ?? {}, "id").pipe(
+      Option.getOrUndefined
+    ) === "playwright-cache-restore" &&
+    Record.get(playwrightCacheRestoreStep ?? {}, "uses").pipe(
+      Option.getOrUndefined
+    ) === cacheRestoreAction &&
+    Record.get(playwrightCacheRestoreStep, "continue-on-error").pipe(
+      Option.getOrUndefined
+    ) === true &&
     playwrightCacheRestoreWith !== null &&
     hasOnly(playwrightCacheRestoreWith, ["path", "key"]) &&
-    playwrightCacheRestoreWith.path === expectedPlaywrightCachePath &&
-    playwrightCacheRestoreWith.key === expectedPlaywrightCacheKey &&
+    Record.get(playwrightCacheRestoreWith ?? {}, "path").pipe(
+      Option.getOrUndefined
+    ) === expectedPlaywrightCachePath &&
+    Record.get(playwrightCacheRestoreWith ?? {}, "key").pipe(
+      Option.getOrUndefined
+    ) === expectedPlaywrightCacheKey &&
     browserStep !== null &&
     hasOnly(browserStep, ["run"]) &&
-    browserStep.run ===
-      "apps/docs/node_modules/.bin/playwright install --with-deps chromium" &&
+    Record.get(browserStep ?? {}, "run").pipe(Option.getOrUndefined) ===
+      "apps/web/node_modules/.bin/playwright install --with-deps chromium" &&
     playwrightCacheSaveStep !== null &&
     hasOnly(playwrightCacheSaveStep, [
       "uses",
@@ -394,53 +503,89 @@ const inspectSteps = (
       "continue-on-error",
       "with",
     ]) &&
-    playwrightCacheSaveStep.uses === cacheSaveAction &&
-    playwrightCacheSaveStep.if ===
-      "steps.playwright-cache-restore.outputs.cache-hit != 'true'" &&
-    playwrightCacheSaveStep["continue-on-error"] === true &&
+    Record.get(playwrightCacheSaveStep ?? {}, "uses").pipe(
+      Option.getOrUndefined
+    ) === cacheSaveAction &&
+    Record.get(playwrightCacheSaveStep ?? {}, "if").pipe(
+      Option.getOrUndefined
+    ) === "steps.playwright-cache-restore.outputs.cache-hit != 'true'" &&
+    Record.get(playwrightCacheSaveStep, "continue-on-error").pipe(
+      Option.getOrUndefined
+    ) === true &&
     playwrightCacheSaveWith !== null &&
     hasOnly(playwrightCacheSaveWith, ["path", "key"]) &&
-    playwrightCacheSaveWith.path === expectedPlaywrightCachePath &&
-    playwrightCacheSaveWith.key === expectedPlaywrightSaveKey &&
+    Record.get(playwrightCacheSaveWith ?? {}, "path").pipe(
+      Option.getOrUndefined
+    ) === expectedPlaywrightCachePath &&
+    Record.get(playwrightCacheSaveWith ?? {}, "key").pipe(
+      Option.getOrUndefined
+    ) === expectedPlaywrightSaveKey &&
     policyStep !== null &&
     hasOnly(policyStep, ["run"]) &&
-    policyStep.run === "bun run check:quality-workflow" &&
+    Record.get(policyStep ?? {}, "run").pipe(Option.getOrUndefined) ===
+      "bun run check:quality-workflow" &&
     dopplerStep !== null &&
     hasOnly(dopplerStep, ["name", "id", "if", "uses", "with"]) &&
-    dopplerStep.name === "Fetch trusted CI configuration" &&
-    dopplerStep.id === "doppler-ci" &&
-    dopplerStep.if === trustedEventCondition &&
-    dopplerStep.uses === dopplerAction &&
+    Record.get(dopplerStep ?? {}, "name").pipe(Option.getOrUndefined) ===
+      "Fetch trusted CI configuration" &&
+    Record.get(dopplerStep ?? {}, "id").pipe(Option.getOrUndefined) ===
+      "doppler-ci" &&
+    Record.get(dopplerStep ?? {}, "if").pipe(Option.getOrUndefined) ===
+      trustedEventCondition &&
+    Record.get(dopplerStep ?? {}, "uses").pipe(Option.getOrUndefined) ===
+      dopplerAction &&
     dopplerWith !== null &&
     hasOnly(dopplerWith, ["doppler-token"]) &&
-    dopplerWith["doppler-token"] === dopplerToken &&
+    Record.get(dopplerWith, "doppler-token").pipe(Option.getOrUndefined) ===
+      dopplerToken &&
     identityStep !== null &&
     hasOnly(identityStep, ["name", "if", "env", "run"]) &&
-    identityStep.name === "Check trusted CI configuration identity" &&
-    identityStep.if === trustedEventCondition &&
+    Record.get(identityStep ?? {}, "name").pipe(Option.getOrUndefined) ===
+      "Check trusted CI configuration identity" &&
+    Record.get(identityStep ?? {}, "if").pipe(Option.getOrUndefined) ===
+      trustedEventCondition &&
     identityEnv !== null &&
     hasOnly(identityEnv, ["DOPPLER_CONFIG", "DOPPLER_PROJECT"]) &&
-    identityEnv.DOPPLER_CONFIG === dopplerConfigOutput &&
-    identityEnv.DOPPLER_PROJECT === dopplerProjectOutput &&
-    identityStep.run === dopplerIdentityCommand &&
+    Record.get(identityEnv ?? {}, "DOPPLER_CONFIG").pipe(
+      Option.getOrUndefined
+    ) === dopplerConfigOutput &&
+    Record.get(identityEnv ?? {}, "DOPPLER_PROJECT").pipe(
+      Option.getOrUndefined
+    ) === dopplerProjectOutput &&
+    Record.get(identityStep ?? {}, "run").pipe(Option.getOrUndefined) ===
+      dopplerIdentityCommand &&
     trustedReleaseStep !== null &&
     hasOnly(trustedReleaseStep, ["name", "if", "env", "run"]) &&
-    trustedReleaseStep.name === "Run trusted Quality with remote cache" &&
-    trustedReleaseStep.if === trustedEventCondition &&
+    Record.get(trustedReleaseStep ?? {}, "name").pipe(Option.getOrUndefined) ===
+      "Run trusted Quality with remote cache" &&
+    Record.get(trustedReleaseStep ?? {}, "if").pipe(Option.getOrUndefined) ===
+      trustedEventCondition &&
     trustedReleaseEnv !== null &&
     hasOnly(trustedReleaseEnv, ["TURBO_CACHE", "TURBO_TEAM", "TURBO_TOKEN"]) &&
-    trustedReleaseEnv.TURBO_CACHE === trustedTurboCache &&
-    trustedReleaseEnv.TURBO_TEAM === turboTeamOutput &&
-    trustedReleaseEnv.TURBO_TOKEN === turboTokenOutput &&
-    trustedReleaseStep.run === "bun run release:check -- --ci" &&
+    Record.get(trustedReleaseEnv ?? {}, "TURBO_CACHE").pipe(
+      Option.getOrUndefined
+    ) === trustedTurboCache &&
+    Record.get(trustedReleaseEnv ?? {}, "TURBO_TEAM").pipe(
+      Option.getOrUndefined
+    ) === turboTeamOutput &&
+    Record.get(trustedReleaseEnv ?? {}, "TURBO_TOKEN").pipe(
+      Option.getOrUndefined
+    ) === turboTokenOutput &&
+    Record.get(trustedReleaseStep ?? {}, "run").pipe(Option.getOrUndefined) ===
+      "bun run release:check -- --ci" &&
     forkReleaseStep !== null &&
     hasOnly(forkReleaseStep, ["name", "if", "env", "run"]) &&
-    forkReleaseStep.name === "Run fork Quality without credentials" &&
-    forkReleaseStep.if === forkEventCondition &&
+    Record.get(forkReleaseStep ?? {}, "name").pipe(Option.getOrUndefined) ===
+      "Run fork Quality without credentials" &&
+    Record.get(forkReleaseStep ?? {}, "if").pipe(Option.getOrUndefined) ===
+      forkEventCondition &&
     forkReleaseEnv !== null &&
     hasOnly(forkReleaseEnv, ["TURBO_CACHE"]) &&
-    forkReleaseEnv.TURBO_CACHE === forkTurboCache &&
-    forkReleaseStep.run === "bun run release:check -- --ci";
+    Record.get(forkReleaseEnv ?? {}, "TURBO_CACHE").pipe(
+      Option.getOrUndefined
+    ) === forkTurboCache &&
+    Record.get(forkReleaseStep ?? {}, "run").pipe(Option.getOrUndefined) ===
+      "bun run release:check -- --ci";
   return [
     ...(validActionSteps
       ? []
@@ -472,34 +617,50 @@ const inspectSteps = (
   ];
 };
 
-export const decodeQualityWorkflow = (text: string) => {
+export const decodeQualityWorkflow = Effect.fnUntraced(function* (
+  text: string
+) {
   const document = parseDocument(text, { prettyErrors: false, version: "1.2" });
-  return document.errors.length === 0
-    ? Schema.decodeUnknownEffect(QualityWorkflowDocument, {
-        onExcessProperty: "error",
-      })(document.toJS())
-    : Effect.fail(
-        new QualityWorkflowYamlError({
+  if (document.errors.length !== 0) {
+    return yield* Effect.fail(
+      new QualityWorkflowYamlError({ target: ".github/workflows/quality.yml" })
+    );
+  }
+  return yield* Schema.decodeUnknownEffect(QualityWorkflowDocument, {
+    onExcessProperty: "error",
+  })(document.toJS()).pipe(
+    Effect.mapError(
+      () =>
+        new QualityWorkflowInputError({
           target: ".github/workflows/quality.yml",
         })
-      );
-};
+    )
+  );
+});
 
 const hasExactWorkflowCredentialPolicy = (
   workflow: QualityWorkflowDocument,
   quality: WorkflowRecord | null
 ) => {
-  const steps = Array.isArray(quality?.steps) ? quality.steps : [];
-  const stepEnvironments = steps.flatMap((step) => {
+  const stepValue = Record.get(quality ?? {}, "steps").pipe(
+    Option.getOrUndefined
+  );
+  const steps = Schema.is(Schema.Array(Schema.Unknown))(stepValue)
+    ? stepValue
+    : [];
+  const stepEnvironments = EffectArray.flatMap(steps, (step) => {
     const record = asRecord(step);
-    const environment = asRecord(record?.env);
+    const environment = asRecord(
+      Record.get(record ?? {}, "env").pipe(Option.getOrUndefined)
+    );
     return environment === null ? [] : [environment];
   });
   return (
     workflow.env !== undefined &&
     hasOnly(workflow.env, ["TAXKIT_ACTION_PIN_UPDATE_OWNER"]) &&
     stepEnvironments.length === 3 &&
-    stepEnvironments.every(
+    EffectArray.every(
+      stepEnvironments,
       (environment) =>
         !Reflect.has(environment, "DOPPLER_CI_TOKEN") &&
         !Reflect.has(environment, "CLOUDFLARE_API_TOKEN") &&
@@ -508,16 +669,21 @@ const hasExactWorkflowCredentialPolicy = (
   );
 };
 
+// oxlint-disable-next-line complexity -- each independent authority field must produce its own bounded finding.
 export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
   const { concurrency, jobs, permissions } = workflow;
-  const quality = asRecord(jobs.quality);
+  const quality = asRecord(
+    Record.get(jobs ?? {}, "quality").pipe(Option.getOrUndefined)
+  );
   const credentialPolicyIsExact = hasExactWorkflowCredentialPolicy(
     workflow,
     quality
   );
   const findings = [
     ...inspectTrigger(workflow.on),
-    ...(hasOnly(permissions, ["contents"]) && permissions.contents === "read"
+    ...(hasOnly(permissions, ["contents"]) &&
+    Record.get(permissions ?? {}, "contents").pipe(Option.getOrUndefined) ===
+      "read"
       ? []
       : [
           finding(
@@ -527,8 +693,11 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
           ),
         ]),
     ...(hasOnly(concurrency, ["group", "cancel-in-progress"]) &&
-    concurrency.group === expectedConcurrencyGroup &&
-    concurrency["cancel-in-progress"] === true
+    Record.get(concurrency ?? {}, "group").pipe(Option.getOrUndefined) ===
+      expectedConcurrencyGroup &&
+    Record.get(concurrency, "cancel-in-progress").pipe(
+      Option.getOrUndefined
+    ) === true
       ? []
       : [
           finding(
@@ -557,17 +726,21 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
             "Remove job-level permission overrides; the sole workflow-level contents: read grant owns authority."
           ),
         ]),
-    ...(quality?.["runs-on"] === "ubuntu-latest" &&
-    quality["timeout-minutes"] === 30
+    ...(Record.get(quality ?? {}, "runs-on").pipe(Option.getOrUndefined) ===
+      "ubuntu-latest" &&
+    Record.get(quality ?? {}, "timeout-minutes").pipe(Option.getOrUndefined) ===
+      60
       ? []
       : [
           finding(
             "workflow-timeout",
             ".github/workflows/quality.yml:jobs.quality.timeout-minutes",
-            "Use the bounded 30-minute timeout on the actual quality job."
+            "Use the bounded 60-minute timeout on the actual quality job."
           ),
         ]),
-    ...(workflow.env?.TAXKIT_ACTION_PIN_UPDATE_OWNER === expectedActionPinOwner
+    ...(Record.get(workflow.env ?? {}, "TAXKIT_ACTION_PIN_UPDATE_OWNER").pipe(
+      Option.getOrUndefined
+    ) === expectedActionPinOwner
       ? []
       : [
           finding(
@@ -585,10 +758,57 @@ export const inspectQualityWorkflow = (workflow: QualityWorkflowDocument) => {
             "Keep the bridge token on the fixed fetch action, bind named Turbo outputs only to the trusted release step, and keep the fork release step local-cache-only."
           ),
         ]),
-    ...inspectSteps(quality?.steps),
+    ...inspectSteps(
+      Record.get(quality ?? {}, "steps").pipe(Option.getOrUndefined)
+    ),
   ];
-  return findings.toSorted((left, right) =>
-    left.invariant.localeCompare(right.invariant)
+  return EffectArray.sort(
+    findings,
+    Order.mapInput(
+      Order.String,
+      (item: QualityWorkflowFinding) => item.invariant
+    )
+  );
+};
+
+const hasExactCiReportOutput = (
+  ciBranch: ts.IfStatement | undefined,
+  calls: readonly ts.CallExpression[],
+  releaseCall: ts.CallExpression | undefined
+) => {
+  const rendererCall = EffectArray.findFirst(
+    calls,
+    (call) => callIdentity(call.expression) === "renderReleaseReadinessReport"
+  ).pipe(Option.getOrUndefined);
+  const rendererArgument = EffectArray.head(rendererCall?.arguments ?? []).pipe(
+    Option.getOrUndefined
+  );
+  const consoleCall = EffectArray.findFirst(
+    calls,
+    (call) => callIdentity(call.expression) === "Console.info"
+  ).pipe(Option.getOrUndefined);
+  const returnedReport =
+    ciBranch !== undefined &&
+    EffectArray.some(
+      syntaxNodes(ciBranch.thenStatement),
+      (node) =>
+        ts.isVariableDeclaration(node) &&
+        ts.isIdentifier(node.name) &&
+        node.name.text === "report" &&
+        node.initializer !== undefined &&
+        ts.isYieldExpression(node.initializer) &&
+        node.initializer.expression === releaseCall
+    );
+  return (
+    returnedReport &&
+    rendererCall?.arguments.length === 1 &&
+    rendererArgument !== undefined &&
+    ts.isIdentifier(rendererArgument) &&
+    rendererArgument.text === "report" &&
+    consoleCall?.arguments.length === 1 &&
+    EffectArray.head(consoleCall?.arguments ?? []).pipe(
+      Option.getOrUndefined
+    ) === rendererCall
   );
 };
 
@@ -600,9 +820,9 @@ export const inspectReleaseRuntime = (source: string) => {
     true,
     ts.ScriptKind.TS
   );
-  let ciBranch: ts.IfStatement | undefined;
-  const findCiBranch = (node: ts.Node) => {
-    if (
+  const ciBranch = EffectArray.findLast(
+    syntaxNodes(file),
+    (node): node is ts.IfStatement =>
       ts.isIfStatement(node) &&
       ts.isBinaryExpression(node.expression) &&
       node.expression.operatorToken.kind ===
@@ -613,19 +833,19 @@ export const inspectReleaseRuntime = (source: string) => {
       node.expression.left.name.text === "mode" &&
       ts.isStringLiteral(node.expression.right) &&
       node.expression.right.text === "ci"
-    ) {
-      ciBranch = node;
-    }
-    ts.forEachChild(node, findCiBranch);
-  };
-  findCiBranch(file);
+  ).pipe(Option.getOrUndefined);
   const calls =
     ciBranch === undefined ? [] : callExpressions(ciBranch.thenStatement);
-  const identities = calls.map((call) => callIdentity(call.expression));
-  const releaseCall = calls.find(
-    (call) => callIdentity(call.expression) === "runCiReleaseReadiness"
+  const identities = EffectArray.map(calls, (call) =>
+    callIdentity(call.expression)
   );
-  const releasePlanArgument = releaseCall?.arguments[0];
+  const releaseCall = EffectArray.findFirst(
+    calls,
+    (call) => callIdentity(call.expression) === "runCiReleaseReadiness"
+  ).pipe(Option.getOrUndefined);
+  const releasePlanArgument = EffectArray.head(
+    releaseCall?.arguments ?? []
+  ).pipe(Option.getOrUndefined);
   const unwrappedReleasePlanArgument =
     releasePlanArgument === undefined
       ? undefined
@@ -640,15 +860,23 @@ export const inspectReleaseRuntime = (source: string) => {
     hasNamedImport(file, "effect", "Console") &&
     hasNamedImport(file, "./program.js", "runCiReleaseReadiness") &&
     hasNamedImport(file, "./schemas.js", "createReleaseReadinessPlan") &&
+    hasNamedImport(file, "./schemas.js", "renderReleaseReadinessReport") &&
     !hasShadowedReservedCallBinding(file);
   return ciBranch !== undefined &&
-    identities.length === 3 &&
-    identities.filter((identity) => identity === "runCiReleaseReadiness")
-      .length === 1 &&
-    identities.filter((identity) => identity === "createReleaseReadinessPlan")
-      .length === 1 &&
-    identities.filter((identity) => identity === "Console.info").length === 1 &&
+    identities.length === 4 &&
+    EffectArray.every(
+      [
+        "runCiReleaseReadiness",
+        "createReleaseReadinessPlan",
+        "Console.info",
+        "renderReleaseReadinessReport",
+      ],
+      (expected) =>
+        EffectArray.filter(identities, (identity) => identity === expected)
+          .length === 1
+    ) &&
     exactReleasePlan &&
+    hasExactCiReportOutput(ciBranch, calls, releaseCall) &&
     exactBindings
     ? []
     : [
@@ -671,8 +899,8 @@ export const inspectReleaseBoundaryFixtures = (
     "workflow-semantics",
     "release-script",
   ] as const;
-  return expected.flatMap((id) =>
-    fixtures.filter((fixture) => fixture.id === id).length === 1
+  return EffectArray.flatMap(expected, (id) =>
+    EffectArray.filter(fixtures, (fixture) => fixture.id === id).length === 1
       ? []
       : [
           finding(
@@ -791,12 +1019,19 @@ const inspectControls = (controls: readonly ControlRegisterEntry[]) => [
           "Keep exactly the five registered controls; reject unowned additions."
         ),
       ]),
-  ...expectedControlIds.flatMap((id) => {
-    const expected = expectedControls[id];
-    const matches = controls.filter((control) => control.id === id);
+  ...EffectArray.flatMap(expectedControlIds, (id) => {
+    const expected = Record.get(expectedControls, id).pipe(
+      Option.getOrUndefined
+    );
+    const matches = EffectArray.filter(
+      controls,
+      (control) => control.id === id
+    );
     return matches.length === 1 &&
-      matches[0] !== undefined &&
-      matchesControlContract(matches[0], expected)
+      expected !== undefined &&
+      Option.exists(EffectArray.head(matches), (control) =>
+        matchesControlContract(control, expected)
+      )
       ? []
       : [
           finding(
@@ -813,7 +1048,7 @@ const hasExactMembers = (
   expected: readonly string[]
 ) =>
   actual.length === expected.length &&
-  expected.every((item) => actual.includes(item));
+  EffectArray.every(expected, (item) => actual.includes(item));
 
 const deniedExternalMutation = [
   "credential-write",
@@ -856,7 +1091,10 @@ const hasAutomationRelations = (automation: AutomationRegisterEntry) =>
 const inspectAutomationIds = (
   automations: readonly AutomationRegisterEntry[]
 ) => {
-  const automationIds = automations.map((automation) => automation.id);
+  const automationIds = EffectArray.map(
+    automations,
+    (automation) => automation.id
+  );
   return automationIds.length !== 2 ||
     !automationIds.includes("quality-ci") ||
     !automationIds.includes("documentation-context-freshness")
@@ -874,9 +1112,10 @@ const inspectAutomationIds = (
 const inspectContextAutomation = (
   automations: readonly AutomationRegisterEntry[]
 ) => {
-  const context = automations.find(
+  const context = EffectArray.findFirst(
+    automations,
     (automation) => automation.id === "documentation-context-freshness"
-  );
+  ).pipe(Option.getOrUndefined);
   const candidate = context?.candidate;
   return context?.owner !== "taxkit-documentation-owner" ||
     context.signal.kind !== "foreground-maintainer-request" ||
@@ -955,9 +1194,10 @@ const inspectContextAutomation = (
 const inspectQualityAutomation = (
   automations: readonly AutomationRegisterEntry[]
 ) => {
-  const quality = automations.find(
+  const quality = EffectArray.findFirst(
+    automations,
     (automation) => automation.id === "quality-ci"
-  );
+  ).pipe(Option.getOrUndefined);
   return quality?.owner !== "taxkit-ci-release-maintainer" ||
     quality.signal.kind !== "pull-request-or-push" ||
     quality.signal.revisionSource !== "github.sha" ||
@@ -1042,11 +1282,10 @@ export const renderQualityWorkflowReport = (
     ? "Quality workflow policy passed: decoded immutable, bounded, content-addressed ref-scoped cache and canonical release graph."
     : [
         `Quality workflow policy failed with ${findings.length} finding(s):`,
-        ...findings
-          .slice(0, 12)
-          .map(
-            (item) =>
-              `${item.invariant}; target=${item.target}; recovery=${item.recovery}`
-          ),
+        ...EffectArray.map(
+          findings.slice(0, 12),
+          (item) =>
+            `${item.invariant}; target=${item.target}; recovery=${item.recovery}`
+        ),
         `omitted=${Math.max(0, findings.length - 12)}; detail=.github/workflows/quality.yml.`,
       ].join("\n");

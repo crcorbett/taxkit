@@ -77,7 +77,7 @@
             "$ref": "#/components/schemas/MoneyEncoded"
           },
           "rulePackVersion": {
-            "enum": ["rules-au-income-tax/1.0.0"],
+            "enum": ["rules-au-income-tax/1.0.1"],
             "type": "string"
           },
           "taxableIncome": {
@@ -135,6 +135,54 @@
           }
         },
         "required": ["_tag", "message"],
+        "type": "object"
+      },
+      "CalculatorAdmissionUnavailableEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorAdmissionUnavailable"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["calculation-admission-unavailable"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "The calculation could not be started. Try again when you are ready."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
+      "CalculatorCapacityExceededEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorCapacityExceeded"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["calculation-capacity"],
+            "type": "string"
+          },
+          "message": {
+            "enum": ["The calculators are busy. Try again when you are ready."],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "CalculatorInputDecodeErrorEncoded": {
@@ -231,6 +279,136 @@
           }
         },
         "required": ["_tag", "message", "path"],
+        "type": "object"
+      },
+      "CalculatorOperationTimedOutEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorOperationTimedOut"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["calculation-timeout"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "The calculation could not finish within five seconds. Try again when you are ready."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
+      "CalculatorRateLimitedEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorRateLimited"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["rate-limited"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "Too many calculations were sent. Wait a minute before trying again."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["wait-then-try-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
+      "CalculatorRequestBodyTimedOutEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorRequestBodyTimedOut"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["request-timeout"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "This request could not be read within five seconds. Try again when you are ready."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["try-again-manually"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
+      "CalculatorRequestBodyTooLargeEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["CalculatorRequestBodyTooLarge"],
+            "type": "string"
+          },
+          "code": {
+            "enum": ["request-too-large"],
+            "type": "string"
+          },
+          "message": {
+            "enum": [
+              "This request is too large. Reduce it to 64 KiB or less and try again."
+            ],
+            "type": "string"
+          },
+          "retry": {
+            "enum": ["reduce-request"],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "code", "message", "retry"],
+        "type": "object"
+      },
+      "DocsPageUnavailableEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["DocsPageUnavailable"],
+            "type": "string"
+          },
+          "message": {
+            "enum": ["The documentation page was not found."],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "message"],
+        "type": "object"
+      },
+      "DocsSearchUnavailableEncoded": {
+        "additionalProperties": false,
+        "properties": {
+          "_tag": {
+            "enum": ["DocsSearchUnavailable"],
+            "type": "string"
+          },
+          "message": {
+            "enum": ["Documentation search is temporarily unavailable."],
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "message"],
         "type": "object"
       },
       "FactQuestionEncoded": {
@@ -631,7 +809,7 @@
     "securitySchemes": {}
   },
   "info": {
-    "description": "HTTP API for TaxKit health checks, public calculator metadata and public calculator execution.",
+    "description": "HTTP API for TaxKit health checks, public calculator metadata, calculator execution and accepted public documentation.",
     "title": "TaxKit API",
     "version": "0.0.1"
   },
@@ -865,6 +1043,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -1119,6 +1314,23 @@
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],
@@ -1438,6 +1650,114 @@
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "408": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorRequestBodyTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorRequestBodyTooLargeEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorRateLimitedEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error",
+            "headers": {
+              "retry-after": {
+                "required": true,
+                "schema": {
+                  "enum": ["60"],
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "error": {
+                          "$ref": "#/components/schemas/CalculatorAdmissionUnavailableEncoded"
+                        }
+                      },
+                      "required": ["error"],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "error": {
+                          "$ref": "#/components/schemas/CalculatorCapacityExceededEncoded"
+                        }
+                      },
+                      "required": ["error"],
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],
@@ -1907,6 +2227,23 @@
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],
@@ -2418,10 +2755,392 @@
               }
             },
             "description": "Error"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
         "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/docs/markdown": {
+      "get": {
+        "description": "Read processed public Markdown, with resolved links and without executable MDX. This route does not return personal calculation reports.",
+        "operationId": "content.getMarkdown",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "pattern": "^\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*$"
+                }
+              ],
+              "maxLength": 256,
+              "minLength": 1,
+              "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocsPageUnavailableEncoded"
+                }
+              }
+            },
+            "description": "DocsPageUnavailable"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
+      }
+    },
+    "/api/v1/docs/navigation": {
+      "get": {
+        "description": "Read navigation for accepted public documentation.",
+        "operationId": "content.getNavigation",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "primaryNavigation": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "pageType": {
+                            "enum": [
+                              "api reference overview",
+                              "changelog or release note",
+                              "concept",
+                              "contribution guide",
+                              "decision page",
+                              "guide",
+                              "quickstart",
+                              "reference",
+                              "section index",
+                              "troubleshooting"
+                            ],
+                            "type": "string"
+                          },
+                          "pages": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "pageType": {
+                                  "enum": [
+                                    "api reference overview",
+                                    "changelog or release note",
+                                    "concept",
+                                    "contribution guide",
+                                    "decision page",
+                                    "guide",
+                                    "quickstart",
+                                    "reference",
+                                    "section index",
+                                    "troubleshooting"
+                                  ],
+                                  "type": "string"
+                                },
+                                "path": {
+                                  "minLength": 1,
+                                  "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                  "type": "string"
+                                },
+                                "primaryReader": {
+                                  "enum": [
+                                    "API consumer",
+                                    "Application integrator",
+                                    "Correctness reviewer",
+                                    "Documentation contributor",
+                                    "New contributor",
+                                    "SDK evaluator",
+                                    "Type-safety focused developer"
+                                  ],
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "minLength": 1,
+                                  "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "minLength": 1,
+                                  "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "pageType",
+                                "path",
+                                "primaryReader",
+                                "source",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "path": {
+                            "minLength": 1,
+                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                            "type": "string"
+                          },
+                          "primaryReader": {
+                            "enum": [
+                              "API consumer",
+                              "Application integrator",
+                              "Correctness reviewer",
+                              "Documentation contributor",
+                              "New contributor",
+                              "SDK evaluator",
+                              "Type-safety focused developer"
+                            ],
+                            "type": "string"
+                          },
+                          "source": {
+                            "minLength": 1,
+                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                            "type": "string"
+                          },
+                          "title": {
+                            "minLength": 1,
+                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "pageType",
+                          "path",
+                          "primaryReader",
+                          "source",
+                          "title",
+                          "pages"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["primaryNavigation"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
+      }
+    },
+    "/api/v1/docs/page": {
+      "get": {
+        "description": "Read one accepted public documentation page.",
+        "operationId": "content.getPage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "pattern": "^\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*$"
+                }
+              ],
+              "maxLength": 256,
+              "minLength": 1,
+              "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "frontmatter": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "description": {
+                          "minLength": 1,
+                          "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": ["published"],
+                          "type": "string"
+                        },
+                        "title": {
+                          "minLength": 1,
+                          "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                          "type": "string"
+                        }
+                      },
+                      "required": ["description", "status", "title"],
+                      "type": "object"
+                    },
+                    "markdown": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "allOf": [
+                        {
+                          "pattern": "^\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*$"
+                        }
+                      ],
+                      "maxLength": 256,
+                      "minLength": 1,
+                      "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                      "type": "string"
+                    },
+                    "slugs": {
+                      "items": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "source": {
+                      "minLength": 1,
+                      "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "frontmatter",
+                    "markdown",
+                    "path",
+                    "slugs",
+                    "source"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocsPageUnavailableEncoded"
+                }
+              }
+            },
+            "description": "DocsPageUnavailable"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
+      }
+    },
+    "/api/v1/docs/search": {
+      "get": {
+        "description": "Search accepted public documentation; at most 20 results with 240-character excerpts.",
+        "operationId": "content.searchPages",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "term",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "description": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      },
+                      "excerpt": {
+                        "maxLength": 240,
+                        "type": "string"
+                      },
+                      "path": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      },
+                      "title": {
+                        "minLength": 1,
+                        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                        "type": "string"
+                      }
+                    },
+                    "required": ["description", "excerpt", "path", "title"],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocsSearchUnavailableEncoded"
+                }
+              }
+            },
+            "description": "DocsSearchUnavailable"
+          }
+        },
+        "security": [],
+        "tags": ["Public documentation"]
       }
     },
     "/api/v1/facts": {
@@ -2561,6 +3280,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -2619,6 +3355,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -2885,6 +3638,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -3009,6 +3779,23 @@
               }
             },
             "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
           }
         },
         "security": [],
@@ -3023,6 +3810,9 @@
     },
     {
       "name": "Calculator API"
+    },
+    {
+      "name": "Public documentation"
     }
   ]
 }

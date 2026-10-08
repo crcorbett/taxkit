@@ -21,8 +21,23 @@ export class TaxKitUnexpectedError extends Schema.TaggedError<TaxKitUnexpectedEr
   }
 ) {}
 
+export class TaxKitClientDisposedError extends Schema.TaggedError<TaxKitClientDisposedError>()(
+  "TaxKitClientDisposedError",
+  {
+    message: Schema.Literal("TaxKit client is closed"),
+  }
+) {}
+
+export class TaxKitClientDisposeError extends Schema.TaggedError<TaxKitClientDisposeError>()(
+  "TaxKitClientDisposeError",
+  {
+    message: Schema.Literal("TaxKit client could not be closed"),
+  }
+) {}
+
 export const TaxKitCalculationErrorDetail = Schema.Union([
   CalculatorServiceError,
+  TaxKitClientDisposedError,
   TaxKitSchemaDecodeError,
   TaxKitUnexpectedError,
 ]);

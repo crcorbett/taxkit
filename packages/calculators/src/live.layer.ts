@@ -17,6 +17,7 @@ import {
 } from "./metadata.js";
 import {
   CalculatorCatalogResponseData,
+  DescriptorFilterQuery,
   CalculatorRunResponseData,
   UnsupportedCalculatorContextError,
 } from "./schemas.js";
@@ -50,7 +51,7 @@ const calculateWithEntry = (
             toCalculatorInputDecodeError({
               calculatorId: request.calculatorId,
               entry,
-              help: Option.fromNullishOr(request.help),
+              help: Option.flatten(request.help),
               issue: error.issue,
             })
           )
@@ -142,6 +143,7 @@ export const PublicCalculatorServiceLive = Layer.effect(
         Effect.succeed(
           pipe(
             query,
+            DescriptorFilterQuery.make,
             filterCalculatorEntries,
             (entries) =>
               new CalculatorCatalogResponseData({

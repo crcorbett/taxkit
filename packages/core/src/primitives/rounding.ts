@@ -1,7 +1,9 @@
 import { Match, Schema } from "effect";
+import type { Effect } from "effect";
 
-import { aud } from "./money.js";
-import type { Money } from "./money.js";
+import type { InvalidMoneyValue } from "./errors.js";
+import { audFromCents } from "./money.js";
+import type { Cents, Money } from "./money.js";
 
 /**
  * Rounding policies used by formula evaluation and trace output.
@@ -30,14 +32,14 @@ export type RoundingMode = typeof RoundingMode.Type;
  *
  * @example
  * ```ts
- * import { roundCentsToDollar } from "@taxkit/core";
+ * import { Cents, roundCentsToDollar } from "@taxkit/core";
  *
- * const rounded = roundCentsToDollar(12_345, "ato-withholding-rounding");
+ * const rounded = roundCentsToDollar(Cents.make(12_345), "ato-withholding-rounding");
  * ```
  *
  * @since 0.1.0
  */
-export const roundCentsToDollar = (cents: number, mode: RoundingMode): number =>
+export const roundCentsToDollar = (cents: Cents, mode: RoundingMode): number =>
   Match.value(mode).pipe(
     Match.when("none", () => Math.round(cents)),
     Match.when("round-to-nearest-cent", () => Math.round(cents)),
@@ -54,5 +56,8 @@ export const roundCentsToDollar = (cents: number, mode: RoundingMode): number =>
  *
  * @since 0.1.0
  */
-export const roundMoney = (m: Money, mode: RoundingMode): Money =>
-  aud(roundCentsToDollar(m.cents, mode));
+export const roundMoney = (
+  m: Money,
+  mode: RoundingMode
+): Effect.Effect<Money, InvalidMoneyValue> =>
+  audFromCents(roundCentsToDollar(m.cents, mode));

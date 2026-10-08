@@ -1,0 +1,498 @@
+name: Docs Production Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Plan, deploy or source-bound rollback fixed Production
+        required: true
+        type: choice
+        options:
+          - plan
+          - deploy
+          - rollback
+      candidate_sha:
+        description: Exact accepted candidate SHA
+        required: true
+        type: string
+      accepted_preview_commit:
+        description: Candidate SHA accepted by Preview
+        required: true
+        type: string
+      accepted_preview_plan_sha256:
+        description: Preview receipt digest accepted for this candidate
+        required: true
+        type: string
+      accepted_preview_run_id:
+        description: Successful Preview workflow run whose receipt is accepted
+        required: true
+        type: string
+      accepted_preview_pr_number:
+        description: Numeric PR number whose deterministic Preview stage was accepted
+        required: true
+        type: string
+      rollback_expected_current_version_id:
+        description: Current Production version expected before a normal rollback
+        required: false
+        type: string
+      rollback_recovery_identity:
+        description: Recovery identity read from the accepted Preview provider receipt
+        required: false
+        type: string
+      accepted_plan_sha256:
+        description: Accepted canonical Production plan digest for deploy
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+
+concurrency:
+  group: taxkit-docs-production-prod
+  cancel-in-progress: false
+
+jobs:
+  production:
+    name: ${{ inputs.operation }} fixed Production
+    if: github.repository == 'crcorbett/taxkit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: taxkit-docs-production
+    env:
+      ALCHEMY_PROFILE: default
+      CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      ACCEPTED_PREVIEW_COMMIT: ${{ inputs.accepted_preview_commit }}
+      ACCEPTED_PREVIEW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
+      ACCEPTED_PREVIEW_RUN_ID: ${{ inputs.accepted_preview_run_id }}
+      ACCEPTED_PREVIEW_PR_NUMBER: ${{ inputs.accepted_preview_pr_number }}
+      ROLLBACK_EXPECTED_CURRENT_VERSION_ID: ${{ inputs.rollback_expected_current_version_id }}
+      ROLLBACK_RECOVERY_IDENTITY: ${{ inputs.rollback_recovery_identity }}
+      ACCEPTED_PLAN_SHA256: ${{ inputs.accepted_plan_sha256 }}
+      OPERATION: ${{ inputs.operation }}
+      TURBO_CACHE: local:rw
+    steps:
+      - name: Check exact candidate and Quality result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$GITHUB_SHA" = "$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          printf '%s' "$ACCEPTED_PREVIEW_RUN_ID" | grep -Eq '^[1-9][0-9]*$'
+          printf '%s' "$ACCEPTED_PREVIEW_PR_NUMBER" | grep -Eq '^[1-9][0-9]*$'
+          test "$CANDIDATE_SHA" = "$ACCEPTED_PREVIEW_COMMIT"
+          test -n "$ACCEPTED_PREVIEW_PLAN_SHA256"
+          preview_run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${ACCEPTED_PREVIEW_RUN_ID}")"
+          preview_path="$(jq -er .path <<<"$preview_run")"
+          preview_source_sha="$(jq -er .head_sha <<<"$preview_run")"
+          preview_ancestry="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${preview_source_sha}...${GITHUB_SHA}" --jq .status)"
+          case "$preview_ancestry" in
+            ahead|identical) ;;
+            *) exit 1 ;;
+          esac
+          printf 'ACCEPTED_PREVIEW_WORKFLOW_COMMIT=%s\n' "$preview_source_sha" >> "$GITHUB_ENV"
+          test "$(jq -r .name <<<"$preview_run")" = "Docs Preview Deployment"
+          test "$(jq -r .head_branch <<<"$preview_run")" = "main"
+          test "$preview_path" = ".github/workflows/docs-preview.yml"
+          test "$(jq -r .status <<<"$preview_run")" = "completed"
+          test "$(jq -r .conclusion <<<"$preview_run")" = "success"
+          checks="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${CANDIDATE_SHA}/check-runs?per_page=100")"
+          # A rerun can leave a cancelled historical Quality check on the same
+          # SHA. Require a completed exact-candidate success, reject any
+          # pending attempt, and keep every completed failure blocking.
+          quality_runs="$(jq '[.check_runs[] | select((.name | test("quality"; "i"))) | {status,conclusion}]' <<<"$checks")"
+          jq -e '
+            length > 0 and
+            all(.[]; .status == "completed") and
+            any(.[]; .conclusion == "success") and
+            all(.[]; .conclusion == "success" or .conclusion == "cancelled")
+          ' <<<"$quality_runs" >/dev/null
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          jq -nS \
+            --arg candidate "$CANDIDATE_SHA" \
+            --arg operation "$OPERATION" \
+            --arg workflow "$GITHUB_SHA" \
+            --arg run "$GITHUB_RUN_ID" \
+            '{candidateCommit:$candidate,operation:$operation,prNumber:null,sourceRef:"refs/heads/main",workflowCommit:$workflow,workflowName:"Docs Production Deployment",workflowPath:".github/workflows/docs-production.yml",workflowRunId:$run}' \
+            > "$RUNNER_TEMP/docs-deployment/workflow-input.json"
+
+      - name: Check out exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ inputs.candidate_sha }}
+
+      - name: Verify checkout identity
+        run: test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+
+      - name: Download and bind accepted Preview artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/accepted-preview-provider" "$RUNNER_TEMP/accepted-preview-plan"
+          gh run download "$ACCEPTED_PREVIEW_RUN_ID" --name "taxkit-docs-preview-$ACCEPTED_PREVIEW_RUN_ID" --dir "$RUNNER_TEMP/accepted-preview-plan"
+          accepted_preview_plan="$(find "$RUNNER_TEMP/accepted-preview-plan" -name plan.json -print -quit)"
+          test -n "$accepted_preview_plan"
+          accepted_preview_input="$(find "$RUNNER_TEMP/accepted-preview-plan" -name workflow-input.json -print -quit)"
+          test -n "$accepted_preview_input"
+          printf 'ACCEPTED_PREVIEW_PLAN=%s\n' "$accepted_preview_plan" >> "$GITHUB_ENV"
+          printf 'ACCEPTED_PREVIEW_INPUT=%s\n' "$accepted_preview_input" >> "$GITHUB_ENV"
+          gh run download "$ACCEPTED_PREVIEW_RUN_ID" --name "taxkit-docs-preview-provider-$ACCEPTED_PREVIEW_RUN_ID" --dir "$RUNNER_TEMP/accepted-preview-provider"
+          accepted_preview_readback="$(find "$RUNNER_TEMP/accepted-preview-provider" -name provider-readback.json -print -quit)"
+          accepted_preview_hosted="$(find "$RUNNER_TEMP/accepted-preview-provider" -name hosted-proof.json -print -quit)"
+          test -n "$accepted_preview_readback"
+          test -n "$accepted_preview_hosted"
+          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.stage == ("pr-" + $pr))' "$accepted_preview_readback" > /dev/null
+          jq -e --arg pr "$ACCEPTED_PREVIEW_PR_NUMBER" '(.previewPrNumber | tostring) == $pr and .stage == ("pr-" + $pr)' "$accepted_preview_readback" > /dev/null
+          jq -e --arg candidate "$CANDIDATE_SHA" --arg plan "$ACCEPTED_PREVIEW_PLAN_SHA256" '(.candidateCommit == $candidate) and (.acceptedPlanSha256 == $plan) and (.diagnostics | length == 0)' "$accepted_preview_hosted" > /dev/null
+          test "$(jq -er '.previewPrNumber | tostring' "$accepted_preview_readback")" = "$ACCEPTED_PREVIEW_PR_NUMBER"
+          accepted_preview_recovery_identity="$(jq -er '.rollbackRecoveryIdentity | select(type == "string" and length > 0)' "$accepted_preview_readback")"
+          if [ "$OPERATION" = "rollback" ]; then
+            test -n "$ROLLBACK_RECOVERY_IDENTITY"
+            test "$ROLLBACK_RECOVERY_IDENTITY" = "$accepted_preview_recovery_identity"
+          fi
+          printf 'ACCEPTED_PREVIEW_READBACK=%s\n' "$accepted_preview_readback" >> "$GITHUB_ENV"
+          printf 'ACCEPTED_PREVIEW_HOSTED=%s\n' "$accepted_preview_hosted" >> "$GITHUB_ENV"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Resolve Bun package cache path
+        id: bun-cache-path
+        run: echo "path=$(bun pm cache)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Bun package cache
+        id: bun-cache-restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ steps.bun-cache-path.outputs.path }}
+          key: bun-packages-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.bun-version') }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install frozen dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Save Bun package cache
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: steps.bun-cache-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        with:
+          path: ${{ steps.bun-cache-path.outputs.path }}
+          key: ${{ steps.bun-cache-restore.outputs.cache-primary-key }}
+
+      - name: Schema-check current Production workflow input
+        env:
+          TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ runner.temp }}/docs-deployment/workflow-input.json
+          TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT: ${{ github.sha }}
+          TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ github.run_id }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: .github/workflows/docs-production.yml
+          TAXKIT_WORKFLOW_INPUT_OPERATION: ${{ inputs.operation }}
+        run: bun run check:docs-deployment-workflow-input
+
+      - name: Schema-check accepted Preview workflow input
+        env:
+          TAXKIT_WORKFLOW_INPUT_RECEIPT: ${{ env.ACCEPTED_PREVIEW_INPUT }}
+          TAXKIT_WORKFLOW_INPUT_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_COMMIT: ${{ env.ACCEPTED_PREVIEW_WORKFLOW_COMMIT }}
+          TAXKIT_WORKFLOW_INPUT_RUN_ID: ${{ inputs.accepted_preview_run_id }}
+          TAXKIT_WORKFLOW_INPUT_WORKFLOW_PATH: .github/workflows/docs-preview.yml
+          TAXKIT_WORKFLOW_INPUT_OPERATION: deploy
+          TAXKIT_WORKFLOW_INPUT_PR_NUMBER: ${{ inputs.accepted_preview_pr_number }}
+        run: bun run check:docs-deployment-workflow-input
+
+      - name: Resolve Playwright cache identity
+        id: playwright-identity
+        run: |
+          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
+          echo "version=$(apps/docs/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Playwright Chromium cache
+        id: playwright-cache-restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: playwright-chromium-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-identity.outputs.version }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install pinned Playwright browser
+        run: apps/docs/node_modules/.bin/playwright install chromium
+
+      - name: Save Playwright Chromium cache
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: steps.playwright-cache-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
+
+      - name: Fetch trusted CI configuration
+        id: doppler-ci
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_CI_TOKEN }}
+
+      - name: Check trusted CI configuration identity
+        env:
+          DOPPLER_CONFIG: ${{ steps.doppler-ci.outputs.DOPPLER_CONFIG }}
+          DOPPLER_PROJECT: ${{ steps.doppler-ci.outputs.DOPPLER_PROJECT }}
+        run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "ci"
+
+      - name: Fetch Production provider configuration
+        id: doppler-provider
+        uses: dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+        with:
+          doppler-token: ${{ secrets.DOPPLER_PROVIDER_TOKEN }}
+
+      - name: Check Production provider configuration identity
+        env:
+          DOPPLER_CONFIG: ${{ steps.doppler-provider.outputs.DOPPLER_CONFIG }}
+          DOPPLER_PROJECT: ${{ steps.doppler-provider.outputs.DOPPLER_PROJECT }}
+        run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "prd"
+
+      - name: Schema-check accepted Preview plan
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
+          TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_PLAN_OPERATION: preview-equal-replan
+          TAXKIT_WORKFLOW_PLAN_STAGE: pr-${{ inputs.accepted_preview_pr_number }}
+          TAXKIT_WORKFLOW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
+          TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN: "1"
+        run: |
+          set -euo pipefail
+          test -n "$ACCEPTED_PREVIEW_PLAN"
+          TAXKIT_WORKFLOW_PLAN_RECEIPT="$ACCEPTED_PREVIEW_PLAN" \
+            bun run check:docs-deployment-workflow-plan
+
+      - name: Schema-check accepted Preview provider and hosted proof
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
+          TAXKIT_WORKFLOW_PROVIDER_READBACK: ${{ env.ACCEPTED_PREVIEW_READBACK }}
+          TAXKIT_WORKFLOW_HOSTED_PROBE: ${{ env.ACCEPTED_PREVIEW_HOSTED }}
+          TAXKIT_WORKFLOW_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_STAGE: pr-${{ inputs.accepted_preview_pr_number }}
+          TAXKIT_WORKFLOW_PLAN_SHA256: ${{ inputs.accepted_preview_plan_sha256 }}
+          TAXKIT_WORKFLOW_SCREENSHOT_ROOT: ${{ runner.temp }}/accepted-preview-provider
+        run: bun run check:docs-deployment-workflow-proof
+
+      - name: Validate deployment owners
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
+        run: bun run check:docs-deployment
+
+      - name: Build provider-free docs proof
+        env:
+          TURBO_CACHE: local:rw,remote:rw
+          TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
+        run: bun run docs:build
+
+      - name: Run mutation-capable Alchemy state-store bootstrap
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          # CI=0 writes the account-matched state-store cache for inventory in this job.
+          # The complete Doppler-provided Cloudflare environment pair remains the auth source.
+          ALCHEMY_PLAIN=1 CI=0 bunx alchemy provider cloudflare bootstrap --profile "$ALCHEMY_PROFILE" --worker-name alchemy-state-store
+          TAXKIT_WORKFLOW_EVIDENCE_BOOTSTRAP_PATH="$RUNNER_TEMP/docs-deployment/bootstrap.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_EVIDENCE_MODE=bootstrap \
+          TAXKIT_WORKFLOW_EVIDENCE_RUN_ID="$GITHUB_RUN_ID" \
+          TAXKIT_WORKFLOW_EVIDENCE_STAGE=prod \
+            bun --conditions=source run tools/docs-deployment/workflow-evidence.runtime.ts
+
+      - name: Plan exact fixed Production candidate
+        id: plan
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-deployment"
+          ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-plan.txt"
+          TAXKIT_WORKFLOW_EVIDENCE_ACCEPTED_BY="$GITHUB_ACTOR" \
+          TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH="$GITHUB_OUTPUT" \
+          TAXKIT_WORKFLOW_EVIDENCE_IDENTITY_PATH="$RUNNER_TEMP/docs-deployment/identity.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_MODE=plan \
+          TAXKIT_WORKFLOW_EVIDENCE_OPERATION=production-plan \
+          TAXKIT_WORKFLOW_EVIDENCE_PLAN_PATH="$RUNNER_TEMP/docs-deployment/plan.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_PLAN_TEXT_PATH="$RUNNER_TEMP/docs-deployment/alchemy-plan.txt" \
+          TAXKIT_WORKFLOW_EVIDENCE_PROJECTION_PATH="$RUNNER_TEMP/docs-deployment/projection.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_RECEIPT_PATH="docs/evidence/deployments/workflow-${GITHUB_RUN_ID}/plan.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_REPOSITORY_ROOT="$GITHUB_WORKSPACE" \
+          TAXKIT_WORKFLOW_EVIDENCE_STAGE=prod \
+            bun --conditions=source run tools/docs-deployment/workflow-evidence.runtime.ts
+
+      - name: Schema-check initial Production plan
+        env:
+          TAXKIT_WORKFLOW_PLAN_RECEIPT: ${{ runner.temp }}/docs-deployment/plan.json
+          TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT: ${{ inputs.candidate_sha }}
+          TAXKIT_WORKFLOW_PLAN_OPERATION: production-plan
+          TAXKIT_WORKFLOW_PLAN_STAGE: prod
+          TAXKIT_WORKFLOW_PLAN_SHA256: ${{ steps.plan.outputs.plan_sha256 }}
+        run: bun run check:docs-deployment-workflow-plan
+
+      - name: Replan and deploy fixed Production candidate
+        if: inputs.operation == 'deploy' || inputs.operation == 'rollback'
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ steps.doppler-provider.outputs.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ steps.doppler-provider.outputs.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$ACCEPTED_PLAN_SHA256"
+          test "$ACCEPTED_PLAN_SHA256" = "${{ steps.plan.outputs.plan_sha256 }}"
+          ALCHEMY_PLAIN=1 CI=1 bunx alchemy plan --stage prod --profile "$ALCHEMY_PROFILE" > "$RUNNER_TEMP/docs-deployment/alchemy-replan.txt"
+          replan_sha256="$(
+            TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+            TAXKIT_WORKFLOW_EVIDENCE_IDENTITY_PATH="$RUNNER_TEMP/docs-deployment/replan-identity.json" \
+            TAXKIT_WORKFLOW_EVIDENCE_MODE=replan \
+            TAXKIT_WORKFLOW_EVIDENCE_OPERATION=production-equal-replan \
+            TAXKIT_WORKFLOW_EVIDENCE_PLAN_PATH="$RUNNER_TEMP/docs-deployment/plan.json" \
+            TAXKIT_WORKFLOW_EVIDENCE_PLAN_TEXT_PATH="$RUNNER_TEMP/docs-deployment/alchemy-replan.txt" \
+            TAXKIT_WORKFLOW_EVIDENCE_PROJECTION_PATH="$RUNNER_TEMP/docs-deployment/replan-projection.json" \
+            TAXKIT_WORKFLOW_EVIDENCE_REPOSITORY_ROOT="$GITHUB_WORKSPACE" \
+            TAXKIT_WORKFLOW_EVIDENCE_STAGE=prod \
+              bun --conditions=source run tools/docs-deployment/workflow-evidence.runtime.ts
+          )"
+          test "$ACCEPTED_PLAN_SHA256" = "$replan_sha256"
+          TAXKIT_WORKFLOW_PLAN_RECEIPT="$RUNNER_TEMP/docs-deployment/plan.json" \
+          TAXKIT_WORKFLOW_PLAN_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_PLAN_OPERATION=production-equal-replan \
+          TAXKIT_WORKFLOW_PLAN_STAGE=prod \
+          TAXKIT_WORKFLOW_PLAN_SHA256="$ACCEPTED_PLAN_SHA256" \
+          TAXKIT_WORKFLOW_PLAN_REQUIRE_REPLAN=1 \
+            bun run check:docs-deployment-workflow-plan
+          TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" \
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
+          TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH="$RUNNER_TEMP/docs-deployment/provider-before.env" \
+          TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH="$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_MODE=provider \
+          TAXKIT_WORKFLOW_EVIDENCE_PHASE=before \
+          TAXKIT_WORKFLOW_EVIDENCE_STAGE=prod \
+            bun --conditions=source run tools/docs-deployment/workflow-evidence.runtime.ts
+          . "$RUNNER_TEMP/docs-deployment/provider-before.env"
+          if [ "$stage_present" = true ]; then
+            bunx wrangler deployments list --name "$previous_worker_name" --json > "$RUNNER_TEMP/docs-deployment/previous-deployments.json"
+            TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH="$RUNNER_TEMP/docs-deployment/provider-before-version.env" \
+            TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH="$RUNNER_TEMP/docs-deployment/provider-inventory-before.json" \
+            TAXKIT_WORKFLOW_EVIDENCE_MODE=provider \
+            TAXKIT_WORKFLOW_EVIDENCE_PHASE=before \
+            TAXKIT_WORKFLOW_EVIDENCE_PREVIOUS_DEPLOYMENTS_PATH="$RUNNER_TEMP/docs-deployment/previous-deployments.json" \
+            TAXKIT_WORKFLOW_EVIDENCE_STAGE=prod \
+              bun --conditions=source run tools/docs-deployment/workflow-evidence.runtime.ts
+            . "$RUNNER_TEMP/docs-deployment/provider-before-version.env"
+          fi
+          if [ "$OPERATION" = "rollback" ]; then
+            test -n "$ROLLBACK_EXPECTED_CURRENT_VERSION_ID"
+            test "$previous_version_id" = "$ROLLBACK_EXPECTED_CURRENT_VERSION_ID"
+            test -n "$ROLLBACK_RECOVERY_IDENTITY"
+          fi
+          ALCHEMY_PLAIN=1 CI=1 bunx alchemy deploy --stage prod --profile "$ALCHEMY_PROFILE" --yes
+          TAXKIT_DOCS_DEPLOYMENT_INVENTORY_REPORT="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
+          ALCHEMY_PROFILE="$ALCHEMY_PROFILE" CI=1 bun run check:docs-deployment-inventory
+          if [ "$OPERATION" = "rollback" ]; then rollback_identity="$ROLLBACK_RECOVERY_IDENTITY"; else rollback_identity="production-$GITHUB_RUN_ID"; fi
+          if [ "$OPERATION" = "rollback" ]; then evidence_environment=rollback; else evidence_environment=production; fi
+          TAXKIT_WORKFLOW_EVIDENCE_GITHUB_OUTPUT_PATH="$RUNNER_TEMP/docs-deployment/provider-after-worker.env" \
+          TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_MODE=provider \
+          TAXKIT_WORKFLOW_EVIDENCE_PHASE=before \
+          TAXKIT_WORKFLOW_EVIDENCE_STAGE=prod \
+            bun --conditions=source run tools/docs-deployment/workflow-evidence.runtime.ts
+          . "$RUNNER_TEMP/docs-deployment/provider-after-worker.env"
+          test "$stage_present" = true
+          bunx wrangler deployments list --name "$previous_worker_name" --json > "$RUNNER_TEMP/docs-deployment/current-deployments.json"
+          if [ -f "$RUNNER_TEMP/docs-deployment/previous-deployments.json" ]; then previous_deployments_path="$RUNNER_TEMP/docs-deployment/previous-deployments.json"; else previous_deployments_path=""; fi
+          TAXKIT_WORKFLOW_EVIDENCE_ACCEPTED_PLAN_SHA256="$ACCEPTED_PLAN_SHA256" \
+          TAXKIT_WORKFLOW_EVIDENCE_ACCOUNT_ID="$CLOUDFLARE_ACCOUNT_ID" \
+          TAXKIT_WORKFLOW_EVIDENCE_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_EVIDENCE_CURRENT_DEPLOYMENTS_PATH="$RUNNER_TEMP/docs-deployment/current-deployments.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_ENVIRONMENT="$evidence_environment" \
+          TAXKIT_WORKFLOW_EVIDENCE_GITHUB_ENV_PATH="$GITHUB_ENV" \
+          TAXKIT_WORKFLOW_EVIDENCE_IDENTITY_PATH="$RUNNER_TEMP/docs-deployment/replan-identity.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_INVENTORY_PATH="$RUNNER_TEMP/docs-deployment/provider-inventory.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_MODE=provider \
+          TAXKIT_WORKFLOW_EVIDENCE_PHASE=after \
+          TAXKIT_WORKFLOW_EVIDENCE_PREVIOUS_DEPLOYMENTS_PATH="$previous_deployments_path" \
+          TAXKIT_WORKFLOW_EVIDENCE_PREVIEW_PR_NUMBER="" \
+          TAXKIT_WORKFLOW_EVIDENCE_PROVIDER_READBACK_PATH="$RUNNER_TEMP/docs-deployment/provider-readback.json" \
+          TAXKIT_WORKFLOW_EVIDENCE_ROLLBACK_IDENTITY="$rollback_identity" \
+          TAXKIT_WORKFLOW_EVIDENCE_RUN_ID="$GITHUB_RUN_ID" \
+          TAXKIT_WORKFLOW_EVIDENCE_STAGE=prod \
+            bun --conditions=source run tools/docs-deployment/workflow-evidence.runtime.ts
+
+      - name: Run hosted Production HTTP/browser/screenshot proof
+        if: inputs.operation == 'deploy' || inputs.operation == 'rollback'
+        env:
+          TAXKIT_DOCS_HOSTED_PROPAGATION_ATTEMPTS: "6"
+          TAXKIT_DOCS_HOSTED_PROPAGATION_DELAY_MS: "2000"
+        run: |
+          set -euo pipefail
+          mkdir -p "$TAXKIT_DOCS_EVIDENCE_DIRECTORY"
+          hosted_rollback_identity="$TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY"
+          if [ -z "$hosted_rollback_identity" ]; then
+            test "$OPERATION" = "deploy"
+            hosted_rollback_identity="production-$GITHUB_RUN_ID"
+          fi
+          env -u TAXKIT_DOCS_PREVIEW_PR_NUMBER \
+            TAXKIT_DOCS_ROLLBACK_RECOVERY_IDENTITY="$hosted_rollback_identity" \
+            bun apps/docs/scripts/test-cloudflare-hosted.tsx > "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json"
+          jq '{acceptedPlanSha256,assetPropagationRetries,accountId,candidateCommit,configSha256,deploymentInputSha256,deploymentId,diagnostics,environment,lockfileSha256,previewPrNumber,previousVersionId:(if .previousVersionId == "" then null else .previousVersionId end),rollbackRecoveryIdentity,screenshots,stage,stateStoreId,url,versionId,workerName} | if .assetPropagationRetries == null then del(.assetPropagationRetries) else . end' "$RUNNER_TEMP/docs-deployment/hosted-proof.raw.json" > "$RUNNER_TEMP/docs-deployment/hosted-proof.json"
+          mkdir -p "$RUNNER_TEMP/docs-deployment/docs/evidence/deployments"
+          cp -R "$TAXKIT_DOCS_EVIDENCE_DIRECTORY" "$RUNNER_TEMP/docs-deployment/docs/evidence/deployments/"
+          TAXKIT_WORKFLOW_PROVIDER_READBACK="$RUNNER_TEMP/docs-deployment/provider-readback.json" \
+          TAXKIT_WORKFLOW_HOSTED_PROBE="$RUNNER_TEMP/docs-deployment/hosted-proof.json" \
+          TAXKIT_WORKFLOW_CANDIDATE_COMMIT="$CANDIDATE_SHA" \
+          TAXKIT_WORKFLOW_STAGE="$TAXKIT_DOCS_STAGE" \
+          TAXKIT_WORKFLOW_PLAN_SHA256="$TAXKIT_DOCS_PLAN_SHA256" \
+          TAXKIT_WORKFLOW_SCREENSHOT_ROOT="$RUNNER_TEMP/docs-deployment" \
+            bun run check:docs-deployment-workflow-proof
+
+      - name: Prepare allowlisted Production plan evidence
+        if: always()
+        env:
+          TAXKIT_WORKFLOW_ARTIFACT_MODE: production-plan
+          TAXKIT_WORKFLOW_ARTIFACT_SOURCE: ${{ runner.temp }}/docs-deployment
+          TAXKIT_WORKFLOW_ARTIFACT_UPLOAD: ${{ runner.temp }}/docs-production-plan-upload
+        run: bun --conditions=source run tools/docs-deployment/workflow-artifact.runtime.ts
+
+      - name: Upload sanitized Production plan and replan evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-production-${{ github.run_id }}
+          path: ${{ runner.temp }}/docs-production-plan-upload
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Prepare allowlisted Production provider evidence
+        if: (inputs.operation == 'deploy' || inputs.operation == 'rollback') && always()
+        env:
+          TAXKIT_WORKFLOW_ARTIFACT_MODE: production-provider
+          TAXKIT_WORKFLOW_ARTIFACT_SOURCE: ${{ runner.temp }}/docs-deployment
+          TAXKIT_WORKFLOW_ARTIFACT_UPLOAD: ${{ runner.temp }}/docs-production-provider-upload
+        run: bun --conditions=source run tools/docs-deployment/workflow-artifact.runtime.ts
+
+      - name: Upload Production provider readback
+        if: (inputs.operation == 'deploy' || inputs.operation == 'rollback') && always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: taxkit-docs-production-provider-${{ github.run_id }}
+          path: ${{ runner.temp }}/docs-production-provider-upload
+          retention-days: 30
+          if-no-files-found: error

@@ -1,0 +1,716 @@
+{
+  "document_type": "bounded-proof-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "taxkit-analytics-owner",
+  "last_reviewed": "2026-10-07",
+  "review_trigger": "T008 source, native host, privacy, provider or qualification change",
+  "status": "T008 backend and request policy locally qualified; browser design decision and remaining T008 work pending",
+  "observedAt": "2026-10-07T11:48:27.886384+00:00",
+  "baseHead": "d9cadb664291b327cf3e3cb624d40c511d78a384",
+  "executionAuthority": {
+    "principal": "Cooper",
+    "operation": "Approved repository implementation, local checks, commits/pushes/draft PR and routine Linear tracking",
+    "resource": "crcorbett/taxkit; CSF-T008 / DEV-79",
+    "environment": "Local Mac; disposable native workerd and controlled upstream only",
+    "boundary": "No PostHog provider, credential, deployment, merge or publication mutation in this candidate",
+    "rollback": "Revert this candidate; collection defaults to off and requires no capture settings"
+  },
+  "outcomes": [
+    "Private compiled analytics package with catalogue-owned calculator identity, checked event/settings/policy Schemas, safe errors and separate named live/test services",
+    "Backend capture sends only calculator catalogue ID/name plus required operational and event identity, never inputs, answers, visitor identity, URLs or request headers",
+    "Off needs no token; invalid enabled settings have a separate checked configuration failure",
+    "One API decorator records a successful hosted calculation; request-local deny, malformed policy or DNT refuses collection without changing calculation admission",
+    "Application captures delivery during initialisation and provides it to returned requests; native Worker/session waitUntil owns a one-attempt send, own HTTP scope and complete five-second deadline; the collector is capped at 64 successes",
+    "Actual native HTTP/RPC and both official client protocols use the same successful-use owner; denied requests and metadata do not add another event",
+    "Pure tax packages and local SDK calculations have no analytics dependency"
+  ],
+  "qualification": {
+    "focusedPackageTests": 31,
+    "focusedApiTests": 112,
+    "actualPathLintCases": 16,
+    "nativeAnalyticsCases": 3,
+    "wholeSource": "PASS at 311288c3b12c768af15e1efe4738286b56b5e506",
+    "nativeAllCases": 17
+  },
+  "referenceVersions": {
+    "installedEffect": "4.0.0",
+    "installedAlchemy": "2.0.0-beta.80",
+    "officialRegistryPostHogBrowserCandidate": "1.438.2",
+    "officialRegistryDistilledPostHogCandidate": "1.0.0-rc.13",
+    "browserAndManagementSdkInstalled": false,
+    "nativeMcpClient": "2.3.1",
+    "nativeProtocols": [
+      "2026-07-28",
+      "2025-11-25"
+    ],
+    "CommonplaceGuidance": "development-workflows 0.6.9; repository canonical skill baseline 0.6.1 unchanged"
+  },
+  "packageValidation": {
+    "renderer": "Repository canonical package-structure renderer, effect-service variant",
+    "adaptation": "Private compiled package using TaxKit stable dependency graph, root tsconfig and source export condition; original scaffold/config identities retained in package-structure.render.json",
+    "structuralScope": "Byte-matched copy of all 16 owned package files, excluding installed node_modules, dist, caches and tsbuildinfo",
+    "result": "validate_package.py and validate_ecosystem.py pass; focused types/build/tests qualify the adapted package only"
+  },
+  "docImpact": [
+    {
+      "decision": "Change required",
+      "paths": [
+        "packages/analytics/README.md",
+        "packages/analytics/package-structure.render.json",
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "docs/architecture/package-ownership.md",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "oxlint.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "apps/web/test/native-local-development.boundary.test.ts"
+      ],
+      "basis": "New private package, application boundary, exact decoder/encoder and native representation-test admission, candidate ownership and evidence pointers"
+    },
+    {
+      "decision": "Preserve",
+      "paths": [
+        "packages/calculators",
+        "packages/rules",
+        "packages/sdk/typescript",
+        "packages/docs-content/content",
+        "docs/runbooks/docs-deployment.md",
+        "docs/runbooks/recovery.md",
+        "tools/documentation/runbook-contract.json",
+        "tools/skills/canonical-skill-baseline.json"
+      ],
+      "basis": "Retained tax outputs, public accepted content, published interfaces and five inspect-only procedures unchanged; metrics remain deferred. Update public privacy and analytics operations before actual activation in the owning remaining T008 work."
+    },
+    {
+      "decision": "N/A",
+      "surface": "Changeset, generated content acceptance, new CI/deployment workflow or provider operation",
+      "basis": "Private package and application changes do not change the published tax/SDK closure; no external operation occurs in this checkpoint"
+    }
+  ],
+  "retainedAttempts": [
+    "Initial installed Effect APIs, raw body encoding and constructor/type assumptions were corrected against installed types; earlier focused failures remain in private logs",
+    "Initial production Knip caught a test-only exported collector limit; it is private without changing the rule",
+    "Actual-path lint fixtures were corrected to preserve the isolated config root, import format and an explicit bare-fetch restriction; no canonical policy baseline was changed",
+    "Native enabled project setting needed the SDK packEnvValue representation, and native request execution exposed missing captured delivery; both are corrected at their owners",
+    "The controlled Node response bridge did not expose body cancellation. Native bounded completion uses the existing safe logger plus measured timing; upstream cancellation is not claimed",
+    "A lint auto-fix added new to the TaggedError factory and broke the test. The exact native test joins the existing TaggedError factory exception while the actual command proves ordinary Error calls still require new and runtime/adjacent decoding remain refused",
+    "The official client requires legacy negotiation for 2025-11-25; its current supported protocol selection is explicit",
+    "The added factory-positive lint fixture initially failed the existing import-newline rule; its valid representation now passes without changing that rule.",
+    "The full local run passed all preceding checks and 16 of 17 native cases, but the local reload fixture timed out: its exact old Effect import replacement no longer matched the new configuration imports, leaving its injected header operation without an import. A separate named test import fixes the real source mutation without extending any deadline. The isolated two-case native local-development test then passed.",
+    "An explicit receipt-only formatter call was refused because the established root formatter excludes docs; no formatter policy was changed and receipt formatting is not claimed."
+  ],
+  "limitations": [
+    "T008 is not complete: browser SDK, React/Atom lifetime, final enrichment allowlist, denied-storage/DNT proof, same-origin relay, Website policy forwarding, retained projects and operational/public privacy owners remain",
+    "Accessible PostHog read preparation lists Cooper and six projects with no TaxKit match; it does not establish region or complete paged management absence before creation",
+    "No PostHog settings are present in the checked TaxKit Production/Preview Doppler configs; no unrelated project credential is borrowed",
+    "A successful capture HTTP response establishes transport only, not stored events or exactly-once ingestion",
+    "The native controlled test observes bounded app completion; it does not establish cancellation of the upstream Node bridge or production provider work",
+    "No browser analytics, provider project, credential, stored UUID readback, deployment, release publication, modern remote prompt cancellation fix, retained-tax correction or metrics work is claimed"
+  ],
+  "checks": [
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "apps/api/README.md",
+        "apps/web/README.md",
+        "docs/architecture/api-and-sdk.md",
+        "docs/architecture/effect-services.md",
+        "docs/architecture/package-ownership.md",
+        "docs/product-specs/clean-slate-foundation.tasks.json",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json",
+        "packages/analytics",
+        "oxlint.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "log": "/private/tmp/dev79-backend-focus-a-format.log",
+      "logSha256": "66a75fd6c7b3b01a7dec60a5ec10b03f79503343ba2049fb8ba12c79e4952e9c",
+      "logBytesRead": 47
+    },
+    {
+      "stage": "api-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.49,
+      "log": "/private/tmp/dev79-backend-focus-a-api-types.log",
+      "logSha256": "fa6046fb73f8f14447cba1f4fa499c2555f7e3d961f8b49daf3ce61c43c4eca9",
+      "logBytesRead": 82434
+    },
+    {
+      "stage": "web-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.05,
+      "log": "/private/tmp/dev79-backend-focus-a-web-types.log",
+      "logSha256": "c61973022fe7465ff3f9a9223d3ebf17d32bd04cca17f5744a8b3d790a2076eb",
+      "logBytesRead": 45998
+    },
+    {
+      "stage": "analytics-types",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/analytics",
+        "check-types"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev79-backend-focus-a-analytics-types.log",
+      "logSha256": "76e53ea532eeb53fa4dbd6829afce1e0420e863770ee1c91b63462f053e2aa0b",
+      "logBytesRead": 7107
+    },
+    {
+      "stage": "api-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=api",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 1.2,
+      "log": "/private/tmp/dev79-backend-focus-a-api-tests.log",
+      "logSha256": "35e20ee509d51182d4f4577829ec83b8fa44b3e253bd1d544dd8055bb5f8da8c",
+      "logBytesRead": 324
+    },
+    {
+      "stage": "analytics-tests",
+      "command": [
+        "bun",
+        "run",
+        "--filter=@taxkit/analytics",
+        "test"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.39,
+      "log": "/private/tmp/dev79-backend-focus-a-analytics-tests.log",
+      "logSha256": "806da9ccb1a142ffc5e38f5e5fbec939c3892bc259cb4fc45cc23f95656f909f",
+      "logBytesRead": 483
+    },
+    {
+      "stage": "lint-fixtures",
+      "command": [
+        "bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 3.14,
+      "log": "/private/tmp/dev79-backend-focus-a-lint-fixtures.log",
+      "logSha256": "167c07683daeb7b788eee21b60940bb66b48cbb4737d5ae842e4ad306d4db7ba",
+      "logBytesRead": 178
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 2.96,
+      "log": "/private/tmp/dev79-backend-focus-a-lint.log",
+      "logSha256": "f7329259b17707a13f1119e717652ed363aa28676c14552762c3be02d198af97",
+      "logBytesRead": 1814
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "tools/oxlint/analytics-boundaries.test.ts",
+        "oxlint.config.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.06,
+      "log": "/private/tmp/dev79-backend-focus-b-format.log",
+      "logSha256": "1d5ad52fd2fdfb6fbcb884854a9e554c3adafb6286043b270db4f3cc5cedfcf1",
+      "logBytesRead": 46
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.28,
+      "log": "/private/tmp/dev79-backend-focus-b-lint.log",
+      "logSha256": "ebc3273d6a6f8737fcabe4707a441c760d831dc13be0dcb013364b44551d131c",
+      "logBytesRead": 951
+    },
+    {
+      "stage": "lint-fixtures",
+      "command": [
+        "bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 3.53,
+      "log": "/private/tmp/dev79-backend-focus-b-lint-fixtures.log",
+      "logSha256": "739080b33c4c324fd4778871677e3c523e68907aa8a3fd1c057c2b5828d16917",
+      "logBytesRead": 2945
+    },
+    {
+      "stage": "lint-fixtures",
+      "command": [
+        "bun",
+        "--bun",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "tools/vitest.config.ts",
+        "tools/oxlint/analytics-boundaries.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.02,
+      "log": "/private/tmp/dev79-backend-focus-c-lint-fixtures.log",
+      "logSha256": "119350e1af18d9f9ea3e6be33c4db2fd70e3d6fe8cf28f74b5092bccf2e90f77",
+      "logBytesRead": 178
+    },
+    {
+      "stage": "native-analytics",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "--",
+        "test/native-analytics.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 7.32,
+      "log": "/private/tmp/dev79-backend-focus-c-native-analytics.log",
+      "logSha256": "d55192d58c981e6041a62d90dbb7fa9d76594b83aba5a2ee0d4c5352ab46a5b5",
+      "logBytesRead": 438
+    },
+    {
+      "stage": "format-check",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.64,
+      "log": "/private/tmp/dev79-backend-focus-c-format-check.log",
+      "logSha256": "4ad52c7d781224a2c68911c0256d3e4edac3ed8c49478a4ff654cc988d16b034",
+      "logBytesRead": 630
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "docs/exec-plans/active/clean-slate-foundation.md",
+        "docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json",
+        "packages/analytics/package-structure.render.json"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.06,
+      "log": "/private/tmp/dev79-backend-precommit-a-format.log",
+      "logSha256": "0adbe932e9c4db846a9da1fb80dfee23d14810ff477017fd009b25b36bddb72c",
+      "logBytesRead": 46
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.31,
+      "log": "/private/tmp/dev79-backend-precommit-a-docs.log",
+      "logSha256": "2135e681fbb1391cb61d876e948a7302f42091f41f0aa8be3d873b7205449335",
+      "logBytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.15,
+      "log": "/private/tmp/dev79-backend-precommit-a-runbooks.log",
+      "logSha256": "d251993f038f55535360de5fc37888d8cdd4266c17516bf485294715c7c34f5c",
+      "logBytesRead": 840
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.02,
+      "log": "/private/tmp/dev79-backend-precommit-a-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logBytesRead": 0
+    },
+    {
+      "stage": "native-local",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "--",
+        "test/native-local-development.boundary.test.ts"
+      ],
+      "exitCode": 1,
+      "durationSeconds": 27.35,
+      "log": "/private/tmp/dev79-backend-startup-a-native-local.log",
+      "logSha256": "f3ec517d7639d342ab80d4d932a034214f179484a6bcbb0779d025b319ffa9d9",
+      "logBytesRead": 3594
+    },
+    {
+      "stage": "format",
+      "command": [
+        "node_modules/.bin/oxfmt",
+        "--write",
+        "apps/web/test/native-local-development.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.08,
+      "log": "/private/tmp/dev79-backend-startup-b-format.log",
+      "logSha256": "dc58fb862cbb0f39a5acbed79ab194ec45c06573fbade4266c7d57a6ddb1397e",
+      "logBytesRead": 46
+    },
+    {
+      "stage": "native-local",
+      "command": [
+        "bun",
+        "run",
+        "--filter=web",
+        "test:native-pair",
+        "--",
+        "test/native-local-development.boundary.test.ts"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 13.72,
+      "log": "/private/tmp/dev79-backend-startup-b-native-local.log",
+      "logSha256": "da7c4e31f222ec1a02ee71b63c94505314eecffd17b2b674a8dc047702c8501b",
+      "logBytesRead": 425
+    },
+    {
+      "stage": "lint",
+      "command": [
+        "bun",
+        "run",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 5.86,
+      "log": "/private/tmp/dev79-backend-repair-a-lint.log",
+      "logSha256": "f3d4f23d0eb93b06726478f661ae6c3d1e90092c8f733d09dbfbb88aaa681394",
+      "logBytesRead": 951
+    },
+    {
+      "stage": "format",
+      "command": [
+        "bun",
+        "run",
+        "format:check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.51,
+      "log": "/private/tmp/dev79-backend-repair-a-format.log",
+      "logSha256": "373581a18d1b406e6fb1c05672f38fe7974579a5d7a428c2e2b0a91b06af78e9",
+      "logBytesRead": 630
+    },
+    {
+      "stage": "docs",
+      "command": [
+        "bun",
+        "run",
+        "check:docs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.29,
+      "log": "/private/tmp/dev79-backend-repair-a-docs.log",
+      "logSha256": "5acf2df0bdfc41e5dc322f4233aea7d095c7104469831e160a46dccaca4b1e95",
+      "logBytesRead": 819
+    },
+    {
+      "stage": "runbooks",
+      "command": [
+        "bun",
+        "run",
+        "check:runbooks"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.14,
+      "log": "/private/tmp/dev79-backend-repair-a-runbooks.log",
+      "logSha256": "e0a25bfa94a550f8864a9b2b47842f8294b50cfbcd8a4a46efba3c7c8ea28591",
+      "logBytesRead": 839
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.01,
+      "log": "/private/tmp/dev79-backend-repair-a-diff.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logBytesRead": 0
+    }
+  ],
+  "initialWholeSourceAttempt": {
+    "candidateCommit": "73f2bc7d8bcdb49446e02e878a3944e7e263e8c8",
+    "tree": "b976995fe55f9716557eea1a0f840b7d290a0750",
+    "trackedCount": 1772,
+    "freezeSha256": "53c5a32cb17e7947870ae239e68e50a3030c6e0d94da9aa541b55113af52119f",
+    "unchangedAfterRunExceptDeliberateFixtureRepair": 1771,
+    "deliberateChangedPath": "apps/web/test/native-local-development.boundary.test.ts",
+    "checks": [
+      {
+        "stage": "tests",
+        "command": [
+          "bun",
+          "run",
+          "test"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 74.72,
+        "log": "/private/tmp/dev79-backend-whole-a-tests.log",
+        "logSha256": "a02983620a319741fecca4c7af5377c176af6bea4313d62e681b361380b4ed93",
+        "logBytesRead": 88131
+      },
+      {
+        "stage": "build",
+        "command": [
+          "bun",
+          "run",
+          "build"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 5.4,
+        "log": "/private/tmp/dev79-backend-whole-a-build.log",
+        "logSha256": "17d47d54f730bcbfeb1649800f3587415c4389ea823d9430575b423f48066d05",
+        "logBytesRead": 95313
+      },
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 1,
+        "durationSeconds": 697.54,
+        "log": "/private/tmp/dev79-backend-whole-a-verification.log",
+        "logSha256": "de115ad4966e1085068329261a91bac5a2d4b9d9b9ad067a0cbeddbd5724f8b7",
+        "logBytesRead": 570638
+      }
+    ],
+    "nativeCases": {
+      "passed": 16,
+      "failed": 1,
+      "failure": "Temporary reload fixture missing import; fixed without changing startup/reload deadline"
+    },
+    "verificationPassed": false
+  },
+  "wholeSourceQualification": {
+    "observedAt": "2026-10-07T11:48:27.854072+00:00",
+    "candidateCommit": "311288c3b12c768af15e1efe4738286b56b5e506",
+    "tree": "9f450f37aa0f25cdd9131d0a735cbd36b90f5e2f",
+    "trackedCount": 1772,
+    "trackedBytesUnchanged": true,
+    "gitStatusClean": true,
+    "freezeSha256": "30eb77b80d30a69c2fb56d0e06c8e1186bb61ddc13d7a65ce46b645f99efe785",
+    "checks": [
+      {
+        "stage": "verification",
+        "command": [
+          "bun",
+          "run",
+          "verification"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 680.92,
+        "log": "/private/tmp/dev79-backend-whole-b-verification.log",
+        "logSha256": "e47218774ea3ea74291db087d22d8318f37b98434ddff49c626e25eee3e6d299",
+        "bytesRead": 567419,
+        "testSummaries": [
+          "//:test:docs-deployment:task:  Test Files  22 passed (22)",
+          "//:test:docs-deployment:task:       Tests  273 passed (273)",
+          "//:test:docs-deployment:task:    Duration  9.20s (tests 77%, import 21%, transform 2%)",
+          "//:test:skills:task:  Test Files  1 passed (1)",
+          "//:test:skills:task:       Tests  21 passed (21)",
+          "//:test:skills:task:    Duration  116ms (import 55%, tests 24%, transform 19%, worker 2%)",
+          " Test Files  3 passed (3)",
+          "      Tests  16 passed (16)",
+          "   Duration  599ms (tests 66%, import 26%, transform 6%, worker 1%)",
+          "//:test:quality-workflow:task:  Test Files  2 passed (2)",
+          "//:test:quality-workflow:task:       Tests  34 passed (34)",
+          "//:test:quality-workflow:task:    Duration  513.92s (tests 100%)",
+          "@taxkit/sdk:test:browser:  Test Files  4 passed (4)",
+          "@taxkit/sdk:test:browser:       Tests  26 passed (26)",
+          "@taxkit/sdk:test:browser:    Duration  1.34s (import 77%, worker 20%, tests 4%)",
+          "web:test:browser:  Test Files  3 passed (3)",
+          "web:test:browser:       Tests  21 passed (21)",
+          "web:test:browser:    Duration  4.89s (tests 72%, import 21%, worker 8%)",
+          "web test:native-pair:  Test Files  10 passed (10)",
+          "web test:native-pair:       Tests  17 passed (17)",
+          "web test:native-pair:    Duration  121.76s (tests 97%, import 3%)"
+        ]
+      }
+    ],
+    "allWholeLogBytesRead": true,
+    "newProviderApplyClaim": false
+  },
+  "checkLineage": {
+    "earlierRootTestAndBuildSource": "73f2bc7d8bcdb49446e02e878a3944e7e263e8c8",
+    "latestWholeVerificationSource": "311288c3b12c768af15e1efe4738286b56b5e506",
+    "pathsChangedBetweenSources": [
+      "apps/web/test/native-local-development.boundary.test.ts",
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "applicationPackageAndBuildSourcesUnchanged": true,
+    "nativeReloadFixtureRepairCoveredByLatestVerification": true
+  },
+  "browserSdkPreparation": {
+    "scope": "Private controlled Chromium experiment only; no installed browser SDK, real provider request or runtime activation",
+    "version": "1.438.2",
+    "typesVersion": "1.415.1",
+    "batchAfterDoNotTrackChanged": {
+      "requests": 1,
+      "requestsWhileDntOne": 1
+    },
+    "retryAfterDoNotTrackChanged": {
+      "requests": 2,
+      "requestsWhileDntOne": 1,
+      "retryQuery": "retry_count=1"
+    },
+    "payload": "Current SDK wraps api_key, batch and sent_at at /e/ with text/plain; approved synchronous event reconstruction strips tax fields and URL context",
+    "storage": "No cookie or local/session storage in the final supported-options-only experiment; earlier use of the SDK opt-out API wrote a cookie and unsupported memory consent configuration was removed",
+    "experimentalSignal": "The runtime-only signal experiment prevented outbound requests, but the public fetch_options type declares cache and next_options only; no signal contract or shipping exception is claimed",
+    "decision": "Cooper asked to choose a small owned sender or retain the SDK requirement; accepted SPEC remains unchanged while waiting",
+    "proposal": "/private/tmp/dev79-browser-sender-proposal.md",
+    "evidence": "/private/tmp/dev79-sdk-policy-probe-e.json",
+    "evidenceSha256": "90ad14f945baaee30a77570dbdbffcd1a42373d792fded058288fd14f93dc81f"
+  },
+  "providerPreparation": {
+    "connectorUiHost": "https://us.posthog.com",
+    "activeProjectSelectionUnchanged": true,
+    "activeForeignProject": "645344",
+    "scope": "Generated existing connector UI link only; authenticated management region, complete listing and capacity still need qualification",
+    "taxkitDopplerConfigsWithoutPostHogVariableNames": [
+      "ci",
+      "dev",
+      "prd",
+      "stg_preview"
+    ],
+    "valuesPrinted": false,
+    "providerOrCredentialWrites": false
+  },
+  "postQualificationDocumentation": {
+    "paths": [
+      "docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json",
+      "docs/exec-plans/active/clean-slate-foundation.md"
+    ],
+    "sourceBehaviourChanged": false,
+    "checkStatus": "PASS: docs, runbooks, repository paths, established format policy and diff",
+    "receiptBeforeSha256": "047831e554c2af1aba67529c9499b68159a124d296933a8682a60d711c4b056a",
+    "checks": [
+      {
+        "stage": "docs",
+        "command": [
+          "bun",
+          "run",
+          "check:docs"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.34,
+        "log": "/private/tmp/dev79-backend-close-a-docs.log",
+        "logSha256": "4400c9e33d729097c2ecaa44560f2f97c8628f22b3551f0c41b6d3137d60912e",
+        "logBytesRead": 819
+      },
+      {
+        "stage": "runbooks",
+        "command": [
+          "bun",
+          "run",
+          "check:runbooks"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.14,
+        "log": "/private/tmp/dev79-backend-close-a-runbooks.log",
+        "logSha256": "ab36d28f279736940f1873d1dc89ebbf36d776bf0600bd96745dbc863fdf98f7",
+        "logBytesRead": 839
+      },
+      {
+        "stage": "paths",
+        "command": [
+          "bun",
+          "run",
+          "check:repository-paths"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.24,
+        "log": "/private/tmp/dev79-backend-close-a-paths.log",
+        "logSha256": "ee44565a189eff8ffd0d0e236153869de41aed19dbaaa3187125985320378d69",
+        "logBytesRead": 565
+      },
+      {
+        "stage": "format",
+        "command": [
+          "bun",
+          "run",
+          "format:check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.52,
+        "log": "/private/tmp/dev79-backend-close-a-format.log",
+        "logSha256": "3dfb8c4c04d9297eb1cf39648e924336c53a9b5fb316f2f5c187fe1f92ef4871",
+        "logBytesRead": 630
+      },
+      {
+        "stage": "diff",
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 0.01,
+        "log": "/private/tmp/dev79-backend-close-a-diff.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "logBytesRead": 0
+      }
+    ]
+  }
+}

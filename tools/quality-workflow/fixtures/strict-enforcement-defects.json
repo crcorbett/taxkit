@@ -1,0 +1,56 @@
+[
+  {
+    "id": "required-rule-removed",
+    "mutation": {
+      "search": "\"strict-effect/no-imperative-collections\": \"error\",",
+      "replacement": ""
+    },
+    "failureOracle": "Required lint rule: strict-effect/no-imperative-collections",
+    "recovery": "Restore all eleven canonical rules in the owned-path override and rerun the actual CLI corpus."
+  },
+  {
+    "id": "required-rule-disabled",
+    "mutation": {
+      "search": "\"strict-effect/no-imperative-collections\": \"error\",",
+      "replacement": "\"strict-effect/no-imperative-collections\": \"off\","
+    },
+    "failureOracle": "Required lint rule: strict-effect/no-imperative-collections",
+    "recovery": "Restore the required collection rule at error severity and rerun the actual CLI corpus."
+  },
+  {
+    "id": "assignment-admission-broadened",
+    "mutation": {
+      "search": "target: \"host.value\",",
+      "replacement": "target: \"host.value\",\n},\n{\nfile: \"tools/oxlint/.generated-collection-host.ts\",\ntarget: \"host.other\","
+    },
+    "failureOracle": "Strict collection admission canary",
+    "recovery": "Remove the additional assignment target; retain only the synthetic exact host.value admission."
+  },
+  {
+    "id": "method-admission-broadened",
+    "mutation": {
+      "search": "receiver: \"host\",",
+      "replacement": "receiver: \"host\",\n},\n{\nfile: \"tools/oxlint/.generated-collection-host.ts\",\nmethod: \"map\",\nreceiver: \"host\","
+    },
+    "failureOracle": "Strict collection admission canary",
+    "recovery": "Remove the additional method; retain only the synthetic exact host.push admission."
+  },
+  {
+    "id": "source-coverage-removed",
+    "mutation": {
+      "search": "\"**/*.{ts,tsx,js,jsx,mjs,cjs}\",",
+      "replacement": ""
+    },
+    "failureOracle": "Owned source extension coverage",
+    "recovery": "Restore the whole-source extension selector and rerun the actual CLI extension corpus."
+  },
+  {
+    "id": "fixture-exclusion-broadened",
+    "mutation": {
+      "search": "excludeFiles: [\n        \"tools/oxlint/fixtures/bun-accepted.ts\",",
+      "replacement": "excludeFiles: [\n        \"tools/oxlint/fixtures/**\",\n        \"tools/oxlint/fixtures/bun-accepted.ts\","
+    },
+    "failureOracle": "Owned-source fixture exclusions",
+    "recovery": "Remove the wildcard exclusion; retain only the five unexecuted named fixture inputs and rerun their strict neighbours."
+  }
+]

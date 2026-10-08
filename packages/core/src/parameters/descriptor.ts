@@ -1,8 +1,8 @@
-import { Schema } from "effect";
+import { Effect, Option, Schema } from "effect";
 import type { Context } from "effect";
 
 import { DateInterval } from "../primitives/date.js";
-import type { SourceArtifact, SourceRef } from "../trace/node.js";
+import { SourceArtifact, SourceRef } from "../trace/node.js";
 
 /**
  * Stable identifier for an official parameter service.
@@ -37,57 +37,51 @@ export const ParameterEffectivePeriod = DateInterval;
  */
 export type ParameterEffectivePeriod = typeof ParameterEffectivePeriod.Type;
 
-/**
- * Static metadata for a sourced parameter service supplied to rule layers.
- *
- * Parameter descriptors let graph validation tie a rule's required parameter
- * services back to the source references that justify them.
- *
- * @since 0.1.0
- */
-export interface ParameterDescriptor<Self, Value> {
-  readonly effectivePeriod: ParameterEffectivePeriod;
-  readonly id: ParameterId;
-  readonly schema: Schema.Schema<Value>;
-  readonly source: SourceRef;
-  readonly sourceArtifact?: SourceArtifact;
-  readonly tag: Context.Key<Self, Value>;
-  readonly title: string;
-}
+const ParameterDescriptorFields = Schema.Struct({
+  effectivePeriod: Schema.toType(ParameterEffectivePeriod),
+  id: ParameterId,
+  source: SourceRef,
+  sourceArtifact: Schema.OptionFromOptional(Schema.toType(SourceArtifact)).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
+  title: Schema.String,
+});
 
 /**
- * Parameter descriptor with its service type erased for graph validation.
- *
+ * Checked parameter metadata with its schema-to-service relation.
+ * @since 0.1.0
+ */
+export type ParameterDescriptor<Self, Value> =
+  typeof ParameterDescriptorFields.Type & {
+    readonly schema: Schema.Schema<Value>;
+    readonly tag: Context.Key<Self, Value>;
+  };
+
+/**
+ * Parameter descriptor whose service relation is not needed by graph checks.
  * @since 0.1.0
  */
 export type AnyParameterDescriptor = ParameterDescriptor<unknown, unknown>;
 
 /**
- * Builds a schema-backed parameter descriptor with a branded stable ID.
- *
+ * Builds a parameter descriptor from its owning field representation.
+ * The supplied period and artifact are already checked domain values.
  * @since 0.1.0
  */
-export const makeParameterDescriptor = <Self, Value>(args: {
-  readonly effectivePeriod: ParameterEffectivePeriod;
-  readonly id: string;
-  readonly schema: Schema.Schema<Value>;
-  readonly source: SourceRef;
-  readonly sourceArtifact?: SourceArtifact;
-  readonly tag: Context.Key<Self, Value>;
-  readonly title: string;
-}): ParameterDescriptor<Self, Value> => {
-  const descriptor: ParameterDescriptor<Self, Value> = {
-    effectivePeriod: ParameterEffectivePeriod.make(args.effectivePeriod),
-    id: ParameterId.make(args.id),
-    schema: args.schema,
-    source: args.source,
-    tag: args.tag,
-    title: args.title,
-  };
-
-  if (args.sourceArtifact !== undefined) {
-    return { ...descriptor, sourceArtifact: args.sourceArtifact };
+export const makeParameterDescriptor = <Self, Value>(
+  args: Omit<typeof ParameterDescriptorFields.Encoded, "id"> & {
+    readonly id: string;
+    readonly schema: Schema.Schema<Value>;
+    readonly tag: Context.Key<Self, Value>;
   }
-
-  return descriptor;
-};
+): ParameterDescriptor<Self, Value> => ({
+  ...ParameterDescriptorFields.make({
+    effectivePeriod: args.effectivePeriod,
+    id: ParameterId.make(args.id),
+    source: args.source,
+    sourceArtifact: Option.fromUndefinedOr(args.sourceArtifact),
+    title: args.title,
+  }),
+  schema: args.schema,
+  tag: args.tag,
+});

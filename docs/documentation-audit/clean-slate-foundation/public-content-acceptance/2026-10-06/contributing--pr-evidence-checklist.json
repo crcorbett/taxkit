@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-06T11:59:30Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "c5941244ef6faa658dac6035fe8848894874528af4a42802be2273c783f32710",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/contributing/pr-evidence-checklist.mdx"
+}

@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "paths": {
+      "@taxkit/calculators": ["../calculators/src/index.ts"],
+      "@taxkit/calculators/live": ["../calculators/src/live.layer.ts"],
+      "@taxkit/calculators/*": ["../calculators/src/*.ts"],
+      "@taxkit/core": ["../core/src/index.ts"],
+      "@taxkit/core/*": ["../core/src/*/index.ts"],
+      "@taxkit/rules-au-income-tax": ["../rules/au/income-tax/src/index.ts"],
+      "@taxkit/rules-au-income-tax/*": [
+        "../rules/au/income-tax/src/*/index.ts"
+      ],
+      "@taxkit/rules-au-pay": ["../rules/au/pay/src/index.ts"],
+      "@taxkit/rules-au-pay/*": ["../rules/au/pay/src/*/index.ts"],
+      "@taxkit/sdk": ["../sdk/typescript/src/index.ts"],
+      "@taxkit/sdk/au": ["../sdk/typescript/src/au.ts"],
+      "@taxkit/sdk/au/effect": ["../sdk/typescript/src/au-effect.ts"],
+      "@taxkit/sdk/effect": ["../sdk/typescript/src/effect.ts"],
+      "@taxkit/sdk/schemas": ["../sdk/typescript/src/schemas/index.ts"],
+      "@taxkit/api-http/client/live": ["../api/http/src/client/live.layer.ts"],
+      "@taxkit/api-http/client/server": [
+        "../api/http/src/client/server.layer.ts"
+      ],
+      "@taxkit/api-http": ["../api/http/src/index.ts"],
+      "@taxkit/api-http/client": ["../api/http/src/client/index.ts"]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2024",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}
