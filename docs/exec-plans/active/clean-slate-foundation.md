@@ -30,7 +30,7 @@ safe action. A draft PR, checkpoint or completed slice is not the terminal goal.
 The local continuation also records this objective in the runtime's native goal
 manager. This active plan and the task ledger remain the durable repository
 continuation record.
-Cooper approved the separate [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) on 8 October. Its owning task MCR-001 permits affected result changes; independent rebuild work continues. Cooper's 7 October direction adds native Preview and Production
+Cooper approved the separate [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) on 8 October. Its bounded MCR-001/002 work is completed locally in the [correction receipt](../../documentation-audit/medicare-2025-26-correction.json); the original correction source and the test-only recovery checkpoint have separate recorded outcomes. This does not complete the larger rebuild or authorise source adoption by adad. Its owning task MCR-001 permits affected result changes; independent rebuild work continues. Cooper's 7 October direction adds native Preview and Production
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
@@ -48,10 +48,12 @@ qualification is locally accepted. T002's
 installed dependency graph, app/script/SDK/infrastructure
 migrations, six-extension strict scope, fixture containment and final source
 review are complete locally. The [acceptance review](../../documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
-records the completed local checks and their limits. The companion adad
-qualification remains exactly `59b0a36ff1bc6f95501734ee65d789a4f5a37fcc`;
-later SDK work has not been qualified there, and neither result is Medicare
-correctness proof.
+records the completed local checks and their limits. The earlier companion adad candidate
+`59b0a36ff1bc6f95501734ee65d789a4f5a37fcc` remains historical and does not prove
+Medicare correctness. Current annual consumer qualification belongs to
+[DEV-68](https://linear.app/coopers-personal/issue/DEV-68/cf-012-qualify-a-correct-effect-v4-taxkit-revision)
+and the exact approved correction source `0d82b82d1c48079fc4b8e2ec96abadfe12999789`;
+its remaining checks and public enablement are separately owned by adad.
 
 ## Starting point and retention
 

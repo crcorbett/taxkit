@@ -3,7 +3,7 @@ document_type: evidence-index
 lifecycle: evidence
 authority: supporting
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: documentation-audit receipt, evidence class, corpus inventory, or decision-record change
 ---
 
@@ -34,6 +34,8 @@ current proposal or installed enforcement.
 
 Clean slate implementation evidence:
 
+- [8 October bounded Medicare and exact-zero correction](medicare-2025-26-correction.json): accepted local correction, separately identified test recovery and source-approval limits.
+
 - [Retention manifest](clean-slate-foundation/retention-manifest.json)
 - [4 October baseline checks](clean-slate-foundation/2026-10-04-baseline.json)
 - [4 October version observations](clean-slate-foundation/2026-10-04-version-observations.json)
@@ -44,9 +46,10 @@ Clean slate implementation evidence:
 - [6 October shared native calculation admission and local T004 closeout](clean-slate-foundation/2026-10-06-shared-rate-admission.json)
 - [6 October checked docs source owner and draft-review candidate](clean-slate-foundation/2026-10-06-checked-docs-source-owner.json)
 
-The baseline preserves tax results and historical provider proof. The Medicare
-finding requires a scope decision before changing retained results; no correction
-or current-law qualification is claimed.
+The baseline and the 4 October Medicare conflict are retained historical
+observations. Cooper approved the bounded correction on 8 October; its separate
+receipt above records the changed annual scope and local proof. Earlier
+provider evidence does not qualify this correction or adad deployment.
 
 Entire session history setup evidence:
 

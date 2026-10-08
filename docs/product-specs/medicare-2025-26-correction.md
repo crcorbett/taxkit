@@ -1,13 +1,13 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: canonical
 owner: taxkit-au-income-tax-owner
 last_reviewed: 2026-10-08
 review_trigger: Medicare source, annual rule edition or consumer qualification change
 ---
 
-# Correct the 2025–26 annual Medicare table
+# Implemented 2025–26 annual Medicare correction
 
 Cooper approved this correction on 8 October in the adad delivery conversation.
 This supersedes the retained-result requirement only for affected annual Medicare
@@ -16,14 +16,14 @@ under its [owning plan](../exec-plans/active/clean-slate-foundation.md).
 
 ## Outcome and scope
 
-Correct the single-person, non-SAPTO Medicare table in
+The correction updated the single-person, non-SAPTO Medicare table in
 `packages/rules/au/income-tax/src/parameters/medicare-levy-table.ts` from
-$27,222/$34,027 to $28,011/$35,013. Keep the existing nil, 10% shade-in and 2%
+$27,222/$34,027 to $28,011/$35,013, retaining the existing nil, 10% shade-in and 2%
 full-rate algorithm. Section 7(2) of the Medicare Levy Act includes the phase-in
 limit itself. The enacted amendment is Schedule 5 items 3, 5 and 14 of
 [Act No. 58 of 2026](https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf).
-Record the downloaded PDF checksum, source identity, retrieval date and annual
-ruleset edition `rules-au-income-tax/1.0.1`. Task MCR-002 below also corrects the
+The receipt records the downloaded PDF checksum, source identity, retrieval date
+and annual ruleset edition `rules-au-income-tax/1.0.1`. Task MCR-002 below also corrected the
 zero-income boundary discovered during the authorised adad qualification.
 Positive-income tax amounts, LITO, PAYG and take-home rules stay unchanged.
 Family reductions, SAPTO, exemptions, surcharge, student
@@ -52,9 +52,11 @@ The reused historical comparison in the packed consumer admits only complete
 Medicare-owned fragments and the named annual report edition and $90k Medicare
 trace. Keep original response digest arrays and prove unrelated changed
 dates, amounts and versions still fail. The evidence owner is `docs/documentation-audit/medicare-2025-26-correction.json`.
-Task status: in progress; acceptance requires focused tests/types, lint,
-formatting, build, documentation, full local verification, SDK packed/downstream
-checks for the changed literal, and one fresh independent review.
+Task status: completed for this correction on 8 October. The
+[qualification receipt](../documentation-audit/medicare-2025-26-correction.json)
+records focused checks, full local verification at the separately identified
+test-only recovery checkpoint, real packed/downstream checks and independent
+review. The approved adad source remains the exact correction commit.
 
 ## Impact and proof
 
@@ -69,8 +71,12 @@ change and success after it for $0, one cent and $18,200. Preserve all existing
 positive-income assertions and the rule's declared nearest-cent calculation.
 This is a small prerequisite bug fix under the authorised annual delivery goal,
 not a change to the Medicare formula or a claim of complete tax-return accuracy.
-Task status: in progress; acceptance requires the annual test suite, independent
-consumer boundary checks, full local checks and fresh independent review.
+Task status: completed for this correction on 8 October. The same
+[receipt](../documentation-audit/medicare-2025-26-correction.json) records the
+red-before-fix proof, annual tests, independent consumer checks and review.
+The original correction source’s full aggregate failed one stale browser
+expectation; the test-only successor corrects that expectation and passes the
+full aggregate with unchanged calculation packages, manifests and lock.
 
 | Surface | Decision and proof |
 | --- | --- |
