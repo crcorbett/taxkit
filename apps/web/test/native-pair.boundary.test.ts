@@ -1668,7 +1668,7 @@ describe("built native API and Website", () => {
               id: "au.income-tax.annual",
               label: "Annual taxable income ($)",
               savedAmount: "30000",
-              savedAnswer: "$1,465.80",
+              savedAnswer: "$1,386.90",
               savedForm: "taxableDollars=30000",
               title: "AU annual income tax",
             },
