@@ -35,9 +35,12 @@ independent work. Cooper's 7 October direction adds native Preview and Productio
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
-Next continuation milestone: finish T008's browser sender and settle the
-one-project scope proposed by Cooper. Temporary management-read preparation and
-cleanup are complete; the organisation has no free project slot. Backend capture rules,
+Next continuation milestone: qualify T008's single shared TaxKit project graph
+selected by Cooper on 8 October, then finish the browser sender and reviewed
+provider plan. Temporary management-read preparation and cleanup are complete.
+Cooper scheduled `adad test` for deletion. Direct browser readback shows a
+pending-deletion notice for 10 October at 10:43 am; the US organisation still
+lists six projects, so a free slot is not yet confirmed. Backend capture rules,
 Website calculator preferences, retained-project management and the bounded
 relay have complete local qualification. Draft #167's app pair is delivered to
 Preview `pr-167` and Production with collection off; its dated delivery receipt
@@ -92,7 +95,7 @@ records command outcomes and log digests.
 | T005 / DEV-76 | Complete locally; draft review outstanding | Documentation reader and old app/build/operation retirement passed the complete local graph and exact #155 hosted Quality. Metrics remain deferred. |
 | T006 / DEV-77 | Complete locally; draft review outstanding | Six remote and five visible browser tools reuse the checked owners. All nine local checks pass at `72bfa16ac08dacc4c26f3de023a2880baefe1c55`, with both fourteen-case native runs. Draft #162 contains the stage-derived connection guide, deployed and read back on pr-162 and Production with both supported clients. The explicit modern five-second cleanup limit remains; no autonomous model session or prompt cleanup is claimed. |
 | T007 / DEV-78 | Complete locally; draft review outstanding | Exact native graph/source/secret/state/live plans are delivered in drafts #159–161, with #162 guide delivery. Draft #163 aligns the current native CLI/runbooks/recovery and paged provider reads. Full local verification passes `226c60bddb225467db64e772d48304af2368a216` in 684.12 seconds; all 1,750 frozen identities match, including the fourteen-case built app check. No new provider, state, credential or deployment mutation; rollback and no-op convergence remain unqualified. |
-| T008 / DEV-79 | In progress | Backend, Website calculator preferences, retained-project management and the bounded relay pass full local qualification. Draft #167's qualified app pair is delivered on pr-167 and Production with collection off; all 11 live checks pass in each. Temporary management reads and the native no-apply plan passed, and the key/Doppler cleanup is independently confirmed. Browser sender choice, Cooper's proposed one-project scope, actual project resources and final hosted/stored-event proof remain. |
+| T008 / DEV-79 | In progress | Backend, Website calculator preferences, retained-project management and the bounded relay have dated local qualification. Draft #167's qualified app pair is delivered on pr-167 and Production with collection off; all 11 live checks pass in each. Temporary management reads and the old two-project no-apply plan passed, and key/Doppler cleanup is independently confirmed. Cooper selected one shared TaxKit project; adad test is scheduled for deletion on 10 October and still counts in the six-project list. The changed graph and fresh independent-review fixes are undergoing local qualification. Browser sender choice, actual project resources and final hosted/stored-event proof remain. |
 | T009 / DEV-80 | Deferred by Cooper on 6 October | Leave the metrics approach for now and proceed with other work. Existing fixed safe errors and disabled collection remain; exported telemetry is not completed. |
 | T010 / DEV-81 | Awaiting T008 and deferred T009 | T007 is locally complete. The #167 local release graph and collection-off app delivery are bounded progress; final independent review, completed analytics and the deferred telemetry requirement remain outstanding. No final rebuild acceptance, package version application or publication is claimed. |
 
@@ -6000,3 +6003,93 @@ This qualifies execution records locally; the deployed app source remains
 
 Final six focused closeout checks pass for the saved proof metadata. All 1,797
 other content/link identities and modes match the frozen source.
+
+
+### T008 one shared PostHog project and fresh review corrections
+
+Cooper selected one TaxKit project for Production and controlled Preview events
+on 8 October 2026, then reported deleting `adad test` to free one slot. The
+initial connector read and fresh US Cooper browser list still showed six
+projects. Direct readback of project 645344 then redirected to its pending
+deletion page, whose visible notice schedules deletion for 10 October at
+10:43 am. The slot has not yet been confirmed free. This is not permission to
+upgrade or delete another project. Capacity must be checked before any apply.
+
+The changed native `TaxKitPostHog/prod` graph declares only `TaxKitProject`,
+display name `TaxKit`, marker `taxkit:posthog:shared:v1`, and one `projectId`
+output. It retains the fixed US organisation/region and provider retention.
+Local and PR graphs refuse. Old Production/Preview markers and foreign markers
+refuse rather than adopting history. Earlier two-project plans were never
+applied and remain dated evidence; no provider resource or shared state is
+migrated by this source change. Checked runtime configuration already accepts
+the same project ID/token for Production and controlled Preview while requiring
+the proper mode and exact stage. Events keep project, application and stage;
+Production reports filter `prod`, and controlled proof filters its exact `pr-N`.
+Filters do not isolate access within a project. Collection stays off.
+
+A fresh independent review pinned to `cc11c6aa` found two defects: early rejected
+HTTP replies lacked a deterministic native abort lifetime, and bodyless backend
+204 success was incorrectly classified as transport failure. The corrected
+backend and relay scope their actual HTTP clients. Management scopes each
+bounded native response collection before the SDK sees its in-memory reply,
+including rejected redirects. Backend success handles only the native named
+empty-body case; other failures retain their safe error. Fixed hosts, headers,
+one attempt, deadlines and byte limits stay enforced. Focused native response
+and signal checks cover all three owners, alongside existing interruption,
+size, deadline, no-retry and redirect checks. These are local transport checks,
+not proof of live Cloudflare socket termination or provider event storage.
+
+Documentation impact: **Change required** for the SPEC/T008 scope, this plan,
+infrastructure and analytics READMEs, Website relay README, configuration,
+deployment, testing/quality and Effect-service owners, dated evidence and the
+private infrastructure/analytics Changeset. **Preserve** root routes, five
+runbooks, package ownership/export maps, HTTP/OpenAPI/SDK and public content,
+critical journeys, old receipts, skills/lint/CI rules, deferred metrics and
+retained tax results. **N/A** for generated regeneration, dependency upgrades,
+package version consumption, provider apply, credentials, collection activation
+and publication: none is performed by this slice.
+
+Qualification is recorded in the [shared-project receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-shared-posthog-project.json).
+The first restricted focused run could not start the existing loopback test
+server; the approved local run passed all focused suites. Full qualification
+and corrected-source review must match the saved source before acceptance.
+Rollback reverts this slice's source/docs/Changeset; collection remains off,
+the old temporary key remains revoked and no provider deletion is involved.
+T008/T010 remain unfinished for browser sender, reviewed live plan/apply,
+controlled Preview/stored-event proof and final acceptance.
+
+
+The first complete root test, type and build commands pass. Complete verification
+then correctly refuses a newly added marker-decoding assertion in the graph
+test, because that file is not an input boundary. The unchanged three refusal
+assertions move into the existing management boundary test. No decoder-list,
+lint rule, runtime or package contract changes are needed for this repair.
+A matching focused run and complete verification qualify the corrected source;
+the failed attempt remains in the dated receipt. The bounded fresh review finds
+no remaining material issue in its 15 frozen files; the later test relocation
+changes only the assertion owner and is checked separately.
+
+
+The second complete verification passes all 34 workflow cases and 21 of 22
+built app cases, then the cancellation fixture exhausts its 45-second whole-test
+timeout as departure begins. A focused unchanged repeat reproduces the same
+whole-test timeout after all three sequential deadline checks and editing
+cancellation. The fixture total is now 65 seconds (70 including cleanup for
+the runner); every individual request deadline, elapsed assertion, alert limit
+and cancellation limit is preserved. This fixture-only correction and the
+testing owner must receive focused proof and a bounded fresh review before
+final source qualification. Both failed runs remain in the dated receipt.
+
+
+Final-source local qualification passes: 39 infrastructure project tests,
+35 analytics tests and 26 relay tests, full repository lint, root tests/types/
+build and complete verification. The complete verification takes 957.81 seconds.
+The independent addendum confirms the exact two-file test relocation and
+unchanged other 13 reviewed source files. All 1,801 frozen identities and modes
+match before metadata; final frozen digest
+`b644d5994db95757cc69a4cbcc06c8af5cc376049658e0559233c8a797aedde9`
+binds corrected source. Only this plan and the receipt receive later proof
+metadata; all 1,799 other identities must match and focused closeout must pass.
+The first root suite results precede the test-only relocation; corrected focused
+tests and full verification own the final source. No provider apply, credential
+change, new deployment, activation, merge or publication is claimed.

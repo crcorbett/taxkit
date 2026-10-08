@@ -44,9 +44,8 @@ const organisation = PostHogOrganisationId.make(
   "00000000-0000-4000-8000-000000000079"
 );
 const definition = ProjectDefinition.make({
-  environment: "preview",
-  marker: "taxkit:posthog:preview:v1",
-  name: PostHogManagedName.make("TaxKit Preview"),
+  marker: "taxkit:posthog:shared:v1",
+  name: PostHogManagedName.make("TaxKit"),
   organisation,
   region: "us",
 });
@@ -59,8 +58,8 @@ const saved = ManagedProject.make({
   ),
 });
 const identity = {
-  fqn: "TaxKitPreviewProject",
-  id: "TaxKitPreviewProject",
+  fqn: "TaxKitProject",
+  id: "TaxKitProject",
   instanceId: "fixture-instance",
 };
 const graphEnvironment = Effect.provide(
@@ -114,7 +113,7 @@ const graphEnvironment = Effect.provide(
 const session = { ...noopSession, note: () => Effect.void };
 
 it.effect(
-  "retains both projects through the actual native destroy plan and nuke inventory",
+  "retains one shared project through the actual native destroy plan and nuke inventory",
   () =>
     Effect.gen(function* () {
       const native = yield* makePostHogManagementTest();
@@ -129,10 +128,9 @@ it.effect(
         state: stateLayer,
       })(declarePostHogProjects).pipe(Effect.provideService(Stage, "prod"));
       const resources = Record.values(compiled.resources);
-      expect(resources).toHaveLength(2);
+      expect(resources).toHaveLength(1);
       expect(Array.map(resources, (resource) => resource.LogicalId)).toEqual([
-        "TaxKitProductionProject",
-        "TaxKitPreviewProject",
+        "TaxKitProject",
       ]);
       expect(
         Array.every(
@@ -145,7 +143,7 @@ it.effect(
       );
       expect(
         Array.map(Record.values(created.resources), (node) => node.action)
-      ).toEqual(["create", "create"]);
+      ).toEqual(["create"]);
       const state = yield* State.pipe(Effect.provideContext(compiled.services));
       const store = yield* state;
       const management = yield* PostHogManagement.pipe(
@@ -181,7 +179,7 @@ it.effect(
       );
       expect(
         Array.map(Record.values(noop.resources), (node) => node.action)
-      ).toEqual(["noop", "noop"]);
+      ).toEqual(["noop"]);
       const removed = yield* Plan.destroy(compiled).pipe(
         Effect.provideContext(compiled.services)
       );
@@ -194,7 +192,7 @@ it.effect(
             })
           )
         )
-      ).toEqual(["orphaned", "orphaned"]);
+      ).toEqual(["orphaned"]);
       const context = yield* Layer.build(providers);
       const scanned = yield* Nuke.list({ context, mode: "live" });
       expect(scanned).toEqual({ failures: [], resources: [] });
@@ -203,7 +201,7 @@ it.effect(
           yield* Ref.get(native.operations),
           (operation) => operation === "create-project"
         )
-      ).toHaveLength(2);
+      ).toHaveLength(1);
     }).pipe(graphEnvironment)
 );
 
@@ -217,7 +215,7 @@ it.effect(
       );
       const renamed = ProjectDefinition.make({
         ...definition,
-        name: PostHogManagedName.make("TaxKit Preview renamed"),
+        name: PostHogManagedName.make("TaxKit renamed"),
       });
       const difference = yield* Option.match(
         Option.fromNullishOr(provider.diff),
@@ -236,14 +234,7 @@ it.effect(
       );
       expect(difference).toEqual({
         action: "update",
-        stables: [
-          "id",
-          "organisation",
-          "marker",
-          "environment",
-          "region",
-          "token",
-        ],
+        stables: ["id", "organisation", "marker", "region", "token"],
       });
       const changed = yield* provider.reconcile({
         ...identity,

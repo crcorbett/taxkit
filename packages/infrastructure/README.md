@@ -85,9 +85,11 @@ See the [dated graph receipt](../../docs/documentation-audit/clean-slate-foundat
 
 The explicit source-only `./posthog` export composes `alchemy.posthog.run.ts`.
 The separate durable `TaxKitPostHog` stack accepts only `prod` and declares
-`TaxKitProductionProject` / `TaxKitPreviewProject`, with display names
-`TaxKit Production` / `TaxKit Preview`. Both use the fixed US management host
-and exact environment ownership markers. Neither PR nor local stages declare
+one `TaxKitProject`, with display name `TaxKit` and exact ownership marker
+`taxkit:posthog:shared:v1`. It uses the fixed US management host. Production
+and deliberate controlled Previews share this project; each event retains its
+checked application and exact stage for report filters. Filters do not isolate
+access to events within the project. Neither PR nor local stages declare
 projects. Native secrets select only `taxkit/prd`, with ambient app settings
 disabled. Required `POSTHOG_ORGANISATION_ID` is a checked organisation identity;
 `POSTHOG_MANAGEMENT_KEY` is a checked redacted personal management key.
@@ -109,7 +111,7 @@ write; it never automatically repeats POST. Update checks ownership first,
 changes only the managed name and ten supported privacy controls, and reads
 back the same ID and capture key. Update is bounded to 15 seconds. Missing
 retained projects and changed ownership refuse rather than silently replacing
-history. Both native removal policies retain; provider delete additionally
+history. The native removal policy retains; provider delete additionally
 refuses even a forced call, and the bulk-delete scan skips this resource type.
 Removing tracking state is not deletion of the retained provider project.
 
@@ -121,7 +123,7 @@ introduced. Starting another native CLI run reacquires configuration.
 
 The deterministic management Layer is test-only and is excluded only from the
 Production unused-code inventory. It remains typechecked and linted. Controlled
-SDK HTTP, a real loopback redirect, and native memory-state plans cover this
+SDK HTTP, native request-abort checks, a real loopback redirect, and native memory-state plans cover this
 candidate. These are neither project capacity, credential-scope nor provider
 change proof. Cross-process creation races remain a limitation of the provider
 API; duplicate ownership fails on a subsequent complete inventory. The app stack still collects off

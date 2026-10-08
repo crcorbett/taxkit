@@ -19,6 +19,7 @@ import {
   Headers,
   HttpClient,
   HttpClientRequest,
+  HttpClientResponse,
   HttpServer,
   HttpServerRequest,
   HttpServerResponse,
@@ -482,6 +483,41 @@ it.effect(
         (yield* Schema.decodeEffect(WebsiteRelayQuery)("?retry_count=1"))
           .retry_count
       ).toEqual(Option.some("1"));
+    })
+);
+
+it.effect(
+  "closes the native request when refusing a redirect before reading its body",
+  () =>
+    Effect.gen(function* () {
+      const seen = yield* Ref.make<readonly AbortSignal[]>([]);
+      const http = HttpClient.make((request, _address, signal) =>
+        Ref.update(seen, (items) => Array.append(items, signal)).pipe(
+          Effect.as(
+            HttpClientResponse.fromWeb(
+              request,
+              new Response("redirect", { status: 302 })
+            )
+          )
+        )
+      );
+      const failure = yield* WebsiteAnalyticsRelay.use((relay) =>
+        relay.handle(HttpServerRequest.fromClientRequest(input))
+      ).pipe(
+        Effect.provide(
+          WebsiteAnalyticsRelayLive.pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, http)),
+            Layer.provide(
+              ConfigProvider.layer(ConfigProvider.fromUnknown(settings))
+            )
+          )
+        ),
+        Effect.flip
+      );
+      expect(failure.reason).toBe("redirect");
+      const signals = yield* Ref.get(seen);
+      expect(signals).toHaveLength(1);
+      expect(Array.every(signals, (signal) => signal.aborted)).toBe(true);
     })
 );
 

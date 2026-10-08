@@ -22,7 +22,7 @@ export const PostHogProject = Resource<PostHogProject>(
 );
 
 // This is an ownership rule, shared by saved-state read and update planning.
-// Names can change in place; account, region, environment and marker cannot.
+// Names can change in place; account, region and marker cannot.
 const requireSameOwner = Effect.fnUntraced(function* (
   expected: ProjectDefinition,
   observed: ProjectDefinition
@@ -30,7 +30,6 @@ const requireSameOwner = Effect.fnUntraced(function* (
   if (
     expected.organisation !== observed.organisation ||
     expected.marker !== observed.marker ||
-    expected.environment !== observed.environment ||
     expected.region !== observed.region
   ) {
     return yield* new PostHogManagementError({
@@ -112,7 +111,6 @@ export const PostHogProjectProvider = Provider.effect(
                       "id",
                       "organisation",
                       "marker",
-                      "environment",
                       "region",
                       "token",
                     ],
@@ -252,14 +250,7 @@ export const PostHogProjectProvider = Provider.effect(
             }),
         });
       }),
-      stables: [
-        "id",
-        "organisation",
-        "marker",
-        "environment",
-        "region",
-        "token",
-      ],
+      stables: ["id", "organisation", "marker", "region", "token"],
     };
   })
 );

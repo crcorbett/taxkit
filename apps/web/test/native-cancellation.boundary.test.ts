@@ -404,9 +404,12 @@ it.live(
       // does not establish upstream cancellation of its artificial twelve-second
       // stream; never report this as provider or remote-operation cancellation.
     }).pipe(
-      Effect.timeout("45 seconds"),
+      // Three ten-second deadline checks run sequentially, alongside Worker
+      // and browser startup. Keep each operation's own bound above; allow
+      // enough time for the whole fixture and its departure assertions.
+      Effect.timeout("65 seconds"),
       Effect.scoped,
       Effect.provide(NodeServices.layer)
     ),
-  50_000
+  70_000
 );

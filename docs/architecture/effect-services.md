@@ -222,7 +222,10 @@ fallible live acquisition in the native stack scope and defers it to a lifecycle
 operation. Invalid settings remain typed failures before any request. The
 [infrastructure owner](../../packages/infrastructure/README.md) records the
 retention, limits and qualification boundaries; no app runtime receives this
-management service.
+management service. Its native HTTP attempt owns deterministic abort within
+the operation's scope, including refusal before reading a redirect body. The
+SDK receives only a bounded, collected in-memory response; that response can
+outlive the completed native request without retaining its connection.
 
 Use [the repo-owned effect client wrapper skill](../../.agents/skills/effect-client-wrapper/SKILL.md)
 when introducing or reviewing a provider adapter. Its canonical example and

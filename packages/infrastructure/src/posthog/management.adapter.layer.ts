@@ -116,6 +116,7 @@ export const PostHogManagementLive = Layer.effect(
     const transport = Layer.succeed(
       HttpClient.HttpClient,
       http.pipe(
+        HttpClient.withScope,
         HttpClient.filterStatus(
           (status) => status >= 200 && (status < 300 || status >= 400)
         ),
@@ -151,7 +152,8 @@ export const PostHogManagementLive = Layer.effect(
               )
             )
           )
-        )
+        ),
+        HttpClient.transformResponse(Effect.scoped)
       )
     );
     const writePermit = yield* Semaphore.make(1);

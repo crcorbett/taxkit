@@ -25,14 +25,10 @@ export const makePostHogManagementTest = Effect.fnUntraced(function* (
         );
         const saved = ManagedProject.make({
           ...definition,
-          id: PostHogProjectId.make(
-            definition.environment === "production" ? 79 : 80
-          ),
+          id: PostHogProjectId.make(79),
           privacy: desiredProjectPrivacy,
           token: Redacted.make(
-            CaptureToken.make(
-              `phc_synthetic_taxkit_${definition.environment}_fixture_only`
-            )
+            CaptureToken.make("phc_synthetic_taxkit_shared_fixture_only")
           ),
         });
         yield* Ref.update(projects, (current) => Array.append(current, saved));

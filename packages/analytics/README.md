@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-analytics-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-08
 review_trigger: analytics event, settings, service, export, transport or privacy change
 ---
 
@@ -32,7 +32,9 @@ The application supplies native `FetchHttpClient` and Effect `Crypto`. Each
 backend send owns one scope and one five-second limit covering identity,
 encoding, headers and the complete reply. Replies are limited to 64 KiB. A
 request has one attempt, omits credentials, disables trace propagation and
-refuses redirects. Disabled or denied collection makes no request and generates
+refuses redirects. The native client's abort lifetime belongs to that scope,
+including rejection before a response body is read. A successful bodyless reply
+counts as accepted. Disabled or denied collection makes no request and generates
 no UUID. `accepted` means a successful HTTP response; stored provider events
 require separate readback.
 
@@ -51,8 +53,9 @@ Change required: this README, the repository
 [active plan](../../docs/exec-plans/active/clean-slate-foundation.md) route these
 contracts and pending application work. Preserve: tax Schemas, results, HTTP
 and SDK contracts, public accepted documentation and the five existing runbook
-procedures. This package is private and is not part of the published tax/SDK
-closure, so its addition alone needs no Changeset.
+procedures. This versioned private package follows the
+[Changeset rules](../../docs/standards/versioning.md); package-facing changes
+include their own Changeset outside the public tax/SDK release group.
 
 ## Runbook applicability
 

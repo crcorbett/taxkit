@@ -106,6 +106,10 @@ are deployment-only and never Worker bindings or browser settings. Current
 application analytics remain configured off; declaring project resources does
 not enable collection. The [infrastructure owner](../../packages/infrastructure/README.md#retained-posthog-project-candidate)
 describes deferred acquisition and native lifecycle bounds.
+One retained project ID and capture token serve Production and controlled
+Previews. Checked application configuration still requires the matching
+collection mode and exact event stage; ordinary Previews and local collection
+remain off. Report filters use those event labels rather than separate projects.
 
 The Website relay reuses the analytics package's checked runtime mode, numeric
 project ID, region, stage and redacted capture token plus `WEBSITE_PUBLIC_ORIGIN`.

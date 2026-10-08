@@ -733,7 +733,7 @@
       ],
       "goal": "Only the documented events and fields leave the app; no persistent browser identity or consent dialogue is introduced.",
       "scope": [
-        "Manage retained TaxKit Production and shared Preview projects through a private Alchemy Resource/Provider and current Distilled PostHog, with checked organisation/region/ownership and safe management failures.",
+        "Manage one retained TaxKit project shared by Production and controlled Previews through a private Alchemy Resource/Provider and current Distilled PostHog, with checked organisation/region/ownership and safe management failures. Filter events by project, application and exact stage; filters do not isolate access within the project.",
         "Implement explicit pageviews in a private React-owned browser service and one successful hosted-calculation event owner in the backend application; honour a checked browser opt-out without linking identities.",
         "Use a synchronous final-enrichment allowlist, memory-only persistence, explicit DNT and disabled automatic/replay/person features. Local and ordinary Preview capture stay off; no consent dialog.",
         "Implement the bounded same-origin event relay and native backend capture through owned Effect HTTP. Qualify actual current SDK transport/disposal and no duplicate events; retain best-effort delivery limits."

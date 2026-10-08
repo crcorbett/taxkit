@@ -535,11 +535,16 @@ retry; do not promise exactly-once storage across provider loss or caller
 recalculation. Local package calculations do not send analytics. Visits are
 loaded-page counts, not a promise of exact returning-person counts.
 
-Manage retained TaxKit Production and one shared Preview PostHog project through
-Alchemy, following Common Practice's fixed US-region pattern, subject to the
+Manage one retained TaxKit PostHog project through Alchemy, shared by Production
+and deliberate controlled Previews. Cooper selected this single-project scope
+on 8 October 2026. Follow Common Practice's fixed US-region pattern, subject to the
 actual organisation/credentials in the reviewed provider plan. Local analytics
 is disabled. Ordinary Previews are disabled; an explicit controlled Preview
-proof can enable its Preview project. Production capture tokens are public
+proof can use the same project. Every event carries `project=taxkit`, its
+application and exact stage (`prod` or the checked `pr-N`). Production reports
+filter `stage=prod`; controlled Preview proof filters its exact stage. These
+filters separate reports, not access to event data within the project.
+The project has one stable identity and one capture token. Capture tokens are public
 write-only browser inputs; management/query credentials remain private in
 Doppler and never enter app output or bundles. No paid feature or billing
 change is required by this scope.

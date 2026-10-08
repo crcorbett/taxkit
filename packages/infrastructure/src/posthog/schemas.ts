@@ -8,22 +8,13 @@ export const PostHogManagedName = Schema.String.check(
   Schema.isMinLength(1),
   Schema.isMaxLength(120)
 ).pipe(Schema.brand("taxkit/PostHogManagedName"));
-const PostHogProjectMarker = Schema.Literals([
-  "taxkit:posthog:production:v1",
-  "taxkit:posthog:preview:v1",
-]);
+const PostHogProjectMarker = Schema.Literal("taxkit:posthog:shared:v1");
 export const ProjectDefinition = Schema.Struct({
-  environment: Schema.Literals(["production", "preview"]),
   marker: PostHogProjectMarker,
   name: PostHogManagedName,
   organisation: PostHogOrganisationId,
   region: Schema.Literal("us"),
-}).check(
-  Schema.makeFilter(
-    (value) => value.marker === `taxkit:posthog:${value.environment}:v1`,
-    { message: "Project ownership must match its environment." }
-  )
-);
+});
 export type ProjectDefinition = typeof ProjectDefinition.Type;
 export const ProjectLookup = Schema.Struct({
   definition: ProjectDefinition,
@@ -62,12 +53,7 @@ export const ManagedProject = Schema.Struct({
   id: PostHogProjectId,
   privacy: ProjectPrivacy,
   token: Schema.Redacted(CaptureToken),
-}).check(
-  Schema.makeFilter(
-    (value) => value.marker === `taxkit:posthog:${value.environment}:v1`,
-    { message: "Stored project ownership must match its environment." }
-  )
-);
+});
 export type ManagedProject = typeof ManagedProject.Type;
 
 export const PostHogManagementKey = Schema.String.check(

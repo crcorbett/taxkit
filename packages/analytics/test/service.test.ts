@@ -16,6 +16,7 @@ import {
 import {
   FetchHttpClient,
   HttpClient,
+  HttpClientResponse,
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
@@ -191,6 +192,46 @@ it.effect.each([200, 204, 299, 301, 400, 429, 500])(
           onSuccess: (value) => value,
         })
       ).toBe(status < 300 ? "accepted" : "rejected");
+    })
+);
+
+it.effect.each([200, 204, 302, 500])(
+  "closes the native request lifetime, including a bodyless reply, at status %i",
+  (status) =>
+    Effect.gen(function* () {
+      const settings = yield* productionAnalyticsFixture;
+      const input = yield* calculatorUseFixture;
+      const seen = yield* Ref.make<readonly AbortSignal[]>([]);
+      const transport = HttpClient.make((request, _address, signal) =>
+        Ref.update(seen, (items) => Array.append(items, signal)).pipe(
+          Effect.as(
+            HttpClientResponse.fromWeb(
+              request,
+              new Response(status === 204 ? null : "provider-body", { status })
+            )
+          )
+        )
+      );
+      const result = yield* BackendAnalytics.use((analytics) =>
+        analytics.recordCalculatorUse(input)
+      ).pipe(
+        Effect.result,
+        Effect.provide(
+          BackendAnalyticsLive(settings).pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
+            Layer.provide(TestCrypto)
+          )
+        )
+      );
+      expect(
+        Result.match(result, {
+          onFailure: (error) => error.reason,
+          onSuccess: (value) => value,
+        })
+      ).toBe(status < 300 ? "accepted" : "rejected");
+      const signals = yield* Ref.get(seen);
+      expect(signals).toHaveLength(1);
+      expect(Array.every(signals, (signal) => signal.aborted)).toBe(true);
     })
 );
 

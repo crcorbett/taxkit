@@ -1268,9 +1268,12 @@ automatic retry. Real native HTTP controllers must abort on checked status
 rejection. TestClock confirms the complete deadline has not fired at nine
 seconds and releases stalled headers/body at ten. The native delayed fixtures
 now wait twelve seconds: the contract change justifies a 12-second browser
-observation allowance and 45-second total cancellation Effect budget (50-second test-runner allowance
-including cleanup) for three
-sequential ten-second deadlines plus setup/edit/departure work. Original
+observation allowance. The cancellation fixture has a 65-second total Effect
+budget and 70-second test-runner allowance including cleanup. Two local runs
+exhausted the previous 45-second total after the deadlines and editing checks,
+before departure could finish. The total allows three sequential ten-second
+deadlines alongside Worker/browser startup and edit/departure work; each
+individual deadline and cancellation assertion remains unchanged. Original
 15-second page observation guards remain unchanged.
 
 
@@ -1750,7 +1753,7 @@ through its immutable group, so registry values and descriptions share a
 lifetime. Root disposal still releases the registry and scoped client.
 
 
-### Retained PostHog projects
+### Retained PostHog project
 
 The infrastructure tests use the installed Distilled operations with controlled
 HTTP replies, plus a real native Fetch request to a loopback redirect. They check
@@ -1758,7 +1761,7 @@ complete paged ownership before create, safe permission failures, uncertain
 write recovery without a second POST, unchanged keys during update, supported
 privacy readback, one-attempt deadlines and streamed reply bounds. The native
 Stack/Plan tests use memory state and a deterministic management Layer; profile,
-credential and network services refuse access. Both projects retain, no-change
+credential and network services refuse access. Exactly one shared project retains; no-change
 and in-place rename preserve identity, missing retained resources refuse, and
 the native bulk-delete scan skips the project resource type.
 
@@ -1769,6 +1772,12 @@ execution still refuse. The
 [dated candidate receipt](../documentation-audit/clean-slate-foundation/2026-10-08-retained-posthog-projects.json)
 records local checks and failed attempts. These tests do not prove real project
 capacity, credential scope, provider changes or stored events.
+The current graph supersedes that receipt's un-applied two-project shape;
+historical receipts retain their original source and observations.
+Native response and request-signal checks cover deterministic abort on rejected
+backend replies and redirected relay/management replies, plus bodyless backend
+204 success. An Effect scope also owns the actual HTTP client's abort lifetime;
+a fixture's own finaliser alone is not proof of native transport cleanup.
 
 
 The docs-content generation, test and type leaves rely on Turbo's existing

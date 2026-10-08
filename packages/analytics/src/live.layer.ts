@@ -38,7 +38,7 @@ export const BackendAnalyticsLive = (settings: AnalyticsSettings) =>
       Layer.effect(
         BackendAnalytics,
         Effect.gen(function* () {
-          const http = yield* HttpClient.HttpClient;
+          const http = HttpClient.withScope(yield* HttpClient.HttpClient);
           const crypto = yield* Crypto.Crypto;
           return BackendAnalytics.of({
             recordCalculatorUse: Effect.fn(
@@ -115,6 +115,12 @@ export const BackendAnalyticsLive = (settings: AnalyticsSettings) =>
                   });
                 }
                 yield* response.stream.pipe(
+                  Stream.catchTag("HttpClientError", (error) =>
+                    Match.value(error.reason).pipe(
+                      Match.tag("EmptyBodyError", () => Stream.empty),
+                      Match.orElse(() => Stream.fail(error))
+                    )
+                  ),
                   Stream.mapError(
                     () =>
                       new AnalyticsCaptureError({

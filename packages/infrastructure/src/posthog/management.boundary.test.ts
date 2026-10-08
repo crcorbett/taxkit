@@ -42,13 +42,26 @@ import { PostHogManagement } from "./service.js";
 
 const organisation = "00000000-0000-4000-8000-000000000079";
 const definition = ProjectDefinition.make({
-  environment: "preview",
-  marker: "taxkit:posthog:preview:v1",
-  name: PostHogManagedName.make("TaxKit Preview"),
+  marker: "taxkit:posthog:shared:v1",
+  name: PostHogManagedName.make("TaxKit"),
   organisation: PostHogOrganisationId.make(organisation),
   region: "us",
 });
 const id = PostHogProjectId.make(79);
+it.effect.each([
+  "taxkit:posthog:production:v1",
+  "taxkit:posthog:preview:v1",
+  "foreign:posthog:shared:v1",
+])("refuses adopting the historical or foreign marker %s", (marker) =>
+  Effect.gen(function* () {
+    const decoded = yield* Schema.decodeUnknownEffect(ProjectDefinition)({
+      ...definition,
+      marker,
+    }).pipe(Effect.exit);
+    expect(Exit.isFailure(decoded)).toBe(true);
+  })
+);
+
 const project = {
   ...desiredProjectPrivacy,
   api_token: "phc_synthetic_taxkit_capture_fixture_only",
@@ -234,6 +247,46 @@ const fixture = Effect.fnUntraced(function* (
   );
   return { calls, closed, layer, pending, started };
 });
+
+it.effect(
+  "closes the native management request when a redirect is refused",
+  () =>
+    Effect.gen(function* () {
+      const seen = yield* Ref.make<readonly AbortSignal[]>([]);
+      const http = HttpClient.make((request, _address, signal) =>
+        Ref.update(seen, (items) => Array.append(items, signal)).pipe(
+          Effect.as(
+            HttpClientResponse.fromWeb(
+              request,
+              new Response("redirect", { status: 302 })
+            )
+          )
+        )
+      );
+      const error = yield* PostHogManagement.use((service) =>
+        service.readProject({ definition, id })
+      ).pipe(
+        Effect.provide(
+          PostHogManagementLive.pipe(
+            Layer.provide(Layer.succeed(HttpClient.HttpClient, http)),
+            Layer.provide(
+              ConfigProvider.layerAdd(
+                ConfigProvider.fromUnknown({
+                  POSTHOG_MANAGEMENT_KEY:
+                    "phx_synthetic_management_fixture_only",
+                })
+              )
+            )
+          )
+        ),
+        Effect.flip
+      );
+      expect(error.reason).toBe("provider-failure");
+      const signals = yield* Ref.get(seen);
+      expect(signals).toHaveLength(1);
+      expect(Array.every(signals, (signal) => signal.aborted)).toBe(true);
+    })
+);
 
 const failure = <A>(outcome: Exit.Exit<A, PostHogManagementError>) =>
   Exit.match(outcome, {

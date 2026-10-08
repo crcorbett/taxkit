@@ -590,7 +590,9 @@ One five-second scope covers the incoming body, upstream headers and complete
 reply. Each body is limited to 65,536 bytes, including streams without a declared
 length; crossing the limit fails rather than forwarding a partial batch.
 Provider status and checked numeric retry advice survive. Replies are no-store
-and forward no cookies or Location. Denied collection or `DNT: 1` returns an
+and the native client aborts when the request scope closes, including a refused
+redirect whose body is never read. Replies forward no cookies or Location.
+Denied collection or `DNT: 1` returns an
 empty 204 before body read or delivery. Configured-off returns 404 without a
 key; invalid enabled settings remain a distinct checked 503 failure on this
 route, keeping ordinary calculator/documentation service ownership separate.

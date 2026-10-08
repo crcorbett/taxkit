@@ -55,7 +55,9 @@ export const WebsiteAnalyticsRelayLive = Layer.unwrap(
               Layer.effect(
                 WebsiteAnalyticsRelay,
                 Effect.gen(function* () {
-                  const http = yield* HttpClient.HttpClient;
+                  const http = HttpClient.withScope(
+                    yield* HttpClient.HttpClient
+                  );
                   return WebsiteAnalyticsRelay.of({
                     handle: Effect.fn("WebsiteAnalyticsRelay.handle")(
                       function* (request) {

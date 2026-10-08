@@ -12,7 +12,7 @@ import {
   ProjectDefinition,
 } from "./schemas.js";
 
-// A single durable stack owns both projects. PR and local graphs never create
+// A single durable stack owns the shared project. PR and local graphs never create
 // or replace a project. The current application graph still collects off.
 export const declarePostHogProjects = Effect.gen(function* () {
   const stage = yield* Stage;
@@ -29,27 +29,16 @@ export const declarePostHogProjects = Effect.gen(function* () {
     PostHogOrganisationId,
     "POSTHOG_ORGANISATION_ID"
   );
-  const production = yield* PostHogProject(
-    "TaxKitProductionProject",
+  const project = yield* PostHogProject(
+    "TaxKitProject",
     ProjectDefinition.make({
-      environment: "production",
-      marker: "taxkit:posthog:production:v1",
-      name: PostHogManagedName.make("TaxKit Production"),
+      marker: "taxkit:posthog:shared:v1",
+      name: PostHogManagedName.make("TaxKit"),
       organisation,
       region: "us",
     })
   ).pipe(retain());
-  const preview = yield* PostHogProject(
-    "TaxKitPreviewProject",
-    ProjectDefinition.make({
-      environment: "preview",
-      marker: "taxkit:posthog:preview:v1",
-      name: PostHogManagedName.make("TaxKit Preview"),
-      organisation,
-      region: "us",
-    })
-  ).pipe(retain());
-  return { previewProjectId: preview.id, productionProjectId: production.id };
+  return { projectId: project.id };
 });
 
 export const nativePostHogSecrets = (({ stage }: Secrets.SecretsContext) => {
