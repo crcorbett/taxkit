@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1",
-  "status": "inconclusive",
-  "claim": "Qualify the exact combination of all 81 open TaxKit PR heads with the already merged main changes before the authorised repository merge.",
+  "status": "passed",
+  "claim": "The exact combination of all 81 recorded open TaxKit PR heads and preserved main changes passes all nine local release checks before the authorised repository merge tracked by PR #171.",
   "target": "crcorbett/taxkit main; integration branch codex/merge-all-20261008",
-  "candidateIdentity": "ae32f42694278566d79cbec673d5c895077fcf4e",
+  "candidateIdentity": "44a5e236460a74285c3894195184a7865371e92b",
   "actor": "Cooper Corbett approves; Codex executes through GitHub account crcorbett",
   "authorityReceipt": "Direct human instruction in this chat on 8 October 2026: Merge everything. Approval covers all 81 open TaxKit drafts, ready conversion, conflict resolution, commits/pushes and repository merges for this task. Local checks follow Cooper's earlier direction. No package publication, version application, new deployment, billing, credentials, provider mutation or adad source/enablement change is included.",
   "environment": "Local Mac validation; GitHub crcorbett/taxkit repository merge; Personal Taxkit Linear tracking",
@@ -28,10 +28,14 @@
     "The fourth report at 7ab9f80a14fda2ceec76b19c10b9ff623b3ab929 stopped in 36.79 seconds at the isolated release-workflow suite: 13 temporary offline fixture installs were blocked by the restricted shell (Bun tempdir EPERM). Earlier source/check/format stages passed. This is an execution-environment failure; no assertion or source was changed. The same full graph will run with approved local shell access.",
     "The fifth graph ran with approved local access and reached real offline-installed fixture tests. One documentation CLI JSON success case exceeded its default five-second test timeout. The owning full graph was deliberately stopped after that confirmed nested test failure; it has no normal exit or complete report. Only the four process cases now use a finite 15-second test budget; all expected exit codes, safe output, Schema-decoded receipt fields, invalid options and failure assertions are preserved. The focused documentation suite (46 cases) and formatting pass. Documentation impact: Preserve the actual documentation command contract; N/A for public/package/provider semantics; Change required for this dated evidence.",
     "The sixth full report at 7fc58b39bfa349675c7010920f88621c917d8f41 ended with exit 1 after 1283.31 seconds. Canonical verification passed, including all 34 isolated release-workflow cases and all 22 built native app cases. The subsequent test stage passed 661 Oxlint cases and failed two fixtures for tools/skills, which #140 intentionally removed. Remove only that retired-host positive/negative pair and its unused exact lint admission/path; all active host cases, ten strict rules and historical input records remain. Documentation impact: Change required for the dated merge proof; Preserve every active runtime/lint/package contract; N/A for new public or provider behaviour.",
-    "The retired-host recovery passes all 661 remaining Oxlint cases in 74.24 seconds, formatting and lint. A transient API test-file replacement was traced to the existing scoped lint fixture test and independently restored to its original tracked bytes; no unrelated edit was included. Current testing architecture, SPEC and T002 routing now follow #140: latest published shared-plugin lookup plus local profiles and retained repository-specific skills, with the exact old receipt retained as history. Task statuses, dependencies, verification requirements and acceptance conditions are unchanged. Focused docs, runbooks and formatting pass."
+    "The retired-host recovery passes all 661 remaining Oxlint cases in 74.24 seconds, formatting and lint. A transient API test-file replacement was traced to the existing scoped lint fixture test and independently restored to its original tracked bytes; no unrelated edit was included. Current testing architecture, SPEC and T002 routing now follow #140: latest published shared-plugin lookup plus local profiles and retained repository-specific skills, with the exact old receipt retained as history. Task statuses, dependencies, verification requirements and acceptance conditions are unchanged. Focused docs, runbooks and formatting pass.",
+    "The final complete local report at 44a5e236460a74285c3894195184a7865371e92b passed all nine ordered checks once with true zero exits in 1080.48 seconds. Both native app runs passed all 22 cases; isolated workflow tests passed all 34. Packed SDK and strict downstream checks were real cache-miss executions. All 18 exact report-selected log digests were independently read and matched; all 1712 frozen source identities matched before proof-only closeout.",
+    "Integration draft #171 was created and read back at head 44a5e236460a74285c3894195184a7865371e92b targeting main. The GitHub connector returned a collaborator validation error before creating a PR; a fresh no-existing-PR readback preceded creation with authenticated local repository owner crcorbett. The created PR is attached to this chat. PR creation and eventual merge state are owned by that live PR readback, not by local test output."
   ],
   "postconditions": [
-    "Every one of the 81 recorded PR heads is an ancestor of the integration candidate. Complete combined-source release checks are not yet claimed."
+    "All 81 recorded original PR heads are ancestors of the qualified integration candidate; the already merged #140/#153 main changes remain ancestors.",
+    "All nine combined-source local release checks passed. All 18 selected log digests and all 1712 frozen source identities matched at qualification closeout.",
+    "Current docs and task intent preserve the approved shared-plugin migration. T008 remains in_progress, T009 and T010 pending; their statuses, blockers and acceptance conditions are not completed by merging."
   ],
   "detailArtifacts": [
     {
@@ -149,11 +153,103 @@
     {
       "path": "taxkit-merge-owner-recovery-results.jsonl",
       "sha256": "fecc18bbd690cf74ca737e8bf38697d067a636c08a5a1ddc783bd06f55ec242a"
+    },
+    {
+      "path": "taxkit-merge-final-qualified-results.jsonl",
+      "sha256": "f11cba6d3ace75e7cb95eb9e7ffafd8ff28bf151b471855e0839011885e0297c"
+    },
+    {
+      "path": "taxkit-merge-final-qualified-release-report.log",
+      "sha256": "1d9f37d98244a4ea50758630fbd8bfc44aae4efa70fe8a4e6e7d57cf82e4747d"
+    },
+    {
+      "path": "taxkit-merge-final-qualified-source-freeze.json",
+      "sha256": "c8b39e50b0e68adb2e02937f83317f360dd9494d8302a5dc9f8b36a9d8ae687a"
+    },
+    {
+      "path": "taxkit-merge-passing-evidence.json",
+      "sha256": "d9f4101d671f6cf5d9918f5f1a4e62f62b8b29c657c7cab8ceaab6d89d5b427c"
+    },
+    {
+      "path": "taxkit-merge-integration-pr-created.json",
+      "sha256": "3e9ea997595444fc941afef9007358a1e616ebf4adf9c2c32e10053827cdc87b"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stdout-pORQWS/92d9c44f30f0.log",
+      "sha256": "db0aa93fd83eb26692af3d7e638e6972f7631eacdc46cd7240f41ba682882e7f"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stderr-F3MLNd/c689e9d0e916.log",
+      "sha256": "f4163ad802da7ba8e0532ad1922c12c5b8268fef8d3b62c2e1d095c797c47eb5"
+    },
+    {
+      "path": "tmp/release-readiness/test-stdout-Ny9pY3/93d3252c6e59.log",
+      "sha256": "6071d5ac68fd4f5559364326579f8e60ae4d9266c41dd7936cc834685f68ead7"
+    },
+    {
+      "path": "tmp/release-readiness/test-stderr-pb1g4o/a2fde794d974.log",
+      "sha256": "a6449128f49a8062f660b9c6d986febc94fdd268a42e39cfffec53397d475cc8"
+    },
+    {
+      "path": "tmp/release-readiness/build-stdout-PTtoGf/eb9868f89541.log",
+      "sha256": "19a40c1b9fb723de2b5c55f58a57e2abff6aa4553b9a6aa6bca31c4e4f7f1262"
+    },
+    {
+      "path": "tmp/release-readiness/build-stderr-d6nIP2/73c2cf33b461.log",
+      "sha256": "844915855e64ad7359e63b5ba6df54e45ef4825107084cebde1492f28bf01a07"
+    },
+    {
+      "path": "tmp/release-readiness/docs-validation-stdout-Q4jciG/afa75b5fe9ae.log",
+      "sha256": "98e42d5d187c07347ce87d5780087681b0fe29255e9d8dd359a816442c6deb47"
+    },
+    {
+      "path": "tmp/release-readiness/docs-validation-stderr-9d3Csi/9d92b2eeee21.log",
+      "sha256": "fbab99070da3e9f6763b79e37ef455d64b363e20e42b59af24ff8f525bcb7697"
+    },
+    {
+      "path": "tmp/release-readiness/packed-artifact-stdout-rBwwjK/07c4113bfc32.log",
+      "sha256": "6f616e6a42e3a112b3a2a7d328a6aa5f4b076e4143fd4126500ce181fbf8168c"
+    },
+    {
+      "path": "tmp/release-readiness/packed-artifact-stderr-n6qtEM/fefa6525c010.log",
+      "sha256": "06bb0466c9e54c67c601f23e819b04d3ceff01307bb31b34eed819b468c368b7"
+    },
+    {
+      "path": "tmp/release-readiness/downstream-consumer-stdout-Rz2RCL/8c1f2edc30f1.log",
+      "sha256": "976a5fefd4ec89b0f8a8ffaf9d9112d7fdb4be19dcea19afc7fcc4429cadf522"
+    },
+    {
+      "path": "tmp/release-readiness/downstream-consumer-stderr-x6dqlI/9d2b53d39ed6.log",
+      "sha256": "d454e75fe1d3477c5daefee37e512745a9c3d7494162cc990528f18c9c4a84c9"
+    },
+    {
+      "path": "tmp/release-readiness/api-smoke-stdout-dzI7GJ/a83627aa94f8.log",
+      "sha256": "73e16494c83bee108b99601ba8f11a305397e0625f809e4a00c365473a3b9e68"
+    },
+    {
+      "path": "tmp/release-readiness/api-smoke-stderr-XtEO07/dcafbe7ce93f.log",
+      "sha256": "1393e6f60a2d9612683056687c04f8f967bc56b9a7509e6ef637ec7739ca2d87"
+    },
+    {
+      "path": "tmp/release-readiness/docs-browser-stdout-qvXbSv/36ea5b2bf26a.log",
+      "sha256": "f89e8dca1bfd5dc9b22f62c669c1e8ab893f7e924a6155531fee76b5db40f68d"
+    },
+    {
+      "path": "tmp/release-readiness/docs-browser-stderr-bOLsvt/b7bc46eb3547.log",
+      "sha256": "781929b60c93b72b91f107ec71c66824884dc1aeb4a60966dc36035ed5eaeba4"
+    },
+    {
+      "path": "tmp/release-readiness/changeset-status-stdout-1g3S6h/74ca38dd0467.log",
+      "sha256": "050be18a07b4b98bcac45050ec8d544326e05785d9af17fc287353a05375dd5e"
+    },
+    {
+      "path": "tmp/release-readiness/changeset-status-stderr-cv7Sgw/8e5b040cc080.log",
+      "sha256": "26fb769a184a70dd74309895ef98bc4a9e40ed92b095f91e292ebfe6580224c3"
     }
   ],
   "limitations": [
-    "Combined-source release checks must pass before the requested merge. The earlier separate local checks do not prove this new combination.",
-    "GitHub and Linear independent readback own the eventual merge outcome; this receipt currently establishes preparation only.",
+    "The passed claim is local combined-source qualification. GitHub PR #171 and independent current main/PR readback own the repository merge outcome; no hosted CI success is claimed.",
+    "Final closeout changes only this receipt and the active plan to record completed qualification. Focused docs/runbook/path/format/Changeset checks cover those metadata edits; the full report remains bound to the exact qualified semantic source.",
     "Merging does not complete T008/T009 or full T010 acceptance. Collection remains off."
   ],
   "nonClaims": [
@@ -161,5 +257,5 @@
     "The exact adad source exception remains 0d82b82d1c48079fc4b8e2ec96abadfe12999789. No independent adad consumer acceptance or calculation enablement is claimed."
   ],
   "rollbackOrRecovery": "Before external merge, discard or revert only this isolated integration branch to the retained handover parent. After merge, prepare a reviewed revert of the actual main merge commit with first-parent selection, preserving the immutable source and receipts. Do not force-push main or change providers.",
-  "observedAt": "2026-10-08T07:48:21.227095+00:00"
+  "observedAt": "2026-10-08T08:07:22.138099+00:00"
 }

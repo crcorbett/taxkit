@@ -6184,3 +6184,20 @@ reviewed revert of the resulting main merge commit to its first parent; no
 provider rollback is involved. Merging leaves T008/T009 incomplete, collection
 off and full T010/rebuild acceptance open. It does not publish packages, deploy
 the corrected Medicare result, or enable adad calculations.
+
+
+Combined-source qualification is complete at
+`44a5e236460a74285c3894195184a7865371e92b`: all nine local release checks
+passed in 1,080.48 seconds. The packed SDK and strict downstream checks ran
+freshly; both native app runs passed all 22 cases and the isolated workflow
+suite passed all 34. All 18 selected output digests and all 1,712 frozen source
+identities matched before this proof-only closeout. The
+[bounded qualification receipt](../../documentation-audit/clean-slate-foundation/2026-10-08-merge-all.json)
+retains the failed attempts, corrections and limits.
+
+The authorised repository merge is tracked by
+[PR #171](https://github.com/crcorbett/taxkit/pull/171); current GitHub main and
+PR readback own its external result. This closeout records proof only in this
+plan and receipt. It preserves the qualified runtime source and all task
+statuses, blockers, acceptance and PostHog/metrics deferrals. Full T010 remains
+open; no package version application, publication or new deployment is made.
