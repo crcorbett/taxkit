@@ -148,92 +148,95 @@ describe("documentation command", () => {
       name: "rejects unknown options with bounded output",
       violation: false,
     },
-  ])("$name", ({ args, violation, expectedExit }) =>
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const path = yield* Path.Path;
-      const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
-      const root = yield* path.fromFileUrl(new URL("../..", import.meta.url));
-      if (violation) {
-        const fixture = path.join(
-          root,
-          "docs/.generated-documentation-violation.md"
-        );
-        // Acquire before writing so interruption also removes this exact owned file.
-        yield* Effect.acquireRelease(Effect.succeed(fixture), (ownedPath) =>
-          fs.remove(ownedPath, { force: true }).pipe(Effect.orDie)
-        );
-        yield* fs.writeFileString(
-          fixture,
-          "# Candidate without required metadata\n"
-        );
-      }
-      const child = yield* spawner.spawn(
-        ChildProcess.make(
-          "bun",
-          [
-            "--conditions=source",
-            "run",
-            "tools/documentation/check.runtime.ts",
-            ...args,
-          ],
-          {
-            cwd: root,
-            extendEnv: true,
-            stderr: "pipe",
-            stdin: "ignore",
-            stdout: "pipe",
-          }
-        )
-      );
-      const [exitCode, stdout, stderr] = yield* Effect.all(
-        [
-          child.exitCode,
-          Stream.mkString(Stream.decodeText(child.stdout)),
-          Stream.mkString(Stream.decodeText(child.stderr)),
-        ],
-        { concurrency: "unbounded" }
-      );
-      expect(Number(exitCode)).toBe(expectedExit);
-      expect(stderr.length).toBeLessThan(1000);
-      expect(stderr).not.toMatch(/\/Users\/[^/\s]+\//u);
-      expect(stderr).not.toContain("DocumentationCheckError:");
-      if (Array.contains(args, "--json")) {
-        const receipt = yield* Schema.decodeEffect(
-          Schema.fromJsonString(DocumentationReceipt)
-        )(stdout);
-        expect(receipt.ok).toBe(!violation);
-        expect(receipt.reportPath).toBe("tmp/docs-policy-report.json");
-        expect(receipt.nonClaim).toContain(
-          "does not establish public availability"
-        );
-        expect(
-          Array.some(
-            receipt.diagnostics,
-            (finding) =>
-              finding.target === "docs/.generated-documentation-violation.md"
-          )
-        ).toBe(violation);
-        const detail = yield* fs
-          .readFileString(path.join(root, receipt.reportPath))
-          .pipe(
-            Effect.flatMap(
-              Schema.decodeEffect(Schema.fromJsonString(DocumentationReceipt))
-            )
+  ])(
+    "$name",
+    ({ args, violation, expectedExit }) =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+        const root = yield* path.fromFileUrl(new URL("../..", import.meta.url));
+        if (violation) {
+          const fixture = path.join(
+            root,
+            "docs/.generated-documentation-violation.md"
           );
-        expect(detail.ok).toBe(!violation);
-        expect(detail.omittedDiagnostics).toBe(0);
-        expect(detail.diagnostics).toHaveLength(detail.violationCount);
-      } else if (args.length === 0) {
-        expect(stdout).toContain("Documentation policy passed.");
-        expect(stdout).toContain("violations=0");
-        expect(stderr).toBe("");
-      } else {
-        expect(stdout.length).toBeLessThan(1500);
-        expect(stdout).toContain("USAGE");
-        expect(stdout).toContain("check-docs [flags]");
-        expect(stderr).toContain("Documentation check could not complete");
-      }
-    }).pipe(Effect.provide(BunServices.layer))
+          // Acquire before writing so interruption also removes this exact owned file.
+          yield* Effect.acquireRelease(Effect.succeed(fixture), (ownedPath) =>
+            fs.remove(ownedPath, { force: true }).pipe(Effect.orDie)
+          );
+          yield* fs.writeFileString(
+            fixture,
+            "# Candidate without required metadata\n"
+          );
+        }
+        const child = yield* spawner.spawn(
+          ChildProcess.make(
+            "bun",
+            [
+              "--conditions=source",
+              "run",
+              "tools/documentation/check.runtime.ts",
+              ...args,
+            ],
+            {
+              cwd: root,
+              extendEnv: true,
+              stderr: "pipe",
+              stdin: "ignore",
+              stdout: "pipe",
+            }
+          )
+        );
+        const [exitCode, stdout, stderr] = yield* Effect.all(
+          [
+            child.exitCode,
+            Stream.mkString(Stream.decodeText(child.stdout)),
+            Stream.mkString(Stream.decodeText(child.stderr)),
+          ],
+          { concurrency: "unbounded" }
+        );
+        expect(Number(exitCode)).toBe(expectedExit);
+        expect(stderr.length).toBeLessThan(1000);
+        expect(stderr).not.toMatch(/\/Users\/[^/\s]+\//u);
+        expect(stderr).not.toContain("DocumentationCheckError:");
+        if (Array.contains(args, "--json")) {
+          const receipt = yield* Schema.decodeEffect(
+            Schema.fromJsonString(DocumentationReceipt)
+          )(stdout);
+          expect(receipt.ok).toBe(!violation);
+          expect(receipt.reportPath).toBe("tmp/docs-policy-report.json");
+          expect(receipt.nonClaim).toContain(
+            "does not establish public availability"
+          );
+          expect(
+            Array.some(
+              receipt.diagnostics,
+              (finding) =>
+                finding.target === "docs/.generated-documentation-violation.md"
+            )
+          ).toBe(violation);
+          const detail = yield* fs
+            .readFileString(path.join(root, receipt.reportPath))
+            .pipe(
+              Effect.flatMap(
+                Schema.decodeEffect(Schema.fromJsonString(DocumentationReceipt))
+              )
+            );
+          expect(detail.ok).toBe(!violation);
+          expect(detail.omittedDiagnostics).toBe(0);
+          expect(detail.diagnostics).toHaveLength(detail.violationCount);
+        } else if (args.length === 0) {
+          expect(stdout).toContain("Documentation policy passed.");
+          expect(stdout).toContain("violations=0");
+          expect(stderr).toBe("");
+        } else {
+          expect(stdout.length).toBeLessThan(1500);
+          expect(stdout).toContain("USAGE");
+          expect(stdout).toContain("check-docs [flags]");
+          expect(stderr).toContain("Documentation check could not complete");
+        }
+      }).pipe(Effect.provide(BunServices.layer)),
+    15_000
   );
 });

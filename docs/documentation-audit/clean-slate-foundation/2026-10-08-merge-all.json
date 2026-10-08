@@ -24,7 +24,9 @@
     "The initial focused docs check failed on two references to the retired skill command. The corrected owner passed docs, governance types/tests/runtime. Frozen install, docs/runbooks/format/lint also passed before the complete graph.",
     "The first complete combined-source report at 12b6d7d765dc7c645e1034b967b1c33fd605528e stopped at verification in 7.31 seconds: the historical receipt checker still referenced the removed sha256 helper. Its existing runGit returns bytes; the resolved call uses the existing typed hashEpochBytes operation. The focused epoch type check now passes. No calculator source changed.",
     "The second report at 8cb46fca8f06e1c24fdd6b93293aabe70d35395a stopped at verification in 29.96 seconds. Two historical CLI cases still expected failure messages from before #140. The actual old checkers correctly refuse current source: the removed shared-skill input and changed historical source-artifact identity. Only those two expected diagnostics changed; nonzero refusal, bounded output, safe paths, recovery and invalid-option assertions remain. The full historical suite and Knip pass.",
-    "The third report at 2a27c43d06626a8f1725538cda810d70efe975f7 stopped at verification in 73.14 seconds. Formatting rejected the changed historical test oracle line. The repository formatter corrected only that line wrapping; format:check now passes. The combined release graph remains unqualified until a complete passing report."
+    "The third report at 2a27c43d06626a8f1725538cda810d70efe975f7 stopped at verification in 73.14 seconds. Formatting rejected the changed historical test oracle line. The repository formatter corrected only that line wrapping; format:check now passes. The combined release graph remains unqualified until a complete passing report.",
+    "The fourth report at 7ab9f80a14fda2ceec76b19c10b9ff623b3ab929 stopped in 36.79 seconds at the isolated release-workflow suite: 13 temporary offline fixture installs were blocked by the restricted shell (Bun tempdir EPERM). Earlier source/check/format stages passed. This is an execution-environment failure; no assertion or source was changed. The same full graph will run with approved local shell access.",
+    "The fifth graph ran with approved local access and reached real offline-installed fixture tests. One documentation CLI JSON success case exceeded its default five-second test timeout. The owning full graph was deliberately stopped after that confirmed nested test failure; it has no normal exit or complete report. Only the four process cases now use a finite 15-second test budget; all expected exit codes, safe output, Schema-decoded receipt fields, invalid options and failure assertions are preserved. The focused documentation suite (46 cases) and formatting pass. Documentation impact: Preserve the actual documentation command contract; N/A for public/package/provider semantics; Change required for this dated evidence."
   ],
   "postconditions": [
     "Every one of the 81 recorded PR heads is an ancestor of the integration candidate. Complete combined-source release checks are not yet claimed."
@@ -97,6 +99,30 @@
     {
       "path": "taxkit-merge-format-recovery-results.jsonl",
       "sha256": "716279f4a0e6b6eb8d651f434dc1c4b80b1c367e2c903cd85d6885eae716ba07"
+    },
+    {
+      "path": "taxkit-merge-complete-results.jsonl",
+      "sha256": "3ba58b5395f5f3adee5662337d9e8ca18c90e43431ef56b49ae714305fc958e5"
+    },
+    {
+      "path": "taxkit-merge-complete-release-report.log",
+      "sha256": "c0e63d4ae36e0d80b26c05c9e3d07311119274c569d1658200b6311cce65a0cd"
+    },
+    {
+      "path": "taxkit-merge-complete-source-freeze.json",
+      "sha256": "daadc29a263d1e9c694e266ffaaf04bd69c3acbee12af28119d4431f5c711385"
+    },
+    {
+      "path": "taxkit-merge-local-qualified-interruption.json",
+      "sha256": "5da415c4315f440df26c32846ae694c966b1fb549f23a5bca1c1069ce9b170ed"
+    },
+    {
+      "path": "taxkit-merge-command-timeout-recovery-results.jsonl",
+      "sha256": "3080aff8366a496cddecb4c58186e75f7e0b5ae6243cfb073f60f5fe7df707be"
+    },
+    {
+      "path": "tmp/release-readiness/verification-stdout-GulsJD/70e0c6de34f6.log",
+      "sha256": "41710caaa1409a617875a6f3dcb522696e873b8f011e65eb39a1ec38d62e3c90"
     }
   ],
   "limitations": [
@@ -109,5 +135,5 @@
     "The exact adad source exception remains 0d82b82d1c48079fc4b8e2ec96abadfe12999789. No independent adad consumer acceptance or calculation enablement is claimed."
   ],
   "rollbackOrRecovery": "Before external merge, discard or revert only this isolated integration branch to the retained handover parent. After merge, prepare a reviewed revert of the actual main merge commit with first-parent selection, preserving the immutable source and receipts. Do not force-push main or change providers.",
-  "observedAt": "2026-10-08T04:07:44.100355+00:00"
+  "observedAt": "2026-10-08T04:13:47.071275+00:00"
 }
