@@ -291,7 +291,10 @@ Effect. Public examples use the same owning primitive contracts.
 The genuine packed consumer also imports the three public rule-parameter
 entrypoints. It rejects incomplete tables at construction and typed/saved
 representation decoding, and compares all five retained table, effective-period
-and source-artifact encodings against 15 historical SHA-256 values. These are
+and source-artifact encodings against 13 preserved historical SHA-256 values
+and two approved 2025–26 Medicare table/source fingerprints. The original
+fingerprints remain in the earlier source history; the correction receipt
+records their exact legal-data delta. These are
 local packed-package checks, not publication or provider proof.
 
 
@@ -303,7 +306,11 @@ selected Schema's Type; it does not decode transport JSON again. Transport
 consumers use the owning report codec at their representation boundary.
 The genuine packed consumer rejects incorrect trace constructor fields and
 child records, preserves service tuple types, compares all 22 saved metadata
-response hashes and retains existing trace/ledger and table/source expectations.
+response hashes. Only complete Medicare-owned source/table/artifact fragments
+and the named annual report edition and $90k Medicare trace are inverted for
+that historical comparison. A neighbouring mismatch proves unrelated changed
+dates, amounts and versions still fail. Direct corrected parameter fingerprints
+and independent annual money tests qualify the real current values.
 
 
 Calculator-owned context, help and filter fields use `Option<Option<A>>` in

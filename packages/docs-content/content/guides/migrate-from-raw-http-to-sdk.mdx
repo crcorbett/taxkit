@@ -63,9 +63,11 @@ const report = await au.incomeTax.annual({
 ## Verify the result
 
 Both calls should produce annual tax liability of `1958800` cents for taxable
-income of $90,000.00 in the retained 2025–26 fixture. See
+income of $90,000.00 in 2025–26. That example is unchanged by the Medicare
+correction in rules-au-income-tax/1.0.1. See
 [the annual calculation guide](./calculate-annual-income-tax.mdx) for the
-pending Medicare threshold review and the limit on current-law claims.
+supported case and exclusions. Check the returned rule version to identify
+the edition used by your installation.
 
 ## Handle errors
 

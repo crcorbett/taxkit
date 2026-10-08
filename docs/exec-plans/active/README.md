@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-01
+last_reviewed: 2026-10-08
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -13,6 +13,8 @@ tombstone: false
 
 The [Clean slate foundation](./clean-slate-foundation.md) implements the accepted
 website/API rebuild in dependency order; provider apply remains separately gated.
+
+The [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) is implemented locally, with [completed correction evidence](../../documentation-audit/medicare-2025-26-correction.json). The wider clean-slate plan remains active; adad consumer qualification and enablement are separate work.
 
 The completed [Entire session history setup](../completed/entire-session-history.md)
 retains recording, import and hosted publication proof.

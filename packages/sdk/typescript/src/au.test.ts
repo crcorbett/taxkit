@@ -52,7 +52,7 @@ describe("AU SDK subpath", () => {
       );
 
       expect(helperReport).toEqual(descriptorReport);
-      expect(helperReport.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
+      expect(helperReport.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
       yield* Effect.promise(() => client.dispose());
     })
   );

@@ -19,6 +19,7 @@ import {
   AtoMedicareLevyTable,
   AtoMedicareLevy_2025_26_Live,
   MedicareLevyTable,
+  MedicareLevyArtifact2025_26,
 } from "../src/parameters/medicare-levy-table.js";
 
 describe("IncomeTaxTable owned relationships", () => {
@@ -381,8 +382,18 @@ describe("MedicareLevyTable owned relationships", () => {
             ).toBe(false);
           })
         );
-        expect(table.thresholdCents).toBe(2_722_200);
-        expect(table.shadeInMaxCents).toBe(3_402_700);
+        expect(table.year).toBe("2025-26");
+        expect(BigDecimal.format(table.levyRate)).toBe("0.02");
+        expect(BigDecimal.format(table.shadeInRate)).toBe("0.1");
+        expect(MedicareLevyArtifact2025_26.documentVersion).toBe(
+          "C2026A00058/asmade; Schedule 5"
+        );
+        expect(MedicareLevyArtifact2025_26.checksum).toBe(
+          "sha256:8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67"
+        );
+        expect(MedicareLevyArtifact2025_26.retrievedOn).toBe("2026-10-08");
+        expect(table.thresholdCents).toBe(2_801_100);
+        expect(table.shadeInMaxCents).toBe(3_501_300);
         expect(Schema.is(Schema.toEncoded(MedicareLevyTable))(table)).toBe(
           true
         );

@@ -64,10 +64,11 @@ export class AtoMedicareLevyTable extends Context.Service<
  * @since 0.1.0
  */
 export const MedicareLevySource2025_26 = SourceRef.make({
-  kind: "ato-publication",
+  kind: "legislation",
   reference:
-    "https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners",
-  title: "ATO Medicare levy reduction thresholds for low-income earners",
+    "https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf",
+  title:
+    "Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26",
 });
 
 /**
@@ -77,14 +78,14 @@ export const MedicareLevySource2025_26 = SourceRef.make({
  */
 export const MedicareLevyArtifact2025_26 = new SourceArtifact({
   checksum: sourceChecksum(
-    "sha256:d3b8ab27d44a3b0dc9d84b81c09a5f1af0cfa197f9f96deab47d19362195c987"
+    "sha256:8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67"
   ),
-  documentVersion: "2025-26",
+  documentVersion: "C2026A00058/asmade; Schedule 5",
   extract: new SourceExtract({
     rowContract: "MedicareLevyTable",
     rowCount: 1,
   }),
-  retrievedOn: IsoDate.make("2026-05-12"),
+  retrievedOn: IsoDate.make("2026-10-08"),
   source: MedicareLevySource2025_26,
 });
 
@@ -106,13 +107,13 @@ export const AtoMedicareLevyTableDescriptor = makeParameterDescriptor({
   title: "ATO Medicare levy threshold and rate parameters",
 });
 
-// Single non-SAPTO 2025-26: nil at/below $27,222, shade-in to $34,027, then 2% flat.
+// Single non-SAPTO 2025-26: nil at/below $28,011, shade-in through $35,013, then 2% flat.
 const table2025_26 = new MedicareLevyTable({
   levyRate: TaxRate.make(BigDecimal.make(2n, 2)),
-  shadeInMaxCents: Cents.make(3_402_700),
+  shadeInMaxCents: Cents.make(3_501_300),
   shadeInRate: TaxRate.make(BigDecimal.make(1n, 1)),
   source: MedicareLevySource2025_26,
-  thresholdCents: Cents.make(2_722_200),
+  thresholdCents: Cents.make(2_801_100),
   year: taxYear("2025-26"),
 });
 

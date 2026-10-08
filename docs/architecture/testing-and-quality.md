@@ -39,7 +39,7 @@ The current repository baseline is canonical root verification:
 ```bash
 bun run verification
 bun run knip:production
-bun run test:skills
+bun run test:harness-governance
 ```
 
 Root verification includes lint, format, both Knip graphs and workspace type
@@ -643,19 +643,13 @@ supporting gate and cannot replace semantic ownership or call-graph review.
   values from neutral fragments so the checker and its tests remain inside the
   policy they prove. Reports must never include matched text, usernames,
   process stderr or surrounding content.
-- Repo-owned skill changes must pass `bun run test:skills` and the skill
-  validator. Canonical baseline or repository-profile changes must also pass
-  `bun run check:harness-governance`, which compares only repository-local
-  paths with the content-addressed receipt and never reads a user home or
-  installed global skill collection. Epoch requalification must additionally
-  pass `bun run check:harness-foundation-epoch` against its exact candidate
-  evidence. The stale-pattern test checks fenced provider examples for raw
-  clients, generic SDK callbacks, raw IDs, primitive config, `instanceof`, and
-  unchecked SDK result escape. Positive and adversarial fixtures also protect
-  the PRD route/container/leaf ownership boundary and require separate
-  documentation-impact classifications for tests, fixtures, configuration,
-  exports, manifests, lifecycle, release, rollback, critical journeys and
-  semantic owners. Broader semantic Effect/React quality remains a parent
+- Repository check and profile changes must pass the focused type/test/runtime
+  commands for `check:harness-governance`. They validate repository-owned
+  findings, task mappings, all six current journeys and external proof limits.
+  Shared skills are selected through `docs/skills.md`; no current validator
+  compares a copied collection, profile overlay or global plugin installation.
+  Historical epoch checks bind their original source and receipts and do not
+  select today's plugin. Broader semantic Effect/React quality remains a
   review responsibility.
 - Keep the development-aware `knip` graph and dedicated `knip:production`
   graph independent. Production entry and project patterns require Knip's

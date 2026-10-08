@@ -672,6 +672,25 @@ import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
 
+// Preserve original digests. Reverse only complete Medicare-owned fragments;
+// the edition and $90k Medicare trace apply only to the named annual report.
+const restoreAnnualCorrectionHistory = (name: string, bytes: string): string => {
+  const annual = name.startsWith("report/au.income-tax.annual/") && bytes.includes('"_tag":"AnnualTaxReport"')
+    ? bytes
+      .replaceAll('"rulePackVersion":"rules-au-income-tax/1.0.1","taxableIncome":', '"rulePackVersion":"rules-au-income-tax/1.0.0","taxableIncome":')
+      .replaceAll('{"_tag":"TraceNode","children":[],"formula":"levy = round(levyRate * income)","inputs":{"incomeCents":9000000,"levyRate":"0.02","shadeInMaxCents":3501300,"shadeInRate":"0.1","tableYear":"2025-26","thresholdCents":2801100},"result":180000,"rounding":"round-to-nearest-cent","ruleId":"taxkit/rules-au-income-tax/rule/MedicareLevy","sources":[{"_tag":"SourceRef","kind":"legislation","reference":"https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf","title":"Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26"}],"title":"Medicare Levy"}', '{"_tag":"TraceNode","children":[],"formula":"levy = round(levyRate * income)","inputs":{"incomeCents":9000000,"levyRate":"0.02","shadeInMaxCents":3402700,"shadeInRate":"0.1","tableYear":"2025-26","thresholdCents":2722200},"result":180000,"rounding":"round-to-nearest-cent","ruleId":"taxkit/rules-au-income-tax/rule/MedicareLevy","sources":[{"_tag":"SourceRef","kind":"ato-publication","reference":"https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners","title":"ATO Medicare levy reduction thresholds for low-income earners"}],"title":"Medicare Levy"}')
+    : bytes;
+  return annual
+    .replaceAll('{"_tag":"SourceArtifact","checksum":"sha256:8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67","documentVersion":"C2026A00058/asmade; Schedule 5","extract":{"_tag":"SourceExtract","rowContract":"MedicareLevyTable","rowCount":1},"retrievedOn":"2026-10-08","source":{"_tag":"SourceRef","kind":"legislation","reference":"https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf","title":"Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26"}}', '{"_tag":"SourceArtifact","checksum":"sha256:d3b8ab27d44a3b0dc9d84b81c09a5f1af0cfa197f9f96deab47d19362195c987","documentVersion":"2025-26","extract":{"_tag":"SourceExtract","rowContract":"MedicareLevyTable","rowCount":1},"retrievedOn":"2026-05-12","source":{"_tag":"SourceRef","kind":"ato-publication","reference":"https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners","title":"ATO Medicare levy reduction thresholds for low-income earners"}}')
+    .replaceAll('{"_tag":"MedicareLevyTable","levyRate":{"_id":"BigDecimal","value":"2","scale":2},"shadeInMaxCents":3501300,"shadeInRate":{"_id":"BigDecimal","value":"1","scale":1},"source":{"_tag":"SourceRef","kind":"legislation","reference":"https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf","title":"Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26"},"thresholdCents":2801100,"year":"2025-26"}', '{"_tag":"MedicareLevyTable","levyRate":{"_id":"BigDecimal","value":"2","scale":2},"shadeInMaxCents":3402700,"shadeInRate":{"_id":"BigDecimal","value":"1","scale":1},"source":{"_tag":"SourceRef","kind":"ato-publication","reference":"https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners","title":"ATO Medicare levy reduction thresholds for low-income earners"},"thresholdCents":2722200,"year":"2025-26"}')
+    .replaceAll('{"_tag":"SourceRef","kind":"legislation","reference":"https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf","title":"Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26"}', '{"_tag":"SourceRef","kind":"ato-publication","reference":"https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners","title":"ATO Medicare levy reduction thresholds for low-income earners"}');
+};
+const unrelatedCorrectionNeighbour = '{"retrievedOn":"2026-10-08","amount":2801100,"rulePackVersion":"rules-au-income-tax/1.0.1"}';
+const historicalUnrelatedNeighbour = '{"retrievedOn":"2026-05-12","amount":2722200,"rulePackVersion":"rules-au-income-tax/1.0.0"}';
+if (!EffectArray.every(["report/au.pay.take-home/missing/missing", "report/au.income-tax.annual/missing/missing", "listRules/missing"], name => restoreAnnualCorrectionHistory(name, unrelatedCorrectionNeighbour) === unrelatedCorrectionNeighbour && new CryptoHasher("sha256").update(restoreAnnualCorrectionHistory(name, unrelatedCorrectionNeighbour)).digest("hex") !== new CryptoHasher("sha256").update(historicalUnrelatedNeighbour).digest("hex"))) {
+  throw new Error("Annual correction historical comparison admitted an unrelated changed date, amount or version.");
+}
+
 await Effect.runPromise(Effect.gen(function* () {
 // Original Core diagnostic forms saved before this owner migration.
 {
@@ -794,14 +813,14 @@ await Effect.runPromise(Effect.gen(function* () {
   const medicare_levyEncoded = yield* Schema.encodeEffect(MedicareLevyTable)(medicare_levy);
   const medicare_levyPeriod = yield* Schema.encodeEffect(DateInterval)(AtoMedicareLevyTableDescriptor.effectivePeriod);
   const medicare_levyArtifact = yield* Schema.encodeEffect(SourceArtifact)(MedicareLevyArtifact2025_26);
-  if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyEncoded)).digest("hex") !== "a4c9271a2d82c7f403ca1819f59937c21e036bf0da978c45c250051b4a856cf8") {
-    throw new Error("Packed medicare-levy table changed historical bytes.");
+  if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyEncoded)).digest("hex") !== "52cf30372769214b7fe24fd64bf6c9930d771eb72a59591818964b246f2c0edd") {
+    throw new Error("Packed Medicare table differs from the approved 2025-26 correction.");
   }
   if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyPeriod)).digest("hex") !== "c09939f95d9a46e34e1e56be898a5d4b504e19412dd9b4215ef39335b2b19a25") {
     throw new Error("Packed medicare-levy period changed historical bytes.");
   }
-  if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyArtifact)).digest("hex") !== "502caaaebe081be3b6abbc7dedf20daccf66acaa060089e017ff3dbf498d23e2") {
-    throw new Error("Packed medicare-levy artifact changed historical bytes.");
+  if (new CryptoHasher("sha256").update(JSON.stringify(medicare_levyArtifact)).digest("hex") !== "28b2f3f1de4d5ab37d5f6f969b25a1e4667e4091a9edfc0fc1f5f5955f941b16") {
+    throw new Error("Packed Medicare artifact differs from the approved enacted source.");
   }
   const medicare_levyInvalid = yield* MedicareLevyTable.makeEffect({...medicare_levy, shadeInMaxCents: medicare_levy.thresholdCents}).pipe(Effect.result);
   const medicare_levyDecoded = yield* Schema.decodeEffect(MedicareLevyTable)({...medicare_levyEncoded, shadeInMaxCents: medicare_levyEncoded.thresholdCents}).pipe(Effect.result);
@@ -2097,7 +2116,7 @@ await Effect.runPromise(Effect.gen(function* () {
     for (const sample of [{name: "report/" + suffix, value: encodedReport}, {name: "error/" + suffix, value: encodedError}]) {
       const prior = historicalRuns.find((row) => row.name === sample.name);
       const bytes = JSON.stringify(sample.value);
-      if (!prior || new CryptoHasher("sha256").update(bytes).digest("hex") !== prior.sha256 || JSON.stringify(Object.keys(sample.value)) !== JSON.stringify(prior.keys) || bytes.includes("private-fixed-sentinel")) {
+      if (!prior || new CryptoHasher("sha256").update(restoreAnnualCorrectionHistory(sample.name, bytes)).digest("hex") !== prior.sha256 || JSON.stringify(Object.keys(sample.value)) !== JSON.stringify(prior.keys) || bytes.includes("private-fixed-sentinel")) {
         throw new Error("Packed calculator changed original result or safe error bytes: " + sample.name);
       }
     }
@@ -2197,7 +2216,7 @@ const historicalMetadataResponses = [
 ];
 const assertHistoricalMetadataResponse = (name: string, bytes: string) => {
   const expected = historicalMetadataResponses.find((sample) => sample.name === name);
-  if (!expected || new CryptoHasher("sha256").update(bytes).digest("hex") !== expected.sha256) {
+  if (!expected || new CryptoHasher("sha256").update(restoreAnnualCorrectionHistory(name, bytes)).digest("hex") !== expected.sha256) {
     throw new Error("Packed metadata response changed saved bytes: " + name);
   }
 };
@@ -2272,11 +2291,11 @@ if (effectReport.rulePackVersion !== "rules-au-pay/1.0.0") {
   throw new Error("Effect SDK downstream calculation returned the wrong pay ruleset version.");
 }
 
-if (plainAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.0") {
+if (plainAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.1") {
   throw new Error("Plain AU SDK downstream calculation returned the wrong income-tax ruleset version.");
 }
 
-if (effectAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.0") {
+if (effectAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.1") {
   throw new Error("Effect SDK downstream calculation returned the wrong income-tax ruleset version.");
 }
 

@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-07T22:42:22Z",
+  "owner": "taxkit-product-owner",
+  "schemaVersion": 2,
+  "sourceSha256": "9bdc482c05007fbb18bd6da979f1385b29c4a8ebeb477f5e54fd42aeab3aa86c",
+  "state": "accepted",
+  "targetPath": "packages/docs-content/content/api/agent-tools.mdx"
+}

@@ -134,7 +134,7 @@ assert(
 );
 assert(
   annualTaxCalculation.report?.rulePackVersion ===
-    "rules-au-income-tax/1.0.0",
+    "rules-au-income-tax/1.0.1",
   "Annual-tax calculate route returned the wrong ruleset version."
 );
 

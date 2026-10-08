@@ -2,8 +2,14 @@
 
 ## Unreleased
 
+- Accept zero taxable income in the existing annual nil-rate band.
+
 ### Patch Changes
 
+- Annual reports now identify `rules-au-income-tax/1.0.1`. The single-person
+  2025–26 Medicare thresholds are corrected to $28,011/$35,013, with the enacted
+  source and boundary tests; affected lower-income answers change. Other tax
+  components and pay rules retain their results.
 - Invalid present `API_PORT` values now fail with a safe settings error rather
   than silently using `PORT`. Normal defaults and valid overrides remain.
 - Public-route smoke checks cover complete request deadlines, the OpenAPI

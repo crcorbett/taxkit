@@ -13,13 +13,16 @@ Cooper's 4 October request authorises implementation, reviewable commits and
 draft PRs. It supersedes the old Q14 whole-design admission hold; Q1–Q13 remain
 settled. Cooper's 7 October direction now authorises native Preview and
 Production deployments from this Mac after exact source, target, credentials,
-plans, recovery and readback are qualified. Merge, publication, unrelated
-provider changes and credential creation remain outside this authority. The
+plans, recovery and readback are qualified. Cooper's 8 October "Merge
+everything" instruction additionally authorises merging all open TaxKit PRs into
+main after resolving conflicts and checking the combined source locally.
+Publication, new provider changes and credential creation remain outside this
+merge authority. The
 [SPEC](../../product-specs/clean-slate-foundation.md) and
 [task ledger](../../product-specs/clean-slate-foundation.tasks.json) own scope,
 dependencies and acceptance; this plan owns execution evidence.
 
-## Current review and handover goal — 8 October 2026
+## Completed review and handover goal — 8 October 2026
 
 Cooper postponed PostHog and confirmed the remaining review and handover work
 as the current goal. Review the existing draft stack, resolve material findings,
@@ -49,19 +52,17 @@ rebuild through reviewable, tested draft PRs. Continue until implementation is
 finished and verified, or a concrete external blocker prevents every remaining
 safe action. A draft PR, checkpoint or completed slice is not the terminal goal.
 
-The runtime's native goal manager now tracks the bounded handover above. This
-active plan and the task ledger retain the wider unfinished rebuild scope and
-its durable continuation record.
-Cooper approved the narrow 2025–26 annual Medicare correction on 8 October in
-the separate adad delivery conversation. Live DEV-68 and DEV-73 readback confirms
-that decision; draft [#168](https://github.com/crcorbett/taxkit/pull/168) owns the
-separate source correction. It is not integrated into this handover branch and
-its independent consumer qualification remains separate. Its later receipt at
-`2051a9870d2ede97ab30d72597c4bc2c90b20d53` records a local aggregate pass at
-`557b4e524ead6f469e92150360a9e8a451c37cdd`; Cooper's exact adad source exception
-stays `0d82b82d1c48079fc4b8e2ec96abadfe12999789`. Later test/docs commits do not
-extend that consumer approval or prove public enablement. Continue all
-independent work. Cooper's 7 October direction added native Preview and Production
+The review and handover goal above is complete. The active plan and task ledger
+retain the wider unfinished rebuild scope and durable continuation record.
+Cooper approved the narrow 2025–26 annual Medicare correction on 8 October;
+[its SPEC](../../product-specs/medicare-2025-26-correction.md) and
+[receipt](../../documentation-audit/medicare-2025-26-correction.json) own that
+locally completed correction. The new "Merge everything" instruction authorises
+combining #168 with the reviewed rebuild for the repository merge. It does not
+extend the exact adad source exception at
+`0d82b82d1c48079fc4b8e2ec96abadfe12999789`, establish adad consumer acceptance,
+or complete the full rebuild. The correction's original source and test-only
+recovery checkpoint retain their distinct outcomes. Cooper's 7 October direction added native Preview and Production
 deployment authority from this Mac, subject to the qualification above. Keep
 Linear activity, status and evidence aligned with actual results.
 
@@ -80,10 +81,12 @@ qualification is locally accepted. T002's
 installed dependency graph, app/script/SDK/infrastructure
 migrations, six-extension strict scope, fixture containment and final source
 review are complete locally. The [acceptance review](../../documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json)
-records the completed local checks and their limits. The companion adad
-qualification remains exactly `59b0a36ff1bc6f95501734ee65d789a4f5a37fcc`;
-later SDK work has not been qualified there, and neither result is Medicare
-correctness proof.
+records the completed local checks and their limits. The earlier companion adad candidate
+`59b0a36ff1bc6f95501734ee65d789a4f5a37fcc` remains historical and does not prove
+Medicare correctness. Current annual consumer qualification belongs to
+[DEV-68](https://linear.app/coopers-personal/issue/DEV-68/cf-012-qualify-a-correct-effect-v4-taxkit-revision)
+and the exact approved correction source `0d82b82d1c48079fc4b8e2ec96abadfe12999789`;
+its remaining checks and public enablement are separately owned by adad.
 
 ## Starting point and retention
 
@@ -6147,3 +6150,37 @@ receipt records the initial delivery identity to avoid claiming its own future
 commit hash. PostHog and metrics remain incomplete, collection remains off,
 and T010/full rebuild acceptance stays open. No merge, version application,
 publication, deployment, billing, credential or provider change is made.
+
+
+### 8 October 2026 — merge-all instruction and combined-source checks
+
+Cooper instructed "Merge everything" after accepting the reviewed handover.
+The fresh GitHub inventory has 81 open drafts: 80 in the reviewed rebuild stack
+and the separate Medicare correction #168. The main branch already contains
+#140's plugin-skills migration and #153's Entire shared-upload setting at
+`b2923793790975dbf619674ed59c768402e8d7d6`; both must remain in the result.
+
+The integration branch combines handover source
+`601693dc93a45b8345db19349f959b2a41508a24`, current main, and Medicare source
+`2051a9870d2ede97ab30d72597c4bc2c90b20d53`. The 60 main conflicts are largely
+removed copied skill files. Resolution preserves the approved plugin lookup,
+removes only the retired copied-skill checks, and retains the rebuilt stable
+toolchain, Effect-native checks and all six current journey requirements. The
+remaining Medicare conflict combines the current scope/approval wording in
+this plan. No calculator rule is hand-edited during conflict resolution.
+
+Documentation impact: **Change required** for this plan, the current checking
+architecture, harness profile, plugin skill profiles and bounded merge proof.
+**Preserve** the accepted calculator/SDK/API/content changes, current journey
+oracles, historical receipts and recovery records, PostHog/metrics deferrals,
+and version/publication/provider boundaries. **N/A** for new tax or deployment
+design: this operation combines the separately reviewed branches.
+
+The exact combined source must pass local release checks before the authorised
+merge. Merge commits preserve reviewed commit identities and include `[skip ci]`
+under Cooper's instruction to run checks locally while Actions credits are
+exhausted. GitHub/Linear readback owns the eventual merge result. Recovery is a
+reviewed revert of the resulting main merge commit to its first parent; no
+provider rollback is involved. Merging leaves T008/T009 incomplete, collection
+off and full T010/rebuild acceptance open. It does not publish packages, deploy
+the corrected Medicare result, or enable adad calculations.

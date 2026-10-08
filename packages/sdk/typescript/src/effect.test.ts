@@ -243,7 +243,7 @@ describe("Effect SDK facade", () => {
         });
 
         expect(report._tag).toBe("AnnualTaxReport");
-        expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.0");
+        expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
         expect(report.liability.cents).toBe(1_958_800);
       }).pipe(Effect.provide(ServiceLive))
   );

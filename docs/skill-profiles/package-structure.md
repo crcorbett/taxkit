@@ -27,10 +27,10 @@ The local root manifest and lockfile select stable Effect 4.0.0 and TypeScript
 that reference snapshot does not downgrade TaxKit or prove an app/provider
 migration. Check installed exports and the active clean-slate plan before use.
 
-The complete local skill collection is pinned by
-`tools/skills/canonical-skill-baseline.json` to Commonplace development-workflows
-0.6.1. It includes `linear`, `strict-effect-ts` and `alchemy-iac`, with relative
-Claude links. Use the Linear skill for tracked task status/evidence. The active
-`docs/exec-plans/active/clean-slate-foundation.md` distinguishes skill adoption, strict enforcement and Atom integration from
-later application work. Use its task receipts for current acceptance; the
+Shared workflow skills are selected through `docs/skills.md` from the latest
+installed plugin. The removed local collection and its 0.6.1 receipt remain
+historical evidence; they do not select today's plugin or qualify TaxKit's
+stable dependency graph. Repository validators stay independent of a user's
+plugin installation. Use the retained task receipts and direct source checks
+for the implementation's current acceptance and limits. Use its task receipts for current acceptance; the
 upstream skill receipt alone does not prove runtime behaviour.
