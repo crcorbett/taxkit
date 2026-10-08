@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4CM12JXQRGWPW14RBQKFG00",
+  "strategy": "manual-commit",
+  "branch": "codex/dev-81-review-handover",
+  "checkpoints_count": 5,
+  "files_touched": [
+    "apps/web/README.md",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/testing-and-quality.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/runbooks/release-readiness.md",
+    "packages/api/rpc/README.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 294111,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 12800768,
+    "output_tokens": 77344,
+    "api_call_count": 85,
+    "subagent_tokens_complete": false
+  }
+}
