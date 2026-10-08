@@ -1,0 +1,29 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4CQVX6530452TXEPB0YRZ7D",
+  "strategy": "manual-commit",
+  "branch": "codex/merge-all-20261008",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/documentation-audit/clean-slate-foundation/2026-10-08-merge-all.json",
+    "tools/governance/policy.test.ts",
+    "tools/governance/policy.ts",
+    "turbo.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 11397,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1325056,
+    "output_tokens": 6551,
+    "api_call_count": 7
+  }
+}
