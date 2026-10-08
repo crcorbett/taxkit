@@ -140,10 +140,7 @@ const inspectProfile = (
 
 const inspectExternalClaims = ({
   profile,
-}: Pick<
-  GovernanceInputs,
-  "profile"
->): readonly GovernanceFinding[] => {
+}: Pick<GovernanceInputs, "profile">): readonly GovernanceFinding[] => {
   const source = profile.nonClaims.join(" ");
   return EffectArray.every(requiredExternalBoundaries, (boundary) =>
     source.toLowerCase().includes(boundary.toLowerCase())

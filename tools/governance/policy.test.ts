@@ -1,19 +1,12 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it } from "@effect/vitest";
-import {
-  Array as EffectArray,
-  Effect,
-  Result,
-  Schema,
-} from "effect";
+import { Array as EffectArray, Effect, Result, Schema } from "effect";
 
 import { checkHarnessGovernance } from "./check.runtime.js";
 import acceptedFixture from "./fixtures/accepted.json";
 import adversarialFixture from "./fixtures/adversarial.json";
 import { inspectGovernance } from "./policy.js";
-import type {
-  GovernanceInputs,
-} from "./policy.js";
+import type { GovernanceInputs } from "./policy.js";
 import {
   GovernanceFixtureCorpus,
   RepositoryHarnessProfile,

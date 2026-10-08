@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "1",
+  "status": "inconclusive",
+  "claim": "Qualify the exact combination of all 81 open TaxKit PR heads with the already merged main changes before the authorised repository merge.",
+  "target": "crcorbett/taxkit main; integration branch codex/merge-all-20261008",
+  "candidateIdentity": "ae32f42694278566d79cbec673d5c895077fcf4e",
+  "actor": "Cooper Corbett approves; Codex executes through GitHub account crcorbett",
+  "authorityReceipt": "Direct human instruction in this chat on 8 October 2026: Merge everything. Approval covers all 81 open TaxKit drafts, ready conversion, conflict resolution, commits/pushes and repository merges for this task. Local checks follow Cooper's earlier direction. No package publication, version application, new deployment, billing, credentials, provider mutation or adad source/enablement change is included.",
+  "environment": "Local Mac validation; GitHub crcorbett/taxkit repository merge; Personal Taxkit Linear tracking",
+  "journeyIds": [
+    "taxkit-calculator-direct",
+    "taxkit-sdk-packed",
+    "taxkit-http-api",
+    "taxkit-docs-runtime",
+    "taxkit-release-closure",
+    "taxkit-native-website"
+  ],
+  "observations": [
+    "Fresh open inventory: 81 drafts. The 80-head reviewed rebuild stack remains unchanged; separate Medicare #168 stays at 2051a9870d2ede97ab30d72597c4bc2c90b20d53.",
+    "Main already contains merged #140 and #153 at b2923793790975dbf619674ed59c768402e8d7d6. Repository allows merge commits and has no active ruleset or protected-main requirement at readback.",
+    "Local merges resolve 60 main conflicts by preserving approved shared-plugin removals and stable rebuilt toolchain/Effect-native six-journey checks; the one Medicare plan conflict combines the dated scopes. No calculator rule was hand-edited during conflict resolution.",
+    "Published Commonplace development-workflows manifest and matching release both report 0.6.10; this is the loaded installation. The unauthenticated web source returned 404; authenticated primary GitHub reads verified the manifest and release.",
+    "Documentation impact: Change required for current checking architecture, profile, plugin profiles, retired task commands and active plan. Preserve accepted runtime/public content/Changesets, six journey oracles, original historical evidence, Entire settings, PostHog/metrics deferrals and consumer/provider limits. N/A for dependency or new tax/provider design changes.",
+    "The initial focused docs check failed on two references to the retired skill command. The corrected owner passed docs, governance types/tests/runtime. Frozen install, docs/runbooks/format/lint also passed before the complete graph."
+  ],
+  "postconditions": [
+    "Every one of the 81 recorded PR heads is an ancestor of the integration candidate. Complete combined-source release checks are not yet claimed."
+  ],
+  "detailArtifacts": [
+    {
+      "path": "taxkit-merge-open-prs.json",
+      "sha256": "5fbbc370b8b556ce862017a2249e54add5b8743b0828694da8f28fd0272ebca7"
+    },
+    {
+      "path": "taxkit-merge-main-before.json",
+      "sha256": "c41d79690615f8ec198fcf6b35456e76cde305d868695a53a549de196dc2d612"
+    },
+    {
+      "path": "taxkit-merge-plugin-manifest.json",
+      "sha256": "911a5b3d432208bf67a19338b8682dd213be9f76edf70abee7052e24e0c81fbc"
+    },
+    {
+      "path": "taxkit-merge-commonplace-releases.jsonl",
+      "sha256": "ded0bf7631d30f11195b97662d290e57fe974021d8f39dab75f97875ca440bc5"
+    },
+    {
+      "path": "taxkit-merge-preflight-results.jsonl",
+      "sha256": "8e1d90f2820000e31a0b985359270ad7ae75c2a6a3408cc251be17bb3e937a12"
+    },
+    {
+      "path": "taxkit-merge-preflight-recovery-results.jsonl",
+      "sha256": "157946ab35dc6c5179d21cf511dc8d0d42fe72bb06f86a91b75a880f3c40d065"
+    },
+    {
+      "path": "taxkit-merge-qualified-preflight-results.jsonl",
+      "sha256": "5856be6f1fd4672bcce7800e40ab7567a7931cd4b723659a23e3283cf052e17b"
+    }
+  ],
+  "limitations": [
+    "Combined-source release checks must pass before the requested merge. The earlier separate local checks do not prove this new combination.",
+    "GitHub and Linear independent readback own the eventual merge outcome; this receipt currently establishes preparation only.",
+    "Merging does not complete T008/T009 or full T010 acceptance. Collection remains off."
+  ],
+  "nonClaims": [
+    "No hosted CI success, package release/publication, package version application, new Preview/Production deployment, provider or credential mutation is claimed.",
+    "The exact adad source exception remains 0d82b82d1c48079fc4b8e2ec96abadfe12999789. No independent adad consumer acceptance or calculation enablement is claimed."
+  ],
+  "rollbackOrRecovery": "Before external merge, discard or revert only this isolated integration branch to the retained handover parent. After merge, prepare a reviewed revert of the actual main merge commit with first-parent selection, preserving the immutable source and receipts. Do not force-push main or change providers.",
+  "observedAt": "2026-10-08T03:10:47.389782+00:00"
+}
