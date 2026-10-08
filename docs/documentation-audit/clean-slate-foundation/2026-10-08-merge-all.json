@@ -22,7 +22,8 @@
     "Published Commonplace development-workflows manifest and matching release both report 0.6.10; this is the loaded installation. The unauthenticated web source returned 404; authenticated primary GitHub reads verified the manifest and release.",
     "Documentation impact: Change required for current checking architecture, profile, plugin profiles, retired task commands and active plan. Preserve accepted runtime/public content/Changesets, six journey oracles, original historical evidence, Entire settings, PostHog/metrics deferrals and consumer/provider limits. N/A for dependency or new tax/provider design changes.",
     "The initial focused docs check failed on two references to the retired skill command. The corrected owner passed docs, governance types/tests/runtime. Frozen install, docs/runbooks/format/lint also passed before the complete graph.",
-    "The first complete combined-source report at 12b6d7d765dc7c645e1034b967b1c33fd605528e stopped at verification in 7.31 seconds: the historical receipt checker still referenced the removed sha256 helper. Its existing runGit returns bytes; the resolved call uses the existing typed hashEpochBytes operation. The focused epoch type check now passes. No calculator source changed."
+    "The first complete combined-source report at 12b6d7d765dc7c645e1034b967b1c33fd605528e stopped at verification in 7.31 seconds: the historical receipt checker still referenced the removed sha256 helper. Its existing runGit returns bytes; the resolved call uses the existing typed hashEpochBytes operation. The focused epoch type check now passes. No calculator source changed.",
+    "The second report at 8cb46fca8f06e1c24fdd6b93293aabe70d35395a stopped at verification in 29.96 seconds. Two historical CLI cases still expected failure messages from before #140. The actual old checkers correctly refuse current source: the removed shared-skill input and changed historical source-artifact identity. Only those two expected diagnostics changed; nonzero refusal, bounded output, safe paths, recovery and invalid-option assertions remain. The full historical suite and Knip pass."
   ],
   "postconditions": [
     "Every one of the 81 recorded PR heads is an ancestor of the integration candidate. Complete combined-source release checks are not yet claimed."
@@ -71,6 +72,18 @@
     {
       "path": "taxkit-merge-epoch-recovery-results.jsonl",
       "sha256": "cd9e58bb6947d4088207918cdd0dd948db389a5406fcfb65caeb484b5728e6f4"
+    },
+    {
+      "path": "taxkit-merge-recovered-results.jsonl",
+      "sha256": "3ef1d89757f585dba41ef2532f8586ed7fe6dd77f2fab38285e1916e52e98433"
+    },
+    {
+      "path": "taxkit-merge-recovered-release-report.log",
+      "sha256": "87c2c13a6102c3eb7c20ad15f43b19648e54bff1c0ad6eacd6f1aefcae606782"
+    },
+    {
+      "path": "taxkit-merge-historical-recovery-results.jsonl",
+      "sha256": "1d26aa46b04386cbedeafbe07931a1c3a6f9081707772790d000d835fbbb2951"
     }
   ],
   "limitations": [

@@ -8,13 +8,13 @@ test.effect.each([
     args: [],
     command: "hgi-206",
     oracle:
-      "FAIL [input] target=docs/exec-plans/active/harness-governance-documentation.md",
+      "FAIL [input] target=.agents/skills/docs-maintainer/SKILL.md",
     source: "tools/evals/hgi-206/check.runtime.ts",
   },
   {
     args: [],
     command: "harness-foundation-epoch",
-    oracle: "FAIL [skill-receipt-projection]",
+    oracle: "FAIL [source-artifact-identity]",
     source: "tools/evals/harness-foundation/check.runtime.ts",
   },
   {
