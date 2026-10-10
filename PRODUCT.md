@@ -107,10 +107,12 @@ Agreed product constraints from the rebuild spec:
   report downloads.
 - The browser never runs a second tax engine.
 
+Licence: MIT (`LICENSE`, every package declares `"license": "MIT"`),
+chosen by Cooper on 2026-10-10. Copyright stays with Cooper Corbett. The MIT
+text says nothing about patents, so surfaces must not claim a patent grant.
+
 Explicitly undecided or absent:
 
-- Licence: the repo calls itself open source but holds no LICENSE file and no
-  package licence field. Do not state a licence until one is chosen.
 - Search for docs is deferred.
 
 ## Brand Commitments
@@ -130,6 +132,12 @@ Explicitly undecided or absent:
   white with four colours that only ever mean a tax rate. The master SVG path
   is `M0 0H9V1H5V5A3 3 0 0 0 8 8V9H1V8A3 3 0 0 0 4 5V1H0Z` on a `0 0 9 9`
   viewBox. No brand asset files are in the repository yet.
+- Trademarks: Cooper Corbett keeps the TaxKit name, the Stand mark and the
+  lockup, which are unregistered. `TRADEMARKS.md` sets out permitted use;
+  forks need their own name. Confirmed 2026-10-10.
+- Brand line: "Tax rules that compile." Chosen by Cooper on 2026-10-10. It
+  restates the typed-and-deterministic positioning; keep it beside the lockup
+  and do not stretch it into a claim about tax outcomes.
 
 ## Evidence on Hand
 
@@ -165,5 +173,5 @@ Keyboard, focus management, loading, error and cancellation states are
 acceptance criteria for the calculator surface (CSF-004), and the docs app
 already ships a skip link, focus-visible outlines and heading focus after
 navigation. The built-docs proof includes representative accessibility checks.
-No formal conformance target (such as a WCAG level) has been chosen; record
-one before claiming it.
+The target is WCAG 2.2 AA, chosen by Cooper on 2026-10-10. No audit has
+confirmed conformance yet, so surfaces must not claim it.

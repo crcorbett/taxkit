@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "TypeScript SDK for in-process TaxKit calculations.",
+  "license": "MIT",
   "files": [
     "dist",
     "README.md"

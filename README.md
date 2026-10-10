@@ -3,7 +3,7 @@ document_type: repository-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-repository-maintainers
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-10
 review_trigger: contributor setup, repository entry points, or supported commands change
 ---
 
@@ -279,3 +279,10 @@ open docs/repo-status-outline.html
   browser-safe.
 - `@taxkit/api-http/client/server`, `@taxkit/api-http/server` and handler
   exports are server-only and should stay out of `apps/web`.
+
+## Licence and trademarks
+
+TaxKit's code and documentation are available under the [MIT licence](./LICENSE).
+The licence grants no rights to the TaxKit name or the Stand mark. Cooper
+Corbett keeps both, and [TRADEMARKS.md](./TRADEMARKS.md) sets out how others
+may use them.
