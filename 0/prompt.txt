@@ -24,3 +24,7 @@ Each item contains text selected from an earlier Codex response and may include 
 
 ## My request:
 We also need to ensure we drop/jettison all of the receipts-theatre and ceremony. I want the approach that Common Practice has with commits, deployments, doppler, Alchemy etc. We currently do way to much checking/verification/approvals/receipts, I want to copy what we do in Common Practice (which doesn't reuqire any of that).
+
+---
+
+That sounds good. Now please review the design futther [$development-workflows:grill-with-docs](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.6.11/skills/grill-with-docs/SKILL.md) - particularly ensuring you have a solid grasp on the Effect TS patterns, and Alchemy patterns within [$development-workflows:repo-structure](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.6.11/skills/repo-structure/SKILL.md) as well as the lint rules there and from Common Practice. [$development-workflows:strict-effect-ts](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.6.11/skills/strict-effect-ts/SKILL.md) is extremely important.
