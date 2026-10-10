@@ -1,6 +1,7 @@
 {
   "name": "taxkit",
   "private": true,
+  "license": "MIT",
   "workspaces": {
     "packages": [
       "apps/*",
