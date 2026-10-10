@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4J02Y8N6SBM2ZDF5JTYCWMS",
+  "session_id": "01a123b2-d3fe-7403-8a75-465bdb2772be",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-10T04:10:50.659011Z",
+  "branch": "claude/impeccable-init-c28575",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "3c49fe3e63fa",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 551316,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 19293824,
+    "output_tokens": 95607,
+    "api_call_count": 176,
+    "subagent_tokens_complete": false
+  },
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 15974,
+      "agent_lines_removed": 5
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 459,
+      "agent_lines_removed": 5
+    }
+  ]
+}

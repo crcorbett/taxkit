@@ -1,0 +1,26 @@
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_DUh95xann4xYAiLB6s7x70SB\",0]","question":"❓ Q1 — Website calls: should the website keep its current RPC calls (typed remote function calls), or move normal reads and calculations to HTTP? ➡️ I recommend keeping RPC and improving shared checked clients. It already has cancellation, deadlines and trusted caller checks that a switch must preserve.","answer":"Decide after the full comparison"}]
+</send_user_message_question_reply>
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_DUh95xann4xYAiLB6s7x70SB\",1]","question":"❓ Q2 — Bun API: should the standalone API that runs outside Cloudflare remain a supported way to run TaxKit? ➡️ I recommend keeping it as a small host over the same service, with no separate calculation logic.","answer":"Keep Bun and Cloudflare hosts, but ensure the packages are abstracted from this. Thoroughly review and research Effect and Alchemy cloned repos to understand how they support this approach"}]
+</send_user_message_question_reply>
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_DUh95xann4xYAiLB6s7x70SB\",2]","question":"❓ Q3 — Operational logging: should the design allow only fixed operational details, such as stage, route, duration and safe error name, and exclude salaries, calculation facts, results and calculation traces? ➡️ I recommend this narrow policy for Axiom and Cloudflare logs/metrics. Nothing would be enabled during this review.","answer":"Allow only safe operational details (recommended)"}]
+</send_user_message_question_reply>
+
+---
+
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. For every annotation you address, include its inline directive `:codex-annotation{index="N"}`, where N is its one-based array position (for example, `:codex-annotation{index="1"}`). Do not use unstructured annotation labels.
+<response-annotations>
+[{"text":"Keep website RPC for now; improve the checked HTTP client separately.","annotation":"Ensure this adopts the approaches from Common Practice","source":{"messageId":"msg_05785dff31b64c62016ac9b0099d6481919a3a541629812eed","startOffset":224,"endOffset":293}},{"text":"Bun currently creates a fresh capacity limit per request. It should share one limit across requests.","annotation":"Prioritise Cloudflare set up first. The bun API server is less relevant","source":{"messageId":"msg_05785dff31b64c62016ac9b0099d6481919a3a541629812eed","startOffset":293,"endOffset":393}},{"text":"The newer, unpatched Alchemy candidate failed a mocked safety check.","annotation":"We need to remove ALL patches affecting Alchemy — Common Practice has not required any of these soI would prefer that we dont use them here either.","source":{"messageId":"msg_05785dff31b64c62016ac9b0099d6481919a3a541629812eed","startOffset":393,"endOffset":461}}]
+</response-annotations>
+
+## My request:
+We also need to ensure we drop/jettison all of the receipts-theatre and ceremony. I want the approach that Common Practice has with commits, deployments, doppler, Alchemy etc. We currently do way to much checking/verification/approvals/receipts, I want to copy what we do in Common Practice (which doesn't reuqire any of that).
