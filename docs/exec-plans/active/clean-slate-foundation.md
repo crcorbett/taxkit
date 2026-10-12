@@ -3,11 +3,17 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-13
 review_trigger: task progress, dependency qualification, acceptance evidence or authority change
 ---
 
 # Clean slate foundation implementation
+
+The [Common Practice foundation](./common-practice-foundation-review.md) now owns current transport, origin,
+publication-link, caching, Alchemy and delivery choices. Its 13 October design
+replaces the earlier Website RPC/client wrappers and receipt-based operations.
+The text below is retained execution and interview history; it is not current
+policy where the newer plan differs.
 
 Cooper's 4 October request authorises implementation, reviewable commits and
 draft PRs. It supersedes the old Q14 whole-design admission hold; Q1–Q13 remain
