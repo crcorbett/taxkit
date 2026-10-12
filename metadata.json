@@ -3,7 +3,7 @@
   "checkpoint_id": "01M4S7QX40WQG364Y4JFWX90EQ",
   "strategy": "manual-commit",
   "branch": "claude/taxkit-native-effect-alchemy-f44f82",
-  "checkpoints_count": 7,
+  "checkpoints_count": 9,
   "files_touched": [
     "CONTEXT.md",
     "docs/adr/0003-support-independent-api-hosts.md",
@@ -23,14 +23,28 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 889880,
-    "cache_creation_tokens": 0,
-    "cache_read_tokens": 22131200,
-    "output_tokens": 113084,
-    "api_call_count": 179,
+    "input_tokens": 890018,
+    "cache_creation_tokens": 268579,
+    "cache_read_tokens": 36474600,
+    "output_tokens": 138621,
+    "api_call_count": 248,
+    "subagent_tokens": {
+      "input_tokens": 248,
+      "cache_creation_tokens": 497386,
+      "cache_read_tokens": 12522053,
+      "output_tokens": 55912,
+      "api_call_count": 124
+    },
     "subagent_tokens_complete": false
   }
 }
