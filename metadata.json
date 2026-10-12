@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4S7QX40WQG364Y4JFWX90EQ",
+  "strategy": "manual-commit",
+  "branch": "claude/taxkit-native-effect-alchemy-f44f82",
+  "checkpoints_count": 7,
+  "files_touched": [
+    "CONTEXT.md",
+    "docs/adr/0003-support-independent-api-hosts.md",
+    "docs/adr/0004-limit-operational-observations.md",
+    "docs/adr/0005-public-api-and-production-publication-links.md",
+    "docs/exec-plans/active/README.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/exec-plans/active/common-practice-foundation-review.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/common-practice-foundation-review.md",
+    "docs/product-specs/index.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 889880,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 22131200,
+    "output_tokens": 113084,
+    "api_call_count": 179,
+    "subagent_tokens_complete": false
+  }
+}
