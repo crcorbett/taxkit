@@ -182,7 +182,7 @@ a future release-prep slice instead of treating earlier registry results as
 current truth.
 
 Packed artifacts should include only `dist`, `README.md` and package metadata.
-Do not run `bun run version-repo`, remove `private: true` or publish from this
+Do not run `bun run version-packages`, remove `private: true` or publish from this
 package without an explicit release-prep approval.
 
 ### Downstream validation

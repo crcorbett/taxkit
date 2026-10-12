@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "declaration": false,
+    "declarationMap": false,
+    "module": "ESNext",
+    "noEmit": true,
+    "types": ["bun"]
+  },
+  "include": [
+    "documentation/*.ts",
+    "oxlint/*.ts",
+    "repository-paths/*.ts",
+    "vitest.config.ts"
+  ]
+}

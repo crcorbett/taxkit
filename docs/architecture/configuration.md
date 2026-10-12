@@ -70,9 +70,7 @@ cache saves, while teardown stays local-cache-only and cannot fetch `ci`.
 The earlier Doppler implementation recorded establishment of the project,
 configs and GitHub bridges, and removal of direct Turbo/Cloudflare entries after
 replacement proof. That is historical provider evidence, not a fresh readback
-from this checkout. Current source has no supported direct-value fallback;
-provider custody and availability require the separate operational readback
-owned by the [authority model](../operations/authority-model.md).
+from this checkout. Current source has no supported direct-value fallback.
 
 ## Current package and app pattern
 

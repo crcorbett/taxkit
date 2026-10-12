@@ -70,7 +70,7 @@ public-status representation and navigation ownership without claiming runtime
 or external availability.
 
 `tools/documentation/catalogue.runtime.ts`
-: Local accepted-catalogue build command (`bun run docs:catalogue`). It checks
+: Local accepted-catalogue build command (`bun run --filter=@taxkit/docs-content build`). It checks
 version-two records and exact source hashes before and after MDX processing,
 omits drafts, checks navigation through the canonical catalogue constructor,
 and writes ignored `.source/public-catalogue.json` only on success. No accepted

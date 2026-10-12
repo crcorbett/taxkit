@@ -7,7 +7,6 @@
 "@taxkit/docs-content": major
 "@taxkit/docs-fumadocs": major
 "@taxkit/api-http": minor
-"@taxkit/scripts": minor
 ---
 
 Adopt the stricter shared Oxlint policy and use precise public contract names.

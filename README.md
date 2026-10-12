@@ -58,8 +58,6 @@ validation, but it is not published yet.
   workspace packages.
 - [packages/tsconfig](./packages/tsconfig/README.md): shared TypeScript config
   presets.
-- [packages/scripts](./packages/scripts/README.md): private Effect-native
-  orchestration package for the complete local release-readiness command.
 - [packages/ui](./packages/ui/README.md): documented planned shared UI
   ownership without a package manifest or runtime code yet.
 
@@ -137,94 +135,33 @@ and the [setup spec](./docs/product-specs/entire-session-history.md).
 ```sh
 bun install
 bun run dev
-bun run --filter=api dev
-bun run --filter=web dev
-bun run check:doppler-custody
-bun run check:repository-paths
-bun run check:harness-governance
-bun run check:docs
-bun run knip:production
-
+bun run verification
 bun run release:check
 bun run changeset
-bun run version-repo
+bun run version-packages
 ```
 
-`bun run dev` builds the API dependencies, then starts the native API and
-Website together using `alchemy.apps.local.run.ts`. Alchemy prints both local
-addresses and supplies the matching browser origin and private server binding.
-It uses local state and an isolated local profile directory; it requires no
-Cloudflare or Doppler login. App source edits reload automatically. After
-editing a shared package, rebuild that package before expecting its compiled
-API exports to change. Stop the pair with Ctrl-C.
+`bun run dev` starts the native API and Website together with
+`alchemy dev` in the isolated `dev_native_apps` stage. Alchemy prints both
+local addresses and supplies the browser API address and private server binding.
+It uses local state and needs no Cloudflare or Doppler login. Stop it with
+Ctrl-C. `bun run --filter=api dev` starts the separate Bun HTTP host.
 
-`bun run --filter=api dev` retains the separate Bun HTTP process through
-portless at `https://api.taxkit.localhost`. The [Website README](./apps/web/README.md)
-owns its standalone fixture, generated types and native checks. Use `bun run
-web:test:native-pair` for the saved built and live development journeys.
-Documentation development uses the native Website and API pair above. The
-old documentation workspace and writer workflows are retired; their exact
-source and recovery records are linked from the [retirement tombstone](./apps/docs/README.md).
-`bun run check:repository-paths` rejects machine-local checkout references in tracked
-readable text without printing the matched private value. `bun run check:docs`
-checks maintainer metadata, links, documented commands, workspace README
-coverage, public/maintainer path separation, and generated-source ownership.
-It treats public content status as opaque and does not establish publication,
-availability, accuracy, or accepted-current truth. `bun run
-check:harness-governance` validates the repository-local harness profile,
-accepted HE crosswalk, critical journeys, and external non-claims. It
-does not read a global skill installation or establish remote Git, hosted CI,
-registry, release, deployment, provider, public-site, or external-consumer
-state. `bun run knip:production`
-checks the release-artifact package, repository command and
-API runtime graph without test or development reachability. `bun run
-verification` is the baseline verification command for documentation, package
-wiring and scaffold changes. Shared skills use the latest plugin; see
-[development skills](docs/skills.md). Checks for saved skill copies have been removed. `bun run
-release:check` runs the complete ordered
-release evidence, including tests, builds, package artifacts, API smoke, docs
-browser proof and Changeset status.
+`bun run verification` is the check to run before merging: build, formatting,
+lint, types, Effect diagnostics, unit and browser tests, unused-code checks,
+documentation links and portable paths. `bun run test:native` runs the slower
+native Website/API pair tests. `bun run release:check` adds the packed SDK,
+downstream consumer, API smoke and Changeset checks before a package release.
+The [testing guide](./docs/architecture/testing-and-quality.md) lists focused
+checks for each kind of change.
 
-Deterministic repository commands run through Turbo, including the root
-validators used by `verification` and the app/package checks used by
-`release:check`. Trusted GitHub Quality runs fetch the minimum `taxkit/ci`
-config through the pinned Doppler action after every cache save, check the safe
-project/config identity, and pass only the named Turbo outputs to the canonical
-release step. Same-repository pull requests and `main` may read and write
-Vercel Remote Cache. Fork pull requests do not fetch Doppler and run the same
-full command graph with local cache only. Local repository commands use local
-cache and do not have a supported direct Turbo credential path. Never put a
-cache credential in the shell, source or an env file, and never treat a cache
-hit as test, release, deployment or public-availability proof. The repository
-`DOPPLER_CI_TOKEN` bridge is the sole hosted Turbo source.
+The `Checks` GitHub workflow runs `bun run verification` on pull requests and
+`main`. Trusted runs read the Turbo cache values from Doppler `taxkit/ci`; fork
+pull requests run without credentials.
 
-Quality also keeps separate GitHub caches for Bun package downloads and the
-Playwright Chromium binary. It does not cache `node_modules`: current warm
-hosted evidence shows the frozen Bun install takes only 1–2 seconds after the
-package cache restores, while the installed tree is about 1.4 GB. The workflow
-still runs frozen install plus Playwright system-dependency setup on every run.
-Keys use platform and dependency content, so pull requests may restore a
-matching cache saved by `main`. GitHub keeps pull-request writes on the
-pull-request merge ref, away from `main` and sibling pull requests. A miss or
-cache outage only changes download time.
-
-The trusted docs Preview, Production, teardown and receipt workflows use
-bounded Turbo caching for deterministic work. Receipt validation and Preview
-get their two Turbo values from `taxkit/ci` after cache saves; teardown stays
-local-cache-only. Preview and teardown get Cloudflare values only from
-`taxkit/stg_preview` through the Preview environment bridge and expose them
-only to exact provider steps. Production uses its separate protected
-`taxkit/prd` bridge and keeps its fixed `prod` plan/deploy/rollback controls.
-All deployment and receipt uploads use separate allowlisted directories so raw
-runner output is not retained. The TaxKit Doppler configs and GitHub bridges
-are established. Merged-main Quality and exact absent-stage teardown proof are
-recorded in the deployment evidence index; that evidence does not claim a
-served Preview or Production deployment under this credential epoch.
-
-Package-facing changes must include a Changeset. Use `bun run changeset` during
-implementation to record the user-facing package impact, and use
-`bun run version-repo` only when intentionally consuming pending Changesets into
-fixed release-train package versions and changelogs.
+Deployments run locally with native Alchemy and Doppler; see the
+[deployment runbook](./docs/runbooks/deployment.md). Package-facing changes need
+a Changeset; see [versioning](./docs/runbooks/versioning.md).
 
 ## Documentation entry points
 

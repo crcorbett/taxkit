@@ -3,7 +3,7 @@ document_type: documentation-router
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-13
 review_trigger: any maintainer/public docs class, root route, SPEC, plan, runbook, proof, evidence, or lifecycle change
 ---
 
@@ -55,61 +55,29 @@ lifecycle; migrate it only when its owner is materially revised.
 | Current intent | [`product-specs/index.md`](product-specs/index.md) and [`exec-plans/active/README.md`](exec-plans/active/README.md) | Only genuinely active work; implemented/history stays inventory. |
 | Completed history | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) | Historical provenance, never default policy. |
 | Public docs product | [`../apps/web/README.md`](../apps/web/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md), and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) | Consumer-facing content/runtime, not maintainer lifecycle policy. |
-| Repeatable release/deployment/recovery operations | [`runbooks/README.md`](runbooks/README.md) and [`operations/authority-model.md`](operations/authority-model.md) | Exactly five target-owned procedures; stop consequential operations when principal, candidate, target or receipt is unknown. |
-| CI controls and recurring automation | [`standards/controls.md`](standards/controls.md) and [`operations/automation-register.md`](operations/automation-register.md) | Quality workflow admission, release-graph controls, and report-only candidate boundaries; neither route grants external authority. |
-| Verification/critical journeys/proof | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md), [`verification/critical-journeys.json`](verification/critical-journeys.json), [`evidence/releases/HGI-203-critical-journeys.json`](evidence/releases/HGI-203-critical-journeys.json), [`evidence/releases/HGI-203-local.json`](evidence/releases/HGI-203-local.json), and [`documentation-audit/HGI-203-validation.json`](documentation-audit/HGI-203-validation.json) | The current inventory owns evolving journeys. Accepted HGI-203 retains the exact historical five-journey snapshot and bounded local proof that its immutable packet observed; HGI-204 validates both epochs without attributing current changes to the old attempt. Raw logs and secrets are never durable proof. |
-| Harness foundation and requalification | [`verification/repository-harness-profile.json`](verification/repository-harness-profile.json), [`documentation-audit/harness-foundation/accepted-findings.json`](documentation-audit/harness-foundation/accepted-findings.json), [`verification/harness-epochs.md`](verification/harness-epochs.md), and [`verification/effectiveness.md`](verification/effectiveness.md) | The TaxKit profile, accepted HE crosswalk, content-addressed skill receipt and focused gate own the implemented baseline. Last accepted epoch `HFI-004-2026-07-24` qualifies saved candidate `7c8a96e`; HGI-206 remains previous history. The active clean-slate plan owns pending qualification of today's graph. Neither saved epoch establishes current-checkout or external state. |
+| Versioning, packed SDK checks and deployment | [`runbooks/README.md`](runbooks/README.md) | Short repeatable steps. Git, pull requests, checks and Alchemy state are the ordinary record. |
+| Checks and quality | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md) | What `bun run verification` covers and which focused checks to run. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |
 
-Failed/inconclusive work retains provenance, last successful step, observed
-state, escalation, resume trigger, recovery, and non-claims outside default
-current routes. Do not delete or move historical/public/binary evidence without
-an approved retention manifest.
+Dated evidence and completed plans stay in Git as history. They are not inputs
+to current checks or prerequisites for new work.
 
 ## Maintenance
 
-Every material slice decides `Change required`, `Preserve`, or `N/A` for docs,
-READMEs, architecture, standards, public/generated references, runbooks,
-proof/evidence, skills, lint/config/CI, and active SPEC/tasks. Update the
-earliest durable owner and necessary pointers in the same slice. Counts prove
-accounting only; semantic and consumer claims need owner review and
-boundary-matched proof.
+Each material change decides which documents change: owner documents, READMEs,
+runbooks, public content, skills, lint/config/CI and the active SPEC/plan. Update
+the owner document and its pointers in the same change. Use the plugin
+`development-workflows:docs-maintainer` skill for that decision. `$docs-writer`
+is limited to public-copy wording after the owner has been chosen.
 
-Use the plugin `development-workflows:docs-maintainer` skill for this impact decision on
-both PRD and ordinary changes. `$docs-writer` is limited to public-copy wording
-after the maintenance route has selected the owner; it cannot close lifecycle,
-generated-content, package, proof, or validation work. Background freshness
-scans produce report-only candidates and cannot publish policy or documentation
-without separately attached implementation authority, review and publication
-identity.
+`bun run check:docs` checks maintainer metadata in `docs/`, relative links and
+documented `bun run` commands in current documents and READMEs. Completed and
+dated documents keep the links and commands of their time.
 
-`bun run check:docs` enforces the mechanical owner contract in
-[`../tools/documentation/owner-policy.json`](../tools/documentation/owner-policy.json).
-It checks maintainer metadata, links, documented commands, workspace README
-coverage, public/maintainer separation, accepted public-status representation,
-and generated-source edges with bounded diagnostics and a JSON detail receipt.
-The command accepts `--json`; failed checks return a nonzero exit after the
-report is saved. Effect CLI owns option parsing.
-`draft` means authored, locally renderable, visibly labelled candidate content;
-`published` means explicitly accepted current public documentation. Neither
-status proves runtime or external availability.
-
-Acceptance-record Schemas live in `@taxkit/content`. The docs tool explicitly
-selects source exports so it can run in a fresh checkout before package builds.
-Version-two records include the reviewed source hash, which this check verifies;
-version-one records retain their historical contract. The local accepted
-catalogue builder, `bun run docs:catalogue`, requires version two, checks source
-bytes before and after compilation, and writes generated output only when
-accepted pages and matching navigation exist. It does not accept pages or
-establish publication by running. See
-[`../packages/docs-content/README.md`](../packages/docs-content/README.md).
-
-`bun run check:runbooks` Schema-decodes the canonical runbook contract, the
-current journey inventory and the exact historical HGI-203 journey snapshot,
-then reconciles the immutable packet digest, four Markdown owners, commands,
-evidence paths, stop operations, index rows and authority rows. It writes only
-the ignored bounded receipt `tmp/runbook-validation-report.json`, executes none
-of the documented procedures and establishes no consequential state.
+Public pages are published when their MDX frontmatter and
+`packages/docs-content/navigation.json` say `status: published`. The
+`@taxkit/docs-content` build compiles them into the public catalogue the API and
+Website read; see [`../packages/docs-content/README.md`](../packages/docs-content/README.md).
 
 Shared development workflows: [latest plugin and repository profiles](skills.md).

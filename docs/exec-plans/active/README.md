@@ -18,8 +18,8 @@ Alchemy and retirement of receipt tooling. It supersedes the transport, origin,
 cache and workflow parts of the older clean-slate plan, which keeps its
 execution history.
 
-The [Clean slate foundation](./clean-slate-foundation.md) implements the accepted
-website/API rebuild in dependency order; provider apply remains separately gated.
+The superseded [Clean slate foundation](./clean-slate-foundation.md) retains the
+earlier Website/API rebuild history.
 
 The [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) is implemented locally, with [completed correction evidence](../../documentation-audit/medicare-2025-26-correction.json). The wider clean-slate plan remains active; adad consumer qualification and enablement are separate work.
 

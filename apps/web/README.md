@@ -470,7 +470,7 @@ run so withdrawn pages cannot survive in this subtree.
 The existing Vite host supplies NodeServices and is the sole generation runner.
 Builds need the accepted catalogue first; the native pair and Turbo dependency
 graph already build that owner. Standalone development needs `bun run
-docs:catalogue` before `bun run --filter=web dev`. Development also generates the
+--filter=@taxkit/docs-content build` before `bun run --filter=web dev`. Development also generates the
 images when its Vite configuration starts. Turbo declares both `dist/**` and
 `public/og/**` outputs. Tracked template/config/Schema/manifest and lockfile inputs,
 plus the upstream catalogue's source/review inputs, determine the build cache.
@@ -488,7 +488,7 @@ package Changesets remain. Old-app retirement and metrics work stay separate.
 
 ## Release documentation check
 
-The root release graph's `docs-browser` check uses `bun run web:test:native-pair`.
+The root release graph's `docs-browser` check uses `bun run test:native`.
 It rebuilds this Website and the native API and runs all native cases.
 The accepted-page reader observes actual HTML, private navigation, search,
 discovery, Markdown and all generated share images, plus keyboard/focus,

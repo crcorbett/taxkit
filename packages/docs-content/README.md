@@ -154,7 +154,7 @@ fenced example in the documentation has been compiled.
 
 ## Accepted catalogue build
 
-`bun run docs:catalogue` generates both compiler indexes, then runs the
+`bun run --filter=@taxkit/docs-content build` generates both compiler indexes, then runs the
 repository-owned builder in `tools/documentation/catalogue.runtime.ts`.
 The package `build` command now includes that same accepted catalogue step;
 `generate` remains the lower-level compiler-index command. The dedicated

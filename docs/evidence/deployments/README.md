@@ -1,6 +1,6 @@
 ---
 document_type: deployment-evidence-index
-lifecycle: current
+lifecycle: evidence
 authority: canonical
 owner: taxkit-docs-deployment-proof-owner
 last_reviewed: 2026-10-07

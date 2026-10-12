@@ -18,29 +18,19 @@
         "tools/effect-language-service/compatibility.ts",
         "tools/repository-paths/check.runtime.ts",
         "tools/repository-paths/*.test.ts",
-        "tools/quality-workflow/check.runtime.ts",
-        "tools/quality-workflow/*.test.ts",
-        "tools/docs-deployment/check.runtime.ts",
-        "tools/docs-deployment/automation.check.runtime.ts",
-        "tools/docs-deployment/doppler-custody.runtime.ts",
-        "tools/docs-deployment/inventory.runtime.ts",
-        "tools/docs-deployment/local-doppler.runtime.ts",
-        "tools/docs-deployment/workflow-artifact.runtime.ts",
-        "tools/docs-deployment/*.test.ts",
         "alchemy.apps.run.ts",
         "alchemy.apps.local.run.ts",
         "alchemy.posthog.run.ts",
-        "tools/documentation/catalogue.runtime.ts",
-        "tools/docs-deployment/workflow-evidence.runtime.ts"
+        "tools/documentation/check.runtime.ts",
+        "tools/**/*.test.ts"
       ],
       "project": [
         "*.json",
         "*.ts",
         "tools/effect-language-service/**/*.ts",
         "tools/repository-paths/**/*.ts",
-        "tools/quality-workflow/**/*.ts",
-        "tools/docs-deployment/**/*.ts",
-        "tools/documentation/catalogue*.ts"
+        "tools/documentation/*.ts",
+        "tools/oxlint/*.ts"
       ],
       "ignoreDependencies": ["typescript", "@effect/language-service"]
     },
@@ -123,7 +113,8 @@
         "src/**/*.test.ts",
         "vitest.config.ts",
         "src/catalogue-index.runtime.ts",
-        "src/catalogue-source.layer.ts"
+        "src/catalogue-source.layer.ts",
+        "src/catalogue.runtime.ts"
       ],
       "project": ["source.config.ts", "src/**/*.ts", "vitest.config.ts"],
       "ignoreDependencies": ["@shikijs/core", "@taxkit/tsconfig", "typescript"]
@@ -164,13 +155,6 @@
         "type-tests/**/*.ts"
       ],
       "ignoreDependencies": ["@types/bun"]
-    },
-    "packages/scripts": {
-      "entry": [
-        "src/index.ts",
-        "src/release-readiness/release-readiness.runtime.ts"
-      ],
-      "project": ["src/**/*.ts", "vitest.config.ts"]
     },
     "packages/rules/au/income-tax": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],

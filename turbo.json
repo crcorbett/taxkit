@@ -16,13 +16,7 @@
     "@taxkit/docs-content#build": {
       "dependsOn": ["^build"],
       "env": ["NODE_ENV", "PLAYWRIGHT_BROWSERS_PATH"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/tools/documentation/catalogue.*",
-        "$TURBO_ROOT$/tools/documentation/schemas.ts",
-        "$TURBO_ROOT$/tools/documentation/owner-policy.json",
-        "$TURBO_ROOT$/docs/documentation-audit/clean-slate-foundation/public-content-acceptance/**/*.json"
-      ],
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": [".source/**"]
     },
     "build": {
@@ -81,114 +75,6 @@
     "test:browser": {
       "dependsOn": ["build"],
       "env": ["PLAYWRIGHT_BROWSERS_PATH"],
-      "outputs": []
-    },
-    "//#check:docs:task": {
-      "outputs": ["tmp/docs-policy-report.json"]
-    },
-    "//#check:runbooks:task": {
-      "outputs": ["tmp/runbook-validation-report.json"]
-    },
-    "//#knip:task": {
-      "dependsOn": ["@taxkit/docs-content#build"],
-      "outputs": []
-    },
-    "//#knip:production:task": {
-      "dependsOn": ["@taxkit/docs-content#build"],
-      "outputs": []
-    },
-    "//#check:docs-deployment:task": {
-      "outputs": []
-    },
-    "//#check:docs-deployment-automation:task": {
-      "outputs": []
-    },
-    "//#check:docs-deployment-inventory:task": {
-      "cache": false,
-      "passThroughEnv": ["ALCHEMY_PROFILE", "CLOUDFLARE_*", "TAXKIT_*"]
-    },
-    "//#check:docs-deployment-workflow-proof:task": {
-      "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
-    },
-    "//#check:docs-deployment-workflow-input:task": {
-      "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
-    },
-    "//#check:docs-deployment-workflow-run:task": {
-      "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
-    },
-    "//#check:docs-deployment-workflow-plan:task": {
-      "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
-    },
-    "//#check:docs-deployment-workflow-teardown-proof:task": {
-      "cache": false,
-      "passThroughEnv": ["TAXKIT_*"]
-    },
-    "//#check:docs-deployment:types:task": {
-      "outputs": []
-    },
-    "//#check:docs-deployment-tools:types:task": {
-      "outputs": []
-    },
-    "//#check:oxlint:types:task": {
-      "outputs": []
-    },
-    "//#check:docs:types:task": {
-      "outputs": [],
-      "dependsOn": ["@taxkit/docs-content#build"]
-    },
-    "//#check:effect-language-service:task": {
-      "outputs": []
-    },
-    "//#check:harness-governance:task": {
-      "outputs": []
-    },
-    "//#check:repository-paths:task": {
-      "outputs": []
-    },
-    "//#check:repository-paths:types:task": {
-      "outputs": []
-    },
-    "//#check:quality-workflow:task": {
-      "outputs": []
-    },
-    "//#check:quality-workflow:types:task": {
-      "outputs": []
-    },
-    "//#format:check:task": {
-      "outputs": []
-    },
-    "//#lint:task": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".agents/skills/strict-effect-ts/assets/oxlint/effect-policy.ts"
-      ],
-      "outputs": []
-    },
-    "//#test:documentation:task": {
-      "outputs": []
-    },
-    "//#test:docs-deployment:task": {
-      "outputs": []
-    },
-    "//#test:oxlint:task": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".agents/skills/strict-effect-ts/assets/oxlint/effect-policy.ts"
-      ],
-      "outputs": []
-    },
-    "//#test:repository-paths:task": {
-      "outputs": []
-    },
-    "//#test:quality-workflow:task": {
-      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
-      "outputs": []
-    },
-    "//#changeset:status:task": {
       "outputs": []
     },
     "dev": {
