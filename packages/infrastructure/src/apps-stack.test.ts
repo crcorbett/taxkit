@@ -523,6 +523,7 @@ describe("native paired app graph and planner", () => {
       expect(bots.Props).toMatchObject(productionBotPolicy);
       // Production serves only its custom domain: no workers.dev or previews.
       expect(website.Props.workersDev).toBe(false);
+      expect(api.Props.workersDev).toBe(false);
       expect(Object.hasOwn(settings.Props, "soa")).toBe(false);
       expect(Object.hasOwn(settings.Props, "internalDns")).toBe(false);
     }).pipe(

@@ -85,10 +85,13 @@ const compatibility = {
 const NativeApiHostLive = TaxKitApiWorker.make(
   Effect.gen(function* () {
     return {
+      // Production serves only api.taxkit.dev, as in Common Practice; other
+      // stages keep the native workers.dev default.
       ...Option.match(yield* NativeProductionZone, {
-        onNone: () => ({}),
+        onNone: () => ({ workersDev: true }),
         onSome: (zone) => ({
           domain: { name: "api.taxkit.dev", zoneId: zone.zoneId },
+          workersDev: false,
         }),
       }),
       compatibility,
@@ -101,7 +104,6 @@ const NativeApiHostLive = TaxKitApiWorker.make(
       // through that export rather than a relative filesystem import.
       main: import.meta.resolve("api/worker"),
       observability: ApiWorkerObservability,
-      workersDev: true,
     };
   }),
   ApiWorkerNativeInit

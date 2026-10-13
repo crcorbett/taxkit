@@ -20,11 +20,11 @@ providers, `Cloudflare.state()` and the native secrets in
 
 | Resource | Owner | Notes |
 | --- | --- | --- |
-| `TaxKitApi` | native Effect Worker from `api/worker` | Its own address from `Worker.URL`; `api.taxkit.dev` in Production. |
+| `TaxKitApi` | native Effect Worker from `api/worker` | Its own address from `Worker.URL`. Production serves only `api.taxkit.dev`, with no `workers.dev` address; other stages keep the native `workers.dev` default. |
 | `TaxKitWebsite` | `Cloudflare.Website.Vite` for `apps/web` | Its own address from `Worker.URL`; the API's address Output and the private `TAXKIT_API` binding. Production serves only `taxkit.dev`, with a native `www.taxkit.dev` redirect and no `workers.dev` address; other stages use their stable `workers.dev` address. No stage has version preview addresses. |
 | `TaxKitProductionZone` | adopted and retained in `prod` only | Never created, replaced or deleted by the stack. |
 | `TaxKitProductionDnsSettings` | retained in `prod` only | Matches the 7 October readback; registrar and records are not managed. |
-| `TaxKitProduction*` zone settings | retained native `Cloudflare.Zone.Setting` in `prod` only | TLS 1.3 on with a TLS 1.2 minimum, Always Use HTTPS on, Browser Integrity Check off (it answers script user agents with error 1010) and the lowest security level, as in Common Practice. Removing a setting restores its earlier value. |
+| `TaxKitProduction*` zone settings | retained native `Cloudflare.Zone.Setting` in `prod` only | TLS 1.3 on with a TLS 1.2 minimum, Always Use HTTPS on, Browser Integrity Check off (it answers script user agents with error 1010) and the lowest security level, as in Common Practice. Retained: removing a setting from the stack leaves its live value in place. |
 | `TaxKitProductionDnssec` | retained native `Cloudflare.DNS.Dnssec` in `prod` only | Signing active; Cloudflare Registrar publishes the DS record. |
 | `TaxKitProductionBotManagement` | retained native `Cloudflare.BotManagement` in `prod` only | Bans no user agent: no Bot Fight Mode, AI-bot, crawler or content-bot blocking, and no Cloudflare-managed robots.txt. |
 

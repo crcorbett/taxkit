@@ -50,8 +50,8 @@ and `10078<pr-number>` for each Preview, so stages never share counters.
 In `prod` the graph adopts and retains the `taxkit.dev` zone, its DNS settings
 five zone settings (TLS, HTTPS, Browser Integrity Check and security level),
 DNSSEC and a bot policy that bans no user agent, as in Common Practice, attaches `taxkit.dev` (with a native `www.taxkit.dev`
-redirect) to the Website and `api.taxkit.dev` to the API. The Production
-Website has no `workers.dev` address; Local and Preview graphs declare no
+redirect) to the Website and `api.taxkit.dev` to the API. Neither
+Production Worker has a `workers.dev` address; Local and Preview graphs declare no
 domains and keep their stable `workers.dev` address without version previews.
 The native redirect provider treats a failed shared-ruleset read as absence;
 the focused provider test records that limit.
