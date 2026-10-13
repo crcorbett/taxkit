@@ -1051,3 +1051,32 @@ Suggested check on a docs URL: warm the HTML, send an unusual Accept that yields
 ---
 
 Are we properly using the native Alchemy www DNS stuff like in Common Practice?
+
+---
+
+<!-- reply 2 -->
+> Fewer zone settings managed in code. Common Practice also manages zone settings (TLS, HTTPS), DNSSEC and the bot policy as retained resources. TaxKit only keeps its existing DNS settings. That isn’t about www, but it is the rest of Common Practice’s native DNS setup.
+
+We should adopt all of this too
+
+<!-- reply -->
+> workers.dev stays on in every stage. apps-stack.ts sets workersDev: true on both Workers, so it stays on in Production. Both Production Workers still answer on their workers.dev addresses (I just got 200 from each), and every deploy also gets a version preview address. Common Practice turns the Website’s workers.dev off in Production and leaves preview addresses off in the other stages. Nothing in TaxKit relies on the Production workers.dev addresses; the Website reaches the API through a private service binding.
+
+Yes please fix this to match Common Practice.
+
+
+For both of these tweaks, please review Commonplace plugins and ensure its skills/docs are clear on the correct approach (taken from Common Practice)
+
+---
+
+<task-notification>
+<task-id>b9s0h4szn</task-id>
+<tool-use-id>toolu_018LZArEAmvAsJm9v55Pa1Cf</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/b9s0h4szn.output</output-file>
+<status>completed</status>
+<summary>Background command "Run full verification" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+If the token needs updating to include the permission use the cf cli to do it
