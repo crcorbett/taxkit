@@ -352,17 +352,22 @@ does not make a public package or change the existing HTTP/OpenAPI contract.
 
 `@taxkit/api-http/request-boundary` owns the native streamed POST limit
 (`@taxkit/api-rpc/request-boundary` re-exports it). `@taxkit/api-rpc/host-telemetry`
-owns the same fixed logging/reporting policy used by the Website. Existing API
-proof remains applicable through its focused regression tests; this reuse does
-not qualify native trace export or every framework logging path.
+owns the same fixed logging/reporting policy used by the Website, and the one
+`taxkit.request` record each host writes per request. The API maps its paths to
+a closed route family (`health`, `calculate`, `catalogue`, `docs`,
+`discovery`, `reference`, `rpc`, `mcp` or `other`); calls through the private
+binding are recorded too. The record never reads the URL, headers or either
+body. This reuse does not qualify native trace export or every framework
+logging path.
 
-The private `api/worker` export also owns `ApiWorkerObservability`. Both its
-default Worker and the native apps graph explicitly disable platform invocation
-logs, stored logs and traces, with zero sampling. Those automatic records can
-contain caller URLs even when the application reporter emits only fixed fields.
-Local graph/state checks establish the declared settings; they do not establish
-uploaded Cloudflare settings or safe exported rows. T009 owns that remaining
-requirement. The fixed application reporter remains in use.
+The private `api/worker` export also owns `ApiWorkerObservability`, which
+disables platform invocation logs, stored logs and traces with zero sampling.
+Its default Worker and every non-Production stage of the native apps graph use
+it. Production exports console logs only, through the retained
+`taxkit-axiom-logs` destination; the
+[deployment owner](../../docs/architecture/deployment.md#observability) explains
+why invocation logs and traces stay off. Local graph/state checks establish the
+declared settings, not uploaded Cloudflare settings or safe stored rows.
 
 The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second

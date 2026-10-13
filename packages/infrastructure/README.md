@@ -10,10 +10,12 @@ review_trigger: Alchemy resource, stage, provider, state, or package-export chan
 # TaxKit infrastructure
 
 This private source-only package owns the native Website/API graph, stage
-rules, native secret selection and the retained PostHog project. Root
-`alchemy.run.ts` deploys the pair; `alchemy.local.run.ts` runs it locally;
-`alchemy.posthog.run.ts` owns the PostHog project. The package has no
-application runtime.
+rules, native secret selection, the retained PostHog project and the
+production-only telemetry stacks. Root `alchemy.run.ts` deploys the pair;
+`alchemy.local.run.ts` runs it locally; `alchemy.posthog.run.ts` owns the
+PostHog project; `alchemy.axiom.run.ts` and `alchemy.trace.run.ts` own the
+Axiom and Cloudflare telemetry resources. The package has no application
+runtime.
 
 | Export | Owns |
 | --- | --- |
@@ -21,6 +23,9 @@ application runtime.
 | `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. |
 | `./stage` | Stage Schemas: `prod`, `pr-<number>` and `dev_<name>`. |
 | `./posthog` | The retained PostHog project stack. |
+| `./telemetry` | The `TaxKitObservability` and `TaxKitTraceExport` stack classes, their shared providers, state and secrets, the `prod`-only guard, Site's shared dataset names and the Production trace-export reference the apps graph reads. |
+| `./axiom` | `declareTaxKitObservability`: the retained ingest token and four dashboards. |
+| `./trace-export` | `declareTaxKitTraceExport`: the retained log and trace destinations. |
 
 Run `bun run --filter=@taxkit/infrastructure test` and `bun run check-types`
 for local declaration checks. They use memory state and refuse provider writes;
@@ -38,9 +43,11 @@ fixed publication address `https://taxkit.dev`. Nothing in the API depends on
 the Website, so unpatched Alchemy plans the graph without a binding cycle.
 
 Both Workers declare version-scoped native caching, and the Website's build memo
-includes the shared packages so content changes rebuild it. Platform invocation
-logs, stored logs and traces are disabled on both because platform records can
-include caller URLs.
+includes the shared packages so content changes rebuild it. In `prod` both
+Workers export console logs only, at sampling rate 1, to the
+`taxkit-axiom-logs` destination read from `TaxKitTraceExport/prod`; invocation
+logs, Cloudflare persistence and traces stay off. Every other stage disables
+all platform channels with `ApiWorkerObservability`.
 
 `NativeAppsHostMode` defaults to `edge`. The API's admission Layer registers one
 60-per-60-second RateLimit binding and reads `CALCULATOR_RATE_NAMESPACE` through
@@ -75,6 +82,41 @@ and native alarm expiry. Only alarm bookkeeping uses storage. The
 [API owner](../../apps/api/README.md#native-remote-calculator-tools)
 explains limits, private original-key forwarding, separate instance pools and
 the documented modern five-second cancellation limit.
+
+## Production telemetry stacks
+
+Common Practice's split applies. Site's `CooperCorbettSiteCloudflare/prod`
+stack owns the three shared Axiom datasets; TaxKit reads them by name for token
+capabilities and dashboard queries, and through `Axiom.Dataset.ref` for the
+destination endpoints. Two stacks with their own native Cloudflare state own
+TaxKit's part, and both refuse every stage but `prod` before declaring a
+resource:
+
+- `TaxKitObservability` declares the retained `TaxKitTelemetryIngest` token
+  (`taxkit-telemetry-ingest`, `ingest:create` only on `site-prod-logs`,
+  `site-prod-traces` and `site-prod-metrics`) and four retained dashboards.
+  Dashboard queries read only TaxKit's records in `site-prod-logs`, filtered
+  by the `taxkit-api` and `taxkit-web` services, with the names
+  `@taxkit/api-rpc/host-telemetry` emits. Its output is the dashboard count.
+- `TaxKitTraceExport` declares the retained `taxkit-axiom-logs` and
+  `taxkit-axiom-traces` destinations. Each reads the token through
+  `Axiom.ApiToken.ref` and sends it as a bearer header with `X-Axiom-Dataset`.
+  Its outputs are the two names only; headers and destination configuration
+  never become outputs.
+
+Both use `Cloudflare.providers()`, `Axiom.providers()`, `Cloudflare.state()`
+and `deploymentSecrets`, so the Axiom provider reads the TaxKit management key
+`AXIOM_TOKEN` from `taxkit/prd`. It is an organisation API token, so no
+organisation ID is set. Native state holds the ingest token value; treat it as
+secret.
+
+`telemetry.test.ts` compiles both stacks with memory state and write-refusing
+providers. It checks the `prod`-only refusal, the planned and retained
+resources, the token's exact capabilities, the dashboards' dataset and service
+filters and absent URL/header/calculation fields, the destinations' datasets,
+endpoints and bearer header from a synthetic token, and the name-only outputs.
+`apps-stack.test.ts` checks the Production Workers' logs-only settings and that
+a Production plan fails before the trace-export stack exists.
 
 ## Retained PostHog project
 

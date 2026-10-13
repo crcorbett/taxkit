@@ -62,9 +62,50 @@ package store (about 1.2 million files) and the deploy runs out of memory.
 
 ## Observability
 
-Both Workers disable Cloudflare invocation logs, stored logs and traces, because
-platform records can include caller URLs. Application diagnostics use fixed
-safe fields only; see [ADR 0004](../adr/0004-limit-operational-observations.md).
+Production telemetry follows Common Practice's split. Site's production stack
+(`CooperCorbettSiteCloudflare/prod`) owns the three shared Axiom datasets in the
+Axiom Personal organisation: `site-prod-logs`, `site-prod-traces` and
+`site-prod-metrics`. TaxKit references them and never declares, adopts or
+changes them. Two production-only stacks, each with its own native Cloudflare
+state, own TaxKit's part:
+
+| Stack and entry point | Resource | Owner and policy |
+| --- | --- | --- |
+| `TaxKitObservability/prod` (`alchemy.axiom.run.ts`) | `TaxKitTelemetryIngest` | Retained `Axiom.ApiToken` named `taxkit-telemetry-ingest`, with `ingest:create` only on the three shared datasets. Axiom has no token update API: a changed prop replaces it and leaves the old token live for deliberate revocation. |
+| `TaxKitObservability/prod` | `TaxKitRequestOverview`, `TaxKitRequestFailures`, `TaxKitRequestLatency`, `TaxKitTelemetryHealth` | Retained `Axiom.Dashboard`s (`taxkit-request-overview`, `taxkit-request-failures`, `taxkit-request-latency`, `taxkit-telemetry-health`). Every query reads `site-prod-logs` and filters to the `taxkit-api` and `taxkit-web` services. |
+| `TaxKitTraceExport/prod` (`alchemy.trace.run.ts`) | `TaxKitAxiomLogs` | Retained `Cloudflare.Workers.ObservabilityDestination` named `taxkit-axiom-logs`: OTLP logs to Site's logs dataset, with the ingest token as its bearer header and `X-Axiom-Dataset`. Its outputs are the two destination names only. |
+| `TaxKitTraceExport/prod` | `TaxKitAxiomTraces` | Retained destination named `taxkit-axiom-traces` for Site's traces dataset. No Worker attaches it (see below). |
+
+Both stacks use `@taxkit/infrastructure/telemetry` for providers, state and
+the ordinary native secrets, and refuse every stage but `prod`. The Axiom
+provider reads the TaxKit management key `AXIOM_TOKEN` from `taxkit/prd`.
+
+The Production API and Website read `TaxKitTraceExport/prod`'s persisted
+outputs, so a Production plan fails until that stack exists. Each Production
+Worker enables Workers logs at sampling rate 1, exports them to
+`taxkit-axiom-logs`, and keeps invocation logs, Cloudflare log persistence and
+automatic traces off. Every other stage keeps every platform channel off with
+zero sampling (`ApiWorkerObservability`), so Preview and local runs export
+nothing.
+
+What leaves a Worker is therefore only its own console output: one fixed
+`taxkit.request` record per request (service, closed route family, method,
+outcome, status and status class, and response-ready time from the Workers
+clock) and fixed `*.runtime.event` lines carrying service, level and time. The
+Worker name and version arrive in Cloudflare's log envelope. Tax facts,
+salaries, calculation inputs and results, report contents, URLs and query
+strings, headers, cookies, IP addresses, rate keys, bodies and raw error
+messages or causes are never fields. See
+[ADR 0004](../adr/0004-limit-operational-observations.md).
+
+Cloudflare's automatic traces record the full request URL with its query
+string (`url.full`) and the user agent, and invocation logs can carry request
+headers and caller details, all outside those fixed fields. TaxKit keeps them off, as Common Practice does for its
+privacy-sensitive tracking Worker; its public Website and API enable them. No
+supported setting removes those fields, so the trace destination exists ready
+but unattached. Uncaught exceptions and framework console output still bypass
+the fixed logger; check stored rows after each Production release (see the
+runbook). Custom metrics are not sent.
 
 ## Retained analytics project
 

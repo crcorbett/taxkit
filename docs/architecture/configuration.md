@@ -124,11 +124,14 @@ describes the project. Application analytics are off.
 
 ## Platform logging and tracing
 
-`apps/api/src/worker.ts` owns the API's disabled platform collection policy;
-`packages/infrastructure/src/apps-stack.ts` supplies it to the API and declares
-the Website's matching policy. Both disable invocation logs, stored logs and
-traces with zero sampling, because platform records can contain caller URLs
-outside the fixed application logging policy.
+`apps/api/src/worker.ts` owns the disabled platform collection policy
+(`ApiWorkerObservability`); `packages/infrastructure/src/apps-stack.ts` gives
+it to both Workers in every stage but `prod`. Production Workers export only
+their console logs to the `taxkit-axiom-logs` destination and keep invocation
+logs, Cloudflare persistence and traces off, because those platform records
+contain caller URLs, headers and caller details outside the fixed application
+fields. The [deployment owner](deployment.md#observability) lists the
+resources and exported fields.
 
 ## Guardrails
 
