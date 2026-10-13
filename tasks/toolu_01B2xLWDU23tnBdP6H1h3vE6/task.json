@@ -1,0 +1,7 @@
+{
+  "tool_use_id": "toolu_01B2xLWDU23tnBdP6H1h3vE6",
+  "agent_id": "a80e187e2abf2a058",
+  "subagent_type": "general-purpose",
+  "task_description": "Clean up stale ceremony docs",
+  "started_at": "2026-10-13T16:20:09.344746+11:00"
+}

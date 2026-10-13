@@ -1,0 +1,37 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4SVPTC0EZ6BTX3H9CTHNFP1",
+  "strategy": "manual-commit",
+  "branch": "claude/taxkit-docs-ceremony-cleanup",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/exec-plans/active/README.md",
+    "docs/exec-plans/active/clean-slate-foundation.md",
+    "docs/product-specs/clean-slate-foundation.md",
+    "docs/product-specs/common-practice-foundation-review.md",
+    "docs/product-specs/index.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 4,
+    "cache_creation_tokens": 2368,
+    "cache_read_tokens": 1463716,
+    "output_tokens": 829,
+    "api_call_count": 2,
+    "subagent_tokens": {
+      "input_tokens": 74,
+      "cache_creation_tokens": 76728,
+      "cache_read_tokens": 5394134,
+      "output_tokens": 23075,
+      "api_call_count": 36
+    }
+  }
+}
