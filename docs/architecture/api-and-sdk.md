@@ -658,9 +658,8 @@ Options. Current rule errors omit diagnostics; historical opaque/null values
 remain codec values and are not safe telemetry. Catalogue entries use their
 checked selected continuation without the unused generic `program` field.
 The fresh package declarations change deliberately; retained HTTP/RPC, report,
-metadata and table/source values stay fixed. The active plan and domain-contract
-receipt own qualification; native rate admission below still needs whole-slice
-qualification before T004 can close.
+metadata and table/source values stay fixed. The HTTP OpenAPI snapshot and the
+HTTP/RPC package tests check that they do.
 
 
 ## Native calculation rate admission
@@ -674,7 +673,7 @@ The same API POST endpoint mounts five documentation procedures through
 Documentation has its own client and revision `2`; calculator revision `4` is
 unchanged. The server requires the calculator, content lookup and discovery
 services, supplied once at API composition. The content handlers reuse the
-generated accepted catalogue; they run no calculation and take no calculator
+generated public catalogue; they run no calculation and take no calculator
 allowance. Both client groups share the 2 MiB reader, ten-second deadline,
 credential/redirect/tracing policy and checked version skew. Their fixed
 page/search/discovery errors and path bounds belong to `@taxkit/content`.
@@ -685,7 +684,7 @@ The Website reads documentation through the public HTTP content routes
 (`/api/v1/docs/navigation`, `page`, `search` and `markdown`) and serves
 `.md`/`Accept` Markdown from `getMarkdown`; see
 [frontend architecture](frontend.md#documentation). The API's discovery routes
-build each document from the accepted catalogue and the checked API and
+build each document from the public catalogue and the checked API and
 publication origins through the static `ContentDiscoveryLive`.
 
 ## Native remote MCP
@@ -732,7 +731,7 @@ modern cancellation. The accepted [agent guide](../../packages/docs-content/cont
 owns connection steps, the discovered tool names, input-first use, older expiry
 and experimental browser support. The Website's `/agents` route derives its
 remote MCP address from checked same-stage API settings and links that guide;
-processed Markdown and documentation discovery reuse the accepted catalogue.
+processed Markdown and documentation discovery reuse the public catalogue.
 
 The memory-only native source builder consumes computed SDK exports from the
 actual app declaration, refusing provider/credential/network access. Tests must

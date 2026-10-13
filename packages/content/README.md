@@ -9,18 +9,15 @@ review_trigger: content contracts, search policy or package exports change
 
 # @taxkit/content
 
-Private compiled package for TaxKit docs contracts and accepted public page
+Private compiled package for TaxKit docs contracts and published public page
 lookup, navigation, search and discovery documents. `DocsPublicCatalogue` rejects draft pages,
 duplicate addresses and navigation that does not match the pages. Application
 composition supplies a checked catalogue through `ContentCatalogue`;
 `ContentServiceLive` has no default catalogue or filesystem access.
 
-The authored MDX, source review and Fumadocs compiler remain in
-[`docs-content`](../docs-content/README.md). This package cannot itself accept
-an authored page for publication. The local catalogue builder requires reviewed
-source records; the
-[dated source review](../../docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json)
-owns those individual decisions. The checked
+The authored MDX, its frontmatter status and the Fumadocs compiler remain in
+[`docs-content`](../docs-content/README.md), whose catalogue build decides which
+pages are published. This package cannot itself publish an authored page. The checked
 [HTTP package](../api/http/README.md) now delegates public content routes to
 this service. The [native RPC package](../api/rpc/README.md#documentation-connection)
 delegates page, navigation, Markdown, search and discovery operations to the
@@ -28,12 +25,6 @@ content owners for machine callers. The Website reads pages, navigation,
 search and Markdown through the API's HTTP routes.
 Existing docs-content imports re-export
 the canonical page, navigation and lookup error contracts for compatibility.
-
-Acceptance records have one canonical Schema here. Version one retains its
-existing fields for older lifecycle evidence. Version two adds the exact
-reviewed source SHA-256 hash. The repository catalogue builder requires the
-second version and checks file bytes; this package's Schema does not read files
-or accept authored pages by itself.
 
 Search matches page titles, descriptions and processed Markdown without case
 sensitivity. Results follow catalogue order, contain at most twenty pages, and
@@ -44,7 +35,7 @@ projection failure stays in the safe `DocsSourceError` channel.
 ## Discovery documents
 
 `ContentDiscovery.getDocument` admits only `/sitemap.xml`, `/robots.txt`,
-`/llms.txt` and `/llms-full.txt`. All four use the same accepted catalogue.
+`/llms.txt` and `/llms-full.txt`. All four use the same public catalogue.
 `ContentDiscoveryLive` is a static Layer that requires
 `ContentDiscoverySettings`, a lazy Effect of `DocsDiscoverySettings`. Its
 application owner supplies it with `Layer.succeed(ContentDiscoverySettings)`,
@@ -55,7 +46,7 @@ This keeps deferred native stage addresses out of source-time guesses.
 (`DocsPublicationOrigin`, `https://taxkit.dev` in every stage). `PublicHttpOrigin`
 owns the shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin`
 and the RPC package's API origin have separate identities. The sitemap contains
-canonical accepted page addresses on the publication origin, escaped as XML,
+canonical published page addresses on the publication origin, escaped as XML,
 without invented modification dates. Robots is `User-agent: *`, `Allow: /` and
 the sitemap address. The short agent index links to the existing checked API
 Markdown endpoint. The full index preserves processed page bodies and their
@@ -67,12 +58,12 @@ The document Schema relates path to media type and limits body length to
 JSON escaping. Projection failure remains `DocsSourceError`; the API's HTTP
 discovery route returns an empty 503 and RPC exposes only the fixed
 `DocsDiscoveryUnavailable`. No document cache or secondary content
-index is added. The [discovery receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json)
-records local qualification separately from public availability.
+index is added. Local tests do not show public availability; check the
+deployed API for that.
 
 ## Exports
 
-- `./schemas`: canonical page, navigation, accepted catalogue, search, secure
+- `./schemas`: canonical page, navigation, public catalogue, search, secure
   origin, discovery settings and discovery document Schemas.
 - `./errors`: internal checked source/lookup failures and shared fixed public
   page/search/discovery failures.
@@ -98,8 +89,8 @@ still does not authorise registry publication.
 Change required for this README, docs-content compatibility routes,
 [repository package ownership](../../docs/architecture/package-ownership.md),
 [content architecture](../../docs/architecture/content-and-posts.md) and focused
-proof. Preserve exact reviewed lifecycle decisions, tax results,
-metrics deferral and historical receipts. Application routing, generated MDX
+proof. Preserve page publication status, tax results and the metrics
+deferral. Application routing, generated MDX
 presentation and external publication are separate owners.
 
 ## Runbook applicability
@@ -109,7 +100,7 @@ without external systems, runtime execution or consequential operations.
 
 ## Non-claims
 
-Service tests and compiled output do not prove source acceptance, an installed
+Service tests and compiled output do not prove page correctness, an installed
 HTTP consumer, app routes, deployment, public availability or publication.
 
 `DocsPublicPagePath` refines the existing page identity to a canonical lowercase

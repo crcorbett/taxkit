@@ -12,7 +12,7 @@ review_trigger: Medicare source, annual rule edition or consumer qualification c
 Cooper approved this correction on 8 October in the adad delivery conversation.
 This supersedes the retained-result requirement only for affected annual Medicare
 results. The first adad release remains 2025–26. The separate rebuild continues
-under its [owning plan](../exec-plans/active/clean-slate-foundation.md).
+under its [owning plan](../exec-plans/completed/clean-slate-foundation.md).
 
 ## Outcome and scope
 

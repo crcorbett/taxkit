@@ -42,7 +42,6 @@ Current implemented code lives in:
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
-- `packages/scripts`
 - `packages/testing`
 - `packages/tsconfig`
 
@@ -76,21 +75,11 @@ golden tests. Current implemented packages are `pay`, `income-tax` and `stsl`.
 : Shared test helpers for workspace packages. It must not become a back door
 for production-only runtime helpers.
 
-`packages/scripts`
-: Implemented private repository-automation package. It owns schema-backed,
-  Effect-native orchestration that crosses package owners, including the
-  release-readiness command, its command-runner service, live process layer,
-  deterministic test layer and runtime entrypoint. It invokes canonical root
-  and package commands without moving or duplicating their validator logic.
-  Constructor functions use `create*`; deprecated `make*` aliases remain only
-  for package compatibility.
-
 `tools/repository-paths`
 : Root-owned repository portability gate. It owns the closed machine-local path
   policy, schema-backed safe findings, typed local process and file failures,
   focused tests and Bun runtime entrypoint. It is not a reusable file-scanner
-  package. `@taxkit/scripts` may invoke its root command but must not mirror the
-  policy.
+  package.
 
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
@@ -249,8 +238,8 @@ belongs in apps or explicitly server-only package exports.
   including TaxKit's nested rule and transport packages.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
-- Keep cross-package command orchestration in `packages/scripts`, but keep each
-  validator and its domain policy with the package or app it validates.
+- Keep each validator and its domain policy with the package or app it
+  validates; root `package.json` commands chain them.
 - Keep repository path classification and safe reporting in
   `tools/repository-paths`; do not move it into package orchestration or browser
   code.

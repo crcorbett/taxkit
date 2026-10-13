@@ -20,8 +20,7 @@ reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, a private
 TypeScript SDK package, private `@taxkit/docs-content` and
 `@taxkit/docs-fumadocs` packages, shared testing helpers and shared TypeScript
-config, plus private Effect-native repository release orchestration in
-`@taxkit/scripts`. The SDK is implemented for local and downstream
+config. The SDK is implemented for local and downstream
 validation, but it is not published yet.
 
 ## What exists today

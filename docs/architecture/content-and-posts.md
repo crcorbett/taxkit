@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
 last_reviewed: 2026-10-13
-review_trigger: content ownership, acceptance or generated presentation changes
+review_trigger: content ownership, publication status or generated presentation changes
 ---
 
 # Content and posts
@@ -36,9 +36,8 @@ on the open-source tax engine and avoid downstream private-product specifics.
 : Private compiled owner of canonical docs page, frontmatter, navigation and
   source error contracts. Its public catalogue Schema admits published pages
   with matching navigation; its service reads that checked catalogue and limits
-  search to twenty short results. It also owns both acceptance-record versions;
-  the second binds the reviewed source bytes. Adding this package does not
-  accept an authored draft.
+  search to twenty short results. It does not read authored sources or decide
+  which pages are published.
 
 `packages/docs-content`
 : Private source-only package for authored navigation, meta, MDX, validation
@@ -63,35 +62,28 @@ on the open-source tax engine and avoid downstream private-product specifics.
   Standard Schema bridging, the generic source service and live/test Layers,
   and generic MDX render primitives.
 
-`tools/documentation/owner-policy.json`
-: Machine-readable separation between public content, maintainer documents,
-generated artifacts, and authored SDK documentation. It validates accepted
-public-status representation and navigation ownership without claiming runtime
-or external availability.
-
-`tools/documentation/catalogue.runtime.ts`
-: Local accepted-catalogue build command (`bun run --filter=@taxkit/docs-content build`). It checks
-version-two records and exact source hashes before and after MDX processing,
-omits drafts, checks navigation through the canonical catalogue constructor,
-and writes ignored `.source/public-catalogue.json` only on success. No accepted
-pages is a failure. Source acceptance is recorded independently for each page
-and navigation in the owner policy's exact bindings. Reviewed byte hashes
-prevent a later edit from silently inheriting acceptance. The docs-content
-package build includes this step, with source-review records and the compiler's
-browser path in its cache inputs. Its JSON-only `./public-catalogue` export is
+`packages/docs-content/src/catalogue.runtime.ts`
+: Local public-catalogue build step, run by
+`bun run --filter=@taxkit/docs-content build`. Page frontmatter and
+`navigation.json` decide publication: `catalogue.policy.ts` keeps pages whose
+`status` is `published`, requires published navigation, rejects a published
+child under a draft section page, and builds the one catalogue through the
+canonical constructor. No published pages is a failure. It writes ignored
+`.source/public-catalogue.json` only on success. The compiler's browser path is
+a build environment input. Its JSON-only `./public-catalogue` export is
 checked once by each API host; it imports no compiler into request handling.
 HTTP and native RPC documentation groups delegate page/navigation/search and
 processed Markdown to the same `ContentService`. Its compiled public-path
 refinement and fixed missing-page/search errors serve both transports. The
 Website reads pages, navigation, search and Markdown from the API's public HTTP
 content routes with the generated client and renders browser-safe compiled
-presentation. Its `/search` GET form shows accepted titles and descriptions
+presentation. Its `/search` GET form shows published titles and descriptions
 with the existing document links. No second index is added.
-`ContentDiscovery` derives four discovery files from the same accepted
+`ContentDiscovery` derives four discovery files from the same public
 catalogue, the API origin and the publication origin `https://taxkit.dev`. The
 API serves them at `/api/v1/docs/discovery/*`; the Website forwards its
 conventional addresses there once. Robots allows everything (`Allow: /`) and
-names the sitemap. The short agent index links to accepted processed Markdown;
+names the sitemap. The short agent index links to published processed Markdown;
 the full index retains those bodies, including fenced examples. No authored
 source, personal report, guessed origin or competing content catalogue is
 exposed. The Website serves the processed body through same-address Accept
@@ -116,7 +108,7 @@ browser or Website SSR
   -> apps/web route loader
     -> generated HttpApiClient (public origin or private binding)
       -> API content routes -> ContentService
-        -> accepted JSON catalogue
+        -> public JSON catalogue
     -> browser-safe compiled MDX presentation
     -> @taxkit/docs-fumadocs/render primitives
     -> app-local MDX component map
@@ -132,9 +124,8 @@ docs implementation
     -> MDX component allowlist
     -> examples and OpenAPI reference checks
   -> bun run check:docs
-  -> public/maintainer path separation and accepted status representation
-    -> generated Fumadocs and OpenAPI owner edges
-    -> maintainer metadata, links, commands and package README coverage
+    -> maintainer metadata in docs/
+    -> relative links and documented commands in current documents
   -> @taxkit/docs-fumadocs tests
   -> apps/web native build and real browser/Worker checks when rendering changes
   -> bun run verification
@@ -154,11 +145,11 @@ docs implementation
   frontmatter, navigation coverage, source-text policy, local link, MDX
   component allowlist, examples and OpenAPI reference checks.
 - `draft` means authored, locally renderable, visibly labelled candidate public
-  documentation; it is not accepted-current truth, publication, deployment,
-  external availability, correctness, or user visibility. `published` means
-  explicitly accepted current public documentation; it still does not establish
-  runtime or external availability. Preserve draft pages unless explicit
-  page-level acceptance records their transition.
+  documentation; it is not publication, deployment, external availability,
+  correctness, or user visibility. `published` puts the page in the public
+  catalogue; it still does not establish runtime or external availability.
+  Change a page from `draft` to `published` in its frontmatter in an ordinary
+  pull request.
 - Keep reusable Fumadocs code in `@taxkit/docs-fumadocs`; keep TaxKit
   content contracts in `@taxkit/docs-content`; keep route composition and
   app-specific rendering in `apps/web`.
@@ -177,14 +168,13 @@ Promise reads, preserving the SDK receiver. The reusable Fumadocs live Layer
 decodes raw representations through its owning Schemas. Shiki metadata
 transformation returns replacement nodes instead of mutating SDK-owned input.
 
-### Accepted page share assets
+### Published page share assets
 
-The Website Vite build derives PNG share assets from the existing accepted
+The Website Vite build derives PNG share assets from the existing public
 catalogue through `apps/web/scripts/docs-images.build.ts`. The same page address
 mapping supplies HTML metadata; there is no separate page list or dynamic image
 API. The exact current Takumi 2.14.0 WebAssembly renderer and embedded font are
 build-only dependencies. Generator, dimensions/byte Schema, metadata egress and
 Website config are tracked inputs; generated `apps/web/public/og/**` is ignored
-and declared as a Turbo build output. Upstream catalogue construction continues
-to bind reviewed source bytes and navigation. Static generation accepts no
-calculation values and creates no new content acceptance record.
+and declared as a Turbo build output. Static generation reads only the built
+catalogue and accepts no calculation values.

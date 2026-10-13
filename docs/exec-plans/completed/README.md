@@ -14,6 +14,12 @@ tombstone: false
 Completed implementation plans can be preserved here when their validation
 evidence remains useful.
 
+Superseded plans are kept here too. The
+[Clean slate foundation](./clean-slate-foundation.md) plan and its
+[local continuation prompt](./clean-slate-local-handoff.md) were superseded by
+the [Common Practice foundation](../active/common-practice-foundation-review.md)
+on 13 October 2026.
+
 Completed plans:
 
 - [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md)

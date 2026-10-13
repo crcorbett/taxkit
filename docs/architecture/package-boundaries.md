@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-package-boundaries-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-13
 review_trigger: package responsibility, dependency direction or public export change
 ---
 
@@ -33,7 +33,6 @@ Implemented packages and apps:
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
-- `packages/scripts`
 - `packages/infrastructure` (private, source-only deployment graph)
 - `packages/testing`
 - `packages/tsconfig`
@@ -176,11 +175,6 @@ boundary for:
 
 It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
 config, app runtime lifecycle, SDK client transport or CLI command parsing.
-
-Implemented `@taxkit/scripts` owns cross-package repository command
-orchestration. Its release-readiness program invokes canonical root and
-package-owned commands through an Effect child-process service. It must not
-copy validator logic out of the SDK, API, docs app or other owning packages.
 
 Implemented `@taxkit/api-http` owns:
 
