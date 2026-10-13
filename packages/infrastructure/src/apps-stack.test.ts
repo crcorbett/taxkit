@@ -24,6 +24,7 @@ import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { inMemoryState, State } from "alchemy/State";
 import { StackConfigOverrides } from "alchemy/Util/ConfigProvider";
+import { ApiWorkerObservability } from "api/worker";
 import {
   Array,
   Cause,
@@ -51,7 +52,8 @@ import { checkedStage, deploymentSecrets, dopplerConfig } from "./secrets.js";
 
 const graphFixture = Effect.fnUntraced(function* (
   mode: "create" | "noop" | "update" | "without-precreate" | "adopted",
-  stage = "dev_native_graph_proof"
+  stage = "dev_native_graph_proof",
+  traceExport = stage === "prod"
 ) {
   const providerWrites = yield* Ref.make(0);
   const forbiddenWrite = Ref.update(providerWrites, (count) => count + 1).pipe(
@@ -177,6 +179,19 @@ const graphFixture = Effect.fnUntraced(function* (
     providers,
     state: stateLayer,
   })(declareNativeAppsStack).pipe(Effect.provideService(Stage, stage));
+  if (traceExport) {
+    // The persisted outputs of the separately deployed trace-export stack.
+    const state = yield* State.pipe(Effect.provideContext(compiled.services));
+    const store = yield* state;
+    yield* store.setOutput({
+      stack: "TaxKitTraceExport",
+      stage: "prod",
+      value: {
+        logsDestinationName: "taxkit-axiom-logs",
+        tracesDestinationName: "taxkit-axiom-traces",
+      },
+    });
+  }
   if (mode === "noop" || mode === "update") {
     const state = yield* State.pipe(Effect.provideContext(compiled.services));
     const store = yield* state;
@@ -396,6 +411,11 @@ describe("native paired app graph and planner", () => {
             Option.map((website) => website.Props.workersDev)
           )
         ).toEqual(Option.some({ enabled: true, previewsEnabled: false }));
+        // Only Production exports; other stages need no trace-export stack
+        // and keep every platform channel off.
+        expect(
+          Array.map(members, (resource) => resource.Props.observability)
+        ).toEqual([ApiWorkerObservability, ApiWorkerObservability]);
       }).pipe(
         Effect.provideService(AlchemyContext, localContext),
         graphEnvironment,
@@ -507,6 +527,28 @@ describe("native paired app graph and planner", () => {
       });
       expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
       expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
+      // Production exports the hosts' checked console records only, through
+      // the persisted trace-export destination. Invocation logs and automatic
+      // traces (which carry URLs and caller details) stay off.
+      const observability = yield* Output.evaluate(
+        {
+          api: api.Props.observability,
+          website: website.Props.observability,
+        },
+        {}
+      ).pipe(Effect.provideContext(result.compiled.services));
+      const logsOnly = {
+        enabled: true,
+        logs: {
+          destinations: ["taxkit-axiom-logs"],
+          enabled: true,
+          headSamplingRate: 1,
+          invocationLogs: false,
+          persist: false,
+        },
+        traces: { enabled: false, persist: false },
+      };
+      expect(observability).toEqual({ api: logsOnly, website: logsOnly });
       // DNSSEC signs the zone and the bot policy bans no user agent; both are
       // retained like the zone.
       const dnssec = Record.get(
@@ -526,6 +568,22 @@ describe("native paired app graph and planner", () => {
       expect(api.Props.workersDev).toBe(false);
       expect(Object.hasOwn(settings.Props, "soa")).toBe(false);
       expect(Object.hasOwn(settings.Props, "internalDns")).toBe(false);
+    }).pipe(
+      Effect.provideService(AlchemyContext, localContext),
+      graphEnvironment,
+      Effect.scoped
+    )
+  );
+  it.live("refuses a Production plan before the trace-export stack", () =>
+    Effect.gen(function* () {
+      const result = yield* graphFixture("adopted", "prod", false);
+      expect(Exit.isFailure(result.planned)).toBe(true);
+      if (Exit.isFailure(result.planned)) {
+        expect(Cause.pretty(result.planned.cause)).toContain(
+          "Reference to stack 'TaxKitTraceExport' at stage 'prod' not found"
+        );
+      }
+      expect(result.providerWrites).toBe(0);
     }).pipe(
       Effect.provideService(AlchemyContext, localContext),
       graphEnvironment,

@@ -16,6 +16,7 @@ import {
 import { Context, Effect, Option } from "effect";
 
 import { checkedStage } from "./secrets.js";
+import { taxKitLogsDestinationProduction } from "./telemetry.js";
 
 export const NativeAppsHostMode = Context.Reference<CalculatorHostMode>(
   "@taxkit/infrastructure/NativeAppsHostMode",
@@ -75,6 +76,29 @@ export const productionBotPolicy = {
 // stage, including Preview. Each host still binds its own native address.
 export const publicationOrigin = "https://taxkit.dev";
 
+/**
+ * Production exports only the hosts' own checked console records, through the
+ * retained `taxkit-axiom-logs` destination. Cloudflare's invocation logs and
+ * automatic traces stay off: they can record the full request URL with its
+ * query string, headers and caller details outside the fixed fields.
+ * This is Common Practice's decision for its privacy-sensitive tracking
+ * Worker. Other stages keep every platform channel off.
+ */
+const productionObservability = Effect.gen(function* () {
+  const logsDestination = yield* taxKitLogsDestinationProduction;
+  return {
+    enabled: true,
+    logs: {
+      destinations: [logsDestination],
+      enabled: true,
+      headSamplingRate: 1,
+      invocationLogs: false,
+      persist: false,
+    },
+    traces: { enabled: false, persist: false },
+  };
+});
+
 const compatibility = {
   date: "2026-10-04",
   flags: ["nodejs_compat"],
@@ -103,7 +127,9 @@ const NativeApiHostLive = TaxKitApiWorker.make(
       // The app export owns its native entry; the graph crosses the workspace
       // through that export rather than a relative filesystem import.
       main: import.meta.resolve("api/worker"),
-      observability: ApiWorkerObservability,
+      observability: Option.isSome(yield* NativeProductionZone)
+        ? yield* productionObservability
+        : ApiWorkerObservability,
     };
   }),
   ApiWorkerNativeInit
@@ -170,19 +196,11 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
         include: ["**/*", "../../packages/**"],
         lockfile: true,
       },
-      // The Website's platform records can include caller URLs independently
-      // of its fixed application reporter. Keep them off.
-      observability: {
-        enabled: false,
-        headSamplingRate: 0,
-        logs: {
-          enabled: false,
-          headSamplingRate: 0,
-          invocationLogs: false,
-          persist: false,
-        },
-        traces: { enabled: false, headSamplingRate: 0, persist: false },
-      },
+      // Same policy as the API: Production exports checked console records
+      // only; other stages keep every platform channel off.
+      observability: Option.isSome(yield* NativeProductionZone)
+        ? yield* productionObservability
+        : ApiWorkerObservability,
       rootDir: "apps/web",
     };
   })
