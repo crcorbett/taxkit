@@ -49,8 +49,10 @@ export const withDocsRepresentation = (
           Headers.get(incoming.headers, "accept").pipe(Option.getOrNull)
         ).pipe(Result.getOrElse(() => "invalid"));
     if (preference === "invalid" || preference === "unacceptable") {
+      // The host's cache decision stores this Accept answer as its own
+      // variant, so an odd Accept header cannot evict the cached page.
       return HttpServerResponse.empty({
-        headers: { "cache-control": "no-store", vary: "Accept" },
+        headers: { vary: "Accept" },
         status: preference === "invalid" ? 400 : 406,
       });
     }

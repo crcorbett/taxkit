@@ -831,7 +831,14 @@ describe("built native API and Website", () => {
               expect(response.headers.get("vary")).toBe("Accept");
               const body = yield* Effect.promise(() => response.text());
               if (choice.status !== 200) {
-                expect(response.headers.get("cache-control")).toBe("no-store");
+                // Negotiation answers are stored as their own public variant
+                // so they never evict the page's cached HTML.
+                expect(response.headers.get("cache-control")).toBe(
+                  "public, max-age=0"
+                );
+                expect(
+                  response.headers.get("cloudflare-cdn-cache-control")
+                ).toBe("public, max-age=604800, stale-if-error=0");
                 expect(body).toBe("");
               } else if (choice.markdown) {
                 expect(body).toBe(quickstart.markdown);
