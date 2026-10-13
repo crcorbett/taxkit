@@ -3,14 +3,15 @@ document_type: domain-glossary
 lifecycle: current
 authority: supporting
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-03
-review_trigger: calculation vocabulary or domain meaning changes
+last_reviewed: 2026-10-13
+review_trigger: calculation, public content vocabulary or domain meaning changes
 ---
 
-# TaxKit calculation language
+# TaxKit calculation and publication language
 
 TaxKit answers defined tax questions from explicit facts and supported rules.
-These terms describe the existing calculation model.
+These terms distinguish its calculation model from information intended for
+everyone who reads the published site.
 
 ## Language
 
@@ -50,4 +51,21 @@ _Avoid_: tax return, personal tax advice
 
 **Trace**:
 A record of the calculation steps and values behind a result.
-_Avoid_: application log
+_Avoid_: application log, request timing
+
+**Public calculator metadata**:
+Descriptions of TaxKit's supported calculators, periods, fact definitions and
+rules. It contains no person's input facts, reports or calculation traces.
+_Avoid_: personal facts, calculation results
+
+**TaxKit publication address**:
+The main public address named by TaxKit's published pages and discovery
+documents. It identifies the published site even when a page is viewed in a
+separate Preview.
+_Avoid_: current Preview address, API endpoint address
+
+**TaxKit operational observation**:
+A record about a TaxKit request or host, such as its stage, route, duration or
+safe error name. It contains no salaries, input facts, results or calculation
+traces.
+_Avoid_: calculation trace, calculation report

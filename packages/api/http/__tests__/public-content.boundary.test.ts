@@ -12,17 +12,23 @@ import {
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 
-import { TaxKitApiInProcessClientLive } from "../src/client/server.layer.js";
-import { TaxKitHttpApiService } from "../src/client/service.js";
+import { TaxKitApi } from "../src/api.js";
 import {
   DocsPageUnavailable,
   DocsSearchUnavailable,
 } from "../src/groups/content.js";
+import { TaxKitApiInProcessLive } from "../src/in-process.layer.js";
 import { TaxKitServerLayer } from "../src/server.js";
 import { ContentTestLive } from "./content.fixture.js";
 
-const ClientTestLive = TaxKitApiInProcessClientLive.pipe(
+// The native generated client over the in-process routes.
+const inProcessClient = HttpApiClient.make(TaxKitApi, {
+  baseUrl: "http://taxkit.internal",
+});
+
+const ClientTestLive = TaxKitApiInProcessLive.pipe(
   Layer.provide(ContentTestLive)
 );
 
@@ -32,7 +38,7 @@ describe("checked public documentation HTTP", () => {
     () =>
       Effect.gen(function* () {
         const catalogue = yield* exampleContentCatalogue;
-        const client = yield* TaxKitHttpApiService;
+        const client = yield* inProcessClient;
         const path = yield* DocsPagePath.makeEffect("/start/overview");
         const term = yield* DocsSearchTerm.makeEffect("calculator");
         const page = yield* client.content.getPage({ query: { path } });
@@ -60,7 +66,7 @@ describe("checked public documentation HTTP", () => {
     "returns typed missing-page failures for both representations without reflecting the requested path",
     () =>
       Effect.gen(function* () {
-        const client = yield* TaxKitHttpApiService;
+        const client = yield* inProcessClient;
         const path = yield* DocsPagePath.makeEffect("/private-taxkit-sentinel");
         const expected = new DocsPageUnavailable({
           message: "The documentation page was not found.",
@@ -181,7 +187,7 @@ describe("checked public documentation HTTP", () => {
           })
         );
         yield* Effect.gen(function* () {
-          const client = yield* TaxKitHttpApiService;
+          const client = yield* inProcessClient;
           const term = yield* DocsSearchTerm.makeEffect("calculator");
           assert.deepEqual(
             yield* client.content
@@ -192,9 +198,7 @@ describe("checked public documentation HTTP", () => {
             })
           );
         }).pipe(
-          Effect.provide(
-            TaxKitApiInProcessClientLive.pipe(Layer.provide(controlled))
-          )
+          Effect.provide(TaxKitApiInProcessLive.pipe(Layer.provide(controlled)))
         );
       }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
   );
@@ -218,7 +222,7 @@ describe("checked public documentation HTTP", () => {
           })
         );
         yield* Effect.gen(function* () {
-          const client = yield* TaxKitHttpApiService;
+          const client = yield* inProcessClient;
           const path = yield* DocsPagePath.makeEffect("/start/overview");
           const request = yield* client.content
             .getPage({ query: { path } })
@@ -227,9 +231,7 @@ describe("checked public documentation HTTP", () => {
           yield* Fiber.interrupt(request);
           assert.isTrue(yield* Ref.get(closed));
         }).pipe(
-          Effect.provide(
-            TaxKitApiInProcessClientLive.pipe(Layer.provide(controlled))
-          )
+          Effect.provide(TaxKitApiInProcessLive.pipe(Layer.provide(controlled)))
         );
       }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
   );

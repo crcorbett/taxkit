@@ -104,6 +104,10 @@ it.live(
                         simple: { limit: 3, period: 60 as const },
                         type: "rate-limit",
                       },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json",
+                        value: "https://website.example.com",
+                      },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",
                         value: "https://website.example.com",
@@ -349,6 +353,10 @@ it.live(
                     namespace: fixture.namespace,
                     simple: { limit: fixture.limit, period: 60 as const },
                     type: "rate-limit" as const,
+                  },
+                  TAXKIT_PUBLICATION_ORIGIN: {
+                    type: "json" as const,
+                    value: "https://website.example.com",
                   },
                   WEBSITE_PUBLIC_ORIGIN: {
                     type: "json" as const,

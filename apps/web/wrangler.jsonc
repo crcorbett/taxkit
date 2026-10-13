@@ -24,6 +24,7 @@
   ],
   "vars": {
     "API_PUBLIC_ORIGIN": "http://127.0.0.1:4101",
+    "TAXKIT_PUBLICATION_ORIGIN": "https://taxkit.dev",
     "WEBSITE_PUBLIC_ORIGIN": "http://127.0.0.1:4100",
   },
 }

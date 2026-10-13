@@ -1,7 +1,6 @@
 import type { DocsPublicPage } from "@taxkit/content/schemas";
 import { Result, Schema } from "effect";
 
-import type { WebsitePublicSettings } from "../schemas";
 import {
   docsImagePath,
   WebsiteDocsArticleJson,
@@ -9,13 +8,10 @@ import {
 } from "./social.schemas";
 
 // This is the named HTML metadata/script egress. Only checked public page and
-// stage settings enter it; it invents no author, publisher or modification date.
-export const docsMetadata = (
-  page: DocsPublicPage,
-  settings: WebsitePublicSettings
-) => {
-  const canonical = new URL(page.path, settings.websiteOrigin);
-  const image = new URL(docsImagePath(page), settings.websiteOrigin);
+// publication settings enter it; it invents no author, publisher or modification date.
+export const docsMetadata = (page: DocsPublicPage, publicationOrigin: URL) => {
+  const canonical = new URL(page.path, publicationOrigin);
+  const image = new URL(docsImagePath(page), publicationOrigin);
   return Schema.encodeResult(WebsiteDocsArticleJson)({
     "@context": "https://schema.org",
     "@type": "TechArticle",
@@ -28,7 +24,7 @@ export const docsMetadata = (
       links: [
         { href: canonical.href, rel: "canonical" },
         {
-          href: new URL(`${page.path}.md`, settings.websiteOrigin).href,
+          href: new URL(`${page.path}.md`, publicationOrigin).href,
           rel: "alternate",
           type: "text/markdown",
         },

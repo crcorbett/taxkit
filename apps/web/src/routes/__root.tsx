@@ -1,31 +1,31 @@
-import { RegistryProvider } from "@effect/atom-react";
+import {
+  RegistryContext,
+  RegistryProvider,
+  scheduleTask,
+  useAtomInitialValues,
+} from "@effect/atom-react";
 import {
   createRootRouteWithContext,
   HeadContent,
   Link,
   Outlet,
   Scripts,
-  useLoaderData,
 } from "@tanstack/react-router";
-import type { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
-import { Array, Option, Result, Schema } from "effect";
-import { createContext, useMemo } from "react";
+import type { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
+import { Array, Function, Option, Result, Schema } from "effect";
+import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
+import { createContext, useEffect, useMemo, useRef } from "react";
+import type { ReactNode } from "react";
 
-import {
-  publicSettingsAtom,
-  websiteCatalogueAtom,
-} from "#/lib/calculator.atoms";
-import type { RouterContext } from "#/lib/route-context";
-import {
-  WebsiteSettingsTransport,
-  WebsiteCatalogueTransport,
-  WebsiteSubmissionTransport,
-} from "#/lib/schemas";
-import type { WebsiteSubmission } from "#/lib/schemas";
+import { publicSettingsAtom } from "#/lib/api/client.atoms";
+import type { LoaderContext } from "#/lib/loader-context";
+import { loadRoot } from "#/lib/loaders";
+import { WebsiteRootView, WebsiteSubmissionTransport } from "#/lib/schemas";
+import type { WebsitePublicSettings, WebsiteSubmission } from "#/lib/schemas";
 
 import "../styles.css";
 
-// Only the root route restores this transport. Children receive checked values.
+// Only the root route restores these values. Children receive checked values.
 export const WebsiteSubmissionContext = createContext<
   Option.Option<typeof WebsiteSubmission.Type>
 >(Option.none());
@@ -33,7 +33,14 @@ export const WebsiteCatalogueContext = createContext<
   Option.Option<typeof CalculatorCatalogResponse.Type>
 >(Option.none());
 
-const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
+const SettingsUnavailable = () => (
+  <main className="home">
+    <h1>TaxKit</h1>
+    <p role="alert">TaxKit cannot load its settings. Please try again later.</p>
+  </main>
+);
+
+const RootShell = ({ children }: { readonly children: ReactNode }) => (
   <html lang="en-AU">
     <head>
       <HeadContent />
@@ -44,108 +51,138 @@ const RootShell = ({ children }: { readonly children: React.ReactNode }) => (
     </body>
   </html>
 );
-const RootComponent = () => {
-  const data = useLoaderData({ from: "__root__" });
-  const settings = useMemo(
-    () => Schema.decodeUnknownResult(WebsiteSettingsTransport)(data.settings),
-    [data.settings]
-  );
-  const submission = useMemo(
-    () =>
-      data.submission === undefined
-        ? Option.none<typeof WebsiteSubmission.Type>()
-        : Schema.decodeResult(WebsiteSubmissionTransport)(data.submission).pipe(
-            Result.getSuccess
-          ),
-    [data.submission]
-  );
-  const catalogue = useMemo(
-    () =>
-      Schema.decodeUnknownResult(WebsiteCatalogueTransport)(
-        data.catalogue
-      ).pipe(
-        Result.match({
-          onFailure: () => Option.none<typeof CalculatorCatalogResponse.Type>(),
-          onSuccess: Result.getSuccess,
-        })
-      ),
-    [data.catalogue]
-  );
-  if (Result.isFailure(settings) || Result.isFailure(settings.success)) {
-    return (
-      <main className="home">
-        <h1>TaxKit</h1>
-        <p role="alert">
-          TaxKit cannot load its settings. Please try again later.
-        </p>
-      </main>
-    );
-  }
-  const checked = settings.success.success;
+
+// The browser registry was created before loaders ran; React uses that same
+// registry. React can replay mount and cleanup in development, so disposal is
+// scheduled and cancelled by the next mount rather than run immediately.
+const BrowserRegistry = ({
+  children,
+  registry,
+}: Readonly<{ children: ReactNode; registry: AtomRegistry.AtomRegistry }>) => {
+  const pendingDisposal = useRef(Function.constVoid);
+  useEffect(() => {
+    pendingDisposal.current();
+    return () => {
+      pendingDisposal.current = scheduleTask(() => {
+        registry.dispose();
+      });
+    };
+  }, [registry]);
   return (
-    <RegistryProvider
-      key={checked.apiOrigin.href}
-      initialValues={[
-        [publicSettingsAtom, Option.some(checked)],
-        [websiteCatalogueAtom, catalogue],
-      ]}
-    >
-      <WebsiteSubmissionContext.Provider value={submission}>
-        <WebsiteCatalogueContext.Provider value={catalogue}>
-          <div className="app-shell">
-            <a className="skip-link" href="#main-content">
-              Skip to content
-            </a>
-            <nav aria-label="Calculators">
-              {Option.match(catalogue, {
-                onNone: () => (
-                  <p>
-                    The calculator list could not load. Please reload this page.
-                  </p>
-                ),
-                onSome: (value) => (
-                  <ul>
-                    {Array.map(value.calculators, (calculator) => (
-                      <li key={calculator.calculatorId}>
-                        {calculator.calculatorId === "au.pay.take-home" ? (
-                          <Link activeProps={{ "aria-current": "page" }} to="/">
-                            {calculator.title}
-                          </Link>
-                        ) : (
-                          <Link
-                            activeProps={{ "aria-current": "page" }}
-                            to="/calculators/$calculatorId"
-                            params={{ calculatorId: calculator.calculatorId }}
-                          >
-                            {calculator.title}
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                ),
-              })}
-              <a href={new URL("/api/docs", checked.apiOrigin).href}>
-                For developers: API documentation
-              </a>
-              <Link activeProps={{ "aria-current": "page" }} to="/agents">
-                For agents: API access
-              </Link>
-              <Link params={{ _splat: "start/quickstart" }} to="/$">
-                Documentation
-              </Link>
-            </nav>
-            <main id="main-content" tabIndex={-1}>
-              <Outlet />
-            </main>
-          </div>
-        </WebsiteCatalogueContext.Provider>
-      </WebsiteSubmissionContext.Provider>
-    </RegistryProvider>
+    <RegistryContext.Provider value={registry}>
+      {children}
+    </RegistryContext.Provider>
   );
 };
-export const Route = createRootRouteWithContext<RouterContext>()({
-  component: RootComponent,
+
+const RootRegistry = ({
+  children,
+  registry,
+}: Readonly<{ children: ReactNode; registry: LoaderContext["registry"] }>) =>
+  Option.match(registry, {
+    // Server rendering keeps an isolated registry per request.
+    onNone: () => <RegistryProvider>{children}</RegistryProvider>,
+    onSome: (value) => (
+      <BrowserRegistry registry={value}>{children}</BrowserRegistry>
+    ),
+  });
+
+const InitialSettings = ({
+  children,
+  settings,
+}: Readonly<{ children: ReactNode; settings: WebsitePublicSettings }>) => {
+  useAtomInitialValues([[publicSettingsAtom, Option.some(settings)]]);
+  return children;
+};
+
+export const Route = createRootRouteWithContext<LoaderContext>()({
+  component: function RootComponent() {
+    const data = Route.useLoaderData();
+    const { registry } = Route.useRouteContext();
+    const view = useMemo(
+      () => Schema.decodeUnknownResult(WebsiteRootView)(data.view),
+      [data.view]
+    );
+    const submission = useMemo(
+      () =>
+        Option.fromNullishOr(data.submission).pipe(
+          Option.flatMap((encoded) =>
+            Schema.decodeResult(WebsiteSubmissionTransport)(encoded).pipe(
+              Result.getSuccess
+            )
+          )
+        ),
+      [data.submission]
+    );
+    if (Result.isFailure(view)) {
+      return <SettingsUnavailable />;
+    }
+    const { catalogue, settings } = view.success;
+    return (
+      <RootRegistry registry={registry}>
+        <InitialSettings settings={settings}>
+          <WebsiteSubmissionContext.Provider value={submission}>
+            <WebsiteCatalogueContext.Provider value={catalogue}>
+              <div className="app-shell">
+                <a className="skip-link" href="#main-content">
+                  Skip to content
+                </a>
+                <nav aria-label="Calculators">
+                  {Option.match(catalogue, {
+                    onNone: () => (
+                      <p>
+                        The calculator list could not load. Please reload this
+                        page.
+                      </p>
+                    ),
+                    onSome: (value) => (
+                      <ul>
+                        {Array.map(value.calculators, (calculator) => (
+                          <li key={calculator.calculatorId}>
+                            {calculator.calculatorId === "au.pay.take-home" ? (
+                              <Link
+                                activeProps={{ "aria-current": "page" }}
+                                to="/"
+                              >
+                                {calculator.title}
+                              </Link>
+                            ) : (
+                              <Link
+                                activeProps={{ "aria-current": "page" }}
+                                to="/calculators/$calculatorId"
+                                params={{
+                                  calculatorId: calculator.calculatorId,
+                                }}
+                              >
+                                {calculator.title}
+                              </Link>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    ),
+                  })}
+                  <a href={new URL("/api/docs", settings.apiOrigin).href}>
+                    For developers: API documentation
+                  </a>
+                  <Link activeProps={{ "aria-current": "page" }} to="/agents">
+                    For agents: API access
+                  </Link>
+                  <Link params={{ _splat: "start/quickstart" }} to="/$">
+                    Documentation
+                  </Link>
+                </nav>
+                <main id="main-content" tabIndex={-1}>
+                  <Outlet />
+                </main>
+              </div>
+            </WebsiteCatalogueContext.Provider>
+          </WebsiteSubmissionContext.Provider>
+        </InitialSettings>
+      </RootRegistry>
+    );
+  },
+  errorComponent: SettingsUnavailable,
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -158,10 +195,16 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
     ],
   }),
+  // A no-JavaScript calculation result is personal; it is read from this
+  // request's server context and never reused as public loader data.
   loader: ({ context, abortController, serverContext }) =>
-    context.loadSettings({
+    loadRoot({
+      context,
       signal: abortController.signal,
       submission: serverContext?.submission,
     }),
   shellComponent: RootShell,
+  // Live settings and any personal submission are never treated as fresh
+  // public data; the one-minute default applies to documentation routes.
+  staleTime: 0,
 });

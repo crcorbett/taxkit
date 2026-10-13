@@ -59,9 +59,8 @@ include their own Changeset outside the public tax/SDK release group.
 
 ## Runbook applicability
 
-The [deployment runbook](../../docs/runbooks/docs-deployment.md) and
-[recovery runbook](../../docs/runbooks/recovery.md) own later analytics resource
-plans, authority, retained projects, recovery and readback. Tests use controlled
+The [deployment runbook](../../docs/runbooks/deployment.md) owns deployment and
+rollback; the PostHog project belongs to `@taxkit/infrastructure`. Tests use controlled
 transports and synthetic capture tokens; they perform no provider operation.
 Local and ordinary Preview collection must stay off. Production or a controlled
 Preview requires checked settings and separately qualified app composition.

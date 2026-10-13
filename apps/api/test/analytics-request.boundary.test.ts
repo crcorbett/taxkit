@@ -4,6 +4,7 @@ import type { CalculatorUse } from "@taxkit/analytics/schemas";
 import {
   CalculationRequest,
   CalculatorFixture,
+  CalculatorFixtureMode,
   CalculatorLive,
 } from "@taxkit/api-rpc/testing/fixtures";
 import { GetCalculatorRequest } from "@taxkit/calculators/schemas";
@@ -99,7 +100,9 @@ it.effect.each(["expected", "defect", "mixed", "capacity", "timeout"] as const)(
         Effect.provide(
           ApiCalculatorAnalyticsLive.pipe(
             Layer.provide(
-              CalculatorFixture(mode).pipe(Layer.provide(CalculatorLive))
+              CalculatorFixture.pipe(
+                Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode))
+              ).pipe(Layer.provide(CalculatorLive))
             )
           )
         )

@@ -1,3 +1,1 @@
-import { CalculatorHostTelemetryLive } from "@taxkit/api-rpc/host-telemetry";
-
-export const ApiSafeTelemetryLive = CalculatorHostTelemetryLive("api");
+export { ApiHostTelemetryLive as ApiSafeTelemetryLive } from "@taxkit/api-rpc/host-telemetry";

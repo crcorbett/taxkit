@@ -1,4 +1,4 @@
-import { Effect, Layer } from "effect";
+import { Context, Effect, Layer } from "effect";
 
 import {
   GrossPayFact,
@@ -46,18 +46,36 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
 });
 
 /**
- * Builds the typed scenario layer for gross pay and tax-free-threshold status.
+ * The caller's decoded take-home scenario. Supply it with
+ * `Layer.succeed(TakeHomeScenario)(input)` after decoding
+ * `TakeHomeScenarioInputSchema` at the caller's boundary.
  *
- * Use this after an owning boundary has decoded `TakeHomeScenarioInput`.
- *
- * @since 0.1.0
+ * @since 2.0.0
  */
-export const TakeHomeScenarioLiveFromInput = (input: TakeHomeScenarioInput) =>
-  Layer.mergeAll(
-    Layer.succeed(GrossPayFact)(input.grossPay),
-    Layer.succeed(TaxFreeThresholdClaimedFact)(
-      new TaxFreeThresholdClaimed({
-        value: input.taxFreeThresholdClaimed,
-      })
+export class TakeHomeScenario extends Context.Service<
+  TakeHomeScenario,
+  TakeHomeScenarioInput
+>()("taxkit/rules-au-pay/TakeHomeScenario") {}
+
+/**
+ * Provides gross pay and tax-free-threshold status from `TakeHomeScenario`.
+ *
+ * @since 2.0.0
+ */
+export const TakeHomeScenarioLive = Layer.mergeAll(
+  Layer.effect(
+    GrossPayFact,
+    TakeHomeScenario.pipe(Effect.map((scenario) => scenario.grossPay))
+  ),
+  Layer.effect(
+    TaxFreeThresholdClaimedFact,
+    TakeHomeScenario.pipe(
+      Effect.map(
+        (scenario) =>
+          new TaxFreeThresholdClaimed({
+            value: scenario.taxFreeThresholdClaimed,
+          })
+      )
     )
-  );
+  )
+);

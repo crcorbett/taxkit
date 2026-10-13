@@ -1,5 +1,5 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import type { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
+import type { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
 import { Array, Option, Result, Schema } from "effect";

@@ -6,11 +6,11 @@
 export {
   AnnualTaxReport,
   AnnualTaxScenarioInputSchema,
-  AnnualTaxScenarioLiveFromInput,
+  AnnualTaxScenario,
+  AnnualTaxScenarioLive,
   CalculateAnnualTax,
   type AnnualTaxScenarioInput,
 } from "./annual-tax.js";
-export { AnnualTaxScenarioLive } from "./annual-tax.boundary.js";
 export {
   AuAnnualTaxCalculatorId,
   AuAnnualTaxContext,

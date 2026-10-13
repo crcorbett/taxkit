@@ -19,7 +19,7 @@ import { DocsRpcGroup } from "./content.group.js";
 import { DocsRpcDeadline, DocsRpcVersion } from "./content.schemas.js";
 import { DocsRpcClient } from "./content.service.js";
 import { boundedRpcHttpClient } from "./response-budget.boundary.js";
-import type { CalculatorRpcOrigin } from "./schemas.js";
+import { TaxKitRpcOrigin } from "./service.js";
 
 class DocsReplyDecodeDefect extends Schema.TaggedError<DocsReplyDecodeDefect>()(
   "DocsReplyDecodeDefect",
@@ -78,89 +78,88 @@ const checkedDocsRpcOperation = <A>(
     )
   );
 
-export const DocsRpcClientLive = (origin: CalculatorRpcOrigin) =>
-  Layer.effect(
-    DocsRpcClient,
-    Effect.gen(function* () {
-      const protocol = yield* RpcClient.Protocol;
-      return DocsRpcClient.of({
-        getDiscovery: Effect.fn("DocsRpcClient.getDiscovery")(
-          (path: DocsDiscoveryPath) =>
-            checkedDocsRpcOperation(
-              RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
-                Effect.flatMap((client) =>
-                  client.GetDocsDiscovery({ path, version: DocsRpcVersion })
-                )
-              ),
-              protocol
-            ).pipe(
-              Effect.flatMap((document) =>
-                document.path === path
-                  ? Effect.succeed(document)
-                  : Effect.fail(new DocsRpcInvalidResponse())
-              )
-            )
-        ),
-        getMarkdown: Effect.fn("DocsRpcClient.getMarkdown")(
-          (path: DocsPagePath) =>
-            checkedDocsRpcOperation(
-              RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
-                Effect.flatMap((client) =>
-                  client.GetDocsMarkdown({ path, version: DocsRpcVersion })
-                )
-              ),
-              protocol
-            )
-        ),
-        getNavigation: Effect.fn("DocsRpcClient.getNavigation")(() =>
+export const DocsRpcClientLive = Layer.effect(
+  DocsRpcClient,
+  Effect.gen(function* () {
+    const protocol = yield* RpcClient.Protocol;
+    return DocsRpcClient.of({
+      getDiscovery: Effect.fn("DocsRpcClient.getDiscovery")(
+        (path: DocsDiscoveryPath) =>
           checkedDocsRpcOperation(
             RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
               Effect.flatMap((client) =>
-                client.GetDocsNavigation({ version: DocsRpcVersion })
+                client.GetDocsDiscovery({ path, version: DocsRpcVersion })
+              )
+            ),
+            protocol
+          ).pipe(
+            Effect.flatMap((document) =>
+              document.path === path
+                ? Effect.succeed(document)
+                : Effect.fail(new DocsRpcInvalidResponse())
+            )
+          )
+      ),
+      getMarkdown: Effect.fn("DocsRpcClient.getMarkdown")(
+        (path: DocsPagePath) =>
+          checkedDocsRpcOperation(
+            RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
+              Effect.flatMap((client) =>
+                client.GetDocsMarkdown({ path, version: DocsRpcVersion })
               )
             ),
             protocol
           )
-        ),
-        getPage: Effect.fn("DocsRpcClient.getPage")((path: DocsPagePath) =>
-          checkedDocsRpcOperation(
-            RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
-              Effect.flatMap((client) =>
-                client.GetDocsPage({ path, version: DocsRpcVersion })
-              )
-            ),
-            protocol
-          )
-        ),
-        searchPages: Effect.fn("DocsRpcClient.searchPages")(
-          (term: DocsSearchTerm) =>
-            checkedDocsRpcOperation(
-              RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
-                Effect.flatMap((client) =>
-                  client.SearchDocsPages({ term, version: DocsRpcVersion })
-                )
-              ),
-              protocol
-            )
-        ),
-      });
-    })
-  ).pipe(
-    Layer.provide(
-      Layer.effect(
-        RpcClient.Protocol,
-        HttpClient.HttpClient.pipe(
-          Effect.map((client) =>
-            client.pipe(
-              HttpClient.mapRequest(
-                HttpClientRequest.setUrl(new URL("/rpc", origin).href)
-              ),
-              boundedRpcHttpClient
+      ),
+      getNavigation: Effect.fn("DocsRpcClient.getNavigation")(() =>
+        checkedDocsRpcOperation(
+          RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
+            Effect.flatMap((client) =>
+              client.GetDocsNavigation({ version: DocsRpcVersion })
             )
           ),
-          Effect.flatMap(RpcClient.makeProtocolHttp)
+          protocol
         )
+      ),
+      getPage: Effect.fn("DocsRpcClient.getPage")((path: DocsPagePath) =>
+        checkedDocsRpcOperation(
+          RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
+            Effect.flatMap((client) =>
+              client.GetDocsPage({ path, version: DocsRpcVersion })
+            )
+          ),
+          protocol
+        )
+      ),
+      searchPages: Effect.fn("DocsRpcClient.searchPages")(
+        (term: DocsSearchTerm) =>
+          checkedDocsRpcOperation(
+            RpcClient.make(DocsRpcGroup, { disableTracing: true }).pipe(
+              Effect.flatMap((client) =>
+                client.SearchDocsPages({ term, version: DocsRpcVersion })
+              )
+            ),
+            protocol
+          )
+      ),
+    });
+  })
+).pipe(
+  Layer.provide(
+    Layer.effect(
+      RpcClient.Protocol,
+      Effect.all([HttpClient.HttpClient, TaxKitRpcOrigin]).pipe(
+        Effect.map(([client, origin]) =>
+          client.pipe(
+            HttpClient.mapRequest(
+              HttpClientRequest.setUrl(new URL("/rpc", origin).href)
+            ),
+            boundedRpcHttpClient
+          )
+        ),
+        Effect.flatMap(RpcClient.makeProtocolHttp)
       )
-    ),
-    Layer.provide(replySerialization)
-  );
+    )
+  ),
+  Layer.provide(replySerialization)
+);

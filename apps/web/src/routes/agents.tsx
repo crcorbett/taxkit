@@ -2,7 +2,7 @@ import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Option } from "effect";
 
-import { publicSettingsAtom } from "#/lib/calculator.atoms";
+import { publicSettingsAtom } from "#/lib/api/client.atoms";
 
 export const Route = createFileRoute("/agents")({
   component: function AgentsRoute() {

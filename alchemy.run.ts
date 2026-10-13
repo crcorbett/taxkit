@@ -1,7 +1,16 @@
-import { RetiredDocsStack } from "@taxkit/infrastructure/stack";
+import { declareNativeAppsStack } from "@taxkit/infrastructure/apps-stack";
+import { deploymentSecrets } from "@taxkit/infrastructure/secrets";
+import * as Alchemy from "alchemy";
+import * as Cloudflare from "alchemy/Cloudflare";
 
-export default new RetiredDocsStack({
-  reason: "The old docs app and its default Stack are retired.",
-  recoveryRecord:
-    "docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json",
-});
+// The Website/API pair for `prod` and `pr-<number>` stages. The stack name
+// and resource IDs are the existing state identity; do not rename them.
+export default Alchemy.Stack(
+  "TaxKitAppsCloudflare",
+  {
+    providers: Cloudflare.providers(),
+    secrets: deploymentSecrets,
+    state: Cloudflare.state(),
+  },
+  declareNativeAppsStack
+);

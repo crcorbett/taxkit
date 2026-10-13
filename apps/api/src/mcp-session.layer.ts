@@ -1,7 +1,5 @@
-import {
-  CalculatorClientRateKey,
-  CalculatorRequestRateKey,
-} from "@taxkit/api-rpc/rate-identity";
+import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
+import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { ContentService } from "@taxkit/content/service";
 import { DurableObject, DurableObjectState } from "alchemy/Cloudflare/Workers";
@@ -44,7 +42,7 @@ import {
   McpSessionLifetime,
   McpSessionRequestLimit,
 } from "./mcp.schemas.js";
-import { TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
+import { TaxKitMcpHost, TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
 
@@ -92,10 +90,16 @@ export const McpSessionHostLive = Layer.effect(
                 const scope = yield* Scope.make();
                 return yield* Effect.gen(function* () {
                   const handler = yield* HttpRouter.toHttpEffect(
-                    TaxKitMcpHttpLayer(
-                      config.websiteOrigin,
-                      McpProtocol.v2025_11_25
-                    ).pipe(Layer.provide(calculator), Layer.provide(content))
+                    TaxKitMcpHttpLayer.pipe(
+                      Layer.provide(calculator),
+                      Layer.provide(content),
+                      Layer.provide(
+                        Layer.succeed(TaxKitMcpHost)({
+                          protocol: McpProtocol.v2025_11_25,
+                          publicationOrigin: config.publicationOrigin,
+                        })
+                      )
+                    )
                   ).pipe(
                     Scope.provide(scope),
                     Effect.provideContext(telemetry),
@@ -159,7 +163,7 @@ export const McpSessionHostLive = Layer.effect(
                 const origin = Headers.get(request.headers, "origin");
                 if (
                   Option.isSome(origin) &&
-                  origin.value !== config.websiteOrigin.origin
+                  origin.value !== config.publicationOrigin.origin
                 ) {
                   return HttpServerResponse.empty({ status: 403 });
                 }

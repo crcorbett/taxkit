@@ -3,7 +3,15 @@ import { fileURLToPath } from "node:url";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it as test } from "@effect/vitest";
-import { Array, Effect, FileSystem, Option, Record, Schema } from "effect";
+import {
+  Array,
+  Effect,
+  FileSystem,
+  Option,
+  Order,
+  Record,
+  Schema,
+} from "effect";
 import type { OxlintConfig } from "oxlint";
 
 import oxlintConfig from "../../oxlint.config.js";
@@ -163,24 +171,26 @@ const fixtureCases = [
       "apps/web/src/lib/config.ts",
       "apps/web/src/lib/config.server.ts",
       "apps/web/src/lib/config.boundary.test.ts",
-      "apps/web/src/lib/route-context.ts",
       "apps/web/src/lib/runtime.server.ts",
+      "apps/web/src/lib/runtime.client.ts",
+      "apps/web/src/lib/api/host.server.ts",
+      "apps/web/src/lib/api/client.atoms.ts",
+      "apps/web/src/lib/api/requests.ts",
       "apps/web/src/lib/calculator.atoms.ts",
       "apps/web/src/lib/loaders.ts",
       "apps/web/src/lib/calculator.boundary.browser.test.tsx",
       "apps/web/scripts/native-pair-build.runtime.ts",
-      "apps/web/test/native-pair.boundary.test.ts",
+      // native-pair takes over a minute to lint alone; `bun run lint` covers it.
       "apps/web/test/native-settings-failure.boundary.test.ts",
       "apps/web/test/native-rpc-failures.boundary.test.ts",
       "apps/web/test/native-cancellation.boundary.test.ts",
       "apps/web/test/native-local-development.boundary.test.ts",
       "apps/web/vitest.native.config.ts",
       "apps/web/src/lib/form.boundary.ts",
-      "apps/web/src/lib/loaders.server.ts",
       "apps/web/src/server.ts",
       "apps/web/src/routes/index.tsx",
       "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
-      "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+      "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
       "apps/web/vite.config.ts",
       "apps/web/vitest.config.ts",
       "apps/web/vitest.browser.config.ts",
@@ -204,9 +214,8 @@ const fixtureCases = [
   {
     accepted: [
       "packages/infrastructure/src/stage.ts",
-      "packages/infrastructure/src/retired-stack.schemas.ts",
-      "packages/infrastructure/src/cloudflare/website.ts",
-      "packages/infrastructure/src/cloudflare/website.test.ts",
+      "packages/infrastructure/src/secrets.ts",
+      "packages/infrastructure/src/apps-stack.ts",
     ],
     generated: "packages/infrastructure/src/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -374,45 +383,6 @@ const fixtureCases = [
 
   {
     accepted: [
-      "packages/scripts/src/index.ts",
-      "packages/scripts/src/release-readiness/cli.test.ts",
-      "packages/scripts/src/release-readiness/cli.ts",
-      "packages/scripts/src/release-readiness/errors.ts",
-      "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
-      "packages/scripts/src/release-readiness/evidence.boundary.ts",
-      "packages/scripts/src/release-readiness/index.ts",
-      "packages/scripts/src/release-readiness/live.layer.test.ts",
-      "packages/scripts/src/release-readiness/live.layer.ts",
-      "packages/scripts/src/release-readiness/output-redaction.ts",
-      "packages/scripts/src/release-readiness/present.runtime.ts",
-      "packages/scripts/src/release-readiness/program.test.ts",
-      "packages/scripts/src/release-readiness/program.ts",
-      "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
-      "packages/scripts/src/release-readiness/schemas.ts",
-      "packages/scripts/src/release-readiness/service.ts",
-      "packages/scripts/src/release-readiness/test.layer.ts",
-      "packages/scripts/vitest.config.ts",
-    ],
-    generated:
-      "packages/scripts/src/release-readiness/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-
-  {
-    accepted: [
       "tools/oxlint/binding-tracker.ts",
       "tools/oxlint/binding-tracker.test.ts",
       "tools/oxlint/host.types.ts",
@@ -530,245 +500,8 @@ const fixtureCases = [
     ],
   },
   {
-    accepted: [
-      "tools/quality-workflow/check.runtime.ts",
-      "tools/quality-workflow/policy.test.ts",
-      "tools/quality-workflow/release-boundary.test.ts",
-    ],
-    generated: "tools/quality-workflow/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/documentation/check.runtime.ts",
-      "tools/documentation/runbook-check.runtime.ts",
-      "tools/documentation/policy.ts",
-      "tools/documentation/runbook-policy.ts",
-      "tools/documentation/policy.test.ts",
-      "tools/documentation/runbook-policy.test.ts",
-      "tools/documentation/check.runtime.test.ts",
-      "tools/documentation/runbook-check.runtime.test.ts",
-    ],
+    accepted: ["tools/documentation/check.runtime.ts"],
     generated: "tools/documentation/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/evals/hgi-206/check.runtime.ts",
-      "tools/evals/hgi-206/check.runtime.test.ts",
-      "tools/evals/hgi-206/input.boundary.ts",
-      "tools/evals/hgi-206/input.boundary.test.ts",
-      "tools/evals/hgi-206/schemas.ts",
-      "tools/evals/hgi-206/service.ts",
-      "tools/evals/hgi-206/service.test.ts",
-      "tools/evals/harness-foundation/check.runtime.ts",
-      "tools/evals/harness-foundation/input.boundary.ts",
-      "tools/evals/harness-foundation/schemas.ts",
-    ],
-    generated: "tools/evals/hgi-206/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/docs-deployment/input.boundary.ts",
-      "tools/docs-deployment/input.boundary.test.ts",
-      "tools/docs-deployment/workflow-artifact.ts",
-      "tools/docs-deployment/workflow-artifact.schemas.ts",
-      "tools/docs-deployment/workflow-artifact.runtime.ts",
-      "tools/docs-deployment/workflow-artifact.test.ts",
-      "tools/docs-deployment/strict-boundaries.policy.ts",
-      "tools/docs-deployment/strict-boundaries.contract.test.ts",
-      "tools/docs-deployment/alchemy-memo.test.ts",
-    ],
-    generated: "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/docs-deployment/doppler-custody.boundary.ts",
-      "tools/docs-deployment/doppler-custody.runtime.ts",
-      "tools/docs-deployment/doppler-custody.test.ts",
-      "tools/docs-deployment/inventory-credentials.boundary.ts",
-      "tools/docs-deployment/inventory-credentials.boundary.test.ts",
-      "tools/docs-deployment/inventory.schemas.ts",
-      "tools/docs-deployment/local-doppler.ts",
-      "tools/docs-deployment/retirement.runtime.ts",
-      "tools/docs-deployment/local-doppler.runtime.ts",
-      "tools/docs-deployment/local-doppler.schemas.ts",
-      "tools/docs-deployment/local-doppler.test.ts",
-      "tools/docs-deployment/local-doppler-environment.boundary.ts",
-      "tools/docs-deployment/local-doppler-environment.boundary.test.ts",
-      "tools/docs-deployment/workflow-check.boundary.ts",
-      "tools/docs-deployment/workflow-check.boundary.test.ts",
-      "tools/docs-deployment/workflow-check.schemas.ts",
-      "tools/docs-deployment/workflow-input-check.runtime.ts",
-      "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
-      "tools/docs-deployment/fixtures/fake-doppler.schemas.ts",
-    ],
-    generated: "tools/docs-deployment/.generated-credential-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/docs-deployment/workflow.contract.test.ts",
-      "tools/docs-deployment/workflow-plan-projection.ts",
-      "tools/docs-deployment/workflow-plan-projection.runtime.ts",
-      "tools/docs-deployment/workflow-plan-projection.runtime.test.ts",
-      "tools/docs-deployment/workflow-plan-projection.test.ts",
-      "tools/docs-deployment/workflow-plan-check.runtime.ts",
-      "tools/docs-deployment/workflow-evidence.ts",
-      "tools/docs-deployment/workflow-evidence.runtime.ts",
-      "tools/docs-deployment/workflow-evidence.historical.ts",
-      "tools/docs-deployment/workflow-evidence.schemas.ts",
-      "tools/docs-deployment/workflow-evidence.test.ts",
-    ],
-    generated: "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/docs-deployment/automation.check.runtime.ts",
-      "tools/docs-deployment/automation.check.runtime.test.ts",
-      "tools/docs-deployment/automation.policy.ts",
-      "tools/docs-deployment/automation.policy.test.ts",
-      "tools/docs-deployment/automation.schemas.ts",
-      "tools/docs-deployment/workflow-receipts.schemas.ts",
-    ],
-    generated: "tools/docs-deployment/.generated-automation-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/docs-deployment/policy.ts",
-      "tools/docs-deployment/policy.test.ts",
-      "tools/docs-deployment/schemas.ts",
-      "tools/docs-deployment/check.runtime.ts",
-      "tools/docs-deployment/retained-record.egress.ts",
-      "tools/docs-deployment/retained-record.egress.test.ts",
-    ],
-    generated:
-      "tools/docs-deployment/.generated-retained-proof-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/docs-deployment/inventory.service.ts",
-      "tools/docs-deployment/inventory.service.test.ts",
-      "tools/docs-deployment/inventory.live.layer.ts",
-      "tools/docs-deployment/inventory.live.layer.test.ts",
-      "tools/docs-deployment/inventory.test.layer.ts",
-      "tools/docs-deployment/inventory.report.egress.ts",
-      "tools/docs-deployment/inventory.runtime.ts",
-      "tools/docs-deployment/inventory.runtime.test.ts",
-      "tools/docs-deployment/workflow-proof-check.runtime.ts",
-      "tools/docs-deployment/workflow-run-check.runtime.ts",
-      "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
-    ],
-    generated: "tools/docs-deployment/.generated-inventory-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -803,7 +536,7 @@ const fixtureCases = [
     ],
   },
   {
-    accepted: ["packages/api/http/src/client/server.layer.ts"],
+    accepted: ["packages/api/http/src/in-process.layer.ts"],
     generated: "packages/api/http/src/.generated-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
@@ -823,27 +556,6 @@ const fixtureCases = [
   {
     accepted: ["tools/repository-paths/check.runtime.ts"],
     generated: "tools/repository-paths/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/governance/policy.test.ts",
-      "tools/governance/check.runtime.ts",
-    ],
-    generated: "tools/governance/.generated-strict-rejected.test.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -1147,15 +859,19 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
         path,
       }))
     )
-  )("$namespace accepts its boundary fixture ($path)", ({ namespace, path }) =>
-    Effect.gen(function* () {
-      const result = yield* runOxlint(path);
-      expect(result.files).toBe(1);
-      expect(result.exitCode).toBe(0);
-      expect(
-        Array.some(result.codes, (code) => code.startsWith(`${namespace}(`))
-      ).toBe(false);
-    }).pipe(Effect.provide(BunServices.layer))
+  )(
+    "$namespace accepts its boundary fixture ($path)",
+    ({ namespace, path }) =>
+      Effect.gen(function* () {
+        const result = yield* runOxlint(path);
+        expect(result.files).toBe(1);
+        expect(result.exitCode).toBe(0);
+        expect(
+          Array.some(result.codes, (code) => code.startsWith(`${namespace}(`))
+        ).toBe(false);
+      }).pipe(Effect.provide(BunServices.layer)),
+    // The largest native suites take more than five seconds to lint.
+    30_000
   );
 
   test.effect.each(fixtureCases)(
@@ -1289,9 +1005,7 @@ test.effect.each([
 test.each([
   "apps/web/vite.config.ts",
   "apps/web/src/lib/runtime.server.ts",
-  "apps/web/src/lib/loaders.server.ts",
-  "apps/web/src/lib/loaders.ts",
-  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
+  "apps/web/src/lib/runtime.client.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
   "apps/web/src/server.ts",
   "apps/api/src/index.ts",
@@ -1300,31 +1014,9 @@ test.each([
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
-  "packages/scripts/src/release-readiness/present.runtime.ts",
-  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
-  "tools/governance/check.runtime.ts",
-  "tools/quality-workflow/check.runtime.ts",
   "packages/docs-content/src/validate.runtime.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.ts",
-  "tools/evals/hgi-206/check.runtime.ts",
-  "tools/evals/harness-foundation/check.runtime.ts",
-  "tools/docs-deployment/workflow-artifact.runtime.ts",
-  "tools/docs-deployment/doppler-custody.runtime.ts",
-  "tools/docs-deployment/retirement.runtime.ts",
-  "tools/docs-deployment/local-doppler.runtime.ts",
-  "tools/docs-deployment/workflow-input-check.runtime.ts",
-  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
-  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
-  "tools/docs-deployment/workflow-plan-check.runtime.ts",
-  "tools/docs-deployment/workflow-evidence.runtime.ts",
-  "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/check.runtime.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/workflow-proof-check.runtime.ts",
-  "tools/docs-deployment/workflow-run-check.runtime.ts",
-  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ])("keeps the execution runtime admission exact: %s", (path) => {
   expect(
     Array.filter(
@@ -1348,30 +1040,61 @@ test.each([
   ]);
 });
 
-test.each([
-  "packages/sdk/typescript/src/client.runtime.ts",
-  "apps/web/src/server.ts",
-])("keeps the host Promise result admission exact: %s", (path) => {
-  expect(
-    Array.filter(
-      oxlintConfig.overrides ?? [],
-      (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
-        Array.contains(entry.files ?? [], path) &&
-        Record.has<string>("strict-effect/no-promise-workflow")(
-          entry.rules ?? {}
-        )
-    )
-  ).toEqual([
-    {
-      files: [path],
-      rules: {
-        "strict-effect/no-promise-workflow": [
-          "error",
-          { allowedFiles: [path] },
-        ],
-      },
-    },
+const PromiseAdmission = Schema.Tuple([
+  Schema.Literal("error"),
+  Schema.Struct({
+    allowedFiles: Schema.Array(Schema.String),
+    promiseOnlyFiles: Schema.optionalKey(Schema.Array(Schema.String)),
+  }),
+]);
+
+test("keeps every Promise admission exact and listed once", () => {
+  const admissions = Array.filter(
+    oxlintConfig.overrides ?? [],
+    (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
+      Record.get<string>("strict-effect/no-promise-workflow")(
+        entry.rules ?? {}
+      ).pipe(Option.exists(Array.isArray))
+  );
+  // One override owns production adapters, host-contract tests and the CLI
+  // fixture; each admitted path is named exactly, never by glob.
+  expect(Array.map(admissions, (entry) => entry.files)).toEqual([
+    ["tools/oxlint/.generated-fetch-host.ts"],
+    expect.arrayContaining([
+      "apps/web/src/lib/api/host.server.ts",
+      "apps/web/src/server.ts",
+      "packages/sdk/typescript/src/client.runtime.ts",
+    ]),
   ]);
+  const listed = Array.map(
+    admissions,
+    (entry: NonNullable<OxlintConfig["overrides"]>[number]) => ({
+      files: Array.sort(entry.files ?? [], Order.String),
+      named: Record.get<string>("strict-effect/no-promise-workflow")(
+        entry.rules ?? {}
+      ).pipe(
+        Option.filter(Schema.is(PromiseAdmission)),
+        Option.map(([, options]) =>
+          Array.sort(
+            Array.appendAll(
+              options.allowedFiles,
+              options.promiseOnlyFiles ?? []
+            ),
+            Order.String
+          )
+        )
+      ),
+    })
+  );
+  expect(Array.map(listed, ({ named }) => named)).toEqual(
+    Array.map(listed, ({ files }) => Option.some(files))
+  );
+  expect(
+    Array.some(
+      Array.flatMap(listed, ({ files }) => files),
+      (path) => path.includes("*")
+    )
+  ).toBe(false);
 });
 
 describe("exact native RPC lint boundaries", () => {
@@ -1406,7 +1129,6 @@ describe("exact native RPC lint boundaries", () => {
     ...Array.flatMap(
       [
         "apps/web/src/lib/docs/mdx.boundary.tsx",
-        "apps/web/src/lib/docs/route-boundary.ts",
         "apps/web/src/lib/docs/search-location.boundary.ts",
         "apps/web/src/lib/docs/markdown.boundary.test.ts",
         "apps/web/src/lib/docs/markdown.response.server.ts",
@@ -1498,28 +1220,28 @@ describe("exact native RPC lint boundaries", () => {
       ]
     ),
     {
-      path: "apps/web/src/lib/loaders.server.ts",
+      path: "apps/web/src/lib/api/host.server.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/route-context.ts",
+      path: "apps/web/src/lib/loader-context.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/route-context.ts",
+      path: "apps/web/src/lib/loader-context.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/route-context.ts",
+      path: "apps/web/src/lib/loader-context.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
@@ -2050,7 +1772,7 @@ describe("exact native RPC lint boundaries", () => {
     },
     {
       path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
-      rejected: true,
+      rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
@@ -2084,7 +1806,7 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      path: "packages/infrastructure/src/secrets.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
@@ -2126,35 +1848,35 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      path: "packages/infrastructure/src/secrets.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      path: "packages/infrastructure/src/secrets.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "packages/api/rpc/src/rate-identity.boundary.ts",
+      path: "apps/api/src/edge-identity.boundary.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "packages/api/rpc/src/rate-identity.boundary.ts",
+      path: "apps/api/src/edge-identity.boundary.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "packages/api/rpc/src/rate-identity.boundary.ts",
+      path: "apps/api/src/edge-identity.boundary.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
@@ -2197,27 +1919,6 @@ describe("exact native RPC lint boundaries", () => {
     },
     {
       path: "apps/api/src/worker-admission.layer.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/live.server.layer.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/live.server.layer.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/src/lib/live.server.layer.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
@@ -2485,55 +2186,6 @@ describe("exact native RPC lint boundaries", () => {
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "tools/documentation/catalogue.build.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "tools/documentation/catalogue.build.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "tools/documentation/catalogue.build.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "tools/documentation/catalogue.build.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "tools/documentation/catalogue.build.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "tools/documentation/catalogue.build.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "tools/documentation/catalogue.runtime.ts",
-      rejected: false,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { BunRuntime } from "@effect/platform-bun";\nimport { Effect } from "effect";\n\nBunRuntime.runMain(Effect.void);',
     },
     {
       path: "packages/docs-content/src/catalogue-index.runtime.ts",

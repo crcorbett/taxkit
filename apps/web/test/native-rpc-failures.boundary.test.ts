@@ -8,7 +8,7 @@ import {
   CalculatorRpcVersion,
   GetCalculatorRequest,
 } from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import {
   Array,
@@ -31,6 +31,7 @@ import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
+import { WebsiteApiUnavailable } from "../src/lib/api/errors";
 import {
   nativeMcpSessionExports,
   nativeMcpSessionFixture,
@@ -130,6 +131,10 @@ it.live(
                   }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
+              },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
                 value: websiteOrigin,
@@ -194,7 +199,9 @@ it.live(
       const result = yield* TaxKitRpcClient.pipe(
         Effect.flatMap((client) => client.calculate(CalculationRequest)),
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(Layer.provide(FetchHttpClient.layer))
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(FetchHttpClient.layer))
         )
       );
       Match.value(result.report).pipe(
@@ -329,8 +336,34 @@ it.live(
         })
       );
       const html = yield* Effect.promise(() => server.text());
-      expect(server.status).toBe(500);
-      expect(html).toBe("");
+      const httpBody = yield* Schema.encodeEffect(
+        Schema.fromJsonString(
+          CalculatorRpcPayload.fields.request.fields.payload
+        )
+      )(CalculationRequest.payload);
+      const fatalHttp = yield* Effect.promise(() =>
+        fault.fetch(
+          `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+          {
+            body: httpBody,
+            headers: {
+              "content-type": "application/json",
+              origin: websiteOrigin,
+            },
+            method: "POST",
+          }
+        )
+      );
+      // The same defect behind the public HTTP route is a safe empty 500.
+      expect(fatalHttp.status).toBe(500);
+      expect(fatalHttp.headers.get("cache-control")).toBe("no-store");
+      expect(yield* Effect.promise(() => fatalHttp.text())).toBe("");
+      // The Website's binding call sees that undeclared reply as an unavailable
+      // service and keeps the visitor's form with retry guidance.
+      expect(server.status).toBe(200);
+      expect(server.headers.get("cache-control")).toBe("no-store");
+      expect(html).toContain(new WebsiteApiUnavailable().message);
+      expect(html).toContain('value="1654"');
       expect(html).not.toContain(sentinel);
       expect(html).not.toContain("$1,301.00");
       const invalidApi = yield* Effect.promise(() =>
@@ -349,6 +382,22 @@ it.live(
       yield* Schema.decodeEffect(Json)(invalidText);
       expect(invalidText).toContain("TakeHomePayReport");
       expect(invalidText).toContain(sentinel);
+      // The public HTTP calculation reply carries the same corruption.
+      const invalidHttp = yield* Effect.promise(() =>
+        invalidApi.fetch(
+          `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+          {
+            body: httpBody,
+            headers: { "content-type": "application/json" },
+            method: "POST",
+          }
+        )
+      );
+      expect(invalidHttp.status).toBe(200);
+      const invalidHttpText = yield* Effect.promise(() => invalidHttp.text());
+      expect(invalidHttpText).toContain("TakeHomePayReport");
+      expect(invalidHttpText).toContain(sentinel);
+      expect(invalidHttpText).not.toContain('"netPay":');
       const invalidWebsite = yield* Effect.promise(() =>
         host.getWorker("website-invalid-reply")
       );
@@ -360,10 +409,14 @@ it.live(
         })
       );
       const invalidHtml = yield* Effect.promise(() => invalidPage.text());
+      // The generated client rejects the undecodable reply; the page keeps the
+      // form and shows the Website's safe retry guidance.
       expect(invalidPage.status).toBe(200);
-      expect(invalidHtml).toContain("CalculatorRpcInvalidResponse");
-      expect(invalidHtml).toContain("Check your details");
+      expect(invalidHtml).toContain('_tag:"WebsiteApiUnavailable"');
+      expect(invalidHtml).toContain(new WebsiteApiUnavailable().message);
+      expect(invalidHtml).toContain('value="1654"');
       expect(invalidHtml).not.toContain(sentinel);
+      expect(invalidHtml).not.toContain("$1,301.00");
       const websiteHost = yield* Effect.acquireRelease(
         Effect.sync(
           () =>
@@ -407,8 +460,13 @@ it.live(
       page.on("pageerror", (error) => {
         Queue.offerUnsafe(exceptions, error.message);
       });
+      // Any browser calculation or retired RPC call would be recorded.
       page.on("request", (browserRequest) => {
-        if (new URL(browserRequest.url()).pathname === "/rpc") {
+        const { pathname } = new URL(browserRequest.url());
+        if (
+          pathname === "/rpc" ||
+          /^\/api\/v1\/calculators\/[^/]+\/calculate$/u.test(pathname)
+        ) {
           Queue.offerUnsafe(calls, browserRequest.url());
         }
       });
@@ -430,7 +488,7 @@ it.live(
         yield* Effect.promise(() =>
           page.getByRole("alert").textContent({ timeout: 5000 })
         )
-      ).toContain("Check your details");
+      ).toBe(new WebsiteApiUnavailable().message);
       expect(
         yield* Effect.promise(() =>
           page.getByText("$1,301.00", { exact: true }).count()
@@ -447,8 +505,9 @@ it.live(
       const messageText = yield* Schema.encodeEffect(Json)(
         Array.map(capturedLogs, (log) => log.message)
       );
+      // The API reports its own defects. The Website receives them as typed,
+      // declared outcomes (an unavailable service), not as host defects.
       expect(logText).toContain("api.runtime.event");
-      expect(logText).toContain("website.runtime.event");
       expect(logText).not.toContain(sentinel);
       expect(messageText).not.toContain("1654");
       expect(messageText).not.toContain("130100");
@@ -516,6 +575,10 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
                   ...nativeMcpSessionFixture(artifact.name),
                 }),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: workApiOrigin },
+            TAXKIT_PUBLICATION_ORIGIN: {
+              type: "json" as const,
+              value: workWebsiteOrigin,
+            },
             WEBSITE_PUBLIC_ORIGIN: {
               type: "json" as const,
               value: workWebsiteOrigin,
@@ -604,8 +667,12 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     const invalidPayInput = page.getByLabel("Pay before tax ($)");
     const requests = yield* Queue.make<string>();
     page.on("request", (request) => {
-      if (new URL(request.url()).pathname === "/rpc") {
-        Queue.offerUnsafe(requests, request.url());
+      const { pathname } = new URL(request.url());
+      if (
+        pathname === "/rpc" ||
+        /^\/api\/v1\/calculators\/[^/]+\/calculate$/u.test(pathname)
+      ) {
+        Queue.offerUnsafe(requests, `${request.method()} ${request.url()}`);
       }
     });
     yield* Effect.promise(() => page.goto(workWebsiteOrigin));
@@ -718,7 +785,9 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     expect(
       yield* Effect.promise(() => page.getByRole("alert").textContent())
     ).toContain("The calculators are busy.");
-    expect(yield* Queue.clear(requests)).toHaveLength(1);
+    expect(yield* Queue.clear(requests)).toEqual([
+      `POST ${workApiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+    ]);
     yield* Effect.promise(() => invalidPayInput.fill("2000"));
     yield* Effect.promise(() =>
       page.getByRole("alert").waitFor({ state: "hidden", timeout: 3000 })
@@ -748,7 +817,9 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
       Effect.flatMap((client) => client.calculate(CalculationRequest)),
       Effect.exit,
       Effect.provide(
-        TaxKitRpcClientLive(origin).pipe(Layer.provide(FetchHttpClient.layer))
+        TaxKitRpcClientLive.pipe(
+          Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+        ).pipe(Layer.provide(FetchHttpClient.layer))
       )
     );
     expect(Exit.isFailure(clientExit)).toBe(true);
@@ -783,7 +854,9 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
       ),
       Effect.exit,
       Effect.provide(
-        TaxKitRpcClientLive(origin).pipe(Layer.provide(FetchHttpClient.layer))
+        TaxKitRpcClientLive.pipe(
+          Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+        ).pipe(Layer.provide(FetchHttpClient.layer))
       ),
       Effect.forkScoped
     );

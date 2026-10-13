@@ -3,7 +3,7 @@ document_type: architecture-router
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-13
 review_trigger: package ownership, runtime boundary, public contract, or architecture-route change
 ---
 
@@ -17,8 +17,8 @@ gaps are routed by [`../README.md`](../README.md). The legacy
 [`../architecture.md`](../architecture.md) path is a tombstone to this file.
 
 TaxKit is the open-source engine repository. Today it contains a standalone
-Bun API app, a native API/Website candidate with a take-home-pay form, a
-Fumadocs-backed docs app, the
+Bun API app, the native Cloudflare API and Website (calculators and
+Fumadocs-compiled documentation), the
 `@taxkit/api-http` package with health, generated docs, metadata and public
 calculation endpoints, the `@taxkit/calculators` service package,
 deterministic core engine primitives, Australian pay, income-tax and STSL rule
@@ -31,16 +31,16 @@ documentation.
 
 Implemented surfaces:
 
-- `apps/api`: retained standalone Bun API and native Worker candidate sharing
-  the public HTTP contract and calculator service.
+- `apps/api`: standalone Bun API and native Worker sharing the public HTTP
+  contract and calculator service; the Worker also serves RPC, MCP and the
+  discovery documents.
 - `apps/docs`: retirement tombstone with verified original-source and dated
   provider recovery routes; no active app workspace.
-- `apps/web`: native TanStack Website candidate; its take-home-pay form uses
-  private API binding for server calculation and direct browser RPC. The
-  development pair and accepted documentation reader are locally qualified.
-  It owns current release documentation checking. Exported telemetry remains
-  deferred; old docs retirement and provider operations need separate proof.
-- `packages/api/rpc`: private native calculation transport over the same service.
+- `apps/web`: TanStack Start Website for the calculators and documentation. It
+  reads the API with the generated HTTP client, over the private binding on the
+  server and the public origin in the browser.
+- `packages/api/rpc`: private native RPC transport for machine callers over the
+  same services.
 - `packages/api/http`: Effect HTTP API package for health, generated docs,
   OpenAPI JSON, public calculator metadata and public calculation routes.
 - `packages/calculators`: reusable calculator catalog, metadata, graph,

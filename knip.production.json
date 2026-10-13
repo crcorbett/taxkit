@@ -2,15 +2,13 @@
   "$schema": "./node_modules/knip/schema.json",
   "ignoreWorkspaces": ["packages/tsconfig"],
   "ignoreIssues": {
-    "packages/api/http/src/client/service.ts": ["duplicates"],
-    "packages/scripts/src/release-readiness/evidence.boundary.ts": ["exports"]
+    "packages/api/http/src/client/service.ts": ["duplicates"]
   },
   "workspaces": {
     ".": {
       "entry": [
         "alchemy.run.ts!",
-        "alchemy.apps.run.ts!",
-        "alchemy.apps.local.run.ts!",
+        "alchemy.local.run.ts!",
         "alchemy.posthog.run.ts!"
       ],
       "project": ["alchemy.run.ts!"]
@@ -25,7 +23,7 @@
         "src/api.ts!",
         "src/client/index.ts!",
         "src/client/live.layer.ts!",
-        "src/client/server.layer.ts!",
+        "src/in-process.layer.ts!",
         "src/config.ts!",
         "src/server.ts!",
         "src/handlers/index.ts!",
@@ -72,7 +70,8 @@
         "src/service.ts!",
         "src/validate.runtime.ts!",
         "src/catalogue-index.runtime.ts!",
-        "src/catalogue-source.layer.ts!"
+        "src/catalogue-source.layer.ts!",
+        "src/catalogue.runtime.ts!"
       ],
       "project": [
         ".source/browser.ts!",
@@ -126,14 +125,6 @@
         "src/rule-pack/index.ts!"
       ],
       "project": ["src/**/*.ts!"]
-    },
-    "packages/scripts": {
-      "entry": [
-        "src/index.ts!",
-        "src/release-readiness/present.runtime.ts!",
-        "src/release-readiness/release-readiness.runtime.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/release-readiness/test.layer.ts!"]
     },
     "packages/sdk/typescript": {
       "entry": [

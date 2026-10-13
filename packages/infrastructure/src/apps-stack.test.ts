@@ -6,7 +6,6 @@ import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
-import { formatPlanLines } from "alchemy/Cli/LoggingCli";
 import { Providers } from "alchemy/Cloudflare";
 import { ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import {
@@ -31,24 +30,18 @@ import {
   ConfigProvider,
   Effect,
   Exit,
-  FileSystem,
   Layer,
   Option,
   Order,
-  Predicate,
   Record,
   Redacted,
   Ref,
-  Result,
   Schema,
 } from "effect";
 import { HttpClient } from "effect/http";
 
-import {
-  nativeAppsDopplerSelection,
-  nativeAppsSecrets,
-} from "./apps-secrets.boundary.js";
-import { declareNativeAppsStack } from "./apps-stack.js";
+import { declareNativeAppsStack, publicationOrigin } from "./apps-stack.js";
+import { checkedStage, deploymentSecrets, dopplerConfig } from "./secrets.js";
 
 const graphFixture = Effect.fnUntraced(function* (
   mode: "create" | "noop" | "update" | "without-precreate" | "adopted",
@@ -168,8 +161,8 @@ const graphFixture = Effect.fnUntraced(function* (
             workerId: `proof-${resource.LogicalId}`,
             workerName: resource.LogicalId,
           },
-          // These are the actual already-applied native bindings, including
-          // the circular address placeholders resolved later by the planner.
+          // The actual already-applied native bindings. Only the Website
+          // depends on the other host's address.
           bindings:
             resource.LogicalId === "TaxKitApi"
               ? [
@@ -207,8 +200,16 @@ const graphFixture = Effect.fnUntraced(function* (
                     sid: "CALCULATOR_RATE_LIMIT",
                   },
                   {
-                    data: { bindings: [undefined] },
-                    sid: "WEBSITE_PUBLIC_ORIGIN",
+                    data: {
+                      bindings: [
+                        {
+                          name: "TAXKIT_PUBLICATION_ORIGIN",
+                          text: publicationOrigin,
+                          type: "plain_text",
+                        },
+                      ],
+                    },
+                    sid: "TAXKIT_PUBLICATION_ORIGIN",
                   },
                 ]
               : [
@@ -230,6 +231,18 @@ const graphFixture = Effect.fnUntraced(function* (
                       bindings: [{ name: "TAXKIT_API", type: "service" }],
                     },
                     sid: "TAXKIT_API",
+                  },
+                  {
+                    data: {
+                      bindings: [
+                        {
+                          name: "TAXKIT_PUBLICATION_ORIGIN",
+                          text: publicationOrigin,
+                          type: "plain_text",
+                        },
+                      ],
+                    },
+                    sid: "TAXKIT_PUBLICATION_ORIGIN",
                   },
                   {
                     data: {
@@ -329,13 +342,9 @@ describe("native paired app graph and planner", () => {
         ]);
         expect(result.compiled.stage).toBe(stage);
         expect(result.providerWrites).toBe(0);
-        if (stage === "pr-214") {
-          expect(formatPlanLines(plan).join("\n")).toBe(
-            (yield* (yield* FileSystem.FileSystem).readFileString(
-              "../../tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-preview.txt"
-            )).trimEnd()
-          );
-        }
+        expect(
+          Array.map(Record.values(plan.resources), ({ action }) => action)
+        ).toEqual(["create", "create"]);
         const members = Record.values(result.compiled.resources);
         expect(
           Array.every(
@@ -360,11 +369,12 @@ describe("native paired app graph and planner", () => {
         "TaxKitWebsite",
       ]);
       expect(result.providerWrites).toBe(0);
-      expect(formatPlanLines(plan).join("\n")).toBe(
-        (yield* (yield* FileSystem.FileSystem).readFileString(
-          "../../tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-production.txt"
-        )).trimEnd()
-      );
+      expect(
+        Array.every(
+          Record.values(plan.resources),
+          ({ action }) => action !== "replace"
+        )
+      ).toBe(true);
       const zone = Record.get(
         result.compiled.resources,
         "TaxKitProductionZone"
@@ -425,7 +435,7 @@ describe("native paired app graph and planner", () => {
     )
   );
   it.live.each(["create", "noop", "update"] as const)(
-    "keeps the actual circular address graph live for %s",
+    "plans the one-way address graph for %s",
     (mode) =>
       Effect.gen(function* () {
         const result = yield* graphFixture(mode);
@@ -435,17 +445,22 @@ describe("native paired app graph and planner", () => {
           "TaxKitApi",
           "TaxKitWebsite",
         ]);
+        // No binding cycle: the unpatched planner needs no deferred member.
+        expect(Array.fromIterable(plan.cycleMembers)).toEqual([]);
         expect(
-          Array.sort(Array.fromIterable(plan.cycleMembers), Order.String)
-        ).toEqual(["TaxKitApi", "TaxKitWebsite"]);
-        expect(
-          Array.map(Record.values(plan.resources), ({ resource, action }) => ({
-            action,
-            id: resource.LogicalId,
-          }))
+          Array.sort(
+            Array.map(
+              Record.values(plan.resources),
+              ({ resource, action }) => ({
+                action,
+                id: resource.LogicalId,
+              })
+            ),
+            Order.mapInput(Order.String, (node: { id: string }) => node.id)
+          )
         ).toEqual([
-          { action: mode, id: "TaxKitWebsite" },
           { action: mode, id: "TaxKitApi" },
+          { action: mode, id: "TaxKitWebsite" },
         ]);
         const api = Record.get(result.compiled.resources, "TaxKitApi").pipe(
           Option.getOrElse(() => expect.fail("Expected native graph member"))
@@ -476,8 +491,22 @@ describe("native paired app graph and planner", () => {
           "API_PUBLIC_ORIGIN",
           "CALCULATOR_HOST_MODE",
           "TAXKIT_API",
+          "TAXKIT_PUBLICATION_ORIGIN",
           "WEBSITE_PUBLIC_ORIGIN",
         ]);
+        // The API no longer reads the Website's address.
+        expect(
+          Array.sort(Record.keys(api.Props.env ?? {}), Order.String)
+        ).toEqual([
+          "API_PUBLIC_ORIGIN",
+          "CALCULATOR_HOST_MODE",
+          "CALCULATOR_RATE_NAMESPACE",
+          "TAXKIT_PUBLICATION_ORIGIN",
+        ]);
+        expect(website.Props.cache).toEqual({
+          crossVersionCache: false,
+          enabled: true,
+        });
         const apiNode = Record.get(plan.resources, "TaxKitApi").pipe(
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
@@ -518,27 +547,15 @@ describe("native paired app graph and planner", () => {
         expect(result.compiled.stage).toBe("dev_native_graph_proof");
         expect(result.compiled.name).toBe("TaxKitAppsGraphProof");
         const absent = yield* Output.evaluate(
-          {
-            api: websiteProps.env?.API_PUBLIC_ORIGIN,
-            website: apiProps.env?.WEBSITE_PUBLIC_ORIGIN,
-          },
-          { TaxKitApi: { url: undefined }, TaxKitWebsite: { url: null } }
+          { api: websiteProps.env?.API_PUBLIC_ORIGIN },
+          { TaxKitApi: { url: undefined } }
         ).pipe(Effect.provideContext(result.compiled.services));
-        expect(absent).toEqual({ api: null, website: null });
+        expect(absent).toEqual({ api: null });
         const resolved = yield* Output.evaluate(
-          {
-            api: websiteProps.env?.API_PUBLIC_ORIGIN,
-            website: apiProps.env?.WEBSITE_PUBLIC_ORIGIN,
-          },
-          {
-            TaxKitApi: { url: "https://fresh-api.example.com" },
-            TaxKitWebsite: { url: "https://fresh-website.example.com" },
-          }
+          { api: websiteProps.env?.API_PUBLIC_ORIGIN },
+          { TaxKitApi: { url: "https://fresh-api.example.com" } }
         ).pipe(Effect.provideContext(result.compiled.services));
-        expect(resolved).toEqual({
-          api: "https://fresh-api.example.com",
-          website: "https://fresh-website.example.com",
-        });
+        expect(resolved).toEqual({ api: "https://fresh-api.example.com" });
       }).pipe(
         Effect.provideService(AlchemyContext, localContext),
         Effect.provideService(Stage, "dev_native_graph_proof"),
@@ -546,18 +563,15 @@ describe("native paired app graph and planner", () => {
         Effect.scoped
       )
   );
-  it.live("refuses a cycle whose provider cannot precreate", () =>
+  it.live("plans without provider precreation", () =>
     Effect.gen(function* () {
       const result = yield* graphFixture("without-precreate");
       expect(result.providerWrites).toBe(0);
-      expect(Exit.isFailure(result.planned)).toBe(true);
-      expect(Exit.hasDies(result.planned)).toBe(true);
-      if (Exit.isFailure(result.planned)) {
-        const die = Cause.findDie(result.planned.cause).pipe(Result.getOrThrow);
-        expect(Predicate.isTagged(die.defect, "UnsatisfiedResourceCycle")).toBe(
-          true
-        );
-      }
+      const plan = yield* result.planned;
+      expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
+        "TaxKitApi",
+        "TaxKitWebsite",
+      ]);
     }).pipe(
       Effect.provideService(AlchemyContext, localContext),
       Effect.provideService(Stage, "dev_native_graph_proof"),
@@ -585,7 +599,7 @@ describe("native app root secret selection", () => {
             }),
             { asPrimary: true }
           ),
-          ...Array.drop(nativeAppsSecrets(context), 1),
+          ...Array.drop(deploymentSecrets(context), 1),
         ],
         state: inMemoryState(),
       })(Config.schema(Schema.String, "CALCULATOR_RATE_NAMESPACE"));
@@ -603,21 +617,18 @@ describe("native app root secret selection", () => {
     { config: "dev", stage: "dev_ci_user" },
   ])("selects taxkit/$config for $stage", ({ config, stage }) =>
     Effect.gen(function* () {
-      expect(yield* nativeAppsDopplerSelection(stage)).toEqual({
-        config,
-        project: "taxkit",
-      });
+      expect(dopplerConfig(yield* checkedStage(stage))).toBe(config);
     })
   );
   it.effect.each(["prod-2", "pr-0", "dev", "private-stage-sentinel"])(
     "rejects an invalid stage without retaining its value: %s",
     (stage) =>
       Effect.gen(function* () {
-        const exit = yield* nativeAppsDopplerSelection(stage).pipe(Effect.exit);
+        const exit = yield* checkedStage(stage).pipe(Effect.exit);
         expect(Exit.isFailure(exit)).toBe(true);
         if (Exit.isFailure(exit)) {
           expect(Cause.pretty(exit.cause)).toContain(
-            "Native app stack stage is missing or invalid"
+            "The TaxKit stage name is not supported"
           );
           expect(Cause.pretty(exit.cause)).not.toContain(stage);
         }
@@ -637,7 +648,7 @@ describe("native app root secret selection", () => {
             ConfigProvider.fromUnknown({ PATH: "selected-doppler-fixture" }),
             { asPrimary: true }
           ),
-          ...Array.drop(nativeAppsSecrets(context), 1),
+          ...Array.drop(deploymentSecrets(context), 1),
         ],
         state: inMemoryState(),
       })(Config.schema(Schema.String, "PATH"));
@@ -654,7 +665,7 @@ describe("native app root secret selection", () => {
       const exit = yield* Stack.make({
         name: "TaxKitAppsSecretsProof",
         providers: Layer.empty,
-        secrets: nativeAppsSecrets,
+        secrets: deploymentSecrets,
         state: inMemoryState(),
       })(Effect.void).pipe(Effect.exit);
       expect(Exit.isFailure(exit)).toBe(true);
@@ -681,13 +692,13 @@ describe("native app root secret selection", () => {
         const exit = yield* Stack.make({
           name: "TaxKitAppsSecretsProof",
           providers: Layer.empty,
-          secrets: nativeAppsSecrets,
+          secrets: deploymentSecrets,
           state: inMemoryState(),
         })(Effect.void).pipe(Effect.exit);
         expect(Exit.isFailure(exit)).toBe(true);
         if (Exit.isFailure(exit)) {
           expect(Cause.pretty(exit.cause)).toContain(
-            "Native app stack stage is missing or invalid"
+            "The TaxKit stage name is not supported"
           );
           expect(Cause.pretty(exit.cause)).not.toContain(
             "private-stage-sentinel"

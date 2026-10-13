@@ -3,14 +3,14 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-app-owner
-last_reviewed: 2026-10-07
-review_trigger: API app settings, startup, smoke command or shutdown change
+last_reviewed: 2026-10-13
+review_trigger: API app settings, startup, routes, CORS, cache, smoke command or shutdown change
 ---
 
 # API App
 
-API application with the retained standalone Bun process and a native Alchemy
-Worker candidate for the active DEV-74 work.
+API application with a standalone Bun process and the native Alchemy Worker
+that the Website and deployed stages use.
 
 ## Scope
 
@@ -29,14 +29,15 @@ See the [HTTP package](../../packages/api/http/README.md) for paths/response rul
 and the [RPC owner](../../packages/api/rpc/README.md#documentation-connection)
 for the separate documentation revision and client.
 
-The native instance also builds `ContentDiscovery` from that same checked
-catalogue. It receives the already cached, checked API/Website settings as a
-lazy Effect, so deferred native addresses are resolved on incoming use. The
-revision-two native discovery call returns one of four bounded documents with
-its matching media type; internal projection/configuration failures become
-fixed unavailable guidance. The Website serves them at their ordinary file
-addresses. Existing public HTTP routes and the standalone Bun host retain
-their content contract. Discovery takes no calculator allowance.
+The native Worker also serves the four discovery documents at GET (and HEAD)
+`/api/v1/docs/discovery/sitemap.xml`, `/robots.txt`, `/llms.txt` and
+`/llms-full.txt`. It builds the static `ContentDiscoveryLive` once from that
+same catalogue, supplying `ContentDiscoverySettings` from its cached checked
+API and publication origins, so deferred native addresses are read on first
+use. A document is plain text or XML with `nosniff`; settings or projection
+failure is an empty 503. The Website forwards its own `/sitemap.xml`,
+`/robots.txt` and `/llms*.txt` requests here once. The standalone Bun host does
+not serve these routes. Discovery takes no calculator allowance.
 
 The API dependency build generates the accepted catalogue before TypeScript
 or native bundling consumes it. Its ESNext module profile preserves the JSON
@@ -50,7 +51,7 @@ Markdown through the real HTTP process. It checks their common page address,
 title and processed body within one five-second operation deadline, in addition
 to the existing calculator and OpenAPI checks.
 
-## Native Worker candidate
+## Native Worker
 
 `src/worker.ts` declares native `TaxKitApiWorker` with the standard Alchemy
 class and `.make` entry. `src/worker.application.ts` constructs one router and
@@ -59,13 +60,40 @@ POST `/rpc` delegate to the same calculator service. Its named RPC operations
 match all nine existing calculator-service calls using the canonical request/result contracts. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
-The Worker checks `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` with the
-canonical RPC origin policy. Its own origin comes from native `Worker.URL`;
-the apps stack supplies the matching website resource Output.
-Absent or invalid settings return a fixed native Config error without the
-rejected value. CORS allows the checked website origin, `content-type` and the
-optional `x-taxkit-collection-policy` header,
-with credentials disabled. Other origins receive no allow-origin header.
+The Worker exposes two entry points. `fetch` serves public HTTP, RPC and MCP.
+`calculatorRequest(request, key)` is a service-binding method with no HTTP
+route: the Website uses it for calculations so the original caller's checked
+rate key travels outside JSON and headers. It admits only POST `/rpc` and POST
+`/api/v1/calculators/:calculatorId/calculate` (404 otherwise), and buffers the
+reply within 2 MiB and ten seconds (503 otherwise).
+
+The native init declares Cloudflare Workers Cache with
+`cache({ crossVersionCache: false })`, so each deployed version starts its own
+cache. Every reply, including error responses, gets one decision from
+`applyCachePolicy` in `@taxkit/api-http/response-policy`. A successful GET or
+HEAD on a public read path (documentation, discovery, calculator metadata and
+the OpenAPI documents) without `Set-Cookie` gets
+`Cache-Control: public, max-age=0` and
+`Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
+Health, calculation, RPC, MCP and every error reply get `no-store`.
+
+`src/edge-identity.boundary.ts` (export `api/edge-identity`) owns
+`CalculatorHostMode` and `calculatorEdgeRateKey`, which reads the checked
+`cf-connecting-ip` and refuses Worker subrequests. The Website's no-JavaScript
+form host uses the same function.
+
+The Worker checks `API_PUBLIC_ORIGIN` and `TAXKIT_PUBLICATION_ORIGIN` with the
+canonical origin policy. Its own origin comes from native `Worker.URL`; the
+publication origin is the fixed Production site `https://taxkit.dev`. The API
+does not read the Website's address. Absent or invalid settings return a fixed
+native Config error without the rejected value. HTTP and RPC CORS admit any
+exact HTTP(S) browser origin with credentials disabled (`publicCors` and
+`isBrowserOrigin` in `@taxkit/api-http/response-policy`, also used by the Bun
+host routes), and allow `content-type`, the optional
+`x-taxkit-collection-policy` header and the native `b3`/`traceparent` tracing
+headers. Remote MCP admits Origin-less clients and browser pages served from
+the publication origin only: `TaxKitMcpHost` supplies that origin to the static
+`TaxKitMcpHttpLayer`, whose `allowedOrigins` holds just it.
 Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
 produce an empty 503 response, without a guessed address.
@@ -80,11 +108,9 @@ and severity. Arbitrary messages, Causes, annotations and span labels are
 discarded before console output. This is bounded containment; T009 still owns
 safe native tracing and exporter qualification.
 
-The apps infrastructure root now declares the native API and Website candidate
-and their matching resource bindings. Local plans and transport tests do not
-prove deployment. DEV-74's local acceptance review owns the complete connection
-qualification; T009 retains safe exported tracing. The Bun commands and public contract
-stay available during this work.
+The infrastructure apps stack declares the API and Website and the Website's
+binding to the API; see [deployment](../../docs/architecture/deployment.md).
+Local plans and transport tests do not show a deployment works.
 
 ## Analytics candidate
 
@@ -308,7 +334,7 @@ curl -X POST https://api.taxkit.localhost/api/v1/calculators/au.pay.take-home/ca
 - Do not create a runtime inside request handling.
 - Keep process-owned resources in `ApiAppLayer` so root fiber interruption
   releases them through scoped finalizers.
-- Keep `apps/web` as a native RPC client of this app, with no in-process API mount.
+- Keep `apps/web` a client of this app through the generated HTTP client, with no in-process API mount.
 
 ## Related Docs
 
@@ -324,18 +350,11 @@ and declaration paths are explicit. The graph owns peer binding and addresses;
 the API app owns request handling and checked runtime configuration. This export
 does not make a public package or change the existing HTTP/OpenAPI contract.
 
-The shared `@taxkit/api-rpc/request-boundary` now owns the native streamed POST
-limit; the app keeps its compatibility alias. `@taxkit/api-rpc/host-telemetry`
+`@taxkit/api-http/request-boundary` owns the native streamed POST limit
+(`@taxkit/api-rpc/request-boundary` re-exports it). `@taxkit/api-rpc/host-telemetry`
 owns the same fixed logging/reporting policy used by the Website. Existing API
 proof remains applicable through its focused regression tests; this reuse does
 not qualify native trace export or every framework logging path.
-
-The Website's native cancellation fixture uses the real API calculation and
-reply encoder before delaying headers or the remainder of the encoded body.
-This qualifies the client's complete ten-second wait and browser request abort,
-not cancellation of upstream Worker work. The [Website README](../web/README.md)
-owns its local commands and [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
-records the bounded observations.
 
 The private `api/worker` export also owns `ApiWorkerObservability`. Both its
 default Worker and the native apps graph explicitly disable platform invocation
@@ -378,9 +397,9 @@ The native API builds `PublicCalculatorServiceRateLimited` once underneath its b
 Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) is approximate and local to a location, not an exact global quota. Real edge identity, namespace uniqueness and uploaded provider settings need separate authorised readback. Direct engine/local SDK and standalone Bun execution keep their existing contracts.
 
 
-## Native remote calculator tools candidate
+## Native remote calculator tools
 
-The native Worker candidate serves `/mcp` through installed Effect's
+The native Worker serves `/mcp` through installed Effect's
 `McpServer` and `Toolkit`. It composes modern protocol `2026-07-28` in the
 Worker and older protocol `2025-11-25` in an app-owned native Durable Object.
 The six tools list calculators, read an input Schema, calculate, read docs
@@ -418,8 +437,9 @@ HTTP/modern/older calls exhaust one allowance even with a forged private header.
 Cloud location/approximation limits still apply.
 
 The existing 64 KiB streamed POST limit applies before delegation. Complete
-native JSON/SSE replies are read within ten seconds and 2 MiB. The exact Website
-Origin is accepted; other supplied Origins fail, while origin-less clients work.
+native JSON/SSE replies are read within ten seconds and 2 MiB. Only the
+publication origin is accepted; other supplied Origins fail, while origin-less
+clients work.
 Only `/mcp` permits protocol/routing/session headers in CORS. Expected failures
 have fixed codes and manual-retry guidance; native internal failures use the
 existing safe reply and fixed reporter.
@@ -463,7 +483,7 @@ fixtures bind the genuine generated class in disposable namespaces. Merely
 adding an emulator binding is insufficient and previously returned 503.
 See the [session candidate record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json),
 [earlier modern record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
-and [browser caller owner](../web/README.md#visible-calculator-browser-tools).
+and [browser caller owner](../web/README.md#browser-tools).
 T006 is locally accepted against its bounded contract and ready for draft
 review. Source-built setup, actual browser callers and deployed ordinary remote
 calls do not establish prompt modern cleanup or an autonomous model session.

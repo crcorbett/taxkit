@@ -17,12 +17,3 @@ export class DocsSearchInputError extends Schema.TaggedError<DocsSearchInputErro
     ),
   }
 ) {}
-
-export class DocsRouteTransportError extends Schema.TaggedError<DocsRouteTransportError>()(
-  "DocsRouteTransportError",
-  {
-    message: Schema.tag(
-      "The documentation page could not be read. Please reload it to try again."
-    ),
-  }
-) {}

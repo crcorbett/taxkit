@@ -1,5 +1,5 @@
 import type { HttpEffect } from "alchemy/Http";
-import { ByteSize, Cause, Effect, Option, Stream } from "effect";
+import { ByteSize, Effect, Option, Stream } from "effect";
 import { HttpClientRequest, HttpServerResponse } from "effect/http";
 
 import {
@@ -40,9 +40,12 @@ export const withBoundedMcpReply = Effect.fnUntraced(function* (
       )
     ),
     Effect.timeoutOption(McpResponseDeadline),
-    Effect.catchCause((cause) =>
-      Cause.hasInterrupts(cause) ? Effect.interrupt : Effect.succeedNone
-    ),
+    // Only this adapter's own body-read, size and deadline failures become
+    // 503. Interruption and unexpected defects reach the native host handler.
+    Effect.catchTags({
+      HttpClientError: () => Effect.succeedNone,
+      McpResponseTooLarge: () => Effect.succeedNone,
+    }),
     Effect.map(
       Option.getOrElse(() => HttpServerResponse.empty({ status: 503 }))
     )

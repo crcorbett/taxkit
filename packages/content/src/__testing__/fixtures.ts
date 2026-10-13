@@ -6,7 +6,7 @@ export const exampleDiscoverySettings = Schema.decodeEffect(
   DocsDiscoverySettings
 )({
   apiOrigin: "https://api.example.com",
-  websiteOrigin: "https://website.example.com",
+  publicationOrigin: "https://website.example.com",
 });
 
 // Checked, controlled test data does not accept any authored MDX for publication.

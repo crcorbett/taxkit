@@ -59,7 +59,7 @@
     }
   },
   "scripts": {
-    "build": "bun run generate && bun --conditions=source run ../../tools/documentation/catalogue.runtime.ts",
+    "build": "bun run generate && bun --conditions=source run ./src/catalogue.runtime.ts",
     "check-types": "tsc --noEmit",
     "generate": "fumadocs-mdx && bun --conditions=source run ./src/catalogue-index.runtime.ts",
     "test": "vitest run --passWithNoTests",

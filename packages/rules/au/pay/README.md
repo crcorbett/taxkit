@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-au-pay-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-13
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -40,6 +40,13 @@ runtime manifest reads.
   unsupported amount returns a safe `CalculationError` through the Effect
   error channel. `buildPayWithholdingsLedger` now returns an Effect; callers
   yield its result. Retained Schedule 1 values and known pay results are unchanged.
+
+## Scenario input
+
+`CalculateTakeHomePay` and `CalculatePayWithholdings` read their input facts from `TakeHomeScenario`, a service holding the
+decoded scenario. The static `TakeHomeScenarioLive` Layer derives those facts from it.
+Decode `TakeHomeScenarioInputSchema` at your boundary, then supply the value with
+`Layer.succeed(TakeHomeScenario)(input)`; no Layer is built from request input.
 
 ## Commands
 

@@ -1,2 +1,0 @@
-# Intentionally empty. Local Cloudflare development receives governed values
-# from the fixed Doppler adapter, never from a developer .env file.

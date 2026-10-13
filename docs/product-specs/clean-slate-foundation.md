@@ -1,13 +1,21 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: superseded
 authority: supporting
 owner: taxkit-product-owner
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-13
 review_trigger: rebuild scope, interview answer, version selection, or implementation admission
+successor: ../exec-plans/active/common-practice-foundation-review.md
+superseded_reason: The 13 October Common Practice foundation owns current transport, origin, cache, Alchemy and delivery intent.
 ---
 
 # Clean slate for the TaxKit website and API
+
+The [Common Practice foundation](./common-practice-foundation-review.md) now owns current transport, origin,
+publication-link, caching, Alchemy and delivery choices. Its 13 October design
+replaces the earlier Website RPC/client wrappers and receipt-based operations.
+The text below is retained execution and interview history; it is not current
+policy where the newer plan differs.
 
 This is the accepted implementation contract and design interview record.
 Cooper explicitly requested implementation on 4 October 2026, superseding the

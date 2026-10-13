@@ -43,8 +43,8 @@ app is no longer a workspace; its original source remains historical data.
 - `src/live.layer.ts`: Effect service layer that serves navigation and
   renderable Fumadocs page data and loads validation policy only when its
   explicit validation operation runs.
-- `src/test.layer.ts`: deterministic `DocsContentService` composition over the
-  generic Fumadocs test Layer.
+- `src/test.layer.ts`: static `DocsContentServiceTest` composition over the
+  generic Fumadocs test Layer; tests supply `FumadocsSourceFixtures`.
 - `src/catalogue-index.runtime.ts`: local command that asks the installed MDX
   compiler to generate an independent native index in `.source/catalogue/`.
 - `src/catalogue-source.layer.ts`: local build-only compiler connection exposed
@@ -60,8 +60,8 @@ app is no longer a workspace; its original source remains historical data.
 is resolved from `source.config.ts` through its module URL because generation
 also runs from the docs app working directory; generated imports remain
 checkout-relative and portable in either consumer. Server-only package
-code supplies one TaxKit generated-collection adapter to
-`@taxkit/docs-fumadocs/live`. `DocsContentServiceLive` requires the generic
+code supplies one TaxKit generated-collection adapter as
+`FumadocsGeneratedCollection` to the static `FumadocsSourceLive`. `DocsContentServiceLive` requires the generic
 `FumadocsSource` service, decodes its generic representation into canonical
 TaxKit page values and maps generic source errors at the content boundary.
 The app composes the two Layers and executes the resulting server runtime.
@@ -154,7 +154,7 @@ fenced example in the documentation has been compiled.
 
 ## Accepted catalogue build
 
-`bun run docs:catalogue` generates both compiler indexes, then runs the
+`bun run --filter=@taxkit/docs-content build` generates both compiler indexes, then runs the
 repository-owned builder in `tools/documentation/catalogue.runtime.ts`.
 The package `build` command now includes that same accepted catalogue step;
 `generate` remains the lower-level compiler-index command. The dedicated

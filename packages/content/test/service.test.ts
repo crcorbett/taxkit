@@ -17,6 +17,7 @@ import {
 import {
   ContentCatalogue,
   ContentDiscovery,
+  ContentDiscoverySettings,
   ContentService,
 } from "../src/service.js";
 import {
@@ -76,9 +77,14 @@ describe("accepted content service", () => {
       Effect.gen(function* () {
         const observed = yield* Ref.make(0);
         const settings = yield* exampleDiscoverySettings;
-        const layer = ContentDiscoveryLive(
-          Ref.update(observed, (count) => count + 1).pipe(Effect.as(settings))
-        ).pipe(
+        const layer = ContentDiscoveryLive.pipe(
+          Layer.provide(
+            Layer.succeed(ContentDiscoverySettings)(
+              Ref.update(observed, (count) => count + 1).pipe(
+                Effect.as(settings)
+              )
+            )
+          ),
           Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
         );
         yield* Effect.gen(function* () {
@@ -105,7 +111,10 @@ describe("accepted content service", () => {
           Effect.flatMap((service) => service.getDocument("/sitemap.xml")),
           Effect.flip,
           Effect.provide(
-            ContentDiscoveryLive(Effect.fail(expected)).pipe(
+            ContentDiscoveryLive.pipe(
+              Layer.provide(
+                Layer.succeed(ContentDiscoverySettings)(Effect.fail(expected))
+              ),
               Layer.provide(
                 Layer.effect(ContentCatalogue, exampleContentCatalogue)
               )
@@ -140,7 +149,7 @@ describe("accepted content service", () => {
         });
         const settings = yield* Schema.decodeEffect(DocsDiscoverySettings)({
           apiOrigin: "http://127.0.0.1:4001",
-          websiteOrigin: "http://127.0.0.1:4000",
+          publicationOrigin: "http://127.0.0.1:4000",
         });
         const setup = yield* makeContentDiscoveryTest(catalogue, settings);
         const index = yield* ContentDiscovery.pipe(

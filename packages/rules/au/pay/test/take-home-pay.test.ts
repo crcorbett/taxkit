@@ -12,8 +12,9 @@ import {
   PaygWithholdingRuleId,
   PayWithholdingsLedgerRuleId,
   TakeHomePayReport,
+  TakeHomeScenario,
+  TakeHomeScenarioInputSchema,
   TakeHomeScenarioLive,
-  TakeHomeScenarioLiveFromInput,
   TaxablePayRuleId,
 } from "@taxkit/rules-au-pay";
 import type { TakeHomeScenarioInput } from "@taxkit/rules-au-pay";
@@ -29,7 +30,8 @@ const runScenario = (
     const result = yield* engine.run({
       calculation: CalculateTakeHomePay,
       layer: pack.pipe(
-        Layer.provideMerge(TakeHomeScenarioLiveFromInput(input))
+        Layer.provideMerge(TakeHomeScenarioLive),
+        Layer.provide(Layer.succeed(TakeHomeScenario)(input))
       ),
     });
 
@@ -247,26 +249,17 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
     })
   );
 
-  it.effect(
-    "scenario layer rejects malformed input through Effect Schema",
-    () =>
-      Effect.gen(function* () {
-        const exit = yield* CalculateTakeHomePay.pipe(
-          Effect.provide(
-            AuTakeHomePay2025_26_Live.pipe(
-              Layer.provideMerge(
-                TakeHomeScenarioLive({
-                  grossPay: weekly1500,
-                  taxFreeThresholdClaimed: "yes",
-                })
-              )
-            )
-          ),
-          Effect.exit
-        );
+  it.effect("scenario input Schema rejects malformed input", () =>
+    Effect.gen(function* () {
+      const exit = yield* Schema.decodeUnknownEffect(
+        TakeHomeScenarioInputSchema
+      )({
+        grossPay: weekly1500,
+        taxFreeThresholdClaimed: "yes",
+      }).pipe(Effect.exit);
 
-        expect(Exit.isFailure(exit)).toBe(true);
-      })
+      expect(Exit.isFailure(exit)).toBe(true);
+    })
   );
 
   it.effect("fortnightly period: weekly-equivalent formula", () =>

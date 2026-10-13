@@ -20,7 +20,7 @@ import {
   CalculatorRunResponse,
   RulesResponse,
   TaxYearsResponse,
-} from "@taxkit/calculators";
+} from "@taxkit/calculators/schemas";
 import { Data, Schema } from "effect";
 import {
   HttpApiEndpoint,
@@ -34,12 +34,11 @@ import {
   CalculatorRequestBodyTooLarge,
 } from "../schemas.js";
 
+// The declaration imports only Schemas, so browser clients built from it never
+// include calculator implementations.
 export {
-  CalculatorCatalog,
   CalculatorCatalogItem,
-  CalculatorCatalogItems,
   CalculatorCatalogResponse,
-  CalculatorCatalogResponseValue,
   CalculatorContext,
   CalculatorId,
   CalculatorInputDecodeError,
@@ -53,11 +52,7 @@ export {
   HelpMode,
   UnsupportedCalculatorContextError,
   UnsupportedCalculatorError,
-  getCalculatorCatalogEntry,
-  listCalculatorCatalogEntries,
-  toCalculatorCatalogItem,
-  type CalculatorCatalogEntry,
-} from "@taxkit/calculators";
+} from "@taxkit/calculators/schemas";
 
 const CalculatorApiRequestErrorEnvelope = Schema.Struct({
   error: CalculatorRequestError,

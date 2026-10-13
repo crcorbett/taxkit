@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { TaxKitApiInProcessClientLive } from "@taxkit/api-http/client/server";
+import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
 import { ContentServiceLive } from "@taxkit/content/live";
 import { ContentCatalogue } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
@@ -53,9 +53,11 @@ it.effect(
   "uses the real HTTP route and checked descriptor fields for calculator help",
   () =>
     Effect.gen(function* () {
-      const labels = yield* loadCalculatorHelp.pipe(
+      const labels = yield* loadCalculatorHelp(
+        new URL("http://taxkit.internal")
+      ).pipe(
         Effect.provide(
-          TaxKitApiInProcessClientLive.pipe(
+          TaxKitApiInProcessLive.pipe(
             Layer.provide(
               ContentServiceLive.pipe(
                 Layer.provide(

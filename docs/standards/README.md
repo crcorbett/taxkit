@@ -17,7 +17,6 @@ quality tools.
 ## Documents
 
 - [Code patterns](./code-patterns.md)
-- [Controls and automation governance](./controls.md)
 - [Docstring conventions](./docstrings.md)
 - [Documentation architecture](./documentation-architecture.md)
 - [Documentation review](./documentation-review.md)

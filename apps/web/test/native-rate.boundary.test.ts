@@ -101,6 +101,10 @@ it.live(
                     type: "json" as const,
                     value: "edge",
                   },
+                  TAXKIT_PUBLICATION_ORIGIN: {
+                    type: "json" as const,
+                    value: websiteOrigin,
+                  },
                   WEBSITE_PUBLIC_ORIGIN: {
                     type: "json" as const,
                     value: websiteOrigin,

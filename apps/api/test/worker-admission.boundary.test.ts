@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { CalculatorClientRateKey } from "@taxkit/api-rpc/rate-identity";
+import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import {
   CalculatorAdmissionUnavailable,

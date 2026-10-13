@@ -4,7 +4,10 @@ import {
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/request-boundary";
-import { CalculatorHostTelemetryLive } from "@taxkit/api-rpc/host-telemetry";
+import {
+  ApiHostTelemetryLive,
+  WebsiteHostTelemetryLive,
+} from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculatorRpcPayload,
   CalculatorRpcVersion,
@@ -12,6 +15,7 @@ import {
 import {
   CalculationRequest,
   CalculatorFixture,
+  CalculatorFixtureMode,
   CalculatorLive,
   sensitiveSentinel,
 } from "@taxkit/api-rpc/testing/fixtures";
@@ -61,7 +65,7 @@ const ApiWorkerInit = ApiWorkerApplicationInit.pipe(
 
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
-  WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+  TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
 });
 const Json = Schema.fromJsonString(Schema.Unknown);
 const NativeRequest = Schema.TaggedStruct("Request", {
@@ -71,7 +75,82 @@ const NativeRequest = Schema.TaggedStruct("Request", {
   tag: Schema.Literal("Calculate"),
 });
 
+const header = (
+  response: HttpServerResponse.HttpServerResponse,
+  name: string
+) => Headers.get(response.headers, name).pipe(Option.getOrUndefined);
+
+const allowOrigin = (response: HttpServerResponse.HttpServerResponse) =>
+  Headers.get(response.headers, "access-control-allow-origin").pipe(
+    Option.getOrUndefined
+  );
+
 describe("native API application", () => {
+  it.effect("serves discovery and shares only public reads", () =>
+    Effect.gen(function* () {
+      const app = yield* ApiWorkerInit;
+      const send = (path: string, method: string, body: string | null) =>
+        app.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request(`https://api.example.com${path}`, {
+                body,
+                headers: {
+                  "cf-connecting-ip": "203.0.113.7",
+                  "content-type": "application/json",
+                  origin: "https://other.example.com",
+                },
+                method,
+              })
+            )
+          ),
+          Effect.scoped
+        );
+      const llms = yield* send("/api/v1/docs/discovery/llms.txt", "GET", null);
+      expect(llms.status).toBe(200);
+      expect(header(llms, "content-type")).toBe("text/plain; charset=utf-8");
+      expect(header(llms, "cache-control")).toBe("public, max-age=0");
+      expect(header(llms, "cloudflare-cdn-cache-control")).toBe(
+        "public, max-age=604800, stale-if-error=0"
+      );
+      const text = yield* Effect.promise(() =>
+        HttpServerResponse.toWeb(llms).text()
+      );
+      expect(text).toContain("https://website.example.com");
+      const head = yield* send(
+        "/api/v1/docs/discovery/sitemap.xml",
+        "HEAD",
+        null
+      );
+      expect(head.status).toBe(200);
+      expect(header(head, "cache-control")).toBe("public, max-age=0");
+      const metadata = yield* send("/api/v1/calculators", "GET", null);
+      expect(header(metadata, "cache-control")).toBe("public, max-age=0");
+      const health = yield* send("/api/health", "GET", null);
+      expect(header(health, "cache-control")).toBe("no-store");
+      const missing = yield* send(
+        "/api/v1/docs/discovery/other.txt",
+        "GET",
+        null
+      );
+      expect(missing.status).toBe(404);
+      expect(header(missing, "cloudflare-cdn-cache-control")).toBe("no-store");
+      const calculated = yield* send(
+        "/api/v1/calculators/au.pay.take-home/calculate",
+        "POST",
+        yield* Schema.encodeEffect(Schema.fromJsonString(CalculatorRunRequest))(
+          CalculationRequest.payload
+        )
+      );
+      expect(calculated.status).toBe(200);
+      expect(header(calculated, "cache-control")).toBe("no-store");
+      expect(header(calculated, "cloudflare-cdn-cache-control")).toBe(
+        "no-store"
+      );
+    }).pipe(Effect.provideService(ConfigProvider.ConfigProvider, settings))
+  );
+
   it.effect("shares eight calculation places across HTTP and RPC batches", () =>
     Effect.gen(function* () {
       const live = yield* PublicCalculatorService;
@@ -417,63 +496,54 @@ describe("native API application", () => {
     )
   );
 
-  it.effect("checks each preflight origin with the native predicate", () =>
+  it.effect("admits public browser origins without credentials", () =>
     Effect.gen(function* () {
       const app = yield* ApiWorkerInit;
-      const matching = yield* app.fetch.pipe(
-        Effect.provideService(
-          HttpServerRequest.HttpServerRequest,
-          HttpServerRequest.fromWeb(
-            new Request("https://api.example.com/rpc", {
-              headers: {
-                "access-control-request-headers": "content-type",
-                "access-control-request-method": "POST",
-                origin: "https://website.example.com",
-              },
-              method: "OPTIONS",
-            })
-          )
-        ),
-        Effect.scoped
-      );
-      const other = yield* app.fetch.pipe(
-        Effect.provideService(
-          HttpServerRequest.HttpServerRequest,
-          HttpServerRequest.fromWeb(
-            new Request("https://api.example.com/rpc", {
-              headers: {
-                "access-control-request-headers": "content-type",
-                "access-control-request-method": "POST",
-                origin: "https://other.example.com",
-              },
-              method: "OPTIONS",
-            })
-          )
-        ),
-        Effect.scoped
-      );
-      expect(matching.status).toBe(204);
-      expect(
-        Headers.get(matching.headers, "access-control-allow-origin").pipe(
-          Option.getOrUndefined
-        )
-      ).toBe("https://website.example.com");
-      expect(
-        Headers.get(matching.headers, "access-control-allow-headers").pipe(
-          Option.getOrUndefined
-        )
-      ).toBe("content-type,x-taxkit-collection-policy");
-      expect(
-        Headers.get(matching.headers, "access-control-allow-credentials").pipe(
-          Option.getOrUndefined
-        )
-      ).toBeUndefined();
+      const preflight = (path: string, origin: string) =>
+        app.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request(`https://api.example.com${path}`, {
+                headers: {
+                  "access-control-request-headers": "content-type,traceparent",
+                  "access-control-request-method": "POST",
+                  origin,
+                },
+                method: "OPTIONS",
+              })
+            )
+          ),
+          Effect.scoped
+        );
+      const other = yield* preflight("/rpc", "https://other.example.com");
       expect(other.status).toBe(204);
+      expect(allowOrigin(other)).toBe("https://other.example.com");
       expect(
-        Headers.get(other.headers, "access-control-allow-origin").pipe(
+        Headers.get(other.headers, "access-control-allow-headers").pipe(
+          Option.getOrUndefined
+        )
+      ).toBe("x-taxkit-collection-policy,b3,content-type,traceparent");
+      expect(
+        Headers.get(other.headers, "access-control-allow-credentials").pipe(
           Option.getOrUndefined
         )
       ).toBeUndefined();
+      const http = yield* preflight(
+        "/api/v1/calculators/au.pay.take-home/calculate",
+        "http://127.0.0.1:3000"
+      );
+      expect(allowOrigin(http)).toBe("http://127.0.0.1:3000");
+      // A malformed or non-HTTP origin is never echoed.
+      const malformed = yield* preflight("/rpc", "https://other.example.com/");
+      expect(allowOrigin(malformed)).toBeUndefined();
+      const opaque = yield* preflight("/rpc", "null");
+      expect(allowOrigin(opaque)).toBeUndefined();
+      // Remote MCP keeps its exact browser list.
+      const mcpListed = yield* preflight("/mcp", "https://website.example.com");
+      expect(allowOrigin(mcpListed)).toBe("https://website.example.com");
+      const mcpOther = yield* preflight("/mcp", "https://other.example.com");
+      expect(allowOrigin(mcpOther)).toBeUndefined();
     }).pipe(
       Effect.provideService(ConfigProvider.ConfigProvider, settings),
       Effect.scoped
@@ -687,7 +757,7 @@ describe("native API application", () => {
           ConfigProvider.ConfigProvider,
           ConfigProvider.fromUnknown({
             API_PUBLIC_ORIGIN: sensitiveSentinel,
-            WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+            TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
           })
         ),
         Effect.exit
@@ -707,12 +777,16 @@ describe("native API application", () => {
         yield* Effect.log(sensitiveSentinel).pipe(
           Effect.annotateLogs({ [sensitiveSentinel]: sensitiveSentinel }),
           Effect.withLogSpan(sensitiveSentinel),
-          Effect.provide(CalculatorHostTelemetryLive(host))
+          Effect.provide(
+            host === "api" ? ApiHostTelemetryLive : WebsiteHostTelemetryLive
+          )
         );
         yield* Effect.die(sensitiveSentinel).pipe(
           Effect.withErrorReporting,
           Effect.exit,
-          Effect.provide(CalculatorHostTelemetryLive(host))
+          Effect.provide(
+            host === "api" ? ApiHostTelemetryLive : WebsiteHostTelemetryLive
+          )
         );
         const lines = yield* TestConsole.logLines;
         expect(lines.length).toBe(2);
@@ -728,7 +802,11 @@ describe("native API application", () => {
     Effect.gen(function* () {
       const app = yield* ApiWorkerApplication.pipe(
         Effect.provide(ApiContentLive),
-        Effect.provide(CalculatorFixture("defect"))
+        Effect.provide(
+          CalculatorFixture.pipe(
+            Layer.provide(Layer.succeed(CalculatorFixtureMode)("defect"))
+          )
+        )
       );
       const body = yield* Schema.encodeEffect(
         Schema.fromJsonString(NativeRequest)

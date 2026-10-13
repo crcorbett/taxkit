@@ -19,7 +19,7 @@ import { CalculatorRpcOperationCases } from "../src/__testing__/fixtures.js";
 import { CalculatorRpcDeadlineExceeded } from "../src/errors.js";
 import { TaxKitRpcClientLive } from "../src/live.layer.js";
 import { CalculatorRpcOrigin } from "../src/schemas.js";
-import { TaxKitRpcClient } from "../src/service.js";
+import { TaxKitRpcClient, TaxKitRpcOrigin } from "../src/service.js";
 
 const origin = Schema.decodeResult(CalculatorRpcOrigin)(
   "https://api.example.com"
@@ -65,9 +65,9 @@ it.effect.each(
         yield* Deferred.await(released);
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })
@@ -109,9 +109,9 @@ it.effect.each(CalculatorRpcOperationCases)(
         yield* Deferred.await(released);
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })
@@ -135,9 +135,9 @@ it.effect.each(CalculatorRpcOperationCases)(
         yield* Deferred.await(started);
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         ),
         Effect.scoped
       );
@@ -183,9 +183,9 @@ it.effect.each(CalculatorRpcOperationCases)(
         yield* Fiber.interrupt(call);
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })

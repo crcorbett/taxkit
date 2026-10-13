@@ -9,6 +9,11 @@
       "source": "./src/worker.ts",
       "types": "./dist/worker.d.ts",
       "default": "./dist/worker.js"
+    },
+    "./edge-identity": {
+      "source": "./src/edge-identity.boundary.ts",
+      "types": "./dist/edge-identity.boundary.d.ts",
+      "default": "./dist/edge-identity.boundary.js"
     }
   },
   "scripts": {

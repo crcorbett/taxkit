@@ -1,15 +1,6 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
-import {
-  Array,
-  Effect,
-  FileSystem,
-  Option,
-  Path,
-  Queue,
-  Record,
-  Schema,
-} from "effect";
+import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
@@ -48,22 +39,12 @@ it.live(
           module.contents.includes('die("PRIVATE9")')
         )
       ).toBe(true);
-      const functionId = Array.findFirst(Record.values(modules), (module) =>
-        module.contents.includes(
-          'functionName: "websiteSettings_createServerFn_handler"'
+      // The Website has no generated server-function surface to fall back on.
+      expect(
+        Array.some(Record.values(modules), (module) =>
+          module.contents.includes("_createServerFn_handler")
         )
-      ).pipe(
-        Option.flatMap((module) =>
-          Option.fromNullishOr(
-            module.contents.match(
-              /"(?<functionId>[a-f0-9]{64})":\s*\{\s*functionName:\s*"websiteSettings_createServerFn_handler"/u
-            )?.groups
-          ).pipe(Option.flatMap(Record.get("functionId")))
-        ),
-        Option.getOrElse(() =>
-          expect.fail("Missing native settings function identity")
-        )
-      );
+      ).toBe(false);
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
       const host = yield* Effect.acquireRelease(
@@ -93,6 +74,10 @@ it.live(
                         type: "worker" as const,
                         worker: "taxkit-website-settings-defect",
                       },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json" as const,
+                        value: origin,
+                      },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json" as const,
                         value: origin,
@@ -110,19 +95,45 @@ it.live(
       yield* Effect.promise(() => host.ready).pipe(
         Effect.timeout("10 seconds")
       );
-      const response = yield* Effect.promise(() =>
-        host.dispatchFetch(`${origin}/_serverFn/${functionId}`, {
-          headers: {
-            origin,
-            "sec-fetch-site": "same-origin",
-            "x-tsr-serverFn": "true",
+      // The root loader's settings read reaches the injected defect on both a
+      // plain page request and a no-JavaScript form submission.
+      yield* Effect.forEach(
+        [
+          { body: null, headers: { accept: "text/html" }, method: "GET" },
+          {
+            body: "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on",
+            headers: {
+              accept: "text/html",
+              "content-type": "application/x-www-form-urlencoded",
+            },
+            method: "POST",
           },
-        })
+        ],
+        (request) =>
+          Effect.gen(function* () {
+            const response = yield* Effect.promise(() =>
+              host.dispatchFetch(`${origin}/`, request)
+            );
+            const body = yield* Effect.promise(() => response.text());
+            expect(body.includes("PRIVATE9"), request.method).toBe(false);
+            // TanStack's native root error egress for an internal defect.
+            expect(response.status, request.method).toBe(500);
+            expect(response.headers.get("content-type")).toContain("text/html");
+            expect(response.headers.get("cache-control")).toBe("no-store");
+            expect(response.headers.get("cloudflare-cdn-cache-control")).toBe(
+              "no-store"
+            );
+            // The root error component is the only page content.
+            expect(body).toContain(
+              "TaxKit cannot load its settings. Please try again later."
+            );
+            expect(body).not.toContain("Pay before tax");
+            expect(body).not.toContain("1654");
+            expect(body).not.toContain("Server Fn Error");
+            // The dehydrated route error carries no message or stack.
+            expect(body).toMatch(/s:"error",e:\$R\[\d+\]=new Error\(""\)/u);
+          })
       );
-      const body = yield* Effect.promise(() => response.text());
-      expect(body.includes("PRIVATE9")).toBe(false);
-      expect(response.status).toBe(500);
-      expect(body).toBe("");
       expect(yield* Queue.clear(exceptions)).toEqual([]);
       const logText = yield* Schema.encodeEffect(Json)(
         yield* Queue.clear(logs)

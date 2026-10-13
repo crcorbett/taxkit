@@ -2,8 +2,9 @@ import { describe, expect, it } from "@effect/vitest";
 import { Effect, Layer, Option, Result, Schema } from "effect";
 import { Headers, HttpServerRequest, HttpServerResponse } from "effect/http";
 
+import { WebsiteHost } from "../api/host.server";
+import { TaxKitWebConfigError } from "../config";
 import { WebsiteDocsAccept } from "../schemas";
-import { WebsiteServerApplication } from "../service.server";
 import { withDocsRepresentation } from "./markdown.response.server";
 
 describe("documentation representation preferences", () => {
@@ -71,6 +72,12 @@ describe("documentation representation preferences", () => {
   });
 });
 
+const unconfigured = new TaxKitWebConfigError({
+  message: "TaxKit web settings are missing or invalid.",
+  operation: "settings",
+  runtime: "server",
+});
+
 describe("documentation HTML response headers", () => {
   it.effect.each([
     { existing: "", expected: "Accept" },
@@ -95,7 +102,12 @@ describe("documentation HTML response headers", () => {
           new Request("http://127.0.0.1:4196/start/quickstart")
         )
       ),
-      Effect.provide(Layer.mock(WebsiteServerApplication, {})),
+      Effect.provide(
+        Layer.mock(WebsiteHost, {
+          client: Result.fail(unconfigured),
+          settings: Result.fail(unconfigured),
+        })
+      ),
       Effect.scoped,
       Effect.tap((response) =>
         Effect.sync(() => {

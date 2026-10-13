@@ -5,35 +5,25 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./stack": {
-      "source": "./src/retired-stack.schemas.ts",
-      "types": "./src/retired-stack.schemas.ts",
-      "default": "./src/retired-stack.schemas.ts"
-    },
-    "./stage": {
-      "source": "./src/stage.ts",
-      "types": "./src/stage.ts",
-      "default": "./src/stage.ts"
-    },
-    "./website": {
-      "source": "./src/cloudflare/website.ts",
-      "types": "./src/cloudflare/website.ts",
-      "default": "./src/cloudflare/website.ts"
-    },
     "./apps-stack": {
       "source": "./src/apps-stack.ts",
       "types": "./src/apps-stack.ts",
       "default": "./src/apps-stack.ts"
     },
-    "./apps-secrets": {
-      "source": "./src/apps-secrets.boundary.ts",
-      "types": "./src/apps-secrets.boundary.ts",
-      "default": "./src/apps-secrets.boundary.ts"
-    },
     "./posthog": {
       "source": "./src/posthog/index.ts",
       "types": "./src/posthog/index.ts",
       "default": "./src/posthog/index.ts"
+    },
+    "./secrets": {
+      "source": "./src/secrets.ts",
+      "types": "./src/secrets.ts",
+      "default": "./src/secrets.ts"
+    },
+    "./stage": {
+      "source": "./src/stage.ts",
+      "types": "./src/stage.ts",
+      "default": "./src/stage.ts"
     }
   },
   "scripts": {

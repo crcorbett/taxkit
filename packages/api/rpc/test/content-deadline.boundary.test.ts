@@ -19,6 +19,7 @@ import { DocsRpcDeadlineExceeded } from "../src/content.errors.js";
 import { DocsRpcClientLive } from "../src/content.live.layer.js";
 import { DocsRpcClient } from "../src/content.service.js";
 import { CalculatorRpcOrigin } from "../src/schemas.js";
+import { TaxKitRpcOrigin } from "../src/service.js";
 import { DocsRpcOperationCases } from "./content.fixture.js";
 
 const origin = Schema.decodeResult(CalculatorRpcOrigin)(
@@ -65,9 +66,9 @@ it.effect.each(
         yield* Deferred.await(released);
       }).pipe(
         Effect.provide(
-          DocsRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          DocsRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })
@@ -109,9 +110,9 @@ it.effect.each(DocsRpcOperationCases)(
         yield* Deferred.await(released);
       }).pipe(
         Effect.provide(
-          DocsRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          DocsRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })
@@ -135,9 +136,9 @@ it.effect.each(DocsRpcOperationCases)(
         yield* Deferred.await(started);
       }).pipe(
         Effect.provide(
-          DocsRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          DocsRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         ),
         Effect.scoped
       );
@@ -183,9 +184,9 @@ it.effect.each(DocsRpcOperationCases)(
         yield* Fiber.interrupt(call);
       }).pipe(
         Effect.provide(
-          DocsRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          DocsRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })

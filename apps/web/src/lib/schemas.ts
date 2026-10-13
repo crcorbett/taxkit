@@ -1,17 +1,18 @@
-import { DocsRpcClientError } from "@taxkit/api-rpc/content/errors";
-import { CalculatorRpcClientError } from "@taxkit/api-rpc/errors";
 import {
-  CalculatorRpcOrigin,
   CalculatorCatalogResponse,
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
-} from "@taxkit/api-rpc/schemas";
-import {
-  DocsWebsiteOrigin,
+} from "@taxkit/calculators/schemas";
+import type {
   DocsPublicNavigation,
   DocsPublicPage,
-  DocsSearchTerm,
   DocsSearchResult,
+} from "@taxkit/content/schemas";
+import {
+  DocsPublicationOrigin,
+  DocsWebsiteOrigin,
+  DocsSearchTerm,
+  PublicHttpOrigin,
 } from "@taxkit/content/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import {
@@ -20,6 +21,7 @@ import {
 } from "@taxkit/rules-au-pay/schemas";
 import {
   Array,
+  Data,
   Match,
   Option,
   Record,
@@ -28,11 +30,8 @@ import {
   SchemaGetter,
 } from "effect";
 
+import { WebsiteCalculationFailure } from "./api/errors";
 import { TaxKitWebConfigError } from "./config";
-import {
-  DocsSearchInputError,
-  DocsPresentationUnavailable,
-} from "./docs/errors";
 import {
   AnnualTaxForm,
   TakeHomeForm,
@@ -40,35 +39,42 @@ import {
   WebsiteInputError,
 } from "./form.boundary";
 
+// The same stage's public API address, used by browser clients.
+const WebsiteApiOrigin = PublicHttpOrigin.pipe(
+  Schema.brand("taxkit/web/WebsiteApiOrigin")
+);
 export const WebsitePublicSettings = Schema.Struct({
-  apiOrigin: CalculatorRpcOrigin,
+  apiOrigin: WebsiteApiOrigin,
+  // Canonical, social, JSON-LD and Markdown links name the published site.
+  publicationOrigin: DocsPublicationOrigin,
+  // The running Website's own address: tools, analytics and form actions.
   websiteOrigin: DocsWebsiteOrigin,
 });
 export type WebsitePublicSettings = typeof WebsitePublicSettings.Type;
-export const WebsiteSettingsTransport = Schema.toCodecJson(
-  Schema.Result(WebsitePublicSettings, TaxKitWebConfigError)
-);
-export const WebsiteCatalogueTransport = Schema.toCodecJson(
-  Schema.Result(
-    CalculatorCatalogResponse,
-    Schema.Union([CalculatorRpcClientError, TaxKitWebConfigError])
-  )
-);
-const WebsiteDocsPageView = Schema.Struct({
-  navigation: DocsPublicNavigation,
-  page: DocsPublicPage,
+// The root loader's checked view: plain encoded values for TanStack's native
+// serialisation, decoded once by the root route.
+export const WebsiteRootView = Schema.Struct({
+  catalogue: Schema.OptionFromNullOr(CalculatorCatalogResponse),
   settings: WebsitePublicSettings,
 });
-export const WebsiteDocsPageTransport = Schema.toCodecJson(
-  Schema.Result(
-    WebsiteDocsPageView,
-    Schema.Union([
-      DocsRpcClientError,
-      TaxKitWebConfigError,
-      DocsPresentationUnavailable,
-    ])
-  )
-);
+// A documentation page as its route renders it. Every field is plain public
+// data, so TanStack serialises it natively.
+export interface WebsiteDocsPageView {
+  readonly navigation: DocsPublicNavigation;
+  readonly page: DocsPublicPage;
+  readonly publicationOrigin: string;
+}
+// The search route's two page states. Invalid words are a normal page, not a
+// failed load. Variants are plain data, so TanStack serialises them natively.
+export type WebsiteDocsSearchView = Data.TaggedEnum<{
+  Found: {
+    readonly navigation: DocsPublicNavigation;
+    readonly results: readonly DocsSearchResult[];
+    readonly term: "" | DocsSearchTerm;
+  };
+  InvalidSearch: Readonly<Record<never, never>>;
+}>;
+export const WebsiteDocsSearchView = Data.taggedEnum<WebsiteDocsSearchView>();
 export const WebsiteSearchParameters = Schema.Record(
   Schema.String,
   Schema.Array(Schema.String)
@@ -105,39 +111,13 @@ export const WebsiteDocsSearchLocation = Schema.String.check(
     ),
   })
 );
-// Headers admit only bounded ASCII. The native URI codec carries Unicode
-// safely without relying on a browser Headers ByteString conversion.
-export const WebsiteDocsSearchHeader = Schema.String.check(
-  Schema.isMaxLength(1200),
-  Schema.isPattern(/^(?:[A-Za-z0-9_.!~*'()-]|%[0-9A-Fa-f]{2})*$/u)
-).pipe(
-  Schema.decodeTo(Schema.StringFromUriComponent),
-  Schema.decodeTo(Schema.toType(WebsiteDocsSearchTerm))
-);
-const WebsiteDocsSearchView = Schema.Struct({
-  navigation: DocsPublicNavigation,
-  results: Schema.Array(DocsSearchResult).check(Schema.isMaxLength(20)),
-  settings: WebsitePublicSettings,
-  term: Schema.toType(WebsiteDocsSearchTerm),
-});
-export const WebsiteDocsSearchTransport = Schema.toCodecJson(
-  Schema.Result(
-    WebsiteDocsSearchView,
-    Schema.Union([
-      DocsRpcClientError,
-      TaxKitWebConfigError,
-      DocsSearchInputError,
-    ])
-  )
-);
-
 export const WebsiteSubmission = Schema.Struct({
   calculatorId: CalculatorRunServiceRequest.fields.calculatorId,
   form: WebsiteCalculatorForm,
   result: Schema.Result(
     CalculatorRunResponse,
     Schema.Union([
-      CalculatorRpcClientError,
+      WebsiteCalculationFailure,
       TaxKitWebConfigError,
       WebsiteInputError,
     ])

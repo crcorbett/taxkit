@@ -13,3 +13,15 @@ export class DocsValidationFailedError extends Schema.TaggedError<DocsValidation
     issues: Schema.Array(Schema.String),
   }
 ) {}
+
+export class DocsCatalogueBuildError extends Schema.TaggedError<DocsCatalogueBuildError>()(
+  "DocsCatalogueBuildError",
+  {
+    operation: Schema.Literals([
+      "no-published-pages",
+      "project",
+      "encode",
+      "write",
+    ]),
+  }
+) {}

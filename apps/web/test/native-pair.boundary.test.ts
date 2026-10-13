@@ -16,7 +16,7 @@ import {
   GetCalculatorRequest,
   MetadataQuery,
 } from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
 import {
   DocsDiscoveryPath,
   DocsPublicCatalogue,
@@ -46,10 +46,11 @@ import {
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
-import type { Page } from "playwright";
+import type { Page, Request as BrowserRequest } from "playwright";
 
 import { generateDocsImages } from "../scripts/docs-images.build";
 import { WebsiteDocsImageBytes } from "../scripts/docs-images.schemas";
+import { WebsiteApiUnavailable } from "../src/lib/api/errors";
 import {
   docsImagePath,
   WebsiteDocsArticleJson,
@@ -67,6 +68,20 @@ import {
 const apiOrigin = "http://127.0.0.1:4197";
 const websiteOrigin = "http://127.0.0.1:4196";
 const form = "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on";
+// The one cache policy: shared public reads and unshared everything else.
+const publicCache = {
+  browser: "public, max-age=0",
+  cdn: "public, max-age=604800, stale-if-error=0",
+};
+const frameworkSentinel = "PRIVATE9";
+// The browser calls the public API directly. Calculation is its only POST.
+const calculationPath = /^\/api\/v1\/calculators\/[^/]+\/calculate$/u;
+const isCalculation = (url: URL) =>
+  url.origin === apiOrigin && calculationPath.test(url.pathname);
+const takeHomeCalculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`;
+const docsNavigationAddress = `${apiOrigin}/api/v1/docs/navigation`;
+const docsPageAddress = (path: string) =>
+  `${apiOrigin}/api/v1/docs/page?${new URLSearchParams({ path })}`;
 const Json = Schema.fromJsonString(Schema.Unknown);
 const ColourChannel = Schema.NumberFromString.check(
   Schema.isGreaterThanOrEqualTo(0),
@@ -244,6 +259,10 @@ describe("built native API and Website", () => {
               ...nativeLocalModeFixture,
               ...nativeRateFixture("10075"),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
+              },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
                 value: websiteOrigin,
@@ -306,6 +325,10 @@ describe("built native API and Website", () => {
               TAXKIT_API: {
                 type: "worker" as const,
                 worker: binding,
+              },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
               },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
@@ -497,9 +520,9 @@ describe("built native API and Website", () => {
           );
         }).pipe(
           Effect.provide(
-            DocsRpcClientLive(catalogueOrigin).pipe(
-              Layer.provide(FetchHttpClient.layer)
-            )
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
+            ).pipe(Layer.provide(FetchHttpClient.layer))
           )
         );
         const unavailableDiscoveryWorker = yield* Effect.promise(() =>
@@ -515,12 +538,31 @@ describe("built native API and Website", () => {
               `${document.contentType}; charset=utf-8`
             );
             expect(served.headers.get("cache-control")).toBe(
-              "public, max-age=300"
+              publicCache.browser
+            );
+            expect(served.headers.get("cloudflare-cdn-cache-control")).toBe(
+              publicCache.cdn
             );
             expect(served.headers.get("x-content-type-options")).toBe(
               "nosniff"
             );
             expect(yield* Effect.promise(() => served.text())).toBe(
+              document.body
+            );
+            // The Website forwards the API's own discovery route unchanged.
+            const owned = yield* Effect.promise(() =>
+              publicApi.dispatchFetch(
+                `${apiOrigin}/api/v1/docs/discovery${document.path}`
+              )
+            );
+            expect(owned.status).toBe(200);
+            expect(owned.headers.get("content-type")).toBe(
+              served.headers.get("content-type")
+            );
+            expect(owned.headers.get("cache-control")).toBe(
+              publicCache.browser
+            );
+            expect(yield* Effect.promise(() => owned.text())).toBe(
               document.body
             );
             const head = yield* Effect.promise(() =>
@@ -535,6 +577,9 @@ describe("built native API and Website", () => {
             expect(head.headers.get("cache-control")).toBe(
               served.headers.get("cache-control")
             );
+            expect(head.headers.get("cloudflare-cdn-cache-control")).toBe(
+              served.headers.get("cloudflare-cdn-cache-control")
+            );
             expect(head.headers.get("x-content-type-options")).toBe(
               served.headers.get("x-content-type-options")
             );
@@ -547,6 +592,7 @@ describe("built native API and Website", () => {
             );
             expect(wrongMethod.status).toBe(405);
             expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD");
+            expect(wrongMethod.headers.get("cache-control")).toBe("no-store");
             expect(yield* Effect.promise(() => wrongMethod.text())).toBe("");
             const query = yield* Effect.promise(() =>
               website.dispatchFetch(
@@ -562,8 +608,19 @@ describe("built native API and Website", () => {
             );
             expect(unavailable.status).toBe(503);
             expect(unavailable.headers.get("cache-control")).toBe("no-store");
+            expect(
+              unavailable.headers.get("cloudflare-cdn-cache-control")
+            ).toBe("no-store");
             expect(yield* Effect.promise(() => unavailable.text())).toBe("");
           })
+        );
+        const discoveryRobots = yield* Array.findFirst(
+          discoveryDocuments,
+          (document) => document.path === "/robots.txt"
+        ).pipe(Effect.fromOption);
+        // Nothing remains behind a retired server-function path.
+        expect(discoveryRobots.body).toBe(
+          `User-agent: *\nAllow: /\nSitemap: ${websiteOrigin}/sitemap.xml\n`
         );
         const discoverySitemap = yield* Array.findFirst(
           discoveryDocuments,
@@ -647,6 +704,12 @@ describe("built native API and Website", () => {
             expect(response.status, page.path).toBe(200);
             expect(response.headers.get("content-type")).toContain("text/html");
             const html = yield* Effect.promise(() => response.text());
+            expect(response.headers.get("cache-control")).toBe(
+              publicCache.browser
+            );
+            expect(response.headers.get("cloudflare-cdn-cache-control")).toBe(
+              publicCache.cdn
+            );
             expect(html).toContain(`href="${websiteOrigin}${page.path}"`);
             expect(html).toContain(
               `content="${websiteOrigin}/og${page.path}.png"`
@@ -674,7 +737,10 @@ describe("built native API and Website", () => {
                   "text/markdown; charset=utf-8"
                 );
                 expect(served.headers.get("cache-control")).toBe(
-                  "public, max-age=300"
+                  publicCache.browser
+                );
+                expect(served.headers.get("cloudflare-cdn-cache-control")).toBe(
+                  publicCache.cdn
                 );
                 expect(served.headers.get("vary")).toBe("Accept");
                 expect(served.headers.get("x-content-type-options")).toBe(
@@ -694,6 +760,7 @@ describe("built native API and Website", () => {
                   [
                     "content-type",
                     "cache-control",
+                    "cloudflare-cdn-cache-control",
                     "vary",
                     "x-content-type-options",
                     "link",
@@ -759,7 +826,9 @@ describe("built native API and Website", () => {
                 })
               );
               expect(response.status, choice.accept).toBe(choice.status);
-              expect(response.headers.get("vary")).toContain("Accept");
+              // Every reply at a docs address carries the same Vary set, so Workers
+              // Cache keeps the HTML and Markdown variants side by side.
+              expect(response.headers.get("vary")).toBe("Accept");
               const body = yield* Effect.promise(() => response.text());
               if (choice.status !== 200) {
                 expect(response.headers.get("cache-control")).toBe("no-store");
@@ -893,9 +962,9 @@ describe("built native API and Website", () => {
                 client.listCalculators(MetadataQuery.make({}))
               ),
               Effect.provide(
-                TaxKitRpcClientLive(catalogueOrigin).pipe(
-                  Layer.provide(FetchHttpClient.layer)
-                )
+                TaxKitRpcClientLive.pipe(
+                  Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
+                ).pipe(Layer.provide(FetchHttpClient.layer))
               )
             );
             expect(catalogue.calculators).toHaveLength(3);
@@ -958,9 +1027,9 @@ describe("built native API and Website", () => {
           });
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(catalogueOrigin).pipe(
-              Layer.provide(FetchHttpClient.layer)
-            )
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
+            ).pipe(Layer.provide(FetchHttpClient.layer))
           )
         );
         // Deliberately oversize only this controlled transport's encoded body;
@@ -984,100 +1053,55 @@ describe("built native API and Website", () => {
           ),
           Effect.flip,
           Effect.provide(
-            TaxKitRpcClientLive(catalogueOrigin).pipe(
-              Layer.provide(oversizedTransport)
-            )
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
+            ).pipe(Layer.provide(oversizedTransport))
           )
         );
         expect(rejected).toEqual(new CalculatorRpcRequestTooLarge());
-        const settingsFunctionId = Array.findFirst(
-          Record.values(websiteModules),
-          (module) =>
-            module.contents.includes(
-              'functionName: "websiteSettings_createServerFn_handler"'
-            )
-        ).pipe(
-          Option.flatMap((module) =>
-            Option.fromNullishOr(
-              module.contents.match(
-                /"(?<functionId>[a-f0-9]{64})":\s*\{\s*functionName:\s*"websiteSettings_createServerFn_handler"/u
-              )?.groups
-            ).pipe(Option.flatMap(Record.get("functionId")))
-          ),
-          Option.getOrElse(() =>
-            expect.fail("Missing native generated settings function identity")
+        // The Website declares no server functions: the generated resolver
+        // manifest is empty and the framework base path serves nothing.
+        expect(
+          Array.some(Record.values(websiteModules), (module) =>
+            /"[a-f0-9]{64}":\s*\{\s*functionName:/u.test(module.contents)
           )
-        );
-        const frameworkSentinel = "PRIVATE9";
-        const nativeSettings = yield* Effect.promise(() =>
-          website.dispatchFetch(
-            `${websiteOrigin}/_serverFn/${settingsFunctionId}`,
-            {
-              headers: {
-                origin: websiteOrigin,
-                "sec-fetch-site": "same-origin",
-                "x-tsr-serverFn": "true",
-              },
-            }
+        ).toBe(false);
+        expect(
+          Array.some(Record.values(websiteModules), (module) =>
+            module.contents.includes("_createServerFn_handler")
           )
-        );
-        expect(nativeSettings.status).toBe(200);
-        expect(yield* Effect.promise(() => nativeSettings.text())).toContain(
-          apiOrigin
-        );
-        const malformedSettings = yield* Effect.promise(() =>
-          website.dispatchFetch(
-            `${websiteOrigin}/_serverFn/${settingsFunctionId}?payload=${frameworkSentinel}`,
-            {
-              headers: {
-                origin: websiteOrigin,
-                "sec-fetch-site": "same-origin",
-                "x-tsr-serverFn": "true",
-              },
-            }
-          )
-        );
-        const malformedSettingsBody = yield* Effect.promise(() =>
-          malformedSettings.text()
-        );
-        expect(malformedSettings.status).toBe(400);
-        expect(malformedSettingsBody).toBe("");
-        expect(malformedSettingsBody.includes(frameworkSentinel)).toBe(false);
-        const unexpectedMethod = yield* Effect.promise(() =>
-          website.dispatchFetch(
-            `${websiteOrigin}/_serverFn/${settingsFunctionId}`,
-            {
-              body: frameworkSentinel,
-              headers: { "content-type": "application/json" },
-              method: "POST",
-            }
-          )
-        );
-        expect(unexpectedMethod.status).toBe(405);
-        expect(unexpectedMethod.headers.get("allow")).toBe("GET");
-        expect(yield* Effect.promise(() => unexpectedMethod.text())).toBe("");
+        ).toBe(false);
         yield* Effect.forEach(
           [
-            frameworkSentinel,
-            "0".repeat(64),
-            `${settingsFunctionId}/${frameworkSentinel}`,
-            "",
+            { address: frameworkSentinel, method: "GET" },
+            { address: "0".repeat(64), method: "GET" },
+            {
+              address: `${"0".repeat(64)}/${frameworkSentinel}`,
+              method: "GET",
+            },
+            { address: "", method: "GET" },
+            { address: "0".repeat(64), method: "POST" },
+            { address: `0?payload=${frameworkSentinel}`, method: "GET" },
           ],
-          (unknownPath) =>
+          (retired) =>
             Effect.gen(function* () {
               const response = yield* Effect.promise(() =>
                 website.dispatchFetch(
-                  `${websiteOrigin}/_serverFn/${unknownPath}`,
+                  `${websiteOrigin}/_serverFn/${retired.address}`,
                   {
+                    body: retired.method === "POST" ? frameworkSentinel : null,
                     headers: {
+                      "content-type": "application/json",
                       origin: websiteOrigin,
                       "sec-fetch-site": "same-origin",
                       "x-tsr-serverFn": "true",
                     },
+                    method: retired.method,
                   }
                 )
               );
-              expect(response.status).toBe(404);
+              expect(response.status, retired.address).toBe(404);
+              expect(response.headers.get("cache-control")).toBe("no-store");
               expect(yield* Effect.promise(() => response.text())).toBe("");
             })
         );
@@ -1087,6 +1111,15 @@ describe("built native API and Website", () => {
         );
         const initialHtml = yield* Effect.promise(() => initial.text());
         expect(initial.status).toBe(200);
+        expect(initial.headers.get("cache-control")).toBe(publicCache.browser);
+        expect(initial.headers.get("cloudflare-cdn-cache-control")).toBe(
+          publicCache.cdn
+        );
+        // The first HTML seeds the browser's checked public settings; there is
+        // no separate settings request.
+        expect(initialHtml).toContain(
+          `apiOrigin:"${apiOrigin}/",publicationOrigin:"${websiteOrigin}/",websiteOrigin:"${websiteOrigin}/"`
+        );
         expect(initialHtml).toContain("Pay before tax");
         expect(initialHtml).toContain(
           'href="/calculators/au.pay.withholdings"'
@@ -1105,6 +1138,11 @@ describe("built native API and Website", () => {
           })
         );
         expect(server.status).toBe(200);
+        // A personal no-JavaScript result is never shared.
+        expect(server.headers.get("cache-control")).toBe("no-store");
+        expect(server.headers.get("cloudflare-cdn-cache-control")).toBe(
+          "no-store"
+        );
         const serverHtml = yield* Effect.promise(() => server.text());
         expect(serverHtml).toContain("$1,301.00");
         const invalid = yield* Effect.promise(() =>
@@ -1188,7 +1226,10 @@ describe("built native API and Website", () => {
         );
         expect(unavailable.status).toBe(200);
         const unavailableHtml = yield* Effect.promise(() => unavailable.text());
-        expect(unavailableHtml).toContain("Check your details");
+        // The unconfigured API's reply is an unavailable service; the visitor
+        // keeps the form and gets the Website's safe retry guidance.
+        expect(unavailableHtml).toContain(new WebsiteApiUnavailable().message);
+        expect(unavailableHtml).toContain('value="1654"');
         expect(unavailableHtml).not.toContain("invalid-local-fixture");
         // A second request after the isolate has been idle catches native receive
         // loops that were incorrectly retained from an earlier request.
@@ -1214,21 +1255,40 @@ describe("built native API and Website", () => {
           Effect.promise(() => browser.newContext()),
           (value) => Effect.promise(() => value.close())
         );
+        // A visitor cookie for the shared host: credentialed API calls would
+        // carry it to the API's port as well.
+        yield* Effect.promise(() =>
+          context.addCookies([
+            {
+              domain: "127.0.0.1",
+              name: "taxkit_visitor",
+              path: "/",
+              value: "visitor",
+            },
+          ])
+        );
         const page = yield* Effect.promise(() => context.newPage());
         const calls = yield* Queue.make<{
           readonly method: string;
           readonly url: string;
-          readonly headers: Readonly<Record<string, string>>;
+          readonly request: BrowserRequest;
         }>();
-        page.on("request", (request) => {
-          if (new URL(request.url()).pathname.startsWith("/rpc")) {
+        // Record calculations and any retired RPC or server-function call.
+        const recordCalls = (request: BrowserRequest) => {
+          const url = new URL(request.url());
+          if (
+            isCalculation(url) ||
+            url.pathname.startsWith("/rpc") ||
+            url.pathname.startsWith("/_serverFn")
+          ) {
             Queue.offerUnsafe(calls, {
-              headers: request.headers(),
               method: request.method(),
+              request,
               url: request.url(),
             });
           }
-        });
+        };
+        page.on("request", recordCalls);
         page.on("pageerror", (error) => {
           Queue.offerUnsafe(exceptions, error.message);
         });
@@ -1301,16 +1361,26 @@ describe("built native API and Website", () => {
             method: request.method,
             url: request.url,
           }))
-        ).toEqual([{ method: "POST", url: `${apiOrigin}/rpc` }]);
+        ).toEqual([{ method: "POST", url: takeHomeCalculation }]);
+        // Credentials are omitted and no trace correlation is sent; the
+        // visitor's collection preference travels as its own header.
+        const sentHeaders = yield* Effect.forEach(requests, (call) =>
+          Effect.promise(() => call.request.allHeaders())
+        );
         expect(
           Array.every(
-            requests,
-            (request) =>
-              !Record.has(request.headers, "b3") &&
-              !Record.has(request.headers, "traceparent") &&
-              !Record.has(request.headers, "cookie")
+            sentHeaders,
+            (headers) =>
+              !Record.has(headers, "b3") &&
+              !Record.has(headers, "traceparent") &&
+              !Record.has(headers, "cookie")
           )
         ).toBe(true);
+        expect(
+          Array.map(sentHeaders, (headers) =>
+            Record.get(headers, "x-taxkit-collection-policy")
+          )
+        ).toEqual([Option.some("allow")]);
         const payInput = page.getByLabel("Pay before tax ($)");
         yield* Effect.promise(() => payInput.fill("2000"));
         yield* Effect.promise(() =>
@@ -1381,8 +1451,12 @@ describe("built native API and Website", () => {
         ).toBe(1);
         expect(yield* Queue.clear(calls)).toHaveLength(1);
         yield* Effect.promise(() =>
-          page.route(`${apiOrigin}/rpc`, (route) =>
-            route.fulfill({ body: "", status: 503 })
+          page.route(isCalculation, (route) =>
+            route.fulfill({
+              body: "",
+              headers: { "access-control-allow-origin": websiteOrigin },
+              status: 503,
+            })
           )
         );
         yield* Effect.promise(() => payInput.fill("2000"));
@@ -1432,15 +1506,7 @@ describe("built native API and Website", () => {
         errorPage.on("pageerror", (error) => {
           Queue.offerUnsafe(exceptions, error.message);
         });
-        errorPage.on("request", (request) => {
-          if (new URL(request.url()).pathname.startsWith("/rpc")) {
-            Queue.offerUnsafe(calls, {
-              headers: request.headers(),
-              method: request.method(),
-              url: request.url(),
-            });
-          }
-        });
+        errorPage.on("request", recordCalls);
         // Feed the native Worker-generated error document to a fresh browser.
         // Its real assets and transport state still perform the hydration.
         yield* Effect.promise(() =>
@@ -1461,7 +1527,7 @@ describe("built native API and Website", () => {
           yield* Effect.promise(() =>
             errorPage.getByRole("alert").textContent({ timeout: 5000 })
           )
-        ).toContain("Check your details");
+        ).toBe(new WebsiteApiUnavailable().message);
         const errorPayInput = errorPage.getByLabel("Pay before tax ($)");
         yield* Effect.promise(() => errorPayInput.fill("2000"));
         yield* Effect.promise(() =>
@@ -1478,15 +1544,7 @@ describe("built native API and Website", () => {
         savedPage.on("pageerror", (error) => {
           Queue.offerUnsafe(exceptions, error.message);
         });
-        savedPage.on("request", (request) => {
-          if (new URL(request.url()).pathname.startsWith("/rpc")) {
-            Queue.offerUnsafe(calls, {
-              headers: request.headers(),
-              method: request.method(),
-              url: request.url(),
-            });
-          }
-        });
+        savedPage.on("request", recordCalls);
         // Obtain actual private POST HTML over the document's real local connection.
         // Synthetic navigation fulfillment misclassifies its address space in Chromium.
         yield* Effect.promise(() =>
@@ -1551,8 +1609,13 @@ describe("built native API and Website", () => {
         expect(yield* Queue.clear(calls)).toEqual([]);
         yield* Effect.promise(() =>
           savedPage.route(
-            `${apiOrigin}/rpc`,
-            (route) => route.fulfill({ body: "", status: 503 }),
+            isCalculation,
+            (route) =>
+              route.fulfill({
+                body: "",
+                headers: { "access-control-allow-origin": websiteOrigin },
+                status: 503,
+              }),
             { times: 1 }
           )
         );
@@ -1675,7 +1738,7 @@ describe("built native API and Website", () => {
           ] as const,
           (calculator) =>
             Effect.gen(function* () {
-              yield* Effect.promise(() => page.unroute(`${apiOrigin}/rpc`));
+              yield* Effect.promise(() => page.unroute(isCalculation));
               yield* Effect.promise(() =>
                 page
                   .locator(`nav a[href="/calculators/${calculator.id}"]`)
@@ -1755,8 +1818,13 @@ describe("built native API and Website", () => {
               expect(yield* Queue.clear(calls)).toEqual([]);
               yield* Effect.promise(() =>
                 page.route(
-                  `${apiOrigin}/rpc`,
-                  (route) => route.fulfill({ body: "", status: 503 }),
+                  isCalculation,
+                  (route) =>
+                    route.fulfill({
+                      body: "",
+                      headers: { "access-control-allow-origin": websiteOrigin },
+                      status: 503,
+                    }),
                   { times: 1 }
                 )
               );
@@ -1955,77 +2023,63 @@ describe("built native API and Website", () => {
         expect(guideBody).toContain("# Agent connection guide");
         expect(guideBody).toContain("taxkit_get_calculator_schema");
         expect(guideBody).toContain("five-second limit");
-        const docsFunctionId = Array.findFirst(
-          Record.values(websiteModules),
-          (module) =>
-            module.contents.includes(
-              'functionName: "websiteDocsPage_createServerFn_handler"'
-            )
-        ).pipe(
-          Option.flatMap((module) =>
-            Option.fromNullishOr(
-              module.contents.match(
-                /"(?<functionId>[a-f0-9]{64})":\s*\{\s*functionName:\s*"websiteDocsPage_createServerFn_handler"/u
-              )?.groups
-            ).pipe(Option.flatMap(Record.get("functionId")))
-          ),
-          Option.getOrElse(() =>
-            expect.fail("Missing native generated docs function identity")
-          )
-        );
-        const nativeDocsAddress = `${websiteOrigin}/_serverFn/${docsFunctionId}`;
-        const nativeDocsHeaders = {
-          origin: websiteOrigin,
-          "sec-fetch-site": "same-origin",
-          "x-taxkit-docs-page": "/start/quickstart",
-          "x-tsr-serverFn": "true",
-        };
-        const nativeDocs = yield* Effect.promise(() =>
-          website.dispatchFetch(nativeDocsAddress, {
-            headers: nativeDocsHeaders,
+        // Documentation reads use the API's own public routes. Read the actual
+        // replies the browser will receive for later corrupted-reply checks.
+        const typescriptSdkReply = yield* Effect.promise(() =>
+          publicApi.dispatchFetch(docsPageAddress("/sdk/typescript-sdk"), {
+            headers: { origin: websiteOrigin },
           })
         );
-        expect(nativeDocs.status).toBe(200);
-        const nativeDocsBody = yield* Effect.promise(() => nativeDocs.text());
-        expect(nativeDocsBody).toContain("Quickstart");
-        expect(nativeDocsBody).toContain('"navigation"');
+        expect(typescriptSdkReply.status).toBe(200);
+        expect(
+          typescriptSdkReply.headers.get("access-control-allow-origin")
+        ).toBe(websiteOrigin);
+        const typescriptSdkBody = yield* Effect.promise(() =>
+          typescriptSdkReply.text()
+        );
+        expect(typescriptSdkBody).toContain('"markdown":');
+        const docsNavigationReply = yield* Effect.promise(() =>
+          publicApi.dispatchFetch(docsNavigationAddress, {
+            headers: { origin: websiteOrigin },
+          })
+        );
+        expect(docsNavigationReply.status).toBe(200);
+        const docsNavigationBody = yield* Effect.promise(() =>
+          docsNavigationReply.text()
+        );
+        expect(docsNavigationBody).toContain('"primaryNavigation":');
+        // Invalid page addresses are rejected by the API and give the Website's
+        // native not-found page; neither reflects a framework error.
         yield* Effect.forEach(
-          [
-            { headers: nativeDocsHeaders, suffix: "?payload=PRIVATE9" },
-            {
-              headers: {
-                ...nativeDocsHeaders,
-                "content-type": "application/json",
-              },
-              suffix: "",
-            },
-            {
-              headers: {
-                ...nativeDocsHeaders,
-                "x-taxkit-docs-page": `/${"a".repeat(256)}`,
-              },
-              suffix: "",
-            },
-            {
-              headers: {
-                ...nativeDocsHeaders,
-                "x-taxkit-docs-page": "../PRIVATE9",
-              },
-              suffix: "",
-            },
-          ],
-          (invalidDocsRequest) =>
+          [`/${"a".repeat(256)}`, `../${frameworkSentinel}`],
+          (invalidPath) =>
             Effect.gen(function* () {
               const response = yield* Effect.promise(() =>
-                website.dispatchFetch(
-                  `${nativeDocsAddress}${invalidDocsRequest.suffix}`,
-                  {
-                    headers: invalidDocsRequest.headers,
-                  }
-                )
+                publicApi.dispatchFetch(docsPageAddress(invalidPath))
               );
-              expect(response.status).toBe(400);
+              expect(response.status, invalidPath).toBe(400);
+              expect(response.headers.get("cache-control")).toBe("no-store");
               expect(yield* Effect.promise(() => response.text())).toBe("");
+            })
+        );
+        yield* Effect.forEach(
+          [
+            `/${"a".repeat(256)}`,
+            `/..%2F${frameworkSentinel}`,
+            "/start/missing",
+          ],
+          (address) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(`${websiteOrigin}${address}`, {
+                  headers: { accept: "text/html" },
+                })
+              );
+              expect(response.status, address).toBe(404);
+              expect(response.headers.get("cache-control")).toBe("no-store");
+              const html = yield* Effect.promise(() => response.text());
+              expect(html).toContain("Documentation page not found");
+              expect(html).not.toContain("Server Fn Error");
             })
         );
         const docsPage = yield* Effect.promise(() => context.newPage());
@@ -2059,9 +2113,21 @@ describe("built native API and Website", () => {
         );
         const docsCalls = yield* Queue.make<string>();
         const docsDocuments = yield* Queue.make<string>();
+        // Record every documentation API read and any retired transport call.
+        const docsRequests = yield* Queue.make<BrowserRequest>();
         docsPage.on("request", (request) => {
-          if (new URL(request.url()).pathname.startsWith("/_serverFn/")) {
-            Queue.offerUnsafe(docsCalls, request.url());
+          const url = new URL(request.url());
+          if (
+            (url.origin === apiOrigin &&
+              url.pathname.startsWith("/api/v1/docs/")) ||
+            url.pathname.startsWith("/_serverFn") ||
+            url.pathname.startsWith("/rpc")
+          ) {
+            Queue.offerUnsafe(
+              docsCalls,
+              `${request.method()} ${request.url()}`
+            );
+            Queue.offerUnsafe(docsRequests, request);
           }
           if (
             request.isNavigationRequest() &&
@@ -2259,7 +2325,9 @@ describe("built native API and Website", () => {
             expect(rendered.alternate).toBe(
               `${websiteOrigin}${expected.path}.md`
             );
-            expect(response.headers.get("vary")).toContain("Accept");
+            // Every reply at a docs address carries the same Vary set, so Workers
+            // Cache keeps the HTML and Markdown variants side by side.
+            expect(response.headers.get("vary")).toBe("Accept");
             expect(rendered.navigation).toBe(62);
             expect(rendered.markdown).toBe(
               `${websiteOrigin}${expected.path}.md`
@@ -2301,16 +2369,15 @@ describe("built native API and Website", () => {
                 worker.fetch(`${websiteOrigin}/start/quickstart`)
               );
               const html = yield* Effect.promise(() => response.text());
-              expect(html).not.toContain("PRIVATE9");
-              expect(html).not.toContain("content/private9.mdx");
-              const native = yield* Effect.promise(() =>
-                worker.fetch(nativeDocsAddress, { headers: nativeDocsHeaders })
-              );
-              const body = yield* Effect.promise(() => native.text());
-              expect(body).toContain("DocsPresentationUnavailable");
+              // The server checks the API page against its compiled
+              // presentation before rendering and fails closed through
+              // TanStack's native route error egress.
+              expect(response.status, mode).toBe(500);
+              expect(response.headers.get("cache-control")).toBe("no-store");
               expect(html).toContain("Documentation could not load");
-              expect(body).not.toContain("PRIVATE9");
-              expect(body).not.toContain("private9.mdx");
+              expect(html).not.toContain("PRIVATE9");
+              expect(html).not.toContain("private9.mdx");
+              expect(html).not.toContain("DocsPresentationUnavailable");
             })
         );
         yield* Queue.clear(docsCalls);
@@ -2339,7 +2406,27 @@ describe("built native API and Website", () => {
               .getAttribute("href")
           )
         ).toBe("/sdk/typescript-sdk");
-        expect(yield* Queue.clear(docsCalls)).toContain(nativeDocsAddress);
+        expect(Array.sort(yield* Queue.clear(docsCalls), Order.String)).toEqual(
+          [
+            `GET ${docsNavigationAddress}`,
+            `GET ${docsPageAddress("/sdk/typescript-sdk")}`,
+          ]
+        );
+        // Direct public reads omit credentials and trace correlation.
+        const docsHeaders = yield* Effect.forEach(
+          yield* Queue.clear(docsRequests),
+          (request) => Effect.promise(() => request.allHeaders())
+        );
+        expect(docsHeaders).toHaveLength(2);
+        expect(
+          Array.every(
+            docsHeaders,
+            (headers) =>
+              !Record.has(headers, "cookie") &&
+              !Record.has(headers, "b3") &&
+              !Record.has(headers, "traceparent")
+          )
+        ).toBe(true);
         expect(yield* Queue.clear(docsDocuments)).toEqual([]);
         yield* Effect.promise(() =>
           docsPage
@@ -2352,7 +2439,12 @@ describe("built native API and Website", () => {
             .getByRole("heading", { exact: true, name: "Plain SDK" })
             .waitFor({ timeout: 5000 })
         );
-        expect(yield* Queue.clear(docsCalls)).toContain(nativeDocsAddress);
+        expect(Array.sort(yield* Queue.clear(docsCalls), Order.String)).toEqual(
+          [
+            `GET ${docsNavigationAddress}`,
+            `GET ${docsPageAddress("/sdk/plain-sdk")}`,
+          ]
+        );
         expect(yield* Queue.clear(docsDocuments)).toEqual([]);
         yield* Effect.promise(() =>
           docsPage
@@ -2489,13 +2581,14 @@ describe("built native API and Website", () => {
           docsPage.goto(`${websiteOrigin}/start/quickstart`)
         );
         yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+        // An undecodable API reply is contained by the documentation route.
         yield* Effect.promise(() =>
           docsPage.route(
-            nativeDocsAddress,
+            docsPageAddress("/sdk/typescript-sdk"),
             (route) =>
               route.fulfill({
-                body: nativeDocsBody.replace('"navigation"', '"PRIVATE9"'),
-                headers: Record.fromEntries(nativeDocs.headers),
+                body: typescriptSdkBody.replace('"markdown":', '"PRIVATE9":'),
+                headers: Record.fromEntries(typescriptSdkReply.headers),
                 status: 200,
               }),
             { times: 1 }
@@ -2528,84 +2621,49 @@ describe("built native API and Website", () => {
             .getByRole("heading", { exact: true, name: "Quickstart" })
             .waitFor()
         );
-        const searchFunctionId = Array.findFirst(
-          Record.values(websiteModules),
-          (module) =>
-            module.contents.includes(
-              'functionName: "websiteDocsSearch_createServerFn_handler"'
-            )
-        ).pipe(
-          Option.flatMap((module) =>
-            Option.fromNullishOr(
-              module.contents.match(
-                /"(?<functionId>[a-f0-9]{64})":\s*\{\s*functionName:\s*"websiteDocsSearch_createServerFn_handler"/u
-              )?.groups
-            ).pipe(Option.flatMap(Record.get("functionId")))
-          ),
-          Option.getOrElse(() =>
-            expect.fail("Missing native generated search function identity")
+        // A valid page whose body differs from the compiled presentation (a
+        // differently activated API) is not rendered in the browser either.
+        const plainSdkReply = yield* Effect.promise(() =>
+          publicApi.dispatchFetch(docsPageAddress("/sdk/plain-sdk"), {
+            headers: { origin: websiteOrigin },
+          })
+        );
+        expect(plainSdkReply.status).toBe(200);
+        const plainSdkBody = yield* Effect.promise(() => plainSdkReply.text());
+        expect(plainSdkBody).toContain('"markdown":"');
+        yield* Effect.promise(() =>
+          docsPage.route(
+            docsPageAddress("/sdk/plain-sdk"),
+            (route) =>
+              route.fulfill({
+                body: plainSdkBody.replace(
+                  '"markdown":"',
+                  `"markdown":"${frameworkSentinel} `
+                ),
+                headers: Record.fromEntries(plainSdkReply.headers),
+                status: 200,
+              }),
+            { times: 1 }
           )
         );
-        const nativeSearchAddress = `${websiteOrigin}/_serverFn/${searchFunctionId}`;
-        const nativeSearchHeaders = {
-          origin: websiteOrigin,
-          "sec-fetch-site": "same-origin",
-          "x-taxkit-docs-search": "Quickstart",
-          "x-tsr-serverFn": "true",
-        };
-        const nativeSearch = yield* Effect.promise(() =>
-          website.dispatchFetch(nativeSearchAddress, {
-            headers: nativeSearchHeaders,
-          })
+        yield* Effect.promise(() =>
+          docsPage.locator('.docs-navigation a[href="/sdk/plain-sdk"]').click()
         );
-        expect(nativeSearch.status).toBe(200);
-        const nativeSearchBody = yield* Effect.promise(() =>
-          nativeSearch.text()
-        );
-        expect(nativeSearchBody).toContain('"results"');
-        expect(nativeSearchBody).toContain('"term"');
-        yield* Effect.forEach(
-          [
-            { header: "%ZZ", suffix: "" },
-            { header: "a".repeat(1201), suffix: "" },
-            { header: "Quickstart", suffix: "?payload=PRIVATE9" },
-          ],
-          (invalidSearchInput) =>
-            Effect.gen(function* () {
-              const response = yield* Effect.promise(() =>
-                website.dispatchFetch(
-                  `${nativeSearchAddress}${invalidSearchInput.suffix}`,
-                  {
-                    headers: {
-                      ...nativeSearchHeaders,
-                      "x-taxkit-docs-search": invalidSearchInput.header,
-                    },
-                  }
-                )
-              );
-              expect(response.status).toBe(400);
-              expect(yield* Effect.promise(() => response.text())).toBe("");
+        yield* Effect.promise(() =>
+          docsPage
+            .getByRole("heading", {
+              exact: true,
+              name: "This documentation page needs to be reloaded",
             })
+            .waitFor({ timeout: 5000 })
         );
-        yield* Effect.forEach(["税 😀", "a".repeat(101), "%ED%A0%80"], (term) =>
-          Effect.gen(function* () {
-            const response = yield* Effect.promise(() =>
-              website.dispatchFetch(nativeSearchAddress, {
-                headers: {
-                  ...nativeSearchHeaders,
-                  "x-taxkit-docs-search":
-                    term === "%ED%A0%80" ? term : encodeURIComponent(term),
-                },
-              })
-            );
-            expect(response.status).toBe(200);
-            const body = yield* Effect.promise(() => response.text());
-            expect(body).toContain(
-              term === "税 😀" ? '"s":"税 😀"' : "DocsSearchInputError"
-            );
-            expect(body).not.toContain("PRIVATE9");
-          })
+        expect(
+          yield* Effect.promise(() => docsPage.locator("body").textContent())
+        ).not.toContain(frameworkSentinel);
+        yield* Effect.promise(() =>
+          docsPage.goto(`${websiteOrigin}/start/quickstart`)
         );
+        yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
         yield* Queue.clear(docsCalls);
         yield* Queue.clear(docsDocuments);
         yield* Effect.promise(() =>
@@ -2618,7 +2676,11 @@ describe("built native API and Website", () => {
             .getByRole("heading", { exact: true, name: "Search documentation" })
             .waitFor()
         );
-        expect(yield* Queue.clear(docsCalls)).toContain(nativeSearchAddress);
+        // An empty search reads only the navigation, directly from the API.
+        expect(yield* Queue.clear(docsCalls)).toEqual([
+          `GET ${docsNavigationAddress}`,
+        ]);
+        yield* Queue.clear(docsRequests);
         expect(yield* Queue.clear(docsDocuments)).toEqual([]);
         expect(
           yield* Effect.promise(() =>
@@ -2706,6 +2768,7 @@ describe("built native API and Website", () => {
             `?term=${"a".repeat(101)}`,
             "?term=PRIVATE9&term=Quickstart",
             "?unexpected=PRIVATE9",
+            `?term=${encodeURIComponent("a".repeat(1201))}`,
           ],
           (query) =>
             Effect.gen(function* () {
@@ -2744,7 +2807,12 @@ describe("built native API and Website", () => {
             `${websiteOrigin}/search?term=Quickstart`
           )
         );
-        expect(unavailableSearch.status).toBe(200);
+        // A failed search load is a server error page, never a shared reply.
+        expect(unavailableSearch.status).toBe(500);
+        expect(unavailableSearch.headers.get("cache-control")).toBe("no-store");
+        expect(
+          unavailableSearch.headers.get("cloudflare-cdn-cache-control")
+        ).toBe("no-store");
         expect(yield* Effect.promise(() => unavailableSearch.text())).toContain(
           "Documentation search could not load. Please reload this page to try again."
         );
@@ -2855,13 +2923,17 @@ describe("built native API and Website", () => {
           docsPage.goto(`${websiteOrigin}/start/quickstart`)
         );
         yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+        // An undecodable navigation reply is contained by the search route.
         yield* Effect.promise(() =>
           docsPage.route(
-            nativeSearchAddress,
+            docsNavigationAddress,
             (route) =>
               route.fulfill({
-                body: nativeSearchBody.replace('"results"', '"PRIVATE9"'),
-                headers: Record.fromEntries(nativeSearch.headers),
+                body: docsNavigationBody.replace(
+                  '"primaryNavigation":',
+                  '"PRIVATE9":'
+                ),
+                headers: Record.fromEntries(docsNavigationReply.headers),
                 status: 200,
               }),
             { times: 1 }

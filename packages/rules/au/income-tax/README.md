@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-au-income-tax-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-13
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -40,6 +40,13 @@ without runtime manifest reads.
 - Derived money and ledger totals use core fallible constructors and return
   safe `CalculationError` failures for unsupported amounts. Exact decimal
   arithmetic and unaffected results stay unchanged. The [accepted Medicare correction](../../../../docs/product-specs/medicare-2025-26-correction.md) owns the changed source, affected results and proof. This table covers a single person not entitled to SAPTO; family reductions, exemptions and surcharge are not modelled.
+
+## Scenario input
+
+`CalculateAnnualTax` read their input facts from `AnnualTaxScenario`, a service holding the
+decoded scenario. The static `AnnualTaxScenarioLive` Layer derives those facts from it.
+Decode `AnnualTaxScenarioInputSchema` at your boundary, then supply the value with
+`Layer.succeed(AnnualTaxScenario)(input)`; no Layer is built from request input.
 
 ## Commands
 

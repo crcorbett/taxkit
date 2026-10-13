@@ -5,12 +5,9 @@ import { exampleContentCatalogue } from "../src/__testing__/fixtures.js";
 import {
   DocsDiscoveryDocument,
   DocsDiscoverySettings,
-  DocsAcceptedSourceDigest,
   DocsPublicCatalogue,
   DocsPublicPage,
   DocsSearchTerm,
-  PublicPageAcceptanceRecord,
-  PublicPageAcceptanceRecordV2,
 } from "../src/schemas.js";
 
 describe("public catalogue ingress", () => {
@@ -57,10 +54,10 @@ describe("public catalogue ingress", () => {
             "http://localhost:4000",
             "http://127.0.0.1:4000",
           ],
-          (websiteOrigin) =>
+          (publicationOrigin) =>
             Schema.decodeEffect(DocsDiscoverySettings)({
               apiOrigin: "https://api.example.com",
-              websiteOrigin,
+              publicationOrigin,
             })
         );
         yield* Effect.forEach(
@@ -71,58 +68,11 @@ describe("public catalogue ingress", () => {
             "https://user:secret@website.example.com",
             "https://website.example.com/#private",
           ],
-          (websiteOrigin) =>
+          (publicationOrigin) =>
             Schema.decodeEffect(DocsDiscoverySettings)({
               apiOrigin: "https://api.example.com",
-              websiteOrigin,
+              publicationOrigin,
             }).pipe(Effect.flip)
-        );
-      })
-  );
-  it.effect(
-    "retains legacy acceptance records and requires a hash in version two",
-    () =>
-      Effect.gen(function* () {
-        const legacy =
-          '{"observedAt":"2026-07-21T22:30:00Z","owner":"product-owner","schemaVersion":1,"state":"accepted","targetPath":"packages/docs-content/content/guide.mdx"}';
-        const codec = Schema.fromJsonString(PublicPageAcceptanceRecord);
-        const record = yield* Schema.decodeEffect(codec, {
-          onExcessProperty: "error",
-        })(legacy);
-        assert.equal(yield* Schema.encodeEffect(codec)(record), legacy);
-        const second = yield* PublicPageAcceptanceRecordV2.makeEffect({
-          ...record,
-          schemaVersion: 2,
-          sourceSha256: yield* DocsAcceptedSourceDigest.makeEffect(
-            "0".repeat(64)
-          ),
-        });
-        const wire = yield* Schema.encodeEffect(codec)(second);
-        assert.deepEqual(
-          yield* Schema.decodeEffect(codec, { onExcessProperty: "error" })(
-            wire
-          ),
-          second
-        );
-        yield* Effect.forEach(
-          [
-            wire.replace('"schemaVersion":2', '"schemaVersion":3'),
-            wire.replace(
-              `"sourceSha256":"${"0".repeat(64)}"`,
-              '"sourceSha256":"bad"'
-            ),
-            legacy.replace('"schemaVersion":1', '"schemaVersion":2'),
-            wire.replace('"state":"accepted"', '"state":"draft"'),
-          ],
-          (invalid) =>
-            Schema.decodeEffect(codec, { onExcessProperty: "error" })(
-              invalid
-            ).pipe(
-              Effect.flip,
-              Effect.tap((error) =>
-                Effect.sync(() => assert.equal(error._tag, "SchemaError"))
-              )
-            )
         );
       })
   );

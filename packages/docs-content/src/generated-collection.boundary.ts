@@ -1,5 +1,5 @@
 import { FumadocsSourceLoadError } from "@taxkit/docs-fumadocs/errors";
-import type { FumadocsGeneratedCollectionAdapter } from "@taxkit/docs-fumadocs/live";
+import type { FumadocsGeneratedCollectionAdapter } from "@taxkit/docs-fumadocs/service";
 import { Array, Effect, Option } from "effect";
 
 import { readGeneratedPage } from "./generated-page.boundary.js";

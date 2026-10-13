@@ -8,10 +8,10 @@ export {
   CalculateTakeHomePay,
   TakeHomePayReport,
   TakeHomeScenarioInputSchema,
-  TakeHomeScenarioLiveFromInput,
+  TakeHomeScenario,
+  TakeHomeScenarioLive,
   type TakeHomeScenarioInput,
 } from "./calculator/take-home-pay.js";
-export { TakeHomeScenarioLive } from "./calculator/take-home-pay.boundary.js";
 export {
   AuPayCalculatorId,
   AuPayContext,

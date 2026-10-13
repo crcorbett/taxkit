@@ -2,26 +2,23 @@
 document_type: runbook-index
 lifecycle: current
 authority: canonical
-owner: taxkit-runbook-contract-owner
-last_reviewed: 2026-07-30
-review_trigger: release command, Changesets, package graph, evidence epoch, recovery, or authority-boundary change
+owner: repository-maintainers
+last_reviewed: 2026-10-13
+review_trigger: release command, Changesets, package graph or deployment command change
 ---
 
 # TaxKit runbooks
 
-This index routes repeatable operational work. Runbooks own steps; architecture
-and skills teach boundaries and judgment without copying these procedures.
+Runbooks hold repeatable steps. Architecture documents explain the boundaries;
+Git commits, pull requests, Alchemy state and the checks themselves are the
+ordinary record of what happened.
 
-| ID | Canonical path | Operation owner |
-| --- | --- | --- |
-| `release-readiness` | `docs/runbooks/release-readiness.md` | `taxkit-release-readiness-operation-owner` |
-| `versioning` | `docs/runbooks/versioning.md` | `taxkit-versioning-operation-owner` |
-| `packed-consumer-proof` | `docs/runbooks/packed-consumer-proof.md` | `taxkit-packed-consumer-operation-owner` |
-| `recovery` | `docs/runbooks/recovery.md` | `taxkit-recovery-operation-owner` |
-| `docs-deployment` | `docs/runbooks/docs-deployment.md` | `taxkit-docs-deployment-operation-owner` |
+| Runbook | Use it for |
+| --- | --- |
+| [Website and API deployment](./deployment.md) | Native Alchemy plan, deploy, drift, destroy and rollback for Preview and Production. |
+| [Versioning](./versioning.md) | Changesets, package versions and changelogs. |
+| [Packed consumer check](./packed-consumer-proof.md) | Packing the SDK and installing it in a fresh consumer. |
 
-These are exactly the five canonical TaxKit runbooks. Before any consequential
-operation, apply the [authority model](../operations/authority-model.md). Run
-`bun run check:runbooks` to inspect their structural and semantic contract. The
-validator executes no documented command and writes only the ignored bounded
-receipt `tmp/runbook-validation-report.json`.
+Publishing packages to npm or deploying the Website/API needs the maintainer's
+explicit request for that operation. A local check does not show that a package
+was published or that a deployment works.

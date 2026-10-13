@@ -34,7 +34,12 @@ export const websiteSearchParameters = {
 
 // The route's original address is representation ingress, separate from
 // restoration of a later encoded loader reply.
-export const readDocsSearchLocation = (encoded: typeof Schema.Unknown.Type) =>
+const readDocsSearchLocation = (encoded: typeof Schema.Unknown.Type) =>
   Schema.decodeUnknownResult(WebsiteDocsSearchLocation)(encoded).pipe(
     Result.mapError(() => new DocsSearchInputError())
   );
+
+// The search words a loader reads: empty for the search page itself.
+export const readDocsSearchTerm = (encoded: typeof Schema.Unknown.Type) =>
+  readDocsSearchLocation(encoded).pipe(Result.map((query) => query.term ?? ""));
+export type WebsiteDocsSearchQuery = ReturnType<typeof readDocsSearchTerm>;

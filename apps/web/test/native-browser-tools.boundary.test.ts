@@ -30,6 +30,13 @@ import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4231";
 const websiteOrigin = "http://127.0.0.1:4230";
+// The browser calls the public API directly; calculation is its only POST.
+const catalogueRead = "GET /api/v1/calculators";
+const calculation = (calculatorId: string) =>
+  `POST /api/v1/calculators/${calculatorId}/calculate`;
+const isAnnualCalculation = (url: URL) =>
+  url.origin === apiOrigin &&
+  url.pathname === "/api/v1/calculators/au.income-tax.annual/calculate";
 const BrowserReply = Schema.toCodecJson(
   Schema.Union([
     WebsiteCalculatorViewState,
@@ -84,6 +91,10 @@ it.live(
             ...nativeMcpSessionFixture(name),
             ...nativeRateFixture("10090"),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+            TAXKIT_PUBLICATION_ORIGIN: {
+              type: "json" as const,
+              value: websiteOrigin,
+            },
             WEBSITE_PUBLIC_ORIGIN: {
               type: "json" as const,
               value: websiteOrigin,
@@ -140,6 +151,10 @@ it.live(
                       TAXKIT_API: {
                         type: "worker",
                         worker: "browser-private-api",
+                      },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json",
+                        value: websiteOrigin,
                       },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",
@@ -214,9 +229,20 @@ it.live(
       caller.on("WebMCP.toolsRemoved", (event) => {
         Queue.offerUnsafe(removed, event);
       });
+      // Calls are calculations plus any retired Website or RPC transport path;
+      // public API reads are recorded separately.
+      const reads = yield* Queue.make<string>();
       page.on("request", (request) => {
-        if (new URL(request.url()).pathname.startsWith("/rpc")) {
-          Queue.offerUnsafe(calls, request.url());
+        const url = new URL(request.url());
+        const call = `${request.method()} ${url.pathname}`;
+        if (url.origin === apiOrigin && request.method() === "GET") {
+          Queue.offerUnsafe(reads, call);
+        } else if (
+          url.origin === apiOrigin ||
+          url.pathname.startsWith("/rpc") ||
+          url.pathname.startsWith("/_serverFn")
+        ) {
+          Queue.offerUnsafe(calls, `${call}${url.search}`);
         }
       });
       yield* Effect.promise(() => caller.send("WebMCP.enable"));
@@ -327,7 +353,11 @@ it.live(
       if (Schema.is(WebsiteBrowserToolFailure)(invalid)) {
         expect(invalid.code).toBe("invalid-input");
       }
-      expect(yield* Queue.clear(calls)).toHaveLength(1);
+      // The catalogue tool reads the API; one visible calculation follows.
+      expect(yield* Queue.clear(reads)).toEqual([catalogueRead]);
+      expect(yield* Queue.clear(calls)).toEqual([
+        calculation("au.pay.take-home"),
+      ]);
       yield* Effect.promise(() =>
         page.locator('nav a[href="/calculators/au.income-tax.annual"]').click()
       );
@@ -350,10 +380,15 @@ it.live(
         page.getByText("$14,788.00", { exact: true }).first().waitFor()
       );
       expect(yield* call(annualTools, "taxkit_read_result")).toEqual(annual);
+      expect(yield* Queue.clear(calls)).toEqual([
+        calculation("au.income-tax.annual"),
+      ]);
       const manualResponse = yield* Effect.sync(() =>
         page.waitForResponse(
           (response) =>
-            response.url().startsWith(`${apiOrigin}/rpc`) && response.ok()
+            isAnnualCalculation(new URL(response.url())) &&
+            response.request().method() === "POST" &&
+            response.ok()
         )
       );
       yield* Effect.promise(() =>
@@ -386,7 +421,7 @@ it.live(
       // form edit and page exit separately; tools share the visible request.
       const held = yield* Queue.make<Route>();
       yield* Effect.promise(() =>
-        page.route(`${apiOrigin}/rpc`, (route) => {
+        page.route(isAnnualCalculation, (route) => {
           Queue.offerUnsafe(held, route);
         })
       );
@@ -455,7 +490,9 @@ it.live(
       const retryResponse = yield* Effect.sync(() =>
         page.waitForResponse(
           (response) =>
-            response.url().startsWith(`${apiOrigin}/rpc`) && response.ok()
+            isAnnualCalculation(new URL(response.url())) &&
+            response.request().method() === "POST" &&
+            response.ok()
         )
       );
       yield* Effect.promise(() =>
@@ -520,6 +557,13 @@ it.live(
         expect.fail("Returned calculator lost its retained page snapshot");
       }
       expect(yield* Queue.clear(calls)).toEqual([]);
+      // Navigation may refresh only public catalogue reads.
+      expect(
+        Array.every(
+          yield* Queue.clear(reads),
+          (entry) => entry === catalogueRead
+        )
+      ).toBe(true);
       expect(yield* Queue.clear(exceptions)).toEqual([]);
       yield* Effect.logInfo("native-webmcp: actual caller completed", {
         browser: browser.version(),

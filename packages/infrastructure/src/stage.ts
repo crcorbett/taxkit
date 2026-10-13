@@ -1,12 +1,20 @@
 import * as Schema from "effect/Schema";
 
-const PreviewStage = Schema.String.check(Schema.isPattern(/^pr-[1-9]\d*$/u));
+// Pull-request Preview stages share one Doppler config and own one stage each.
+export const PreviewStage = Schema.String.check(
+  Schema.isPattern(/^pr-[1-9]\d{0,6}$/u)
+).pipe(Schema.brand("taxkit/PreviewStage"));
 
-export const DocsLocalDevelopmentStage = Schema.String.check(
+// Local development uses its own stage and local state, never cloud state.
+export const LocalStage = Schema.String.check(
   Schema.isPattern(/^dev_[a-z0-9]+(?:[-_a-z0-9]+)*$/iu)
-).pipe(Schema.brand("taxkit/LocalDocsDevelopmentStage"));
+).pipe(Schema.brand("taxkit/LocalStage"));
 
-export const DocsDeploymentStage = Schema.Union([
-  Schema.Literals(["prod"]),
+export const DeploymentStage = Schema.Union([
+  Schema.Literal("prod"),
   PreviewStage,
-]).pipe(Schema.brand("taxkit/DocsDeploymentStage"));
+]);
+export type DeploymentStage = typeof DeploymentStage.Type;
+
+export const AppStage = Schema.Union([DeploymentStage, LocalStage]);
+export type AppStage = typeof AppStage.Type;

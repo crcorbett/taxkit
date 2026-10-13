@@ -1,17 +1,16 @@
 import { describe, expect, it } from "@effect/vitest";
-import { createTaxKitApiClient } from "@taxkit/api-http/client";
-import type { CalculatorClientRateKey } from "@taxkit/api-rpc/rate-identity";
-import {
-  CalculatorRequestRateKey,
-  calculatorEdgeRateKey,
-} from "@taxkit/api-rpc/rate-identity";
+import { TaxKitApi } from "@taxkit/api-http/api";
 import {
   CalculatorRpcPayload,
   CalculatorRpcVersion,
   MetadataQuery,
 } from "@taxkit/api-rpc/schemas";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
-import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
+import type { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
+import {
+  CalculatorAdmission,
+  CalculatorRequestRateKey,
+} from "@taxkit/calculators/admission.service";
 import {
   CalculatorRateLimited,
   CalculationQuery,
@@ -24,6 +23,7 @@ import {
   HashMap,
   Layer,
   Option,
+  Redacted,
   Ref,
   Result,
   Schema,
@@ -35,7 +35,9 @@ import {
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 
+import { calculatorEdgeRateKey } from "../src/edge-identity.boundary.js";
 import { ApiCalculatorAdmission } from "../src/worker-admission.layer.js";
 import { ApiWorkerInit } from "../src/worker.js";
 
@@ -48,7 +50,7 @@ const Frame = Schema.TaggedStruct("Request", {
 const Json = Schema.fromJsonString(Schema.Unknown);
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
-  WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+  TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
 });
 
 describe("shared native host calculation admission", () => {
@@ -102,7 +104,7 @@ describe("shared native host calculation admission", () => {
           ConfigProvider.fromUnknown({
             API_PUBLIC_ORIGIN: origin,
             CALCULATOR_HOST_MODE: mode,
-            WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+            TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
           })
         ),
         Effect.scoped
@@ -200,9 +202,10 @@ describe("shared native host calculation admission", () => {
             Effect.scoped
           )
         );
-        const client = yield* createTaxKitApiClient({
+        const client = yield* HttpApiClient.makeWith(TaxKitApi, {
           baseUrl: "https://api.example.com",
-        }).pipe(Effect.provideService(HttpClient.HttpClient, http));
+          httpClient: http,
+        });
         const calculate = client.calculatorApi.calculate({
           params: { calculatorId: CalculationRequest.calculatorId },
           payload: CalculationRequest.payload,
@@ -268,6 +271,102 @@ describe("shared native host calculation admission", () => {
           })).calculators.length
         ).toBe(3);
         expect(first.report).toBeDefined();
+      }).pipe(
+        Effect.provideService(ConfigProvider.ConfigProvider, settings),
+        Effect.scoped
+      )
+  );
+
+  it.effect(
+    "admits the trusted caller key on the canonical HTTP calculation only",
+    () =>
+      Effect.gen(function* () {
+        const keys = yield* Ref.make<readonly string[]>([]);
+        const app = yield* ApiWorkerInit.pipe(
+          Effect.provideService(
+            CalculatorAdmission,
+            CalculatorAdmission.of({
+              admitCalculation: (key) =>
+                Ref.update(keys, (seen) => [
+                  ...seen,
+                  String(Redacted.value(key)),
+                ]),
+            })
+          )
+        );
+        const body = yield* Schema.encodeEffect(
+          Schema.fromJsonString(
+            CalculatorRpcPayload.fields.request.fields.payload
+          )
+        )(CalculationRequest.payload);
+        const call = (path: string, method: string, payload: string) =>
+          app.calculatorRequest(
+            new Request(`https://api.example.com${path}`, {
+              body: method === "POST" ? payload : null,
+              headers: {
+                "cf-connecting-ip": "198.51.100.99",
+                "content-type": "application/json",
+              },
+              method,
+            }),
+            "203.0.113.75"
+          );
+        const accepted = yield* call(
+          "/api/v1/calculators/au.pay.take-home/calculate",
+          "POST",
+          body
+        );
+        expect(accepted.status).toBe(200);
+        expect(yield* Ref.get(keys)).toHaveLength(1);
+        // An error reply keeps its real status instead of a rebuilt 200.
+        const rejected = yield* call(
+          "/api/v1/calculators/au.pay.take-home/calculate",
+          "POST",
+          "{}"
+        );
+        expect(rejected.status).toBe(400);
+        const text = yield* Effect.promise(() => rejected.text());
+        expect(text).not.toContain("203.0.113.75");
+        yield* Effect.forEach(
+          [
+            ["/api/v1/calculators/au.pay.take-home/calculate", "GET"],
+            ["/api/v1/calculators/not-a-calculator/calculate", "POST"],
+            ["/api/v1/calculators/au.pay.take-home/calculate/x", "POST"],
+            ["/api/v1/calculators", "POST"],
+          ] as const,
+          ([path, method]) =>
+            call(path, method, body).pipe(
+              Effect.tap((response) =>
+                Effect.sync(() => expect(response.status).toBe(404))
+              )
+            )
+        );
+        expect(yield* Ref.get(keys)).toHaveLength(1);
+        // A declared 4xx keeps its status, headers and checked body.
+        const limited = yield* ApiWorkerInit.pipe(
+          Effect.provideService(
+            CalculatorAdmission,
+            CalculatorAdmission.of({
+              admitCalculation: () => Effect.fail(new CalculatorRateLimited()),
+            })
+          )
+        );
+        const reply = yield* limited.calculatorRequest(
+          new Request(
+            "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+            {
+              body,
+              headers: { "content-type": "application/json" },
+              method: "POST",
+            }
+          ),
+          "203.0.113.75"
+        );
+        expect(reply.status).toBe(429);
+        expect(reply.headers.get("retry-after")).toBe("60");
+        expect(yield* Effect.promise(() => reply.text())).toContain(
+          "CalculatorRateLimited"
+        );
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.scoped

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
 import { DocsPublicPage } from "@taxkit/content/schemas";
 import {
   exampleContentCatalogue,
@@ -8,7 +7,6 @@ import {
 import { Array, Effect, Result, Schema } from "effect";
 
 import { WebsiteDocsImageBytes } from "../../../scripts/docs-images.schemas";
-import { WebsitePublicSettings } from "../schemas";
 import { docsMetadata } from "./metadata.egress";
 import { docsImagePath, WebsiteDocsArticleJson } from "./social.schemas";
 
@@ -89,12 +87,8 @@ describe("public documentation images and structured data", () => {
             title: "Title </script><script>PRIVATE9</script>\u2028 end",
           }),
         });
-        const publicSettings = WebsitePublicSettings.make({
-          apiOrigin: CalculatorRpcOrigin.make(settings.apiOrigin),
-          websiteOrigin: settings.websiteOrigin,
-        });
         const metadata = yield* Effect.fromResult(
-          docsMetadata(page, publicSettings)
+          docsMetadata(page, settings.publicationOrigin)
         );
         const script = yield* Array.head(metadata.scripts).pipe(
           Effect.fromOption

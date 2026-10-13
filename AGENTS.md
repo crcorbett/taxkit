@@ -3,7 +3,7 @@ document_type: agent-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-13
 ---
 
 # TaxKit repository guide
@@ -15,25 +15,20 @@ file; edit `AGENTS.md` only.
 
 ## Operating loop
 
-1. Read `docs/README.md`, then only the semantic owner for the task.
-2. Confirm the claim against code, configuration, Schemas, exports, generated
-   owners, or external readback at the boundary it describes.
-3. Put current implementation intent in a SPEC/task and active execution plan;
-   never reopen completed work as policy.
-4. Update the earliest durable owner and required pointers in the same slice.
-5. Run `bun run check:docs`, `bun run check:runbooks` when operations changed,
-   focused checks, and `bun run verification`;
-   package-facing changes also need an appropriate Changeset.
-6. Retain artifact identity, authority, postconditions, limitations,
-   non-claims, and rollback.
+1. Read `docs/README.md`, then only the owner document for the task.
+2. Confirm the claim against code, configuration, Schemas, exports or the
+   running system it describes.
+3. Put current implementation intent in the active SPEC and plan; completed
+   work is history, not policy.
+4. Update the owner document and its pointers in the same change.
+5. Run focused checks while working and `bun run verification` before merging.
+   Public package changes also need a Changeset.
+6. Use ordinary Git commits and pull requests. Describe what changed, the
+   checks that ran and anything not checked.
 
-For any material calculator/rule/schema, SDK/export/example, HTTP/OpenAPI,
-public MDX/navigation/runtime, package/app, command/CI/versioning/release-proof,
-lifecycle, SPEC, plan, runbook, or skill change, invoke the plugin
-`development-workflows:docs-maintainer` route before accepting the slice. Record `Change required`,
-`Preserve`, or evidenced `N/A` for its documentation impact. Scheduled or
-background freshness work is report-only candidate output unless a separately
-attached implementation authority names the reviewer and publisher.
+For a material calculator, rule, Schema, SDK, HTTP/OpenAPI, public docs,
+package, command, deployment, SPEC or plan change, use the plugin
+`development-workflows:docs-maintainer` skill to decide which documents change.
 
 ## Task routes
 
@@ -51,24 +46,19 @@ attached implementation authority names the reviewer and publisher.
 - Frontend/public docs:
   [`docs/architecture/frontend.md`](docs/architecture/frontend.md),
   [`docs/architecture/content-and-posts.md`](docs/architecture/content-and-posts.md),
-  and [`apps/web/README.md`](apps/web/README.md). The retained old app
-  belongs to the existing [docs deployment procedure](docs/runbooks/docs-deployment.md).
+  and [`apps/web/README.md`](apps/web/README.md).
 - Current work: [`docs/product-specs/index.md`](docs/product-specs/index.md) and
   [`docs/exec-plans/active/README.md`](docs/exec-plans/active/README.md).
 - Standards, tests, and release checks:
   [`docs/standards/README.md`](docs/standards/README.md) and
   [`docs/architecture/testing-and-quality.md`](docs/architecture/testing-and-quality.md).
-- Repeatable release, versioning, packed-consumer and recovery operations:
-  [`docs/runbooks/README.md`](docs/runbooks/README.md) and
-  [`docs/operations/authority-model.md`](docs/operations/authority-model.md).
+- Versioning, packed SDK checks and Website/API deployment:
+  [`docs/runbooks/README.md`](docs/runbooks/README.md).
 - References and audits: [`docs/references/README.md`](docs/references/README.md)
   and [`docs/documentation-audit/README.md`](docs/documentation-audit/README.md).
 
 Use the repository-owned [Linear skill](.agents/skills/linear/SKILL.md) when
-work is tracked in Linear. The [strict Effect skill](.agents/skills/strict-effect-ts/SKILL.md)
-and [Alchemy skill](.agents/skills/alchemy-iac/SKILL.md) supply methods; local
-profiles and the installed dependency graph own TaxKit compatibility. Skill
-installation does not imply that the clean-slate enforcement migration is complete.
+work is tracked in Linear.
 
 ## Engineering guardrails
 
@@ -92,18 +82,16 @@ installation does not imply that the clean-slate enforcement migration is comple
 - Admit an abstraction only with semantic weight, an owner, a real reuse or
   substitution point, a simpler call graph, and focused proof.
 
-## Authority and proof
+## Operations
 
-Tool access is capability, not authority. Provider, registry, publication,
-release, deployment, credential, and destructive operations require a named
-principal, operation, resource, environment, approval boundary, receipt,
-rollback/revocation, and readback. Local gates do not prove publication,
-production, or external consumer behavior.
+Tool access is not permission. Deploying, publishing packages, changing
+credentials or deleting provider resources needs the maintainer's explicit
+request for that operation. Local checks do not show that a deployment or
+publication works; check the deployed Website/API or registry directly.
 
-Use `bun run check:repository-paths` for checkout portability and
-`bun run verification` for repository closeout. Use `bun run release:check`
-only for its documented local release-evidence graph; it does not authorize or
-prove publication.
+Use `bun run verification` before merging and `bun run release:check` before
+publishing packages. Roll back a deployment by redeploying the previous working
+commit with the same native command.
 
 ## Shared development skills
 

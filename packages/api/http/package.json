@@ -21,20 +21,10 @@
       "types": "./dist/api.d.ts",
       "default": "./dist/api.js"
     },
-    "./client": {
-      "source": "./src/client/index.ts",
-      "types": "./dist/client/index.d.ts",
-      "default": "./dist/client/index.js"
-    },
-    "./client/live": {
-      "source": "./src/client/live.layer.ts",
-      "types": "./dist/client/live.layer.d.ts",
-      "default": "./dist/client/live.layer.js"
-    },
-    "./client/server": {
-      "source": "./src/client/server.layer.ts",
-      "types": "./dist/client/server.layer.d.ts",
-      "default": "./dist/client/server.layer.js"
+    "./in-process": {
+      "source": "./src/in-process.layer.ts",
+      "types": "./dist/in-process.layer.d.ts",
+      "default": "./dist/in-process.layer.js"
     },
     "./config": {
       "source": "./src/config.ts",
@@ -60,6 +50,11 @@
       "source": "./src/request-boundary.ts",
       "types": "./dist/request-boundary.d.ts",
       "default": "./dist/request-boundary.js"
+    },
+    "./response-policy": {
+      "source": "./src/response-policy.ts",
+      "types": "./dist/response-policy.d.ts",
+      "default": "./dist/response-policy.js"
     }
   },
   "publishConfig": {
@@ -72,17 +67,9 @@
         "types": "./dist/api.d.ts",
         "default": "./dist/api.js"
       },
-      "./client": {
-        "types": "./dist/client/index.d.ts",
-        "default": "./dist/client/index.js"
-      },
-      "./client/live": {
-        "types": "./dist/client/live.layer.d.ts",
-        "default": "./dist/client/live.layer.js"
-      },
-      "./client/server": {
-        "types": "./dist/client/server.layer.d.ts",
-        "default": "./dist/client/server.layer.js"
+      "./in-process": {
+        "types": "./dist/in-process.layer.d.ts",
+        "default": "./dist/in-process.layer.js"
       },
       "./config": {
         "types": "./dist/config.d.ts",
@@ -103,6 +90,10 @@
       "./request-boundary": {
         "types": "./dist/request-boundary.d.ts",
         "default": "./dist/request-boundary.js"
+      },
+      "./response-policy": {
+        "types": "./dist/response-policy.d.ts",
+        "default": "./dist/response-policy.js"
       }
     },
     "access": "public"

@@ -7,7 +7,7 @@ import {
   CalculatorRpcPayload,
   CalculatorRpcVersion,
 } from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import {
   Array,
@@ -26,6 +26,7 @@ import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
+import { WebsiteApiDeadlineExceeded } from "../src/lib/api/errors";
 import {
   nativeMcpSessionExports,
   nativeMcpSessionFixture,
@@ -39,6 +40,11 @@ const apiOrigin = "http://127.0.0.1:4201";
 const websiteOrigin = "http://127.0.0.1:4202";
 const headersOrigin = "http://127.0.0.1:4203";
 const Json = Schema.fromJsonString(Schema.Unknown);
+// The browser's only calculation request: the public HTTP calculate route.
+const calculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`;
+const isCalculation = (
+  request: Readonly<{ method: () => string; url: () => string }>
+) => request.method() === "POST" && request.url() === calculation;
 const NativeRequestFixture = Schema.TaggedStruct("Request", {
   headers: Schema.Unknown,
   id: Schema.Unknown,
@@ -115,6 +121,10 @@ it.live(
                   }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
+              },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
                 value: websiteOrigin,
@@ -245,9 +255,9 @@ it.live(
             Effect.flatMap((client) => client.calculate(CalculationRequest)),
             Effect.flip,
             Effect.provide(
-              TaxKitRpcClientLive(origin).pipe(
-                Layer.provide(FetchHttpClient.layer)
-              )
+              TaxKitRpcClientLive.pipe(
+                Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+              ).pipe(Layer.provide(FetchHttpClient.layer))
             )
           );
           const elapsed = (yield* Clock.currentTimeMillis) - started;
@@ -303,12 +313,17 @@ it.live(
         Queue.offerUnsafe(exceptions, error.message);
       });
       page.on("request", (request) => {
-        if (new URL(request.url()).pathname === "/rpc") {
-          Queue.offerUnsafe(calls, request.url());
+        // Record calculator routes and the retired machine RPC path.
+        const { pathname } = new URL(request.url());
+        if (
+          pathname === "/rpc" ||
+          pathname.startsWith("/api/v1/calculators/")
+        ) {
+          Queue.offerUnsafe(calls, `${request.method()} ${request.url()}`);
         }
       });
       page.on("requestfailed", (request) => {
-        if (new URL(request.url()).pathname === "/rpc") {
+        if (isCalculation(request)) {
           Queue.offerUnsafe(
             failed,
             request.failure()?.errorText ??
@@ -329,6 +344,7 @@ it.live(
       const payInput = page.getByLabel("Pay before tax ($)");
       yield* Effect.promise(() => payInput.fill("1654"));
       expect(yield* Queue.clear(calls)).toEqual([]);
+      const deadlineStarted = yield* Clock.currentTimeMillis;
       yield* Effect.promise(() =>
         page.getByRole("button", { exact: true, name: "Calculate" }).click()
       );
@@ -340,10 +356,14 @@ it.live(
       yield* Effect.promise(() =>
         page.getByRole("alert").waitFor({ timeout: 12_000 })
       );
+      const deadlineElapsed =
+        (yield* Clock.currentTimeMillis) - deadlineStarted;
+      expect(deadlineElapsed).toBeGreaterThanOrEqual(9500);
+      expect(deadlineElapsed).toBeLessThan(12_000);
       expect(
         yield* Effect.promise(() => page.getByRole("alert").textContent())
-      ).toContain("The calculation could not finish");
-      expect(yield* Queue.clear(calls)).toEqual([`${apiOrigin}/rpc`]);
+      ).toBe(new WebsiteApiDeadlineExceeded().message);
+      expect(yield* Queue.clear(calls)).toEqual([`POST ${calculation}`]);
       expect(yield* Queue.take(failed)).toContain("ERR_ABORTED");
       yield* Effect.promise(() => payInput.fill("1700"));
       yield* Effect.promise(() =>
@@ -352,7 +372,9 @@ it.live(
 
       yield* Effect.logInfo("native-cancellation: editing");
       const editResponse = yield* Effect.promise(() =>
-        page.waitForResponse(`${apiOrigin}/rpc`, { timeout: 5000 })
+        page.waitForResponse((response) => isCalculation(response.request()), {
+          timeout: 5000,
+        })
       ).pipe(Effect.forkScoped);
       yield* Effect.promise(() =>
         page.getByRole("button", { exact: true, name: "Calculate" }).click()
@@ -362,7 +384,7 @@ it.live(
       expect(
         yield* Queue.take(failed).pipe(Effect.timeout("3 seconds"))
       ).toContain("ERR_ABORTED");
-      expect(yield* Queue.clear(calls)).toEqual([`${apiOrigin}/rpc`]);
+      expect(yield* Queue.clear(calls)).toEqual([`POST ${calculation}`]);
       expect(yield* Effect.promise(() => page.getByRole("alert").count())).toBe(
         0
       );
@@ -374,7 +396,9 @@ it.live(
 
       yield* Effect.logInfo("native-cancellation: departure");
       const departureResponse = yield* Effect.promise(() =>
-        page.waitForResponse(`${apiOrigin}/rpc`, { timeout: 5000 })
+        page.waitForResponse((response) => isCalculation(response.request()), {
+          timeout: 5000,
+        })
       ).pipe(Effect.forkScoped);
       yield* Effect.promise(() =>
         page.getByRole("button", { exact: true, name: "Calculate" }).click()
@@ -389,7 +413,7 @@ it.live(
       expect(
         yield* Queue.take(failed).pipe(Effect.timeout("3 seconds"))
       ).toContain("ERR_ABORTED");
-      expect(yield* Queue.clear(calls)).toEqual([`${apiOrigin}/rpc`]);
+      expect(yield* Queue.clear(calls)).toEqual([`POST ${calculation}`]);
       expect(yield* Queue.clear(exceptions)).toEqual([]);
       const capturedLogs = yield* Queue.clear(logs);
       const logText = yield* Schema.encodeEffect(Json)(capturedLogs);

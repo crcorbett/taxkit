@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-13
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -31,11 +31,12 @@ Current implemented code lives in:
 - `packages/docs-fumadocs`
 - `packages/api/http`
 - `packages/api/rpc`
-: Private compiled native Effect RPC transport. It owns separately versioned
-  calculator and documentation procedures, thin named service handlers, checked POST/JSON ingress and
-  caller-scoped private client Layers. Calculator/content Schemas remain with
-  their existing owners. Explicit test-only composition is separate; no app
-  runtime or backend fallback belongs here. T003 app-host composition is locally accepted; T009 exported tracing remains open.
+: Private compiled native Effect RPC transport for machine callers. It owns
+  separately versioned calculator and documentation procedures, thin named
+  service handlers, checked POST/JSON ingress and checked client Layers used by
+  tests and machine callers. Calculator/content Schemas remain with their
+  existing owners. Explicit test-only composition is separate; no app runtime
+  or backend fallback belongs here.
 
 `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
@@ -93,12 +94,14 @@ for production-only runtime helpers.
 
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
-schemas, thin server handlers, OpenAPI, typed HTTP clients and HTTP
-status/transport annotations. Its narrow `request-boundary` export also owns the
-shared streamed HTTP-body admission used by the RPC and native app hosts. The
-RPC package depends inward on that export and retains its compatibility alias;
-the HTTP package has no RPC runtime dependency. Client and Layer constructors use `create*`;
-deprecated `make*` aliases remain at the export owner for compatibility.
+schemas, thin server handlers, OpenAPI and HTTP status/transport annotations.
+Callers use Effect's generated `HttpApiClient` for its `TaxKitApi` directly;
+`./in-process` supplies an in-process `HttpClient` for tests and examples. Its
+narrow `request-boundary` export owns the shared streamed HTTP-body admission
+used by the RPC and native app hosts, and `response-policy` owns the shared
+public CORS and cache decision. The RPC package depends inward on that export
+and retains its compatibility alias; the HTTP package has no RPC runtime
+dependency.
 
 `packages/calculators`
 : Implemented reusable calculator orchestration package. It owns calculator
@@ -129,52 +132,42 @@ request-preserving calculator helpers such as `calculateRunRequest`,
 calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
 
 `apps/web`
-: Native TanStack Website candidate. It owns form presentation/commands, the
-  server runner and React Atom registry. The private server binding and checked
-  public browser address reach the separate API through native RPC. The root
-  restores encoded outcomes. Tax rules and calculations remain package/API-owned;
-  the three calculator pages and bounded T003 connection are locally qualified.
-  The same app owns checked documentation page loaders, app-specific MDX
-  composition, navigation/focus, search and responsive reading. Its server
-  returns checked backend discovery documents at their conventional addresses.
-  Both Markdown representations and generated share images are locally
-  qualified. Current release documentation checking selects this app.
-  The old `apps/docs` workspace and writer workflows are retired; its
-  verified original source and dated recovery records remain addressable.
+: TanStack Start Website. It owns form presentation/commands, the server
+  `ManagedRuntime`, the browser `ApiClient` Atom runtime and the shared
+  registry. It reads the separate API through the generated HTTP client, over
+  the private binding on the server and the public origin in the browser. Tax
+  rules, calculations and content lookup remain package/API-owned. The app owns
+  documentation page loaders, app-specific MDX composition, navigation/focus,
+  search, Markdown representations, share images and responsive reading, and
+  forwards discovery file requests to the API. The old `apps/docs` workspace is
+  retired; its verified original source and dated recovery records remain
+  addressable.
 
 `apps/docs`
 : Retirement tombstone only. The strict historical source bundle retains all
   49 original files. The deployment runbook owns inspection and separately
   approved recovery, rather than an active old workspace.
 
-Root `alchemy.run.ts`
-: Static retirement record which the actual Alchemy importer refuses before
-  session providers, remote state and planning. It declares no empty graph.
+Root `alchemy.run.ts` and `alchemy.local.run.ts`
+: The deployed and local-development roots for the Website/API graph; see
+  [deployment](./deployment.md).
 
 `packages/infrastructure`
-: Private source-only owner of the native API/Website graph and stage/secret
-  selection, plus the separate retained PostHog project candidate through the
-  explicit `./posthog` export and `alchemy.posthog.run.ts`. Its private management
-  adapter contains Distilled; application packages do not receive that client
-  or its management credentials. The old `./stack` export is now the typed retirement marker.
-  Pure retained old stage/resource metadata remains for historical receipt
-  decoding. New provider operations belong DEV-81 and cannot inherit old IDs
-  or approvals.
-
-`tools/docs-deployment`
-: Read-only historical receipt, source and policy checks. Retired writer CLI
-  and workflow paths stop before configuration or credential fetch. Native
-  process tests qualify the stops separately from historical source inspection.
+: Private source-only owner of the native API/Website graph (`./apps-stack`),
+  stage Schemas (`./stage`) and secret selection (`./secrets`), plus the
+  separate retained PostHog project through the explicit `./posthog` export and
+  `alchemy.posthog.run.ts`. Its private management adapter contains Distilled;
+  application packages do not receive that client or its management
+  credentials.
 
 `apps/api`
 : API application owner. It retains standalone Bun config/startup/shutdown
-and adds the native Alchemy Worker candidate for active DEV-74. The native
-instance owns one router and calculator service; incoming requests own body
-limits, dispatch and cleanup. HTTP and RPC share the named calculator service operations.
-The private `api/worker` export supplies native composition to the infrastructure
-graph. The Website uses its private binding for SSR and checked public origin
-for browser RPC; T003 is locally accepted by its dated connection acceptance review.
-T009 exported tracing and provider/deployment proof remain open.
+and the native Alchemy Worker. The native instance owns one router and
+calculator service; incoming requests own body limits, dispatch and cleanup.
+HTTP, RPC and MCP share the named calculator service operations; the Worker
+also serves the discovery documents and the trusted `calculatorRequest`
+binding method. The private `api/worker` export supplies native composition to
+the infrastructure graph, and `api/edge-identity` owns edge caller identity.
 
 `packages/content`
 : Private compiled owner of canonical docs page/navigation contracts, source
@@ -186,8 +179,9 @@ T009 exported tracing and provider/deployment proof remain open.
   Fumadocs collection. The public path refinement and fixed page/search errors
   have one owner here. `ContentDiscovery` and its separate live/test composition
   derive the four discovery documents from the same catalogue and deferred
-  checked stage settings. Shared public-origin policy and distinct Website
-  identity live in its Schema owner; RPC retains a distinct API identity.
+  checked API and publication origins (`ContentDiscoverySettings`). Shared
+  public-origin policy lives in its Schema owner; RPC retains a distinct API
+  identity.
 
 `packages/analytics`
 : Private compiled owner of checked page/calculator events, collection policy,
@@ -227,8 +221,9 @@ T009 exported tracing and provider/deployment proof remain open.
 `packages/docs-fumadocs`
 : Implemented private reusable package for generic Fumadocs integration. It
   owns Effect Schema to Standard Schema bridging, shared MDX compile config,
-  the schema-decoded `FumadocsSource` service, safe tagged errors,
-  generated-loader live and deterministic test Layers, and generic
+  the schema-decoded `FumadocsSource` service, safe tagged errors, the static
+  `FumadocsSourceLive` (over a supplied `FumadocsGeneratedCollection`) and
+  `FumadocsSourceTest` (over `FumadocsSourceFixtures`) Layers, and generic
   browser-safe MDX render primitives. It must not own TaxKit-specific
   frontmatter, navigation, validation policy, routes or generated content.
   Service interfaces use the precise `Contract` suffix.
@@ -259,8 +254,7 @@ belongs in apps or explicitly server-only package exports.
 - Keep repository path classification and safe reporting in
   `tools/repository-paths`; do not move it into package orchestration or browser
   code.
-- Keep replacement app-specific MDX components in `apps/web`; old components
-  remain with the retained legacy app until retirement. Promote only generic,
+- Keep app-specific MDX components in `apps/web`. Promote only generic,
   repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
   TaxKit UI primitives to `packages/ui`.
 - Do not add flat engine packages once nested domain or rule ownership exists.
@@ -280,8 +274,8 @@ belongs in apps or explicitly server-only package exports.
 - [API and SDK](./api-and-sdk.md)
 
 
-`@taxkit/infrastructure` also owns the separate native app candidate graph and
-root secret selection through explicit source-only exports. It consumes the
+`@taxkit/infrastructure` owns the native app graph and root secret selection
+through explicit source-only exports. It consumes the
 API's named app export rather than reaching through a workspace filesystem
 path. Engine, HTTP and RPC packages have no infrastructure dependency. The API
 app retains ownership of native request/instance behaviour; root composition

@@ -5,6 +5,7 @@ import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import {
   ContentCatalogue,
   ContentDiscovery,
+  ContentDiscoverySettings,
   ContentService,
 } from "@taxkit/content/service";
 import {
@@ -33,7 +34,10 @@ import {
 } from "effect/http";
 import { RpcClient, RpcSerialization } from "effect/rpc";
 
-import { CalculatorFixture } from "../src/__testing__/fixtures.js";
+import {
+  CalculatorFixture,
+  CalculatorFixtureMode,
+} from "../src/__testing__/fixtures.js";
 import {
   DocsDiscoveryUnavailable,
   DocsPageUnavailable,
@@ -51,6 +55,7 @@ import { DocsRpcClient } from "../src/content.service.js";
 import { DocsRpcClientTest } from "../src/content.test.layer.js";
 import { CalculatorRpcOrigin } from "../src/schemas.js";
 import { TaxKitRpcHttpLayer } from "../src/server.js";
+import { TaxKitRpcOrigin } from "../src/service.js";
 import {
   DocsRpcOperationCases,
   docsPath,
@@ -65,7 +70,13 @@ const missing = Schema.decodeResult(DocsPublicPagePath)("/start/missing").pipe(
 );
 const ContentLive = Layer.merge(
   ContentServiceLive,
-  ContentDiscoveryLive(exampleDiscoverySettings.pipe(Effect.orDie))
+  ContentDiscoveryLive.pipe(
+    Layer.provide(
+      Layer.succeed(ContentDiscoverySettings)(
+        exampleDiscoverySettings.pipe(Effect.orDie)
+      )
+    )
+  )
 ).pipe(Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue)));
 const NativeSuccess = Schema.TaggedStruct("Success", { value: Schema.Unknown });
 const NativeExit = Schema.TaggedStruct("Exit", {
@@ -79,7 +90,9 @@ const makeTransport = Effect.gen(function* () {
   const handler = yield* HttpRouter.toHttpEffect(
     TaxKitRpcHttpLayer.pipe(
       Layer.provide([
-        CalculatorFixture("success"),
+        CalculatorFixture.pipe(
+          Layer.provide(Layer.succeed(CalculatorFixtureMode)("success"))
+        ),
         Layer.succeed(ContentService, content),
         Layer.succeed(ContentDiscovery, discovery),
       ])
@@ -141,7 +154,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap((client) => client.getDiscovery("/sitemap.xml")),
           Effect.flip,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -174,7 +189,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap((client) => client.getDiscovery("/sitemap.xml")),
           Effect.flip,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -215,7 +232,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap(invoke),
           Effect.flip,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -245,7 +264,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap(invoke),
           Effect.flip,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -282,7 +303,9 @@ describe("checked documentation native RPC", () => {
           ).toEqual(Option.some(docsPath));
         }).pipe(
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -351,7 +374,11 @@ describe("checked documentation native RPC", () => {
         const real = yield* ContentService.pipe(Effect.provide(ContentLive));
         const handler = yield* HttpRouter.toHttpEffect(
           TaxKitRpcHttpLayer.pipe(
-            Layer.provide(CalculatorFixture("success")),
+            Layer.provide(
+              CalculatorFixture.pipe(
+                Layer.provide(Layer.succeed(CalculatorFixtureMode)("success"))
+              )
+            ),
             Layer.provide(
               Layer.succeed(
                 ContentService,
@@ -420,7 +447,9 @@ describe("checked documentation native RPC", () => {
           );
         }).pipe(
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -480,7 +509,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap(invoke),
           Effect.flip,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -551,7 +582,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap(invoke),
           Effect.exit,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -611,7 +644,9 @@ describe("checked documentation native RPC", () => {
         yield* DocsRpcClient.pipe(
           Effect.flatMap(invoke),
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -632,7 +667,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap(invoke),
           Effect.exit,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -693,7 +730,9 @@ describe("checked documentation native RPC", () => {
           Effect.flatMap(invoke),
           Effect.flip,
           Effect.provide(
-            DocsRpcClientLive(origin).pipe(
+            DocsRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )

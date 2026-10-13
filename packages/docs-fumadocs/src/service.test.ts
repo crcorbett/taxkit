@@ -1,10 +1,10 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Match, Schema } from "effect";
+import { Effect, Layer, Match, Schema } from "effect";
 
 import { FumadocsSourceLoadError } from "./errors.js";
-import { makeFumadocsSourceLive } from "./live.layer.js";
-import { FumadocsSource } from "./service.js";
-import { makeFumadocsSourceTest } from "./test.layer.js";
+import { FumadocsSourceLive } from "./live.layer.js";
+import { FumadocsGeneratedCollection, FumadocsSource } from "./service.js";
+import { FumadocsSourceFixtures, FumadocsSourceTest } from "./test.layer.js";
 
 const guide = {
   browserPath: "guides/example.mdx",
@@ -29,7 +29,13 @@ describe("FumadocsSource", () => {
 
         expect(page).toEqual(guide);
         expect(pages).toEqual([guide]);
-      }).pipe(Effect.provide(makeFumadocsSourceTest([guide])))
+      }).pipe(
+        Effect.provide(
+          FumadocsSourceTest.pipe(
+            Layer.provide(Layer.succeed(FumadocsSourceFixtures)([guide]))
+          )
+        )
+      )
   );
 
   it.effect("returns a tagged missing-page error", () =>
@@ -37,7 +43,11 @@ describe("FumadocsSource", () => {
       const source = yield* FumadocsSource;
       return yield* source.getPage(["missing"]);
     }).pipe(
-      Effect.provide(makeFumadocsSourceTest([guide])),
+      Effect.provide(
+        FumadocsSourceTest.pipe(
+          Layer.provide(Layer.succeed(FumadocsSourceFixtures)([guide]))
+        )
+      ),
       Effect.flip,
       Effect.tap((error) =>
         Effect.sync(() => {
@@ -55,16 +65,20 @@ describe("FumadocsSource", () => {
         return yield* source.listPages();
       }).pipe(
         Effect.provide(
-          makeFumadocsSourceLive({
-            getPage: () => Effect.succeed(guide),
-            listPages: () =>
-              Effect.fail(
-                new FumadocsSourceLoadError({
-                  message: "provider detail",
-                  operation: "listPages",
-                })
-              ),
-          })
+          FumadocsSourceLive.pipe(
+            Layer.provide(
+              Layer.succeed(FumadocsGeneratedCollection)({
+                getPage: () => Effect.succeed(guide),
+                listPages: () =>
+                  Effect.fail(
+                    new FumadocsSourceLoadError({
+                      message: "provider detail",
+                      operation: "listPages",
+                    })
+                  ),
+              })
+            )
+          )
         ),
         Effect.flip,
         Effect.tap((error) =>
@@ -87,10 +101,14 @@ describe("FumadocsSource", () => {
       return yield* source.getPage(["guides", "example"]);
     }).pipe(
       Effect.provide(
-        makeFumadocsSourceLive({
-          getPage: () => Effect.succeed({ ...guide, markdown: 42 }),
-          listPages: () => Effect.succeed([guide]),
-        })
+        FumadocsSourceLive.pipe(
+          Layer.provide(
+            Layer.succeed(FumadocsGeneratedCollection)({
+              getPage: () => Effect.succeed({ ...guide, markdown: 42 }),
+              listPages: () => Effect.succeed([guide]),
+            })
+          )
+        )
       ),
       Effect.flip,
       Effect.tap((error) =>

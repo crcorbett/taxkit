@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-13
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -11,8 +11,15 @@ tombstone: false
 
 # Active exec plans
 
-The [Clean slate foundation](./clean-slate-foundation.md) implements the accepted
-website/API rebuild in dependency order; provider apply remains separately gated.
+The [Common Practice foundation plan](./common-practice-foundation-review.md)
+implements the 13 October design: Common Practice's native HTTP/Atom Website
+clients and ordinary Git/Alchemy/Doppler delivery, Cloudflare first, patch-free
+Alchemy and retirement of receipt tooling. It supersedes the transport, origin,
+cache and workflow parts of the older clean-slate plan, which keeps its
+execution history.
+
+The superseded [Clean slate foundation](./clean-slate-foundation.md) retains the
+earlier Website/API rebuild history.
 
 The [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) is implemented locally, with [completed correction evidence](../../documentation-audit/medicare-2025-26-correction.json). The wider clean-slate plan remains active; adad consumer qualification and enablement are separate work.
 

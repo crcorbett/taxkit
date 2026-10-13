@@ -60,11 +60,6 @@
       "types": "./dist/host-telemetry.d.ts",
       "default": "./dist/host-telemetry.js"
     },
-    "./rate-identity": {
-      "source": "./src/rate-identity.boundary.ts",
-      "types": "./dist/rate-identity.boundary.d.ts",
-      "default": "./dist/rate-identity.boundary.js"
-    },
     "./content/group": {
       "source": "./src/content.group.ts",
       "types": "./dist/content.group.d.ts",

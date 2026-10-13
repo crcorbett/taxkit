@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Match, Option, Result } from "effect";
+import { Match, Option } from "effect";
 
 import { DocsHeading } from "#/lib/docs/components";
 import { DocsNavigation } from "#/lib/docs/page.view";
-import { docsSearchRouteBoundary } from "#/lib/docs/route-boundary";
-import { readDocsSearchLocation } from "#/lib/docs/search-location.boundary";
+import { readDocsSearchTerm } from "#/lib/docs/search-location.boundary";
 import { DocsSearchForm, DocsSearchResults } from "#/lib/docs/search.view";
+import { loadDocsSearch } from "#/lib/loaders";
 
 const SearchUnavailable = () => (
   <section className="docs-state" role="alert">
@@ -20,28 +20,16 @@ const SearchUnavailable = () => (
 
 export const Route = createFileRoute("/search")({
   component: function DocumentationSearchRoute() {
-    const restored = docsSearchRouteBoundary.restore(Route.useLoaderData());
-    return Result.match(restored, {
-      onFailure: (error) => (
+    return Match.value(Route.useLoaderData()).pipe(
+      Match.tag("InvalidSearch", () => (
         <section className="docs-state" role="alert">
           <DocsHeading>Search documentation</DocsHeading>
-          <p>
-            {Match.value(error).pipe(
-              Match.tag(
-                "DocsSearchInputError",
-                () => "Enter up to 100 characters to search the documentation."
-              ),
-              Match.orElse(
-                () =>
-                  "Documentation search could not load. Please reload this page to try again."
-              )
-            )}
-          </p>
+          <p>Enter up to 100 characters to search the documentation.</p>
           <DocsSearchForm term="" />
           <a href="/start/quickstart">Open the Quickstart</a>
         </section>
-      ),
-      onSuccess: ({ navigation, results, term }) => (
+      )),
+      Match.tag("Found", ({ navigation, results, term }) => (
         <div className="docs-layout">
           <aside className="docs-sidebar">
             <DocsNavigation
@@ -55,8 +43,9 @@ export const Route = createFileRoute("/search")({
             <DocsSearchResults results={results} term={term} />
           </article>
         </div>
-      ),
-    });
+      )),
+      Match.exhaustive
+    );
   },
   errorComponent: SearchUnavailable,
   head: () => ({
@@ -70,8 +59,9 @@ export const Route = createFileRoute("/search")({
     ],
   }),
   loader: ({ location, context, abortController }) =>
-    context.loadDocsSearch({
-      query: readDocsSearchLocation(location.searchStr),
+    loadDocsSearch({
+      context,
+      query: readDocsSearchTerm(location.searchStr),
       signal: abortController.signal,
     }),
   pendingComponent: () => (

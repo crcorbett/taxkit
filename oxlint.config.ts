@@ -14,6 +14,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Local package-manifest ingress for the documentation command check.
+  "tools/documentation/check.boundary.ts",
   "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
   "apps/web/src/lib/analytics/relay/relay.boundary.test.ts",
   "apps/web/test/native-relay.boundary.test.ts",
@@ -37,7 +39,6 @@ const decodingBoundaryFiles = [
   // Exact official MCP client wire ingress and adversarial host fixture.
   "apps/api/test/mcp-client.boundary.test.ts",
   "apps/web/test/native-mcp.boundary.test.ts",
-  "tools/docs-deployment/retirement.refusal.boundary.test.ts",
   // Exact build catalogue/renderer bytes and adversarial metadata fixture ingress.
   "apps/web/scripts/docs-images.build.ts",
   "apps/web/src/lib/docs/social.boundary.test.ts",
@@ -45,8 +46,6 @@ const decodingBoundaryFiles = [
   // No synchronous throwing codec, encoder or runtime execution admission.
   "packages/docs-content/source.config.ts",
   // Exact acceptance JSON, external example JSON and raw HTTP error ingress.
-  "tools/documentation/catalogue.build.ts",
-  "tools/documentation/catalogue.build.test.ts",
   "packages/docs-examples/src/validate-external-input.ts",
   "packages/docs-examples/src/api-error-envelope.ts",
   "packages/docs-examples/test/integration.example.test.ts",
@@ -56,10 +55,9 @@ const decodingBoundaryFiles = [
   "packages/content/test/service.test.ts",
   // Exact native connection, private-call and provider-reply trust boundaries.
   // No encoder, runner, cast, mutation or neighbouring-path permission.
-  "packages/api/rpc/src/rate-identity.boundary.ts",
+  "apps/api/src/edge-identity.boundary.ts",
   "apps/api/src/worker.application.ts",
   "apps/api/src/worker-admission.layer.ts",
-  "apps/web/src/lib/live.server.layer.ts",
   // Exact native rate wire/provider fixtures and redacted-key codec checks.
   "apps/api/test/rate-admission.boundary.test.ts",
   "apps/api/test/worker-admission.boundary.test.ts",
@@ -71,7 +69,7 @@ const decodingBoundaryFiles = [
   // Historical trace and question representation round trips only.
   "packages/core/test/domain-absence.boundary.test.ts",
   // Native app root stage ingress, checked before constructing secret Layers.
-  "packages/infrastructure/src/apps-secrets.boundary.ts",
+  "packages/infrastructure/src/secrets.ts",
   "apps/web/test/native-rpc-failures.boundary.test.ts",
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-local-development.boundary.test.ts",
@@ -87,17 +85,21 @@ const decodingBoundaryFiles = [
   // Exact native website settings, form and hydration boundaries.
   "apps/web/src/lib/config.boundary.test.ts",
   "apps/web/src/lib/config.server.ts",
-  // Native documentation loader ingress: checked public header or SSR address.
-  "apps/web/src/lib/loaders.server.ts",
+  // Native API host binding ingress, route-address ingress and generated
+  // reply kind checks; loader fixtures restore only their own route data.
+  "apps/web/src/lib/api/host.server.ts",
+  "apps/web/src/lib/api/requests.ts",
+  "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
+  // Scenario input Schema rejection tests.
+  "packages/rules/au/income-tax/test/annual-tax.test.ts",
+  "packages/rules/au/pay/test/take-home-pay.test.ts",
   "apps/web/src/lib/docs/mdx.boundary.tsx",
-  "apps/web/src/lib/docs/route-boundary.ts",
   "apps/web/src/lib/docs/search-location.boundary.ts",
   // Exact original-URL/representation-header HTTP ingress and bounded fixtures.
   // No encoder, runner or neighbouring-module admission.
   "apps/web/src/lib/docs/markdown.boundary.test.ts",
   "apps/web/src/lib/docs/markdown.response.server.ts",
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
-  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/form.boundary.ts",
   "apps/web/src/routes/__root.tsx",
   "apps/web/src/server.ts",
@@ -105,9 +107,6 @@ const decodingBoundaryFiles = [
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/scripts/script-boundaries.test.ts",
   // Exact synthetic register fixture ingress; no command execution admission.
-  "tools/docs-deployment/automation.check.runtime.test.ts",
-  "tools/docs-deployment/local-doppler-environment.boundary.ts",
-  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   // Exact synchronous Oxlint rule-options ingress, decoded once and fail-closed.
   "tools/oxlint/taxkit-rules.ts",
   // Application configuration, executable smoke checks and checked examples.
@@ -149,60 +148,21 @@ const decodingBoundaryFiles = [
   "tools/oxlint/cli-fixture.ts",
   "tools/oxlint/no-decoding-outside-boundaries.test.ts",
   "tools/oxlint/portable-rules.test.ts",
+  "tools/oxlint/native-request-rules.test.ts",
   "tools/oxlint/lexical-policy.test.ts",
-  "tools/oxlint/no-route-transport-restore-outside-consumers.test.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/check.runtime.test.ts",
-  "tools/documentation/runbook-check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.test.ts",
-  "tools/documentation/runbook-policy.test.ts",
-  "tools/docs-deployment/doppler-custody.boundary.ts",
-  "tools/docs-deployment/input.boundary.ts",
-  "tools/docs-deployment/retired-source.boundary.ts",
-  "tools/docs-deployment/inventory-credentials.boundary.ts",
-  "tools/docs-deployment/workflow-check.boundary.ts",
-  "tools/docs-deployment/automation.policy.test.ts",
-  "tools/docs-deployment/inventory.service.test.ts",
   // Synthetic report ingress for the inventory caller and output boundary.
-  "tools/docs-deployment/inventory.runtime.test.ts",
-  "tools/docs-deployment/inventory.live.layer.ts",
-  "tools/docs-deployment/policy.test.ts",
-  "tools/docs-deployment/workflow-evidence.test.ts",
-  "tools/docs-deployment/workflow-evidence.ts",
-  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
-  "tools/docs-deployment/workflow-plan-projection.test.ts",
-  "tools/docs-deployment/workflow-plan-projection.ts",
-  "tools/docs-deployment/local-doppler.test.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
   "tools/repository-paths/policy.ts",
-  "tools/quality-workflow/check.runtime.ts",
-  "tools/quality-workflow/policy.test.ts",
-  "tools/quality-workflow/policy.ts",
-  "tools/quality-workflow/release-boundary.test.ts",
-  "tools/evals/hgi-206/input.boundary.ts",
   // Exact child-process UTF-8 output boundary; no runtime admission.
-  "tools/evals/hgi-206/check.runtime.test.ts",
-  "tools/evals/harness-foundation/input.boundary.ts",
-  "tools/evals/harness-foundation/check.runtime.ts",
-  "tools/governance/foundation.test.ts",
-  "tools/governance/input.boundary.ts",
-  "tools/governance/policy.test.ts",
 
   // Heterogeneous catalogue dispatch and public unknown-input scenario boundaries.
   "packages/calculators/src/catalog.ts",
   "packages/calculators/src/errors.ts",
-  "packages/rules/au/income-tax/src/calculator/annual-tax.boundary.ts",
-  "packages/rules/au/pay/src/calculator/take-home-pay.boundary.ts",
 
   // Release-evidence decoders and their adversarial boundary fixtures.
-  "packages/scripts/src/release-readiness/cli.test.ts",
-  "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
-  "packages/scripts/src/release-readiness/evidence.boundary.ts",
-  "packages/scripts/src/release-readiness/cli.ts",
-  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   // Cross-process command output restored by the release-readiness live layer.
-  "packages/scripts/src/release-readiness/live.layer.ts",
 
   // SDK rejected Promise ingress and descriptor/process boundaries.
   "packages/sdk/typescript/src/index.test.ts",
@@ -214,16 +174,6 @@ const decodingBoundaryFiles = [
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/src/effect.ts",
   "packages/sdk/typescript/src/types.ts",
-];
-
-const routeTransportBoundaryModules = ["#/lib/docs/route-boundary"];
-
-const routeTransportConsumerFiles = [
-  "apps/web/src/routes/$.tsx",
-  "apps/web/src/routes/search.tsx",
-
-  "tools/oxlint/fixtures/route-transport-allowed.tsx",
-  "tools/oxlint/fixtures/.generated-route-transport-consumer.tsx",
 ];
 
 const effectContractFiles = [
@@ -258,6 +208,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Generated public catalogue file egress.
+  "packages/docs-content/src/catalogue.runtime.ts",
   // Synthetic PostHog HTTP fixture representation only.
   "packages/infrastructure/src/posthog/management.boundary.test.ts",
   // Exact native PostHog capture request and safe configuration error bytes.
@@ -273,8 +225,6 @@ const schemaEncoderEgressFiles = [
   "apps/web/test/native-mcp.boundary.test.ts",
   // Exact checked public structured-data script egress; no decoder/runtime permission.
   "apps/web/src/lib/docs/metadata.egress.ts",
-  "tools/documentation/catalogue.build.ts",
-  "tools/documentation/catalogue.build.test.ts",
   // Exact public catalogue representation round-trip proof, not a service encoder.
   "packages/content/test/schemas.test.ts",
   // Exact rate wire/secret-negative fixtures; no production encoding permission.
@@ -305,11 +255,12 @@ const schemaEncoderEgressFiles = [
   "packages/api/rpc/test/content.boundary.test.ts",
 
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
-  "apps/web/src/lib/loaders.server.ts",
-  // Native public search header and checked local input-error transport egress.
+  // Route loader data egress and checked local input-error transport egress.
   "apps/web/src/lib/loaders.ts",
+  "apps/web/src/lib/runtime.client.ts",
+  "apps/web/src/lib/runtime.server.ts",
+  "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
   "apps/web/src/server.ts",
-  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
   "apps/web/src/lib/config.boundary.test.ts",
   // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
 
@@ -321,27 +272,14 @@ const schemaEncoderEgressFiles = [
   "packages/sdk/typescript/src/index.test.ts",
   "packages/sdk/typescript/src/effect.test.ts",
   "packages/sdk/typescript/src/client-lifetime.test.ts",
-  "packages/scripts/src/release-readiness/evidence.boundary.test.ts",
-  "packages/scripts/src/release-readiness/live.layer.test.ts",
-  "tools/docs-deployment/inventory.report.egress.ts",
   // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
-  "tools/docs-deployment/retained-record.egress.ts",
-  "tools/docs-deployment/automation.check.runtime.test.ts",
   // Exact saved-plan JSON and synthetic provider fixture representations.
-  "tools/docs-deployment/workflow-plan-projection.ts",
-  "tools/docs-deployment/workflow-evidence.test.ts",
   // Exact credential/YAML/receipt negative-fixture representations only.
-  "tools/docs-deployment/doppler-custody.test.ts",
-  "tools/docs-deployment/inventory-credentials.boundary.test.ts",
-  "tools/docs-deployment/workflow-check.boundary.test.ts",
-  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "packages/docs-content/src/service.test.ts",
   "packages/docs-content/src/generated-page.boundary.test.ts",
   "packages/docs-fumadocs/src/service.test.ts",
   "packages/docs-examples/src/node-server.ts",
-  "tools/governance/check.runtime.ts",
   // Exact historical skill representation test uses the Candidate-owned Schema.
-  "tools/evals/hgi-206/service.test.ts",
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
   "packages/api/http/__tests__/public-calculation-api.test.ts",
   // Exact representation-boundary tests: deterministic report bytes and secret-negative error JSON.
@@ -349,163 +287,76 @@ const schemaEncoderEgressFiles = [
   "packages/calculators/__tests__/public-calculator-service.test.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
 
-  "packages/scripts/src/release-readiness/evidence.boundary.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   // Exact acceptance-record and command-fixture representation tests.
-  "tools/documentation/policy.test.ts",
-  "tools/documentation/check.runtime.test.ts",
-  "tools/documentation/runbook-check.runtime.test.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/workflow-evidence.ts",
 ];
 
 const throwingCodecTestFiles = [
-  "tools/docs-deployment/doppler-custody.test.ts",
-  "tools/docs-deployment/inventory-credentials.boundary.test.ts",
-  "tools/docs-deployment/workflow-check.boundary.test.ts",
-
   // Pure policy fixtures encode their Schema-owned accepted record bytes.
-  "tools/documentation/policy.test.ts",
   "packages/docs-content/src/validation/policy.runtime.test.ts",
-  "tools/docs-deployment/workflow-plan-projection.test.ts",
 ];
 
 const runtimeBoundaryFiles = [
   "packages/docs-content/src/catalogue-index.runtime.ts",
-  "tools/documentation/catalogue.runtime.ts",
+  "packages/docs-content/src/catalogue.runtime.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
 
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
-  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
 
   "apps/web/vite.config.ts",
   "apps/web/src/lib/runtime.server.ts",
+  "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/loaders.ts",
-  "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
-  "apps/web/src/lib/loaders.server.ts",
   "apps/web/src/server.ts",
   "packages/docs-content/src/validate.runtime.ts",
-  "packages/scripts/src/release-readiness/present.runtime.ts",
-  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/repository-paths/check.runtime.test.ts",
   "tools/repository-paths/check.runtime.ts",
-  "tools/quality-workflow/check.runtime.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.ts",
-  "tools/evals/hgi-206/check.runtime.ts",
-  "tools/evals/harness-foundation/check.runtime.ts",
-  "tools/governance/check.runtime.ts",
-  "tools/governance/policy.test.ts",
-  "tools/docs-deployment/retirement.runtime.ts",
-  "tools/docs-deployment/check.runtime.ts",
-  "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/doppler-custody.runtime.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/local-doppler.runtime.ts",
-  "tools/docs-deployment/workflow-artifact.runtime.ts",
-  "tools/docs-deployment/workflow-evidence.runtime.ts",
-  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
-  "tools/docs-deployment/workflow-proof-check.runtime.ts",
-  "tools/docs-deployment/workflow-input-check.runtime.ts",
-  "tools/docs-deployment/workflow-run-check.runtime.ts",
-  "tools/docs-deployment/workflow-plan-check.runtime.ts",
-  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const processBoundaryFiles = [
-  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
 
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.ts",
-  "tools/evals/hgi-206/check.runtime.ts",
-  "tools/evals/harness-foundation/check.runtime.ts",
-  "tools/governance/check.runtime.ts",
-  "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/local-doppler.test.ts",
-  "tools/docs-deployment/workflow-input-check.runtime.ts",
-  "tools/docs-deployment/workflow-plan-check.runtime.ts",
 ];
 
 const consoleBoundaryFiles = [
-  "tools/docs-deployment/retirement.runtime.ts",
-
   "packages/docs-content/src/validate.runtime.ts",
-  "packages/scripts/src/release-readiness/present.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.ts",
-  "tools/evals/hgi-206/check.runtime.ts",
-  "tools/evals/harness-foundation/check.runtime.ts",
-  "tools/governance/check.runtime.ts",
-  "tools/docs-deployment/check.runtime.ts",
-  "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/doppler-custody.runtime.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/workflow-artifact.runtime.ts",
-  "tools/docs-deployment/workflow-proof-check.runtime.ts",
-  "tools/docs-deployment/workflow-input-check.runtime.ts",
-  "tools/docs-deployment/workflow-run-check.runtime.ts",
-  "tools/docs-deployment/workflow-plan-check.runtime.ts",
-  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
 ];
 
 const bunAdapterFiles = [
   "apps/api/src/server.ts",
 
   "tools/oxlint/fixtures/bun-accepted.ts",
-  "tools/governance/check.runtime.ts",
-  "tools/docs-deployment/workflow-plan-check.runtime.ts",
 ];
 
 const bunRuntimeEntrypointFiles = [
-  "tools/docs-deployment/retirement.runtime.ts",
   "packages/docs-content/src/catalogue-index.runtime.ts",
-  "tools/documentation/catalogue.runtime.ts",
+  "packages/docs-content/src/catalogue.runtime.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
 
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
-  "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
 
   "packages/docs-content/src/validate.runtime.ts",
-  "packages/scripts/src/release-readiness/present.runtime.ts",
-  "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/documentation/check.runtime.ts",
-  "tools/documentation/runbook-check.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
-  "tools/quality-workflow/check.runtime.ts",
-  "tools/evals/hgi-206/check.runtime.ts",
-  "tools/evals/harness-foundation/check.runtime.ts",
-  "tools/governance/check.runtime.ts",
-  "tools/docs-deployment/check.runtime.ts",
-  "tools/docs-deployment/automation.check.runtime.ts",
-  "tools/docs-deployment/doppler-custody.runtime.ts",
-  "tools/docs-deployment/inventory.runtime.ts",
-  "tools/docs-deployment/local-doppler.runtime.ts",
-  "tools/docs-deployment/workflow-artifact.runtime.ts",
-  "tools/docs-deployment/workflow-evidence.runtime.ts",
-  "tools/docs-deployment/workflow-proof-check.runtime.ts",
-  "tools/docs-deployment/workflow-input-check.runtime.ts",
-  "tools/docs-deployment/workflow-run-check.runtime.ts",
-  "tools/docs-deployment/workflow-plan-check.runtime.ts",
-  "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
-  "tools/docs-deployment/workflow-plan-projection.runtime.ts",
 ];
 
 export default defineConfig({
@@ -521,12 +372,12 @@ export default defineConfig({
     ".turbo/**",
     ".vercel/**",
     "tools/oxlint/anti-slop/**",
+    "tools/oxlint/vendor/**",
   ],
   jsPlugins: [
     {
       name: "strict-effect",
-      specifier:
-        "./.agents/skills/strict-effect-ts/assets/oxlint/effect-policy.ts",
+      specifier: "./tools/oxlint/vendor/strict-effect/effect-policy.ts",
     },
     "./tools/oxlint/bun-rules.ts",
     "./tools/oxlint/effect-rules.ts",
@@ -644,34 +495,7 @@ export default defineConfig({
         "tools/oxlint/taxkit-rules.ts",
         "tools/oxlint/.generated-strict-bindings.js",
         "tools/repository-paths/**",
-        "tools/governance/**",
-        "tools/quality-workflow/**",
         "tools/documentation/**",
-        "tools/evals/**",
-        "tools/docs-deployment/input.boundary.ts",
-        "tools/docs-deployment/input.boundary.test.ts",
-        "tools/docs-deployment/workflow-artifact*.ts",
-        "tools/docs-deployment/strict-boundaries*.ts",
-        "tools/docs-deployment/alchemy-memo.test.ts",
-        "tools/docs-deployment/{doppler-custody*,local-doppler*,inventory-credentials*,workflow-check*,workflow-input-check*}.ts",
-        "tools/docs-deployment/inventory.schemas.ts",
-        "tools/docs-deployment/workflow.contract.test.ts",
-        "tools/docs-deployment/workflow-plan-projection*.ts",
-        "tools/docs-deployment/workflow-plan-check*.ts",
-        "tools/docs-deployment/workflow-evidence*.ts",
-        "tools/docs-deployment/automation*.ts",
-        "tools/docs-deployment/{policy*,check.runtime*,schemas,retained-record*}.ts",
-        "tools/docs-deployment/inventory*.ts",
-        "tools/docs-deployment/workflow-{proof,run,teardown-proof}-check*.ts",
-        "tools/docs-deployment/.generated-inventory-strict-rejected.ts",
-        "tools/docs-deployment/.generated-retained-proof-strict-rejected.ts",
-        "tools/docs-deployment/workflow-receipts.schemas.ts",
-        "tools/docs-deployment/.generated-automation-strict-rejected.ts",
-        "tools/docs-deployment/.generated-workflow-strict-rejected.ts",
-        "tools/docs-deployment/fixtures/fake-doppler*.ts",
-        "tools/docs-deployment/.generated-credential-strict-rejected.ts",
-        "tools/docs-deployment/.generated-artifact-strict-rejected.ts",
-        "packages/scripts/**",
         "packages/sdk/typescript/src/**",
         "packages/sdk/typescript/scripts/**",
         "apps/api/**",
@@ -822,48 +646,6 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/src/lib/health-loader.boundary.browser.test.tsx"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "apps/web/src/lib/health-loader.boundary.browser.test.tsx",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["apps/web/src/server.ts"],
-      rules: {
-        "strict-effect/no-promise-workflow": [
-          "error",
-          { allowedFiles: ["apps/web/src/server.ts"] },
-        ],
-      },
-    },
-    {
-      // Controlled native callback output must be checked as a Promise before
-      // awaiting it. This admits its host signature, not Promise workflows.
-      files: ["apps/web/src/lib/browser-tools.boundary.test.ts"],
-      rules: {
-        "strict-effect/no-promise-workflow": [
-          "error",
-          { allowedFiles: ["apps/web/src/lib/browser-tools.boundary.test.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["apps/web/src/lib/loaders.server.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["apps/web/src/lib/loaders.server.ts"] },
-        ],
-      },
-    },
-    {
       files: ["apps/web/src/server.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
@@ -878,6 +660,35 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["apps/web/src/lib/runtime.server.ts"] },
+        ],
+      },
+    },
+    {
+      // The browser loader runner: one Promise bridge per TanStack loader.
+      files: ["apps/web/src/lib/runtime.client.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/lib/runtime.client.ts"] },
+        ],
+      },
+    },
+    {
+      // React replays mount and cleanup in development. The root keeps one
+      // ref to cancel a scheduled registry disposal; nothing else mutates.
+      files: ["apps/web/src/routes/__root.tsx"],
+      rules: {
+        "strict-effect/no-imperative-collections": [
+          "error",
+          {
+            allowedAssignments: [
+              {
+                file: "apps/web/src/routes/__root.tsx",
+                target: "pendingDisposal.current",
+              },
+            ],
+            allowedMethods: [],
+          },
         ],
       },
     },
@@ -955,90 +766,12 @@ export default defineConfig({
       },
     },
     {
-      // Synthetic synchronous-host canaries only. They do not admit production
-      // mutation; neighbouring paths and unrelated targets/methods stay strict.
-      files: [
-        "tools/oxlint/.generated-collection-host.ts",
-        "tools/oxlint/.generated-collection-neighbour.ts",
-      ],
-      rules: {
-        "strict-effect/no-imperative-collections": [
-          "error",
-          {
-            allowedAssignments: [
-              {
-                file: "tools/oxlint/.generated-collection-host.ts",
-                target: "host.value",
-              },
-            ],
-            allowedMethods: [
-              {
-                file: "tools/oxlint/.generated-collection-host.ts",
-                method: "push",
-                receiver: "host",
-              },
-            ],
-          },
-        ],
-      },
-    },
-    {
-      // The scoped CLI fixture checks Fetch's required Promise result signature.
-      // The native in-process client needs no production Promise exception.
-      files: ["tools/oxlint/.generated-fetch-host.ts"],
-      rules: {
-        "strict-effect/no-promise-workflow": [
-          "error",
-          {
-            allowedFiles: ["tools/oxlint/.generated-fetch-host.ts"],
-          },
-        ],
-      },
-    },
-    {
       // Accepted plain SDK signatures only; client.runtime owns caller lifetime.
       files: ["packages/sdk/typescript/src/client.runtime.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["packages/sdk/typescript/src/client.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["packages/sdk/typescript/src/client.runtime.ts"],
-      rules: {
-        "strict-effect/no-promise-workflow": [
-          "error",
-          { allowedFiles: ["packages/sdk/typescript/src/client.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["packages/scripts/src/release-readiness/present.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "packages/scripts/src/release-readiness/present.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: [
-        "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
-      ],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "packages/scripts/src/release-readiness/release-readiness.runtime.ts",
-            ],
-          },
         ],
       },
     },
@@ -1052,210 +785,20 @@ export default defineConfig({
       },
     },
     {
-      files: ["tools/quality-workflow/check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/quality-workflow/check.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/governance/check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/governance/check.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/doppler-custody.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: ["tools/docs-deployment/doppler-custody.runtime.ts"],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/retirement.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/docs-deployment/retirement.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/local-doppler.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/docs-deployment/local-doppler.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-input-check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-input-check.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/fixtures/fake-doppler.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/fixtures/fake-doppler.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/inventory.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/docs-deployment/inventory.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-proof-check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-proof-check.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-run-check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-run-check.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-teardown-proof-check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-teardown-proof-check.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/docs-deployment/check.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/automation.check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: ["tools/docs-deployment/automation.check.runtime.ts"],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-evidence.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-evidence.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-plan-projection.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-plan-projection.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-plan-check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-plan-check.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["tools/docs-deployment/workflow-artifact.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "tools/docs-deployment/workflow-artifact.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
       files: [
-        "tools/documentation/catalogue.runtime.ts",
         "packages/docs-content/src/catalogue-index.runtime.ts",
+        "packages/docs-content/src/catalogue.runtime.ts",
+        "packages/docs-content/src/catalogue.runtime.ts",
       ],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           {
             allowedFiles: [
-              "tools/documentation/catalogue.runtime.ts",
               "packages/docs-content/src/catalogue-index.runtime.ts",
+              "packages/docs-content/src/catalogue.runtime.ts",
+              "packages/docs-content/src/catalogue.runtime.ts",
+              "packages/docs-content/src/catalogue.runtime.ts",
             ],
           },
         ],
@@ -1267,33 +810,6 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["tools/documentation/check.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/documentation/runbook-check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/documentation/runbook-check.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/evals/hgi-206/check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/evals/hgi-206/check.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["tools/evals/harness-foundation/check.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["tools/evals/harness-foundation/check.runtime.ts"] },
         ],
       },
     },
@@ -1323,7 +839,6 @@ export default defineConfig({
         "**/errors/*.ts",
         "**/schemas.ts",
         "**/*.schemas.ts",
-        "tools/docs-deployment/workflow-plan-projection.ts",
       ],
       rules: {
         "unicorn/throw-new-error": "off",
@@ -1443,6 +958,153 @@ export default defineConfig({
         "bun/no-runtime-outside-entrypoints": "off",
       },
     },
+    {
+      // Synthetic synchronous-host canaries only. They do not admit production
+      // mutation; neighbouring paths and unrelated targets/methods stay strict.
+      files: [
+        "tools/oxlint/.generated-collection-host.ts",
+        "tools/oxlint/.generated-collection-neighbour.ts",
+      ],
+      rules: {
+        "strict-effect/no-imperative-collections": [
+          "error",
+          {
+            allowedAssignments: [
+              {
+                file: "tools/oxlint/.generated-collection-host.ts",
+                target: "host.value",
+              },
+            ],
+            allowedMethods: [
+              {
+                file: "tools/oxlint/.generated-collection-host.ts",
+                method: "push",
+                receiver: "host",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      // The scoped CLI fixture checks Fetch's required Promise result signature.
+      // The native in-process client needs no production Promise exception.
+      files: ["tools/oxlint/.generated-fetch-host.ts"],
+      rules: {
+        "strict-effect/no-promise-workflow": [
+          "error",
+          {
+            allowedFiles: ["tools/oxlint/.generated-fetch-host.ts"],
+          },
+        ],
+      },
+    },
+    {
+      // Exact Promise boundaries. Adapters convert one host, SDK, compiler or
+      // binding Promise; host-contract tests drive Playwright, Miniflare, MCP
+      // and the plain SDK. promiseOnlyFiles admit Effect.promise only.
+      files: [
+        "apps/api/test/mcp-client.boundary.test.ts",
+        "apps/api/test/rate-admission.boundary.test.ts",
+        "apps/api/test/worker.boundary.test.ts",
+        "apps/web/scripts/docs-images.build.ts",
+        "apps/web/src/lib/api/host.server.ts",
+        "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
+        "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
+        "apps/web/src/lib/browser-tools.boundary.test.ts",
+        "apps/web/src/lib/browser-tools.boundary.ts",
+        "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+        "apps/web/src/lib/docs/mdx.boundary.tsx",
+        "apps/web/src/server.ts",
+        "apps/web/test/native-analytics.boundary.test.ts",
+        "apps/web/test/native-browser-tools.boundary.test.ts",
+        "apps/web/test/native-cancellation.boundary.test.ts",
+        "apps/web/test/native-local-development.boundary.test.ts",
+        "apps/web/test/native-mcp.boundary.test.ts",
+        "apps/web/test/native-pair.boundary.test.ts",
+        "apps/web/test/native-rate-provider.boundary.test.ts",
+        "apps/web/test/native-rate.boundary.test.ts",
+        "apps/web/test/native-relay.boundary.test.ts",
+        "apps/web/test/native-rpc-failures.boundary.test.ts",
+        "apps/web/test/native-settings-failure.boundary.test.ts",
+        "packages/docs-content/src/catalogue-index.runtime.ts",
+        "packages/docs-content/src/catalogue-source.layer.ts",
+        "packages/docs-content/src/generated-page.boundary.ts",
+        "packages/docs-content/src/live.layer.ts",
+        "packages/docs-content/src/public-links.boundary.test.ts",
+        "packages/docs-examples/src/error-handling.ts",
+        "packages/docs-examples/src/validate-external-input.ts",
+        "packages/docs-examples/test/integration.example.test.ts",
+        "packages/sdk/typescript/src/au.test.ts",
+        "packages/sdk/typescript/src/client-lifetime.test.ts",
+        "packages/sdk/typescript/src/client.runtime.ts",
+        "packages/sdk/typescript/src/index.test.ts",
+      ],
+      rules: {
+        "strict-effect/no-promise-workflow": [
+          "error",
+          {
+            allowedFiles: [
+              "apps/api/test/mcp-client.boundary.test.ts",
+              "apps/web/scripts/docs-images.build.ts",
+              "apps/web/src/lib/api/host.server.ts",
+              "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
+              "apps/web/src/lib/browser-tools.boundary.test.ts",
+              "apps/web/src/lib/browser-tools.boundary.ts",
+              "apps/web/src/lib/docs/mdx.boundary.tsx",
+              "apps/web/src/server.ts",
+              "apps/web/test/native-analytics.boundary.test.ts",
+              "apps/web/test/native-mcp.boundary.test.ts",
+              "packages/docs-content/src/catalogue-index.runtime.ts",
+              "packages/docs-content/src/catalogue-source.layer.ts",
+              "packages/docs-content/src/generated-page.boundary.ts",
+              "packages/docs-content/src/public-links.boundary.test.ts",
+              "packages/sdk/typescript/src/client-lifetime.test.ts",
+              "packages/sdk/typescript/src/client.runtime.ts",
+              "packages/sdk/typescript/src/index.test.ts",
+            ],
+            promiseOnlyFiles: [
+              "apps/api/test/rate-admission.boundary.test.ts",
+              "apps/api/test/worker.boundary.test.ts",
+              "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
+              "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+              "apps/web/test/native-browser-tools.boundary.test.ts",
+              "apps/web/test/native-cancellation.boundary.test.ts",
+              "apps/web/test/native-local-development.boundary.test.ts",
+              "apps/web/test/native-pair.boundary.test.ts",
+              "apps/web/test/native-rate-provider.boundary.test.ts",
+              "apps/web/test/native-rate.boundary.test.ts",
+              "apps/web/test/native-relay.boundary.test.ts",
+              "apps/web/test/native-rpc-failures.boundary.test.ts",
+              "apps/web/test/native-settings-failure.boundary.test.ts",
+              "packages/docs-content/src/live.layer.ts",
+              "packages/docs-examples/src/error-handling.ts",
+              "packages/docs-examples/src/validate-external-input.ts",
+              "packages/docs-examples/test/integration.example.test.ts",
+              "packages/sdk/typescript/src/au.test.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      // The Website reads the API with native clients: one server runtime,
+      // one browser Atom runtime and registry, no server-function endpoint.
+      files: ["apps/web/src/**"],
+      rules: {
+        "strict-effect/website-rpc-boundary": [
+          "error",
+          {
+            browserRuntime: "apps/web/src/lib/api/client.atoms.ts",
+            registryTests: [
+              "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
+              "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+            ],
+            serverRuntime: "apps/web/src/lib/runtime.server.ts",
+          },
+        ],
+      },
+    },
   ],
   rules: {
     "anti-slop-effect/no-service-constructor-imports": "error",
@@ -1505,18 +1167,61 @@ export default defineConfig({
     // Effect.mapError/Effect.flatMap instead of async/await.
     "promise/prefer-await-to-callbacks": "off",
     "strict-effect/error-constructor-new": "error",
-    "strict-effect/no-native-at": "error",
-    "strict-effect/no-unsafe-option-unwrap": "error",
-    "strict-effect/runtime-file-convention": "error",
-    "strict-effect/tagged-error-name": "error",
-    "taxkit/no-decoding-outside-boundaries": "error",
-    "taxkit/no-route-transport-restore-outside-consumers": [
+    "strict-effect/module-ownership": [
       "error",
       {
-        routeTransportBoundaryModules,
-        routeTransportConsumerFiles,
+        owners: [
+          // Worker bindings are read at the Website's server runtime only.
+          {
+            allowTypes: true,
+            allowedFiles: [
+              "apps/web/src/lib/runtime.server.ts",
+              "apps/web/test/native-pair.boundary.test.ts",
+              "apps/web/test/native-rate-provider.boundary.test.ts",
+            ],
+            module: "cloudflare:workers",
+          },
+          // The private API binding is adapted once, by the Website host.
+          {
+            allowTypes: true,
+            allowedFiles: [
+              "apps/web/src/lib/api/host.server.ts",
+              "apps/web/test/native-rate.boundary.test.ts",
+            ],
+            module: "alchemy/Cloudflare/Bridge",
+          },
+        ],
       },
     ],
+    // The Cloudflare cache belongs to native Alchemy Worker/Website caching.
+    "strict-effect/native-cloudflare-cache": "error",
+    "strict-effect/no-loader-request-state": [
+      "error",
+      {
+        clientServices: [{ module: "./api/client.atoms", name: "ApiClient" }],
+        loaderFiles: [
+          "apps/web/src/lib/loaders.ts",
+          "apps/web/src/lib/runtime.client.ts",
+          "apps/web/src/lib/runtime.server.ts",
+        ],
+      },
+    ],
+    "strict-effect/no-native-at": "error",
+    "strict-effect/no-native-client-replica": "error",
+    "strict-effect/no-unsafe-option-unwrap": "error",
+    "strict-effect/runtime-file-convention": "error",
+    "strict-effect/static-layers": "error",
+    "strict-effect/tagged-error-name": "error",
+    // Browser reads call the API directly; the Website has no proxy at the
+    // API's public paths.
+    "strict-effect/website-data-proxy": [
+      "error",
+      {
+        publicApiPaths: ["/api", "/rpc", "/mcp"],
+        websiteDirectory: "apps/web/src",
+      },
+    ],
+    "taxkit/no-decoding-outside-boundaries": "error",
     "typescript/consistent-type-assertions": [
       "error",
       {

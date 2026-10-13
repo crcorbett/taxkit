@@ -143,7 +143,8 @@ const program = Effect.gen(function* () {
         fs.readFileString(owner),
         (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
       );
-      const declaration = ").pipe(Effect.provideContext(telemetry));";
+      const declaration =
+        "  ).pipe(\n    // Every reply, including native error responses, gets one cache decision.";
       if (!original.includes(declaration)) {
         return yield* Effect.die(
           "Native invalid-reply fixture no longer matches its source owner"
@@ -151,8 +152,7 @@ const program = Effect.gen(function* () {
       }
       const injected = original.replace(
         declaration,
-        `).pipe(
-          Effect.provideContext(telemetry),
+        `  ).pipe(
           Effect.flatMap((response) =>
             Effect.promise(() => HttpServerResponse.toWeb(response).text()).pipe(
               Effect.map((text) => HttpServerResponse.text(
@@ -163,9 +163,9 @@ const program = Effect.gen(function* () {
                   status: response.status,
                 }
               ))
-            )
-          )
-        );`
+            ).pipe(Effect.provideContext(telemetry))
+          ),
+          // Every reply, including native error responses, gets one cache decision.`
       );
       yield* fs.writeFileString(owner, injected);
       const fixtureId = "TaxKitApiInvalidReply";
@@ -205,7 +205,8 @@ const program = Effect.gen(function* () {
           fs.readFileString(owner),
           (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
         );
-        const declaration = ").pipe(Effect.provideContext(telemetry));";
+        const declaration =
+          "  ).pipe(\n    // Every reply, including native error responses, gets one cache decision.";
         const imports = "Headers,";
         if (!original.includes(declaration) || !original.includes(imports)) {
           return yield* Effect.die(
@@ -244,7 +245,7 @@ const program = Effect.gen(function* () {
             ))`;
         const injected = original.replace(
           declaration,
-          `).pipe(Effect.provideContext(telemetry), ${operation});`
+          `  ).pipe(${operation},\n    // Every reply, including native error responses, gets one cache decision.`
         );
         yield* fs.writeFileString(owner, injected);
         const fixtureId =
@@ -384,14 +385,14 @@ const program = Effect.gen(function* () {
     // compiler. The scoped source replacement is restored before the ordinary
     // build; no production test flag, alternate handler or protocol is added.
     yield* Effect.gen(function* nativeSettingsDefectBuild() {
-      const owner = path.join(root, "apps/web/src/lib/live.server.layer.ts");
+      const owner = path.join(root, "apps/web/src/lib/runtime.server.ts");
       const original = yield* Effect.acquireRelease(
         fs.readFileString(owner),
         (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
       );
       const injected = original.replace(
-        /settings: Effect\.succeed\(\s*WebsitePublicSettings\.make\(\{\s*apiOrigin: settings\.apiOrigin,\s*websiteOrigin: settings\.websiteOrigin,?\s*\}\)\s*\)/u,
-        'settings: Effect.die("PRIVATE9")'
+        "      const settings = yield* Effect.fromResult(host.settings);\n      // The catalogue",
+        '      const settings = yield* Effect.die("PRIVATE9");\n      // The catalogue'
       );
       if (injected === original) {
         return yield* Effect.die(

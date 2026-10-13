@@ -7,9 +7,9 @@ export const ApiWorkerSettingsConfig = Config.all({
     ApiWorkerSettings.fields.apiOrigin,
     "API_PUBLIC_ORIGIN"
   ),
-  websiteOrigin: Config.schema(
-    ApiWorkerSettings.fields.websiteOrigin,
-    "WEBSITE_PUBLIC_ORIGIN"
+  publicationOrigin: Config.schema(
+    ApiWorkerSettings.fields.publicationOrigin,
+    "TAXKIT_PUBLICATION_ORIGIN"
   ),
 }).pipe(
   Effect.map(ApiWorkerSettings.make),

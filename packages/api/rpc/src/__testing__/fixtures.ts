@@ -14,7 +14,7 @@ import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
-import { Cause, Effect, Layer, Match, Option } from "effect";
+import { Context, Cause, Effect, Layer, Match, Option } from "effect";
 import type { RpcClient, RpcClientError } from "effect/rpc";
 
 import type { TaxKitRpcGroup } from "../group.js";
@@ -39,132 +39,136 @@ export const CalculatorLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
 
-export const CalculatorFixture = (
-  mode: "success" | "expected" | "defect" | "mixed" | "capacity" | "timeout"
-) =>
-  Layer.effect(
-    PublicCalculatorService,
-    Effect.gen(function* () {
-      const calculator = yield* PublicCalculatorService;
-      const inputFailure = new CalculatorInputDecodeError({
-        issues: [
-          new CalculatorInputIssue({
-            message: sensitiveSentinel,
-            path: [sensitiveSentinel],
-          }),
-        ],
-        message: sensitiveSentinel,
-      });
-      const metadataDefect = Effect.die({
-        cause: sensitiveSentinel,
-        message: sensitiveSentinel,
-      });
-      const metadataInterruptedDefect = Effect.failCause(
-        Cause.combine(Cause.die(sensitiveSentinel), Cause.interrupt())
-      );
-      return PublicCalculatorService.of({
-        ...calculator,
-        calculate: (request) =>
-          Match.value(mode).pipe(
-            Match.when("capacity", () =>
-              Effect.fail(new CalculatorCapacityExceeded())
-            ),
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("success", () => calculator.calculate(request)),
-            Match.when("expected", () => Effect.fail(inputFailure)),
-            Match.when("defect", () =>
-              Effect.die({
-                cause: sensitiveSentinel,
-                message: sensitiveSentinel,
-              })
-            ),
-            Match.when("mixed", () =>
-              Effect.failCause(
-                Cause.combine(Cause.die(sensitiveSentinel), Cause.interrupt())
-              )
-            ),
-            Match.exhaustive
+// The behaviour a test selects for the wrapped calculator.
+export class CalculatorFixtureMode extends Context.Service<
+  CalculatorFixtureMode,
+  "success" | "expected" | "defect" | "mixed" | "capacity" | "timeout"
+>()("taxkit/api-rpc/testing/CalculatorFixtureMode") {}
+
+export const CalculatorFixture = Layer.effect(
+  PublicCalculatorService,
+  Effect.gen(function* () {
+    const mode = yield* CalculatorFixtureMode;
+    const calculator = yield* PublicCalculatorService;
+    const inputFailure = new CalculatorInputDecodeError({
+      issues: [
+        new CalculatorInputIssue({
+          message: sensitiveSentinel,
+          path: [sensitiveSentinel],
+        }),
+      ],
+      message: sensitiveSentinel,
+    });
+    const metadataDefect = Effect.die({
+      cause: sensitiveSentinel,
+      message: sensitiveSentinel,
+    });
+    const metadataInterruptedDefect = Effect.failCause(
+      Cause.combine(Cause.die(sensitiveSentinel), Cause.interrupt())
+    );
+    return PublicCalculatorService.of({
+      ...calculator,
+      calculate: (request) =>
+        Match.value(mode).pipe(
+          Match.when("capacity", () =>
+            Effect.fail(new CalculatorCapacityExceeded())
           ),
-        getCalculator: (request) =>
-          Match.value(mode).pipe(
-            Match.when("expected", () => Effect.fail(inputFailure)),
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.getCalculator(request))
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
           ),
-        getCalculatorGraph: (request) =>
-          Match.value(mode).pipe(
-            Match.when("expected", () => Effect.fail(inputFailure)),
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.getCalculatorGraph(request))
+          Match.when("success", () => calculator.calculate(request)),
+          Match.when("expected", () => Effect.fail(inputFailure)),
+          Match.when("defect", () =>
+            Effect.die({
+              cause: sensitiveSentinel,
+              message: sensitiveSentinel,
+            })
           ),
-        getCalculatorSchema: (request) =>
-          Match.value(mode).pipe(
-            Match.when("expected", () => Effect.fail(inputFailure)),
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.getCalculatorSchema(request))
+          Match.when("mixed", () =>
+            Effect.failCause(
+              Cause.combine(Cause.die(sensitiveSentinel), Cause.interrupt())
+            )
           ),
-        listCalculators: (query) =>
-          Match.value(mode).pipe(
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.listCalculators(query))
+          Match.exhaustive
+        ),
+      getCalculator: (request) =>
+        Match.value(mode).pipe(
+          Match.when("expected", () => Effect.fail(inputFailure)),
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
           ),
-        listFacts: (query) =>
-          Match.value(mode).pipe(
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.listFacts(query))
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.getCalculator(request))
+        ),
+      getCalculatorGraph: (request) =>
+        Match.value(mode).pipe(
+          Match.when("expected", () => Effect.fail(inputFailure)),
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
           ),
-        listJurisdictions: () =>
-          Match.value(mode).pipe(
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.listJurisdictions())
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.getCalculatorGraph(request))
+        ),
+      getCalculatorSchema: (request) =>
+        Match.value(mode).pipe(
+          Match.when("expected", () => Effect.fail(inputFailure)),
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
           ),
-        listRules: (query) =>
-          Match.value(mode).pipe(
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.listRules(query))
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.getCalculatorSchema(request))
+        ),
+      listCalculators: (query) =>
+        Match.value(mode).pipe(
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
           ),
-        listTaxYears: (query) =>
-          Match.value(mode).pipe(
-            Match.when("timeout", () =>
-              Effect.fail(new CalculatorOperationTimedOut())
-            ),
-            Match.when("defect", () => metadataDefect),
-            Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.listTaxYears(query))
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.listCalculators(query))
+        ),
+      listFacts: (query) =>
+        Match.value(mode).pipe(
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
           ),
-      });
-    })
-  ).pipe(Layer.provide(CalculatorLive));
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.listFacts(query))
+        ),
+      listJurisdictions: () =>
+        Match.value(mode).pipe(
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.listJurisdictions())
+        ),
+      listRules: (query) =>
+        Match.value(mode).pipe(
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.listRules(query))
+        ),
+      listTaxYears: (query) =>
+        Match.value(mode).pipe(
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculator.listTaxYears(query))
+        ),
+    });
+  })
+).pipe(Layer.provide(CalculatorLive));
 
 // Closed named calls for common transport/lifetime and revision tests.
 export const CalculatorRpcOperationCases = [
