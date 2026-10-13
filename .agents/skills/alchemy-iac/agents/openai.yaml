@@ -1,4 +1,0 @@
-interface:
-  display_name: "Alchemy IaC"
-  short_description: "Governed Effect-based infrastructure architecture"
-  default_prompt: "Use $alchemy-iac to design or review this repository's governed Alchemy infrastructure."
