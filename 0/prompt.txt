@@ -1123,3 +1123,13 @@ If the token needs updating to include the permission use the cf cli to do it
 **Not verified here:** the hosted observations (error 1010, the memo out-of-memory stall, the drift reports, DNSSEC staying `pending`) come from the Common Practice and TaxKit sessions. I made no deployment, provider call or token change.</result>
 <usage><subagent_tokens>197100</subagent_tokens><tool_uses>62</tool_uses><duration_ms>472238</duration_ms></usage>
 </task-notification>
+
+---
+
+<task-notification>
+<task-id>bchlnn0b7</task-id>
+<tool-use-id>toolu_01977kJoHq2hpNwLydeXorkX</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bchlnn0b7.output</output-file>
+<status>completed</status>
+<summary>Background command "Commit and run full verification" completed (exit code 0)</summary>
+</task-notification>
