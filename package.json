@@ -54,6 +54,8 @@
     "knip:production": "knip --production --config knip.production.json --no-gitignore --no-progress --no-config-hints",
     "lint": "bun run lint:boundary-directives && oxlint -c oxlint.config.ts . --disable-nested-config --no-error-on-unmatched-pattern",
     "lint:boundary-directives": "oxlint -c oxlint.config.ts . --allow=taxkit/no-decoding-outside-boundaries --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern",
+    "axiom:deploy": "BUN_OPTIONS=--conditions=source alchemy deploy --config alchemy.axiom.run.ts --stage prod",
+    "axiom:plan": "BUN_OPTIONS=--conditions=source alchemy plan --config alchemy.axiom.run.ts --stage prod",
     "posthog:plan": "BUN_OPTIONS=--conditions=source alchemy plan --config alchemy.posthog.run.ts --stage prod",
     "pr:deploy": "sh -c 'stage=\"$1\"; shift; printf %s \"$stage\" | grep -Eqx \"pr-[1-9][0-9]{0,6}\" || { echo \"pr:deploy needs a pr-<number> stage\" >&2; exit 64; }; for arg in \"$@\"; do case \"$arg\" in --stage|--stage=*) echo \"pr:deploy takes the stage only as its first argument\" >&2; exit 64;; esac; done; bun run build && BUN_OPTIONS=--conditions=source exec alchemy deploy --stage \"$stage\" \"$@\"' pr:deploy",
     "pr:destroy": "sh -c 'stage=\"$1\"; shift; printf %s \"$stage\" | grep -Eqx \"pr-[1-9][0-9]{0,6}\" || { echo \"pr:destroy needs a pr-<number> stage\" >&2; exit 64; }; for arg in \"$@\"; do case \"$arg\" in --stage|--stage=*) echo \"pr:destroy takes the stage only as its first argument\" >&2; exit 64;; esac; done; BUN_OPTIONS=--conditions=source exec alchemy destroy --stage \"$stage\" \"$@\"' pr:destroy",
@@ -70,6 +72,8 @@
     "test:native": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair",
     "test:tools": "bun --bun vitest run --config tools/vitest.config.ts",
     "verification": "bun run build && bun run format:check && bun run lint && bun run check-types && bun run check:effect && bun run test && bun run test:browser && bun run knip && bun run knip:production && bun run check:docs && bun run check:repository-paths",
+    "trace:deploy": "BUN_OPTIONS=--conditions=source alchemy deploy --config alchemy.trace.run.ts --stage prod",
+    "trace:plan": "BUN_OPTIONS=--conditions=source alchemy plan --config alchemy.trace.run.ts --stage prod",
     "version-packages": "changeset version"
   },
   "dependencies": {

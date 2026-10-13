@@ -84,6 +84,75 @@ state.
    should show `CF-Cache-Status: HIT` and an `Age`. Calculation results,
    errors and `Set-Cookie` replies stay private and uncached.
 
+## Observability
+
+Production telemetry goes to Site's shared Axiom datasets `site-prod-logs`,
+`site-prod-traces` and `site-prod-metrics` in the Axiom Personal organisation.
+Site owns them; TaxKit owns its ingest token, dashboards and Cloudflare
+destinations. The [deployment owner](../architecture/deployment.md#observability)
+lists the resources and the exported fields.
+
+### Management key
+
+`AXIOM_TOKEN` in `taxkit/prd` is the Axiom API token
+`taxkit-alchemy-management-20261013`, expiring on 21 December 2026. On the
+three shared datasets it can create ingest and read queries; on the
+organisation it can create and read API tokens, create, read and update
+dashboards, and read datasets. It cannot write or delete datasets. Native
+Alchemy reads it through the ordinary `prd` sources; no organisation ID is
+needed. The trace-export stack also uses the Production Cloudflare token's
+Workers Observability Write permission. Never print either value.
+
+### Commands and order
+
+```sh
+DOPPLER_TOKEN="$(doppler configure get token --plain)" bun run axiom:plan
+DOPPLER_TOKEN="$(doppler configure get token --plain)" bun run axiom:deploy
+DOPPLER_TOKEN="$(doppler configure get token --plain)" bun run trace:plan
+DOPPLER_TOKEN="$(doppler configure get token --plain)" bun run trace:deploy
+DOPPLER_TOKEN="$(doppler configure get token --plain)" bun run production:plan
+```
+
+Deploy in this order, each after its own reviewed plan:
+
+1. `axiom:*` (`TaxKitObservability/prod`): the retained `taxkit-telemetry-ingest`
+   token and the four dashboards.
+2. `trace:*` (`TaxKitTraceExport/prod`): the retained `taxkit-axiom-logs` and
+   `taxkit-axiom-traces` destinations. Its plan reads the token from step 1 and
+   fails until that exists.
+3. `production:*`: the Workers attach `taxkit-axiom-logs`. Its plan reads the
+   destination names from step 2 and fails until they exist.
+
+Each stack accepts only `--stage prod`. A plan that would replace the ingest
+token, or replace or delete a destination or dashboard, must stop. A
+dashboard-only change updates the four dashboards and nothing else.
+
+### Check after a Production release
+
+1. Read both Production Workers' settings in Cloudflare: logs enabled at
+   sampling rate 1 with destination `taxkit-axiom-logs`, invocation logs,
+   persistence and traces off, and no Axiom binding.
+2. Request a few uncached Website pages, one no-JavaScript calculation and one
+   API calculation with a unique query string. Record the time window.
+3. After the delivery delay, query `site-prod-logs` for that window and the
+   `taxkit-api` and `taxkit-web` services. Expect one `taxkit.request` record
+   per request and inspect complete envelopes: no URL, query, header, user
+   agent, IP address, body, tax figure or error text. Uncaught exceptions and
+   framework console output bypass the fixed logger, so check for them too.
+4. Open the four dashboards and confirm their panels fill.
+
+An exporter accepting records is not proof they were stored or that they are
+safe; record what the stored rows showed.
+
+### Rotation and removal
+
+The token, dashboards and destinations are retained: removing a declaration or
+destroying a telemetry stack leaves them in place. Axiom has no token update
+API, so changing the token's props replaces it and leaves the old token live.
+Prove the new token through the destinations, then revoke the old one in
+Axiom. Replace `AXIOM_TOKEN` in `taxkit/prd` before 21 December 2026, keeping
+the same scope. Native state holds the ingest token value; never print it.
+
 ## GitHub Actions
 
 Two workflows run the same native commands as the sections above. Each passes

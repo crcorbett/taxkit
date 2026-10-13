@@ -10,6 +10,11 @@
       "types": "./src/apps-stack.ts",
       "default": "./src/apps-stack.ts"
     },
+    "./axiom": {
+      "source": "./src/axiom/resources.ts",
+      "types": "./src/axiom/resources.ts",
+      "default": "./src/axiom/resources.ts"
+    },
     "./posthog": {
       "source": "./src/posthog/index.ts",
       "types": "./src/posthog/index.ts",
@@ -24,6 +29,16 @@
       "source": "./src/stage.ts",
       "types": "./src/stage.ts",
       "default": "./src/stage.ts"
+    },
+    "./telemetry": {
+      "source": "./src/telemetry.ts",
+      "types": "./src/telemetry.ts",
+      "default": "./src/telemetry.ts"
+    },
+    "./trace-export": {
+      "source": "./src/trace-export.ts",
+      "types": "./src/trace-export.ts",
+      "default": "./src/trace-export.ts"
     }
   },
   "scripts": {
@@ -34,6 +49,7 @@
   "dependencies": {
     "@distilled.cloud/posthog": "1.0.0-rc.13",
     "@taxkit/analytics": "workspace:*",
+    "@taxkit/api-rpc": "workspace:*",
     "alchemy": "catalog:",
     "api": "workspace:*",
     "effect": "catalog:"

@@ -20,6 +20,8 @@
         "tools/repository-paths/*.test.ts",
         "alchemy.local.run.ts",
         "alchemy.posthog.run.ts",
+        "alchemy.axiom.run.ts",
+        "alchemy.trace.run.ts",
         "tools/documentation/check.runtime.ts",
         "tools/**/*.test.ts"
       ],

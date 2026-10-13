@@ -20,8 +20,9 @@ import { ApiWorkerApplication } from "./worker.application.js";
 
 export { CalculatorHostMode } from "./edge-identity.boundary.js";
 
-// Platform invocation records include URLs outside the fixed app logger.
-// Keep the platform channels off until their exported fields are qualified.
+// Platform invocation records and automatic traces include URLs outside the
+// fixed app logger. Every stage but Production keeps the platform channels
+// off; the infrastructure graph gives Production checked console logs only.
 export const ApiWorkerObservability = {
   enabled: false,
   headSamplingRate: 0,

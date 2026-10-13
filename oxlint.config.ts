@@ -30,6 +30,8 @@ const decodingBoundaryFiles = [
   // Actual installed provider request bytes at the mocked network boundary.
   // No provider, credential, profile or runtime-execution permission.
   "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
+  // Evaluated memory-plan props of the telemetry stacks; no provider writes.
+  "packages/infrastructure/src/telemetry.test.ts",
   // Exact native session header/private binding capability ingress only.
   "apps/api/src/mcp-session.layer.ts",
   // Exact native browser capability/refusal ingress; no runner permission.

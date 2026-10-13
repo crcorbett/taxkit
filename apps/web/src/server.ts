@@ -8,6 +8,8 @@ import {
   withCalculatorRequestBodyLimit,
 } from "@taxkit/api-http/request-boundary";
 import { applyCachePolicy } from "@taxkit/api-http/response-policy";
+import { observeHostRequest } from "@taxkit/api-rpc/host-telemetry";
+import type { HostRoute } from "@taxkit/api-rpc/host-telemetry";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { DocsDiscoveryPath } from "@taxkit/content/schemas";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
@@ -40,6 +42,27 @@ import type { WebsiteServerRenderContext } from "./lib/schemas";
 const render = createStartHandler<{
   server: { requestContext: WebsiteServerRenderContext };
 }>(defaultStreamHandler);
+
+// The closed route family for the one request record; the raw path, query and
+// form fields never leave this function.
+const websiteRoute = (pathname: string, method: string): HostRoute =>
+  Match.value(pathname).pipe(
+    Match.when(Schema.is(DocsDiscoveryPath), () => "discovery" as const),
+    Match.when(
+      (path) => path.startsWith("/ingest/"),
+      () => "analytics-relay" as const
+    ),
+    Match.when(
+      (path) => path === "/" || path.startsWith("/calculators/"),
+      (): HostRoute => (method === "POST" ? "calculate" : "calculator-page")
+    ),
+    Match.when("/search", () => "search" as const),
+    Match.when(
+      (path) => path === "/_serverFn" || path.startsWith("/_serverFn/"),
+      () => "other" as const
+    ),
+    Match.orElse(() => "page" as const)
+  );
 
 // The Worker entry is server-only; the runtime never reaches a browser bundle.
 const handleRequest = createServerOnlyFn((request: Request) =>
@@ -229,6 +252,11 @@ const handleRequest = createServerOnlyFn((request: Request) =>
           publicRead: !new URL(request.url).pathname.startsWith("/ingest/"),
         })
       ),
+      // One fixed request record per Website request.
+      observeHostRequest("taxkit-web", {
+        method: request.method,
+        route: websiteRoute(new URL(request.url).pathname, request.method),
+      }),
       Effect.provideService(
         CalculatorRequestRateKey,
         calculatorEdgeRateKey(EffectHeaders.fromInput(request.headers))

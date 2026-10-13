@@ -37,7 +37,7 @@ Orders 1 to 5 are implemented on branch
   builds its Layer once.
 
 Failed server page loads reply 500 with `no-store`: TanStack's error handling
-replaces the 503 the loader sets. Safe operational fields stay later work.
+replaces the 503 the loader sets. Safe operational fields follow below.
 
 ## Delivery (13 October 2026)
 
@@ -82,6 +82,24 @@ and SDK contracts remain; no provider or dependency change follows from research
 The new audit packet has been removed and its useful findings folded into the
 proposal. No implementation acceptance crosswalk or new receipt is required.
 
+## Safe operational fields (13 October 2026)
+
+The Later item is implemented on branch `claude/taxkit-observability`, not yet
+deployed. Following Common Practice, production-only `TaxKitObservability`
+(`alchemy.axiom.run.ts`) and `TaxKitTraceExport` (`alchemy.trace.run.ts`)
+stacks own a retained ingest-only token, four retained dashboards and retained
+`taxkit-axiom-logs`/`taxkit-axiom-traces` destinations over Site's shared
+datasets. Each host writes one fixed `taxkit.request` record per request
+(service, closed route family, method, outcome, status, response-ready time).
+Production Workers export console logs only; invocation logs and automatic
+traces stay off because they carry URLs and caller details, so the trace
+destination is unattached. Other stages export nothing.
+
+Memory graph and privacy tests cover the stacks, Worker settings and record
+fields. Not yet done: the reviewed `axiom:deploy`, `trace:deploy` and
+Production release, stored-row privacy checks and dashboard rendering. The
+[runbook](../../runbooks/deployment.md#observability) has the order and checks.
+
 ## Implementation order
 
 | Order | Work | Meaningful check |
@@ -93,7 +111,7 @@ proposal. No implementation acceptance crosswalk or new receipt is required.
 | 3b | Enable native version-scoped caching on both Workers and apply agreed seven-day headers only to public successes. Replace obsolete public restrictions; keep personal/error/cookie exclusions. Include content in both build inputs and deploy the stage pair together when authorised. | Repeated consumed public requests show HIT/Age; checked variants work in both orders; private/error replies remain uncached; a Preview content-only change refreshes both JSON and HTML. Native activation is not atomic. |
 | 4 | Vendor published 0.7.1 portable policy unchanged with provenance, real owner paths and useful TaxKit extensions. Enable native loader/client/cache/proxy ownership checks; checked-page-response only with an existing complete helper. Make imports aware of nested manifests and run actual Effect diagnostics. | Actual Oxlint accepts native clients, component queries, config/service atoms and cache declarations; rejects loader request state, replica services, global Cache API wrappers and Website data proxies. Aliases, neighbouring files and nested paths are covered. |
 | 5 | Fix Bun application-wide calculation pool using the same host-neutral services. Keep current HTTP coverage. | Overlapping requests share eight places; five-second work limit and existing HTTP behaviour remain. |
-| Later | Introduce fixed safe operational fields through native Axiom/Cloudflare resources using the agreed existing datasets. | No salaries/facts/results/traces, raw URLs/bodies/errors or unsafe native channel exports. |
+| Later (implemented, not deployed) | Introduce fixed safe operational fields through native Axiom/Cloudflare resources using the agreed existing datasets. | No salaries/facts/results/traces, raw URLs/bodies/errors or unsafe native channel exports. Stored Production rows checked after release. |
 
 Keep each code change coherent and reversible with Git. Use focused tests for
 its actual behaviour and one ordinary verification command. Public package
