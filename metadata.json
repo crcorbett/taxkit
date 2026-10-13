@@ -1,0 +1,48 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4SQE3PKRA6KT84XFDPDCAN8",
+  "strategy": "manual-commit",
+  "branch": "codex/common-practice-foundation-review",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "CONTEXT.md",
+    "apps/api/src/mcp.schemas.ts",
+    "apps/api/src/worker.ts",
+    "apps/web/src/lib/live.server.layer.ts",
+    "docs/adr/0003-support-independent-api-hosts.md",
+    "docs/adr/0004-limit-operational-observations.md",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/common-practice-foundation/accepted-findings.json",
+    "docs/documentation-audit/common-practice-foundation/application-readout.md",
+    "docs/documentation-audit/common-practice-foundation/audit-findings.json",
+    "docs/documentation-audit/common-practice-foundation/audit-scope.json",
+    "docs/documentation-audit/common-practice-foundation/corpus-groups.json",
+    "docs/documentation-audit/common-practice-foundation/corpus-inventory.json",
+    "docs/documentation-audit/common-practice-foundation/documentation-impact.json",
+    "docs/documentation-audit/common-practice-foundation/independent-review.md",
+    "docs/documentation-audit/common-practice-foundation/infrastructure-readout.md",
+    "docs/documentation-audit/common-practice-foundation/provider-probe-results.json",
+    "docs/documentation-audit/common-practice-foundation/registry-observations.json",
+    "docs/documentation-audit/common-practice-foundation/validation.json",
+    "docs/exec-plans/active/README.md",
+    "docs/exec-plans/active/common-practice-foundation-review.md",
+    "docs/product-specs/common-practice-foundation-review.md",
+    "docs/product-specs/index.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
+  }
+}
