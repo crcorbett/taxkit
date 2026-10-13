@@ -19,7 +19,7 @@
     "test:native-pair": "node node_modules/vitest/vitest.mjs run --config vitest.native.config.ts"
   },
   "dependencies": {
-    "@effect/atom-react": "4.0.0",
+    "@effect/atom-react": "4.0.2",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@taxkit/analytics": "workspace:*",

@@ -115,6 +115,10 @@ it.live(
                   }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
+              },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
                 value: websiteOrigin,

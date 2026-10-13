@@ -140,7 +140,7 @@ describe("accepted content service", () => {
         });
         const settings = yield* Schema.decodeEffect(DocsDiscoverySettings)({
           apiOrigin: "http://127.0.0.1:4001",
-          websiteOrigin: "http://127.0.0.1:4000",
+          publicationOrigin: "http://127.0.0.1:4000",
         });
         const setup = yield* makeContentDiscoveryTest(catalogue, settings);
         const index = yield* ContentDiscovery.pipe(

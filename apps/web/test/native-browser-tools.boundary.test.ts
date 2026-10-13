@@ -84,6 +84,10 @@ it.live(
             ...nativeMcpSessionFixture(name),
             ...nativeRateFixture("10090"),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+            TAXKIT_PUBLICATION_ORIGIN: {
+              type: "json" as const,
+              value: websiteOrigin,
+            },
             WEBSITE_PUBLIC_ORIGIN: {
               type: "json" as const,
               value: websiteOrigin,
@@ -140,6 +144,10 @@ it.live(
                       TAXKIT_API: {
                         type: "worker",
                         worker: "browser-private-api",
+                      },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json",
+                        value: websiteOrigin,
                       },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",

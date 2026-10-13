@@ -206,15 +206,17 @@ const TaxKitMcpHandlersLive = TaxKitMcpToolkit.toLayer(
 
 // The composition root selects the native adapter. Each host keeps its own
 // native protocol scope while using the captured calculator/content owners.
+// Origin-less desktop and server clients are admitted; browser pages must be
+// served from the publication address. Add another site only for a known need.
 export const TaxKitMcpHttpLayer = (
-  websiteOrigin: ApiWorkerSettings["websiteOrigin"],
+  publicationOrigin: ApiWorkerSettings["publicationOrigin"],
   protocol: McpProtocol.ProtocolAdapter = McpProtocol.v2026_07_28
 ) =>
   McpServer.toolkit(TaxKitMcpToolkit).pipe(
     Layer.provide(TaxKitMcpHandlersLive),
     Layer.provide(
       McpServer.layerHttp({
-        allowedOrigins: [websiteOrigin.origin],
+        allowedOrigins: [publicationOrigin.origin],
         name: "TaxKit",
         path: "/mcp",
         protocols: [protocol],

@@ -12,6 +12,7 @@ import {
   CalculatorRpcResponseTooLarge,
 } from "@taxkit/api-rpc/errors";
 import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { Cents, aud } from "@taxkit/core/primitives";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
@@ -71,7 +72,12 @@ describe("browser calculator lifetime", () => {
                 [
                   publicSettingsAtom,
                   Option.some(
-                    WebsitePublicSettings.make({ apiOrigin, websiteOrigin })
+                    WebsitePublicSettings.make({
+                      apiOrigin,
+                      publicationOrigin:
+                        DocsPublicationOrigin.make(websiteOrigin),
+                      websiteOrigin,
+                    })
                   ),
                 ],
               ],

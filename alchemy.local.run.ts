@@ -6,8 +6,8 @@ import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Config, ConfigProvider, Effect } from "effect";
 
-// This root owns disposable local app development only. It cannot select the
-// cloud app stack, Doppler configuration or Cloudflare state store.
+// Local development only: the native Website/API pair in local emulation with
+// local state. It cannot select cloud state, Doppler or a deployed stage.
 export default Alchemy.Stack(
   "TaxKitAppsLocal",
   {

@@ -14,9 +14,15 @@ export const DocsWebsiteOrigin = PublicHttpOrigin.pipe(
   Schema.brand("taxkit/DocsWebsiteOrigin")
 );
 export type DocsWebsiteOrigin = typeof DocsWebsiteOrigin.Type;
+// The main public address named by published pages and discovery documents,
+// including when a page is served by a separate Preview Website.
+export const DocsPublicationOrigin = PublicHttpOrigin.pipe(
+  Schema.brand("taxkit/DocsPublicationOrigin")
+);
+export type DocsPublicationOrigin = typeof DocsPublicationOrigin.Type;
 export const DocsDiscoverySettings = Schema.Struct({
   apiOrigin: PublicHttpOrigin,
-  websiteOrigin: DocsWebsiteOrigin,
+  publicationOrigin: DocsPublicationOrigin,
 });
 export type DocsDiscoverySettings = typeof DocsDiscoverySettings.Type;
 export const DocsDiscoveryPath = Schema.Literals([

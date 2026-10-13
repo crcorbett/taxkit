@@ -5,7 +5,7 @@ import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/admissio
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import { CalculationEngineLive } from "@taxkit/core";
-import { RateLimitBinding, Worker } from "alchemy/Cloudflare/Workers";
+import { RateLimitBinding, Worker, cache } from "alchemy/Cloudflare/Workers";
 import type { InferEnv } from "alchemy/Cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
 import { Config, ConfigProvider, Effect, Layer } from "effect";
@@ -76,7 +76,12 @@ export const ApiWorkerInit = ApiWorkerApplication.pipe(
   Effect.provide(ApiWorkerServicesLive)
 );
 
-export const ApiWorkerNativeInit = ApiWorkerApplication.pipe(
+export const ApiWorkerNativeInit = Effect.gen(function* () {
+  // Native Workers Cache, scoped to this deployed version. Response headers
+  // decide which public replies Cloudflare may reuse.
+  yield* cache({ crossVersionCache: false });
+  return yield* ApiWorkerApplication;
+}).pipe(
   Effect.provide(
     McpSessionHostLive.pipe(Layer.provideMerge(ApiWorkerServicesLive))
   ),

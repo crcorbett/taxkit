@@ -48,7 +48,7 @@ const Frame = Schema.TaggedStruct("Request", {
 const Json = Schema.fromJsonString(Schema.Unknown);
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
-  WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+  TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
 });
 
 describe("shared native host calculation admission", () => {
@@ -102,7 +102,7 @@ describe("shared native host calculation admission", () => {
           ConfigProvider.fromUnknown({
             API_PUBLIC_ORIGIN: origin,
             CALCULATOR_HOST_MODE: mode,
-            WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+            TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
           })
         ),
         Effect.scoped

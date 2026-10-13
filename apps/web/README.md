@@ -124,7 +124,7 @@ native binding input and Playwright's `fill` operation; nearby application
 files retain the restrictions. Both Knip graphs include the Website.
 
 From the repository root, `bun run dev` starts the native API and Website
-pair. `alchemy.apps.local.run.ts` admits only local development at the named
+pair. `alchemy.local.run.ts` admits only local development at the named
 `dev_native_apps` stage (and `dev_native_apps_proof` for the saved test).
 Alchemy prints the two addresses, binds the private API and supplies the public
 origins. It uses local state and `.alchemy/native-apps-auth`, without an ambient

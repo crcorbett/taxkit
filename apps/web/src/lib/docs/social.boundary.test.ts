@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
-import { DocsPublicPage } from "@taxkit/content/schemas";
+import { DocsPublicPage, DocsWebsiteOrigin } from "@taxkit/content/schemas";
 import {
   exampleContentCatalogue,
   exampleDiscoverySettings,
@@ -91,7 +91,8 @@ describe("public documentation images and structured data", () => {
         });
         const publicSettings = WebsitePublicSettings.make({
           apiOrigin: CalculatorRpcOrigin.make(settings.apiOrigin),
-          websiteOrigin: settings.websiteOrigin,
+          publicationOrigin: settings.publicationOrigin,
+          websiteOrigin: DocsWebsiteOrigin.make(settings.publicationOrigin),
         });
         const metadata = yield* Effect.fromResult(
           docsMetadata(page, publicSettings)

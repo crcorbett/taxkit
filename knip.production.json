@@ -8,8 +8,7 @@
     ".": {
       "entry": [
         "alchemy.run.ts!",
-        "alchemy.apps.run.ts!",
-        "alchemy.apps.local.run.ts!",
+        "alchemy.local.run.ts!",
         "alchemy.posthog.run.ts!"
       ],
       "project": ["alchemy.run.ts!"]

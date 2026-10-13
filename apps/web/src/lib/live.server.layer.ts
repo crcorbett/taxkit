@@ -151,6 +151,7 @@ export const WebsiteServerLive = (binding: Cloudflare.Env["TAXKIT_API"]) =>
                 settings: Effect.succeed(
                   WebsitePublicSettings.make({
                     apiOrigin: settings.apiOrigin,
+                    publicationOrigin: settings.publicationOrigin,
                     websiteOrigin: settings.websiteOrigin,
                   })
                 ),

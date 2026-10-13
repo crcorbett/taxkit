@@ -9,13 +9,13 @@ import {
 } from "./social.schemas";
 
 // This is the named HTML metadata/script egress. Only checked public page and
-// stage settings enter it; it invents no author, publisher or modification date.
+// publication settings enter it; it invents no author, publisher or modification date.
 export const docsMetadata = (
   page: DocsPublicPage,
   settings: WebsitePublicSettings
 ) => {
-  const canonical = new URL(page.path, settings.websiteOrigin);
-  const image = new URL(docsImagePath(page), settings.websiteOrigin);
+  const canonical = new URL(page.path, settings.publicationOrigin);
+  const image = new URL(docsImagePath(page), settings.publicationOrigin);
   return Schema.encodeResult(WebsiteDocsArticleJson)({
     "@context": "https://schema.org",
     "@type": "TechArticle",
@@ -28,7 +28,7 @@ export const docsMetadata = (
       links: [
         { href: canonical.href, rel: "canonical" },
         {
-          href: new URL(`${page.path}.md`, settings.websiteOrigin).href,
+          href: new URL(`${page.path}.md`, settings.publicationOrigin).href,
           rel: "alternate",
           type: "text/markdown",
         },

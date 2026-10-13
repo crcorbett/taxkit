@@ -91,7 +91,7 @@ describe("native local development", () => {
                 "node_modules/alchemy/bin/cli.js",
                 "dev",
                 "--config",
-                "alchemy.apps.local.run.ts",
+                "alchemy.local.run.ts",
                 "--env-file",
                 "tools/apps-local/no-local-env",
                 "--stage",
@@ -259,8 +259,7 @@ describe("native local development", () => {
           const originalWorker = yield* fs.readFileString(workerPath);
           // Local development runs the native entry point. Alter that actual
           // composition so a passing reload proves the served Worker changed.
-          const init =
-            "export const ApiWorkerNativeInit = ApiWorkerApplication.pipe(";
+          const init = "  return yield* ApiWorkerApplication;";
           expect(originalWorker).toContain(init);
           yield* Effect.gen(function* () {
             yield* Effect.addFinalizer(() =>
@@ -270,7 +269,7 @@ describe("native local development", () => {
               workerPath,
               `import { HttpServerResponse as LocalReloadHttpResponse } from "effect/http";\n${originalWorker.replace(
                 init,
-                `${init}\n  Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => LocalReloadHttpResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })),`
+                '  return yield* ApiWorkerApplication.pipe(Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => LocalReloadHttpResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })));'
               )}`
             );
             yield* Effect.promise(() =>
@@ -394,7 +393,7 @@ describe("native local development", () => {
                     "node_modules/alchemy/bin/cli.js",
                     attempt.command,
                     "--config",
-                    "alchemy.apps.local.run.ts",
+                    "alchemy.local.run.ts",
                     "--env-file",
                     "tools/apps-local/no-local-env",
                     "--stage",

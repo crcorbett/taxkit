@@ -102,7 +102,7 @@ export const withDocsRepresentation = (
       const headers = {
         "cache-control": "public, max-age=300",
         "content-type": "text/markdown; charset=utf-8",
-        link: `<${new URL(docsPath.success, settings.websiteOrigin).href}>; rel="canonical"; type="text/html"`,
+        link: `<${new URL(docsPath.success, settings.publicationOrigin).href}>; rel="canonical"; type="text/html"`,
         vary: "Accept",
         "x-content-type-options": "nosniff",
       };

@@ -25,6 +25,7 @@ import {
   Effect,
   Layer,
   Option,
+  Result,
   Schema,
   Scope,
   Stream,
@@ -37,6 +38,7 @@ import {
   HttpRouter,
   HttpServerRequest,
   HttpServerResponse,
+  Url,
 } from "effect/http";
 
 import {
@@ -51,6 +53,16 @@ import { TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
+
+// Exact HTTP(S) origin text, as browsers send it. URL parsing normalises the
+// address, so compare the parsed origin with the original header.
+const isBrowserOrigin = (origin: string) =>
+  Result.match(Url.fromString(origin), {
+    onFailure: () => false,
+    onSuccess: (url) =>
+      url.origin === origin &&
+      (url.protocol === "https:" || url.protocol === "http:"),
+  });
 
 // Construct once in the native instance scope. Both transports receive this
 // same application service; native requests keep their own scope and fibre.
@@ -94,7 +106,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       Effect.map((config) =>
         DocsDiscoverySettings.make({
           apiOrigin: config.apiOrigin,
-          websiteOrigin: config.websiteOrigin,
+          publicationOrigin: config.publicationOrigin,
         })
       ),
       Effect.mapError(
@@ -127,7 +139,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     settings.pipe(
       Effect.flatMap((config) =>
         HttpRouter.toHttpEffect(
-          TaxKitMcpHttpLayer(config.websiteOrigin).pipe(
+          TaxKitMcpHttpLayer(config.publicationOrigin).pipe(
             Layer.provide(calculator),
             Layer.provide(content)
           )
@@ -186,20 +198,27 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         withApiRequestBodyLimit(selected)
       ).pipe(
         Effect.provideService(ApiCalculatorDelivery, analytics),
+        // Public credential-free browser access for HTTP and RPC. Remote MCP
+        // keeps its own exact browser origin list. Native Effect clients send
+        // b3 and traceparent; no exporter is enabled by admitting them.
         HttpMiddleware.cors({
           allowedHeaders: isMcp
             ? [
                 CollectionPolicyHeader,
+                "b3",
                 "content-type",
                 "mcp-method",
                 "mcp-name",
                 "mcp-protocol-version",
                 "mcp-session-id",
+                "traceparent",
               ]
-            : ["content-type", CollectionPolicyHeader],
-          allowedMethods: ["GET", "POST", "OPTIONS"],
-          // The native predicate checks the actual request origin.
-          allowedOrigins: (origin) => origin === config.websiteOrigin.origin,
+            : [CollectionPolicyHeader, "b3", "content-type", "traceparent"],
+          allowedMethods: ["GET", "HEAD", "POST", "OPTIONS"],
+          allowedOrigins: (origin) =>
+            isMcp
+              ? origin === config.publicationOrigin.origin
+              : isBrowserOrigin(origin),
           credentials: false,
         })
       );

@@ -37,6 +37,10 @@ export const TaxKitWebServerConfig = (
     hostMode: Config.schema(CalculatorHostMode, "CALCULATOR_HOST_MODE").pipe(
       Config.withDefault("edge")
     ),
+    publicationOrigin: Config.schema(
+      WebsitePublicSettings.fields.publicationOrigin,
+      "TAXKIT_PUBLICATION_ORIGIN"
+    ),
     websiteOrigin: Config.schema(
       WebsitePublicSettings.fields.websiteOrigin,
       "WEBSITE_PUBLIC_ORIGIN"

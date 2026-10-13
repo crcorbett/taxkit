@@ -93,6 +93,10 @@ it.live(
                         type: "worker" as const,
                         worker: "taxkit-website-settings-defect",
                       },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json" as const,
+                        value: origin,
+                      },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json" as const,
                         value: origin,

@@ -54,10 +54,10 @@ describe("public catalogue ingress", () => {
             "http://localhost:4000",
             "http://127.0.0.1:4000",
           ],
-          (websiteOrigin) =>
+          (publicationOrigin) =>
             Schema.decodeEffect(DocsDiscoverySettings)({
               apiOrigin: "https://api.example.com",
-              websiteOrigin,
+              publicationOrigin,
             })
         );
         yield* Effect.forEach(
@@ -68,10 +68,10 @@ describe("public catalogue ingress", () => {
             "https://user:secret@website.example.com",
             "https://website.example.com/#private",
           ],
-          (websiteOrigin) =>
+          (publicationOrigin) =>
             Schema.decodeEffect(DocsDiscoverySettings)({
               apiOrigin: "https://api.example.com",
-              websiteOrigin,
+              publicationOrigin,
             }).pipe(Effect.flip)
         );
       })

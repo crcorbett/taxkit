@@ -113,6 +113,10 @@ it.live.each(["off", "invalid", "enabled", "redirect"] as const)(
                       ...nativeMcpSessionFixture("relay-api"),
                       ...nativeRateFixture("10179166"),
                       API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json",
+                        value: websiteOrigin,
+                      },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",
                         value: websiteOrigin,
@@ -153,6 +157,10 @@ it.live.each(["off", "invalid", "enabled", "redirect"] as const)(
                         value: mode === "invalid" ? "prod" : "pr-179",
                       },
                       TAXKIT_API: { type: "worker", worker: "relay-api" },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json",
+                        value: websiteOrigin,
+                      },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",
                         value: websiteOrigin,

@@ -13,6 +13,7 @@ const binding = {
 const settings = {
   API_PUBLIC_ORIGIN: "https://api.taxkit.example",
   TAXKIT_API: binding,
+  TAXKIT_PUBLICATION_ORIGIN: "https://taxkit.example",
   WEBSITE_PUBLIC_ORIGIN: "https://taxkit.example",
 };
 describe("native website settings boundary", () => {
@@ -34,6 +35,7 @@ describe("native website settings boundary", () => {
           Result.succeed(
             WebsitePublicSettings.make({
               apiOrigin: checked.apiOrigin,
+              publicationOrigin: checked.publicationOrigin,
               websiteOrigin: checked.websiteOrigin,
             })
           )

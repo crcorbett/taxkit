@@ -130,6 +130,10 @@ it.live(
                   }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
+              },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
                 value: websiteOrigin,
@@ -516,6 +520,10 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
                   ...nativeMcpSessionFixture(artifact.name),
                 }),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: workApiOrigin },
+            TAXKIT_PUBLICATION_ORIGIN: {
+              type: "json" as const,
+              value: workWebsiteOrigin,
+            },
             WEBSITE_PUBLIC_ORIGIN: {
               type: "json" as const,
               value: workWebsiteOrigin,

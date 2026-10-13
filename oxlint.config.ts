@@ -70,7 +70,7 @@ const decodingBoundaryFiles = [
   // Historical trace and question representation round trips only.
   "packages/core/test/domain-absence.boundary.test.ts",
   // Native app root stage ingress, checked before constructing secret Layers.
-  "packages/infrastructure/src/apps-secrets.boundary.ts",
+  "packages/infrastructure/src/secrets.ts",
   "apps/web/test/native-rpc-failures.boundary.test.ts",
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-local-development.boundary.test.ts",

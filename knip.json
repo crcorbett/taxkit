@@ -18,8 +18,7 @@
         "tools/effect-language-service/compatibility.ts",
         "tools/repository-paths/check.runtime.ts",
         "tools/repository-paths/*.test.ts",
-        "alchemy.apps.run.ts",
-        "alchemy.apps.local.run.ts",
+        "alchemy.local.run.ts",
         "alchemy.posthog.run.ts",
         "tools/documentation/check.runtime.ts",
         "tools/**/*.test.ts"

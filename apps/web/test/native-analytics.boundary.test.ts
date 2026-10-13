@@ -110,6 +110,10 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
                       },
                       POSTHOG_REGION: { type: "json", value: "us" },
                       POSTHOG_STAGE: { type: "json", value: "pr-179" },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json",
+                        value: "https://website.example.com",
+                      },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",
                         value: "https://website.example.com",
@@ -424,6 +428,10 @@ it.live(
             },
             POSTHOG_REGION: { type: "json" as const, value: "us" },
             POSTHOG_STAGE: { type: "json" as const, value: "pr-179" },
+            TAXKIT_PUBLICATION_ORIGIN: {
+              type: "json" as const,
+              value: websiteOrigin,
+            },
             WEBSITE_PUBLIC_ORIGIN: {
               type: "json" as const,
               value: websiteOrigin,
@@ -492,6 +500,10 @@ it.live(
                       TAXKIT_API: {
                         type: "worker",
                         worker: "collection-private-api",
+                      },
+                      TAXKIT_PUBLICATION_ORIGIN: {
+                        type: "json",
+                        value: websiteOrigin,
                       },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",

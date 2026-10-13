@@ -1765,7 +1765,7 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      path: "packages/infrastructure/src/secrets.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
@@ -1807,14 +1807,14 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      path: "packages/infrastructure/src/secrets.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/apps-secrets.boundary.ts",
+      path: "packages/infrastructure/src/secrets.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:

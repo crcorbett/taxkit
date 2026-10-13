@@ -11,9 +11,9 @@
       "packages/rules/au/*"
     ],
     "catalog": {
-      "@effect/platform-bun": "4.0.0",
-      "@effect/platform-node": "4.0.0",
-      "@effect/vitest": "4.0.0",
+      "@effect/platform-bun": "4.0.2",
+      "@effect/platform-node": "4.0.2",
+      "@effect/vitest": "4.0.2",
       "@cloudflare/vite-plugin": "1.62.5",
       "@tanstack/react-router": "1.170.41",
       "@tanstack/react-start": "1.168.60",
@@ -22,8 +22,8 @@
       "@types/react": "19.3.0",
       "@types/react-dom": "19.3.0",
       "@vitejs/plugin-react": "6.1.1",
-      "alchemy": "2.0.0-beta.80",
-      "effect": "4.0.0",
+      "alchemy": "2.0.0-beta.81",
+      "effect": "4.0.2",
       "react": "19.3.0",
       "react-dom": "19.3.0",
       "typescript": "7.0.2",
@@ -34,6 +34,7 @@
   },
   "type": "module",
   "scripts": {
+    "api:smoke": "turbo run smoke --filter=api",
     "build": "turbo run build",
     "changeset": "changeset",
     "changeset:status": "changeset status --verbose",
@@ -44,7 +45,7 @@
     "check:effect": "effect-tsgo diagnostics --project tools/effect-language-service/tsconfig.json && tsc --noEmit -p tools/effect-language-service/tsconfig.json",
     "check:repository-paths": "bun run tools/repository-paths/check.runtime.ts",
     "clean": "turbo run clean",
-    "dev": "turbo run build --filter=api && CI=1 ALCHEMY_HOME=.alchemy/native-apps-auth ALCHEMY_TELEMETRY_DISABLED=1 BUN_OPTIONS=\"--conditions=source --no-env-file\" bun run node_modules/alchemy/bin/cli.js dev --config alchemy.apps.local.run.ts --env-file tools/apps-local/no-local-env --stage dev_native_apps",
+    "dev": "turbo run build --filter=api && CI=1 ALCHEMY_HOME=.alchemy/native-apps-auth ALCHEMY_TELEMETRY_DISABLED=1 BUN_OPTIONS=\"--conditions=source --no-env-file\" alchemy dev --config alchemy.local.run.ts --env-file tools/apps-local/no-local-env --stage dev_native_apps",
     "docs:validate": "turbo run validate --filter=@taxkit/docs-content",
     "fix": "ultracite fix --type-aware",
     "format": "oxfmt -c oxfmt.config.ts --write . --no-error-on-unmatched-pattern",
@@ -53,15 +54,21 @@
     "knip:production": "knip --production --config knip.production.json --no-gitignore --no-progress --no-config-hints",
     "lint": "bun run lint:boundary-directives && oxlint -c oxlint.config.ts . --disable-nested-config --no-error-on-unmatched-pattern",
     "lint:boundary-directives": "oxlint -c oxlint.config.ts . --allow=taxkit/no-decoding-outside-boundaries --allow=taxkit/no-route-transport-restore-outside-consumers --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern",
+    "posthog:plan": "BUN_OPTIONS=--conditions=source alchemy plan --config alchemy.posthog.run.ts --stage prod",
+    "pr:deploy": "sh -c 'stage=\"$1\"; shift; printf %s \"$stage\" | grep -Eqx \"pr-[1-9][0-9]{0,6}\" || { echo \"pr:deploy needs a pr-<number> stage\" >&2; exit 64; }; for arg in \"$@\"; do case \"$arg\" in --stage|--stage=*) echo \"pr:deploy takes the stage only as its first argument\" >&2; exit 64;; esac; done; bun run build && BUN_OPTIONS=--conditions=source exec alchemy deploy --stage \"$stage\" \"$@\"' pr:deploy",
+    "pr:destroy": "sh -c 'stage=\"$1\"; shift; printf %s \"$stage\" | grep -Eqx \"pr-[1-9][0-9]{0,6}\" || { echo \"pr:destroy needs a pr-<number> stage\" >&2; exit 64; }; for arg in \"$@\"; do case \"$arg\" in --stage|--stage=*) echo \"pr:destroy takes the stage only as its first argument\" >&2; exit 64;; esac; done; BUN_OPTIONS=--conditions=source exec alchemy destroy --stage \"$stage\" \"$@\"' pr:destroy",
+    "pr:plan": "sh -c 'stage=\"$1\"; shift; printf %s \"$stage\" | grep -Eqx \"pr-[1-9][0-9]{0,6}\" || { echo \"pr:plan needs a pr-<number> stage\" >&2; exit 64; }; for arg in \"$@\"; do case \"$arg\" in --stage|--stage=*) echo \"pr:plan takes the stage only as its first argument\" >&2; exit 64;; esac; done; BUN_OPTIONS=--conditions=source exec alchemy plan --stage \"$stage\" \"$@\"' pr:plan",
     "prepare": "effect-tsgo patch",
-    "test": "bun run test:tools && turbo run test",
-    "test:tools": "bun --bun vitest run --config tools/vitest.config.ts",
-    "test:browser": "turbo run test:browser",
-    "test:native": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair",
-    "api:smoke": "turbo run smoke --filter=api",
+    "production:deploy": "bun run build && BUN_OPTIONS=--conditions=source alchemy deploy --stage prod",
+    "production:drift": "BUN_OPTIONS=--conditions=source alchemy drift --stage prod",
+    "production:plan": "BUN_OPTIONS=--conditions=source alchemy plan --stage prod",
+    "release:check": "bun run verification && bun run sdk:check-packed-artifact && bun run sdk:validate-downstream && bun run api:smoke && bun run docs:validate && bun run changeset:status",
     "sdk:check-packed-artifact": "turbo run check-packed-artifact --filter=@taxkit/sdk",
     "sdk:validate-downstream": "turbo run validate:downstream --filter=@taxkit/sdk",
-    "release:check": "bun run verification && bun run sdk:check-packed-artifact && bun run sdk:validate-downstream && bun run api:smoke && bun run docs:validate && bun run changeset:status",
+    "test": "bun run test:tools && turbo run test",
+    "test:browser": "turbo run test:browser",
+    "test:native": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair",
+    "test:tools": "bun --bun vitest run --config tools/vitest.config.ts",
     "verification": "bun run build && bun run format:check && bun run lint && bun run check-types && bun run check:effect && bun run test && bun run test:browser && bun run knip && bun run knip:production && bun run check:docs && bun run check:repository-paths",
     "version-packages": "changeset version"
   },
@@ -90,18 +97,14 @@
     "yaml": "2.9.1"
   },
   "overrides": {
-    "@effect/platform-node-shared": "4.0.0",
-    "@effect/sql-d1": "4.0.0",
-    "@effect/sql-sqlite-do": "4.0.0",
+    "@effect/platform-node-shared": "4.0.2",
+    "@effect/sql-d1": "4.0.2",
+    "@effect/sql-sqlite-do": "4.0.2",
     "workerd": "1.20261001.1"
   },
   "engines": {
     "bun": ">=1.4.2",
     "node": ">=24.16.0"
   },
-  "packageManager": "bun@1.4.2",
-  "patchedDependencies": {
-    "@effect/atom-react@4.0.0": "patches/@effect%2Fatom-react@4.0.0.patch",
-    "alchemy@2.0.0-beta.80": "patches/alchemy@2.0.0-beta.80.patch"
-  }
+  "packageManager": "bun@1.4.2"
 }

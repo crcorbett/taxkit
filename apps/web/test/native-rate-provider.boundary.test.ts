@@ -46,6 +46,10 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
           type: "json" as const,
           value: packEnvValue("10082"),
         },
+        TAXKIT_PUBLICATION_ORIGIN: {
+          type: "json" as const,
+          value: "https://website.example.com",
+        },
         WEBSITE_PUBLIC_ORIGIN: {
           type: "json" as const,
           value: "https://website.example.com",

@@ -59,13 +59,15 @@ POST `/rpc` delegate to the same calculator service. Its named RPC operations
 match all nine existing calculator-service calls using the canonical request/result contracts. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
-The Worker checks `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` with the
-canonical RPC origin policy. Its own origin comes from native `Worker.URL`;
-the apps stack supplies the matching website resource Output.
-Absent or invalid settings return a fixed native Config error without the
-rejected value. CORS allows the checked website origin, `content-type` and the
-optional `x-taxkit-collection-policy` header,
-with credentials disabled. Other origins receive no allow-origin header.
+The Worker checks `API_PUBLIC_ORIGIN` and `TAXKIT_PUBLICATION_ORIGIN` with the
+canonical origin policy. Its own origin comes from native `Worker.URL`; the
+publication origin is the fixed Production site `https://taxkit.dev`. The API
+does not read the Website's address. Absent or invalid settings return a fixed
+native Config error without the rejected value. HTTP and RPC CORS admit any
+exact HTTP(S) browser origin with credentials disabled, and allow
+`content-type`, the optional `x-taxkit-collection-policy` header and the native
+`b3`/`traceparent` tracing headers. Remote MCP admits Origin-less clients and
+browser pages served from the publication origin only.
 Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
 produce an empty 503 response, without a guessed address.

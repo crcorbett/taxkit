@@ -7,6 +7,7 @@ import {
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
+import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { Array, Effect, Fiber, Option, Result, Schema } from "effect";
 import { createRoot } from "react-dom/client";
 import { vi } from "vitest";
@@ -33,7 +34,13 @@ describe("actual website settings loader", () => {
         WebsitePublicSettings.fields.websiteOrigin
       )("https://taxkit.example");
       const encoded = yield* Schema.encodeEffect(WebsiteSettingsTransport)(
-        Result.succeed(WebsitePublicSettings.make({ apiOrigin, websiteOrigin }))
+        Result.succeed(
+          WebsitePublicSettings.make({
+            apiOrigin,
+            publicationOrigin: DocsPublicationOrigin.make(websiteOrigin),
+            websiteOrigin,
+          })
+        )
       );
       const catalogue = yield* Schema.encodeEffect(WebsiteCatalogueTransport)(
         Result.succeed({ calculators: [] })

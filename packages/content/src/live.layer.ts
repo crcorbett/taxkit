@@ -100,7 +100,7 @@ export const ContentDiscoveryLive = (
                   (page) => {
                     const address = new URL(
                       page.path,
-                      config.websiteOrigin
+                      config.publicationOrigin
                     ).href
                       .replaceAll("&", "&amp;")
                       .replaceAll("'", "&apos;")
@@ -115,12 +115,12 @@ export const ContentDiscoveryLive = (
               "/robots.txt",
               () =>
                 "User-agent: *\nAllow: /\nDisallow: /_serverFn/\n" +
-                `Sitemap: ${new URL("/sitemap.xml", config.websiteOrigin).href}\n`
+                `Sitemap: ${new URL("/sitemap.xml", config.publicationOrigin).href}\n`
             ),
             Match.when(
               "/llms.txt",
               () =>
-                `# TaxKit\n\n> Open-source Australian tax calculators, APIs and integration documentation.\n\nThese links contain accepted public documentation, not personal calculation reports.\nRelative page links in the Markdown use ${config.websiteOrigin.origin}.\n\n## Documentation\n\n${Array.map(
+                `# TaxKit\n\n> Open-source Australian tax calculators, APIs and integration documentation.\n\nThese links contain accepted public documentation, not personal calculation reports.\nRelative page links in the Markdown use ${config.publicationOrigin.origin}.\n\n## Documentation\n\n${Array.map(
                   catalogue.pages,
                   (page) => {
                     const label = page.frontmatter.title
@@ -137,10 +137,10 @@ export const ContentDiscoveryLive = (
             Match.when(
               "/llms-full.txt",
               () =>
-                `# TaxKit documentation\n\nAccepted public documentation only; no personal calculation reports.\nRelative page links use ${config.websiteOrigin.origin}.\n\n${Array.map(
+                `# TaxKit documentation\n\nAccepted public documentation only; no personal calculation reports.\nRelative page links use ${config.publicationOrigin.origin}.\n\n${Array.map(
                   catalogue.pages,
                   (page) =>
-                    `Canonical page: ${new URL(page.path, config.websiteOrigin).href}\n\n${page.markdown}`
+                    `Canonical page: ${new URL(page.path, config.publicationOrigin).href}\n\n${page.markdown}`
                 ).join("\n\n---\n\n")}\n`
             ),
             Match.exhaustive

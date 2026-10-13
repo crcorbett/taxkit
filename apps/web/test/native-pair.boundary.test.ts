@@ -244,6 +244,10 @@ describe("built native API and Website", () => {
               ...nativeLocalModeFixture,
               ...nativeRateFixture("10075"),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
+              },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,
                 value: websiteOrigin,
@@ -306,6 +310,10 @@ describe("built native API and Website", () => {
               TAXKIT_API: {
                 type: "worker" as const,
                 worker: binding,
+              },
+              TAXKIT_PUBLICATION_ORIGIN: {
+                type: "json" as const,
+                value: websiteOrigin,
               },
               WEBSITE_PUBLIC_ORIGIN: {
                 type: "json" as const,

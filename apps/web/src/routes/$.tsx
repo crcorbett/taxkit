@@ -28,7 +28,11 @@ export const Route = createFileRoute("/$")({
           <article className="docs-article">
             <MdxDocument page={page} />
             <p className="docs-markdown-link">
-              <a href={new URL(`${page.path}.md`, settings.websiteOrigin).href}>
+              <a
+                href={
+                  new URL(`${page.path}.md`, settings.publicationOrigin).href
+                }
+              >
                 Read this page as Markdown
               </a>
             </p>

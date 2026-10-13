@@ -7,6 +7,7 @@ import {
   CalculatorRunServiceRequest,
 } from "@taxkit/api-rpc/schemas";
 import {
+  DocsPublicationOrigin,
   DocsWebsiteOrigin,
   DocsPublicNavigation,
   DocsPublicPage,
@@ -42,6 +43,9 @@ import {
 
 export const WebsitePublicSettings = Schema.Struct({
   apiOrigin: CalculatorRpcOrigin,
+  // Canonical, social, JSON-LD and Markdown links name the published site.
+  publicationOrigin: DocsPublicationOrigin,
+  // The running Website's own address: tools, analytics and form actions.
   websiteOrigin: DocsWebsiteOrigin,
 });
 export type WebsitePublicSettings = typeof WebsitePublicSettings.Type;

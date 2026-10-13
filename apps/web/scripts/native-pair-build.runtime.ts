@@ -390,7 +390,7 @@ const program = Effect.gen(function* () {
         (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
       );
       const injected = original.replace(
-        /settings: Effect\.succeed\(\s*WebsitePublicSettings\.make\(\{\s*apiOrigin: settings\.apiOrigin,\s*websiteOrigin: settings\.websiteOrigin,?\s*\}\)\s*\)/u,
+        /settings: Effect\.succeed\(\s*WebsitePublicSettings\.make\(\{\s*apiOrigin: settings\.apiOrigin,\s*publicationOrigin: settings\.publicationOrigin,\s*websiteOrigin: settings\.websiteOrigin,?\s*\}\)\s*\)/u,
         'settings: Effect.die("PRIVATE9")'
       );
       if (injected === original) {

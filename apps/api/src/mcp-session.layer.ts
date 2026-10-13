@@ -93,7 +93,7 @@ export const McpSessionHostLive = Layer.effect(
                 return yield* Effect.gen(function* () {
                   const handler = yield* HttpRouter.toHttpEffect(
                     TaxKitMcpHttpLayer(
-                      config.websiteOrigin,
+                      config.publicationOrigin,
                       McpProtocol.v2025_11_25
                     ).pipe(Layer.provide(calculator), Layer.provide(content))
                   ).pipe(
@@ -159,7 +159,7 @@ export const McpSessionHostLive = Layer.effect(
                 const origin = Headers.get(request.headers, "origin");
                 if (
                   Option.isSome(origin) &&
-                  origin.value !== config.websiteOrigin.origin
+                  origin.value !== config.publicationOrigin.origin
                 ) {
                   return HttpServerResponse.empty({ status: 403 });
                 }
