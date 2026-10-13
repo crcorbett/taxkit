@@ -93,7 +93,28 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       },
       // Authored content and shared packages are build inputs, so a
       // content-only change deploys a new Website version.
+      // Hash the Website and the workspace packages it bundles. Native
+      // gitignore excludes do not reach `../` paths, so name them here;
+      // otherwise the hash follows linked node_modules into the package store.
       memo: {
+        exclude: [
+          "**/node_modules/**",
+          "**/dist/**",
+          "**/.alchemy/**",
+          "**/.output/**",
+          "**/.tanstack/**",
+          "**/.turbo/**",
+          "**/.wrangler/**",
+          "**/.vitest/**",
+          "**/.env",
+          "**/.env.*",
+          "public/og/**",
+          "../../packages/**/node_modules/**",
+          "../../packages/**/dist/**",
+          "../../packages/**/.source/**",
+          "../../packages/**/.turbo/**",
+          "../../packages/**/*.tsbuildinfo",
+        ],
         include: ["**/*", "../../packages/**"],
         lockfile: true,
       },
