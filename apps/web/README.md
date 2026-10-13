@@ -149,9 +149,12 @@ words load navigation only. Search pages are `noindex, follow`.
 **Markdown.** Accepted pages also serve their processed Markdown at the `.md`
 address and at the page address with a preferring `Accept` header
 (`markdown.response.server.ts`). HTML wins ties and a missing preference.
-Invalid or wholly excluding `Accept` fields return empty 400/406; other methods
-on `.md` return 405; query input 400; missing or unavailable pages 404/503, all
-`no-store`. Markdown replies carry `Vary: Accept`, `nosniff` and a canonical
+Invalid or wholly excluding `Accept` fields return empty 400/406, stored as
+their own public variant: Workers Cache drops a page's stored HTML when an
+uncacheable reply arrives at the same address, so an odd `Accept` header must
+not be able to empty it. Other methods on `.md` return 405; query input 400;
+missing or unavailable pages 404/503, all `no-store`. Every reply at a docs
+address carries `Vary: Accept`; Markdown also carries `nosniff` and a canonical
 link to the publication origin.
 
 **Discovery.** `/sitemap.xml`, `/robots.txt`, `/llms.txt` and `/llms-full.txt`

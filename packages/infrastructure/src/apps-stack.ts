@@ -1,8 +1,9 @@
 import { adopt } from "alchemy/AdoptPolicy";
-import { ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
+import { BotManagement } from "alchemy/Cloudflare/BotManagement";
+import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import * as Website from "alchemy/Cloudflare/Website";
 import { Worker } from "alchemy/Cloudflare/Workers";
-import { Zone } from "alchemy/Cloudflare/Zone";
+import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import * as Output from "alchemy/Output";
 import { retain } from "alchemy/RemovalPolicy";
 import { Stage } from "alchemy/Stage";
@@ -26,6 +27,50 @@ const NativeProductionZone = Context.Reference<Option.Option<Zone>>(
   { defaultValue: Option.none }
 );
 
+/**
+ * Production zone settings, one retained native resource each. TLS 1.3 is on
+ * with a TLS 1.2 minimum (a 1.3 minimum would refuse TLS 1.2 clients, including
+ * some crawlers). Browser Integrity Check is off because it answers default
+ * script user agents with Cloudflare error 1010, and the lowest challenge
+ * level keeps IP-reputation challenges to a minimum for API and agent callers.
+ */
+export const productionZoneSettings = [
+  { resource: "TaxKitProductionTls13", settingId: "tls_1_3", value: "on" },
+  {
+    resource: "TaxKitProductionMinimumTlsVersion",
+    settingId: "min_tls_version",
+    value: "1.2",
+  },
+  {
+    resource: "TaxKitProductionBrowserIntegrityCheck",
+    settingId: "browser_check",
+    value: "off",
+  },
+  {
+    resource: "TaxKitProductionSecurityLevel",
+    settingId: "security_level",
+    value: "essentially_off",
+  },
+  {
+    resource: "TaxKitProductionAlwaysUseHttps",
+    settingId: "always_use_https",
+    value: "on",
+  },
+] as const;
+
+/**
+ * A bot policy that bans no user agent: no Bot Fight Mode, no AI-bot blocking
+ * or link maze, no content-bot blocking, and no Cloudflare-managed robots.txt
+ * prepended to TaxKit's own. TaxKit is for API, SDK and agent callers.
+ */
+export const productionBotPolicy = {
+  aiBotsProtection: "disabled",
+  contentBotsProtection: "disabled",
+  crawlerProtection: "disabled",
+  fightMode: false,
+  isRobotsTxtManaged: false,
+} as const;
+
 // Published pages and discovery documents name the Production site in every
 // stage, including Preview. Each host still binds its own native address.
 export const publicationOrigin = "https://taxkit.dev";
@@ -40,10 +85,13 @@ const compatibility = {
 const NativeApiHostLive = TaxKitApiWorker.make(
   Effect.gen(function* () {
     return {
+      // Production serves only api.taxkit.dev, as in Common Practice; other
+      // stages keep the native workers.dev default.
       ...Option.match(yield* NativeProductionZone, {
-        onNone: () => ({}),
+        onNone: () => ({ workersDev: true }),
         onSome: (zone) => ({
           domain: { name: "api.taxkit.dev", zoneId: zone.zoneId },
+          workersDev: false,
         }),
       }),
       compatibility,
@@ -56,7 +104,6 @@ const NativeApiHostLive = TaxKitApiWorker.make(
       // through that export rather than a relative filesystem import.
       main: import.meta.resolve("api/worker"),
       observability: ApiWorkerObservability,
-      workersDev: true,
     };
   }),
   ApiWorkerNativeInit
@@ -68,15 +115,20 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
   Effect.gen(function* () {
     const api = yield* TaxKitApiWorker;
     return {
+      // Production serves its custom domain only; native Alchemy redirects www
+      // with a 301 that keeps path and query. Other stages use their stable
+      // workers.dev address. No stage needs version preview addresses.
       ...Option.match(yield* NativeProductionZone, {
-        onNone: () => ({}),
+        onNone: () => ({
+          workersDev: { enabled: true, previewsEnabled: false },
+        }),
         onSome: (zone) => ({
-          // Native Alchemy redirects www with a 301 that keeps path and query.
           domain: {
             name: "taxkit.dev",
             redirects: ["www.taxkit.dev"],
             zoneId: zone.zoneId,
           },
+          workersDev: false,
         }),
       }),
       // Each deployed Website version starts its own cache.
@@ -132,7 +184,6 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
         traces: { enabled: false, headSamplingRate: 0, persist: false },
       },
       rootDir: "apps/web",
-      workersDev: true,
     };
   })
 ) {}
@@ -151,7 +202,7 @@ export const declareNativeAppsStack = Effect.gen(function* () {
       : Option.none<Zone>();
   if (Option.isSome(zone)) {
     // Preserve the DNS settings independently read on 7 October. This does
-    // not change DNSSEC, registrar, TLS, mail or verification records.
+    // not change registrar, mail or verification records.
     yield* ZoneDnsSettings("TaxKitProductionDnsSettings", {
       flattenAllCnames: false,
       foundationDns: false,
@@ -161,6 +212,22 @@ export const declareNativeAppsStack = Effect.gen(function* () {
       secondaryOverrides: false,
       zoneId: zone.value.zoneId,
       zoneMode: "standard",
+    }).pipe(retain());
+    yield* Effect.forEach(productionZoneSettings, (setting) =>
+      Setting(setting.resource, {
+        settingId: setting.settingId,
+        value: setting.value,
+        zoneId: zone.value.zoneId,
+      }).pipe(retain())
+    );
+    // Cloudflare Registrar publishes the DS record when signing starts.
+    yield* Dnssec("TaxKitProductionDnssec", {
+      status: "active",
+      zoneId: zone.value.zoneId,
+    }).pipe(retain());
+    yield* BotManagement("TaxKitProductionBotManagement", {
+      ...productionBotPolicy,
+      zoneId: zone.value.zoneId,
     }).pipe(retain());
   }
   return yield* Effect.gen(function* () {

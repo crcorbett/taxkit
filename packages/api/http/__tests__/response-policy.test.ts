@@ -56,11 +56,32 @@ describe("public response cache policy", () => {
     expect(cacheHeaders({ ...base, method: "POST" })).toEqual(unshared);
     expect(cacheHeaders({ ...base, status: 404 })).toEqual(unshared);
     expect(cacheHeaders({ ...base, status: 503 })).toEqual(unshared);
+    expect(cacheHeaders({ ...base, status: 400 })).toEqual(unshared);
     expect(cacheHeaders({ ...base, publicRead: false })).toEqual(unshared);
     expect(
       cacheHeaders({
         ...base,
         headers: Headers.fromInput({ "set-cookie": "a=b" }),
+      })
+    ).toEqual(unshared);
+  });
+
+  it("stores Accept negotiation answers as their own public variant", () => {
+    const negotiated = {
+      headers: Headers.fromInput({ vary: "Origin, Accept" }),
+      method: "GET",
+      publicRead: true,
+    };
+    expect(cacheHeaders({ ...negotiated, status: 400 })).toEqual(shared);
+    expect(cacheHeaders({ ...negotiated, status: 406 })).toEqual(shared);
+    // Missing and unavailable pages are never stored, whatever they vary on.
+    expect(cacheHeaders({ ...negotiated, status: 404 })).toEqual(unshared);
+    expect(cacheHeaders({ ...negotiated, status: 503 })).toEqual(unshared);
+    expect(
+      cacheHeaders({
+        ...negotiated,
+        headers: Headers.fromInput({ vary: "Accept-Encoding" }),
+        status: 400,
       })
     ).toEqual(unshared);
   });

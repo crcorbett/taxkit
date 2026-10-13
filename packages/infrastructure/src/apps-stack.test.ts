@@ -7,13 +7,14 @@ import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
 import { Providers } from "alchemy/Cloudflare";
-import { ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
+import { BotManagement } from "alchemy/Cloudflare/BotManagement";
+import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import {
   Worker,
   isDurableObjectExport,
   isSelfUrl,
 } from "alchemy/Cloudflare/Workers";
-import { Zone } from "alchemy/Cloudflare/Zone";
+import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
@@ -40,7 +41,12 @@ import {
 } from "effect";
 import { HttpClient } from "effect/http";
 
-import { declareNativeAppsStack, publicationOrigin } from "./apps-stack.js";
+import {
+  declareNativeAppsStack,
+  productionBotPolicy,
+  productionZoneSettings,
+  publicationOrigin,
+} from "./apps-stack.js";
 import { checkedStage, deploymentSecrets, dopplerConfig } from "./secrets.js";
 
 const graphFixture = Effect.fnUntraced(function* (
@@ -121,12 +127,44 @@ const graphFixture = Effect.fnUntraced(function* (
     read: ({ output }) => Effect.succeed(output),
     reconcile: () => forbiddenWrite,
   });
+  const zoneSettingProvider = Provider.succeed(Setting, {
+    delete: () => forbiddenWrite,
+    diff: () => Effect.void,
+    read: ({ output }) => Effect.succeed(output),
+    reconcile: () => forbiddenWrite,
+  });
+  const dnssecProvider = Provider.succeed(Dnssec, {
+    delete: () => forbiddenWrite,
+    diff: () => Effect.void,
+    read: ({ output }) => Effect.succeed(output),
+    reconcile: () => forbiddenWrite,
+  });
+  const botProvider = Provider.succeed(BotManagement, {
+    delete: () => forbiddenWrite,
+    diff: () => Effect.void,
+    read: ({ output }) => Effect.succeed(output),
+    reconcile: () => forbiddenWrite,
+  });
   const providers = Layer.merge(
     Layer.effect(
       Providers,
-      Provider.collection([Worker, Zone, ZoneDnsSettings]).pipe(
+      Provider.collection([
+        Worker,
+        Zone,
+        ZoneDnsSettings,
+        Setting,
+        Dnssec,
+        BotManagement,
+      ]).pipe(
         Effect.provide(
-          Layer.mergeAll(workerProvider, zoneProvider, settingsProvider)
+          Layer.mergeAll(
+            workerProvider,
+            zoneProvider,
+            settingsProvider,
+            zoneSettingProvider,
+            dnssecProvider,
+            botProvider
+          )
         )
       )
     ),
@@ -352,6 +390,12 @@ describe("native paired app graph and planner", () => {
             (resource) => !Object.hasOwn(resource.Props, "domain")
           )
         ).toBe(true);
+        // Other stages keep their stable workers.dev address without previews.
+        expect(
+          Record.get(result.compiled.resources, "TaxKitWebsite").pipe(
+            Option.map((website) => website.Props.workersDev)
+          )
+        ).toEqual(Option.some({ enabled: true, previewsEnabled: false }));
       }).pipe(
         Effect.provideService(AlchemyContext, localContext),
         graphEnvironment,
@@ -364,10 +408,47 @@ describe("native paired app graph and planner", () => {
       const plan = yield* result.planned;
       expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
         "TaxKitApi",
+        "TaxKitProductionAlwaysUseHttps",
+        "TaxKitProductionBotManagement",
+        "TaxKitProductionBrowserIntegrityCheck",
         "TaxKitProductionDnsSettings",
+        "TaxKitProductionDnssec",
+        "TaxKitProductionMinimumTlsVersion",
+        "TaxKitProductionSecurityLevel",
+        "TaxKitProductionTls13",
         "TaxKitProductionZone",
         "TaxKitWebsite",
       ]);
+      // Every zone setting is retained and pinned to the Production zone.
+      const zoneSettings = yield* Effect.forEach(
+        productionZoneSettings,
+        (setting) =>
+          Record.get(result.compiled.resources, setting.resource).pipe(
+            Option.getOrElse(() => expect.fail("Expected zone setting")),
+            (resource) =>
+              Output.evaluate(
+                {
+                  removal: resource.RemovalPolicy,
+                  settingId: resource.Props.settingId,
+                  value: resource.Props.value,
+                  zoneId: resource.Props.zoneId,
+                },
+                {
+                  TaxKitProductionZone: {
+                    zoneId: "15103853342ab9f18f7894b7fae39c39",
+                  },
+                }
+              ).pipe(Effect.provideContext(result.compiled.services))
+          )
+      );
+      expect(zoneSettings).toEqual(
+        Array.map(productionZoneSettings, (setting) => ({
+          removal: "retain",
+          settingId: setting.settingId,
+          value: setting.value,
+          zoneId: "15103853342ab9f18f7894b7fae39c39",
+        }))
+      );
       expect(result.providerWrites).toBe(0);
       expect(
         Array.every(
@@ -426,6 +507,23 @@ describe("native paired app graph and planner", () => {
       });
       expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
       expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
+      // DNSSEC signs the zone and the bot policy bans no user agent; both are
+      // retained like the zone.
+      const dnssec = Record.get(
+        result.compiled.resources,
+        "TaxKitProductionDnssec"
+      ).pipe(Option.getOrElse(() => expect.fail("Expected DNSSEC")));
+      const bots = Record.get(
+        result.compiled.resources,
+        "TaxKitProductionBotManagement"
+      ).pipe(Option.getOrElse(() => expect.fail("Expected bot policy")));
+      expect(dnssec.RemovalPolicy).toBe("retain");
+      expect(bots.RemovalPolicy).toBe("retain");
+      expect(dnssec.Props.status).toBe("active");
+      expect(bots.Props).toMatchObject(productionBotPolicy);
+      // Production serves only its custom domain: no workers.dev or previews.
+      expect(website.Props.workersDev).toBe(false);
+      expect(api.Props.workersDev).toBe(false);
       expect(Object.hasOwn(settings.Props, "soa")).toBe(false);
       expect(Object.hasOwn(settings.Props, "internalDns")).toBe(false);
     }).pipe(

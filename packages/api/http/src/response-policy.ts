@@ -43,11 +43,24 @@ export const isPublicReadPath = (pathname: string) =>
 
 const restrictive = /(?:^|,)\s*(?:private|no-store)\s*(?:=|,|$)/iu;
 
+// A 400 or 406 that answers only the Accept header is a stable variant of a
+// public page. Workers Cache drops a page's stored entry when an uncacheable
+// reply arrives at the same address, so these answers are stored as their own
+// variant rather than letting any odd Accept header empty the page's cache.
+const negotiationAnswer = (status: number, headers: Headers.Headers) =>
+  (status === 400 || status === 406) &&
+  Option.exists(Headers.get(headers, "vary"), (vary) =>
+    Array.some(
+      vary.split(","),
+      (field) => field.trim().toLowerCase() === "accept"
+    )
+  );
+
 /**
- * The one cache decision for TaxKit hosts. Only a successful public GET/HEAD
- * without cookies or a stricter owner instruction is shared; everything else
- * is `no-store` for both the browser and Cloudflare, so a CDN header can never
- * make a private reply public.
+ * The one cache decision for TaxKit hosts. Only a successful public GET/HEAD,
+ * or its Accept negotiation answer, without cookies or a stricter owner
+ * instruction is shared; everything else is `no-store` for both the browser
+ * and Cloudflare, so a CDN header can never make a private reply public.
  */
 export const cacheHeaders = ({
   headers,
@@ -69,7 +82,7 @@ export const cacheHeaders = ({
   const eligible =
     publicRead &&
     (method === "GET" || method === "HEAD") &&
-    status === 200 &&
+    (status === 200 || negotiationAnswer(status, headers)) &&
     !Headers.has(headers, "set-cookie") &&
     !restricted;
   return eligible

@@ -36,6 +36,13 @@ DOPPLER_TOKEN="$(doppler configure get token --plain)" bun run production:plan
 
 Do not copy Cloudflare values into the shell, a committed file or GitHub.
 
+The Production token (`taxkit/prd`) is an account-owned token. On the
+`taxkit.dev` zone it holds Zone DNS Settings Read, Zone Settings Write, DNS Write
+(DNSSEC), Bot Management Write, Dynamic URL Redirects Write and Workers Routes
+Write; on the account, Workers Scripts, Workers Observability and Secrets Store
+Write. Change it with `cf accounts tokens update`, keeping its name, expiry and
+existing policies, and record the change here. It expires on 18 November 2026.
+
 ## Preview
 
 ```sh
@@ -55,8 +62,8 @@ bun run production:deploy
 bun run production:drift
 ```
 
-Review the plan. Production adopts and retains the `taxkit.dev` zone and DNS
-settings; a plan that would create, replace or delete the zone, or delete either
+Review the plan. Production adopts and retains the `taxkit.dev` zone, DNS
+settings, zone settings, DNSSEC and bot policy; a plan that would create, replace or delete the zone, or delete either
 Worker, must stop. `production:drift` compares the deployed resources with
 state.
 

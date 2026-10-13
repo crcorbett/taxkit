@@ -182,8 +182,10 @@ same `publicCors` policy.
 
 `publicCors` admits any exact HTTP(S) browser origin without credentials, for
 GET, HEAD, POST and OPTIONS, with `content-type`, `b3` and `traceparent`
-headers. `applyCachePolicy` shares only a successful public GET/HEAD reply
-without `Set-Cookie` or a stricter `private`/`no-store` instruction: it gets
+headers. `applyCachePolicy` shares only a successful public GET/HEAD reply, or
+a 400/406 that varies on `Accept` (a stable negotiation answer that would
+otherwise evict the cached page), without `Set-Cookie` or a stricter
+`private`/`no-store` instruction: it gets
 `Cache-Control: public, max-age=0` and
 `Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
 Every other reply gets `no-store` for both. Public read paths are the
