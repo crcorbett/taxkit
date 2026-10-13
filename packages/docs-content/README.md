@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-13
 review_trigger: package contracts or generated-source boundaries change
 ---
 
@@ -117,7 +117,7 @@ this read; interrupting its awaiting Effect does not prove provider cancellation
 policy remains Node-only and is dynamically imported only by
 `validateContent`. Normal docs requests must not initialize either filesystem
 operation. The original old-app failure oracle remains retained-source
-history. Current API/Website native tests own accepted-catalogue runtime proof.
+history. Current API/Website native tests cover the public catalogue at runtime.
 
 ## Checked examples
 
@@ -144,37 +144,30 @@ Literal money examples use `aud(Cents.make(...))`. Programs that construct
 unchecked amounts use `audFromCents` and handle its typed failure channel.
 The server example reuses request-decoded cents to assemble Money directly.
 The corresponding public browser/server snippets match these source examples;
-the money concept owns constructor and arithmetic guidance. MDX lifecycle and
-navigation each require their own reviewed source acceptance.
+the money concept owns constructor and arithmetic guidance.
 
 The five complete validation, raw-error, help, fact and test examples listed in
 `src/validation/checked-snippets.ts` must match their compiled source files
 exactly. This check applies to those named fences; it does not claim every
 fenced example in the documentation has been compiled.
 
-## Accepted catalogue build
+## Public catalogue build
 
-`bun run --filter=@taxkit/docs-content build` generates both compiler indexes, then runs the
-repository-owned builder in `tools/documentation/catalogue.runtime.ts`.
-The package `build` command now includes that same accepted catalogue step;
-`generate` remains the lower-level compiler-index command. The dedicated
-Turbo build inputs include the builder, policy Schemas, exact acceptance
-bindings and source-review records, alongside all package sources. Its checked
-browser path is an explicit build environment input because Mermaid rendering
-uses Chromium.
-The retained Mermaid compiler uses Chromium. Use the repository's configured
-`PLAYWRIGHT_BROWSERS_PATH`, as the Quality workflow does, when browsers are
+`bun run --filter=@taxkit/docs-content build` generates both compiler indexes,
+then runs `src/catalogue.runtime.ts`. `generate` remains the lower-level
+compiler-index command. The Turbo build task hashes the package sources and
+takes `PLAYWRIGHT_BROWSERS_PATH` as an environment input because Mermaid
+rendering uses Chromium. Use the repository's configured
+`PLAYWRIGHT_BROWSERS_PATH`, as the Checks workflow does, when browsers are
 stored outside Playwright's default location.
-The MDX compiler owns frontmatter and processed Markdown. The builder reads
-the exact acceptance bindings in `tools/documentation/owner-policy.json` and
-requires version-two records with the reviewed source's SHA-256 hash. It
-checks the bytes before loading the compiler and again before writing output.
-Relative paths and their resolved files must stay inside the checkout.
+The MDX compiler owns frontmatter and processed Markdown.
 
-Published pages need matching accepted navigation. Drafts are omitted, and
-an accepted child cannot be hidden under a draft section page. The canonical
+Page frontmatter and `navigation.json` decide publication.
+`src/catalogue.policy.ts` keeps pages whose `status` is `published` and
+requires published navigation. Drafts are omitted, and a published child
+cannot be hidden under a draft section page. The canonical
 `DocsPublicCatalogue` constructor checks page addresses, sources, titles and
-navigation coverage. No accepted pages is an error; it cannot silently create
+navigation coverage. No published pages is an error; it cannot silently create
 an empty public site. Successful builds encode the checked catalogue once to
 `.source/public-catalogue.json`. That generated file is local build output,
 not publication or deployment evidence.
@@ -182,15 +175,9 @@ not publication or deployment evidence.
 composition time and checks it with `@taxkit/content`; this export does not
 import compiler, filesystem, React or authored-source Layers.
 
-Version-one acceptance records remain readable by the regular docs checker
-for their retained lifecycle evidence. The new catalogue builder requires
-version two. Adding a record must follow page review; generating an index
-does not accept its authored pages. The
-[dated page review](../../docs/documentation-audit/clean-slate-foundation/2026-10-06-public-content-acceptance.json)
-records the individual source and navigation decisions. Exact bindings in the
-owner policy determine which reviewed bytes may enter the generated catalogue;
-a later edit requires a fresh reviewed hash. Accepted source metadata establishes
-neither public routes nor external availability.
+To publish a page, change its frontmatter `status` to `published` in an
+ordinary pull request. A published status establishes neither public routes
+nor external availability.
 
 ## Frontmatter contract
 
@@ -205,11 +192,10 @@ Fumadocs receives that schema through `Schema.toStandardSchemaV1(...)`, so the
 Effect Schema contract remains canonical while Fumadocs performs frontmatter
 validation.
 
-`DocsContentStatus` owns the allowed representation values. HGI-207 defines
-`draft` as authored, locally renderable, visibly labelled candidate content and
-`published` as explicitly accepted current public documentation. Neither this
-package nor `bun run check:docs` may infer publication, deployment, runtime or
-external availability, correctness, or user visibility from either value.
+`DocsContentStatus` owns the allowed representation values. `draft` is
+authored, locally renderable, visibly labelled candidate content; `published`
+puts the page in the public catalogue. Neither value establishes deployment,
+runtime or external availability, correctness, or user visibility.
 
 ## Validation policy
 
@@ -252,7 +238,7 @@ implementation in the consuming app or reusable primitives in
   the checked source templates.
 - Keep docs identifiers, frontmatter, meta, navigation and tagged source errors
   schema-owned in this package.
-- Keep service tests on the deterministic test Layer so accepted, missing and
+- Keep service tests on the deterministic test Layer so published, missing and
   malformed content exercise the same canonical service contract as
   production.
 
@@ -274,7 +260,7 @@ public references.
 
 The error reference distinguishes checked Core diagnostic absence from its
 retained encoded forms and does not treat opaque diagnostics as safe telemetry.
-Content lifecycle and navigation acceptance remain unchanged.
+Page and navigation publication status remain unchanged.
 
 The replacement Website also consumes `./client` through the matching MDX Vite
 plugin and this package's collection configuration. Its server obtains checked
@@ -285,7 +271,7 @@ source, compiler or filesystem fallback to its request handlers. The retained
 docs app and its commands remain until replacement qualification is complete.
 
 The Website also generates static PNG share assets from this checked catalogue
-at its Vite build boundary. Catalogue acceptance and authored bytes remain owned
+at its Vite build boundary. Publication status and authored sources remain owned
 here; rendering, the image-address mapping, page metadata and build-only Takumi
 renderer belong to [the Website](../../apps/web/README.md). Its renderer consumes
 only checked public title, description and path. It does not add a source/export

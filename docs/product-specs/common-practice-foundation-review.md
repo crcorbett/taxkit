@@ -595,12 +595,11 @@ than disable a failing check while leaving its policy active.
 | `AGENTS.md`, `docs/README.md`, `docs/operations/authority-model.md`, standards, skill profiles and active plans | Replace mandatory receipt/approval/epoch language and accumulated historical task routing with short current instructions. Keep tax/package boundaries, ordinary operation scope and a practical rollback command. |
 | New audit packet from this review | Remove inventories, scope/findings JSON, acceptance/impact crosswalks, registry/provider result packets and validation hashes. Retain the useful findings and source comparison in this proposal. |
 
-Two build/test dependencies need replacement before deleting their old owners:
-`packages/docs-content` currently builds its catalogue from acceptance records
-and hashes; switch to the reviewed MDX/frontmatter/navigation sources while
-keeping generated catalogue consumers working. Native app-stack tests read two
-plan fixtures under `tools/docs-deployment`; retain useful resource cases under
-their actual test owner.
+Two build/test dependencies needed replacement before deleting their old owners.
+`packages/docs-content` now builds its catalogue from MDX frontmatter and
+navigation instead of acceptance records and hashes, and generated catalogue
+consumers keep working. Native app-stack tests no longer read plan fixtures
+under the removed `tools/docs-deployment`.
 
 Older history is already recorded in Git. It must stop being an input to current
 checks, a prerequisite for new work or a reason to add another retention

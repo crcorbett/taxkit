@@ -18,7 +18,7 @@ that the Website and deployed stages use.
 `@taxkit/api-http/server` and graceful shutdown. API contracts, handlers,
 schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
 
-Both API hosts provide `ContentService` from the accepted generated catalogue.
+Both API hosts provide `ContentService` from the generated public catalogue.
 `src/content.boundary.ts` imports only `@taxkit/docs-content/public-catalogue`
 JSON, checks it once when the host is built and reports a fixed configuration
 failure if it is invalid. Incoming requests do not load authored MDX or run
@@ -39,7 +39,7 @@ failure is an empty 503. The Website forwards its own `/sitemap.xml`,
 `/robots.txt` and `/llms*.txt` requests here once. The standalone Bun host does
 not serve these routes. Discovery takes no calculator allowance.
 
-The API dependency build generates the accepted catalogue before TypeScript
+The API dependency build generates the public catalogue before TypeScript
 or native bundling consumes it. Its ESNext module profile preserves the JSON
 import attribute for ordinary Node loading of emitted modules. The Website,
 infrastructure and Alchemy source-checking profiles also admit that attribute
@@ -105,8 +105,8 @@ checked JSON 413 guidance; stalled bodies return checked JSON 408 guidance. CORS
 
 The app's native logger and error reporter emit only a fixed event name, time
 and severity. Arbitrary messages, Causes, annotations and span labels are
-discarded before console output. This is bounded containment; T009 still owns
-safe native tracing and exporter qualification.
+discarded before console output. This is bounded containment; it provides no
+native tracing or trace exporter.
 
 The infrastructure apps stack declares the API and Website and the Website's
 binding to the API; see [deployment](../../docs/architecture/deployment.md).
@@ -138,23 +138,22 @@ invalid enabled settings become a fixed native Config error. An in-process
 host has no background delivery. The retained standalone Bun host remains
 local and does not acquire analytics.
 
-T008 is still in progress. Focused tests cover the event owner, request
-isolation, policies and controlled transport. The built native API additionally
-checks real Fetch sends after HTTP and RPC calculations and both official MCP
-client protocols. Each MCP conversation changes deny → allow → deny without
-retaining its first choice. Rejected or redirected capture keeps the tax reply
-successful; a stalled capture reply reaches the native five-second drop while
-the tax reply returns within two seconds. The controlled Node response bridge
-does not expose upstream body cancellation; that is not claimed.
+Focused tests cover the event owner, request isolation, policies and controlled
+transport. The built native API additionally checks real Fetch sends after HTTP
+and RPC calculations and both official MCP client protocols. Each MCP
+conversation changes deny → allow → deny without retaining its first choice.
+Rejected or redirected capture keeps the tax reply successful; a stalled capture
+reply reaches the native five-second drop while the tax reply returns within two
+seconds. The controlled Node response bridge does not expose upstream body
+cancellation; that is not claimed.
 
-The Website forwards a fresh browser preference or original HTML request choice
-to this same boundary. Its built-pair proof is recorded in the
-[Website policy receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-calculator-collection-policy.json).
-Browser sender privacy, retained provider projects and stored UUID readback
-still require their remaining tests and separately qualified provider journey. The
-[candidate receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json)
-keeps focused and full-source qualification separate. No analytics provider or
-deployment change is claimed by these source edits.
+The Website sends the choice to this same boundary in the
+`x-taxkit-collection-policy` header. Browser calls read `navigator.doNotTrack`
+at each dispatch: `1`, an unreadable value or an unexpected value means deny.
+Server-rendered calls forward the incoming page request's choice, and a server
+call with no incoming request sends deny. The API's CORS policy admits that
+header. Tests cover this request boundary only; provider-side storage is not
+checked here.
 
 ## Local native pair
 
@@ -378,8 +377,7 @@ budgets. Metadata does not use a calculation place. Native built proof covers a
 seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
 browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. The native rate policy below is implemented separately; MCP and whole T004
-qualification remain unfinished.
+control returns. The native rate policy below is separate.
 
 
 Scripted typed HTTP requests construct the calculator-owned context/help
@@ -463,17 +461,14 @@ The [agent connection guide](../../packages/docs-content/content/api/agent-tools
 documents both versions, all six remote tools, anonymous limits, exact browser
 Origin admission, older expiry and the modern five-second cancellation limit.
 The Website's `/agents` page derives its MCP address from the checked API
-settings, including in Preview. Ordinary official-client calls were read back
-on both deployed stages in the
-[local deployment receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-cloud-preparation.json).
-That delivery does not prove prompt modern pre-response cleanup. The
-[agent setup receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
-records the separately qualified guide deployment and both supported ordinary
-client calls on Preview and Production.
+settings, including in Preview. `bun run test:native` runs the official clients
+against the locally built pair; check the deployed API directly before claiming
+a stage serves them. Neither proves prompt modern pre-response cleanup.
+History: [7 October agent setup record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json).
 
 `@modelcontextprotocol/client` 2.3.1 is test-only. The full native-pair command
 runs actual official clients over loopback TCP against the source-built API.
-Reports and accepted processed Markdown equal HTTP, two conversations remain
+Reports and published processed Markdown equal HTTP, two conversations remain
 distinct, admission is bounded and stale IDs fail. A scoped source fixture
 shortens only the actual host lifetime to 1.5 seconds: its real platform alarm
 must release 32 held metadata calls without another HTTP request, then a fresh
@@ -486,9 +481,8 @@ by memory-only compilation of the actual API declaration. All provider,
 credential and network methods refuse; it runs no provider plan/apply. Local
 fixtures bind the genuine generated class in disposable namespaces. Merely
 adding an emulator binding is insufficient and previously returned 503.
-See the [session candidate record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json),
-[earlier modern record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
-and [browser caller owner](../web/README.md#browser-tools).
-T006 is locally accepted against its bounded contract and ready for draft
-review. Source-built setup, actual browser callers and deployed ordinary remote
+The [browser caller owner](../web/README.md#browser-tools) covers browser
+tools. Source-built setup, actual browser callers and deployed ordinary remote
 calls do not establish prompt modern cleanup or an autonomous model session.
+History: [7 October session record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
+and [earlier modern record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json).
