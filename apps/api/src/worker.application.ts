@@ -1,4 +1,8 @@
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
+import {
+  applyCachePolicy,
+  isPublicReadPath,
+} from "@taxkit/api-http/response-policy";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { CalculatorRpcResponseTooLarge } from "@taxkit/api-rpc/errors";
 import {
@@ -12,19 +16,29 @@ import {
   CalculatorRpcResponseLimit,
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcHttpLayer } from "@taxkit/api-rpc/server";
+import { CalculatorId } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { DocsSourceError } from "@taxkit/content/errors";
 import { ContentDiscoveryLive } from "@taxkit/content/live";
-import { DocsDiscoverySettings } from "@taxkit/content/schemas";
-import { ContentCatalogue, ContentService } from "@taxkit/content/service";
+import {
+  DocsDiscoveryPath,
+  DocsDiscoverySettings,
+} from "@taxkit/content/schemas";
+import {
+  ContentCatalogue,
+  ContentDiscovery,
+  ContentService,
+} from "@taxkit/content/service";
 import { safeHttpEffect } from "alchemy/Http";
 import {
+  Array,
   ByteSize,
   Config,
   Context,
   Effect,
   Layer,
   Option,
+  Record,
   Result,
   Schema,
   Scope,
@@ -53,6 +67,40 @@ import { TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
+
+const calculatePath = /^\/api\/v1\/calculators\/(?<id>[^/]+)\/calculate$/u;
+
+// Exact trusted Website calls: machine RPC and the canonical HTTP calculation.
+const isTrustedCalculationPath = (pathname: string) =>
+  pathname === "/rpc" ||
+  Option.fromNullishOr(calculatePath.exec(pathname)).pipe(
+    Option.flatMap((match) => Option.fromNullishOr(match.groups)),
+    Option.flatMap(Record.get("id")),
+    Option.exists(Schema.is(CalculatorId))
+  );
+
+// The finished public discovery documents. The Website forwards its own
+// /sitemap.xml, /robots.txt and /llms*.txt requests here once.
+const DiscoveryRoutes = HttpRouter.addAll(
+  Array.map(DocsDiscoveryPath.literals, (path) =>
+    HttpRouter.route(
+      "GET",
+      `/api/v1/docs/discovery${path}`,
+      ContentDiscovery.pipe(
+        Effect.flatMap((discovery) => discovery.getDocument(path)),
+        Effect.map((document) =>
+          HttpServerResponse.text(document.body, {
+            contentType: `${document.contentType}; charset=utf-8`,
+            headers: { "x-content-type-options": "nosniff" },
+          })
+        ),
+        Effect.catchTag("DocsSourceError", () =>
+          Effect.succeed(HttpServerResponse.empty({ status: 503 }))
+        )
+      )
+    )
+  )
+);
 
 // Exact HTTP(S) origin text, as browsers send it. URL parsing normalises the
 // address, so compare the parsed origin with the original header.
@@ -122,7 +170,8 @@ export const ApiWorkerApplication = Effect.gen(function* () {
   );
   const routes = Layer.mergeAll(
     TaxKitApiRoutesLayer,
-    TaxKitRpcHttpLayer.pipe(Layer.provide(calculator))
+    TaxKitRpcHttpLayer.pipe(Layer.provide(calculator)),
+    DiscoveryRoutes.pipe(HttpRouter.provideRequest(discovery))
   ).pipe(
     Layer.provide(Layer.merge(content, discovery)),
     HttpRouter.provideRequest(calculator)
@@ -227,11 +276,27 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         Effect.succeed(HttpServerResponse.empty({ status: 503 }))
       )
     )
-  ).pipe(Effect.provideContext(telemetry));
+  ).pipe(
+    // Every reply, including native error responses, gets one cache decision.
+    Effect.flatMap((response) =>
+      HttpServerRequest.HttpServerRequest.pipe(
+        Effect.map((request) =>
+          applyCachePolicy(response, {
+            method: request.method,
+            publicRead: isPublicReadPath(
+              new URL(request.url, "https://api.invalid").pathname
+            ),
+          })
+        )
+      )
+    ),
+    Effect.provideContext(telemetry)
+  );
 
   return {
     // Native service-binding RPC only; this method has no HTTP route. The
-    // Website passes its checked original edge key separately from JSON.
+    // Website passes its checked original caller key separately from JSON,
+    // for exactly the RPC endpoint and the canonical HTTP calculation POST.
     calculatorRequest: (request: Request, encodedKey: string) =>
       Effect.gen(function* () {
         if (
@@ -243,54 +308,74 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         }
         if (
           request.method !== "POST" ||
-          new URL(request.url).pathname !== "/rpc"
+          !isTrustedCalculationPath(new URL(request.url).pathname)
         ) {
           return new Response(null, { status: 404 });
         }
         const key = Schema.decodeUnknownOption(CalculatorClientRateKey)(
           encodedKey
         );
-        const response = yield* fetch.pipe(
+        // One deadline covers the whole call, including the reply body. The
+        // closed JSON reply is buffered before the native method closes its
+        // event scope, keeping its real status and headers.
+        return yield* fetch.pipe(
           Effect.provideService(CalculatorRequestRateKey, key),
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromWeb(request)
-          )
-        );
-        // Buffer this closed JSON reply before the native method closes its
-        // event scope. Bound bytes and the complete read; it is not a stream.
-        const body = yield* HttpClientResponse.fromWeb(
-          HttpClientRequest.post(request.url),
-          HttpServerResponse.toWeb(response)
-        ).stream.pipe(
-          Stream.mapAccumEffect(
-            () => ByteSize.bytes(0),
-            (total, chunk) => {
-              const next = ByteSize.sum(
-                total,
-                ByteSize.bytes(chunk.byteLength)
-              );
-              return ByteSize.isGreaterThan(next, CalculatorRpcResponseLimit)
-                ? Effect.fail(new CalculatorRpcResponseTooLarge())
-                : Effect.succeed([next, [chunk]] as const);
-            }
           ),
-          Stream.mkUint8Array,
+          Effect.flatMap((response) => {
+            const web = HttpServerResponse.toWeb(response);
+            // An empty reply (such as an undeclared 400) has no body to read.
+            return Option.match(Option.fromNullishOr(web.body), {
+              onNone: () =>
+                Effect.succeed(
+                  new Response(null, {
+                    headers: web.headers,
+                    status: web.status,
+                  })
+                ),
+              onSome: () =>
+                HttpClientResponse.fromWeb(
+                  HttpClientRequest.post(request.url),
+                  web
+                ).stream.pipe(
+                  Stream.mapAccumEffect(
+                    () => ByteSize.bytes(0),
+                    (total, chunk) => {
+                      const next = ByteSize.sum(
+                        total,
+                        ByteSize.bytes(chunk.byteLength)
+                      );
+                      return ByteSize.isGreaterThan(
+                        next,
+                        CalculatorRpcResponseLimit
+                      )
+                        ? Effect.fail(new CalculatorRpcResponseTooLarge())
+                        : Effect.succeed([next, [chunk]] as const);
+                    }
+                  ),
+                  Stream.mkUint8Array,
+                  Effect.map(
+                    (bytes) =>
+                      new Response(new Uint8Array(bytes), {
+                        headers: web.headers,
+                        status: web.status,
+                      })
+                  )
+                ),
+            });
+          }),
           Effect.timeoutOption(CalculatorRpcDeadline),
+          // Only this adapter's body-read, size and deadline failures become
+          // 503. Interruption and unexpected defects keep their identity.
+          Effect.catchTags({
+            CalculatorRpcResponseTooLarge: () => Effect.succeedNone,
+            HttpClientError: () => Effect.succeedNone,
+          }),
           Effect.map(
-            Option.map(
-              (bytes) =>
-                new Response(new Uint8Array(bytes), {
-                  headers: response.headers,
-                  status: response.status,
-                })
-            )
-          ),
-          Effect.catchCause(() => Effect.succeed(Option.none<Response>()))
-        );
-        return Option.getOrElse(
-          body,
-          () => new Response(null, { status: 503 })
+            Option.getOrElse(() => new Response(null, { status: 503 }))
+          )
         );
       }).pipe(Effect.provideContext(telemetry)),
     fetch: Effect.gen(function* () {

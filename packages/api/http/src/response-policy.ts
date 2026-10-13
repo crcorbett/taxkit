@@ -1,0 +1,84 @@
+import { Array, Option } from "effect";
+import { Headers, HttpServerResponse } from "effect/http";
+
+// Browsers recheck public content on every visit. Cloudflare may reuse the same
+// deployed Worker version's response for seven days; that is freshness, not a
+// promise that the cache keeps it.
+export const publicBrowserCacheControl = "public, max-age=0";
+export const publicCdnCacheControl = "public, max-age=604800, stale-if-error=0";
+export const privateCacheControl = "no-store";
+
+// Public documentation and fixed calculator metadata. Health, calculation,
+// RPC and MCP replies are never shared.
+const publicReadPaths = [
+  /^\/api\/v1\/docs\/(?:navigation|page|search|markdown)$/u,
+  /^\/api\/v1\/docs\/discovery\/(?:sitemap\.xml|robots\.txt|llms\.txt|llms-full\.txt)$/u,
+  /^\/api\/v1\/(?:jurisdictions|tax-years|calculators|facts|rules)$/u,
+  /^\/api\/v1\/calculators\/[^/]+(?:\/schema|\/graph)?$/u,
+  /^\/api\/docs(?:\/openapi\.json)?$/u,
+] as const;
+
+export const isPublicReadPath = (pathname: string) =>
+  Array.some(publicReadPaths, (pattern) => pattern.test(pathname));
+
+const restrictive = /(?:^|,)\s*(?:private|no-store)\s*(?:=|,|$)/iu;
+
+/**
+ * The one cache decision for TaxKit hosts. Only a successful public GET/HEAD
+ * without cookies or a stricter owner instruction is shared; everything else
+ * is `no-store` for both the browser and Cloudflare, so a CDN header can never
+ * make a private reply public.
+ */
+export const cacheHeaders = ({
+  headers,
+  method,
+  publicRead,
+  status,
+}: Readonly<{
+  headers: Headers.Headers;
+  method: string;
+  publicRead: boolean;
+  status: number;
+}>): Readonly<Record<string, string>> => {
+  const declared = Array.getSomes([
+    Headers.get(headers, "cache-control"),
+    Headers.get(headers, "cdn-cache-control"),
+    Headers.get(headers, "cloudflare-cdn-cache-control"),
+  ]);
+  const restricted = Array.some(declared, (value) => restrictive.test(value));
+  const eligible =
+    publicRead &&
+    (method === "GET" || method === "HEAD") &&
+    status === 200 &&
+    !Headers.has(headers, "set-cookie") &&
+    !restricted;
+  return eligible
+    ? {
+        "cache-control": publicBrowserCacheControl,
+        "cloudflare-cdn-cache-control": publicCdnCacheControl,
+      }
+    : {
+        "cache-control": restricted
+          ? Option.getOrElse(
+              Headers.get(headers, "cache-control"),
+              () => privateCacheControl
+            )
+          : privateCacheControl,
+        "cloudflare-cdn-cache-control": privateCacheControl,
+      };
+};
+
+/** Apply the cache decision to a native Effect HTTP response. */
+export const applyCachePolicy = (
+  response: HttpServerResponse.HttpServerResponse,
+  request: Readonly<{ method: string; publicRead: boolean }>
+) =>
+  HttpServerResponse.setHeaders(
+    response,
+    cacheHeaders({
+      headers: response.headers,
+      method: request.method,
+      publicRead: request.publicRead,
+      status: response.status,
+    })
+  );

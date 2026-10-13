@@ -71,12 +71,82 @@ const NativeRequest = Schema.TaggedStruct("Request", {
   tag: Schema.Literal("Calculate"),
 });
 
+const header = (
+  response: HttpServerResponse.HttpServerResponse,
+  name: string
+) => Headers.get(response.headers, name).pipe(Option.getOrUndefined);
+
 const allowOrigin = (response: HttpServerResponse.HttpServerResponse) =>
   Headers.get(response.headers, "access-control-allow-origin").pipe(
     Option.getOrUndefined
   );
 
 describe("native API application", () => {
+  it.effect("serves discovery and shares only public reads", () =>
+    Effect.gen(function* () {
+      const app = yield* ApiWorkerInit;
+      const send = (path: string, method: string, body: string | null) =>
+        app.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request(`https://api.example.com${path}`, {
+                body,
+                headers: {
+                  "cf-connecting-ip": "203.0.113.7",
+                  "content-type": "application/json",
+                  origin: "https://other.example.com",
+                },
+                method,
+              })
+            )
+          ),
+          Effect.scoped
+        );
+      const llms = yield* send("/api/v1/docs/discovery/llms.txt", "GET", null);
+      expect(llms.status).toBe(200);
+      expect(header(llms, "content-type")).toBe("text/plain; charset=utf-8");
+      expect(header(llms, "cache-control")).toBe("public, max-age=0");
+      expect(header(llms, "cloudflare-cdn-cache-control")).toBe(
+        "public, max-age=604800, stale-if-error=0"
+      );
+      const text = yield* Effect.promise(() =>
+        HttpServerResponse.toWeb(llms).text()
+      );
+      expect(text).toContain("https://website.example.com");
+      const head = yield* send(
+        "/api/v1/docs/discovery/sitemap.xml",
+        "HEAD",
+        null
+      );
+      expect(head.status).toBe(200);
+      expect(header(head, "cache-control")).toBe("public, max-age=0");
+      const metadata = yield* send("/api/v1/calculators", "GET", null);
+      expect(header(metadata, "cache-control")).toBe("public, max-age=0");
+      const health = yield* send("/api/health", "GET", null);
+      expect(header(health, "cache-control")).toBe("no-store");
+      const missing = yield* send(
+        "/api/v1/docs/discovery/other.txt",
+        "GET",
+        null
+      );
+      expect(missing.status).toBe(404);
+      expect(header(missing, "cloudflare-cdn-cache-control")).toBe("no-store");
+      const calculated = yield* send(
+        "/api/v1/calculators/au.pay.take-home/calculate",
+        "POST",
+        yield* Schema.encodeEffect(Schema.fromJsonString(CalculatorRunRequest))(
+          CalculationRequest.payload
+        )
+      );
+      expect(calculated.status).toBe(200);
+      expect(header(calculated, "cache-control")).toBe("no-store");
+      expect(header(calculated, "cloudflare-cdn-cache-control")).toBe(
+        "no-store"
+      );
+    }).pipe(Effect.provideService(ConfigProvider.ConfigProvider, settings))
+  );
+
   it.effect("shares eight calculation places across HTTP and RPC batches", () =>
     Effect.gen(function* () {
       const live = yield* PublicCalculatorService;

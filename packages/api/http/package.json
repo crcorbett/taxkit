@@ -60,6 +60,11 @@
       "source": "./src/request-boundary.ts",
       "types": "./dist/request-boundary.d.ts",
       "default": "./dist/request-boundary.js"
+    },
+    "./response-policy": {
+      "source": "./src/response-policy.ts",
+      "types": "./dist/response-policy.d.ts",
+      "default": "./dist/response-policy.js"
     }
   },
   "publishConfig": {
@@ -103,6 +108,10 @@
       "./request-boundary": {
         "types": "./dist/request-boundary.d.ts",
         "default": "./dist/request-boundary.js"
+      },
+      "./response-policy": {
+        "types": "./dist/response-policy.d.ts",
+        "default": "./dist/response-policy.js"
       }
     },
     "access": "public"
