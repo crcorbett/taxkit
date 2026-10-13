@@ -52,7 +52,10 @@ Response headers choose what is public; see the
 [frontend](./frontend.md) and [API and SDK](./api-and-sdk.md) owners. Authored
 content is an input to both Worker builds (the API bundles the public catalogue;
 the Website memo includes the shared packages), so a content-only change
-deploys new versions of both and starts new caches.
+deploys new versions of both and starts new caches. Native gitignore rules do
+not reach the memo's `../../packages/**` paths, so the stack names those
+excludes itself; without them the hash follows linked `node_modules` into the
+package store (about 1.2 million files) and the deploy runs out of memory.
 
 ## Observability
 
