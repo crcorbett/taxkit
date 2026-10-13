@@ -17,7 +17,7 @@ application runtime.
 
 | Export | Owns |
 | --- | --- |
-| `./apps-stack` | `declareNativeAppsStack`: `TaxKitApi`, `TaxKitWebsite` and, in `prod`, the retained zone and DNS settings. |
+| `./apps-stack` | `declareNativeAppsStack`: `TaxKitApi`, `TaxKitWebsite` and, in `prod`, the retained zone, DNS settings and zone settings (`productionZoneSettings`). |
 | `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. |
 | `./stage` | Stage Schemas: `prod`, `pr-<number>` and `dev_<name>`. |
 | `./posthog` | The retained PostHog project stack. |
@@ -47,9 +47,12 @@ include caller URLs.
 Alchemy's Config bridge. `deploymentSecrets` supplies `10078` for Production
 and `10078<pr-number>` for each Preview, so stages never share counters.
 
-In `prod` the graph adopts and retains the `taxkit.dev` zone and DNS settings,
-attaches `taxkit.dev` (with a native `www.taxkit.dev` redirect) to the Website
-and `api.taxkit.dev` to the API. Local and Preview graphs declare no domains.
+In `prod` the graph adopts and retains the `taxkit.dev` zone, its DNS settings
+and five zone settings (TLS, HTTPS, Browser Integrity Check and security level,
+as in Common Practice), attaches `taxkit.dev` (with a native `www.taxkit.dev`
+redirect) to the Website and `api.taxkit.dev` to the API. The Production
+Website has no `workers.dev` address; Local and Preview graphs declare no
+domains and keep their stable `workers.dev` address without version previews.
 The native redirect provider treats a failed shared-ruleset read as absence;
 the focused provider test records that limit.
 

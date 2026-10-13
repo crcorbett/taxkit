@@ -55,8 +55,8 @@ bun run production:deploy
 bun run production:drift
 ```
 
-Review the plan. Production adopts and retains the `taxkit.dev` zone and DNS
-settings; a plan that would create, replace or delete the zone, or delete either
+Review the plan. Production adopts and retains the `taxkit.dev` zone, DNS
+settings and zone settings; a plan that would create, replace or delete the zone, or delete either
 Worker, must stop. `production:drift` compares the deployed resources with
 state.
 
