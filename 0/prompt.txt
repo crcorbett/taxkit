@@ -1,0 +1,377 @@
+TaxKit native Effect and Alchemy deliveryNew goal: implement and deliver the agreed TaxKit native Effect/Alchemy design in this new isolated TaxKit worktree, starting from main. Name this session TaxKit native Effect and Alchemy delivery.
+
+Read /private/tmp/taxkit-claude-native-implementation-2026-10-13/GOAL.md completely, then all six saved design documents beside it. This is Cooper’s authorised implementation handover and contains the settled decisions, scope, sources, important limits and completion criteria. Integrate the saved design carefully because it is uncommitted in the original checkout; preserve all unrelated work and do not implement in the original /Users/cooper/Projects/taxkit checkout.
+
+Follow the latest published Commonplace development-workflows plugins and applicable local profiles, especially strict-effect-ts, repo-structure, package-structure, alchemy-iac and docs-maintainer. Inspect the actual cloned Effect and Alchemy sources, installed APIs and current Common Practice. Remove unnecessary wrappers, approval/receipt ceremony, and ALL Alchemy patches while preserving tax correctness, public machine clients and privacy. Prioritise Cloudflare, with Bun as a supported secondary host.
+
+Run meaningful checks and native Alchemy/Doppler deployments locally from this Mac/worktree, not GitHub Actions. Cooper explicitly authorises the necessary commits, PRs/pushes, merging this goal’s checked changes into TaxKit main, and publishing and checking the Production Website/API pair. This supersedes the earlier review-only scope and duplicate receipt/approval requirements for these same operations. Do not ask again for the already-approved merge or deployments.
+
+Create/activate this as a persistent goal if the goal facility is available and work through completion. Do not stop at a plan. Read the full saved goal before coding; it includes the practical local checks, known upstream limits, rollback and delivery criteria. Report concrete blockers clearly. Your first response should confirm the actual worktree path and that the full handover has been read.
+
+---
+
+<task-notification>
+<task-id>abd8a1197c10d5e20</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/abd8a1197c10d5e20.output</output-file>
+<status>completed</status>
+<summary>Agent "Map infra/Alchemy graph" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I mapped the Alchemy graph in the worktree without changing anything. One thing to know up front: the declarations form a deliberate cycle. The API reads the Website's URL for CORS, and the Website reads the API's URL and binding. The repo patches Alchemy's planner so this cycle can be planned (§3).
+
+## 1. Entrypoints, stacks, stages, state
+
+| File | Declares |
+|---|---|
+| `alchemy.run.ts:3` | `new RetiredDocsStack({...})`. This is a Schema TaggedClass record from `packages/infrastructure/src/retired-stack.schemas.ts:5`, not a Stack. Alchemy rejects it before it builds providers or state. The old `TaxKitDocsCloudflare/DocsWebsite` is retired. |
+| `alchemy.apps.run.ts:8-15` | `Alchemy.Stack("TaxKitAppsCloudflare", { providers: Cloudflare.providers(), secrets: nativeAppsSecrets, state: Cloudflare.state() }, declareNativeAppsStack)`. This is the cloud stack. |
+| `alchemy.apps.local.run.ts:11-50` | `Stack("TaxKitAppsLocal", { providers: Cloudflare.providers(), state: Alchemy.localState() }, ...)`. It has no secrets. It fails unless `context.dev &amp;&amp; ALCHEMY_DEV &amp;&amp; ProviderMode === "local"` and the stage is `dev_native_apps` or `dev_native_apps_proof` (:22-36). It provides `NativeAppsHostMode = "local-emulator"` and falls back to the config `CALCULATOR_RATE_NAMESPACE: "10075"` (:39-46). |
+| `alchemy.posthog.run.ts:11-19` | `Stack("TaxKitPostHog", { providers: PostHogProjectProviderLive, secrets: nativePostHogSecrets, state: Cloudflare.state() }, declarePostHogProjects)` |
+| `tsconfig.alchemy.json` | Extends the base config with `noEmit` and `types: ["bun"]`. It includes the 4 roots plus `packages/infrastructure/src/**/*.ts`. Used by `check:docs-deployment:types`. |
+
+**`packages/infrastructure/src`** (the package exports are in `package.json:7-37`; all point at `.ts` source):
+- **`stage.ts`:** Preview stages match `^pr-[1-9]\d*$`. `DocsDeploymentStage` is `"prod"` or a preview stage. `DocsLocalDevelopmentStage` matches `^dev_[a-z0-9]+...`.
+- **`cloudflare/website.ts`:**
+  - `DocsCloudflareStackStage` is the union of the deployment and local stages; `decodeDocsCloudflareStackStage` (:35) decodes it.
+  - The remaining constants (`docsCloudflareStackName`, memo, observability) belong to the retired docs stack.
+- **`apps-secrets.boundary.ts`:**
+  - `nativeAppsStage` is that same decoder (:16).
+  - `nativeAppsDopplerSelection` (:21-41) maps the stage to a Doppler config in project `taxkit`: `prod` → `prd`, `pr-N` → `stg_preview`, and `dev_*` → `dev`.
+  - `nativeAppsSecrets` (:43-74) is made of three parts:
+    - `Doppler.Secrets(selection).layer`.
+    - `ConfigProvider.layerAdd(..., {asPrimary:true})`, which sets `CALCULATOR_RATE_NAMESPACE`: `"10078"` for prod, `` `10078${N}` `` for `pr-N`, and nothing for `dev_*`.
+    - `Secrets.ProcessEnv({ disabled: true })`.
+- **`apps-stack.ts`:** The app graph, detailed in §2.
+- **PostHog files:**
+  - **`posthog/stack.ts`:**
+    - `declarePostHogProjects` fails unless the stage is `prod` (:19). It reads `POSTHOG_ORGANISATION_ID` and declares the `PostHogProject("TaxKitProject", …).pipe(retain())`.
+    - `nativePostHogSecrets` uses `Doppler.Secrets({config:"prd",project:"taxkit"})` for prod only, plus ProcessEnv disabled.
+  - **`posthog/projects.provider.ts`:** A custom `Resource&lt;"TaxKit.PostHog.Project"&gt;` with a provider (`Provider.effect`) whose delete always fails.
+  - **`posthog/projects.live.layer.ts`:** Defers fallible acquisition. Its comment says "Alchemy beta.80 requires provider registration to have no error channel".
+  - **`posthog/management.adapter.layer.ts:93`:** Reads `POSTHOG_MANAGEMENT_KEY`.
+
+**How stage and state identity are chosen:** The stage comes from the CLI `--stage`. For cloud stacks the state store is `Cloudflare.state()`, selected by `--profile`. For the local stack it is `localState()` under `ALCHEMY_HOME=.alchemy/native-apps-auth` (root `dev` script). Tests show the path `.alchemy/state/TaxKitAppsLocal/&lt;stage&gt;/TaxKitApi.json` (`apps/web/test/native-local-development.boundary.test.ts:315-324`).
+
+## 2. API Worker and Website declarations
+
+- **`TaxKitApiWorker`:** Declared in `apps/api/src/worker.ts:87-95` as ``Worker&lt;…, {fetch: HttpEffect; calculatorRequest}&gt;()("TaxKitApi")``. The worker exposes an RPC method, `calculatorRequest`.
+- **Standalone API default export** (`worker.ts:101-113`): sets `env: { API_PUBLIC_ORIGIN: Worker.URL }`, `main: import.meta.url` and `workersDev: true`. Only `apps/web/scripts/native-api-source.boundary.ts` uses it, for in-memory source discovery.
+- **Rate-limit binding:** `RateLimit("CALCULATOR_RATE_LIMIT", { namespaceId: CALCULATOR_RATE_NAMESPACE, simple:{limit:60,period:60} })` is declared in `apps/api/src/worker-admission.layer.ts:24`. It is provided through `ApiWorkerNativeInit` (`worker.ts:79-85`, `Layer.provide(RateLimitBinding)`).
+
+**In `packages/infrastructure/src/apps-stack.ts`:**
+- **`TaxKitWebsite`** is `Website.Vite&lt;TaxKitWebsite&gt;()("TaxKitWebsite", …)` (:31-76). It sets:
+  - `const api = yield* TaxKitApiWorker` (:34). This is how the Website gets the API binding and URL.
+  - `env`: `API_PUBLIC_ORIGIN: api.url.pipe(Output.map(→ null if absent))`, `CALCULATOR_HOST_MODE`, `TAXKIT_API: api` (a service binding), and `WEBSITE_PUBLIC_ORIGIN: Worker.URL` (:53-58).
+  - On prod only: `domain: { name: "taxkit.dev", redirects: ["www.taxkit.dev"], zoneId }` (:39-48).
+  - `rootDir: "apps/web"`, `workersDev: true`, compatibility `2026-10-04` with `nodejs_compat`, and observability fully disabled.
+  - It sets no `assets`, `runWorkerFirst`, cache settings or `memo`. Alchemy's `Website/Vite.ts` defaults apply.
+- **`NativeApiHostLive = TaxKitApiWorker.make(...)`** (:78-107). This is the reverse dependency:
+  - It does `const website = yield* TaxKitWebsite` (:80).
+  - `env`: `API_PUBLIC_ORIGIN: Worker.URL` and `WEBSITE_PUBLIC_ORIGIN: website.url.pipe(Output.map(...))` (:92-98).
+  - On prod only: `domain: { name: "api.taxkit.dev", zoneId }` (:85).
+  - `main: import.meta.resolve("api/worker")` and `observability: ApiWorkerObservability`.
+- **`declareNativeAppsStack`** (:109-143). On prod it declares:
+  - `Zone("TaxKitProductionZone", {name:"taxkit.dev"}).pipe(adopt(true), retain())`.
+  - `ZoneDnsSettings("TaxKitProductionDnsSettings", …).pipe(retain())`.
+
+  It then yields both workers with `NativeApiHostLive` and the zone provided, and returns `{ apiUrl, websiteUrl }`.
+- **The API consumes the Website URL for CORS:**
+  - `apps/api/src/worker.config.ts:5-13` reads `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN`.
+  - `worker.application.ts:189-202` applies `HttpMiddleware.cors({ allowedOrigins: (o) =&gt; o === config.websiteOrigin.origin, … })`.
+- **The Website consumes the binding:**
+  - `apps/web/src/lib/runtime.server.ts:14` passes `WebsiteServerLive(env.TAXKIT_API)`.
+  - `live.server.layer.ts:15,49-52` uses `fromCloudflareFetcher` / `toRpcAsync&lt;typeof TaxKitApiWorker&gt;` from `alchemy/Cloudflare/Bridge`.
+  - The origins are read in `config.server.ts:34,42`.
+- **Local build without Alchemy:**
+  - `apps/web/vite.config.ts:16-25,51-53` adds the `cloudflare()` plugin only when `ALCHEMY_CLOUDFLARE_VITE_INJECTED !== "1"`.
+  - `apps/web/wrangler.jsonc` is a local/standalone candidate. It has the service `TAXKIT_API` → `taxkit-api-local-candidate` and hard-coded vars `API_PUBLIC_ORIGIN = http://127.0.0.1:4101` and `WEBSITE_PUBLIC_ORIGIN = http://127.0.0.1:4100`.
+
+## 3. Patches and wrappers
+
+**`patches/alchemy@2.0.0-beta.80.patch`** is applied through `patchedDependencies` in the root `package.json`. It has two logical changes, each applied to the `.ts` source, the compiled `.js` and the `.js.map`:
+1. **`src/Cloudflare/Workers/WorkerProvider.ts` @1707 and `lib/…/WorkerProvider.js` @1191.**
+   - When reading the `http_request_dynamic_redirect` ruleset entrypoint, it changes `Effect.catch(() =&gt; succeed(undefined))` to `Effect.catchTag("RulesetNotFound", …)`.
+   - Effect: only a ruleset that is confirmed missing is treated as empty. Other read failures now fail instead of leading to a PUT that would overwrite shared or foreign redirect rules.
+2. **`src/Plan.ts` @839 and `lib/Plan.js` @411.**
+   - Inside the cached "stable refs" resolution, it moves `materializeStableRefs(resolveInput(resource.Props))` after the persisted-row check.
+   - It adds `combinedCycleMembers.has(resource.FQN)` to the early-return condition, so the planner returns `resourceExpr` (deferred) for cycle members.
+   - Effect: this fixes a planner deadlock on the API ↔ Website binding cycle (README:69-75).
+
+**Other places that use or wrap Alchemy:**
+- **No monkeypatch, copied planner code or postinstall.** Root `prepare` is only `effect-tsgo patch`.
+- **`apps/web/scripts/native-api-source.boundary.ts`:** Builds an in-memory `Stack.make({ name: "TaxKitLocalSourceDiscovery", state: inMemoryState() })`. It uses a Worker provider that refuses every operation, plus blocked Profile, Credentials and HttpClient stores, at stage `dev_native_pair`.
+- **`apps/web/scripts/native-pair-build.runtime.ts`:** Uses `resolveSource` / `makeSourceContext` / `scopedArtifacts` to build into `.alchemy/native-pair`. It temporarily rewrites `apps/api/src/worker.ts` to inject fixtures and restores it on release.
+- **`tools/docs-deployment/inventory.runtime.ts:65-83`:** A read-only inventory. It calls `makeHttpStateStore` directly instead of `Cloudflare.state()`, and uses `LiveWorkerProvider`.
+- **`tools/docs-deployment/workflow-plan-projection.ts`:** Parses Alchemy beta.80's plain-text plan output. Version three handles the native-apps graph.
+
+**`patches/@effect%2Fatom-react@4.0.0.patch`:** Changes only `package.json` `peerDependencies.scheduler` from `&gt;=0.25.0 &lt;0.28.0` to `&gt;=0.25.0 &lt;0.28.0 || 0.28.0`.
+
+## 4. How deployments run
+
+- **Local dev (root `dev` script):**
+  - It runs `turbo build --filter=api`, then `CI=1 ALCHEMY_HOME=.alchemy/native-apps-auth ALCHEMY_TELEMETRY_DISABLED=1 BUN_OPTIONS="--conditions=source --no-env-file" bun run node_modules/alchemy/bin/cli.js dev --config alchemy.apps.local.run.ts --env-file tools/apps-local/no-local-env --stage dev_native_apps`.
+  - `tools/apps-local/` contains only `no-local-env`, an empty file whose comments explain that it stops Alchemy loading a local `.env`.
+- **No script deploys to the cloud.** `docs:dev:cloudflare` and `docs:dev:cloudflare:internal` both run `tools/docs-deployment/retirement.runtime.ts`, which always fails.
+- **Cloud deploys are manual,** following `docs/runbooks/docs-deployment.md:200-213`:
+  ```
+  bun --no-env-file --conditions=source run node_modules/alchemy/bin/cli.js plan|deploy --config alchemy.apps.run.ts --stage &lt;stage&gt; --profile &lt;verified-state-profile&gt;
+  ```
+  The runbook forbids `--yes` and `--env-file`. The plan is qualified via `workflow-plan-projection.runtime.ts` with `REDACTED`, which writes to `tmp/native-apps-plans/&lt;stage&gt;/`.
+- **`tools/docs-deployment`** is governance and proof tooling. It does not deploy anything. It covers:
+  - Receipt schemas: v1/v2 historical receipts and the v3 `NativeAppsPlanProjection`.
+  - Workflow input and run checks: `workflow-input-check.runtime.ts` compares the receipt's candidate/workflow commit, run ID, path, operation and PR number against env vars.
+  - Proof and teardown-proof checks.
+  - The artifact upload allowlist and secret scan.
+  - The read-only provider/state inventory.
+  - Doppler custody: `doppler-custody.boundary.ts` accepts only a mode-0600 `secret-…` keyring reference.
+  - The retired `local-doppler.ts` adapter.
+  - Retirement refusal, strict-boundary policy, an automation register and fixtures for beta.64 and beta.80.
+  - These checks run locally through `bun run verification`.
+- **`.github/workflows/`:**
+  - **`quality.yml`:** Runs on PR and push. Installs, installs Playwright, runs `check:quality-workflow`, fetches Doppler `taxkit/ci` (Turbo creds), then runs `release:check -- --ci`.
+  - **`docs-deployment-workflow-receipts.yml`:** Triggered by `workflow_run` of the three old Docs workflows. Reconciles and validates the input/run receipt and uploads a single allowlisted artifact. Uses Doppler `ci`.
+  - **`docs-preview.yml`, `docs-production.yml`, `docs-preview-teardown.yml`, `docs-production-hosted-verify.yml`:** Retired, 18 lines each. `workflow_dispatch` stubs that print a retirement message and `exit 1`.
+
+## 5. Doppler
+
+- **Project and configs:** The project is `taxkit`. Configs are `prd` (prod), `stg_preview` (`pr-N`), `dev` (`dev_*`) and `ci` (GitHub Actions, Turbo only).
+- **App and PostHog stacks:** Secrets load through native `alchemy/Doppler` `Doppler.Secrets({project, config}).layer`. Its auth provider reads `DOPPLER_TOKEN` or the Alchemy profile login. Ambient env is blocked by `Secrets.ProcessEnv({disabled:true})`.
+- **Cloudflare credentials:** Per the runbook (:191-197), the operator resolves the repo-scoped Doppler login and supplies the existing credential inputs separately. The stack owns application secret names and their precedence.
+- **CI:** Uses `dopplerhq/secrets-fetch-action` with `DOPPLER_CI_TOKEN` and asserts `project=taxkit`, `config=ci`.
+- **Retired CLI injection:** `tools/docs-deployment/local-doppler.ts` built `doppler run --project taxkit --config dev --no-fallback --only-secrets CLOUDFLARE_ACCOUNT_ID,CLOUDFLARE_API_TOKEN -- bun run --no-env-file …` and stripped `DOPPLER_*` and CF variables. No current script calls it.
+- **The local apps stack uses no Doppler.**
+- **`.env` handling:**
+  - Bun runs with `--no-env-file` everywhere.
+  - Alchemy dev uses `--env-file tools/apps-local/no-local-env`.
+  - `tools/docs-deployment/no-local-env` is a second empty dotenv file.
+  - `.gitignore` excludes `.env` and `.env.*` (except `.env.example`) and `.alchemy`.
+  - The cloud runbook forbids `--env-file`.</result>
+<usage><subagent_tokens>124633</subagent_tokens><tool_uses>29</tool_uses><duration_ms>135921</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>acab3e98813d2ceb8</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/acab3e98813d2ceb8.output</output-file>
+<status>completed</status>
+<summary>Agent "Map Website data flow" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've mapped the Website's data loading and API calls below. Several things the brief asks about are absent from `apps/web`: `createIsomorphicFn`, `createLoaderRegistry`, `AtomHttpApi`, `AtomRpc`, `defaultStaleTime`/`staleTime`, `runtime.client`, a browser `ManagedRuntime`, and `build/cloudflare.ts`. `RegistryContext` appears only in tests, and there is no browser-side analytics code (no posthog-js). Paths below are relative to `/Users/cooper/Projects/taxkit/.claude/worktrees/taxkit-native-effect-alchemy-f44f82/apps/web/`.
+
+## 1. Router and runtime setup
+
+- **`src/router.tsx:13-25`**: `getRouter` builds the TanStack router.
+  - Its context is `{ loadDocsPage, loadDocsSearch, loadSettings }`, taken from `#/lib/loaders`.
+  - Settings: `defaultPreload: "intent"`, `scrollRestoration: true`, and custom `parseSearch`/`stringifySearch` from `docs/search-location.boundary.ts:9-33`, which keeps raw URL pairs instead of the JSON parser.
+  - `Register` declares `server: { requestContext: WebsiteServerRenderContext }` (`:26-31`).
+- **`src/lib/route-context.ts:7-11`**: the `RouterContext` interface, typed from the three loader functions.
+- **`src/routes/__root.tsx`**:
+  - The loader (`:161-165`) calls `context.loadSettings({ signal: abortController.signal, submission: serverContext?.submission })`.
+  - `RootComponent` decodes `data.settings` with `WebsiteSettingsTransport` (`:49-52`), `data.submission` with `WebsiteSubmissionTransport` (`:53-61`) and `data.catalogue` with `WebsiteCatalogueTransport` (`:62-73`).
+  - The Atom registry is created at `:86-92`: `&lt;RegistryProvider key={checked.apiOrigin.href} initialValues={[[publicSettingsAtom, Option.some(checked)], [websiteCatalogueAtom, catalogue]]}&gt;`.
+  - The checked submission and catalogue reach children through the React contexts `WebsiteSubmissionContext` and `WebsiteCatalogueContext` (`:29-34`).
+- **Server runtime, `src/lib/runtime.server.ts:12-23`**: one module-level `ManagedRuntime.make(Layer.mergeAll(...))` per Worker module. It combines:
+  - `WebsiteServerLive(env.TAXKIT_API)` with `ConfigProvider.fromUnknown(env)`
+  - `CalculatorHostTelemetryLive("website")`
+  - `WebsiteAnalyticsRelayLive` on `FetchHttpClient.layer`
+  
+  `env` comes from `import { env } from "cloudflare:workers"` (`:3`), the only `cloudflare:workers` import in `src`.
+- **Browser runtime, `src/lib/calculator.atoms.ts`**: there is no `ManagedRuntime`. The comment at `:37-38` says the React registry owns client acquisition.
+  - `publicSettingsAtom` and `websiteCatalogueAtom` are `Atom.make(Option.none()).pipe(Atom.keepAlive)` (`:41-46`).
+  - `calculatorRuntime = Atom.runtime((get) =&gt; ...)` (`:47-67`). If settings are missing it fails with `TaxKitWebConfigError` (runtime `"client"`). Otherwise it builds `TaxKitRpcClientLive(settings.apiOrigin)` on `BrowserCalculatorPolicyLive` and `FetchHttpClient.layer`.
+  - `BrowserCalculatorPolicyLive` (`calculator-policy.browser.layer.ts:14-36`) sets `CollectionPolicyHeader` from `navigator.doNotTrack` on each request: `"1"` means deny, an unknown value or error also means deny.
+- **RPC transport**: both RPC clients POST to `new URL("/rpc", origin)` through `RpcClient.makeProtocolHttp` (`packages/api/rpc/src/live.layer.ts:218-223`; `content.live.layer.ts:156-161`).
+
+## 2. Route loaders and data fetching
+
+**`createServerFn` usage** (all in `src/lib/loaders.ts`, all `GET` with no input validator):
+
+| Name | Line | Handler | Exported URL constant |
+|---|---|---|---|
+| `websiteSettings` | `:13` | `loadWebsiteSettingsServer()` | `WebsiteSettingsFunctionPath = websiteSettings.url` (`:17`) |
+| `websiteDocsPage` | `:18` | `loadWebsiteDocsPageServer()` | `WebsiteDocsPageFunctionPath` (`:21`) |
+| `websiteDocsSearch` | `:37` | `loadWebsiteDocsSearchServer()` | `WebsiteDocsSearchFunctionPath` (`:40`) |
+
+**Client wrappers.** Each is a small `Effect.runPromise(..., { signal })`.
+- `loadWebsiteDocsPage` (`:23-35`) sends `headers: { "x-taxkit-docs-page": path }`.
+- `loadWebsiteDocsSearch` (`:41-65`) URI-encodes the term with `WebsiteDocsSearchHeader` into `x-taxkit-docs-search`. A `DocsSearchInputError` is encoded locally as a failed transport `Result`.
+- `loadWebsiteSettings` (`:69-82`) maps the result to `{ catalogue, settings, submission }`.
+
+These two `x-taxkit-*` headers are the only loader request headers.
+
+**Path allowlist.** It is built from the generated identities, not mirrored IDs. `src/server.ts:134-165`:
+- Any `/_serverFn/*` path other than the three `.url` values gets a 404.
+- A method other than GET gets a 405 with `allow: GET`.
+- Any query string, any `content-type` header, or an invalid `x-taxkit-docs-search` / `x-taxkit-docs-page` header gets a 400.
+- The base is `WebsiteServerFunctionBase = "/_serverFn"` (`src/lib/config.ts:4`), wired in through `vite.config.ts:56`.
+
+**Server handlers** (`src/lib/loaders.server.ts`, marked `server-only`):
+- `loadWebsiteSettingsServer` (`:23-54`): runs `application.settings` and `application.catalogue`, each through `Effect.result`, then encodes with `WebsiteSettingsTransport` / `WebsiteCatalogueTransport`. Unexpected causes go to `HttpServerError.causeResponse` and `ErrorReporter.report`, and an empty web Response is returned.
+- `loadWebsiteDocsPageServer` (`:56-111`):
+  - The path comes from the URL during SSR, or from `x-taxkit-docs-page` only on a `/_serverFn/` call.
+  - It is decoded with `DocsPublicPagePath`, then loads settings, `docsNavigation`, `docsPage` and `preloadDocsPresentation`.
+  - `DocsPageUnavailable` becomes a `notFound()` die, which passes through. Everything else is encoded as `WebsiteDocsPageTransport`.
+- `loadWebsiteDocsSearchServer` (`:113-156`): the term comes from the header or from `WebsiteDocsSearchLocation(url.search)`. It returns `{navigation, results, settings, term}`, encoded as `WebsiteDocsSearchTransport`.
+
+**Envelopes** (`src/lib/schemas.ts`). Each is `Schema.toCodecJson(Schema.Result(success, errorUnion))`:
+- `WebsiteSettingsTransport` (`:48`)
+- `WebsiteCatalogueTransport` (`:51`)
+- `WebsiteDocsPageTransport` (`:62`)
+- `WebsiteDocsSearchTransport` (`:123`)
+- `WebsiteSubmissionTransport` (`:170`)
+
+`WebsiteServerRenderContext.submission` is at `:183`. Routes restore the envelopes through `docs/route-boundary.ts:11-24`, which maps a decode failure to `DocsRouteTransportError`.
+
+**Routes:**
+- **`/`** (`routes/index.tsx`): no loader. Reads `WebsiteSubmissionContext` and renders `TakeHomeCalculator`.
+- **`/calculators/$calculatorId`** (`routes/calculators.$calculatorId.tsx:55-91`): no loader. Finds the calculator in `WebsiteCatalogueContext`, redirects `au.pay.take-home` to `/`, and uses `remountDeps` on `calculatorId`.
+- **`/agents`**: no loader. Reads `useAtomValue(publicSettingsAtom)` (`:9`).
+- **`/search`** (`routes/search.tsx:72-86`): loader `context.loadDocsSearch({ query: readDocsSearchLocation(location.searchStr), ... })`, with `pendingMs: 150` and `shouldReload: true`.
+- **`/$`** (`routes/$.tsx:53-57`): loader `context.loadDocsPage({ path: `/${params._splat}` })`, with `pendingMs: 150` and a `notFoundComponent`.
+
+**`websiteCatalogueAtom` consumers.** It is seeded in `__root.tsx:90` and read only in `browser-tools.atoms.ts:150` (`taxkit_find_calculators`). Route components read the catalogue from `WebsiteCatalogueContext` instead.
+
+## 3. Server-side calls to the API
+
+- **`src/lib/config.server.ts`**:
+  - `PrivateApiBinding` (`:11-21`) is a `Schema.declare` check that the binding has callable `fetch`, `connect` and `calculatorRequest`. It keeps the original Fetcher object rather than copying its methods.
+  - `TaxKitWebServerConfig` (`:22-53`) reads `API_PUBLIC_ORIGIN`, `CALCULATOR_HOST_MODE` (default `"edge"`) and `WEBSITE_PUBLIC_ORIGIN`. Any failure becomes `TaxKitWebConfigError` with runtime `"server"`.
+- **`src/lib/live.server.layer.ts`**, `WebsiteServerLive(binding)`:
+  - **`localKey` (`:38-48`)**: a rate key fixed to `127.0.0.1`. It is used only when the host mode is `local-emulator` and the API origin is http on `127.0.0.1` or `localhost`.
+  - **Calculator transport (`:53-116`)**: with no `CalculatorRequestRateKey`, it calls `fromCloudflareFetcher(binding).fetch`. With a key, it calls `toRpcAsync&lt;typeof TaxKitApiWorker&gt;(binding).calculatorRequest(incoming, NetAddress.formatIp(key))`. The comment at `:60-62` says the native RPC cannot carry an AbortSignal, so cancelling the call does not stop remote work.
+  - **Collection policy (`:97-113`)**: every outgoing request gets `CollectionPolicyHeader`, derived from the incoming request's headers, or `"deny"` when there is no incoming request.
+  - **`calculate` (`:123-144`)**: without an edge key and without `localKey`, it fails with `CalculatorAdmissionUnavailable`.
+  - **Service methods (`:145-156`)**: `catalogue` is `listCalculators(MetadataQuery.make({}))`. The docs methods map to `docs.getDiscovery`, `getMarkdown`, `getNavigation`, `getPage` and `searchPages`.
+  - **Docs RPC transport (`:165-205`)**: plain `settings.binding.fetch(incoming, { signal })` with the body kept materialised. It never uses `calculatorRequest`.
+  - **Config failure (`:211-227`)**: every method fails with `TaxKitWebConfigError`.
+- **`src/lib/service.server.ts:23-61`**: the `WebsiteServerApplication` contract (docsDiscovery, docsNavigation, docsPage, docsMarkdown, searchDocs, catalogue, settings, calculate).
+- **API side**: `calculatorRequest` is defined at `apps/api/src/worker.application.ts:216`, and the `TaxKitApiBinding` type at `apps/api/src/worker.ts:97`.
+- **`src/server.ts:272-275`**: provides `CalculatorRequestRateKey = calculatorEdgeRateKey(headers)` on every request.
+- **`WEBSITE_PUBLIC_ORIGIN` / `websiteOrigin` usage:**
+  - `config.server.ts:40-43`; `analytics/relay/relay.adapter.layer.ts:50`
+  - Docs metadata canonical and image URLs (`metadata.egress.ts:17-18,31`)
+  - Markdown link (`routes/$.tsx:31`) and the Markdown `link` header (`markdown.response.server.ts:105`)
+  - WebMCP origin gate (`browser-tools.atoms.ts:177`)
+- **`wrangler.jsonc`**:
+  - `services: [{ binding: "TAXKIT_API", service: "taxkit-api-local-candidate" }]`
+  - vars `API_PUBLIC_ORIGIN: http://127.0.0.1:4101`, `WEBSITE_PUBLIC_ORIGIN: http://127.0.0.1:4100`
+  - `nodejs_compat`, with observability off
+
+## 4. Calculation flow
+
+**Browser (`calculator.atoms.ts:70-231`).** `calculatorPageAtoms = Atom.family(calculatorId =&gt; ...)`:
+- `calculation = calculatorRuntime.fn&lt;CalculatorRunServiceRequest&gt;()(req =&gt; TaxKitRpcClient.calculate(req))` (`:85-90`).
+- `submit` (`:114-148`) builds the request with `takeHomeRequestFromForm` / `annualTaxRequestFromForm`. Invalid input sets `formError` and sends `Atom.Interrupt`. Valid input sets `attempt` and the `calculation`.
+- `edit` (`:106-113`) and `cancel` (`:101-105`) set `attempt` to none and send `Atom.Interrupt` to `calculation`.
+- `view` (`:168-227`, keepAlive) derives `{busy, form, message, report, stale}`, falling back to `savedReport` / `savedMessage`. Errors are mapped through `calculationFailureMessage` (`calculation-failure.ts:9-29`), which shows safe tagged messages and a generic fallback.
+- Legacy home aliases are at `:235-251`.
+
+**Containers.** `take-home.container.tsx` and `calculator-page.container.tsx`:
+- Seed the server submission with `useAtomInitialValues` (`take-home:44-69`, `calculator-page:47-59`).
+- On unmount, interrupt the calculation (`take-home:80-83`, `calculator-page:68-72`) and the browser tools (`:71-74` / `:61-64`).
+- The views render `&lt;form action="/" method="post"&gt;` (`take-home.view.tsx:28-34`) or `action={`/calculators/${calculatorId}`}` (`calculator-page.view.tsx:43-49`). With JavaScript, `onSubmit` calls `preventDefault()` and then `onCalculate()`.
+- The button shows "Calculating…" and is disabled while busy. Messages render with `role="alert"`. The result views use `aria-live="polite"` and show a stale notice (`take-home-result.view.tsx:20-22`, `calculator-page-result.view.tsx:36-38`).
+
+**No-JavaScript POST (`src/server.ts:124-133, 167-261`).**
+1. Only POSTs to `/`, `/calculators/au.income-tax.annual` and `/calculators/au.pay.withholdings` are handled. Other POSTs get a 404 (`markdown.response.server.ts:28-30`).
+2. The handler is wrapped in `withCalculatorRequestBodyLimit(..., CalculatorRequestBodyPolicy.make({ responseFormat: "html" }))`.
+3. It reads `formData()` and decodes `AnnualTaxForm` or `TakeHomeForm`; failures are `WebsiteInputError` → 400.
+4. It calls `application.calculate` under `Effect.result` and encodes a `WebsiteSubmission`.
+5. It re-renders as a synthetic GET with `content-length` and `content-type` removed, passing `{ context: { submission } }`. The root loader then forwards `serverContext.submission`.
+
+**Body limit** (`packages/api/http/src/request-boundary.ts`):
+- `CalculatorRequestBodyLimit = ByteSize.kibibytes(64)` (`:33`) and `CalculatorRequestBodyDeadline = Duration.seconds(5)` (`:34`).
+- The stream is counted chunk by chunk with a timeout, plus a monotonic-clock re-check for late synchronous reads (`:50-83`).
+- Failures return 413 (size) or 408 (deadline) as a fixed HTML page (`:84-102`).
+
+**Cancellation:**
+- The request signal is passed to `appRuntime.runPromise` (`server.ts:283`) and to the server-function runners.
+- Browser: `Atom.Interrupt` on edit, cancel or unmount.
+- The binding RPC path cannot carry an abort signal (`live.server.layer.ts:60-62`).
+
+## 5. Docs, Markdown and discovery
+
+- **`routes/$.tsx`**:
+  - `head` (`:41-52`) uses `docsMetadata`.
+  - It renders `MdxDocument` plus a "Read this page as Markdown" link built from `websiteOrigin`.
+  - `MdxDocument` (`docs/mdx.boundary.tsx`) uses `docsCollection.createClientLoader`. `preloadDocsPresentation` (`:46-58`) checks that the compiled `_markdown` and frontmatter match the API page.
+- **`docs/metadata.egress.ts:13-78`**: builds the canonical link, the `alternate text/markdown` link, og/twitter meta, and JSON-LD `TechArticle` with `&lt;`, U+2028 and U+2029 escaped.
+- **`docs/markdown.response.server.ts`**, `withDocsRepresentation(html)` wraps every non-calculator-POST HTML render (`server.ts:176`):
+  - A `.md` path, or an `Accept` header negotiated with `WebsiteDocsAccept` (`schemas.ts:197-328`), selects Markdown.
+  - Negotiation applies only to valid `DocsPublicPagePath` values, excluding `/search` and `/agents`.
+- **Discovery** (`server.ts:88-123`):
+  - Paths come from `DocsDiscoveryPath` = `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/llms-full.txt` (`packages/content/src/schemas.ts:22-27`).
+  - Only GET/HEAD are allowed (otherwise 405); a query string gets 400. Content comes from `application.docsDiscovery`.
+
+**Cache-Control and Vary headers set in `apps/web/src`:**
+
+| Location | Cache-Control | Vary |
+|---|---|---|
+| `server.ts:68` (relay failure) | `no-store` | none |
+| `server.ts:103` (discovery OK) | `public, max-age=300` (also `x-content-type-options: nosniff`) | none |
+| `server.ts:117` (discovery 503) | `no-store` | none |
+| `markdown.response.server.ts:52` (400/406) | `no-store` | `Accept` |
+| `markdown.response.server.ts:72-88` (HTML) | not set | `Accept` appended to any existing value unless `accept` or `*` is already present |
+| `markdown.response.server.ts:94` (400) | `no-store` | `Accept` |
+| `markdown.response.server.ts:103-106` (Markdown OK) | `public, max-age=300` (plus `link` canonical and `nosniff`) | `Accept` |
+| `markdown.response.server.ts:119` (404) | `no-store` | `Accept` |
+| `markdown.response.server.ts:127` (503) | `no-store` | `Accept` |
+| `relay.adapter.layer.ts:23-26` (all relay responses) | `no-store` (plus `nosniff`) | none |
+| `relay.adapter.layer.ts:179` (outgoing to PostHog) | `no-store` | none |
+
+## 6. WebMCP, browser tools and analytics
+
+- **`browser-tools.toolkit.ts:16-62`**: five tools: `taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`, `taxkit_calculate_visible_form`, `taxkit_read_result`.
+- **`browser-tools.atoms.ts:20-185`**: `browserCalculatorToolsAtom = Atom.family(id =&gt; calculatorRuntime.fn&lt;"register"&gt;()(...))`.
+  - Calculate uses the page's `submit` and waits on `AtomRegistry.getResult`, raced against an attempt change, with a 12 s timeout and cleanup through `page.cancel`.
+  - Registration is held open with `Effect.never` until React interrupts it.
+- **`browser-tools.boundary.ts`**:
+  - `nativeBrowserContext` (`:35-51`) registers only if a `document` exists, `location.origin` equals `websiteOrigin.origin`, and `document.modelContext.registerTool` exists.
+  - `registerWebsiteBrowserTools` (`:56-199`) uses `FiberSet.makeRuntimePromise`, an `AbortController` per tool, and a 2 s registration timeout. Failures are logged as a warning.
+- **Analytics.** There is no client SDK in `src`. The server relay works as follows:
+  - Requests to `/ingest/*` go to `server.ts:61-87`, then `WebsiteAnalyticsRelay`.
+  - `relay.adapter.layer.ts` accepts POST only, at the exact path `/ingest/e/`.
+  - The `Origin` header and the request URL origin must both equal `WEBSITE_PUBLIC_ORIGIN` (`:87-116`), otherwise 403.
+  - The media type must be JSON or text/plain, and the query may contain only `retry_count` (`schemas.ts`).
+  - A denied collection policy returns 204. Request and response bodies are capped at 65,536 bytes (`schemas.ts:4`).
+  - It forwards to `https://us.i.posthog.com/e/` (`:175`) with `redirect: "manual"` and `credentials: "omit"`, under a 5 s deadline (`:272-283`).
+  - Failure status codes are mapped at `server.ts:69-82`.
+
+## 7. Tests and build
+
+**Scripts in `package.json`:**
+- `test`: `bun --bun vitest run`, using `vitest.config.ts` (includes `src/**/*.test.ts`, excludes browser tests).
+- `test:browser`: `vitest run --config vitest.browser.config.ts`, with Playwright chromium headless, include `src/**/*.browser.test.tsx` and `optimizeDeps.force`.
+- `test:native-pair`: `node node_modules/vitest/vitest.mjs run --config vitest.native.config.ts`, with `fileParallelism: false` and a 30 s timeout.
+- `build:native-pair`: `cd ../.. &amp;&amp; turbo run build --filter=api &amp;&amp; bun --conditions=source run apps/web/scripts/native-pair-build.runtime.ts`. That script builds Alchemy fixtures into `.alchemy/native-pair` (`:11-16`) using `scripts/native-api-source.boundary.ts`.
+- `check:worker-types`: `wrangler types src/worker-runtime.generated.d.ts --include-env true --include-runtime true --strict-vars false --config wrangler.jsonc --check`. `generate:worker-types` is the same command without `--check`.
+- Others: `build` (`vite build`), `check-types` (`tsc --noEmit`), `dev` (`portless run --name taxkit vite dev`).
+
+**Test files:**
+- Unit:
+  - `src/lib/config.boundary.test.ts`
+  - `src/lib/form.boundary.test.ts`
+  - `src/lib/browser-tools.boundary.test.ts`
+  - `src/lib/docs/markdown.boundary.test.ts`
+  - `src/lib/docs/social.boundary.test.ts`
+  - `src/lib/analytics/relay/relay.boundary.test.ts`
+- Browser (these use `RegistryContext.Provider`):
+  - `src/lib/atom-lifecycle.browser.test.tsx`
+  - `src/lib/calculator.boundary.browser.test.tsx`
+  - `src/lib/health-loader.boundary.browser.test.tsx`, which includes a `preloadRoute` abort test at `:248-301`
+- Native pair: `test/native-{pair, analytics, relay, mcp, browser-tools, rate, rate-provider, rpc-failures, cancellation, settings-failure, local-development}.boundary.test.ts`, plus the fixtures `test/native-mcp.fixture.ts`, `test/native-rate.fixture.ts` and `test/fixtures/posthog-1.438.2-relay.json`.
+  - They run Miniflare against `apps/web/dist/server`, `dist/client` and `.alchemy/native-pair/bundles/TaxKitApi` (`native-pair.boundary.test.ts:46,149-151,265`).
+  - Server-function IDs are found by regex on `websiteSettings_createServerFn_handler` and the docs equivalents (`:997-1003`, `:1962`, `:2535`).
+
+**`vite.config.ts`:**
+- `envPrefix: []`.
+- A `configResolved` plugin runs `generateDocsImages` (`scripts/docs-images.build.ts`).
+- `fumadocs-mdx` uses `packages/docs-content/source.config.ts`.
+- `cloudflare({ viteEnvironment: { name: "ssr" } })` is added only when `ALCHEMY_CLOUDFLARE_VITE_INJECTED !== "1"` (`:16-25, 51-53`).
+- `tanstackStart({ server: { entry: "server" }, serverFns: { base: "/_serverFn" } })`, then `viteReact()`.
+- Resolve conditions are `["source"]`; SSR uses `noExternal: [/^@taxkit\//]` with conditions `["source","node"]`.
+- The Worker entry is `src/server.ts` (`wrangler.jsonc` `main`).</result>
+<usage><subagent_tokens>143226</subagent_tokens><tool_uses>25</tool_uses><duration_ms>138900</duration_ms></usage>
+</task-notification>
