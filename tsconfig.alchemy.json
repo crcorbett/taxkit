@@ -10,6 +10,8 @@
   },
   "include": [
     "alchemy.run.ts",
+    "alchemy.axiom.run.ts",
+    "alchemy.trace.run.ts",
     "alchemy.local.run.ts",
     "alchemy.posthog.run.ts",
     "packages/infrastructure/src/**/*.ts"
