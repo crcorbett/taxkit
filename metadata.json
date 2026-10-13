@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4SVKZRK5NDC2J326ANV7CAX",
+  "strategy": "manual-commit",
+  "branch": "claude/taxkit-deploy-workflows",
+  "checkpoints_count": 1,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 6,
+    "cache_creation_tokens": 5878,
+    "cache_read_tokens": 2182619,
+    "output_tokens": 1598,
+    "api_call_count": 3,
+    "subagent_tokens": {
+      "input_tokens": 54,
+      "cache_creation_tokens": 75436,
+      "cache_read_tokens": 3187545,
+      "output_tokens": 11211,
+      "api_call_count": 27
+    }
+  }
+}
