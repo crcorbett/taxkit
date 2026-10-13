@@ -1,0 +1,1320 @@
+TaxKit native Effect and Alchemy deliveryNew goal: implement and deliver the agreed TaxKit native Effect/Alchemy design in this new isolated TaxKit worktree, starting from main. Name this session TaxKit native Effect and Alchemy delivery.
+
+Read /private/tmp/taxkit-claude-native-implementation-2026-10-13/GOAL.md completely, then all six saved design documents beside it. This is Cooper’s authorised implementation handover and contains the settled decisions, scope, sources, important limits and completion criteria. Integrate the saved design carefully because it is uncommitted in the original checkout; preserve all unrelated work and do not implement in the original /Users/cooper/Projects/taxkit checkout.
+
+Follow the latest published Commonplace development-workflows plugins and applicable local profiles, especially strict-effect-ts, repo-structure, package-structure, alchemy-iac and docs-maintainer. Inspect the actual cloned Effect and Alchemy sources, installed APIs and current Common Practice. Remove unnecessary wrappers, approval/receipt ceremony, and ALL Alchemy patches while preserving tax correctness, public machine clients and privacy. Prioritise Cloudflare, with Bun as a supported secondary host.
+
+Run meaningful checks and native Alchemy/Doppler deployments locally from this Mac/worktree, not GitHub Actions. Cooper explicitly authorises the necessary commits, PRs/pushes, merging this goal’s checked changes into TaxKit main, and publishing and checking the Production Website/API pair. This supersedes the earlier review-only scope and duplicate receipt/approval requirements for these same operations. Do not ask again for the already-approved merge or deployments.
+
+Create/activate this as a persistent goal if the goal facility is available and work through completion. Do not stop at a plan. Read the full saved goal before coding; it includes the practical local checks, known upstream limits, rollback and delivery criteria. Report concrete blockers clearly. Your first response should confirm the actual worktree path and that the full handover has been read.
+
+---
+
+<task-notification>
+<task-id>abd8a1197c10d5e20</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/abd8a1197c10d5e20.output</output-file>
+<status>completed</status>
+<summary>Agent "Map infra/Alchemy graph" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I mapped the Alchemy graph in the worktree without changing anything. One thing to know up front: the declarations form a deliberate cycle. The API reads the Website's URL for CORS, and the Website reads the API's URL and binding. The repo patches Alchemy's planner so this cycle can be planned (§3).
+
+## 1. Entrypoints, stacks, stages, state
+
+| File | Declares |
+|---|---|
+| `alchemy.run.ts:3` | `new RetiredDocsStack({...})`. This is a Schema TaggedClass record from `packages/infrastructure/src/retired-stack.schemas.ts:5`, not a Stack. Alchemy rejects it before it builds providers or state. The old `TaxKitDocsCloudflare/DocsWebsite` is retired. |
+| `alchemy.apps.run.ts:8-15` | `Alchemy.Stack("TaxKitAppsCloudflare", { providers: Cloudflare.providers(), secrets: nativeAppsSecrets, state: Cloudflare.state() }, declareNativeAppsStack)`. This is the cloud stack. |
+| `alchemy.apps.local.run.ts:11-50` | `Stack("TaxKitAppsLocal", { providers: Cloudflare.providers(), state: Alchemy.localState() }, ...)`. It has no secrets. It fails unless `context.dev &amp;&amp; ALCHEMY_DEV &amp;&amp; ProviderMode === "local"` and the stage is `dev_native_apps` or `dev_native_apps_proof` (:22-36). It provides `NativeAppsHostMode = "local-emulator"` and falls back to the config `CALCULATOR_RATE_NAMESPACE: "10075"` (:39-46). |
+| `alchemy.posthog.run.ts:11-19` | `Stack("TaxKitPostHog", { providers: PostHogProjectProviderLive, secrets: nativePostHogSecrets, state: Cloudflare.state() }, declarePostHogProjects)` |
+| `tsconfig.alchemy.json` | Extends the base config with `noEmit` and `types: ["bun"]`. It includes the 4 roots plus `packages/infrastructure/src/**/*.ts`. Used by `check:docs-deployment:types`. |
+
+**`packages/infrastructure/src`** (the package exports are in `package.json:7-37`; all point at `.ts` source):
+- **`stage.ts`:** Preview stages match `^pr-[1-9]\d*$`. `DocsDeploymentStage` is `"prod"` or a preview stage. `DocsLocalDevelopmentStage` matches `^dev_[a-z0-9]+...`.
+- **`cloudflare/website.ts`:**
+  - `DocsCloudflareStackStage` is the union of the deployment and local stages; `decodeDocsCloudflareStackStage` (:35) decodes it.
+  - The remaining constants (`docsCloudflareStackName`, memo, observability) belong to the retired docs stack.
+- **`apps-secrets.boundary.ts`:**
+  - `nativeAppsStage` is that same decoder (:16).
+  - `nativeAppsDopplerSelection` (:21-41) maps the stage to a Doppler config in project `taxkit`: `prod` → `prd`, `pr-N` → `stg_preview`, and `dev_*` → `dev`.
+  - `nativeAppsSecrets` (:43-74) is made of three parts:
+    - `Doppler.Secrets(selection).layer`.
+    - `ConfigProvider.layerAdd(..., {asPrimary:true})`, which sets `CALCULATOR_RATE_NAMESPACE`: `"10078"` for prod, `` `10078${N}` `` for `pr-N`, and nothing for `dev_*`.
+    - `Secrets.ProcessEnv({ disabled: true })`.
+- **`apps-stack.ts`:** The app graph, detailed in §2.
+- **PostHog files:**
+  - **`posthog/stack.ts`:**
+    - `declarePostHogProjects` fails unless the stage is `prod` (:19). It reads `POSTHOG_ORGANISATION_ID` and declares the `PostHogProject("TaxKitProject", …).pipe(retain())`.
+    - `nativePostHogSecrets` uses `Doppler.Secrets({config:"prd",project:"taxkit"})` for prod only, plus ProcessEnv disabled.
+  - **`posthog/projects.provider.ts`:** A custom `Resource&lt;"TaxKit.PostHog.Project"&gt;` with a provider (`Provider.effect`) whose delete always fails.
+  - **`posthog/projects.live.layer.ts`:** Defers fallible acquisition. Its comment says "Alchemy beta.80 requires provider registration to have no error channel".
+  - **`posthog/management.adapter.layer.ts:93`:** Reads `POSTHOG_MANAGEMENT_KEY`.
+
+**How stage and state identity are chosen:** The stage comes from the CLI `--stage`. For cloud stacks the state store is `Cloudflare.state()`, selected by `--profile`. For the local stack it is `localState()` under `ALCHEMY_HOME=.alchemy/native-apps-auth` (root `dev` script). Tests show the path `.alchemy/state/TaxKitAppsLocal/&lt;stage&gt;/TaxKitApi.json` (`apps/web/test/native-local-development.boundary.test.ts:315-324`).
+
+## 2. API Worker and Website declarations
+
+- **`TaxKitApiWorker`:** Declared in `apps/api/src/worker.ts:87-95` as ``Worker&lt;…, {fetch: HttpEffect; calculatorRequest}&gt;()("TaxKitApi")``. The worker exposes an RPC method, `calculatorRequest`.
+- **Standalone API default export** (`worker.ts:101-113`): sets `env: { API_PUBLIC_ORIGIN: Worker.URL }`, `main: import.meta.url` and `workersDev: true`. Only `apps/web/scripts/native-api-source.boundary.ts` uses it, for in-memory source discovery.
+- **Rate-limit binding:** `RateLimit("CALCULATOR_RATE_LIMIT", { namespaceId: CALCULATOR_RATE_NAMESPACE, simple:{limit:60,period:60} })` is declared in `apps/api/src/worker-admission.layer.ts:24`. It is provided through `ApiWorkerNativeInit` (`worker.ts:79-85`, `Layer.provide(RateLimitBinding)`).
+
+**In `packages/infrastructure/src/apps-stack.ts`:**
+- **`TaxKitWebsite`** is `Website.Vite&lt;TaxKitWebsite&gt;()("TaxKitWebsite", …)` (:31-76). It sets:
+  - `const api = yield* TaxKitApiWorker` (:34). This is how the Website gets the API binding and URL.
+  - `env`: `API_PUBLIC_ORIGIN: api.url.pipe(Output.map(→ null if absent))`, `CALCULATOR_HOST_MODE`, `TAXKIT_API: api` (a service binding), and `WEBSITE_PUBLIC_ORIGIN: Worker.URL` (:53-58).
+  - On prod only: `domain: { name: "taxkit.dev", redirects: ["www.taxkit.dev"], zoneId }` (:39-48).
+  - `rootDir: "apps/web"`, `workersDev: true`, compatibility `2026-10-04` with `nodejs_compat`, and observability fully disabled.
+  - It sets no `assets`, `runWorkerFirst`, cache settings or `memo`. Alchemy's `Website/Vite.ts` defaults apply.
+- **`NativeApiHostLive = TaxKitApiWorker.make(...)`** (:78-107). This is the reverse dependency:
+  - It does `const website = yield* TaxKitWebsite` (:80).
+  - `env`: `API_PUBLIC_ORIGIN: Worker.URL` and `WEBSITE_PUBLIC_ORIGIN: website.url.pipe(Output.map(...))` (:92-98).
+  - On prod only: `domain: { name: "api.taxkit.dev", zoneId }` (:85).
+  - `main: import.meta.resolve("api/worker")` and `observability: ApiWorkerObservability`.
+- **`declareNativeAppsStack`** (:109-143). On prod it declares:
+  - `Zone("TaxKitProductionZone", {name:"taxkit.dev"}).pipe(adopt(true), retain())`.
+  - `ZoneDnsSettings("TaxKitProductionDnsSettings", …).pipe(retain())`.
+
+  It then yields both workers with `NativeApiHostLive` and the zone provided, and returns `{ apiUrl, websiteUrl }`.
+- **The API consumes the Website URL for CORS:**
+  - `apps/api/src/worker.config.ts:5-13` reads `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN`.
+  - `worker.application.ts:189-202` applies `HttpMiddleware.cors({ allowedOrigins: (o) =&gt; o === config.websiteOrigin.origin, … })`.
+- **The Website consumes the binding:**
+  - `apps/web/src/lib/runtime.server.ts:14` passes `WebsiteServerLive(env.TAXKIT_API)`.
+  - `live.server.layer.ts:15,49-52` uses `fromCloudflareFetcher` / `toRpcAsync&lt;typeof TaxKitApiWorker&gt;` from `alchemy/Cloudflare/Bridge`.
+  - The origins are read in `config.server.ts:34,42`.
+- **Local build without Alchemy:**
+  - `apps/web/vite.config.ts:16-25,51-53` adds the `cloudflare()` plugin only when `ALCHEMY_CLOUDFLARE_VITE_INJECTED !== "1"`.
+  - `apps/web/wrangler.jsonc` is a local/standalone candidate. It has the service `TAXKIT_API` → `taxkit-api-local-candidate` and hard-coded vars `API_PUBLIC_ORIGIN = http://127.0.0.1:4101` and `WEBSITE_PUBLIC_ORIGIN = http://127.0.0.1:4100`.
+
+## 3. Patches and wrappers
+
+**`patches/alchemy@2.0.0-beta.80.patch`** is applied through `patchedDependencies` in the root `package.json`. It has two logical changes, each applied to the `.ts` source, the compiled `.js` and the `.js.map`:
+1. **`src/Cloudflare/Workers/WorkerProvider.ts` @1707 and `lib/…/WorkerProvider.js` @1191.**
+   - When reading the `http_request_dynamic_redirect` ruleset entrypoint, it changes `Effect.catch(() =&gt; succeed(undefined))` to `Effect.catchTag("RulesetNotFound", …)`.
+   - Effect: only a ruleset that is confirmed missing is treated as empty. Other read failures now fail instead of leading to a PUT that would overwrite shared or foreign redirect rules.
+2. **`src/Plan.ts` @839 and `lib/Plan.js` @411.**
+   - Inside the cached "stable refs" resolution, it moves `materializeStableRefs(resolveInput(resource.Props))` after the persisted-row check.
+   - It adds `combinedCycleMembers.has(resource.FQN)` to the early-return condition, so the planner returns `resourceExpr` (deferred) for cycle members.
+   - Effect: this fixes a planner deadlock on the API ↔ Website binding cycle (README:69-75).
+
+**Other places that use or wrap Alchemy:**
+- **No monkeypatch, copied planner code or postinstall.** Root `prepare` is only `effect-tsgo patch`.
+- **`apps/web/scripts/native-api-source.boundary.ts`:** Builds an in-memory `Stack.make({ name: "TaxKitLocalSourceDiscovery", state: inMemoryState() })`. It uses a Worker provider that refuses every operation, plus blocked Profile, Credentials and HttpClient stores, at stage `dev_native_pair`.
+- **`apps/web/scripts/native-pair-build.runtime.ts`:** Uses `resolveSource` / `makeSourceContext` / `scopedArtifacts` to build into `.alchemy/native-pair`. It temporarily rewrites `apps/api/src/worker.ts` to inject fixtures and restores it on release.
+- **`tools/docs-deployment/inventory.runtime.ts:65-83`:** A read-only inventory. It calls `makeHttpStateStore` directly instead of `Cloudflare.state()`, and uses `LiveWorkerProvider`.
+- **`tools/docs-deployment/workflow-plan-projection.ts`:** Parses Alchemy beta.80's plain-text plan output. Version three handles the native-apps graph.
+
+**`patches/@effect%2Fatom-react@4.0.0.patch`:** Changes only `package.json` `peerDependencies.scheduler` from `&gt;=0.25.0 &lt;0.28.0` to `&gt;=0.25.0 &lt;0.28.0 || 0.28.0`.
+
+## 4. How deployments run
+
+- **Local dev (root `dev` script):**
+  - It runs `turbo build --filter=api`, then `CI=1 ALCHEMY_HOME=.alchemy/native-apps-auth ALCHEMY_TELEMETRY_DISABLED=1 BUN_OPTIONS="--conditions=source --no-env-file" bun run node_modules/alchemy/bin/cli.js dev --config alchemy.apps.local.run.ts --env-file tools/apps-local/no-local-env --stage dev_native_apps`.
+  - `tools/apps-local/` contains only `no-local-env`, an empty file whose comments explain that it stops Alchemy loading a local `.env`.
+- **No script deploys to the cloud.** `docs:dev:cloudflare` and `docs:dev:cloudflare:internal` both run `tools/docs-deployment/retirement.runtime.ts`, which always fails.
+- **Cloud deploys are manual,** following `docs/runbooks/docs-deployment.md:200-213`:
+  ```
+  bun --no-env-file --conditions=source run node_modules/alchemy/bin/cli.js plan|deploy --config alchemy.apps.run.ts --stage &lt;stage&gt; --profile &lt;verified-state-profile&gt;
+  ```
+  The runbook forbids `--yes` and `--env-file`. The plan is qualified via `workflow-plan-projection.runtime.ts` with `REDACTED`, which writes to `tmp/native-apps-plans/&lt;stage&gt;/`.
+- **`tools/docs-deployment`** is governance and proof tooling. It does not deploy anything. It covers:
+  - Receipt schemas: v1/v2 historical receipts and the v3 `NativeAppsPlanProjection`.
+  - Workflow input and run checks: `workflow-input-check.runtime.ts` compares the receipt's candidate/workflow commit, run ID, path, operation and PR number against env vars.
+  - Proof and teardown-proof checks.
+  - The artifact upload allowlist and secret scan.
+  - The read-only provider/state inventory.
+  - Doppler custody: `doppler-custody.boundary.ts` accepts only a mode-0600 `secret-…` keyring reference.
+  - The retired `local-doppler.ts` adapter.
+  - Retirement refusal, strict-boundary policy, an automation register and fixtures for beta.64 and beta.80.
+  - These checks run locally through `bun run verification`.
+- **`.github/workflows/`:**
+  - **`quality.yml`:** Runs on PR and push. Installs, installs Playwright, runs `check:quality-workflow`, fetches Doppler `taxkit/ci` (Turbo creds), then runs `release:check -- --ci`.
+  - **`docs-deployment-workflow-receipts.yml`:** Triggered by `workflow_run` of the three old Docs workflows. Reconciles and validates the input/run receipt and uploads a single allowlisted artifact. Uses Doppler `ci`.
+  - **`docs-preview.yml`, `docs-production.yml`, `docs-preview-teardown.yml`, `docs-production-hosted-verify.yml`:** Retired, 18 lines each. `workflow_dispatch` stubs that print a retirement message and `exit 1`.
+
+## 5. Doppler
+
+- **Project and configs:** The project is `taxkit`. Configs are `prd` (prod), `stg_preview` (`pr-N`), `dev` (`dev_*`) and `ci` (GitHub Actions, Turbo only).
+- **App and PostHog stacks:** Secrets load through native `alchemy/Doppler` `Doppler.Secrets({project, config}).layer`. Its auth provider reads `DOPPLER_TOKEN` or the Alchemy profile login. Ambient env is blocked by `Secrets.ProcessEnv({disabled:true})`.
+- **Cloudflare credentials:** Per the runbook (:191-197), the operator resolves the repo-scoped Doppler login and supplies the existing credential inputs separately. The stack owns application secret names and their precedence.
+- **CI:** Uses `dopplerhq/secrets-fetch-action` with `DOPPLER_CI_TOKEN` and asserts `project=taxkit`, `config=ci`.
+- **Retired CLI injection:** `tools/docs-deployment/local-doppler.ts` built `doppler run --project taxkit --config dev --no-fallback --only-secrets CLOUDFLARE_ACCOUNT_ID,CLOUDFLARE_API_TOKEN -- bun run --no-env-file …` and stripped `DOPPLER_*` and CF variables. No current script calls it.
+- **The local apps stack uses no Doppler.**
+- **`.env` handling:**
+  - Bun runs with `--no-env-file` everywhere.
+  - Alchemy dev uses `--env-file tools/apps-local/no-local-env`.
+  - `tools/docs-deployment/no-local-env` is a second empty dotenv file.
+  - `.gitignore` excludes `.env` and `.env.*` (except `.env.example`) and `.alchemy`.
+  - The cloud runbook forbids `--env-file`.</result>
+<usage><subagent_tokens>124633</subagent_tokens><tool_uses>29</tool_uses><duration_ms>135921</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>acab3e98813d2ceb8</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/acab3e98813d2ceb8.output</output-file>
+<status>completed</status>
+<summary>Agent "Map Website data flow" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've mapped the Website's data loading and API calls below. Several things the brief asks about are absent from `apps/web`: `createIsomorphicFn`, `createLoaderRegistry`, `AtomHttpApi`, `AtomRpc`, `defaultStaleTime`/`staleTime`, `runtime.client`, a browser `ManagedRuntime`, and `build/cloudflare.ts`. `RegistryContext` appears only in tests, and there is no browser-side analytics code (no posthog-js). Paths below are relative to `/Users/cooper/Projects/taxkit/.claude/worktrees/taxkit-native-effect-alchemy-f44f82/apps/web/`.
+
+## 1. Router and runtime setup
+
+- **`src/router.tsx:13-25`**: `getRouter` builds the TanStack router.
+  - Its context is `{ loadDocsPage, loadDocsSearch, loadSettings }`, taken from `#/lib/loaders`.
+  - Settings: `defaultPreload: "intent"`, `scrollRestoration: true`, and custom `parseSearch`/`stringifySearch` from `docs/search-location.boundary.ts:9-33`, which keeps raw URL pairs instead of the JSON parser.
+  - `Register` declares `server: { requestContext: WebsiteServerRenderContext }` (`:26-31`).
+- **`src/lib/route-context.ts:7-11`**: the `RouterContext` interface, typed from the three loader functions.
+- **`src/routes/__root.tsx`**:
+  - The loader (`:161-165`) calls `context.loadSettings({ signal: abortController.signal, submission: serverContext?.submission })`.
+  - `RootComponent` decodes `data.settings` with `WebsiteSettingsTransport` (`:49-52`), `data.submission` with `WebsiteSubmissionTransport` (`:53-61`) and `data.catalogue` with `WebsiteCatalogueTransport` (`:62-73`).
+  - The Atom registry is created at `:86-92`: `&lt;RegistryProvider key={checked.apiOrigin.href} initialValues={[[publicSettingsAtom, Option.some(checked)], [websiteCatalogueAtom, catalogue]]}&gt;`.
+  - The checked submission and catalogue reach children through the React contexts `WebsiteSubmissionContext` and `WebsiteCatalogueContext` (`:29-34`).
+- **Server runtime, `src/lib/runtime.server.ts:12-23`**: one module-level `ManagedRuntime.make(Layer.mergeAll(...))` per Worker module. It combines:
+  - `WebsiteServerLive(env.TAXKIT_API)` with `ConfigProvider.fromUnknown(env)`
+  - `CalculatorHostTelemetryLive("website")`
+  - `WebsiteAnalyticsRelayLive` on `FetchHttpClient.layer`
+  
+  `env` comes from `import { env } from "cloudflare:workers"` (`:3`), the only `cloudflare:workers` import in `src`.
+- **Browser runtime, `src/lib/calculator.atoms.ts`**: there is no `ManagedRuntime`. The comment at `:37-38` says the React registry owns client acquisition.
+  - `publicSettingsAtom` and `websiteCatalogueAtom` are `Atom.make(Option.none()).pipe(Atom.keepAlive)` (`:41-46`).
+  - `calculatorRuntime = Atom.runtime((get) =&gt; ...)` (`:47-67`). If settings are missing it fails with `TaxKitWebConfigError` (runtime `"client"`). Otherwise it builds `TaxKitRpcClientLive(settings.apiOrigin)` on `BrowserCalculatorPolicyLive` and `FetchHttpClient.layer`.
+  - `BrowserCalculatorPolicyLive` (`calculator-policy.browser.layer.ts:14-36`) sets `CollectionPolicyHeader` from `navigator.doNotTrack` on each request: `"1"` means deny, an unknown value or error also means deny.
+- **RPC transport**: both RPC clients POST to `new URL("/rpc", origin)` through `RpcClient.makeProtocolHttp` (`packages/api/rpc/src/live.layer.ts:218-223`; `content.live.layer.ts:156-161`).
+
+## 2. Route loaders and data fetching
+
+**`createServerFn` usage** (all in `src/lib/loaders.ts`, all `GET` with no input validator):
+
+| Name | Line | Handler | Exported URL constant |
+|---|---|---|---|
+| `websiteSettings` | `:13` | `loadWebsiteSettingsServer()` | `WebsiteSettingsFunctionPath = websiteSettings.url` (`:17`) |
+| `websiteDocsPage` | `:18` | `loadWebsiteDocsPageServer()` | `WebsiteDocsPageFunctionPath` (`:21`) |
+| `websiteDocsSearch` | `:37` | `loadWebsiteDocsSearchServer()` | `WebsiteDocsSearchFunctionPath` (`:40`) |
+
+**Client wrappers.** Each is a small `Effect.runPromise(..., { signal })`.
+- `loadWebsiteDocsPage` (`:23-35`) sends `headers: { "x-taxkit-docs-page": path }`.
+- `loadWebsiteDocsSearch` (`:41-65`) URI-encodes the term with `WebsiteDocsSearchHeader` into `x-taxkit-docs-search`. A `DocsSearchInputError` is encoded locally as a failed transport `Result`.
+- `loadWebsiteSettings` (`:69-82`) maps the result to `{ catalogue, settings, submission }`.
+
+These two `x-taxkit-*` headers are the only loader request headers.
+
+**Path allowlist.** It is built from the generated identities, not mirrored IDs. `src/server.ts:134-165`:
+- Any `/_serverFn/*` path other than the three `.url` values gets a 404.
+- A method other than GET gets a 405 with `allow: GET`.
+- Any query string, any `content-type` header, or an invalid `x-taxkit-docs-search` / `x-taxkit-docs-page` header gets a 400.
+- The base is `WebsiteServerFunctionBase = "/_serverFn"` (`src/lib/config.ts:4`), wired in through `vite.config.ts:56`.
+
+**Server handlers** (`src/lib/loaders.server.ts`, marked `server-only`):
+- `loadWebsiteSettingsServer` (`:23-54`): runs `application.settings` and `application.catalogue`, each through `Effect.result`, then encodes with `WebsiteSettingsTransport` / `WebsiteCatalogueTransport`. Unexpected causes go to `HttpServerError.causeResponse` and `ErrorReporter.report`, and an empty web Response is returned.
+- `loadWebsiteDocsPageServer` (`:56-111`):
+  - The path comes from the URL during SSR, or from `x-taxkit-docs-page` only on a `/_serverFn/` call.
+  - It is decoded with `DocsPublicPagePath`, then loads settings, `docsNavigation`, `docsPage` and `preloadDocsPresentation`.
+  - `DocsPageUnavailable` becomes a `notFound()` die, which passes through. Everything else is encoded as `WebsiteDocsPageTransport`.
+- `loadWebsiteDocsSearchServer` (`:113-156`): the term comes from the header or from `WebsiteDocsSearchLocation(url.search)`. It returns `{navigation, results, settings, term}`, encoded as `WebsiteDocsSearchTransport`.
+
+**Envelopes** (`src/lib/schemas.ts`). Each is `Schema.toCodecJson(Schema.Result(success, errorUnion))`:
+- `WebsiteSettingsTransport` (`:48`)
+- `WebsiteCatalogueTransport` (`:51`)
+- `WebsiteDocsPageTransport` (`:62`)
+- `WebsiteDocsSearchTransport` (`:123`)
+- `WebsiteSubmissionTransport` (`:170`)
+
+`WebsiteServerRenderContext.submission` is at `:183`. Routes restore the envelopes through `docs/route-boundary.ts:11-24`, which maps a decode failure to `DocsRouteTransportError`.
+
+**Routes:**
+- **`/`** (`routes/index.tsx`): no loader. Reads `WebsiteSubmissionContext` and renders `TakeHomeCalculator`.
+- **`/calculators/$calculatorId`** (`routes/calculators.$calculatorId.tsx:55-91`): no loader. Finds the calculator in `WebsiteCatalogueContext`, redirects `au.pay.take-home` to `/`, and uses `remountDeps` on `calculatorId`.
+- **`/agents`**: no loader. Reads `useAtomValue(publicSettingsAtom)` (`:9`).
+- **`/search`** (`routes/search.tsx:72-86`): loader `context.loadDocsSearch({ query: readDocsSearchLocation(location.searchStr), ... })`, with `pendingMs: 150` and `shouldReload: true`.
+- **`/$`** (`routes/$.tsx:53-57`): loader `context.loadDocsPage({ path: `/${params._splat}` })`, with `pendingMs: 150` and a `notFoundComponent`.
+
+**`websiteCatalogueAtom` consumers.** It is seeded in `__root.tsx:90` and read only in `browser-tools.atoms.ts:150` (`taxkit_find_calculators`). Route components read the catalogue from `WebsiteCatalogueContext` instead.
+
+## 3. Server-side calls to the API
+
+- **`src/lib/config.server.ts`**:
+  - `PrivateApiBinding` (`:11-21`) is a `Schema.declare` check that the binding has callable `fetch`, `connect` and `calculatorRequest`. It keeps the original Fetcher object rather than copying its methods.
+  - `TaxKitWebServerConfig` (`:22-53`) reads `API_PUBLIC_ORIGIN`, `CALCULATOR_HOST_MODE` (default `"edge"`) and `WEBSITE_PUBLIC_ORIGIN`. Any failure becomes `TaxKitWebConfigError` with runtime `"server"`.
+- **`src/lib/live.server.layer.ts`**, `WebsiteServerLive(binding)`:
+  - **`localKey` (`:38-48`)**: a rate key fixed to `127.0.0.1`. It is used only when the host mode is `local-emulator` and the API origin is http on `127.0.0.1` or `localhost`.
+  - **Calculator transport (`:53-116`)**: with no `CalculatorRequestRateKey`, it calls `fromCloudflareFetcher(binding).fetch`. With a key, it calls `toRpcAsync&lt;typeof TaxKitApiWorker&gt;(binding).calculatorRequest(incoming, NetAddress.formatIp(key))`. The comment at `:60-62` says the native RPC cannot carry an AbortSignal, so cancelling the call does not stop remote work.
+  - **Collection policy (`:97-113`)**: every outgoing request gets `CollectionPolicyHeader`, derived from the incoming request's headers, or `"deny"` when there is no incoming request.
+  - **`calculate` (`:123-144`)**: without an edge key and without `localKey`, it fails with `CalculatorAdmissionUnavailable`.
+  - **Service methods (`:145-156`)**: `catalogue` is `listCalculators(MetadataQuery.make({}))`. The docs methods map to `docs.getDiscovery`, `getMarkdown`, `getNavigation`, `getPage` and `searchPages`.
+  - **Docs RPC transport (`:165-205`)**: plain `settings.binding.fetch(incoming, { signal })` with the body kept materialised. It never uses `calculatorRequest`.
+  - **Config failure (`:211-227`)**: every method fails with `TaxKitWebConfigError`.
+- **`src/lib/service.server.ts:23-61`**: the `WebsiteServerApplication` contract (docsDiscovery, docsNavigation, docsPage, docsMarkdown, searchDocs, catalogue, settings, calculate).
+- **API side**: `calculatorRequest` is defined at `apps/api/src/worker.application.ts:216`, and the `TaxKitApiBinding` type at `apps/api/src/worker.ts:97`.
+- **`src/server.ts:272-275`**: provides `CalculatorRequestRateKey = calculatorEdgeRateKey(headers)` on every request.
+- **`WEBSITE_PUBLIC_ORIGIN` / `websiteOrigin` usage:**
+  - `config.server.ts:40-43`; `analytics/relay/relay.adapter.layer.ts:50`
+  - Docs metadata canonical and image URLs (`metadata.egress.ts:17-18,31`)
+  - Markdown link (`routes/$.tsx:31`) and the Markdown `link` header (`markdown.response.server.ts:105`)
+  - WebMCP origin gate (`browser-tools.atoms.ts:177`)
+- **`wrangler.jsonc`**:
+  - `services: [{ binding: "TAXKIT_API", service: "taxkit-api-local-candidate" }]`
+  - vars `API_PUBLIC_ORIGIN: http://127.0.0.1:4101`, `WEBSITE_PUBLIC_ORIGIN: http://127.0.0.1:4100`
+  - `nodejs_compat`, with observability off
+
+## 4. Calculation flow
+
+**Browser (`calculator.atoms.ts:70-231`).** `calculatorPageAtoms = Atom.family(calculatorId =&gt; ...)`:
+- `calculation = calculatorRuntime.fn&lt;CalculatorRunServiceRequest&gt;()(req =&gt; TaxKitRpcClient.calculate(req))` (`:85-90`).
+- `submit` (`:114-148`) builds the request with `takeHomeRequestFromForm` / `annualTaxRequestFromForm`. Invalid input sets `formError` and sends `Atom.Interrupt`. Valid input sets `attempt` and the `calculation`.
+- `edit` (`:106-113`) and `cancel` (`:101-105`) set `attempt` to none and send `Atom.Interrupt` to `calculation`.
+- `view` (`:168-227`, keepAlive) derives `{busy, form, message, report, stale}`, falling back to `savedReport` / `savedMessage`. Errors are mapped through `calculationFailureMessage` (`calculation-failure.ts:9-29`), which shows safe tagged messages and a generic fallback.
+- Legacy home aliases are at `:235-251`.
+
+**Containers.** `take-home.container.tsx` and `calculator-page.container.tsx`:
+- Seed the server submission with `useAtomInitialValues` (`take-home:44-69`, `calculator-page:47-59`).
+- On unmount, interrupt the calculation (`take-home:80-83`, `calculator-page:68-72`) and the browser tools (`:71-74` / `:61-64`).
+- The views render `&lt;form action="/" method="post"&gt;` (`take-home.view.tsx:28-34`) or `action={`/calculators/${calculatorId}`}` (`calculator-page.view.tsx:43-49`). With JavaScript, `onSubmit` calls `preventDefault()` and then `onCalculate()`.
+- The button shows "Calculating…" and is disabled while busy. Messages render with `role="alert"`. The result views use `aria-live="polite"` and show a stale notice (`take-home-result.view.tsx:20-22`, `calculator-page-result.view.tsx:36-38`).
+
+**No-JavaScript POST (`src/server.ts:124-133, 167-261`).**
+1. Only POSTs to `/`, `/calculators/au.income-tax.annual` and `/calculators/au.pay.withholdings` are handled. Other POSTs get a 404 (`markdown.response.server.ts:28-30`).
+2. The handler is wrapped in `withCalculatorRequestBodyLimit(..., CalculatorRequestBodyPolicy.make({ responseFormat: "html" }))`.
+3. It reads `formData()` and decodes `AnnualTaxForm` or `TakeHomeForm`; failures are `WebsiteInputError` → 400.
+4. It calls `application.calculate` under `Effect.result` and encodes a `WebsiteSubmission`.
+5. It re-renders as a synthetic GET with `content-length` and `content-type` removed, passing `{ context: { submission } }`. The root loader then forwards `serverContext.submission`.
+
+**Body limit** (`packages/api/http/src/request-boundary.ts`):
+- `CalculatorRequestBodyLimit = ByteSize.kibibytes(64)` (`:33`) and `CalculatorRequestBodyDeadline = Duration.seconds(5)` (`:34`).
+- The stream is counted chunk by chunk with a timeout, plus a monotonic-clock re-check for late synchronous reads (`:50-83`).
+- Failures return 413 (size) or 408 (deadline) as a fixed HTML page (`:84-102`).
+
+**Cancellation:**
+- The request signal is passed to `appRuntime.runPromise` (`server.ts:283`) and to the server-function runners.
+- Browser: `Atom.Interrupt` on edit, cancel or unmount.
+- The binding RPC path cannot carry an abort signal (`live.server.layer.ts:60-62`).
+
+## 5. Docs, Markdown and discovery
+
+- **`routes/$.tsx`**:
+  - `head` (`:41-52`) uses `docsMetadata`.
+  - It renders `MdxDocument` plus a "Read this page as Markdown" link built from `websiteOrigin`.
+  - `MdxDocument` (`docs/mdx.boundary.tsx`) uses `docsCollection.createClientLoader`. `preloadDocsPresentation` (`:46-58`) checks that the compiled `_markdown` and frontmatter match the API page.
+- **`docs/metadata.egress.ts:13-78`**: builds the canonical link, the `alternate text/markdown` link, og/twitter meta, and JSON-LD `TechArticle` with `&lt;`, U+2028 and U+2029 escaped.
+- **`docs/markdown.response.server.ts`**, `withDocsRepresentation(html)` wraps every non-calculator-POST HTML render (`server.ts:176`):
+  - A `.md` path, or an `Accept` header negotiated with `WebsiteDocsAccept` (`schemas.ts:197-328`), selects Markdown.
+  - Negotiation applies only to valid `DocsPublicPagePath` values, excluding `/search` and `/agents`.
+- **Discovery** (`server.ts:88-123`):
+  - Paths come from `DocsDiscoveryPath` = `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/llms-full.txt` (`packages/content/src/schemas.ts:22-27`).
+  - Only GET/HEAD are allowed (otherwise 405); a query string gets 400. Content comes from `application.docsDiscovery`.
+
+**Cache-Control and Vary headers set in `apps/web/src`:**
+
+| Location | Cache-Control | Vary |
+|---|---|---|
+| `server.ts:68` (relay failure) | `no-store` | none |
+| `server.ts:103` (discovery OK) | `public, max-age=300` (also `x-content-type-options: nosniff`) | none |
+| `server.ts:117` (discovery 503) | `no-store` | none |
+| `markdown.response.server.ts:52` (400/406) | `no-store` | `Accept` |
+| `markdown.response.server.ts:72-88` (HTML) | not set | `Accept` appended to any existing value unless `accept` or `*` is already present |
+| `markdown.response.server.ts:94` (400) | `no-store` | `Accept` |
+| `markdown.response.server.ts:103-106` (Markdown OK) | `public, max-age=300` (plus `link` canonical and `nosniff`) | `Accept` |
+| `markdown.response.server.ts:119` (404) | `no-store` | `Accept` |
+| `markdown.response.server.ts:127` (503) | `no-store` | `Accept` |
+| `relay.adapter.layer.ts:23-26` (all relay responses) | `no-store` (plus `nosniff`) | none |
+| `relay.adapter.layer.ts:179` (outgoing to PostHog) | `no-store` | none |
+
+## 6. WebMCP, browser tools and analytics
+
+- **`browser-tools.toolkit.ts:16-62`**: five tools: `taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`, `taxkit_calculate_visible_form`, `taxkit_read_result`.
+- **`browser-tools.atoms.ts:20-185`**: `browserCalculatorToolsAtom = Atom.family(id =&gt; calculatorRuntime.fn&lt;"register"&gt;()(...))`.
+  - Calculate uses the page's `submit` and waits on `AtomRegistry.getResult`, raced against an attempt change, with a 12 s timeout and cleanup through `page.cancel`.
+  - Registration is held open with `Effect.never` until React interrupts it.
+- **`browser-tools.boundary.ts`**:
+  - `nativeBrowserContext` (`:35-51`) registers only if a `document` exists, `location.origin` equals `websiteOrigin.origin`, and `document.modelContext.registerTool` exists.
+  - `registerWebsiteBrowserTools` (`:56-199`) uses `FiberSet.makeRuntimePromise`, an `AbortController` per tool, and a 2 s registration timeout. Failures are logged as a warning.
+- **Analytics.** There is no client SDK in `src`. The server relay works as follows:
+  - Requests to `/ingest/*` go to `server.ts:61-87`, then `WebsiteAnalyticsRelay`.
+  - `relay.adapter.layer.ts` accepts POST only, at the exact path `/ingest/e/`.
+  - The `Origin` header and the request URL origin must both equal `WEBSITE_PUBLIC_ORIGIN` (`:87-116`), otherwise 403.
+  - The media type must be JSON or text/plain, and the query may contain only `retry_count` (`schemas.ts`).
+  - A denied collection policy returns 204. Request and response bodies are capped at 65,536 bytes (`schemas.ts:4`).
+  - It forwards to `https://us.i.posthog.com/e/` (`:175`) with `redirect: "manual"` and `credentials: "omit"`, under a 5 s deadline (`:272-283`).
+  - Failure status codes are mapped at `server.ts:69-82`.
+
+## 7. Tests and build
+
+**Scripts in `package.json`:**
+- `test`: `bun --bun vitest run`, using `vitest.config.ts` (includes `src/**/*.test.ts`, excludes browser tests).
+- `test:browser`: `vitest run --config vitest.browser.config.ts`, with Playwright chromium headless, include `src/**/*.browser.test.tsx` and `optimizeDeps.force`.
+- `test:native-pair`: `node node_modules/vitest/vitest.mjs run --config vitest.native.config.ts`, with `fileParallelism: false` and a 30 s timeout.
+- `build:native-pair`: `cd ../.. &amp;&amp; turbo run build --filter=api &amp;&amp; bun --conditions=source run apps/web/scripts/native-pair-build.runtime.ts`. That script builds Alchemy fixtures into `.alchemy/native-pair` (`:11-16`) using `scripts/native-api-source.boundary.ts`.
+- `check:worker-types`: `wrangler types src/worker-runtime.generated.d.ts --include-env true --include-runtime true --strict-vars false --config wrangler.jsonc --check`. `generate:worker-types` is the same command without `--check`.
+- Others: `build` (`vite build`), `check-types` (`tsc --noEmit`), `dev` (`portless run --name taxkit vite dev`).
+
+**Test files:**
+- Unit:
+  - `src/lib/config.boundary.test.ts`
+  - `src/lib/form.boundary.test.ts`
+  - `src/lib/browser-tools.boundary.test.ts`
+  - `src/lib/docs/markdown.boundary.test.ts`
+  - `src/lib/docs/social.boundary.test.ts`
+  - `src/lib/analytics/relay/relay.boundary.test.ts`
+- Browser (these use `RegistryContext.Provider`):
+  - `src/lib/atom-lifecycle.browser.test.tsx`
+  - `src/lib/calculator.boundary.browser.test.tsx`
+  - `src/lib/health-loader.boundary.browser.test.tsx`, which includes a `preloadRoute` abort test at `:248-301`
+- Native pair: `test/native-{pair, analytics, relay, mcp, browser-tools, rate, rate-provider, rpc-failures, cancellation, settings-failure, local-development}.boundary.test.ts`, plus the fixtures `test/native-mcp.fixture.ts`, `test/native-rate.fixture.ts` and `test/fixtures/posthog-1.438.2-relay.json`.
+  - They run Miniflare against `apps/web/dist/server`, `dist/client` and `.alchemy/native-pair/bundles/TaxKitApi` (`native-pair.boundary.test.ts:46,149-151,265`).
+  - Server-function IDs are found by regex on `websiteSettings_createServerFn_handler` and the docs equivalents (`:997-1003`, `:1962`, `:2535`).
+
+**`vite.config.ts`:**
+- `envPrefix: []`.
+- A `configResolved` plugin runs `generateDocsImages` (`scripts/docs-images.build.ts`).
+- `fumadocs-mdx` uses `packages/docs-content/source.config.ts`.
+- `cloudflare({ viteEnvironment: { name: "ssr" } })` is added only when `ALCHEMY_CLOUDFLARE_VITE_INJECTED !== "1"` (`:16-25, 51-53`).
+- `tanstackStart({ server: { entry: "server" }, serverFns: { base: "/_serverFn" } })`, then `viteReact()`.
+- Resolve conditions are `["source"]`; SSR uses `noExternal: [/^@taxkit\//]` with conditions `["source","node"]`.
+- The Worker entry is `src/server.ts` (`wrangler.jsonc` `main`).</result>
+<usage><subagent_tokens>143226</subagent_tokens><tool_uses>25</tool_uses><duration_ms>138900</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a50968460f7f4192e</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/a50968460f7f4192e.output</output-file>
+<status>completed</status>
+<summary>Agent "Map API hosts and packages" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I mapped the API side end to end. Two items you asked about do not exist in this worktree: there is no `ALCHEMY_PHASE` check, and the API sets no `Cache-Control` headers. Paths below are relative to the worktree root.
+
+## 1. apps/api (Cloudflare Worker)
+
+**Entry and how it is built**
+- **`apps/api/src/worker.ts`**
+  - :87-95 declares `class TaxKitApiWorker extends Worker&lt;…, { fetch: HttpEffect; calculatorRequest: … }&gt;()("TaxKitApi")`.
+  - :101-113 is the default export: `TaxKitApiWorker.make({ compatibility 2026-10-04 + nodejs_compat, env: { API_PUBLIC_ORIGIN: Worker.URL }, observability: ApiWorkerObservability (all off, :25-35), workersDev: true }, ApiWorkerNativeInit)`.
+- **Service layer order (:37-51):** `PublicCalculatorServiceLive` → `PublicCalculatorServiceRateLimited` → `PublicCalculatorServiceBounded` (+ `CalculationEngineLive`) → `ApiCalculatorAnalyticsLive`, merged with `ApiContentLive`.
+- **`ApiWorkerNativeInit` (:79-85)** adds `McpSessionHostLive`, `ApiAnalyticsLive` (PostHog via `FetchHttpClient`/`NodeCrypto`) and `ApiCalculatorAdmission` with `RateLimitBinding`. `TaxKitApiBinding` is at :97-99.
+- **`apps/api/src/worker.application.ts`** (`ApiWorkerApplication`, :57):
+  - Settings are read lazily with `Effect.cached(ApiWorkerSettingsConfig)` (:61), so origins resolve on first request, not during planning.
+  - Routes (:111-117) are `TaxKitApiRoutesLayer` (built with `HttpApiBuilder.layer(TaxKitApi)` in `packages/api/http/src/server/live.layer.ts:17`) merged with `TaxKitRpcHttpLayer`. They are given content/discovery and use `HttpRouter.provideRequest(calculator)`. `HttpRouter.toHttpEffect(routes)` is at :118.
+  - `fetch` (:159-211) is wrapped in `safeHttpEffect` from `alchemy/Http`. That function catches causes, returns 499 for interrupt-only and 500 otherwise. A `ConfigError` returns 503 (:207-209).
+  - The public `fetch` (:277-284) gets its rate key from `calculatorEdgeRateKey(headers)`, falling back to `localKey`. `localKey` is 127.0.0.1 only when `CALCULATOR_HOST_MODE=local-emulator` and the API origin is http on localhost (:62-85).
+- **Plan check:** nothing reads `ALCHEMY_PHASE`; grep finds it nowhere. Planning is detected instead in `apps/api/src/worker-admission.layer.ts:28-34`: `const runtime = yield* CurrentRuntimeContext; if (runtime === undefined) → admitCalculation fails CalculatorAdmissionUnavailable`.
+
+**Private `calculatorRequest` capability** (`worker.application.ts:213-276`)
+- It only accepts POST /rpc:
+  - a non-`Request` input returns 503 (:218-224);
+  - `request.method !== "POST" || pathname !== "/rpc"` returns 404 (:225-230).
+- The rate key is decoded from the separate `encodedKey` argument (:231-233). The request then goes through the shared `fetch`.
+- The reply is buffered: a byte-counting `Stream.mapAccumEffect` fails with `CalculatorRpcResponseTooLarge` above `CalculatorRpcResponseLimit` (2 MiB), followed by `Effect.timeoutOption(CalculatorRpcDeadline)` (10s) (:243-260).
+- The `catchCause` site is :270: `Effect.catchCause(() =&gt; Effect.succeed(Option.none&lt;Response&gt;()))`, then `Option.getOrElse(… 503)` (:272-275). This also swallows interrupts.
+- **Possible gap:** the 10s timeout wraps only the body-buffering stream. The `fetch` call at :234 runs before it.
+- Caller: `apps/web/src/lib/live.server.layer.ts:50-69` (`toRpcAsync(...).calculatorRequest(incoming, formatIp(key))`). The binding is checked in `apps/web/src/lib/config.server.ts:11-20`.
+
+**Bounded buffers**
+| Limit | Location |
+|---|---|
+| Request body 64 KiB / 5s, POST only; 413 on size, 408 on deadline, plus a post-read clock check | `packages/api/http/src/request-boundary.ts:33-34, 39-123` (re-exported via `api-rpc/request-boundary` and `apps/api/src/worker-request.boundary.ts:1`); applied at `worker.application.ts:186` |
+| RPC response 2 MiB / 10s | `packages/api/rpc/src/schemas.ts:60-61` |
+| MCP response 2 MiB / 10s | `apps/api/src/mcp.schemas.ts:4-5` |
+| Calculator work 5s budget; concurrency 8 (semaphore `withPermitsIfAvailable`, `CalculatorCapacityExceeded` when full) | `packages/calculators/src/work.layer.ts:9-10, 14-34, 42-56` |
+| RPC ingress: ≤16 envelopes, ≤32 headers, ≤64 KiB | `packages/api/rpc/src/server-serialization.boundary.ts:19-60` |
+
+**`catchCause` sites**
+- `worker.application.ts:270`, described above.
+- `apps/api/src/mcp-response.boundary.ts:42-48`: `timeoutOption(McpResponseDeadline)` wraps the handler and the buffering, then `catchCause((cause) =&gt; Cause.hasInterrupts(cause) ? Effect.interrupt : Effect.succeedNone)`, so failures become 503.
+- Others: `apps/api/scripts/smoke-public-routes.runtime.ts:341` and `packages/api/http/src/client/server.layer.ts:27`.
+
+**ErrorReporter**
+- The API never calls `ErrorReporter.report`.
+- `packages/api/rpc/src/host-telemetry.ts:14-25`: `ErrorReporter.make` logs the fixed message "Calculation host failure" with `Cause.empty`, as JSON event `api.runtime.event`. It is wired through `apps/api/src/worker-telemetry.layer.ts:3` (`CalculatorHostTelemetryLive("api")`) and provided at `worker.application.ts:86, 119, 145, 211, 276`.
+- Explicit `report` calls exist only in `apps/web/src/server.ts:265-268` and `apps/web/src/lib/loaders.server.ts:43-147`.
+
+**CORS** (`worker.application.ts:189-204`)
+- Uses `HttpMiddleware.cors`.
+- `allowedOrigins: (origin) =&gt; origin === config.websiteOrigin.origin`, `allowedMethods: ["GET","POST","OPTIONS"]`, `credentials: false`.
+- Headers: `["content-type", CollectionPolicyHeader]`. For /mcp it adds `mcp-method`, `mcp-name`, `mcp-protocol-version` and `mcp-session-id`.
+- `traceparent` is not allowed. Tracing is disabled instead, which keeps it off requests:
+  - server: `RpcServer.layerHttp({ disableTracing: true, protocol: "http", path: "/rpc" })` (`packages/api/rpc/src/server.ts:10-15`);
+  - clients: `RpcClient.make(..., { disableTracing: true })` plus `TracerDisabledWhen → true` and `RequestInit { credentials: "omit", redirect: "error" }` (`packages/api/rpc/src/live.layer.ts:66-72`; `content.live.layer.ts:60-66`).
+
+**MCP**
+- **Modern:** `TaxKitMcpHttpLayer(websiteOrigin, protocol = McpProtocol.v2026_07_28)` uses `McpServer.layerHttp({ allowedOrigins: [websiteOrigin.origin], path: "/mcp", name: "TaxKit", version: "1" })` (`apps/api/src/mcp.tools.layer.ts:209-224`). It has 6 tools (:24-90), and each handler is wrapped in `withMcpRequestCancellation` (`mcp-cancellation.boundary.ts`, an AbortSignal race).
+  - It is built once with `Effect.cached` in the instance `Scope`, with request-scoped services omitted (`worker.application.ts:126-157`).
+- **Legacy:** chosen when the session host exists and `mcp-protocol-version` is absent or `2025-11-25` (`worker.application.ts:164-176`). It routes to the Durable Object `TaxKitMcpSessions` via `getByName("legacy-mcp-v2025-11-25")`. The trusted key travels in header `x-taxkit-mcp-calculator-key`; any incoming copy is stripped first (`apps/api/src/mcp-session.layer.ts:62, 277-291`).
+- **Early protection in the DO fetch:** path ≠ /mcp → 404; bad Origin → 403 *before* state allocation (:158-165); malformed session id → 404; non-POST → 405. An expired or unknown id cannot create a host (:200-203). Each host allows 32 initialisations, then 429 with `retry-after` (:212-236). Requests are capped at 32 via a semaphore, then 503 (:131, 259-264). Sessions last 10 minutes and expire by alarm (:86-116, 132-148; constants in `mcp.schemas.ts:6-8`).
+
+**Rate limit**
+- `apps/api/src/worker-admission.layer.ts:20-27`: `RateLimit("CALCULATOR_RATE_LIMIT", { namespaceId: CALCULATOR_RATE_NAMESPACE, simple: { limit: 60, period: 60 } })`, keyed by `NetAddress.formatIp(key)`.
+- Applied by `PublicCalculatorServiceRateLimited` (`packages/calculators/src/admission.layer.ts:12-33`); a missing key gives `CalculatorAdmissionUnavailable`.
+- HTTP 429 carries `retry-after: "60"` (`packages/api/http/src/groups/calculators.ts:76-89`).
+
+**Cache-Control:** none is set anywhere in `apps/api/src` or `packages/{api,content,calculators}/src`. The only headers set are the `retry-after` ones above. Cache headers live in the Website:
+- `apps/web/src/server.ts:103` sets `"public, max-age=300"` on discovery documents;
+- `"no-store"` appears at `server.ts:68,117`, `markdown.response.server.ts:52,94,119,127` (which also sets `public, max-age=300` at :103), and `relay.adapter.layer.ts:24`.
+
+**Discovery documents**
+- The formatter is `ContentDiscoveryLive(settings)` in `packages/content/src/live.layer.ts:81-169`. It builds `/sitemap.xml`, `/robots.txt`, `/llms.txt` (links to `${apiOrigin}/api/v1/docs/markdown?path=…`) and `/llms-full.txt` (canonical links use `websiteOrigin`).
+- The API exposes them only as RPC `GetDocsDiscovery` (`packages/api/rpc/src/content.group.ts:44-49`; handler `content.handlers.ts:18-29`). There is no HTTP route on the API; the Website serves the paths (`apps/web/src/server.ts:88-121`).
+
+**Origins and Outputs**
+- `apps/api/src/worker.config.ts:5-24` reads `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN`, validated by `ApiWorkerSettings` (`apps/api/src/schemas.ts:37-40`).
+- In `packages/infrastructure/src/apps-stack.ts`, the API gets `WEBSITE_PUBLIC_ORIGIN: website.url.pipe(Output.map(...))` (:92-98). The Website gets `API_PUBLIC_ORIGIN: api.url` via `Output.map`, plus `TAXKIT_API: api` (:34-58).
+
+## 2. Bun host
+- It lives in `apps/api/src/index.ts`, which runs `BunRuntime.runMain` on `ApiAppLayer`. `server.ts:20-23` serves `HttpRouter.serve(TaxKitServerLayer)` over `BunHttpServer` (`API_HOST`/`API_PORT`/`PORT`, default 127.0.0.1:4000, `config.ts:19-70`). Scripts are `dev` and `start` (`apps/api/package.json`).
+- It serves only the HTTP API: health, calculators, docs, Scalar at `/api/docs` and `/api/docs/openapi.json`. There is no RPC, MCP, rate limiting or analytics.
+- CORS is `HttpRouter.cors()` with defaults, which means `access-control-allow-origin: *`.
+- Composition is in `packages/api/http/src/server/live.layer.ts:41-50`: `HttpRouter.provideRequest(PublicCalculatorServiceBounded ← Live ← CalculationEngineLive)` plus the body-limit middleware.
+- **No per-request capacity pool.** `provideRequest` runs `Layer.build` once when the middleware is built (effect `HttpRouter.ts:1304-1321`), so there is one semaphore per serve or per built layer. `TaxKitApiInProcessClientLive` likewise builds it once per layer build.
+
+## 3. packages/api/http
+- **`TaxKitApi`** (`src/api.ts:7-15`) contains these groups and endpoints:
+  - **health** (prefix `/api`, `groups/health.ts:9-16`): GET `/api/health`.
+  - **calculatorApi** (prefix `/api/v1`, `groups/calculators.ts:121-232`):
+    - GET `/jurisdictions`, `/tax-years`, `/calculators`
+    - GET `/calculators/:calculatorId`, `/calculators/:calculatorId/schema`, `/calculators/:calculatorId/graph`
+    - POST `/calculators/:calculatorId/calculate`
+    - GET `/facts`, `/rules`
+  - **content** (prefix `/api/v1/docs`, `groups/content.ts:31-73`): GET `/navigation`, `/page`, `/search`, `/markdown` (text/markdown).
+  - Extra routes: GET `/api/docs` (Scalar) and GET `/api/docs/openapi.json` (`server/live.layer.ts:23-31`).
+- **Helpers:**
+  - `createTaxKitApiClient` and the deprecated `makeTaxKitApiClient`: `src/client/index.ts:12-20`.
+  - `TaxKitHttpApiService`, its alias `getTaxKitHttpApiClient`, and `withTaxKitHttpApiClient`: `src/client/service.ts:5-18`.
+  - `createTaxKitApiClientLayer` and the deprecated `makeTaxKitApiClientLayer`: `src/client/live.layer.ts:12-19`.
+  - `TaxKitApiInProcessClientLive`: `src/client/server.layer.ts:17-42`.
+- **Users:**
+  - `createTaxKitApiClient`: `packages/docs-examples/src/browser-http.ts:1,10`, `apps/api/test/rate-admission.boundary.test.ts:2,203`, and the guide `build-a-browser-app-with-the-http-api.mdx:29,38`.
+  - `createTaxKitApiClientLayer` and `TaxKitHttpApiService`: `packages/docs-examples/src/calculator-help.ts:1-23` and `show-calculator-help-to-users.mdx:28-50`.
+  - `TaxKitApiInProcessClientLive`: `packages/docs-examples/test/public-guides.boundary.test.ts` and api-http `__tests__`.
+  - **No users at all** for `withTaxKitHttpApiClient`, `getTaxKitHttpApiClient`, `makeTaxKitApiClient` or `makeTaxKitApiClientLayer`, and nothing in packages/sdk. There is no top-level `examples/` directory.
+
+## 4. packages/api/rpc
+- **Groups** (`src/group.ts:89-101`): `TaxKitRpcGroup` has Calculate, GetCalculator, GetCalculatorGraph, GetCalculatorSchema, ListCalculators, ListFacts, ListJurisdictions, ListRules and ListTaxYears. It merges with `DocsRpcGroup` (GetDocsNavigation, GetDocsPage, SearchDocsPages, GetDocsMarkdown, GetDocsDiscovery) to form `TaxKitPublicRpcGroup`. `CalculatorRpcVersion = "4"` (`schemas.ts:29`).
+- **`src/rate-identity.boundary.ts:14-21`:** if a `cf-worker` header is present the result is `Option.none()`, because same-zone subrequests can alter IPs. Otherwise it decodes `cf-connecting-ip` as `CalculatorClientRateKey`. `CalculatorHostMode = "edge" | "local-emulator"` (:8).
+- **Bounded client adapter** (`src/response-budget.boundary.ts:13-53`, `boundedRpcHttpClient`):
+  - applies `HttpClient.withScope`, then `HttpClient.filterStatusOk`;
+  - counts bytes up to 2 MiB and fails with `DecodeError(cause: RpcResponseBodyTooLarge)`;
+  - rebuilds the reply as `new Response(new Uint8Array(bytes), { headers })`, with no status, so it defaults to 200;
+  - is wired in `live.layer.ts:211-224` (URL set to `/rpc` on the origin) and `content.live.layer.ts:158`.
+- **Failure mapping** (`client-response.boundary.ts:18-64`): status 408 → `RequestTimedOut`, 413 → `RequestTooLarge`, 429 → `CalculatorRateLimited`, oversize → `ResponseTooLarge`, anything else → Unavailable or InvalidResponse.
+
+## 5. packages/calculators
+- **Signatures:**
+  - `TakeHomeScenarioLiveFromInput = (input: TakeHomeScenarioInput) =&gt; Layer.mergeAll(GrossPayFact, TaxFreeThresholdClaimedFact)` at `packages/rules/au/pay/src/calculator/take-home-pay.ts:55`.
+  - `AnnualTaxScenarioLiveFromInput = (input: AnnualTaxScenarioInput) =&gt; Layer.succeed(AnnualTaxableIncomeFact)(…)` at `packages/rules/au/income-tax/src/calculator/annual-tax.ts:51`.
+- **Callers:**
+  - `packages/calculators/src/catalog.ts:150, 181` (take-home and withholdings) and `:214` (annual);
+  - the unknown-input wrappers `take-home-pay.boundary.ts:21` and `annual-tax.boundary.ts:20`;
+  - rule tests;
+  - `docs/architecture/calculators.md:50`.
+- **`PublicCalculatorService`** (`packages/calculators/src/service.ts:24-58`, tag `@taxkit/calculators/PublicCalculatorService`) has these methods: calculate, getCalculator, getCalculatorGraph, getCalculatorSchema, listCalculators, listFacts, listJurisdictions, listRules, listTaxYears.
+- Layers: `live.layer.ts:76`, `work.layer.ts` (bounded), `admission.layer.ts` (rate-limited); `CalculatorRequestRateKey` and `CalculatorAdmission` are in `admission.service.ts:10-26`.
+
+## 6. packages/sdk/typescript
+- **Private Promise runtime** (`src/client.runtime.ts`):
+  - `createPlainClient` (:68-175) owns one `ManagedRuntime.make(layer)` per client, with `runPromise(..., { onFiberStart: Fiber.runIn(runtime.scope), uninterruptible: true })` and an idempotent `dispose` through a Deferred (:115-134).
+  - One-shot `calculate` and `calculateSafe` (:178-229) provide `SdkCalculatorServiceLive`, which is unbounded `PublicCalculatorServiceLive` + `CalculationEngineLive` (`src/live.layer.ts:7-9`).
+- **Exports** (`src/index.ts`): `calculate`, `calculateSafe`, `createClient`, `TaxKit`, plus error classes and types. The `package.json` subpaths `.`, `./effect`, `./au`, `./au/effect`, `./schemas` and `./testing` all point to dist only, with no `source` condition.
+- **Validation commands:**
+  - package scripts: `check-packed-artifact` (`scripts/check-packed-artifact.runtime.ts`, which runs `bun pm pack` and checks the tarball with `tar -tzf`), `validate:downstream` (`scripts/validate-downstream-consumer.runtime.ts`, runs `bun install` and `tsc` in a temporary consumer), and `check-boundaries`;
+  - root aliases: `sdk:check-packed-artifact` and `sdk:validate-downstream` (`package.json:119-120`); turbo tasks depend on `build` (`turbo.json:68-75`).
+
+## 7. packages/content
+- **`src/schemas.ts`:**
+  - `PublicHttpOrigin` (:4-12) accepts origin-only URLs that are https, or http on localhost/127.0.0.1.
+  - `DocsWebsiteOrigin` is that schema branded (:13-15).
+  - `DocsDiscoverySettings { apiOrigin: PublicHttpOrigin, websiteOrigin: DocsWebsiteOrigin }` (:17-20).
+  - `DocsDiscoveryPath` covers the 4 paths (:22-27); bodies are capped at 300,000 characters (:31-33); the content type must match the path (:34-45).
+  - There is no `publicOrigin` field anywhere; grep finds only `API_PUBLIC_ORIGIN` and `WEBSITE_PUBLIC_ORIGIN` environment keys.
+- **`src/live.layer.ts:81-88`:** `ContentDiscoveryLive(settings: Effect&lt;DocsDiscoverySettings, DocsSourceError&gt;)` caches the settings Effect and resolves it on first use. The API supplies it at `worker.application.ts:92-110`.
+- `CalculatorRpcOrigin` (`packages/api/rpc/src/schemas.ts:55-57`) is `PublicHttpOrigin` with an RPC brand.</result>
+<usage><subagent_tokens>176035</subagent_tokens><tool_uses>38</tool_uses><duration_ms>178220</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>ac3bb3161a8713ad1</task-id>
+<tool-use-id>toolu_016c5daztinep1cPcHPQQja1</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/ac3bb3161a8713ad1.output</output-file>
+<status>completed</status>
+<summary>Agent "Map ceremony tooling to retire" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The core finding is that most of this tooling only checks itself. There is one real exception: the docs catalogue build. The public docs catalogue is generated only after acceptance records and source hashes pass, and the API and web app both read that catalogue. Everything below is from reading files; I ran no scripts.
+
+## 1. `verification` root script chain (24 steps, run in order)
+
+| # | Script | Runs | Kind |
+|---|---|---|---|
+| 1 | check:oxlint:types | tsc on `tools/oxlint` | Real |
+| 2 | check:repository-paths:types | tsc on `tools/repository-paths` | Real (small) |
+| 3 | check:repository-paths | scans `git ls-files` for absolute home or checkout paths | Real hygiene check |
+| 4 | check:harness-governance | `tools/governance/check.runtime.ts` | Ceremony |
+| 5 | check:quality-workflow:types | tsc | Ceremony |
+| 6 | check:quality-workflow | checks the shape of `quality.yml` against `controls.json` and `automation-register.json` | Ceremony |
+| 7 | check:docs:types | tsc on `tools/documentation` (turbo makes it wait for the docs-content build) | Mixed |
+| 8 | check:harness-foundation-epoch:types | tsc on `tools/evals` | Ceremony |
+| 9 | check:docs | `tools/documentation/check.runtime.ts` | Mixed (see §4) |
+| 10 | check:runbooks | `runbook-check.runtime.ts` (HGI-203/204 hashes) | Ceremony |
+| 11 | check:effect-language-service | effect-tsgo diagnostics plus tsc on a 17-line `compatibility.ts` | Smoke test only; low value but not ceremony |
+| 12 | check:docs-deployment:types | `tsc -p tsconfig.alchemy.json`, which covers `alchemy*.run.ts` and `packages/infrastructure/src/**` | **Real, despite the name.** Mostly duplicates infrastructure's own `check-types`, but the `alchemy*.run.ts` files are only covered here |
+| 13 | check:docs-deployment-tools:types | tsc on `tools/docs-deployment` | Ceremony |
+| 14 | check:docs-deployment | `tools/docs-deployment/check.runtime.ts` (about 30 receipts under `docs/evidence/deployments/**` plus `docs/verification/docs-deployment-journeys.json`) | Ceremony |
+| 15 | check:docs-deployment-automation | `automation.check.runtime.ts` plus `automation-register.json` | Ceremony |
+| 16 | test:docs-deployment | vitest on `tools/docs-deployment` | Ceremony |
+| 17 | lint | oxlint (boundary-directive pass, then full) | Real |
+| 18 | format:check | oxfmt | Real |
+| 19 | test:hgi-206 | vitest on `tools/evals/hgi-206` | Ceremony |
+| 20 | test:quality-workflow | vitest on `tools/quality-workflow` | Ceremony |
+| 21 | knip | turbo makes it wait for the docs-content build | Real |
+| 22 | knip:production | same | Real |
+| 23 | check-types | turbo across workspaces | Real |
+| 24 | sdk:test:browser, web:test:browser, `--filter=web check:worker-types`, web:test:native-pair | | Real |
+
+`release:check -- --ci` is defined in `packages/scripts/src/release-readiness/schemas.ts` (`createReleaseReadinessPlan`). It runs `verification`, `test`, `build`, `docs:validate`, `sdk:check-packed-artifact`, `sdk:validate-downstream`, `api:smoke`, `web:test:native-pair` and `changeset:status`. In CI mode it writes no evidence. Running it without `--ci` reads `docs/evidence/releases/HGI-203-local.json` and builds a release-attempt receipt. Note that `web:test:native-pair` runs twice: once inside `verification` and again in the plan.
+
+The root `test` script runs `test:documentation`, `test:repository-paths`, `test:oxlint`, then `turbo run test`.
+
+## 2. Workflows (`.github/workflows`)
+
+- **`docs-preview.yml`, `docs-production.yml`, `docs-production-hosted-verify.yml`, `docs-preview-teardown.yml`** (18 lines each): manual-only stubs named "… (retired)" that print a recovery pointer and `exit 1`. Nothing consumes them; nothing to keep.
+- **`docs-deployment-workflow-receipts.yml`** (270 lines): fires on completion of workflows named "Docs Preview Deployment", "Docs Production Deployment" and "Docs Preview Teardown". Those names no longer exist (all now end in "(retired)"), so **this workflow can never trigger**. It runs `check:docs-deployment-workflow-input`, `check:docs-deployment-workflow-run` and a Doppler fetch. Nothing to keep.
+- **`quality.yml`** (86 lines, PR plus push): installs, then runs `check:quality-workflow`, a Doppler identity check, and `release:check -- --ci`. **Keep.** Only the `check:quality-workflow` step is ceremony, and `tools/quality-workflow/policy.ts` checks this file's exact step layout, so editing `quality.yml` will break that check until it is retired.
+
+## 3. tools/
+
+**`tools/docs-deployment`** (860K, about 17.8k lines of TS). The retired docs deployment: Doppler custody, inventory, workflow input/run/plan/proof receipts, retirement refusal, plus fixtures.
+- Consumers:
+  - Root `package.json`: about 20 scripts (`check:docs-deployment*`, `check:doppler-custody`, `docs:dev:cloudflare*` (which run `retirement.runtime.ts`), `test:docs-deployment`).
+  - `turbo.json`: 10 `//#check:docs-deployment*` tasks.
+  - The receipts workflow.
+  - `knip.json` entry/project lists.
+  - `oxlint.config.ts`: about 100 path entries and override blocks.
+  - `tools/oxlint/portable-rules.test.ts`: lines about 612–771 and 1313–1327 require exact override entries per file, so that test must be edited.
+  - `README.md` (`check:doppler-custody`).
+  - `packages/infrastructure/README.md` (lines 39 and 237).
+- **App-stack tests read its fixtures.** `packages/infrastructure/src/apps-stack.test.ts` lines 335 and 365 read `tools/docs-deployment/fixtures/alchemy-beta.80/native-apps-preview.txt` and `native-apps-production.txt` as expected native-apps plan snapshots. These two files must move, for example into `packages/infrastructure`. The `alchemy-beta.64/*` fixtures and `fake-doppler*` are used only inside docs-deployment.
+- No production code imports it.
+
+**`tools/governance`** (80K). Checks `docs/verification/repository-harness-profile.json` and `critical-journeys.json`, `docs/documentation-audit/harness-foundation/{audit,accepted}-findings.json`, `docs/product-specs/harness-foundation-improvements*`, and that `package.json#scripts.verification` calls `check:harness-governance` exactly once.
+- Consumers: `verification` step 4, `test:harness-governance`, `check:harness-governance:types`, turbo task, the oxlint runtime allow-list plus `portable-rules.test.ts`.
+- Nothing kept depends on it.
+
+**`tools/evals`** (176K): the `hgi-206/` and `harness-foundation/` checkers plus `hgi-206-*.json` and `harness-foundation-*.json`. They read `docs/documentation-audit/{hgi-206,harness-foundation}/**` receipts, epoch candidates and `HFI-004-candidate-*`.
+- Consumers: `check:hgi-206`, `test:hgi-206` (in `verification`), `check:harness-foundation-epoch`, `check:harness-foundation-epoch:types` (in `verification`), oxlint config plus `portable-rules.test.ts`.
+- Nothing kept depends on it.
+
+**`tools/quality-workflow`** (132K): policy over the shape of `quality.yml`, `controls.json`, `automation-register.json` and its fixtures. It references `packages/scripts/src/release-readiness/*` as a control owner.
+- Consumers: `quality.yml` step, `verification` steps 5, 6 and 20, `knip.json`, oxlint.
+- Nothing kept depends on it.
+
+**`tools/repository-paths`** (32K): rejects machine-specific absolute paths in tracked files. **A real check; worth keeping.**
+
+**`tools/effect-language-service`** (8K): one trivial file used to smoke-test the effect-tsgo plugin (`verification` step 11, `knip.json` entry). Low value but harmless.
+
+**`tools/documentation`**, split by usefulness:
+- **Useful checks:** `policy.ts` and `check.runtime.ts` invariants `maintainer-metadata`, `lifecycle-successor`, `relative-link`, `local-bun-command` (a `bun run X` in docs must exist as a script), `workspace-readme`, `generated-source-owner`.
+- **Ceremony inside the same files:**
+  - The `owner-policy` invariant: requires one acceptance-record binding per published page and verifies `sourceSha256` through `verifyAcceptedSource`.
+  - `DocumentationReceipt` with its nonClaim/postcondition fields.
+  - The report written to `tmp/docs-policy-report.json`.
+- **`owner-policy.json`** (319 lines) is mixed. Path classes (public, maintainer and sdkDocs roots, fumadocs, openApi bindings) are useful. `public.statusDecision.acceptanceRecords[]`, which maps each MDX page and `navigation.json` to `docs/documentation-audit/clean-slate-foundation/public-content-acceptance/2026-10-0{6,7,8}/*.json` (284K), is ceremony.
+- **Pure ceremony:**
+  - `runbook-contract.json` (HGI-204).
+  - `runbook-policy.ts`, which imports types from `@taxkit/scripts/release-readiness`. This is the only code import of `@taxkit/scripts` anywhere.
+  - `runbook-check.runtime.ts`, which hashes the `HGI-203-*` evidence and reads `docs/runbooks/*` and `docs/operations/authority-model.md`.
+- **`catalogue.build.ts`, `catalogue.runtime.ts`, `catalogue.policy.ts`: needed for the real build** (see §4).
+
+## 4. Docs packages
+
+**`packages/docs-content`.**
+- `generate` runs `fumadocs-mdx` and `src/catalogue-index.runtime.ts`. No ceremony.
+- **`build` runs `generate` and then `tools/documentation/catalogue.runtime.ts`**, which:
+  1. reads the acceptance bindings in `owner-policy.json`;
+  2. decodes each `PublicPageAcceptanceRecordV2`;
+  3. compares SHA-256 hashes of each MDX file and `navigation.json` against the record's `sourceSha256`;
+  4. calls `projectPublicCatalogue`, which requires exactly one record per page with `status: "published"` plus navigation, else fails;
+  5. re-checks the hashes, then writes `.source/public-catalogue.json`.
+- The build therefore **depends on acceptance records and source hashes**.
+- `turbo.json` `@taxkit/docs-content#build` lists `tools/documentation/catalogue.*`, `schemas.ts`, `owner-policy.json` and the `public-content-acceptance/**/*.json` files as inputs.
+- **Consumers that must keep working:**
+  - `apps/api/src/content.boundary.ts` imports `@taxkit/docs-content/public-catalogue`.
+  - `apps/web/scripts/docs-images.build.ts` reads it.
+  - `apps/web/test/native-pair.boundary.test.ts` (line 408) reads it.
+  - `knip` and `check:docs:types` wait on this build.
+  - The root `docs:catalogue` script.
+- **Implication:** retiring acceptance records means rewriting catalogue build/policy to filter on frontmatter `status: published` alone. The projection logic (published filter, navigation pruning, parent/child check) is worth keeping.
+- `docs:validate` (`src/validate.runtime.ts`, `src/validation/*`: MDX component policy and checked snippets) is real content validation. Keep it.
+
+**`packages/docs-fumadocs`**: no acceptance, receipt or hash code. Nothing to retire.
+
+**`packages/content/src/schemas.ts` lines 233–261**: `PublicPageAcceptanceRecordV1`/`V2`, `DocsAcceptedSourceDigest` and the `PublicPageAcceptanceRecord` union.
+- Consumers: `tools/documentation/{schemas,catalogue.build,catalogue.policy}.ts` and their tests, and `packages/content/test/schemas.test.ts` (lines 88–96).
+- No app imports them.
+
+## 5. `packages/scripts` (release-readiness, 3.8k lines)
+
+- `release:check` runs `release-readiness.runtime.ts`. `release:present` runs `present.runtime.ts`, which reads and verifies a release-attempt receipt.
+- Consumers:
+  - Root scripts `release:check`, `release:present`, `test:release-readiness`.
+  - `quality.yml` (`release:check -- --ci`). **The ordered check plan is the real CI gate.**
+  - `tools/documentation/runbook-policy.ts` (type import).
+  - `tools/quality-workflow/{policy.ts,controls.json}`.
+  - Both knip configs (`knip.production.json` also ignores exports in `evidence.boundary.ts`).
+  - `oxlint.config.ts` and `portable-rules.test.ts` runtime allow-list.
+  - Changesets, `AGENTS.md`/`CLAUDE.md` (lines 24 and 104).
+  - Root `devDependencies`.
+- **Keep:** the plan of checks plus the CI runner (`program.ts`, `live.layer.ts`, `service.ts`, part of `schemas.ts`).
+- **Ceremony:** `evidence.boundary.ts` (612 lines), `present.runtime.ts`, `output-redaction.ts`, local attempt receipts, the `ReleaseProofPacket` (`taskId: "HGI-203"`) and `docs/evidence/releases/HGI-203-*`.
+
+## 6. Other dependents
+
+- **`alchemy.run.ts`** exports `RetiredDocsStack`, defined in `packages/infrastructure/src/retired-stack.schemas.ts`. The record is a literal pointing at `docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement-manifest.json`. The retired workflow stubs print the same path. It is a string literal, not a file read.
+- **`packages/content/package-structure.render.json`** and **`packages/api/rpc/package-structure.render.json`** cite `docs/documentation-audit/clean-slate-foundation/*` paths. Only audit JSONs reference these files.
+- **`knip.json`** root entries: `tools/effect-language-service/compatibility.ts`, `tools/repository-paths/*`, `tools/quality-workflow/*`, 8 `tools/docs-deployment/*` entries, `tools/documentation/catalogue.runtime.ts`. Root project globs cover `tools/{effect-language-service,repository-paths,quality-workflow,docs-deployment}/**` and `tools/documentation/catalogue*.ts`. The `packages/scripts` workspace entry is release-readiness. **`knip.production.json`**: `packages/scripts` entries plus the `evidence.boundary.ts` ignore.
+
+## 7. docs/ folders holding receipts and evidence
+
+| Path | Size | Files | Contents and consumers |
+|---|---|---|---|
+| `docs/verification` | 60K | 5 | `critical-journeys.json` (32K; governance), `docs-deployment-journeys.json` (8K; docs-deployment check), `repository-harness-profile.json` (8K; governance), `harness-epochs.md`, `effectiveness.md` |
+| `docs/evidence` | 11M | 280 | `deployments/` (11M: dated preview/prod receipts, screenshots, `retired-docs-*`; read by docs-deployment check/policy), `releases/HGI-203-*` (6 files; read by `release:check` local mode and `runbook-check`) |
+| `docs/documentation-audit` | 3.8M | 284 | HGI-200…208 candidate/validation/receipt JSONs at top level, plus subdirectories; breakdown below |
+| `docs/operations` | 40K | 2 | `authority-model.md` (read by runbook-check, linked from `AGENTS.md`), `automation-register.md` |
+| `docs/runbooks` | 44K | 6 | `README.md`, `docs-deployment.md`, `packed-consumer-proof.md`, `recovery.md`, `release-readiness.md`, `versioning.md`; required by `runbook-policy.ts` |
+| `docs/standards/controls.md` | 18.6K, 245 lines | 1 | Referenced only from docs and `tools/evals/hgi-206-*.json` |
+
+`docs/documentation-audit` subdirectories:
+- `clean-slate-foundation/` (3.1M), which includes `public-content-acceptance/` (284K, **used by the catalogue build**) and the retirement manifest.
+- `harness-foundation/` (128K; governance and evals).
+- `strict-apps-iac/` (88K), `ci-cache-efficiency/` (60K), `alchemy-deployment-structure/` (52K), `hgi-206/` (44K; evals), `hgi-207/` (32K), `templates/` (12K), several smaller ones.
+- Top-level `corpus-inventory.json` and `link-report.json`.
+
+## 8. Things that must keep working
+
+1. **Docs catalogue.** Rewrite `tools/documentation/catalogue.build.ts` / `catalogue.policy.ts` to drop records and hashes. Then update `owner-policy.json`, the `turbo.json` docs-content build inputs, the `packages/content` acceptance schemas, `packages/content/test/schemas.test.ts`, and the `catalogue.*` tests.
+2. **Infrastructure plan snapshots.** Move `tools/docs-deployment/fixtures/alchemy-beta.80/*.txt` and update `apps-stack.test.ts`.
+3. **Real type check under a misleading name.** Keep `tsc -p tsconfig.alchemy.json` under a new script name.
+4. **CI gate.** Keep the ordered check plan behind `release:check -- --ci` (or call the commands from `quality.yml` directly), and remove the `check:quality-workflow` step from `quality.yml`.
+5. **Lint config and its test.** Prune `oxlint.config.ts` and `tools/oxlint/portable-rules.test.ts` together, and remove the `tools/governance` and `tools/evals` entries in both.
+6. **Agent instructions.** Update `AGENTS.md`/`CLAUDE.md` lines 24–25 and 103–104, which mention `check:runbooks` and `verification`.</result>
+<usage><subagent_tokens>145473</subagent_tokens><tool_uses>57</tool_uses><duration_ms>237962</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bsiq86jlr</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bsiq86jlr.output</output-file>
+<status>completed</status>
+<summary>Background command "Run workspace unit tests baseline" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bmccpp1so</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bmccpp1so.output</output-file>
+<status>completed</status>
+<summary>Background command "Run native pair tests" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>b1590jjfa</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/b1590jjfa.output</output-file>
+<status>completed</status>
+<summary>Background command "Fix fixture pattern and rerun native tests" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bmy79vvvw</task-id>
+<tool-use-id>toolu_01AFVNVfnc5Aez15S8LWf2xz</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bmy79vvvw.output</output-file>
+<status>completed</status>
+<summary>Background command "Run native pair tests after Website migration" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bw383ta3m</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bw383ta3m.output</output-file>
+<status>completed</status>
+<summary>Background command "Run lint with vendored 0.7.1 policy" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bwhjaz7k9</task-id>
+<tool-use-id>toolu_014f4LgCvX66LRMhWyCuM9r2</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bwhjaz7k9.output</output-file>
+<status>completed</status>
+<summary>Background command "Rerun native pair tests" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>aeeb88aef60358b27</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/aeeb88aef60358b27.output</output-file>
+<status>completed</status>
+<summary>Agent "Convert Layer factories to static" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>All five factories are now static Layers, and no `static-layers` (or other) lint errors remain in any file I touched. One lint error does remain in `apps/api/src/worker.application.ts`, but it isn't from my change: another session is editing that file at the same time. It removed the uses of `Result` and `Url` around 12:05, and `Result` is now an unused import (`eslint(no-unused-vars)`, line 41). I left it for that owner.
+
+**What changed**
+1. **MCP**: `TaxKitMcpHttpLayer` is now a static Layer built with `Layer.unwrap(TaxKitMcpHost.pipe(Effect.map(...)))`. The new service `TaxKitMcpHost` holds `{ protocol, publicationOrigin }` and is defined in `apps/api/src/mcp.tools.layer.ts`, beside the Layer. Allowed origins, name, path and version are unchanged. `worker.application.ts` supplies `McpProtocol.v2026_07_28` (the old default, now written out) and `mcp-session.layer.ts` supplies `McpProtocol.v2025_11_25`, both with `Layer.succeed(TaxKitMcpHost)({...})`.
+2. **Content**: `ContentDiscoveryLive` is a static Layer that needs the new `ContentDiscoverySettings` service, defined in `packages/content/src/service.ts` and exported from `@taxkit/content/service`. Settings are still `Effect.cached` and read on first use, so a settings failure fails `getDocument`, not Layer construction; the existing test for that still passes. I updated all callers; in the two rpc test files only the `ContentDiscoveryLive` call sites and their imports changed.
+3. **Fumadocs live**: `makeFumadocsSourceLive(adapter)` became `FumadocsSourceLive`, which needs the new `FumadocsGeneratedCollection` service. I moved the `FumadocsGeneratedCollectionAdapter` interface from `./live` to `./service` alongside it, and updated the docs-content callers and the docs-fumadocs service test.
+4. **Test Layers**: `makeFumadocsSourceTest(fixtures)` became `FumadocsSourceTest`, which needs the new `FumadocsSourceFixtures` service, defined in `packages/docs-fumadocs/src/test.layer.ts` and exported from `./test`. `makeDocsContentServiceTest(fixtures)` became `DocsContentServiceTest`. The tests now supply fixtures with `Layer.succeed(FumadocsSourceFixtures)([...])`.
+5. **SDK test**: the `fixtureLayer(...)` factory became a static `FixtureLayer` that reads a test-local `LifetimeFixture` service holding `{ mode, release, resources, started }`. Each of the 7 call sites supplies it with `Layer.succeed`, so the lifetime and teardown behaviour is the same as before.
+
+I also ran oxfmt on every touched file.
+
+**New public names:** `TaxKitMcpHost` (apps/api, private), `ContentDiscoverySettings`, `FumadocsGeneratedCollection`, `FumadocsSourceLive`, `FumadocsSourceTest`, `FumadocsSourceFixtures`, `DocsContentServiceTest`. Removed: `makeFumadocsSourceLive`, `makeFumadocsSourceTest`, `makeDocsContentServiceTest`, and the `FumadocsGeneratedCollectionAdapter` type from `@taxkit/docs-fumadocs/live`.
+
+**Changeset:** `.changeset/static-content-source-layers.md`, marking `@taxkit/content`, `@taxkit/docs-fumadocs` and `@taxkit/docs-content` as `major`. There is none for apps/api or the SDK because neither public export changed.
+
+**Docs updated:** the content, docs-fumadocs and docs-content package READMEs, plus one paragraph in `docs/architecture/effect-services.md`. `docs/product-specs/docs-application-architecture.md:178` still names `makeFumadocsSourceLive`. I left it because that spec is marked implemented, so it records history. No knip or oxlint path lists name the changed paths.
+
+**Checks**
+- **Typecheck:** content, docs-fumadocs, docs-content, api/rpc, sdk/typescript and apps/api all have 0 errors. For apps/api that covers `tsconfig.json`, `tsconfig.tests.json` and `tsconfig.scripts.json`. The remaining output is warnings and suggestions on lines I didn't change.
+- **Build:** content and docs-fumadocs built successfully before their dependants were tested.
+- **Tests:** all pass.
+
+| Package | Test files | Tests |
+| --- | --- | --- |
+| content | 2 | 13 |
+| docs-fumadocs | 2 | 6 |
+| docs-content | 6 | 27 |
+| api/rpc | 4 | 332 |
+| sdk/typescript | 5 | 58 |
+| apps/api | 8 | 114 |
+
+- **Lint:** `bunx oxlint -c oxlint.config.ts apps/api packages/content packages/docs-fumadocs packages/docs-content packages/api/rpc packages/sdk/typescript --disable-nested-config`. Apart from the `Result` error above, the only errors left are `static-layers` in files outside this task: `packages/api/rpc/src/content.live.layer.ts:81`, `packages/api/rpc/src/live.layer.ts:92` and `packages/api/rpc/src/__testing__/fixtures.ts:42`.</result>
+<usage><subagent_tokens>153788</subagent_tokens><tool_uses>45</tool_uses><duration_ms>401744</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>ae9ed67d43dbb601c</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/ae9ed67d43dbb601c.output</output-file>
+<status>completed</status>
+<summary>Agent "Adapt native pair tests" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>`bun run test:native` now passes in full: 11 test files, 22 tests, after a fresh rebuild of the API and Website. Two failures were real product bugs, which I fixed in source (below). Other changes were outdated expectations, rewritten to check the new path at the same or higher strictness.
+
+## Source bugs found and fixed
+1. **The old server-function address returned 500 instead of 404.** The migration removed the Website's guard for `/_serverFn/*`, but the framework still serves that path. Every GET there returned 500 with `{"status":500,"unhandled":true,"message":"HTTPError"}`, and `robots.txt` now allows crawling it. In `apps/web/src/server.ts` I added a check that returns an empty 404 for `/_serverFn` and `/_serverFn/*`.
+2. **Browser API requests were sending `b3` and `traceparent` tracing headers.** The old RPC clients switched this off, and the old pair test checked for it. The new browser client didn't. In `apps/web/src/lib/api/client.atoms.ts` I turned it off with `HttpClient.TracerDisabledWhen`. The server's binding client still sends these headers; I left it alone because no test covers it, but the old setup didn't send them either.
+
+## Behaviour that differs from the code's apparent intent (not changed)
+- **Pages that fail to load return 500, not 503.** `rejectServerLoad` sets 503, but the framework's error handling overrides it. This affects the settings failure, a docs page whose content doesn't match its compiled build, and an unavailable search. Unavailable search used to return 200, so 500 is safer: it can no longer be cached publicly. The tests assert 500 plus `no-store`.
+- **An unreadable or invalid API calculation reply now shows "The TaxKit service could not be reached"** (`WebsiteApiUnavailable`). It used to show "Check your details". `WebsiteApiMismatch` might fit a malformed reply better; that's your call.
+- **The Website no longer logs when the API's calculation crashes.** It treats the reply as a normal unavailable-service error, so only the API logs it. The rpc-failures test now requires only the API's log entry.
+
+## Tests changed (all in `apps/web/test/`)
+- **`native-settings-failure`:** the server-function ID lookup is replaced with a check that the build declares no server functions. GET `/` and the no-JavaScript form POST against the build with the injected `PRIVATE9` defect now expect: 500, the "TaxKit cannot load its settings" page, `no-store`, no form, no `PRIVATE9`, and an empty route error in the page data. The log checks are unchanged.
+- **`native-cancellation`:** now tracks the HTTP calculate POST. The deadline message must equal the `WebsiteApiDeadlineExceeded` text, and the browser deadline must fall between 9.5 and 12 seconds (new). A browser call to `/rpc` would fail the test.
+- **`native-local-development`:** expects exactly one POST to `/api/v1/calculators/au.pay.take-home/calculate`, with `/rpc` still recorded. One isolated run failed earlier on a timing race that predates these changes (clicking Calculate before the page finished hydrating). It passed on rerun and in the full run.
+- **`native-analytics`** (this is the "forwards fresh browser and HTML collection choices" test you listed under relay): it was timing out waiting for a `/rpc` response; it now waits for the calculate POST.
+- **`native-browser-tools`:** separates API reads from calculations. The catalogue tool must issue exactly `GET /api/v1/calculators`, the calculations must match exactly, and any `/rpc` or `/_serverFn` call fails the test. Held-request checks now use the annual calculate route.
+- **`native-rpc-failures`:**
+  - New check: the defect build's HTTP calculate route returns an empty 500 with `no-store`.
+  - The Website page shows the unavailable message, keeps the entered form value, and contains no `PRIVATE9`.
+  - The invalid-reply build is now also shown to corrupt the HTTP reply, not just the RPC one.
+  - The work-limits test expects exactly one calculate POST.
+- **`native-pair`:**
+  - **Caching:** checks the new policy, including `cloudflare-cdn-cache-control`, on discovery files, Markdown, HTML pages, form results and errors.
+  - **Discovery files:** each one must match the API's `/api/v1/docs/discovery/*` route exactly, and `robots.txt` must be the new exact body.
+  - **Server functions:** the build contains no server-function entries, and `/_serverFn/*` returns an empty 404 with `no-store` for GET, POST and query variants.
+  - **Settings:** the first HTML must contain the settings the browser needs.
+  - **Browser calculation:** a visitor cookie is added for 127.0.0.1, and each calculate POST is checked with `allHeaders()`: no cookie, no tracing headers, and the collection-policy header present. Simulated 503s now include a CORS header so the browser actually sees a 503.
+  - **Docs requests:** client navigation must issue exactly the navigation and page GETs to the API, with no credentials or tracing headers.
+  - **Bad docs addresses:** invalid page paths get 400 from the API and the not-found page from the Website.
+  - **Mismatched docs builds:** the server returns 500 with "Documentation could not load". New: a browser-side mismatch shows "needs to be reloaded" and no `PRIVATE9`.
+  - **Corrupted replies:** a corrupted page reply and a corrupted navigation reply each show the safe error.
+  - **Search:** a 1,201-character search term is added to the rejected-term checks.
+
+`apps/web/scripts/native-pair-build.runtime.ts` needed no changes. The edited tests are formatted with oxfmt, pass oxlint, and have no type errors. I had to format and lint by hand, because the repo's configs ignore `.claude/**`, which covers this worktree.
+
+Another session was editing `server.ts`, `runtime.server.ts` and `loaders.ts` while I worked. Both fixes and the settings-defect injection point were still in place when the passing full run started.</result>
+<usage><subagent_tokens>355038</subagent_tokens><tool_uses>113</tool_uses><duration_ms>1528864</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>be2tzfwk7</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/be2tzfwk7.output</output-file>
+<status>completed</status>
+<summary>Background command "Run native pair tests" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a6541be001c94680d</task-id>
+<tool-use-id>toolu_013zVj4E3hrAoFjzjQ7DnM5u</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/a6541be001c94680d.output</output-file>
+<status>completed</status>
+<summary>Agent "Align current docs with native design" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've brought the listed current documents into line with the code in the working tree. `bun run check:docs` passed for all 182 documents, and `bun run check:repository-paths` passed. I didn't edit any code or config file, and I didn't commit anything.
+
+**Rewritten** (each was mostly history about the old setup):
+- `apps/web/README.md` now describes the setup as it is:
+  - **Server:** one server runtime with a host service that calls the API over the private binding. Calculations go through the trusted `calculatorRequest` method. Discovery files are forwarded to the API once.
+  - **Browser:** `ApiClient` calls the API's public origin directly, sends no credentials or tracing headers, and caps replies at 2 MiB with a 10-second deadline per call.
+  - **Loaders:** one registry is created before loaders run. TanStack owns loader data, and the stale times are as you described.
+  - **Settings, cache and other routes:** the settings keys table, the one cache decision per reply, and the Markdown, search, discovery, analytics relay and browser-tools sections.
+  - Your corrections are in: failed server page loads reply 500 with `no-store`, `/_serverFn` returns an empty 404, the browser client sends no `b3`/`traceparent`, and an invalid calculation reply shows the `WebsiteApiUnavailable` message.
+- `docs/architecture/frontend.md`: same model; the durable composition rules and guardrails are kept, with the new lint rules named.
+- `docs/architecture/configuration.md`: the Doppler section and Website/API settings now match `@taxkit/infrastructure/secrets` and the apps stack. I removed the old GitHub-bridge text, the `alchemy.apps*.run.ts` names and the claim that the API reads a Website origin.
+- `packages/api/rpc/README.md`: the server and machine protocol remain. The clients are described only as checked clients used by tests and machine callers, with no factory signatures. The `./rate-identity` export is gone; edge identity now lives at `api/edge-identity`.
+
+**Edited:**
+- `docs/architecture/api-and-sdk.md`: new "Native API Worker" and "Website client" sections, and the RPC and documentation sections trimmed.
+- `docs/architecture/effect-services.md`: runtime composition, static Layers and scenario services, loader transport, the static `FumadocsSourceLive`/`ContentDiscoveryLive`, and discovery now served by the API.
+- `docs/architecture/calculators.md`: the example now uses `Layer.succeed(TakeHomeScenario)(input)`.
+- `docs/architecture/package-ownership.md`, `content-and-posts.md` and `testing-and-quality.md` (Effect diagnostics in every `check-types`, `check:effect` as a smoke check, the vendored policy, the native rules and their fixtures).
+- `apps/api/README.md`: discovery routes, `calculatorRequest`, cache, CORS, MCP limited to the publication origin, edge identity.
+- `packages/api/http/README.md`: new "Response policy" section and the `response-policy` export; I removed the stale SDK-delegation guardrail and the in-process Promise lint note.
+- `packages/content/README.md`: `publicationOrigin`, and robots as `Allow: /` plus the sitemap.
+- I added a short "Scenario input" section to `packages/rules/au/pay/README.md` and `packages/rules/au/income-tax/README.md`. Neither mentioned scenario Layers before; I judged it worth stating the new public usage, but it can come out.
+- Stale-term grep fixes in the root `README.md` (including the removed `@taxkit/api-http/client/server`) and `docs/architecture/README.md`, plus one anchor fix in `packages/infrastructure/README.md`.
+
+`docs/architecture/deployment.md` and `docs/runbooks/deployment.md` are consistent with the code; no change needed.
+
+**Problems I found but didn't fix:**
+- `apps/web/src/server.ts` still has a comment saying the form POST "reaches the same named RPC client through the private binding".
+- `oxlint.config.ts` still lists `#/lib/docs/route-boundary` in `routeTransportBoundaryModules`, but that module has been deleted.
+- `packages/docs-content/content/api/agent-tools.mdx` (line 84) says MCP accepts browser calls from "this installation's configured website origin". It is now the publication origin only. I left it alone because editing a published page would invalidate its reviewed source hash.
+- The active plans (`clean-slate-foundation.md`, `common-practice-foundation-review.md`) still mention server functions. I treated them as plan intent and history, not current documents.
+
+**Claims I couldn't fully verify:**
+- The 500 + `no-store` behaviour for failed server loads comes from your message. The code sets 503, which TanStack overrides; I didn't run the native tests myself.
+- The summary of what the native tests cover is based on the test file names and assertions I read, not on running them.
+- I left the analytics (T008) and MCP progress statements in `apps/api/README.md` unchanged, because I can't confirm their current status from the code.</result>
+<usage><subagent_tokens>330310</subagent_tokens><tool_uses>104</tool_uses><duration_ms>671684</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>acbb1169fbdad692d</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/acbb1169fbdad692d.output</output-file>
+<status>completed</status>
+<summary>Agent "Remove obsolete route transport rule" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I removed `taxkit/no-route-transport-restore-outside-consumers` completely. Lint, tsc and the docs check pass, but the tools test suite does not: 24 tests fail, all in `tools/oxlint/portable-rules.test.ts`. None of the failing tests involve the removed rule. I could not confirm a pre-change baseline, because that would mean stashing, which you ruled out.
+
+**Files changed**
+- `tools/oxlint/taxkit-rules.ts` (about 1,370 lines removed):
+  - The rule itself and its Schema options struct.
+  - All the types and helpers only it used: the `RouteFunction` / `RouteConsumer` / `RoutePolicyInput` types through `validateDirectRouteRestores`, including `routeTransportDeclaredVariable` and `isRouteTransportReference`.
+  - Earlier helpers that became unused: `nodePath` / `resolve`, `firstArgument`, `sourceFileName`, `importName`.
+  - Imports that became unused: `MutableRef`, `Ref`, `Result`, `Schema`, `referenceIdentity`, `syntaxParents`, `OxlintContext`, `OxlintSourceCode`, `SyntaxVariable`. They are only dropped from this file; `binding-tracker.ts` exports are unchanged because `effect-rules.ts` and `binding-tracker.test.ts` still use them.
+  - The rule's entry in the plugin's rules map.
+- `oxlint.config.ts`: removed the `routeTransportBoundaryModules` and `routeTransportConsumerFiles` constants, the rule entry, and the deleted test's line in `decodingBoundaryFiles`.
+- `package.json`: removed the `--allow=taxkit/no-route-transport-restore-outside-consumers` flag from `lint:boundary-directives`.
+- `docs/standards/tooling.md`: line 92 now reads "tax, calculator and decoder policy remains under `taxkit/*`".
+- Deleted with `git rm`: `tools/oxlint/no-route-transport-restore-outside-consumers.test.ts` and `tools/oxlint/fixtures/route-transport-allowed.tsx`. Only the deleted test and the config used the fixture.
+- No changes were needed in `knip.json`, `tools/tsconfig.json` or `tools/vitest.config.ts`; they only use globs.
+- I left these alone as you asked: `docs/evidence/**`, `docs/documentation-audit/**`, completed plans, and product specs (all the matching ones are marked Implemented in `docs/product-specs/index.md`). The remaining "route transport" wording in `docs/architecture/effect-services.md:405` and `tools/oxlint/effect-rules.ts:603` is about the general concept, not this rule, so it stays.
+
+**Check results**
+- **`bunx oxfmt -c oxfmt.config.ts --write`** on the changed files: exit 0. It collapsed the `effect` import to one line.
+- **`bunx tsc --noEmit -p tools/tsconfig.json`**: exit 0, no errors. Output is only the existing Effect `unstableApiUsage` warnings and one `preferTypedSchemaDecoder` suggestion.
+- **`bun run lint`**: exit 0, both the boundary-directives pass and the main pass.
+- **`bun run check:docs`**: exit 0, "Documentation check passed for 182 documents."
+- **`bun --bun vitest run --config tools/vitest.config.ts`**: exit 1, 10 of 11 files and 504 of 528 tests pass. All 24 failures are in `portable-rules.test.ts`, which was already modified in the worktree before I started. They come from Website files deleted by the migration in progress:
+  - **Missing files:** they fail with NotFound on `apps/web/src/lib/docs/route-boundary.ts`, `route-context.ts`, `loaders.server.ts` and `live.server.layer.ts`.
+  - **Stale boundary expectations:** "expected +0 to be 1" and expected-exact-admission mismatches for `loaders.server.ts`, `health-loader.boundary.browser.test.tsx`, `client.runtime.ts`, `server.ts`, infrastructure files and `annual-tax`.
+
+`portable-rules.test.ts` line 1090 still lists `apps/web/src/lib/docs/route-boundary.ts`. That entry belongs to the `no-decoding-outside-boundaries` / encoder / runtime boundary tests, not the removed rule, so I didn't change it. It and the other stale paths need updating as part of the Website migration.</result>
+<usage><subagent_tokens>122423</subagent_tokens><tool_uses>20</tool_uses><duration_ms>750433</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bu1e33yue</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bu1e33yue.output</output-file>
+<status>completed</status>
+<summary>Background command "Run full repository verification" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<cross-session-message from="uds:/tmp/cc-socks/69729.sock" from-session="local_41ccfba9-333e-4bd8-85ed-320988d41697" from-name="Site DEV-119 native HTTP cutover" from-mode="bypass">
+Cooper asked me (the Site DEV-119 session) to have you check TaxKit against a Workers Cache bug found in Site and Common Practice, and fix it if it applies.
+
+The bug: when a page's HTML and another response at the same URL (an Accept-negotiated Markdown response or redirect, or a 400/406 negotiation reply) carry different `Vary` headers, Workers Cache keeps evicting one with the other. On Site preview and Common Practice production, the HTML had `Vary: Accept, Cookie` and the Markdown 307 had `Vary: Accept`. The HTML was then a MISS after every Markdown request, whichever came first. Content stays correct; only cache reuse is lost.
+
+Your worktree (taxkit-native-effect-alchemy-f44f82) enables `cache({ crossVersionCache: false })` on the API Worker. `apps/web/src/lib/docs/markdown.response.server.ts` sets and merges `vary: Accept` for docs Markdown. Please check whether the docs HTML at the same URLs carries exactly the same Vary set, and whether any HTML varies on Cookie.
+
+The rule is now published in development-workflows 0.7.2 (commonplace-plugins main@32cff8e, PR #51):
+1. Every response served at one URL must carry the same `Vary` set. Discovery files at their own URLs keep their own set. See `alchemy-iac/references/providers/cloudflare.md`, "Native public response caching".
+2. Public HTML must not vary on `Cookie`. A saved theme is applied before first paint with TanStack's `ScriptOnce`, with `suppressHydrationWarning` on `<html>`. See `strict-effect-ts/references/applications/react-and-tanstack.md`, "Theme and appearance before first paint".
+
+Hosted proof Cooper wants, where the website is cached:
+- At one fresh docs URL: HTML, the Markdown variant, HTML, then the reverse order. Every repeat must be a HIT.
+- HTML with and without an unrelated cookie is shared.
+
+If TaxKit isn't affected, record that with the evidence. Please handle it after your current work, through your normal checks and delivery. I won't edit your repo.
+</cross-session-message>
+
+---
+
+<task-notification>
+<task-id>bgdpii8v5</task-id>
+<tool-use-id>toolu_017Stb4u41Ccd2cz2s3Wh21m</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bgdpii8v5.output</output-file>
+<status>completed</status>
+<summary>Background command "Ignore vendor in formatter; rerun verification" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Try again
+
+---
+
+Continue
+
+---
+
+<task-notification>
+<task-id>bx9tngkub</task-id>
+<tool-use-id>toolu_01B7bcV4d78iCTpGpGYpQfjf</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bx9tngkub.output</output-file>
+<status>completed</status>
+<summary>Background command "Redeploy Preview with content change" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Can you continue
+
+---
+
+<task-notification>
+<task-id>bhcvlq72d</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bhcvlq72d.output</output-file>
+<status>completed</status>
+<summary>Background command "Run full verification on fix" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bvvr7098e</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bvvr7098e.output</output-file>
+<status>completed</status>
+<summary>Background command "Deploy content change to Preview" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<cross-session-message from="uds:/tmp/cc-socks/8134.sock" from-session="local_41ccfba9-333e-4bd8-85ed-320988d41697" from-name="Site DEV-119 native HTTP cutover" from-mode="bypass">
+Thanks for the TaxKit evidence. One related case to check: you said the docs 400/406/404/503 negotiation replies carry `Vary: Accept`. If any of them is `no-store` at the same URL as the docs HTML, it can still evict the cached page.
+
+Site Preview, 13 October, one fresh /about URL:
+plain MISS → plain HIT → `Accept: text/markdown;q=bad` gives 406, `cache-control: no-store`, BYPASS → plain MISS.
+The no-store reply dropped the cached page despite an identical Vary set. adad saw the same with a no-store 308. That means anyone can empty a page's cache entry with an odd Accept header.
+
+Site's fix: negotiation answers that depend only on Accept (400 and 406) get the page's public cache policy and are stored as their own variant. Errors that mean "unavailable" (503) stay no-store. A 404 at a URL that has no cached page doesn't matter.
+
+Suggested check on a docs URL: warm the HTML, send an unusual Accept that yields 400 or 406, then request the HTML again; it must stay a HIT. If it drops, store those negotiation answers publicly. I'll add this rule to development-workflows 0.7.3 once Site's Preview proof passes. The marketplace `stable` branch now points at 0.7.2.
+</cross-session-message>
+
+---
+
+Are we properly using the native Alchemy www DNS stuff like in Common Practice?
+
+---
+
+<!-- reply 2 -->
+> Fewer zone settings managed in code. Common Practice also manages zone settings (TLS, HTTPS), DNSSEC and the bot policy as retained resources. TaxKit only keeps its existing DNS settings. That isn’t about www, but it is the rest of Common Practice’s native DNS setup.
+
+We should adopt all of this too
+
+<!-- reply -->
+> workers.dev stays on in every stage. apps-stack.ts sets workersDev: true on both Workers, so it stays on in Production. Both Production Workers still answer on their workers.dev addresses (I just got 200 from each), and every deploy also gets a version preview address. Common Practice turns the Website’s workers.dev off in Production and leaves preview addresses off in the other stages. Nothing in TaxKit relies on the Production workers.dev addresses; the Website reaches the API through a private service binding.
+
+Yes please fix this to match Common Practice.
+
+
+For both of these tweaks, please review Commonplace plugins and ensure its skills/docs are clear on the correct approach (taken from Common Practice)
+
+---
+
+<task-notification>
+<task-id>b9s0h4szn</task-id>
+<tool-use-id>toolu_018LZArEAmvAsJm9v55Pa1Cf</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/b9s0h4szn.output</output-file>
+<status>completed</status>
+<summary>Background command "Run full verification" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+If the token needs updating to include the permission use the cf cli to do it
+
+---
+
+<task-notification>
+<task-id>af8c05b75238d2cd7</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/af8c05b75238d2cd7.output</output-file>
+<status>completed</status>
+<summary>Agent "Review Commonplace Cloudflare hosting guidance" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've opened PR https://github.com/crcorbett/commonplace-plugins/pull/55 (branch `claude/cloudflare-zone-hosting-guidance`, made from `origin/main` in the worktree `/private/tmp/commonplace-zone-hosting`). It is not merged or released. The checks passed: `bun run test` and `bun run verification`.
+
+**Files changed**
+- `plugins/development-workflows/skills/alchemy-iac/references/providers/cloudflare.md`: four new subsections under "Routes, zones, and domains" (custom domain, `workers.dev`, zone settings/DNSSEC/bot policy, token permissions and preflight) and a new "Website build inputs in a monorepo" section. The redirect-limit sentence that sat in the State section was removed, because the domain section now owns it.
+- `plugins/development-workflows/skills/alchemy-iac/references/operations/adoption-drift-recovery-and-destroy.md`: one paragraph on native `alchemy drift`.
+- `plugins/development-workflows/skills/alchemy-iac/references/sources.md`: links to the beta.81 Alchemy source behind each claim.
+- `plugins/development-workflows/sources.json`: fingerprints refreshed with `source:sync`.
+- `.changeset/cloudflare-zone-hosting.md`: a patch Changeset. The changelog and version are left to the Version Packages PR, as the release runbook requires.
+- `docs/archive/scaffold-qualification/2026-10-13-zone-hosting.md` and `docs/archive/README.md`: an evidence record, following the pattern of the previous change.
+- `SKILL.md` is unchanged. Its existing "load the Cloudflare reference" step already leads there, so a pointer would only repeat it.
+
+**What was missing or contradictory before**
+- **Custom domains:** nothing on `domain.redirects` versus `aliases`, or on when to pass `zoneId`. The redirect ruleset limit was only hinted at, in the State section and a table in `native-migrations.md`.
+- **`workers.dev`:** no policy at all. Nothing said that the default `true` also turns on a preview address for every version.
+- **Zone resources:** zone settings, DNSSEC and bot management weren't covered. That includes the singleton lifecycle, the `pending` DS trap, and the fact that `retain()` skips the provider's restore.
+- **Token permissions:** no zone permission list. The read-only preflight was only a generic checklist.
+- **`memo`:** only "include content in memo inputs", with no warning about `../` paths.
+- **Drift:** nothing on native `alchemy drift` disagreeing with `plan`, its successful exit even when it reports changes, or `--repair`.
+
+**Checked against the installed beta.81 source**
+- All six lessons hold.
+- A failed read of the zone's redirect rules really is treated as empty, and the Worker is uploaded before the redirect rule is written.
+- Setting `exclude` replaces the gitignore defaults entirely, and setting `include` or `exclude` drops the lockfile unless `lockfile: true` is set.
+- Drift compares a fresh provider read with the attributes saved at the last deploy, while plan compares the declaration with saved props. That explains why drift can report changes when plan shows none.
+- One new finding: if DNSSEC is already on and Alchemy has no state for it, the resource reads as unowned and needs `adopt(true)`. Neither reference project hit this because both zones started unsigned.
+
+**Two problems outside this repo**
+1. TaxKit's `docs/architecture/deployment.md` says "Removing a setting restores its earlier value". That's wrong because TaxKit retains its settings, and `retain()` skips the restore. I didn't edit it, since TaxKit was read-only for this task.
+2. The repository starter's API Worker (`skills/repo-structure/assets/repository/apps/api/src/deployment/cloudflare/worker.ts.tmpl`) still sets `workersDev: true`, which turns on version preview addresses. Changing a template needs its own render qualification, so I've listed it in the PR under "Not checked" rather than changing it.
+
+**Not verified here:** the hosted observations (error 1010, the memo out-of-memory stall, the drift reports, DNSSEC staying `pending`) come from the Common Practice and TaxKit sessions. I made no deployment, provider call or token change.</result>
+<usage><subagent_tokens>197100</subagent_tokens><tool_uses>62</tool_uses><duration_ms>472238</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bchlnn0b7</task-id>
+<tool-use-id>toolu_01977kJoHq2hpNwLydeXorkX</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bchlnn0b7.output</output-file>
+<status>completed</status>
+<summary>Background command "Commit and run full verification" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+Merge and release commonplace updates
+
+---
+
+Ok so are we now properly following Common Practice approaches for all resources? Have we removed all of the verification ceremony?
+
+---
+
+<!-- reply 3 -->
+> Deploy workflows. Common Practice deploys Preview and Production from GitHub Actions (preview.yml, production.yml) using native Alchemy and Doppler. TaxKit only has checks.yml, and this goal deployed locally. The plan’s first step did include wiring these workflows, and I haven’t done that. Actions can’t run at the moment anyway because of the billing problem.
+
+Ok get these Actions setup, but we will continue running locally.
+
+<!-- reply -->
+> Observability. Common Practice declares Axiom datasets and dashboards, a Cloudflare trace export and a telemetry stack. TaxKit has Worker logs and traces switched off. The agreed design had already deferred the safe operational fields to later work.
+
+Enable these replicating Common Practice's approach per Commonplace plugin
+
+<!-- reply -->
+> I recommend I clean up the docs now: mark the handoff plan superseded, move both clean-slate plans out of active/, and correct PRODUCT.md and the architecture and README lines. That fits within this goal and changes no behaviour.
+
+Do this too
+
+---
+
+<task-notification>
+<task-id>bnnq52bb2</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/bnnq52bb2.output</output-file>
+<status>completed</status>
+<summary>Background command "Full verification on final commit" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a611cebc660b6097b</task-id>
+<tool-use-id>toolu_01DFLr2tubtqBXdpTG9goRkX</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/a611cebc660b6097b.output</output-file>
+<status>completed</status>
+<summary>Agent "Add Preview and Production workflows" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>I've added both deploy workflows and committed them; nothing was pushed, dispatched or run. The checks you listed all pass: YAML parse, `bun run check:docs`, `bun run format:check` and `bun run check:repository-paths`. actionlint isn't installed, so it didn't run.
+
+- **Branch:** `claude/taxkit-deploy-workflows`, from origin/main at `cf25b351`, with the upstream unset
+- **Worktree:** `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b`
+- **Commit:** `878314ae` ("ci: add Preview and Production deploy workflows")
+
+**Secret names to create:** I deviated from the brief here, so check this first. Common Practice doesn't use repository secrets; it uses two GitHub environments with one secret each, both named `DOPPLER_TOKEN`. One repository secret name can't hold two tokens, so I followed Common Practice:
+
+| GitHub environment | Secret | Doppler token |
+| --- | --- | --- |
+| `preview` (no branch restriction) | `DOPPLER_TOKEN` | read-only, scoped to `taxkit/stg_preview` |
+| `production` (deployment branch `main` only) | `DOPPLER_TOKEN` | read-only, scoped to `taxkit/prd` |
+
+The runbook includes `doppler configs tokens create … | gh secret set DOPPLER_TOKEN --env &lt;env&gt; --repo crcorbett/taxkit` commands, so token values never appear in a terminal. If you'd rather have two repository secrets, they'd need different names, and that's a small edit to the workflows and the runbook.
+
+**`preview.yml`:**
+- **Trigger:** same-repository pull requests only, on opened, synchronize, reopened and closed. Forks get no job and no secret.
+- **Deploy:** runs `bun run pr:plan "$STAGE" --no-input`, then `bun run pr:deploy "$STAGE" --yes`.
+- **Cleanup:** when the PR closes, a `pr-&lt;number&gt;` check runs and then `bun run pr:destroy "$STAGE" --yes`.
+- **Concurrency:** one group per PR, never cancelling a run in progress. Each run rechecks whether the PR is open or closed before it changes anything, as Common Practice does.
+- **Permissions:** `contents: read`, plus `pull-requests: read` for that open/closed recheck.
+- **Smoke checks:** Preview `workers.dev` addresses have generated suffixes, so the workflow reads `apiUrl` and `websiteUrl` from the deploy's printed stack outputs. It rejects anything that isn't a `workers.dev` address, then expects 200 from the Website, `/api/health` and `/api/v1/calculators`. I tested the address parsing against a sample log; it hasn't seen a real CI run.
+
+**`production.yml`:**
+- **Trigger:** push to `main` and manual dispatch, guarded to `main`, using the `production` environment.
+- **Steps:** `production:plan --no-input`, then `production:deploy --yes`, then the public checks, then `production:drift --no-input` with `continue-on-error: true` so drift is information only.
+- **Concurrency:** one global group, `taxkit-production`, with no cancel-in-progress.
+- **Arguments:** Bun drops `--`, so `bun run production:deploy --yes` and `-- --yes` reach Alchemy the same way; I tested this locally.
+- **Public checks:** I ran them against live Production and they pass. taxkit.dev returns 200, `https://www.taxkit.dev/docs?from=actions` returns a 301 to `https://taxkit.dev/docs?from=actions`, and `api.taxkit.dev/api/health` returns 200.
+
+**Shared setup:** both workflows pin the same action versions as `checks.yml` (checkout v7.0.1, setup-bun v2.2.0). Bun comes from `.bun-version` (1.4.2) with a frozen install, and checkout uses `persist-credentials: false`. There's no Doppler CLI: Alchemy reads `DOPPLER_TOKEN`, and Actions sets `CI=true` itself.
+
+**What I left out:**
+- **No `bun run verification` before deploy.** Common Practice runs it, but TaxKit's version needs Playwright browsers, and `checks.yml` already runs it on PRs and `main`. As written, a push to `main` deploys alongside Checks rather than waiting for it.
+- **No `.env` metadata step.** Common Practice writes GitHub run details to `.env`, but TaxKit's stack reads none of them.
+
+**Docs:** `docs/runbooks/deployment.md` has a new "GitHub Actions" section. It covers what each workflow does, the two environment secrets, and that Actions can't start because of the billing/spending limit, so local commands remain the route. It also says a local Production apply must only run while the workflow is idle. I updated the runbook's review trigger, its intro and credentials pointers, and its row in `docs/runbooks/README.md`. `docs/architecture/testing-and-quality.md` doesn't list workflows, so it's unchanged.
+
+Files changed:
+- `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b/.github/workflows/preview.yml` (new)
+- `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b/.github/workflows/production.yml` (new)
+- `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b/docs/runbooks/deployment.md`
+- `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b/docs/runbooks/README.md`</result>
+<usage><subagent_tokens>129643</subagent_tokens><tool_uses>45</tool_uses><duration_ms>289615</duration_ms></usage>
+<worktree><worktreePath>/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b</worktreePath><worktreeBranch>worktree-agent-a611cebc660b6097b</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a611cebc660b6097b</task-id>
+<tool-use-id>toolu_014r67CBsndvR94oH4J7vxWr</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/a611cebc660b6097b.output</output-file>
+<status>completed</status>
+<summary>Agent "Add Preview and Production workflows" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Both deploy workflows now run `bun run verification` before any plan or deploy, as Common Practice does. The new commit is `da540e9c`, added on top of `878314ae` on `claude/taxkit-deploy-workflows`; nothing was pushed or run. YAML parse, `check:docs`, `format:check` and `check:repository-paths` all pass. A local run of each workflow's shell steps also passed, including the Preview address parsing against a sample log.
+
+- **Setup:** before verification, both deploy jobs now do the same setup as `checks.yml`, with identical action pins:
+  - full-history checkout (`fetch-depth: 0`) and the step that tracks `main`
+  - Bun cache restore and save around the frozen install
+  - `PLAYWRIGHT_BROWSERS_PATH`, then the Playwright chromium install with its cache restore and save
+- **Destroy path:** the Preview cleanup job for closed PRs is unchanged and does not run verification.
+- **Turbo cache:** I left out the "Fetch trusted CI configuration" step. It only supplies the Turbo remote-cache team and token, and it needs a different secret, `DOPPLER_CI_TOKEN`, scoped to `taxkit/ci`. Verification runs with `TURBO_CACHE: local:rw`, like the fork path in Checks. The checks are the same; they just get no remote cache hits, so they run slower.
+- **Timeouts:** deploy jobs now allow 60 minutes, matching Checks, so verification has room to finish. Cleanup stays at 15.
+- **Runbook:** the GitHub Actions section in `docs/runbooks/deployment.md` now says every deploy runs verification first, as in Common Practice, before any credential is used, and explains the local-only Turbo cache. I removed the sentence that said Production didn't run verification.
+
+Files changed in this commit:
+- `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b/.github/workflows/preview.yml`
+- `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b/.github/workflows/production.yml`
+- `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b/docs/runbooks/deployment.md`
+
+The owner still needs to create the same secrets: a `DOPPLER_TOKEN` in the `preview` GitHub environment (read-only, `taxkit/stg_preview`) and one in the `production` environment (read-only, `taxkit/prd`).</result>
+<usage><subagent_tokens>139969</subagent_tokens><tool_uses>55</tool_uses><duration_ms>374519</duration_ms></usage>
+<worktree><worktreePath>/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a611cebc660b6097b</worktreePath><worktreeBranch>worktree-agent-a611cebc660b6097b</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a80e187e2abf2a058</task-id>
+<tool-use-id>toolu_01B2xLWDU23tnBdP6H1h3vE6</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/a80e187e2abf2a058.output</output-file>
+<status>completed</status>
+<summary>Agent "Clean up stale ceremony docs" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>The cleanup is committed: current documents no longer present the receipt, approval, acceptance or custody process as live policy. `bun run check:docs`, `bun run format:check` and `bun run check:repository-paths` all pass. I did not run `bun run verification` because this change is documentation only. Nothing is pushed and there is no PR.
+
+- **Branch:** `claude/taxkit-docs-ceremony-cleanup`, from `origin/main` at `cf25b351`
+- **Worktree:** `/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a80e187e2abf2a058`
+- **Commit:** `0bc19c70bb4dc2f3aba6284a7c6fe00baf77ef26`
+- **Size:** 21 files, including two renames
+
+**The five listed items:**
+1. **Plans moved.** `clean-slate-foundation.md` and `clean-slate-local-handoff.md` are now in `docs/exec-plans/completed/`, which is where superseded plans already sat. The handoff is marked `lifecycle: superseded` with a one-line pointer to `common-practice-foundation-review.md`. Links are updated in the active and completed plan indexes, `product-specs/index.md`, the clean-slate and Medicare SPECs, and `packages/analytics/README.md`.
+2. **`PRODUCT.md`.** `docs/evidence/` is now described as dated history. The Website description now matches the code: server rendering uses `HttpApiClient` over the private API binding, and the browser uses `AtomHttpApi.Service` to call the API directly. It points to the Common Practice SPEC instead of the clean-slate one, and tells readers to check the deployed Website and API for what is live.
+3. **`apps/api/README.md`.** The receipt citations are replaced with the current behaviour, checked against the code:
+   - The Website sends the `x-taxkit-collection-policy` header, which is driven by the browser's do-not-track setting or the incoming page request, and defaults to deny.
+   - The API's CORS policy admits that header.
+   - `bun run test:native` runs the official MCP clients.
+
+   A few plain "History:" links remain. I also removed sentences naming the superseded plan's tasks (T004, T008, T009) as owners of open work.
+4. **`docs/architecture/content-and-posts.md`.** Acceptance records are gone. The two entries for files that no longer exist (`tools/documentation/owner-policy.json` and `tools/documentation/catalogue.runtime.ts`) are replaced with the real `packages/docs-content/src/catalogue.runtime.ts` and `catalogue.policy.ts`, where frontmatter and navigation decide publication. The `check:docs` summary now matches what the check actually does.
+5. **The other two.** The receipt reference in `api-and-sdk.md` now names the OpenAPI snapshot and the HTTP/RPC tests. The `review_trigger` in `configuration.md` now says "secret handling".
+
+**Extra stale passages found by the step 6 grep:**
+- `packages/content/README.md` and `packages/docs-content/README.md` described acceptance-record Schemas, owner-policy bindings and SHA-256 source hashes, all now removed from the code. Both now say publication is a frontmatter `status` change made in an ordinary pull request.
+- Several docs still described `@taxkit/scripts` (release-readiness), a package that was deleted with the receipt tooling. I removed those passages from `docs/architecture/README.md`, `package-ownership.md`, `package-boundaries.md` and the root `README.md`.
+- `product-specs/index.md` still pointed to old harness tasks (HGI-*) as current owners and described the epoch and governance gate as live. Those rows now note the tooling was retired, and point to `docs/README.md` and the versioning runbook.
+- One sentence in `common-practice-foundation-review.md` still said the docs catalogue is built from acceptance records; it now says it is built from frontmatter.
+- `packages/sdk/typescript/README.md` now labels its correction-receipt mention as history.
+
+Edited current docs carry `last_reviewed: 2026-10-13`. Nothing under `docs/evidence/**`, `docs/documentation-audit/**`, the two deployment docs, `.github/`, `packages/infrastructure/**` or any code was changed.
+
+**Decision for you:** `docs/product-specs/clean-slate-foundation.tasks.json` still names `docs/exec-plans/active/clean-slate-foundation.md` as a task output. I left it because it records what that task produced at the time. Say if you want it repointed.
+
+There is no Changeset: the package edits are README text only, with no contract change. If your Changeset rule covers package READMEs too, one needs adding.</result>
+<usage><subagent_tokens>183429</subagent_tokens><tool_uses>112</tool_uses><duration_ms>491578</duration_ms></usage>
+<worktree><worktreePath>/Users/cooper/Projects/taxkit/.claude/worktrees/agent-a80e187e2abf2a058</worktreePath><worktreeBranch>worktree-agent-a80e187e2abf2a058</worktreeBranch></worktree>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>blvw60c0l</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/blvw60c0l.output</output-file>
+<status>completed</status>
+<summary>Background command "Verify workflows branch" completed (exit code 0)</summary>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>be3jeljb9</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-cooper-Projects-taxkit--claude-worktrees-taxkit-native-effect-alchemy-f44f82/6357669d-1a72-42db-b49d-5a71a61feb75/tasks/be3jeljb9.output</output-file>
+<status>completed</status>
+<summary>Background command "Merge main into docs branch and verify" completed (exit code 0)</summary>
+</task-notification>
