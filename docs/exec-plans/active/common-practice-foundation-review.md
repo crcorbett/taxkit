@@ -37,8 +37,34 @@ Orders 1 to 5 are implemented on branch
   builds its Layer once.
 
 Failed server page loads reply 500 with `no-store`: TanStack's error handling
-replaces the 503 the loader sets. Remaining: merge, then Preview and Production
-deployment and public checks. Safe operational fields stay later work.
+replaces the 503 the loader sets. Safe operational fields stay later work.
+
+## Delivery (13 October 2026)
+
+Main `4cb91fb8` (PRs 173 and 174) was deployed locally with native Alchemy and
+Doppler: Preview `pr-173`, then Production at 04:32Z. The Production plan left
+the zone and DNS settings unchanged. Public checks on `taxkit.dev` and
+`api.taxkit.dev`: www keeps path and query on a 301; public reads HIT after
+their first request; HTML and Markdown at one docs URL HIT in both orders
+(`Vary: Accept`); an unrelated cookie shares HTML; API `Origin` variants HIT in
+both orders; calculations, errors and health are `no-store`; any HTTPS origin
+gets credential-free CORS; MCP admits only `https://taxkit.dev` and Origin-less
+clients; the no-JavaScript form and the browser both return $1,301.00 for
+$1,654 weekly; browser docs navigation calls the API directly. A Preview
+content-only change reached the API JSON, HTML and Markdown and was restored;
+`pr-173` was then destroyed.
+
+Roll back by redeploying `f2191048` with that revision's own commands.
+
+Known limits:
+
+- Production `alchemy drift` reports both Workers as changed straight after a
+  clean deploy, while `production:plan` shows no changes and Preview shows no
+  drift; the report does not name the fields. Nothing was repaired.
+- Linting `apps/web/test/native-pair.boundary.test.ts` alone takes about 100
+  seconds under the vendored policy.
+- The Website memo needed explicit excludes (PR 174); without them a deploy
+  hashed about 1.2 million linked package files and ran out of memory.
 
 Completed research covers the full Website/HTTP/RPC/MCP/SDK call paths, current
 Common Practice workflows and native secrets, upstream Effect/Alchemy support,
