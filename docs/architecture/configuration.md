@@ -4,7 +4,7 @@ lifecycle: current
 authority: canonical
 owner: taxkit-configuration-owner
 last_reviewed: 2026-10-13
-review_trigger: config Schema, namespace, source selection or secret custody change
+review_trigger: config Schema, namespace, source selection or secret handling change
 ---
 
 # Configuration

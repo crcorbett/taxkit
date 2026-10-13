@@ -18,10 +18,11 @@ Alchemy and retirement of receipt tooling. It supersedes the transport, origin,
 cache and workflow parts of the older clean-slate plan, which keeps its
 execution history.
 
-The superseded [Clean slate foundation](./clean-slate-foundation.md) retains the
-earlier Website/API rebuild history.
+The superseded [Clean slate foundation](../completed/clean-slate-foundation.md)
+plan and its [local continuation prompt](../completed/clean-slate-local-handoff.md)
+now sit with completed plans as the earlier Website/API rebuild history.
 
-The [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) is implemented locally, with [completed correction evidence](../../documentation-audit/medicare-2025-26-correction.json). The wider clean-slate plan remains active; adad consumer qualification and enablement are separate work.
+The [2025–26 annual Medicare correction](../../product-specs/medicare-2025-26-correction.md) is implemented locally, with [completed correction evidence](../../documentation-audit/medicare-2025-26-correction.json). adad consumer qualification and enablement are separate work.
 
 The completed [Entire session history setup](../completed/entire-session-history.md)
 retains recording, import and hosted publication proof.
@@ -57,12 +58,9 @@ beta.64 parser and current-runbook implementation evidence.
 The implemented [Native Alchemy docs hard cutover](../../product-specs/native-alchemy-hard-cutover.md)
 SPEC and [`native-alchemy-hard-cutover.tasks.json`](../../product-specs/native-alchemy-hard-cutover.tasks.json)
 were implemented and closed as the successor to the completed native Alchemy
-graph. The current repository graph removes `DocsBuild`/`Command.Build`
-admission, uses one Preview/teardown lock, and includes the beta.64 Vite memo
-boundary. The separate Preview state reconciliation is recorded in the
-[cutover receipt](../../evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json).
-It does not establish Production deployment, publication or permanent
-availability.
+graph. That work removed `DocsBuild`/`Command.Build` admission and added one
+Preview/teardown lock and the beta.64 Vite memo boundary. History: the
+[21 August Preview state reconciliation record](../../evidence/deployments/2026-08-21-native-alchemy-hard-cutover/legacy-state-cutover.json).
 
 The completed
 [Automatic Preview Teardown Admission](../completed/automatic-preview-teardown-admission.md)
@@ -104,6 +102,3 @@ and
 The completed docs application migration and its bounded local screenshot
 evidence are retained under
 [`../completed/docs-application-architecture.md`](../completed/docs-application-architecture.md).
-
-The [TaxKit local continuation prompt](clean-slate-local-handoff.md) records the
-4 October requested cloud-to-local handoff for the active clean-slate plan.

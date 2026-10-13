@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-sdk-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-13
 review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
@@ -293,8 +293,8 @@ entrypoints. It rejects incomplete tables at construction and typed/saved
 representation decoding, and compares all five retained table, effective-period
 and source-artifact encodings against 13 preserved historical SHA-256 values
 and two approved 2025–26 Medicare table/source fingerprints. The original
-fingerprints remain in the earlier source history; the correction receipt
-records their exact legal-data delta. These are
+fingerprints remain in the earlier source history; the dated Medicare correction
+record keeps their exact legal-data delta as history. These are
 local packed-package checks, not publication or provider proof.
 
 

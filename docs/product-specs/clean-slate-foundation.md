@@ -21,7 +21,7 @@ This is the accepted implementation contract and design interview record.
 Cooper explicitly requested implementation on 4 October 2026, superseding the
 prior whole-design Q14 admission hold. Q1–Q13 remain settled. The
 [sibling tasks](./clean-slate-foundation.tasks.json) and
-[active plan](../exec-plans/active/clean-slate-foundation.md) track actual progress.
+[superseded plan](../exec-plans/completed/clean-slate-foundation.md) record its progress.
 The original implementation authority includes reviewable commits and draft
 PRs. Cooper subsequently authorised native TaxKit Preview and Production
 deployments from this Mac on 7 October after exact source, plans, credentials,

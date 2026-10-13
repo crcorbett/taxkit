@@ -58,8 +58,6 @@ Implemented surfaces:
 - `packages/rules/au/income-tax`: Australian annual income-tax rule pack.
 - `packages/rules/au/stsl`: Australian STSL withholding rule pack.
 - `packages/testing`: shared test helpers for workspace packages.
-- `packages/scripts`: Effect-native release-readiness command orchestration
-  over canonical root and package-owned validators.
 - `packages/tsconfig`: shared TypeScript configuration presets.
 - `docs/**`: architecture, product specs, execution plans, standards,
   references and documentation audits.

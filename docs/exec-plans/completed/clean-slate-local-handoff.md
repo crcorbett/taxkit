@@ -1,13 +1,19 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: superseded
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-04
+last_reviewed: 2026-10-13
 review_trigger: local continuation, PR reconciliation, approval or dependency revision changes
+successor: ../active/common-practice-foundation-review.md
+superseded_reason: The clean-slate plan it continued is superseded by the 13 October Common Practice foundation.
 ---
 
 # TaxKit local continuation prompt
+
+Superseded: current work follows the
+[Common Practice foundation plan](../active/common-practice-foundation-review.md).
+The prompt below is the 4 October handoff, kept as history.
 
 Paste the following into the local thread with this repository selected.
 
@@ -23,7 +29,7 @@ Read `AGENTS.md`, `docs/README.md`, the current Commonplace Linear skill at
 `.agents/skills/linear/SKILL.md` and its applicable references, the strict Effect
 skill, and the relevant package/architecture instructions before editing. Use
 `docs/product-specs/clean-slate-foundation.md`, its sibling `.tasks.json`, and
-`docs/exec-plans/active/clean-slate-foundation.md` as the current scope, dependency,
+`docs/exec-plans/completed/clean-slate-foundation.md` as the current scope, dependency,
 acceptance and execution owners. Read live Linear issues, linked design and
 comments, PR state and hosted checks before resuming. Retain native dependency
 relations and distinguish implemented, tested, reviewed, merged and deployed.

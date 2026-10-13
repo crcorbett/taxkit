@@ -68,17 +68,21 @@ Supporting facts that reinforce it, not replace it:
   fact, derived fact, rule, parameter, scenario, report, trace. Avoid "mode",
   "formula", "tax return" and "personal tax advice".
 - The repository is public and so are its AI work-history transcripts
-  (Entire). Maintainer docs under `docs/` are a governed lifecycle with
-  SPECs, execution plans, runbooks and evidence receipts.
-- Current apps: `apps/web` is the native TanStack Start Website candidate. It
-  serves the three calculators over native Effect RPC and reads all accepted
-  documentation pages. Tax calculation stays in the separate `apps/api`.
-  `apps/docs` is a retirement tombstone. The clean-slate rebuild
-  (`docs/product-specs/clean-slate-foundation.md`) is in progress; that SPEC
-  owns what is accepted and deployed.
+  (Entire). Maintainer docs under `docs/` carry a lifecycle: SPECs, execution
+  plans, architecture and runbooks. Ordinary commits, pull requests and
+  `bun run verification` are the process; `docs/evidence/` holds dated
+  historical records only.
+- Current apps: `apps/web` is the native TanStack Start Website. It calls the
+  API through native generated HTTP clients: server rendering uses
+  `HttpApiClient` over the private API binding, and the browser uses an
+  `AtomHttpApi.Service` that calls the public API directly. It reads the
+  published documentation pages from the API. Tax calculation stays in the
+  separate `apps/api`. `apps/docs` is a retirement tombstone. The Common
+  Practice foundation (`docs/product-specs/common-practice-foundation-review.md`)
+  owns current Website/API work.
 - Production addresses are agreed as `taxkit.dev` and `api.taxkit.dev` on
-  Cloudflare via Alchemy. Check the SPEC and `docs/evidence/` for what is
-  actually deployed before claiming it.
+  Cloudflare via Alchemy. Check the deployed Website and API directly before
+  claiming what is live.
 
 ## Capabilities and Constraints
 
@@ -103,7 +107,7 @@ Agreed product constraints from the rebuild spec:
 - Anonymous access with request limits; no accounts or payments.
 - Analytics are page views and calculator names only, with no consent dialog
   and no calculation details.
-- Public Markdown covers accepted docs and reference pages only; no personal
+- Public Markdown covers published docs and reference pages only; no personal
   report downloads.
 - The browser never runs a second tax engine.
 
@@ -149,7 +153,8 @@ Explicitly undecided or absent:
 - 62 published MDX pages in `packages/docs-content/content` with a reader
   persona per page in `packages/docs-content/navigation.json`.
 - Generated OpenAPI snapshot and route fixtures under `packages/api/http`.
-- Deployment and verification receipts under `docs/evidence/`.
+- Dated historical deployment and release records under `docs/evidence/`.
+  They are history, not proof of what is deployed now.
 
 Absences future work must not fabricate: no customers, testimonials, case
 studies, usage numbers, press, pricing, published package, or production
