@@ -3,74 +3,212 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-10-08
-review_trigger: website rendering, settings, transport, form, generated types or build change
+last_reviewed: 2026-10-13
+review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
 ---
 
 # Website app
 
-`apps/web` is the native TanStack Start Website candidate. Its calculator pages use
-native Effect RPC for the three supported Australian 2025–26 calculators and
-all accepted documentation pages. Tax calculation stays
-in the separate API app. This Website also owns the accepted documentation reader. `apps/docs` is
-a retirement tombstone for the old source and dated recovery records.
+`apps/web` is the TanStack Start Website on Cloudflare. It renders the three
+supported Australian 2025–26 calculators and the accepted public
+documentation. Tax calculation and content lookup stay in the separate API app;
+the Website reads them through Effect's generated `HttpApiClient` for
+`TaxKitApi`. `apps/docs` is a retirement tombstone for the old source and dated
+recovery records.
 
 ## What runs where
 
-The server has one `ManagedRuntime` in `src/lib/runtime.server.ts`. Its checked
-`WebsiteServerApplication` exposes settings, the supported calculator catalogue,
-calculation and five named documentation operations. The private
-`TAXKIT_API` service binding supplies the server connection. Calculator calls use the native Alchemy Fetcher adapter. Documentation calls
-materialise their native HTTP request with `HttpClientRequest.toWeb`, preserving
-the JSON byte body and the binding's receiver. This avoids carrying a stream
-owned by an earlier Cloudflare request into a later call.
+**Server rendering.** `src/lib/runtime.server.ts` owns one `ManagedRuntime`
+(`runtime`) per loaded Worker module. It provides `WebsiteHostLive`
+(`src/lib/api/host.server.ts`), the fixed host telemetry and the analytics
+relay. `WebsiteHost` holds:
 
-The root route restores Schema-encoded settings/catalogue and seeds a React-owned Atom
-registry. `calculator.atoms.ts` describes the browser connection and commands;
-it creates no browser runner. Checked settings stay alive for that registry's
-lifetime, including time spent waiting before the first click. The browser calls
-the checked `API_PUBLIC_ORIGIN` directly at POST `/rpc`. The server function
-transports settings and the checked catalogue. No calculation runs when the page loads.
+- the checked settings;
+- the generated client, `HttpApiClient.makeWith(TaxKitApi, ...)`, over the
+  private `TAXKIT_API` service binding
+  (`toHttpClient(fromCloudflareFetcher(binding))`);
+- `forward(path)`, which sends one request to the API and returns its finished
+  response (used for discovery files).
 
-Calculate sends the existing canonical request. Editing interrupts unfinished
-work and keeps the previous successful answer with an out-of-date message.
-A failed retry or invalid form keeps that answer visibly out of date; only a
-successful explicit calculation updates it. A previous request error is hidden
-while a new request is running. Leaving the form interrupts its operation;
-disposing the registry releases its resources. The standard HTML POST form also
-works without JavaScript, using the private binding and the same API operation.
-Server submissions use an encoded checked result when TanStack loads the page
-in the browser. Neither an Effect Context nor a service binding is serialised.
+The calculation POST does not use the binding's `fetch`. It calls the API's
+trusted private `calculatorRequest` method, so the caller's rate key travels
+outside JSON and headers. That method cannot carry an `AbortSignal`; the API
+bounds its own work and reply. Every server call forwards the visitor's
+analytics collection choice (`deny` when there is no incoming request).
 
-The take-home result leaf shows the answer first and uses native `details` for
-its pay breakdown, assumptions, supported year and source references. Amounts,
-pay period, threshold choice and sources come from the checked report and its
-recorded withholding trace, not the currently edited form. This keeps an old
-answer's explanation consistent while it is out of date. Source references
-become links only when they are valid HTTPS addresses; other citations remain
-text. The container owns calculation commands; result rendering creates no
-browser client, cache or tax calculation.
+**Browser.** `src/lib/api/client.atoms.ts` declares `ApiClient`, an
+`AtomHttpApi.Service` for `TaxKitApi` built with `runtime:
+browserRuntime.factory`. It calls the API's public origin directly with
+`FetchHttpClient` (`credentials: "omit"`, `redirect: "error"`), sends no
+`b3`/`traceparent` headers (`HttpClient.TracerDisabledWhen`) and adds the
+Do Not Track collection choice to each request. The Website has no proxy for
+API paths and declares no TanStack server functions.
 
-The shared RPC client owns its receive-loop scope per calculation. Retaining a
-client started by an earlier Worker request can stall a later request. Its
-transport Layer keeps configuration, and each call creates and releases the
-native RPC client without building a Layer or runner. Both RPC and HTTP tracing
-are disabled for this connection; HTTP tracing otherwise adds headers outside
-the admitted browser CORS policy. This is containment, not completed tracing.
+**Both.** `boundedResponses` (`src/lib/api/bounded-response.ts`) reads each
+reply into memory with a 2 MiB cap, keeping its status and headers so the
+generated client still decodes declared errors. `src/lib/api/requests.ts`
+wraps each generated call in one ten-second deadline covering headers, body and
+decoding, and maps transport, deadline and size failures to the Website's
+errors in `src/lib/api/errors.ts`. A calculation reply must answer the
+requested calculator with its own report kind (`WebsiteApiMismatch`
+otherwise). An unreadable or invalid reply shows the `WebsiteApiUnavailable`
+message.
 
-## Settings and generated owners
+## Loaders and router
 
-Alchemy's apps graph supplies `API_PUBLIC_ORIGIN`, `WEBSITE_PUBLIC_ORIGIN` and
-`TAXKIT_API` from the matching native resources. Origin Schemas admit HTTPS or
-local HTTP origins and reject paths, queries, fragments and credentials. Config
-reads semantic strings; Schema checks the native binding object separately.
-Expected settings errors use fixed safe fields. No guessed production address
-or browser build-time origin is used. Automatic Vite env-prefix exposure is off.
+`src/router.tsx` creates one `AtomRegistry` (`createLoaderRegistry`) before any
+loader runs and passes it as router context; the root route gives the same
+registry to React. On the server the context holds none and each render gets
+its own registry.
 
-`wrangler.jsonc` owns the standalone local fixture and compatibility settings.
-Its local names and addresses are test inputs, not deployed resources. Wrangler
-owns `src/worker-runtime.generated.d.ts`; regenerate it rather than editing it.
-TanStack owns `src/routeTree.gen.ts`.
+TanStack owns loader data. There are no request atoms or a second cache.
+`defaultPreload` is `"intent"` and `defaultStaleTime`/`defaultPreloadStaleTime`
+are 60 seconds. The root route sets `staleTime: 0` because it carries the live
+settings and any personal no-JavaScript submission.
+
+`src/lib/loaders.ts` uses `createIsomorphicFn`: server loads call
+`runtime.server.ts`, browser loads call `runtime.client.ts`. Both call the same
+request functions with the generated client. Server loads stop when either the
+loader or the incoming request is aborted; browser loads use the loader's own
+`AbortSignal`, which cancels the HTTP call. `src/lib/load.failure.ts` turns a
+missing documentation page into TanStack `notFound()` (HTTP 404) and any other
+failure into `WebsiteLoadError`, rendered by the route's error component.
+Interruption stays interruption. Failed server page loads (settings
+unavailable, a documentation build mismatch, search unavailable) reply 500 with
+`no-store`.
+
+## Settings
+
+`src/lib/config.server.ts` reads only the Website's own keys from the Worker
+bindings, through `reifyBoundConfigProvider`:
+
+| Key | Source | Use |
+| --- | --- | --- |
+| `WEBSITE_PUBLIC_ORIGIN` | the Website's own `Worker.URL` | browser-tool registration and the analytics relay origin check |
+| `API_PUBLIC_ORIGIN` | the API's address Output | browser client base URL and the server client's base URL |
+| `TAXKIT_PUBLICATION_ORIGIN` | fixed `https://taxkit.dev` | canonical, Markdown alternate and share-image links |
+| `CALCULATOR_HOST_MODE` | the apps graph | `local-emulator` allows the loopback rate key in local development; default `edge` |
+| `POSTHOG_*` | not bound by the current graph | analytics relay settings; collection stays off |
+
+`TAXKIT_API` is checked separately as the binding object (it must expose
+`fetch`, `connect` and `calculatorRequest`) so its methods keep their receiver.
+Missing or invalid settings produce `TaxKitWebConfigError` with fixed fields.
+The root loader encodes the public settings into its loader data; the root
+route restores them and seeds `publicSettingsAtom`, which the browser client
+reads. No binding, credential or Effect Context reaches the browser. Vite sets
+`envPrefix: []`; there is no build-time API address.
+
+`wrangler.jsonc` owns the standalone local fixture. Wrangler generates
+`src/worker-runtime.generated.d.ts` and TanStack generates
+`src/routeTree.gen.ts`; regenerate them rather than editing them.
+
+## Calculator pages
+
+Take-home pay is at `/`; `/calculators/au.pay.withholdings` and
+`/calculators/au.income-tax.annual` have their own form and answer state. The
+navigation uses the API catalogue's titles and identities. Annual pages state
+that the retained Medicare thresholds await correction.
+
+`src/lib/calculator.atoms.ts` holds one `Atom.family` group per calculator: the
+form, the calculation (`apiClientRuntime.fn` over the generated client) and the
+shared readonly view. Calculate sends the checked request. Editing interrupts
+unfinished work and keeps the last successful answer, marked out of date, until
+an explicit calculation succeeds. Leaving the page interrupts its work. The
+view is kept alive for the registry's lifetime so a restored server answer
+survives a paused first render and a return visit. No figures go to browser
+storage or the URL.
+
+The take-home result shows the answer first, with native `details` for the
+breakdown, assumptions, year and sources. Explanations come from the checked
+report and its trace, not the edited form. Source references become links only
+for valid HTTPS addresses.
+
+**Without JavaScript.** `src/server.ts` handles form POSTs to the three
+calculator paths before TanStack. It applies the shared 64 KiB, five-second
+body limit (HTML 413/408 guidance), decodes the form (empty 400 if invalid),
+calculates through the same server client and renders the page with the result
+in the request's server context. The root loader returns that submission beside
+the public data, never inside it.
+
+## Documentation pages
+
+The catch-all route loads the page and navigation from the API's documentation
+routes; the server uses the original pathname. The MDX presentation is compiled
+at build time from the same content collection. Before display, its processed
+Markdown and frontmatter must match the API's page; a mismatch, or a missing
+compiled module, shows fixed guidance. Missing pages use TanStack's not-found
+state and HTTP 404. Internal links are router links; client navigation moves
+focus to the new heading and initial hydration does not.
+
+`/search` has a plain GET form with one `term` field and works without
+JavaScript. `search-location.boundary.ts` reads the raw address once, so words
+such as `1e3` or quoted text are not JSON-parsed; duplicate or unexpected keys
+and words over 100 characters are a normal invalid-search page state. Empty
+words load navigation only. Search pages are `noindex, follow`.
+
+**Markdown.** Accepted pages also serve their processed Markdown at the `.md`
+address and at the page address with a preferring `Accept` header
+(`markdown.response.server.ts`). HTML wins ties and a missing preference.
+Invalid or wholly excluding `Accept` fields return empty 400/406; other methods
+on `.md` return 405; query input 400; missing or unavailable pages 404/503, all
+`no-store`. Markdown replies carry `Vary: Accept`, `nosniff` and a canonical
+link to the publication origin.
+
+**Discovery.** `/sitemap.xml`, `/robots.txt`, `/llms.txt` and `/llms-full.txt`
+are forwarded once to the API's `/api/v1/docs/discovery/*` routes, which own the
+documents. GET and HEAD only (other methods 405 with `Allow: GET, HEAD`); query
+input 400; an unreachable API 503.
+
+**Share metadata.** `metadata.egress.ts` derives canonical, Markdown alternate,
+Open Graph and Twitter addresses from the page and the publication origin, and
+encodes TechArticle data with script-breaking characters escaped. The Vite
+config runs `scripts/docs-images.build.ts` before copying public assets: it
+renders one 1200 × 630 PNG per accepted page into the ignored `public/og`
+directory with the build-only `@takumi-rs/wasm` 2.14.0 renderer. The renderer
+stays out of the Worker and browser bundles.
+
+## Caching
+
+`src/server.ts` makes one cache decision for every reply with
+`applyCachePolicy` from `@taxkit/api-http/response-policy`. A successful GET or
+HEAD without `Set-Cookie` or a stricter instruction gets
+`Cache-Control: public, max-age=0` and
+`Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
+Everything else, including form submissions, errors and the `/ingest/` relay,
+gets `no-store`. The apps graph enables the Website's native Workers Cache
+scoped to the deployed version. `/_serverFn` and `/_serverFn/*` return an empty
+404.
+
+## Browser tools
+
+On a mounted calculator, browsers with WebMCP support can register five tools:
+`taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`,
+`taxkit_calculate_visible_form` and `taxkit_read_result`
+(`browser-tools.atoms.ts`). They use the page's own edit and submit commands and
+the same `ApiClient`; mounting or reading starts no calculation. Each tool has a
+two-second registration limit and calculation has a twelve-second outer limit.
+A caller's cancellation or an edit cancels only the request that call owns;
+another unfinished calculation is reported as busy. Page cleanup removes the
+tools. Failures carry fixed codes without input values. `/agents` links the
+remote MCP address on the API origin, the OpenAPI description and the
+[agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx).
+
+## Analytics
+
+The browser client reads `navigator.doNotTrack` at each request: `1` refuses
+collection; `0`, `unspecified` or no value permit it; an unexpected value or a
+host that throws refuses it. HTML form calculations read the original request's headers
+through the analytics package's header boundary. Only the allow/deny flag is
+sent; it carries no identity.
+
+POST `/ingest/e/` is a private relay to `https://us.i.posthog.com/e/`. It admits
+only the Website origin, checked media types and one `retry_count` query field;
+bodies are limited to 65,536 bytes and one five-second scope covers the body,
+upstream headers and reply. It strips cookies, authorisation, forwarded IP and
+trace headers and refuses redirects. Denied collection returns an empty 204;
+configured-off returns 404; invalid enabled settings return 503. Replies are
+`no-store`. The current apps graph binds no PostHog settings, so collection is
+off.
 
 ## Checks
 
@@ -85,526 +223,47 @@ bun run --filter=web build:native-pair
 bun run --filter=web test:native-pair
 ```
 
-`build:native-pair` first builds the API dependency graph, including the accepted
-docs catalogue and compiled RPC dependencies, then uses Alchemy's
-public native source builders for both apps. The Website declares `api` as a
-workspace development dependency because this local builder resolves
-`api/worker`; a stray root link cannot stand in for that declaration.
-It acquires no cloud provider,
-state, plan, credentials or apply. The API output is ignored under
-`.alchemy/native-pair`; the native Website output is `dist/server/server.js`.
-A standalone Cloudflare Vite build instead produces `dist/server/index.js`.
-Run the native build immediately before its test, because a normal build
-replaces that Website output.
+`test:browser` runs the Chromium tests in `src/lib/*.browser.test.tsx`: the
+shared loader registry and client reuse, not-found and load-error translation,
+loader cancellation, invalid search words, calculator commands, editing,
+hydration and form unmount.
 
-The native pair test requires the selected Node 24.16.0 and installed Chromium.
-It owns local ports 4196 and 4197 and disposes its browser and Workers on exit.
-The public API and private binding use separate local isolates built from the
-same API artifact. The test covers an initial page, repeated private requests
-across idle time, one exact browser POST, omitted cookies/tracing headers,
-editing, and a calculation without JavaScript. It does not prove deployment,
-provider cancellation or every failure/trace-export path.
+`build:native-pair` builds the API dependency graph and then both apps with
+Alchemy's native builders, without a cloud provider, state or credentials. Its
+API output is under the ignored `.alchemy/native-pair`; the Website output is
+`dist/server/server.js`. A standalone Vite build writes `dist/server/index.js`
+instead, so run the native build immediately before its test. The root
+`bun run test:native` does both.
 
-The native analytics test uses the freshly built API and a controlled local
-upstream with a synthetic capture token. It covers HTTP, RPC and both official
-MCP client versions, changing collection choice within each conversation,
-refused/redirected capture and a stalled reply. It uses no PostHog provider
-credentials or service. The built pair additionally checks fresh browser and
-HTML collection choices, including actual Chrome WebMCP caller changes. Ordinary local/Preview collection stays off. The
-pageview sender and relay remain T008 work in progress. See the [API candidate owner](../api/README.md#analytics-candidate)
-and [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-analytics-backend-and-request-policy.json).
+The native tests in `test/` run the built pair in Miniflare and Chromium. They
+cover first HTML for every page, documentation pages, search, Markdown and
+discovery files with their cache headers, calculation with and without
+JavaScript, request and reply limits, cancellation, rate admission, settings
+failure, the analytics relay and collection choice, MCP clients and the WebMCP
+browser tools. They need Node 24.16.0 and the installed Chromium, and they do
+not show hosted behaviour.
 
-The Atom/Scheduler browser checks cover scheduling, StrictMode remount,
-hydration, rapid updates, editing and form unmount cancellation, and expected
-server-error restoration without replaying a calculation. A different restored
-form must match both the displayed fields and shared state before its explicit
-retry sends that same checked request. Effect scopes own
-fixture cleanup. Exact lint admissions cover required execution, encoding,
-native binding input and Playwright's `fill` operation; nearby application
-files retain the restrictions. Both Knip graphs include the Website.
+## Local development
 
-From the repository root, `bun run dev` starts the native API and Website
-pair. `alchemy.local.run.ts` admits only local development at the named
-`dev_native_apps` stage (and `dev_native_apps_proof` for the saved test).
-Alchemy prints the two addresses, binds the private API and supplies the public
-origins. It uses local state and `.alchemy/native-apps-auth`, without an ambient
-env file or cloud login. Ctrl-C stops the pair. Source changes in either app
-reload automatically; shared-package changes require the owning package build
-because the API bundler reads compiled dependency exports.
+From the repository root, `bun run dev` starts the native API and Website pair
+with `alchemy.local.run.ts` at the `dev_native_apps` stage. Alchemy prints both
+addresses, binds the private API and supplies the origins, using local state
+and `.alchemy/native-apps-auth` without a cloud login. Ctrl-C stops the pair.
+App source changes reload; shared-package changes need that package's build,
+because the API bundler reads compiled exports.
 
-The Website Vite config reads a fresh ConfigProvider when Alchemy injects its
-native plugin flag, so it does not add a second Cloudflare plugin. Server code
-imports the supported runtime-only `alchemy/Cloudflare/Bridge` export, keeping
-SDK development tools out of the Worker bundle. Bun's inherited source options
-select the API source across Alchemy launcher processes. The root pins workerd
-at the app-compatible version for both the native SDK and standalone fixtures.
+`bun run --filter=web dev` runs the Website alone through portless. It still
+needs a native API binding, which the standalone Bun API cannot supply. Build
+the accepted catalogue first with `bun run --filter=@taxkit/docs-content build`.
 
-`bun run --filter=web dev` remains the standalone Website fixture. It needs a
-matching native API binding; the separate Bun HTTP process cannot supply that
-binding. The saved native suite also starts the real CLI pair with an isolated
-empty profile directory, reads its actual addresses, checks browser validation
-before live edits, restores both sources exactly, and verifies calculations
-with and without JavaScript plus closed app ports after shutdown. Do not run
-it beside another development process in this checkout: both watch the same
-sources. Full exported telemetry and complete package/transport qualification remain active work.
+The Vite config reads Alchemy's native plugin flag through a fresh
+ConfigProvider so it does not add a second Cloudflare plugin. Server code
+imports the runtime-only `alchemy/Cloudflare/Bridge` export.
 
 ## Related owners
 
 - [Frontend architecture](../../docs/architecture/frontend.md)
-- [RPC package](../../packages/api/rpc/README.md)
 - [API app](../api/README.md)
+- [HTTP API package](../../packages/api/http/README.md)
 - [Native apps graph](../../packages/infrastructure/README.md)
-- [Active execution plan](../../docs/exec-plans/active/clean-slate-foundation.md)
-
-Retained 2025–26 results are unchanged. The Medicare decision, complete package/transport
-qualification and safe exported telemetry remain separate unfinished tasks.
-T003's local connection, failure/cancellation and disabled-platform acceptance
-is recorded in the [acceptance review](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-connection-acceptance-review.json).
-
-The settings server function accepts GET without query data or client Context.
-The shared explicit route base is configured in Vite and checked at Worker
-ingress. The native function's generated URL is the exact admitted address;
-unknown IDs, extra path parts and missing IDs get empty 404 before framework
-lookup/logging. Unexpected payloads get empty 400 responses; unsupported methods get
-empty 405 with `Allow: GET`. Unexpected internal settings failures pass through
-the native HTTP matcher and fixed host reporter before TanStack serialisation.
-
-The native builder also compiles a controlled `PRIVATE9` settings defect into
-ignored `.alchemy/native-pair/settings-defect/server`. An Effect scope restores
-the source byte-for-byte before rebuilding the ordinary pair. Do not run this
-builder concurrently with source scans or tests that replace source files.
-The fault test requires the injected operation in the actual artifact, empty
-500 response, positive fixed log event and no marker in logs or replies.
-
-The same builder also creates controlled API failure artifacts from the actual
-API entry: a real calculation followed by an unexpected defect, and one damaged
-report field after native reply encoding. Scoped finalisers restore the entry
-byte-for-byte before the ordinary build. Fresh owned output and reached-response
-checks prevent an old bundle from standing in for the injected operation.
-
-The native RPC failure test uses ports 4199 and 4200. Real Workers check malformed
-JSON, unknown procedures/envelopes, invalid identities, excess properties and
-bounded batches, plus procedure decoding, version disagreement and expected
-calculator rejection. The fatal reply retains its native defect identity and
-fixed safe message; the Website returns empty 500 through the private binding.
-A damaged valid-JSON reply becomes the checked invalid-response error. Its real
-Worker-produced HTML loads in Chromium; editing clears the restored error
-without replaying a calculation, proving the browser has taken over the form.
-Actual fixed API/Website log events must be present and omit the short marker
-and pay values. These are local observations; exported telemetry remains unfinished.
-
-The native cancellation test uses ports 4201–4203. Two controlled API artifacts
-first run the real calculation and native reply encoder, then delay headers or
-the rest of that same reply for twelve seconds. The generated client must reach
-its ten-second deadline in both cases. Chromium must abort its unfinished
-request after the deadline, on editing, and when browser Back leaves the form.
-These checks establish caller and browser cancellation. They do not establish
-that the upstream Worker stops its artificial delayed response.
-
-The native log checks compare pay values against emitted messages. Numeric
-Worker timestamps can coincidentally contain a pay value; they are metadata,
-not an emitted pay message. Private text markers remain checked across the
-whole log record. The [dated cancellation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-05-native-cancellation.json)
-records source-removal checks, restoration and the remaining
-exported-telemetry work.
-
-The native graph and standalone `wrangler.jsonc` explicitly disable platform
-invocation logs, stored logs and traces, with zero sampling. This protects the
-candidate while safe exports remain unqualified in T009. Saved real CLI state
-must contain the disabled policy for both apps; this is local desired-state
-proof, not a provider upload or exported-data observation.
-
-The saved development test uses the non-polling file watcher used by Linux CI.
-It separates the first visible page edit from exact source restoration by
-100 milliseconds because the pinned Vite watcher suppresses repeat file-change
-events within 50 milliseconds. It still requires both visible page updates;
-the original 15-second observation deadlines remain unchanged.
-
-
-## Calculator routes
-
-The root takes its navigation names, identities and year from the API catalogue.
-Take-home pay stays at `/`; `/calculators/au.pay.withholdings` and
-`/calculators/au.income-tax.annual` have independent form and answer state.
-The root restores only encoded transport. The additional route selects the
-expected checked report and saved form for its calculator;
-the container seeds the checked saved form once with `useAtomInitialValues`
-and owns commands/cancellation. Focused readonly leaves show the form/report.
-The root registry seeds settings and the catalogue; a later form restoration must not depend
-on its first-render-only initial values. A saved submission checks its identity, form and successful
-report together before restoration. Standard HTML POST uses the selected
-canonical calculator and same private connection at each page address.
-
-The root registry retains the shared view, whose read callback holds the whole
-atom-family description group. That family uses weak references; holding only
-individual members would allow a second group on a return visit after browser
-memory cleanup. The group describes state and work, while the registry owns
-values and execution. Controls have visible keyboard focus and a skip link to
-the single main landmark.
-
-The withholding and annual explanations use returned ledger components and
-sources. Annual subtractive offsets are labelled as reducing the total; the
-zero minimum is shown separately. Annual pages visibly state that retained
-Medicare thresholds await Cooper's correction decision. No tax rule changes
-or current-law correctness claim is made.
-
-The developer link opens the native API documentation. `/agents` links to the
-actual OpenAPI description and calculator list. Remote MCP, discovery content
-and accepted publication remain later tasks; this page does not claim they exist.
-
-All three standard HTML form POST paths share the native 64 KiB body limit and
-five-second total body-read deadline with the API host. Oversized bodies return
-HTML 413 guidance and stalled bodies return HTML 408 guidance, each with a fixed
-message and link back to the calculators. Neither reflects submitted figures or
-URLs. Unfinished readers close on rejection, timeout or interruption. This admission check runs before form data
-is materialised. It counts bytes, including multi-byte text, not characters.
-
-Native page proof screenshots are saved under ignored
-`.alchemy/native-pair/screenshots` at the checkout root. Effect Path/FileSystem
-creates that folder; tests must not assume a macOS-only temporary directory.
-These images contain controlled local examples and do not establish a deployed
-page or current-law correctness.
-
-The RPC client rejects oversized replies and distinguishes request timeout,
-request size and rate-limit errors before reading an error body. The calculator
-containers show fixed safe guidance for checked browser and restored form
-failures. A retry is always a visitor action; previous answers remain visibly
-out of date until an explicit successful calculation. The response limit and
-complete ten-second client deadline belong to the private RPC package.
-
-The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
-across HTTP and RPC, including individual batch messages, with a five-second
-calculation budget. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `4` errors. Website guidance requests
-manual retry only. This is separate from the body-read and ten-second client
-budgets. Metadata does not use a calculation place. Native built proof covers a
-seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
-browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
-cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. The native rate policy below is implemented separately; MCP and whole T004
-qualification remain unfinished.
-
-
-The private checked RPC contract now contains all nine calculator-service calls,
-with operation-scoped client lifetime and shared reply protections. Website
-commands still request only the data needed by their pages; the added metadata
-calls do not load the calculation engine into the browser. See the
-[RPC owner](../../packages/api/rpc/README.md#complete-named-operation-contract).
-
-
-Website form restoration constructs known rule-owned context values through
-the canonical request Schema. It wraps them in the owning Options before RPC
-serialisation. Supported form fields, results and retry behaviour are unchanged.
-
-
-Chromium qualification forces a fresh dependency bundle for its explicitly
-included workspace RPC source. The lockfile alone cannot identify changes to
-those local Schemas. This prevents a stale compiled client from qualifying a
-different request contract; production Vite configuration is unchanged.
-
-
-## Native calculation rate admission
-
-The API and Website use the [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission). The Website checks its original Cloudflare connection address and supplies it separately from request JSON to the binding-only `calculatorRequest` operation. The installed Alchemy native RPC adapter owns private-call reply handling. Both browser and restored HTML forms display fixed rate/unavailable guidance and never retry automatically.
-
-The private request omits an explicit AbortSignal because the pinned native RPC cannot serialise it. Client cancellation stops local waiting; API work and reply budgets remain in force. This does not prove remote cancellation. The guarded disposable root selects `local-emulator` and one loopback allowance; hosted composition defaults to `edge`. [Infrastructure configuration](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns this distinction.
-
-The native pair test also uses the separate checked documentation RPC client
-against the actual built API. It compares navigation, every one of the
-accepted pages and exact Markdown, plus bounded search across separate Worker
-requests. The same saved journey now qualifies the Website page connection described below.
-Search and discovery are described below. The
-[retirement receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-docs-retirement.json)
-records the old app's locally qualified retirement and retained recovery limits.
-
-## Documentation pages
-
-The catch-all route renders every accepted public page through the checked
-private documentation client. Server rendering reads the original pathname;
-request headers cannot select a different page. Browser navigation uses the
-native data-free GET function with one bounded `x-taxkit-docs-page` header.
-Its generated URL is admitted beside the settings function. Both reject query
-payloads, unsupported methods and content-type input before framework parsing;
-invalid public page addresses receive empty 400 responses.
-
-The route's dedicated browser-safe boundary restores checked loader outcomes.
-The route matches that result before composing its sidebar and article. One
-app-owned MDX map supplies internal router links, heading focus, code, images
-and keyboard-focusable table scrolling. Initial hydration keeps the reader's
-focus. Ordinary navigation moves focus to the new page heading. Missing pages
-use the native not-found state and HTTP 404. Expected failures offer a fixed
-message and an explicit recovery link.
-
-The Vite build uses the existing content collection configuration and matching
-MDX compiler. Browser code imports only compiled presentation and checked
-contracts. Before display, compiled Markdown and frontmatter must match the
-API page exactly; a different body, metadata or missing module produces fixed
-safe guidance. Canonical URLs use the checked Website origin. The article's
-Markdown link opens the same Website page's explicit `.md` address; its head
-links that address as an alternate Markdown representation.
-
-The native pair checks actual HTML for all accepted pages, native GET admission,
-three source-built content mismatches, malformed browser transport, real
-sidebar/MDX navigation without document reload, heading focus, mobile
-navigation, table keyboard focus and reading without JavaScript. Saved local
-images supplement those checks. The [Website documentation receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-connection.json)
-records their scope. Share images and old-app retirement
-are separate unfinished work. No local check establishes public availability.
-
-The application router supplies the named documentation page loader through
-its typed router context, beside the settings and search loaders. The page route consumes
-that function without importing its server-only implementation. Standalone
-browser checks use the same route tree with supplied loaders; native built
-checks exercise the actual server function and private API connection.
-
-
-## Documentation search
-
-`/search` has a labelled plain GET form with one `term` field. It works with
-and without JavaScript and calls the same accepted-catalogue `searchDocs`
-operation as the API. Empty words show an invitation to search; matching pages
-show their accepted titles and descriptions; no matches and unavailable search
-have separate guidance. Results link to the existing documentation routes.
-Search pages use `noindex, follow` and contain no calculation values.
-
-The content owner keeps the 100-character term and twenty-result limits. The
-Website checks its original URL once: duplicate or unexpected keys and excess
-length fail with fixed input guidance. Its router preserves literal URL pairs,
-so words such as `1e3`, quoted text and Unicode cannot turn into JSON values.
-The native browser GET carries a bounded ASCII URI component in
-`x-taxkit-docs-search`; the installed Schema codec encodes and decodes Unicode.
-SSR uses the original URL, so a forged header cannot change the search words.
-Only the generated settings, page and search function addresses are admitted.
-Native search query payloads, content types and malformed headers reject before
-framework parsing; checked input failures never expose decoding diagnostics.
-
-The search route restores its encoded outcome through its own checked boundary,
-then matches it before composing readonly form and result leaves. The typed
-route context supplies the named loader without importing server code into a
-browser route. Search links share the existing heading-focus policy; a normal
-HTML form submission remains an ordinary GET. No second index, personalised
-result store or collection event is added. The existing native journey checks
-real API results, literal words, hostile input, unavailable search, damaged
-transport, keyboard/phone behaviour and JavaScript-free form submission.
-The [search receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-search.json)
-records qualification separately from deployment and public availability.
-
-The saved local-development check waits up to fifteen seconds for the Website
-to serve a page after its address is printed. Only startup 502 or 503 responses
-are retried; other errors fail immediately. The following actual browser
-navigation must still return 200 and show the expected page. This is a bounded
-readiness condition, not evidence of the cause of an earlier hosted 502.
-
-## Documentation discovery
-
-The Website serves `/sitemap.xml`, `/robots.txt`, `/llms.txt` and
-`/llms-full.txt` through the same app-owned server runner and the checked private
-`docsDiscovery` call. The backend content owner derives every document from
-the accepted catalogue and the configured stage addresses. No authored MDX,
-extra content index or guessed public origin enters Website request handling.
-
-GET returns the declared XML/plain-text UTF-8 body; HEAD returns the same
-successful headers with no body. Both use a five-minute public cache header
-and `nosniff`. Other methods receive empty 405 with `Allow: GET, HEAD`;
-query input receives empty 400. Expected backend/settings failure returns
-empty 503 with `no-store`. Each call retains the native documentation deadline,
-checked reply, address correlation and caller cancellation.
-
-The sitemap lists accepted documentation pages without inventing update dates.
-Robots links it and excludes private server functions; the search page's
-noindex policy remains visible to crawlers. Agent links use the existing
-processed-Markdown API; the full index preserves every accepted processed body
-and explains its Website link base. It includes useful code examples and
-contains no personal calculation reports. Native tests compare actual served
-documents with checked backend replies, parse sitemap XML in Chromium, check
-all page addresses/bodies, headers/HEAD, invalid requests and unavailable API.
-The [discovery receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-discovery.json)
-keeps exact local proof and limitations. Share images and old-app retirement
-remain unfinished.
-
-
-## Documentation Markdown
-
-Accepted pages serve their checked processed body at both the ordinary page
-address with `Accept: text/markdown` and the explicit `.md` address. The latter
-works from the article link and alternate head link. The existing private
-`docsMarkdown` operation supplies the body; the Website reads no authored source.
-
-A bounded ingress-only Schema reads the complete Accept field, including
-weights, wildcards and quoted parameters. More specific preferences override
-wildcards; zero excludes a representation; HTML wins ties. Missing preference
-keeps HTML. Invalid fields return empty 400; excluding both representations
-returns empty 406. Same-address HTML keeps existing Vary fields and adds Accept.
-
-The named native HTTP policy composes the existing HTML Effect in the host's
-single request scope. The original URL supplies the checked public page identity.
-GET Markdown is UTF-8 with a five-minute public cache, `nosniff`, `Vary: Accept`
-and a checked Website canonical link. HEAD has those headers and explicit empty
-200. Explicit file methods other than GET/HEAD receive empty 405; Markdown query
-input receives empty 400; missing/unavailable content gives empty 404/503 with
-`no-store`. Calculator forms/functions and search/agent landing pages keep their
-existing behaviour. No personal report becomes a download.
-
-The existing native journey compares all accepted page/file GET bodies and
-HEAD headers with accepted content, tests real header choices and safe failures,
-and opens the real article link in Chromium. Exact decoding admissions have
-actual CLI positives and nearby negatives; encoder/runtime policy stays enforced.
-The [Markdown receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-markdown.json)
-records qualification separately from hosted checks and public availability.
-
-## Public documentation share images
-
-The Vite configuration runs `scripts/docs-images.build.ts` before copying public
-assets. That lazy, scoped Effect reads the checked accepted catalogue, uses the
-exact build-only `@takumi-rs/wasm` 2.14.0 renderer with its embedded Geist font,
-checks PNG dimensions and byte bounds through its build-only
-`docs-images.schemas.ts`, and writes the owned ignored `public/og`
-subtree. Each accepted page maps to `/og` plus its public path and `.png`.
-Images are 1200 by 630 pixels and include the public title, description and path.
-No calculation, source file, external font request or search word enters them.
-The full Knip graph includes this Vite host and its imported build program.
-The renderer is released when generation ends; a failed catalogue/render/image/
-write operation has fixed guidance. Former generated images are removed on each
-run so withdrawn pages cannot survive in this subtree.
-
-The existing Vite host supplies NodeServices and is the sole generation runner.
-Builds need the accepted catalogue first; the native pair and Turbo dependency
-graph already build that owner. Standalone development needs `bun run
---filter=@taxkit/docs-content build` before `bun run --filter=web dev`. Development also generates the
-images when its Vite configuration starts. Turbo declares both `dist/**` and
-`public/og/**` outputs. Tracked template/config/Schema/manifest and lockfile inputs,
-plus the upstream catalogue's source/review inputs, determine the build cache.
-
-`metadata.egress.ts` derives canonical, Markdown alternate, Open Graph and
-Twitter addresses from the checked page and Website origin. Its owning
-TechArticle Schema encodes the structured-data script; `<` and Unicode line
-separators are escaped without changing the decoded text. Author, publisher and
-modification dates are absent because this catalogue does not own them.
-The image renderer and WebAssembly stay out of Worker and browser bundles.
-Qualification is recorded in the [share-image receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-docs-images.json).
-This private app/build change needs no additional Changeset; existing T005
-package Changesets remain. Old-app retirement and metrics work stay separate.
-
-
-## Release documentation check
-
-The root release graph's `docs-browser` check uses `bun run test:native`.
-It rebuilds this Website and the native API and runs all native cases.
-The accepted-page reader observes actual HTML, private navigation, search,
-discovery, Markdown and all generated share images, plus keyboard/focus,
-landmarks, contrast and reduced motion. Quality installs Chromium from this
-app's pinned Playwright executable. The old docs workspace and writer workflows are
-retired. Their exact sources and dated recovery records remain addressable;
-new provider operations belong DEV-81. This is local source/build/browser proof only.
-
-
-The native-pair suite also runs the official MCP client over local TCP against
-its freshly built API. It compares returned calculation reports and accepted
-Markdown pages with HTTP and checks their common anonymous allowance. This
-belongs to the [API's agent-tools candidate](../api/README.md#native-remote-calculator-tools-candidate).
-The same suite checks older native conversations, bounded allocation/request
-admission, conversation-scoped cancellation, automatic alarm expiry and fresh
-initialise after 404. It separately preserves the modern TCP-disconnect cleanup
-limit: remote pre-response work ends at its five-second budget. The real native
-browser caller check is described below. T006 is locally accepted with this
-documented limit and ready for draft review. The MCP client and calculator
-Schema imports are test-only dependencies;
-no browser calculation implementation or production SDK client is added.
-
-## Visible calculator browser tools
-
-The `/agents` route offers a remote MCP address derived from the checked
-same-stage API settings, plus the accepted
-[agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx).
-The guide also appears in documentation navigation, search, processed Markdown
-and both agent discovery files through the existing accepted catalogue. It
-distinguishes remote tools from visible browser commands and explains the
-modern five-second cleanup limit, older conversation expiry and experimental
-browser support. The
-[agent setup receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json)
-records the full local checks and separate Preview/Production guide deployment
-and live readback. No autonomous AI session is claimed.
-
-Supported experimental browsers can register five tools on a mounted calculator:
-`taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`,
-`taxkit_calculate_visible_form` and `taxkit_read_result`. The catalogue, visible
-form and answer come from the same React-owned state as the page. Fill uses the
-existing edit command; calculate uses its submit command and existing RPC client.
-Neither mounting nor reading starts a calculation. The previous answer remains
-marked out of date after editing or interruption. The shared page snapshot stays
-in memory until the root registry is disposed. This keeps once-restored server
-answers and errors through a paused first React render and later navigation,
-including browser memory cleanup between leaving and returning.
-No figures are written to browser storage.
-
-Registration requires native capability and the checked Website origin. Missing
-support leaves normal browser/HTML use working. Each tool has its own two-second
-registration limit; one refusal cannot prevent the others. Page cleanup removes
-tools and interrupts their unfinished callbacks. Caller cancellation or editing
-cancels only the request owned by that call; another unfinished calculation is
-rejected as busy. Execution has a twelve-second outer limit around the existing
-request limits. Fixed failures omit input values and raw host details.
-
-The native suite runs Chrome for Testing 153.0.8010.12 with experimental WebMCP
-enabled in a disposable browser. Its actual developer-tools caller discovers,
-reads, fills, calculates and reads results, compares an answer with a completed
-manual RPC, and checks excess arguments, stale answers, busy calls, cancellation,
-editing, manual retry, route cleanup and a return after forced browser garbage
-collection without losing fields/results or starting a request. It uses local
-ports 4230/4231. This is
-actual native protocol-caller proof, not an autonomous model session or general
-browser availability. `webmcp-types` 0.1.10 is type-only; the installed caller's
-own types qualify the tested browser contract. See the
-[dated browser receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-browser-calculator-tools.json)
-and [frontend owner](../../docs/architecture/frontend.md#page-owned-browser-tools).
-
-
-## Calculator collection choice
-
-The browser calculator HttpClient reads `navigator.doNotTrack` at each actual
-request. `1` refuses collection; recognised unset/allow values permit it. A
-missing or refusing browser host or an unexpected value refuses collection
-without changing the tax request. Manual calculation and visible browser tools
-use the same existing Atom client, so neither path sends a second usage event.
-This adds no identity or storage and does not implement the pending pageview sender.
-
-HTML form calculation reads the original request through the shared private
-analytics header boundary. `DNT: 1` overrides allow, malformed and denied flags
-refuse collection, and a missing flag keeps ordinary HTML use compatible. Each
-private request carries only the checked allow/deny flag, alongside its existing
-rate admission; it never forwards browser identity. A missing server request
-refuses collection. Settings/catalogue lookups emit no calculator-use event.
-The [dated receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-website-calculator-collection-policy.json)
-separates controlled native/browser proof from provider ingestion or deployment.
-
-## Browser event relay
-
-The existing server runtime composes the private `WebsiteAnalyticsRelay` Layer.
-POST `/ingest/e/` fixes its upstream to `https://us.i.posthog.com/e/`. It admits
-the configured Website origin, checked `text/plain` gzip bytes or the selected
-SDK's JSON fallback, and one canonical `retry_count` from 0 to 10. Unknown or
-duplicate query fields, other media types and foreign/missing origins refuse.
-Each upstream attempt keeps complete bytes unchanged, strips caller cookies,
-authorisation, forwarded IP and trace headers, disables trace propagation, and
-refuses native redirects. It creates no retry queue or fallback destination.
-
-One five-second scope covers the incoming body, upstream headers and complete
-reply. Each body is limited to 65,536 bytes, including streams without a declared
-length; crossing the limit fails rather than forwarding a partial batch.
-Provider status and checked numeric retry advice survive. Replies are no-store
-and the native client aborts when the request scope closes, including a refused
-redirect whose body is never read. Replies forward no cookies or Location.
-Denied collection or `DNT: 1` returns an
-empty 204 before body read or delivery. Configured-off returns 404 without a
-key; invalid enabled settings remain a distinct checked 503 failure on this
-route, keeping ordinary calculator/documentation service ownership separate.
-
-The relay does not decompress or rebuild events. Compressed byte bounds do not
-prove decompressed size; the future browser sender owns the field allowlist
-and withdrawal policy. Current app bindings keep collection off. This local
-candidate supplies no sender, project, credential, stored-event proof or
-activation. Only the minimal Fetch profile is supported: other SDK paths,
-form/beacon fallback, automatic features and unreviewed query formats refuse.
-The [relay receipt](../../docs/documentation-audit/clean-slate-foundation/2026-10-08-website-event-relay.json)
-separates controlled SDK transport, native app and complete local qualification
-from the still-pending browser queue-discard choice.
+- [Deployment](../../docs/architecture/deployment.md)

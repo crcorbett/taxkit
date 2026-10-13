@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-13
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -16,7 +16,8 @@ calculation endpoints, generated docs and API server route wiring.
 
 `@taxkit/api-http` owns the current HTTP API contract, generated OpenAPI
 metadata, health and public calculation routes, HTTP status envelopes, thin
-handler adapters and typed client helpers used by TaxKit apps. Reusable
+handler adapters, the shared browser CORS and cache policy, and an in-process
+`HttpClient` for tests and examples. Reusable
 calculator schemas, catalog entries, metadata projections, graph construction,
 calculation dispatch and schema-guided expected error shaping live in
 `@taxkit/calculators`.
@@ -56,7 +57,7 @@ The SDK is a test-only comparison dependency, rather than a server dependency.
 
 `@taxkit/api-http/server` exports `TaxKitApiRoutesLayer` for application-owned
 service and CORS composition. It also retains `TaxKitServerLayer` with the
-existing calculator engine and CORS defaults for Bun and in-process consumers.
+existing calculator engine and `publicCors` for Bun and in-process consumers.
 Both server Layers require the caller's `ContentService`. API hosts supply the
 accepted build output; the HTTP package imports only the compiled content
 contracts. The native API host supplies its shared calculator service to HTTP
@@ -71,10 +72,13 @@ guidance, without reflecting paths or source-error messages. Native invalid
 query responses are empty 400 replies. This surface returns accepted public
 documentation only, not personal calculation reports.
 
-`TaxKitApiInProcessClientLive` also requires supplied content. It now uses the
-native Effect HTTP client and router in the caller's Layer scope; each request
-closes its own scope. It creates no web-handler runner or Promise bridge.
-Its generated client checks the same response Schemas as remote consumers.
+Callers use Effect's generated client directly:
+`HttpApiClient.make(TaxKitApi, { baseUrl })` from `effect/http-api`, with
+`TaxKitApi` from `@taxkit/api-http/api` and the caller's `HttpClient`.
+`TaxKitApiInProcessLive` (`@taxkit/api-http/in-process`) is an in-process
+`HttpClient` over the same routes for tests and examples. It requires supplied
+content, runs in the caller's Layer scope and closes each request's scope. The
+generated client checks the same response Schemas as remote consumers.
 
 ```ts
 HTTP calculate
@@ -92,7 +96,7 @@ API host
 Tests: in-process HTTP client
 
 HTTP API tests
-  -> TaxKitApiInProcessClientLive
+  -> HttpApiClient.make(TaxKitApi) over TaxKitApiInProcessLive
     -> CalculatorApiHandlerLive
       -> PublicCalculatorServiceLive
         -> CalculationEngineLive
@@ -128,17 +132,21 @@ incompatible calculator/facts combinations.
 - `src/server.ts`: server export boundary for `TaxKitServerLayer`.
 - `src/config.ts`: package-owned client config schema and neutral `httpApi`
   config source.
-- `src/client/`: typed Effect HTTP API client helpers and layers.
+- `src/in-process.layer.ts`: in-process `HttpClient` over the routes, for
+  tests and examples.
+- `src/response-policy.ts`: `publicCors` and `isBrowserOrigin` (credential-free
+  CORS for any exact HTTP(S) origin), the public read paths and
+  `cacheHeaders`/`applyCachePolicy`, the one cache decision for API and Website
+  replies.
 
 Export paths:
 
 - `@taxkit/api-http`
 - `@taxkit/api-http/api`
-- `@taxkit/api-http/client`
-- `@taxkit/api-http/client/live`
-- `@taxkit/api-http/client/server`
 - `@taxkit/api-http/config`
+- `@taxkit/api-http/in-process`
 - `@taxkit/api-http/request-boundary`
+- `@taxkit/api-http/response-policy`
 - `@taxkit/api-http/server`
 - `@taxkit/api-http/handlers`
 - `@taxkit/api-http/handlers/live`
@@ -157,21 +165,35 @@ Reusable calculator exports:
 
 The package is built as ESM TypeScript. Runtime exports are split by boundary:
 
-- browser-safe consumers should use `@taxkit/api-http/client`
+- browser-safe consumers use `@taxkit/api-http/api` with Effect's
+  `HttpApiClient`
 - server runtimes may use `@taxkit/api-http/server`
-- app or test code that needs in-process wiring can use the client layers
+- tests and examples that need in-process wiring use
+  `@taxkit/api-http/in-process`
 - handler exports are server-side and should not be imported from browser code
 
-`ApiRoutesLive` owns reusable route middleware such as CORS inside this package.
-App packages should provide a platform HTTP server and process config, not
-duplicate API route middleware.
+`ApiRoutesLive` (exported as `TaxKitServerLayer`) owns reusable route
+middleware such as CORS inside this package. App packages should provide a
+platform HTTP server and process config, not duplicate API route middleware.
+The native API Worker composes `TaxKitApiRoutesLayer` itself and applies the
+same `publicCors` policy.
+
+## Response policy
+
+`publicCors` admits any exact HTTP(S) browser origin without credentials, for
+GET, HEAD, POST and OPTIONS, with `content-type`, `b3` and `traceparent`
+headers. `applyCachePolicy` shares only a successful public GET/HEAD reply
+without `Set-Cookie` or a stricter `private`/`no-store` instruction: it gets
+`Cache-Control: public, max-age=0` and
+`Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
+Every other reply gets `no-store` for both. Public read paths are the
+documentation and discovery routes, calculator metadata and the OpenAPI
+documents; health, calculation, RPC and MCP are never shared.
 
 `@taxkit/api-http/config` owns the reusable client config schema, type and
-keyed config fragment. Apps should compose that fragment into runtime-specific
-config modules, then provide server or client environment values through Effect
-`ConfigProvider` composition. The package owns its env namespaces, including
-`TAXKIT_API_*` and `VITE_TAXKIT_API_*`. See
-`docs/architecture/configuration.md`.
+keyed config fragment (`baseUrl`). The package owns its env namespaces,
+`TAXKIT_API_*` and `VITE_TAXKIT_API_*`. The Website does not use it; it reads
+its own origins. See `docs/architecture/configuration.md`.
 
 Current responses are schema-backed with Effect Schema. Calculator response
 schemas are imported from `@taxkit/calculators`; route-only HTTP envelopes and
@@ -324,16 +346,15 @@ actual API tarball and imports all JavaScript public entrypoints.
 
 ## Guardrails
 
-- Keep browser consumers on client exports; do not import server handlers into
+- Keep browser consumers on `api` with the generated client; do not import server handlers into
   browser code.
 - Keep endpoint request and response shapes schema-owned; route-only HTTP
   envelopes stay here and reusable `CalculatorRun*` payload schemas live in
   `@taxkit/calculators`.
 - Keep calculate facts imported from `@taxkit/calculators` so OpenAPI and
   typed clients reflect canonical rule-owned fact shapes.
-- Keep calculation execution delegated through `@taxkit/sdk/effect`
-  `calculateRunRequest`, which uses `PublicCalculatorService` for the
-  catalog-driven, scenario-schema decoded and `CalculationEngine` based run.
+- Keep calculation execution in `PublicCalculatorService`; the SDK is only a
+  test comparison.
 - Keep metadata responses derived from canonical fact descriptors, rule
   descriptors, source refs, parameter periods and graph diagnostics from the
   owning engine and rule packages.
@@ -343,8 +364,7 @@ actual API tarball and imports all JavaScript public entrypoints.
   error shaping stay in `@taxkit/calculators`.
 - Add OpenAPI annotations with new API groups so docs stay generated from the
   contract.
-- Add tests or focused verification when new endpoints, handlers or client
-  layers are added.
+- Add tests or focused verification when new endpoints or handlers are added.
 
 ## Related Docs
 
@@ -361,12 +381,6 @@ codec; the committed normalized snapshot remains the wire-contract oracle.
 The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
 Both test files are checked by `tsconfig.test.json` in `check-types`, including
 canonical branded identities and explicit Match narrowing of report/error unions.
-
-The in-process Fetch adapter retains its required Promise return signature in
-one exact lint admission. It contains no async orchestration or Effect runner.
-Real CLI fixtures prove adjacent files reject the signature and the admitted
-file still rejects async/await. This preserves the current host bridge pending
-the separate native app composition task; it is not native Worker lifetime proof.
 
 The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
@@ -387,8 +401,8 @@ qualification remain unfinished.
 five-second total read deadline. It counts encoded bytes before parsing, closes
 rejected/interrupted readers and rejects late synchronous reads after control
 returns. The retained standalone server applies it before calculator decoding;
-native API and Website hosts use the same owner. The RPC entrypoint re-exports
-its original four symbols for compatibility. Only the native API host's outer
+native API and Website hosts use the same owner. `@taxkit/api-rpc/request-boundary`
+re-exports its four symbols. Only the native API host's outer
 composition covers both HTTP and RPC; a custom route host must supply its own
 admission middleware.
 

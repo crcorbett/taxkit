@@ -89,7 +89,7 @@ Current TaxKit-specific overrides are narrow:
   JavaScript array method `thisArg` usage.
 
 Portable custom rules live under `effect/*`, `bun/*` and `mdx/*`; tax,
-calculator, decoder and route-transport policy remains under `taxkit/*`.
+calculator and decoder policy remains under `taxkit/*`.
 Important portable rules include:
 
 - `effect/no-manual-tag`: bans manual `_tag` object literals. Use

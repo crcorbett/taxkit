@@ -12,8 +12,33 @@ review_trigger: agreed direction, implementation scope or Common Practice approa
 The [proposal](../../product-specs/common-practice-foundation-review.md) records
 the source comparison and Cooper's direction: Common Practice's app/client and
 ordinary operational approach, Cloudflare first, patch-free Alchemy, supported
-Bun host, and safe operational details only. This remains design work; no runtime
-or provider change has been made.
+Bun host, and safe operational details only.
+
+## Progress (13 October 2026)
+
+Orders 1 to 5 are implemented on branch
+`claude/taxkit-native-effect-alchemy-f44f82`:
+
+- Receipt, approval, custody and epoch tooling is retired; ordinary checks and
+  native Alchemy/Doppler commands replace it.
+- The one-way unpatched Website/API graph uses Effect 4.0.2 and Alchemy
+  2.0.0-beta.81 with no patches. Native www redirects remain; the failed
+  ruleset-read limit is recorded in the infrastructure tests.
+- The API serves discovery, the trusted HTTP calculation and one public cache
+  decision; HTTP and RPC share the public credential-free browser policy on
+  both hosts; MCP lists only `https://taxkit.dev`.
+- The Website uses native generated clients (private binding on the server,
+  `AtomHttpApi.Service` in the browser) with one registry; server functions,
+  the Website RPC path and request atoms are gone.
+- Q5 helpers are replaced by `HttpApiClient`; scenario, content, Fumadocs,
+  MCP and RPC client Layers are static.
+- The 0.7.1 policy is vendored with native ownership rules and fixtures.
+- Bun's calculation pool was already application-wide: `HttpRouter.provideRequest`
+  builds its Layer once.
+
+Failed server page loads reply 500 with `no-store`: TanStack's error handling
+replaces the 503 the loader sets. Remaining: merge, then Preview and Production
+deployment and public checks. Safe operational fields stay later work.
 
 Completed research covers the full Website/HTTP/RPC/MCP/SDK call paths, current
 Common Practice workflows and native secrets, upstream Effect/Alchemy support,
@@ -47,8 +72,8 @@ proposal. No implementation acceptance crosswalk or new receipt is required.
 Keep each code change coherent and reversible with Git. Use focused tests for
 its actual behaviour and one ordinary verification command. Public package
 contract changes use normal Changesets and actual packed/downstream checks.
-The previous native emulator timeout failures remain unresolved; do not declare
-the new graph working until meaningful runtime checks pass.
+The local native Website/API pair suite (`bun run test:native`) passes on the
+new graph; hosted behaviour still needs its own Preview and Production checks.
 
 Cooper agreed on 10 October 2026 to replace public raw-client/Layer-factory HTTP
 helpers, with callers/examples updated together and no temporary compatibility

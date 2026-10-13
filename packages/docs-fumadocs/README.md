@@ -13,9 +13,9 @@ review_trigger: package contracts or generated-source boundaries change
 
 This private compiled package owns the narrow reusable Fumadocs boundary:
 shared MDX compile configuration, generic source representation Schemas, safe
-tagged source errors, the named `FumadocsSource` Effect service, its
-generated-loader live Layer factory, deterministic test Layer and the generic
-render primitives used by the docs app.
+tagged source errors, the named `FumadocsSource` Effect service, its static
+generated-loader live Layer, deterministic test Layer and the generic render
+primitives used by the docs app.
 
 It does not own TaxKit frontmatter, navigation, content roots, generated
 collection locations, routes, app layout or runtime execution.
@@ -27,9 +27,9 @@ collection locations, routes, app layout or runtime execution.
 | `@taxkit/docs-fumadocs/config` | Build-time shared `fumadocs-mdx` and Effect Schema bridging. |
 | `@taxkit/docs-fumadocs/schemas` | Generic decoded page and code-block representations. |
 | `@taxkit/docs-fumadocs/errors` | Safe generic lookup and source-load errors. |
-| `@taxkit/docs-fumadocs/service` | Named `getPage` and `listPages` service contract. |
-| `@taxkit/docs-fumadocs/live` | One generated-collection adapter at Layer construction. |
-| `@taxkit/docs-fumadocs/test` | Deterministic decoded fixture Layer. |
+| `@taxkit/docs-fumadocs/service` | Named `getPage` and `listPages` service contract and the `FumadocsGeneratedCollection` adapter requirement. |
+| `@taxkit/docs-fumadocs/live` | Static `FumadocsSourceLive` over the supplied generated-collection adapter. |
+| `@taxkit/docs-fumadocs/test` | Static `FumadocsSourceTest` over supplied `FumadocsSourceFixtures`. |
 | `@taxkit/docs-fumadocs/render` | Browser-safe generic picture and code-block primitives. |
 
 The live Layer is the only boundary that accepts generated-provider

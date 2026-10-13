@@ -80,8 +80,8 @@ provide control of the browser page.
   with at most 32 initialisation attempts and 32 concurrent requests during its
   ten-minute lifetime. A late connection has only the remaining time. Expiry or
   host eviction returns 404; start a fresh conversation.
-- Calls without an Origin header are accepted. Browser calls must use this
-  installation's configured website origin; other supplied origins are refused.
+- Calls without an Origin header are accepted. Browser calls must come from the
+  TaxKit publication site, `https://taxkit.dev`; other origins are refused.
   This is a browser origin check, not a login system.
 - When a call is refused or times out, read its fixed error code and guidance.
   Retry only after checking the cause. Subscriptions, resumed streams and saved

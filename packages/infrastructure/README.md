@@ -69,7 +69,7 @@ not export this class. Graph tests check this distinction in their memory-only
 create/no-change/update cases; no namespace ID or provider setting is invented.
 The app owns one fixed-name host per stage, with bounded in-memory conversations
 and native alarm expiry. Only alarm bookkeeping uses storage. The
-[API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
+[API owner](../../apps/api/README.md#native-remote-calculator-tools)
 explains limits, private original-key forwarding, separate instance pools and
 the documented modern five-second cancellation limit.
 

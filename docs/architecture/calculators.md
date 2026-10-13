@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-calculator-architecture-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-13
 review_trigger: calculator composition, catalogue execution or domain error contract change
 ---
 
@@ -46,12 +46,17 @@ metadata and retained output values are unchanged.
 
 ```ts
 const calculation = CalculateTakeHomePay.pipe(
-  Effect.provide(AuTakeHomePay2025_26_Live),
-  Effect.provide(TakeHomeScenarioLiveFromInput(input))
+  Effect.provide(
+    AuTakeHomePay2025_26_Live.pipe(
+      Layer.provideMerge(TakeHomeScenarioLive),
+      Layer.provide(Layer.succeed(TakeHomeScenario)(input))
+    )
+  )
 );
 ```
 
-Here `input` is the checked rule-owned scenario Type. The application runner
+Here `input` is the rule-owned scenario Type, already decoded from
+`TakeHomeScenarioInputSchema` at the caller's boundary. The application runner
 executes this lazy program; awaiting an Effect does not execute it. The compiler
 shows unresolved requirements if a rule pack or scenario is missing.
 
@@ -69,13 +74,17 @@ Avoid one large `calculate()` function with mode switches for PAYG, annual tax, 
 
 ## Scenario Layers
 
-Scenario layers decode user input through Effect Schema, then provide accepted input facts.
+A scenario is a rule-owned service (`TakeHomeScenario`, `AnnualTaxScenario`)
+holding the decoded input. Its static Layer (`TakeHomeScenarioLive`,
+`AnnualTaxScenarioLive`) derives the accepted input facts from that service.
+Layers do not take request input; the caller decodes once and supplies the
+value with `Layer.succeed`.
 
 ```txt
 User input
-  -> schema decode
-  -> scenario dates
-  -> accepted fact layer
+  -> scenario input Schema decode (caller boundary)
+  -> Layer.succeed(TakeHomeScenario)(input)
+  -> TakeHomeScenarioLive (accepted fact layer)
   -> calculator
 ```
 

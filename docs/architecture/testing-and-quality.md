@@ -24,6 +24,17 @@ Website/API. Detailed rule-package expectations live in
 | `bun run test:native` | Builds the API and Website and runs them together in Miniflare: first HTML, docs pages, Markdown, discovery files, calculation with and without JavaScript, MCP and request limits. |
 | `bun run release:check` | `verification` plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
 
+Effect diagnostics run inside every workspace's `check-types`, because the
+`prepare` script (`effect-tsgo patch`) patches the TypeScript compiler with the
+Effect language service; `bun run check:effect` is a smoke check that the patch
+and plugin are active. `bun run lint` applies the vendored Commonplace
+`strict-effect` policy (`tools/oxlint/vendor/strict-effect`), including the
+native request rules `static-layers`, `no-loader-request-state`,
+`no-native-client-replica`, `native-cloudflare-cache`, `website-data-proxy`,
+`website-rpc-boundary` (`apps/web/src` only) and `module-ownership`. Their
+accept/reject fixtures are in `tools/oxlint/native-request-rules.test.ts`, run
+by `bun run test:tools`.
+
 Focused checks are the owning workspace's `test`, `check-types` and
 `test:browser` scripts. Rule and calculator changes need their golden and
 boundary tests; HTTP contract changes need `bun run --filter=@taxkit/api-http test`

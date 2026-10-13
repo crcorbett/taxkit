@@ -3,7 +3,7 @@ document_type: repository-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-repository-maintainers
-last_reviewed: 2026-10-10
+last_reviewed: 2026-10-13
 review_trigger: contributor setup, repository entry points, or supported commands change
 ---
 
@@ -13,8 +13,8 @@ TaxKit is the public monorepo for the open-source tax engine, API, SDK and
 documentation site.
 
 The repo is early, but the main public integration surfaces now exist. The
-implemented surface includes the retained standalone Bun API and a native
-API/Website candidate with a take-home-pay form, accepted documentation in the same Website, an Effect HTTP API package
+implemented surface includes the standalone Bun API, the native Cloudflare
+API and Website with three calculators and the accepted documentation, an Effect HTTP API package
 with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, a private
@@ -30,13 +30,15 @@ validation, but it is not published yet.
   startup, listening config and Effect runtime teardown for `/api/*`.
 - [apps/docs](./apps/docs/README.md): retirement tombstone and retained-source
   recovery route; no active documentation workspace.
-- [apps/web](./apps/web/README.md): Native TanStack Website candidate with a take-home form,
-  private server binding and direct checked browser RPC to the API. It also
-  renders accepted documentation, search, discovery, Markdown and share images
-  and owns the current release documentation journey.
+- [apps/web](./apps/web/README.md): TanStack Start Website with the three
+  calculators, reading the API through the generated HTTP client over the
+  private server binding and, in the browser, the public API origin. It also
+  renders accepted documentation, search, Markdown and share images and
+  forwards discovery files to the API.
 - [packages/api/http](./packages/api/http/README.md): Effect HTTP API contract,
   generated docs, public calculator routes, thin handler adapters, server
-  handler exports and browser-safe client exports.
+  handler exports, the shared CORS/cache policy and the browser-safe `api`
+  export for generated clients.
 - [packages/calculators](./packages/calculators/README.md): reusable public
   calculator orchestration package for catalog metadata, graph construction,
   calculation dispatch and schema-guided expected error shaping.
@@ -201,20 +203,21 @@ open docs/repo-status-outline.html
 
 ## Runtime boundary
 
-- `apps/api` is the API runtime owner. It creates one process-lifetime
-  `ManagedRuntime`, serves `packages/api/http` through Bun and disposes scoped
-  resources on shutdown.
+- `apps/api` is the API runtime owner. Its standalone entry runs through
+  `BunRuntime.runMain`, serves `packages/api/http` through Bun and disposes
+  scoped resources on shutdown; its native Worker serves HTTP, RPC and MCP.
 - `apps/web` owns the replacement documentation reader over the accepted
   backend catalogue and compiled MDX. Canonical page fields and reusable
   Fumadocs internals remain package-owned. `apps/docs` is a
   retirement tombstone; exact original source and deployed recovery identities
   remain historical evidence.
-- `apps/web/src/lib/runtime.server.ts` owns one server runner. React's Atom
-  registry owns browser execution and cleanup. Both use native RPC to the
-  separate API; the Website contains no calculation fallback.
-- `@taxkit/api-http/client` and `@taxkit/api-http/client/live` are
-  browser-safe.
-- `@taxkit/api-http/client/server`, `@taxkit/api-http/server` and handler
+- `apps/web/src/lib/runtime.server.ts` owns one server runtime; the browser
+  `ApiClient` Atom runtime and one shared registry own browser execution and
+  cleanup. Both read the separate API with Effect's generated `HttpApiClient`;
+  the Website contains no calculation fallback.
+- `@taxkit/api-http/api` is browser-safe; use it with
+  `HttpApiClient.make(TaxKitApi, { baseUrl })`.
+- `@taxkit/api-http/server`, `@taxkit/api-http/in-process` and handler
   exports are server-only and should stay out of `apps/web`.
 
 ## Licence and trademarks

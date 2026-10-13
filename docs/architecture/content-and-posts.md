@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-13
 review_trigger: content ownership, acceptance or generated presentation changes
 ---
 
@@ -83,22 +83,23 @@ checked once by each API host; it imports no compiler into request handling.
 HTTP and native RPC documentation groups delegate page/navigation/search and
 processed Markdown to the same `ContentService`. Its compiled public-path
 refinement and fixed missing-page/search errors serve both transports. The
-replacement Website renders accepted pages using that private connection and
-browser-safe compiled presentation. Its `/search` GET form uses the same named
-accepted-catalogue search operation, showing accepted titles and descriptions
+Website reads pages, navigation, search and Markdown from the API's public HTTP
+content routes with the generated client and renders browser-safe compiled
+presentation. Its `/search` GET form shows accepted titles and descriptions
 with the existing document links. No second index is added.
 `ContentDiscovery` derives four discovery files from the same accepted
-catalogue and the actual checked stage addresses, through one closed native
-operation. The Website serves the checked XML/text body at its conventional
-address. The short agent index links to accepted processed Markdown; the full
-index retains those bodies, including fenced examples. No authored source,
-personal report, guessed origin or competing content catalogue is exposed.
-The Website serves the same checked processed body from accepted pages through
-same-address Accept negotiation and explicit `.md` links. It adds no backend
-route or compiler fallback; the [frontend owner](frontend.md#replacement-website-markdown)
-records representation policy. Share images are derived during the Website build. The old app workspace and
-writer workflows are retired; verified original-source data and dated provider
-recovery identities remain addressable. This implementation does not establish public availability.
+catalogue, the API origin and the publication origin `https://taxkit.dev`. The
+API serves them at `/api/v1/docs/discovery/*`; the Website forwards its
+conventional addresses there once. Robots allows everything (`Allow: /`) and
+names the sitemap. The short agent index links to accepted processed Markdown;
+the full index retains those bodies, including fenced examples. No authored
+source, personal report, guessed origin or competing content catalogue is
+exposed. The Website serves the processed body through same-address Accept
+negotiation and explicit `.md` links; the
+[frontend owner](frontend.md#documentation) records representation policy.
+Share images are derived during the Website build. The old app workspace is
+retired; verified original-source data and dated provider recovery identities
+remain addressable.
 
 `docs/architecture`
 : Durable implementation architecture.
@@ -112,9 +113,10 @@ recovery identities remain addressable. This implementation does not establish p
 Current native public docs request
 
 browser or Website SSR
-  -> apps/web route and checked route boundary
-    -> private docs RPC / checked backend ContentService
-      -> accepted JSON catalogue
+  -> apps/web route loader
+    -> generated HttpApiClient (public origin or private binding)
+      -> API content routes -> ContentService
+        -> accepted JSON catalogue
     -> browser-safe compiled MDX presentation
     -> @taxkit/docs-fumadocs/render primitives
     -> app-local MDX component map

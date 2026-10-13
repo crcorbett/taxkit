@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-08
+last_reviewed: 2026-10-13
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -30,9 +30,10 @@ boundary, forwards bounded complete bytes, and owns each request scope and
 whole-operation deadline. It uses the existing server runner. Exact decoder
 permissions admit neither neighbouring decoders, raw fetch nor another runner;
 actual lint fixtures enforce those limits.
-The browser calculator transport reads its native preference at dispatch, and
-the server transport reads the current original request; neither freezes policy
-when its Layer is built. Missing server/browser hosts refuse collection.
+The browser API client reads its native preference at dispatch, and the
+server client reads the current original request; neither freezes policy when
+its Layer is built. A server call with no incoming request, or a browser host
+that throws, refuses collection.
 The application owns when to capture and which checked collection policy applies.
 The API application captures its delivery service during initialisation, then
 supplies it to each returned request operation. Worker and older MCP session
@@ -60,6 +61,12 @@ context validation, metadata projection, graph diagnostics, scenario layer
 composition, `CalculationEngine` execution and expected error shaping. HTTP
 handlers should only pass route input to the service and return the resulting
 schema-backed value or tagged error envelope.
+
+Layers are static values, not functions of request input
+(`strict-effect/static-layers`). A rule package's scenario is a service such as
+`TakeHomeScenario` or `AnnualTaxScenario` with a static `*ScenarioLive` Layer
+that derives its facts; the caller decodes the input Schema and supplies the
+value with `Layer.succeed(TakeHomeScenario)(input)`.
 
 ## Effect-native primitives
 
@@ -203,14 +210,15 @@ output and substitution tests.
 
 The Fumadocs generated-source boundary follows the same rule.
 `@taxkit/docs-fumadocs/service` exposes only named `getPage` and `listPages`
-Effects over schema-decoded generic page values. Its live Layer accepts one
-narrow generated-collection adapter at construction, contains unknown provider
-output plus promise and throw handling, and emits safe tagged errors.
+Effects over schema-decoded generic page values. The static
+`FumadocsSourceLive` requires the `FumadocsGeneratedCollection` adapter
+service, contains unknown provider output and emits safe tagged errors;
+`FumadocsSourceTest` requires `FumadocsSourceFixtures`.
 `@taxkit/docs-content` supplies the TaxKit collection adapter and decodes the
 generic value into its canonical content Schemas. Neither package executes a
 runtime. The accepted catalogue is built through the generated adapter;
-`apps/api` owns its checked content service and `apps/web` owns the reader
-runner and private API connection. The old app runtime is retained history.
+`apps/api` owns its checked content service and `apps/web` reads documentation
+from the API.
 
 The infrastructure-owned `PostHogManagement` contract has only find, read,
 create and update operations over checked TaxKit identities. Its private
@@ -236,20 +244,20 @@ stale-pattern audit are acceptance requirements, not an optional template.
 Use `ManagedRuntime.make(...)` for module-scoped app runtimes that run many
 Effects against the same fully provided service graph. Do not create a
 `ManagedRuntime` inside route loaders, React components, request handlers or
-per-operation helpers. The docs app owns one server-only managed runtime and an
-explicit disposal operation for focused tests and host lifecycle integration;
-it has no browser Effect runtime. Browser routes restore the schema-encoded
-server-function transport and render canonical values.
+per-operation helpers.
 
-The Website candidate owns one server runner and a React Atom registry in the
-browser. Its typed route context contains named framework settings/catalogue and
-documentation page and search transports, never an Effect runtime or Context. The root restores encoded values and passes
-checked submission state through ordinary React context. The container owns
-commands; focused leaves render readonly values. Editing and form unmount
-interrupt active work. Private binding transport belongs to the server Layer;
-public browser transport belongs to the registry. The RPC protocol Layer keeps
-configuration, while each named native client receive loop has an operation scope.
-No calculation or catalogue read builds a Layer or runner. See the [Website owner](../../apps/web/README.md).
+The Website owns one server `ManagedRuntime` (`runtime` in
+`apps/web/src/lib/runtime.server.ts`) with `WebsiteHostLive`, which builds
+Effect's generated `HttpApiClient` for `TaxKitApi` over the private binding. In
+the browser, `ApiClient` is an `AtomHttpApi.Service` whose runtime comes from
+`browserRuntime.factory`; one `AtomRegistry` is created before loaders run and
+shared with React. Browser loaders run through one Promise bridge
+(`runtime.client.ts`) with that registry and the loader's `AbortSignal`. The
+router context holds only that registry, never an Effect runtime or Context.
+TanStack owns loader data; there are no request atoms. The container owns
+calculator commands; focused leaves render readonly values. Editing and form
+unmount interrupt active work. No calculation or page read builds a Layer or
+runner. See the [Website owner](../../apps/web/README.md).
 The SDK owns one runtime per client, with caller disposal and bounded one-shot
 helpers; see the [SDK lifetime owner](api-and-sdk.md#typescript-sdk-facade).
 
@@ -260,7 +268,7 @@ interruption/scopes release resources.
 
 ### Native API instance and request ownership
 
-The DEV-74 API candidate uses the native Alchemy Worker class and `.make`.
+The API Worker uses the native Alchemy Worker class and `.make`.
 `ApiWorkerApplication` constructs its router in the native instance scope and
 receives one calculator service for HTTP and RPC. It creates no ManagedRuntime.
 Each handler runs in the incoming native fibre and request scope; tests observe
@@ -430,29 +438,20 @@ flow remains a review concern rather than a reason for broad suppressions.
 
 ### TanStack loader transport
 
-Treat a TanStack Start server-function call and TanStack Router loader-state
-transport as separate representation crossings. When a server function
-produces route data, keep the schema-encoded representation intact through the
-route loader. On initial SSR, Router dehydrates and hydrates that encoded
-loader state. On client navigation, the server-function RPC serialiser and the
-route loader carry the same encoded value.
+Loader data must be plain values TanStack can serialise; the Website declares
+no server functions. The generated client has already decoded API replies, and
+documentation page and search views are plain public data. When a loader returns a Schema-encoded value
+(the root route's settings and catalogue, or a no-JavaScript submission
+encoded with `WebsiteSubmissionTransport`), the direct route component that
+first reads `Route.useLoaderData` restores it once and matches the resulting
+`Result` before passing canonical values into React composition. Ordinary
+hooks, containers and leaf components must not receive encoded loader data,
+call the restore operation or run Effect runtimes.
 
-Use a browser-safe boundary adapter built around
-`Schema.Exit(success, expectedError, Schema.Never)` when a route needs to
-transport an Effect outcome. The producer must capture `Effect.exit` once,
-encode a success or exactly one typed expected failure, and preserve any Cause
-containing a defect or interruption with `Effect.failCause`. An empty or
-multi-failure producer Cause is an invariant defect. Use `Effect.orDie` only
-when canonical schema encoding fails after the program has already satisfied
-the declared success and error contracts.
-
-The direct route component or route-owned `head` consumer may restore the
-encoded loader value when it first reads `Route.useLoaderData` or callback
-loader data. Restore once per consumer invocation, map malformed or
-semantically invalid transport to a schema-owned tagged transport error, and
-match the resulting `Result` before passing canonical values into React
-composition. Ordinary hooks, containers and leaf components must not receive
-encoded loader data, call the restore operation or run Effect runtimes.
+Loader failures are translated once, in `apps/web/src/lib/load.failure.ts`:
+a missing page becomes TanStack's `notFound()` and other failures a
+`WebsiteLoadError` for the route's error component. Interruption stays
+interruption.
 
 ## Guardrails
 
@@ -542,18 +541,20 @@ with its own revision/error vocabulary and per-call resource scope. Only the
 concrete closed JSON byte reader is shared with the calculator client; no raw
 client callback or provider object enters either service contract.
 
-The native API composes `ContentDiscoveryLive` once from the checked catalogue
-and its existing cached settings Effect. Configuration remains application-owned;
-the content capability lazily reads checked addresses and returns one bounded
-document for a closed file identity. `ContentDiscovery` is contract-only;
-the live and observed test Layers remain separate. The Website reuses its
-existing runner/private client and projects the checked document to an HTTP
-body. No incoming request builds a Layer, compiler, content cache or runtime.
+The native API composes the static `ContentDiscoveryLive` once from the
+checked catalogue and supplies its existing cached settings Effect as
+`ContentDiscoverySettings` (`Layer.succeed(ContentDiscoverySettings)(...)`).
+Configuration remains application-owned; the content capability lazily reads
+checked addresses and returns one bounded document for a closed file identity.
+`ContentDiscovery` is contract-only; the live and observed test Layers remain
+separate. The API serves each document on its discovery HTTP route and the
+Website forwards its conventional file addresses there once. No incoming
+request builds a Layer, compiler, content cache or runtime.
 
 
 Website Markdown composition uses a named HTTP policy over the existing native
 HTML Effect. Original URL and Accept ingress decode once at that exact boundary;
-checked body lookup uses the already captured app service. It owns the
+the body comes from the host's generated client. It owns the
 representation's response/error headers inside the host's existing runner and
 request scope. No request builds a Layer or executes another runtime. The
 policy preserves existing HTML Vary fields and expected/fatal error separation.
@@ -579,5 +580,5 @@ operation races tool work against an Effect callback for the native stop event.
 Listener registration and a second aborted-state check close the early-abort
 race; losing work and its finalisers are awaited. This capability carries no
 figures or identity and never changes a calculator/content service contract.
-The [API owner](../../apps/api/README.md#native-remote-calculator-tools-candidate)
+The [API owner](../../apps/api/README.md#native-remote-calculator-tools)
 records the actual-client and built-Worker proof limits.
