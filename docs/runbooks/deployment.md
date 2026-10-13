@@ -89,24 +89,25 @@ state.
 Two workflows run the same native commands as the sections above. Each passes
 a read-only, config-scoped Doppler service token to Alchemy as `DOPPLER_TOKEN`;
 GitHub sets `CI=true`. Neither workflow installs the Doppler CLI or holds a
-Cloudflare value.
+Cloudflare value. As in Common Practice, every deploy first runs
+`bun run verification` with the same Bun and Playwright setup as the Checks
+workflow, before any credential is used. Deploys use the local Turbo cache
+only: the remote cache needs Checks' separate `DOPPLER_CI_TOKEN`.
 
 - `.github/workflows/preview.yml` runs on same-repository pull requests. Opened,
-  reopened and synchronised pull requests run `pr:plan` and `pr:deploy` for
+  reopened and synchronised pull requests run verification, then `pr:plan` and `pr:deploy` for
   `pr-<number>`, read both stage addresses from the deploy's stack outputs and
   check the Website, `/api/health` and `/api/v1/calculators` for 200. Closing
   the pull request runs `pr:destroy`. Fork pull requests get no job and no
   secret. Runs for one pull request share a concurrency group and never
   overlap; each rechecks the pull request's state before it plans or destroys.
 - `.github/workflows/production.yml` runs on push to `main` and manual dispatch
-  from `main`. It runs `production:plan`, `production:deploy --yes`, then checks
+  from `main`. It runs verification, `production:plan`, `production:deploy --yes`, then checks
   `https://taxkit.dev` for 200, a `www` 301 that keeps path and query, and
   `https://api.taxkit.dev/api/health` for 200. `production:drift` runs last as
   information only: on Alchemy beta.81 it can report Workers with custom
   domains as changed after a clean deploy. Production runs share one
-  concurrency group and never cancel a run in progress. The workflow does not
-  run `bun run verification`; merges to `main` rely on the pull request's
-  Checks run.
+  concurrency group and never cancel a run in progress.
 
 The owner must create, as in Common Practice, two GitHub environments, each
 with one environment secret named `DOPPLER_TOKEN`:
