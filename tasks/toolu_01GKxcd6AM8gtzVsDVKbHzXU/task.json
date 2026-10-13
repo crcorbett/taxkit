@@ -1,0 +1,7 @@
+{
+  "tool_use_id": "toolu_01GKxcd6AM8gtzVsDVKbHzXU",
+  "agent_id": "ae9ed67d43dbb601c",
+  "subagent_type": "general-purpose",
+  "task_description": "Adapt native pair tests",
+  "started_at": "2026-10-13T11:43:07.199158+11:00"
+}
