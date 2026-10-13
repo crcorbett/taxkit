@@ -7,6 +7,8 @@ import {
 } from "@taxkit/api-http/response-policy";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { CalculatorRpcResponseTooLarge } from "@taxkit/api-rpc/errors";
+import { observeHostRequest } from "@taxkit/api-rpc/host-telemetry";
+import type { HostRoute } from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculatorRpcDeadline,
   CalculatorRpcResponseLimit,
@@ -36,6 +38,7 @@ import {
   Context,
   Effect,
   Layer,
+  Match,
   Option,
   Record,
   Schema,
@@ -79,6 +82,36 @@ const isTrustedCalculationPath = (pathname: string) =>
     Option.flatMap((match) => Option.fromNullishOr(match.groups)),
     Option.flatMap(Record.get("id")),
     Option.exists(Schema.is(CalculatorId))
+  );
+
+// The closed route family for the one request record; the raw path, query and
+// calculator ID never leave this function.
+const apiRoute = (pathname: string): HostRoute =>
+  Match.value(pathname).pipe(
+    Match.when("/api/health", () => "health" as const),
+    Match.when("/rpc", () => "rpc" as const),
+    Match.when("/mcp", () => "mcp" as const),
+    Match.when(
+      (path) => calculatePath.test(path),
+      () => "calculate" as const
+    ),
+    Match.when(
+      (path) => path.startsWith("/api/v1/docs/discovery/"),
+      () => "discovery" as const
+    ),
+    Match.when(
+      (path) => path === "/api/v1/docs" || path.startsWith("/api/v1/docs/"),
+      () => "docs" as const
+    ),
+    Match.when(
+      (path) => path.startsWith("/api/v1/"),
+      () => "catalogue" as const
+    ),
+    Match.when(
+      (path) => path === "/api/docs" || path.startsWith("/api/docs/"),
+      () => "reference" as const
+    ),
+    Match.orElse(() => "other" as const)
   );
 
 // The finished public discovery documents. The Website forwards its own
@@ -291,6 +324,20 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         )
       )
     ),
+    // One fixed request record per external call or private binding call.
+    (reply) =>
+      HttpServerRequest.HttpServerRequest.pipe(
+        Effect.flatMap((request) =>
+          reply.pipe(
+            observeHostRequest("taxkit-api", {
+              method: request.method,
+              route: apiRoute(
+                new URL(request.url, "https://api.invalid").pathname
+              ),
+            })
+          )
+        )
+      ),
     Effect.provideContext(telemetry)
   );
 

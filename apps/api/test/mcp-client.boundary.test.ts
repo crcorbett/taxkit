@@ -3,6 +3,7 @@ import {
   Client,
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
+import { HostRequestRecord } from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculationRequest,
   CalculatorLive,
@@ -83,6 +84,15 @@ const settings = ConfigProvider.fromUnknown({
   TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
 });
 
+// Each request writes one checked fixed-field record; anything else is a
+// runtime log line.
+const runtimeLines = (lines: readonly unknown[]) =>
+  Array.filter(lines, (line) =>
+    Option.isNone(
+      Schema.decodeUnknownOption(Schema.fromJsonString(HostRequestRecord))(line)
+    )
+  );
+
 describe("real MCP client against the native API application", () => {
   it.effect.each([
     { headers: { origin: "https://foreign.example.com" }, status: 403 },
@@ -154,7 +164,7 @@ describe("real MCP client against the native API application", () => {
         );
         expect(refused._tag).toBe("Failure");
         expect(yield* Ref.get(observed)).toEqual(Option.some(status));
-        expect(yield* TestConsole.logLines).toEqual([]);
+        expect(runtimeLines(yield* TestConsole.logLines)).toEqual([]);
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.provide(CalculatorLive),
@@ -225,7 +235,7 @@ describe("real MCP client against the native API application", () => {
         expect(text).not.toContain(sensitiveSentinel);
         expect(text).not.toContain("165400");
         const lines = yield* TestConsole.logLines;
-        expect(lines.length).toBe(mode === "defect" ? 2 : 0);
+        expect(runtimeLines(lines).length).toBe(mode === "defect" ? 2 : 0);
         const logged = yield* Schema.encodeEffect(
           Schema.fromJsonString(Schema.Unknown)
         )(lines);
@@ -629,7 +639,7 @@ describe("real MCP client against the native API application", () => {
           }).pipe(Effect.scoped)
         );
         expect(HashMap.size(yield* Ref.get(counters))).toBe(2);
-        expect(yield* TestConsole.logLines).toEqual([]);
+        expect(runtimeLines(yield* TestConsole.logLines)).toEqual([]);
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.provide(ApiContentLive),

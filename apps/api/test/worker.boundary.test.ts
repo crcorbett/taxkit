@@ -6,7 +6,9 @@ import {
 } from "@taxkit/api-http/request-boundary";
 import {
   ApiHostTelemetryLive,
+  HostRequestRecord,
   WebsiteHostTelemetryLive,
+  observeHostRequest,
 } from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculatorRpcPayload,
@@ -32,6 +34,8 @@ import {
   Fiber,
   Layer,
   Option,
+  Order,
+  Record,
   Ref,
   References,
   Schema,
@@ -74,6 +78,15 @@ const NativeRequest = Schema.TaggedStruct("Request", {
   payload: CalculatorRpcPayload,
   tag: Schema.Literal("Calculate"),
 });
+
+// Each request writes one checked fixed-field record; anything else is a
+// runtime log line.
+const runtimeLines = (lines: readonly unknown[]) =>
+  Array.filter(lines, (line) =>
+    Option.isNone(
+      Schema.decodeUnknownOption(Schema.fromJsonString(HostRequestRecord))(line)
+    )
+  );
 
 const header = (
   response: HttpServerResponse.HttpServerResponse,
@@ -404,7 +417,7 @@ describe("native API application", () => {
         );
         // These native parser failures send fixed global replies without logging.
         // The separate reporter/formatter fixtures exercise positive log egress.
-        expect(yield* TestConsole.logLines).toEqual([]);
+        expect(runtimeLines(yield* TestConsole.logLines)).toEqual([]);
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.provideService(References.MinimumLogLevel, "Debug"),
@@ -796,6 +809,172 @@ describe("native API application", () => {
         expect(output).not.toContain("annotations");
         expect(output).not.toContain("cause");
       }).pipe(Effect.provide(TestConsole.layer))
+  );
+
+  it.effect(
+    "writes one fixed request record without URL, headers or body",
+    () =>
+      Effect.gen(function* () {
+        const app = yield* ApiWorkerInit;
+        const send = (path: string, method: string, body: string | null) =>
+          app.fetch.pipe(
+            Effect.provideService(
+              HttpServerRequest.HttpServerRequest,
+              HttpServerRequest.fromWeb(
+                new Request(`https://api.example.com${path}`, {
+                  body,
+                  headers: {
+                    "cf-connecting-ip": "203.0.113.7",
+                    "content-type": "application/json",
+                    cookie: `session=${sensitiveSentinel}`,
+                    "user-agent": sensitiveSentinel,
+                  },
+                  method,
+                })
+              )
+            ),
+            Effect.scoped
+          );
+        const query = `?gross=165400&note=${encodeURIComponent(sensitiveSentinel)}`;
+        yield* send(
+          `/api/v1/calculators/au.pay.take-home/calculate${query}`,
+          "POST",
+          `{"grossDollars":165400,"note":"${sensitiveSentinel}"}`
+        );
+        yield* send(`/api/health${query}`, "GET", null);
+        yield* send(`/api/v1/calculators${query}`, "GET", null);
+        const lines = yield* TestConsole.logLines;
+        expect(runtimeLines(lines)).toEqual([]);
+        const records = yield* Effect.forEach(lines, (line) =>
+          Schema.decodeUnknownEffect(
+            Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown))
+          )(line)
+        );
+        expect(
+          Array.map(records, (record) =>
+            Array.sort(Record.keys(record), Order.String)
+          )
+        ).toEqual(
+          Array.makeBy(3, () => [
+            "durationMs",
+            "event",
+            "level",
+            "method",
+            "outcome",
+            "route",
+            "service",
+            "status",
+            "statusClass",
+            "timestamp",
+          ])
+        );
+        const decoded = yield* Effect.forEach(lines, (line) =>
+          Schema.decodeUnknownEffect(Schema.fromJsonString(HostRequestRecord))(
+            line
+          )
+        );
+        expect(
+          Array.map(decoded, ({ method, outcome, route, service }) => ({
+            method,
+            outcome,
+            route,
+            service,
+          }))
+        ).toEqual([
+          {
+            method: "POST",
+            outcome: "completed",
+            route: "calculate",
+            service: "taxkit-api",
+          },
+          {
+            method: "GET",
+            outcome: "completed",
+            route: "health",
+            service: "taxkit-api",
+          },
+          {
+            method: "GET",
+            outcome: "completed",
+            route: "catalogue",
+            service: "taxkit-api",
+          },
+        ]);
+        const output = yield* Schema.encodeEffect(Json)(lines);
+        expect(output).not.toContain(sensitiveSentinel);
+        expect(output).not.toContain("165400");
+        expect(output).not.toContain("203.0.113.7");
+        expect(output).not.toContain("api.example.com");
+      }).pipe(
+        Effect.provideService(ConfigProvider.ConfigProvider, settings),
+        Effect.provide(TestConsole.layer),
+        Effect.scoped
+      )
+  );
+
+  it.effect("records failures and cancellation without their causes", () =>
+    Effect.gen(function* () {
+      const observe = observeHostRequest("taxkit-web", {
+        method: sensitiveSentinel,
+        route: "calculate",
+      });
+      yield* Effect.fail(sensitiveSentinel).pipe(observe, Effect.exit);
+      yield* Effect.interrupt.pipe(observe, Effect.exit);
+      yield* Effect.succeed({ status: 503 }).pipe(observe);
+      // A record claiming another host keeps none of its fields.
+      yield* Effect.logInfo(
+        HostRequestRecord.make({
+          durationMs: 0,
+          event: "taxkit.request",
+          method: "GET",
+          outcome: "completed",
+          route: "docs",
+          service: "taxkit-api",
+          status: 200,
+          statusClass: "2xx",
+        })
+      );
+      const lines = yield* TestConsole.logLines;
+      const decoded = yield* Effect.forEach(Array.take(lines, 3), (line) =>
+        Schema.decodeUnknownEffect(Schema.fromJsonString(HostRequestRecord))(
+          line
+        )
+      );
+      expect(
+        Array.map(decoded, ({ method, outcome, status, statusClass }) => ({
+          method,
+          outcome,
+          status,
+          statusClass,
+        }))
+      ).toEqual([
+        {
+          method: "other",
+          outcome: "failed",
+          status: null,
+          statusClass: "none",
+        },
+        {
+          method: "other",
+          outcome: "interrupted",
+          status: null,
+          statusClass: "none",
+        },
+        {
+          method: "other",
+          outcome: "completed",
+          status: 503,
+          statusClass: "5xx",
+        },
+      ]);
+      expect(runtimeLines(lines).length).toBe(1);
+      const output = yield* Schema.encodeEffect(Json)(lines);
+      expect(output).not.toContain(sensitiveSentinel);
+      expect(output).toContain("website.runtime.event");
+    }).pipe(
+      Effect.provide(WebsiteHostTelemetryLive),
+      Effect.provide(TestConsole.layer)
+    )
   );
 
   it.effect("captures a native RPC defect in the installed safe reporter", () =>

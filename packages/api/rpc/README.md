@@ -38,7 +38,10 @@ Website's native tests and other machine callers.
 - `./testing/fixtures`: deterministic real-calculator and failure fixtures only.
 - `./request-boundary`: re-export of the 64 KiB, five-second POST body limit
   owned by `@taxkit/api-http/request-boundary`.
-- `./host-telemetry`: API/Website log and reporter containment with fixed fields.
+- `./host-telemetry`: API/Website log and reporter containment with fixed
+  fields, and `observeHostRequest`, the one checked `taxkit.request` record per
+  request (service, closed route family, method, outcome, status and
+  response-ready time). The Axiom dashboards read these names.
 - `./content/*`: the documentation group, Schemas, errors, client contract,
   handlers, client Layer and test Layer.
 
