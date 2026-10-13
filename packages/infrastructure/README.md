@@ -48,8 +48,8 @@ Alchemy's Config bridge. `deploymentSecrets` supplies `10078` for Production
 and `10078<pr-number>` for each Preview, so stages never share counters.
 
 In `prod` the graph adopts and retains the `taxkit.dev` zone, its DNS settings
-and five zone settings (TLS, HTTPS, Browser Integrity Check and security level,
-as in Common Practice), attaches `taxkit.dev` (with a native `www.taxkit.dev`
+five zone settings (TLS, HTTPS, Browser Integrity Check and security level),
+DNSSEC and a bot policy that bans no user agent, as in Common Practice, attaches `taxkit.dev` (with a native `www.taxkit.dev`
 redirect) to the Website and `api.taxkit.dev` to the API. The Production
 Website has no `workers.dev` address; Local and Preview graphs declare no
 domains and keep their stable `workers.dev` address without version previews.

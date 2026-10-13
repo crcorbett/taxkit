@@ -24,7 +24,9 @@ providers, `Cloudflare.state()` and the native secrets in
 | `TaxKitWebsite` | `Cloudflare.Website.Vite` for `apps/web` | Its own address from `Worker.URL`; the API's address Output and the private `TAXKIT_API` binding. Production serves only `taxkit.dev`, with a native `www.taxkit.dev` redirect and no `workers.dev` address; other stages use their stable `workers.dev` address. No stage has version preview addresses. |
 | `TaxKitProductionZone` | adopted and retained in `prod` only | Never created, replaced or deleted by the stack. |
 | `TaxKitProductionDnsSettings` | retained in `prod` only | Matches the 7 October readback; registrar and records are not managed. |
-| `TaxKitProduction*` zone settings | retained native `Cloudflare.Zone.Setting` in `prod` only | TLS 1.3 on with a TLS 1.2 minimum, Always Use HTTPS on, Browser Integrity Check off (it answers script user agents with error 1010) and the lowest security level, as in Common Practice. Removing a setting restores its earlier value. DNSSEC and bot management are not yet managed: the Production Cloudflare token cannot read or edit them. |
+| `TaxKitProduction*` zone settings | retained native `Cloudflare.Zone.Setting` in `prod` only | TLS 1.3 on with a TLS 1.2 minimum, Always Use HTTPS on, Browser Integrity Check off (it answers script user agents with error 1010) and the lowest security level, as in Common Practice. Removing a setting restores its earlier value. |
+| `TaxKitProductionDnssec` | retained native `Cloudflare.DNS.Dnssec` in `prod` only | Signing active; Cloudflare Registrar publishes the DS record. |
+| `TaxKitProductionBotManagement` | retained native `Cloudflare.BotManagement` in `prod` only | Bans no user agent: no Bot Fight Mode, AI-bot, crawler or content-bot blocking, and no Cloudflare-managed robots.txt. |
 
 The graph is one-way: the API is declared first and has no Website address or
 binding. Published pages and discovery documents use the fixed Production

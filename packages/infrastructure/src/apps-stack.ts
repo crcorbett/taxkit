@@ -1,5 +1,6 @@
 import { adopt } from "alchemy/AdoptPolicy";
-import { ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
+import { BotManagement } from "alchemy/Cloudflare/BotManagement";
+import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import * as Website from "alchemy/Cloudflare/Website";
 import { Worker } from "alchemy/Cloudflare/Workers";
 import { Setting, Zone } from "alchemy/Cloudflare/Zone";
@@ -56,6 +57,19 @@ export const productionZoneSettings = [
     value: "on",
   },
 ] as const;
+
+/**
+ * A bot policy that bans no user agent: no Bot Fight Mode, no AI-bot blocking
+ * or link maze, no content-bot blocking, and no Cloudflare-managed robots.txt
+ * prepended to TaxKit's own. TaxKit is for API, SDK and agent callers.
+ */
+export const productionBotPolicy = {
+  aiBotsProtection: "disabled",
+  contentBotsProtection: "disabled",
+  crawlerProtection: "disabled",
+  fightMode: false,
+  isRobotsTxtManaged: false,
+} as const;
 
 // Published pages and discovery documents name the Production site in every
 // stage, including Preview. Each host still binds its own native address.
@@ -204,6 +218,15 @@ export const declareNativeAppsStack = Effect.gen(function* () {
         zoneId: zone.value.zoneId,
       }).pipe(retain())
     );
+    // Cloudflare Registrar publishes the DS record when signing starts.
+    yield* Dnssec("TaxKitProductionDnssec", {
+      status: "active",
+      zoneId: zone.value.zoneId,
+    }).pipe(retain());
+    yield* BotManagement("TaxKitProductionBotManagement", {
+      ...productionBotPolicy,
+      zoneId: zone.value.zoneId,
+    }).pipe(retain());
   }
   return yield* Effect.gen(function* () {
     const api = yield* TaxKitApiWorker;
