@@ -12,6 +12,7 @@ import type {
 import {
   ContentCatalogue,
   ContentDiscovery,
+  ContentDiscoverySettings,
   ContentService,
 } from "./service.js";
 
@@ -59,7 +60,10 @@ export const makeContentDiscoveryTest = Effect.fnUntraced(function* (
 ) {
   const service = yield* ContentDiscovery.pipe(
     Effect.provide(
-      ContentDiscoveryLive(Effect.succeed(settings)).pipe(
+      ContentDiscoveryLive.pipe(
+        Layer.provide(
+          Layer.succeed(ContentDiscoverySettings)(Effect.succeed(settings))
+        ),
         Layer.provide(Layer.succeed(ContentCatalogue, catalogue))
       )
     )

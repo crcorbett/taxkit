@@ -8,54 +8,50 @@ import {
   DocsPageUnavailable,
   DocsNavigation,
 } from "#/lib/docs/page.view";
-import { docsPageRouteBoundary } from "#/lib/docs/route-boundary";
+import { loadDocsPage } from "#/lib/loaders";
+import type { WebsiteDocsPageView } from "#/lib/schemas";
+
+const docsHead = (loaderData: WebsiteDocsPageView | undefined) =>
+  Option.fromNullishOr(loaderData).pipe(
+    Option.flatMap(({ page, publicationOrigin }) =>
+      Result.getSuccess(docsMetadata(page, new URL(publicationOrigin)))
+    ),
+    Option.getOrElse(() => ({
+      meta: [{ title: "Documentation | TaxKit" }],
+    }))
+  );
 
 export const Route = createFileRoute("/$")({
   component: function DocumentationRoute() {
-    // This route alone restores the plain server-function representation.
-    const loaderData = Route.useLoaderData();
-    const restored = docsPageRouteBoundary.restore(loaderData);
-    return Result.match(restored, {
-      onFailure: () => <DocsPageUnavailable />,
-      onSuccess: ({ navigation, page, settings }) => (
-        <div className="docs-layout">
-          <aside className="docs-sidebar">
-            <DocsNavigation
-              currentPath={Option.some(page.path)}
-              navigation={navigation}
-            />
-          </aside>
-          <article className="docs-article">
-            <MdxDocument page={page} />
-            <p className="docs-markdown-link">
-              <a
-                href={
-                  new URL(`${page.path}.md`, settings.publicationOrigin).href
-                }
-              >
-                Read this page as Markdown
-              </a>
-            </p>
-          </article>
-        </div>
-      ),
-    });
+    const { navigation, page, publicationOrigin } = Route.useLoaderData();
+    return (
+      <div className="docs-layout">
+        <aside className="docs-sidebar">
+          <DocsNavigation
+            currentPath={Option.some(page.path)}
+            navigation={navigation}
+          />
+        </aside>
+        <article className="docs-article">
+          <MdxDocument page={page} />
+          <p className="docs-markdown-link">
+            <a href={new URL(`${page.path}.md`, publicationOrigin).href}>
+              Read this page as Markdown
+            </a>
+          </p>
+        </article>
+      </div>
+    );
   },
   errorComponent: DocsPageUnavailable,
-  head: ({ loaderData }) => {
-    const restored = docsPageRouteBoundary.restore(loaderData);
-    return Result.match(restored, {
-      onFailure: () => ({ meta: [{ title: "Documentation | TaxKit" }] }),
-      onSuccess: ({ page, settings }) =>
-        docsMetadata(page, settings).pipe(
-          Result.getOrElse(() => ({
-            meta: [{ title: "Documentation | TaxKit" }],
-          }))
-        ),
-    });
-  },
+  // An explicit parameter type keeps loader inference independent of head.
+  head: ({
+    loaderData,
+  }: Readonly<{ loaderData?: WebsiteDocsPageView | undefined }>) =>
+    docsHead(loaderData),
   loader: ({ params, context, abortController }) =>
-    context.loadDocsPage({
+    loadDocsPage({
+      context,
       path: `/${params._splat}`,
       signal: abortController.signal,
     }),

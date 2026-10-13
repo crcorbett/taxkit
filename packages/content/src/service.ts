@@ -5,6 +5,7 @@ import type { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
 import type {
   DocsDiscoveryDocument,
   DocsDiscoveryPath,
+  DocsDiscoverySettings,
   DocsPagePath,
   DocsPublicCatalogue,
   DocsPublicNavigation,
@@ -42,3 +43,10 @@ export class ContentDiscovery extends Context.Service<
     ) => Effect.Effect<DocsDiscoveryDocument, DocsSourceError>;
   }
 >()("@taxkit/content/ContentDiscovery") {}
+
+// Settings are a checked lazy Effect owned by application composition. Native
+// stage addresses are resolved on incoming use, never invented at source build.
+export class ContentDiscoverySettings extends Context.Service<
+  ContentDiscoverySettings,
+  Effect.Effect<DocsDiscoverySettings, DocsSourceError>
+>()("@taxkit/content/ContentDiscoverySettings") {}

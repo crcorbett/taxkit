@@ -4,8 +4,9 @@ import { audDollars, Money, Cents, moneyEquals } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
   AnnualTaxLedgerRuleId,
+  AnnualTaxScenario,
+  AnnualTaxScenarioInputSchema,
   AnnualTaxScenarioLive,
-  AnnualTaxScenarioLiveFromInput,
   AuAnnualTax2025_26_Live,
   CalculateAnnualTax,
   IncomeTaxComponentId,
@@ -33,11 +34,8 @@ const runScenario = (incomeDollars: number) =>
     const result = yield* engine.run({
       calculation: CalculateAnnualTax,
       layer: AuAnnualTax2025_26_Live.pipe(
-        Layer.provideMerge(
-          AnnualTaxScenarioLiveFromInput({
-            taxableIncome,
-          })
-        )
+        Layer.provideMerge(AnnualTaxScenarioLive),
+        Layer.provide(Layer.succeed(AnnualTaxScenario)({ taxableIncome }))
       ),
     });
 
@@ -281,23 +279,14 @@ describe("AU annual income tax calculator (2025-26)", () => {
       })
   );
 
-  it.effect(
-    "scenario layer rejects malformed input through Effect Schema",
-    () =>
-      Effect.gen(function* () {
-        const exit = yield* CalculateAnnualTax.pipe(
-          Effect.provide(
-            AuAnnualTax2025_26_Live.pipe(
-              Layer.provideMerge(
-                AnnualTaxScenarioLive({ taxableIncome: "80000" })
-              )
-            )
-          ),
-          Effect.exit
-        );
+  it.effect("scenario input Schema rejects malformed input", () =>
+    Effect.gen(function* () {
+      const exit = yield* Schema.decodeUnknownEffect(
+        AnnualTaxScenarioInputSchema
+      )({ taxableIncome: "80000" }).pipe(Effect.exit);
 
-        expect(Exit.isFailure(exit)).toBe(true);
-      })
+      expect(Exit.isFailure(exit)).toBe(true);
+    })
   );
 
   it.effect("trace tree shape: Ledger -> [IncomeTax, LITO, MedicareLevy]", () =>

@@ -1,82 +1,54 @@
-import { createServerFn } from "@tanstack/react-start";
-import { Effect, Result, Schema } from "effect";
+import { createIsomorphicFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import * as Option from "effect/Option";
 
-import type { readDocsSearchLocation } from "./docs/search-location.boundary";
-import {
-  loadWebsiteDocsSearchServer,
-  loadWebsiteDocsPageServer,
-  loadWebsiteSettingsServer,
-} from "./loaders.server";
-import { WebsiteDocsSearchHeader, WebsiteDocsSearchTransport } from "./schemas";
+import * as browserRegistry from "./api/client.atoms";
+import type { WebsiteDocsSearchQuery } from "./docs/search-location.boundary";
+import type { LoaderContext } from "./loader-context";
+import * as browser from "./runtime.client";
+import * as server from "./runtime.server";
 import type { WebsiteServerRenderContext } from "./schemas";
 
-const websiteSettings = createServerFn({ method: "GET" }).handler(() =>
-  loadWebsiteSettingsServer()
-);
-// Use the native generated identity at ingress; never mirror a build-time ID.
-export const WebsiteSettingsFunctionPath = websiteSettings.url;
-const websiteDocsPage = createServerFn({ method: "GET" }).handler(() =>
-  loadWebsiteDocsPageServer()
-);
-export const WebsiteDocsPageFunctionPath = websiteDocsPage.url;
+type LoadRequest = Readonly<{ context: LoaderContext; signal: AbortSignal }>;
 
-export const loadWebsiteDocsPage = (options: {
-  readonly path: string;
-  readonly signal: AbortSignal;
-}) =>
-  Effect.runPromise(
-    Effect.promise(() =>
-      websiteDocsPage({
-        headers: { "x-taxkit-docs-page": options.path },
-        signal: options.signal,
+// Each branch calls local code; none creates a Website endpoint. Server loads
+// also stop when the incoming request is cancelled.
+export const createLoaderRegistry = createIsomorphicFn()
+  .server(() => Option.none())
+  .client(() => browserRegistry.createLoaderRegistry());
+
+type RootRequest = LoadRequest &
+  Readonly<{ submission: WebsiteServerRenderContext["submission"] }>;
+
+export const loadRoot = createIsomorphicFn()
+  .server((request: RootRequest) =>
+    server.loadRoot({
+      signal: AbortSignal.any([request.signal, getRequest().signal]),
+      submission: request.submission,
+    })
+  )
+  .client((request: RootRequest) => browser.loadRoot(request));
+
+export const loadDocsPage = createIsomorphicFn()
+  .server((request: LoadRequest & Readonly<{ path: string }>) =>
+    server.loadDocsPage({
+      path: request.path,
+      signal: AbortSignal.any([request.signal, getRequest().signal]),
+    })
+  )
+  .client((request: LoadRequest & Readonly<{ path: string }>) =>
+    browser.loadDocsPage(request)
+  );
+
+export const loadDocsSearch = createIsomorphicFn()
+  .server(
+    (request: LoadRequest & Readonly<{ query: WebsiteDocsSearchQuery }>) =>
+      server.loadDocsSearch({
+        query: request.query,
+        signal: AbortSignal.any([request.signal, getRequest().signal]),
       })
-    ),
-    { signal: options.signal }
-  );
-
-const websiteDocsSearch = createServerFn({ method: "GET" }).handler(() =>
-  loadWebsiteDocsSearchServer()
-);
-export const WebsiteDocsSearchFunctionPath = websiteDocsSearch.url;
-export const loadWebsiteDocsSearch = (options: {
-  readonly query: ReturnType<typeof readDocsSearchLocation>;
-  readonly signal: AbortSignal;
-}) =>
-  Effect.runPromise(
-    Effect.gen(function* () {
-      const query = yield* Effect.fromResult(options.query);
-      const header = yield* Schema.encodeEffect(WebsiteDocsSearchHeader)(
-        query.term ?? ""
-      ).pipe(Effect.orDie);
-      return yield* Effect.promise(() =>
-        websiteDocsSearch({
-          headers: { "x-taxkit-docs-search": header },
-          signal: options.signal,
-        })
-      );
-    }).pipe(
-      Effect.catchTag("DocsSearchInputError", (error) =>
-        Schema.encodeEffect(WebsiteDocsSearchTransport)(
-          Result.fail(error)
-        ).pipe(Effect.orDie)
-      )
-    ),
-    { signal: options.signal }
-  );
-
-// The framework owns this plain Promise transport. Its small Effect carries
-// the request signal and encoded SSR submission; it owns no client or Layer.
-export const loadWebsiteSettings = (options: {
-  readonly signal: AbortSignal;
-  readonly submission?: WebsiteServerRenderContext["submission"];
-}) =>
-  Effect.runPromise(
-    Effect.promise(() => websiteSettings({ signal: options.signal })).pipe(
-      Effect.map((bootstrap) => ({
-        catalogue: "catalogue" in bootstrap ? bootstrap.catalogue : undefined,
-        settings: "settings" in bootstrap ? bootstrap.settings : undefined,
-        submission: options.submission,
-      }))
-    ),
-    { signal: options.signal }
+  )
+  .client(
+    (request: LoadRequest & Readonly<{ query: WebsiteDocsSearchQuery }>) =>
+      browser.loadDocsSearch(request)
   );

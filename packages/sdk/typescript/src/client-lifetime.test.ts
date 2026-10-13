@@ -5,6 +5,7 @@ import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import {
+  Context,
   Deferred,
   Effect,
   Fiber,
@@ -41,65 +42,68 @@ const facts = {
 };
 const sentinel = "taxkit-private-secret:/private/sdk-lifetime/input.json";
 
+class LifetimeFixture extends Context.Service<
+  LifetimeFixture,
+  {
+    readonly mode:
+      | "normal"
+      | "operationBlocked"
+      | "startupBlocked"
+      | "startupDefect"
+      | "operationDefect"
+      | "finalizerBlocked"
+      | "finalizerDefect";
+    readonly release: Deferred.Deferred<boolean>;
+    readonly resources: Ref.Ref<number>;
+    readonly started: Deferred.Deferred<boolean>;
+  }
+>()("@taxkit/sdk/test/LifetimeFixture") {}
+
 // A calculator-service fixture owns real scoped acquisition and release. Each
 // failure is placed at its actual lifecycle step, with deterministic signals.
-const fixtureLayer = (
-  mode:
-    | "normal"
-    | "operationBlocked"
-    | "startupBlocked"
-    | "startupDefect"
-    | "operationDefect"
-    | "finalizerBlocked"
-    | "finalizerDefect",
-  resources: Ref.Ref<number>,
-  started: Deferred.Deferred<boolean>,
-  release: Deferred.Deferred<boolean>
-) =>
-  Layer.effect(
-    PublicCalculatorService,
-    Effect.gen(function* () {
-      yield* Effect.acquireRelease(
-        Ref.update(resources, (value) => value + 1),
-        () =>
-          Match.value(mode)
-            .pipe(
-              Match.when("finalizerBlocked", () =>
-                Deferred.succeed(started, true).pipe(
-                  Effect.andThen(Deferred.await(release))
-                )
-              ),
-              Match.when("finalizerDefect", () =>
-                Effect.die(new Error(sentinel))
-              ),
-              Match.orElse(() => Effect.void)
-            )
-            .pipe(Effect.ensuring(Ref.update(resources, (value) => value - 1)))
-      );
-      yield* Match.value(mode).pipe(
-        Match.when("startupBlocked", () =>
-          Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
-        ),
-        Match.when("startupDefect", () => Effect.die(new Error(sentinel))),
-        Match.orElse(() => Effect.void)
-      );
-      const service = yield* PublicCalculatorService;
-      return {
-        ...service,
-        calculate: Effect.fn("SdkFixture.calculate")((request) =>
-          Match.value(mode).pipe(
-            Match.when("operationBlocked", () =>
-              Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
+const FixtureLayer = Layer.effect(
+  PublicCalculatorService,
+  Effect.gen(function* () {
+    const { mode, release, resources, started } = yield* LifetimeFixture;
+    yield* Effect.acquireRelease(
+      Ref.update(resources, (value) => value + 1),
+      () =>
+        Match.value(mode)
+          .pipe(
+            Match.when("finalizerBlocked", () =>
+              Deferred.succeed(started, true).pipe(
+                Effect.andThen(Deferred.await(release))
+              )
             ),
-            Match.when("operationDefect", () =>
+            Match.when("finalizerDefect", () =>
               Effect.die(new Error(sentinel))
             ),
-            Match.orElse(() => service.calculate(request))
+            Match.orElse(() => Effect.void)
           )
-        ),
-      };
-    })
-  ).pipe(Layer.provide(ServiceLive));
+          .pipe(Effect.ensuring(Ref.update(resources, (value) => value - 1)))
+    );
+    yield* Match.value(mode).pipe(
+      Match.when("startupBlocked", () =>
+        Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
+      ),
+      Match.when("startupDefect", () => Effect.die(new Error(sentinel))),
+      Match.orElse(() => Effect.void)
+    );
+    const service = yield* PublicCalculatorService;
+    return {
+      ...service,
+      calculate: Effect.fn("SdkFixture.calculate")((request) =>
+        Match.value(mode).pipe(
+          Match.when("operationBlocked", () =>
+            Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
+          ),
+          Match.when("operationDefect", () => Effect.die(new Error(sentinel))),
+          Match.orElse(() => service.calculate(request))
+        )
+      ),
+    };
+  })
+).pipe(Layer.provide(ServiceLive));
 
 it.effect("closes an unused client without starting its Layer", () =>
   Effect.gen(function* () {
@@ -107,7 +111,16 @@ it.effect("closes an unused client without starting its Layer", () =>
     const started = yield* Deferred.make<boolean>();
     const release = yield* Deferred.make<boolean>();
     const client = createPlainClient(
-      fixtureLayer("normal", resources, started, release),
+      FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode: "normal",
+            release,
+            resources,
+            started,
+          })
+        )
+      ),
       AuPay2025_26Module
     );
     yield* Effect.promise(() => client.dispose());
@@ -137,7 +150,16 @@ it.effect("keeps separate client lifetimes even with the same Layer", () =>
     const resources = yield* Ref.make(0);
     const started = yield* Deferred.make<boolean>();
     const release = yield* Deferred.make<boolean>();
-    const layer = fixtureLayer("normal", resources, started, release);
+    const layer = FixtureLayer.pipe(
+      Layer.provide(
+        Layer.succeed(LifetimeFixture)({
+          mode: "normal",
+          release,
+          resources,
+          started,
+        })
+      )
+    );
     const first = createPlainClient(layer, AuPay2025_26Module);
     const second = createPlainClient(layer, AuPay2025_26Module);
     const reports = yield* Effect.all(
@@ -174,7 +196,16 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
       const client = createPlainClient(
-        fixtureLayer(mode, resources, started, release),
+        FixtureLayer.pipe(
+          Layer.provide(
+            Layer.succeed(LifetimeFixture)({
+              mode,
+              release,
+              resources,
+              started,
+            })
+          )
+        ),
         AuPay2025_26Module
       );
       const pending = yield* Effect.promise(() =>
@@ -211,7 +242,16 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
       const client = createPlainClient(
-        fixtureLayer(mode, resources, started, release),
+        FixtureLayer.pipe(
+          Layer.provide(
+            Layer.succeed(LifetimeFixture)({
+              mode,
+              release,
+              resources,
+              started,
+            })
+          )
+        ),
         AuPay2025_26Module
       );
       const pending = yield* Effect.tryPromise({
@@ -241,7 +281,16 @@ it.effect.each(["startupDefect", "operationDefect"] as const)(
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
       const client = createPlainClient(
-        fixtureLayer(mode, resources, started, release),
+        FixtureLayer.pipe(
+          Layer.provide(
+            Layer.succeed(LifetimeFixture)({
+              mode,
+              release,
+              resources,
+              started,
+            })
+          )
+        ),
         AuPay2025_26Module
       );
       const result = yield* Effect.promise(() =>
@@ -273,7 +322,16 @@ it.effect("all overlapping dispose calls await the same finalisers", () =>
     const started = yield* Deferred.make<boolean>();
     const release = yield* Deferred.make<boolean>();
     const client = createPlainClient(
-      fixtureLayer("finalizerBlocked", resources, started, release),
+      FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode: "finalizerBlocked",
+            release,
+            resources,
+            started,
+          })
+        )
+      ),
       AuPay2025_26Module
     );
     yield* Effect.promise(() =>
@@ -309,7 +367,16 @@ it.effect(
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
       const client = createPlainClient(
-        fixtureLayer("finalizerDefect", resources, started, release),
+        FixtureLayer.pipe(
+          Layer.provide(
+            Layer.succeed(LifetimeFixture)({
+              mode: "finalizerDefect",
+              release,
+              resources,
+              started,
+            })
+          )
+        ),
         AuPay2025_26Module
       );
       yield* Effect.promise(() =>

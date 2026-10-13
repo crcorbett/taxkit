@@ -1,5 +1,25 @@
-import { Array, Option } from "effect";
-import { Headers, HttpServerResponse } from "effect/http";
+import { Array, Option, Result } from "effect";
+import { Headers, HttpServerResponse, Url } from "effect/http";
+
+// Exact HTTP(S) origin text, as browsers send it. URL parsing normalises the
+// address, so compare the parsed origin with the original header.
+export const isBrowserOrigin = (origin: string) =>
+  Result.match(Url.fromString(origin), {
+    onFailure: () => false,
+    onSuccess: (url) =>
+      url.origin === origin &&
+      (url.protocol === "https:" || url.protocol === "http:"),
+  });
+
+// Public credential-free browser access for HTTP and RPC on every host.
+// Native Effect clients send b3 and traceparent; admitting them enables no
+// exporter.
+export const publicCors = {
+  allowedHeaders: ["b3", "content-type", "traceparent"],
+  allowedMethods: ["GET", "HEAD", "POST", "OPTIONS"],
+  allowedOrigins: isBrowserOrigin,
+  credentials: false,
+} as const;
 
 // Browsers recheck public content on every visit. Cloudflare may reuse the same
 // deployed Worker version's response for seven days; that is freshness, not a

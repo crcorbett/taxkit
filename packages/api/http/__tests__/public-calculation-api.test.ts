@@ -36,24 +36,30 @@ import {
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 
-import { TaxKitApiInProcessClientLive } from "../src/client/server.layer.js";
-import { TaxKitHttpApiService } from "../src/client/service.js";
+import { TaxKitApi } from "../src/api.js";
 import {
   CalculatorApiErrorEnvelope,
   CalculatorCatalogResponse,
   CalculatorRunResponse,
   CalculatorServiceError,
 } from "../src/groups/calculators.js";
+import { TaxKitApiInProcessLive } from "../src/in-process.layer.js";
 import { TaxKitApiRoutesLayer } from "../src/server.js";
 import { ContentTestLive } from "./content.fixture.js";
+
+// The native generated client over the in-process routes.
+const inProcessClient = HttpApiClient.make(TaxKitApi, {
+  baseUrl: "http://taxkit.internal",
+});
 
 const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
 
 const TestLive = Layer.mergeAll(
-  TaxKitApiInProcessClientLive.pipe(Layer.provide(ContentTestLive)),
+  TaxKitApiInProcessLive.pipe(Layer.provide(ContentTestLive)),
   PublicCalculatorServiceTestLive
 );
 
@@ -127,7 +133,7 @@ describe("TaxKit public calculation HTTP API", () => {
 
   it.effect("pins the health route fixture", () =>
     Effect.gen(function* () {
-      const client = yield* TaxKitHttpApiService;
+      const client = yield* inProcessClient;
       const response = yield* client.health.getHealth();
 
       expect(response).toEqual({
@@ -141,7 +147,7 @@ describe("TaxKit public calculation HTTP API", () => {
     "pins calculator metadata against the calculator service contract",
     () =>
       Effect.gen(function* () {
-        const client = yield* TaxKitHttpApiService;
+        const client = yield* inProcessClient;
         const service = yield* PublicCalculatorService;
         const context = {
           jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
@@ -179,7 +185,7 @@ describe("TaxKit public calculation HTTP API", () => {
 
   it.effect("pins calculate success through SDK full-run parity", () =>
     Effect.gen(function* () {
-      const client = yield* TaxKitHttpApiService;
+      const client = yield* inProcessClient;
       const facts = grossPayFacts(
         yield* audFromCents(346_200),
         "fortnightly",
@@ -261,7 +267,7 @@ describe("TaxKit public calculation HTTP API", () => {
     "returns typed calculator input errors through the HTTP client",
     () =>
       Effect.gen(function* () {
-        const client = yield* TaxKitHttpApiService;
+        const client = yield* inProcessClient;
         const service = yield* PublicCalculatorService;
         const invalidFacts = {
           rejectedSource: `${secretSentinel}:${privatePathSentinel}`,

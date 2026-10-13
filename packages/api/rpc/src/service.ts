@@ -18,6 +18,7 @@ import { Context } from "effect";
 import type { Effect } from "effect";
 
 import type { CalculatorRpcClientError } from "./errors.js";
+import type { CalculatorRpcOrigin } from "./schemas.js";
 
 export class TaxKitRpcClient extends Context.Service<
   TaxKitRpcClient,
@@ -52,3 +53,9 @@ export class TaxKitRpcClient extends Context.Service<
     ) => Effect.Effect<TaxYearsResponse, CalculatorRpcClientError>;
   }
 >()("@taxkit/api-rpc/TaxKitRpcClient") {}
+
+/** The API origin whose `/rpc` endpoint the checked RPC clients call. */
+export class TaxKitRpcOrigin extends Context.Service<
+  TaxKitRpcOrigin,
+  CalculatorRpcOrigin
+>()("taxkit/api-rpc/TaxKitRpcOrigin") {}

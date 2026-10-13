@@ -1,4 +1,5 @@
-import { makeFumadocsSourceLive } from "@taxkit/docs-fumadocs/live";
+import { FumadocsSourceLive } from "@taxkit/docs-fumadocs/live";
+import { FumadocsGeneratedCollection } from "@taxkit/docs-fumadocs/service";
 import { plugin } from "bun";
 import { Effect, Layer, Path } from "effect";
 import { loader } from "fumadocs-core/source";
@@ -56,7 +57,13 @@ export const DocsCatalogueSourceLive = Layer.unwrap(
       try: () =>
         loader({ baseUrl: "", source: generated.docs.toFumadocsSource() }),
     });
-    return makeFumadocsSourceLive(createGeneratedCollectionAdapter(source));
+    return FumadocsSourceLive.pipe(
+      Layer.provide(
+        Layer.succeed(FumadocsGeneratedCollection)(
+          createGeneratedCollectionAdapter(source)
+        )
+      )
+    );
   }).pipe(
     Effect.mapError(
       () =>

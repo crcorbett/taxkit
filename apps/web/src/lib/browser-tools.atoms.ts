@@ -1,17 +1,18 @@
-import type { CalculatorRunServiceRequest } from "@taxkit/api-rpc/schemas";
+import type { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
 import { Duration, Effect, Option, Result, Schema, Stream } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
+import {
+  ApiClient,
+  apiClientRuntime,
+  publicSettingsAtom,
+} from "./api/client.atoms";
+import { readCatalogue } from "./api/requests";
 import { registerWebsiteBrowserTools } from "./browser-tools.boundary";
 import { WebsiteBrowserToolFailure } from "./browser-tools.schemas";
 import { WebsiteBrowserToolkit } from "./browser-tools.toolkit";
-import {
-  calculatorPageAtoms,
-  calculatorRuntime,
-  publicSettingsAtom,
-  websiteCatalogueAtom,
-} from "./calculator.atoms";
+import { calculatorPageAtoms } from "./calculator.atoms";
 import { AnnualTaxForm, TakeHomeForm } from "./form.boundary";
 
 // One mounted calculator owns these registrations and callbacks through its
@@ -20,7 +21,7 @@ import { AnnualTaxForm, TakeHomeForm } from "./form.boundary";
 export const browserCalculatorToolsAtom = Atom.family(
   (calculatorId: CalculatorRunServiceRequest["calculatorId"]) => {
     const page = calculatorPageAtoms(calculatorId);
-    return calculatorRuntime.fn<"register">()((_, get) =>
+    return apiClientRuntime.fn<"register">()((_, get) =>
       Effect.gen(function* () {
         const settings = get.registry.get(publicSettingsAtom);
         if (Option.isNone(settings)) {
@@ -29,6 +30,7 @@ export const browserCalculatorToolsAtom = Atom.family(
         // Reads made by a later native callback do not retain an idle atom.
         // Hold the current attempt for this page's entire registration lifetime.
         get.mount(page.attempt);
+        const client = yield* ApiClient;
         const handlers = yield* WebsiteBrowserToolkit.toHandlers({
           taxkit_calculate_visible_form: Effect.fn(
             "WebsiteBrowserTools.calculateVisibleForm"
@@ -144,21 +146,17 @@ export const browserCalculatorToolsAtom = Atom.family(
               return Result.succeed(get.registry.get(page.view));
             }).pipe(Effect.flatMap(Effect.fromResult))
           ),
+          // Page tools use the same native client directly.
           taxkit_find_calculators: Effect.fn(
             "WebsiteBrowserTools.findCalculators"
           )(() =>
-            Effect.sync(() => get.registry.get(websiteCatalogueAtom)).pipe(
-              Effect.flatMap(
-                Option.match({
-                  onNone: () =>
-                    Effect.fail(
-                      new WebsiteBrowserToolFailure({
-                        code: "service-unavailable",
-                        retry: "try-again-manually",
-                      })
-                    ),
-                  onSome: Effect.succeed,
-                })
+            readCatalogue(client).pipe(
+              Effect.mapError(
+                () =>
+                  new WebsiteBrowserToolFailure({
+                    code: "service-unavailable",
+                    retry: "try-again-manually",
+                  })
               )
             )
           ),

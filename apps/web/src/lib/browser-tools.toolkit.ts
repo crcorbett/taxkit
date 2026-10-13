@@ -1,4 +1,4 @@
-import { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
+import { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
 import { Schema } from "effect";
 import { Tool, Toolkit } from "effect/ai";
 

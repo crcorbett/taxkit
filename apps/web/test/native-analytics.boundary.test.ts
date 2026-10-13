@@ -7,7 +7,7 @@ import {
 import { CalculatorCaptureBatch } from "@taxkit/analytics/schemas";
 import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
 import { packEnvValue } from "alchemy/RuntimeContext";
@@ -237,7 +237,9 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
         const rpc = yield* TaxKitRpcClient.pipe(
           Effect.flatMap((client) => client.calculate(CalculationRequest)),
           Effect.provide(
-            TaxKitRpcClientLive(rpcOrigin).pipe(Layer.provide(transport))
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(rpcOrigin))
+            ).pipe(Layer.provide(transport))
           )
         );
         expect(rpc.calculator.calculatorId).toBe("au.pay.take-home");
@@ -613,7 +615,8 @@ it.live(
             const pending = yield* Effect.promise(() =>
               page.waitForResponse(
                 (value) =>
-                  value.url() === `${apiOrigin}/rpc` &&
+                  value.url() ===
+                    `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate` &&
                   value.request().method() === "POST"
               )
             ).pipe(Effect.forkChild);

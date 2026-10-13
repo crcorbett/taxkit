@@ -5,12 +5,11 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   optimizeDeps: {
-    // The explicitly bundled workspace RPC source can change without a lockfile
-    // change. Each qualification must compile that source again.
+    // Workspace source can change without a lockfile change. Each run must
+    // compile that source again.
     force: true,
     include: [
       "@tanstack/react-router",
-      "@taxkit/api-rpc/live",
       "effect/Function",
       "effect/http-api",
       "effect/http/HttpClient",

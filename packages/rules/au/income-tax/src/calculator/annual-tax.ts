@@ -1,5 +1,5 @@
 import { Cents, Money } from "@taxkit/core/primitives";
-import { Effect, Layer } from "effect";
+import { Context, Effect, Layer } from "effect";
 
 import {
   AnnualTaxableIncome,
@@ -42,13 +42,27 @@ export const CalculateAnnualTax = Effect.gen(function* () {
 });
 
 /**
- * Builds the typed scenario layer for annual taxable income.
+ * The caller's decoded annual tax scenario. Supply it with
+ * `Layer.succeed(AnnualTaxScenario)(input)` after decoding
+ * `AnnualTaxScenarioInputSchema` at the caller's boundary.
  *
- * Use this after an owning boundary has decoded `AnnualTaxScenarioInput`.
- *
- * @since 0.1.0
+ * @since 2.0.0
  */
-export const AnnualTaxScenarioLiveFromInput = (input: AnnualTaxScenarioInput) =>
-  Layer.succeed(AnnualTaxableIncomeFact)(
-    new AnnualTaxableIncome({ income: input.taxableIncome })
-  );
+export class AnnualTaxScenario extends Context.Service<
+  AnnualTaxScenario,
+  AnnualTaxScenarioInput
+>()("taxkit/rules-au-income-tax/AnnualTaxScenario") {}
+
+/**
+ * Provides annual taxable income from `AnnualTaxScenario`.
+ *
+ * @since 2.0.0
+ */
+export const AnnualTaxScenarioLive = Layer.effect(
+  AnnualTaxableIncomeFact,
+  AnnualTaxScenario.pipe(
+    Effect.map(
+      (scenario) => new AnnualTaxableIncome({ income: scenario.taxableIncome })
+    )
+  )
+);

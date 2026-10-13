@@ -7,6 +7,7 @@ import {
   CalculationRequest,
   CalculatorLive,
   CalculatorFixture,
+  CalculatorFixtureMode,
   sensitiveSentinel,
 } from "@taxkit/api-rpc/testing/fixtures";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
@@ -176,7 +177,11 @@ describe("real MCP client against the native API application", () => {
       Effect.gen(function* () {
         const app = yield* ApiWorkerApplication.pipe(
           Effect.provide(ApiContentLive),
-          Effect.provide(CalculatorFixture(mode))
+          Effect.provide(
+            CalculatorFixture.pipe(
+              Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode))
+            )
+          )
         );
         const context = yield* Effect.context<never>();
         const handler = HttpEffect.toWebHandlerWith<

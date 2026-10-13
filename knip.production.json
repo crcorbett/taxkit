@@ -23,7 +23,7 @@
         "src/api.ts!",
         "src/client/index.ts!",
         "src/client/live.layer.ts!",
-        "src/client/server.layer.ts!",
+        "src/in-process.layer.ts!",
         "src/config.ts!",
         "src/server.ts!",
         "src/handlers/index.ts!",

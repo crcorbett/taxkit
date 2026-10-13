@@ -1,17 +1,16 @@
 import { describe, expect, it } from "@effect/vitest";
-import { createTaxKitApiClient } from "@taxkit/api-http/client";
-import type { CalculatorClientRateKey } from "@taxkit/api-rpc/rate-identity";
-import {
-  CalculatorRequestRateKey,
-  calculatorEdgeRateKey,
-} from "@taxkit/api-rpc/rate-identity";
+import { TaxKitApi } from "@taxkit/api-http/api";
 import {
   CalculatorRpcPayload,
   CalculatorRpcVersion,
   MetadataQuery,
 } from "@taxkit/api-rpc/schemas";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
-import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
+import type { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
+import {
+  CalculatorAdmission,
+  CalculatorRequestRateKey,
+} from "@taxkit/calculators/admission.service";
 import {
   CalculatorRateLimited,
   CalculationQuery,
@@ -36,7 +35,9 @@ import {
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 
+import { calculatorEdgeRateKey } from "../src/edge-identity.boundary.js";
 import { ApiCalculatorAdmission } from "../src/worker-admission.layer.js";
 import { ApiWorkerInit } from "../src/worker.js";
 
@@ -201,9 +202,10 @@ describe("shared native host calculation admission", () => {
             Effect.scoped
           )
         );
-        const client = yield* createTaxKitApiClient({
+        const client = yield* HttpApiClient.makeWith(TaxKitApi, {
           baseUrl: "https://api.example.com",
-        }).pipe(Effect.provideService(HttpClient.HttpClient, http));
+          httpClient: http,
+        });
         const calculate = client.calculatorApi.calculate({
           params: { calculatorId: CalculationRequest.calculatorId },
           payload: CalculationRequest.payload,

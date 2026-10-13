@@ -74,9 +74,15 @@ describe("native local development", () => {
         const page = yield* Effect.promise(() => browser.newPage());
         const calls = yield* Queue.make<string>();
         const exceptions = yield* Queue.make<string>();
+        // Record every browser call to a calculator route, including the
+        // retired machine RPC path, so only the HTTP calculation can satisfy it.
         page.on("request", (request) => {
-          if (new URL(request.url()).pathname === "/rpc") {
-            Queue.offerUnsafe(calls, request.url());
+          const { pathname } = new URL(request.url());
+          if (
+            pathname === "/rpc" ||
+            /^\/api\/v1\/calculators\/[^/]+\/calculate$/u.test(pathname)
+          ) {
+            Queue.offerUnsafe(calls, `${request.method()} ${request.url()}`);
           }
         });
         page.on("pageerror", (error) => {
@@ -236,7 +242,9 @@ describe("native local development", () => {
               .getByText("$1,301.00", { exact: true })
               .waitFor({ timeout: 10_000 })
           );
-          expect(yield* Queue.clear(calls)).toEqual([`${apiOrigin}/rpc`]);
+          expect(yield* Queue.clear(calls)).toEqual([
+            `POST ${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+          ]);
           const plainContext = yield* Effect.acquireRelease(
             Effect.promise(() =>
               browser.newContext({ javaScriptEnabled: false })

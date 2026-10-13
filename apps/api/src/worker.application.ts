@@ -1,21 +1,19 @@
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import {
   applyCachePolicy,
+  isBrowserOrigin,
   isPublicReadPath,
+  publicCors,
 } from "@taxkit/api-http/response-policy";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { CalculatorRpcResponseTooLarge } from "@taxkit/api-rpc/errors";
-import {
-  CalculatorClientRateKey,
-  CalculatorHostMode,
-  CalculatorRequestRateKey,
-  calculatorEdgeRateKey,
-} from "@taxkit/api-rpc/rate-identity";
 import {
   CalculatorRpcDeadline,
   CalculatorRpcResponseLimit,
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcHttpLayer } from "@taxkit/api-rpc/server";
+import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
+import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { CalculatorId } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { DocsSourceError } from "@taxkit/content/errors";
@@ -27,6 +25,7 @@ import {
 import {
   ContentCatalogue,
   ContentDiscovery,
+  ContentDiscoverySettings,
   ContentService,
 } from "@taxkit/content/service";
 import { safeHttpEffect } from "alchemy/Http";
@@ -39,11 +38,11 @@ import {
   Layer,
   Option,
   Record,
-  Result,
   Schema,
   Scope,
   Stream,
 } from "effect";
+import { McpProtocol } from "effect/ai";
 import {
   HttpClientRequest,
   HttpClientResponse,
@@ -52,7 +51,6 @@ import {
   HttpRouter,
   HttpServerRequest,
   HttpServerResponse,
-  Url,
 } from "effect/http";
 
 import {
@@ -60,10 +58,14 @@ import {
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
 import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";
+import {
+  CalculatorHostMode,
+  calculatorEdgeRateKey,
+} from "./edge-identity.boundary.js";
 import { McpRequestAbortSignal } from "./mcp-request.service.js";
 import { withBoundedMcpReply } from "./mcp-response.boundary.js";
 import { McpSessionHost } from "./mcp-session.layer.js";
-import { TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
+import { TaxKitMcpHost, TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
@@ -102,16 +104,6 @@ const DiscoveryRoutes = HttpRouter.addAll(
   )
 );
 
-// Exact HTTP(S) origin text, as browsers send it. URL parsing normalises the
-// address, so compare the parsed origin with the original header.
-const isBrowserOrigin = (origin: string) =>
-  Result.match(Url.fromString(origin), {
-    onFailure: () => false,
-    onSuccess: (url) =>
-      url.origin === origin &&
-      (url.protocol === "https:" || url.protocol === "http:"),
-  });
-
 // Construct once in the native instance scope. Both transports receive this
 // same application service; native requests keep their own scope and fibre.
 export const ApiWorkerApplication = Effect.gen(function* () {
@@ -149,23 +141,26 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     yield* PublicCalculatorService
   );
   const content = Layer.succeed(ContentService, yield* ContentService);
-  const discovery = ContentDiscoveryLive(
-    settings.pipe(
-      Effect.map((config) =>
-        DocsDiscoverySettings.make({
-          apiOrigin: config.apiOrigin,
-          publicationOrigin: config.publicationOrigin,
-        })
-      ),
-      Effect.mapError(
-        () =>
-          new DocsSourceError({
-            message: "Documentation discovery settings are unavailable.",
-            operation: "getDiscoveryDocument",
-          })
+  const discovery = ContentDiscoveryLive.pipe(
+    Layer.provide(
+      Layer.succeed(ContentDiscoverySettings)(
+        settings.pipe(
+          Effect.map((config) =>
+            DocsDiscoverySettings.make({
+              apiOrigin: config.apiOrigin,
+              publicationOrigin: config.publicationOrigin,
+            })
+          ),
+          Effect.mapError(
+            () =>
+              new DocsSourceError({
+                message: "Documentation discovery settings are unavailable.",
+                operation: "getDiscoveryDocument",
+              })
+          )
+        )
       )
-    )
-  ).pipe(
+    ),
     Layer.provide(Layer.succeed(ContentCatalogue, yield* ContentCatalogue))
   );
   const routes = Layer.mergeAll(
@@ -188,9 +183,15 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     settings.pipe(
       Effect.flatMap((config) =>
         HttpRouter.toHttpEffect(
-          TaxKitMcpHttpLayer(config.publicationOrigin).pipe(
+          TaxKitMcpHttpLayer.pipe(
             Layer.provide(calculator),
-            Layer.provide(content)
+            Layer.provide(content),
+            Layer.provide(
+              Layer.succeed(TaxKitMcpHost)({
+                protocol: McpProtocol.v2026_07_28,
+                publicationOrigin: config.publicationOrigin,
+              })
+            )
           )
         )
       ),
@@ -247,9 +248,9 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         withApiRequestBodyLimit(selected)
       ).pipe(
         Effect.provideService(ApiCalculatorDelivery, analytics),
-        // Public credential-free browser access for HTTP and RPC. Remote MCP
-        // keeps its own exact browser origin list. Native Effect clients send
-        // b3 and traceparent; no exporter is enabled by admitting them.
+        // The shared public browser policy for HTTP and RPC, plus the
+        // Website's collection header. Remote MCP keeps its own exact
+        // browser origin list.
         HttpMiddleware.cors({
           allowedHeaders: isMcp
             ? [
@@ -262,8 +263,8 @@ export const ApiWorkerApplication = Effect.gen(function* () {
                 "mcp-session-id",
                 "traceparent",
               ]
-            : [CollectionPolicyHeader, "b3", "content-type", "traceparent"],
-          allowedMethods: ["GET", "HEAD", "POST", "OPTIONS"],
+            : [CollectionPolicyHeader, ...publicCors.allowedHeaders],
+          allowedMethods: publicCors.allowedMethods,
           allowedOrigins: (origin) =>
             isMcp
               ? origin === config.publicationOrigin.origin

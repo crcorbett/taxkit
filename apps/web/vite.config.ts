@@ -10,7 +10,6 @@ import mdx from "fumadocs-mdx/vite";
 import { defineConfig } from "vite";
 
 import { generateDocsImages } from "./scripts/docs-images.build.ts";
-import { WebsiteServerFunctionBase } from "./src/lib/config.ts";
 
 export default defineConfig(() => {
   const alchemyOwnsCloudflareVite = Effect.runSync(
@@ -53,7 +52,6 @@ export default defineConfig(() => {
         : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
       tanstackStart({
         server: { entry: "server" },
-        serverFns: { base: WebsiteServerFunctionBase },
       }),
       viteReact(),
     ],

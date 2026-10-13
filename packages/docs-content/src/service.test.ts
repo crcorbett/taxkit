@@ -1,10 +1,11 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Match, Schema } from "effect";
+import { FumadocsSourceFixtures } from "@taxkit/docs-fumadocs/test";
+import { Effect, Layer, Match, Schema } from "effect";
 
 import { DocsSourceError } from "./errors.js";
 import { DocsPagePath } from "./schemas.js";
 import { DocsContentService } from "./service.js";
-import { makeDocsContentServiceTest } from "./test.layer.js";
+import { DocsContentServiceTest } from "./test.layer.js";
 
 const guide = {
   browserPath: "guides/example.mdx",
@@ -29,7 +30,13 @@ describe("DocsContentService", () => {
       expect(page.path).toBe("/guides/example");
       expect(page.source).toBe("content/guides/example.mdx");
       expect(pages).toEqual([page]);
-    }).pipe(Effect.provide(makeDocsContentServiceTest([guide])))
+    }).pipe(
+      Effect.provide(
+        DocsContentServiceTest.pipe(
+          Layer.provide(Layer.succeed(FumadocsSourceFixtures)([guide]))
+        )
+      )
+    )
   );
 
   it.effect("maps generic missing pages to the content-owned path error", () =>
@@ -37,7 +44,11 @@ describe("DocsContentService", () => {
       const content = yield* DocsContentService;
       return yield* content.getPage(DocsPagePath.make("/missing"));
     }).pipe(
-      Effect.provide(makeDocsContentServiceTest([guide])),
+      Effect.provide(
+        DocsContentServiceTest.pipe(
+          Layer.provide(Layer.succeed(FumadocsSourceFixtures)([guide]))
+        )
+      ),
       Effect.flip,
       Effect.tap((error) =>
         Effect.sync(() => {
@@ -55,15 +66,19 @@ describe("DocsContentService", () => {
         return yield* content.getPage(DocsPagePath.make("/guides/malformed"));
       }).pipe(
         Effect.provide(
-          makeDocsContentServiceTest([
-            {
-              ...guide,
-              frontmatter: {
-                description: "Missing canonical fields.",
-              },
-              slugs: ["guides", "malformed"],
-            },
-          ])
+          DocsContentServiceTest.pipe(
+            Layer.provide(
+              Layer.succeed(FumadocsSourceFixtures)([
+                {
+                  ...guide,
+                  frontmatter: {
+                    description: "Missing canonical fields.",
+                  },
+                  slugs: ["guides", "malformed"],
+                },
+              ])
+            )
+          )
         ),
         Effect.flip,
         Effect.tap((error) =>

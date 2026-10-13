@@ -1,4 +1,4 @@
-import type { CalculatorRunServiceRequest } from "@taxkit/api-rpc/schemas";
+import type { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
 import type { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import type { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
 import type { Option } from "effect";

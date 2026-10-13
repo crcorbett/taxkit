@@ -6,19 +6,18 @@ import {
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
-import { HttpApiClient } from "effect/http-api";
 
-import { TaxKitApi } from "../api.js";
-import { TaxKitServerLayer } from "../server.js";
-import { TaxKitHttpApiService } from "./service.js";
+import { TaxKitServerLayer } from "./server.js";
 
-// The caller supplies accepted content. Native request Effects share the
-// caller's Layer lifetime and each request has its own closing scope.
-export const TaxKitApiInProcessClientLive = Layer.effect(
-  TaxKitHttpApiService,
+// An HttpClient that answers from the TaxKit HTTP routes in this process, for
+// tests and examples. Use it under the native generated client:
+// `HttpApiClient.make(TaxKitApi, { baseUrl })`. The caller supplies accepted
+// content; each request has its own closing scope.
+export const TaxKitApiInProcessLive = Layer.effect(
+  HttpClient.HttpClient,
   Effect.gen(function* () {
     const handler = yield* HttpRouter.toHttpEffect(TaxKitServerLayer);
-    const client = HttpClient.make((request) =>
+    return HttpClient.make((request) =>
       handler.pipe(
         Effect.provideService(
           HttpServerRequest.HttpServerRequest,
@@ -35,8 +34,5 @@ export const TaxKitApiInProcessClientLive = Layer.effect(
         Effect.scoped
       )
     );
-    return yield* HttpApiClient.make(TaxKitApi, {
-      baseUrl: "http://taxkit.internal",
-    }).pipe(Effect.provideService(HttpClient.HttpClient, client));
   })
 );

@@ -3,14 +3,14 @@ import {
   useAtomSet,
   useAtomValue,
 } from "@effect/atom-react";
-import type { CalculatorRpcClientError } from "@taxkit/api-rpc/errors";
-import type { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
+import type { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
 import { Option, Schema } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
+import type { WebsiteCalculationFailure } from "./api/errors";
 import { browserCalculatorToolsAtom } from "./browser-tools.atoms";
 import { calculationFailureMessage } from "./calculation-failure";
 import { CalculatorPageView } from "./calculator-page.view";
@@ -32,7 +32,7 @@ export const CalculatorPage = ({
   readonly calculator: CalculatorCatalogResponse["calculators"][number];
   readonly report: Option.Option<AnnualTaxReport | PayWithholdingsLedger>;
   readonly savedError: Option.Option<
-    CalculatorRpcClientError | TaxKitWebConfigError | WebsiteInputError
+    WebsiteCalculationFailure | TaxKitWebConfigError | WebsiteInputError
   >;
   readonly savedForm: Option.Option<WebsiteCalculatorForm>;
 }) => {

@@ -8,7 +8,10 @@ import {
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
 import { ContentDiscoveryLive, ContentServiceLive } from "@taxkit/content/live";
-import { ContentCatalogue } from "@taxkit/content/service";
+import {
+  ContentCatalogue,
+  ContentDiscoverySettings,
+} from "@taxkit/content/service";
 import {
   exampleContentCatalogue,
   exampleDiscoverySettings,
@@ -42,6 +45,7 @@ import {
   CalculationRequest,
   CalculatorRpcOperationCases,
   CalculatorFixture,
+  CalculatorFixtureMode,
   CalculatorLive,
   sensitiveSentinel,
 } from "../src/__testing__/fixtures.js";
@@ -64,7 +68,7 @@ import {
   MetadataQuery,
 } from "../src/schemas.js";
 import { TaxKitRpcHttpLayer } from "../src/server.js";
-import { TaxKitRpcClient } from "../src/service.js";
+import { TaxKitRpcClient, TaxKitRpcOrigin } from "../src/service.js";
 import { TaxKitRpcClientTest } from "../src/test.layer.js";
 
 const origin = Schema.decodeResult(CalculatorRpcOrigin)(
@@ -90,11 +94,21 @@ const makeHttpTransport = Effect.fnUntraced(function* (
 ) {
   const handler = yield* HttpRouter.toHttpEffect(
     TaxKitRpcHttpLayer.pipe(
-      Layer.provide(CalculatorFixture(mode)),
+      Layer.provide(
+        CalculatorFixture.pipe(
+          Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode))
+        )
+      ),
       Layer.provide(
         Layer.merge(
           ContentServiceLive,
-          ContentDiscoveryLive(exampleDiscoverySettings.pipe(Effect.orDie))
+          ContentDiscoveryLive.pipe(
+            Layer.provide(
+              Layer.succeed(ContentDiscoverySettings)(
+                exampleDiscoverySettings.pipe(Effect.orDie)
+              )
+            )
+          )
         ).pipe(
           Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
         )
@@ -127,7 +141,9 @@ describe("native calculator RPC", () => {
           Effect.flatMap(invoke),
           Effect.exit,
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -153,7 +169,9 @@ describe("native calculator RPC", () => {
           Effect.flatMap((client) => client.calculate(CalculationRequest)),
           Effect.exit,
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -228,7 +246,9 @@ describe("native calculator RPC", () => {
           });
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -253,7 +273,9 @@ describe("native calculator RPC", () => {
           Effect.flatMap((client) => invoke(client)),
           Effect.flip,
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -279,9 +301,9 @@ describe("native calculator RPC", () => {
         Effect.flatMap((client) => invoke(client)),
         Effect.exit,
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
       expect(Exit.isFailure(exit)).toBe(true);
@@ -384,7 +406,9 @@ describe("native calculator RPC", () => {
           );
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -446,7 +470,9 @@ describe("native calculator RPC", () => {
           }
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -492,7 +518,9 @@ describe("native calculator RPC", () => {
           );
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -571,7 +599,9 @@ describe("native calculator RPC", () => {
           );
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -743,7 +773,9 @@ describe("native calculator RPC", () => {
           expect(Schema.is(CalculatorRpcInvalidResponse)(error)).toBe(true);
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -776,7 +808,9 @@ describe("native calculator RPC", () => {
           }
         }).pipe(
           Effect.provide(
-            TaxKitRpcClientLive(origin).pipe(
+            TaxKitRpcClientLive.pipe(
+              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+            ).pipe(
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
             )
           )
@@ -854,9 +888,9 @@ it.effect.each(
         expect(yield* Ref.get(calls)).toBe(1);
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })
@@ -896,9 +930,9 @@ it.effect.each(CalculatorRpcOperationCases)(
         expect(yield* Ref.get(released)).toBe(true);
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     }).pipe(Effect.scoped)
@@ -955,9 +989,9 @@ it.effect.each(
         expect(yield* Ref.get(calls)).toBe(1);
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })
@@ -985,9 +1019,9 @@ it.effect.each(
         expect(error).toEqual(new CalculatorRpcInvalidResponse());
       }).pipe(
         Effect.provide(
-          TaxKitRpcClientLive(origin).pipe(
-            Layer.provide(Layer.succeed(HttpClient.HttpClient, transport))
-          )
+          TaxKitRpcClientLive.pipe(
+            Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
+          ).pipe(Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)))
         )
       );
     })

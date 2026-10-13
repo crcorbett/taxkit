@@ -1,17 +1,16 @@
 import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import { describe, expect, it } from "@effect/vitest";
+import { TaxKitApi } from "@taxkit/api-http/api";
 import {
-  CalculatorRpcUnavailable,
-  CalculatorRpcDeadlineExceeded,
-  CalculatorRateLimited,
+  CalculatorRequestBodyTimedOut,
+  CalculatorRequestBodyTooLarge,
+} from "@taxkit/api-http/request-boundary";
+import {
   CalculatorAdmissionUnavailable,
-  CalculatorRpcRequestTimedOut,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
-  CalculatorRpcRequestTooLarge,
-  CalculatorRpcResponseTooLarge,
-} from "@taxkit/api-rpc/errors";
-import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+  CalculatorRateLimited,
+} from "@taxkit/calculators/schemas";
 import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { Cents, aud } from "@taxkit/core/primitives";
@@ -22,6 +21,9 @@ import {
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
 import { Array, Effect, Layer, Option, Ref, Result, Schema } from "effect";
+import { HttpClient, HttpClientError, HttpClientResponse } from "effect/http";
+import type { HttpClientRequest } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 import { useEffect } from "react";
@@ -30,11 +32,19 @@ import { renderToString } from "react-dom/server";
 import { vi } from "vitest";
 
 import {
+  ApiClient,
+  apiClientRuntime,
+  publicSettingsAtom,
+} from "./api/client.atoms";
+import {
+  WebsiteApiDeadlineExceeded,
+  WebsiteApiResponseTooLarge,
+  WebsiteApiUnavailable,
+} from "./api/errors";
+import {
   calculateAtom,
   calculatorPageAtoms,
-  calculatorRuntime,
   editTakeHomeAtom,
-  publicSettingsAtom,
   submitTakeHomeAtom,
   takeHomeFormAtom,
 } from "./calculator.atoms";
@@ -50,6 +60,19 @@ import {
 } from "./schemas";
 import { TakeHomeResultView } from "./take-home-result.view";
 import { TakeHomeCalculator } from "./take-home.container";
+
+// A real generated client over the test's controlled transport, supplied
+// through the native client runtime's Layer.
+const generatedClient = Layer.effect(
+  ApiClient,
+  HttpApiClient.make(TaxKitApi, { baseUrl: "http://127.0.0.1:49999" })
+);
+const unreachable = (request: HttpClientRequest.HttpClientRequest) =>
+  Effect.fail(
+    new HttpClientError.HttpClientError({
+      reason: new HttpClientError.TransportError({ request }),
+    })
+  );
 
 describe("browser calculator lifetime", () => {
   it.live(
@@ -103,7 +126,7 @@ describe("browser calculator lifetime", () => {
           );
           expect(Result.isFailure(failure)).toBe(true);
           if (Result.isFailure(failure)) {
-            expect(failure.failure._tag).toBe("CalculatorRpcUnavailable");
+            expect(failure.failure._tag).toBe("WebsiteApiUnavailable");
           }
         }
       }).pipe(Effect.scoped)
@@ -113,33 +136,28 @@ describe("browser calculator lifetime", () => {
     Effect.gen(function* () {
       const started = vi.fn();
       const cancelled = vi.fn();
-      const client = Layer.succeed(
-        TaxKitRpcClient,
-        TaxKitRpcClient.of({
-          calculate: Effect.fn("TaxKitRpcClient.calculate")(() =>
-            Effect.sync(started).pipe(
-              Effect.andThen(Effect.never),
-              Effect.onInterrupt(() => Effect.sync(cancelled))
+      const client = generatedClient.pipe(
+        Layer.provide(
+          Layer.succeed(HttpClient.HttpClient)(
+            HttpClient.make((request) =>
+              Effect.sync(started)
+                .pipe(
+                  Effect.andThen(Effect.never),
+                  Effect.onInterrupt(() => Effect.sync(cancelled))
+                )
+                .pipe(
+                  Effect.map((response) =>
+                    HttpClientResponse.fromWeb(request, response)
+                  )
+                )
             )
-          ),
-          getCalculator: () => Effect.die("Metadata not used by this fixture"),
-          getCalculatorGraph: () =>
-            Effect.die("Metadata not used by this fixture"),
-          getCalculatorSchema: () =>
-            Effect.die("Metadata not used by this fixture"),
-          listCalculators: () =>
-            Effect.die("Catalogue not used by this fixture"),
-          listFacts: () => Effect.die("Metadata not used by this fixture"),
-          listJurisdictions: () =>
-            Effect.die("Metadata not used by this fixture"),
-          listRules: () => Effect.die("Metadata not used by this fixture"),
-          listTaxYears: () => Effect.die("Metadata not used by this fixture"),
-        })
+          )
+        )
       );
       const registry = yield* Effect.acquireRelease(
         Effect.sync(() =>
           AtomRegistry.make({
-            initialValues: [[calculatorRuntime.layer, client]],
+            initialValues: [[apiClientRuntime.layer, client]],
           })
         ),
         (value) => Effect.sync(() => value.dispose())
@@ -167,34 +185,28 @@ describe("browser calculator lifetime", () => {
       Effect.gen(function* () {
         const started = vi.fn();
         const cancelled = vi.fn();
-        const client = Layer.succeed(
-          TaxKitRpcClient,
-          TaxKitRpcClient.of({
-            calculate: Effect.fn("TaxKitRpcClient.calculate")(() =>
-              Effect.sync(started).pipe(
-                Effect.andThen(Effect.never),
-                Effect.onInterrupt(() => Effect.sync(cancelled))
+        const client = generatedClient.pipe(
+          Layer.provide(
+            Layer.succeed(HttpClient.HttpClient)(
+              HttpClient.make((request) =>
+                Effect.sync(started)
+                  .pipe(
+                    Effect.andThen(Effect.never),
+                    Effect.onInterrupt(() => Effect.sync(cancelled))
+                  )
+                  .pipe(
+                    Effect.map((response) =>
+                      HttpClientResponse.fromWeb(request, response)
+                    )
+                  )
               )
-            ),
-            getCalculator: () =>
-              Effect.die("Metadata not used by this fixture"),
-            getCalculatorGraph: () =>
-              Effect.die("Metadata not used by this fixture"),
-            getCalculatorSchema: () =>
-              Effect.die("Metadata not used by this fixture"),
-            listCalculators: () =>
-              Effect.die("Catalogue not used by this fixture"),
-            listFacts: () => Effect.die("Metadata not used by this fixture"),
-            listJurisdictions: () =>
-              Effect.die("Metadata not used by this fixture"),
-            listRules: () => Effect.die("Metadata not used by this fixture"),
-            listTaxYears: () => Effect.die("Metadata not used by this fixture"),
-          })
+            )
+          )
         );
         const registry = yield* Effect.acquireRelease(
           Effect.sync(() =>
             AtomRegistry.make({
-              initialValues: [[calculatorRuntime.layer, client]],
+              initialValues: [[apiClientRuntime.layer, client]],
             })
           ),
           (value) => Effect.sync(() => value.dispose())
@@ -237,11 +249,11 @@ describe("browser calculator lifetime", () => {
 
   it.live.each([
     {
-      error: new CalculatorRpcUnavailable(),
-      message: "Check your details",
+      error: new WebsiteApiUnavailable(),
+      message: "could not be reached",
     },
     {
-      error: new CalculatorRpcDeadlineExceeded(),
+      error: new WebsiteApiDeadlineExceeded(),
       message: "within ten seconds",
     },
     { error: new CalculatorRateLimited(), message: "Wait a minute" },
@@ -249,7 +261,10 @@ describe("browser calculator lifetime", () => {
       error: new CalculatorAdmissionUnavailable(),
       message: "Try again when you are ready",
     },
-    { error: new CalculatorRpcRequestTimedOut(), message: "request timed out" },
+    {
+      error: new CalculatorRequestBodyTimedOut(),
+      message: "within five seconds",
+    },
     {
       error: new CalculatorCapacityExceeded(),
       message: "The calculators are busy",
@@ -258,8 +273,11 @@ describe("browser calculator lifetime", () => {
       error: new CalculatorOperationTimedOut(),
       message: "within five seconds",
     },
-    { error: new CalculatorRpcRequestTooLarge(), message: "64 KiB or less" },
-    { error: new CalculatorRpcResponseTooLarge(), message: "Reduce the query" },
+    { error: new CalculatorRequestBodyTooLarge(), message: "64 KiB or less" },
+    {
+      error: new WebsiteApiResponseTooLarge(),
+      message: "Reduce the request",
+    },
   ])(
     "restores $error._tag and its guidance without starting another calculation",
     ({ error, message }) =>
@@ -276,33 +294,18 @@ describe("browser calculator lifetime", () => {
           period: "fortnightly",
           taxFreeThresholdClaimed: false,
         });
-        const client = Layer.effect(
-          TaxKitRpcClient,
-          Effect.yieldNow.pipe(
-            Effect.as(
-              TaxKitRpcClient.of({
-                calculate: Effect.fn("TaxKitRpcClient.calculate")((request) =>
-                  Effect.sync(() => called(request)).pipe(
-                    Effect.andThen(Effect.fail(error))
+        const client = generatedClient.pipe(
+          Layer.provide(
+            Layer.succeed(HttpClient.HttpClient)(
+              HttpClient.make((request) =>
+                Effect.sync(() => called(request.url))
+                  .pipe(Effect.andThen(unreachable(request)))
+                  .pipe(
+                    Effect.map((response) =>
+                      HttpClientResponse.fromWeb(request, response)
+                    )
                   )
-                ),
-                getCalculator: () =>
-                  Effect.die("Metadata not used by this fixture"),
-                getCalculatorGraph: () =>
-                  Effect.die("Metadata not used by this fixture"),
-                getCalculatorSchema: () =>
-                  Effect.die("Metadata not used by this fixture"),
-                listCalculators: () =>
-                  Effect.die("Catalogue not used by this fixture"),
-                listFacts: () =>
-                  Effect.die("Metadata not used by this fixture"),
-                listJurisdictions: () =>
-                  Effect.die("Metadata not used by this fixture"),
-                listRules: () =>
-                  Effect.die("Metadata not used by this fixture"),
-                listTaxYears: () =>
-                  Effect.die("Metadata not used by this fixture"),
-              })
+              )
             )
           )
         );
@@ -318,7 +321,7 @@ describe("browser calculator lifetime", () => {
         const registry = yield* Effect.acquireRelease(
           Effect.sync(() =>
             AtomRegistry.make({
-              initialValues: [[calculatorRuntime.layer, client]],
+              initialValues: [[apiClientRuntime.layer, client]],
               scheduleTask,
             })
           ),
@@ -391,7 +394,7 @@ describe("browser calculator lifetime", () => {
         expect(
           yield* Array.head(called.mock.calls).pipe(Effect.fromOption)
         ).toEqual([
-          yield* Effect.fromResult(takeHomeRequestFromForm(restoredForm)),
+          "http://127.0.0.1:49999/api/v1/calculators/au.pay.take-home/calculate",
         ]);
       }).pipe(Effect.scoped)
   );
@@ -399,36 +402,29 @@ describe("browser calculator lifetime", () => {
   it.effect("keeps old request errors hidden while a retry is running", () =>
     Effect.gen(function* () {
       const attempt = yield* Ref.make(0);
-      const client = Layer.succeed(
-        TaxKitRpcClient,
-        TaxKitRpcClient.of({
-          calculate: Effect.fn("TaxKitRpcClient.calculate")(() =>
-            Ref.getAndUpdate(attempt, (value) => value + 1).pipe(
-              Effect.flatMap((value) =>
-                value === 0
-                  ? Effect.fail(new CalculatorRpcUnavailable())
-                  : Effect.never
-              )
+      const client = generatedClient.pipe(
+        Layer.provide(
+          Layer.succeed(HttpClient.HttpClient)(
+            HttpClient.make((request) =>
+              Ref.getAndUpdate(attempt, (value) => value + 1)
+                .pipe(
+                  Effect.flatMap((value) =>
+                    value === 0 ? unreachable(request) : Effect.never
+                  )
+                )
+                .pipe(
+                  Effect.map((response) =>
+                    HttpClientResponse.fromWeb(request, response)
+                  )
+                )
             )
-          ),
-          getCalculator: () => Effect.die("Metadata not used by this fixture"),
-          getCalculatorGraph: () =>
-            Effect.die("Metadata not used by this fixture"),
-          getCalculatorSchema: () =>
-            Effect.die("Metadata not used by this fixture"),
-          listCalculators: () =>
-            Effect.die("Catalogue not used by this fixture"),
-          listFacts: () => Effect.die("Metadata not used by this fixture"),
-          listJurisdictions: () =>
-            Effect.die("Metadata not used by this fixture"),
-          listRules: () => Effect.die("Metadata not used by this fixture"),
-          listTaxYears: () => Effect.die("Metadata not used by this fixture"),
-        })
+          )
+        )
       );
       const registry = yield* Effect.acquireRelease(
         Effect.sync(() =>
           AtomRegistry.make({
-            initialValues: [[calculatorRuntime.layer, client]],
+            initialValues: [[apiClientRuntime.layer, client]],
           })
         ),
         (value) => Effect.sync(() => value.dispose())

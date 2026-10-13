@@ -85,7 +85,7 @@
         "src/api.ts",
         "src/client/index.ts",
         "src/client/live.layer.ts",
-        "src/client/server.layer.ts",
+        "src/in-process.layer.ts",
         "src/server.ts",
         "src/handlers/index.ts",
         "src/handlers/live.ts"

@@ -4,7 +4,10 @@ import {
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/request-boundary";
-import { CalculatorHostTelemetryLive } from "@taxkit/api-rpc/host-telemetry";
+import {
+  ApiHostTelemetryLive,
+  WebsiteHostTelemetryLive,
+} from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculatorRpcPayload,
   CalculatorRpcVersion,
@@ -12,6 +15,7 @@ import {
 import {
   CalculationRequest,
   CalculatorFixture,
+  CalculatorFixtureMode,
   CalculatorLive,
   sensitiveSentinel,
 } from "@taxkit/api-rpc/testing/fixtures";
@@ -773,12 +777,16 @@ describe("native API application", () => {
         yield* Effect.log(sensitiveSentinel).pipe(
           Effect.annotateLogs({ [sensitiveSentinel]: sensitiveSentinel }),
           Effect.withLogSpan(sensitiveSentinel),
-          Effect.provide(CalculatorHostTelemetryLive(host))
+          Effect.provide(
+            host === "api" ? ApiHostTelemetryLive : WebsiteHostTelemetryLive
+          )
         );
         yield* Effect.die(sensitiveSentinel).pipe(
           Effect.withErrorReporting,
           Effect.exit,
-          Effect.provide(CalculatorHostTelemetryLive(host))
+          Effect.provide(
+            host === "api" ? ApiHostTelemetryLive : WebsiteHostTelemetryLive
+          )
         );
         const lines = yield* TestConsole.logLines;
         expect(lines.length).toBe(2);
@@ -794,7 +802,11 @@ describe("native API application", () => {
     Effect.gen(function* () {
       const app = yield* ApiWorkerApplication.pipe(
         Effect.provide(ApiContentLive),
-        Effect.provide(CalculatorFixture("defect"))
+        Effect.provide(
+          CalculatorFixture.pipe(
+            Layer.provide(Layer.succeed(CalculatorFixtureMode)("defect"))
+          )
+        )
       );
       const body = yield* Schema.encodeEffect(
         Schema.fromJsonString(NativeRequest)

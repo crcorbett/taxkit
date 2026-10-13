@@ -14,8 +14,9 @@ import {
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
-import { Effect, Layer, Match, Schema } from "effect";
-import { McpProtocol, McpServer, Tool, Toolkit } from "effect/ai";
+import { Context, Effect, Layer, Match, Schema } from "effect";
+import { McpServer, Tool, Toolkit } from "effect/ai";
+import type { McpProtocol } from "effect/ai";
 
 import { withMcpRequestCancellation } from "./mcp-cancellation.boundary.js";
 import { McpDocsSearchResponse, McpToolUnavailable } from "./mcp.schemas.js";
@@ -204,23 +205,34 @@ const TaxKitMcpHandlersLive = TaxKitMcpToolkit.toLayer(
   })
 );
 
-// The composition root selects the native adapter. Each host keeps its own
-// native protocol scope while using the captured calculator/content owners.
+// The composition root supplies the publication address and selects the
+// native protocol adapter. Each host keeps its own native protocol scope while
+// using the captured calculator/content owners.
+export class TaxKitMcpHost extends Context.Service<
+  TaxKitMcpHost,
+  {
+    readonly protocol: McpProtocol.ProtocolAdapter;
+    readonly publicationOrigin: ApiWorkerSettings["publicationOrigin"];
+  }
+>()("@taxkit/api/TaxKitMcpHost") {}
+
 // Origin-less desktop and server clients are admitted; browser pages must be
 // served from the publication address. Add another site only for a known need.
-export const TaxKitMcpHttpLayer = (
-  publicationOrigin: ApiWorkerSettings["publicationOrigin"],
-  protocol: McpProtocol.ProtocolAdapter = McpProtocol.v2026_07_28
-) =>
-  McpServer.toolkit(TaxKitMcpToolkit).pipe(
-    Layer.provide(TaxKitMcpHandlersLive),
-    Layer.provide(
-      McpServer.layerHttp({
-        allowedOrigins: [publicationOrigin.origin],
-        name: "TaxKit",
-        path: "/mcp",
-        protocols: [protocol],
-        version: "1",
-      })
+export const TaxKitMcpHttpLayer = Layer.unwrap(
+  TaxKitMcpHost.pipe(
+    Effect.map(({ protocol, publicationOrigin }) =>
+      McpServer.toolkit(TaxKitMcpToolkit).pipe(
+        Layer.provide(TaxKitMcpHandlersLive),
+        Layer.provide(
+          McpServer.layerHttp({
+            allowedOrigins: [publicationOrigin.origin],
+            name: "TaxKit",
+            path: "/mcp",
+            protocols: [protocol],
+            version: "1",
+          })
+        )
+      )
     )
-  );
+  )
+);

@@ -1,23 +1,19 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
 import { websiteSearchParameters } from "#/lib/docs/search-location.boundary";
-import {
-  loadWebsiteDocsSearch,
-  loadWebsiteDocsPage,
-  loadWebsiteSettings,
-} from "#/lib/loaders";
+import { createLoaderRegistry } from "#/lib/loaders";
 import type { WebsiteServerRenderContext } from "#/lib/schemas";
 
 import { routeTree } from "./routeTree.gen";
 
+// Public documentation and metadata are reused for one minute, including
+// intent preloads. Routes with personal or live data opt out.
 export const getRouter = () =>
   createTanStackRouter({
-    context: {
-      loadDocsPage: loadWebsiteDocsPage,
-      loadDocsSearch: loadWebsiteDocsSearch,
-      loadSettings: loadWebsiteSettings,
-    },
+    context: { registry: createLoaderRegistry() },
     defaultPreload: "intent",
+    defaultPreloadStaleTime: 60_000,
+    defaultStaleTime: 60_000,
     parseSearch: websiteSearchParameters.parse,
     routeTree,
     scrollRestoration: true,

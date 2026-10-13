@@ -1,4 +1,4 @@
-import { CalculatorRunServiceRequest } from "@taxkit/api-rpc/schemas";
+import { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
 import { Cents, Money } from "@taxkit/core/primitives";
 import {
   AnnualTaxScenarioInputSchema,

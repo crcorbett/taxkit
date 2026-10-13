@@ -13,7 +13,8 @@ import {
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
   AnnualTaxScenarioInputSchema,
-  AnnualTaxScenarioLiveFromInput,
+  AnnualTaxScenario,
+  AnnualTaxScenarioLive,
   AnnualTaxableIncomeDescriptor,
   AuAnnualTax2025_26_Live,
   AuAnnualTaxRuleDescriptors,
@@ -40,7 +41,8 @@ import {
   TaxablePayRuleDescriptor,
   TaxFreeThresholdClaimedDescriptor,
   TakeHomeScenarioInputSchema,
-  TakeHomeScenarioLiveFromInput,
+  TakeHomeScenario,
+  TakeHomeScenarioLive,
 } from "@taxkit/rules-au-pay";
 import type { Option } from "effect";
 import { Array, Data, Effect, HashMap, Layer, Schema } from "effect";
@@ -147,7 +149,8 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
         return yield* engine.run({
           calculation: CalculateTakeHomePay,
           layer: AuTakeHomePay2025_26_Live.pipe(
-            Layer.provideMerge(TakeHomeScenarioLiveFromInput(facts))
+            Layer.provideMerge(TakeHomeScenarioLive),
+            Layer.provide(Layer.succeed(TakeHomeScenario)(facts))
           ),
           validationIssues,
         });
@@ -178,7 +181,8 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
         return yield* engine.run({
           calculation: CalculatePayWithholdings,
           layer: AuPayWithholdings2025_26_Live.pipe(
-            Layer.provideMerge(TakeHomeScenarioLiveFromInput(facts))
+            Layer.provideMerge(TakeHomeScenarioLive),
+            Layer.provide(Layer.succeed(TakeHomeScenario)(facts))
           ),
           validationIssues,
         });
@@ -211,7 +215,8 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
         return yield* engine.run({
           calculation: CalculateAnnualTax,
           layer: AuAnnualTax2025_26_Live.pipe(
-            Layer.provideMerge(AnnualTaxScenarioLiveFromInput(facts))
+            Layer.provideMerge(AnnualTaxScenarioLive),
+            Layer.provide(Layer.succeed(AnnualTaxScenario)(facts))
           ),
           validationIssues,
         });

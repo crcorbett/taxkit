@@ -3,6 +3,7 @@ import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder, HttpApiScalar } from "effect/http-api";
+import * as HttpMiddleware from "effect/http/HttpMiddleware";
 import * as HttpRouter from "effect/http/HttpRouter";
 import * as HttpServer from "effect/http/HttpServer";
 import * as HttpServerResponse from "effect/http/HttpServerResponse";
@@ -13,6 +14,7 @@ import { ContentApiHandlerLive } from "../handlers/content.js";
 import { HealthHandlerLive } from "../handlers/health.js";
 import { taxKitOpenApiSpec } from "../openapi.js";
 import { withCalculatorRequestBodyLimit } from "../request-boundary.js";
+import { publicCors } from "../response-policy.js";
 
 const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
@@ -46,5 +48,7 @@ export const ApiRoutesLive = ApiRoutesLayer.pipe(
     )
   ),
   Layer.provide(HttpRouter.middleware(withCalculatorRequestBodyLimit).layer),
-  Layer.provide(HttpRouter.cors())
+  Layer.provide(
+    HttpRouter.middleware(HttpMiddleware.cors(publicCors), { global: true })
+  )
 );

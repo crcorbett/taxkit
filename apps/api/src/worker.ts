@@ -18,7 +18,7 @@ import { McpSessionHostLive } from "./mcp-session.layer.js";
 import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
 import { ApiWorkerApplication } from "./worker.application.js";
 
-export { CalculatorHostMode } from "@taxkit/api-rpc/rate-identity";
+export { CalculatorHostMode } from "./edge-identity.boundary.js";
 
 // Platform invocation records include URLs outside the fixed app logger.
 // Keep the platform channels off until their exported fields are qualified.

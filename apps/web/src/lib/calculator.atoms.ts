@@ -1,25 +1,21 @@
-import type { CalculatorRpcClientError } from "@taxkit/api-rpc/errors";
-import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import type {
-  CalculatorCatalogResponse,
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
-} from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient } from "@taxkit/api-rpc/service";
+} from "@taxkit/calculators/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import {
   AuPayCalculatorId,
   PayWithholdingsLedger,
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
-import { Cause, Effect, Layer, Match, Option, Result, Schema } from "effect";
-import { FetchHttpClient } from "effect/http";
+import { Cause, Effect, Match, Option, Result, Schema } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as Atom from "effect/reactivity/Atom";
 
+import { ApiClient, apiClientRuntime } from "./api/client.atoms";
+import type { WebsiteCalculationFailure } from "./api/errors";
+import { calculate } from "./api/requests";
 import { calculationFailureMessage } from "./calculation-failure";
-import { BrowserCalculatorPolicyLive } from "./calculator-policy.browser.layer";
-import { TaxKitWebConfigError } from "./config";
 import {
   takeHomeRequestFromForm,
   annualTaxRequestFromForm,
@@ -29,42 +25,8 @@ import {
   TakeHomeForm,
 } from "./form.boundary";
 import type { WebsiteCalculatorForm } from "./form.boundary";
-import type {
-  WebsiteCalculatorViewState,
-  WebsitePublicSettings,
-} from "./schemas";
+import type { WebsiteCalculatorViewState } from "./schemas";
 
-// These are descriptions of work. React's registry owns client acquisition,
-// execution and release; no module creates or runs a browser ManagedRuntime.
-// The loader seeds these settings for the React registry's whole lifetime.
-// They must survive an idle form before its first calculation.
-export const publicSettingsAtom = Atom.make(
-  Option.none<WebsitePublicSettings>()
-).pipe(Atom.keepAlive);
-export const websiteCatalogueAtom = Atom.make(
-  Option.none<CalculatorCatalogResponse>()
-).pipe(Atom.keepAlive);
-export const calculatorRuntime = Atom.runtime((get) =>
-  Option.match(get(publicSettingsAtom), {
-    onNone: () =>
-      Layer.effect(
-        TaxKitRpcClient,
-        Effect.fail(
-          new TaxKitWebConfigError({
-            message: "TaxKit web settings are missing or invalid.",
-            operation: "settings",
-            runtime: "client",
-          })
-        )
-      ),
-    onSome: (settings) =>
-      TaxKitRpcClientLive(settings.apiOrigin).pipe(
-        Layer.provide(
-          BrowserCalculatorPolicyLive.pipe(Layer.provide(FetchHttpClient.layer))
-        )
-      ),
-  })
-);
 // The registry owns separate temporary state for each checked calculator ID.
 // The family memoises descriptions, never a client or a computed answer.
 export const calculatorPageAtoms = Atom.family(
@@ -82,11 +44,12 @@ export const calculatorPageAtoms = Atom.family(
         }))
       )
     );
-    const calculation = calculatorRuntime.fn<CalculatorRunServiceRequest>()(
+    // The native client's calculation, with this feature's deadline, reply
+    // bound and calculator/report correlation. Replacing the request or
+    // interrupting it cancels the browser call.
+    const calculation = apiClientRuntime.fn<CalculatorRunServiceRequest>()(
       (request) =>
-        TaxKitRpcClient.pipe(
-          Effect.flatMap((client) => client.calculate(request))
-        )
+        ApiClient.pipe(Effect.flatMap((client) => calculate(client, request)))
     );
     const showSaved = Atom.make(true);
     const showCalculation = Atom.make(false);
@@ -236,7 +199,7 @@ const home = calculatorPageAtoms(AuPayCalculatorId.make("au.pay.take-home"));
 export const calculateAtom: Atom.AtomResultFn<
   CalculatorRunServiceRequest,
   CalculatorRunResponse,
-  CalculatorRpcClientError | TaxKitWebConfigError
+  WebsiteCalculationFailure
 > = home.calculation;
 export const takeHomeFormAtom = Atom.writable(
   (get) => {
