@@ -3,8 +3,8 @@ document_type: repository-skill-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-05
-review_trigger: plugin source, skill routing, or repository profile change
+last_reviewed: 2026-10-16
+review_trigger: plugin source or skill routing change
 ---
 
 # Development skills
@@ -25,9 +25,9 @@ from its agent skill folders to a personal installation.
 3. If the latest version cannot be checked or loaded, report that blocker before
    doing work that requires the skill. Do not fall back to a saved copy, an old
    cache, a fixed plugin version, or a hard-coded path on someone's computer.
-4. Read the repository profiles below alongside the plugin. They hold local
-   paths and commands; the plugin holds the shared instructions. Record the
-   version used in the task's evidence when a proof record is required.
+4. Resolve repository paths, commands and ownership from `AGENTS.md`,
+   `docs/README.md`, the relevant package/app README and executable configuration.
+   Shared skills supply workflow guidance.
 
 This is an agent startup requirement. The old checks for copied shared
 skills have been removed. Code, package and documentation checks remain; they
@@ -45,11 +45,6 @@ succeeded.
 - `development-workflows:prd-writer`
 - `development-workflows:repo-structure`
 - `development-workflows:strict-effect-ts`
-
-## Repository profiles
-
-- [Documentation profile](skill-profiles/docs-maintainer.md)
-- [Package profile](skill-profiles/package-structure.md)
 
 Other repository-specific or third-party skills remain local where there is no
 replacement in this plugin. They must not override the shared skills above.

@@ -97,5 +97,5 @@ commit with the same native command.
 
 Before starting work, follow [the plugin lookup](docs/skills.md) and load the
 latest published Commonplace `development-workflows` plugin. Do not use saved
-repository copies or assume a cached plugin version is current. Read the local
-profiles in `docs/skill-profiles/` alongside the plugin.
+repository copies or assume a cached plugin version is current. Repository paths,
+commands and ownership come from the manifests, code and documentation linked above.

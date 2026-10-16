@@ -592,7 +592,7 @@ than disable a failing check while leaving its policy active.
 | `tools/documentation/owner-policy.json`, documentation policy and schemas | Keep useful links, commands, metadata/source checks. Remove mandatory acceptance receipts, source hashes and historical evidence validation; simplify public page status to its actual content/navigation owner. |
 | `tools/documentation/catalogue.*`, `packages/docs-content`, `packages/docs-fumadocs` | Preserve actual content compilation, generated source and Website catalogue loading. Replace acceptance-record plumbing without deleting the working public documentation product. |
 | `packages/scripts/src/release-readiness`, `release:present` and custom `release:check` | Remove per-run authority envelopes, proof graphs, digest-ledger outputs and deploy/receipt prerequisites. Preserve real build, package packing and downstream checks as direct commands when releasing or changing package contracts. `@taxkit/scripts` exports this runner: check its consumers before retiring those exports deliberately. |
-| `AGENTS.md`, `docs/README.md`, `docs/operations/authority-model.md`, standards, skill profiles and active plans | Replace mandatory receipt/approval/epoch language and accumulated historical task routing with short current instructions. Keep tax/package boundaries, ordinary operation scope and a practical rollback command. |
+| `AGENTS.md`, `docs/README.md`, `docs/operations/authority-model.md`, standards, skill routing and active plans | Replace mandatory receipt/approval/epoch language and accumulated historical task routing with short current instructions. Keep tax/package boundaries, ordinary operation scope and a practical rollback command. |
 | New audit packet from this review | Remove inventories, scope/findings JSON, acceptance/impact crosswalks, registry/provider result packets and validation hashes. Retain the useful findings and source comparison in this proposal. |
 
 Two build/test dependencies needed replacement before deleting their old owners.
@@ -713,7 +713,7 @@ Alchemy Worker redirect/apply ordering against installed and matching sources.
 Documentation impact: **Change required** for the proposal, plan, ADR 0005,
 domain glossary, decision priority and index pointers in this design edit; for root instructions,
 deployment/API/frontend/testing owners, commands/runbooks and local skill
-profiles during implementation. **Preserve** tax, API/SDK and package contracts,
+routing during implementation. **Preserve** tax, API/SDK and package contracts,
 working public docs generation, and the agreed privacy/dataset choices.
 **N/A** for generated OpenAPI, package changelogs and provider records in this
 edit because none of those inputs or systems changed. The normal Git diff
