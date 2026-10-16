@@ -80,4 +80,4 @@ Public pages are published when their MDX frontmatter and
 `@taxkit/docs-content` build compiles them into the public catalogue the API and
 Website read; see [`../packages/docs-content/README.md`](../packages/docs-content/README.md).
 
-Shared development workflows: [latest plugin and repository profiles](skills.md).
+Shared development workflows: [latest plugin and skill routing](skills.md).

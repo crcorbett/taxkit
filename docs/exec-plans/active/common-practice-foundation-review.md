@@ -157,7 +157,7 @@ Static Layers also change exported scenario helper signatures. Use normal
 Changesets and update callers together, preserving the checked tax inputs and
 results. There is no silent factory allowance in the new shared rule.
 
-Update current architecture, runbooks, root instructions, skill profiles and the
+Update current architecture, runbooks, root instructions, skill routing and the
 older clean-slate plan as their implementation changes. History stops being an
 executable prerequisite. Do not create a replacement receipt system under a
 new name. Redeploy a previous working revision for operational rollback through
