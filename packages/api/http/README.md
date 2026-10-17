@@ -193,13 +193,16 @@ same `publicCors` policy.
 GET, HEAD, POST and OPTIONS, with `content-type`, `b3` and `traceparent`
 headers. `applyCachePolicy` shares only a successful public GET/HEAD reply, or
 a 400/406 that varies on `Accept` (a stable negotiation answer that would
-otherwise evict the cached page), without `Set-Cookie` or a stricter
-`private`/`no-store` instruction: it gets
-`Cache-Control: public, max-age=0` and
-`Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
-Every other reply gets `no-store` for both. Public read paths are the
-documentation and discovery routes, calculator metadata and the OpenAPI
-documents; health, calculation, RPC and MCP are never shared.
+otherwise evict the cached page). A `Set-Cookie` header, Effect response cookies,
+or a `private`/`no-store` instruction prevents sharing.
+
+Public replies default to `Cache-Control: public, max-age=0` and seven days of
+Cloudflare freshness. Explicit handler lifetimes are preserved, and `no-cache`,
+`must-revalidate` or `proxy-revalidate` requires edge revalidation instead of
+receiving that default. Restrictions are checked across browser, CDN and
+Cloudflare CDN cache-control headers. Non-public replies are `no-store`.
+Public read paths are documentation and discovery routes, calculator metadata
+and OpenAPI documents; health, calculation, RPC and MCP are never shared.
 
 `@taxkit/api-http/config` owns the reusable client config schema, type and
 keyed config fragment (`baseUrl`). The package owns its env namespaces,

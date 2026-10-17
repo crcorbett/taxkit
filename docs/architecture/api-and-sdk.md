@@ -350,10 +350,14 @@ HTTP and RPC use public credential-free CORS for any exact HTTP(S) origin
 (`publicCors`/`isBrowserOrigin` in `@taxkit/api-http/response-policy`, shared
 with the Bun host routes). MCP admits Origin-less clients and the publication
 origin only. The native init declares Cloudflare Workers Cache with
-`cache({ crossVersionCache: false })`; `applyCachePolicy` gives successful
-public reads `Cache-Control: public, max-age=0` and
-`Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`, and
-every other reply `no-store`.
+`cache({ crossVersionCache: false })`; `applyCachePolicy` defaults successful
+public reads to `Cache-Control: public, max-age=0` and
+`Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
+Explicit handler lifetimes and revalidation directives take precedence over
+these defaults. Storage restrictions from any cache-control header, a
+`Set-Cookie` header or Effect response cookies prevent sharing; non-public
+replies are `no-store`. Accept-only negotiation answers remain separate public
+variants. The package README owns the detailed response policy.
 
 Besides `fetch`, the Worker exposes `calculatorRequest(request, key)` to its
 service-binding callers only. It admits POST `/rpc` and POST
