@@ -106,7 +106,7 @@ assert(
   "Calculate route returned the wrong report tag."
 );
 assert(
-  calculation.report?.rulePackVersion === "rules-au-pay/1.0.0",
+  calculation.report?.rulePackVersion === "rules-au-pay/1.0.1",
   "Calculate route returned the wrong pay ruleset version."
 );
 

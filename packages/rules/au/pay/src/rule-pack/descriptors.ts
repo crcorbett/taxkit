@@ -15,7 +15,12 @@ import {
   AtoSchedule1TableDescriptor,
   Schedule1Source2025_26,
 } from "../parameters/schedule1.js";
-import { NetPayLive, NetPayRuleId } from "../rules/net-pay.js";
+import {
+  NetPayLive,
+  NetPayRuleId,
+  NetPayWithSacrificeLive,
+  NetPayWithSacrificeRuleId,
+} from "../rules/net-pay.js";
 import {
   PaygWithholdingLive,
   PaygWithholdingRuleId,
@@ -106,6 +111,21 @@ export const NetPayRuleDescriptor = makeRuleDescriptor({
   title: "Net pay",
 });
 
+/** Salary-sacrifice cash net rule. @since 1.0.1 */
+export const NetPayWithSacrificeRuleDescriptor = makeRuleDescriptor({
+  id: NetPayWithSacrificeRuleId,
+  layer: NetPayWithSacrificeLive,
+  provides: [NetPayDescriptor],
+  requires: [
+    GrossPayDescriptor,
+    PayWithholdingsLedgerDescriptor,
+    SalarySacrificeDescriptor,
+  ],
+  sourcePolicy: "not-required",
+  sources: [],
+  title: "Net pay with salary sacrifice",
+});
+
 /**
  * Descriptor list for the base Australian take-home-pay rule pack.
  *
@@ -127,5 +147,5 @@ export const AuTakeHomePayWithSacrificeRuleDescriptors = [
   TaxablePayWithSacrificeRuleDescriptor,
   PaygWithholdingRuleDescriptor,
   PayWithholdingsLedgerRuleDescriptor,
-  NetPayRuleDescriptor,
+  NetPayWithSacrificeRuleDescriptor,
 ] as const;

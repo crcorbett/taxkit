@@ -3,6 +3,7 @@ import {
   Array,
   Cause,
   Crypto,
+  ConfigProvider,
   Deferred,
   Effect,
   Exit,
@@ -24,8 +25,7 @@ import { TestClock } from "effect/testing";
 
 import {
   calculatorUseFixture,
-  disabledAnalyticsFixture,
-  productionAnalyticsFixture,
+  productionAnalyticsConfig,
 } from "../src/__testing__/fixtures.js";
 import { BackendAnalyticsLive } from "../src/live.layer.js";
 import { BackendAnalytics } from "../src/service.js";
@@ -43,7 +43,7 @@ it.effect(
   "encodes one minimal event with no caller identity, figures, queries or credentials",
   () =>
     Effect.gen(function* () {
-      const settings = yield* productionAnalyticsFixture;
+      const config = productionAnalyticsConfig;
       const input = yield* calculatorUseFixture;
       const seen = yield* Ref.make<readonly unknown[]>([]);
       const transport = HttpClient.make((request, url) =>
@@ -85,7 +85,8 @@ it.effect(
       const disposition = yield* BackendAnalytics.pipe(
         Effect.flatMap((analytics) => analytics.recordCalculatorUse(input)),
         Effect.provide(
-          BackendAnalyticsLive(settings).pipe(
+          BackendAnalyticsLive.pipe(
+            Layer.provide(ConfigProvider.layer(config)),
             Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
             Layer.provide(TestCrypto)
           )
@@ -122,9 +123,10 @@ it.effect.each(["disabled", "denied"] as const)(
   "$0 collection generates no identity and makes no request",
   (mode) =>
     Effect.gen(function* () {
-      const settings = yield* mode === "disabled"
-        ? disabledAnalyticsFixture
-        : productionAnalyticsFixture;
+      const config =
+        mode === "disabled"
+          ? ConfigProvider.fromUnknown({ POSTHOG_COLLECTION_MODE: "off" })
+          : productionAnalyticsConfig;
       const input = yield* calculatorUseFixture;
       const crypto = yield* Crypto.Crypto;
       const noUseCrypto = Layer.succeed(Crypto.Crypto, {
@@ -143,7 +145,8 @@ it.effect.each(["disabled", "denied"] as const)(
             })
           ),
           Effect.provide(
-            BackendAnalyticsLive(settings).pipe(
+            BackendAnalyticsLive.pipe(
+              Layer.provide(ConfigProvider.layer(config)),
               Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
               Layer.provide(noUseCrypto)
             )
@@ -157,7 +160,7 @@ it.effect.each([200, 204, 299, 301, 400, 429, 500])(
   "does not retry, follow or expose a provider response with status %i",
   (status) =>
     Effect.gen(function* () {
-      const settings = yield* productionAnalyticsFixture;
+      const config = productionAnalyticsConfig;
       const input = yield* calculatorUseFixture;
       const count = yield* Ref.make(0);
       const transport = HttpClient.make((request) =>
@@ -179,7 +182,8 @@ it.effect.each([200, 204, 299, 301, 400, 429, 500])(
         Effect.flatMap((analytics) => analytics.recordCalculatorUse(input)),
         Effect.result,
         Effect.provide(
-          BackendAnalyticsLive(settings).pipe(
+          BackendAnalyticsLive.pipe(
+            Layer.provide(ConfigProvider.layer(config)),
             Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
             Layer.provide(TestCrypto)
           )
@@ -199,7 +203,7 @@ it.effect.each([200, 204, 302, 500])(
   "closes the native request lifetime, including a bodyless reply, at status %i",
   (status) =>
     Effect.gen(function* () {
-      const settings = yield* productionAnalyticsFixture;
+      const config = productionAnalyticsConfig;
       const input = yield* calculatorUseFixture;
       const seen = yield* Ref.make<readonly AbortSignal[]>([]);
       const transport = HttpClient.make((request, _address, signal) =>
@@ -217,7 +221,8 @@ it.effect.each([200, 204, 302, 500])(
       ).pipe(
         Effect.result,
         Effect.provide(
-          BackendAnalyticsLive(settings).pipe(
+          BackendAnalyticsLive.pipe(
+            Layer.provide(ConfigProvider.layer(config)),
             Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
             Layer.provide(TestCrypto)
           )
@@ -239,7 +244,7 @@ it.effect.each([65_536, 65_537])(
   "bounds the whole reply across multiple chunks at %i bytes",
   (size) =>
     Effect.gen(function* () {
-      const settings = yield* productionAnalyticsFixture;
+      const config = productionAnalyticsConfig;
       const input = yield* calculatorUseFixture;
       const transport = HttpClient.make((request) =>
         Effect.succeed(
@@ -255,7 +260,8 @@ it.effect.each([65_536, 65_537])(
         Effect.flatMap((analytics) => analytics.recordCalculatorUse(input)),
         Effect.result,
         Effect.provide(
-          BackendAnalyticsLive(settings).pipe(
+          BackendAnalyticsLive.pipe(
+            Layer.provide(ConfigProvider.layer(config)),
             Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
             Layer.provide(TestCrypto)
           )
@@ -274,7 +280,7 @@ it.effect.each(["headers", "body"] as const)(
   "one five-second deadline includes stalled %s and closes that work",
   (phase) =>
     Effect.gen(function* () {
-      const settings = yield* productionAnalyticsFixture;
+      const config = productionAnalyticsConfig;
       const input = yield* calculatorUseFixture;
       const started = yield* Deferred.make<boolean>();
       const released = yield* Deferred.make<boolean>();
@@ -307,7 +313,8 @@ it.effect.each(["headers", "body"] as const)(
         yield* Deferred.await(released);
       }).pipe(
         Effect.provide(
-          BackendAnalyticsLive(settings).pipe(
+          BackendAnalyticsLive.pipe(
+            Layer.provide(ConfigProvider.layer(config)),
             Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
             Layer.provide(TestCrypto)
           )
@@ -319,7 +326,7 @@ it.effect.each(["headers", "body"] as const)(
 
 it.effect("headers and body share one budget after late headers", () =>
   Effect.gen(function* () {
-    const settings = yield* productionAnalyticsFixture;
+    const config = productionAnalyticsConfig;
     const input = yield* calculatorUseFixture;
     const started = yield* Deferred.make<boolean>();
     const bodyStarted = yield* Deferred.make<boolean>();
@@ -357,7 +364,8 @@ it.effect("headers and body share one budget after late headers", () =>
       yield* Deferred.await(released);
     }).pipe(
       Effect.provide(
-        BackendAnalyticsLive(settings).pipe(
+        BackendAnalyticsLive.pipe(
+          Layer.provide(ConfigProvider.layer(config)),
           Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
           Layer.provide(TestCrypto)
         )
@@ -371,7 +379,7 @@ it.effect(
   "earlier caller interruption closes pending capture and remains interruption",
   () =>
     Effect.gen(function* () {
-      const settings = yield* productionAnalyticsFixture;
+      const config = productionAnalyticsConfig;
       const input = yield* calculatorUseFixture;
       const started = yield* Deferred.make<boolean>();
       const released = yield* Deferred.make<boolean>();
@@ -397,7 +405,8 @@ it.effect(
         yield* Deferred.await(released);
       }).pipe(
         Effect.provide(
-          BackendAnalyticsLive(settings).pipe(
+          BackendAnalyticsLive.pipe(
+            Layer.provide(ConfigProvider.layer(config)),
             Layer.provide(Layer.succeed(HttpClient.HttpClient, transport)),
             Layer.provide(TestCrypto)
           )
@@ -420,5 +429,39 @@ it.effect(
         )
       ).toBe("accepted");
       expect(yield* Ref.get(test.uses)).toEqual([input]);
+    })
+);
+
+it.effect(
+  "constructs a static Layer and rejects invalid enabled configuration before using transport",
+  () =>
+    Effect.gen(function* () {
+      expect(Layer.isLayer(BackendAnalyticsLive)).toBe(true);
+      const result = yield* BackendAnalytics.pipe(
+        Effect.provide(
+          BackendAnalyticsLive.pipe(
+            Layer.provide(
+              ConfigProvider.layer(
+                ConfigProvider.fromUnknown({
+                  POSTHOG_COLLECTION_MODE: "production",
+                })
+              )
+            ),
+            Layer.provide(
+              Layer.succeed(
+                HttpClient.HttpClient,
+                HttpClient.make(() =>
+                  Effect.die("Invalid configuration used transport")
+                )
+              )
+            ),
+            Layer.provide(TestCrypto)
+          )
+        ),
+        Effect.result
+      );
+      expect(Result.isFailure(result) && result.failure._tag).toBe(
+        "AnalyticsConfigurationError"
+      );
     })
 );

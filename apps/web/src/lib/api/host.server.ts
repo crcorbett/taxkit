@@ -33,8 +33,8 @@ import { NetAddress } from "effect/net";
 import type { TaxKitWebConfigError } from "../config";
 import { TaxKitWebServerConfig } from "../config.server";
 import type { WebsitePublicSettings } from "../schemas";
-import { boundedResponses } from "./bounded-response";
-import { WebsiteApiUnavailable } from "./errors";
+import { boundedResponses, websiteApiDeadline } from "./bounded-response";
+import { WebsiteApiUnavailable, WebsiteApiDeadlineExceeded } from "./errors";
 import type { TaxKitClient } from "./requests";
 
 /**
@@ -52,7 +52,10 @@ export class WebsiteHost extends Context.Service<
     readonly client: Result.Result<TaxKitClient, TaxKitWebConfigError>;
     readonly forward: (
       path: string
-    ) => Effect.Effect<Response, WebsiteApiUnavailable | TaxKitWebConfigError>;
+    ) => Effect.Effect<
+      Response,
+      WebsiteApiUnavailable | WebsiteApiDeadlineExceeded | TaxKitWebConfigError
+    >;
   }
 >()("taxkit/web/WebsiteHost") {}
 
@@ -148,35 +151,50 @@ export const WebsiteHostLive = Layer.effect(
           boundedResponses
         );
         return {
-          binding: config.binding,
           client: HttpApiClient.makeWith(TaxKitApi, {
             baseUrl: config.apiOrigin,
             httpClient: http,
           }),
+          reads: boundedResponses(reads),
           settings: config,
         };
       }),
-      Effect.flatMap(({ binding, client, settings }) =>
-        client.pipe(
-          Effect.map((generated) => ({ binding, generated, settings }))
-        )
+      Effect.flatMap(({ reads, client, settings }) =>
+        client.pipe(Effect.map((generated) => ({ generated, reads, settings })))
       ),
       Effect.result
     );
     return WebsiteHost.of({
       client: Result.map(host, ({ generated }) => generated),
-      forward: (path) =>
+      forward: Effect.fn("WebsiteHost.forward")((path: string) =>
         Effect.fromResult(host).pipe(
-          Effect.flatMap(({ binding, settings }) =>
-            Effect.tryPromise({
-              catch: () => new WebsiteApiUnavailable(),
-              try: (signal) =>
-                binding.fetch(new URL(path, settings.apiOrigin).href, {
-                  signal,
-                }),
-            })
-          )
-        ),
+          Effect.flatMap(({ reads, settings }) =>
+            reads.get(new URL(path, settings.apiOrigin)).pipe(
+              Effect.flatMap((response) =>
+                response.arrayBuffer.pipe(
+                  Effect.map(
+                    (body) =>
+                      new Response(
+                        response.status === 204 ||
+                          response.status === 205 ||
+                          response.status === 304
+                          ? null
+                          : body,
+                        { headers: response.headers, status: response.status }
+                      )
+                  )
+                )
+              ),
+              Effect.mapError(() => new WebsiteApiUnavailable())
+            )
+          ),
+          Effect.scoped,
+          Effect.timeoutOrElse({
+            duration: websiteApiDeadline,
+            orElse: () => Effect.fail(new WebsiteApiDeadlineExceeded()),
+          })
+        )
+      ),
       settings: Result.map(host, ({ settings }) => ({
         apiOrigin: settings.apiOrigin,
         publicationOrigin: settings.publicationOrigin,

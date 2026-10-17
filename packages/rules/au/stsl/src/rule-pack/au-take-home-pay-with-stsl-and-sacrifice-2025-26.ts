@@ -1,6 +1,6 @@
 import { AtoSchedule1_2025_26_Live } from "@taxkit/rules-au-pay/parameters";
 import {
-  NetPayLive,
+  NetPayWithSacrificeLive,
   PaygWithholdingLive,
   TaxablePayWithSacrificeLive,
 } from "@taxkit/rules-au-pay/rules";
@@ -18,11 +18,12 @@ import { PayWithholdingsLedgerWithStslLive } from "../rules/withholdings-ledger-
  *
  * @since 0.1.0
  */
-export const AuTakeHomePayWithStslAndSacrifice2025_26_Live = NetPayLive.pipe(
-  Layer.provideMerge(PayWithholdingsLedgerWithStslLive),
-  Layer.provideMerge(StslComponentLive),
-  Layer.provideMerge(PaygWithholdingLive),
-  Layer.provideMerge(TaxablePayWithSacrificeLive),
-  Layer.provideMerge(AtoSchedule1_2025_26_Live),
-  Layer.provideMerge(AtoStsl_2025_26_Live)
-);
+export const AuTakeHomePayWithStslAndSacrifice2025_26_Live =
+  NetPayWithSacrificeLive.pipe(
+    Layer.provideMerge(PayWithholdingsLedgerWithStslLive),
+    Layer.provideMerge(StslComponentLive),
+    Layer.provideMerge(PaygWithholdingLive),
+    Layer.provideMerge(TaxablePayWithSacrificeLive),
+    Layer.provideMerge(AtoSchedule1_2025_26_Live),
+    Layer.provideMerge(AtoStsl_2025_26_Live)
+  );

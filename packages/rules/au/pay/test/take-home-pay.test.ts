@@ -44,6 +44,32 @@ const weekly1500 = new GrossPay({
 });
 
 describe("AU take-home pay calculator (2025-26 rule pack)", () => {
+  // Independent exact-decimal Schedule 1 oracles around half-dollar boundaries.
+  it.effect.each([
+    { claimed: true, gross: 101_400, tax: 14_700 },
+    { claimed: true, gross: 101_500, tax: 14_800 },
+    { claimed: true, gross: 129_300, tax: 23_700 },
+    { claimed: true, gross: 267_800, tax: 68_600 },
+    { claimed: true, gross: 369_500, tax: 108_600 },
+    { claimed: false, gross: 46_900, tax: 8900 },
+    { claimed: false, gross: 225_400, tax: 65_600 },
+    { claimed: false, gross: 330_700, tax: 106_700 },
+  ])(
+    "rounds the complete formula once for $gross cents, threshold $claimed",
+    ({ gross, claimed, tax }) =>
+      Effect.gen(function* () {
+        const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
+          grossPay: new GrossPay({
+            amount: new Money({ cents: Cents.make(gross), currency: "AUD" }),
+            period: "weekly",
+          }),
+          taxFreeThresholdClaimed: claimed,
+        });
+        expect(report.withholdingsTotal.cents).toBe(tax);
+        expect(report.netPay.cents + tax).toBe(gross);
+      })
+  );
+
   it.effect("golden case: $1500 weekly, TFN claimed", () =>
     Effect.gen(function* () {
       const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
@@ -67,7 +93,7 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         )
       ).toBe(true);
       expect(report.period).toBe("weekly");
-      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.0");
+      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.1");
     })
   );
 

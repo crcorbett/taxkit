@@ -107,7 +107,7 @@ describe("Effect SDK facade", () => {
 
         expect(sdkResult).toEqual(serviceResult);
         expect(sdkResult.report._tag).toBe("TakeHomePayReport");
-        expect(sdkResult.report.rulePackVersion).toBe("rules-au-pay/1.0.0");
+        expect(sdkResult.report.rulePackVersion).toBe("rules-au-pay/1.0.1");
       }).pipe(Effect.provide(ServiceLive))
   );
 

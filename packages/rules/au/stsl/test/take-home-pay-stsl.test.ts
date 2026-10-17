@@ -265,6 +265,21 @@ describe("AU take-home pay with STSL", () => {
     })
   );
 
+  it.effect.each([0, 30_000, 150_000])(
+    "balances cash, sacrifice and tax for %i cents sacrificed",
+    (cents) =>
+      Effect.gen(function* () {
+        const sacrifice = new SalarySacrifice({
+          amount: new Money({ cents: Cents.make(cents), currency: "AUD" }),
+          period: "weekly",
+        });
+        const report = yield* sacrificeOnlyScenario(weekly1500, sacrifice);
+        expect(
+          report.netPay.cents + cents + report.withholdingsTotal.cents
+        ).toBe(weekly1500.amount.cents);
+      })
+  );
+
   it.effect(
     "+sacrifice only (no STSL): sacrifice reduces taxable pay and PAYG",
     () =>
@@ -287,9 +302,14 @@ describe("AU take-home pay with STSL", () => {
         expect(
           moneyEquals(
             report.netPay,
-            new Money({ cents: Cents.make(129_200), currency: "AUD" })
+            new Money({ cents: Cents.make(99_200), currency: "AUD" })
           )
         ).toBe(true);
+        expect(
+          report.netPay.cents +
+            sacrifice300.amount.cents +
+            report.withholdingsTotal.cents
+        ).toBe(weekly1500.amount.cents);
         expect(report.withholdings.components.length).toBe(1);
 
         const ledgerTrace = expectAt(report.trace.children, 0);
@@ -303,7 +323,7 @@ describe("AU take-home pay with STSL", () => {
     "+both: STSL + sacrifice, STSL applies to post-sacrifice taxable",
     () =>
       Effect.gen(function* () {
-        // taxable = 1_800 - 300 = 1_500; PAYG = 304; STSL = 32; total = 336; net = 1_464
+        // taxable = 1_800 - 300 = 1_500; PAYG = 304; STSL = 32; net = 1_800 - 300 - 336 = 1_164
         const report = yield* stslWithSacrificeScenario(
           weekly1800,
           stslEnabled,
@@ -325,7 +345,7 @@ describe("AU take-home pay with STSL", () => {
         expect(
           moneyEquals(
             report.netPay,
-            new Money({ cents: Cents.make(146_400), currency: "AUD" })
+            new Money({ cents: Cents.make(116_400), currency: "AUD" })
           )
         ).toBe(true);
         const payg = expectAt(report.withholdings.components, 0);

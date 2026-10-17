@@ -19,7 +19,7 @@ export {
  *
  * @since 1.0.0
  */
-export const PayRulePackVersion = Schema.Literal("rules-au-pay/1.0.0");
+export const PayRulePackVersion = Schema.Literal("rules-au-pay/1.0.1");
 
 /**
  * Take-home pay report for one Australian pay-period scenario.

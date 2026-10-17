@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-rules-and-parameters-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-17
 review_trigger: rule Layer, descriptor, parameter or rule-pack composition change
 ---
 
@@ -110,6 +110,13 @@ This excerpt uses the owning module's imports. The caller supplies
 The base withholding ledger includes PAYG only; a pack adding STSL replaces
 that ledger with the owner that requires both components. Compose typed Layers
 rather than using untyped plugin arrays.
+
+Salary-sacrifice packs additionally select `NetPayWithSacrificeLive`, whose
+explicit salary-sacrifice dependency accounts for cash diverted before tax.
+Their invariant is gross = cash net + salary sacrifice + tax withheld. Taxable
+pay adjustments alone do not define cash deductions. PAYG keeps `a*x-b` in
+exact decimal dollars until the single statutory whole-dollar rounding step;
+cent-rounded helper outputs must not be composed for this formula.
 
 ## Algorithm and data separation
 

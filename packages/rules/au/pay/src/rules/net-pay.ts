@@ -4,6 +4,7 @@ import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer, Option } from "effect";
 
 import { GrossPayFact, NetPay, NetPayFact } from "../facts/pay.js";
+import { SalarySacrificeFact } from "../facts/sacrifice.js";
 import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
 
 /**
@@ -38,6 +39,65 @@ export const NetPayLive = Layer.effect(NetPayFact)(
       ruleId: NetPayRuleId,
       sources: [],
       title: "Net pay = gross - withholdings ledger total",
+    });
+
+    return new NetPay({
+      amount: netAmount,
+      period: gross.period,
+      trace,
+    });
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Net pay could not produce a supported amount.",
+        })
+    )
+  )
+);
+
+/**
+ * Rule id for deriving take-home pay from gross pay and the withholding ledger.
+ *
+ * @since 0.1.0
+ */
+export const NetPayWithSacrificeRuleId = RuleId.make(
+  "taxkit/rules-au-pay/rule/NetPayWithSacrifice"
+);
+
+/**
+ * Derives cash net pay after salary sacrifice and tax withholdings.
+ *
+ * @since 0.1.0
+ */
+export const NetPayWithSacrificeLive = Layer.effect(NetPayFact)(
+  Effect.gen(function* () {
+    const gross = yield* GrossPayFact;
+    const ledger = yield* PayWithholdingsLedgerFact;
+
+    const sacrifice = yield* SalarySacrificeFact;
+    if (gross.period !== sacrifice.period) {
+      return yield* new CalculationError({
+        message: "Salary sacrifice must use the gross pay period.",
+      });
+    }
+    const cashPay = yield* moneySub(gross.amount, sacrifice.amount);
+    const netAmount = yield* moneySub(cashPay, ledger.total);
+
+    const trace = TraceNode.make({
+      children: [ledger.trace],
+      formula: Option.some(
+        Option.some("net = gross - salarySacrifice - withholdingsLedger.total")
+      ),
+      inputs: {
+        grossCents: gross.amount.cents,
+        salarySacrificeCents: sacrifice.amount.cents,
+        withholdingsTotalCents: ledger.total.cents,
+      },
+      result: netAmount.cents,
+      ruleId: NetPayWithSacrificeRuleId,
+      sources: [],
+      title: "Net pay = gross - salary sacrifice - withholdings ledger total",
     });
 
     return new NetPay({

@@ -11,6 +11,7 @@ export {
   AuTakeHomePayRuleDescriptors,
   AuTakeHomePayWithSacrificeRuleDescriptors,
   NetPayRuleDescriptor,
+  NetPayWithSacrificeRuleDescriptor,
   PayWithholdingsLedgerRuleDescriptor,
   PaygWithholdingRuleDescriptor,
   TaxablePayRuleDescriptor,

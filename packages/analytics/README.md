@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-analytics-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: analytics event, settings, service, export, transport or privacy change
 ---
 
@@ -28,7 +28,8 @@ Tax rule packages and local SDK calculations do not depend on this package.
 - `./testing/fixtures`: narrow test fixtures.
 - `./testing/observations`: narrow test observation types.
 
-The application supplies native `FetchHttpClient` and Effect `Crypto`. Each
+`BackendAnalyticsLive` is a static Layer that reads `AnalyticsSettingsConfig`
+from the host ConfigProvider; tests replace that provider. The application supplies native `FetchHttpClient` and Effect `Crypto`. Each
 backend send owns one scope and one five-second limit covering identity,
 encoding, headers and the complete reply. Replies are limited to 64 KiB. A
 request has one attempt, omits credentials, disables trace propagation and

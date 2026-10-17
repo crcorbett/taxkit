@@ -228,7 +228,7 @@ describe("TaxKit public calculation HTTP API", () => {
       );
       expect(response.calculator.calculatorId).toBe("au.pay.take-home");
       expect(response.report._tag).toBe("TakeHomePayReport");
-      expect(takeHomeReport.rulePackVersion).toBe("rules-au-pay/1.0.0");
+      expect(takeHomeReport.rulePackVersion).toBe("rules-au-pay/1.0.1");
       expect(decoded).toEqual(sdkResponse);
       expect(response).toEqual(sdkResponse);
       expect(takeHomeReport.withholdingsTotal.cents).toBe(75_600);

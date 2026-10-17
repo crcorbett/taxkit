@@ -22,7 +22,7 @@ describe("AU SDK subpath", () => {
 
       expect(report._tag).toBe("TakeHomePayReport");
       expect(report.netPay.cents).toBe(130_100);
-      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.0");
+      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.1");
     })
   );
 

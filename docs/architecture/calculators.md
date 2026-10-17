@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-calculator-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: calculator composition, catalogue execution or domain error contract change
 ---
 
@@ -140,7 +140,7 @@ Reports should include:
 Each report owner defines its ruleset-version Schema as an exact literal and
 emits that value directly. Ruleset versions describe the independent tax-rule
 edition used for a calculation; they are not read from package manifests at
-runtime. Current report values are `rules-au-pay/1.0.0` and
+runtime. Current report values are `rules-au-pay/1.0.1` and
 `rules-au-income-tax/1.0.1`.
 
 ## Question Planning

@@ -300,6 +300,8 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  // Synthetic fetch Promise entrypoint for deterministic discovery cancellation.
+  "apps/web/src/lib/api/forward.boundary.test.ts",
   "packages/docs-content/src/catalogue-index.runtime.ts",
   "packages/docs-content/src/catalogue.runtime.ts",
   "apps/web/scripts/native-pair-build.runtime.ts",
@@ -530,6 +532,17 @@ export default defineConfig({
       },
     },
 
+    {
+      // The synthetic fetch host must return a Promise. Its never Effect is
+      // cancelled through the native binding's AbortSignal in the deadline test.
+      files: ["apps/web/src/lib/api/forward.boundary.test.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/lib/api/forward.boundary.test.ts"] },
+        ],
+      },
+    },
     {
       files: ["apps/web/src/lib/config.server.ts"],
       rules: { "anti-slop/no-unknown-parameters": "off" },
@@ -1011,6 +1024,7 @@ export default defineConfig({
         "apps/api/test/worker.boundary.test.ts",
         "apps/web/scripts/docs-images.build.ts",
         "apps/web/src/lib/api/host.server.ts",
+        "apps/web/src/lib/api/forward.boundary.test.ts",
         "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
         "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
         "apps/web/src/lib/browser-tools.boundary.test.ts",
@@ -1050,6 +1064,7 @@ export default defineConfig({
               "apps/api/test/mcp-client.boundary.test.ts",
               "apps/web/scripts/docs-images.build.ts",
               "apps/web/src/lib/api/host.server.ts",
+              "apps/web/src/lib/api/forward.boundary.test.ts",
               "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
               "apps/web/src/lib/browser-tools.boundary.test.ts",
               "apps/web/src/lib/browser-tools.boundary.ts",

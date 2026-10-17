@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
 ---
 
@@ -28,7 +28,8 @@ relay. `WebsiteHost` holds:
   private `TAXKIT_API` service binding
   (`toHttpClient(fromCloudflareFetcher(binding))`);
 - `forward(path)`, which sends one request to the API and returns its finished
-  response (used for discovery files).
+  response (used for discovery files), with a ten-second deadline covering
+  headers and the complete body, a 2 MiB cap, and scoped cancellation.
 
 The calculation POST does not use the binding's `fetch`. It calls the API's
 trusted private `calculatorRequest` method, so the caller's rate key travels
