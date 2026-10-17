@@ -500,7 +500,7 @@ describe("browser calculator lifetime", () => {
           grossPay: aud(Cents.make(200)),
           netPay: aud(Cents.make(100)),
           period: "weekly",
-          rulePackVersion: "rules-au-pay/1.0.0",
+          rulePackVersion: "rules-au-pay/1.0.1",
           taxablePay: aud(Cents.make(200)),
           trace,
           withholdings: new PayWithholdingsLedger({

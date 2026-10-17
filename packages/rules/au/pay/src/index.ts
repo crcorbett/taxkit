@@ -69,12 +69,18 @@ export {
   AuTakeHomePayRuleDescriptors,
   AuTakeHomePayWithSacrificeRuleDescriptors,
   NetPayRuleDescriptor,
+  NetPayWithSacrificeRuleDescriptor,
   PayWithholdingsLedgerRuleDescriptor,
   PaygWithholdingRuleDescriptor,
   TaxablePayRuleDescriptor,
   TaxablePayWithSacrificeRuleDescriptor,
 } from "./rule-pack/descriptors.js";
-export { NetPayLive, NetPayRuleId } from "./rules/net-pay.js";
+export {
+  NetPayLive,
+  NetPayRuleId,
+  NetPayWithSacrificeLive,
+  NetPayWithSacrificeRuleId,
+} from "./rules/net-pay.js";
 export {
   PaygWithholdingComponentId,
   PaygWithholdingLive,

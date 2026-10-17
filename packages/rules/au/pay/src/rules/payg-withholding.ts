@@ -1,12 +1,6 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import {
-  Cents,
-  audFromCents,
-  decimalDollarsToCents,
-  multiplyCentsByDecimal,
-  roundCentsToDollar,
-} from "@taxkit/core/primitives";
+import { Cents, audFromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
@@ -89,20 +83,23 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
 
     const checkedWeeklyFormulaCents =
       yield* Cents.makeEffect(weeklyFormulaCents);
-    const multiplied = yield* multiplyCentsByDecimal(
-      checkedWeeklyFormulaCents,
-      row.a
+    // Keep a*x-b exact until Schedule 1's whole-dollar rounding boundary.
+    const weeklyWithholding = BigDecimal.subtract(
+      BigDecimal.multiply(
+        BigDecimal.make(BigInt(checkedWeeklyFormulaCents), 2),
+        row.a
+      ),
+      row.bDollars
     );
-    const subtracted = yield* decimalDollarsToCents(row.bDollars);
-    const weeklyWithholdingCentsRaw = yield* Cents.makeEffect(
-      multiplied - subtracted
+    const weeklyWithholdingDollars = Math.max(
+      0,
+      BigDecimal.toNumberUnsafe(
+        BigDecimal.round(weeklyWithholding, {
+          mode: "half-from-zero",
+          scale: 0,
+        })
+      )
     );
-    const weeklyWithholdingCentsRounded = roundCentsToDollar(
-      weeklyWithholdingCentsRaw,
-      "ato-withholding-rounding"
-    );
-    const weeklyWithholdingDollars =
-      Math.max(0, weeklyWithholdingCentsRounded) / 100;
     const periodWithholding = yield* audFromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
@@ -126,7 +123,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         taxablePeriodCents: taxable.amount.cents,
         weeklyEquivalentCents: weeklyCents,
         weeklyFormulaCents,
-        weeklyWithholdingCentsRaw,
+        weeklyWithholdingDollarsRaw: BigDecimal.format(weeklyWithholding),
       },
       result: periodWithholding.cents,
       rounding: Option.some(Option.some("ato-withholding-rounding")),

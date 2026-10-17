@@ -1,5 +1,4 @@
 import { NodeCrypto } from "@effect/platform-node";
-import { AnalyticsSettingsConfig } from "@taxkit/analytics/config";
 import { BackendAnalyticsLive } from "@taxkit/analytics/live";
 import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/admission.layer";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
@@ -53,20 +52,7 @@ const ApiWorkerServicesLive = Layer.merge(
 
 const ApiAnalyticsLive = ApiCalculatorDeliveryLive.pipe(
   Layer.provide(
-    Layer.unwrap(
-      AnalyticsSettingsConfig.pipe(
-        Effect.mapError(
-          () =>
-            new Config.ConfigError(
-              new ConfigProvider.SourceError({
-                message:
-                  "PostHog analytics configuration is missing or invalid.",
-              })
-            )
-        ),
-        Effect.map(BackendAnalyticsLive)
-      )
-    ).pipe(
+    BackendAnalyticsLive.pipe(
       Layer.provide(FetchHttpClient.layer),
       Layer.provide(NodeCrypto.layer)
     )
@@ -87,7 +73,16 @@ export const ApiWorkerNativeInit = Effect.gen(function* () {
     McpSessionHostLive.pipe(Layer.provideMerge(ApiWorkerServicesLive))
   ),
   Effect.provide(ApiAnalyticsLive),
-  Effect.provide(ApiCalculatorAdmission.pipe(Layer.provide(RateLimitBinding)))
+  Effect.provide(ApiCalculatorAdmission.pipe(Layer.provide(RateLimitBinding))),
+  Effect.catchTag("AnalyticsConfigurationError", () =>
+    Effect.fail(
+      new Config.ConfigError(
+        new ConfigProvider.SourceError({
+          message: "PostHog analytics configuration is missing or invalid.",
+        })
+      )
+    )
+  )
 );
 
 export class TaxKitApiWorker extends Worker<

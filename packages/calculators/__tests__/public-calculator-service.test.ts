@@ -167,7 +167,7 @@ describe("PublicCalculatorService", () => {
       expect(nurse.report.withholdingsTotal.cents).toBe(35_300);
       expect(nurse.report.netPay.cents).toBe(130_100);
       expect(nurse.report.period).toBe("weekly");
-      expect(nurse.report.rulePackVersion).toBe("rules-au-pay/1.0.0");
+      expect(nurse.report.rulePackVersion).toBe("rules-au-pay/1.0.1");
       expect(nurse.diagnostics.graphIssues.length).toBe(0);
 
       const teacher = yield* calculateTakeHome(346_200, "fortnightly", true);

@@ -1,4 +1,9 @@
-export { NetPayLive, NetPayRuleId } from "./net-pay.js";
+export {
+  NetPayLive,
+  NetPayRuleId,
+  NetPayWithSacrificeLive,
+  NetPayWithSacrificeRuleId,
+} from "./net-pay.js";
 export {
   PaygWithholdingComponentId,
   PaygWithholdingLive,

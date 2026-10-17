@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: agreed direction, implementation scope or Common Practice approach changes
 ---
 
@@ -13,6 +13,15 @@ The [proposal](../../product-specs/common-practice-foundation-review.md) records
 the source comparison and Cooper's direction: Common Practice's app/client and
 ordinary operational approach, Cloudflare first, patch-free Alchemy, supported
 Bun host, and safe operational details only.
+
+## Strict-review correction (17 October 2026)
+
+The static analytics Layer now acquires checked Config at its owner. Order 4's
+original lint acceptance missed Match-wrapped factories and used structural
+comparison for cyclic host AST nodes. The vendor provenance documents both
+local corrections; real CLI fixtures reject the factory variants and traverse
+the large native-pair fixture within the test deadline. Full verification
+remains the merge gate. The package Changeset covers the analytics signature.
 
 ## Progress (13 October 2026)
 
@@ -109,7 +118,7 @@ Production release, stored-row privacy checks and dashboard rendering. The
 | 3 | Use existing native HttpApi contracts, static host Layers and selected-key Config. Replace Q5 helpers with direct generated clients and update examples. Keep final calculation policies; extend trusted private admission to the HTTP calculation POST. Move Cloudflare header interpretation to hosts and correct native safe reporting. | Calculator-specific inputs, returned ID/report-kind, caller key outside JSON, complete ten-second/two-MiB response bounds, native declared HTTP statuses/errors, five-second body/work limits and no-JavaScript form. |
 | 3a | Native SSR HttpApiClient over the private binding; native browser AtomHttpApi.Service with browserRuntime.factory and one router/React registry. Loader-only reads call generated methods directly through one bridge. Remove server functions, copied method services, loader request atoms/caches and Website-only result envelopes. Add native API discovery GET/HEAD handlers and forward finished responses once. | Full first HTML/metadata, native serialisation/recovery, current navigation/preload policy, idle configuration, actual browser CORS, cancellation/replay/final disposal, preserved Markdown/discovery and machine RPC clients. |
 | 3b | Enable native version-scoped caching on both Workers and apply agreed seven-day headers only to public successes. Replace obsolete public restrictions; keep personal/error/cookie exclusions. Include content in both build inputs and deploy the stage pair together when authorised. | Repeated consumed public requests show HIT/Age; checked variants work in both orders; private/error replies remain uncached; a Preview content-only change refreshes both JSON and HTML. Native activation is not atomic. |
-| 4 | Vendor published 0.7.1 portable policy unchanged with provenance, real owner paths and useful TaxKit extensions. Enable native loader/client/cache/proxy ownership checks; checked-page-response only with an existing complete helper. Make imports aware of nested manifests and run actual Effect diagnostics. | Actual Oxlint accepts native clients, component queries, config/service atoms and cache declarations; rejects loader request state, replica services, global Cache API wrappers and Website data proxies. Aliases, neighbouring files and nested paths are covered. |
+| 4 | Vendor published 0.7.1 portable policy with provenance, the 17 October AST-identity/Match-factory corrections, real owner paths and useful TaxKit extensions. Enable native loader/client/cache/proxy ownership checks; checked-page-response only with an existing complete helper. Make imports aware of nested manifests and run actual Effect diagnostics. | Actual Oxlint accepts native clients, component queries, config/service atoms and cache declarations; rejects loader request state, replica services, global Cache API wrappers and Website data proxies. Aliases, neighbouring files and nested paths are covered. |
 | 5 | Fix Bun application-wide calculation pool using the same host-neutral services. Keep current HTTP coverage. | Overlapping requests share eight places; five-second work limit and existing HTTP behaviour remain. |
 | Later (implemented, not deployed) | Introduce fixed safe operational fields through native Axiom/Cloudflare resources using the agreed existing datasets. | No salaries/facts/results/traces, raw URLs/bodies/errors or unsafe native channel exports. Stored Production rows checked after release. |
 

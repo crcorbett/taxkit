@@ -37,7 +37,7 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
     grossPay: gross.amount,
     netPay: net.amount,
     period: gross.period,
-    rulePackVersion: PayRulePackVersion.make("rules-au-pay/1.0.0"),
+    rulePackVersion: PayRulePackVersion.make("rules-au-pay/1.0.1"),
     taxablePay: taxable.amount,
     trace: net.trace,
     withholdings: ledger,

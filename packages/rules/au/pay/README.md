@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-au-pay-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -18,9 +18,14 @@ withholdings ledger, net pay, salary-sacrifice pay effects, Schedule 1
 parameters, descriptors, rule packs, calculator program and golden tests.
 
 `TakeHomePayReport.rulePackVersion` is the exact literal
-`rules-au-pay/1.0.0`. It versions this package's ruleset independently from the
+`rules-au-pay/1.0.1`. It versions this package's ruleset independently from the
 package manifest version so callers can identify the pay rules used without
 runtime manifest reads.
+
+PAYG evaluates the complete decimal `a*x-b` before rounding to whole dollars;
+intermediate amounts are never rounded to cents. Salary-sacrifice packs use
+`NetPayWithSacrificeLive`: cash net equals gross minus salary sacrifice minus
+the withholding ledger. Salary sacrifice remains separate from tax withheld.
 
 ## Guardrails
 

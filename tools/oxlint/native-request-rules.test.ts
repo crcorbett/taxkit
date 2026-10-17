@@ -28,17 +28,42 @@ const runOxlint = (path: string) =>
   );
 
 describe("native request ownership rules", () => {
+  it.effect(
+    "traverses a large cyclic host AST without structural hashing",
+    () =>
+      runOxlint("apps/web/test/native-pair.boundary.test.ts").pipe(
+        Effect.tap((codes) => Effect.sync(() => expect(codes).toEqual([]))),
+        Effect.provide(BunServices.layer)
+      ),
+    10_000
+  );
   it.effect.each([
     {
-      count: 2,
-      name: "rejects exported and aliased Layer factories",
+      count: 4,
+      name: "rejects exported, aliased and Match-wrapped Layer factories",
       path: "packages/analytics/src/.generated-static-layers.ts",
       rule: "strict-effect(static-layers)",
-      source: `import { Context, Effect, Layer, Layer as L } from "effect";
+      source: `import { Context, Effect, Layer, Layer as L, Match } from "effect";
 class Origin extends Context.Service<Origin, string>()("Origin") {}
 class Address extends Context.Service<Address, URL>()("Address") {}
 export const factory = (origin: string) => Layer.succeed(Origin)(origin);
 export const aliased = (origin: string) => L.succeed(Origin)(origin);
+export const matched = (enabled: boolean) => Match.value(enabled).pipe(
+  Match.when(true, () => Layer.succeed(Origin)("enabled")),
+  Match.orElse(() => Layer.succeed(Origin)("disabled")),
+);
+export const exhaustive = (mode: { readonly _tag: "on" } | { readonly _tag: "off" }) => Match.value(mode).pipe(
+  Match.tag("on", () => Layer.succeed(Origin)("enabled")),
+  Match.tag("off", () => Layer.succeed(Origin)("disabled")),
+  Match.exhaustive,
+);
+export const matcher = () => Match.type<boolean>().pipe(
+  Match.when(true, () => Layer.succeed(Origin)("enabled")),
+  Match.orElse(() => Layer.succeed(Origin)("disabled")),
+);
+export const ordinaryMatch = (enabled: boolean) => Match.value(enabled).pipe(
+  Match.when(true, () => "enabled"), Match.orElse(() => "disabled"),
+);
 export const staticLayer = Layer.effect(
   Address,
   Effect.map(Origin, (origin) => new URL(origin))

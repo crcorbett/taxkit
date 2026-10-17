@@ -80,140 +80,141 @@ describe("AU take-home pay rule graph", () => {
           AuTakeHomePayWithSacrificeRuleDescriptors
         ),
       }).toMatchInlineSnapshot(`
-      {
-        "base": [
-          {
-            "id": "taxkit/rules-au-pay/rule/TaxablePay",
-            "parameters": [],
-            "provides": [
-              "taxkit/rules-au-pay/fact/TaxablePay",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/GrossPay",
-            ],
-            "sources": [],
-          },
-          {
-            "id": "taxkit/rules-au-pay/rule/PaygWithholding",
-            "parameters": [
-              {
-                "effectivePeriod": {
-                  "from": "2025-07-01",
-                  "toExclusive": "2026-07-01",
+        {
+          "base": [
+            {
+              "id": "taxkit/rules-au-pay/rule/TaxablePay",
+              "parameters": [],
+              "provides": [
+                "taxkit/rules-au-pay/fact/TaxablePay",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/GrossPay",
+              ],
+              "sources": [],
+            },
+            {
+              "id": "taxkit/rules-au-pay/rule/PaygWithholding",
+              "parameters": [
+                {
+                  "effectivePeriod": {
+                    "from": "2025-07-01",
+                    "toExclusive": "2026-07-01",
+                  },
+                  "id": "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
+                  "source": "ato-publication",
+                  "sourceArtifact": {
+                    "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
+                    "retrievedOn": "2026-05-12",
+                    "rowCount": 15,
+                  },
                 },
-                "id": "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
-                "source": "ato-publication",
-                "sourceArtifact": {
-                  "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
-                  "retrievedOn": "2026-05-12",
-                  "rowCount": 15,
+              ],
+              "provides": [
+                "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/TaxablePay",
+                "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
+              ],
+              "sources": [
+                "ato-publication",
+              ],
+            },
+            {
+              "id": "taxkit/rules-au-pay/rule/PayWithholdingsLedger",
+              "parameters": [],
+              "provides": [
+                "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/GrossPay",
+                "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
+              ],
+              "sources": [],
+            },
+            {
+              "id": "taxkit/rules-au-pay/rule/NetPay",
+              "parameters": [],
+              "provides": [
+                "taxkit/rules-au-pay/fact/NetPay",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/GrossPay",
+                "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
+              ],
+              "sources": [],
+            },
+          ],
+          "withSacrifice": [
+            {
+              "id": "taxkit/rules-au-pay/rule/TaxablePayWithSacrifice",
+              "parameters": [],
+              "provides": [
+                "taxkit/rules-au-pay/fact/TaxablePay",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/GrossPay",
+                "taxkit/rules-au-pay/fact/SalarySacrifice",
+              ],
+              "sources": [],
+            },
+            {
+              "id": "taxkit/rules-au-pay/rule/PaygWithholding",
+              "parameters": [
+                {
+                  "effectivePeriod": {
+                    "from": "2025-07-01",
+                    "toExclusive": "2026-07-01",
+                  },
+                  "id": "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
+                  "source": "ato-publication",
+                  "sourceArtifact": {
+                    "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
+                    "retrievedOn": "2026-05-12",
+                    "rowCount": 15,
+                  },
                 },
-              },
-            ],
-            "provides": [
-              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/TaxablePay",
-              "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
-            ],
-            "sources": [
-              "ato-publication",
-            ],
-          },
-          {
-            "id": "taxkit/rules-au-pay/rule/PayWithholdingsLedger",
-            "parameters": [],
-            "provides": [
-              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/GrossPay",
-              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
-            ],
-            "sources": [],
-          },
-          {
-            "id": "taxkit/rules-au-pay/rule/NetPay",
-            "parameters": [],
-            "provides": [
-              "taxkit/rules-au-pay/fact/NetPay",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/GrossPay",
-              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
-            ],
-            "sources": [],
-          },
-        ],
-        "withSacrifice": [
-          {
-            "id": "taxkit/rules-au-pay/rule/TaxablePayWithSacrifice",
-            "parameters": [],
-            "provides": [
-              "taxkit/rules-au-pay/fact/TaxablePay",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/GrossPay",
-              "taxkit/rules-au-pay/fact/SalarySacrifice",
-            ],
-            "sources": [],
-          },
-          {
-            "id": "taxkit/rules-au-pay/rule/PaygWithholding",
-            "parameters": [
-              {
-                "effectivePeriod": {
-                  "from": "2025-07-01",
-                  "toExclusive": "2026-07-01",
-                },
-                "id": "taxkit/rules-au-pay/parameter/AtoSchedule1Table",
-                "source": "ato-publication",
-                "sourceArtifact": {
-                  "checksum": "sha256:4e65d8a6b04f94b2f7fb7d2f4b219c4ad05fb8a4a9938d7b8fc36c012594c9f5",
-                  "retrievedOn": "2026-05-12",
-                  "rowCount": 15,
-                },
-              },
-            ],
-            "provides": [
-              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/TaxablePay",
-              "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
-            ],
-            "sources": [
-              "ato-publication",
-            ],
-          },
-          {
-            "id": "taxkit/rules-au-pay/rule/PayWithholdingsLedger",
-            "parameters": [],
-            "provides": [
-              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/GrossPay",
-              "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
-            ],
-            "sources": [],
-          },
-          {
-            "id": "taxkit/rules-au-pay/rule/NetPay",
-            "parameters": [],
-            "provides": [
-              "taxkit/rules-au-pay/fact/NetPay",
-            ],
-            "requires": [
-              "taxkit/rules-au-pay/fact/GrossPay",
-              "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
-            ],
-            "sources": [],
-          },
-        ],
-      }
-    `);
+              ],
+              "provides": [
+                "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/TaxablePay",
+                "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
+              ],
+              "sources": [
+                "ato-publication",
+              ],
+            },
+            {
+              "id": "taxkit/rules-au-pay/rule/PayWithholdingsLedger",
+              "parameters": [],
+              "provides": [
+                "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/GrossPay",
+                "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
+              ],
+              "sources": [],
+            },
+            {
+              "id": "taxkit/rules-au-pay/rule/NetPayWithSacrifice",
+              "parameters": [],
+              "provides": [
+                "taxkit/rules-au-pay/fact/NetPay",
+              ],
+              "requires": [
+                "taxkit/rules-au-pay/fact/GrossPay",
+                "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
+                "taxkit/rules-au-pay/fact/SalarySacrifice",
+              ],
+              "sources": [],
+            },
+          ],
+        }
+      `);
     })
   );
 

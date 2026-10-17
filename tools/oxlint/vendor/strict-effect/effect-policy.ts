@@ -6,6 +6,7 @@ import * as Option from "effect/Option";
 import * as Predicate from "effect/Predicate";
 import * as Schema from "effect/Schema";
 
+// AST cycle guards compare node identity: structural equality hashes cyclic parent links.
 // Resolve the nearest declaration, so a parameter or block-local name cannot
 // borrow a constant or import from an outer scope.
 const scopedVariable = (scope: Scope, name: string): Option.Option<Variable> =>
@@ -44,7 +45,7 @@ const moduleAddress = (
   source: ESTree.Node,
   visited: readonly ESTree.Node[] = [],
 ): Option.Option<string> => {
-  if (Array.contains(source)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === source)) {
     return Option.none();
   }
   const next = [...visited, source];
@@ -708,7 +709,7 @@ const layerType = (
   type: ESTree.Node,
   visited: readonly ESTree.Node[] = [],
 ): boolean => {
-  if (Array.contains(type)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === type)) {
     return false;
   }
   if (type.type === "TSUnionType" || type.type === "TSIntersectionType") {
@@ -749,7 +750,7 @@ const layerExpression = (
   expression: ESTree.Node,
   visited: readonly ESTree.Node[] = [],
 ): boolean => {
-  if (Array.contains(expression)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === expression)) {
     return false;
   }
   const next = [...visited, expression];
@@ -857,6 +858,31 @@ const layerExpression = (
     if (Array.isReadonlyArrayEmpty(expression.arguments)) {
       return layerExpression(context, expression.callee.object, next);
     }
+    // Exhaustive Match pipelines return their branch values, including Layers.
+    // Inline native callbacks remain allowed; the enclosing owned factory does not.
+    const completesMatch = Array.last(expression.arguments).pipe(
+      Option.exists((argument) => scopedEffectReference(
+        context, argument.type === "CallExpression" ? argument.callee : argument,
+      ).pipe(Option.exists((reference) =>
+        isExport(reference, "effect/Match", "exhaustive") ||
+        isExport(reference, "effect/Match", "orElse"),
+      ))),
+    );
+    const valueMatch = expression.callee.object.type === "CallExpression" &&
+      scopedEffectReference(context, expression.callee.object.callee).pipe(
+        Option.exists((reference) => isExport(reference, "effect/Match", "value")),
+      );
+    if (valueMatch && completesMatch && Array.some(expression.arguments, (argument) =>
+      argument.type === "CallExpression" &&
+      scopedEffectReference(context, argument.callee).pipe(
+        Option.exists((reference) => reference.module === "effect/Match"),
+      ) && Array.some(argument.arguments, (callback) =>
+        (callback.type === "ArrowFunctionExpression" || callback.type === "FunctionExpression") &&
+        (callback.body.type === "BlockStatement"
+          ? returnsLayer(context, callback.body)
+          : layerExpression(context, callback.body, next)),
+      ),
+    )) return true;
     return transforms(expression.arguments);
   }
   return false;
@@ -993,7 +1019,7 @@ const scopedImportedReference = (
   visited: readonly ESTree.Node[] = [],
   acceptsModule: (source: string) => boolean = Function.constTrue,
 ): Option.Option<EffectReference> => {
-  if (Array.contains(expression)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === expression)) {
     return Option.none();
   }
   const next = [...visited, expression];
@@ -1935,7 +1961,7 @@ const noLoaderRequestState = defineRule({
       expression: ESTree.Node,
       visited: readonly ESTree.Node[] = [],
     ): boolean => {
-      if (Array.contains(expression)(visited)) return false;
+      if (Array.some(visited, (ancestor) => ancestor === expression)) return false;
       if (
         expression.type === "MemberExpression" &&
         Option.contains(staticPropertyName(expression.property, expression.computed), "query")
@@ -1956,7 +1982,7 @@ const noLoaderRequestState = defineRule({
       );
     };
     const queryAtom = (expression: ESTree.Node, visited: readonly ESTree.Node[] = []): boolean => {
-      if (Array.contains(expression)(visited)) return false;
+      if (Array.some(visited, (ancestor) => ancestor === expression)) return false;
       if (expression.type === "CallExpression") return queryFactory(expression.callee);
       if (expression.type !== "Identifier") return false;
       return scopedVariable(context.sourceCode.getScope(expression), expression.name).pipe(
@@ -2014,7 +2040,7 @@ const acquiredHttpClient = (
   expression: ESTree.Node,
   visited: readonly ESTree.Node[] = [],
 ): boolean => {
-  if (Array.contains(expression)(visited)) return false;
+  if (Array.some(visited, (ancestor) => ancestor === expression)) return false;
   if (expression.type === "MemberExpression")
     return acquiredHttpClient(context, expression.object, [...visited, expression]);
   if (expression.type !== "Identifier") return false;
@@ -2216,7 +2242,7 @@ const checkedPageEffect = (
   options: CheckedPageOptions,
   visited: readonly ESTree.Node[] = [],
 ): Option.Option<ESTree.CallExpression> => {
-  if (Array.contains(node)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === node)) {
     return Option.none();
   }
   const next = [...visited, node];
@@ -2262,7 +2288,7 @@ const checkedPageValue = (
   options: CheckedPageOptions,
   visited: readonly ESTree.Node[] = [],
 ): Option.Option<ESTree.CallExpression> => {
-  if (Array.contains(node)(visited) || node.type !== "Identifier") {
+  if (Array.some(visited, (ancestor) => ancestor === node) || node.type !== "Identifier") {
     return Option.none();
   }
   const next = [...visited, node];
@@ -2455,7 +2481,7 @@ const globalObjectRead = (
   node: ESTree.Node,
   visited: readonly ESTree.Node[] = [],
 ): boolean => {
-  if (Array.contains(node)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === node)) {
     return false;
   }
   if (unboundGlobal(context, node, "globalThis")) {
@@ -2477,7 +2503,7 @@ const globalCacheRead = (
   node: ESTree.Node,
   visited: readonly ESTree.Node[] = [],
 ): boolean => {
-  if (Array.contains(node)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === node)) {
     return false;
   }
   if (unboundGlobal(context, node, "caches")) {
@@ -2565,7 +2591,7 @@ const localObject = (
   node: ESTree.Node,
   visited: readonly ESTree.Node[] = [],
 ): Option.Option<ESTree.ObjectExpression> => {
-  if (Array.contains(node)(visited)) {
+  if (Array.some(visited, (ancestor) => ancestor === node)) {
     return Option.none();
   }
   if (node.type === "ObjectExpression") {

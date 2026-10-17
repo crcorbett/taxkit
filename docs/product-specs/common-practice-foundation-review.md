@@ -376,10 +376,14 @@ TaxKit's executable skill copy still carries the older eleven-rule set. Vendor
 the published asset byte-for-byte with a short provenance note, and configure
 real TaxKit paths instead of copying Common Practice's product names.
 
-Use one unchanged copy of the current portable asset under
+Use one provenance-tracked copy of the portable asset under
 `tools/oxlint/vendor/strict-effect`, with a short source/version note. Keep only
 useful TaxKit extensions and adapt Common Practice's ownership checks to actual
-TaxKit paths. Do not edit installed plugin caches or add a digest/receipt system.
+TaxKit paths. The 17 October strict-review correction qualifies two local
+patches: identity-based AST cycle guards for Effect 4.0.2 and detection of
+Match-wrapped Layer factories. Their provenance and update rules belong to
+`tools/oxlint/vendor/strict-effect/README.md`; actual CLI fixtures cover them.
+Do not edit installed plugin caches or add a digest/receipt system.
 TaxKit's newer Oxlint 1.86.0, Ultracite 7.12.2 and Effect tooling 0.48.0 do not
 need downgrading to Common Practice's versions to adopt its approach.
 
