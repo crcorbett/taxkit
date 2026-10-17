@@ -48,12 +48,15 @@ import {
   ContentDiscovery,
   ContentDiscoverySettings,
 } from "@taxkit/publication/service";
+import { WorkerExecutionContext } from "alchemy/Cloudflare/Workers";
 import { safeHttpEffect } from "alchemy/Http";
+import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
   Array,
   ByteSize,
   Config,
   Context,
+  Deferred,
   Effect,
   Layer,
   Match,
@@ -260,33 +263,51 @@ export const ApiWorkerApplication = Effect.gen(function* () {
             )
           )
         : handler;
-      return yield* withCalculatorAnalytics(
-        withApiRequestBodyLimit(selected)
-      ).pipe(
-        Effect.provideService(ApiCalculatorDelivery, analytics),
-        // The shared public browser policy for HTTP and RPC, plus the
-        // Website's collection header. Remote MCP keeps its own exact
-        // browser origin list.
-        HttpMiddleware.cors({
-          allowedHeaders: isMcp
-            ? [
-                CollectionPolicyHeader,
-                "b3",
-                "content-type",
-                "mcp-method",
-                "mcp-name",
-                "mcp-protocol-version",
-                "mcp-session-id",
-                "traceparent",
-              ]
-            : [CollectionPolicyHeader, ...publicCors.allowedHeaders],
-          allowedMethods: publicCors.allowedMethods,
-          allowedOrigins: (origin) =>
-            isMcp
-              ? origin === config.publicationOrigin.origin
-              : isBrowserOrigin(origin),
-          credentials: false,
-        })
+      return yield* Effect.acquireUseRelease(
+        Effect.gen(function* () {
+          const completed = yield* Deferred.make<boolean>();
+          if (isMcp && !legacy) {
+            const native = yield* Effect.serviceOption(RuntimeContext);
+            const worker = yield* Effect.serviceOption(WorkerExecutionContext);
+            if (Option.isSome(native) && Option.isSome(worker)) {
+              // Workerd may discard an aborted invocation without Effect cleanup.
+              // Hold only this bounded request's lifetime; tax work stays in the
+              // original fibre and releases its place at the existing budget.
+              yield* worker.value
+                .waitUntil(Deferred.await(completed))
+                .pipe(Effect.provideService(RuntimeContext, native.value));
+            }
+          }
+          return completed;
+        }),
+        () =>
+          withCalculatorAnalytics(withApiRequestBodyLimit(selected)).pipe(
+            Effect.provideService(ApiCalculatorDelivery, analytics),
+            // The shared public browser policy for HTTP and RPC, plus the
+            // Website's collection header. Remote MCP keeps its own exact
+            // browser origin list.
+            HttpMiddleware.cors({
+              allowedHeaders: isMcp
+                ? [
+                    CollectionPolicyHeader,
+                    "b3",
+                    "content-type",
+                    "mcp-method",
+                    "mcp-name",
+                    "mcp-protocol-version",
+                    "mcp-session-id",
+                    "traceparent",
+                  ]
+                : [CollectionPolicyHeader, ...publicCors.allowedHeaders],
+              allowedMethods: publicCors.allowedMethods,
+              allowedOrigins: (origin) =>
+                isMcp
+                  ? origin === config.publicationOrigin.origin
+                  : isBrowserOrigin(origin),
+              credentials: false,
+            })
+          ),
+        (completed) => Deferred.succeed(completed, true)
       );
     }).pipe(
       Effect.catchTag("ConfigError", () =>

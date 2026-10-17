@@ -472,8 +472,12 @@ notification cannot cancel it. Modern in-process AbortSignal cancellation also
 works. On the pinned real Worker, an outgoing modern TCP abort stops the caller
 but pre-response calculation work remains until its five-second budget. The
 native modern HTTP adapter has no conversation binding for that notification.
-No flag-only workaround is accepted. The current contract preserves this
-five-second bound and does not promise prompt modern remote cleanup.
+No flag-only workaround is accepted. The native modern host registers a `WorkerExecutionContext.waitUntil` observer
+before running the bounded request and completes it when that handler exits.
+This keeps the invocation alive after a remote disconnect so Effect cleanup
+can release its calculation place at the existing five-second budget. The
+calculation stays in its original request fibre and scope; the observer runs
+no tax work. The contract does not promise prompt modern remote cleanup.
 
 The [agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx)
 documents both versions, all six remote tools, anonymous limits, exact browser

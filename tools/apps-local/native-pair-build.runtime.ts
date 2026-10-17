@@ -109,11 +109,32 @@ const program = Effect.gen(function* () {
             force: true,
             recursive: true,
           });
-          const props = {
+          const baseProps = {
             ...apiDeclaration,
             compatibility,
             main: path.join(root, "apps/api/src/worker.ts"),
           };
+          // The native bundler normally selects compiled workspace exports.
+          // Only this accelerated alarm fixture resolves its lifetime owner
+          // from patched source; other package entries keep their real graph.
+          const props =
+            mode === "session-expiry"
+              ? {
+                  ...baseProps,
+                  build: {
+                    input: {
+                      resolve: {
+                        alias: {
+                          "@taxkit/api-mcp/schemas": path.join(
+                            root,
+                            "packages/api/mcp/src/schemas.ts"
+                          ),
+                        },
+                      },
+                    },
+                  },
+                }
+              : baseProps;
           const artifacts = scopedArtifacts(fixtureId);
           const source = yield* resolveSource(props).pipe(
             Effect.provide(artifacts)
@@ -135,6 +156,25 @@ const program = Effect.gen(function* () {
             )
             .pipe(Effect.provide(artifacts));
         }).pipe(Effect.scoped)
+    );
+    // The fixture must restore source and never mutate the compiled package
+    // consumed by ordinary native builds. Guard both selected owners before
+    // compiling the remaining artifacts with the production ten-minute value.
+    yield* Effect.forEach(
+      ["src/schemas.ts", "dist/schemas.js"],
+      (owner) =>
+        fs
+          .readFileString(path.join(root, "packages/api/mcp", owner))
+          .pipe(
+            Effect.flatMap((source) =>
+              source.includes("McpSessionLifetime = Duration.minutes(10)")
+                ? Effect.void
+                : Effect.die(
+                    "Native MCP lifetime fixture did not restore its owner"
+                  )
+            )
+          ),
+      { discard: true }
     );
     // Corrupt one field in the actual native encoded reply. The native message
     // framing and server remain intact; this qualifies the client's decoder.
