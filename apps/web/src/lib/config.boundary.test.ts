@@ -2,8 +2,13 @@ import { describe, expect, it } from "@effect/vitest";
 import { Effect, Option, Result, Schema } from "effect";
 import { vi } from "vitest";
 
+import { WebsiteApiConfigError } from "./api/errors";
 import { TaxKitWebConfigError } from "./config";
-import { TaxKitWebServerConfig, WebsiteBindings } from "./config.server";
+import {
+  WebsiteSettingsConfig,
+  WebsiteApiConfig,
+  WebsiteBindings,
+} from "./config.server";
 import { WebsiteRootView } from "./schemas";
 
 const binding = {
@@ -24,10 +29,13 @@ describe("native website settings boundary", () => {
     "retains the binding receiver and restores checked origins from JSON",
     () =>
       Effect.gen(function* () {
-        const checked = yield* TaxKitWebServerConfig.pipe(
+        const checked = yield* WebsiteSettingsConfig.pipe(
           Effect.provideService(WebsiteBindings, settings)
         );
-        expect(checked.binding).toBe(binding);
+        const api = yield* WebsiteApiConfig.pipe(
+          Effect.provideService(WebsiteBindings, settings)
+        );
+        expect(api.binding).toBe(binding);
         expect(checked.apiOrigin.href).toBe("https://api.taxkit.example/");
         expect(checked.publicationOrigin.href).toBe("https://taxkit.example/");
         expect(checked.websiteOrigin.href).toBe(
@@ -56,13 +64,11 @@ describe("native website settings boundary", () => {
     },
     { ...settings, WEBSITE_PUBLIC_ORIGIN: "secret-canary" },
     { ...settings, TAXKIT_PUBLICATION_ORIGIN: undefined },
-    { ...settings, TAXKIT_API: { fetch: vi.fn() } },
-    { ...settings, TAXKIT_API: "secret-canary" },
   ])(
     "rejects missing or invalid settings without carrying raw input",
     (input) =>
       Effect.gen(function* () {
-        const checked = yield* TaxKitWebServerConfig.pipe(
+        const checked = yield* WebsiteSettingsConfig.pipe(
           Effect.provideService(WebsiteBindings, input),
           Effect.result
         );
@@ -79,3 +85,56 @@ describe("native website settings boundary", () => {
       })
   );
 });
+
+it.effect.each([
+  { apiValid: true, changed: {}, settingsValid: true },
+  { apiValid: false, changed: { TAXKIT_API: {} }, settingsValid: true },
+  {
+    apiValid: false,
+    changed: { TAXKIT_API: "secret-canary" },
+    settingsValid: true,
+  },
+  {
+    apiValid: true,
+    changed: { WEBSITE_PUBLIC_ORIGIN: "secret-canary" },
+    settingsValid: false,
+  },
+  {
+    apiValid: true,
+    changed: { TAXKIT_PUBLICATION_ORIGIN: undefined },
+    settingsValid: false,
+  },
+  {
+    apiValid: false,
+    changed: { CALCULATOR_HOST_MODE: "secret-canary" },
+    settingsValid: true,
+  },
+  {
+    apiValid: false,
+    changed: { API_PUBLIC_ORIGIN: "secret-canary" },
+    settingsValid: false,
+  },
+])(
+  "keeps settings and API failures independent for $changed",
+  ({ changed, settingsValid, apiValid }) =>
+    Effect.gen(function* () {
+      const input = { ...settings, ...changed };
+      const publicSettings = yield* WebsiteSettingsConfig.pipe(
+        Effect.provideService(WebsiteBindings, input),
+        Effect.result
+      );
+      const api = yield* WebsiteApiConfig.pipe(
+        Effect.provideService(WebsiteBindings, input),
+        Effect.result
+      );
+      expect(Result.isSuccess(publicSettings)).toBe(settingsValid);
+      expect(Result.isSuccess(api)).toBe(apiValid);
+      if (Result.isFailure(api)) {
+        expect(api.failure._tag).toBe("WebsiteApiConfigError");
+        expect(api.failure.message).toBe(
+          "TaxKit API settings are missing or invalid."
+        );
+        expect(api.failure).toEqual(new WebsiteApiConfigError());
+      }
+    })
+);

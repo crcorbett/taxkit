@@ -39,6 +39,16 @@
       "source": "./src/trace-export.ts",
       "types": "./src/trace-export.ts",
       "default": "./src/trace-export.ts"
+    },
+    "./api-worker": {
+      "source": "./src/api-worker.ts",
+      "types": "./src/api-worker.ts",
+      "default": "./src/api-worker.ts"
+    },
+    "./worker-settings": {
+      "source": "./src/worker-settings.ts",
+      "types": "./src/worker-settings.ts",
+      "default": "./src/worker-settings.ts"
     }
   },
   "scripts": {
@@ -49,9 +59,8 @@
   "dependencies": {
     "@distilled.cloud/posthog": "1.0.0-rc.13",
     "@taxkit/analytics": "workspace:*",
-    "@taxkit/api-rpc": "workspace:*",
+    "@taxkit/observability": "workspace:*",
     "alchemy": "catalog:",
-    "api": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

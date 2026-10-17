@@ -4,7 +4,8 @@ import { TestClock } from "effect/testing";
 import { vi } from "vitest";
 
 import { WebsiteBindings } from "../config.server";
-import { WebsiteHost, WebsiteHostLive } from "./host.server";
+import { WebsiteApi } from "../host.service";
+import { WebsiteApiLive } from "./host.server";
 
 it.effect.each(["headers", "body"] as const)(
   "bounds discovery %s stalls and cancels the request",
@@ -26,9 +27,9 @@ it.effect.each(["headers", "body"] as const)(
               );
         }),
       };
-      const host = yield* WebsiteHost.pipe(
+      const host = yield* WebsiteApi.pipe(
         Effect.provide(
-          WebsiteHostLive.pipe(
+          WebsiteApiLive.pipe(
             Layer.provide(
               Layer.succeed(WebsiteBindings)({
                 API_PUBLIC_ORIGIN: "https://api.taxkit.example",
@@ -76,9 +77,9 @@ it.effect.each([
           )
         ),
       };
-      const host = yield* WebsiteHost.pipe(
+      const host = yield* WebsiteApi.pipe(
         Effect.provide(
-          WebsiteHostLive.pipe(
+          WebsiteApiLive.pipe(
             Layer.provide(
               Layer.succeed(WebsiteBindings)({
                 API_PUBLIC_ORIGIN: "https://api.taxkit.example",

@@ -7,6 +7,7 @@
       "dependencies": {
         "@taxkit/infrastructure": "workspace:*",
         "alchemy": "catalog:",
+        "api": "workspace:*",
       },
       "devDependencies": {
         "@changesets/cli": "3.0.3",
@@ -36,11 +37,15 @@
         "@effect/platform-node": "catalog:",
         "@taxkit/analytics": "workspace:*",
         "@taxkit/api-http": "workspace:*",
+        "@taxkit/api-mcp": "workspace:*",
         "@taxkit/api-rpc": "workspace:*",
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
         "@taxkit/docs-content": "workspace:*",
+        "@taxkit/infrastructure": "workspace:*",
+        "@taxkit/observability": "workspace:*",
+        "@taxkit/publication": "workspace:*",
         "alchemy": "catalog:",
         "effect": "catalog:",
       },
@@ -64,11 +69,11 @@
         "@tanstack/react-start": "catalog:",
         "@taxkit/analytics": "workspace:*",
         "@taxkit/api-http": "workspace:*",
-        "@taxkit/api-rpc": "workspace:*",
         "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
         "@taxkit/docs-content": "workspace:*",
         "@taxkit/docs-fumadocs": "workspace:*",
+        "@taxkit/observability": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
         "alchemy": "catalog:",
@@ -83,13 +88,15 @@
         "@effect/vitest": "catalog:",
         "@modelcontextprotocol/client": "2.3.1",
         "@takumi-rs/wasm": "2.14.0",
+        "@taxkit/api-rpc": "workspace:*",
         "@taxkit/calculators": "workspace:*",
+        "@taxkit/infrastructure": "workspace:*",
+        "@taxkit/publication": "workspace:*",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "catalog:",
         "@vitest/browser-playwright": "5.0.3",
-        "api": "workspace:*",
         "fumadocs-mdx": "15.4.6",
         "miniflare": "5.20261001.0-alpha",
         "playwright": "1.63.0",
@@ -110,6 +117,7 @@
         "effect": "catalog:",
       },
       "devDependencies": {
+        "@effect/platform-bun": "catalog:",
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
@@ -136,6 +144,22 @@
         "vitest": "catalog:",
       },
     },
+    "packages/api/mcp": {
+      "name": "@taxkit/api-mcp",
+      "version": "0.1.0",
+      "dependencies": {
+        "@taxkit/api-http": "workspace:*",
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/content": "workspace:*",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/api/rpc": {
       "name": "@taxkit/api-rpc",
       "version": "0.1.0",
@@ -143,6 +167,7 @@
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
+        "@taxkit/publication": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
@@ -266,15 +291,42 @@
       "dependencies": {
         "@distilled.cloud/posthog": "1.0.0-rc.13",
         "@taxkit/analytics": "workspace:*",
-        "@taxkit/api-rpc": "workspace:*",
+        "@taxkit/observability": "workspace:*",
         "alchemy": "catalog:",
-        "api": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/vitest": "catalog:",
         "@types/bun": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/observability": {
+      "name": "@taxkit/observability",
+      "version": "0.1.0",
+      "dependencies": {
+        "@taxkit/calculators": "workspace:*",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/publication": {
+      "name": "@taxkit/publication",
+      "version": "1.0.0",
+      "dependencies": {
+        "@taxkit/api-http": "workspace:*",
+        "@taxkit/content": "workspace:*",
+        "effect": "catalog:",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
       },
@@ -1085,6 +1137,8 @@
 
     "@taxkit/api-http": ["@taxkit/api-http@workspace:packages/api/http"],
 
+    "@taxkit/api-mcp": ["@taxkit/api-mcp@workspace:packages/api/mcp"],
+
     "@taxkit/api-rpc": ["@taxkit/api-rpc@workspace:packages/api/rpc"],
 
     "@taxkit/calculators": ["@taxkit/calculators@workspace:packages/calculators"],
@@ -1100,6 +1154,10 @@
     "@taxkit/docs-fumadocs": ["@taxkit/docs-fumadocs@workspace:packages/docs-fumadocs"],
 
     "@taxkit/infrastructure": ["@taxkit/infrastructure@workspace:packages/infrastructure"],
+
+    "@taxkit/observability": ["@taxkit/observability@workspace:packages/observability"],
+
+    "@taxkit/publication": ["@taxkit/publication@workspace:packages/publication"],
 
     "@taxkit/rules-au-income-tax": ["@taxkit/rules-au-income-tax@workspace:packages/rules/au/income-tax"],
 

@@ -1,4 +1,7 @@
-import { HostService, hostRequestEvent } from "@taxkit/api-rpc/host-telemetry";
+import {
+  HostService,
+  hostRequestEvent,
+} from "@taxkit/observability/host-telemetry";
 import { Array } from "effect";
 
 import type { SharedLogsDatasetName } from "../../telemetry.js";

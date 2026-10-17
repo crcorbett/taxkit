@@ -55,6 +55,11 @@
       "source": "./src/response-policy.ts",
       "types": "./dist/response-policy.d.ts",
       "default": "./dist/response-policy.js"
+    },
+    "./routes": {
+      "source": "./src/routes.ts",
+      "types": "./dist/routes.d.ts",
+      "default": "./dist/routes.js"
     }
   },
   "publishConfig": {
@@ -94,6 +99,10 @@
       "./response-policy": {
         "types": "./dist/response-policy.d.ts",
         "default": "./dist/response-policy.js"
+      },
+      "./routes": {
+        "types": "./dist/routes.d.ts",
+        "default": "./dist/routes.js"
       }
     },
     "access": "public"

@@ -19,17 +19,26 @@ recovery records.
 ## What runs where
 
 **Server rendering.** `src/lib/runtime.server.ts` owns one `ManagedRuntime`
-(`runtime`) per loaded Worker module. It provides `WebsiteHostLive`
+(`runtime`) per loaded Worker module. It provides `WebsiteSettingsLive`
+(`src/lib/settings.server.layer.ts`), `WebsiteApiLive`
 (`src/lib/api/host.server.ts`), the fixed host telemetry and the analytics
-relay. `WebsiteHost` holds:
+relay. The contracts in `src/lib/host.service.ts` fail independently:
 
-- the checked settings;
-- the generated client, `HttpApiClient.makeWith(TaxKitApi, ...)`, over the
+- `WebsiteSettings` holds checked public settings;
+- `WebsiteApi` holds the generated client, `HttpApiClient.makeWith(TaxKitApi, ...)`, over the
   private `TAXKIT_API` service binding
   (`toHttpClient(fromCloudflareFetcher(binding))`);
 - `forward(path)`, which sends one request to the API and returns its finished
   response (used for discovery files), with a ten-second deadline covering
   headers and the complete body, a 2 MiB cap, and scoped cancellation.
+
+A malformed binding or calculator host mode fails only the API capability;
+invalid Website or publication origins fail only public settings. The API origin
+is required by both. Configuration failures expose fixed safe errors
+(`TaxKitWebConfigError` for settings, `WebsiteApiConfigError` for the API).
+The root load policy in `src/lib/root.load.server.ts` can therefore retain its
+settings and omit the optional catalogue when the API is unavailable. It owns
+the root transport encoding; `runtime.server.ts` owns execution and cancellation.
 
 The calculation POST does not use the binding's `fetch`. It calls the API's
 trusted private `calculatorRequest` method, so the caller's rate key travels
@@ -53,7 +62,10 @@ decoding, and maps transport, deadline and size failures to the Website's
 errors in `src/lib/api/errors.ts`. A calculation reply must answer the
 requested calculator with its own report kind (`WebsiteApiMismatch`
 otherwise). An unreadable or invalid reply shows the `WebsiteApiUnavailable`
-message.
+message. A docs page reply must also have the requested path; the Content-owned
+`isRequestedDocsPage` predicate checks that identity after generated decoding
+and fails with `WebsiteDocsPageMismatch` when it differs. Both server and browser
+loaders use this check without decoding the page again.
 
 ## Loaders and router
 

@@ -19,25 +19,25 @@ const decoder =
 it.effect.each([
   {
     allowed: true,
-    path: "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+    path: "packages/analytics/src/relay/live.layer.ts",
     rule: "",
     source: decoder,
   },
   {
     allowed: false,
-    path: "apps/web/src/lib/analytics/relay/adjacent.layer.ts",
+    path: "packages/analytics/src/relay/adjacent.layer.ts",
     rule: "no-decoding-outside-boundaries",
     source: decoder,
   },
   {
     allowed: false,
-    path: "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+    path: "packages/analytics/src/relay/live.layer.ts",
     rule: "no-restricted-globals",
     source: 'export const result = fetch("https://invalid.example");',
   },
   {
     allowed: false,
-    path: "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
+    path: "packages/analytics/src/relay/live.layer.ts",
     rule: "no-runtime-execution-outside-boundaries",
     source:
       'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',

@@ -5,21 +5,13 @@ import { TaxKitApi } from "@taxkit/api-http/api";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { CalculatorAdmissionUnavailable } from "@taxkit/calculators/schemas";
+import type { TaxKitApiWorker } from "@taxkit/infrastructure/api-worker";
 import {
   fromCloudflareFetcher,
   toHttpClient,
   toRpcAsync,
 } from "alchemy/Cloudflare/Bridge";
-import type { TaxKitApiWorker } from "api/worker";
-import {
-  Context,
-  Effect,
-  Layer,
-  Option,
-  Redacted,
-  Result,
-  Schema,
-} from "effect";
+import { Effect, Layer, Option, Redacted, Result, Schema } from "effect";
 import {
   HttpClient,
   HttpClientError,
@@ -30,41 +22,17 @@ import {
 import { HttpApiClient } from "effect/http-api";
 import { NetAddress } from "effect/net";
 
-import type { TaxKitWebConfigError } from "../config";
-import { TaxKitWebServerConfig } from "../config.server";
-import type { WebsitePublicSettings } from "../schemas";
+import { WebsiteApiConfig } from "../config.server";
+import { WebsiteApi } from "../host.service";
 import { boundedResponses, websiteApiDeadline } from "./bounded-response";
 import { WebsiteApiUnavailable, WebsiteApiDeadlineExceeded } from "./errors";
-import type { TaxKitClient } from "./requests";
-
-/**
- * The Website server's host capabilities: its checked settings, the native
- * generated API client over the private same-stage binding, and one finished
- * forward for API-owned downloads.
- */
-export class WebsiteHost extends Context.Service<
-  WebsiteHost,
-  {
-    readonly settings: Result.Result<
-      WebsitePublicSettings,
-      TaxKitWebConfigError
-    >;
-    readonly client: Result.Result<TaxKitClient, TaxKitWebConfigError>;
-    readonly forward: (
-      path: string
-    ) => Effect.Effect<
-      Response,
-      WebsiteApiUnavailable | WebsiteApiDeadlineExceeded | TaxKitWebConfigError
-    >;
-  }
->()("taxkit/web/WebsiteHost") {}
 
 // Native Alchemy bindings: the selected keys only, with protected values
 // unwrapped by Alchemy's own reader. The binding object keeps its receiver.
-export const WebsiteHostLive = Layer.effect(
-  WebsiteHost,
+export const WebsiteApiLive = Layer.effect(
+  WebsiteApi,
   Effect.gen(function* () {
-    const checked = yield* TaxKitWebServerConfig.pipe(Effect.result);
+    const checked = yield* WebsiteApiConfig.pipe(Effect.result);
     const host = yield* Effect.fromResult(checked).pipe(
       Effect.map((config) => {
         const localKey =
@@ -164,9 +132,9 @@ export const WebsiteHostLive = Layer.effect(
       ),
       Effect.result
     );
-    return WebsiteHost.of({
+    return WebsiteApi.of({
       client: Result.map(host, ({ generated }) => generated),
-      forward: Effect.fn("WebsiteHost.forward")((path: string) =>
+      forward: Effect.fn("WebsiteApi.forward")((path: string) =>
         Effect.fromResult(host).pipe(
           Effect.flatMap(({ reads, settings }) =>
             reads.get(new URL(path, settings.apiOrigin)).pipe(
@@ -195,11 +163,6 @@ export const WebsiteHostLive = Layer.effect(
           })
         )
       ),
-      settings: Result.map(host, ({ settings }) => ({
-        apiOrigin: settings.apiOrigin,
-        publicationOrigin: settings.publicationOrigin,
-        websiteOrigin: settings.websiteOrigin,
-      })),
     });
   })
 );

@@ -10,6 +10,7 @@ import {
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
 import { DocsPublicPage } from "@taxkit/content/schemas";
+import { HostRequestRecord } from "@taxkit/observability/host-telemetry";
 import {
   Array,
   Clock,
@@ -48,6 +49,15 @@ class NativeMcpClientFailed extends Schema.TaggedError<NativeMcpClientFailed>()(
     ]),
   }
 ) {}
+
+const NativeMcpWorkLog = Schema.fromJsonString(
+  Schema.Struct({
+    event: Schema.Literal("api.runtime.event"),
+    level: Schema.Literals(["Info", "Warn"]),
+    service: Schema.Literal("taxkit-api"),
+    timestamp: Schema.String,
+  })
+);
 
 it.live(
   "serves real MCP client calls through the built native API and shares its HTTP allowance",
@@ -277,6 +287,14 @@ it.live(
       const path = yield* Path.Path;
       const root = path.resolve("../..");
       const logs = yield* Queue.make<WorkerdStructuredLog>();
+      const allLogs = yield* Queue.make<WorkerdStructuredLog>();
+      const workLog = Queue.take(logs).pipe(
+        Effect.flatMap((log) =>
+          Schema.decodeUnknownEffect(NativeMcpWorkLog)(log.message).pipe(
+            Effect.map((event) => ({ ...event, message: log.message }))
+          )
+        )
+      );
       const exceptions = yield* Queue.make<string>();
       const workers = yield* Effect.forEach(
         [
@@ -381,7 +399,19 @@ it.live(
             new Miniflare({
               cf: false,
               handleStructuredLogs: (log) => {
-                Queue.offerUnsafe(logs, log);
+                Queue.offerUnsafe(allLogs, log);
+                // Official-client GET probes can finish after the handshake.
+                // Checked request events do not prove work start or cleanup;
+                // keep every raw record for the privacy assertions below.
+                if (
+                  Option.isNone(
+                    Schema.decodeUnknownOption(
+                      Schema.fromJsonString(HostRequestRecord)
+                    )(log.message)
+                  )
+                ) {
+                  Queue.offerUnsafe(logs, log);
+                }
               },
               handleUncaughtError: (error) => {
                 Queue.offerUnsafe(exceptions, error.message);
@@ -854,10 +884,10 @@ it.live(
         }).pipe(Effect.result, Effect.forkScoped)
       );
       yield* Effect.forEach(Array.range(1, 8), () =>
-        Queue.take(logs).pipe(
+        workLog.pipe(
           Effect.tap((log) =>
             Effect.sync(() => {
-              expect(log.message).toContain("Warn");
+              expect(log.level).toBe("Warn");
               expect(log.message).not.toContain("PRIVATE9");
             })
           )
@@ -875,9 +905,9 @@ it.live(
             params: { requestId },
           }),
       });
-      expect(
-        yield* Queue.take(logs).pipe(Effect.timeoutOption("150 millis"))
-      ).toEqual(Option.none());
+      expect(yield* workLog.pipe(Effect.timeoutOption("150 millis"))).toEqual(
+        Option.none()
+      );
       yield* Effect.sync(() => Array.headNonEmpty(aborts).abort());
       const firstCall = yield* Array.head(calls).pipe(
         Option.match({
@@ -887,8 +917,8 @@ it.live(
         })
       );
       expect(Result.isFailure(yield* Fiber.join(firstCall))).toBe(true);
-      const freed = yield* Queue.take(logs).pipe(Effect.timeout("1 second"));
-      expect(freed.message).toContain("Info");
+      const freed = yield* workLog.pipe(Effect.timeout("1 second"));
+      expect(freed.level).toBe("Info");
       const replacement = yield* Effect.tryPromise({
         catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
         try: () =>
@@ -897,9 +927,9 @@ it.live(
             { signal: Array.lastNonEmpty(aborts).signal }
           ),
       }).pipe(Effect.result, Effect.forkScoped);
-      expect(
-        (yield* Queue.take(logs).pipe(Effect.timeout("1 second"))).message
-      ).toContain("Warn");
+      expect((yield* workLog.pipe(Effect.timeout("1 second"))).level).toBe(
+        "Warn"
+      );
       yield* Effect.forEach(
         aborts,
         (abort) => Effect.sync(() => abort.abort()),
@@ -907,10 +937,10 @@ it.live(
       );
       yield* Effect.forEach([...calls, replacement], Fiber.join);
       yield* Effect.forEach(Array.range(1, 8), () =>
-        Queue.take(logs).pipe(
+        workLog.pipe(
           Effect.tap((log) =>
             Effect.sync(() => {
-              expect(log.message).toContain("Info");
+              expect(log.level).toBe("Info");
             })
           )
         )
@@ -973,10 +1003,10 @@ it.live(
         }).pipe(Effect.result, Effect.forkScoped)
       );
       yield* Effect.forEach(Array.range(1, 8), () =>
-        Queue.take(logs).pipe(
+        workLog.pipe(
           Effect.tap((log) =>
             Effect.sync(() => {
-              expect(log.message).toContain("Warn");
+              expect(log.level).toBe("Warn");
               expect(log.message).not.toContain("165400");
             })
           )
@@ -988,9 +1018,9 @@ it.live(
       expect(
         Result.isFailure(yield* Fiber.join(Array.headNonEmpty(modernCalls)))
       ).toBe(true);
-      expect(
-        yield* Queue.take(logs).pipe(Effect.timeoutOption("150 millis"))
-      ).toEqual(Option.none());
+      expect(yield* workLog.pipe(Effect.timeoutOption("150 millis"))).toEqual(
+        Option.none()
+      );
       const stillBusy = yield* Effect.tryPromise({
         catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
         try: () =>
@@ -1001,11 +1031,14 @@ it.live(
       )(yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(stillBusy));
       expect(stillBusy.isError).toBe(true);
       expect(busyText).toContain("capacity-exceeded");
+      // Without the native keep-alive Workerd discarded the disconnected
+      // invocation, including its cleanup log and occupied place. All eight
+      // requests must now finalize at the existing five-second budget.
       yield* Effect.forEach(Array.range(1, 8), () =>
-        Queue.take(logs).pipe(
+        workLog.pipe(
           Effect.tap((log) =>
             Effect.sync(() => {
-              expect(log.message).toContain("Info");
+              expect(log.level).toBe("Info");
               expect(log.message).not.toContain("165400");
             })
           )
@@ -1016,6 +1049,34 @@ it.live(
       expect(cleanupMillis).toBeGreaterThanOrEqual(4500);
       expect(cleanupMillis).toBeLessThan(6500);
       yield* Effect.forEach(modernCalls, Fiber.join);
+      const recoveredCalls = yield* Effect.forEach(Array.range(1, 8), () =>
+        Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
+          try: () =>
+            modernWork.callTool({ arguments: input, name: "taxkit_calculate" }),
+        }).pipe(Effect.result, Effect.forkScoped)
+      );
+      // Every recovered place must enter held work before any five-second
+      // expiry; accepting a transport request alone cannot satisfy this oracle.
+      yield* Effect.forEach(Array.range(1, 8), () =>
+        workLog.pipe(
+          Effect.tap((log) =>
+            Effect.sync(() => {
+              expect(log.level).toBe("Warn");
+            })
+          )
+        )
+      ).pipe(Effect.timeout("1 second"));
+      yield* Effect.forEach(Array.range(1, 8), () =>
+        workLog.pipe(
+          Effect.tap((log) =>
+            Effect.sync(() => {
+              expect(log.level).toBe("Info");
+            })
+          )
+        )
+      ).pipe(Effect.timeout("6 seconds"));
+      yield* Effect.forEach(recoveredCalls, Fiber.join);
 
       const expiryAddress = yield* Effect.promise(() =>
         host.unsafeGetDirectURL("session-expiry")
@@ -1053,10 +1114,10 @@ it.live(
         }).pipe(Effect.result, Effect.forkScoped)
       );
       yield* Effect.forEach(Array.range(1, 32), () =>
-        Queue.take(logs).pipe(
+        workLog.pipe(
           Effect.tap((log) =>
             Effect.sync(() => {
-              expect(log.message).toContain("Warn");
+              expect(log.level).toBe("Warn");
             })
           )
         )
@@ -1077,10 +1138,10 @@ it.live(
       // No HTTP request or manually triggered callback runs here. The native
       // platform alarm must release every actual held operation by itself.
       yield* Effect.forEach(Array.range(1, 32), () =>
-        Queue.take(logs).pipe(
+        workLog.pipe(
           Effect.tap((log) =>
             Effect.sync(() => {
-              expect(log.message).toContain("Info");
+              expect(log.level).toBe("Info");
               expect(log.message).not.toContain("PRIVATE9");
             })
           )
@@ -1142,6 +1203,11 @@ it.live(
       expect(freshTransport.sessionId).not.toBe(expiredId);
       expect(freshTransport.sessionId).toMatch(/^[a-f0-9-]{36}$/u);
       expect(yield* Queue.clear(exceptions)).toEqual([]);
+      const logText = yield* Schema.encodeEffect(
+        Schema.fromJsonString(Schema.Unknown)
+      )(yield* Queue.clear(allLogs));
+      expect(logText).not.toContain("PRIVATE9");
+      expect(logText).not.toContain("165400");
     }).pipe(
       Effect.timeout("20 seconds"),
       Effect.provide(NodeServices.layer),

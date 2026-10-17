@@ -1,7 +1,7 @@
 import "@tanstack/react-start/server-only";
+import type { TaxKitApiBinding } from "@taxkit/infrastructure/api-worker";
+import { CalculatorHostMode } from "@taxkit/observability/edge-identity";
 import { reifyBoundConfigProvider } from "alchemy/Runtime";
-import { CalculatorHostMode } from "api/edge-identity";
-import type { TaxKitApiBinding } from "api/worker";
 import {
   Array,
   Config,
@@ -14,6 +14,7 @@ import {
   Schema,
 } from "effect";
 
+import { WebsiteApiConfigError } from "./api/errors";
 import { TaxKitWebConfigError } from "./config";
 import { WebsitePublicSettings } from "./schemas";
 
@@ -63,19 +64,12 @@ export const websiteConfigProvider = WebsiteBindings.pipe(
   })
 );
 
-export const TaxKitWebServerConfig = Effect.gen(function* () {
-  const bindings = yield* WebsiteBindings;
+export const WebsiteSettingsConfig = Effect.gen(function* () {
   const provider = yield* websiteConfigProvider;
   return yield* Effect.all({
     apiOrigin: Config.schema(
       WebsitePublicSettings.fields.apiOrigin,
       "API_PUBLIC_ORIGIN"
-    ),
-    binding: Schema.decodeUnknownEffect(PrivateApiBinding)(
-      Record.get(bindings, "TAXKIT_API").pipe(Option.getOrUndefined)
-    ),
-    hostMode: Config.schema(CalculatorHostMode, "CALCULATOR_HOST_MODE").pipe(
-      Config.withDefault("edge")
     ),
     publicationOrigin: Config.schema(
       WebsitePublicSettings.fields.publicationOrigin,
@@ -96,3 +90,20 @@ export const TaxKitWebServerConfig = Effect.gen(function* () {
       })
   )
 );
+
+export const WebsiteApiConfig = Effect.gen(function* () {
+  const bindings = yield* WebsiteBindings;
+  const provider = yield* websiteConfigProvider;
+  return yield* Effect.all({
+    apiOrigin: Config.schema(
+      WebsitePublicSettings.fields.apiOrigin,
+      "API_PUBLIC_ORIGIN"
+    ),
+    binding: Schema.decodeUnknownEffect(PrivateApiBinding)(
+      Record.get(bindings, "TAXKIT_API").pipe(Option.getOrUndefined)
+    ),
+    hostMode: Config.schema(CalculatorHostMode, "CALCULATOR_HOST_MODE").pipe(
+      Config.withDefault("edge")
+    ),
+  }).pipe(Effect.provideService(ConfigProvider.ConfigProvider, provider));
+}).pipe(Effect.mapError(() => new WebsiteApiConfigError()));

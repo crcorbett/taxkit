@@ -16,8 +16,15 @@ const taxkitReact = defineConfig({
 const decodingBoundaryFiles = [
   // Local package-manifest ingress for the documentation command check.
   "tools/documentation/check.boundary.ts",
-  "apps/web/src/lib/analytics/relay/relay.adapter.layer.ts",
-  "apps/web/src/lib/analytics/relay/relay.boundary.test.ts",
+  "tools/workspace/dependencies.boundary.test.ts",
+  "packages/observability/test/host-telemetry.boundary.test.ts",
+  "packages/publication/src/__testing__/fixtures.ts",
+  "packages/publication/test/schemas.test.ts",
+  "packages/publication/test/service.test.ts",
+  "packages/publication/test/discovery-links.test.ts",
+  "apps/web/src/lib/api/host.boundary.test.ts",
+  "packages/analytics/src/relay/live.layer.ts",
+  "packages/analytics/test/relay.boundary.test.ts",
   "apps/web/test/native-relay.boundary.test.ts",
   // Closed native PostHog SDK ingress; no runner or neighbouring-file permission.
   "packages/infrastructure/src/posthog/management.adapter.layer.ts",
@@ -57,7 +64,7 @@ const decodingBoundaryFiles = [
   "packages/content/test/service.test.ts",
   // Exact native connection, private-call and provider-reply trust boundaries.
   // No encoder, runner, cast, mutation or neighbouring-path permission.
-  "apps/api/src/edge-identity.boundary.ts",
+  "packages/observability/src/edge-identity.boundary.ts",
   "apps/api/src/worker.application.ts",
   "apps/api/src/worker-admission.layer.ts",
   // Exact native rate wire/provider fixtures and redacted-key codec checks.
@@ -210,6 +217,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  "apps/web/src/lib/api/requests.boundary.test.ts",
+  "apps/web/src/lib/root.load.server.ts",
   // Generated public catalogue file egress.
   "packages/docs-content/src/catalogue.runtime.ts",
   // Synthetic PostHog HTTP fixture representation only.
@@ -304,7 +313,7 @@ const runtimeBoundaryFiles = [
   "apps/web/src/lib/api/forward.boundary.test.ts",
   "packages/docs-content/src/catalogue-index.runtime.ts",
   "packages/docs-content/src/catalogue.runtime.ts",
-  "apps/web/scripts/native-pair-build.runtime.ts",
+  "tools/apps-local/native-pair-build.runtime.ts",
 
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
@@ -349,7 +358,7 @@ const bunAdapterFiles = [
 const bunRuntimeEntrypointFiles = [
   "packages/docs-content/src/catalogue-index.runtime.ts",
   "packages/docs-content/src/catalogue.runtime.ts",
-  "apps/web/scripts/native-pair-build.runtime.ts",
+  "tools/apps-local/native-pair-build.runtime.ts",
 
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -430,9 +439,9 @@ export default defineConfig({
       files: [
         "packages/analytics/src/**/*.ts",
         "packages/infrastructure/src/posthog/**/*.ts",
-        "apps/web/src/lib/analytics/relay/**/*.ts",
+        "packages/analytics/src/relay/**/*.ts",
         "apps/api/src/analytics-request.boundary.ts",
-        "apps/api/src/calculator-analytics.layer.ts",
+        "packages/analytics/src/api-usage.layer.ts",
         "apps/web/src/lib/calculator-policy.browser.layer.ts",
       ],
       rules: {
@@ -643,11 +652,11 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/scripts/native-pair-build.runtime.ts"],
+      files: ["tools/apps-local/native-pair-build.runtime.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
-          { allowedFiles: ["apps/web/scripts/native-pair-build.runtime.ts"] },
+          { allowedFiles: ["tools/apps-local/native-pair-build.runtime.ts"] },
         ],
       },
     },
@@ -1025,6 +1034,8 @@ export default defineConfig({
         "apps/web/scripts/docs-images.build.ts",
         "apps/web/src/lib/api/host.server.ts",
         "apps/web/src/lib/api/forward.boundary.test.ts",
+        "apps/web/src/lib/api/requests.boundary.test.ts",
+        "apps/web/src/lib/api/host.boundary.test.ts",
         "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
         "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
         "apps/web/src/lib/browser-tools.boundary.test.ts",
@@ -1065,6 +1076,8 @@ export default defineConfig({
               "apps/web/scripts/docs-images.build.ts",
               "apps/web/src/lib/api/host.server.ts",
               "apps/web/src/lib/api/forward.boundary.test.ts",
+              "apps/web/src/lib/api/requests.boundary.test.ts",
+              "apps/web/src/lib/api/host.boundary.test.ts",
               "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
               "apps/web/src/lib/browser-tools.boundary.test.ts",
               "apps/web/src/lib/browser-tools.boundary.ts",

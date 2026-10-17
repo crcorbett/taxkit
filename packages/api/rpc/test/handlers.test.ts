@@ -7,15 +7,12 @@ import {
   CalculatorOperationTimedOut,
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
-import { ContentDiscoveryLive, ContentServiceLive } from "@taxkit/content/live";
-import {
-  ContentCatalogue,
-  ContentDiscoverySettings,
-} from "@taxkit/content/service";
-import {
-  exampleContentCatalogue,
-  exampleDiscoverySettings,
-} from "@taxkit/content/testing/fixtures";
+import { ContentServiceLive } from "@taxkit/content/live";
+import { ContentCatalogue } from "@taxkit/content/service";
+import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { ContentDiscoveryLive } from "@taxkit/publication/live";
+import { ContentDiscoverySettings } from "@taxkit/publication/service";
+import { exampleDiscoverySettings } from "@taxkit/publication/testing/fixtures";
 import {
   Array,
   Cause,

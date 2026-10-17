@@ -3,7 +3,11 @@ import {
   Client,
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
-import { HostRequestRecord } from "@taxkit/api-rpc/host-telemetry";
+import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
+import {
+  McpDocsSearchResponse,
+  McpToolUnavailable,
+} from "@taxkit/api-mcp/schemas";
 import {
   CalculationRequest,
   CalculatorLive,
@@ -32,6 +36,7 @@ import {
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
+import { HostRequestRecord } from "@taxkit/observability/host-telemetry";
 import {
   Array,
   ConfigProvider,
@@ -54,11 +59,6 @@ import { NetAddress } from "effect/net";
 import { TestConsole } from "effect/testing";
 
 import { ApiContentLive } from "../src/content.boundary.js";
-import { McpRequestAbortSignal } from "../src/mcp-request.service.js";
-import {
-  McpDocsSearchResponse,
-  McpToolUnavailable,
-} from "../src/mcp.schemas.js";
 import { ApiWorkerApplication } from "../src/worker.application.js";
 import { ApiWorkerInit } from "../src/worker.js";
 

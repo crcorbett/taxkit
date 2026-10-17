@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: content ownership, publication status or generated presentation changes
 ---
 
@@ -79,7 +79,7 @@ Website reads pages, navigation, search and Markdown from the API's public HTTP
 content routes with the generated client and renders browser-safe compiled
 presentation. Its `/search` GET form shows published titles and descriptions
 with the existing document links. No second index is added.
-`ContentDiscovery` derives four discovery files from the same public
+`@taxkit/publication` owns `ContentDiscovery`, which derives four discovery files from the same public
 catalogue, the API origin and the publication origin `https://taxkit.dev`. The
 API serves them at `/api/v1/docs/discovery/*`; the Website forwards its
 conventional addresses there once. Robots allows everything (`Allow: /`) and

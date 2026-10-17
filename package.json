@@ -78,7 +78,8 @@
   },
   "dependencies": {
     "@taxkit/infrastructure": "workspace:*",
-    "alchemy": "catalog:"
+    "alchemy": "catalog:",
+    "api": "workspace:*"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",

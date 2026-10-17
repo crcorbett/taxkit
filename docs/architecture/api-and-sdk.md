@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-api-sdk-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
@@ -360,7 +360,7 @@ service-binding callers only. It admits POST `/rpc` and POST
 `/api/v1/calculators/:calculatorId/calculate`, carries the original caller's
 checked rate key outside JSON and headers, and buffers the reply within 2 MiB
 and ten seconds. Direct edge callers are identified by
-`apps/api/src/edge-identity.boundary.ts` (export `api/edge-identity`).
+`@taxkit/observability/edge-identity`.
 
 POST bodies are read through the native Effect stream with a 64-KiB limit
 and a total five-second read deadline, before native JSON decoding. Oversized
@@ -676,7 +676,8 @@ services, supplied once at API composition. The content handlers reuse the
 generated public catalogue; they run no calculation and take no calculator
 allowance. Both client groups share the 2 MiB reader, ten-second deadline,
 credential/redirect/tracing policy and checked version skew. Their fixed
-page/search/discovery errors and path bounds belong to `@taxkit/content`.
+page/search errors and path bounds belong to `@taxkit/content`; discovery contracts
+and failures belong to `@taxkit/publication`.
 
 ### Documentation over HTTP
 
@@ -689,7 +690,7 @@ publication origins through the static `ContentDiscoveryLive`.
 
 ## Native remote MCP
 
-The native API adds the app-owned `/mcp` adapter using installed Effect
+The native API mounts the `@taxkit/api-mcp` transport at `/mcp` using installed Effect
 `McpServer`, `Tool` and `Toolkit`. Its six named tools use canonical calculator
 and accepted-content Schemas, delegating to the same captured services as
 HTTP/RPC. Successful reports and processed Markdown are existing domain values;

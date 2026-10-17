@@ -1,23 +1,13 @@
-import { Array, Effect, Layer, Match, pipe } from "effect";
+import { Array, Effect, Layer, pipe } from "effect";
 
 import { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
-import {
-  DocsDiscoveryBody,
-  DocsDiscoveryDocument,
-  DocsSearchExcerpt,
-} from "./schemas.js";
+import { DocsSearchExcerpt } from "./schemas.js";
 import type {
-  DocsDiscoveryPath,
   DocsPagePath,
   DocsSearchResult,
   DocsSearchTerm,
 } from "./schemas.js";
-import {
-  ContentCatalogue,
-  ContentDiscovery,
-  ContentDiscoverySettings,
-  ContentService,
-} from "./service.js";
+import { ContentCatalogue, ContentService } from "./service.js";
 
 export const ContentServiceLive = Layer.effect(
   ContentService,
@@ -72,94 +62,6 @@ export const ContentServiceLive = Layer.effect(
             )
           )
       ),
-    });
-  })
-);
-
-// Settings are read on first use; a settings failure fails that request only.
-export const ContentDiscoveryLive = Layer.effect(
-  ContentDiscovery,
-  Effect.gen(function* () {
-    const catalogue = yield* ContentCatalogue;
-    const configured = yield* Effect.cached(yield* ContentDiscoverySettings);
-    return ContentDiscovery.of({
-      getDocument: Effect.fn("ContentDiscovery.getDocument")(function* (
-        path: DocsDiscoveryPath
-      ) {
-        const config = yield* configured;
-        const body = Match.value(path).pipe(
-          Match.when(
-            "/sitemap.xml",
-            () =>
-              `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${Array.map(
-                catalogue.pages,
-                (page) => {
-                  const address = new URL(
-                    page.path,
-                    config.publicationOrigin
-                  ).href
-                    .replaceAll("&", "&amp;")
-                    .replaceAll("'", "&apos;")
-                    .replaceAll('"', "&quot;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll("<", "&lt;");
-                  return `  <url><loc>${address}</loc></url>`;
-                }
-              ).join("\n")}\n</urlset>\n`
-          ),
-          Match.when(
-            "/robots.txt",
-            () =>
-              "User-agent: *\nAllow: /\n" +
-              `Sitemap: ${new URL("/sitemap.xml", config.publicationOrigin).href}\n`
-          ),
-          Match.when(
-            "/llms.txt",
-            () =>
-              `# TaxKit\n\n> Open-source Australian tax calculators, APIs and integration documentation.\n\nThese links contain accepted public documentation, not personal calculation reports.\nRelative page links in the Markdown use ${config.publicationOrigin.origin}.\n\n## Documentation\n\n${Array.map(
-                catalogue.pages,
-                (page) => {
-                  const label = page.frontmatter.title
-                    .replaceAll(/\s+/gu, " ")
-                    .replaceAll(/(?<delimiter>[\\[\]])/gu, "\\$<delimiter>");
-                  const address = new URL(
-                    `/api/v1/docs/markdown?${new URLSearchParams({ path: page.path }).toString()}`,
-                    config.apiOrigin
-                  ).href;
-                  return `- [${label}](${address}): ${page.frontmatter.description.replaceAll(/\s+/gu, " ")}`;
-                }
-              ).join("\n")}\n`
-          ),
-          Match.when(
-            "/llms-full.txt",
-            () =>
-              `# TaxKit documentation\n\nAccepted public documentation only; no personal calculation reports.\nRelative page links use ${config.publicationOrigin.origin}.\n\n${Array.map(
-                catalogue.pages,
-                (page) =>
-                  `Canonical page: ${new URL(page.path, config.publicationOrigin).href}\n\n${page.markdown}`
-              ).join("\n\n---\n\n")}\n`
-          ),
-          Match.exhaustive
-        );
-        return yield* DocsDiscoveryBody.makeEffect(body).pipe(
-          Effect.flatMap((checked) =>
-            DocsDiscoveryDocument.makeEffect({
-              body: checked,
-              contentType:
-                path === "/sitemap.xml" ? "application/xml" : "text/plain",
-              path,
-            })
-          ),
-          Effect.mapError(
-            () =>
-              new DocsSourceError({
-                message:
-                  "The documentation discovery document could not be prepared.",
-                operation: "getDiscoveryDocument",
-              })
-          )
-        );
-      }),
     });
   })
 );

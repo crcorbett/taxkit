@@ -18,13 +18,13 @@ import {
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
 import {
-  DocsDiscoveryPath,
   DocsPublicCatalogue,
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
+import { DocsDiscoveryPath } from "@taxkit/publication/schemas";
 import {
   Array,
   Effect,

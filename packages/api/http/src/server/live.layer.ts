@@ -15,6 +15,7 @@ import { HealthHandlerLive } from "../handlers/health.js";
 import { taxKitOpenApiSpec } from "../openapi.js";
 import { withCalculatorRequestBodyLimit } from "../request-boundary.js";
 import { publicCors } from "../response-policy.js";
+import { openApiPath, referencePath } from "../routes.js";
 
 const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
@@ -23,12 +24,12 @@ const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
 );
 
 const DocsRouteLayer = HttpApiScalar.layer(TaxKitApi, {
-  path: "/api/docs",
+  path: referencePath,
 });
 
 const OpenApiRouteLayer = HttpRouter.add(
   "GET",
-  "/api/docs/openapi.json",
+  openApiPath,
   Effect.succeed(HttpServerResponse.jsonUnsafe(taxKitOpenApiSpec))
 );
 

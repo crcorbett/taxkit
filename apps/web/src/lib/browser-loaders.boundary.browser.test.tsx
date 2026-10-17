@@ -9,7 +9,17 @@ import {
   DocsPublicPage,
 } from "@taxkit/content/schemas";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { Array, Effect, Fiber, Layer, Option, Ref, Schema } from "effect";
+import {
+  Array,
+  Effect,
+  Fiber,
+  Layer,
+  Match,
+  Option,
+  Ref,
+  Result,
+  Schema,
+} from "effect";
 import { HttpClient, HttpClientResponse } from "effect/http";
 import type { HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -77,6 +87,56 @@ const fixture = Effect.fnUntraced(function* (
 });
 
 describe("browser route loaders", () => {
+  it.effect.each([
+    { reply: "matching", succeeds: true },
+    { reply: "mismatched", succeeds: false },
+    { reply: "malformed", succeeds: false },
+  ] as const)(
+    "checks a $reply docs reply through the browser loader",
+    ({ reply, succeeds }) =>
+      Effect.gen(function* () {
+        const catalogue = yield* exampleContentCatalogue;
+        const page = yield* Array.head(catalogue.pages).pipe(Effect.fromOption);
+        const navigation = yield* Schema.encodeEffect(
+          Schema.fromJsonString(DocsPublicNavigation)
+        )(catalogue.navigation);
+        const encodedPage = yield* Schema.encodeEffect(
+          Schema.fromJsonString(DocsPublicPage)
+        )(page);
+        const { context } = yield* fixture((request) =>
+          Effect.succeed(
+            new Response(
+              request.url.includes("navigation")
+                ? navigation
+                : Match.value(reply).pipe(
+                    Match.when("malformed", () => "{}"),
+                    Match.orElse(() => encodedPage)
+                  ),
+              json
+            )
+          )
+        );
+        const result = yield* Effect.tryPromise({
+          catch: (error) => ({
+            loadError: Schema.is(WebsiteLoadError)(error),
+            notFound: isNotFound(error),
+          }),
+          try: () =>
+            loadDocsPage({
+              context,
+              path: reply === "mismatched" ? "/start/quickstart" : page.path,
+              signal: new AbortController().signal,
+            }),
+        }).pipe(Effect.result);
+        expect(Result.isSuccess(result)).toBe(succeeds);
+        if (Result.isSuccess(result)) {
+          expect(result.success.page.path).toBe(page.path);
+        } else {
+          expect(result.failure).toEqual({ loadError: true, notFound: false });
+        }
+      }).pipe(Effect.scoped)
+  );
+
   it.effect("reuses one native client from the shared registry", () =>
     Effect.gen(function* () {
       const catalogue = yield* exampleContentCatalogue;

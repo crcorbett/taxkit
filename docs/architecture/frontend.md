@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: frontend runtime, API client, loader, rendering, cache, build adapter, or composition change
 ---
 
@@ -44,7 +44,8 @@ define tax calculation rules.
 The Website has exactly two places that run Effects:
 
 - `apps/web/src/lib/runtime.server.ts`: one `ManagedRuntime` with
-  `WebsiteHostLive`. The host builds the generated client over the binding with
+  independent `WebsiteSettingsLive` and `WebsiteApiLive` Layers. The API Layer
+  builds the generated client over the binding with
   `toHttpClient(fromCloudflareFetcher(binding))`. Its calculation POST uses the
   API's trusted private `calculatorRequest` method so the caller's rate key
   travels outside JSON and headers.
@@ -71,7 +72,10 @@ second cache. `loaders.ts` selects the server or browser branch with
 The Website's own address comes from its native `Worker.URL`, the API address
 from the API resource's Output and canonical links from the fixed publication
 origin `https://taxkit.dev`. `config.server.ts` reads only the Website's keys
-through `reifyBoundConfigProvider` and checks the binding object separately.
+through `reifyBoundConfigProvider`. Settings and the API binding retain independent
+checked failures: a broken binding leaves settings available, and invalid Website
+settings do not block valid API forwarding. `root.load.server.ts` requires settings
+and treats the catalogue as optional page chrome.
 Vite exposes no ambient public env prefix or build-time API address.
 
 `src/server.ts` is the Worker entry. Before TanStack it handles the analytics
@@ -86,7 +90,9 @@ shared; everything else is `no-store`.
 Route loaders, actions and dedicated boundary adapters own executable decoding
 of URL state, browser storage, external HTTP responses and other transport
 representations. The generated client decodes API replies; route code does not
-decode them again. Prefer extracting a focused boundary module when a TanStack
+decode them again. `@taxkit/content/response-check` separately relates the checked
+page to its requested path; a different valid page becomes `WebsiteDocsPageMismatch`.
+Prefer extracting a focused boundary module when a TanStack
 route file also renders React; do not allowlist a mixed `.tsx` route merely
 because its loader needs a decoder.
 

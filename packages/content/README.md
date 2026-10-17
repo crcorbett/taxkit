@@ -3,14 +3,14 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: content contracts, search policy or package exports change
 ---
 
 # @taxkit/content
 
 Private compiled package for TaxKit docs contracts and published public page
-lookup, navigation, search and discovery documents. `DocsPublicCatalogue` rejects draft pages,
+lookup, navigation and search. `DocsPublicCatalogue` rejects draft pages,
 duplicate addresses and navigation that does not match the pages. Application
 composition supplies a checked catalogue through `ContentCatalogue`;
 `ContentServiceLive` has no default catalogue or filesystem access.
@@ -20,8 +20,8 @@ The authored MDX, its frontmatter status and the Fumadocs compiler remain in
 pages are published. This package cannot itself publish an authored page. The checked
 [HTTP package](../api/http/README.md) now delegates public content routes to
 this service. The [native RPC package](../api/rpc/README.md#documentation-connection)
-delegates page, navigation, Markdown, search and discovery operations to the
-content owners for machine callers. The Website reads pages, navigation,
+delegates page, navigation, Markdown and search to Content, and discovery to
+[Publication](../publication/README.md), for machine callers. The Website reads pages, navigation,
 search and Markdown through the API's HTTP routes.
 Existing docs-content imports re-export
 the canonical page, navigation and lookup error contracts for compatibility.
@@ -32,47 +32,25 @@ include a whitespace-normalised excerpt of at most 240 characters. The caller
 checks the search term once, including its 100-character limit. The excerpt uses its owning checked type;
 projection failure stays in the safe `DocsSourceError` channel.
 
-## Discovery documents
+## Publication boundary
 
-`ContentDiscovery.getDocument` admits only `/sitemap.xml`, `/robots.txt`,
-`/llms.txt` and `/llms-full.txt`. All four use the same public catalogue.
-`ContentDiscoveryLive` is a static Layer that requires
-`ContentDiscoverySettings`, a lazy Effect of `DocsDiscoverySettings`. Its
-application owner supplies it with `Layer.succeed(ContentDiscoverySettings)`,
-checks configuration and maps settings failure to the safe source error. Settings are read on first use and retained in that instance.
-This keeps deferred native stage addresses out of source-time guesses.
-
-`DocsDiscoverySettings` holds the API origin and `publicationOrigin`
-(`DocsPublicationOrigin`, `https://taxkit.dev` in every stage). `PublicHttpOrigin`
-owns the shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin`
-and the RPC package's API origin have separate identities. The sitemap contains
-canonical published page addresses on the publication origin, escaped as XML,
-without invented modification dates. Robots is `User-agent: *`, `Allow: /` and
-the sitemap address. The short agent index links to the existing checked API
-Markdown endpoint. The full index preserves processed page bodies and their
-canonical publication addresses, including useful fenced code examples. Neither
-file contains personal calculation reports or performs a calculation.
-
-The document Schema relates path to media type and limits body length to
-300,000 characters, within the existing native reply byte budget even under
-JSON escaping. Projection failure remains `DocsSourceError`; the API's HTTP
-discovery route returns an empty 503 and RPC exposes only the fixed
-`DocsDiscoveryUnavailable`. No document cache or secondary content
-index is added. Local tests do not show public availability; check the
-deployed API for that.
+[Publication](../publication/README.md) owns discovery settings, document
+Schemas and generation. It consumes the checked catalogue and HTTP route
+catalogue, keeping transport addresses out of Content. `PublicHttpOrigin`
+retains the shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin`
+and `DocsPublicationOrigin` preserve their separate checked identities.
 
 ## Exports
 
 - `./schemas`: canonical page, navigation, public catalogue, search, secure
-  origin, discovery settings and discovery document Schemas.
+  origin Schemas.
 - `./errors`: internal checked source/lookup failures and shared fixed public
-  page/search/discovery failures.
-- `./service`: `ContentServiceContract`, `ContentService`, `ContentCatalogue`,
-  the closed `ContentDiscovery` contract and its deferred
-  `ContentDiscoverySettings` requirement.
-- `./live`: page/search implementation and `ContentDiscoveryLive` over a
-  supplied checked catalogue and deferred checked discovery settings.
-- `./test`: the same implementations with controlled request observations.
+  page/search failures.
+- `./service`: `ContentServiceContract`, `ContentService` and `ContentCatalogue`.
+- `./live`: page/search implementation over a supplied checked catalogue.
+- `./response-check`: request/reply page identity predicate for checked docs
+  pages, used after generated-client decoding.
+- `./test`: the same implementation with controlled request observations.
 - `./testing/fixtures`: checked synthetic catalogue inputs for tests.
 - `./testing/observations`: typed test observations.
 

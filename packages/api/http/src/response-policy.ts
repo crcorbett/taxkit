@@ -28,18 +28,8 @@ export const publicBrowserCacheControl = "public, max-age=0";
 export const publicCdnCacheControl = "public, max-age=604800, stale-if-error=0";
 export const privateCacheControl = "no-store";
 
-// Public documentation and fixed calculator metadata. Health, calculation,
-// RPC and MCP replies are never shared.
-const publicReadPaths = [
-  /^\/api\/v1\/docs\/(?:navigation|page|search|markdown)$/u,
-  /^\/api\/v1\/docs\/discovery\/(?:sitemap\.xml|robots\.txt|llms\.txt|llms-full\.txt)$/u,
-  /^\/api\/v1\/(?:jurisdictions|tax-years|calculators|facts|rules)$/u,
-  /^\/api\/v1\/calculators\/[^/]+(?:\/schema|\/graph)?$/u,
-  /^\/api\/docs(?:\/openapi\.json)?$/u,
-] as const;
-
-export const isPublicReadPath = (pathname: string) =>
-  Array.some(publicReadPaths, (pattern) => pattern.test(pathname));
+// Compatibility export; the route catalogue owns cache eligibility.
+export { isPublicReadApiPath as isPublicReadPath } from "./routes.js";
 
 const restrictive = /(?:^|,)\s*(?:private|no-store)\s*(?:=|,|$)/iu;
 

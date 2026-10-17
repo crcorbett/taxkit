@@ -27,10 +27,14 @@
     {
       "status": "qualified",
       "decision": "Adapt the renderer to the existing TaxKit root tsconfig, source export condition and catalogue dependencies. The exact adapted package passes its installed Effect 4.0.0 type check, build and 31 contract tests; this is focused package compatibility, not complete T008 app, browser or provider acceptance."
+    },
+    {
+      "status": "qualified",
+      "decision": "2026-10-17: Existing compiled-internal Effect-service package now owns the analytics relay and calculator usage decorator through focused exports. Qualified against installed Effect 4.0.2 with package check-types/build, 69 controlled package tests and 14 API request/decorator integration tests. The original render snapshot and scaffold provenance above remain historical; no package-global runner or app/deployment dependency was added."
     }
   ],
   "configDigests": {
-    "package.json": "c51493a39a23e4d8149ca4c6674811ba2134afa847334239284ea1473f4e4837",
+    "package.json": "80926f3db601f7351edc4d5f34fa45bc6b92d22fe54df99655577d2bca4a55e1",
     "tsconfig.json": "89330beddb9118c14591ce205a7be8d39d42264daa40a589966d92ffdb770938",
     "tsconfig.build.json": "044f58d619deef8e2416a1fce0a3418879aac27f2aa5d70b245a4c774acac230",
     "vitest.config.ts": "c81a2a24fc321eaa98816ca4b8e42bd601c6406b7bd48d3e8a5bd450dcc2faeb"

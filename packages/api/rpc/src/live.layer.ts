@@ -1,3 +1,4 @@
+import { rpcPath } from "@taxkit/api-http/routes";
 import type {
   CalculatorRunServiceRequest,
   DescriptorFilterQuery,
@@ -213,7 +214,7 @@ export const TaxKitRpcClientLive = Layer.effect(
         Effect.map(([client, origin]) =>
           client.pipe(
             HttpClient.mapRequest(
-              HttpClientRequest.setUrl(new URL("/rpc", origin).href)
+              HttpClientRequest.setUrl(new URL(rpcPath, origin).href)
             ),
             boundedCalculatorRpcHttpClient
           )

@@ -1,3 +1,4 @@
+import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import {
   applyCachePolicy,
@@ -5,10 +6,26 @@ import {
   isPublicReadPath,
   publicCors,
 } from "@taxkit/api-http/response-policy";
+import {
+  ApiReferencePath,
+  CalculationFamilyPath,
+  CalculatorApiPath,
+  DocsApiPath,
+  DocsDiscoveryApiPath,
+  HealthPath,
+  McpRoutePath,
+  RpcRoutePath,
+  DiscoveryPath,
+  discoveryApiPath,
+  isTrustedCalculationPath,
+  mcpPath,
+} from "@taxkit/api-http/routes";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
+import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
+import { withBoundedMcpReply } from "@taxkit/api-mcp/response-budget";
+import { TaxKitMcpHttpLayer } from "@taxkit/api-mcp/server";
+import { TaxKitMcpHost } from "@taxkit/api-mcp/service";
 import { CalculatorRpcResponseTooLarge } from "@taxkit/api-rpc/errors";
-import { observeHostRequest } from "@taxkit/api-rpc/host-telemetry";
-import type { HostRoute } from "@taxkit/api-rpc/host-telemetry";
 import {
   CalculatorRpcDeadline,
   CalculatorRpcResponseLimit,
@@ -16,31 +33,34 @@ import {
 import { TaxKitRpcHttpLayer } from "@taxkit/api-rpc/server";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
-import { CalculatorId } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { DocsSourceError } from "@taxkit/content/errors";
-import { ContentDiscoveryLive } from "@taxkit/content/live";
+import { ContentCatalogue, ContentService } from "@taxkit/content/service";
 import {
-  DocsDiscoveryPath,
-  DocsDiscoverySettings,
-} from "@taxkit/content/schemas";
+  CalculatorHostMode,
+  calculatorEdgeRateKey,
+} from "@taxkit/observability/edge-identity";
+import { observeHostRequest } from "@taxkit/observability/host-telemetry";
+import type { HostRoute } from "@taxkit/observability/host-telemetry";
+import { ContentDiscoveryLive } from "@taxkit/publication/live";
+import { DocsDiscoverySettings } from "@taxkit/publication/schemas";
 import {
-  ContentCatalogue,
   ContentDiscovery,
   ContentDiscoverySettings,
-  ContentService,
-} from "@taxkit/content/service";
+} from "@taxkit/publication/service";
+import { WorkerExecutionContext } from "alchemy/Cloudflare/Workers";
 import { safeHttpEffect } from "alchemy/Http";
+import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
   Array,
   ByteSize,
   Config,
   Context,
+  Deferred,
   Effect,
   Layer,
   Match,
   Option,
-  Record,
   Schema,
   Scope,
   Stream,
@@ -60,67 +80,33 @@ import {
   ApiCalculatorDelivery,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
-import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";
-import {
-  CalculatorHostMode,
-  calculatorEdgeRateKey,
-} from "./edge-identity.boundary.js";
-import { McpRequestAbortSignal } from "./mcp-request.service.js";
-import { withBoundedMcpReply } from "./mcp-response.boundary.js";
 import { McpSessionHost } from "./mcp-session.layer.js";
-import { TaxKitMcpHost, TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
-
-const calculatePath = /^\/api\/v1\/calculators\/(?<id>[^/]+)\/calculate$/u;
-
-// Exact trusted Website calls: machine RPC and the canonical HTTP calculation.
-const isTrustedCalculationPath = (pathname: string) =>
-  pathname === "/rpc" ||
-  Option.fromNullishOr(calculatePath.exec(pathname)).pipe(
-    Option.flatMap((match) => Option.fromNullishOr(match.groups)),
-    Option.flatMap(Record.get("id")),
-    Option.exists(Schema.is(CalculatorId))
-  );
 
 // The closed route family for the one request record; the raw path, query and
 // calculator ID never leave this function.
 const apiRoute = (pathname: string): HostRoute =>
   Match.value(pathname).pipe(
-    Match.when("/api/health", () => "health" as const),
-    Match.when("/rpc", () => "rpc" as const),
-    Match.when("/mcp", () => "mcp" as const),
-    Match.when(
-      (path) => calculatePath.test(path),
-      () => "calculate" as const
-    ),
-    Match.when(
-      (path) => path.startsWith("/api/v1/docs/discovery/"),
-      () => "discovery" as const
-    ),
-    Match.when(
-      (path) => path === "/api/v1/docs" || path.startsWith("/api/v1/docs/"),
-      () => "docs" as const
-    ),
-    Match.when(
-      (path) => path.startsWith("/api/v1/"),
-      () => "catalogue" as const
-    ),
-    Match.when(
-      (path) => path === "/api/docs" || path.startsWith("/api/docs/"),
-      () => "reference" as const
-    ),
+    Match.when(Schema.is(HealthPath), () => "health" as const),
+    Match.when(Schema.is(RpcRoutePath), () => "rpc" as const),
+    Match.when(Schema.is(McpRoutePath), () => "mcp" as const),
+    Match.when(Schema.is(CalculationFamilyPath), () => "calculate" as const),
+    Match.when(Schema.is(DocsDiscoveryApiPath), () => "discovery" as const),
+    Match.when(Schema.is(DocsApiPath), () => "docs" as const),
+    Match.when(Schema.is(CalculatorApiPath), () => "catalogue" as const),
+    Match.when(Schema.is(ApiReferencePath), () => "reference" as const),
     Match.orElse(() => "other" as const)
   );
 
 // The finished public discovery documents. The Website forwards its own
 // /sitemap.xml, /robots.txt and /llms*.txt requests here once.
 const DiscoveryRoutes = HttpRouter.addAll(
-  Array.map(DocsDiscoveryPath.literals, (path) =>
+  Array.map(DiscoveryPath.literals, (path) =>
     HttpRouter.route(
       "GET",
-      `/api/v1/docs/discovery${path}`,
+      discoveryApiPath(path),
       ContentDiscovery.pipe(
         Effect.flatMap((discovery) => discovery.getDocument(path)),
         Effect.map((document) =>
@@ -255,7 +241,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Effect.gen(function* () {
       const config = yield* settings;
       const request = yield* HttpServerRequest.HttpServerRequest;
-      const isMcp = new URL(request.url, config.apiOrigin).pathname === "/mcp";
+      const isMcp = new URL(request.url, config.apiOrigin).pathname === mcpPath;
       const protocol = Headers.get(request.headers, "mcp-protocol-version");
       const legacy =
         Option.isSome(sessions) &&
@@ -277,33 +263,51 @@ export const ApiWorkerApplication = Effect.gen(function* () {
             )
           )
         : handler;
-      return yield* withCalculatorAnalytics(
-        withApiRequestBodyLimit(selected)
-      ).pipe(
-        Effect.provideService(ApiCalculatorDelivery, analytics),
-        // The shared public browser policy for HTTP and RPC, plus the
-        // Website's collection header. Remote MCP keeps its own exact
-        // browser origin list.
-        HttpMiddleware.cors({
-          allowedHeaders: isMcp
-            ? [
-                CollectionPolicyHeader,
-                "b3",
-                "content-type",
-                "mcp-method",
-                "mcp-name",
-                "mcp-protocol-version",
-                "mcp-session-id",
-                "traceparent",
-              ]
-            : [CollectionPolicyHeader, ...publicCors.allowedHeaders],
-          allowedMethods: publicCors.allowedMethods,
-          allowedOrigins: (origin) =>
-            isMcp
-              ? origin === config.publicationOrigin.origin
-              : isBrowserOrigin(origin),
-          credentials: false,
-        })
+      return yield* Effect.acquireUseRelease(
+        Effect.gen(function* () {
+          const completed = yield* Deferred.make<boolean>();
+          if (isMcp && !legacy) {
+            const native = yield* Effect.serviceOption(RuntimeContext);
+            const worker = yield* Effect.serviceOption(WorkerExecutionContext);
+            if (Option.isSome(native) && Option.isSome(worker)) {
+              // Workerd may discard an aborted invocation without Effect cleanup.
+              // Hold only this bounded request's lifetime; tax work stays in the
+              // original fibre and releases its place at the existing budget.
+              yield* worker.value
+                .waitUntil(Deferred.await(completed))
+                .pipe(Effect.provideService(RuntimeContext, native.value));
+            }
+          }
+          return completed;
+        }),
+        () =>
+          withCalculatorAnalytics(withApiRequestBodyLimit(selected)).pipe(
+            Effect.provideService(ApiCalculatorDelivery, analytics),
+            // The shared public browser policy for HTTP and RPC, plus the
+            // Website's collection header. Remote MCP keeps its own exact
+            // browser origin list.
+            HttpMiddleware.cors({
+              allowedHeaders: isMcp
+                ? [
+                    CollectionPolicyHeader,
+                    "b3",
+                    "content-type",
+                    "mcp-method",
+                    "mcp-name",
+                    "mcp-protocol-version",
+                    "mcp-session-id",
+                    "traceparent",
+                  ]
+                : [CollectionPolicyHeader, ...publicCors.allowedHeaders],
+              allowedMethods: publicCors.allowedMethods,
+              allowedOrigins: (origin) =>
+                isMcp
+                  ? origin === config.publicationOrigin.origin
+                  : isBrowserOrigin(origin),
+              credentials: false,
+            })
+          ),
+        (completed) => Deferred.succeed(completed, true)
       );
     }).pipe(
       Effect.catchTag("ConfigError", () =>

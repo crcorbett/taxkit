@@ -1,9 +1,9 @@
 import {
-  DocsDiscoveryDocument,
   DocsPublicNavigation,
   DocsPublicPage,
   DocsSearchResult,
 } from "@taxkit/content/schemas";
+import { DocsDiscoveryDocument } from "@taxkit/publication/schemas";
 import { Schema } from "effect";
 import { Rpc, RpcGroup } from "effect/rpc";
 

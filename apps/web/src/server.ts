@@ -3,18 +3,19 @@ import {
   createStartHandler,
   defaultStreamHandler,
 } from "@tanstack/react-start/server";
+import { WebsiteAnalyticsRelay } from "@taxkit/analytics/relay/service";
 import {
   CalculatorRequestBodyPolicy,
   withCalculatorRequestBodyLimit,
 } from "@taxkit/api-http/request-boundary";
 import { applyCachePolicy } from "@taxkit/api-http/response-policy";
-import { observeHostRequest } from "@taxkit/api-rpc/host-telemetry";
-import type { HostRoute } from "@taxkit/api-rpc/host-telemetry";
+import { DiscoveryPath, discoveryApiPath } from "@taxkit/api-http/routes";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
-import { DocsDiscoveryPath } from "@taxkit/content/schemas";
+import { calculatorEdgeRateKey } from "@taxkit/observability/edge-identity";
+import { observeHostRequest } from "@taxkit/observability/host-telemetry";
+import type { HostRoute } from "@taxkit/observability/host-telemetry";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
 import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
-import { calculatorEdgeRateKey } from "api/edge-identity";
 import { Effect, ErrorReporter, Match, Schema } from "effect";
 import {
   Headers as EffectHeaders,
@@ -23,8 +24,6 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
-import { WebsiteAnalyticsRelay } from "./lib/analytics/relay/service";
-import { WebsiteHost } from "./lib/api/host.server";
 import { calculate } from "./lib/api/requests";
 import { withDocsRepresentation } from "./lib/docs/markdown.response.server";
 import {
@@ -35,6 +34,7 @@ import {
   WebsiteInputError,
 } from "./lib/form.boundary";
 import type { WebsiteCalculatorForm } from "./lib/form.boundary";
+import { WebsiteApi } from "./lib/host.service";
 import { runtime } from "./lib/runtime.server";
 import { WebsiteSubmission, WebsiteSubmissionTransport } from "./lib/schemas";
 import type { WebsiteServerRenderContext } from "./lib/schemas";
@@ -47,7 +47,7 @@ const render = createStartHandler<{
 // form fields never leave this function.
 const websiteRoute = (pathname: string, method: string): HostRoute =>
   Match.value(pathname).pipe(
-    Match.when(Schema.is(DocsDiscoveryPath), () => "discovery" as const),
+    Match.when(Schema.is(DiscoveryPath), () => "discovery" as const),
     Match.when(
       (path) => path.startsWith("/ingest/"),
       () => "analytics-relay" as const
@@ -100,7 +100,7 @@ const handleRequest = createServerOnlyFn((request: Request) =>
         );
       }
       const discoveryPath = url.pathname;
-      if (Schema.is(DocsDiscoveryPath)(discoveryPath)) {
+      if (Schema.is(DiscoveryPath)(discoveryPath)) {
         if (request.method !== "GET" && request.method !== "HEAD") {
           return HttpServerResponse.empty({
             headers: { allow: "GET, HEAD" },
@@ -111,15 +111,13 @@ const handleRequest = createServerOnlyFn((request: Request) =>
           return HttpServerResponse.empty({ status: 400 });
         }
         // The API owns the finished document; forward it once.
-        const host = yield* WebsiteHost;
-        return yield* host
-          .forward(`/api/v1/docs/discovery${discoveryPath}`)
-          .pipe(
-            Effect.map(HttpServerResponse.fromWeb),
-            Effect.catch(() =>
-              Effect.succeed(HttpServerResponse.empty({ status: 503 }))
-            )
-          );
+        const host = yield* WebsiteApi;
+        return yield* host.forward(discoveryApiPath(discoveryPath)).pipe(
+          Effect.map(HttpServerResponse.fromWeb),
+          Effect.catch(() =>
+            Effect.succeed(HttpServerResponse.empty({ status: 503 }))
+          )
+        );
       }
       // The framework still mounts its server-function base. The Website
       // declares no server functions, so every such address is absent.
@@ -198,7 +196,7 @@ const handleRequest = createServerOnlyFn((request: Request) =>
               ).pipe(
                 Effect.fromResult,
                 Effect.flatMap((input) =>
-                  WebsiteHost.pipe(
+                  WebsiteApi.pipe(
                     Effect.flatMap((host) => Effect.fromResult(host.client)),
                     Effect.flatMap((client) => calculate(client, input))
                   )

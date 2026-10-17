@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-package-boundaries-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: package responsibility, dependency direction or public export change
 ---
 
@@ -29,6 +29,11 @@ Implemented packages and apps:
 - `packages/core`
 - `packages/api/http`
 - `packages/api/rpc`
+- `packages/api/mcp`
+- `packages/content`
+- `packages/publication`
+- `packages/analytics`
+- `packages/observability`
 - `packages/sdk/typescript`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
@@ -115,7 +120,10 @@ packages/core/**
   <- packages/api/** / packages/sdk/** / packages/cli/** / apps/**
 ```
 
-TaxKit packages must not depend on application-layer code. React is allowed only inside app/docs packages that explicitly need it.
+TaxKit packages and apps must not depend on other apps. Root composition joins
+app implementation exports to deployment declarations; runtime observability and
+analytics have no Alchemy/provider dependency. `tools/workspace/dependencies.boundary.test.ts`
+checks those manifest edges and proves the former reverse edges fail. React is allowed only inside app/docs packages that explicitly need it.
 
 ## Package Responsibilities
 

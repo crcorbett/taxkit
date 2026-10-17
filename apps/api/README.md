@@ -3,8 +3,8 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-app-owner
-last_reviewed: 2026-10-13
-review_trigger: API app settings, startup, routes, CORS, cache, smoke command or shutdown change
+last_reviewed: 2026-10-17
+review_trigger: API app composition, shared protocol owners, settings, routes, CORS, cache or lifecycle change
 ---
 
 # API App
@@ -17,6 +17,12 @@ that the Website and deployed stages use.
 `apps/api` owns process config, Bun server startup, request dispatch to
 `@taxkit/api-http/server` and graceful shutdown. API contracts, handlers,
 schemas, generated OpenAPI and docs routes stay in `packages/api/http`.
+Its `./routes` export owns public path constants and checked path families used
+by endpoint declarations, forwarding, cache policy and native admission.
+[`@taxkit/api-mcp`](../../packages/api/mcp/README.md) owns remote tool contracts,
+handlers, cancellation and reply budgets;
+[`@taxkit/publication`](../../packages/publication/README.md) owns discovery
+contracts and document generation. Native hosting remains in this app.
 
 Both API hosts provide `ContentService` from the generated public catalogue.
 `src/content.boundary.ts` imports only `@taxkit/docs-content/public-catalogue`
@@ -31,9 +37,10 @@ for the separate documentation revision and client.
 
 The native Worker also serves the four discovery documents at GET (and HEAD)
 `/api/v1/docs/discovery/sitemap.xml`, `/robots.txt`, `/llms.txt` and
-`/llms-full.txt`. It builds the static `ContentDiscoveryLive` once from that
-same catalogue, supplying `ContentDiscoverySettings` from its cached checked
-API and publication origins, so deferred native addresses are read on first
+`/llms-full.txt`. It builds the publication package's static
+`ContentDiscoveryLive` once from that same catalogue, supplying its
+`ContentDiscoverySettings` from the app's cached checked API and publication
+origins, so deferred native addresses are read on first
 use. A document is plain text or XML with `nosniff`; settings or projection
 failure is an empty 503. The Website forwards its own `/sitemap.xml`,
 `/robots.txt` and `/llms*.txt` requests here once. The standalone Bun host does
@@ -53,9 +60,13 @@ to the existing calculator and OpenAPI checks.
 
 ## Native Worker
 
-`src/worker.ts` declares native `TaxKitApiWorker` with the standard Alchemy
-class and `.make` entry. `src/worker.application.ts` constructs one router and
-shared `PublicCalculatorService` in the native instance scope. HTTP and
+`@taxkit/infrastructure/api-worker` declares the lightweight native
+`TaxKitApiWorker` identity and binding type. `src/worker.ts` supplies the
+native implementation and standalone `.make` entry. Root `alchemy.apps.ts`
+joins that implementation with deployment resources through the same native
+`.make` API. Infrastructure and the Website do not import this app.
+`src/worker.application.ts` constructs one router and shared
+`PublicCalculatorService` in the native instance scope. HTTP and
 POST `/rpc` delegate to the same calculator service. Its named RPC operations
 match all nine existing calculator-service calls using the canonical request/result contracts. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
@@ -77,9 +88,8 @@ the OpenAPI documents) without `Set-Cookie` gets
 `Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
 Health, calculation, RPC, MCP and every error reply get `no-store`.
 
-`src/edge-identity.boundary.ts` (export `api/edge-identity`) owns
-`CalculatorHostMode` and `calculatorEdgeRateKey`, which reads the checked
-`cf-connecting-ip` and refuses Worker subrequests. The Website's no-JavaScript
+`@taxkit/observability/edge-identity` owns `CalculatorHostMode` and
+`calculatorEdgeRateKey`, which reads the checked `cf-connecting-ip` and refuses Worker subrequests. The Website's no-JavaScript
 form host uses the same function.
 
 The Worker checks `API_PUBLIC_ORIGIN` and `TAXKIT_PUBLICATION_ORIGIN` with the
@@ -93,7 +103,8 @@ host routes), and allow `content-type`, the optional
 `x-taxkit-collection-policy` header and the native `b3`/`traceparent` tracing
 headers. Remote MCP admits Origin-less clients and browser pages served from
 the publication origin only: `TaxKitMcpHost` supplies that origin to the static
-`TaxKitMcpHttpLayer`, whose `allowedOrigins` holds just it.
+`TaxKitMcpHttpLayer` from `@taxkit/api-mcp/server`, whose `allowedOrigins`
+holds just it.
 Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
 produce an empty 503 response, without a guessed address.
@@ -108,15 +119,16 @@ and severity. Arbitrary messages, Causes, annotations and span labels are
 discarded before console output. This is bounded containment; it provides no
 native tracing or trace exporter.
 
-The infrastructure apps stack declares the API and Website and the Website's
-binding to the API; see [deployment](../../docs/architecture/deployment.md).
+Root native composition joins the API implementation with the infrastructure
+host graph, which declares the Website and its binding to the API; see
+[deployment](../../docs/architecture/deployment.md).
 Local plans and transport tests do not show a deployment works.
 
 ## Analytics candidate
 
-`src/calculator-analytics.layer.ts` adds one application owner after a native
-hosted calculation succeeds. It collects only the catalogue calculator ID and
-name. HTTP, native RPC and the two MCP protocols use this same decorator;
+`@taxkit/analytics/api-usage` owns the calculator analytics decorator, composed
+here after native hosted calculation succeeds. It collects only the catalogue
+calculator ID and name. HTTP, native RPC and the two MCP protocols use this same decorator;
 pure tax packages and local SDK calls have no analytics dependency. Metadata,
 failed or interrupted calculations add no successful-use event. A request can
 collect at most 64 successes; excess analytics are dropped without changing
@@ -343,14 +355,15 @@ curl -X POST https://api.taxkit.localhost/api/v1/calculators/au.pay.take-home/ca
 - `docs/product-specs/extract-api-app.md`
 
 
-The private `api/worker` app export supplies the native Worker class and instance
-composition to `@taxkit/infrastructure/apps-stack`. Its source, compiled runtime
-and declaration paths are explicit. The graph owns peer binding and addresses;
-the API app owns request handling and checked runtime configuration. This export
+The private `api/worker` app export supplies native instance composition to
+root `alchemy.apps.ts`. Its source, compiled runtime and declaration paths are
+explicit. The infrastructure graph owns the lightweight Worker identity, peer
+binding and addresses; root composition provides the app implementation. The
+API app owns request handling and checked runtime configuration. This export
 does not make a public package or change the existing HTTP/OpenAPI contract.
 
 `@taxkit/api-http/request-boundary` owns the native streamed POST limit
-(`@taxkit/api-rpc/request-boundary` re-exports it). `@taxkit/api-rpc/host-telemetry`
+(`@taxkit/api-rpc/request-boundary` re-exports it). `@taxkit/observability/host-telemetry`
 owns the same fixed logging/reporting policy used by the Website, and the one
 `taxkit.request` record each host writes per request. The API maps its paths to
 a closed route family (`health`, `calculate`, `catalogue`, `docs`,
@@ -359,10 +372,11 @@ binding are recorded too. The record never reads the URL, headers or either
 body. This reuse does not qualify native trace export or every framework
 logging path.
 
-The private `api/worker` export also owns `ApiWorkerObservability`, which
-disables platform invocation logs, stored logs and traces with zero sampling.
-Its default Worker and every non-Production stage of the native apps graph use
-it. Production exports console logs only, through the retained
+`@taxkit/infrastructure/worker-settings` owns `workerCompatibility` and
+`disabledWorkerObservability`, shared by both native hosts. The latter disables
+platform invocation logs, stored logs and traces with zero sampling. The API's
+default Worker and every non-Production stage of the native apps graph use it.
+Production exports console logs only, through the retained
 `taxkit-axiom-logs` destination; the
 [deployment owner](../../docs/architecture/deployment.md#observability) explains
 why invocation logs and traces stay off. Local graph/state checks establish the
@@ -402,9 +416,10 @@ Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-ap
 
 ## Native remote calculator tools
 
-The native Worker serves `/mcp` through installed Effect's
-`McpServer` and `Toolkit`. It composes modern protocol `2026-07-28` in the
-Worker and older protocol `2025-11-25` in an app-owned native Durable Object.
+The native Worker serves `/mcp` through the toolkit, handlers and server Layer
+owned by [`@taxkit/api-mcp`](../../packages/api/mcp/README.md), using installed
+Effect's `McpServer` and `Toolkit`. It composes modern protocol `2026-07-28`
+in the Worker and older protocol `2025-11-25` in an app-owned native Durable Object.
 The six tools list calculators, read an input Schema, calculate, read docs
 navigation, search docs and read a processed Markdown page. Both adapters use
 canonical calculator/content Schemas and the same service implementations as
@@ -415,7 +430,10 @@ An older client's first initialise has no version header; subsequent requests
 carry its native session ID and `2025-11-25` header. The installed adapter owns
 parsing, IDs, version agreement and cancellation matching. The native API selects
 the app-owned host; no copied parser or private session Map is added. The plain
-in-process composition remains modern-only.
+in-process composition remains modern-only. `src/mcp-session.layer.ts` owns
+Durable Object registration, protocol scope, expiry, trusted forwarding and
+per-request analytics. Shared tool Schemas, cancellation and response budgets
+stay in the MCP package.
 
 The older host uses one fixed-name object per stage and keeps at most 32
 initialisation attempts within a ten-minute host lifetime, plus 32 simultaneous
@@ -454,8 +472,12 @@ notification cannot cancel it. Modern in-process AbortSignal cancellation also
 works. On the pinned real Worker, an outgoing modern TCP abort stops the caller
 but pre-response calculation work remains until its five-second budget. The
 native modern HTTP adapter has no conversation binding for that notification.
-No flag-only workaround is accepted. The current contract preserves this
-five-second bound and does not promise prompt modern remote cleanup.
+No flag-only workaround is accepted. The native modern host registers a `WorkerExecutionContext.waitUntil` observer
+before running the bounded request and completes it when that handler exits.
+This keeps the invocation alive after a remote disconnect so Effect cleanup
+can release its calculation place at the existing five-second budget. The
+calculation stays in its original request fibre and scope; the observer runs
+no tax work. The contract does not promise prompt modern remote cleanup.
 
 The [agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx)
 documents both versions, all six remote tools, anonymous limits, exact browser
@@ -476,8 +498,8 @@ client must initialise and list tools. After real calculations, docs reads and
 32 conversations, local SQL inspection observes only native bookkeeping and the
 emulator's name table, with no application or key-value table.
 
-The native source builder discovers the SDK-generated class export inventory
-by memory-only compilation of the actual API declaration. All provider,
+The root-owned native source builder under `tools/apps-local` discovers the
+SDK-generated class export inventory by memory-only compilation of the actual API declaration. All provider,
 credential and network methods refuse; it runs no provider plan/apply. Local
 fixtures bind the genuine generated class in disposable namespaces. Merely
 adding an emulator binding is insufficient and previously returned 503.

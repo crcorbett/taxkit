@@ -1,28 +1,24 @@
 import "@tanstack/react-start/server-only";
 import type { NotFoundError } from "@tanstack/react-router";
 import { setResponseStatus } from "@tanstack/react-start/server";
-import { WebsiteHostTelemetryLive } from "@taxkit/api-rpc/host-telemetry";
+import { WebsiteAnalyticsRelayLive } from "@taxkit/analytics/relay/live";
+import { WebsiteHostTelemetryLive } from "@taxkit/observability/host-telemetry";
 import { env } from "cloudflare:workers";
-import {
-  Cause,
-  ConfigProvider,
-  Effect,
-  Layer,
-  ManagedRuntime,
-  Schema,
-} from "effect";
+import { Cause, ConfigProvider, Effect, Layer, ManagedRuntime } from "effect";
 import { FetchHttpClient } from "effect/http";
 
-import { WebsiteAnalyticsRelayLive } from "./analytics/relay/relay.adapter.layer";
 import type { WebsiteLoadError } from "./api/errors";
-import { WebsiteHost, WebsiteHostLive } from "./api/host.server";
-import { readCatalogue, readDocsPage, readDocsSearch } from "./api/requests";
+import { WebsiteApiLive } from "./api/host.server";
+import { readDocsPage, readDocsSearch } from "./api/requests";
 import { WebsiteBindings, websiteConfigProvider } from "./config.server";
 import { preloadDocsPresentation } from "./docs/mdx.boundary";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.boundary";
+import { WebsiteApi, WebsiteSettings } from "./host.service";
 import { loadFailureStatus, rejectRouteLoad } from "./load.failure";
-import { WebsiteDocsSearchView, WebsiteRootView } from "./schemas";
+import { loadRootView } from "./root.load.server";
+import { WebsiteDocsSearchView } from "./schemas";
 import type { WebsiteServerRenderContext } from "./schemas";
+import { WebsiteSettingsLive } from "./settings.server.layer";
 
 // The Worker's bindings object, read at this host edge only.
 const bindings = Layer.sync(WebsiteBindings, () => ({ ...env }));
@@ -32,7 +28,8 @@ const bindings = Layer.sync(WebsiteBindings, () => ({ ...env }));
 // supplies its own signal.
 export const runtime = ManagedRuntime.make(
   Layer.mergeAll(
-    WebsiteHostLive,
+    WebsiteApiLive,
+    WebsiteSettingsLive,
     WebsiteHostTelemetryLive,
     WebsiteAnalyticsRelayLive.pipe(
       Layer.provide(FetchHttpClient.layer),
@@ -54,7 +51,7 @@ const rejectServerLoad = <E>(
         Effect.andThen(rejectRouteLoad(cause))
       );
 
-const client = WebsiteHost.pipe(
+const client = WebsiteApi.pipe(
   Effect.flatMap((host) => Effect.fromResult(host.client))
 );
 
@@ -68,22 +65,7 @@ export const loadRoot = ({
   submission: WebsiteServerRenderContext["submission"];
 }>) =>
   runtime.runPromise(
-    Effect.gen(function* () {
-      const host = yield* WebsiteHost;
-      const settings = yield* Effect.fromResult(host.settings);
-      // The catalogue is optional page chrome; its absence is shown in place.
-      const catalogue = yield* client.pipe(
-        Effect.flatMap(readCatalogue),
-        Effect.option
-      );
-      return {
-        submission,
-        view: yield* Schema.encodeEffect(WebsiteRootView)({
-          catalogue,
-          settings,
-        }),
-      };
-    }).pipe(Effect.catchCause(rejectServerLoad)),
+    loadRootView(submission).pipe(Effect.catchCause(rejectServerLoad)),
     { signal }
   );
 
@@ -93,7 +75,7 @@ export const loadDocsPage = ({
 }: Readonly<{ path: string; signal: AbortSignal }>) =>
   runtime.runPromise(
     Effect.gen(function* () {
-      const host = yield* WebsiteHost;
+      const host = yield* WebsiteSettings;
       const settings = yield* Effect.fromResult(host.settings);
       const { navigation, page } = yield* readDocsPage(yield* client, path);
       yield* preloadDocsPresentation(page);

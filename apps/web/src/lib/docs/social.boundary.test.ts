@@ -1,9 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { DocsPublicPage } from "@taxkit/content/schemas";
-import {
-  exampleContentCatalogue,
-  exampleDiscoverySettings,
-} from "@taxkit/content/testing/fixtures";
+import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { exampleDiscoverySettings } from "@taxkit/publication/testing/fixtures";
 import { Array, Effect, Result, Schema } from "effect";
 
 import { WebsiteDocsImageBytes } from "../../../scripts/docs-images.schemas";

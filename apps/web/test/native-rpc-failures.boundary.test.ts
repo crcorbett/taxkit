@@ -10,6 +10,7 @@ import {
 } from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
+import { HostRequestRecord } from "@taxkit/observability/host-telemetry";
 import {
   Array,
   Cause,
@@ -19,6 +20,7 @@ import {
   Fiber,
   FileSystem,
   Layer,
+  LogLevel,
   Match,
   Option,
   Path,
@@ -44,6 +46,16 @@ import {
 const apiOrigin = "http://127.0.0.1:4199";
 const websiteOrigin = "http://127.0.0.1:4200";
 const Json = Schema.fromJsonString(Schema.Unknown);
+// Decode the sanitised runtime envelope, including safe failure reports. Checked
+// host request records are distinct and must not count as work finalisers.
+const NativeRuntimeLog = Schema.fromJsonString(
+  Schema.Struct({
+    event: Schema.Literal("api.runtime.event"),
+    level: Schema.Literals(LogLevel.values),
+    service: Schema.Literal("taxkit-api"),
+    timestamp: Schema.String,
+  })
+);
 // Unknown wire fields belong to this adversarial fixture only.
 const NativeRequestFixture = Schema.TaggedStruct("Request", {
   headers: Schema.Unknown,
@@ -527,6 +539,7 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     const workApiOrigin = "http://127.0.0.1:4204";
     const workWebsiteOrigin = "http://127.0.0.1:4205";
     const logs = yield* Queue.make<WorkerdStructuredLog>();
+    const allLogs = yield* Queue.make<WorkerdStructuredLog>();
     const workers = yield* Effect.forEach(
       [
         {
@@ -623,7 +636,18 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
           new Miniflare({
             cf: false,
             handleStructuredLogs: (log) => {
-              Queue.offerUnsafe(logs, log);
+              Queue.offerUnsafe(allLogs, log);
+              // Request-ready telemetry is independent of injected work
+              // start/finalisation. Preserve every record for privacy checks.
+              if (
+                Option.isNone(
+                  Schema.decodeUnknownOption(
+                    Schema.fromJsonString(HostRequestRecord)
+                  )(log.message)
+                )
+              ) {
+                Queue.offerUnsafe(logs, log);
+              }
             },
             host: "127.0.0.1",
             port: 4204,
@@ -720,13 +744,10 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     // by the real host logger. Wait for eight reached operations, not a delay.
     yield* Effect.forEach(Array.range(1, 8), () =>
       Queue.take(logs).pipe(
-        Effect.flatMap((log) => Schema.encodeEffect(Json)(log.message)),
-        Effect.tap((text) =>
-          Effect.sync(() => {
-            expect(text).toContain("Warn");
-            expect(text).not.toContain("PRIVATE9");
-          })
-        )
+        Effect.flatMap((log) =>
+          Schema.decodeUnknownEffect(NativeRuntimeLog)(log.message)
+        ),
+        Effect.tap((log) => Effect.sync(() => expect(log.level).toBe("Warn")))
       )
     ).pipe(
       Effect.raceFirst(
@@ -830,12 +851,16 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     }
     const capturedLogs = yield* Queue.clear(logs);
     const messages = yield* Effect.forEach(capturedLogs, (log) =>
-      Schema.encodeEffect(Json)(log.message)
+      Schema.decodeUnknownEffect(NativeRuntimeLog)(log.message)
     );
+    // Eight concurrent operations plus the later generated-client call must
+    // each finalise; request-ready telemetry cannot satisfy this count.
     expect(
-      Array.filter(messages, (message) => message.includes("Info"))
+      Array.filter(messages, (message) => message.level === "Info")
     ).toHaveLength(9);
-    const captured = yield* Schema.encodeEffect(Json)(capturedLogs);
+    const captured = yield* Schema.encodeEffect(Json)(
+      yield* Queue.clear(allLogs)
+    );
     expect(captured).not.toContain("PRIVATE9");
     expect(captured).not.toContain("165400");
     const metadataStarted = yield* Clock.monotonicTimeNanos;
@@ -862,13 +887,10 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     );
     yield* Effect.forEach(Array.range(1, 2), () =>
       Queue.take(logs).pipe(
-        Effect.flatMap((log) => Schema.encodeEffect(Json)(log.message)),
-        Effect.tap((message) =>
-          Effect.sync(() => {
-            expect(message).toContain("Warn");
-            expect(message).not.toContain("PRIVATE9");
-          })
-        )
+        Effect.flatMap((log) =>
+          Schema.decodeUnknownEffect(NativeRuntimeLog)(log.message)
+        ),
+        Effect.tap((log) => Effect.sync(() => expect(log.level).toBe("Warn")))
       )
     );
     const metadataResponse = yield* Fiber.join(metadataHttp);
@@ -892,18 +914,16 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
     expect(metadataElapsed).toBeLessThan(8000);
     const metadataLogs = yield* Queue.clear(logs);
     const metadataMessages = yield* Effect.forEach(metadataLogs, (log) =>
-      Schema.encodeEffect(Json)(log.message)
+      Schema.decodeUnknownEffect(NativeRuntimeLog)(log.message)
     );
     expect(
-      Array.filter(metadataMessages, (message) => message.includes("Info"))
+      Array.filter(metadataMessages, (message) => message.level === "Info")
     ).toHaveLength(2);
-    expect(
-      Array.every(
-        metadataMessages,
-        (message) =>
-          !message.includes("PRIVATE9") && !message.includes("165400")
-      )
-    ).toBe(true);
+    const metadataCaptured = yield* Schema.encodeEffect(Json)(
+      yield* Queue.clear(allLogs)
+    );
+    expect(metadataCaptured).not.toContain("PRIVATE9");
+    expect(metadataCaptured).not.toContain("165400");
   }).pipe(
     Effect.timeout("25 seconds"),
     Effect.scoped,

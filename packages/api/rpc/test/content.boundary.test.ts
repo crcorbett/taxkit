@@ -1,17 +1,15 @@
 import { describe, expect, it } from "@effect/vitest";
 import { DocsSourceError } from "@taxkit/content/errors";
-import { ContentDiscoveryLive, ContentServiceLive } from "@taxkit/content/live";
+import { ContentServiceLive } from "@taxkit/content/live";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
+import { ContentCatalogue, ContentService } from "@taxkit/content/service";
+import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { ContentDiscoveryLive } from "@taxkit/publication/live";
 import {
-  ContentCatalogue,
   ContentDiscovery,
   ContentDiscoverySettings,
-  ContentService,
-} from "@taxkit/content/service";
-import {
-  exampleContentCatalogue,
-  exampleDiscoverySettings,
-} from "@taxkit/content/testing/fixtures";
+} from "@taxkit/publication/service";
+import { exampleDiscoverySettings } from "@taxkit/publication/testing/fixtures";
 import {
   Array,
   Cause,

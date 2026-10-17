@@ -1,38 +1,24 @@
 import { NodeCrypto } from "@effect/platform-node";
+import { ApiCalculatorAnalyticsLive } from "@taxkit/analytics/api-usage";
 import { BackendAnalyticsLive } from "@taxkit/analytics/live";
 import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/admission.layer";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import { CalculationEngineLive } from "@taxkit/core";
+import { TaxKitApiWorker } from "@taxkit/infrastructure/api-worker";
+import {
+  disabledWorkerObservability,
+  workerCompatibility,
+} from "@taxkit/infrastructure/worker-settings";
 import { RateLimitBinding, Worker, cache } from "alchemy/Cloudflare/Workers";
-import type { InferEnv } from "alchemy/Cloudflare/Workers";
-import type { HttpEffect } from "alchemy/Http";
 import { Config, ConfigProvider, Effect, Layer } from "effect";
 import { FetchHttpClient } from "effect/http";
 
 import { ApiCalculatorDeliveryLive } from "./analytics-request.boundary.js";
-import { ApiCalculatorAnalyticsLive } from "./calculator-analytics.layer.js";
 import { ApiContentLive } from "./content.boundary.js";
 import { McpSessionHostLive } from "./mcp-session.layer.js";
 import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
 import { ApiWorkerApplication } from "./worker.application.js";
-
-export { CalculatorHostMode } from "./edge-identity.boundary.js";
-
-// Platform invocation records and automatic traces include URLs outside the
-// fixed app logger. Every stage but Production keeps the platform channels
-// off; the infrastructure graph gives Production checked console logs only.
-export const ApiWorkerObservability = {
-  enabled: false,
-  headSamplingRate: 0,
-  logs: {
-    enabled: false,
-    headSamplingRate: 0,
-    invocationLogs: false,
-    persist: false,
-  },
-  traces: { enabled: false, headSamplingRate: 0, persist: false },
-} as const;
 
 const ApiWorkerServicesLive = Layer.merge(
   ApiContentLive,
@@ -85,29 +71,12 @@ export const ApiWorkerNativeInit = Effect.gen(function* () {
   )
 );
 
-export class TaxKitApiWorker extends Worker<
-  TaxKitApiWorker,
-  {
-    readonly fetch: HttpEffect;
-    readonly calculatorRequest: Effect.Success<
-      typeof ApiWorkerApplication
-    >["calculatorRequest"];
-  }
->()("TaxKitApi") {}
-
-export type TaxKitApiBinding = InferEnv<{
-  readonly TAXKIT_API: typeof TaxKitApiWorker;
-}>["TAXKIT_API"];
-
 export default TaxKitApiWorker.make(
   {
-    compatibility: {
-      date: "2026-10-04",
-      flags: ["nodejs_compat"],
-    },
+    compatibility: workerCompatibility,
     env: { API_PUBLIC_ORIGIN: Worker.URL },
     main: import.meta.url,
-    observability: ApiWorkerObservability,
+    observability: disabledWorkerObservability,
     workersDev: true,
   },
   ApiWorkerNativeInit

@@ -13,7 +13,7 @@
         "alchemy.axiom.run.ts!",
         "alchemy.trace.run.ts!"
       ],
-      "project": ["alchemy.run.ts!"]
+      "project": ["alchemy*.ts!"]
     },
     "apps/api": {
       "entry": ["src/index.ts!", "src/worker.ts!"],
@@ -152,8 +152,7 @@
         "src/live.layer.ts!",
         "src/schemas.ts!",
         "src/errors.ts!",
-        "src/request-boundary.ts!",
-        "src/host-telemetry.ts!"
+        "src/request-boundary.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
     },
@@ -186,6 +185,32 @@
         "src/live.layer.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
+    },
+    "packages/publication": {
+      "entry": [
+        "src/schemas.ts!",
+        "src/errors.ts!",
+        "src/service.ts!",
+        "src/live.layer.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
+    },
+    "packages/observability": {
+      "entry": ["src/host-telemetry.ts!", "src/edge-identity.boundary.ts!"],
+      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
+    },
+    "packages/api/mcp": {
+      "entry": [
+        "src/tools.ts!",
+        "src/handlers.layer.ts!",
+        "src/service.ts!",
+        "src/server.ts!",
+        "src/schemas.ts!",
+        "src/request.service.ts!",
+        "src/cancellation.boundary.ts!",
+        "src/response-budget.boundary.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
     }
   },
   "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]
