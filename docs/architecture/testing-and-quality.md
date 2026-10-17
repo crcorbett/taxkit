@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: test command, check coverage, native test or deployment check change
 ---
 
@@ -84,3 +84,9 @@ timeout without understanding the failure.
 - [Frontend](./frontend.md)
 - [Deployment](./deployment.md)
 - [Tooling standard](../standards/tooling.md)
+
+The strict-policy vendor [provenance](../../tools/oxlint/vendor/strict-effect/README.md)
+records the local Effect 4.0.2 AST-identity and Match-factory corrections.
+`native-request-rules.test.ts` exercises both factory spellings through the real
+CLI and a large cyclic host AST; no production or test Layer-factory exemption
+is introduced.
