@@ -59,6 +59,7 @@ lifecycle; migrate it only when its owner is materially revised.
 | Checks and quality | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md) | What `bun run verification` covers and which focused checks to run. |
 | References | [`references/README.md`](references/README.md) | Revalidate mutable external guidance. |
 | Local release evidence | [`2026-10-17 strict-review release`](evidence/releases/2026-10-17-strict-review-local-release.md) | Dated production observation; not current provider state or policy. |
+| Structure preview evidence | [`2026-10-17 structure preview`](evidence/releases/2026-10-17-structure-preview-release.md) | Dated preview deployment and verification of structure-review findings 5–11. |
 | Audit/accounting | [`documentation-audit/README.md`](documentation-audit/README.md) | Dated evidence, not policy. |
 
 Dated evidence and completed plans stay in Git as history. They are not inputs
