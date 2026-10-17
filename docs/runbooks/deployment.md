@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: Alchemy stack, stage, Doppler config, deployment command, deploy workflow or public check change
 ---
 
@@ -73,9 +73,10 @@ state.
 
 ## Check the deployment
 
-1. Note both Worker version IDs from the deploy output.
-2. Load the Website, a docs page and its `.md` page; calculate with and without
-   JavaScript.
+1. Note both active Worker version IDs from Cloudflare deployment readback;
+   the native deploy summary may omit them.
+2. Load the Website, a docs page and its `.md` page; calculate at `/` with
+   and without JavaScript. The take-home form posts to `/`.
 3. Check `https://www.taxkit.dev/<path>?<query>` returns a 301 to the same path
    and query on `taxkit.dev`.
 4. Check API CORS from a browser page on another origin: public GETs and the
@@ -194,11 +195,12 @@ doppler configs tokens create github-preview-actions --project taxkit --config s
 doppler configs tokens create github-production-actions --project taxkit --config prd --access read --max-age <hours>h --plain | gh secret set DOPPLER_TOKEN --env production --repo crcorbett/taxkit
 ```
 
-GitHub Actions currently cannot start jobs for this repository because of the
-account's billing and spending limit, and these secrets do not exist yet. Until
-both change, deploy with the local commands above. A local Production apply
-must run only while the Production workflow is idle; GitHub concurrency does
-not lock a local terminal.
+Check current workflow runs and environment configuration before selecting the
+release path; dated billing or secret-availability observations are not a
+current gate. Use the local commands above when the maintainer requests a local
+release or a current runner limitation prevents CI from starting. A local
+Production apply must run only while the Production workflow is idle; GitHub
+concurrency does not lock a local terminal.
 
 ## Rollback
 
