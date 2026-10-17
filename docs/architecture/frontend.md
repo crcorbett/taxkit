@@ -82,8 +82,11 @@ Vite exposes no ambient public env prefix or build-time API address.
 relay, discovery files (forwarded once to the API), the no-JavaScript
 calculator form POSTs and an empty 404 for `/_serverFn`. Every reply then gets
 one cache decision from `applyCachePolicy` in
-`@taxkit/api-http/response-policy`: only successful public GET/HEAD replies are
-shared; everything else is `no-store`.
+`@taxkit/api-http/response-policy`: public GET/HEAD replies and their Accept-only
+negotiation answers may be shared. Handler lifetimes and revalidation rules are
+preserved; cookie-bearing responses and storage restrictions prevent sharing.
+The [HTTP package response policy](../../packages/api/http/README.md#response-policy)
+owns the defaults and exceptions.
 
 ## Decoding and composition boundaries
 
