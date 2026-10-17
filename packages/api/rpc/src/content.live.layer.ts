@@ -1,8 +1,6 @@
-import type {
-  DocsDiscoveryPath,
-  DocsPagePath,
-  DocsSearchTerm,
-} from "@taxkit/content/schemas";
+import { rpcPath } from "@taxkit/api-http/routes";
+import type { DocsPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
+import type { DocsDiscoveryPath } from "@taxkit/publication/schemas";
 import { Array, Effect, Layer, Schema } from "effect";
 import type { Scope } from "effect";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
@@ -152,7 +150,7 @@ export const DocsRpcClientLive = Layer.effect(
         Effect.map(([client, origin]) =>
           client.pipe(
             HttpClient.mapRequest(
-              HttpClientRequest.setUrl(new URL("/rpc", origin).href)
+              HttpClientRequest.setUrl(new URL(rpcPath, origin).href)
             ),
             boundedRpcHttpClient
           )

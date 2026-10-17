@@ -41,6 +41,12 @@ validation, but it is not published yet.
 - [packages/calculators](./packages/calculators/README.md): reusable public
   calculator orchestration package for catalog metadata, graph construction,
   calculation dispatch and schema-guided expected error shaping.
+- [packages/api/mcp](./packages/api/mcp/README.md): native MCP tool contracts,
+  handlers, cancellation and response budgets.
+- [packages/publication](./packages/publication/README.md): bounded discovery
+  documents derived from the accepted Content catalogue and HTTP routes.
+- [packages/observability](./packages/observability/README.md): shared safe host
+  telemetry and edge identity, independent of deployment providers.
 - [packages/sdk/typescript](./packages/sdk/typescript/README.md): private
   TypeScript SDK package with plain, safe-result, Effect and AU entrypoints.
 - [packages/docs-content](./packages/docs-content/README.md): private

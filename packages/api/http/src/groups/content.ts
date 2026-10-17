@@ -13,6 +13,7 @@ import {
   OpenApi,
 } from "effect/http-api";
 
+import { docsPaths } from "../routes.js";
 import { DocsPageUnavailable, DocsSearchUnavailable } from "../schemas.js";
 
 export { DocsPageUnavailable, DocsSearchUnavailable } from "../schemas.js";
@@ -30,7 +31,7 @@ const SearchError = DocsSearchUnavailable.pipe(
 
 export class ContentApiGroup extends HttpApiGroup.make("content")
   .add(
-    HttpApiEndpoint.get("getNavigation", "/navigation", {
+    HttpApiEndpoint.get("getNavigation", docsPaths.navigation, {
       success: DocsPublicNavigation,
     }).annotate(
       OpenApi.Description,
@@ -38,7 +39,7 @@ export class ContentApiGroup extends HttpApiGroup.make("content")
     )
   )
   .add(
-    HttpApiEndpoint.get("getPage", "/page", {
+    HttpApiEndpoint.get("getPage", docsPaths.page, {
       error: PageError,
       query: DocsPageQuery,
       success: DocsPublicPage,
@@ -48,7 +49,7 @@ export class ContentApiGroup extends HttpApiGroup.make("content")
     )
   )
   .add(
-    HttpApiEndpoint.get("searchPages", "/search", {
+    HttpApiEndpoint.get("searchPages", docsPaths.search, {
       error: SearchError,
       query: DocsSearchQuery,
       success: Schema.Array(DocsSearchResult),
@@ -58,7 +59,7 @@ export class ContentApiGroup extends HttpApiGroup.make("content")
     )
   )
   .add(
-    HttpApiEndpoint.get("getMarkdown", "/markdown", {
+    HttpApiEndpoint.get("getMarkdown", docsPaths.markdown, {
       error: PageError,
       query: DocsPageQuery,
       success: Schema.String.pipe(
@@ -69,5 +70,4 @@ export class ContentApiGroup extends HttpApiGroup.make("content")
       "Read processed public Markdown, with resolved links and without executable MDX. This route does not return personal calculation reports."
     )
   )
-  .prefix("/api/v1/docs")
   .annotate(OpenApi.Title, "Public documentation") {}

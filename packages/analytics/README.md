@@ -9,8 +9,8 @@ review_trigger: analytics event, settings, service, export, transport or privacy
 
 # `@taxkit/analytics`
 
-Private compiled contracts for the accepted page visit and successful hosted
-calculator events. The current backend Layer sends only the catalogue ID and
+Private compiled analytics contracts, browser relay policy and successful hosted
+calculator usage decoration. The current backend Layer sends only the catalogue ID and
 name, fixed application/stage labels, an event UUID and timestamp. It never
 accepts tax inputs, results, browser identity, request URLs or request headers.
 Tax rule packages and local SDK calculations do not depend on this package.
@@ -25,6 +25,10 @@ Tax rule packages and local SDK calculations do not depend on this package.
 - `./service`: public Effect service contract.
 - `./live`: production Layer; compose only at an application/runtime boundary.
 - `./test`: deterministic contract-level test Layer.
+- `./relay/schemas`, `./relay/errors`, `./relay/service`: bounded relay metadata,
+  failures and native HTTP service contract.
+- `./relay/live`: static production relay Layer with checked Config.
+- `./api-usage`: calculator service decorator and request-owned event collector.
 - `./testing/fixtures`: narrow test fixtures.
 - `./testing/observations`: narrow test observation types.
 
@@ -40,11 +44,28 @@ no UUID. `accepted` means a successful HTTP response; stored provider events
 require separate readback.
 
 The browser contract is shared so the Website adapter can keep its SDK private.
-That adapter and the Website relay remain T008 work in progress. The
-[API application owner](../../apps/api/README.md#analytics-candidate) adds the
-single successful-use operation; its actual native transport checks remain
-separate from this package's tests. A test Layer is substitution proof, not SDK
-or browser privacy proof.
+`WebsiteAnalyticsRelayLive` reads the same checked analytics collection/stage
+settings and, only when enabled, `WEBSITE_PUBLIC_ORIGIN` using Content's owning
+origin Schema. The Website supplies its native ConfigProvider and HTTP client;
+the package never imports app bindings or constructs a runner. The relay admits
+only same-origin POSTs to `/ingest/e/`, the qualified JSON/text media types and
+bounded retry counter. It forwards unchanged bytes once to the fixed US host,
+strips caller headers and restricts provider response headers. Both complete
+bodies are limited to 64 KiB within one five-second scoped operation; denied
+collection reads no body and makes no request. This opaque transport does not
+validate event payloads or decompress them; the browser event contract owns the
+financial-input exclusion.
+
+`ApiCalculatorAnalyticsLive` decorates the supplied calculator service after a
+successful checked result. `ApiCalculatorEvents` is an optional request-owned
+collector, limited to 64 allowed events. Metadata, failed calculations, denied
+collection and calls without a collector produce no event. The decorator
+preserves calculation results/errors and records only checked catalogue ID/name
+and collection policy. The [API host](../../apps/api/README.md#analytics-candidate)
+owns collection-header ingress, collector lifetime and delivery through native
+`waitUntil`; native MCP registration must not retain request collectors. The
+Website owns relay execution and its native request lifecycle. A test Layer is
+substitution proof, not SDK or browser privacy proof.
 
 ## Documentation impact
 
@@ -52,7 +73,9 @@ Change required: this README, the repository
 [package ownership](../../docs/architecture/package-ownership.md),
 [Effect boundary owner](../../docs/architecture/effect-services.md) and
 [active plan](../../docs/exec-plans/active/common-practice-foundation-review.md)
-route these contracts and pending application work. Preserve: tax Schemas,
+route these package capabilities and application composition. The focused relay
+boundary tests move with their policy; API request integration tests continue to
+exercise the package decorator through the host collector. Preserve: tax Schemas,
 results, HTTP and SDK contracts, and published public documentation. This versioned private package follows the
 [Changeset rules](../../docs/standards/versioning.md); package-facing changes
 include their own Changeset outside the public tax/SDK release group.

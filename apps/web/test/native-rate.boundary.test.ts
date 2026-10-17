@@ -5,8 +5,8 @@ import {
   CalculatorRpcVersion,
 } from "@taxkit/api-rpc/schemas";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
+import type { TaxKitApiWorker } from "@taxkit/infrastructure/api-worker";
 import { toRpcAsync } from "alchemy/Cloudflare/Bridge";
-import type { TaxKitApiWorker } from "api/worker";
 import {
   Array,
   Clock,

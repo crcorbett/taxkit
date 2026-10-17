@@ -15,6 +15,7 @@ import {
   CalculatorRateLimited,
   CalculationQuery,
 } from "@taxkit/calculators/schemas";
+import { calculatorEdgeRateKey } from "@taxkit/observability/edge-identity";
 import { RateLimit } from "alchemy/Cloudflare/Workers";
 import {
   Array,
@@ -37,7 +38,6 @@ import {
 } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
-import { calculatorEdgeRateKey } from "../src/edge-identity.boundary.js";
 import { ApiCalculatorAdmission } from "../src/worker-admission.layer.js";
 import { ApiWorkerInit } from "../src/worker.js";
 

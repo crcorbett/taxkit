@@ -33,15 +33,6 @@ export class DocsSearchUnavailable extends Schema.TaggedError<DocsSearchUnavaila
   }
 ) {}
 
-export class DocsDiscoveryUnavailable extends Schema.TaggedError<DocsDiscoveryUnavailable>()(
-  "DocsDiscoveryUnavailable",
-  {
-    message: Schema.Literal(
-      "Documentation discovery is temporarily unavailable."
-    ),
-  }
-) {}
-
 export class DocsPageNotFoundError extends Schema.TaggedError<DocsPageNotFoundError>()(
   "DocsPageNotFoundError",
   {

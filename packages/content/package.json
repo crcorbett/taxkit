@@ -43,6 +43,11 @@
       "source": "./src/__testing__/observations.ts",
       "types": "./dist/__testing__/observations.d.ts",
       "default": "./dist/__testing__/observations.js"
+    },
+    "./response-check": {
+      "source": "./src/response-check.ts",
+      "types": "./dist/response-check.d.ts",
+      "default": "./dist/response-check.js"
     }
   },
   "publishConfig": {
@@ -62,6 +67,10 @@
       "./live": {
         "types": "./dist/live.layer.d.ts",
         "default": "./dist/live.layer.js"
+      },
+      "./response-check": {
+        "types": "./dist/response-check.d.ts",
+        "default": "./dist/response-check.js"
       }
     },
     "access": "public"

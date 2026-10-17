@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "kind": "effect-service",
+  "packageName": "@taxkit/observability",
+  "domainPackage": null,
+  "sourceCondition": "source",
+  "versionSnapshot": {
+    "resolvedAt": "2026-10-17",
+    "sha256": "dc01af810f49869dbcb9440caa29f925b1d518b7bd7c4e54c8bd686d57b2c99b"
+  },
+  "officialSources": {
+    "effect": "https://www.npmjs.com/package/effect/v/4.0.2"
+  },
+  "selectedVersions": {
+    "effect": "4.0.2",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3",
+    "@effect/vitest": "4.0.2"
+  },
+  "compatibilityDecisions": [
+    {
+      "status": "qualified",
+      "decision": "Installed Effect 4.0.2 and native Alchemy beta81 APIs checked against local declarations; runtime support consumes Effect only."
+    },
+    {
+      "status": "qualified",
+      "decision": "Adapt the canonical Effect-service renderer to TaxKit compiled runtime support: repository source condition and catalogue dependencies, existing root TypeScript configuration, focused host identity and observation exports with no ceremonial service contract. Installed Effect 4.0.2 typecheck/build and four controlled privacy/event/edge admission tests pass."
+    }
+  ],
+  "configDigests": {
+    "package.json": "0d40771856f41fa6b3240a55d7ee544a238b4f11eca41b13739768a16bf0c73b",
+    "tsconfig.json": "89330beddb9118c14591ce205a7be8d39d42264daa40a589966d92ffdb770938",
+    "tsconfig.build.json": "044f58d619deef8e2416a1fce0a3418879aac27f2aa5d70b245a4c774acac230",
+    "vitest.config.ts": "c81a2a24fc321eaa98816ca4b8e42bd601c6406b7bd48d3e8a5bd450dcc2faeb"
+  },
+  "limitations": [
+    "Structural rendering does not prove installed dependency, declaration, runtime, or packed-consumer behavior.",
+    "The native Alchemy class and binding types are deployment-only infrastructure exports. Source-only provider settings are outside this package; package tests do not establish native bundle contents or remote ingestion."
+  ],
+  "nonClaims": ["Selected versions are not claimed to remain latest."],
+  "scaffoldConfigDigests": {
+    "package.json": "89f16d8eab39649ea732e4e74bf103036b303c3b5dc28a79d4c4d8dd12f6fe04",
+    "tsconfig.json": "4f2c3f083ff132f078933a88a2ad9109f11dd17ac2b7c2e013d31a728796b558",
+    "tsconfig.build.json": "320b70b4115224df6a42038a8759a444d0feecabb0666c22a519904a1e9b9de9",
+    "vitest.config.ts": "8167d20931f3f88793a6253697dad0c2dc7a519ca7d4ec8aea6c2ffc9f1448b7"
+  }
+}

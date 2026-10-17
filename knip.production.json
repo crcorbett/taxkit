@@ -152,8 +152,7 @@
         "src/live.layer.ts!",
         "src/schemas.ts!",
         "src/errors.ts!",
-        "src/request-boundary.ts!",
-        "src/host-telemetry.ts!"
+        "src/request-boundary.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
     },

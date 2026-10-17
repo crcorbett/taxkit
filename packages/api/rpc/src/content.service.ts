@@ -1,12 +1,14 @@
 import type {
-  DocsDiscoveryDocument,
-  DocsDiscoveryPath,
   DocsPagePath,
   DocsPublicNavigation,
   DocsPublicPage,
   DocsSearchResult,
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
+import type {
+  DocsDiscoveryDocument,
+  DocsDiscoveryPath,
+} from "@taxkit/publication/schemas";
 import { Context } from "effect";
 import type { Effect } from "effect";
 

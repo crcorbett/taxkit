@@ -1,4 +1,5 @@
-import { ContentDiscovery, ContentService } from "@taxkit/content/service";
+import { ContentService } from "@taxkit/content/service";
+import { ContentDiscovery } from "@taxkit/publication/service";
 import { Effect } from "effect";
 
 import {

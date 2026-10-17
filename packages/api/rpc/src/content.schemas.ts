@@ -1,8 +1,5 @@
-import {
-  DocsDiscoveryPath,
-  DocsPublicPagePath,
-  DocsSearchTerm,
-} from "@taxkit/content/schemas";
+import { DocsPublicPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
+import { DocsDiscoveryPath } from "@taxkit/publication/schemas";
 import { Duration, Schema, SchemaGetter } from "effect";
 
 export const DocsRpcVersion = "2";

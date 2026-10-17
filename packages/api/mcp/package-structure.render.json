@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "kind": "effect-service",
+  "packageName": "@taxkit/api-mcp",
+  "domainPackage": null,
+  "sourceCondition": "source",
+  "versionSnapshot": {
+    "resolvedAt": "2026-10-08",
+    "sha256": "2ce9417b53cf769d7c595aa9f0300fde2ab25877c3dd394607a1d9923c92245e"
+  },
+  "officialSources": {
+    "npmRegistry": "https://registry.npmjs.org/",
+    "effect": "https://www.npmjs.com/package/effect",
+    "tanstackStart": "https://www.npmjs.com/package/@tanstack/react-start",
+    "alchemy": "https://www.npmjs.com/package/alchemy",
+    "alchemyCloudflare": "https://v2.alchemy.run/cloudflare/",
+    "cloudflareWorkers": "https://developers.cloudflare.com/workers/"
+  },
+  "selectedVersions": {
+    "@oxlint/plugins": "1.85.0",
+    "effect": "4.0.2",
+    "@effect/platform-bun": "4.0.2",
+    "@effect/platform-node": "4.0.2",
+    "@effect/vitest": "4.0.2",
+    "@tanstack/react-start": "1.168.57",
+    "@tanstack/react-router": "1.170.38",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.2",
+    "vitest": "5.0.3",
+    "turbo": "2.11.2",
+    "oxlint": "1.85.0",
+    "oxfmt": "0.70.0",
+    "knip": "6.37.0",
+    "bun": "1.4.2",
+    "@changesets/cli": "2.31.1",
+    "@types/bun": "1.4.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "alchemy": "2.0.0-beta.81",
+    "@effect/atom-react": "4.0.2"
+  },
+  "compatibilityDecisions": [
+    {
+      "id": "effect-ecosystem",
+      "status": "qualified",
+      "decision": "Use exact stable Effect 4.0.2 across the ecosystem with native Alchemy 2.0.0-beta.81. Keep React 19.3.0; its scheduler 0.28 remains outside atom-react's declared peer range, so build and browser-lifecycle qualification remain required.",
+      "evidence": "Generated service, RPC and HTTP API packages and the full repository fixture are qualified by installation, typecheck, tests and builds. This refresh changes Effect and Alchemy only; the other exact selections retain the prior qualified snapshot."
+    },
+    {
+      "id": "tanstack-start",
+      "status": "qualified",
+      "decision": "Select Start and Router independently and disable verbatimModuleSyntax at the app boundary for this snapshot.",
+      "evidence": "The rendered TanStack app fixture is the compatibility oracle."
+    },
+    {
+      "id": "alchemy-cloudflare",
+      "status": "qualified",
+      "decision": "Use Alchemy 2.0.0-beta.81 with explicit native Doppler, optional .env and disabled shell sources. Deploy the native API and Website.Vite in one same-stage stack.",
+      "evidence": "The generated split fixture must install, typecheck, test and build, including the native API entry and browser preflight; no provider deployment is implied."
+    }
+  ],
+  "configDigests": {
+    "package.json": "eaeb70cc884b33ddcf477191405d8a1a6a899089996eeafc85cc88f3a1cae688",
+    "tsconfig.json": "d6ff2031891c11e64e335f72ba07787615e93b4ef1e6eb54f07be29b34edd1f9",
+    "tsconfig.build.json": "044f58d619deef8e2416a1fce0a3418879aac27f2aa5d70b245a4c774acac230",
+    "vitest.config.ts": "c81a2a24fc321eaa98816ca4b8e42bd601c6406b7bd48d3e8a5bd450dcc2faeb"
+  },
+  "limitations": [
+    "Structural rendering does not prove installed dependency, declaration, runtime, or packed-consumer behavior."
+  ],
+  "nonClaims": ["Selected versions are not claimed to remain latest."],
+  "originalScaffoldConfigDigests": {
+    "package.json": "3afb7e37d06c8560a388a9c079403348238fdaee14f703044a52397cba86e9f2",
+    "tsconfig.json": "71596163cd8ffea16eb4950049bc772ec8a8e2db408759c80bc8232aa40a6d99",
+    "tsconfig.build.json": "320b70b4115224df6a42038a8759a444d0feecabb0666c22a519904a1e9b9de9",
+    "vitest.config.ts": "8167d20931f3f88793a6253697dad0c2dc7a519ca7d4ec8aea6c2ffc9f1448b7"
+  },
+  "adaptation": {
+    "date": "2026-10-17",
+    "role": "tool-transport",
+    "scope": "MCP toolkit, service-backed handlers, host contract/server Layer, private request cancellation and response budgets over existing TaxKit calculator/content contracts. Removed generated replica domain service/live/test fixtures.",
+    "proof": "2026-10-17 local checks: package typecheck/build, six reply-budget/cancellation tests, ten official-client API tests, focused lint, and source/default consumer probes (six tools in each mode). Website native-pair tests remain the complete legacy session/host oracle.",
+    "limitations": "Canonical validator requires effect-service domain scaffold; role is narrower. No deployed/provider/publication claim."
+  }
+}

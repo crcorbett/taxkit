@@ -29,6 +29,7 @@ import {
   OpenApi,
 } from "effect/http-api";
 
+import { calculatorPaths } from "../routes.js";
 import {
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
@@ -115,25 +116,26 @@ const CalculatorParams = Schema.Struct({
 
 const GetJurisdictionsEndpoint = HttpApiEndpoint.get(
   "getJurisdictions",
-  "/jurisdictions",
+  calculatorPaths.jurisdictions,
   {
     error: CalculatorApiTimeoutEnvelope,
     success: JurisdictionsResponse,
   }
 ).annotate(OpenApi.Description, "List supported public API jurisdictions.");
 
-const GetTaxYearsEndpoint = HttpApiEndpoint.get("getTaxYears", "/tax-years", {
-  error: CalculatorApiTimeoutEnvelope,
-  query: MetadataQuery,
-  success: TaxYearsResponse,
-}).annotate(
-  OpenApi.Description,
-  "List supported tax years for a jurisdiction."
-);
+const GetTaxYearsEndpoint = HttpApiEndpoint.get(
+  "getTaxYears",
+  calculatorPaths.taxYears,
+  {
+    error: CalculatorApiTimeoutEnvelope,
+    query: MetadataQuery,
+    success: TaxYearsResponse,
+  }
+).annotate(OpenApi.Description, "List supported tax years for a jurisdiction.");
 
 const ListCalculatorsEndpoint = HttpApiEndpoint.get(
   "listCalculators",
-  "/calculators",
+  calculatorPaths.calculators,
   {
     error: CalculatorApiTimeoutEnvelope,
     query: MetadataQuery,
@@ -143,7 +145,7 @@ const ListCalculatorsEndpoint = HttpApiEndpoint.get(
 
 const GetCalculatorEndpoint = HttpApiEndpoint.get(
   "getCalculator",
-  "/calculators/:calculatorId",
+  calculatorPaths.calculator,
   {
     error: CalculatorApiMetadataErrorEnvelopes,
     params: CalculatorParams,
@@ -154,7 +156,7 @@ const GetCalculatorEndpoint = HttpApiEndpoint.get(
 
 const GetCalculatorSchemaEndpoint = HttpApiEndpoint.get(
   "getCalculatorSchema",
-  "/calculators/:calculatorId/schema",
+  calculatorPaths.schema,
   {
     error: CalculatorApiMetadataErrorEnvelopes,
     params: CalculatorParams,
@@ -168,7 +170,7 @@ const GetCalculatorSchemaEndpoint = HttpApiEndpoint.get(
 
 const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
   "getCalculatorGraph",
-  "/calculators/:calculatorId/graph",
+  calculatorPaths.graph,
   {
     error: CalculatorApiMetadataErrorEnvelopes,
     params: CalculatorParams,
@@ -182,7 +184,7 @@ const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
 
 const CalculateEndpoint = HttpApiEndpoint.post(
   "calculate",
-  "/calculators/:calculatorId/calculate",
+  calculatorPaths.calculate,
   {
     error: CalculatorApiErrorEnvelopes,
     params: CalculatorParams,
@@ -195,20 +197,28 @@ const CalculateEndpoint = HttpApiEndpoint.post(
   "Run one public calculator using canonical scenario decoding and rule-pack layers."
 );
 
-const ListFactsEndpoint = HttpApiEndpoint.get("listFacts", "/facts", {
-  error: CalculatorApiTimeoutEnvelope,
-  query: DescriptorFilterQuery,
-  success: FactsResponse,
-}).annotate(
+const ListFactsEndpoint = HttpApiEndpoint.get(
+  "listFacts",
+  calculatorPaths.facts,
+  {
+    error: CalculatorApiTimeoutEnvelope,
+    query: DescriptorFilterQuery,
+    success: FactsResponse,
+  }
+).annotate(
   OpenApi.Description,
   "List canonical fact descriptors, optionally filtered by calculator context."
 );
 
-const ListRulesEndpoint = HttpApiEndpoint.get("listRules", "/rules", {
-  error: CalculatorApiTimeoutEnvelope,
-  query: DescriptorFilterQuery,
-  success: RulesResponse,
-}).annotate(
+const ListRulesEndpoint = HttpApiEndpoint.get(
+  "listRules",
+  calculatorPaths.rules,
+  {
+    error: CalculatorApiTimeoutEnvelope,
+    query: DescriptorFilterQuery,
+    success: RulesResponse,
+  }
+).annotate(
   OpenApi.Description,
   "List canonical rule descriptors, optionally filtered by calculator context."
 );
@@ -223,5 +233,4 @@ export class CalculatorApiGroup extends HttpApiGroup.make("calculatorApi")
   .add(CalculateEndpoint)
   .add(ListFactsEndpoint)
   .add(ListRulesEndpoint)
-  .prefix("/api/v1")
   .annotate(OpenApi.Title, "Calculator API") {}

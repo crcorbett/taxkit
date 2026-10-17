@@ -1,3 +1,4 @@
+import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
 import { collectionPolicyFromHeaders } from "@taxkit/analytics/collection-policy";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
 import { BackendAnalytics } from "@taxkit/analytics/service";
@@ -9,8 +10,6 @@ import type { HttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import { Context, Effect, Layer, Option, Ref } from "effect";
 import { HttpServerRequest } from "effect/http";
-
-import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";
 
 // Native host composition supplies capture. An in-process or local host
 // deliberately has no background delivery; it must not borrow another runtime.

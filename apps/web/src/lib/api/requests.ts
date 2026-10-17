@@ -5,6 +5,7 @@ import {
   DocsPageUnavailable,
   DocsSearchUnavailable,
 } from "@taxkit/content/errors";
+import { isRequestedDocsPage } from "@taxkit/content/response-check";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import type { DocsPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
@@ -22,6 +23,7 @@ import {
   WebsiteApiResponseTooLarge,
   WebsiteApiUnavailable,
   WebsiteCalculationFailure,
+  WebsiteDocsPageMismatch,
 } from "./errors";
 import type { WebsiteApiFailure } from "./errors";
 
@@ -56,13 +58,19 @@ export const readDocsPage = (client: TaxKitClient, address: string) =>
       Effect.all(
         {
           navigation: client.content.getNavigation(),
-          page: client.content.getPage({ query: { path } }),
+          page: client.content.getPage({ query: { path } }).pipe(
+            Effect.filterOrFail(
+              (page) => isRequestedDocsPage(path, page),
+              () => new WebsiteDocsPageMismatch()
+            )
+          ),
         },
         { concurrency: 2 }
       ).pipe(
         Effect.timeout(websiteApiDeadline),
         Effect.mapError((error) =>
-          Schema.is(DocsPageUnavailable)(error)
+          Schema.is(DocsPageUnavailable)(error) ||
+          Schema.is(WebsiteDocsPageMismatch)(error)
             ? error
             : transportFailure(error)
         )

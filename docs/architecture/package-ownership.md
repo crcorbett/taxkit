@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -22,26 +22,23 @@ Current implemented code lives in:
 
 - `apps/api`
 - `apps/web`
-- `packages/core`
+- `packages/analytics`
+- `packages/api/http`
+- `packages/api/mcp`
+- `packages/api/rpc`
 - `packages/calculators`
 - `packages/content`
-- `packages/analytics`
+- `packages/core`
 - `packages/docs-content`
 - `packages/docs-examples`
 - `packages/docs-fumadocs`
-- `packages/api/http`
-- `packages/api/rpc`
-: Private compiled native Effect RPC transport for machine callers. It owns
-  separately versioned calculator and documentation procedures, thin named
-  service handlers, checked POST/JSON ingress and checked client Layers used by
-  tests and machine callers. Calculator/content Schemas remain with their
-  existing owners. Explicit test-only composition is separate; no app runtime
-  or backend fallback belongs here.
-
-`packages/sdk/typescript`
+- `packages/infrastructure`
+- `packages/observability`
+- `packages/publication`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
+- `packages/sdk/typescript`
 - `packages/testing`
 - `packages/tsconfig`
 
@@ -155,8 +152,31 @@ and the native Alchemy Worker. The native instance owns one router and
 calculator service; incoming requests own body limits, dispatch and cleanup.
 HTTP, RPC and MCP share the named calculator service operations; the Worker
 also serves the discovery documents and the trusted `calculatorRequest`
-binding method. The private `api/worker` export supplies native composition to
-the infrastructure graph, and `api/edge-identity` owns edge caller identity.
+binding method. The private `api/worker` export supplies native implementation
+to root `alchemy.apps.ts`; infrastructure owns the lightweight Worker declaration
+and shared settings. `@taxkit/observability/edge-identity` owns shared edge caller
+identity. Neither an app nor a package depends on another app.
+
+`packages/observability`
+: Private compiled, provider-free owner of shared host request records, safe
+  loggers and edge identity policy. API, Website and infrastructure dashboards
+  consume its named exports; machine RPC does not own host telemetry.
+
+`packages/api/mcp`
+: Private compiled MCP transport owner: tool contracts, handlers, request
+  cancellation and response budgets over domain services. Native session storage,
+  dispatch and app lifecycle remain in the API app.
+
+`packages/api/rpc`
+: Private compiled machine RPC transport with versioned calculator/documentation
+  procedures, thin handlers and checked client Layers. Domain Schemas stay with
+  Content, calculators and Publication; runtime composition remains app-owned.
+
+`packages/publication`
+: Private compiled discovery owner. `ContentDiscovery` and its static live/test
+  Layers derive four documents from Content and checked publication/API settings.
+  It consumes HTTP route constants for links; Content never imports HTTP and HTTP
+  never imports Publication, keeping the dependency graph acyclic.
 
 `packages/content`
 : Private compiled owner of canonical docs page/navigation contracts, source
@@ -166,18 +186,17 @@ the infrastructure graph, and `api/edge-identity` owns edge caller identity.
   owner does not perform source acceptance or compile MDX. HTTP and native RPC
   content groups consume this compiled contract instead of the source-only
   Fumadocs collection. The public path refinement and fixed page/search errors
-  have one owner here. `ContentDiscovery` and its separate live/test composition
-  derive the four discovery documents from the same catalogue and deferred
-  checked API and publication origins (`ContentDiscoverySettings`). Shared
-  public-origin policy lives in its Schema owner; RPC retains a distinct API
-  identity.
+  have one owner here. `./response-check` correlates an already-decoded page with
+  its requested path. Shared public-origin policy lives in its Schema owner;
+  RPC retains a distinct API identity.
 
 `packages/analytics`
 : Private compiled owner of checked page/calculator events, collection policy,
   settings, safe errors and named browser/backend service contracts. Its native
   backend capture Layer has one bounded HTTP attempt. The application owns
-  execution, best-effort delivery and successful-use placement; the Website
-  owns its private browser SDK and relay; infrastructure owns retained provider
+  execution and best-effort delivery. Analytics owns the calculator usage decorator
+  and bounded relay; the Website owns its private browser SDK and mounts the relay.
+  Infrastructure owns retained provider
   projects. Calculators, rules and the local SDK have no analytics dependency.
   T008 application and provider qualification remain in progress; package tests
   alone do not prove browser privacy or ingestion.
@@ -264,8 +283,9 @@ belongs in apps or explicitly server-only package exports.
 
 
 `@taxkit/infrastructure` owns the native app graph and root secret selection
-through explicit source-only exports. It consumes the
-API's named app export rather than reaching through a workspace filesystem
-path. Engine, HTTP and RPC packages have no infrastructure dependency. The API
-app retains ownership of native request/instance behaviour; root composition
-retains provider and state selection.
+through explicit source-only exports. It has no application dependency. Root
+`alchemy.apps.ts` joins the graph and the API's named implementation export;
+the native Worker declaration and common compatibility settings live in deployment-only
+exports. Engine, HTTP, RPC, MCP, analytics and observability packages have no
+infrastructure dependency. The API app retains native request/instance behaviour;
+root composition retains provider and state selection.

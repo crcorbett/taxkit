@@ -2,8 +2,9 @@ import { describe, expect, it } from "@effect/vitest";
 import { Effect, Layer, Option, Result, Schema } from "effect";
 import { Headers, HttpServerRequest, HttpServerResponse } from "effect/http";
 
-import { WebsiteHost } from "../api/host.server";
+import { WebsiteApiConfigError } from "../api/errors";
 import { TaxKitWebConfigError } from "../config";
+import { WebsiteApi, WebsiteSettings } from "../host.service";
 import { WebsiteDocsAccept } from "../schemas";
 import { withDocsRepresentation } from "./markdown.response.server";
 
@@ -103,10 +104,12 @@ describe("documentation HTML response headers", () => {
         )
       ),
       Effect.provide(
-        Layer.mock(WebsiteHost, {
-          client: Result.fail(unconfigured),
-          settings: Result.fail(unconfigured),
-        })
+        Layer.mergeAll(
+          Layer.mock(WebsiteApi, {
+            client: Result.fail(new WebsiteApiConfigError()),
+          }),
+          Layer.mock(WebsiteSettings, { settings: Result.fail(unconfigured) })
+        )
       ),
       Effect.scoped,
       Effect.tap((response) =>

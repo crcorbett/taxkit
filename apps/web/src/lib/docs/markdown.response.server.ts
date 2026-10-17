@@ -3,16 +3,16 @@ import type { HttpEffect } from "alchemy/Http";
 import { Array, Effect, Match, Option, Result, Schema } from "effect";
 import { Headers, HttpServerRequest, HttpServerResponse } from "effect/http";
 
-import { WebsiteHost } from "../api/host.server";
 import { readDocsMarkdown } from "../api/requests";
+import { WebsiteApi, WebsiteSettings } from "../host.service";
 import { WebsiteDocsAccept } from "../schemas";
 
 // This named HTTP policy composes the native HTML Effect, not a client callback.
 // It owns only documentation representation selection and its response headers.
 // The host retains its single runner, native-function admission and request scope.
 export const withDocsRepresentation = (
-  html: HttpEffect<WebsiteHost>
-): HttpEffect<WebsiteHost> =>
+  html: HttpEffect<WebsiteApi | WebsiteSettings>
+): HttpEffect<WebsiteApi | WebsiteSettings> =>
   Effect.gen(function* websiteDocsRepresentation() {
     const incoming = yield* HttpServerRequest.HttpServerRequest;
     const url = new URL(incoming.originalUrl);
@@ -98,10 +98,11 @@ export const withDocsRepresentation = (
         status: 400,
       });
     }
-    const host = yield* WebsiteHost;
+    const api = yield* WebsiteApi;
+    const host = yield* WebsiteSettings;
     return yield* Effect.gen(function* websiteDocsMarkdown() {
       const settings = yield* Effect.fromResult(host.settings);
-      const client = yield* Effect.fromResult(host.client);
+      const client = yield* Effect.fromResult(api.client);
       const markdown = yield* readDocsMarkdown(client, docsPath.success);
       // The host's one cache decision adds the cache headers.
       const headers = {

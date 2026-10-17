@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -21,6 +21,15 @@ handler adapters, the shared browser CORS and cache policy, and an in-process
 calculator schemas, catalog entries, metadata projections, graph construction,
 calculation dispatch and schema-guided expected error shaping live in
 `@taxkit/calculators`.
+
+`./routes` owns transport path constants and Schema families for the native
+HTTP declaration, reference endpoints, RPC, MCP and discovery addresses. Cache
+eligibility admits only checked calculator identifiers and exact public read
+paths. Worker classification and trusted calculation admission, Website
+discovery forwarding, and [Publication](../../publication/README.md) links use
+that catalogue. OpenAPI coverage tests require every declared endpoint to belong
+to one data family and give each path its expected cache eligibility. Authored
+page identities remain in Content and Website file routes remain in the app.
 
 The root export includes `HealthResponse`, the same Schema used by the health
 endpoint. The API app's smoke check uses this owner to validate the real health

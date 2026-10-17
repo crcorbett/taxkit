@@ -1,15 +1,15 @@
 import {
-  DocsDiscoveryUnavailable,
   DocsPageUnavailable,
   DocsSearchUnavailable,
 } from "@taxkit/content/errors";
+import { DocsDiscoveryUnavailable } from "@taxkit/publication/errors";
 import { Schema } from "effect";
 
 export {
-  DocsDiscoveryUnavailable,
   DocsPageUnavailable,
   DocsSearchUnavailable,
 } from "@taxkit/content/errors";
+export { DocsDiscoveryUnavailable } from "@taxkit/publication/errors";
 
 export class DocsRpcVersionMismatch extends Schema.TaggedError<DocsRpcVersionMismatch>()(
   "DocsRpcVersionMismatch",

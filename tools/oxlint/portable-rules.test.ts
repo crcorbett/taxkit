@@ -179,7 +179,7 @@ const fixtureCases = [
       "apps/web/src/lib/calculator.atoms.ts",
       "apps/web/src/lib/loaders.ts",
       "apps/web/src/lib/calculator.boundary.browser.test.tsx",
-      "apps/web/scripts/native-pair-build.runtime.ts",
+      "tools/apps-local/native-pair-build.runtime.ts",
       // native-pair takes over a minute to lint alone; `bun run lint` covers it.
       "apps/web/test/native-settings-failure.boundary.test.ts",
       "apps/web/test/native-rpc-failures.boundary.test.ts",
@@ -1006,7 +1006,7 @@ test.each([
   "apps/web/vite.config.ts",
   "apps/web/src/lib/runtime.server.ts",
   "apps/web/src/lib/runtime.client.ts",
-  "apps/web/scripts/native-pair-build.runtime.ts",
+  "tools/apps-local/native-pair-build.runtime.ts",
   "apps/web/src/server.ts",
   "apps/api/src/index.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
@@ -1834,14 +1834,14 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "packages/infrastructure/src/apps-stack.test.ts",
+      path: "tools/infrastructure/apps-stack.test.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/apps-stack.test.ts",
+      path: "tools/infrastructure/apps-stack.test.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
@@ -1862,21 +1862,21 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/api/src/edge-identity.boundary.ts",
+      path: "packages/observability/src/edge-identity.boundary.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/api/src/edge-identity.boundary.ts",
+      path: "packages/observability/src/edge-identity.boundary.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/api/src/edge-identity.boundary.ts",
+      path: "packages/observability/src/edge-identity.boundary.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
@@ -1967,7 +1967,7 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/api/src/mcp.tools.layer.ts",
+      path: "packages/api/mcp/src/handlers.layer.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
@@ -1995,7 +1995,7 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/api/src/mcp-request.service.ts",
+      path: "packages/api/mcp/src/request.service.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
@@ -2104,14 +2104,14 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/api/src/mcp.tools.layer.ts",
+      path: "packages/api/mcp/src/handlers.layer.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "apps/api/src/mcp.tools.layer.ts",
+      path: "packages/api/mcp/src/handlers.layer.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:

@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-infrastructure-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: Alchemy resource, stage, provider, state, or package-export change
 ---
 
@@ -14,12 +14,14 @@ rules, native secret selection, the retained PostHog project and the
 production-only telemetry stacks. Root `alchemy.run.ts` deploys the pair;
 `alchemy.local.run.ts` runs it locally; `alchemy.posthog.run.ts` owns the
 PostHog project; `alchemy.axiom.run.ts` and `alchemy.trace.run.ts` own the
-Axiom and Cloudflare telemetry resources. The package has no application
-runtime.
+Axiom and Cloudflare telemetry resources. Root `alchemy.apps.ts` joins the lightweight native declaration with the API
+implementation; this package imports no application implementation.
 
 | Export | Owns |
 | --- | --- |
-| `./apps-stack` | `declareNativeAppsStack`: `TaxKitApi`, `TaxKitWebsite` and, in `prod`, the retained zone, DNS settings and zone settings (`productionZoneSettings`). |
+| `./apps-stack` | `declareNativeAppsInfrastructure` declares retained Production resources; `declareNativeAppsHosts` declares the Website using a supplied API Worker; `nativeApiHostProps` owns native API deployment settings. |
+| `./api-worker` | Lightweight `TaxKitApiWorker` declaration and native-derived `TaxKitApiBinding`, including the private `calculatorRequest` capability. |
+| `./worker-settings` | Shared compatibility date/flags and `disabledWorkerObservability` policy. |
 | `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. |
 | `./stage` | Stage Schemas: `prod`, `pr-<number>` and `dev_<name>`. |
 | `./posthog` | The retained PostHog project stack. |
@@ -28,14 +30,17 @@ runtime.
 | `./trace-export` | `declareTaxKitTraceExport`: the retained log and trace destinations. |
 
 Run `bun run --filter=@taxkit/infrastructure test` and `bun run check-types`
-for local declaration checks. They use memory state and refuse provider writes;
+for local declaration checks. The root graph proof is `tools/infrastructure/apps-stack.test.ts`, run with
+`bun run test:tools`. These checks use memory state and refuse provider writes;
 they do not plan against Cloudflare or deploy. See the
 [deployment architecture](../../docs/architecture/deployment.md) and
 [deployment runbook](../../docs/runbooks/deployment.md).
 
 ## Website/API graph
 
-The API is declared first from the `api/worker` export. The Website receives
+Root `alchemy.apps.ts` composes `TaxKitApiWorker.make` with the API-owned
+`ApiWorkerNativeInit` and its `api/worker` entry. The infrastructure package owns
+the lightweight native declaration without importing the app. The Website receives
 the API's address Output and the private `TAXKIT_API` binding. Each host binds
 its own address with native `Worker.URL`; absent addresses stay null and fail
 the application's checked Config instead of being guessed. Both receive the
@@ -47,7 +52,7 @@ includes the shared packages so content changes rebuild it. In `prod` both
 Workers export console logs only, at sampling rate 1, to the
 `taxkit-axiom-logs` destination read from `TaxKitTraceExport/prod`; invocation
 logs, Cloudflare persistence and traces stay off. Every other stage disables
-all platform channels with `ApiWorkerObservability`.
+all platform channels with `disabledWorkerObservability`.
 
 `NativeAppsHostMode` defaults to `edge`. The API's admission Layer registers one
 60-per-60-second RateLimit binding and reads `CALCULATOR_RATE_NAMESPACE` through
@@ -97,7 +102,7 @@ resource:
   `site-prod-traces` and `site-prod-metrics`) and four retained dashboards.
   Dashboard queries read only TaxKit's records in `site-prod-logs`, filtered
   by the `taxkit-api` and `taxkit-web` services, with the names
-  `@taxkit/api-rpc/host-telemetry` emits. Its output is the dashboard count.
+  `@taxkit/observability/host-telemetry` emits. Its output is the dashboard count.
 - `TaxKitTraceExport` declares the retained `taxkit-axiom-logs` and
   `taxkit-axiom-traces` destinations. Each reads the token through
   `Axiom.ApiToken.ref` and sends it as a bearer header with `X-Axiom-Dataset`.

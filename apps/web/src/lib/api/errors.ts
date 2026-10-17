@@ -34,6 +34,21 @@ export class WebsiteApiResponseTooLarge extends Schema.TaggedError<WebsiteApiRes
   }
 ) {}
 
+// API binding/configuration fails independently of public Website settings.
+export class WebsiteApiConfigError extends Schema.TaggedError<WebsiteApiConfigError>()(
+  "WebsiteApiConfigError",
+  { message: Schema.tag("TaxKit API settings are missing or invalid.") }
+) {}
+
+export class WebsiteDocsPageMismatch extends Schema.TaggedError<WebsiteDocsPageMismatch>()(
+  "WebsiteDocsPageMismatch",
+  {
+    message: Schema.tag(
+      "The documentation reply did not match the requested page."
+    ),
+  }
+) {}
+
 // A reply that does not match the request it answers.
 export class WebsiteApiMismatch extends Schema.TaggedError<WebsiteApiMismatch>()(
   "WebsiteApiMismatch",
@@ -47,6 +62,7 @@ export const WebsiteApiFailure = Schema.Union([
   WebsiteApiDeadlineExceeded,
   WebsiteApiResponseTooLarge,
   WebsiteApiMismatch,
+  WebsiteApiConfigError,
 ]);
 export type WebsiteApiFailure = typeof WebsiteApiFailure.Type;
 

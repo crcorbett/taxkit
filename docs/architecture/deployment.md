@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: Alchemy graph, stage, provider resource, state, domain, cache or rollback change
 ---
 
@@ -16,11 +16,14 @@ This owner describes the deployed resources and their boundaries. The
 
 `alchemy.run.ts` declares the `TaxKitAppsCloudflare` stack with Cloudflare
 providers, `Cloudflare.state()` and the native secrets in
-`@taxkit/infrastructure/secrets`. `@taxkit/infrastructure/apps-stack` declares:
+`@taxkit/infrastructure/secrets`. Root `alchemy.apps.ts` composes the app
+implementation with the lightweight `@taxkit/infrastructure/api-worker` declaration
+and `./worker-settings`. `@taxkit/infrastructure/apps-stack` declares infrastructure
+and host props without importing an app. Together these declare:
 
 | Resource | Owner | Notes |
 | --- | --- | --- |
-| `TaxKitApi` | native Effect Worker from `api/worker` | Its own address from `Worker.URL`. Production serves only `api.taxkit.dev`, with no `workers.dev` address; other stages keep the native `workers.dev` default. |
+| `TaxKitApi` | `@taxkit/infrastructure/api-worker` identity; `api/worker` implementation | Its own address from `Worker.URL`. Production serves only `api.taxkit.dev`, with no `workers.dev` address; other stages keep the native `workers.dev` default. |
 | `TaxKitWebsite` | `Cloudflare.Website.Vite` for `apps/web` | Its own address from `Worker.URL`; the API's address Output and the private `TAXKIT_API` binding. Production serves only `taxkit.dev`, with a native `www.taxkit.dev` redirect and no `workers.dev` address; other stages use their stable `workers.dev` address. No stage has version preview addresses. |
 | `TaxKitProductionZone` | adopted and retained in `prod` only | Never created, replaced or deleted by the stack. |
 | `TaxKitProductionDnsSettings` | retained in `prod` only | Matches the 7 October readback; registrar and records are not managed. |

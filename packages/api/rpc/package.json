@@ -55,11 +55,6 @@
       "types": "./dist/request-boundary.d.ts",
       "default": "./dist/request-boundary.js"
     },
-    "./host-telemetry": {
-      "source": "./src/host-telemetry.ts",
-      "types": "./dist/host-telemetry.d.ts",
-      "default": "./dist/host-telemetry.js"
-    },
     "./content/group": {
       "source": "./src/content.group.ts",
       "types": "./dist/content.group.d.ts",
@@ -138,6 +133,7 @@
     "@taxkit/api-http": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
+    "@taxkit/publication": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

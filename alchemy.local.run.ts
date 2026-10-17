@@ -1,10 +1,9 @@
-import {
-  declareNativeAppsStack,
-  NativeAppsHostMode,
-} from "@taxkit/infrastructure/apps-stack";
+import { NativeAppsHostMode } from "@taxkit/infrastructure/apps-stack";
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import { Config, ConfigProvider, Effect } from "effect";
+
+import { declareNativeAppsStack } from "./alchemy.apps.js";
 
 // Local development only: the native Website/API pair in local emulation with
 // local state. It cannot select cloud state, Doppler or a deployed stage.

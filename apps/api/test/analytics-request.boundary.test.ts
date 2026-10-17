@@ -1,4 +1,8 @@
 import { expect, it } from "@effect/vitest";
+import {
+  ApiCalculatorAnalyticsLive,
+  ApiCalculatorEvents,
+} from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
 import {
@@ -13,10 +17,6 @@ import { Array, Cause, Effect, Exit, Layer, Option, Ref } from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
-import {
-  ApiCalculatorAnalyticsLive,
-  ApiCalculatorEvents,
-} from "../src/calculator-analytics.layer.js";
 
 const AnalyticsCalculatorLive = ApiCalculatorAnalyticsLive.pipe(
   Layer.provide(CalculatorLive)

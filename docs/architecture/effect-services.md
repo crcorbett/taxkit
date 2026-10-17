@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-17
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -23,7 +23,7 @@ request and maps transport failures to safe errors. The exact encoder admission
 in `oxlint.config.ts` covers that provider egress and its safe error-byte test;
 it does not admit runtime execution, raw JSON or decoding in neighbouring code.
 The package’s collection-header boundary is reused by the API and Website.
-The private `WebsiteAnalyticsRelay` exposes one native request handler with
+The analytics package’s private `WebsiteAnalyticsRelay` exposes one native request handler with
 checked failures and no service requirements escaping its caller. Its named
 adapter captures native HttpClient once, decodes metadata at that explicit
 boundary, forwards bounded complete bytes, and owns each request scope and
@@ -247,8 +247,10 @@ Effects against the same fully provided service graph. Do not create a
 per-operation helpers.
 
 The Website owns one server `ManagedRuntime` (`runtime` in
-`apps/web/src/lib/runtime.server.ts`) with `WebsiteHostLive`, which builds
-Effect's generated `HttpApiClient` for `TaxKitApi` over the private binding. In
+`apps/web/src/lib/runtime.server.ts`) with independent `WebsiteSettingsLive` and
+`WebsiteApiLive` Layers. Only the API Layer builds Effect's generated `HttpApiClient`
+for `TaxKitApi` over the private binding. Settings and binding failures remain
+independent; root loading requires settings and treats catalogue reads as optional. In
 the browser, `ApiClient` is an `AtomHttpApi.Service` whose runtime comes from
 `browserRuntime.factory`; one `AtomRegistry` is created before loaders run and
 shared with React. Browser loaders run through one Promise bridge
@@ -541,10 +543,10 @@ with its own revision/error vocabulary and per-call resource scope. Only the
 concrete closed JSON byte reader is shared with the calculator client; no raw
 client callback or provider object enters either service contract.
 
-The native API composes the static `ContentDiscoveryLive` once from the
+The native API composes the publication package’s static `ContentDiscoveryLive` once from the
 checked catalogue and supplies its existing cached settings Effect as
 `ContentDiscoverySettings` (`Layer.succeed(ContentDiscoverySettings)(...)`).
-Configuration remains application-owned; the content capability lazily reads
+Configuration remains application-owned; the publication capability lazily reads
 checked addresses and returns one bounded document for a closed file identity.
 `ContentDiscovery` is contract-only; the live and observed test Layers remain
 separate. The API serves each document on its discovery HTTP route and the
@@ -573,7 +575,7 @@ lint selectors admit these crossings only; adjacent route/rendering modules
 retain their restrictions.
 
 
-Native MCP tools use `Toolkit.toLayer` and `McpServer.toolkit`; no replacement
+The `@taxkit/api-mcp` package owns native tools and uses `Toolkit.toLayer` and `McpServer.toolkit`; no replacement
 registry or package runner is introduced. Current HTTP cancellation enters via
 an app-private `Context.Reference<Option<AbortSignal>>`. The named lifetime
 operation races tool work against an Effect callback for the native stop event.

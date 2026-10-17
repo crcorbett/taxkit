@@ -1,20 +1,13 @@
 import { Array, Effect, Layer, Ref } from "effect";
 
 import type { ContentObservations } from "./__testing__/observations.js";
-import { ContentDiscoveryLive, ContentServiceLive } from "./live.layer.js";
+import { ContentServiceLive } from "./live.layer.js";
 import type {
-  DocsDiscoveryPath,
-  DocsDiscoverySettings,
   DocsPagePath,
   DocsPublicCatalogue,
   DocsSearchTerm,
 } from "./schemas.js";
-import {
-  ContentCatalogue,
-  ContentDiscovery,
-  ContentDiscoverySettings,
-  ContentService,
-} from "./service.js";
+import { ContentCatalogue, ContentService } from "./service.js";
 
 export const makeContentTest = Effect.fnUntraced(function* (
   catalogue: DocsPublicCatalogue
@@ -51,36 +44,5 @@ export const makeContentTest = Effect.fnUntraced(function* (
       })
     ),
     observations,
-  };
-});
-
-export const makeContentDiscoveryTest = Effect.fnUntraced(function* (
-  catalogue: DocsPublicCatalogue,
-  settings: DocsDiscoverySettings
-) {
-  const service = yield* ContentDiscovery.pipe(
-    Effect.provide(
-      ContentDiscoveryLive.pipe(
-        Layer.provide(
-          Layer.succeed(ContentDiscoverySettings)(Effect.succeed(settings))
-        ),
-        Layer.provide(Layer.succeed(ContentCatalogue, catalogue))
-      )
-    )
-  );
-  const requestedDocuments = yield* Ref.make<readonly DocsDiscoveryPath[]>([]);
-  return {
-    layer: Layer.succeed(
-      ContentDiscovery,
-      ContentDiscovery.of({
-        getDocument: Effect.fn("ContentDiscovery.getDocument")(
-          function* (path) {
-            yield* Ref.update(requestedDocuments, Array.append(path));
-            return yield* service.getDocument(path);
-          }
-        ),
-      })
-    ),
-    observations: { requestedDocuments },
   };
 });

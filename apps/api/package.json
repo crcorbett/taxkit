@@ -9,11 +9,6 @@
       "source": "./src/worker.ts",
       "types": "./dist/worker.d.ts",
       "default": "./dist/worker.js"
-    },
-    "./edge-identity": {
-      "source": "./src/edge-identity.boundary.ts",
-      "types": "./dist/edge-identity.boundary.d.ts",
-      "default": "./dist/edge-identity.boundary.js"
     }
   },
   "scripts": {
@@ -31,11 +26,15 @@
     "@effect/platform-node": "catalog:",
     "@taxkit/analytics": "workspace:*",
     "@taxkit/api-http": "workspace:*",
+    "@taxkit/api-mcp": "workspace:*",
     "@taxkit/api-rpc": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
     "@taxkit/docs-content": "workspace:*",
+    "@taxkit/infrastructure": "workspace:*",
+    "@taxkit/observability": "workspace:*",
+    "@taxkit/publication": "workspace:*",
     "alchemy": "catalog:",
     "effect": "catalog:"
   },

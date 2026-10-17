@@ -1,3 +1,4 @@
+import type { CalculatorHostMode } from "@taxkit/observability/edge-identity";
 import { adopt } from "alchemy/AdoptPolicy";
 import { BotManagement } from "alchemy/Cloudflare/BotManagement";
 import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
@@ -7,23 +8,22 @@ import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import * as Output from "alchemy/Output";
 import { retain } from "alchemy/RemovalPolicy";
 import { Stage } from "alchemy/Stage";
-import type { CalculatorHostMode } from "api/worker";
-import {
-  ApiWorkerNativeInit,
-  ApiWorkerObservability,
-  TaxKitApiWorker,
-} from "api/worker";
 import { Context, Effect, Option } from "effect";
 
+import { TaxKitApiWorker } from "./api-worker.js";
 import { checkedStage } from "./secrets.js";
 import { taxKitLogsDestinationProduction } from "./telemetry.js";
+import {
+  disabledWorkerObservability,
+  workerCompatibility,
+} from "./worker-settings.js";
 
 export const NativeAppsHostMode = Context.Reference<CalculatorHostMode>(
   "@taxkit/infrastructure/NativeAppsHostMode",
   { defaultValue: () => "edge" }
 );
 
-const NativeProductionZone = Context.Reference<Option.Option<Zone>>(
+export const NativeProductionZone = Context.Reference<Option.Option<Zone>>(
   "@taxkit/infrastructure/NativeProductionZone",
   { defaultValue: Option.none }
 );
@@ -99,41 +99,30 @@ const productionObservability = Effect.gen(function* () {
   };
 });
 
-const compatibility = {
-  date: "2026-10-04",
-  flags: ["nodejs_compat"],
-};
-
 // The API is declared first and knows nothing of the Website. Its version
 // scoped cache is declared in its native init (`Cloudflare.cache`).
-const NativeApiHostLive = TaxKitApiWorker.make(
-  Effect.gen(function* () {
-    return {
-      // Production serves only api.taxkit.dev, as in Common Practice; other
-      // stages keep the native workers.dev default.
-      ...Option.match(yield* NativeProductionZone, {
-        onNone: () => ({ workersDev: true }),
-        onSome: (zone) => ({
-          domain: { name: "api.taxkit.dev", zoneId: zone.zoneId },
-          workersDev: false,
-        }),
+export const nativeApiHostProps = Effect.gen(function* () {
+  return {
+    // Production serves only api.taxkit.dev, as in Common Practice; other
+    // stages keep the native workers.dev default.
+    ...Option.match(yield* NativeProductionZone, {
+      onNone: () => ({ workersDev: true }),
+      onSome: (zone) => ({
+        domain: { name: "api.taxkit.dev", zoneId: zone.zoneId },
+        workersDev: false,
       }),
-      compatibility,
-      env: {
-        API_PUBLIC_ORIGIN: Worker.URL,
-        CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
-        TAXKIT_PUBLICATION_ORIGIN: publicationOrigin,
-      },
-      // The app export owns its native entry; the graph crosses the workspace
-      // through that export rather than a relative filesystem import.
-      main: import.meta.resolve("api/worker"),
-      observability: Option.isSome(yield* NativeProductionZone)
-        ? yield* productionObservability
-        : ApiWorkerObservability,
-    };
-  }),
-  ApiWorkerNativeInit
-);
+    }),
+    compatibility: workerCompatibility,
+    env: {
+      API_PUBLIC_ORIGIN: Worker.URL,
+      CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
+      TAXKIT_PUBLICATION_ORIGIN: publicationOrigin,
+    },
+    observability: Option.isSome(yield* NativeProductionZone)
+      ? yield* productionObservability
+      : disabledWorkerObservability,
+  };
+});
 
 // The Website receives the same stage's API address and private binding.
 export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
@@ -159,7 +148,7 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       }),
       // Each deployed Website version starts its own cache.
       cache: { crossVersionCache: false, enabled: true },
-      compatibility,
+      compatibility: workerCompatibility,
       env: {
         API_PUBLIC_ORIGIN: api.url.pipe(
           Output.map((url) => Option.getOrNull(Option.fromNullishOr(url)))
@@ -200,13 +189,13 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       // only; other stages keep every platform channel off.
       observability: Option.isSome(yield* NativeProductionZone)
         ? yield* productionObservability
-        : ApiWorkerObservability,
+        : disabledWorkerObservability,
       rootDir: "apps/web",
     };
   })
 ) {}
 
-export const declareNativeAppsStack = Effect.gen(function* () {
+export const declareNativeAppsInfrastructure = Effect.gen(function* () {
   const stage = yield* checkedStage(yield* Stage);
   const zone =
     stage === "prod"
@@ -248,12 +237,11 @@ export const declareNativeAppsStack = Effect.gen(function* () {
       zoneId: zone.value.zoneId,
     }).pipe(retain());
   }
-  return yield* Effect.gen(function* () {
-    const api = yield* TaxKitApiWorker;
-    const website = yield* TaxKitWebsite;
-    return { apiUrl: api.url, websiteUrl: website.url };
-  }).pipe(
-    Effect.provide(NativeApiHostLive),
-    Effect.provideService(NativeProductionZone, zone)
-  );
+  return zone;
+});
+
+export const declareNativeAppsHosts = Effect.gen(function* () {
+  const api = yield* TaxKitApiWorker;
+  const website = yield* TaxKitWebsite;
+  return { apiUrl: api.url, websiteUrl: website.url };
 });

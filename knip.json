@@ -23,7 +23,8 @@
         "alchemy.axiom.run.ts",
         "alchemy.trace.run.ts",
         "tools/documentation/check.runtime.ts",
-        "tools/**/*.test.ts"
+        "tools/**/*.test.ts",
+        "tools/apps-local/native-pair-build.runtime.ts"
       ],
       "project": [
         "*.json",
@@ -31,7 +32,10 @@
         "tools/effect-language-service/**/*.ts",
         "tools/repository-paths/**/*.ts",
         "tools/documentation/*.ts",
-        "tools/oxlint/*.ts"
+        "tools/oxlint/*.ts",
+        "tools/infrastructure/*.ts",
+        "tools/apps-local/*.ts",
+        "tools/workspace/*.ts"
       ],
       "ignoreDependencies": ["typescript", "@effect/language-service"]
     },

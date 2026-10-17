@@ -1,3 +1,4 @@
+import { rpcPath } from "@taxkit/api-http/routes";
 import { Layer } from "effect";
 import { RpcServer } from "effect/rpc";
 
@@ -10,7 +11,7 @@ import { TaxKitRpcServerSerialization } from "./server-serialization.boundary.js
 export const TaxKitRpcHttpLayer = RpcServer.layerHttp({
   disableTracing: true,
   group: TaxKitPublicRpcGroup,
-  path: "/rpc",
+  path: rpcPath,
   protocol: "http",
 }).pipe(
   Layer.provide([

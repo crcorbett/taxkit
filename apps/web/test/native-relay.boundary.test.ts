@@ -1,5 +1,6 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
+import { WebsiteRelayMediaType } from "@taxkit/analytics/relay/schemas";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import {
   Array,
@@ -15,7 +16,6 @@ import {
 import { Miniflare, Response } from "miniflare";
 import type { Request } from "miniflare";
 
-import { WebsiteRelayMediaType } from "../src/lib/analytics/relay/schemas";
 import capture from "./fixtures/posthog-1.438.2-relay.json";
 import {
   nativeMcpSessionExports,

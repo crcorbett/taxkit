@@ -49,6 +49,31 @@
       "source": "./src/collection-policy.boundary.ts",
       "types": "./dist/collection-policy.boundary.d.ts",
       "default": "./dist/collection-policy.boundary.js"
+    },
+    "./relay/schemas": {
+      "source": "./src/relay/schemas.ts",
+      "types": "./dist/relay/schemas.d.ts",
+      "default": "./dist/relay/schemas.js"
+    },
+    "./relay/errors": {
+      "source": "./src/relay/errors.ts",
+      "types": "./dist/relay/errors.d.ts",
+      "default": "./dist/relay/errors.js"
+    },
+    "./relay/service": {
+      "source": "./src/relay/service.ts",
+      "types": "./dist/relay/service.d.ts",
+      "default": "./dist/relay/service.js"
+    },
+    "./relay/live": {
+      "source": "./src/relay/live.layer.ts",
+      "types": "./dist/relay/live.layer.d.ts",
+      "default": "./dist/relay/live.layer.js"
+    },
+    "./api-usage": {
+      "source": "./src/api-usage.layer.ts",
+      "types": "./dist/api-usage.layer.d.ts",
+      "default": "./dist/api-usage.layer.js"
     }
   },
   "publishConfig": {
@@ -68,6 +93,26 @@
       "./live": {
         "types": "./dist/live.layer.d.ts",
         "default": "./dist/live.layer.js"
+      },
+      "./relay/schemas": {
+        "types": "./dist/relay/schemas.d.ts",
+        "default": "./dist/relay/schemas.js"
+      },
+      "./relay/errors": {
+        "types": "./dist/relay/errors.d.ts",
+        "default": "./dist/relay/errors.js"
+      },
+      "./relay/service": {
+        "types": "./dist/relay/service.d.ts",
+        "default": "./dist/relay/service.js"
+      },
+      "./relay/live": {
+        "types": "./dist/relay/live.layer.d.ts",
+        "default": "./dist/relay/live.layer.js"
+      },
+      "./api-usage": {
+        "types": "./dist/api-usage.layer.d.ts",
+        "default": "./dist/api-usage.layer.js"
       }
     }
   },
@@ -83,6 +128,7 @@
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-bun": "catalog:",
     "@effect/vitest": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

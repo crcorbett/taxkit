@@ -1,3 +1,15 @@
+import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
+import { mcpPath } from "@taxkit/api-http/routes";
+import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
+import { withBoundedMcpReply } from "@taxkit/api-mcp/response-budget";
+import {
+  McpSessionId,
+  McpSessionInitialisationLimit,
+  McpSessionLifetime,
+  McpSessionRequestLimit,
+} from "@taxkit/api-mcp/schemas";
+import { TaxKitMcpHttpLayer } from "@taxkit/api-mcp/server";
+import { TaxKitMcpHost } from "@taxkit/api-mcp/service";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
@@ -33,16 +45,6 @@ import {
   ApiCalculatorDelivery,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
-import { ApiCalculatorEvents } from "./calculator-analytics.layer.js";
-import { McpRequestAbortSignal } from "./mcp-request.service.js";
-import { withBoundedMcpReply } from "./mcp-response.boundary.js";
-import {
-  McpSessionId,
-  McpSessionInitialisationLimit,
-  McpSessionLifetime,
-  McpSessionRequestLimit,
-} from "./mcp.schemas.js";
-import { TaxKitMcpHost, TaxKitMcpHttpLayer } from "./mcp.tools.layer.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
 
@@ -155,7 +157,7 @@ export const McpSessionHostLive = Layer.effect(
                 const request = yield* HttpServerRequest.HttpServerRequest;
                 const config = yield* settings.pipe(Effect.orDie);
                 if (
-                  new URL(request.url, config.apiOrigin).pathname !== "/mcp"
+                  new URL(request.url, config.apiOrigin).pathname !== mcpPath
                 ) {
                   return HttpServerResponse.empty({ status: 404 });
                 }
