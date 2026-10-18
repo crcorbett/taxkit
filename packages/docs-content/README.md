@@ -171,7 +171,13 @@ compiler-index command. The Turbo build task hashes the package sources and
 takes `PLAYWRIGHT_BROWSERS_PATH` as an environment input because Mermaid
 rendering uses Chromium. Use the repository's configured
 `PLAYWRIGHT_BROWSERS_PATH`, as the Checks workflow does, when browsers are
-stored outside Playwright's default location.
+stored outside Playwright's default location. A fresh host must first install
+the matching browser and system libraries with
+`apps/web/node_modules/.bin/playwright install --with-deps chromium` from the
+repository root. This prerequisite also applies when Preview cleanup builds
+only the catalogue dependency closure: Mermaid rendering occurs while reading
+processed page Markdown, before any provider command. Build failures retain
+the safe source-error boundary; missing Chromium must be corrected at host setup.
 The MDX compiler owns frontmatter and processed Markdown.
 
 Page frontmatter and `navigation.json` decide publication.

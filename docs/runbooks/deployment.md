@@ -110,8 +110,15 @@ Production API. Destroy the stage when its pull request closes.
 `pr:destroy` validates the first-argument `pr-<number>` stage and rejects
 `--stage` overrides before doing work. It then builds the docs-content dependency
 closure, generating the catalogue needed by the eager stack import even in a
-cold checkout, before invoking native Alchemy destroy. The workflow checks that
-the pull request is still closed before calling this command.
+cold checkout, before invoking native Alchemy destroy. Catalogue compilation
+renders the authored Mermaid diagrams through Playwright, so this build needs
+the matching Chromium binary and system libraries even though it is not a
+browser test. Before local cleanup, provision them with
+`apps/web/node_modules/.bin/playwright install --with-deps chromium`; when using
+`PLAYWRIGHT_BROWSERS_PATH`, keep that same path for setup and cleanup. The
+workflow rechecks that the pull request is closed and validates its stage before
+setting an isolated browser path and running this native setup. Browser setup
+failure stops cleanup before the catalogue build or provider command.
 
 ## Production
 
@@ -228,7 +235,9 @@ only: the remote cache needs Checks' separate `DOPPLER_CI_TOKEN`.
   `pr-<number>`, read both stage addresses from the deploy's stack outputs and
   check the Website, `/api/health` and `/api/v1/calculators` for 200. Closing
   the pull request runs the stage-validated `pr:destroy`, including its cold
-  catalogue build prerequisite. Fork pull requests get no job and no
+  catalogue build prerequisite. Cleanup provisions Chromium and its system
+  libraries in its own runner after the closed-PR and stage guards; it cannot
+  borrow a deploy job's browser cache. Fork pull requests get no job and no
   secret. Runs for one pull request share a concurrency group and never
   overlap; each rechecks the pull request's state before it plans or destroys.
 - `.github/workflows/production.yml` runs on push to `main` and manual dispatch

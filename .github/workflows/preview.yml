@@ -169,6 +169,7 @@ jobs:
       # Allowlist, not denylist: cleanup only ever destroys pr-<number> stages.
       # `pr:destroy` repeats this check before generation or credential loading.
       - name: Safety check
+        id: stage-safety
         if: steps.pull-request.outputs.closed == 'true'
         shell: bash
         run: |
@@ -176,6 +177,16 @@ jobs:
             echo "Cleanup only destroys pr-<number> stages, got '$STAGE'" >&2
             exit 1
           fi
+      # Catalogue compilation renders Mermaid diagrams through Playwright.
+      # Cleanup has a fresh runner too; provision its browser before the build.
+      - name: Prepare catalogue browser path
+        id: catalogue-browser-path
+        if: steps.pull-request.outputs.closed == 'true'
+        run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
+      - name: Install catalogue Chromium
+        id: catalogue-chromium
+        if: steps.pull-request.outputs.closed == 'true'
+        run: apps/web/node_modules/.bin/playwright install --with-deps chromium
       - name: Destroy preview with native Alchemy
         if: steps.pull-request.outputs.closed == 'true'
         run: bun run pr:destroy "$STAGE" --yes
