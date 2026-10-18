@@ -2697,6 +2697,10 @@ describe("built native API and Website", () => {
             .getByRole("heading", { exact: true, name: "Quickstart" })
             .waitFor()
         );
+        // The Quickstart link is a full page load and its heading is in the
+        // server HTML. Wait for hydration, or the next click bypasses the
+        // intercepted reply as a server-rendered document navigation.
+        yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
         // A valid page whose body differs from the compiled presentation (a
         // differently activated API) is not rendered in the browser either.
         const plainSdkReply = yield* Effect.promise(() =>
