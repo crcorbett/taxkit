@@ -3,7 +3,7 @@ import {
   useAtomSet,
   useAtomValue,
 } from "@effect/atom-react";
-import type { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
+import type { CalculatorSummary } from "@taxkit/calculators/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
 import { Option, Schema } from "effect";
@@ -29,7 +29,7 @@ export const CalculatorPage = ({
   savedError,
   savedForm,
 }: {
-  readonly calculator: CalculatorCatalogResponse["calculators"][number];
+  readonly calculator: CalculatorSummary;
   readonly report: Option.Option<AnnualTaxReport | PayWithholdingsLedger>;
   readonly savedError: Option.Option<
     WebsiteCalculationFailure | TaxKitWebConfigError | WebsiteInputError

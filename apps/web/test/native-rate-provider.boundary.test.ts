@@ -7,10 +7,7 @@ import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
-import {
-  nativeMcpSessionExports,
-  nativeMcpSessionFixture,
-} from "./native-mcp.fixture";
+import { nativeForwardingFixture } from "./native-forwarding.fixture";
 
 it.live.each(["missing", "invalid", "throwing"] as const)(
   "contains a %s native limiter binding without exposing provider data",
@@ -38,6 +35,7 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
       const origins = {
+        ...nativeForwardingFixture,
         API_PUBLIC_ORIGIN: {
           type: "json" as const,
           value: "https://api.example.com",
@@ -86,10 +84,10 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
+                      ...nativeForwardingFixture,
                       ...env,
-                      ...nativeMcpSessionFixture("api-provider-proof"),
                     },
-                    exports: nativeMcpSessionExports,
+
                     manifest: { mainModule: "worker.js", modules, modulesRoot },
                     name: "api-provider-proof",
                   },

@@ -3,11 +3,139 @@ document_type: product-spec
 lifecycle: current
 authority: supporting
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: agreed direction, Common Practice implementation, upstream support or migration scope changes
 ---
 
 # Common Practice foundation review
+
+## Native transport and MCP follow-up (18 October 2026)
+
+This section records the accepted implementation goal following the delivered
+foundation work. Cooper selected all follow-up findings 12–21, removal of the
+Website's `calculatorRequest` tunnel, preservation of the shared per-IP
+calculation allowance, and modern `2026-07-28` MCP only. MCP must be both
+Effect-native and Alchemy-native. These decisions supersede the legacy MCP
+preservation and private calculation RPC choices in the earlier proposal below.
+Cooper confirmed the complete shared understanding and requested implementation
+as one goal on 18 October. Implement the agreed scope with supervised Sol High
+agents, verify Preview, merge and push the reviewed change, then release locally
+and check Production. The active plan owns progress and observed proof; the
+design and source research do not establish deployed behavior.
+
+### Settled boundaries
+
+- Native Effect owns MCP protocol handling, tool registration, framing and
+  request execution. Qualify Effect 4.0.4's
+  [`McpServer.layerHttpRequestScoped`](https://github.com/Effect-TS/effect/blob/effect%404.0.4/packages/effect/src/ai/McpServer.ts#L1673)
+  for the existing six tools. Its source places each POST's protocol server
+  and notification consumer in the request Scope through body completion;
+  calculator/content services and the bounded work pool remain shared.
+- Native Alchemy owns Cloudflare Worker composition, bindings, per-event
+  execution and finalization, with one native runner per host. An application
+  MCP implementation, custom Worker bridge, retained request-origin consumer
+  or global AsyncLocalStorage workaround does not meet this direction.
+- Modern-only MCP removes the supported legacy session contract. Finding 13's
+  proposed legacy browser session-header fix is superseded by that removal.
+  Preserve the six tools, exact publication-origin admission, Origin-less
+  clients, privacy and complete-reply budgets. Discovery must accurately
+  advertise no list-change subscriptions, matching the existing public scope.
+- Cooper selected a hard cutover: remove the native `TaxKitMcpSessions`
+  declaration/export/binding and delete its namespace in the modern-only
+  release through native Alchemy's deletion migration. No inert declaration
+  remains. Deletion permanently removes stored data; redeploying older code
+  cannot restore that data or its previous sessions.
+- Website server operations use generated native HTTP clients over a native
+  service binding; browsers continue calling the public HTTP API directly.
+  Removing `calculatorRequest` does not remove the public machine `/rpc`
+  contract. Preserve no-JavaScript calculations and generated-client codecs.
+- Preserve the approximate 60 calculations per minute per original IP per
+  Cloudflare location, shared across calculation transports through one native
+  limiter namespace. Caller identity stays separate from tax facts, results,
+  ordinary logs and cache keys. Public headers must not let callers select
+  their own trusted identity.
+
+The [glossary](../../CONTEXT.md) distinguishes the calculation caller from the
+person described by supplied facts and defines the shared calculation allowance.
+Common Practice demonstrates generated HTTP clients over native bindings;
+it does not qualify TaxKit's original-caller identity requirement.
+
+### Selected HTTP identity handoff
+
+Inspected Alchemy beta.81, beta.83 and upstream source do not provide a named
+private HTTP entrypoint sharing the native Effect host. The
+[upstream test](https://github.com/alchemy-run/alchemy/blob/9e3c0584342d67b24a4215f931047aabd230327b/packages/alchemy/test/Cloudflare/Workers/WorkerEntrypoint.test.ts#L132)
+explicitly limits Effect Workers to the default entrypoint; live binding props
+are not qualified. Cooper chose authenticated forwarding through the existing
+Website and API Workers, accepting the credential lifecycle to retain the
+smaller graph. A separate public ingress/private API core was considered and
+not selected.
+
+Declare one native Alchemy `Random` resource for the forwarding credential.
+Its redacted Output is persisted in stage-scoped Alchemy state and bound as
+secret environment values to both Workers. This gives each Preview stage its
+own key, stable across normal deployments. Doppler continues supplying
+deployment credentials; the forwarding key is owned by Alchemy state. The
+shared Preview Doppler config alone does not provide per-PR keys. Resolve the
+Output through native bindings/accessors rather than an eager deploy-time
+Config lookup. Attach it and the separately checked
+original caller key only to the Website's server calculation POSTs over the
+native HTTP binding. The API verifies the capability before accepting the
+forwarded key and enforces the owned method/path allowlist. Reject forged,
+missing or malformed forwarding metadata without leaking credentials or keys.
+An unauthenticated forwarded-IP header does not meet the contract.
+
+The credential never enters browser configuration, financial JSON, cached
+public GETs or ordinary logs. Public HTTP, RPC and modern MCP remain
+credential-free and derive their ordinary caller identity at the API edge.
+Do not require the forwarding credential on the public HttpApi globally.
+Credential custody, per-stage separation and rotation overlap must be qualified
+through native primitives because the two Workers deploy separately. Preserve
+the Random resource's logical identity across ordinary releases; a deliberate
+replacement needs old/new credential overlap and rollback qualification.
+
+### Accepted follow-up work
+
+| Finding | Correction and qualification |
+| --- | --- |
+| 12 | Qualify the native request-scoped MCP adapter, compatible dependencies and real Worker behavior; preserve native hosting and shared services. |
+| 13 | Retire legacy MCP; prove modern browser admission and unsupported-protocol behavior instead of adding obsolete session-header handling. |
+| 14 | Apply Content's existing requested-page correlation predicate after native RPC decoding, returning the existing invalid-response error. No wire revision or extra decoder. |
+| 15 | Tie current checked examples, generated guide fences and immutable source links to one accepted source snapshot; preserve historical citations. |
+| 16 | Generate the docs-content dependency closure inside the stage-validated Preview destroy path before stack import, preserving closed-PR and invalid-stage guards. |
+| 17 | Make the existing credential-free native suite a deployment gate, sequential with build/source-rewriting checks, and add the async-context regression. |
+| 18 | Remove optional catalogue waiting from unrelated root completion through qualified native loading ownership; preserve SSR links and no-JavaScript behavior. |
+| 19 | Derive export/dependency inventory from actual manifests, including peers; enforce runtime/browser/deployment roles separately with real lint fixtures. |
+| 20 | Remove unused private docs-source exports/operations; preserve compiler ingress, deterministic substitution and the validation CLI. |
+| 21 | Classify MDX code and JSX through the existing parser AST and retain the component allowlist. |
+
+### Proof and documentation contract
+
+The native MCP regression must fail against the retained cross-request model
+and pass with complete replies, continued protocol/notification progress and
+no native async-resource resume failure. HTTP 200 and generic log hooks alone
+cannot prove the fix. Cover repeated requests, concurrent cold starts, all six
+tools, body completion, cancellation bounds and work-slot recovery. Verify actual
+dependency resolution, the native bundle and runtime compatibility alongside
+Effect 4.0.4's source support. Do not upgrade Alchemy without a demonstrated
+requirement.
+
+HTTP proof covers forged/missing/malformed forwarded identity, actual binding
+header composition, unchanged financial JSON, combined quota consumption
+across direct HTTP, Website, RPC and modern MCP, independent caller keys and
+no-JavaScript submission. Outbound HTTP interruption does not establish remote
+Effect interruption: preserve server work/reply bounds and measure target
+finalization separately.
+
+Implementation updates the existing API/SDK, Effect-services, frontend,
+configuration, package-boundary and testing architecture owners with affected
+package/app READMEs. The public agent-tools guide owns modern-only advice; the
+deployment runbook owns gates, cold cleanup and namespace retirement. Preserve
+dated release history and regenerate public content from its sources. The
+[active plan](../exec-plans/active/common-practice-foundation-review.md) records
+the follow-up sequence and its implementation, verification and delivery status.
+
+## Original foundation direction
 
 Use Common Practice's application structure and ordinary development workflow.
 Prioritise the Cloudflare Website and API, remove every Alchemy patch, and remove

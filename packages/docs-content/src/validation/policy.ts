@@ -1,6 +1,7 @@
 import nodePath from "node:path";
 
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import {
   Array as EffectArray,
   Effect,
@@ -17,6 +18,7 @@ import { parse as parseYaml } from "yaml";
 
 import { DocsSourceError } from "../errors.js";
 import { getNavigation } from "../navigation.js";
+import { docsPublicLinkProfile } from "../public-links.profile.js";
 import {
   DocsPageFrontmatter,
   DocsSourcePath,
@@ -27,6 +29,7 @@ import type {
   DocsNavigationLeaf,
   DocsValidationResult,
 } from "../schemas.js";
+import { readCheckedExampleSnapshot } from "./checked-example-publication.boundary.js";
 import {
   checkedSnippetBindings,
   validateCheckedSnippet,
@@ -217,24 +220,6 @@ const validateTextPolicy = (source: DocsSourcePath, markdown: string) =>
     )
   );
 
-const validateFenceBalance = (source: DocsSourcePath, markdown: string) =>
-  Match.value(
-    Option.fromNullishOr(markdown.match(/```/gu)).pipe(
-      Option.map((matches) => matches.length),
-      Option.getOrElse(() => 0)
-    ) % 2
-  ).pipe(
-    Match.when(0, () => EffectArray.empty<DocsValidationIssue>()),
-    Match.orElse(() =>
-      EffectArray.of(
-        new DocsValidationIssue({
-          message: "unbalanced fenced code blocks",
-          path: [source],
-        })
-      )
-    )
-  );
-
 const missingTextIssue = (
   source: DocsSourcePath,
   label: string,
@@ -349,8 +334,6 @@ const listMdxSources: EffectType.Effect<
   Effect.map((paths) => EffectArray.sort(paths, Order.String))
 );
 
-export { getNavigation } from "../navigation.js";
-
 const navigationLeaves = (navigation: DocsNavigation) =>
   EffectArray.flatMap(navigation.primaryNavigation, (section) => [
     section,
@@ -425,7 +408,6 @@ const validatePage = (
               Effect.map(({ componentIssues, linkIssues }) => [
                 ...frontmatterIssues,
                 ...validateTextPolicy(source, markdown),
-                ...validateFenceBalance(source, markdown),
                 ...componentIssues,
                 ...linkIssues,
               ])
@@ -437,7 +419,6 @@ const validatePage = (
             }).pipe(
               Effect.map(({ componentIssues, linkIssues }) => [
                 ...validateTextPolicy(source, markdown),
-                ...validateFenceBalance(source, markdown),
                 ...componentIssues,
                 ...linkIssues,
               ])
@@ -535,6 +516,9 @@ export const validateContent: EffectType.Effect<
     Effect.map(EffectArray.flatten)
   );
   const referenceIssues = yield* validateReferenceIntegration;
+  yield* readCheckedExampleSnapshot(repoRoot, docsPublicLinkProfile).pipe(
+    Effect.provide(NodeServices.layer)
+  );
 
   return {
     issues: [

@@ -3,7 +3,7 @@ document_type: execution-plan
 lifecycle: current
 authority: supporting
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: agreed direction, implementation scope or Common Practice approach changes
 ---
 
@@ -13,6 +13,88 @@ The [proposal](../../product-specs/common-practice-foundation-review.md) records
 the source comparison and Cooper's direction: Common Practice's app/client and
 ordinary operational approach, Cloudflare first, patch-free Alchemy, supported
 Bun host, and safe operational details only.
+
+## Follow-up design (18 October 2026)
+
+The [current design round](../../product-specs/common-practice-foundation-review.md#native-transport-and-mcp-follow-up-18-october-2026)
+records Cooper's selected scope: all findings 12–21, removal of the
+`calculatorRequest` tunnel, preserved shared per-IP allowance, and modern-only
+MCP that is both Effect-native and Alchemy-native. The modern-only release
+also deletes the legacy `TaxKitMcpSessions` namespace through native Alchemy;
+there is no temporary inert-class retention period. Cooper confirmed the design
+and requested implementation as one goal on 18 October. Integrated acceptance
+and release remain pending. Earlier delivery observations below remain history.
+
+Cooper selected the existing two Workers with native secret-backed HTTP
+forwarding. One native Alchemy Random resource owns the forwarding credential
+in stage-scoped state and binds its redacted Output to both Workers; Doppler
+continues supplying deployment credentials. Keep the forwarding credential and
+original key on server calculation POSTs only; public browser/API/RPC/MCP
+admission remains credential-free. Qualify stage separation and rotation
+through the native configuration owners. The shared-understanding round is
+complete; implementation and release are authorized within the agreed scope.
+
+Use supervised Sol High agents for bounded, independently owned slices. Keep
+builds and native checks that share artifacts sequential under the coordinating
+agent, which integrates and reviews the complete change.
+
+The ordered slices are:
+
+1. Qualify the compatible Effect patch set and native request-scoped modern
+   MCP adapter inside the existing Alchemy host. Add the failing-then-passing
+   cross-request progress/async-context oracle; preserve shared work/rate owners.
+2. Implement the selected native HTTP identity boundary and remove the private
+   RPC tunnel. Prove spoof rejection, shared allowance across transports,
+   complete replies, cancellation bounds and no-JavaScript Website submission.
+3. Remove supported legacy MCP behavior and its obsolete tests/docs. Inspect
+   the native namespace deletion migration and rollback consequences before
+   the modern-only release; prove no legacy binding/class remains afterward.
+   Retain modern browser/origin/privacy tests and complete-reply/work budgets.
+   Public machine RPC remains supported.
+4. Finish docs RPC page correlation and checked-example source alignment
+   (14–15), then cold Preview cleanup and required native deployment gates
+   (16–17). Keep builds and source-rewriting tests sequential.
+5. Correct optional catalogue loading and manifest/export/role enforcement
+   (18–19), then narrow unused docs-source exports and use the MDX AST for
+   component policy (20–21). Preserve SSR/no-JavaScript links and real compiler
+   substitution points.
+6. Complete Changesets and required checks, test the deployed native Preview
+   Website/API pair, merge and push the reviewed change, then release the
+   verified main revision locally through the existing native Alchemy/Doppler
+   commands. Read back the Production resources and test the Website/API,
+   modern MCP, no-JavaScript/browser calculations, shared allowance and cache
+   behavior. The modern-only release includes the approved namespace deletion.
+
+### Goal status
+
+The coordinating agent owns integration, direct proof, independent review,
+delivery and closeout. Independent source slices may proceed in parallel;
+builds, source-mutating fixtures and native proof are serialized.
+
+| Milestone | State | Acceptance |
+| --- | --- | --- |
+| Native MCP and HTTP identity boundary | Implemented | Focused native proof covers all six tools, browser admission, HTTP forwarding, current/previous credentials, spoof rejection, shared allowance, deadlines and work-slot recovery. Hosted deployment remains pending. |
+| Findings 14–21 | Implemented | Focused checks cover requested-page correlation, immutable examples, cold cleanup, required native gate, synchronous root metadata, manifest/role checks and parser policy. |
+| Integrated verification and review | In progress | The native retained-adapter control captures the exact async-context failure; restored request-scoped MCP passes. Complete repository verification and final correction review remain pending. |
+| Preview deployment and journeys | Pending | Native pair plan/apply/readback plus browser, no-JavaScript, MCP, rate and cache checks on the deployed candidate. |
+| Merge and local Production release | Pending | Reviewed merge, pushed source, exact merged-commit verification, native plan/apply/readback and public journeys. |
+| Documentation and goal closeout | Pending | Current owners, plan lifecycle, Changesets and dated delivery evidence agree with actual results. |
+
+Each slice updates its existing semantic documentation owners. Run focused
+checks and the repository verification baseline before merging; package-facing
+changes use the normal Changeset route. Actual native plan, deployment,
+provider readback and public journeys are separate evidence, not inferred from
+this interview or successful local responses.
+
+The native lifetime qualification used the same Effect 4.0.4 dependency graph
+with the native retained `layerHttp` adapter substituted temporarily. An initial
+run failed during concurrent startup before inspecting the observer; that run
+was inconclusive. The corrected failure-path observation captured the exact
+AsyncLocalStorage exception three times. The source was restored byte for byte,
+the native pair rebuilt, and all three modern MCP tests passed, including the
+official browser client. The separate native rate and deadline tests also pass.
+MDX policy checks include member expressions such as `motion.div`, expression
+and attribute Programs, intrinsic HTML and literal-code controls (109 tests).
 
 ## Strict-review correction (17 October 2026)
 

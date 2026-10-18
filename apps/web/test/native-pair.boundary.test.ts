@@ -24,6 +24,10 @@ import {
   DocsSearchResult,
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
+import {
+  WebsiteForwardingCredentialHeader,
+  WebsiteForwardingRateKeyHeader,
+} from "@taxkit/observability/edge-identity";
 import { DocsDiscoveryPath } from "@taxkit/publication/schemas";
 import {
   Array,
@@ -57,9 +61,9 @@ import {
   WebsiteDocsImageSize,
 } from "../src/lib/docs/social.schemas";
 import {
-  nativeMcpSessionExports,
-  nativeMcpSessionFixture,
-} from "./native-mcp.fixture";
+  nativeForwardingFixture,
+  nativeForwardingKey,
+} from "./native-forwarding.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -255,7 +259,8 @@ describe("built native API and Website", () => {
             compatibilityDate: "2026-10-04",
             compatibilityFlags: ["nodejs_compat"],
             env: {
-              ...nativeMcpSessionFixture(name),
+              ...nativeForwardingFixture,
+
               ...nativeLocalModeFixture,
               ...nativeRateFixture("10075"),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
@@ -269,7 +274,7 @@ describe("built native API and Website", () => {
               },
               WORKER_URL: { type: "json" as const, value: apiOrigin },
             },
-            exports: nativeMcpSessionExports,
+
             manifest: {
               mainModule: "worker.js",
               modules: apiModules,
@@ -301,6 +306,7 @@ describe("built native API and Website", () => {
           config: {
             ...unavailableApi.config,
             env: {
+              ...nativeForwardingFixture,
               ...nativeLocalModeFixture,
               ...unavailableApi.config.env,
               API_PUBLIC_ORIGIN: {
@@ -320,6 +326,7 @@ describe("built native API and Website", () => {
             compatibilityDate: "2026-10-04",
             compatibilityFlags: ["nodejs_compat"],
             env: {
+              ...nativeForwardingFixture,
               ...nativeLocalModeFixture,
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               TAXKIT_API: {
@@ -1136,6 +1143,7 @@ describe("built native API and Website", () => {
         );
         expect(initialHtml).toContain('href="/agents"');
         expect(initialHtml).not.toContain("Take-home pay:");
+        expect(initialHtml).not.toContain(nativeForwardingKey);
         yield* Effect.logInfo("native-pair: private binding calculation");
         const server = yield* Effect.promise(() =>
           website.dispatchFetch(`${websiteOrigin}/`, {
@@ -1152,6 +1160,7 @@ describe("built native API and Website", () => {
         );
         const serverHtml = yield* Effect.promise(() => server.text());
         expect(serverHtml).toContain("$1,301.00");
+        expect(serverHtml).not.toContain(nativeForwardingKey);
         const invalid = yield* Effect.promise(() =>
           website.dispatchFetch(`${websiteOrigin}/`, {
             body: "grossDollars=invalid&period=weekly",
@@ -1380,7 +1389,9 @@ describe("built native API and Website", () => {
             (headers) =>
               !Record.has(headers, "b3") &&
               !Record.has(headers, "traceparent") &&
-              !Record.has(headers, "cookie")
+              !Record.has(headers, "cookie") &&
+              !Record.has(headers, WebsiteForwardingCredentialHeader) &&
+              !Record.has(headers, WebsiteForwardingRateKeyHeader)
           )
         ).toBe(true);
         expect(
@@ -1704,6 +1715,31 @@ describe("built native API and Website", () => {
         );
         const plainPage = yield* Effect.promise(() => noJavaScript.newPage());
         yield* Effect.promise(() => plainPage.goto(websiteOrigin));
+        // The complete calculator navigation must already exist in SSR. No
+        // JavaScript catalogue refresh can supply these links after hydration.
+        yield* Effect.forEach(
+          [
+            { href: "/", title: "AU take-home pay" },
+            {
+              href: "/calculators/au.pay.withholdings",
+              title: "AU pay withholdings",
+            },
+            {
+              href: "/calculators/au.income-tax.annual",
+              title: "AU annual income tax",
+            },
+          ],
+          ({ href, title }) =>
+            Effect.gen(function* () {
+              const link = plainPage
+                .getByRole("navigation", { exact: true, name: "Calculators" })
+                .getByRole("link", { exact: true, name: title });
+              expect(yield* Effect.promise(() => link.count())).toBe(1);
+              expect(
+                yield* Effect.promise(() => link.getAttribute("href"))
+              ).toBe(href);
+            })
+        );
         yield* Effect.promise(() =>
           plainPage
             .getByRole("button", { exact: true, name: "Calculate" })
@@ -1714,8 +1750,8 @@ describe("built native API and Website", () => {
             .getByText("$1,301.00", { exact: true })
             .waitFor({ timeout: 5000 })
         );
-        // Both remaining pages consume the same real backend catalogue and
-        // calculators. No browser fixture can supply these known answers.
+        // Both remaining pages use the deployed calculator summaries and
+        // submit to the real API. No browser fixture supplies these answers.
         yield* Effect.forEach(
           [
             {
@@ -1872,7 +1908,10 @@ describe("built native API and Website", () => {
               ).toContain(calculator.answer);
               expect(yield* Queue.clear(calls)).toEqual([]);
               yield* Effect.promise(() =>
-                plainPage.goto(`${websiteOrigin}/calculators/${calculator.id}`)
+                plainPage
+                  .getByRole("navigation", { exact: true, name: "Calculators" })
+                  .getByRole("link", { exact: true, name: calculator.title })
+                  .click()
               );
               const plainCalculatorInput = plainPage.getByLabel(
                 calculator.label

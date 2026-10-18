@@ -17,19 +17,12 @@ import {
   RpcRoutePath,
   DiscoveryPath,
   discoveryApiPath,
-  isTrustedCalculationPath,
   mcpPath,
 } from "@taxkit/api-http/routes";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
 import { withBoundedMcpReply } from "@taxkit/api-mcp/response-budget";
 import { TaxKitMcpHttpLayer } from "@taxkit/api-mcp/server";
-import { TaxKitMcpHost } from "@taxkit/api-mcp/service";
-import { CalculatorRpcResponseTooLarge } from "@taxkit/api-rpc/errors";
-import {
-  CalculatorRpcDeadline,
-  CalculatorRpcResponseLimit,
-} from "@taxkit/api-rpc/schemas";
 import { TaxKitRpcHttpLayer } from "@taxkit/api-rpc/server";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
@@ -38,6 +31,8 @@ import { DocsSourceError } from "@taxkit/content/errors";
 import { ContentCatalogue, ContentService } from "@taxkit/content/service";
 import {
   CalculatorHostMode,
+  WebsiteForwardingCredentialHeader,
+  WebsiteForwardingRateKeyHeader,
   calculatorEdgeRateKey,
 } from "@taxkit/observability/edge-identity";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
@@ -53,7 +48,6 @@ import { safeHttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
   Array,
-  ByteSize,
   Config,
   Context,
   Deferred,
@@ -63,12 +57,8 @@ import {
   Option,
   Schema,
   Scope,
-  Stream,
 } from "effect";
-import { McpProtocol } from "effect/ai";
 import {
-  HttpClientRequest,
-  HttpClientResponse,
   Headers,
   HttpMiddleware,
   HttpRouter,
@@ -80,7 +70,10 @@ import {
   ApiCalculatorDelivery,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
-import { McpSessionHost } from "./mcp-session.layer.js";
+import {
+  ApiWebsiteForwarding,
+  ApiWebsiteForwardingLive,
+} from "./website-forwarding.boundary.js";
 import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
@@ -127,6 +120,7 @@ const DiscoveryRoutes = HttpRouter.addAll(
 // same application service; native requests keep their own scope and fibre.
 export const ApiWorkerApplication = Effect.gen(function* () {
   const analytics = yield* ApiCalculatorDelivery;
+  const websiteForwarding = yield* ApiWebsiteForwarding;
   // Native planning binds deferred resource addresses. Read their runtime
   // values once on first incoming use, without inventing planning URLs.
   const settings = yield* Effect.cached(ApiWorkerSettingsConfig);
@@ -194,26 +188,13 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Effect.provideContext(telemetry)
   );
   const instanceScope = yield* Scope.Scope;
-  const sessions = yield* McpSessionHost;
-  // Build the protocol host once on first use, after native addresses resolve.
-  // Retain its fibres in the instance Scope, and keep the first caller's
-  // request/key out of registration. Each call receives its own native Context.
+  // Cache only native registrations after addresses resolve. The request-scoped
+  // adapter starts and closes its protocol/notification fibres per POST. Keep
+  // the first caller's request/key out of shared registration.
   const mcp = yield* Effect.cached(
-    settings.pipe(
-      Effect.flatMap((config) =>
-        HttpRouter.toHttpEffect(
-          TaxKitMcpHttpLayer.pipe(
-            Layer.provide(calculator),
-            Layer.provide(content),
-            Layer.provide(
-              Layer.succeed(TaxKitMcpHost)({
-                protocol: McpProtocol.v2026_07_28,
-                publicationOrigin: config.publicationOrigin,
-              })
-            )
-          )
-        )
-      ),
+    HttpRouter.toHttpEffect(
+      TaxKitMcpHttpLayer.pipe(Layer.provide(calculator), Layer.provide(content))
+    ).pipe(
       Scope.provide(instanceScope),
       Effect.updateContext((context: Context.Context<never>) =>
         Context.omit(
@@ -241,19 +222,20 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Effect.gen(function* () {
       const config = yield* settings;
       const request = yield* HttpServerRequest.HttpServerRequest;
+      const forwardedKey = yield* websiteForwarding.authenticate(request);
+      const callerKey = forwardedKey.pipe(
+        Option.orElse(() => calculatorEdgeRateKey(request.headers))
+      );
+      const key = Option.isSome(callerKey) ? callerKey : yield* localKey;
+      const admittedRequest = request.modify({
+        headers: Headers.removeMany(request.headers, [
+          WebsiteForwardingCredentialHeader,
+          WebsiteForwardingRateKeyHeader,
+        ]),
+      });
       const isMcp = new URL(request.url, config.apiOrigin).pathname === mcpPath;
-      const protocol = Headers.get(request.headers, "mcp-protocol-version");
-      const legacy =
-        Option.isSome(sessions) &&
-        Option.match(protocol, {
-          onNone: () => true,
-          onSome: (value) => value === "2025-11-25",
-        });
       const selected = isMcp
-        ? (legacy && Option.isSome(sessions)
-            ? Effect.succeed(sessions.value.fetch)
-            : mcp
-          ).pipe(
+        ? mcp.pipe(
             Effect.flatMap(withBoundedMcpReply),
             Effect.provideService(
               McpRequestAbortSignal,
@@ -266,7 +248,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       return yield* Effect.acquireUseRelease(
         Effect.gen(function* () {
           const completed = yield* Deferred.make<boolean>();
-          if (isMcp && !legacy) {
+          if (isMcp) {
             const native = yield* Effect.serviceOption(RuntimeContext);
             const worker = yield* Effect.serviceOption(WorkerExecutionContext);
             if (Option.isSome(native) && Option.isSome(worker)) {
@@ -295,7 +277,6 @@ export const ApiWorkerApplication = Effect.gen(function* () {
                     "mcp-method",
                     "mcp-name",
                     "mcp-protocol-version",
-                    "mcp-session-id",
                     "traceparent",
                   ]
                 : [CollectionPolicyHeader, ...publicCors.allowedHeaders],
@@ -308,11 +289,20 @@ export const ApiWorkerApplication = Effect.gen(function* () {
             })
           ),
         (completed) => Deferred.succeed(completed, true)
+      ).pipe(
+        Effect.provideService(CalculatorRequestRateKey, key),
+        Effect.provideService(
+          HttpServerRequest.HttpServerRequest,
+          admittedRequest
+        )
       );
     }).pipe(
-      Effect.catchTag("ConfigError", () =>
-        Effect.succeed(HttpServerResponse.empty({ status: 503 }))
-      )
+      Effect.catchTags({
+        CalculatorAdmissionUnavailable: () =>
+          Effect.succeed(HttpServerResponse.empty({ status: 503 })),
+        ConfigError: () =>
+          Effect.succeed(HttpServerResponse.empty({ status: 503 })),
+      })
     )
   ).pipe(
     // Every reply, including native error responses, gets one cache decision.
@@ -345,98 +335,5 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Effect.provideContext(telemetry)
   );
 
-  return {
-    // Native service-binding RPC only; this method has no HTTP route. The
-    // Website passes its checked original caller key separately from JSON,
-    // for exactly the RPC endpoint and the canonical HTTP calculation POST.
-    calculatorRequest: (request: Request, encodedKey: string) =>
-      Effect.gen(function* () {
-        if (
-          Option.isNone(
-            Schema.decodeUnknownOption(Schema.instanceOf(Request))(request)
-          )
-        ) {
-          return new Response(null, { status: 503 });
-        }
-        if (
-          request.method !== "POST" ||
-          !isTrustedCalculationPath(new URL(request.url).pathname)
-        ) {
-          return new Response(null, { status: 404 });
-        }
-        const key = Schema.decodeUnknownOption(CalculatorClientRateKey)(
-          encodedKey
-        );
-        // One deadline covers the whole call, including the reply body. The
-        // closed JSON reply is buffered before the native method closes its
-        // event scope, keeping its real status and headers.
-        return yield* fetch.pipe(
-          Effect.provideService(CalculatorRequestRateKey, key),
-          Effect.provideService(
-            HttpServerRequest.HttpServerRequest,
-            HttpServerRequest.fromWeb(request)
-          ),
-          Effect.flatMap((response) => {
-            const web = HttpServerResponse.toWeb(response);
-            // An empty reply (such as an undeclared 400) has no body to read.
-            return Option.match(Option.fromNullishOr(web.body), {
-              onNone: () =>
-                Effect.succeed(
-                  new Response(null, {
-                    headers: web.headers,
-                    status: web.status,
-                  })
-                ),
-              onSome: () =>
-                HttpClientResponse.fromWeb(
-                  HttpClientRequest.post(request.url),
-                  web
-                ).stream.pipe(
-                  Stream.mapAccumEffect(
-                    () => ByteSize.bytes(0),
-                    (total, chunk) => {
-                      const next = ByteSize.sum(
-                        total,
-                        ByteSize.bytes(chunk.byteLength)
-                      );
-                      return ByteSize.isGreaterThan(
-                        next,
-                        CalculatorRpcResponseLimit
-                      )
-                        ? Effect.fail(new CalculatorRpcResponseTooLarge())
-                        : Effect.succeed([next, [chunk]] as const);
-                    }
-                  ),
-                  Stream.mkUint8Array,
-                  Effect.map(
-                    (bytes) =>
-                      new Response(new Uint8Array(bytes), {
-                        headers: web.headers,
-                        status: web.status,
-                      })
-                  )
-                ),
-            });
-          }),
-          Effect.timeoutOption(CalculatorRpcDeadline),
-          // Only this adapter's body-read, size and deadline failures become
-          // 503. Interruption and unexpected defects keep their identity.
-          Effect.catchTags({
-            CalculatorRpcResponseTooLarge: () => Effect.succeedNone,
-            HttpClientError: () => Effect.succeedNone,
-          }),
-          Effect.map(
-            Option.getOrElse(() => new Response(null, { status: 503 }))
-          )
-        );
-      }).pipe(Effect.provideContext(telemetry)),
-    fetch: Effect.gen(function* () {
-      const request = yield* HttpServerRequest.HttpServerRequest;
-      const edgeKey = calculatorEdgeRateKey(request.headers);
-      const key = Option.isSome(edgeKey) ? edgeKey : yield* localKey;
-      return yield* fetch.pipe(
-        Effect.provideService(CalculatorRequestRateKey, key)
-      );
-    }),
-  };
-});
+  return { fetch };
+}).pipe(Effect.provide(ApiWebsiteForwardingLive));

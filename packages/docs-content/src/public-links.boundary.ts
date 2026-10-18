@@ -9,6 +9,7 @@ import { map } from "unist-util-map";
 import type { DocsPublicLinkProfile } from "./public-links.schema.ts";
 import { DocsSourcePath } from "./schemas.ts";
 import type { DocsNavigation } from "./schemas.ts";
+import { checkedExampleFiles } from "./validation/checked-snippets.ts";
 
 // Fumadocs owns parsing, highlighting, HTML compilation and Markdown output.
 // This synchronous compiler callback maps only the SDK's parsed link nodes.
@@ -101,9 +102,20 @@ export const remarkPublicDocsLinks = ({
         repositoryPath.split(path.sep),
         encodeURIComponent
       ).join("/");
+      const revision = Array.some(
+        checkedExampleFiles,
+        (example) =>
+          path.resolve(
+            repositoryDirectory,
+            "packages/docs-examples/src",
+            example
+          ) === destination
+      )
+        ? profile.checkedExampleRevision
+        : profile.repositoryRevision;
       return {
         ...node,
-        url: `${profile.repositoryUrl.href}/blob/${profile.repositoryRevision}/${encodedPath}${target.search}${target.hash}`,
+        url: `${profile.repositoryUrl.href}/blob/${revision}/${encodedPath}${target.search}${target.hash}`,
       };
     });
     if (updated.type !== "root") {

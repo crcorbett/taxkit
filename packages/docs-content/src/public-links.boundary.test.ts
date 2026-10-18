@@ -12,6 +12,7 @@ import {
 import { DocsNavigation, DocsPagePath, DocsSourcePath } from "./schemas.js";
 
 const revision = "a151e51e8a30247526fa93412df046955846eca4";
+const checkedExampleRevision = "def3630768813429a9336df7a276f3da0de0fc9a";
 const navigation = DocsNavigation.make({
   contentRoot: "packages/docs-content/content",
   primaryNavigation: [
@@ -45,6 +46,7 @@ const processor = unified().use(remarkPublicDocsLinks, {
   contentRoot: new URL("file:///checkout/packages/docs-content/content/"),
   navigation,
   profile: DocsPublicLinkProfile.make({
+    checkedExampleRevision: DocsRepositoryRevision.make(checkedExampleRevision),
     repositoryRevision: DocsRepositoryRevision.make(revision),
     repositoryUrl: new URL("https://github.com/crcorbett/taxkit"),
   }),
@@ -62,6 +64,14 @@ describe("public documentation compiler links", () => {
     ["https://example.com/page", "https://example.com/page"],
     ["mailto:example@example.com", "mailto:example@example.com"],
     ["//example.com/page", "//example.com/page"],
+    [
+      "../../../docs-examples/src/browser-http.ts?plain=1#L1",
+      `https://github.com/crcorbett/taxkit/blob/${checkedExampleRevision}/packages/docs-examples/src/browser-http.ts?plain=1#L1`,
+    ],
+    [
+      "../../../docs-examples/src/calculator-help.ts",
+      `https://github.com/crcorbett/taxkit/blob/${checkedExampleRevision}/packages/docs-examples/src/calculator-help.ts`,
+    ],
     [
       "../../../core/src/errors.ts#L12",
       `https://github.com/crcorbett/taxkit/blob/${revision}/packages/core/src/errors.ts#L12`,

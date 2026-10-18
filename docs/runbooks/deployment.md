@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: Alchemy stack, stage, Doppler config, deployment command, deploy workflow or public check change
 ---
 
@@ -40,12 +40,61 @@ Do not copy Cloudflare values into the shell, a committed file or GitHub.
 GitHub holds only the read-only Doppler service tokens described under
 [GitHub Actions](#github-actions).
 
+When the workstation provides separate scoped token variables, select native
+Alchemy authentication for the command explicitly:
+
+```sh
+DOPPLER_TOKEN="$DOPPLER_PROVIDER_TOKEN" bun run pr:plan pr-<number>
+DOPPLER_TOKEN="$DOPPLER_PRODUCTION_TOKEN" bun run production:plan
+```
+
+`DOPPLER_PROVIDER_TOKEN` is scoped to `taxkit/stg_preview` and
+`DOPPLER_PRODUCTION_TOKEN` to `taxkit/prd`. The separate development and CI
+tokens belong to `taxkit/dev` and `taxkit/ci`; they are not deployment fallbacks.
+Only the selected token is passed as native `DOPPLER_TOKEN`; native sources
+continue selecting managed values, and no secret value is printed.
+
+The modern-only MCP cutover removes `TaxKitMcpSessions` from the native Worker
+class/export/binding graph. Review the native deletion migration for exactly
+that namespace before apply and confirm its absence afterward. This deletion
+is permanent; an old-code redeploy cannot recover its data or former sessions.
+The expected graph also creates one stage-owned Random resource for HTTP
+forwarding; other resource deletions remain outside this release.
+
+The Website's calculation forwarding credential is separate: one native
+Alchemy Random resource in the stage's state supplies the same redacted Output
+to both Workers. Doppler supplies deployment credentials. The generated key
+and original caller identity travel only on the Website server's calculation
+POST through the native HTTP binding; public clients supply neither.
+
 The Production token (`taxkit/prd`) is an account-owned token. On the
 `taxkit.dev` zone it holds Zone DNS Settings Read, Zone Settings Write, DNS Write
 (DNSSEC), Bot Management Write, Dynamic URL Redirects Write and Workers Routes
 Write; on the account, Workers Scripts, Workers Observability and Secrets Store
 Write. Change it with `cf accounts tokens update`, keeping its name, expiry and
 existing policies, and record the change here. It expires on 18 November 2026.
+
+## Forwarding credential rotation
+
+Normal releases preserve `TaxKitWebsiteForwardingKey` and its stage-owned
+value. Rotate only through the native resource graph. Keep the former Random
+declaration, introduce a deliberately named replacement, bind its redacted
+Output as the current key on both Workers, and bind the former Output as
+`TAXKIT_WEBSITE_FORWARDING_PREVIOUS_KEY` on the API alone.
+
+Review the stage's native plan, then deploy the API before the Website through
+their existing dependency order. Verify Website calculation admission and
+old/new overlap before removing the previous-key binding in a second native
+update. Keep the former resource and state through the rollback interval;
+changing Random's byte count does not rotate its stored value. Never print a
+key or turn it into a stack output. The credential-free native suite proves
+the verifier's current/previous overlap; a hosted rotation needs its own
+deployment and readback evidence.
+
+During overlap, rollback restores the former Website binding while the API
+still accepts both keys. After overlap has been removed, restore API acceptance
+of the former key before rolling back the Website. MCP namespace deletion is
+independent and remains irreversible.
 
 ## Preview
 
@@ -57,6 +106,12 @@ bun run pr:destroy pr-<number>
 
 `pr:deploy` builds the repository first. Preview uses its own API, never the
 Production API. Destroy the stage when its pull request closes.
+
+`pr:destroy` validates the first-argument `pr-<number>` stage and rejects
+`--stage` overrides before doing work. It then builds the docs-content dependency
+closure, generating the catalogue needed by the eager stack import even in a
+cold checkout, before invoking native Alchemy destroy. The workflow checks that
+the pull request is still closed before calling this command.
 
 ## Production
 
@@ -161,14 +216,19 @@ a read-only, config-scoped Doppler service token to Alchemy as `DOPPLER_TOKEN`;
 GitHub sets `CI=true`. Neither workflow installs the Doppler CLI or holds a
 Cloudflare value. As in Common Practice, every deploy first runs
 `bun run verification` with the same Bun and Playwright setup as the Checks
-workflow, before any credential is used. Deploys use the local Turbo cache
+workflow, before any deployment credential is used. Verification finishes with
+the required credential-free `test:native` build and suite, sequentially after
+all source-rewriting tests and earlier builds. A native failure prevents both
+planning and deployment. `release:check` inherits the same gate locally; run
+verification before an authorised local deployment. Deploys use the local Turbo cache
 only: the remote cache needs Checks' separate `DOPPLER_CI_TOKEN`.
 
 - `.github/workflows/preview.yml` runs on same-repository pull requests. Opened,
   reopened and synchronised pull requests run verification, then `pr:plan` and `pr:deploy` for
   `pr-<number>`, read both stage addresses from the deploy's stack outputs and
   check the Website, `/api/health` and `/api/v1/calculators` for 200. Closing
-  the pull request runs `pr:destroy`. Fork pull requests get no job and no
+  the pull request runs the stage-validated `pr:destroy`, including its cold
+  catalogue build prerequisite. Fork pull requests get no job and no
   secret. Runs for one pull request share a concurrency group and never
   overlap; each rechecks the pull request's state before it plans or destroys.
 - `.github/workflows/production.yml` runs on push to `main` and manual dispatch

@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-rpc-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: RPC contracts, native codecs, clients, handlers, exports or transport proof change
 ---
 
@@ -64,7 +64,7 @@ declares a safe defect Schema. No message framing is invented.
 The private reply codec marks only failures decoding a declared native
 operation exit. Bad JSON and invalid result shapes become
 `CalculatorRpcInvalidResponse`. An unrelated adapter defect retains its
-identity; defects remain defects. The installed Effect version is 4.0.2;
+identity; defects remain defects. The installed Effect version is 4.0.4;
 its RPC APIs remain marked unstable, so requalify these paths on upgrades.
 
 The clients give each call one ten-second budget covering headers and complete
@@ -134,6 +134,9 @@ supplied `ContentService` and publication-owned `ContentDiscovery` once.
 Missing-page and search failures use the content owner's fixed errors;
 discovery uses `@taxkit/publication/errors`. Its closed file addresses come from
 the HTTP route owner, and the client checks that the returned file matches.
+After native decoding, `getPage` uses Content's `isRequestedDocsPage` predicate
+to correlate the page with the requested path. A valid page for another path
+fails with `DocsRpcInvalidResponse`; it is never decoded again.
 The publication package owns discovery document Schemas and generation;
 Content retains page/navigation identity and checked source content. These
 ownership changes preserve revision `2`, procedure tags and wire values.

@@ -16,16 +16,6 @@
       "source": "./src/live.layer.ts",
       "default": "./src/live.layer.ts"
     },
-    "./generated-source": {
-      "types": "./src/generated-source.layer.ts",
-      "source": "./src/generated-source.layer.ts",
-      "default": "./src/generated-source.layer.ts"
-    },
-    "./server": {
-      "types": "./src/server.ts",
-      "source": "./src/server.ts",
-      "default": "./src/server.ts"
-    },
     "./client": {
       "types": "./src/client.ts",
       "source": "./src/client.ts",
@@ -46,11 +36,6 @@
       "source": "./src/test.layer.ts",
       "default": "./src/test.layer.ts"
     },
-    "./validate": {
-      "types": "./src/validate.runtime.ts",
-      "source": "./src/validate.runtime.ts",
-      "default": "./src/validate.runtime.ts"
-    },
     "./source.config": "./source.config.ts",
     "./catalogue-source": {
       "types": "./src/catalogue-source.layer.ts",
@@ -69,13 +54,16 @@
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@mdx-js/mdx": "3.1.1",
     "@taxkit/content": "workspace:*",
     "@taxkit/docs-fumadocs": "workspace:*",
     "effect": "catalog:",
+    "estree-util-visit": "2.0.0",
     "fumadocs-core": "16.16.0",
     "fumadocs-mdx": "15.4.6",
     "react": "catalog:",
     "unist-util-map": "4.0.0",
+    "vfile": "6.0.3",
     "yaml": "2.9.1"
   },
   "devDependencies": {
@@ -84,7 +72,6 @@
     "@types/mdast": "4.0.4",
     "typescript": "catalog:",
     "unified": "11.0.5",
-    "vfile": "6.0.3",
     "vite": "catalog:",
     "vitest": "catalog:"
   }

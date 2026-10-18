@@ -34,10 +34,7 @@ import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
 import { WebsiteApiUnavailable } from "../src/lib/api/errors";
-import {
-  nativeMcpSessionExports,
-  nativeMcpSessionFixture,
-} from "./native-mcp.fixture";
+import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -136,10 +133,10 @@ it.live(
               ).toBe(true);
             }
             const origins = {
+              ...nativeForwardingFixture,
               ...(artifact.entry === "worker.js"
                 ? {
                     ...nativeRateFixture("10076"),
-                    ...nativeMcpSessionFixture(artifact.name),
                   }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
@@ -175,10 +172,7 @@ it.live(
                         },
                       }
                     : origins,
-                exports:
-                  artifact.entry === "worker.js"
-                    ? nativeMcpSessionExports
-                    : undefined,
+
                 manifest: { mainModule: artifact.entry, modules, modulesRoot },
                 name: artifact.name,
               },
@@ -581,11 +575,11 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
             ).toBe(true);
           }
           const origins = {
+            ...nativeForwardingFixture,
             ...(artifact.name === "website-work"
               ? nativeLocalModeFixture
               : {
                   ...nativeRateFixture("10077"),
-                  ...nativeMcpSessionFixture(artifact.name),
                 }),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: workApiOrigin },
             TAXKIT_PUBLICATION_ORIGIN: {
@@ -620,10 +614,7 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
                       },
                     }
                   : origins,
-              exports:
-                artifact.entry === "worker.js"
-                  ? nativeMcpSessionExports
-                  : undefined,
+
               manifest: { mainModule: artifact.entry, modules, modulesRoot },
               name: artifact.name,
             },

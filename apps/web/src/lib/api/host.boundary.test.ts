@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { Effect, Layer, Option, Result, Schema } from "effect";
+import { Effect, Layer, Result, Schema } from "effect";
 import { vi } from "vitest";
 
 import { WebsiteBindings } from "../config.server";
@@ -10,7 +10,6 @@ import { WebsiteSettingsLive } from "../settings.server.layer";
 import { WebsiteApiLive } from "./host.server";
 
 const binding = {
-  calculatorRequest: vi.fn(),
   connect: vi.fn(),
   fetch: vi.fn(() => Promise.resolve(new Response("User-agent: *"))),
 };
@@ -62,8 +61,7 @@ it.effect.each([
         );
       }
       if (!apiValid && settingsValid) {
-        // This is the root loader's optional-catalogue branch. A broken binding
-        // must leave checked public settings available and catalogue absent.
+        // A broken binding leaves the root loader's public settings available.
         const loaded = yield* loadRootView();
         const root = yield* Schema.decodeUnknownEffect(WebsiteRootView)(
           loaded.view
@@ -71,7 +69,6 @@ it.effect.each([
         expect(root.settings.websiteOrigin.origin).toBe(
           "https://preview.taxkit.example"
         );
-        expect(Option.isNone(root.catalogue)).toBe(true);
       }
     }).pipe(
       Effect.provide(

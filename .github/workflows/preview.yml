@@ -72,10 +72,12 @@ jobs:
         with:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
           key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
+      # Verification ends with the required credential-free native pair suite,
+      # after source-rewriting tests and builds finish. A failure blocks plan/apply.
       # Same checks as the Checks workflow, before any credential is used. The
       # Turbo remote cache needs Checks' separate DOPPLER_CI_TOKEN, so deploys
       # use the local cache only.
-      - name: Run checks
+      - name: Run verification and required native suite
         env:
           TURBO_CACHE: local:rw
         run: bun run verification
@@ -150,6 +152,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
+          # Docs generation verifies immutable checked-source Git snapshots.
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version-file: .bun-version
@@ -163,7 +167,7 @@ jobs:
           state="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PULL_REQUEST" --jq .state)"
           echo "closed=$([ "$state" = closed ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       # Allowlist, not denylist: cleanup only ever destroys pr-<number> stages.
-      # `pr:destroy` repeats this check before it loads any credential.
+      # `pr:destroy` repeats this check before generation or credential loading.
       - name: Safety check
         if: steps.pull-request.outputs.closed == 'true'
         shell: bash

@@ -1974,21 +1974,21 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/api/src/mcp-session.layer.ts",
+      path: "apps/api/src/website-forwarding.boundary.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownOption(Schema.String);',
     },
     {
-      path: "apps/api/src/mcp-session.layer.ts",
+      path: "apps/api/src/website-forwarding.boundary.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "apps/api/src/mcp-session.layer.ts",
+      path: "apps/api/src/website-forwarding.boundary.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:

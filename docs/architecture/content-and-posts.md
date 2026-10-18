@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: content ownership, publication status or generated presentation changes
 ---
 
@@ -43,13 +43,22 @@ on the open-source tax engine and avoid downstream private-product specifics.
 : Private source-only package for authored navigation, meta, MDX, validation
   policy, validation errors and generated Fumadocs source access. Its existing
   page/navigation/source-error exports re-export `@taxkit/content` contracts;
-  its source service remains available to build-time content consumers.
-  Its independent native MDX index and build-only source Layer use the installed
-  compiler and the same adapter as the retained Vite source.
+  its source service exposes only build-time `listPages` and `getNavigation`.
+  The local validation CLI imports its policy directly. The unused generated-source,
+  server and executable validation package subpaths are retired; private compiler
+  type references remain internal. Its independent native MDX index and build-only
+  source Layer retain the installed compiler, checked ingress and deterministic
+  source substitution.
   Its compiler-only link policy maps parsed page links through checked navigation
   and repository references to a recorded immutable revision before both HTML
   and processed Markdown are produced. It rejects unowned page destinations
   and paths outside the checkout, preserving code examples and source bytes.
+  Current checked-example links select a separately accepted immutable snapshot;
+  historical citations keep their recorded revision. Local validation compares
+  linked example files byte-for-byte with Git objects at that snapshot. Catalogue
+  publication additionally checks emitted complete guide fences and example URLs
+  before JSON is written. Those Git objects must be available in the checkout;
+  this validation performs no network fetch.
 
 `packages/docs-examples`
 : Private checked integration templates and their compiler/runtime proof. It
@@ -143,7 +152,14 @@ docs implementation
   ownership and runtime detail.
 - Validate public MDX through `@taxkit/docs-content`, which owns Effect Schema
   frontmatter, navigation coverage, source-text policy, local link, MDX
-  component allowlist, examples and OpenAPI reference checks.
+  component allowlist, examples and OpenAPI reference checks. The compiler and
+  standalone validator classify code, inline code and MDX JSX through the same
+  installed MDX parser AST, including its ESTree Programs for JavaScript
+  expressions, ESM and JSX attribute payloads. The native ESTree visitor and
+  per-traversal VFile diagnostics preserve literal strings and template text;
+  fence delimiters are not a second handwritten grammar. JSX member bindings
+  follow the component allowlist even when their namespace begins lowercase;
+  plain lowercase intrinsic HTML tags remain permitted.
 - `draft` means authored, locally renderable, visibly labelled candidate public
   documentation; it is not publication, deployment, external availability,
   correctness, or user visibility. `published` puts the page in the public

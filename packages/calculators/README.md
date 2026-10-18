@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-calculators-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-18
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
@@ -111,6 +111,7 @@ artifact, public entrypoints and concrete dependency ranges.
 - `@taxkit/calculators/metadata`
 - `@taxkit/calculators/service`
 - `@taxkit/calculators/schemas`
+- `@taxkit/calculators/summaries`
 - `@taxkit/calculators/work`
 
 ## Related Docs
@@ -123,6 +124,14 @@ artifact, public entrypoints and concrete dependency ranges.
 ## Browser Schema entrypoints
 
 `@taxkit/calculators/schemas` consumes narrow core/rule Schema entrypoints and owns no live runtime or rule pack. The RPC contract reuses its existing request and report Schemas; calculation remains with `PublicCalculatorService.calculate`.
+
+`@taxkit/calculators/summaries` owns checked calculator IDs, names and contexts
+using the schema-derived `CalculatorSummary`. Catalogue composition reuses
+those values, and browser navigation can use them without importing calculator
+execution or live rule Layers. The application owns route addresses. Summaries
+follow the deployed application version; full discovery metadata remains an
+API operation. `CalculatorSummaries` lists the supported summaries; the named
+exports identify the take-home, pay-withholdings and annual-tax calculators.
 
 The [transport architecture](../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
 

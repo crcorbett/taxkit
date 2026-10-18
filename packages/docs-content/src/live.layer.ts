@@ -1,8 +1,8 @@
 import type { FumadocsSourcePage } from "@taxkit/docs-fumadocs/schemas";
 import { FumadocsSource } from "@taxkit/docs-fumadocs/service";
-import { Array, Effect, Layer, Schema } from "effect";
+import { Effect, Layer, Schema } from "effect";
 
-import { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
+import { DocsSourceError } from "./errors.js";
 import { getNavigation } from "./navigation.js";
 import {
   DocsPageFrontmatter,
@@ -12,9 +12,6 @@ import {
 } from "./schemas.js";
 import type { DocsContentPage } from "./schemas.js";
 import { DocsContentService } from "./service.js";
-
-const slugsFromPath = (path: DocsPagePath) =>
-  Array.filter(path.split("/"), (segment) => segment.length > 0);
 
 const contentPageFromSourcePage = (page: FumadocsSourcePage) =>
   Effect.all({
@@ -53,21 +50,6 @@ export const DocsContentServiceLive = Layer.effect(
 
     return DocsContentService.of({
       getNavigation: () => getNavigation,
-      getPage: (path) =>
-        fumadocs.getPage(slugsFromPath(path)).pipe(
-          Effect.flatMap(contentPageFromSourcePage),
-          Effect.catchTag("FumadocsPageNotFoundError", () =>
-            Effect.fail(new DocsPageNotFoundError({ path }))
-          ),
-          Effect.catchTag("FumadocsSourceLoadError", () =>
-            Effect.fail(
-              new DocsSourceError({
-                message: "The docs page source could not be loaded.",
-                operation: "getPage",
-              })
-            )
-          )
-        ),
       listPages: () =>
         fumadocs.listPages().pipe(
           Effect.flatMap((pages) =>
@@ -81,10 +63,6 @@ export const DocsContentServiceLive = Layer.effect(
               })
             )
           )
-        ),
-      validateContent: () =>
-        Effect.promise(() => import("./validation/policy.js")).pipe(
-          Effect.flatMap(({ validateContent }) => validateContent)
         ),
     });
   })

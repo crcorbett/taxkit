@@ -17,10 +17,7 @@ import { Miniflare, Response } from "miniflare";
 import type { Request } from "miniflare";
 
 import capture from "./fixtures/posthog-1.438.2-relay.json";
-import {
-  nativeMcpSessionExports,
-  nativeMcpSessionFixture,
-} from "./native-mcp.fixture";
+import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const CaptureFixture = Schema.Struct({
@@ -110,7 +107,8 @@ it.live.each(["off", "invalid", "enabled", "redirect"] as const)(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
-                      ...nativeMcpSessionFixture("relay-api"),
+                      ...nativeForwardingFixture,
+
                       ...nativeRateFixture("10179166"),
                       API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },
                       TAXKIT_PUBLICATION_ORIGIN: {
@@ -123,7 +121,7 @@ it.live.each(["off", "invalid", "enabled", "redirect"] as const)(
                       },
                       WORKER_URL: { type: "json", value: apiOrigin },
                     },
-                    exports: nativeMcpSessionExports,
+
                     manifest: apiArtifact,
                     name: "relay-api",
                   },
@@ -138,6 +136,7 @@ it.live.each(["off", "invalid", "enabled", "redirect"] as const)(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
+                      ...nativeForwardingFixture,
                       API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },
                       POSTHOG_CAPTURE_TOKEN: {
                         type: "json",

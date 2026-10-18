@@ -1,13 +1,11 @@
 import nodePath from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { BunServices } from "@effect/platform-bun";
 import { expect, it } from "@effect/vitest";
 import { Effect, FileSystem } from "effect";
 
-import { lintFiles } from "./cli-fixture.js";
+import { lintFiles, makeIsolatedLintWorkspace } from "./cli-fixture.js";
 
-const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const { dirname, join } = nodePath;
 const encoder =
   'import { Schema } from "effect";\n\nexport const result = Schema.encodeEffect(Schema.String)("fixture");';
@@ -287,21 +285,18 @@ it.effect.each([
   ({ path, source, allowed, rule }) =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
-      const temp = yield* fs.makeTempDirectoryScoped({
-        prefix: "taxkit-analytics-lint-",
-      });
-      const config = join(temp, "oxlint.config.ts");
-      yield* fs.copyFile(join(repositoryRoot, "oxlint.config.ts"), config);
-      yield* fs.symlink(
-        join(repositoryRoot, "node_modules"),
-        join(temp, "node_modules")
-      );
-      yield* fs.symlink(join(repositoryRoot, "tools"), join(temp, "tools"));
-      yield* fs.symlink(join(repositoryRoot, ".agents"), join(temp, ".agents"));
-      const target = join(temp, path);
+      const { configuration, workingDirectory } =
+        yield* makeIsolatedLintWorkspace();
+      const target = join(workingDirectory, path);
       yield* fs.makeDirectory(dirname(target), { recursive: true });
       yield* fs.writeFileString(target, source);
-      const result = yield* lintFiles([target], [], "unix", config);
+      const result = yield* lintFiles(
+        [target],
+        [],
+        "unix",
+        configuration,
+        workingDirectory
+      );
       expect(result.exitCode, result.output).toBe(allowed ? 0 : 1);
       if (!allowed) {
         expect(result.output).toContain(rule);

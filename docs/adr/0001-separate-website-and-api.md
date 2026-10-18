@@ -1,13 +1,19 @@
 ---
 document_type: architecture-decision
-lifecycle: proposed
+lifecycle: superseded
 authority: supporting
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-03
+last_reviewed: 2026-10-18
 review_trigger: website/API boundary, rebuild scope, or final design agreement
+successor: ../product-specs/common-practice-foundation-review.md
+reason: The foundation review replaced Website RPC with native HTTP; the separate application and API boundary remains.
 ---
 
 # Rebuild the application layer with a separate website and API
+
+The [foundation review](../product-specs/common-practice-foundation-review.md)
+supersedes this Website RPC direction. The original decision below is retained
+as history; the separate Website/API boundary remains.
 
 Cooper selected a fresh website and application foundation while retaining the
 TaxKit calculation packages. A separate backend will give the website and agent

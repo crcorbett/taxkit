@@ -1,6 +1,9 @@
 import "@tanstack/react-start/server-only";
 import type { TaxKitApiBinding } from "@taxkit/infrastructure/api-worker";
-import { CalculatorHostMode } from "@taxkit/observability/edge-identity";
+import {
+  CalculatorHostMode,
+  WebsiteForwardingCredential,
+} from "@taxkit/observability/edge-identity";
 import { reifyBoundConfigProvider } from "alchemy/Runtime";
 import {
   Array,
@@ -33,9 +36,7 @@ const PrivateApiBinding: Schema.Codec<TaxKitApiBinding> =
       Predicate.hasProperty(value, "fetch") &&
       Predicate.isFunction(value.fetch) &&
       Predicate.hasProperty(value, "connect") &&
-      Predicate.isFunction(value.connect) &&
-      Predicate.hasProperty(value, "calculatorRequest") &&
-      Predicate.isFunction(value.calculatorRequest)
+      Predicate.isFunction(value.connect)
   );
 
 // Only Website-owned settings reach Config. Alchemy's reader unwraps its
@@ -49,6 +50,7 @@ const websiteKeys = [
   "POSTHOG_REGION",
   "POSTHOG_STAGE",
   "TAXKIT_PUBLICATION_ORIGIN",
+  "TAXKIT_WEBSITE_FORWARDING_KEY",
   "WEBSITE_PUBLIC_ORIGIN",
 ] as const;
 
@@ -101,6 +103,17 @@ export const WebsiteApiConfig = Effect.gen(function* () {
     ),
     binding: Schema.decodeUnknownEffect(PrivateApiBinding)(
       Record.get(bindings, "TAXKIT_API").pipe(Option.getOrUndefined)
+    ),
+    // Defer the generated Output-backed key until a calculation executes.
+    // Missing private credentials cannot make public metadata reads unavailable.
+    forwardingCredential: Effect.succeed(
+      Config.schema(
+        WebsiteForwardingCredential,
+        "TAXKIT_WEBSITE_FORWARDING_KEY"
+      ).pipe(
+        Effect.provideService(ConfigProvider.ConfigProvider, provider),
+        Effect.mapError(() => new WebsiteApiConfigError())
+      )
     ),
     hostMode: Config.schema(CalculatorHostMode, "CALCULATOR_HOST_MODE").pipe(
       Config.withDefault("edge")

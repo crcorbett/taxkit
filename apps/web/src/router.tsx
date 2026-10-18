@@ -6,8 +6,8 @@ import type { WebsiteServerRenderContext } from "#/lib/schemas";
 
 import { routeTree } from "./routeTree.gen";
 
-// Public documentation and metadata are reused for one minute, including
-// intent preloads. Routes with personal or live data opt out.
+// Public documentation loader data is reused for one minute, including intent
+// preloads. Routes with personal or live data opt out.
 export const getRouter = () =>
   createTanStackRouter({
     context: { registry: createLoaderRegistry() },

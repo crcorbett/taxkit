@@ -22,10 +22,7 @@ import type { Route } from "playwright";
 import { WebsiteBrowserToolFailure } from "../src/lib/browser-tools.schemas";
 import { WebsiteBrowserToolkit } from "../src/lib/browser-tools.toolkit";
 import { WebsiteCalculatorViewState } from "../src/lib/schemas";
-import {
-  nativeMcpSessionExports,
-  nativeMcpSessionFixture,
-} from "./native-mcp.fixture";
+import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4231";
@@ -88,7 +85,8 @@ it.live(
           compatibilityDate: "2026-10-04",
           compatibilityFlags: ["nodejs_compat"],
           env: {
-            ...nativeMcpSessionFixture(name),
+            ...nativeForwardingFixture,
+
             ...nativeRateFixture("10090"),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
             TAXKIT_PUBLICATION_ORIGIN: {
@@ -101,7 +99,7 @@ it.live(
             },
             WORKER_URL: { type: "json" as const, value: apiOrigin },
           },
-          exports: nativeMcpSessionExports,
+
           manifest: {
             mainModule: "worker.js",
             modules: apiModules,
@@ -146,6 +144,7 @@ it.live(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
+                      ...nativeForwardingFixture,
                       ...nativeRateFixture("10091"),
                       API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },
                       TAXKIT_API: {
@@ -557,13 +556,9 @@ it.live(
         expect.fail("Returned calculator lost its retained page snapshot");
       }
       expect(yield* Queue.clear(calls)).toEqual([]);
-      // Navigation may refresh only public catalogue reads.
-      expect(
-        Array.every(
-          yield* Queue.clear(reads),
-          (entry) => entry === catalogueRead
-        )
-      ).toBe(true);
+      // Ordinary navigation uses deployed summaries; remote catalogue reads
+      // occur only when the explicit discovery tool is invoked.
+      expect(yield* Queue.clear(reads)).toEqual([]);
       expect(yield* Queue.clear(exceptions)).toEqual([]);
       yield* Effect.logInfo("native-webmcp: actual caller completed", {
         browser: browser.version(),

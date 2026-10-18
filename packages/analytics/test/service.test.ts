@@ -131,7 +131,8 @@ it.effect.each(["disabled", "denied"] as const)(
       const crypto = yield* Crypto.Crypto;
       const noUseCrypto = Layer.succeed(Crypto.Crypto, {
         ...crypto,
-        randomUUIDv4: Effect.die("Disabled capture generated an identity"),
+        randomUUIDv4: () =>
+          Effect.die("Disabled capture generated an identity"),
       });
       const transport = HttpClient.make(() =>
         Effect.die("Disabled capture made a request")

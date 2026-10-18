@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: package contracts or generated-source boundaries change
 ---
 
@@ -31,26 +31,26 @@ app is no longer a workspace; its original source remains historical data.
   once at the synchronous compiler configuration boundary.
 - `src/public-links.boundary.ts`: compiler-only mapping of parsed page and
   repository links. It preserves the supplied tree and code examples.
-- `src/public-links.schema.ts`: checked repository URL and immutable Git revision
-  used by the compiler for source attribution.
+- `src/public-links.schema.ts` and `src/public-links.profile.ts`: checked
+  repository URL, historical citation revision and accepted current-example
+  snapshot used by the compiler for source attribution.
 - `src/schemas.ts`: compatibility re-exports from `@taxkit/content` plus authored
   meta and validation issue schemas.
 - `src/errors.ts`: compatibility source/lookup error exports plus validation errors.
-- `src/server.ts`: server-only generated Fumadocs source loader export for the
-  content collection.
+- `src/server.ts`: private generated Fumadocs loader used to derive compiler
+  adapter types. It has no public package subpath.
 - `src/navigation.ts`: deployment-neutral decoding of the bundled navigation
   representation without importing Node filesystem policy.
-- `src/live.layer.ts`: Effect service layer that serves navigation and
-  renderable Fumadocs page data and loads validation policy only when its
-  explicit validation operation runs.
+- `src/live.layer.ts`: build-time source service Layer exposing only
+  `listPages` and `getNavigation` for catalogue preparation.
 - `src/test.layer.ts`: static `DocsContentServiceTest` composition over the
   generic Fumadocs test Layer; tests supply `FumadocsSourceFixtures`.
 - `src/catalogue-index.runtime.ts`: local command that asks the installed MDX
   compiler to generate an independent native index in `.source/catalogue/`.
 - `src/catalogue-source.layer.ts`: local build-only compiler connection exposed
   as `@taxkit/docs-content/catalogue-source`. It waits for Bun plugin setup,
-  loads that native index and uses the same generated collection adapter as
-  the retained Vite source. Browser and request handlers must not import it.
+  loads that native index and supplies the checked generated-collection adapter.
+  Browser and request handlers must not import it.
 - `.source/`: generated Fumadocs output. Regenerate it instead of editing it by
   hand.
 
@@ -58,13 +58,14 @@ app is no longer a workspace; its original source remains historical data.
 
 `fumadocs-mdx` compiles `source.config.ts` into `.source/`. The collection root
 is resolved from `source.config.ts` through its module URL because generation
-also runs from the docs app working directory; generated imports remain
+also runs from the Website working directory; generated imports remain
 checkout-relative and portable in either consumer. Server-only package
 code supplies one TaxKit generated-collection adapter as
 `FumadocsGeneratedCollection` to the static `FumadocsSourceLive`. `DocsContentServiceLive` requires the generic
 `FumadocsSource` service, decodes its generic representation into canonical
 TaxKit page values and maps generic source errors at the content boundary.
-The app composes the two Layers and executes the resulting server runtime.
+The catalogue command composes these Layers. Public requests use
+`@taxkit/content` over the checked JSON catalogue.
 Generic source failures are mapped once into safe TaxKit content errors; raw
 provider causes and fixture content do not cross the package boundary.
 
@@ -76,37 +77,47 @@ inside an app Worker.
 The compiler also checks imported navigation in `source.config.ts`. Its
 synchronous configuration host uses the non-throwing Schema result and turns an
 invalid result into a fixed safe configuration failure. It does not run an
-Effect runtime. Fumadocs owns parsing, highlighting and both HTML and processed
-Markdown. The private link plugin maps its parsed link and reference-definition
+Effect runtime. Every local runtime import in the Node-loaded configuration
+closure uses an explicit `.ts` source specifier; it cannot rely on Bun or a test
+resolver mapping `.js` to source. A native Node config-import regression checks
+that boundary without generation or a custom loader. Fumadocs owns parsing,
+highlighting and both HTML and processed Markdown. The private link plugin maps its parsed link and reference-definition
 nodes through checked navigation. Section indexes use their canonical section
 address. Repository references use the recorded immutable Git revision; queries
 and fragments survive. Anchors and external links are preserved, and code
-examples are not rewritten. Unknown page addresses and paths outside the
-checkout reject compilation. Refresh the source revision only at a recorded
-review phase after confirming its referenced files.
+examples are not rewritten. Current checked-example targets use a separate
+accepted immutable revision; ordinary repository citations retain their
+historical revision. Unknown page addresses and paths outside the checkout
+reject compilation. Refresh the accepted example revision only at a recorded
+review phase after comparing the selected Git objects with the checked files.
+Both standalone validation and catalogue publication require exact source-byte
+equality. The catalogue command also checks the emitted complete guide fences
+and example-reference URLs before writing its JSON. The accepted Git objects
+must be available locally; the check never fetches them.
 
 The same plugin serves the retained Vite index and the independent native index.
 It belongs to the build process; browser modules and request handlers must not
 import its Node path operations or the compiler configuration.
 
 Node's native configuration loader requires `with { type: "json" }` on the
-navigation import. This source-only package, the retained docs app and its script
-typecheck, and the documentation tool typecheck select `ESNext` modules so the
+navigation import. This source-only package and the documentation tool typecheck select `ESNext` modules so the
 installed TypeScript compiler accepts that declaration. The root module setting
 and compiled public package settings retain their existing contract.
 
 This package is intentionally private and source-only. It is not a publishable
-runtime package because its server and client exports wrap generated
-Fumadocs/Vite modules for `content/`. The package exports include
+runtime package because its client export wraps generated Fumadocs/Vite
+modules for `content/`. The retired `./server`, `./generated-source` and
+executable `./validate` imports are absent. Validation remains a package command. The package exports include
 `types`, `source` and `default` entries that all point at source files so
 workspace consumers use the same generated-source boundary in development,
 build and type checking.
 
 Validation may read raw MDX source text for source-text policy checks such as
 frontmatter, navigation coverage, local links, allowed MDX component usage,
-examples and OpenAPI references. App routes should consume the service boundary
-instead of importing `.source/*` files directly. Browser modules must not
-import `@taxkit/docs-content/server`.
+examples and OpenAPI references. MDX syntax and component classification use
+the installed MDX parser; the compiler runs the same component policy on its
+existing tree. App routes consume the public Content service. Browser modules
+use only the supported `./client` presentation entry.
 
 The generated Fumadocs loader retains a `getText("raw")` filesystem branch,
 but the runtime adapter requests only `getText("processed")`. Its private
@@ -114,14 +125,14 @@ but the runtime adapter requests only `getText("processed")`. Its private
 receiver and maps rejections to a safe tagged error. Raw representations are
 decoded once by the Fumadocs live Layer. The SDK offers no abort signal for
 this read; interrupting its awaiting Effect does not prove provider cancellation. The validation
-policy remains Node-only and is dynamically imported only by
-`validateContent`. Normal docs requests must not initialize either filesystem
-operation. The original old-app failure oracle remains retained-source
+policy remains local-command-only through `src/validate.runtime.ts`.
+The source service has no page lookup or validation operation. Normal docs
+requests must not initialize source acquisition or validation. The original old-app failure oracle remains retained-source
 history. Current API/Website native tests cover the public catalogue at runtime.
 
 ## Checked examples
 
-[`@taxkit/docs-examples`](../docs-examples/README.md) owns the four source
+[`@taxkit/docs-examples`](../docs-examples/README.md) owns the checked source
 templates and their compiler/runtime checks. Content validation checks their
 existence and public references. Their HTTP/SDK dependencies do not belong in
 this content package; the HTTP API can therefore consume content contracts
@@ -146,9 +157,10 @@ The server example reuses request-decoded cents to assemble Money directly.
 The corresponding public browser/server snippets match these source examples;
 the money concept owns constructor and arithmetic guidance.
 
-The five complete validation, raw-error, help, fact and test examples listed in
-`src/validation/checked-snippets.ts` must match their compiled source files
-exactly. This check applies to those named fences; it does not claim every
+The complete browser, validation, raw-error, help, fact and test examples listed
+in `src/validation/checked-snippets.ts` must match their checked source files
+exactly. The example registry also owns which repository links promise the
+current checked source snapshot. This check applies to those named fences; it does not claim every
 fenced example in the documentation has been compiled.
 
 ## Public catalogue build
@@ -206,15 +218,24 @@ runtime or external availability, correctness, or user visibility.
 - every authored MDX source is represented in navigation;
 - every page frontmatter decodes through `DocsPageFrontmatter`;
 - local relative links resolve;
-- fenced code blocks are balanced;
+- MDX parses successfully through the compiler's installed parser;
 - banned marketing language, stale public names and private downstream product
   details are absent;
 - JSX-style MDX components outside inline code and fenced code blocks are in the
   explicit allowed component set;
-- examples and OpenAPI reference pages include their required reference text.
+- examples and OpenAPI reference pages include their required reference text;
+- every current checked example exactly matches its accepted immutable Git object.
 
-Add new MDX component allowances in `src/validation/policy.ts` only when the
-component is intentionally supported by the docs app renderer. Keep renderer
+Add new MDX component allowances in `src/validation/mdx-component-policy.ts`
+only when the component is intentionally supported by the Website renderer.
+Backtick and tilde fences, longer fence delimiters and inline-code delimiters
+are classified by the MDX AST, independently of the allowlist. The same policy
+visits parser-owned ESTree Programs for JavaScript expressions, ESM and JSX
+attribute payloads. Executable JSX in those Programs follows the component
+allowlist, including member bindings such as `motion.div` and
+`components.Unsafe` with lowercase namespace roots. Plain lowercase intrinsic
+HTML tags remain supported; strings and template text remain literal. The native ESTree visitor
+uses a fresh VFile diagnostic sink for each traversal and does not mutate the AST. Keep renderer
 implementation in the consuming app or reusable primitives in
 `@taxkit/docs-fumadocs/render`.
 
@@ -236,11 +257,11 @@ implementation in the consuming app or reusable primitives in
   Leaf commands never rebuild another package while it is in use.
 - Run `bun run --filter=@taxkit/docs-examples check-examples` after changing
   the checked source templates.
-- Keep docs identifiers, frontmatter, meta, navigation and tagged source errors
-  schema-owned in this package.
-- Keep service tests on the deterministic test Layer so published, missing and
-  malformed content exercise the same canonical service contract as
-  production.
+- Keep canonical identifiers, frontmatter, navigation and source errors owned
+  by `@taxkit/content`; authored meta and validation contracts remain here.
+- Keep build-source tests on the deterministic test Layer so decoded pages,
+  navigation and malformed representations exercise the catalogue source contract.
+  Public lookup and missing-page behavior belong to `@taxkit/content`.
 
 ## Related docs
 
@@ -267,8 +288,7 @@ plugin and this package's collection configuration. Its server obtains checked
 page/navigation values from the separate API; the browser-safe compiled page
 must match that API value before display. The Website owns routes, rendering,
 focus, responsive navigation and recoverable errors. This adds no authored
-source, compiler or filesystem fallback to its request handlers. The retained
-docs app and its commands remain until replacement qualification is complete.
+source, compiler or filesystem fallback to its request handlers. The old docs app is retired.
 
 The Website also generates static PNG share assets from this checked catalogue
 at its Vite build boundary. Publication status and authored sources remain owned

@@ -27,10 +27,7 @@ import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
 import { WebsiteApiDeadlineExceeded } from "../src/lib/api/errors";
-import {
-  nativeMcpSessionExports,
-  nativeMcpSessionFixture,
-} from "./native-mcp.fixture";
+import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -114,10 +111,10 @@ it.live(
               ).toBe(true);
             }
             const origins = {
+              ...nativeForwardingFixture,
               ...(artifact.entry === "worker.js"
                 ? {
                     ...nativeRateFixture("10078"),
-                    ...nativeMcpSessionFixture(artifact.name),
                   }
                 : nativeLocalModeFixture),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
@@ -153,10 +150,7 @@ it.live(
                         },
                       }
                     : origins,
-                exports:
-                  artifact.entry === "worker.js"
-                    ? nativeMcpSessionExports
-                    : undefined,
+
                 manifest: { mainModule: artifact.entry, modules, modulesRoot },
                 name: artifact.name,
               },
@@ -214,6 +208,7 @@ it.live(
           config: {
             ...worker.config,
             env: {
+              ...nativeForwardingFixture,
               ...nativeLocalModeFixture,
               ...worker.config.env,
               API_PUBLIC_ORIGIN: {
@@ -261,7 +256,13 @@ it.live(
             )
           );
           const elapsed = (yield* Clock.currentTimeMillis) - started;
-          expect(Schema.is(CalculatorRpcDeadlineExceeded)(error)).toBe(true);
+          // The native client exposes a closed safe error union. Report only
+          // its tag and the fixed fixture phase; never inspect raw causes or
+          // request/response bytes to diagnose a transport regression.
+          expect(
+            Schema.is(CalculatorRpcDeadlineExceeded)(error),
+            `Native ${address === apiOrigin ? "body" : "headers"} fixture returned ${error._tag} after ${elapsed}ms`
+          ).toBe(true);
           expect(elapsed).toBeGreaterThanOrEqual(9500);
           expect(elapsed).toBeLessThan(12_000);
         })

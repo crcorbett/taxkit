@@ -1,4 +1,5 @@
 import { rpcPath } from "@taxkit/api-http/routes";
+import { isRequestedDocsPage } from "@taxkit/content/response-check";
 import type { DocsPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
 import type { DocsDiscoveryPath } from "@taxkit/publication/schemas";
 import { Array, Effect, Layer, Schema } from "effect";
@@ -127,6 +128,12 @@ export const DocsRpcClientLive = Layer.effect(
             )
           ),
           protocol
+        ).pipe(
+          Effect.flatMap((page) =>
+            isRequestedDocsPage(path, page)
+              ? Effect.succeed(page)
+              : Effect.fail(new DocsRpcInvalidResponse())
+          )
         )
       ),
       searchPages: Effect.fn("DocsRpcClient.searchPages")(

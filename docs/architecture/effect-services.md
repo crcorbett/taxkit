@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -36,8 +36,8 @@ its Layer is built. A server call with no incoming request, or a browser host
 that throws, refuses collection.
 The application owns when to capture and which checked collection policy applies.
 The API application captures its delivery service during initialisation, then
-supplies it to each returned request operation. Worker and older MCP session
-delivery use their own native `waitUntil`; request collection remains fresh.
+supplies it to each returned request operation. The native Worker owns
+`waitUntil` delivery; request collection remains fresh.
 T008 Website/browser composition and provider readback remain pending.
 
 ## Service shape
@@ -214,9 +214,12 @@ Effects over schema-decoded generic page values. The static
 `FumadocsSourceLive` requires the `FumadocsGeneratedCollection` adapter
 service, contains unknown provider output and emits safe tagged errors;
 `FumadocsSourceTest` requires `FumadocsSourceFixtures`.
-`@taxkit/docs-content` supplies the TaxKit collection adapter and decodes the
-generic value into its canonical content Schemas. Neither package executes a
-runtime. The accepted catalogue is built through the generated adapter;
+`@taxkit/docs-content` privately supplies the TaxKit collection adapter and
+decodes the generic value into its canonical content Schemas. Its build-only
+source service exposes only `listPages` and `getNavigation`; retired source
+subpaths and the executable validation import are removed, while the validation
+CLI remains. Neither package executes a runtime from a service import.
+The accepted catalogue is built through the generated adapter;
 `apps/api` owns its checked content service and `apps/web` reads documentation
 from the API.
 
@@ -279,13 +282,24 @@ workerd instance scope has no teardown hook, so no isolate-finaliser claim is
 made; request-coupled I/O belongs inside incoming dispatch.
 
 Origins stay deferred during native planning. A cached native Config effect
-decodes bound addresses on first incoming runtime use. HTTP/RPC handling builds no live Layer. The native MCP protocol host is
-built once on first runtime use in the existing instance scope, after addresses
-resolve; its registrations omit first-caller request capabilities. The native body stream has bounded accumulation, total read
+decodes bound addresses on first incoming runtime use. HTTP/RPC handling builds
+no live Layer. The modern MCP registration is built once after addresses resolve,
+excluding first-caller capabilities. Native `layerHttpRequestScoped` owns each
+POST's protocol server/notification consumer through body completion; shared
+calculator/content services and work/rate owners remain captured once.
+Legacy session/DO hosting is retired. The native body stream has bounded accumulation, total read
 time and scoped cancellation. Safe logger/reporter context is built at instance
 initialisation and supplied to both native router construction and dispatch;
 T009 retains unqualified safe native trace exports. T003's local connection
 acceptance does not establish that later requirement.
+
+The Website's generated HTTP client uses the private native binding for reads
+and calculations. Its host adapter enforces manual redirects; canonical server
+calculation POSTs alone receive the stage-owned native Random secret and checked
+original IP. The API's static `ApiWebsiteForwardingLive` verifies request-time
+Config with the native constant-time primitive and strips private fields before
+domain dispatch. No credential memo retains an incoming request's fibre or
+context. Public RPC/MCP retain direct-edge identity and the same shared limiter.
 
 ## Promise boundaries
 

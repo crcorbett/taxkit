@@ -20,16 +20,13 @@ import { ProfileStore } from "alchemy/Auth/Profile";
 import { Providers } from "alchemy/Cloudflare";
 import { BotManagement } from "alchemy/Cloudflare/BotManagement";
 import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
-import {
-  Worker,
-  isDurableObjectExport,
-  isSelfUrl,
-} from "alchemy/Cloudflare/Workers";
+import { Worker, isSelfUrl } from "alchemy/Cloudflare/Workers";
 import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
 import * as Provider from "alchemy/Provider";
+import { Random } from "alchemy/Random";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
@@ -43,6 +40,7 @@ import {
   Effect,
   Exit,
   Layer,
+  Match,
   Option,
   Order,
   Record,
@@ -151,11 +149,17 @@ const graphFixture = Effect.fnUntraced(function* (
     read: ({ output }) => Effect.succeed(output),
     reconcile: () => forbiddenWrite,
   });
+  const randomProvider = Provider.succeed(Random, {
+    delete: () => forbiddenWrite,
+    read: ({ output }) => Effect.succeed(output),
+    reconcile: () => forbiddenWrite,
+  });
   const providers = Layer.merge(
     Layer.effect(
       Providers,
       Provider.collection([
         Worker,
+        Random,
         Zone,
         ZoneDnsSettings,
         Setting,
@@ -173,12 +177,14 @@ const graphFixture = Effect.fnUntraced(function* (
           )
         )
       )
-    ),
+    ).pipe(Layer.provideMerge(randomProvider)),
     stateLayer
   );
   // The actual stage selects its native resources. Unlisted providers still
   // fail rather than receive invented services; all writes refuse.
-  const compiled = yield* Stack.make<Providers | State>({
+  const compiled = yield* Stack.make<
+    Providers | State | Provider.Provider<Random>
+  >({
     name: "TaxKitAppsGraphProof",
     providers,
     state: stateLayer,
@@ -205,126 +211,140 @@ const graphFixture = Effect.fnUntraced(function* (
         stack: compiled.name,
         stage: compiled.stage,
         value: {
-          attr: {
-            accountId: "graph-proof-account",
-            crons: [],
-            durableObjectNamespaces: {},
-            routes: [],
-            url:
-              resource.LogicalId === "TaxKitApi"
-                ? "https://api.example.com"
-                : "https://website.example.com",
-            urls: [],
-            workerId: `proof-${resource.LogicalId}`,
-            workerName: resource.LogicalId,
-          },
+          attr:
+            resource.Type === Random.Type
+              ? { text: Redacted.make("a".repeat(64)) }
+              : {
+                  accountId: "graph-proof-account",
+                  crons: [],
+                  durableObjectNamespaces: {},
+                  routes: [],
+                  url:
+                    resource.LogicalId === "TaxKitApi"
+                      ? "https://api.example.com"
+                      : "https://website.example.com",
+                  urls: [],
+                  workerId: `proof-${resource.LogicalId}`,
+                  workerName: resource.LogicalId,
+                },
           // The actual already-applied native bindings. Only the Website
           // depends on the other host's address.
-          bindings:
-            resource.LogicalId === "TaxKitApi"
-              ? [
-                  {
-                    data: {
-                      bindings: [
-                        { name: "API_PUBLIC_ORIGIN", type: "self_url" },
-                      ],
+          bindings: Match.value(resource.Type).pipe(
+            Match.when(Random.Type, () => []),
+            Match.orElse(() =>
+              resource.LogicalId === "TaxKitApi"
+                ? [
+                    {
+                      data: {
+                        bindings: [
+                          { name: "API_PUBLIC_ORIGIN", type: "self_url" },
+                        ],
+                      },
+                      sid: "API_PUBLIC_ORIGIN",
                     },
-                    sid: "API_PUBLIC_ORIGIN",
-                  },
-                  {
-                    data: {
-                      bindings: [
-                        {
-                          name: "CALCULATOR_HOST_MODE",
-                          text: "edge",
-                          type: "plain_text",
-                        },
-                      ],
+                    {
+                      data: {
+                        bindings: [
+                          {
+                            name: "CALCULATOR_HOST_MODE",
+                            text: "edge",
+                            type: "plain_text",
+                          },
+                        ],
+                      },
+                      sid: "CALCULATOR_HOST_MODE",
                     },
-                    sid: "CALCULATOR_HOST_MODE",
-                  },
-                  {
-                    data: {
-                      bindings: [
-                        {
-                          name: "CALCULATOR_RATE_LIMIT",
-                          namespaceId: "10076",
-                          simple: { limit: 60, period: 60 },
-                          type: "ratelimit",
-                        },
-                      ],
+                    {
+                      data: {
+                        bindings: [
+                          {
+                            name: "CALCULATOR_RATE_LIMIT",
+                            namespaceId: "10076",
+                            simple: { limit: 60, period: 60 },
+                            type: "ratelimit",
+                          },
+                        ],
+                      },
+                      sid: "CALCULATOR_RATE_LIMIT",
                     },
-                    sid: "CALCULATOR_RATE_LIMIT",
-                  },
-                  {
-                    data: {
-                      bindings: [
-                        {
-                          name: "TAXKIT_PUBLICATION_ORIGIN",
-                          text: publicationOrigin,
-                          type: "plain_text",
-                        },
-                      ],
+                    {
+                      data: {
+                        bindings: [
+                          {
+                            name: "TAXKIT_PUBLICATION_ORIGIN",
+                            text: publicationOrigin,
+                            type: "plain_text",
+                          },
+                        ],
+                      },
+                      sid: "TAXKIT_PUBLICATION_ORIGIN",
                     },
-                    sid: "TAXKIT_PUBLICATION_ORIGIN",
-                  },
-                ]
-              : [
-                  { data: { bindings: [undefined] }, sid: "API_PUBLIC_ORIGIN" },
-                  {
-                    data: {
-                      bindings: [
-                        {
-                          name: "CALCULATOR_HOST_MODE",
-                          text: "edge",
-                          type: "plain_text",
-                        },
-                      ],
+                  ]
+                : [
+                    {
+                      data: { bindings: [undefined] },
+                      sid: "API_PUBLIC_ORIGIN",
                     },
-                    sid: "CALCULATOR_HOST_MODE",
-                  },
-                  {
-                    data: {
-                      bindings: [{ name: "TAXKIT_API", type: "service" }],
+                    {
+                      data: {
+                        bindings: [
+                          {
+                            name: "CALCULATOR_HOST_MODE",
+                            text: "edge",
+                            type: "plain_text",
+                          },
+                        ],
+                      },
+                      sid: "CALCULATOR_HOST_MODE",
                     },
-                    sid: "TAXKIT_API",
-                  },
-                  {
-                    data: {
-                      bindings: [
-                        {
-                          name: "TAXKIT_PUBLICATION_ORIGIN",
-                          text: publicationOrigin,
-                          type: "plain_text",
-                        },
-                      ],
+                    {
+                      data: {
+                        bindings: [{ name: "TAXKIT_API", type: "service" }],
+                      },
+                      sid: "TAXKIT_API",
                     },
-                    sid: "TAXKIT_PUBLICATION_ORIGIN",
-                  },
-                  {
-                    data: {
-                      bindings: [
-                        { name: "WEBSITE_PUBLIC_ORIGIN", type: "self_url" },
-                      ],
+                    {
+                      data: {
+                        bindings: [
+                          {
+                            name: "TAXKIT_PUBLICATION_ORIGIN",
+                            text: publicationOrigin,
+                            type: "plain_text",
+                          },
+                        ],
+                      },
+                      sid: "TAXKIT_PUBLICATION_ORIGIN",
                     },
-                    sid: "WEBSITE_PUBLIC_ORIGIN",
-                  },
-                ],
+                    {
+                      data: {
+                        bindings: [
+                          { name: "WEBSITE_PUBLIC_ORIGIN", type: "self_url" },
+                        ],
+                      },
+                      sid: "WEBSITE_PUBLIC_ORIGIN",
+                    },
+                  ]
+            )
+          ),
           downstream: [],
           fqn: resource.FQN,
           instanceId: `proof-${resource.LogicalId}`,
           logicalId: resource.LogicalId,
           namespace: resource.Namespace,
-          props:
-            resource.LogicalId === "TaxKitApi"
-              ? {
-                  env: {
-                    CALCULATOR_RATE_NAMESPACE: Redacted.make(
-                      packEnvValue(Redacted.make("10076"))
-                    ),
-                  },
-                }
-              : {},
+          props: Match.value(resource.Type).pipe(
+            Match.when(Random.Type, () => ({ bytes: 32 })),
+            Match.orElse(() =>
+              resource.LogicalId === "TaxKitApi"
+                ? {
+                    env: {
+                      CALCULATOR_RATE_NAMESPACE: Redacted.make(
+                        packEnvValue(Redacted.make("10076"))
+                      ),
+                    },
+                  }
+                : {}
+            )
+          ),
           providerVersion: 0,
           resourceType: resource.Type,
           status: "created",
@@ -396,13 +416,17 @@ describe("native paired app graph and planner", () => {
         expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
           "TaxKitApi",
           "TaxKitWebsite",
+          "TaxKitWebsiteForwardingKey",
         ]);
         expect(result.compiled.stage).toBe(stage);
         expect(result.providerWrites).toBe(0);
         expect(
           Array.map(Record.values(plan.resources), ({ action }) => action)
-        ).toEqual(["create", "create"]);
-        const members = Record.values(result.compiled.resources);
+        ).toEqual(["create", "create", "create"]);
+        const members = Array.filter(
+          Record.values(result.compiled.resources),
+          (resource) => resource.Type === Worker.Type
+        );
         expect(
           Array.every(
             members,
@@ -442,6 +466,7 @@ describe("native paired app graph and planner", () => {
         "TaxKitProductionTls13",
         "TaxKitProductionZone",
         "TaxKitWebsite",
+        "TaxKitWebsiteForwardingKey",
       ]);
       // Every zone setting is retained and pinned to the Production zone.
       const zoneSettings = yield* Effect.forEach(
@@ -604,6 +629,7 @@ describe("native paired app graph and planner", () => {
         expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
           "TaxKitApi",
           "TaxKitWebsite",
+          "TaxKitWebsiteForwardingKey",
         ]);
         // No binding cycle: the unpatched planner needs no deferred member.
         expect(Array.fromIterable(plan.cycleMembers)).toEqual([]);
@@ -621,6 +647,10 @@ describe("native paired app graph and planner", () => {
         ).toEqual([
           { action: mode, id: "TaxKitApi" },
           { action: mode, id: "TaxKitWebsite" },
+          {
+            action: mode === "create" ? "create" : "noop",
+            id: "TaxKitWebsiteForwardingKey",
+          },
         ]);
         const api = Record.get(result.compiled.resources, "TaxKitApi").pipe(
           Option.getOrElse(() => expect.fail("Expected native graph member"))
@@ -633,11 +663,7 @@ describe("native paired app graph and planner", () => {
         );
         expect(api.Props).toBeDefined();
         expect(website.Props).toBeDefined();
-        expect(
-          Record.get(api.Props.exports ?? {}, "TaxKitMcpSessions").pipe(
-            Option.exists(isDurableObjectExport)
-          )
-        ).toBe(true);
+        expect(Record.keys(api.Props.exports ?? {})).toEqual(["default"]);
         expect(
           Record.get(website.Props.exports ?? {}, "TaxKitMcpSessions").pipe(
             Option.isNone
@@ -652,6 +678,7 @@ describe("native paired app graph and planner", () => {
           "CALCULATOR_HOST_MODE",
           "TAXKIT_API",
           "TAXKIT_PUBLICATION_ORIGIN",
+          "TAXKIT_WEBSITE_FORWARDING_KEY",
           "WEBSITE_PUBLIC_ORIGIN",
         ]);
         // The API no longer reads the Website's address.
@@ -662,6 +689,7 @@ describe("native paired app graph and planner", () => {
           "CALCULATOR_HOST_MODE",
           "CALCULATOR_RATE_NAMESPACE",
           "TAXKIT_PUBLICATION_ORIGIN",
+          "TAXKIT_WEBSITE_FORWARDING_KEY",
         ]);
         expect(website.Props.cache).toEqual({
           crossVersionCache: false,
@@ -704,6 +732,26 @@ describe("native paired app graph and planner", () => {
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
         expect(privateBinding).toBe(api);
+        const forwardingKey = Record.get(
+          result.compiled.resources,
+          "TaxKitWebsiteForwardingKey"
+        ).pipe(
+          Option.getOrElse(() => expect.fail("Expected native forwarding key"))
+        );
+        expect(forwardingKey.Type).toBe(Random.Type);
+        expect(forwardingKey.Props).toEqual({ bytes: 32 });
+        // Both native secret env bindings evaluate to one stage-owned Output.
+        const key = Redacted.make("a".repeat(64));
+        const credentials = yield* Output.evaluate(
+          {
+            api: api.Props.env?.TAXKIT_WEBSITE_FORWARDING_KEY,
+            website: website.Props.env?.TAXKIT_WEBSITE_FORWARDING_KEY,
+          },
+          { TaxKitWebsiteForwardingKey: { text: key } }
+        ).pipe(Effect.provideContext(result.compiled.services));
+        expect(Redacted.isRedacted(credentials.api)).toBe(true);
+        expect(credentials.api).toBe(key);
+        expect(credentials.website).toBe(key);
         expect(result.compiled.stage).toBe("dev_native_graph_proof");
         expect(result.compiled.name).toBe("TaxKitAppsGraphProof");
         const absent = yield* Output.evaluate(
@@ -731,6 +779,7 @@ describe("native paired app graph and planner", () => {
       expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
         "TaxKitApi",
         "TaxKitWebsite",
+        "TaxKitWebsiteForwardingKey",
       ]);
     }).pipe(
       Effect.provideService(AlchemyContext, localContext),

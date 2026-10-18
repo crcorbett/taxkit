@@ -1,19 +1,55 @@
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { DocsPublicCatalogue } from "@taxkit/content/schemas";
-import { Console, Effect, FileSystem, Layer, Path, Schema } from "effect";
+import {
+  Array,
+  Console,
+  Effect,
+  FileSystem,
+  Layer,
+  Path,
+  Schema,
+} from "effect";
 
 import { DocsCatalogueSourceLive } from "./catalogue-source.layer.js";
 import { projectPublicCatalogue } from "./catalogue.policy.js";
-import { DocsCatalogueBuildError } from "./errors.js";
+import {
+  DocsCatalogueBuildError,
+  DocsValidationFailedError,
+} from "./errors.js";
 import { DocsContentServiceLive } from "./live.layer.js";
+import { docsPublicLinkProfile } from "./public-links.profile.js";
 import { DocsContentService } from "./service.js";
+import {
+  readCheckedExampleSnapshot,
+  validateCheckedExamplePublication,
+} from "./validation/checked-example-publication.boundary.js";
 
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
   const content = yield* DocsContentService;
+  const pages = yield* content.listPages();
+  const repositoryRoot = yield* path.fromFileUrl(
+    new URL("../../../", import.meta.url)
+  );
+  const snapshot = yield* readCheckedExampleSnapshot(
+    repositoryRoot,
+    docsPublicLinkProfile
+  );
+  const exampleIssues = validateCheckedExamplePublication(
+    pages,
+    snapshot,
+    docsPublicLinkProfile
+  );
+  if (Array.isReadonlyArrayNonEmpty(exampleIssues)) {
+    return yield* Effect.fail(
+      new DocsValidationFailedError({
+        issues: Array.map(exampleIssues, (issue) => issue.message),
+      })
+    );
+  }
   const catalogue = yield* projectPublicCatalogue(
-    yield* content.listPages(),
+    pages,
     yield* content.getNavigation()
   );
   const json = yield* Schema.encodeEffect(

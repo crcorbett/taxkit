@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Option, Result, Schema } from "effect";
+import { packEnvValue } from "alchemy/RuntimeContext";
+import { Effect, Redacted, Result, Schema } from "effect";
 import { vi } from "vitest";
 
 import { WebsiteApiConfigError } from "./api/errors";
@@ -12,7 +13,6 @@ import {
 import { WebsiteRootView } from "./schemas";
 
 const binding = {
-  calculatorRequest: vi.fn(),
   connect: vi.fn(),
   fetch: vi.fn(),
 };
@@ -43,7 +43,7 @@ describe("native website settings boundary", () => {
         );
         const encoded = yield* Schema.encodeEffect(
           Schema.fromJsonString(WebsiteRootView)
-        )({ catalogue: Option.none(), settings: checked });
+        )({ settings: checked });
         expect(encoded).not.toContain("secret-canary");
         const restored = yield* Schema.decodeUnknownEffect(
           Schema.fromJsonString(WebsiteRootView)
@@ -136,5 +136,36 @@ it.effect.each([
         );
         expect(api.failure).toEqual(new WebsiteApiConfigError());
       }
+    })
+);
+
+it.effect(
+  "resolves the protected native key lazily and excludes it from public settings",
+  () =>
+    Effect.gen(function* () {
+      const credential = "a".repeat(64);
+      const input = {
+        ...settings,
+        TAXKIT_WEBSITE_FORWARDING_KEY: packEnvValue(Redacted.make(credential)),
+      };
+      const api = yield* WebsiteApiConfig.pipe(
+        Effect.provideService(WebsiteBindings, input)
+      );
+      const key = yield* api.forwardingCredential;
+      expect(Redacted.value(key)).toBe(credential);
+      const publicSettings = yield* WebsiteSettingsConfig.pipe(
+        Effect.provideService(WebsiteBindings, input)
+      );
+      const encoded = yield* Schema.encodeEffect(
+        Schema.fromJsonString(WebsiteRootView)
+      )({ settings: publicSettings });
+      expect(encoded).not.toContain(credential);
+      expect(encoded).not.toContain("TAXKIT_WEBSITE_FORWARDING_KEY");
+      const missing = yield* WebsiteApiConfig.pipe(
+        Effect.provideService(WebsiteBindings, settings)
+      );
+      expect(yield* missing.forwardingCredential.pipe(Effect.isFailure)).toBe(
+        true
+      );
     })
 );

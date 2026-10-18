@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: current
 authority: canonical
 owner: taxkit-documentation-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: active execution-plan admission, lifecycle, dependency, or successor change
 successor: null
 tombstone: false
@@ -17,6 +17,12 @@ clients and ordinary Git/Alchemy/Doppler delivery, Cloudflare first, patch-free
 Alchemy and retirement of receipt tooling. It supersedes the transport, origin,
 cache and workflow parts of the older clean-slate plan, which keeps its
 execution history.
+
+The 18 October follow-up design covers findings 12–21, native HTTP transport
+cleanup through native secret-backed HTTP forwarding and Effect/Alchemy-native
+modern-only MCP with deletion of its legacy namespace. Cooper confirmed the
+design and requested implementation as one goal on 18 October; integration,
+verification, Preview and local release remain active in the plan.
 
 The superseded [Clean slate foundation](../completed/clean-slate-foundation.md)
 plan and its [local continuation prompt](../completed/clean-slate-local-handoff.md)

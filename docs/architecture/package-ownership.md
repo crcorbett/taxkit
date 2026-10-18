@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -151,8 +151,8 @@ Root `alchemy.run.ts` and `alchemy.local.run.ts`
 and the native Alchemy Worker. The native instance owns one router and
 calculator service; incoming requests own body limits, dispatch and cleanup.
 HTTP, RPC and MCP share the named calculator service operations; the Worker
-also serves the discovery documents and the trusted `calculatorRequest`
-binding method. The private `api/worker` export supplies native implementation
+also serves the discovery documents and authenticates the Website's private
+canonical calculation HTTP requests. The private `api/worker` export supplies native implementation
 to root `alchemy.apps.ts`; infrastructure owns the lightweight Worker declaration
 and shared settings. `@taxkit/observability/edge-identity` owns shared edge caller
 identity. Neither an app nor a package depends on another app.
@@ -251,10 +251,14 @@ belongs in apps or explicitly server-only package exports.
 - Define reusable config schemas in the package that owns the runtime contract,
   then compose and provide them from app-specific config modules.
 - Import from the owner instead of redefining boundary values locally.
-- Use another workspace's named public export. The global
-  `package/no-cross-package-source-imports` rule rejects aliases and relative
-  paths that reach into a different app or package's private `src` tree,
-  including TaxKit's nested rule and transport packages.
+- Use another workspace's declared dependency and named public export. Native
+  `package/workspace-import-boundaries` receives current manifest-derived
+  exports and edges, including nested packages and peers. Direct cross-owner
+  source paths are private. The separate `taxkit-package/workspace-roles` rule
+  restricts Website source to contracts/clients and exact host module grants;
+  new exports and dependency declarations cannot grant a browser/backend role.
+  [Package boundaries](./package-boundaries.md) owns the policy and proof limits;
+  `tools/oxlint/package-roles.ts` owns the enforced module grants.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
 - Keep each validator and its domain policy with the package or app it

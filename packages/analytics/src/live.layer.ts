@@ -50,7 +50,7 @@ export const BackendAnalyticsLive = Layer.unwrap(
                     if (input.collectionPolicy === "deny") {
                       return "denied" as const;
                     }
-                    const uuid = yield* crypto.randomUUIDv4.pipe(
+                    const uuid = yield* crypto.randomUUIDv4().pipe(
                       Effect.flatMap(EventId.makeEffect),
                       Effect.mapError(
                         () =>

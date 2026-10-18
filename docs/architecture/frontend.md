@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: frontend runtime, API client, loader, rendering, cache, build adapter, or composition change
 ---
 
@@ -46,9 +46,13 @@ The Website has exactly two places that run Effects:
 - `apps/web/src/lib/runtime.server.ts`: one `ManagedRuntime` with
   independent `WebsiteSettingsLive` and `WebsiteApiLive` Layers. The API Layer
   builds the generated client over the binding with
-  `toHttpClient(fromCloudflareFetcher(binding))`. Its calculation POST uses the
-  API's trusted private `calculatorRequest` method so the caller's rate key
-  travels outside JSON and headers.
+  `toHttpClient(fromCloudflareFetcher(binding))`. Only the canonical calculation
+  POST adds the private stage-owned forwarding credential and separately checked
+  original caller identity. The API verifies the credential, method and path
+  before accepting that identity into the shared allowance. Public metadata
+  GET/HEAD requests remain credential-free; financial JSON carries neither
+  credential nor caller key. The native adapter forwards the fetch AbortSignal;
+  that alone does not prove remote Effect interruption or late-body cleanup.
 - `apps/web/src/lib/runtime.client.ts`: the browser loader bridge. It runs one
   request Effect with the shared `AtomRegistry` and the loader's `AbortSignal`.
   The browser client is `ApiClient`, an `AtomHttpApi.Service` built with
@@ -64,8 +68,9 @@ The Website declares no server functions, has no proxy at the API's `/api`,
 `src/router.tsx` creates one registry before loaders run and React reuses it.
 TanStack owns loader data and its freshness: intent preloading, a one-minute
 default stale time and `staleTime: 0` on the root route, which carries live
-settings and any personal submission. Loaders hold no request atoms and add no
-second cache. `loaders.ts` selects the server or browser branch with
+settings and any personal submission. Root loading performs no catalogue API
+read and does not acquire the generated client. Loaders hold no request atoms
+and add no second cache. `loaders.ts` selects the server or browser branch with
 `createIsomorphicFn`; failures become TanStack `notFound()` or a
 `WebsiteLoadError` for the route's error component.
 
@@ -74,9 +79,25 @@ from the API resource's Output and canonical links from the fixed publication
 origin `https://taxkit.dev`. `config.server.ts` reads only the Website's keys
 through `reifyBoundConfigProvider`. Settings and the API binding retain independent
 checked failures: a broken binding leaves settings available, and invalid Website
-settings do not block valid API forwarding. `root.load.server.ts` requires settings
-and treats the catalogue as optional page chrome.
+settings do not block valid API forwarding. `root.load.server.ts` requires only
+settings and preserves the request's submission alongside them.
 Vite exposes no ambient public env prefix or build-time API address.
+
+Calculator navigation and calculator page names/contexts use the browser-safe
+`@taxkit/calculators/summaries` export. These checked values own the same fields
+in the API catalogue; the Website owns their route addresses. They import no
+calculator execution or live rule Layers. Links and forms render synchronously
+on the server and need no browser query or deferred reveal. A slow or failed
+remote catalogue operation therefore has no root-loader or navigation fallback
+state. Invalid required settings still use the root error view; an unknown
+calculator address retains its local unavailable view.
+
+Summary freshness follows the application version: a Website/API rebuild and
+deployment publishes changed names and supported contexts, and a browser reload
+loads that version. Summaries have no independent request cache or one-minute
+remote refresh. The browser's catalogue tool still reads the API for full
+discovery metadata. Root-loader completion and SSR response timing are separate
+claims; the absence of catalogue I/O does not establish first-byte timing.
 
 `src/server.ts` is the Worker entry. Before TanStack it handles the analytics
 relay, discovery files (forwarded once to the API), the no-JavaScript
@@ -100,7 +121,7 @@ route file also renders React; do not allowlist a mixed `.tsx` route merely
 because its loader needs a decoder.
 
 Loader data must be plain values TanStack can serialise. When a loader returns a
-Schema-encoded value (the root route's settings and catalogue, or a
+Schema-encoded value (the root route's settings, or a
 no-JavaScript submission), the direct route component is its first consumer:
 it restores the value once and matches the `Result` before composing React.
 It must not forward the encoded value or whole route `Result` to a child, and

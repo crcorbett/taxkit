@@ -3,6 +3,8 @@ import core from "ultracite/oxlint/core";
 import react from "ultracite/oxlint/react";
 import remix from "ultracite/oxlint/remix";
 
+import { workspaceBoundaryOptions } from "./tools/oxlint/workspaces.boundary.ts";
+
 const taxkitReact = defineConfig({
   ...react,
   rules: {
@@ -14,9 +16,18 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  "apps/api/src/website-forwarding.boundary.ts",
+  "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
+  "packages/observability/test/edge-identity.test.ts",
+  "tools/infrastructure/release-gates.boundary.test.ts",
+  "apps/web/src/lib/root-load.boundary.test.ts",
+  "packages/docs-content/src/validation/checked-example-publication.boundary.ts",
+  "packages/docs-content/src/validation/checked-example-publication.boundary.test.ts",
   // Local package-manifest ingress for the documentation command check.
   "tools/documentation/check.boundary.ts",
   "tools/workspace/dependencies.boundary.test.ts",
+  "tools/oxlint/workspaces.boundary.ts",
+  "tools/oxlint/workspace-imports.boundary.test.ts",
   "packages/observability/test/host-telemetry.boundary.test.ts",
   "packages/publication/src/__testing__/fixtures.ts",
   "packages/publication/test/schemas.test.ts",
@@ -39,8 +50,6 @@ const decodingBoundaryFiles = [
   "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
   // Evaluated memory-plan props of the telemetry stacks; no provider writes.
   "packages/infrastructure/src/telemetry.test.ts",
-  // Exact native session header/private binding capability ingress only.
-  "apps/api/src/mcp-session.layer.ts",
   // Exact native browser capability/refusal ingress; no runner permission.
   "apps/web/src/lib/browser-tools.boundary.ts",
   "apps/web/src/lib/browser-tools.boundary.test.ts",
@@ -48,6 +57,7 @@ const decodingBoundaryFiles = [
   // Exact official MCP client wire ingress and adversarial host fixture.
   "apps/api/test/mcp-client.boundary.test.ts",
   "apps/web/test/native-mcp.boundary.test.ts",
+  "apps/web/test/native-rate.boundary.test.ts",
   // Exact build catalogue/renderer bytes and adversarial metadata fixture ingress.
   "apps/web/scripts/docs-images.build.ts",
   "apps/web/src/lib/docs/social.boundary.test.ts",
@@ -217,6 +227,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  "packages/observability/test/edge-identity.test.ts",
+  "apps/web/src/lib/root-load.boundary.test.ts",
   "apps/web/src/lib/api/requests.boundary.test.ts",
   "apps/web/src/lib/root.load.server.ts",
   // Generated public catalogue file egress.
@@ -304,6 +316,8 @@ const schemaEncoderEgressFiles = [
 ];
 
 const throwingCodecTestFiles = [
+  // Oxlint requires synchronous checked configuration before creating rules.
+  "tools/oxlint/workspaces.boundary.ts",
   // Pure policy fixtures encode their Schema-owned accepted record bytes.
   "packages/docs-content/src/validation/policy.runtime.test.ts",
 ];
@@ -395,6 +409,7 @@ export default defineConfig({
     "./tools/oxlint/bun-rules.ts",
     "./tools/oxlint/effect-rules.ts",
     "./tools/oxlint/mdx-rules.ts",
+    "@commonplaces/oxlint-plugin/package",
     "./tools/oxlint/package-rules.ts",
     "./tools/oxlint/taxkit-rules.ts",
     {
@@ -1028,6 +1043,7 @@ export default defineConfig({
       // binding Promise; host-contract tests drive Playwright, Miniflare, MCP
       // and the plain SDK. promiseOnlyFiles admit Effect.promise only.
       files: [
+        "packages/docs-content/src/validation/checked-example-publication.boundary.test.ts",
         "apps/api/test/mcp-client.boundary.test.ts",
         "apps/api/test/rate-admission.boundary.test.ts",
         "apps/api/test/worker.boundary.test.ts",
@@ -1036,6 +1052,7 @@ export default defineConfig({
         "apps/web/src/lib/api/forward.boundary.test.ts",
         "apps/web/src/lib/api/requests.boundary.test.ts",
         "apps/web/src/lib/api/host.boundary.test.ts",
+        "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
         "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
         "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
         "apps/web/src/lib/browser-tools.boundary.test.ts",
@@ -1072,12 +1089,14 @@ export default defineConfig({
           "error",
           {
             allowedFiles: [
+              "packages/docs-content/src/validation/checked-example-publication.boundary.test.ts",
               "apps/api/test/mcp-client.boundary.test.ts",
               "apps/web/scripts/docs-images.build.ts",
               "apps/web/src/lib/api/host.server.ts",
               "apps/web/src/lib/api/forward.boundary.test.ts",
               "apps/web/src/lib/api/requests.boundary.test.ts",
               "apps/web/src/lib/api/host.boundary.test.ts",
+              "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
               "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
               "apps/web/src/lib/browser-tools.boundary.test.ts",
               "apps/web/src/lib/browser-tools.boundary.ts",
@@ -1193,6 +1212,7 @@ export default defineConfig({
       },
     ],
     "package/no-cross-package-source-imports": "error",
+    "package/workspace-import-boundaries": ["error", workspaceBoundaryOptions],
     // Effect pipelines intentionally use callback combinators like
     // Effect.mapError/Effect.flatMap instead of async/await.
     "promise/prefer-await-to-callbacks": "off",
@@ -1251,6 +1271,7 @@ export default defineConfig({
         websiteDirectory: "apps/web/src",
       },
     ],
+    "taxkit-package/workspace-roles": "error",
     "taxkit/no-decoding-outside-boundaries": "error",
     "typescript/consistent-type-assertions": [
       "error",

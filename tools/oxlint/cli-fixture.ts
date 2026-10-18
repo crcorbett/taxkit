@@ -1,9 +1,13 @@
+import nodePath from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { Effect, FileSystem, Stream } from "effect";
+import { Array, Effect, FileSystem, Stream } from "effect";
 import * as ChildProcess from "effect/process/ChildProcess";
 import * as ChildProcessSpawner from "effect/process/ChildProcessSpawner";
 
+import { workspaceContracts } from "./workspaces.boundary.js";
+
+const { dirname, join } = nodePath;
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 const oxlint = fileURLToPath(
   new URL("../../node_modules/.bin/oxlint", import.meta.url)
@@ -14,7 +18,8 @@ export const lintFiles = Effect.fn("OxlintFixture.lintFiles")(function* (
   paths: readonly string[],
   extraArgs: readonly string[] = [],
   format: "json" | "unix" = "unix",
-  configuration = "oxlint.config.ts"
+  configuration = "oxlint.config.ts",
+  workingDirectory = repositoryRoot
 ) {
   const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
   const child = yield* spawner.spawn(
@@ -29,7 +34,7 @@ export const lintFiles = Effect.fn("OxlintFixture.lintFiles")(function* (
         ...extraArgs,
         ...paths,
       ],
-      { cwd: repositoryRoot, stderr: "pipe", stdout: "pipe" }
+      { cwd: workingDirectory, stderr: "pipe", stdout: "pipe" }
     )
   );
   const [exitCode, stdout, stderr] = yield* Effect.all(
@@ -41,6 +46,43 @@ export const lintFiles = Effect.fn("OxlintFixture.lintFiles")(function* (
     { concurrency: "unbounded" }
   );
   return { exitCode, output: `${stdout}${stderr}`, stdout };
+});
+
+/** Copies the real lint owners into a scoped root for exact production-path fixtures. */
+export const makeIsolatedLintWorkspace = Effect.fn(
+  "OxlintFixture.makeIsolatedLintWorkspace"
+)(function* () {
+  const fs = yield* FileSystem.FileSystem;
+  const workingDirectory = yield* fs.makeTempDirectoryScoped({
+    prefix: "taxkit-lint-workspace-",
+  });
+  yield* fs.makeDirectory(join(workingDirectory, "tools"));
+  yield* fs.copy(
+    join(repositoryRoot, "tools/oxlint"),
+    join(workingDirectory, "tools/oxlint")
+  );
+  yield* Effect.forEach(
+    [
+      "oxlint.config.ts",
+      "package.json",
+      ...Array.map(workspaceContracts, ({ owner }) => `${owner}/package.json`),
+    ],
+    (path) =>
+      Effect.gen(function* () {
+        const target = join(workingDirectory, path);
+        yield* fs.makeDirectory(dirname(target), { recursive: true });
+        yield* fs.copyFile(join(repositoryRoot, path), target);
+      }),
+    { concurrency: 1, discard: true }
+  );
+  yield* fs.symlink(
+    join(repositoryRoot, "node_modules"),
+    join(workingDirectory, "node_modules")
+  );
+  return {
+    configuration: join(workingDirectory, "oxlint.config.ts"),
+    workingDirectory,
+  };
 });
 
 /** Removes an exact configured fixture on success, failure or interruption. */
@@ -58,7 +100,11 @@ export const writeLintFixture = Effect.fn("OxlintFixture.writeLintFixture")(
 /** The platform owns unique temporary names and their scoped removal. */
 export const writeTemporaryLintFixture = Effect.fn(
   "OxlintFixture.writeTemporaryLintFixture"
-)(function* (source: string, extension = "ts", directory?: string) {
+)(function* (
+  source: string,
+  extension = "ts",
+  directory = fileURLToPath(new URL("fixtures", import.meta.url))
+) {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* fs.makeTempFileScoped({
     directory,

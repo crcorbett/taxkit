@@ -3,7 +3,7 @@ document_type: domain-glossary
 lifecycle: current
 authority: supporting
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: calculation, public content vocabulary or domain meaning changes
 ---
 
@@ -44,6 +44,16 @@ _Avoid_: user preference
 **Scenario**:
 The accepted input facts and relevant dates for one calculation.
 _Avoid_: saved account
+
+**Calculation caller**:
+A person or program requesting a TaxKit calculation. The caller may supply
+facts describing someone else's circumstances.
+_Avoid_: taxpayer, calculation subject
+
+**Shared calculation allowance**:
+One allowance for calculation requests from the same network address across
+the Website, public API and remote tools.
+_Avoid_: per-interface allowance
 
 **Report**:
 The named results returned by a calculator.

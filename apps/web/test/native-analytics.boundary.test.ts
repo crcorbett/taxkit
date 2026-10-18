@@ -32,10 +32,7 @@ import { Miniflare, Response } from "miniflare";
 import type { Request, WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
-import {
-  nativeMcpSessionExports,
-  nativeMcpSessionFixture,
-} from "./native-mcp.fixture";
+import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const origin = "http://127.0.0.1:4219";
@@ -92,7 +89,8 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
-                      ...nativeMcpSessionFixture("api-analytics"),
+                      ...nativeForwardingFixture,
+
                       ...nativeRateFixture("10179"),
                       API_PUBLIC_ORIGIN: { type: "json", value: origin },
                       DEBUG: { type: "json", value: true },
@@ -120,7 +118,7 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
                       },
                       WORKER_URL: { type: "json", value: origin },
                     },
-                    exports: nativeMcpSessionExports,
+
                     manifest: { mainModule: "worker.js", modules, modulesRoot },
                     name: "api-analytics",
                   },
@@ -264,78 +262,67 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
         const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
           CalculationRequest
         );
-        yield* Effect.forEach(
-          ["2026-07-28", "2025-11-25"] as const,
-          (protocol) =>
+        yield* Effect.gen(function* () {
+          const policy = yield* Ref.make("deny");
+          const client = yield* Effect.acquireRelease(
+            Effect.sync(
+              () =>
+                new Client(
+                  { name: "native-taxkit-analytics-proof", version: "1" },
+                  { versionNegotiation: { mode: { pin: "2026-07-28" } } }
+                )
+            ),
+            (value) => Effect.promise(() => value.close())
+          );
+          // The official transport reads this native getter for each request.
+          // Only a checked test policy is read; the SDK keeps its TCP/parser.
+          const mcp = new StreamableHTTPClientTransport(
+            new URL("/mcp", address),
+            {
+              requestInit: {
+                get headers() {
+                  return {
+                    "cf-connecting-ip": "127.0.0.1",
+                    "x-taxkit-collection-policy": Ref.getUnsafe(policy),
+                  };
+                },
+              },
+            }
+          );
+          yield* Effect.logInfo("Native analytics MCP protocol: 2026-07-28");
+          yield* Effect.tryPromise({
+            catch: () =>
+              new NativeAnalyticsClientFailed({ operation: "connect" }),
+            try: () => client.connect(mcp),
+          });
+          expect(mcp.sessionId).toBeUndefined();
+          yield* Effect.forEach(["deny", "allow", "deny"], (choice) =>
             Effect.gen(function* () {
-              const policy = yield* Ref.make("deny");
-              const client = yield* Effect.acquireRelease(
-                Effect.sync(
-                  () =>
-                    new Client(
-                      { name: "native-taxkit-analytics-proof", version: "1" },
-                      protocol === "2026-07-28"
-                        ? { versionNegotiation: { mode: { pin: protocol } } }
-                        : {
-                            supportedProtocolVersions: ["2025-11-25"],
-                            versionNegotiation: { mode: "legacy" },
-                          }
-                    )
-                ),
-                (value) => Effect.promise(() => value.close())
-              );
-              // The official transport reads this native getter for each request.
-              // Only a checked test policy is read; the SDK keeps its TCP/parser.
-              const mcp = new StreamableHTTPClientTransport(
-                new URL("/mcp", address),
-                {
-                  requestInit: {
-                    get headers() {
-                      return {
-                        "cf-connecting-ip": "127.0.0.1",
-                        "x-taxkit-collection-policy": Ref.getUnsafe(policy),
-                      };
-                    },
-                  },
-                }
-              );
-              yield* Effect.logInfo("Native analytics MCP protocol", protocol);
-              yield* Effect.tryPromise({
+              yield* Ref.set(policy, choice);
+              const result = yield* Effect.tryPromise({
                 catch: () =>
-                  new NativeAnalyticsClientFailed({ operation: "connect" }),
-                try: () => client.connect(mcp),
+                  new NativeAnalyticsClientFailed({
+                    operation: "calculate",
+                  }),
+                try: () =>
+                  client.callTool({
+                    arguments: input,
+                    name: "taxkit_calculate",
+                  }),
               });
-              expect(mcp.sessionId === undefined).toBe(
-                protocol === "2026-07-28"
-              );
-              yield* Effect.forEach(["deny", "allow", "deny"], (choice) =>
-                Effect.gen(function* () {
-                  yield* Ref.set(policy, choice);
-                  const result = yield* Effect.tryPromise({
-                    catch: () =>
-                      new NativeAnalyticsClientFailed({
-                        operation: "calculate",
-                      }),
-                    try: () =>
-                      client.callTool({
-                        arguments: input,
-                        name: "taxkit_calculate",
-                      }),
-                  });
-                  expect(
-                    (yield* Schema.decodeUnknownEffect(
-                      McpSchema.CallToolResult
-                    )(result)).isError
-                  ).toBe(false);
-                  if (choice === "allow") {
-                    yield* nextCapture;
-                  } else {
-                    expect(yield* Queue.clear(outgoing)).toEqual([]);
-                  }
-                })
-              );
-            }).pipe(Effect.scoped)
-        );
+              expect(
+                (yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(
+                  result
+                )).isError
+              ).toBe(false);
+              if (choice === "allow") {
+                yield* nextCapture;
+              } else {
+                expect(yield* Queue.clear(outgoing)).toEqual([]);
+              }
+            })
+          );
+        }).pipe(Effect.scoped);
       }
       if (mode === "stalled-reply") {
         const controller = yield* Queue.take(replies);
@@ -413,7 +400,8 @@ it.live(
           compatibilityDate: "2026-10-04",
           compatibilityFlags: ["nodejs_compat"],
           env: {
-            ...nativeMcpSessionFixture(name),
+            ...nativeForwardingFixture,
+
             ...nativeRateFixture("10180"),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
             POSTHOG_CAPTURE_TOKEN: {
@@ -440,7 +428,7 @@ it.live(
             },
             WORKER_URL: { type: "json" as const, value: apiOrigin },
           },
-          exports: nativeMcpSessionExports,
+
           manifest: {
             mainModule: "worker.js",
             modules: apiModules,
@@ -494,6 +482,7 @@ it.live(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
+                      ...nativeForwardingFixture,
                       API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },
                       CALCULATOR_HOST_MODE: {
                         type: "json",

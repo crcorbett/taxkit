@@ -1,5 +1,4 @@
 import {
-  CalculatorCatalogResponse,
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
@@ -54,7 +53,6 @@ export type WebsitePublicSettings = typeof WebsitePublicSettings.Type;
 // The root loader's checked view: plain encoded values for TanStack's native
 // serialisation, decoded once by the root route.
 export const WebsiteRootView = Schema.Struct({
-  catalogue: Schema.OptionFromNullOr(CalculatorCatalogResponse),
   settings: WebsitePublicSettings,
 });
 // A documentation page as its route renders it. Every field is plain public

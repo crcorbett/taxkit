@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: supporting
 owner: taxkit-infrastructure-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: Alchemy resource, stage, provider, state, or package-export change
 ---
 
@@ -20,7 +20,7 @@ implementation; this package imports no application implementation.
 | Export | Owns |
 | --- | --- |
 | `./apps-stack` | `declareNativeAppsInfrastructure` declares retained Production resources; `declareNativeAppsHosts` declares the Website using a supplied API Worker; `nativeApiHostProps` owns native API deployment settings. |
-| `./api-worker` | Lightweight `TaxKitApiWorker` declaration and native-derived `TaxKitApiBinding`, including the private `calculatorRequest` capability. |
+| `./api-worker` | Lightweight `TaxKitApiWorker` declaration and native-derived `TaxKitApiBinding`, with the native HTTP binding. |
 | `./worker-settings` | Shared compatibility date/flags and `disabledWorkerObservability` policy. |
 | `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. |
 | `./stage` | Stage Schemas: `prod`, `pr-<number>` and `dev_<name>`. |
@@ -76,17 +76,38 @@ refuses anything other than `alchemy dev` in local provider mode at stage
 mode and the local rate namespace `10075`, and uses no Doppler or Cloudflare
 credentials.
 
-## Native older-client conversation host
+## Private Website calculation forwarding
 
-The API app's native composition registers `TaxKitMcpSessions`. The SDK adds its
-Durable Object export and binding to the actual API resource. The Website does
-not export this class. Graph tests check this distinction in their memory-only
-create/no-change/update cases; no namespace ID or provider setting is invented.
-The app owns one fixed-name host per stage, with bounded in-memory conversations
-and native alarm expiry. Only alarm bookkeeping uses storage. The
-[API owner](../../apps/api/README.md#native-remote-calculator-tools)
-explains limits, private original-key forwarding, separate instance pools and
-the documented modern five-second cancellation limit.
+One native `Alchemy.Random` resource, `TaxKitWebsiteForwardingKey`, owns 32
+random bytes per stack/stage. Its redacted hex Output is bound as
+`TAXKIT_WEBSITE_FORWARDING_KEY` to both Workers. Ordinary deploys preserve its
+state identity. Hosted Alchemy state owns this key; Doppler continues owning
+deployment credentials. Local development uses its isolated native local state.
+The key is resolved through native runtime Config only when a calculation needs
+it, never from deploy-time Doppler configuration. During an explicit rotation,
+the API alone may bind `TAXKIT_WEBSITE_FORWARDING_PREVIOUS_KEY` to the previous
+Random Output and accept either checked key. The Website sends the current key
+only; a malformed previous binding fails forwarded admission closed. Normal
+deployments declare no previous binding or additional key resource.
+
+Only the Website server's canonical calculation POST adds the credential and
+checked original caller key. The native Fetcher/HttpClient adapter carries the
+generated HTTP contract to the API's default fetch host. The Website host sets
+standard native `RequestInit.redirect: "manual"` before binding dispatch, so
+redirect replies cannot replay the credential or original IP on another URL.
+The generated client rejects undeclared redirect responses; no HTTP-over-RPC
+method or legacy MCP Durable Object remains. Public HTTP, RPC, modern MCP and public
+reads require no forwarding credential. Both hosts keep `nodejs_compat` for the
+API's native constant-time verifier. The
+[deployment runbook](../../docs/runbooks/deployment.md) owns deliberate key
+rotation, old/new overlap and rollback. Rotation first introduces a new native
+Random identity, binds the former Output to the API's previous-key field and
+updates both current-key bindings with the API deployed before the Website.
+After both hosts and old/new admission are verified, a second native update
+removes the previous-key binding. Preserve the former resource/state for the
+qualified rollback interval. Changing Random's byte count does not rotate an
+existing value. Memory graph and boundary tests do not establish a successful
+live rotation.
 
 ## Production telemetry stacks
 

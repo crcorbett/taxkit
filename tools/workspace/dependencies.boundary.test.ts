@@ -1,31 +1,18 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, describe, it } from "@effect/vitest";
-import {
-  Array,
-  Effect,
-  FileSystem,
-  Option,
-  pipe,
-  Record,
-  Schema,
-} from "effect";
+import { Array, Effect, FileSystem, pipe, Schema } from "effect";
 
-const Dependencies = Schema.Record(Schema.String, Schema.String);
-const Manifest = Schema.Struct({
-  dependencies: Schema.OptionFromOptionalKey(Dependencies),
-  devDependencies: Schema.OptionFromOptionalKey(Dependencies),
-  name: Schema.String,
-});
+import { isForbiddenPackageDependency } from "../oxlint/package-roles.js";
+import {
+  dependencyNames,
+  WorkspaceManifest as Manifest,
+} from "../oxlint/workspaces.boundary.js";
+
 const RootManifest = Schema.Struct({
   workspaces: Schema.Struct({
     packages: Schema.Array(Schema.String.check(Schema.isPattern(/\/\*$/u))),
   }),
 });
-const dependencyNames = (manifest: typeof Manifest.Type) =>
-  Array.dedupe([
-    ...Record.keys(Option.getOrElse(manifest.dependencies, () => ({}))),
-    ...Record.keys(Option.getOrElse(manifest.devDependencies, () => ({}))),
-  ]);
 
 const appEdges = (
   manifests: readonly {
@@ -51,14 +38,13 @@ const manifestFixture = (
   name: string,
   dependencies: Readonly<Record<string, string>>
 ) => ({
-  dependencies: Option.some(dependencies),
-  devDependencies: Option.none(),
+  dependencies,
   name,
 });
 
 describe("workspace dependency direction", () => {
   it.effect(
-    "keeps app composition at the root and runtime support provider-free",
+    "keeps every nondeployment package provider-free and app composition at the root",
     () =>
       Effect.gen(function* () {
         const fs = yield* FileSystem.FileSystem;
@@ -92,29 +78,16 @@ describe("workspace dependency direction", () => {
           )
         );
         assert.deepEqual(appEdges(manifests), []);
-        yield* Effect.forEach(
-          ["@taxkit/observability", "@taxkit/analytics"],
-          (name) =>
-            Effect.gen(function* () {
-              const runtime = yield* Effect.fromOption(
-                Array.findFirst(
-                  manifests,
-                  ({ manifest }) => manifest.name === name
-                )
-              );
-              assert.deepEqual(
-                pipe(
-                  dependencyNames(runtime.manifest),
-                  Array.filter(
-                    (dependency) =>
-                      dependency === "alchemy" ||
-                      dependency === "@taxkit/infrastructure" ||
-                      dependency.startsWith("@distilled.cloud/")
-                  )
-                ),
-                []
-              );
-            })
+        assert.deepEqual(
+          Array.flatMap(manifests, ({ manifest, path }) =>
+            Array.map(
+              Array.filter(dependencyNames(manifest), (dependency) =>
+                isForbiddenPackageDependency(path, dependency)
+              ),
+              (dependency) => `${manifest.name} -> ${dependency}`
+            )
+          ),
+          []
         );
       }).pipe(Effect.provide(BunServices.layer))
   );
@@ -135,6 +108,45 @@ describe("workspace dependency direction", () => {
         },
       ]),
       ["web -> api", "@taxkit/infrastructure -> api"]
+    );
+  });
+  it("rejects app peers and provider dependencies across package roles", () => {
+    assert.deepEqual(
+      appEdges([
+        { manifest: manifestFixture("api", {}), path: "apps/api" },
+        {
+          manifest: {
+            ...manifestFixture("@taxkit/content", {}),
+            peerDependencies: { api: "workspace:*" },
+          },
+          path: "packages/content",
+        },
+      ]),
+      ["@taxkit/content -> api"]
+    );
+    assert.deepEqual(
+      Array.map(
+        [
+          ["packages/api/mcp", "@distilled.cloud/cloudflare"],
+          ["packages/publication", "@taxkit/infrastructure"],
+          ["packages/core", "alchemy"],
+          ["apps/api", "alchemy"],
+          ["apps/web", "alchemy"],
+          ["packages/infrastructure", "@distilled.cloud/cloudflare"],
+        ] as const,
+        ([owner, dependency]) => isForbiddenPackageDependency(owner, dependency)
+      ),
+      [true, true, true, false, false, false]
+    );
+    assert.deepEqual(
+      dependencyNames({
+        dependencies: { a: "1" },
+        devDependencies: { b: "1" },
+        name: "@taxkit/fixture",
+        optionalDependencies: { c: "1" },
+        peerDependencies: { a: "1", d: "1" },
+      }),
+      ["a", "b", "c", "d"]
     );
   });
 });

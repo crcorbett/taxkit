@@ -9,9 +9,6 @@ import type {
 import {
   AnnualTaxLedgerDescriptor,
   AnnualTaxReport,
-  AuAnnualTaxCalculatorId,
-  AuAnnualTaxJurisdiction,
-  AuAnnualTaxYear,
   AnnualTaxScenarioInputSchema,
   AnnualTaxScenario,
   AnnualTaxScenarioLive,
@@ -21,9 +18,6 @@ import {
   CalculateAnnualTax,
 } from "@taxkit/rules-au-income-tax";
 import {
-  AuPayCalculatorId,
-  AuPayJurisdiction,
-  AuPayTaxYear,
   AuPayWithholdings2025_26_Live,
   AuTakeHomePay2025_26_Live,
   AuTakeHomePayRuleDescriptors,
@@ -53,6 +47,11 @@ import type {
   CalculatorRunReport,
   HelpMode,
 } from "./schemas.js";
+import {
+  AnnualTaxCalculatorSummary,
+  PayWithholdingsCalculatorSummary,
+  TakeHomeCalculatorSummary,
+} from "./summaries.js";
 
 type UntrustedCalculatorFacts = typeof Schema.Unknown.Type;
 
@@ -94,8 +93,6 @@ export interface CalculatorCatalogEntry {
   readonly title: string;
 }
 
-class CalculatorContextData extends Data.Class<CalculatorContext> {}
-
 class CalculatorCatalogEntryData extends Data.Class<CalculatorCatalogEntry> {}
 
 export interface CalculatorCatalogEntryDefinition<
@@ -122,16 +119,6 @@ export const defineCalculatorCatalogEntry = <
       ),
   });
 
-const PayContextAu2025_26 = new CalculatorContextData({
-  jurisdiction: AuPayJurisdiction.make("AU"),
-  taxYear: AuPayTaxYear.make("2025-26"),
-});
-
-const AnnualTaxContextAu2025_26 = new CalculatorContextData({
-  jurisdiction: AuAnnualTaxJurisdiction.make("AU"),
-  taxYear: AuAnnualTaxYear.make("2025-26"),
-});
-
 const SupportedHelpModes: readonly HelpMode[] = [
   "none",
   "errors",
@@ -155,8 +142,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
           validationIssues,
         });
       }),
-    calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
-    context: PayContextAu2025_26,
+    ...TakeHomeCalculatorSummary,
     description:
       "Australian pay-period take-home pay after PAYG-only withholdings.",
     inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
@@ -172,7 +158,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     ruleDescriptors: AuTakeHomePayRuleDescriptors,
     rulePackLayer: AuTakeHomePay2025_26_Live,
     supportedHelpModes: SupportedHelpModes,
-    title: "AU take-home pay",
   }),
   defineCalculatorCatalogEntry({
     calculate: (facts, validationIssues) =>
@@ -187,8 +172,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
           validationIssues,
         });
       }),
-    calculatorId: AuPayCalculatorId.make("au.pay.withholdings"),
-    context: PayContextAu2025_26,
+    ...PayWithholdingsCalculatorSummary,
     description: "Australian PAYG-only pay-period withholding ledger.",
     inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
     inputSchema: TakeHomeScenarioInputSchema,
@@ -206,7 +190,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     ],
     rulePackLayer: AuPayWithholdings2025_26_Live,
     supportedHelpModes: SupportedHelpModes,
-    title: "AU pay withholdings",
   }),
   defineCalculatorCatalogEntry({
     calculate: (facts, validationIssues) =>
@@ -221,8 +204,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
           validationIssues,
         });
       }),
-    calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
-    context: AnnualTaxContextAu2025_26,
+    ...AnnualTaxCalculatorSummary,
     description: "Australian annual income tax liability estimate.",
     inputFacts: [AnnualTaxableIncomeDescriptor],
     inputSchema: AnnualTaxScenarioInputSchema,
@@ -232,7 +214,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     ruleDescriptors: AuAnnualTaxRuleDescriptors,
     rulePackLayer: AuAnnualTax2025_26_Live,
     supportedHelpModes: SupportedHelpModes,
-    title: "AU annual income tax",
   }),
 ];
 

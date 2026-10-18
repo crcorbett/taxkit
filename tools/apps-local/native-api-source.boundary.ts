@@ -13,8 +13,7 @@ import api from "api/worker";
 import { ConfigProvider, Effect, Layer, Option, Record } from "effect";
 import { HttpClient } from "effect/http";
 
-// Source builders need the SDK-generated export inventory to emit native
-// Durable Object bridges. Discover it from the actual app declaration, using
+// Source builders discover the SDK-owned Worker declaration using
 // memory-only compilation. Every provider/credential/network method refuses.
 // No provider plan, apply or persisted state is acquired by this boundary.
 export const nativeApiSourceProps = Effect.gen(function* () {
