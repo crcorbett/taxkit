@@ -322,6 +322,7 @@ describe("required native release gate", () => {
         const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
           Option.getOrElse(() => expect.fail("Missing cleanup job"))
         );
+        const { "continue-on-error": cleanupMayFail } = cleanup;
         const required = Array.map(
           [
             "pull-request",
@@ -341,13 +342,11 @@ describe("required native release gate", () => {
         const destroy = Array.findFirst(cleanup.steps, (step) =>
           Option.exists(step.run, (run) => run.startsWith("bun run pr:destroy"))
         ).pipe(Option.getOrElse(() => expect.fail("Missing cleanup command")));
-        expect(
-          Option.getOrElse(cleanup["continue-on-error"], () => false)
-        ).toBe(false);
+        const { "continue-on-error": destroyMayFail } = destroy;
+        expect(Option.getOrElse(cleanupMayFail, () => false)).toBe(false);
         yield* Effect.forEach(required, (step, index) => {
-          expect(Option.getOrElse(step["continue-on-error"], () => false)).toBe(
-            false
-          );
+          const { "continue-on-error": stepMayFail } = step;
+          expect(Option.getOrElse(stepMayFail, () => false)).toBe(false);
           if (index > 0) {
             expect(step.if).toEqual(
               Option.some("steps.pull-request.outputs.closed == 'true'")
@@ -385,9 +384,7 @@ describe("required native release gate", () => {
         expect(destroy.if).toEqual(
           Option.some("steps.pull-request.outputs.closed == 'true'")
         );
-        expect(
-          Option.getOrElse(destroy["continue-on-error"], () => false)
-        ).toBe(false);
+        expect(Option.getOrElse(destroyMayFail, () => false)).toBe(false);
       }).pipe(Effect.provide(BunServices.layer))
   );
 
