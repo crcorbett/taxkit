@@ -3,7 +3,7 @@ document_type: execution-plan-index
 lifecycle: historical
 authority: canonical
 owner: taxkit-execution-history-owner
-last_reviewed: 2026-10-01
+last_reviewed: 2026-10-18
 review_trigger: completed-plan retention, evidence, or successor correction
 successor: null
 tombstone: false
@@ -17,10 +17,12 @@ evidence remains useful.
 Superseded plans are kept here too. The
 [Clean slate foundation](./clean-slate-foundation.md) plan and its
 [local continuation prompt](./clean-slate-local-handoff.md) were superseded by
-the [Common Practice foundation](../active/common-practice-foundation-review.md)
+the [Common Practice foundation](./common-practice-foundation-review.md)
 on 13 October 2026.
 
 Completed plans:
+
+- [Common Practice foundation](./common-practice-foundation-review.md)
 
 - [Alchemy and Doppler modernisation](./alchemy-doppler-modernisation.md)
 - [Entire session history setup](./entire-session-history.md)

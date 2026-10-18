@@ -3,15 +3,15 @@ document_type: execution-plan
 lifecycle: superseded
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: task progress, dependency qualification, acceptance evidence or authority change
-successor: ../active/common-practice-foundation-review.md
+successor: ./common-practice-foundation-review.md
 superseded_reason: The 13 October Common Practice foundation owns current transport, origin, cache, Alchemy and delivery intent.
 ---
 
 # Clean slate foundation implementation
 
-The [Common Practice foundation](../active/common-practice-foundation-review.md) now owns current transport, origin,
+The [Common Practice foundation](./common-practice-foundation-review.md) now owns current transport, origin,
 publication-link, caching, Alchemy and delivery choices. Its 13 October design
 replaces the earlier Website RPC/client wrappers and receipt-based operations.
 The text below is retained execution and interview history; it is not current

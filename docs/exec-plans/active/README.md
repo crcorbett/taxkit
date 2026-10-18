@@ -11,18 +11,12 @@ tombstone: false
 
 # Active exec plans
 
-The [Common Practice foundation plan](./common-practice-foundation-review.md)
-implements the 13 October design: Common Practice's native HTTP/Atom Website
-clients and ordinary Git/Alchemy/Doppler delivery, Cloudflare first, patch-free
-Alchemy and retirement of receipt tooling. It supersedes the transport, origin,
-cache and workflow parts of the older clean-slate plan, which keeps its
-execution history.
-
-The 18 October follow-up design covers findings 12–21, native HTTP transport
-cleanup through native secret-backed HTTP forwarding and Effect/Alchemy-native
-modern-only MCP with deletion of its legacy namespace. Cooper confirmed the
-design and requested implementation as one goal on 18 October; integration,
-verification, Preview and local release remain active in the plan.
+No foundation implementation plan remains active. The implemented
+[Common Practice foundation](../completed/common-practice-foundation-review.md)
+is retained with completed plans; its
+[dated release evidence](../../evidence/releases/2026-10-18-native-transport-mcp-release.md)
+records final delivery and bounded limits. Current architecture and runbooks
+remain the owners for future work.
 
 The superseded [Clean slate foundation](../completed/clean-slate-foundation.md)
 plan and its [local continuation prompt](../completed/clean-slate-local-handoff.md)

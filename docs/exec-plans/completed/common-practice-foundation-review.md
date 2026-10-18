@@ -1,13 +1,25 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: supporting
-owner: taxkit-architecture-owner
+owner: taxkit-execution-history-owner
 last_reviewed: 2026-10-18
 review_trigger: agreed direction, implementation scope or Common Practice approach changes
 ---
 
 # Common Practice foundation implementation plan
+
+## Closeout — 18 October 2026
+
+The 18 October goal is implemented and delivered through source PRs #185 and
+#186. Final Production source is `57a579d9f0834c767342239619e840e6ea8a0882`; the
+[dated release record](../../evidence/releases/2026-10-18-native-transport-mcp-release.md)
+owns verification, Preview/Production observations, namespace retirement and
+proof limits. Hosted quota exhaustion remains inconclusive because shared
+egress identity was not established. No package publication or hosted key
+rotation is claimed. Earlier interviews, proposals and dated observations below
+are retained history, including separate observability limits; they are not
+active foundation implementation tasks.
 
 The [proposal](../../product-specs/common-practice-foundation-review.md) records
 the source comparison and Cooper's direction: Common Practice's app/client and
@@ -23,7 +35,8 @@ MCP that is both Effect-native and Alchemy-native. The modern-only release
 also deletes the legacy `TaxKitMcpSessions` namespace through native Alchemy;
 there is no temporary inert-class retention period. Cooper confirmed the design
 and requested implementation as one goal on 18 October. Integrated acceptance
-and release remain pending. Earlier delivery observations below remain history.
+and delivery are recorded in the closeout above. Earlier delivery observations
+below remain history.
 
 Cooper selected the existing two Workers with native secret-backed HTTP
 forwarding. One native Alchemy Random resource owns the forwarding credential
@@ -73,12 +86,12 @@ builds, source-mutating fixtures and native proof are serialized.
 
 | Milestone | State | Acceptance |
 | --- | --- | --- |
-| Native MCP and HTTP identity boundary | Implemented | Focused native proof covers all six tools, browser admission, HTTP forwarding, current/previous credentials, spoof rejection, shared allowance, deadlines and work-slot recovery. Hosted deployment remains pending. |
+| Native MCP and HTTP identity boundary | Implemented | Focused native proof covers all six tools, browser admission, HTTP forwarding, current/previous credentials, spoof rejection, shared allowance, deadlines and work-slot recovery. Hosted outcomes and bounded limits are recorded in the release evidence. |
 | Findings 14–21 | Implemented | Focused checks cover requested-page correlation, immutable examples, cold cleanup, required native gate, synchronous root metadata, manifest/role checks and parser policy. |
-| Integrated verification and review | In progress | The native retained-adapter control captures the exact async-context failure; restored request-scoped MCP passes. Complete repository verification and final correction review remain pending. |
-| Preview deployment and journeys | Pending | Native pair plan/apply/readback plus browser, no-JavaScript, MCP, rate and cache checks on the deployed candidate. |
-| Merge and local Production release | Pending | Reviewed merge, pushed source, exact merged-commit verification, native plan/apply/readback and public journeys. |
-| Documentation and goal closeout | Pending | Current owners, plan lifecycle, Changesets and dated delivery evidence agree with actual results. |
+| Integrated verification and review | Completed | The native retained-adapter control captures the exact async-context failure; restored request-scoped MCP, final merged-source verification and independent correction review pass. |
+| Preview deployment and journeys | Completed with a hosted quota limit | Native pair plan/apply/readback and all twelve public journeys pass; hosted quota exhaustion remains inconclusive. Local native destroy completed 3/3; independent readback found both Workers and stage resource/Random records absent. |
+| Merge and local Production release | Completed | Source PRs #185/#186 merged; exact final-source verification, local native Production plan/apply/readback and public journeys are recorded in the dated release evidence. |
+| Documentation and goal closeout | Completed | Owner documents and indexes route to this history and the dated release record; the Changeset remains pending without npm publication. |
 
 Each slice updates its existing semantic documentation owners. Run focused
 checks and the repository verification baseline before merging; package-facing
