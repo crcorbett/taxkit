@@ -2,10 +2,7 @@ import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
 import { collectionPolicyFromHeaders } from "@taxkit/analytics/collection-policy";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
 import { BackendAnalytics } from "@taxkit/analytics/service";
-import {
-  DurableObjectState,
-  WorkerExecutionContext,
-} from "alchemy/Cloudflare/Workers";
+import { WorkerExecutionContext } from "alchemy/Cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import { Context, Effect, Layer, Option, Ref } from "effect";
@@ -29,7 +26,6 @@ export const ApiCalculatorDeliveryLive = Layer.effect(
       )(function* (input) {
         const runtime = yield* Effect.serviceOption(RuntimeContext);
         const worker = yield* Effect.serviceOption(WorkerExecutionContext);
-        const session = yield* Effect.serviceOption(DurableObjectState);
         const send = analytics.recordCalculatorUse(input).pipe(
           Effect.catchTag("AnalyticsCaptureError", (error) =>
             Effect.logDebug("Calculator analytics dropped").pipe(
@@ -44,17 +40,10 @@ export const ApiCalculatorDeliveryLive = Layer.effect(
         return yield* Option.match(runtime, {
           onNone: () => Effect.void,
           onSome: (native) =>
-            Option.match(session, {
-              onNone: () =>
-                Option.match(worker, {
-                  onNone: () => Effect.void,
-                  onSome: (background) =>
-                    background
-                      .waitUntil(send)
-                      .pipe(Effect.provideService(RuntimeContext, native)),
-                }),
-              onSome: (state) =>
-                state
+            Option.match(worker, {
+              onNone: () => Effect.void,
+              onSome: (background) =>
+                background
                   .waitUntil(send)
                   .pipe(Effect.provideService(RuntimeContext, native)),
             }),

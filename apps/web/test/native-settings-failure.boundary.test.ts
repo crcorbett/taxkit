@@ -4,6 +4,8 @@ import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
+import { nativeForwardingFixture } from "./native-forwarding.fixture";
+
 const origin = "http://127.0.0.1:4198";
 const Json = Schema.fromJsonString(Schema.Unknown);
 
@@ -66,6 +68,7 @@ it.live(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
+                      ...nativeForwardingFixture,
                       API_PUBLIC_ORIGIN: {
                         type: "json" as const,
                         value: "http://127.0.0.1:4197",

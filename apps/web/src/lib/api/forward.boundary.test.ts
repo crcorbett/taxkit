@@ -14,7 +14,6 @@ it.effect.each(["headers", "body"] as const)(
       const aborted = vi.fn();
       // Promise and stream callbacks are the native fetch host fixture.
       const binding = {
-        calculatorRequest: vi.fn(),
         connect: vi.fn(),
         fetch: vi.fn((_url: string, init?: RequestInit) => {
           init?.signal?.addEventListener("abort", aborted);
@@ -63,7 +62,6 @@ it.effect.each([
   ({ status, body, succeeds }) =>
     Effect.gen(function* () {
       const binding = {
-        calculatorRequest: vi.fn(),
         connect: vi.fn(),
         fetch: vi.fn(() =>
           Promise.resolve(

@@ -117,6 +117,35 @@ const makeTransport = Effect.gen(function* () {
 
 describe("checked documentation native RPC", () => {
   it.effect(
+    "rejects a schema-valid page for a different requested address",
+    () =>
+      Effect.gen(function* () {
+        const content = yield* ContentService.pipe(Effect.provide(ContentLive));
+        const page = yield* content.getPage(docsPath);
+        const transport = yield* makeTransport.pipe(
+          Effect.provideService(ContentService, {
+            ...content,
+            getPage: () => Effect.succeed(page),
+          }),
+          Effect.provide(ContentLive)
+        );
+        const error = yield* DocsRpcClient.pipe(
+          Effect.flatMap((client) => client.getPage(missing)),
+          Effect.flip,
+          Effect.provide(
+            DocsRpcClientLive.pipe(
+              Layer.provide([
+                Layer.succeed(TaxKitRpcOrigin)(origin),
+                Layer.succeed(HttpClient.HttpClient, transport),
+              ])
+            )
+          )
+        );
+        expect(error).toEqual(new DocsRpcInvalidResponse());
+      }).pipe(Effect.scoped)
+  );
+
+  it.effect(
     "rejects a valid document for a different requested discovery address",
     () =>
       Effect.gen(function* () {

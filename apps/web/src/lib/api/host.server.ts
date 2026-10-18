@@ -2,21 +2,21 @@ import "@tanstack/react-start/server-only";
 import { collectionPolicyFromHeaders } from "@taxkit/analytics/collection-policy";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import { TaxKitApi } from "@taxkit/api-http/api";
+import { CalculationPath } from "@taxkit/api-http/routes";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { CalculatorAdmissionUnavailable } from "@taxkit/calculators/schemas";
-import type { TaxKitApiWorker } from "@taxkit/infrastructure/api-worker";
 import {
-  fromCloudflareFetcher,
-  toHttpClient,
-  toRpcAsync,
-} from "alchemy/Cloudflare/Bridge";
+  WebsiteForwardingCredentialHeader,
+  WebsiteForwardingRateKeyHeader,
+} from "@taxkit/observability/edge-identity";
+import { fromCloudflareFetcher, toHttpClient } from "alchemy/Cloudflare/Bridge";
 import { Effect, Layer, Option, Redacted, Result, Schema } from "effect";
 import {
+  Headers,
   HttpClient,
   HttpClientError,
   HttpClientRequest,
-  HttpClientResponse,
   HttpServerRequest,
 } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -42,63 +42,69 @@ export const WebsiteApiLive = Layer.effect(
             config.apiOrigin.hostname === "localhost")
             ? Schema.decodeUnknownOption(CalculatorClientRateKey)("127.0.0.1")
             : Option.none();
-        const reads = toHttpClient(fromCloudflareFetcher(config.binding));
-        const privateApi = toRpcAsync<typeof TaxKitApiWorker>(config.binding);
-        // Calculation is the Website's only POST. It uses the trusted private
-        // method so the original caller's key travels outside JSON and headers.
-        // That native method cannot carry an AbortSignal; the API bounds its
-        // own work and reply.
-        const trusted = HttpClient.make((request) =>
-          CalculatorRequestRateKey.pipe(
-            Effect.map(Option.orElse(() => localKey)),
-            Effect.flatMap(
-              Option.match({
-                onNone: () =>
-                  Effect.fail(
-                    new HttpClientError.HttpClientError({
-                      reason: new HttpClientError.TransportError({
-                        cause: new CalculatorAdmissionUnavailable(),
-                        request,
-                      }),
-                    })
-                  ),
-                onSome: (key) =>
-                  HttpClientRequest.toWeb(request).pipe(
-                    Effect.flatMap((incoming) =>
-                      Effect.tryPromise({
-                        catch: () => new CalculatorAdmissionUnavailable(),
-                        try: () =>
-                          privateApi.calculatorRequest(
-                            incoming,
-                            NetAddress.formatIp(Redacted.value(key))
-                          ),
-                      })
-                    ),
-                    Effect.flatMap(
-                      Schema.decodeUnknownEffect(Schema.instanceOf(Response))
-                    ),
-                    Effect.map((response) =>
-                      HttpClientResponse.fromWeb(request, response)
-                    ),
-                    Effect.mapError(
-                      () =>
-                        new HttpClientError.HttpClientError({
-                          reason: new HttpClientError.TransportError({
-                            cause: new CalculatorAdmissionUnavailable(),
-                            request,
-                          }),
-                        })
-                    )
-                  ),
-              })
-            )
-          )
-        );
-        const http = HttpClient.make((request) =>
-          request.method === "POST"
-            ? trusted.execute(request)
-            : reads.execute(request)
-        ).pipe(
+        // Alchemy's stock adapter supplies the AbortSignal but no redirect
+        // policy. A synthetic Request defaults to follow, and native service
+        // bindings follow with every header. Set standard RequestInit here;
+        // delegate each method on the original native receiver.
+        const binding: Pick<typeof config.binding, "connect" | "fetch"> = {
+          connect: (...args) => config.binding.connect(...args),
+          fetch: (request, init) =>
+            config.binding.fetch(request, {
+              ...init,
+              redirect: "manual",
+            }),
+        };
+        const reads = toHttpClient(fromCloudflareFetcher(binding));
+        const http = reads.pipe(
+          HttpClient.mapRequestEffect((outgoing) => {
+            // Never relay caller-supplied forwarding fields. Only the checked
+            // canonical calculation POST receives newly minted private metadata.
+            const request = outgoing.pipe(
+              HttpClientRequest.removeHeader(WebsiteForwardingCredentialHeader),
+              HttpClientRequest.removeHeader(WebsiteForwardingRateKeyHeader)
+            );
+            if (
+              request.method !== "POST" ||
+              !Schema.is(CalculationPath)(
+                new URL(request.url, config.apiOrigin).pathname
+              )
+            ) {
+              return Effect.succeed(request);
+            }
+            return Effect.gen(function* () {
+              const key = yield* CalculatorRequestRateKey.pipe(
+                Effect.map(Option.orElse(() => localKey)),
+                Effect.flatMap(
+                  Option.match({
+                    onNone: () =>
+                      Effect.fail(new CalculatorAdmissionUnavailable()),
+                    onSome: Effect.succeed,
+                  })
+                )
+              );
+              const credential = yield* config.forwardingCredential;
+              return request.pipe(
+                HttpClientRequest.setHeader(
+                  WebsiteForwardingCredentialHeader,
+                  Redacted.value(credential)
+                ),
+                HttpClientRequest.setHeader(
+                  WebsiteForwardingRateKeyHeader,
+                  NetAddress.formatIp(Redacted.value(key))
+                )
+              );
+            }).pipe(
+              Effect.mapError(
+                () =>
+                  new HttpClientError.HttpClientError({
+                    reason: new HttpClientError.TransportError({
+                      cause: new CalculatorAdmissionUnavailable(),
+                      request,
+                    }),
+                  })
+              )
+            );
+          }),
           // Forward the visitor's collection preference; a server call with no
           // incoming request refuses collection.
           HttpClient.mapRequestEffect((outgoing) =>
@@ -116,7 +122,15 @@ export const WebsiteApiLive = Layer.effect(
               )
             )
           ),
-          boundedResponses
+          boundedResponses,
+          HttpClient.transformResponse((effect) =>
+            effect.pipe(
+              Effect.updateService(Headers.CurrentRedactedNames, (names) => [
+                ...names,
+                WebsiteForwardingRateKeyHeader,
+              ])
+            )
+          )
         );
         return {
           client: HttpApiClient.makeWith(TaxKitApi, {

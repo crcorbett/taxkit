@@ -1,7 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { isNotFound } from "@tanstack/react-router";
 import { TaxKitApi } from "@taxkit/api-http/api";
-import { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
 import { DocsPageUnavailable } from "@taxkit/content/errors";
 import {
   DocsPublicationOrigin,
@@ -137,7 +136,7 @@ describe("browser route loaders", () => {
       }).pipe(Effect.scoped)
   );
 
-  it.effect("reuses one native client from the shared registry", () =>
+  it.effect("loads root without catalogue I/O and reuses the docs client", () =>
     Effect.gen(function* () {
       const catalogue = yield* exampleContentCatalogue;
       const navigation = yield* Schema.encodeEffect(
@@ -147,18 +146,16 @@ describe("browser route loaders", () => {
       const encodedPage = yield* Schema.encodeEffect(
         Schema.fromJsonString(DocsPublicPage)
       )(page);
-      const emptyCatalogue = yield* Schema.encodeEffect(
-        Schema.fromJsonString(CalculatorCatalogResponse)
-      )({ calculators: [] });
       const { builds, context } = yield* fixture((request) =>
-        Effect.sync(() => {
-          if (request.url.includes("/navigation")) {
-            return new Response(navigation, json);
-          }
-          return request.url.includes("/page")
-            ? new Response(encodedPage, json)
-            : new Response(emptyCatalogue, json);
-        })
+        // A valid catalogue transport can stall while Content stays healthy.
+        // Root completion must not start or wait for that optional operation.
+        request.url.includes("/calculators")
+          ? Effect.never
+          : Effect.sync(() =>
+              request.url.includes("/navigation")
+                ? new Response(navigation, json)
+                : new Response(encodedPage, json)
+            )
       );
       const { signal } = new AbortController();
       const root = yield* Effect.promise(() =>
@@ -167,7 +164,7 @@ describe("browser route loaders", () => {
       const view = yield* Schema.decodeUnknownEffect(WebsiteRootView)(
         root.view
       );
-      expect(Option.isSome(view.catalogue)).toBe(true);
+      expect(yield* Ref.get(builds)).toBe(0);
       expect(view.settings.publicationOrigin.href).toBe(
         "https://taxkit.example/"
       );
@@ -176,6 +173,9 @@ describe("browser route loaders", () => {
       );
       expect(loaded.page.path).toBe(page.path);
       expect(loaded.publicationOrigin).toBe("https://taxkit.example/");
+      yield* Effect.promise(() =>
+        loadDocsPage({ context, path: page.path, signal })
+      );
       expect(yield* Ref.get(builds)).toBe(1);
       expect(
         DocsPublicationOrigin.make(new URL(loaded.publicationOrigin))

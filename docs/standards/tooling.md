@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-tooling-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: formatter, lint, dependency, typecheck, Changeset or root command change
 ---
 
@@ -19,8 +19,10 @@ stable boundaries.
   the workspace globs and catalogue dependency versions.
 - `oxlint.config.ts` extends `ultracite/oxlint/core` with the React and Remix
   profiles, the vendored strict Effect policy, the anti-slop plugins and
-  TaxKit's own rules under `tools/oxlint`. Oxlint and `@oxlint/plugins` share
-  one plugin runtime version.
+  TaxKit's own rules under `tools/oxlint`. Native workspace import enforcement
+  comes from `@commonplaces/oxlint-plugin/package` (qualified at 0.3.1), rather
+  than a repository copy. Oxlint and the root `@oxlint/plugins` share one runtime
+  version; the shared plugin declares compatibility with that Oxlint version.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
   wrapping.
 - TypeScript 7 is the root compiler. `@effect/tsgo` patches it at install and
@@ -90,6 +92,24 @@ Current TaxKit-specific overrides are narrow:
 
 Portable custom rules live under `effect/*`, `bun/*` and `mdx/*`; tax,
 calculator and decoder policy remains under `taxkit/*`.
+
+The native `package/workspace-import-boundaries` rule consumes checked current
+manifests from `tools/oxlint/workspaces.boundary.ts`, including public export
+conditions, wildcard/null fences and dependencies, devDependencies,
+optionalDependencies and peerDependencies. Its synchronous Schema decode is an
+exact configuration-host exception; it grants no application runtime execution
+or decoder permission. `taxkit-package/workspace-roles` separately enforces
+browser/backend and runtime/deployment roles. The architecture owner is
+[package boundaries](../architecture/package-boundaries.md). Focused actual CLI
+fixtures live in `tools/oxlint/workspace-imports.boundary.test.ts`; they
+create temporary source/manifests and restore them in scoped finalizers, so run
+them sequentially away from builds. Isolated exact-path fixtures copy the real
+configuration, lint tools and root/workspace manifests, then run with that
+temporary workspace as the command's working directory; the same native import
+fences remain enabled. Ordinary temporary source fixtures stay inside the
+repository's lint fixture directory. The manifest guard covers every actual
+non-infrastructure package and rejects app dependencies in every dependency
+field. Approved Alchemy Worker helpers remain available to app hosts.
 Important portable rules include:
 
 - `effect/no-manual-tag`: bans manual `_tag` object literals. Use

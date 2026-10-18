@@ -174,6 +174,57 @@ describe("real MCP client against the native API application", () => {
   );
 
   it.effect.each([
+    { admitted: true, origin: "https://website.example.com" },
+    { admitted: false, origin: "https://website.example.com.evil.test" },
+    { admitted: false, origin: "https://website.example.com/" },
+    { admitted: false, origin: "null" },
+  ])(
+    "uses the modern browser header contract for $origin",
+    ({ origin, admitted }) =>
+      Effect.gen(function* () {
+        const app = yield* ApiWorkerApplication.pipe(
+          Effect.provide(ApiContentLive)
+        );
+        const context = yield* Effect.context<never>();
+        const handler = HttpEffect.toWebHandlerWith<
+          never,
+          Scope.Scope | HttpServerRequest.HttpServerRequest
+        >(context)(app.fetch);
+        const response = yield* Effect.promise(() =>
+          handler(
+            new Request("https://api.example.com/mcp", {
+              headers: {
+                "access-control-request-headers":
+                  "content-type,mcp-method,mcp-name,mcp-protocol-version,traceparent,b3",
+                "access-control-request-method": "POST",
+                origin,
+              },
+              method: "OPTIONS",
+            })
+          )
+        );
+        expect(response.headers.get("access-control-allow-origin")).toBe(
+          admitted ? origin : null
+        );
+        expect(
+          response.headers.get("access-control-allow-credentials")
+        ).toBeNull();
+        if (admitted) {
+          const headers = response.headers.get("access-control-allow-headers");
+          expect(headers).toContain("mcp-method");
+          expect(headers).toContain("mcp-name");
+          expect(headers).toContain("mcp-protocol-version");
+          expect(headers).not.toContain("mcp-session-id");
+        }
+      }).pipe(
+        Effect.provideService(ConfigProvider.ConfigProvider, settings),
+        Effect.provide(CalculatorLive),
+        Effect.provide(TestConsole.layer),
+        Effect.scoped
+      )
+  );
+
+  it.effect.each([
     { message: "invalid-calculation", mode: "expected" },
     { message: "capacity-exceeded", mode: "capacity" },
     { message: "operation-timeout", mode: "timeout" },
@@ -481,6 +532,11 @@ describe("real MCP client against the native API application", () => {
             yield* Effect.tryPromise({
               catch: () => new McpClientProbeFailed({ operation: "connect" }),
               try: () => client.connect(transport),
+            });
+            expect(client.getServerCapabilities()).toEqual({
+              completions: {},
+              logging: {},
+              tools: { listChanged: false },
             });
             const listed = yield* Effect.tryPromise({
               catch: () => new McpClientProbeFailed({ operation: "list" }),

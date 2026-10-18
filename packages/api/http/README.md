@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -392,6 +392,11 @@ actual API tarball and imports all JavaScript public entrypoints.
 
 The OpenAPI snapshot test uses Effect FileSystem and the owning JSON Schema
 codec; the committed normalized snapshot remains the wire-contract oracle.
+Generated OpenAPI explicitly bounds `Money.cents` from -9007199254740991 to
+9007199254740991. Core's [Cents schema](../../core/src/primitives/money.ts)
+already checks `Schema.Int`, which accepts only JavaScript safe integers.
+Effect 4.0.4 makes those existing bounds explicit in the generated metadata;
+request/response decoding and accepted money values retain that contract.
 The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
 Both test files are checked by `tsconfig.test.json` in `check-types`, including
 canonical branded identities and explicit Match narrowing of report/error unions.

@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-app-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: API app composition, shared protocol owners, settings, routes, CORS, cache or lifecycle change
 ---
 
@@ -71,12 +71,14 @@ POST `/rpc` delegate to the same calculator service. Its named RPC operations
 match all nine existing calculator-service calls using the canonical request/result contracts. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
-The Worker exposes two entry points. `fetch` serves public HTTP, RPC and MCP.
-`calculatorRequest(request, key)` is a service-binding method with no HTTP
-route: the Website uses it for calculations so the original caller's checked
-rate key travels outside JSON and headers. It admits only POST `/rpc` and POST
-`/api/v1/calculators/:calculatorId/calculate` (404 otherwise), and buffers the
-reply within 2 MiB and ten seconds (503 otherwise).
+The Worker exposes the native default `fetch` entrypoint for public HTTP, RPC,
+MCP and the Website's private HTTP binding. Canonical Website calculation POSTs
+carry a stage-owned secret and a separately checked original IP in private
+headers. `ApiWebsiteForwarding` authenticates them before supplying the shared
+rate key and strips both fields before router dispatch. Partial, malformed or
+incorrect metadata fails closed. Public HTTP/RPC/MCP retain their direct-edge
+identity and credential-free contracts; forwarding metadata grants no authority
+on other methods or paths. There is no calculation RPC tunnel.
 
 The native init declares Cloudflare Workers Cache with
 `cache({ crossVersionCache: false })`, so each deployed version starts its own
@@ -102,9 +104,9 @@ exact HTTP(S) browser origin with credentials disabled (`publicCors` and
 host routes), and allow `content-type`, the optional
 `x-taxkit-collection-policy` header and the native `b3`/`traceparent` tracing
 headers. Remote MCP admits Origin-less clients and browser pages served from
-the publication origin only: `TaxKitMcpHost` supplies that origin to the static
-`TaxKitMcpHttpLayer` from `@taxkit/api-mcp/server`, whose `allowedOrigins`
-holds just it.
+the publication origin only: the static `TaxKitMcpHttpLayer` from
+`@taxkit/api-mcp/server` reads and checks that bound origin through Config; its
+`allowedOrigins` holds just it.
 Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
 produce an empty 503 response, without a guessed address.
@@ -139,11 +141,11 @@ header boundary to read the optional collection choice once.
 Missing means allow; deny, malformed values or `DNT: 1` mean no collection.
 The policy carries no browser identity and changes neither admission nor the
 existing rate key. The native MCP registration omits the request collector;
-the older session host makes a fresh collector for each incoming request.
+modern MCP uses a fresh collector for each incoming request.
 
 The native application composes the private
 [analytics backend](../../packages/analytics/README.md). After a completed
-bounded response, native Worker or session `waitUntil` schedules the one-attempt
+bounded response, native Worker `waitUntil` schedules the one-attempt
 send. The send owns its HTTP scope and deadline. Expected capture errors have
 fixed safe diagnostics and do not change the response. Off is the default;
 invalid enabled settings become a fixed native Config error. An in-process
@@ -407,7 +409,18 @@ The original capacity, body size, cleanup and safe-reporter assertions remain.
 
 ## Native calculation rate admission
 
-The native API builds `PublicCalculatorServiceRateLimited` once underneath its bounded service. HTTP/RPC and the binding-only `calculatorRequest` operation share the [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission). Public requests need a checked original Cloudflare connection address; forwarded Worker calls and arbitrary forwarded headers cannot select a key. The Website private call supplies its checked key separately from JSON; no HTTP route admits that argument. The closed reply is buffered inside the native event scope, bounded to 2 MiB and ten seconds.
+The native API builds `PublicCalculatorServiceRateLimited` once underneath its
+bounded service. HTTP, RPC, modern MCP and authenticated Website HTTP share the
+[calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission).
+Public requests need a checked original Cloudflare connection address;
+arbitrary Worker headers cannot select a key. Website canonical calculation
+POSTs use `ApiWebsiteForwarding` and the same checked key outside financial
+JSON. The native Alchemy Random resource persists one private secret per stage,
+bound to both Workers. An optional checked previous API key supports an
+explicit two-step rotation; the Website sends only the current key. Ordinary
+deployments preserve the resource identity. The
+[infrastructure owner](../../packages/infrastructure/README.md) owns custody and
+rotation, and Website calls retain their complete-reply size/deadline bounds.
 
 `ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. The operator must select an account-wide unique stage value before a cloud plan/apply; no provider value is invented. The [infrastructure owner](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns graph and local-root selection. Hosted mode defaults to `edge`. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
 
@@ -417,94 +430,58 @@ Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-ap
 ## Native remote calculator tools
 
 The native Worker serves `/mcp` through the toolkit, handlers and server Layer
-owned by [`@taxkit/api-mcp`](../../packages/api/mcp/README.md), using installed
-Effect's `McpServer` and `Toolkit`. It composes modern protocol `2026-07-28`
-in the Worker and older protocol `2025-11-25` in an app-owned native Durable Object.
+owned by [`@taxkit/api-mcp`](../../packages/api/mcp/README.md). Only protocol
+`2026-07-28` is supported. Installed Effect's
+`McpServer.layerHttpRequestScoped` owns protocol handling, framing and each POST's
+server/notification consumer. Native Alchemy owns Worker event execution and
+finalization. Shared registrations reuse the already-built calculator/content
+services and calculation pool. Request, analytics, rate identity and abort
+capabilities are excluded from cached registration; each actual request supplies
+its own capabilities.
+
 The six tools list calculators, read an input Schema, calculate, read docs
-navigation, search docs and read a processed Markdown page. Both adapters use
-canonical calculator/content Schemas and the same service implementations as
-HTTP/RPC. There is no separate tax engine or saved personal report.
+navigation, search docs and read a processed Markdown page. They use canonical
+calculator/content Schemas and the same service implementations as HTTP/RPC.
+Discovery advertises `tools.listChanged: false`. Legacy sessions, subscriptions,
+GET streams, DELETE termination and resumption are unsupported. The retired
+`TaxKitMcpSessions` class/export/binding is absent from the desired native graph;
+the modern-only release deletes its namespace through Alchemy's native migration.
+That deletion permanently removes the old namespace and stored alarm bookkeeping;
+redeploying old code cannot recover its former sessions.
 
-Modern calls carry their protocol/routing headers and per-request metadata.
-An older client's first initialise has no version header; subsequent requests
-carry its native session ID and `2025-11-25` header. The installed adapter owns
-parsing, IDs, version agreement and cancellation matching. The native API selects
-the app-owned host; no copied parser or private session Map is added. The plain
-in-process composition remains modern-only. `src/mcp-session.layer.ts` owns
-Durable Object registration, protocol scope, expiry, trusted forwarding and
-per-request analytics. Shared tool Schemas, cancellation and response budgets
-stay in the MCP package.
+The existing 64 KiB/five-second streamed POST limit applies. Complete native
+JSON/SSE replies, including finite request progress/log notifications, are read
+inside the request scope within ten seconds and 2 MiB. Origin-less clients work;
+a supplied Origin must exactly match the publication origin. Only `/mcp` permits
+modern protocol/routing headers in CORS, with credentials disabled. Expected
+failures have fixed codes and manual-retry guidance; native internal failures use
+the existing safe reply and fixed reporter. HTTP/RPC/MCP retain the shared native
+anonymous per-IP allowance and five-second calculation budget.
 
-The older host uses one fixed-name object per stage and keeps at most 32
-initialisation attempts within a ten-minute host lifetime, plus 32 simultaneous
-requests without waiting for a place. These are shared host limits, not limits
-per client. The lifetime begins when that host starts; a later conversation has
-only its remaining time. Runtime eviction may end it earlier; conversations do
-not resume across eviction. The native alarm and an incoming time check close the
-whole protocol scope at expiry. All affected clients receive 404 and need a
-fresh initialise. Reinitialising an existing conversation is already refused
-by the installed HTTP adapter and cannot bypass the allocation limit. Client
-metadata stays in memory; only native alarm bookkeeping uses storage. GET/DELETE
-streams, subscriptions, termination and resumption are not advertised.
-
-The host captures the existing calculator/content services without its first
-caller's request, rate identity or stop signal. Its calculation pool belongs to
-that native application instance. It is not a global pool shared with the outer
-Worker's separate isolate. Both use the same native anonymous rate binding and
-five-second operation budget. The API replaces any caller-supplied private key
-header with its current checked original key before the private object call;
-that capability stays outside request JSON and is never logged. Actual local
-HTTP/modern/older calls exhaust one allowance even with a forged private header.
-Cloud location/approximation limits still apply.
-
-The existing 64 KiB streamed POST limit applies before delegation. Complete
-native JSON/SSE replies are read within ten seconds and 2 MiB. Only the
-publication origin is accepted; other supplied Origins fail, while origin-less
-clients work.
-Only `/mcp` permits protocol/routing/session headers in CORS. Expected failures
-have fixed codes and manual-retry guidance; native internal failures use the
-existing safe reply and fixed reporter.
-
-Cancellation has two separately tested boundaries. An older conversation's
-native cancellation notification immediately stops its actual network call,
-releases a calculation place and admits a replacement. Another conversation's
-notification cannot cancel it. Modern in-process AbortSignal cancellation also
-works. On the pinned real Worker, an outgoing modern TCP abort stops the caller
-but pre-response calculation work remains until its five-second budget. The
-native modern HTTP adapter has no conversation binding for that notification.
-No flag-only workaround is accepted. The native modern host registers a `WorkerExecutionContext.waitUntil` observer
-before running the bounded request and completes it when that handler exits.
-This keeps the invocation alive after a remote disconnect so Effect cleanup
-can release its calculation place at the existing five-second budget. The
-calculation stays in its original request fibre and scope; the observer runs
-no tax work. The contract does not promise prompt modern remote cleanup.
+In-process AbortSignal cancellation interrupts actual work. On the pinned native
+Worker, an outgoing modern TCP abort stops the client while pre-response work
+can continue until its five-second budget. The host registers a bounded
+`WorkerExecutionContext.waitUntil` observer before running the request and
+completes it when the handler exits. This keeps the invocation alive for cleanup;
+tax work stays in its original request fibre. Prompt remote server cleanup is
+not guaranteed.
 
 The [agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx)
-documents both versions, all six remote tools, anonymous limits, exact browser
-Origin admission, older expiry and the modern five-second cancellation limit.
-The Website's `/agents` page derives its MCP address from the checked API
-settings, including in Preview. `bun run test:native` runs the official clients
-against the locally built pair; check the deployed API directly before claiming
-a stage serves them. Neither proves prompt modern pre-response cleanup.
-History: [7 October agent setup record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-agent-setup-and-cancellation-bounds.json).
+documents the supported protocol, six tools, limits and exact Origin admission.
+The Website's `/agents` page derives its MCP address from checked API settings,
+including Preview. `bun run test:native` exercises official clients over loopback
+TCP against the source-built native API. Its disposable in-memory native callback
+probe records and rethrows ALS resumption failures and asserts callback progress
+across completed requests; HTTP 200 and Miniflare's ordinary log hooks alone do
+not establish that progress. Native cancellation qualification retains the
+negative prompt-cleanup oracle and requires all eight places to recover at the
+work budget. Local tests do not establish deployed access or arbitrary external
+client compatibility. The [browser caller owner](../web/README.md#browser-tools)
+covers on-page tools.
 
-`@modelcontextprotocol/client` 2.3.1 is test-only. The full native-pair command
-runs actual official clients over loopback TCP against the source-built API.
-Reports and published processed Markdown equal HTTP, two conversations remain
-distinct, admission is bounded and stale IDs fail. A scoped source fixture
-shortens only the actual host lifetime to 1.5 seconds: its real platform alarm
-must release 32 held metadata calls without another HTTP request, then a fresh
-client must initialise and list tools. After real calculations, docs reads and
-32 conversations, local SQL inspection observes only native bookkeeping and the
-emulator's name table, with no application or key-value table.
-
-The root-owned native source builder under `tools/apps-local` discovers the
-SDK-generated class export inventory by memory-only compilation of the actual API declaration. All provider,
-credential and network methods refuse; it runs no provider plan/apply. Local
-fixtures bind the genuine generated class in disposable namespaces. Merely
-adding an emulator binding is insufficient and previously returned 503.
-The [browser caller owner](../web/README.md#browser-tools) covers browser
-tools. Source-built setup, actual browser callers and deployed ordinary remote
-calls do not establish prompt modern cleanup or an autonomous model session.
-History: [7 October session record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
-and [earlier modern record](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json).
+The root-owned native source builder discovers the actual SDK Worker declaration
+through memory-only compilation. Provider, credential and network operations
+refuse; this performs no provider plan/apply. Historical
+[modern](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
+and [session](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
+records describe the prior artifacts and do not define current support.

@@ -15,7 +15,11 @@ import {
   CalculatorRateLimited,
   CalculationQuery,
 } from "@taxkit/calculators/schemas";
-import { calculatorEdgeRateKey } from "@taxkit/observability/edge-identity";
+import {
+  calculatorEdgeRateKey,
+  WebsiteForwardingCredentialHeader,
+  WebsiteForwardingRateKeyHeader,
+} from "@taxkit/observability/edge-identity";
 import { RateLimit } from "alchemy/Cloudflare/Workers";
 import {
   Array,
@@ -48,9 +52,13 @@ const Frame = Schema.TaggedStruct("Request", {
   tag: Schema.Literal("Calculate"),
 });
 const Json = Schema.fromJsonString(Schema.Unknown);
+const forwardingCredential = "a".repeat(64);
+const previousCredential = "b".repeat(64);
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
   TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
+  TAXKIT_WEBSITE_FORWARDING_KEY: forwardingCredential,
+  TAXKIT_WEBSITE_FORWARDING_PREVIOUS_KEY: previousCredential,
 });
 
 describe("shared native host calculation admission", () => {
@@ -161,7 +169,7 @@ describe("shared native host calculation admission", () => {
   );
 
   it.effect(
-    "HTTP, private calls and batch members share one checked allowance",
+    "direct HTTP, Website HTTP and public RPC batch members share one checked allowance",
     () =>
       Effect.gen(function* () {
         const used = yield* Ref.make(
@@ -212,7 +220,36 @@ describe("shared native host calculation admission", () => {
           query: CalculationQuery.make({}),
         });
         const first = yield* calculate;
-        yield* Effect.forEach(Array.range(1, 58), () => calculate);
+        yield* Effect.forEach(Array.range(1, 57), () => calculate);
+        const publicBody = yield* Schema.encodeEffect(
+          Schema.fromJsonString(
+            CalculatorRpcPayload.fields.request.fields.payload
+          )
+        )(CalculationRequest.payload);
+        // The Website uses canonical HTTP and a separately authenticated key,
+        // even if the service hop carries another apparent edge IP.
+        const website = yield* app.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request(
+                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+                {
+                  body: publicBody,
+                  headers: {
+                    "cf-connecting-ip": "198.51.100.99",
+                    "cf-worker": "website.example.com",
+                    "content-type": "application/json",
+                    [WebsiteForwardingCredentialHeader]: forwardingCredential,
+                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
+                  },
+                  method: "POST",
+                }
+              )
+            )
+          )
+        );
+        expect(website.status).toBe(200);
         const batch = yield* Effect.forEach(Array.range(1, 3), (id) =>
           Schema.encodeEffect(Frame)(
             Frame.make({
@@ -227,16 +264,23 @@ describe("shared native host calculation admission", () => {
           )
         );
         const body = yield* Schema.encodeEffect(Json)(batch);
-        const reply = yield* app.calculatorRequest(
-          new Request("https://api.example.com/rpc", {
-            body,
-            headers: {
-              "cf-connecting-ip": "198.51.100.99",
-              "content-type": "application/json",
-            },
-            method: "POST",
-          }),
-          "203.0.113.75"
+        const reply = yield* app.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request("https://api.example.com/rpc", {
+                body,
+                headers: {
+                  "cf-connecting-ip": "203.0.113.75",
+                  "content-type": "application/json",
+                  // RPC is public; forwarded metadata never changes its identity.
+                  [WebsiteForwardingRateKeyHeader]: "198.51.100.99",
+                },
+                method: "POST",
+              })
+            )
+          ),
+          Effect.map(HttpServerResponse.toWeb)
         );
         const text = yield* Effect.promise(() => reply.text());
         expect(reply.status).toBe(200);
@@ -251,11 +295,6 @@ describe("shared native host calculation admission", () => {
             error: new CalculatorRateLimited(),
           });
         }
-        const publicBody = yield* Schema.encodeEffect(
-          Schema.fromJsonString(
-            CalculatorRpcPayload.fields.request.fields.payload
-          )
-        )(CalculationRequest.payload);
         const raw = yield* http.execute(
           HttpClientRequest.post(
             "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate"
@@ -299,17 +338,30 @@ describe("shared native host calculation admission", () => {
             CalculatorRpcPayload.fields.request.fields.payload
           )
         )(CalculationRequest.payload);
-        const call = (path: string, method: string, payload: string) =>
-          app.calculatorRequest(
-            new Request(`https://api.example.com${path}`, {
-              body: method === "POST" ? payload : null,
-              headers: {
-                "cf-connecting-ip": "198.51.100.99",
-                "content-type": "application/json",
-              },
-              method,
-            }),
-            "203.0.113.75"
+        const call = (
+          path: string,
+          method: string,
+          payload: string,
+          credential = forwardingCredential
+        ) =>
+          app.fetch.pipe(
+            Effect.provideService(
+              HttpServerRequest.HttpServerRequest,
+              HttpServerRequest.fromWeb(
+                new Request(`https://api.example.com${path}`, {
+                  body: method === "POST" ? payload : null,
+                  headers: {
+                    "cf-connecting-ip": "198.51.100.99",
+                    "cf-worker": "website.example.com",
+                    "content-type": "application/json",
+                    [WebsiteForwardingCredentialHeader]: credential,
+                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
+                  },
+                  method,
+                })
+              )
+            ),
+            Effect.map(HttpServerResponse.toWeb)
           );
         const accepted = yield* call(
           "/api/v1/calculators/au.pay.take-home/calculate",
@@ -318,6 +370,13 @@ describe("shared native host calculation admission", () => {
         );
         expect(accepted.status).toBe(200);
         expect(yield* Ref.get(keys)).toHaveLength(1);
+        const previous = yield* call(
+          "/api/v1/calculators/au.pay.take-home/calculate",
+          "POST",
+          body,
+          previousCredential
+        );
+        expect(previous.status).toBe(200);
         // An error reply keeps its real status instead of a rebuilt 200.
         const rejected = yield* call(
           "/api/v1/calculators/au.pay.take-home/calculate",
@@ -329,19 +388,27 @@ describe("shared native host calculation admission", () => {
         expect(text).not.toContain("203.0.113.75");
         yield* Effect.forEach(
           [
-            ["/api/v1/calculators/au.pay.take-home/calculate", "GET"],
-            ["/api/v1/calculators/not-a-calculator/calculate", "POST"],
-            ["/api/v1/calculators/au.pay.take-home/calculate/x", "POST"],
-            ["/api/v1/calculators", "POST"],
+            ["/api/v1/calculators/au.pay.take-home/calculate", "GET", 404],
+            ["/api/v1/calculators/not-a-calculator/calculate", "POST", 400],
+            ["/api/v1/calculators/au.pay.take-home/calculate/x", "POST", 404],
+            ["/api/v1/calculators", "POST", 404],
           ] as const,
-          ([path, method]) =>
+          ([path, method, status]) =>
             call(path, method, body).pipe(
               Effect.tap((response) =>
-                Effect.sync(() => expect(response.status).toBe(404))
+                Effect.sync(() => expect(response.status).toBe(status))
               )
             )
         );
-        expect(yield* Ref.get(keys)).toHaveLength(1);
+        expect(yield* Ref.get(keys)).toHaveLength(2);
+        const forged = yield* call(
+          "/api/v1/calculators/au.pay.take-home/calculate",
+          "POST",
+          body,
+          "c".repeat(64)
+        );
+        expect(forged.status).toBe(503);
+        expect(yield* Ref.get(keys)).toHaveLength(2);
         // A declared 4xx keeps its status, headers and checked body.
         const limited = yield* ApiWorkerInit.pipe(
           Effect.provideService(
@@ -351,16 +418,25 @@ describe("shared native host calculation admission", () => {
             })
           )
         );
-        const reply = yield* limited.calculatorRequest(
-          new Request(
-            "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
-            {
-              body,
-              headers: { "content-type": "application/json" },
-              method: "POST",
-            }
+        const reply = yield* limited.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request(
+                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+                {
+                  body,
+                  headers: {
+                    "content-type": "application/json",
+                    [WebsiteForwardingCredentialHeader]: forwardingCredential,
+                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
+                  },
+                  method: "POST",
+                }
+              )
+            )
           ),
-          "203.0.113.75"
+          Effect.map(HttpServerResponse.toWeb)
         );
         expect(reply.status).toBe(429);
         expect(reply.headers.get("retry-after")).toBe("60");

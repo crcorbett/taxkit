@@ -24,11 +24,10 @@ key is required.
 For a preview or your own installation, use the address shown on that website's
 **For agents** page. Keep the website and API in the same environment.
 
-The endpoint offers protocol versions `2026-07-28` and `2025-11-25`. The newer
-version sends its version and method information on each request. The older
-version first starts a conversation and then sends its session ID. Let your
-client handle those headers and messages; changing the version label alone does
-not change the protocol. Other versions are refused.
+The endpoint supports protocol `2026-07-28` only. It sends its version and
+method information on each request and does not create a saved conversation.
+Let your client handle those headers and messages. Older protocol clients are
+refused; changing the version label alone does not change the protocol.
 
 ## Remote tools
 
@@ -75,17 +74,13 @@ provide control of the browser page.
 - Modern remote cancellation stops the client. On the tested Worker runtime,
   server calculation work can continue until its five-second limit. Prompt
   server cleanup before the reply starts is not guaranteed.
-- An older client's cancellation notification stops only its own conversation's
-  call and releases that calculation's place. Older conversations share a host
-  with at most 32 initialisation attempts and 32 concurrent requests during its
-  ten-minute lifetime. A late connection has only the remaining time. Expiry or
-  host eviction returns 404; start a fresh conversation.
 - Calls without an Origin header are accepted. Browser calls must come from the
   TaxKit publication site, `https://taxkit.dev`; other origins are refused.
   This is a browser origin check, not a login system.
 - When a call is refused or times out, read its fixed error code and guidance.
-  Retry only after checking the cause. Subscriptions, resumed streams and saved
-  conversations across host eviction are not offered.
+  Retry only after checking the cause. Subscriptions, list-change notifications,
+  resumed streams and saved conversations are not offered. Finite progress or
+  log notifications arrive with the completed reply.
 
 Annual income-tax reports identify rules-au-income-tax/1.0.1. That edition uses
 the enacted 2025–26 Medicare thresholds of $28,011 and $35,013 for a single

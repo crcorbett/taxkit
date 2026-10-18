@@ -26,6 +26,11 @@
       "types": "./dist/errors.d.ts",
       "default": "./dist/errors.js"
     },
+    "./summaries": {
+      "source": "./src/summaries.ts",
+      "types": "./dist/summaries.d.ts",
+      "default": "./dist/summaries.js"
+    },
     "./metadata": {
       "source": "./src/metadata.ts",
       "types": "./dist/metadata.d.ts",
@@ -80,6 +85,10 @@
       "./errors": {
         "types": "./dist/errors.d.ts",
         "default": "./dist/errors.js"
+      },
+      "./summaries": {
+        "types": "./dist/summaries.d.ts",
+        "default": "./dist/summaries.js"
       },
       "./metadata": {
         "types": "./dist/metadata.d.ts",

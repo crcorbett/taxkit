@@ -2,7 +2,7 @@ import { Effect, Schema } from "effect";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
 import { browserApiClient, publicSettingsAtom } from "./api/client.atoms";
-import { readCatalogue, readDocsPage, readDocsSearch } from "./api/requests";
+import { readDocsPage, readDocsSearch } from "./api/requests";
 import { TaxKitWebConfigError } from "./config";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.boundary";
 import { rejectRouteLoad } from "./load.failure";
@@ -56,14 +56,9 @@ export const loadRoot = (
     ...request,
     effect: Effect.gen(function* () {
       const current = yield* settings;
-      const catalogue = yield* browserApiClient.pipe(
-        Effect.flatMap(readCatalogue),
-        Effect.option
-      );
       return {
         submission: request.submission,
         view: yield* Schema.encodeEffect(WebsiteRootView)({
-          catalogue,
           settings: current,
         }),
       };

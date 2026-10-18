@@ -15,11 +15,6 @@
       "types": "./dist/handlers.layer.d.ts",
       "default": "./dist/handlers.layer.js"
     },
-    "./service": {
-      "source": "./src/service.ts",
-      "types": "./dist/service.d.ts",
-      "default": "./dist/service.js"
-    },
     "./server": {
       "source": "./src/server.ts",
       "types": "./dist/server.d.ts",

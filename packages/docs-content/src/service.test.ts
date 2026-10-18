@@ -1,9 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
 import { FumadocsSourceFixtures } from "@taxkit/docs-fumadocs/test";
-import { Effect, Layer, Match, Schema } from "effect";
+import { Array, Effect, Layer, Match, Option, Schema } from "effect";
 
+import manifest from "../package.json" with { type: "json" };
 import { DocsSourceError } from "./errors.js";
-import { DocsPagePath } from "./schemas.js";
 import { DocsContentService } from "./service.js";
 import { DocsContentServiceTest } from "./test.layer.js";
 
@@ -20,11 +20,25 @@ const guide = {
 } as const;
 
 describe("DocsContentService", () => {
+  it.each(["./generated-source", "./server", "./validate"])(
+    "retires the unused source/executable import %s while keeping the CLI",
+    (subpath) => {
+      expect(manifest.exports).not.toHaveProperty([subpath]);
+      expect(manifest.scripts.validate).toBe(
+        "bun run ./src/validate.runtime.ts"
+      );
+    }
+  );
+
   it.effect("decodes generic source values into canonical TaxKit pages", () =>
     Effect.gen(function* () {
       const content = yield* DocsContentService;
-      const page = yield* content.getPage(DocsPagePath.make("/guides/example"));
       const pages = yield* content.listPages();
+      const page = Array.head(pages).pipe(
+        Option.getOrElse(() => expect.fail("Expected decoded page"))
+      );
+      const navigation = yield* content.getNavigation();
+      expect(navigation.primaryNavigation.length).toBeGreaterThan(0);
 
       expect(page.frontmatter.title).toBe("Guide");
       expect(page.path).toBe("/guides/example");
@@ -39,31 +53,12 @@ describe("DocsContentService", () => {
     )
   );
 
-  it.effect("maps generic missing pages to the content-owned path error", () =>
-    Effect.gen(function* () {
-      const content = yield* DocsContentService;
-      return yield* content.getPage(DocsPagePath.make("/missing"));
-    }).pipe(
-      Effect.provide(
-        DocsContentServiceTest.pipe(
-          Layer.provide(Layer.succeed(FumadocsSourceFixtures)([guide]))
-        )
-      ),
-      Effect.flip,
-      Effect.tap((error) =>
-        Effect.sync(() => {
-          expect(error._tag).toBe("DocsPageNotFoundError");
-        })
-      )
-    )
-  );
-
   it.effect(
     "rejects malformed TaxKit frontmatter with a safe content error",
     () =>
       Effect.gen(function* () {
         const content = yield* DocsContentService;
-        return yield* content.getPage(DocsPagePath.make("/guides/malformed"));
+        return yield* content.listPages();
       }).pipe(
         Effect.provide(
           DocsContentServiceTest.pipe(

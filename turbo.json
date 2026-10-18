@@ -16,8 +16,30 @@
     "@taxkit/docs-content#build": {
       "dependsOn": ["^build"],
       "env": ["NODE_ENV", "PLAYWRIGHT_BROWSERS_PATH"],
-      "inputs": ["$TURBO_DEFAULT$"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/docs-examples/src/**",
+        "$TURBO_ROOT$/packages/docs-examples/test/**"
+      ],
       "outputs": [".source/**"]
+    },
+    "@taxkit/docs-content#test": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/docs-examples/src/**",
+        "$TURBO_ROOT$/packages/docs-examples/test/**"
+      ],
+      "outputs": []
+    },
+    "@taxkit/docs-content#validate": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/docs-examples/src/**",
+        "$TURBO_ROOT$/packages/docs-examples/test/**"
+      ],
+      "outputs": []
     },
     "build": {
       "dependsOn": ["^build"],

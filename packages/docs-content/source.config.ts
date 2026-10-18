@@ -11,15 +11,13 @@ import { Result, Schema } from "effect";
 import navigationJson from "./navigation.json" with { type: "json" };
 import { DocsSourceError } from "./src/errors.ts";
 import { remarkPublicDocsLinks } from "./src/public-links.boundary.ts";
-import {
-  DocsPublicLinkProfile,
-  DocsRepositoryRevision,
-} from "./src/public-links.schema.ts";
+import { docsPublicLinkProfile } from "./src/public-links.profile.ts";
 import {
   DocsMeta,
   DocsNavigation,
   DocsPageFrontmatter,
 } from "./src/schemas.ts";
+import { remarkMdxComponentPolicy } from "./src/validation/mdx-component-policy.ts";
 
 // Fumadocs loads this configuration synchronously. Check the single imported
 // navigation representation here; runtime services retain their own file ingress.
@@ -39,12 +37,7 @@ const navigation = Schema.decodeUnknownResult(DocsNavigation)(
 const publicLinks = {
   contentRoot: new URL("content/", import.meta.url),
   navigation,
-  profile: DocsPublicLinkProfile.make({
-    repositoryRevision: DocsRepositoryRevision.make(
-      "a151e51e8a30247526fa93412df046955846eca4"
-    ),
-    repositoryUrl: new URL("https://github.com/crcorbett/taxkit"),
-  }),
+  profile: docsPublicLinkProfile,
   repositoryRoot: new URL("../../", import.meta.url),
 };
 const mdxOptions = sharedMdxOptions();
@@ -74,6 +67,7 @@ export default defineFumadocsConfig({
     ...mdxOptions,
     remarkPlugins: (existing) => [
       [remarkPublicDocsLinks, publicLinks],
+      remarkMdxComponentPolicy,
       ...mdxOptions.remarkPlugins(existing),
     ],
   },

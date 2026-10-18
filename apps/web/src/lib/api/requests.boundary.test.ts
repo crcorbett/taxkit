@@ -26,7 +26,6 @@ it.effect.each([
         Schema.fromJsonString(DocsPublicPage)
       )(page);
       const binding = {
-        calculatorRequest: vi.fn(),
         connect: vi.fn(),
         // Native Fetcher fixture: the generated client still decodes the bytes.
         fetch: vi.fn((request: Request) =>

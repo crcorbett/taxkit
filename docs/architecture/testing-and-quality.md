@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: test command, check coverage, native test or deployment check change
 ---
 
@@ -18,11 +18,24 @@ Website/API. Detailed rule-package expectations live in
 
 | Command | What it shows |
 | --- | --- |
-| `bun run verification` | Before merging. Build, format, lint, workspace and Alchemy-root types, Effect diagnostics, unit tests, Chromium tests, both Knip graphs, documentation links/commands and portable paths. |
+| `bun run verification` | Before merging. Build, format, lint, workspace and Alchemy-root types, Effect diagnostics, unit tests, Chromium tests, both Knip graphs, documentation links/commands and portable paths, then the required credential-free native pair suite. |
 | `bun run test` | Unit tests in every workspace plus the root tool tests, including the actual-Oxlint rule fixtures. |
 | `bun run test:browser` | Website and SDK tests in Chromium: Atom registry lifetime, calculator commands, loader cancellation and SDK browser imports. |
 | `bun run test:native` | Builds the API and Website and runs them together in Miniflare: first HTML, docs pages, Markdown, discovery files, calculation with and without JavaScript, MCP and request limits. |
-| `bun run release:check` | `verification` plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
+| `bun run release:check` | `verification`, including the native pair suite, plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
+
+The Checks, Preview and Production jobs all require `verification` to succeed.
+Its final `test:native` builds and tests the native pair only after the earlier
+builds and source-rewriting tests have finished. A native failure stops the job
+before deployment credentials, planning or apply. Do not run these artifact-owning
+checks concurrently in one checkout. The native suite covers request-scoped MCP
+progress and async context across requests, shared work/rate limits, reply
+cleanup and the Website's private HTTP identity boundary.
+
+`tools/infrastructure/release-gates.boundary.test.ts` executes the real root
+command composition and workflow gate commands with safe leaf replacements.
+It checks native build/test ordering and proves that a failing native suite
+prevents Preview/Production planning and deployment and later release checks.
 
 Effect diagnostics run inside every workspace's `check-types`, because the
 `prepare` script (`effect-tsgo patch`) patches the TypeScript compiler with the

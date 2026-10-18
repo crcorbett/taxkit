@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-configuration-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: config Schema, namespace, source selection or secret handling change
 ---
 
@@ -67,13 +67,22 @@ the Website's own keys from the Worker bindings, through Alchemy's
   used for canonical and publication links in every stage.
 - `CALCULATOR_HOST_MODE`: `edge` by default; the local root sets
   `local-emulator`.
+- `TAXKIT_WEBSITE_FORWARDING_KEY`: private stage-owned native Alchemy Random
+  Output, read only when a canonical server calculation POST executes.
 - `POSTHOG_*`: analytics relay settings, read through the analytics package's
   Config. The current graph binds none, so the relay reports off.
 
 Each origin is read with `Config.schema` and its owning Schema; deferred or
 missing outputs do not become guessed URLs. `TAXKIT_API` is a native service
 binding, not string configuration: an owning Schema checks the object
-(`fetch`, `connect`, `calculatorRequest`) separately and keeps its receiver.
+(`fetch`, `connect`) separately and keeps its receiver. The Website's narrow
+host adapter enforces standard manual redirects, preserving the native signal
+and receiver before the stock Alchemy HTTP conversion. The API verifies the
+current key, or an explicitly configured previous key during rotation, before
+accepting the separately decoded caller IP. Both headers are stripped before
+domain dispatch. Neither credential reaches public settings, browser clients,
+cached reads, machine RPC or MCP. Doppler owns deployment credentials; generated
+forwarding-key custody remains in stage-scoped Alchemy state.
 Settings errors contain only fixed safe fields.
 
 ## Browser configuration boundary

@@ -7,12 +7,6 @@ import { ByteSize, Duration, Schema } from "effect";
 
 export const McpResponseLimit = ByteSize.mebibytes(2);
 export const McpResponseDeadline = Duration.seconds(10);
-export const McpSessionLifetime = Duration.minutes(10);
-export const McpSessionInitialisationLimit = 32;
-export const McpSessionRequestLimit = 32;
-export const McpSessionId = Schema.String.check(Schema.isUUID(4)).pipe(
-  Schema.brand("McpSessionId")
-);
 export const McpDocsSearchRequest = Schema.Struct({ term: DocsSearchTerm });
 export const McpDocsReadRequest = Schema.Struct({ path: DocsPublicPagePath });
 export const McpDocsSearchResponse = Schema.Struct({

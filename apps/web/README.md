@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
 ---
 
@@ -37,13 +37,17 @@ invalid Website or publication origins fail only public settings. The API origin
 is required by both. Configuration failures expose fixed safe errors
 (`TaxKitWebConfigError` for settings, `WebsiteApiConfigError` for the API).
 The root load policy in `src/lib/root.load.server.ts` can therefore retain its
-settings and omit the optional catalogue when the API is unavailable. It owns
+settings without waiting for an optional remote catalogue. It owns
 the root transport encoding; `runtime.server.ts` owns execution and cancellation.
 
-The calculation POST does not use the binding's `fetch`. It calls the API's
-trusted private `calculatorRequest` method, so the caller's rate key travels
-outside JSON and headers. That method cannot carry an `AbortSignal`; the API
-bounds its own work and reply. Every server call forwards the visitor's
+Canonical calculation POSTs use the same native HTTP binding as reads. The
+server adds a checked original-IP header and the stage-owned forwarding
+credential; the API authenticates them before supplying its shared admission
+service. Incoming forwarding fields are overwritten, and neither field enters
+financial JSON or public settings. The binding boundary uses standard
+`redirect: "manual"` while preserving the native receiver and abort signal.
+Caller interruption cancels the outbound call; remote cleanup still needs the
+API's work/reply bounds. Every server call forwards the visitor's
 analytics collection choice (`deny` when there is no incoming request).
 
 **Browser.** `src/lib/api/client.atoms.ts` declares `ApiClient`, an
@@ -101,10 +105,12 @@ bindings, through `reifyBoundConfigProvider`:
 | `API_PUBLIC_ORIGIN` | the API's address Output | browser client base URL and the server client's base URL |
 | `TAXKIT_PUBLICATION_ORIGIN` | fixed `https://taxkit.dev` | canonical, Markdown alternate and share-image links |
 | `CALCULATOR_HOST_MODE` | the apps graph | `local-emulator` allows the loopback rate key in local development; default `edge` |
+| `TAXKIT_WEBSITE_FORWARDING_KEY` | native Alchemy Random Output, private to the stage | authenticated server calculation POSTs only; resolved through native Config at request time |
 | `POSTHOG_*` | not bound by the current graph | analytics relay settings; collection stays off |
 
 `TAXKIT_API` is checked separately as the binding object (it must expose
-`fetch`, `connect` and `calculatorRequest`) so its methods keep their receiver.
+`fetch` and `connect`) so its methods keep their receiver. Its small host
+adapter enforces manual redirects before the stock Alchemy HTTP conversion.
 Missing or invalid settings produce `TaxKitWebConfigError` with fixed fields.
 The root loader encodes the public settings into its loader data; the root
 route restores them and seeds `publicSettingsAtom`, which the browser client
@@ -119,7 +125,11 @@ reads. No binding, credential or Effect Context reaches the browser. Vite sets
 
 Take-home pay is at `/`; `/calculators/au.pay.withholdings` and
 `/calculators/au.income-tax.annual` have their own form and answer state. The
-navigation uses the API catalogue's titles and identities. Annual pages state
+navigation uses the canonical browser-safe `@taxkit/calculators/summaries`
+titles and identities, also reused by the API catalogue. It renders all links
+without a network read or JavaScript; summaries change with deployment and
+browser reload. Remote discovery tools still read the live API catalogue.
+Annual pages state
 that the retained Medicare thresholds await correction.
 
 `src/lib/calculator.atoms.ts` holds one `Atom.family` group per calculator: the

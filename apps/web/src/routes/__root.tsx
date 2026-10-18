@@ -11,7 +11,7 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
-import type { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
+import { CalculatorSummaries } from "@taxkit/calculators/summaries";
 import { Array, Function, Option, Result, Schema } from "effect";
 import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
 import { createContext, useEffect, useMemo, useRef } from "react";
@@ -29,10 +29,6 @@ import "../styles.css";
 export const WebsiteSubmissionContext = createContext<
   Option.Option<typeof WebsiteSubmission.Type>
 >(Option.none());
-export const WebsiteCatalogueContext = createContext<
-  Option.Option<typeof CalculatorCatalogResponse.Type>
->(Option.none());
-
 const SettingsUnavailable = () => (
   <main className="home">
     <h1>TaxKit</h1>
@@ -117,66 +113,49 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
     if (Result.isFailure(view)) {
       return <SettingsUnavailable />;
     }
-    const { catalogue, settings } = view.success;
+    const { settings } = view.success;
     return (
       <RootRegistry registry={registry}>
         <InitialSettings settings={settings}>
           <WebsiteSubmissionContext.Provider value={submission}>
-            <WebsiteCatalogueContext.Provider value={catalogue}>
-              <div className="app-shell">
-                <a className="skip-link" href="#main-content">
-                  Skip to content
+            <div className="app-shell">
+              <a className="skip-link" href="#main-content">
+                Skip to content
+              </a>
+              <nav aria-label="Calculators">
+                <ul>
+                  {Array.map(CalculatorSummaries, (calculator) => (
+                    <li key={calculator.calculatorId}>
+                      {calculator.calculatorId === "au.pay.take-home" ? (
+                        <Link activeProps={{ "aria-current": "page" }} to="/">
+                          {calculator.title}
+                        </Link>
+                      ) : (
+                        <Link
+                          activeProps={{ "aria-current": "page" }}
+                          to="/calculators/$calculatorId"
+                          params={{ calculatorId: calculator.calculatorId }}
+                        >
+                          {calculator.title}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                <a href={new URL("/api/docs", settings.apiOrigin).href}>
+                  For developers: API documentation
                 </a>
-                <nav aria-label="Calculators">
-                  {Option.match(catalogue, {
-                    onNone: () => (
-                      <p>
-                        The calculator list could not load. Please reload this
-                        page.
-                      </p>
-                    ),
-                    onSome: (value) => (
-                      <ul>
-                        {Array.map(value.calculators, (calculator) => (
-                          <li key={calculator.calculatorId}>
-                            {calculator.calculatorId === "au.pay.take-home" ? (
-                              <Link
-                                activeProps={{ "aria-current": "page" }}
-                                to="/"
-                              >
-                                {calculator.title}
-                              </Link>
-                            ) : (
-                              <Link
-                                activeProps={{ "aria-current": "page" }}
-                                to="/calculators/$calculatorId"
-                                params={{
-                                  calculatorId: calculator.calculatorId,
-                                }}
-                              >
-                                {calculator.title}
-                              </Link>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    ),
-                  })}
-                  <a href={new URL("/api/docs", settings.apiOrigin).href}>
-                    For developers: API documentation
-                  </a>
-                  <Link activeProps={{ "aria-current": "page" }} to="/agents">
-                    For agents: API access
-                  </Link>
-                  <Link params={{ _splat: "start/quickstart" }} to="/$">
-                    Documentation
-                  </Link>
-                </nav>
-                <main id="main-content" tabIndex={-1}>
-                  <Outlet />
-                </main>
-              </div>
-            </WebsiteCatalogueContext.Provider>
+                <Link activeProps={{ "aria-current": "page" }} to="/agents">
+                  For agents: API access
+                </Link>
+                <Link params={{ _splat: "start/quickstart" }} to="/$">
+                  Documentation
+                </Link>
+              </nav>
+              <main id="main-content" tabIndex={-1}>
+                <Outlet />
+              </main>
+            </div>
           </WebsiteSubmissionContext.Provider>
         </InitialSettings>
       </RootRegistry>

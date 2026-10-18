@@ -68,14 +68,14 @@ jobs:
           DOPPLER_CONFIG: ${{ steps.doppler-ci.outputs.DOPPLER_CONFIG }}
           DOPPLER_PROJECT: ${{ steps.doppler-ci.outputs.DOPPLER_PROJECT }}
         run: test "$DOPPLER_PROJECT" = "taxkit" && test "$DOPPLER_CONFIG" = "ci"
-      - name: Run checks with remote cache
+      - name: Run verification and required native suite with remote cache
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         env:
           TURBO_CACHE: local:rw,remote:rw
           TURBO_TEAM: ${{ steps.doppler-ci.outputs.TURBO_TEAM }}
           TURBO_TOKEN: ${{ steps.doppler-ci.outputs.TURBO_TOKEN }}
         run: bun run verification
-      - name: Run fork checks without credentials
+      - name: Run fork verification and required native suite without credentials
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
         env:
           TURBO_CACHE: local:rw

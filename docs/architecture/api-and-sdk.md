@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-api-sdk-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
@@ -359,12 +359,15 @@ these defaults. Storage restrictions from any cache-control header, a
 replies are `no-store`. Accept-only negotiation answers remain separate public
 variants. The package README owns the detailed response policy.
 
-Besides `fetch`, the Worker exposes `calculatorRequest(request, key)` to its
-service-binding callers only. It admits POST `/rpc` and POST
-`/api/v1/calculators/:calculatorId/calculate`, carries the original caller's
-checked rate key outside JSON and headers, and buffers the reply within 2 MiB
-and ten seconds. Direct edge callers are identified by
-`@taxkit/observability/edge-identity`.
+The native default `fetch` serves the Website's private HTTP binding as well
+as public HTTP/RPC/MCP. Website canonical calculation POSTs carry a checked
+original IP and a stage-owned native Alchemy secret in private headers.
+`ApiWebsiteForwarding` authenticates them before installing the request-local
+rate key and strips them before router dispatch. Partial, malformed or wrong
+metadata fails closed; other methods/paths gain no authority from those fields.
+The same native limiter and work pool serve every transport. Direct edge
+callers retain `@taxkit/observability/edge-identity`; public clients require no
+forwarding credential. There is no private calculation RPC method.
 
 POST bodies are read through the native Effect stream with a 64-KiB limit
 and a total five-second read deadline, before native JSON decoding. Oversized
@@ -383,8 +386,10 @@ The Website calls the API only through the generated client for `TaxKitApi`:
 
 - Server: `HttpApiClient.makeWith(TaxKitApi, ...)` over
   `toHttpClient(fromCloudflareFetcher(TAXKIT_API))`, inside the Website's one
-  `ManagedRuntime`. The calculation POST goes through the trusted
-  `calculatorRequest` method; reads use the binding's `fetch`. The visitor's
+  `ManagedRuntime`. Reads and canonical calculation POSTs use native HTTP;
+  only the latter receive authenticated original-IP metadata. A narrow native
+  binding adapter enforces `redirect: "manual"`, retaining the original
+  receiver and abort signal. The visitor's
   collection-policy header is forwarded. Discovery files are forwarded once to
   the API's discovery routes.
 - Browser: `ApiClient`, an `AtomHttpApi.Service` over `FetchHttpClient` with
@@ -685,6 +690,11 @@ and failures belong to `@taxkit/publication`.
 
 ### Documentation over HTTP
 
+The documentation RPC client's `getPage` applies Content's existing
+`isRequestedDocsPage` after native decoding. A schema-valid page for another
+requested path returns the existing `DocsRpcInvalidResponse`; there is no
+additional decoder or wire revision.
+
 The Website reads documentation through the public HTTP content routes
 (`/api/v1/docs/navigation`, `page`, `search` and `markdown`) and serves
 `.md`/`Accept` Markdown from `getMarkdown`; see
@@ -694,56 +704,42 @@ publication origins through the static `ContentDiscoveryLive`.
 
 ## Native remote MCP
 
-The native API mounts the `@taxkit/api-mcp` transport at `/mcp` using installed Effect
-`McpServer`, `Tool` and `Toolkit`. Its six named tools use canonical calculator
-and accepted-content Schemas, delegating to the same captured services as
-HTTP/RPC. Successful reports and processed Markdown are existing domain values;
-fixed transport failures contain no submitted facts or underlying causes.
-The safe reporter remains the single application error owner.
+The native API mounts `@taxkit/api-mcp` at `/mcp` with Effect 4.0.4's native
+`McpServer.layerHttpRequestScoped`, `Tool` and `Toolkit`. Only modern
+`2026-07-28` is supported. The six tools reuse canonical calculator/content
+Schemas and the captured shared services, work pool and native rate limiter.
+Effect owns protocol parsing, discovery and JSON/SSE framing; Alchemy owns the
+Worker, event runner and native finalization. No application MCP runtime or
+AsyncLocalStorage shim is installed.
 
-Modern `2026-07-28` is composed in the native Worker; older `2025-11-25`
-is composed in one app-owned, fixed-name Durable Object per stage. The SDK owns
-its generated class, binding and runtime composition. Native Effect owns message
-parsing, session IDs, version/header agreement and notification matching. The
-plain/in-process composition remains modern-only.
+Shared registration excludes the first caller's request, rate key, analytics
+and abort capabilities. Each POST owns its protocol server and notification
+consumer through response-body completion; no request-owned consumer is retained
+for later invocations. Request input remains bounded to 64 KiB/five seconds,
+complete replies to 2 MiB/ten seconds, and calculation work to the existing
+five-second/eight-place policy. Outbound interruption does not prove immediate
+remote cleanup; modern network cancellation retains its bounded work anchor.
 
-The API owns original connection identity, streamed POST admission and total
-reply bounds. Its private object forwarding replaces a caller-supplied key
-header with the checked original capability, separately from JSON. Native rate
-admission is common to both adapters and HTTP/RPC, subject to the provider's
-location and approximation contract. Each application isolate has its own
-captured eight-place calculation pool and five-second work budget; no global
-pool is claimed.
+Discovery advertises `tools.listChanged: false`. Legacy sessions, subscriptions,
+GET streams, DELETE termination and resumption are unsupported. The modern-only
+release removes `TaxKitMcpSessions` from the native class/export/binding graph
+and deletes its namespace through Alchemy's native migration. Its data and
+former sessions cannot be recovered by redeploying old code. The
+[deployment runbook](../runbooks/deployment.md) owns plan/readback and rollback.
 
-Older host lifetime is ten minutes from first admission, with 32 initialisation
-attempts and 32 concurrent requests without a queue. Expiry closes the entire
-native protocol scope, releasing its in-memory sessions and work. The native
-alarm owns unattended expiry; an incoming time check also refuses old IDs.
-Clients need a fresh handshake after 404, including after a runtime eviction;
-no conversation resumption is promised. The native adapter itself rejects
-initialise carrying an existing ID before registration, preserving existing
-conversations and their exhausted allocation allowance. Native alarm bookkeeping
-is the only storage operation; neither client metadata nor figures are persisted.
+Origin-less clients and the checked publication origin remain admitted; foreign
+browser origins are refused. The public [agent guide](../../packages/docs-content/content/api/agent-tools.mdx)
+owns client compatibility and connection steps. The Website agents page uses
+checked same-stage API settings; public documentation/discovery keeps its
+existing catalogue owner.
 
-Host registration excludes the first caller's request, rate key and stop signal.
-Replies retain native JSON/SSE framing, bounded to 2 MiB and ten seconds. No
-subscription, GET stream, termination or resumption contract is added. Older
-network cancellation is conversation-scoped and immediately releases actual
-work. The modern real-network pre-response abort still relies on the existing
-five-second work budget; earlier in-process cancellation does not prove prompt
-remote cleanup. Public setup explains this limit rather than promising prompt
-modern cancellation. The accepted [agent guide](../../packages/docs-content/content/api/agent-tools.mdx)
-owns connection steps, the discovered tool names, input-first use, older expiry
-and experimental browser support. The Website's `/agents` route derives its
-remote MCP address from checked same-stage API settings and links that guide;
-processed Markdown and documentation discovery reuse the public catalogue.
-
-The memory-only native source builder consumes computed SDK exports from the
-actual app declaration, refusing provider/credential/network access. Tests must
-load the generated native class and use actual clients and platform alarms,
-rather than substitute bindings or handwritten frames. See the
-[API owner](../../apps/api/README.md#native-remote-calculator-tools),
-[session candidate record](../documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
-and [browser owner](frontend.md#page-owned-browser-tools).
-Current app-owned transport changes do not change a published package export or
-the SDK lifetime contract.
+Native qualification uses the actual generated Worker and official client for
+all six tools, separate completed requests and concurrent cold starts. Its
+record-and-rethrow test observer checks native async-resource resumption and
+progress; HTTP 200 or a generic log hook alone cannot establish correct
+lifetimes. A retained-model negative control must fail before the fixed model
+is accepted. Cancellation, work-slot recovery, browser admission, shared quota
+and response cleanup have their own direct assertions. See the
+[API owner](../../apps/api/README.md#native-remote-calculator-tools) and
+[testing owner](testing-and-quality.md). Source design and local proof do not
+establish a deployed migration or hosted behavior.

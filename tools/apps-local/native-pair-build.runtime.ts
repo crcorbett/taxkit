@@ -32,11 +32,6 @@ const program = Effect.gen(function* () {
           mode: "stalled-work",
           workerName: "taxkit-api-local-stalled-work",
         },
-        {
-          fixtureId: "TaxKitApiSessionExpiry",
-          mode: "session-expiry",
-          workerName: "taxkit-api-local-session-expiry",
-        },
       ] as const,
       ({ fixtureId, mode, workerName }) =>
         Effect.gen(function* nativeCalculationPolicyBuild() {
@@ -79,62 +74,15 @@ const program = Effect.gen(function* () {
           ).pipe(Layer.provide(PublicCalculatorServiceLive)))`
             );
           yield* fs.writeFileString(owner, injected);
-          if (mode === "session-expiry") {
-            const lifetimeOwner = path.join(
-              root,
-              "packages/api/mcp/src/schemas.ts"
-            );
-            const lifetime = yield* Effect.acquireRelease(
-              fs.readFileString(lifetimeOwner),
-              (saved) =>
-                fs.writeFileString(lifetimeOwner, saved).pipe(Effect.orDie)
-            );
-            const declaration = "McpSessionLifetime = Duration.minutes(10)";
-            if (!lifetime.includes(declaration)) {
-              return yield* Effect.die(
-                "Native session expiry fixture no longer matches its source owner"
-              );
-            }
-            // Accelerate only the actual native alarm lifetime. The handler,
-            // alarm callback, session adapter and held work stay unchanged.
-            yield* fs.writeFileString(
-              lifetimeOwner,
-              lifetime.replace(
-                declaration,
-                "McpSessionLifetime = Duration.millis(1500)"
-              )
-            );
-          }
           yield* fs.remove(path.join(output, "bundles", fixtureId), {
             force: true,
             recursive: true,
           });
-          const baseProps = {
+          const props = {
             ...apiDeclaration,
             compatibility,
             main: path.join(root, "apps/api/src/worker.ts"),
           };
-          // The native bundler normally selects compiled workspace exports.
-          // Only this accelerated alarm fixture resolves its lifetime owner
-          // from patched source; other package entries keep their real graph.
-          const props =
-            mode === "session-expiry"
-              ? {
-                  ...baseProps,
-                  build: {
-                    input: {
-                      resolve: {
-                        alias: {
-                          "@taxkit/api-mcp/schemas": path.join(
-                            root,
-                            "packages/api/mcp/src/schemas.ts"
-                          ),
-                        },
-                      },
-                    },
-                  },
-                }
-              : baseProps;
           const artifacts = scopedArtifacts(fixtureId);
           const source = yield* resolveSource(props).pipe(
             Effect.provide(artifacts)
@@ -156,25 +104,6 @@ const program = Effect.gen(function* () {
             )
             .pipe(Effect.provide(artifacts));
         }).pipe(Effect.scoped)
-    );
-    // The fixture must restore source and never mutate the compiled package
-    // consumed by ordinary native builds. Guard both selected owners before
-    // compiling the remaining artifacts with the production ten-minute value.
-    yield* Effect.forEach(
-      ["src/schemas.ts", "dist/schemas.js"],
-      (owner) =>
-        fs
-          .readFileString(path.join(root, "packages/api/mcp", owner))
-          .pipe(
-            Effect.flatMap((source) =>
-              source.includes("McpSessionLifetime = Duration.minutes(10)")
-                ? Effect.void
-                : Effect.die(
-                    "Native MCP lifetime fixture did not restore its owner"
-                  )
-            )
-          ),
-      { discard: true }
     );
     // Corrupt one field in the actual native encoded reply. The native message
     // framing and server remain intact; this qualifies the client's decoder.
@@ -258,15 +187,15 @@ const program = Effect.gen(function* () {
           phase === "body"
             ? `response.body._tag === "Uint8Array"
             ? HttpServerResponse.stream(
-                Stream.make(response.body.body.subarray(0, 1)).pipe(
-                  Stream.concat(Stream.fromEffect(
+                NativeFixtureStream.make(response.body.body.subarray(0, 1)).pipe(
+                  NativeFixtureStream.concat(NativeFixtureStream.fromEffect(
                     Effect.logWarning("PRIVATE9 started").pipe(
                       Effect.andThen(Effect.sleep("12 seconds")),
                       Effect.as(response.body.body.subarray(1))
                     )
                   )),
-                  Stream.ensuring(Effect.logInfo("PRIVATE9 released")),
-                  Stream.provideContext(telemetry)
+                  NativeFixtureStream.ensuring(Effect.logInfo("PRIVATE9 released")),
+                  NativeFixtureStream.provideContext(telemetry)
                 ),
                 {
                   contentType: "application/json",
@@ -288,7 +217,19 @@ const program = Effect.gen(function* () {
           declaration,
           `  ).pipe(${operation},\n    // Every reply, including native error responses, gets one cache decision.`
         );
-        yield* fs.writeFileString(owner, injected);
+        // This artificial stream owns its import. Product HTTP composition no
+        // longer needs Stream after the private calculation tunnel retired.
+        if (phase === "body" && original.includes("NativeFixtureStream")) {
+          return yield* Effect.die(
+            "Native stalled-body fixture import collides with its source owner"
+          );
+        }
+        yield* fs.writeFileString(
+          owner,
+          phase === "body"
+            ? `import * as NativeFixtureStream from "effect/Stream";\n${injected}`
+            : injected
+        );
         const fixtureId =
           phase === "body" ? "TaxKitApiStalledBody" : "TaxKitApiStalledHeaders";
         yield* fs.remove(path.join(output, "bundles", fixtureId), {
@@ -432,8 +373,8 @@ const program = Effect.gen(function* () {
         (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
       );
       const injected = original.replace(
-        "  const settings = yield* Effect.fromResult(host.settings);\n  // The catalogue",
-        '  const settings = yield* Effect.die("PRIVATE9");\n  // The catalogue'
+        "  const settings = yield* Effect.fromResult(host.settings);",
+        '  const settings = yield* Effect.die("PRIVATE9");'
       );
       if (injected === original) {
         return yield* Effect.die(

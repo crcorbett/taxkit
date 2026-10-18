@@ -29,7 +29,9 @@ export type DocsMeta = typeof DocsMeta.Type;
 
 export const DocsMdxComponentName = DocsNonEmptyText.pipe(
   Schema.check(
-    Schema.isPattern(/^[A-Z][A-Za-z0-9]*(?:\.[A-Z][A-Za-z0-9]*)*$/u)
+    Schema.isPattern(
+      /^(?:[A-Z_$][A-Za-z0-9_$]*|[A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)+)$/u
+    )
   ),
   Schema.brand("taxkit/DocsMdxComponentName")
 );

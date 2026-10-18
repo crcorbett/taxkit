@@ -16,7 +16,6 @@ import { FetchHttpClient } from "effect/http";
 
 import { ApiCalculatorDeliveryLive } from "./analytics-request.boundary.js";
 import { ApiContentLive } from "./content.boundary.js";
-import { McpSessionHostLive } from "./mcp-session.layer.js";
 import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
 import { ApiWorkerApplication } from "./worker.application.js";
 
@@ -55,9 +54,7 @@ export const ApiWorkerNativeInit = Effect.gen(function* () {
   yield* cache({ crossVersionCache: false });
   return yield* ApiWorkerApplication;
 }).pipe(
-  Effect.provide(
-    McpSessionHostLive.pipe(Layer.provideMerge(ApiWorkerServicesLive))
-  ),
+  Effect.provide(ApiWorkerServicesLive),
   Effect.provide(ApiAnalyticsLive),
   Effect.provide(ApiCalculatorAdmission.pipe(Layer.provide(RateLimitBinding))),
   Effect.catchTag("AnalyticsConfigurationError", () =>

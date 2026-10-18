@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-package-boundaries-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: package responsibility, dependency direction or public export change
 ---
 
@@ -122,8 +122,13 @@ packages/core/**
 
 TaxKit packages and apps must not depend on other apps. Root composition joins
 app implementation exports to deployment declarations; runtime observability and
-analytics have no Alchemy/provider dependency. `tools/workspace/dependencies.boundary.test.ts`
-checks those manifest edges and proves the former reverse edges fail. React is allowed only inside app/docs packages that explicitly need it.
+analytics have no Alchemy/provider dependency. All non-infrastructure packages
+remain free of deployment packages and management SDKs, including dependencies,
+development, optional and peer dependencies. Apps may use Alchemy runtime
+helpers; infrastructure owns provider deployment.
+`tools/workspace/dependencies.boundary.test.ts` checks every actual workspace
+manifest and rejects app peers as well as reverse application edges. React is
+allowed only inside app/docs packages that explicitly need it.
 
 ## Package Responsibilities
 
@@ -267,6 +272,39 @@ Recommended shape:
 ```
 
 Server-only adapters and filesystem code must have explicit server-only export paths and must not be imported by browser-safe packages.
+
+`tools/oxlint/workspaces.boundary.ts` reads the root workspace globs and each
+actual manifest when Oxlint starts. It includes nested transport, SDK and rule
+packages, preserves selected `source`/`import`/`node`/`default` export conditions,
+wildcard subpaths and null fences, and derives undeclared dependency edges from
+all four dependency fields. The native `package/workspace-import-boundaries`
+rule enforces these facts for aliases, relative paths, imports, re-exports,
+dynamic imports and type imports. Cross-owner file paths remain private even
+when the destination file is an export target; use its package address. Root
+composition can consume declared app exports; apps and packages cannot consume
+another app.
+
+The separate `taxkit-package/workspace-roles` rule owns frontend and deployment
+roles. A public export or declared dependency does not make a backend handler,
+server, domain live Layer or content compiler browser-safe. Website source uses
+the contract/client modules listed in `tools/oxlint/package-roles.ts`; the RPC
+`live` entries are transport clients. Exact host exceptions admit the existing
+server relay, host telemetry, admission and infrastructure binding types. These
+exceptions do not bypass exports or declared-dependency checks. Browser code
+also rejects Alchemy and local `.server`/`.server.layer` imports. Exact local
+host grants retain the isomorphic loader's `./runtime.server` import and the
+settings Layer's `./config.server` import; neighbouring browser modules receive
+neither permission. Non-infrastructure package
+source cannot acquire deployment/provider implementations. No package runtime
+SDK exception is currently required.
+
+The CLI fixtures in `tools/oxlint/workspace-imports.boundary.test.ts` exercise
+accepted contracts/clients and actual host files, rejected backend/private and
+undeclared imports, fresh manifest changes, peer dependencies, wildcard null
+fences and conditional selection. This is syntactic import enforcement, not a
+transitive browser bundler or arbitrary runtime module-address evaluator.
+Unresolved Website module addresses fail the role check; the native baseline
+checks statically resolved addresses.
 
 ## Out Of Scope For Engine Packages
 

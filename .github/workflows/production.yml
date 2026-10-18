@@ -65,10 +65,12 @@ jobs:
         with:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
           key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
+      # Verification ends with the required credential-free native pair suite,
+      # after source-rewriting tests and builds finish. A failure blocks plan/apply.
       # Same checks as the Checks workflow, before any credential is used. The
       # Turbo remote cache needs Checks' separate DOPPLER_CI_TOKEN, so deploys
       # use the local cache only.
-      - name: Run checks
+      - name: Run verification and required native suite
         env:
           TURBO_CACHE: local:rw
         run: bun run verification

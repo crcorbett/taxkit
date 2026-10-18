@@ -5,6 +5,7 @@ export const DocsRepositoryRevision = Schema.String.check(
 ).pipe(Schema.brand("taxkit/DocsRepositoryRevision"));
 
 export const DocsPublicLinkProfile = Schema.Struct({
+  checkedExampleRevision: DocsRepositoryRevision,
   repositoryRevision: DocsRepositoryRevision,
   repositoryUrl: Schema.URL,
 });

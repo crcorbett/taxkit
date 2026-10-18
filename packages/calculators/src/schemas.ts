@@ -270,6 +270,14 @@ export const CalculatorCatalogItem = Schema.Struct({
 
 export type CalculatorCatalogItem = typeof CalculatorCatalogItem.Type;
 
+/** Publication metadata shared by the API catalogue and browser navigation. */
+export const CalculatorSummary = Schema.Struct({
+  calculatorId: CalculatorCatalogItem.fields.calculatorId,
+  context: CalculatorCatalogItem.fields.context,
+  title: CalculatorCatalogItem.fields.title,
+});
+export type CalculatorSummary = typeof CalculatorSummary.Type;
+
 export const CalculatorCatalogResponse = Schema.Struct({
   calculators: Schema.Array(CalculatorCatalogItem),
 });

@@ -1,5 +1,6 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import type { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
+import type { CalculatorSummary } from "@taxkit/calculators/schemas";
+import { CalculatorSummaries } from "@taxkit/calculators/summaries";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
 import { Array, Option, Result, Schema } from "effect";
@@ -8,13 +9,13 @@ import { useContext } from "react";
 import { CalculatorPage } from "#/lib/calculator-page.container";
 import type { WebsiteSubmission } from "#/lib/schemas";
 
-import { WebsiteCatalogueContext, WebsiteSubmissionContext } from "./__root";
+import { WebsiteSubmissionContext } from "./__root";
 
 const CalculatorRoutePage = ({
   calculator,
   submission,
 }: {
-  readonly calculator: CalculatorCatalogResponse["calculators"][number];
+  readonly calculator: CalculatorSummary;
   readonly submission: Option.Option<typeof WebsiteSubmission.Type>;
 }) => {
   const saved = submission.pipe(
@@ -55,15 +56,10 @@ const CalculatorRoutePage = ({
 export const Route = createFileRoute("/calculators/$calculatorId")({
   component: function CalculatorRoute() {
     const { calculatorId } = Route.useParams();
-    const catalogue = useContext(WebsiteCatalogueContext);
     const submission = useContext(WebsiteSubmissionContext);
-    const calculator = catalogue.pipe(
-      Option.flatMap((value) =>
-        Array.findFirst(
-          value.calculators,
-          (entry) => entry.calculatorId === calculatorId
-        )
-      )
+    const calculator = Array.findFirst(
+      CalculatorSummaries,
+      (entry) => entry.calculatorId === calculatorId
     );
     if (Option.isNone(calculator)) {
       return (

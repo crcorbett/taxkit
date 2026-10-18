@@ -1,2 +1,2 @@
-import "@taxkit/calculators";
+import "@taxkit/infrastructure/stage";
 import "./catalog.js";

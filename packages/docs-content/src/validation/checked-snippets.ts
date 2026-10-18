@@ -1,19 +1,31 @@
 import { Array, Schema } from "effect";
 
-import { DocsSourcePath, DocsValidationIssue } from "../schemas.js";
+import { DocsSourcePath, DocsValidationIssue } from "../schemas.ts";
+
+export const checkedExampleFiles = [
+  "browser-http.ts",
+  "effect.ts",
+  "error-handling.ts",
+  "node-server.ts",
+  "api-error-envelope.ts",
+  "calculator-help.ts",
+  "validate-external-input.ts",
+  "define-gross-pay-fact.ts",
+  "../test/integration.example.test.ts",
+] as const;
 
 const CheckedSnippetBinding = Schema.Struct({
-  example: Schema.Literals([
-    "api-error-envelope.ts",
-    "calculator-help.ts",
-    "validate-external-input.ts",
-    "define-gross-pay-fact.ts",
-    "../test/integration.example.test.ts",
-  ]),
+  example: Schema.Literals(checkedExampleFiles),
   page: DocsSourcePath,
 });
 
 export const checkedSnippetBindings = Schema.Array(CheckedSnippetBinding).make([
+  {
+    example: "browser-http.ts",
+    page: DocsSourcePath.make(
+      "content/guides/build-a-browser-app-with-the-http-api.mdx"
+    ),
+  },
   {
     example: "api-error-envelope.ts",
     page: DocsSourcePath.make("content/api/errors.mdx"),

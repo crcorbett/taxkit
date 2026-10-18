@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-api-mcp-package-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-18
 review_trigger: MCP toolkit, handlers, protocol composition, cancellation or response budget change
 ---
 
@@ -18,11 +18,9 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 
 - `./tools`: the six shared tool definitions and their annotations.
 - `./handlers`: the static `TaxKitMcpHandlersLive` Layer over calculator/content services.
-- `./service`: the `TaxKitMcpHost` composition contract, with the selected native
-  protocol adapter and checked publication origin.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path.
-- `./schemas`: tool request/reply Schemas, safe failures, session identity and
-  shared protocol budget constants.
+- `./schemas`: tool request/reply Schemas, safe failures and complete-reply
+  budget constants.
 - `./request`: the private `McpRequestAbortSignal` Context reference.
 - `./cancellation`: `withMcpRequestCancellation`, which refuses a missing
   capability and interrupts disconnected request work with scoped cleanup.
@@ -34,15 +32,20 @@ These are compiled internal source/types/default exports. The repository's
 There is no duplicate calculator/content service, client or runtime to acquire.
 Host integration tests substitute domain Layers and supply a fresh private
 cancellation signal.
-The host provides configuration and owns protocol lifetime.
+The host provides native configuration and owns the application scope. The MCP
+Layer reads and checks `TAXKIT_PUBLICATION_ORIGIN` through Config when registering
+its route; the native adapter owns each request's protocol lifetime.
 
 Originless remote clients are accepted. Browser Origins must exactly match the
-checked publication origin. The app selects the native `2026-07-28` adapter for
-stateless requests and `2025-11-25` for the legacy session host; this package's
-Layer supports either selection. Legacy session admission keeps its existing
-32-initialisation, 32-concurrent-request and ten-minute bounds. Durable Object
-registration, session storage/expiry, trusted request forwarding, analytics and
-stripping private request context before host capture remain in
+checked publication origin. `TaxKitMcpHttpLayer` selects only native
+`2026-07-28` with `McpServer.layerHttpRequestScoped`. Registration reuses the
+existing calculator/content services; each POST owns its protocol server and
+notification consumer until its complete response body has been read. No
+request-created consumer remains for a later request to wake. Discovery
+advertises `tools.listChanged: false`; subscriptions and legacy sessions are
+unsupported. Finite request progress/log notifications remain native and are
+buffered with the complete reply. Native Alchemy hosting, request analytics and
+private cancellation capability provision remain in
 [`apps/api`](../../../apps/api/README.md).
 
 ## Documentation impact
@@ -52,8 +55,8 @@ and [package ownership](../../../docs/architecture/package-ownership.md) own
 the durable transport/app boundary. The API app README owns native hosting;
 the Website retains its browser tool coordination. Package tests prove the
 reply budget and cancellation cleanup. The API's official-client tests and
-Website's native-pair MCP tests retain protocol, origin, session and isolation
-proof through the actual app composition.
+Website's native-pair MCP tests retain modern protocol, origin, native callback
+progress and isolation proof through the actual app composition.
 
 The renderer receipt records adaptation from the compiled internal service
 scaffold to the narrower tool-transport role. Its domain service/live/test

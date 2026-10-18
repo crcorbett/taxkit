@@ -3,7 +3,7 @@ document_type: product-spec-index
 lifecycle: current
 authority: canonical
 owner: taxkit-product-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: product-spec admission, lifecycle, evidence, or successor change
 successor: null
 tombstone: false
@@ -21,7 +21,7 @@ Specs:
 
 | Spec | Status | Notes |
 | --- | --- | --- |
-| [Common Practice foundation](./common-practice-foundation-review.md) | In progress | Cooper authorised implementation, merge and local Preview/Production deployment on 13 October. Native HTTP/Atom Website clients, Cloudflare first with Bun retained, patch-free Alchemy, seven-day public caching (Q7), public browser access and Production publication links (Q6), native MCP origin list (Q8), one-minute public loader freshness (Q9) and retirement of receipt tooling. Tax, machine RPC/MCP and SDK contracts stay. [Plan](../exec-plans/active/common-practice-foundation-review.md). |
+| [Common Practice foundation](./common-practice-foundation-review.md) | In progress | Cooper confirmed the 18 October implementation goal: findings 12–21, removal of the private calculation RPC tunnel through native secret-backed HTTP forwarding, preserved shared per-IP allowance and Effect/Alchemy-native modern-only MCP. Supervised implementation, integrated verification, Preview and local release are active. The modern-only release deletes the legacy MCP namespace. [Plan](../exec-plans/active/common-practice-foundation-review.md). |
 | [2025–26 annual Medicare correction](./medicare-2025-26-correction.md) | Implemented locally | MCR-001 and MCR-002 are completed with [correction evidence](../documentation-audit/medicare-2025-26-correction.json). The draft PR and exact approved adad source remain separate from adad qualification and deployment. |
 | [Clean slate website and API foundation](./clean-slate-foundation.md) | Superseded | Q1–Q13 settled: native website RPC, explicit Calculate, expandable existing explanation, calculator-first homepage and public-only Markdown. The complete 0.6.0 skill baseline and Cooper's immutable/declarative Effect policy require actual enforcement qualification. [Ordered tasks](./clean-slate-foundation.tasks.json) include retained tax behaviour, current qualified packages, enforceable rules, agent/discovery support, Alchemy DNS/Doppler, minimal PostHog and shared Axiom signals. Cooper authorised implementation on 4 October. Its [superseded plan](../exec-plans/completed/clean-slate-foundation.md) keeps the work and verification history. |
 | [Entire AI work history](./entire-session-history.md) | Implemented | Both agents recorded fresh sessions linked to a normal commit and push; 742 past turns imported. [Dated proof](../documentation-audit/entire-session-history/2026-10-01.json) and [draft PR #84](https://github.com/crcorbett/taxkit/pull/84) retain the public Sydney setup. |
