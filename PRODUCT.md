@@ -79,7 +79,8 @@ Supporting facts that reinforce it, not replace it:
   published documentation pages from the API. Tax calculation stays in the
   separate `apps/api`. `apps/docs` is a retirement tombstone. The Common
   Practice foundation (`docs/product-specs/common-practice-foundation-review.md`)
-  owns current Website/API work.
+  records the implemented Website/API design and delivery history. Current
+  architecture and runbooks own ongoing implementation and operations.
 - Production addresses are agreed as `taxkit.dev` and `api.taxkit.dev` on
   Cloudflare via Alchemy. Check the deployed Website and API directly before
   claiming what is live.

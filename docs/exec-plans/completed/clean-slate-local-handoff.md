@@ -3,16 +3,16 @@ document_type: execution-plan
 lifecycle: superseded
 authority: supporting
 owner: taxkit-implementation-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-18
 review_trigger: local continuation, PR reconciliation, approval or dependency revision changes
-successor: ../active/common-practice-foundation-review.md
+successor: ./common-practice-foundation-review.md
 superseded_reason: The clean-slate plan it continued is superseded by the 13 October Common Practice foundation.
 ---
 
 # TaxKit local continuation prompt
 
 Superseded: current work follows the
-[Common Practice foundation plan](../active/common-practice-foundation-review.md).
+[Common Practice foundation plan](./common-practice-foundation-review.md).
 The prompt below is the 4 October handoff, kept as history.
 
 Paste the following into the local thread with this repository selected.

@@ -72,7 +72,7 @@ substitution proof, not SDK or browser privacy proof.
 Change required: this README, the repository
 [package ownership](../../docs/architecture/package-ownership.md),
 [Effect boundary owner](../../docs/architecture/effect-services.md) and
-[active plan](../../docs/exec-plans/active/common-practice-foundation-review.md)
+[completed plan](../../docs/exec-plans/completed/common-practice-foundation-review.md)
 route these package capabilities and application composition. The focused relay
 boundary tests move with their policy; API request integration tests continue to
 exercise the package decorator through the host collector. Preserve: tax Schemas,

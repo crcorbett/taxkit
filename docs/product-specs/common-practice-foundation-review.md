@@ -1,6 +1,6 @@
 ---
 document_type: product-spec
-lifecycle: current
+lifecycle: implemented
 authority: supporting
 owner: taxkit-architecture-owner
 last_reviewed: 2026-10-18
@@ -8,6 +8,19 @@ review_trigger: agreed direction, Common Practice implementation, upstream suppo
 ---
 
 # Common Practice foundation review
+
+## Closeout — 18 October 2026
+
+Findings 12–21, native Website HTTP forwarding and the modern-only native MCP
+cutover are implemented through PRs #185 and #186 and released from
+`57a579d9f0834c767342239619e840e6ea8a0882`. The
+[completed plan](../exec-plans/completed/common-practice-foundation-review.md)
+and [dated release evidence](../evidence/releases/2026-10-18-native-transport-mcp-release.md)
+retain exact verification, Preview/Production delivery, namespace retirement
+and bounded proof. Hosted quota exhaustion remains inconclusive; native
+composition and provider configuration are narrower verified claims. No npm
+publication or hosted key rotation is claimed. These limits and earlier dated
+observations are history, not pending implementation steps for this goal.
 
 ## Native transport and MCP follow-up (18 October 2026)
 
@@ -20,7 +33,7 @@ preservation and private calculation RPC choices in the earlier proposal below.
 Cooper confirmed the complete shared understanding and requested implementation
 as one goal on 18 October. Implement the agreed scope with supervised Sol High
 agents, verify Preview, merge and push the reviewed change, then release locally
-and check Production. The active plan owns progress and observed proof; the
+and check Production. The completed plan retains execution history and observed proof; the
 design and source research do not establish deployed behavior.
 
 ### Settled boundaries
@@ -132,7 +145,7 @@ configuration, package-boundary and testing architecture owners with affected
 package/app READMEs. The public agent-tools guide owns modern-only advice; the
 deployment runbook owns gates, cold cleanup and namespace retirement. Preserve
 dated release history and regenerate public content from its sources. The
-[active plan](../exec-plans/active/common-practice-foundation-review.md) records
+[completed plan](../exec-plans/completed/common-practice-foundation-review.md) records
 the follow-up sequence and its implementation, verification and delivery status.
 
 ## Original foundation direction
@@ -165,12 +178,12 @@ against its [published release](https://github.com/crcorbett/commonplace-plugins
 on 13 October 2026. Its native HTTP/Atom and caching guidance supersedes the
 11 October RPC loading proposal and copied client-service approach. Earlier
 Common Practice comparisons remain research history, not the proposed target.
-This document and its [plan](../exec-plans/active/common-practice-foundation-review.md)
+This document and its [plan](../exec-plans/completed/common-practice-foundation-review.md)
 replace the large, uncommitted audit packet created during this review.
 
 On 13 October 2026 Cooper authorised implementing this design, merging it into
 `main` and deploying the Preview and Production Website/API pair locally with
-native Alchemy and Doppler. The [plan](../exec-plans/active/common-practice-foundation-review.md)
+native Alchemy and Doppler. The [plan](../exec-plans/completed/common-practice-foundation-review.md)
 records implementation progress and the remaining limits. Common Practice is
 read-only. Earlier wording below that describes a review-only stage is the
 history of how these choices were agreed.
