@@ -301,6 +301,13 @@ describe("built native API and Website", () => {
           ),
           (host) => Effect.promise(() => host.dispose())
         );
+        // Miniflare serialises each instance's config synchronously on this
+        // event loop. Start the ten-Worker Website only after the API is ready,
+        // so its serialisation cannot run inside the API's startup bound.
+        yield* Effect.logInfo("native-pair: waiting for API");
+        yield* Effect.promise(() => publicApi.ready).pipe(
+          Effect.timeout("10 seconds")
+        );
         const unavailableApi = apiWorker("taxkit-unavailable-api");
         const unavailableApiWorker = {
           config: {
@@ -382,15 +389,22 @@ describe("built native API and Website", () => {
               ).toBe(true);
               const name = `taxkit-api-docs-${mode}`;
               const ordinary = apiWorker(name);
-              return [
-                {
-                  config: {
-                    ...ordinary.config,
-                    manifest: { mainModule: "worker.js", modules, modulesRoot },
+              return {
+                mode,
+                workers: [
+                  {
+                    config: {
+                      ...ordinary.config,
+                      manifest: {
+                        mainModule: "worker.js",
+                        modules,
+                        modulesRoot,
+                      },
+                    },
                   },
-                },
-                websiteWorker(`taxkit-website-docs-${mode}`, name),
-              ];
+                  websiteWorker(`taxkit-website-docs-${mode}`, name),
+                ],
+              };
             })
         );
         const website = yield* Effect.acquireRelease(
@@ -414,15 +428,10 @@ describe("built native API and Website", () => {
                   ),
                   unavailableApiWorker,
                   apiWorker("taxkit-private-api"),
-                  ...Array.flatten(docsFixtureWorkers),
                 ],
               })
           ),
           (host) => Effect.promise(() => host.dispose())
-        );
-        yield* Effect.logInfo("native-pair: waiting for API");
-        yield* Effect.promise(() => publicApi.ready).pipe(
-          Effect.timeout("10 seconds")
         );
         yield* Effect.logInfo("native-pair: waiting for website");
         yield* Effect.promise(() => website.ready).pipe(
@@ -2404,27 +2413,48 @@ describe("built native API and Website", () => {
         expect(missingHtml).not.toContain(
           "The documentation page was not found."
         );
-        yield* Effect.forEach(
-          ["Body", "Metadata", "MissingModule"] as const,
-          (mode) =>
-            Effect.gen(function* () {
-              const worker = yield* Effect.promise(() =>
-                website.getWorker(`taxkit-website-docs-${mode}`)
-              );
-              const response = yield* Effect.promise(() =>
-                worker.fetch(`${websiteOrigin}/start/quickstart`)
-              );
-              const html = yield* Effect.promise(() => response.text());
-              // The server checks the API page against its compiled
-              // presentation before rendering and fails closed through
-              // TanStack's native route error egress.
-              expect(response.status, mode).toBe(500);
-              expect(response.headers.get("cache-control")).toBe("no-store");
-              expect(html).toContain("Documentation could not load");
-              expect(html).not.toContain("PRIVATE9");
-              expect(html).not.toContain("private9.mdx");
-              expect(html).not.toContain("DocsPresentationUnavailable");
-            })
+        // Each broken-docs fixture pair gets its own host. Serialising all of
+        // them with the Website made one config too large for its startup bound.
+        yield* Effect.forEach(docsFixtureWorkers, ({ mode, workers }) =>
+          Effect.gen(function* () {
+            const fixture = yield* Effect.acquireRelease(
+              Effect.sync(
+                () =>
+                  new Miniflare({
+                    cf: false,
+                    handleStructuredLogs: (log) => {
+                      Queue.offerUnsafe(logs, log);
+                    },
+                    handleUncaughtError: (error) => {
+                      Queue.offerUnsafe(exceptions, error.message);
+                    },
+                    host: "127.0.0.1",
+                    port: 0,
+                    workers,
+                  })
+              ),
+              (host) => Effect.promise(() => host.dispose())
+            );
+            yield* Effect.promise(() => fixture.ready).pipe(
+              Effect.timeout("10 seconds")
+            );
+            const worker = yield* Effect.promise(() =>
+              fixture.getWorker(`taxkit-website-docs-${mode}`)
+            );
+            const response = yield* Effect.promise(() =>
+              worker.fetch(`${websiteOrigin}/start/quickstart`)
+            );
+            const html = yield* Effect.promise(() => response.text());
+            // The server checks the API page against its compiled
+            // presentation before rendering and fails closed through
+            // TanStack's native route error egress.
+            expect(response.status, mode).toBe(500);
+            expect(response.headers.get("cache-control")).toBe("no-store");
+            expect(html).toContain("Documentation could not load");
+            expect(html).not.toContain("PRIVATE9");
+            expect(html).not.toContain("private9.mdx");
+            expect(html).not.toContain("DocsPresentationUnavailable");
+          })
         );
         yield* Queue.clear(docsCalls);
         yield* Queue.clear(docsDocuments);
