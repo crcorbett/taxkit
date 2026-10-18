@@ -314,6 +314,80 @@ describe("required native release gate", () => {
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 
+  it.effect(
+    "prepares required catalogue Chromium after cleanup guards and before destroy",
+    () =>
+      Effect.gen(function* () {
+        const configuration = yield* workflow(".github/workflows/preview.yml");
+        const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
+          Option.getOrElse(() => expect.fail("Missing cleanup job"))
+        );
+        const { "continue-on-error": cleanupMayFail } = cleanup;
+        const required = Array.map(
+          [
+            "pull-request",
+            "stage-safety",
+            "catalogue-browser-path",
+            "catalogue-chromium",
+          ],
+          (id) =>
+            Array.findFirst(cleanup.steps, (step) =>
+              Option.contains(step.id, id)
+            ).pipe(
+              Option.getOrElse(() =>
+                expect.fail(`Missing cleanup prerequisite: ${id}`)
+              )
+            )
+        );
+        const destroy = Array.findFirst(cleanup.steps, (step) =>
+          Option.exists(step.run, (run) => run.startsWith("bun run pr:destroy"))
+        ).pipe(Option.getOrElse(() => expect.fail("Missing cleanup command")));
+        const { "continue-on-error": destroyMayFail } = destroy;
+        expect(Option.getOrElse(cleanupMayFail, () => false)).toBe(false);
+        yield* Effect.forEach(required, (step, index) => {
+          const { "continue-on-error": stepMayFail } = step;
+          expect(Option.getOrElse(stepMayFail, () => false)).toBe(false);
+          if (index > 0) {
+            expect(step.if).toEqual(
+              Option.some("steps.pull-request.outputs.closed == 'true'")
+            );
+          }
+          expect(cleanup.steps.indexOf(step)).toBeLessThan(
+            cleanup.steps.indexOf(destroy)
+          );
+          return Array.get(required, index + 1).pipe(
+            Option.match({
+              onNone: () => Effect.void,
+              onSome: (next) =>
+                Effect.sync(() => {
+                  expect(cleanup.steps.indexOf(step)).toBeLessThan(
+                    cleanup.steps.indexOf(next)
+                  );
+                }),
+            })
+          );
+        });
+        expect(
+          Array.get(required, 2).pipe(Option.flatMap((step) => step.run))
+        ).toEqual(
+          Option.some(
+            'echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"'
+          )
+        );
+        expect(
+          Array.get(required, 3).pipe(Option.flatMap((step) => step.run))
+        ).toEqual(
+          Option.some(
+            "apps/web/node_modules/.bin/playwright install --with-deps chromium"
+          )
+        );
+        expect(destroy.if).toEqual(
+          Option.some("steps.pull-request.outputs.closed == 'true'")
+        );
+        expect(Option.getOrElse(destroyMayFail, () => false)).toBe(false);
+      }).pipe(Effect.provide(BunServices.layer))
+  );
+
   it.effect.each(["open", "closed"] as const)(
     "rechecks the actual cleanup PR state before admitting destroy: %s",
     (state) =>
