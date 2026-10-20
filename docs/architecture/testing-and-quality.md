@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-10-20
 review_trigger: test command, check coverage, native test or deployment check change
 ---
 
@@ -24,18 +24,22 @@ Website/API. Detailed rule-package expectations live in
 | `bun run test:native` | Builds the API and Website and runs them together in Miniflare: first HTML, docs pages, Markdown, discovery files, calculation with and without JavaScript, MCP and request limits. |
 | `bun run release:check` | `verification`, including the native pair suite, plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
 
-The Checks, Preview and Production jobs all require `verification` to succeed.
-Its final `test:native` builds and tests the native pair only after the earlier
-builds and source-rewriting tests have finished. A native failure stops the job
-before deployment credentials, planning or apply. Do not run these artifact-owning
+The Checks workflow runs `verification` once per revision in its `checks` job;
+the Preview and Production deploy jobs `need` that job and deploy the same
+commit, so they start only after it succeeds. Its final `test:native` builds
+and tests the native pair only after the earlier builds and source-rewriting
+tests have finished. A native failure fails `checks`, so no deploy job reaches
+deployment credentials, planning or apply. Do not run these artifact-owning
 checks concurrently in one checkout. The native suite covers request-scoped MCP
 progress and async context across requests, shared work/rate limits, reply
 cleanup and the Website's private HTTP identity boundary.
 
 `tools/infrastructure/release-gates.boundary.test.ts` executes the real root
-command composition and workflow gate commands with safe leaf replacements.
-It checks native build/test ordering and proves that a failing native suite
-prevents Preview/Production planning and deployment and later release checks.
+command composition with safe leaf replacements and reads the workflow. It
+checks native build/test ordering, proves that a failing native suite fails
+verification and later release checks, and requires every Preview/Production
+plan or deploy job to need `checks`, check out the verified commit and never
+repeat verification.
 
 Effect diagnostics run inside every workspace's `check-types`, because the
 `prepare` script (`effect-tsgo patch`) patches the TypeScript compiler with the

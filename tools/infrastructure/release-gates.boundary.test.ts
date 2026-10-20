@@ -5,6 +5,7 @@ import {
   Effect,
   FileSystem,
   Option,
+  Order,
   Record,
   Schema,
   Stream,
@@ -24,17 +25,28 @@ const Workflow = Schema.Struct({
     Schema.String,
     Schema.Struct({
       "continue-on-error": Schema.OptionFromOptionalKey(Schema.Boolean),
+      if: Schema.OptionFromOptionalKey(Schema.String),
+      needs: Schema.OptionFromOptionalKey(
+        Schema.Union([Schema.String, Schema.Array(Schema.String)])
+      ),
       steps: Schema.Array(
         Schema.Struct({
           "continue-on-error": Schema.OptionFromOptionalKey(Schema.Boolean),
           id: Schema.OptionFromOptionalKey(Schema.String),
           if: Schema.OptionFromOptionalKey(Schema.String),
           run: Schema.OptionFromOptionalKey(Schema.String),
+          uses: Schema.OptionFromOptionalKey(Schema.String),
+          with: Schema.OptionFromOptionalKey(
+            Schema.Struct({ ref: Schema.OptionFromOptionalKey(Schema.String) })
+          ),
         })
       ),
     })
   ),
 });
+const checksWorkflow = ".github/workflows/checks.yml";
+const providerCommand = /^bun run (?:pr|production):(?:plan|deploy)\b/u;
+const statusOverride = /\b(?:always|failure|cancelled)\s*\(/u;
 
 // These executable fixture leaves cannot build, access a provider or use a
 // credential. The orchestration scripts themselves are read from the repository.
@@ -180,84 +192,132 @@ describe("required native release gate", () => {
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 
-  it.effect.each(["checks", "preview", "production"])(
-    "executes every %s workflow verification gate and blocks later provider steps",
-    (name) =>
+  it.effect(
+    "runs every Checks verification gate once and fails the job when native fails",
+    () =>
       Effect.gen(function* () {
-        const configuration = yield* workflow(`.github/workflows/${name}.yml`);
-        const jobs = Record.values(configuration.jobs);
-        const gatedJobs = Array.filter(jobs, (job) =>
-          Array.some(job.steps, (step) =>
-            Option.contains(step.run, "bun run verification")
-          )
+        const configuration = yield* workflow(checksWorkflow);
+        const checks = Record.get(configuration.jobs, "checks").pipe(
+          Option.getOrElse(() => expect.fail("Missing checks job"))
         );
-        expect(gatedJobs.length).toBeGreaterThan(0);
-        yield* Effect.forEach(gatedJobs, (job) => {
-          const { "continue-on-error": jobMayFail } = job;
-          expect(Option.getOrElse(jobMayFail, () => false)).toBe(false);
-          expect(
-            Array.every(
-              job.steps,
-              ({ "continue-on-error": stepMayFail, run }) =>
-                !Option.contains(run, "bun run verification") ||
-                !Option.getOrElse(stepMayFail, () => false)
+        const { "continue-on-error": checksMayFail } = checks;
+        expect(Option.getOrElse(checksMayFail, () => false)).toBe(false);
+        expect(checks.if).toEqual(
+          Option.some("github.event.action != 'closed'")
+        );
+        const gates = Array.filter(checks.steps, (step) =>
+          Option.contains(step.run, "bun run verification")
+        );
+        // One trusted gate with the remote cache, one credential-free fork gate.
+        expect(gates).toHaveLength(2);
+        expect(
+          Array.every(
+            gates,
+            ({ "continue-on-error": stepMayFail }) =>
+              !Option.getOrElse(stepMayFail, () => false)
+          )
+        ).toBe(true);
+        // No other job repeats verification for the same revision.
+        expect(
+          Array.flatMap(Record.toEntries(configuration.jobs), ([name, job]) =>
+            Array.some(job.steps, (step) =>
+              Option.contains(step.run, "bun run verification")
             )
-          ).toBe(true);
-          const commands = Array.flatMap(job.steps, (step) =>
-            Option.toArray(step.run)
-          );
-          const gates = Array.filter(
-            commands,
-            (run) => run === "bun run verification"
-          );
-          const providerCommands = Array.filter(commands, (run) =>
-            /^bun run (?:pr|production):(?:plan|deploy)\b/u.test(run)
-          );
-          expect(
-            Array.every(
-              job.steps,
-              (step) =>
-                !Option.exists(step.run, (run) =>
-                  /^bun run (?:pr|production):(?:plan|deploy)\b/u.test(run)
-                ) ||
-                !Option.exists(step.if, (condition) =>
-                  /\b(?:always|failure|cancelled)\s*\(/u.test(condition)
-                )
-            )
-          ).toBe(true);
-          if (name !== "checks") {
-            expect(providerCommands).toHaveLength(2);
-            expect(commands.indexOf("bun run verification")).toBeLessThan(
-              commands.indexOf(
-                Array.head(providerCommands).pipe(
-                  Option.getOrElse(() =>
-                    expect.fail("Missing provider command")
-                  )
+              ? [name]
+              : []
+          )
+        ).toEqual(["checks"]);
+        const fixture = yield* commandFixture;
+        const result = yield* runCommand(
+          fixture,
+          "bun run verification",
+          "run --filter=web test:native-pair"
+        );
+        expect(result.code).not.toBe(0);
+        expect(Array.last(result.calls)).toEqual(
+          Option.some("run --filter=web test:native-pair")
+        );
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
+
+  it.effect(
+    "admits Preview and Production only after Checks passed for the same commit",
+    () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const files = yield* fs.readDirectory(".github/workflows");
+        const providerJobs = yield* Effect.forEach(
+          Array.sort(files, Order.String),
+          (file) =>
+            workflow(`.github/workflows/${file}`).pipe(
+              Effect.map((configuration) =>
+                Array.flatMap(
+                  Record.toEntries(configuration.jobs),
+                  ([name, job]) =>
+                    Array.some(job.steps, (step) =>
+                      Option.exists(step.run, (run) =>
+                        providerCommand.test(run)
+                      )
+                    )
+                      ? [{ file, job, name }]
+                      : []
                 )
               )
-            );
-          }
-          return Effect.forEach(gates, (gate) =>
-            Effect.gen(function* () {
-              const fixture = yield* commandFixture;
-              const result = yield* runCommand(
-                fixture,
-                [gate, ...providerCommands].join(" && "),
-                "run --filter=web test:native-pair"
-              );
-              expect(result.code).not.toBe(0);
-              expect(Array.last(result.calls)).toEqual(
-                Option.some("run --filter=web test:native-pair")
-              );
-              expect(
-                Array.some(result.calls, (call) =>
-                  /run (?:pr|production):(?:plan|deploy)/u.test(call)
-                )
-              ).toBe(false);
-            })
+            )
+        ).pipe(Effect.map(Array.flatten));
+        expect(
+          Array.map(providerJobs, ({ file, name }) => `${file}#${name}`)
+        ).toEqual(["checks.yml#deploy", "checks.yml#production"]);
+        const checkoutRef = (job: (typeof providerJobs)[number]["job"]) =>
+          Array.findFirst(job.steps, (step) =>
+            Option.exists(step.uses, (uses) =>
+              uses.startsWith("actions/checkout@")
+            )
+          ).pipe(
+            Option.flatMap((step) => step.with),
+            Option.flatMap((options) => options.ref),
+            // Compare the expression inside the `${{ }}` wrapper.
+            Option.map((ref) => ref.replaceAll(/^\$\{\{\s*|\s*\}\}$/gu, ""))
           );
-        });
-      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+        const configuration = yield* workflow(checksWorkflow);
+        const checks = Record.get(configuration.jobs, "checks").pipe(
+          Option.getOrElse(() => expect.fail("Missing checks job"))
+        );
+        // Checks verifies the pull request head, or the pushed commit; each
+        // deploy job checks out exactly that revision.
+        expect(checkoutRef(checks)).toEqual(
+          Option.some("github.event.pull_request.head.sha || github.sha")
+        );
+        const expectedRef: Record.ReadonlyRecord<string, string> = {
+          deploy: "github.event.pull_request.head.sha",
+          production: "github.sha",
+        };
+        yield* Effect.forEach(providerJobs, ({ job, name }) =>
+          Effect.sync(() => {
+            const { "continue-on-error": jobMayFail } = job;
+            expect(Option.getOrElse(jobMayFail, () => false)).toBe(false);
+            expect(job.needs).toEqual(Option.some("checks"));
+            expect(
+              Option.exists(job.if, (condition) =>
+                statusOverride.test(condition)
+              )
+            ).toBe(false);
+            expect(
+              Array.some(job.steps, (step) =>
+                Option.exists(step.if, (condition) =>
+                  statusOverride.test(condition)
+                )
+              )
+            ).toBe(false);
+            expect(
+              Array.filter(job.steps, (step) =>
+                Option.exists(step.run, (run) => providerCommand.test(run))
+              )
+            ).toHaveLength(2);
+            expect(checkoutRef(job)).toEqual(Record.get(expectedRef, name));
+          })
+        );
+      }).pipe(Effect.provide(BunServices.layer))
   );
 
   it.effect.each([
@@ -318,7 +378,7 @@ describe("required native release gate", () => {
     "prepares required catalogue Chromium after cleanup guards and before destroy",
     () =>
       Effect.gen(function* () {
-        const configuration = yield* workflow(".github/workflows/preview.yml");
+        const configuration = yield* workflow(checksWorkflow);
         const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
           Option.getOrElse(() => expect.fail("Missing cleanup job"))
         );
@@ -392,7 +452,7 @@ describe("required native release gate", () => {
     "rechecks the actual cleanup PR state before admitting destroy: %s",
     (state) =>
       Effect.gen(function* () {
-        const configuration = yield* workflow(".github/workflows/preview.yml");
+        const configuration = yield* workflow(checksWorkflow);
         const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
           Option.getOrElse(() => expect.fail("Missing cleanup job"))
         );

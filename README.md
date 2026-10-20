@@ -162,11 +162,14 @@ downstream consumer, API smoke and Changeset checks before a package release.
 The [testing guide](./docs/architecture/testing-and-quality.md) lists focused
 checks for each kind of change.
 
-The `Checks` GitHub workflow runs `bun run verification` on pull requests and
-`main`. Trusted runs read the Turbo cache values from Doppler `taxkit/ci`; fork
-pull requests run without credentials.
+The `Checks` GitHub workflow runs `bun run verification` once per pull request
+revision and `main` commit, then deploys a same-repository pull request's
+Preview or `main`'s Production from that checked commit. Trusted runs read the
+Turbo cache values from Doppler `taxkit/ci`; fork pull requests run without
+credentials and get no deploy.
 
-Deployments run locally with native Alchemy and Doppler; see the
+Deployments use native Alchemy and Doppler, from those jobs or locally on the
+maintainer's request; see the
 [deployment runbook](./docs/runbooks/deployment.md). Package-facing changes need
 a Changeset; see [versioning](./docs/runbooks/versioning.md).
 
