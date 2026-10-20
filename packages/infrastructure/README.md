@@ -23,7 +23,7 @@ implementation; this package imports no application implementation.
 | `./api-worker` | Lightweight `TaxKitApiWorker` declaration and native-derived `TaxKitApiBinding`, with the native HTTP binding. |
 | `./worker-settings` | Shared compatibility date/flags and `disabledWorkerObservability` policy. |
 | `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. |
-| `./stage` | Stage Schemas: `prod`, `pr-<number>` and `dev_<name>`. |
+| `./stage` | Local `dev_<name>` stage and the `AppStage` union. Hosted `prod` and `pr-<number>` stages reuse [`@taxkit/observability/stage`](../observability/README.md). |
 | `./posthog` | The retained PostHog project stack. |
 | `./telemetry` | The `TaxKitObservability` and `TaxKitTraceExport` stack classes, their shared providers, state and secrets, the `prod`-only guard, Site's shared dataset names and the Production trace-export reference the apps graph reads. |
 | `./axiom` | `declareTaxKitObservability`: the retained ingest token and four dashboards. |

@@ -140,7 +140,7 @@ Root `alchemy.run.ts` and `alchemy.local.run.ts`
 
 `packages/infrastructure`
 : Private source-only owner of the native API/Website graph (`./apps-stack`),
-  stage Schemas (`./stage`) and secret selection (`./secrets`), plus the
+  local stage Schema (`./stage`) and secret selection (`./secrets`), plus the
   separate retained PostHog project through the explicit `./posthog` export and
   `alchemy.posthog.run.ts`. Its private management adapter contains Distilled;
   application packages do not receive that client or its management
@@ -159,7 +159,8 @@ identity. Neither an app nor a package depends on another app.
 
 `packages/observability`
 : Private compiled, provider-free owner of shared host request records, safe
-  loggers and edge identity policy. API, Website and infrastructure dashboards
+  loggers, edge identity policy and the hosted `DeploymentStage` /
+  `PullRequestStage` Schemas that analytics and infrastructure reuse. API, Website and infrastructure dashboards
   consume its named exports; machine RPC does not own host telemetry.
 
 `packages/api/mcp`

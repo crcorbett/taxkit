@@ -86,6 +86,11 @@ it.effect.each([
   { ...enabled, POSTHOG_STAGE: "pr-163" },
   { ...enabled, POSTHOG_COLLECTION_MODE: "controlled-preview" },
   { ...enabled, POSTHOG_STAGE: "dev" },
+  {
+    ...enabled,
+    POSTHOG_COLLECTION_MODE: "controlled-preview",
+    POSTHOG_STAGE: "pr-10000000",
+  },
   { ...enabled, POSTHOG_CAPTURE_TOKEN: "phx_private-management-token" },
 ])("invalid enabled settings are a safe configuration failure %j", (input) =>
   Effect.gen(function* () {

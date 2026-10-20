@@ -1,16 +1,17 @@
+import { PullRequestStage } from "@taxkit/observability/stage";
 import * as Doppler from "alchemy/Doppler";
 import * as Secrets from "alchemy/Secrets";
 import type { SecretsContext } from "alchemy/Secrets";
 import type { StackSecrets } from "alchemy/Stack";
 import { Config, ConfigProvider, Effect, Layer, Match, Schema } from "effect";
 
-import { AppStage, PreviewStage } from "./stage.js";
+import { AppStage } from "./stage.js";
 
 /** The TaxKit Doppler config that holds a stage's values. */
 export const dopplerConfig = (stage: AppStage) =>
   Match.value(stage).pipe(
     Match.when("prod", () => "prd" as const),
-    Match.when(Schema.is(PreviewStage), () => "stg_preview" as const),
+    Match.when(Schema.is(PullRequestStage), () => "stg_preview" as const),
     Match.orElse(() => "dev" as const)
   );
 
@@ -52,7 +53,7 @@ export const deploymentSecrets = (({ stage }: SecretsContext) => [
           Match.when("prod", () =>
             ConfigProvider.fromUnknown({ CALCULATOR_RATE_NAMESPACE: "10078" })
           ),
-          Match.when(Schema.is(PreviewStage), (preview) =>
+          Match.when(Schema.is(PullRequestStage), (preview) =>
             ConfigProvider.fromUnknown({
               CALCULATOR_RATE_NAMESPACE: `10078${preview.slice(3)}`,
             })

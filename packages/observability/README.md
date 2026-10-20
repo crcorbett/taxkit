@@ -27,6 +27,14 @@ the forwarding header names and redacted credential Schema; the API host owns
 authentication and method/path policy. Neither field enters financial payloads,
 public settings, logs or cache keys.
 
+`./stage` owns the hosted stage Schemas: branded `PullRequestStage`
+(`pr-1` to `pr-9999999`) and `DeploymentStage` (`prod` or one pull-request
+stage). Analytics capture settings and infrastructure secret selection reuse
+them; infrastructure adds only its local `dev_<name>` stage. The root `pr:plan`,
+`pr:deploy` and `pr:destroy` host scripts check the same bounded
+`pr-[1-9][0-9]{0,6}` pattern in shell before Alchemy starts, so keep the two in
+step.
+
 The native Worker declaration and binding types belong to
 [`@taxkit/infrastructure`](../infrastructure/README.md). Root composition joins
 that deployment identity with the API implementation.
