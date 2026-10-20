@@ -3,14 +3,14 @@ document_type: agent-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-20
 ---
 
 # TaxKit repository guide
 
 TaxKit is the public monorepo for the open-source tax engine, API, SDK, and
-documentation site. Start with [`docs/README.md`](docs/README.md), the sole
-maintainer-document lifecycle and truth-layer router. `CLAUDE.md` points to this
+documentation site. Start with [`docs/README.md`](docs/README.md), the
+maintainer-document and truth-layer router. `CLAUDE.md` points to this
 file; edit `AGENTS.md` only.
 
 ## Operating loop
@@ -18,8 +18,8 @@ file; edit `AGENTS.md` only.
 1. Read `docs/README.md`, then only the owner document for the task.
 2. Confirm the claim against code, configuration, Schemas, exports or the
    running system it describes.
-3. Put current implementation intent in the active SPEC and plan; completed
-   work is history, not policy.
+3. Put current implementation intent in an active SPEC and plan; delete them
+   when the work is done. Git keeps the history.
 4. Update the owner document and its pointers in the same change.
 5. Run focused checks while working and `bun run verification` before merging.
    Public package changes also need a Changeset.
@@ -27,8 +27,9 @@ file; edit `AGENTS.md` only.
    checks that ran and anything not checked.
 
 For a material calculator, rule, Schema, SDK, HTTP/OpenAPI, public docs,
-package, command, deployment, SPEC or plan change, use the plugin
-`development-workflows:docs-maintainer` skill to decide which documents change.
+package, command, deployment, SPEC or plan change, decide which documents
+change; maintainers with the shared plugin can use
+`development-workflows:docs-maintainer` for that.
 
 ## Task routes
 
@@ -54,8 +55,7 @@ package, command, deployment, SPEC or plan change, use the plugin
   [`docs/architecture/testing-and-quality.md`](docs/architecture/testing-and-quality.md).
 - Versioning, packed SDK checks and Website/API deployment:
   [`docs/runbooks/README.md`](docs/runbooks/README.md).
-- References and audits: [`docs/references/README.md`](docs/references/README.md)
-  and [`docs/documentation-audit/README.md`](docs/documentation-audit/README.md).
+- References: [`docs/references/README.md`](docs/references/README.md).
 
 Use the repository-owned [Linear skill](.agents/skills/linear/SKILL.md) when
 work is tracked in Linear.
@@ -95,7 +95,6 @@ commit with the same native command.
 
 ## Shared development skills
 
-Before starting work, follow [the plugin lookup](docs/skills.md) and load the
-latest published Commonplace `development-workflows` plugin. Do not use saved
-repository copies or assume a cached plugin version is current. Repository paths,
-commands and ownership come from the manifests, code and documentation linked above.
+Use the [shared development skills](docs/skills.md) relevant to the task.
+Repository paths, commands and ownership come from the manifests, code and
+documentation linked above.

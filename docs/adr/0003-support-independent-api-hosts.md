@@ -20,7 +20,6 @@ of this change. Its application-wide calculation pool correction follows the
 Cloudflare work.
 
 Keeping two hosts allows callers to run TaxKit outside Cloudflare without a second implementation of tax rules.
-The [foundation review](../product-specs/common-practice-foundation-review.md)
-must check this against both upstream Effect and Alchemy sources and the
-installed package types. This is an agreed design constraint, not proof that
+[API and SDK](../architecture/api-and-sdk.md) owns the current host
+boundaries. This is an agreed design constraint, not proof that
 both hosts currently expose identical features or that a deployment passed.

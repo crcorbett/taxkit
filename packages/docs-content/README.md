@@ -271,7 +271,6 @@ implementation in the consuming app or reusable primitives in
 
 ## Related docs
 
-- `docs/product-specs/docs-mdx-fumadocs-runtime.md`
 - `docs/architecture/content-and-posts.md`
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/effect-services.md`

@@ -130,4 +130,3 @@ to the zone.
 - [Package ownership](package-ownership.md)
 - [Configuration](configuration.md)
 - [Testing and quality](testing-and-quality.md)
-- [Dated deployment evidence](../evidence/deployments/README.md)

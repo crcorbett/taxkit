@@ -21,7 +21,6 @@
     {
       "status": "qualified",
       "decision": "Retain the receiving workspace exact Effect 4.0.0, TypeScript 7.0.2 and Vitest 5.0.3 selections; the current repository release graph passes.",
-      "evidence": "docs/documentation-audit/clean-slate-foundation/2026-10-06-checked-docs-source-owner.json",
       "limitation": "Version identity and current receiving graph only. The generated scaffold still needs TaxKit adaptation and separate compiler/runtime/packed proof."
     }
   ],
@@ -49,7 +48,6 @@
       "Use the receiving catalogue dependencies and exact workspace compiler graph.",
       "Retain existing canonical schema and error literals through compatibility re-exports.",
       "Keep test exports out of proposed publishConfig; actual Bun pack retains repository exports, so publication remains unqualified."
-    ],
-    "proof": "docs/documentation-audit/clean-slate-foundation/2026-10-06-compiled-content-contract.json"
+    ]
   }
 }

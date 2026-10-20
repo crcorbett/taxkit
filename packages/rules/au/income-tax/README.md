@@ -39,7 +39,7 @@ without runtime manifest reads.
   checks enforce the same relationships.
 - Derived money and ledger totals use core fallible constructors and return
   safe `CalculationError` failures for unsupported amounts. Exact decimal
-  arithmetic and unaffected results stay unchanged. The [accepted Medicare correction](../../../../docs/product-specs/medicare-2025-26-correction.md) owns the changed source, affected results and proof. This table covers a single person not entitled to SAPTO; family reductions, exemptions and surcharge are not modelled.
+  arithmetic and unaffected results stay unchanged. The [Medicare levy table](./src/parameters/medicare-levy-table.ts) owns the source and the [annual tax tests](./test/annual-tax.test.ts) own the affected results. This table covers a single person not entitled to SAPTO; family reductions, exemptions and surcharge are not modelled.
 
 ## Scenario input
 
@@ -71,7 +71,7 @@ tarball validated by the SDK-owned strict downstream gate.
 
 Use `@taxkit/rules-au-income-tax/schemas` for canonical calculator metadata, `AnnualTaxReport` and `AnnualTaxScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
 
-The [transport architecture](../../../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
+The [transport architecture](../../../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
 
 
 Trace formula and rounding values now use Core's nested Option contract. Use

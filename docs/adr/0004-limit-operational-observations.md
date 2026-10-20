@@ -18,8 +18,8 @@ but keeps financial circumstances out of the signal store.
 The policy applies to platform-generated records as well as application logs.
 URLs, request headers and raw errors need separate field-level review before
 export because they can contain financial or identifying values. The
-[foundation review](../product-specs/common-practice-foundation-review.md)
-will propose the exact field and destination contracts. It does not authorise
+[deployment architecture](../architecture/deployment.md#observability) owns the
+exact field and destination contracts. This decision does not authorise
 collection, provider configuration, secrets, billing or deployment. PostHog
 remains postponed. The earlier [shared-dataset proposal](0002-reuse-shared-telemetry-datasets.md)
 retains its history; its destination and collection choices are not approved by

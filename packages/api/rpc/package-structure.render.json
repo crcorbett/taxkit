@@ -21,7 +21,6 @@
     {
       "status": "qualified",
       "decision": "Use TaxKit installed stable Effect 4.0.0 and native TypeScript 7.0.2, rather than canonical templates rc.117 snapshot",
-      "evidence": "docs/documentation-audit/clean-slate-foundation/2026-10-05-foundation-acceptance-review.json",
       "limitation": "RPC templates still require adaptation and runtime qualification before acceptance"
     }
   ],

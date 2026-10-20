@@ -1,52 +1,19 @@
----
-document_type: repository-skill-router
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-10-16
-review_trigger: plugin source or skill routing change
----
-
 # Development skills
 
-Use the latest published `development-workflows` plugin from the `commonplace`
-marketplace. Shared skills must not be copied into this repository or linked
-from its agent skill folders to a personal installation.
+Maintainers can use the optional
+[Commonplace development-workflows plugin](https://github.com/crcorbett/commonplace-plugins/tree/main/plugins/development-workflows).
+Use the skills relevant to the task, alongside `AGENTS.md`, the architecture,
+package READMEs and scripts. Contributors do not need the plugin.
 
-## Resolve the current plugin before starting work
+- `development-workflows:strict-effect-ts`: owned code, tests and tooling.
+- `development-workflows:alchemy-iac`: infrastructure and deployment work.
+- `development-workflows:effect-client-wrapper`: external service adapters.
+- `development-workflows:package-structure`: package boundaries.
+- `development-workflows:docs-maintainer`: documentation changes.
+- `development-workflows:prd-writer`, `prd-review`, `prd-implementer`: product
+  requirements and implementation.
+- `development-workflows:repo-structure`: repository structure reviews.
 
-1. Refresh the marketplace and look up the latest published plugin version.
-   The source is [Commonplace Plugins](https://github.com/crcorbett/commonplace-plugins).
-   Check the current [plugin manifest](https://github.com/crcorbett/commonplace-plugins/blob/main/plugins/development-workflows/.claude-plugin/plugin.json)
-   and its matching published release; do not assume an installed cache is current.
-2. Discover the plugin through the current agent's skill list or plugin manager.
-   Compare its version with that lookup and update the installation if it is old.
-   Load the required `development-workflows:<skill-name>` from that installation.
-3. If the latest version cannot be checked or loaded, report that blocker before
-   doing work that requires the skill. Do not fall back to a saved copy, an old
-   cache, a fixed plugin version, or a hard-coded path on someone's computer.
-4. Resolve repository paths, commands and ownership from `AGENTS.md`,
-   `docs/README.md`, the relevant package/app README and executable configuration.
-   Shared skills supply workflow guidance.
-
-This is an agent startup requirement. The old checks for copied shared
-skills have been removed. Code, package and documentation checks remain; they
-do not prove that an agent refreshed its installation or that an online lookup
-succeeded.
-
-## Shared skills
-
-- `development-workflows:alchemy-iac`
-- `development-workflows:docs-maintainer`
-- `development-workflows:effect-client-wrapper`
-- `development-workflows:package-structure`
-- `development-workflows:prd-implementer`
-- `development-workflows:prd-review`
-- `development-workflows:prd-writer`
-- `development-workflows:repo-structure`
-- `development-workflows:strict-effect-ts`
-
-Other repository-specific or third-party skills remain local where there is no
-replacement in this plugin. They must not override the shared skills above.
-Historical audit and proof records describe the version used at that time;
-they do not select the current plugin version.
+Repository-owned skills under `.agents/skills/` cover public copy
+(`docs-writer`), Linear tracking and local `portless` URLs. Local source and
+configuration determine the actual commands and boundaries.

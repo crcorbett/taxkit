@@ -12,9 +12,8 @@ review_trigger: package ownership, runtime boundary, public contract, or archite
 This directory is the implementation reference for the TaxKit tax calculator
 architecture. It is also the routing guide for the implemented surface that
 exists today.
-Documentation lifecycle, public/maintainer separation, history, and known owner
-gaps are routed by [`../README.md`](../README.md). The legacy
-[`../architecture.md`](../architecture.md) path is a tombstone to this file.
+Maintainer documentation and public/maintainer separation are routed by
+[`../README.md`](../README.md).
 
 TaxKit is the open-source engine repository. Today it contains a standalone
 Bun API app, the native Cloudflare API and Website (calculators and
@@ -34,8 +33,6 @@ Implemented surfaces:
 - `apps/api`: standalone Bun API and native Worker sharing the public HTTP
   contract and calculator service; the Worker also serves RPC, MCP and the
   discovery documents.
-- `apps/docs`: retirement tombstone with verified original-source and dated
-  provider recovery routes; no active app workspace.
 - `apps/web`: TanStack Start Website for the calculators and documentation. It
   reads the API with the generated HTTP client, over the private binding on the
   server and the public origin in the browser.
@@ -59,12 +56,8 @@ Implemented surfaces:
 - `packages/rules/au/stsl`: Australian STSL withholding rule pack.
 - `packages/testing`: shared test helpers for workspace packages.
 - `packages/tsconfig`: shared TypeScript configuration presets.
-- `docs/**`: architecture, product specs, execution plans, standards,
-  references and documentation audits.
-
-`packages/ui` remains a planned ownership directory with README guidance only.
-It is not a runtime package until a package manifest, source exports and
-verification are added.
+- `docs/**`: architecture, ADRs, standards, runbooks, references and any
+  active product spec or execution plan.
 
 ## Core model
 
@@ -95,7 +88,7 @@ explicit TaxKit input facts
 
 ## Documents
 
-- [Documentation lifecycle router](../README.md)
+- [Documentation router](../README.md)
 - [Package boundaries](./package-boundaries.md)
 - [Package ownership](./package-ownership.md)
 - [Effect services](./effect-services.md)

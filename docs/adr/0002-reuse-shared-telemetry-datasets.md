@@ -20,7 +20,6 @@ shared storage is not access isolation or proof that events were delivered.
 PostHog remains the owner of minimal product traffic/calculator counts; Axiom
 owns operational observations without tax inputs or results.
 
-The detailed contract and qualification work are in
-[the proposed rebuild SPEC](../product-specs/clean-slate-foundation.md).
-Implementation awaits final shared understanding; provider changes require a
-reviewed exact-resource plan and its separate authority.
+[Deployment](../architecture/deployment.md#observability) owns the current
+telemetry contract. Provider changes require a reviewed exact-resource plan
+and its separate authority.

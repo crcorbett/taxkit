@@ -386,7 +386,6 @@ actual API tarball and imports all JavaScript public entrypoints.
 - `docs/architecture/effect-services.md`
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/testing-and-quality.md`
-- `docs/product-specs/documentation-improvement-roadmap.md`
 
 ## Contract verification boundaries
 

@@ -13,8 +13,7 @@ review_trigger: website rendering, settings, API client, loader, form, cache, ge
 supported Australian 2025–26 calculators and the accepted public
 documentation. Tax calculation and content lookup stay in the separate API app;
 the Website reads them through Effect's generated `HttpApiClient` for
-`TaxKitApi`. `apps/docs` is a retirement tombstone for the old source and dated
-recovery records.
+`TaxKitApi`.
 
 ## What runs where
 
