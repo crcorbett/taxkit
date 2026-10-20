@@ -312,7 +312,6 @@
       "name": "@taxkit/observability",
       "version": "0.1.0",
       "dependencies": {
-        "@taxkit/calculators": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {

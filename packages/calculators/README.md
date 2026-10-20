@@ -203,7 +203,8 @@ The allowance is 60 calculations per minute for a checked connection address.
 is redacted and its ordinary Schema encoder is disabled. It is carried in a
 request Context reference, never a calculation fact, URL or analytics identity.
 Public native requests need Cloudflare's connection header and must not be
-forwarded Worker calls. Arbitrary forwarded headers cannot choose a key.
+forwarded Worker calls; hosts pass this Schema to the domain-free
+`edgeCallerKey` in `@taxkit/observability/edge-identity`. Arbitrary forwarded headers cannot choose a key.
 The Website's binding-only operation carries its original checked key separately
 from the request JSON; no public route admits that argument.
 

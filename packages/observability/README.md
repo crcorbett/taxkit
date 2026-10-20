@@ -19,8 +19,11 @@ tax facts, calculation results and arbitrary Causes never become event fields.
 The deployment dashboards consume the same event identity and service Schema.
 
 `./edge-identity` owns the shared Cloudflare caller-key admission and host-mode
-Schema. It rejects Worker subrequests and accepts only checked direct edge
-identity; shared calculation services never read Cloudflare headers. Website
+Schema. `edgeCallerKey` rejects Worker subrequests and decodes only direct edge
+identity, with a key Schema the consuming host supplies (calculator admission
+passes `CalculatorClientRateKey`); shared calculation services never read
+Cloudflare headers. The package is domain-free: it depends on no other TaxKit
+workspace, which `taxkit-package/workspace-roles` enforces. Website
 forwarding uses native HTTP with a separately verified private credential and
 checked original caller key on canonical calculation POSTs. This export owns
 the forwarding header names and redacted credential Schema; the API host owns

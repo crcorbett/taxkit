@@ -104,6 +104,11 @@ it.effect(
             'import "@distilled.cloud/cloudflare";',
             "taxkit-package(workspace-roles)",
           ],
+          [
+            "packages/observability/src/.generated-workspace-role.ts",
+            'import "@taxkit/calculators/admission.schemas";',
+            "taxkit-package(workspace-roles)",
+          ],
         ] as const,
         ([file, source, code]) => rejected(file, source, code),
         { concurrency: 1, discard: true }

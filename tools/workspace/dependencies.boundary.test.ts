@@ -110,7 +110,7 @@ describe("workspace dependency direction", () => {
       ["web -> api", "@taxkit/infrastructure -> api"]
     );
   });
-  it("rejects app peers and provider dependencies across package roles", () => {
+  it("rejects app peers, provider dependencies and domain edges into runtime support", () => {
     assert.deepEqual(
       appEdges([
         { manifest: manifestFixture("api", {}), path: "apps/api" },
@@ -133,10 +133,14 @@ describe("workspace dependency direction", () => {
           ["apps/api", "alchemy"],
           ["apps/web", "alchemy"],
           ["packages/infrastructure", "@distilled.cloud/cloudflare"],
+          ["packages/observability", "@taxkit/calculators"],
+          ["packages/observability", "@taxkit/calculators/admission.schemas"],
+          ["packages/observability", "effect"],
+          ["packages/analytics", "@taxkit/observability"],
         ] as const,
         ([owner, dependency]) => isForbiddenPackageDependency(owner, dependency)
       ),
-      [true, true, true, false, false, false]
+      [true, true, true, false, false, false, true, true, false, false]
     );
     assert.deepEqual(
       dependencyNames({

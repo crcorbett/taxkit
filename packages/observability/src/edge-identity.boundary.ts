@@ -1,4 +1,3 @@
-import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { Option, Schema } from "effect";
 import { Headers } from "effect/http";
 
@@ -9,13 +8,17 @@ export type CalculatorHostMode = typeof CalculatorHostMode.Type;
 // it. Shared calculation packages never read Cloudflare headers. Same-zone Worker
 // subrequests can alter x-real-ip; reject that path instead of trusting it.
 // Website forwarding is authenticated separately before its original key is used.
-export const calculatorEdgeRateKey = (
-  headers: Headers.Headers
-): Option.Option<typeof CalculatorClientRateKey.Type> =>
+// This package owns only the header trust policy. The consuming domain supplies
+// its key Schema (for calculator admission, `CalculatorClientRateKey`), so the
+// raw address is decoded once and never leaves this boundary undecoded.
+export const edgeCallerKey = <Key>(
+  headers: Headers.Headers,
+  key: Schema.ConstraintDecoder<Key>
+): Option.Option<Key> =>
   Option.isSome(Headers.get(headers, "cf-worker"))
     ? Option.none()
     : Headers.get(headers, "cf-connecting-ip").pipe(
-        Option.flatMap(Schema.decodeUnknownOption(CalculatorClientRateKey))
+        Option.flatMap(Schema.decodeUnknownOption(key))
       );
 
 // Only the Website server's canonical calculation POST carries these fields.

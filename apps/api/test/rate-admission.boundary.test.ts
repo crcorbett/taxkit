@@ -6,7 +6,7 @@ import {
   MetadataQuery,
 } from "@taxkit/api-rpc/schemas";
 import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
-import type { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
+import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import {
   CalculatorAdmission,
   CalculatorRequestRateKey,
@@ -16,7 +16,7 @@ import {
   CalculationQuery,
 } from "@taxkit/calculators/schemas";
 import {
-  calculatorEdgeRateKey,
+  edgeCallerKey,
   WebsiteForwardingCredentialHeader,
   WebsiteForwardingRateKeyHeader,
 } from "@taxkit/observability/edge-identity";
@@ -128,7 +128,9 @@ describe("shared native host calculation admission", () => {
   ])("rejects absent, invalid and forwarded public identity", (headers) =>
     Effect.gen(function* () {
       expect(
-        Option.isNone(calculatorEdgeRateKey(Headers.fromInput(headers)))
+        Option.isNone(
+          edgeCallerKey(Headers.fromInput(headers), CalculatorClientRateKey)
+        )
       ).toBe(true);
       expect(yield* CalculatorRequestRateKey).toEqual(Option.none());
     })

@@ -158,7 +158,8 @@ and shared settings. `@taxkit/observability/edge-identity` owns shared edge call
 identity. Neither an app nor a package depends on another app.
 
 `packages/observability`
-: Private compiled, provider-free owner of shared host request records, safe
+: Private compiled, provider-free and domain-free owner (it depends on no
+  other TaxKit workspace) of shared host request records, safe
   loggers, edge identity policy and the hosted `DeploymentStage` /
   `PullRequestStage` Schemas that analytics and infrastructure reuse. API, Website and infrastructure dashboards
   consume its named exports; machine RPC does not own host telemetry.
