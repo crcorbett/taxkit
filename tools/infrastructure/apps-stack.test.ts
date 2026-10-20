@@ -3,6 +3,7 @@ import { describe, expect, it } from "@effect/vitest";
 import {
   productionBotPolicy,
   productionZoneSettings,
+  websiteBuildMemo,
 } from "@taxkit/infrastructure/apps-stack";
 import { publicationOrigin } from "@taxkit/infrastructure/hostnames";
 import {
@@ -10,14 +11,26 @@ import {
   deploymentSecrets,
   dopplerConfig,
 } from "@taxkit/infrastructure/secrets";
-import { disabledWorkerObservability } from "@taxkit/infrastructure/worker-settings";
+import {
+  disabledWorkerObservability,
+  workerCompatibility,
+} from "@taxkit/infrastructure/worker-settings";
 import { Unowned } from "alchemy/AdoptPolicy";
 import { AlchemyContext } from "alchemy/AlchemyContext";
-import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
+import {
+  Artifacts,
+  ArtifactStore,
+  createArtifactStore,
+  makeScopedArtifacts,
+} from "alchemy/Artifacts";
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
-import { Providers } from "alchemy/Cloudflare";
+import {
+  makeSourceContext,
+  Providers,
+  resolveSource,
+} from "alchemy/Cloudflare";
 import { BotManagement } from "alchemy/Cloudflare/BotManagement";
 import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import { Worker, isSelfUrl } from "alchemy/Cloudflare/Workers";
@@ -39,10 +52,12 @@ import {
   ConfigProvider,
   Effect,
   Exit,
+  FileSystem,
   Layer,
   Match,
   Option,
   Order,
+  Path,
   Record,
   Redacted,
   Ref,
@@ -920,5 +935,127 @@ describe("native app root secret selection", () => {
         graphEnvironment,
         Effect.scoped
       )
+  );
+});
+
+describe("Website build-input hash", () => {
+  it.live(
+    "changes for package sources, manifests and docs content, not tests, READMEs, CHANGELOGs or installed files",
+    () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const directory = yield* fs.makeTempDirectoryScoped({
+          prefix: "taxkit-website-memo-",
+        });
+        const write = (relative: string, text: string) =>
+          fs
+            .makeDirectory(path.dirname(path.join(directory, relative)), {
+              recursive: true,
+            })
+            .pipe(
+              Effect.andThen(
+                fs.writeFileString(path.join(directory, relative), text)
+              )
+            );
+        // Alchemy reads .gitignore up to the folder holding .git, so use the
+        // repository's own.
+        yield* fs.makeDirectory(path.join(directory, ".git"));
+        yield* fs.copyFile(
+          yield* path.fromFileUrl(new URL("../../.gitignore", import.meta.url)),
+          path.join(directory, ".gitignore")
+        );
+        // Flat, transport-nested and rule-nested packages, manifests,
+        // tsconfigs, authored documentation and the lockfile are inputs.
+        const inputs = [
+          "apps/web/src/server.ts",
+          "packages/content/src/service.ts",
+          "packages/content/package.json",
+          "packages/api/http/src/routes.ts",
+          "packages/api/http/tsconfig.json",
+          "packages/rules/au/pay/src/index.ts",
+          "packages/rules/au/pay/package.json",
+          "packages/docs-content/content/start/quickstart.mdx",
+          "packages/docs-content/navigation.json",
+          "tsconfig.base.json",
+          "bun.lock",
+        ];
+        yield* Effect.forEach(inputs, (input) => write(input, "original"), {
+          discard: true,
+        });
+        const props = {
+          vite: {
+            memo: websiteBuildMemo,
+            rootDir: path.join(directory, "apps/web"),
+          },
+        };
+        const artifacts = makeScopedArtifacts(createArtifactStore(), "Website");
+        const source = yield* resolveSource(props).pipe(
+          Effect.provideService(Artifacts, artifacts)
+        );
+        const context = makeSourceContext({
+          compatibility: workerCompatibility,
+          fqn: "TaxKitWebsite",
+          id: "TaxKitWebsite",
+          props,
+          stack: { name: "TaxKitApps", stage: "dev_website_memo" },
+          workerName: "taxkit-website-memo",
+        });
+        // A previous build may have recorded auto-detected workspaces; the
+        // explicit empty workspace list keeps whole package folders out.
+        const hashAfter = (additionalWorkspaces: string[]) =>
+          source
+            .hash(context, {
+              additionalWorkspaces,
+              assets: undefined,
+              bundle: undefined,
+              input: undefined,
+            })
+            .pipe(
+              Effect.map(({ input }) => input),
+              Effect.provideService(Artifacts, artifacts)
+            );
+        const hash = hashAfter([]);
+        const original = yield* hash;
+        expect(original).toBeDefined();
+        expect(yield* hash).toBe(original);
+        yield* Effect.forEach(
+          inputs,
+          (input) =>
+            Effect.gen(function* () {
+              yield* write(input, "changed");
+              expect(yield* hash, input).not.toBe(original);
+              yield* write(input, "original");
+              expect(yield* hash, input).toBe(original);
+            }),
+          { discard: true }
+        );
+        // Version-packages edits, tests, installed links, build output,
+        // generated sources and API-only code never reach the hash.
+        yield* Effect.forEach(
+          [
+            "packages/content/CHANGELOG.md",
+            "packages/content/README.md",
+            "packages/rules/au/pay/CHANGELOG.md",
+            "packages/content/test/service.test.ts",
+            "packages/api/http/__tests__/routes.test.ts",
+            "packages/infrastructure/src/hostnames.test.ts",
+            "packages/content/node_modules/effect/src/index.ts",
+            "packages/content/node_modules/effect/package.json",
+            "packages/content/dist/schemas.js",
+            "packages/docs-content/.source/index.ts",
+            "apps/web/node_modules/dep/index.js",
+            "apps/web/dist/server/index.js",
+            "apps/api/src/worker.ts",
+          ],
+          (ignored) =>
+            write(ignored, "ignored").pipe(
+              Effect.andThen(hash),
+              Effect.map((value) => expect(value, ignored).toBe(original))
+            ),
+          { discard: true }
+        );
+        expect(yield* hashAfter(["../../packages/content"])).toBe(original);
+      }).pipe(Effect.provide(BunServices.layer), Effect.scoped)
   );
 });

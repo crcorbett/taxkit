@@ -49,8 +49,10 @@ fixed publication address `https://taxkit.dev`, derived from `./hostnames`
 like the Production zone and custom domains. Nothing in the API depends on
 the Website, so unpatched Alchemy plans the graph without a binding cycle.
 
-Both Workers declare version-scoped native caching, and the Website's build memo
-includes the shared packages so content changes rebuild it. In `prod` both
+Both Workers declare version-scoped native caching. The Website's
+`websiteBuildMemo` hashes shared package sources, manifests and authored
+content, not tests, READMEs or CHANGELOGs; see the
+[deployment architecture](../../docs/architecture/deployment.md#caching). In `prod` both
 Workers export console logs only, at sampling rate 1, to the
 `taxkit-axiom-logs` destination read from `TaxKitTraceExport/prod`; invocation
 logs, Cloudflare persistence and traces stay off. Every other stage disables
