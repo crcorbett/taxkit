@@ -72,8 +72,12 @@ the Website's own keys from the Worker bindings, through Alchemy's
 - `POSTHOG_*`: analytics relay settings, read through the analytics package's
   Config. The current graph binds none, so the relay reports off.
 
-Each origin is read with `Config.schema` and its owning Schema; deferred or
-missing outputs do not become guessed URLs. `TAXKIT_API` is a native service
+Each origin binding has one Config declaration beside its owning Schema:
+`TaxKitApiOriginConfig` in the internal `@taxkit/api-http/origin` export and
+`DocsPublicationOriginConfig`/`DocsWebsiteOriginConfig` in the internal
+`@taxkit/content/config` export. The Website, API Worker, MCP Layer and
+analytics relay reuse them; deferred or missing outputs do not become guessed
+URLs. `TAXKIT_API` is a native service
 binding, not string configuration: an owning Schema checks the object
 (`fetch`, `connect`) separately and keeps its receiver. The Website's narrow
 host adapter enforces standard manual redirects, preserving the native signal
@@ -110,8 +114,8 @@ port: optional `API_PORT` falls back to `PORT` only when absent, and an invalid
 supplied value remains an error.
 
 The native API Worker reads `API_PUBLIC_ORIGIN` (its own `Worker.URL`) and
-`TAXKIT_PUBLICATION_ORIGIN` through `apps/api/src/worker.config.ts` and the
-origin Schemas in the app's `schemas.ts`. Native planning leaves resource
+`TAXKIT_PUBLICATION_ORIGIN` through `apps/api/src/worker.config.ts`, which
+composes the shared `TaxKitApiOriginConfig` and `DocsPublicationOriginConfig`. Native planning leaves resource
 addresses deferred; first incoming use decodes and caches them. Missing or
 invalid values produce a fixed Config error and an empty 503. The API reads no
 Website address. `CALCULATOR_RATE_NAMESPACE` comes from the stage's secrets

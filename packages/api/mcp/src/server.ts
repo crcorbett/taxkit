@@ -1,6 +1,6 @@
 import { mcpPath } from "@taxkit/api-http/routes";
-import { DocsPublicationOrigin } from "@taxkit/content/schemas";
-import { Config, Effect, Layer } from "effect";
+import { DocsPublicationOriginConfig } from "@taxkit/content/config";
+import { Effect, Layer } from "effect";
 import { McpProtocol, McpServer } from "effect/ai";
 
 import { TaxKitMcpHandlersLive } from "./handlers.layer.js";
@@ -9,7 +9,7 @@ import { TaxKitMcpToolkit } from "./tools.js";
 // Origin-less desktop and server clients are admitted; browser pages must be
 // served from the publication address. Add another site only for a known need.
 export const TaxKitMcpHttpLayer = Layer.unwrap(
-  Config.schema(DocsPublicationOrigin, "TAXKIT_PUBLICATION_ORIGIN").pipe(
+  DocsPublicationOriginConfig.pipe(
     Effect.map((publicationOrigin) =>
       McpServer.toolkit(TaxKitMcpToolkit).pipe(
         Layer.provide(TaxKitMcpHandlersLive),

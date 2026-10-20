@@ -1,4 +1,9 @@
 import "@tanstack/react-start/server-only";
+import { TaxKitApiOriginConfig } from "@taxkit/api-http/origin";
+import {
+  DocsPublicationOriginConfig,
+  DocsWebsiteOriginConfig,
+} from "@taxkit/content/config";
 import type { TaxKitApiBinding } from "@taxkit/infrastructure/api-worker";
 import {
   CalculatorHostMode,
@@ -19,7 +24,6 @@ import {
 
 import { WebsiteApiConfigError } from "./api/errors";
 import { TaxKitWebConfigError } from "./config";
-import { WebsitePublicSettings } from "./schemas";
 
 /** The raw Cloudflare bindings object, supplied once by the server host. */
 export class WebsiteBindings extends Context.Service<
@@ -69,18 +73,9 @@ export const websiteConfigProvider = WebsiteBindings.pipe(
 export const WebsiteSettingsConfig = Effect.gen(function* () {
   const provider = yield* websiteConfigProvider;
   return yield* Effect.all({
-    apiOrigin: Config.schema(
-      WebsitePublicSettings.fields.apiOrigin,
-      "API_PUBLIC_ORIGIN"
-    ),
-    publicationOrigin: Config.schema(
-      WebsitePublicSettings.fields.publicationOrigin,
-      "TAXKIT_PUBLICATION_ORIGIN"
-    ),
-    websiteOrigin: Config.schema(
-      WebsitePublicSettings.fields.websiteOrigin,
-      "WEBSITE_PUBLIC_ORIGIN"
-    ),
+    apiOrigin: TaxKitApiOriginConfig,
+    publicationOrigin: DocsPublicationOriginConfig,
+    websiteOrigin: DocsWebsiteOriginConfig,
   }).pipe(Effect.provideService(ConfigProvider.ConfigProvider, provider));
 }).pipe(
   Effect.mapError(
@@ -97,10 +92,7 @@ export const WebsiteApiConfig = Effect.gen(function* () {
   const bindings = yield* WebsiteBindings;
   const provider = yield* websiteConfigProvider;
   return yield* Effect.all({
-    apiOrigin: Config.schema(
-      WebsitePublicSettings.fields.apiOrigin,
-      "API_PUBLIC_ORIGIN"
-    ),
+    apiOrigin: TaxKitApiOriginConfig,
     binding: Schema.decodeUnknownEffect(PrivateApiBinding)(
       Record.get(bindings, "TAXKIT_API").pipe(Option.getOrUndefined)
     ),

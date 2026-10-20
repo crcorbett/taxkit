@@ -1,3 +1,4 @@
+import { TaxKitApiOrigin } from "@taxkit/api-http/origin";
 import {
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
@@ -11,7 +12,6 @@ import {
   DocsPublicationOrigin,
   DocsWebsiteOrigin,
   DocsSearchTerm,
-  PublicHttpOrigin,
 } from "@taxkit/content/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import {
@@ -38,12 +38,9 @@ import {
   WebsiteInputError,
 } from "./form.boundary";
 
-// The same stage's public API address, used by browser clients.
-const WebsiteApiOrigin = PublicHttpOrigin.pipe(
-  Schema.brand("taxkit/web/WebsiteApiOrigin")
-);
 export const WebsitePublicSettings = Schema.Struct({
-  apiOrigin: WebsiteApiOrigin,
+  // The same stage's public API address, used by browser clients.
+  apiOrigin: TaxKitApiOrigin,
   // Canonical, social, JSON-LD and Markdown links name the published site.
   publicationOrigin: DocsPublicationOrigin,
   // The running Website's own address: tools, analytics and form actions.

@@ -45,8 +45,8 @@ require separate readback.
 
 The browser contract is shared so the Website adapter can keep its SDK private.
 `WebsiteAnalyticsRelayLive` reads the same checked analytics collection/stage
-settings and, only when enabled, `WEBSITE_PUBLIC_ORIGIN` using Content's owning
-origin Schema. The Website supplies its native ConfigProvider and HTTP client;
+settings and, only when enabled, `WEBSITE_PUBLIC_ORIGIN` through Content's
+`DocsWebsiteOriginConfig`. The Website supplies its native ConfigProvider and HTTP client;
 the package never imports app bindings or constructs a runner. The relay admits
 only same-origin POSTs to `/ingest/e/`, the qualified JSON/text media types and
 bounded retry counter. It forwards unchanged bytes once to the fixed US host,

@@ -8,6 +8,7 @@ const frontendModules = [
   "@taxkit/analytics/errors",
   "@taxkit/analytics/service",
   "@taxkit/api-http/api",
+  "@taxkit/api-http/origin",
   "@taxkit/api-http/request-boundary",
   "@taxkit/api-http/response-policy",
   "@taxkit/api-http/routes",
@@ -67,6 +68,10 @@ const hostModuleExceptions = [
   {
     file: "apps/web/src/lib/runtime.server.ts",
     module: "@taxkit/observability/host-telemetry",
+  },
+  {
+    file: "apps/web/src/lib/config.server.ts",
+    module: "@taxkit/content/config",
   },
   {
     file: "apps/web/src/lib/config.server.ts",
