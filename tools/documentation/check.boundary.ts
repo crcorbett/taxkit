@@ -28,27 +28,12 @@ export type ScriptOwners = Readonly<{
 const markdownLink = /\[[^\]]*\]\((?<target>[^\s)]+)(?:\s+[^)]*)?\)/gu;
 const bunRun =
   /\bbun\s+run\s+(?:--filter(?:=|\s+)(?<filter>[^\s`]+)\s+)?(?<command>[A-Za-z0-9:_-]+)/gu;
-const frontmatter = /^---\r?\n(?<body>[\s\S]*?)\r?\n---(?:\r?\n|$)/u;
 const code = /```[\s\S]*?```|`[^`\n]*`/gu;
-// Current maintainer documents carry these fields. Older documents may keep
-// their legacy status block until their owner revises them.
-const currentFields = ["document_type", "lifecycle", "owner"] as const;
-const legacyFields = ["status", "last_reviewed"] as const;
 
 const group = (match: RegExpMatchArray, name: string): Option.Option<string> =>
   Option.fromNullishOr(match.groups).pipe(
     Option.flatMap((groups) => Record.get(groups, name)),
     Option.flatMap(Option.fromNullishOr)
-  );
-
-const metadataBody = (text: string): Option.Option<string> =>
-  Option.fromNullishOr(frontmatter.exec(text)).pipe(
-    Option.flatMap((match) => group(match, "body"))
-  );
-
-const hasFields = (body: string, fields: readonly string[]) =>
-  Array.every(fields, (field) =>
-    new RegExp(`^${field}:\\s*\\S`, "mu").test(body)
   );
 
 const directoryOf = (file: string) =>
@@ -95,14 +80,6 @@ const resolveTarget = (file: DocumentationFile, target: string) => {
   return normalise(directory === "" ? target : `${directory}/${target}`);
 };
 
-// Completed plans and dated records keep the links and commands of their
-// time; Git retains the files they name.
-const isCurrent = (file: DocumentationFile) =>
-  !file.path.startsWith("docs/") ||
-  Option.exists(metadataBody(file.text), (body) =>
-    /^lifecycle:\s*current\s*$/mu.test(body)
-  );
-
 /**
  * Pure inspection over files the runtime has already read. Each finding names
  * the document and the broken reference so the author can repair it directly.
@@ -117,19 +94,8 @@ export const inspectDocumentation = ({
   scripts: ScriptOwners;
 }>): readonly string[] =>
   Array.flatMap(files, (file) => {
-    const metadata =
-      file.path.startsWith("docs/") && file.path.endsWith(".md")
-        ? Option.match(metadataBody(file.text), {
-            onNone: () => [`${file.path}: missing maintainer metadata`],
-            onSome: (body) =>
-              hasFields(body, currentFields) || hasFields(body, legacyFields)
-                ? []
-                : [`${file.path}: incomplete maintainer metadata`],
-          })
-        : [];
-    const current = isCurrent(file);
     const links = Array.getSomes(
-      Array.map(current ? linkTargets(file) : [], (target) =>
+      Array.map(linkTargets(file), (target) =>
         Option.match(resolveTarget(file, target), {
           onNone: () =>
             Option.some(`${file.path}: link leaves the repository: ${target}`),
@@ -142,36 +108,33 @@ export const inspectDocumentation = ({
     );
     const owned = HashMap.get(scripts.workspaces, directoryOf(file.path));
     const commands = Array.getSomes(
-      Array.map(
-        current ? Array.fromIterable(file.text.matchAll(bunRun)) : [],
-        (match) => {
-          const command = group(match, "command").pipe(
-            Option.getOrElse(() => "")
-          );
-          return Option.match(group(match, "filter"), {
-            onNone: () =>
-              HashSet.has(scripts.root, command) ||
-              Option.exists(owned, (names) => HashSet.has(names, command))
-                ? Option.none()
-                : Option.some(
-                    `${file.path}: unknown root command: bun run ${command}`
-                  ),
-            onSome: (workspace) =>
-              Option.match(HashMap.get(scripts.workspaces, workspace), {
-                // Glob and path filters are not checked here.
-                onNone: () => Option.none(),
-                onSome: (names) =>
-                  HashSet.has(names, command)
-                    ? Option.none()
-                    : Option.some(
-                        `${file.path}: unknown command: bun run --filter=${workspace} ${command}`
-                      ),
-              }),
-          });
-        }
-      )
+      Array.map(Array.fromIterable(file.text.matchAll(bunRun)), (match) => {
+        const command = group(match, "command").pipe(
+          Option.getOrElse(() => "")
+        );
+        return Option.match(group(match, "filter"), {
+          onNone: () =>
+            HashSet.has(scripts.root, command) ||
+            Option.exists(owned, (names) => HashSet.has(names, command))
+              ? Option.none()
+              : Option.some(
+                  `${file.path}: unknown root command: bun run ${command}`
+                ),
+          onSome: (workspace) =>
+            Option.match(HashMap.get(scripts.workspaces, workspace), {
+              // Glob and path filters are not checked here.
+              onNone: () => Option.none(),
+              onSome: (names) =>
+                HashSet.has(names, command)
+                  ? Option.none()
+                  : Option.some(
+                      `${file.path}: unknown command: bun run --filter=${workspace} ${command}`
+                    ),
+            }),
+        });
+      })
     );
-    return [...metadata, ...links, ...commands];
+    return [...links, ...commands];
   });
 
 const workspaceRoots = [
