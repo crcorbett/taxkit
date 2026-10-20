@@ -12,6 +12,12 @@ import { Stage } from "alchemy/Stage";
 import { Context, Effect, Option } from "effect";
 
 import { TaxKitApiWorker } from "./api-worker.js";
+import {
+  apiHostName,
+  publicationOrigin,
+  taxKitZoneName,
+  websiteRedirectHostName,
+} from "./hostnames.js";
 import { checkedStage } from "./secrets.js";
 import { taxKitLogsDestinationProduction } from "./telemetry.js";
 import {
@@ -73,10 +79,6 @@ export const productionBotPolicy = {
   isRobotsTxtManaged: false,
 } as const;
 
-// Published pages and discovery documents name the Production site in every
-// stage, including Preview. Each host still binds its own native address.
-export const publicationOrigin = "https://taxkit.dev";
-
 // Native resource construction is idempotent within the stack. Both host
 // declarations yield this same owning Effect to share its unresolved Output.
 const websiteForwardingKey = Random("TaxKitWebsiteForwardingKey", {
@@ -110,12 +112,12 @@ const productionObservability = Effect.gen(function* () {
 // scoped cache is declared in its native init (`Cloudflare.cache`).
 export const nativeApiHostProps = Effect.gen(function* () {
   return {
-    // Production serves only api.taxkit.dev, as in Common Practice; other
+    // Production serves only its API hostname, as in Common Practice; other
     // stages keep the native workers.dev default.
     ...Option.match(yield* NativeProductionZone, {
       onNone: () => ({ workersDev: true }),
       onSome: (zone) => ({
-        domain: { name: "api.taxkit.dev", zoneId: zone.zoneId },
+        domain: { name: apiHostName, zoneId: zone.zoneId },
         workersDev: false,
       }),
     }),
@@ -147,8 +149,8 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
         }),
         onSome: (zone) => ({
           domain: {
-            name: "taxkit.dev",
-            redirects: ["www.taxkit.dev"],
+            name: taxKitZoneName,
+            redirects: [websiteRedirectHostName],
             zoneId: zone.zoneId,
           },
           workersDev: false,
@@ -213,7 +215,7 @@ export const declareNativeAppsInfrastructure = Effect.gen(function* () {
     stage === "prod"
       ? Option.some(
           yield* Zone("TaxKitProductionZone", {
-            name: "taxkit.dev",
+            name: taxKitZoneName,
             paused: false,
             type: "full",
           }).pipe(adopt(true), retain())

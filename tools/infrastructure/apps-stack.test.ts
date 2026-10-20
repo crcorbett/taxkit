@@ -3,8 +3,8 @@ import { describe, expect, it } from "@effect/vitest";
 import {
   productionBotPolicy,
   productionZoneSettings,
-  publicationOrigin,
 } from "@taxkit/infrastructure/apps-stack";
+import { publicationOrigin } from "@taxkit/infrastructure/hostnames";
 import {
   checkedStage,
   deploymentSecrets,

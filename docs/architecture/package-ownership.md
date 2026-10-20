@@ -140,7 +140,8 @@ Root `alchemy.run.ts` and `alchemy.local.run.ts`
 
 `packages/infrastructure`
 : Private source-only owner of the native API/Website graph (`./apps-stack`),
-  local stage Schema (`./stage`) and secret selection (`./secrets`), plus the
+  local stage Schema (`./stage`), Production hostnames and publication origin
+  (`./hostnames`) and secret selection (`./secrets`), plus the
   separate retained PostHog project through the explicit `./posthog` export and
   `alchemy.posthog.run.ts`. Its private management adapter contains Distilled;
   application packages do not receive that client or its management
