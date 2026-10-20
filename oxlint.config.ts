@@ -423,6 +423,12 @@ export default defineConfig({
   ],
   overrides: [
     {
+      // strict-effect forbids async functions; Promise-returning SDK facades
+      // and native host callbacks cannot satisfy both rules.
+      files: ["**/*.{ts,tsx}"],
+      rules: { "typescript/promise-function-async": "off" },
+    },
+    {
       files: portableEffectSourceFiles,
       rules: {
         "no-restricted-imports": [
