@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-18
+last_reviewed: 2026-10-21
 review_trigger: Alchemy stack, stage, Doppler config, deployment command, deploy workflow or public check change
 ---
 
@@ -72,7 +72,7 @@ The Production token (`taxkit/prd`) is an account-owned token. On the
 (DNSSEC), Bot Management Write, Dynamic URL Redirects Write and Workers Routes
 Write; on the account, Workers Scripts, Workers Observability and Secrets Store
 Write. Change it with `cf accounts tokens update`, keeping its name, expiry and
-existing policies, and record the change here. It expires on 18 November 2026.
+existing policies, and record the change here. It expires on 19 January 2027.
 
 ## Forwarding credential rotation
 
@@ -230,18 +230,35 @@ planning and deployment. `release:check` inherits the same gate locally; run
 verification before an authorised local deployment. Deploys use the local Turbo cache
 only: the remote cache needs Checks' separate `DOPPLER_CI_TOKEN`.
 
+Every job that uses `DOPPLER_TOKEN` first checks that its environment secret is
+set. Only a true/false value reaches that step, so a missing secret stops the
+job in seconds instead of at the first native command after verification. The
+token itself reaches only the native plan, deploy, destroy and drift steps.
+
+On the installed Alchemy (beta.81, unchanged in beta.83), `deploy --yes` and
+`destroy --yes` both approve the plan and let Alchemy set up or upgrade the
+shared Cloudflare state store. The stack disables the shell as a config source,
+so the state store never sees `CI=true` and CI alone does not stop that. Each
+workflow therefore runs the same stage
+without `--yes` first: `pr:plan`, `production:plan` or `pr:destroy --dry-run`,
+all with `--no-input`. That run fails when the store is missing or on another
+version, and the `--yes` step runs only after it passes. Run local commands the
+same way: `--no-input`, and `--yes` only after a clean plan. A deploy with no
+changes needs only `--no-input`.
+
 - `.github/workflows/preview.yml` runs on same-repository pull requests. Opened,
   reopened and synchronised pull requests run verification, then `pr:plan` and `pr:deploy` for
   `pr-<number>`, read both stage addresses from the deploy's stack outputs and
   check the Website, `/api/health` and `/api/v1/calculators` for 200. Closing
-  the pull request runs the stage-validated `pr:destroy`, including its cold
-  catalogue build prerequisite. Cleanup provisions Chromium and its system
+  the pull request runs the stage-validated `pr:destroy`, first as a dry run
+  and then with `--yes`, including its cold catalogue build prerequisite.
+  Cleanup provisions Chromium and its system
   libraries in its own runner after the closed-PR and stage guards; it cannot
   borrow a deploy job's browser cache. Fork pull requests get no job and no
   secret. Runs for one pull request share a concurrency group and never
   overlap; each rechecks the pull request's state before it plans or destroys.
 - `.github/workflows/production.yml` runs on push to `main` and manual dispatch
-  from `main`. It runs verification, `production:plan`, `production:deploy --yes`, then checks
+  from `main`. It runs verification, `production:plan`, `production:deploy --yes --no-input`, then checks
   `https://taxkit.dev` for 200, a `www` 301 that keeps path and query, and
   `https://api.taxkit.dev/api/health` for 200. `production:drift` runs last as
   information only: on Alchemy beta.81 it can report Workers with custom

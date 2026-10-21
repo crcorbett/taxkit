@@ -25,6 +25,12 @@ jobs:
       name: production
       url: https://taxkit.dev
     steps:
+      # A missing environment secret would otherwise fail only at the first
+      # native command, after verification. Only this boolean reaches the shell.
+      - name: Check the production Doppler token is set
+        env:
+          DOPPLER_TOKEN_SET: ${{ secrets.DOPPLER_TOKEN != '' }}
+        run: test "$DOPPLER_TOKEN_SET" = true || { echo "::error::The production environment has no DOPPLER_TOKEN secret"; exit 1; }
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
@@ -74,12 +80,15 @@ jobs:
         env:
           TURBO_CACHE: local:rw
         run: bun run verification
+      # Deploy's --yes also lets native Alchemy set up or upgrade the shared
+      # state store. This plan has no --yes, so it fails closed when the store
+      # is missing or on another version, and deploy runs only after it passes.
       - name: Plan production with native Alchemy
         run: bun run production:plan --no-input
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Deploy production with native Alchemy
-        run: bun run production:deploy --yes
+        run: bun run production:deploy --yes --no-input
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Check Website, www redirect and public API

@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-10-21
 review_trigger: test command, check coverage, native test or deployment check change
 ---
 
@@ -36,6 +36,9 @@ cleanup and the Website's private HTTP identity boundary.
 command composition and workflow gate commands with safe leaf replacements.
 It checks native build/test ordering and proves that a failing native suite
 prevents Preview/Production planning and deployment and later release checks.
+It also checks that each Preview/Production job tests its Doppler secret is set
+before any other step, gives the token only to native commands, and runs every
+`--yes` deploy or destroy only after the same stage has run without `--yes`.
 
 Effect diagnostics run inside every workspace's `check-types`, because the
 `prepare` script (`effect-tsgo patch`) patches the TypeScript compiler with the
