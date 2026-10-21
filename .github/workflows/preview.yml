@@ -32,6 +32,12 @@ jobs:
       name: preview
       url: ${{ steps.addresses.outputs.website }}
     steps:
+      # A missing environment secret would otherwise fail only at the first
+      # native command, after verification. Only this boolean reaches the shell.
+      - name: Check the preview Doppler token is set
+        env:
+          DOPPLER_TOKEN_SET: ${{ secrets.DOPPLER_TOKEN != '' }}
+        run: test "$DOPPLER_TOKEN_SET" = true || { echo "::error::The preview environment has no DOPPLER_TOKEN secret"; exit 1; }
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -89,6 +95,9 @@ jobs:
         run: |
           state="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PULL_REQUEST" --jq .state)"
           echo "open=$([ "$state" = open ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      # Deploy's --yes also lets native Alchemy set up or upgrade the shared
+      # state store. This plan has no --yes, so it fails closed when the store
+      # is missing or on another version, and deploy runs only after it passes.
       - name: Plan preview with native Alchemy
         if: steps.pull-request.outputs.open == 'true'
         run: bun run pr:plan "$STAGE" --no-input
@@ -97,7 +106,7 @@ jobs:
       - name: Deploy preview with native Alchemy
         if: steps.pull-request.outputs.open == 'true'
         shell: bash
-        run: bun run pr:deploy "$STAGE" --yes 2>&1 | tee "$RUNNER_TEMP/deploy.log"
+        run: bun run pr:deploy "$STAGE" --yes --no-input 2>&1 | tee "$RUNNER_TEMP/deploy.log"
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       # The stage's workers.dev names carry generated suffixes, so read both
@@ -147,6 +156,10 @@ jobs:
     environment:
       name: preview
     steps:
+      - name: Check the preview Doppler token is set
+        env:
+          DOPPLER_TOKEN_SET: ${{ secrets.DOPPLER_TOKEN != '' }}
+        run: test "$DOPPLER_TOKEN_SET" = true || { echo "::error::The preview environment has no DOPPLER_TOKEN secret"; exit 1; }
       # Destroy with the code that deployed this stage.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -187,8 +200,16 @@ jobs:
         id: catalogue-chromium
         if: steps.pull-request.outputs.closed == 'true'
         run: apps/web/node_modules/.bin/playwright install --with-deps chromium
+      # Destroy's --yes also lets native Alchemy set up or upgrade the shared
+      # state store. This destroy plan has no --yes, so it fails closed when the
+      # store is missing or on another version before anything is destroyed.
+      - name: Plan preview destroy with native Alchemy
+        if: steps.pull-request.outputs.closed == 'true'
+        run: bun run pr:destroy "$STAGE" --dry-run --no-input
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
       - name: Destroy preview with native Alchemy
         if: steps.pull-request.outputs.closed == 'true'
-        run: bun run pr:destroy "$STAGE" --yes
+        run: bun run pr:destroy "$STAGE" --yes --no-input
         env:
           DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}

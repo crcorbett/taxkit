@@ -27,6 +27,9 @@ const Workflow = Schema.Struct({
       steps: Schema.Array(
         Schema.Struct({
           "continue-on-error": Schema.OptionFromOptionalKey(Schema.Boolean),
+          env: Schema.OptionFromOptionalKey(
+            Schema.Record(Schema.String, Schema.String)
+          ),
           id: Schema.OptionFromOptionalKey(Schema.String),
           if: Schema.OptionFromOptionalKey(Schema.String),
           run: Schema.OptionFromOptionalKey(Schema.String),
@@ -258,6 +261,115 @@ describe("required native release gate", () => {
           );
         });
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
+
+  it.effect.each(["preview", "production"])(
+    "checks the %s Doppler secret first and gives the token only to native commands",
+    (name) =>
+      Effect.gen(function* () {
+        const configuration = yield* workflow(`.github/workflows/${name}.yml`);
+        const credentialJobs = Array.filter(
+          Record.values(configuration.jobs),
+          (job) =>
+            Array.some(job.steps, (step) =>
+              Option.exists(step.env, (env) => Record.has(env, "DOPPLER_TOKEN"))
+            )
+        );
+        expect(credentialJobs.length).toBeGreaterThan(0);
+        yield* Effect.forEach(credentialJobs, (job) =>
+          Effect.gen(function* () {
+            const check = Array.head(job.steps).pipe(
+              Option.getOrElse(() => expect.fail("Missing job steps"))
+            );
+            const { "continue-on-error": checkMayFail } = check;
+            expect(check.env).toEqual(
+              Option.some({
+                DOPPLER_TOKEN_SET: `\${{ secrets.DOPPLER_TOKEN != '' }}`,
+              })
+            );
+            expect(check.if).toEqual(Option.none());
+            expect(Option.getOrElse(checkMayFail, () => false)).toBe(false);
+            expect(
+              Array.every(
+                job.steps,
+                (step) =>
+                  !Option.exists(step.env, (env) =>
+                    Record.has(env, "DOPPLER_TOKEN")
+                  ) ||
+                  Option.exists(step.run, (run) =>
+                    /^bun run (?:pr|production):(?:plan|deploy|destroy|drift)\b/u.test(
+                      run
+                    )
+                  )
+              )
+            ).toBe(true);
+            const command = Option.getOrElse(check.run, () =>
+              expect.fail("Missing token check")
+            );
+            const fixture = yield* commandFixture;
+            const missing = yield* runCommand(
+              fixture,
+              `DOPPLER_TOKEN_SET=false; ${command};`
+            );
+            const present = yield* runCommand(
+              fixture,
+              `DOPPLER_TOKEN_SET=true; ${command};`
+            );
+            expect(missing.code).not.toBe(0);
+            expect(present.code).toBe(0);
+          })
+        );
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
+
+  // `--yes` also lets native Alchemy set up or upgrade the shared state store.
+  // A matching run without it fails closed first when the store is not ready.
+  it.effect.each(["preview", "production"])(
+    "plans every %s --yes command without --yes first",
+    (name) =>
+      Effect.gen(function* () {
+        const configuration = yield* workflow(`.github/workflows/${name}.yml`);
+        const applies = Array.flatMap(
+          Record.values(configuration.jobs),
+          (job) =>
+            Array.map(
+              Array.filter(job.steps, (step) =>
+                Option.exists(step.run, (run) => run.includes("--yes"))
+              ),
+              (step) => ({ job, step })
+            )
+        );
+        expect(applies.length).toBeGreaterThan(0);
+        yield* Effect.forEach(applies, ({ job, step }) =>
+          Effect.sync(() => {
+            const run = Option.getOrElse(step.run, () =>
+              expect.fail("Missing apply command")
+            );
+            const base = run.replace(/ --yes --no-input(?: .*)?$/u, "");
+            expect(base).toMatch(
+              /^bun run (?:pr|production):(?:deploy|destroy)(?: "\$STAGE")?$/u
+            );
+            const guard = base.includes(":destroy")
+              ? `${base} --dry-run --no-input`
+              : `${base.replace(":deploy", ":plan")} --no-input`;
+            const plan = Array.findFirst(job.steps, (candidate) =>
+              Option.contains(candidate.run, guard)
+            ).pipe(Option.getOrElse(() => expect.fail(`Missing ${guard}`)));
+            const { "continue-on-error": planMayFail } = plan;
+            expect(job.steps.indexOf(plan)).toBeLessThan(
+              job.steps.indexOf(step)
+            );
+            expect(plan.if).toEqual(step.if);
+            expect(plan.env).toEqual(step.env);
+            expect(Option.getOrElse(planMayFail, () => false)).toBe(false);
+            expect(
+              Option.exists(step.if, (condition) =>
+                /\b(?:always|failure|cancelled)\s*\(/u.test(condition)
+              )
+            ).toBe(false);
+          })
+        );
+      }).pipe(Effect.provide(BunServices.layer))
   );
 
   it.effect.each([
