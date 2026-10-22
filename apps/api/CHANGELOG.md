@@ -1,6 +1,6 @@
 # TaxKit API
 
-## Unreleased
+## 2.0.0
 
 - Accept zero taxable income in the existing annual nil-rate band.
 
@@ -19,6 +19,19 @@
 
 ### Major Changes
 
+- Generated native HTTP clients replace the former callable client/Layer
+  helpers. Checked request and report types use Schema-owned Option values;
+  the generated package changelog contains the TypeScript migration details.
+- HTTP, RPC and MCP calls share bounded calculation work and the native host's
+  request allowance. Fixed public errors cover request size, timeouts,
+  capacity and rate limits without exposing rejected financial values.
+- Remote MCP supports the modern `2026-07-28` protocol through Effect's native
+  request-scoped transport. Legacy MCP sessions and their Durable Object
+  namespace are retired. Website calculations use the native HTTP binding
+  with a stage-owned forwarding credential and the original caller's allowance.
+- Public documentation and discovery use checked HTTP routes, Production
+  publication links and version-scoped caching for eligible public responses.
+  Calculations, private responses and errors remain uncached.
 - Calculation responses now expose the independent exact ruleset identifiers
   `rules-au-pay/1.0.0` and `rules-au-income-tax/1.0.0`. Calculator field errors
   keep their tagged shape, normalized paths and descriptor help while no longer
