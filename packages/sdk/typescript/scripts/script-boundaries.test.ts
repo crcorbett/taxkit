@@ -140,8 +140,16 @@ describe("SDK direct import command", () => {
     },
     {
       code: 1,
-      http: '{"devDependencies":{"@taxkit/sdk":"workspace:*"}}',
+      http: '{"devDependencies":{"taxkit":"workspace:*"}}',
       name: "reverse transport dependency",
+      sdk: "{}",
+      source: "export {};",
+      tag: "SdkImportPolicyError",
+    },
+    {
+      code: 1,
+      http: '{"devDependencies":{"@taxkit/sdk":"2.1.0"}}',
+      name: "reverse transport dependency on the previous package name",
       sdk: "{}",
       source: "export {};",
       tag: "SdkImportPolicyError",
@@ -426,8 +434,8 @@ it.effect.each([
           Match.tag("DownstreamCommandError", (failure) => {
             expect(failure.stage).toBe(
               mode === "build"
-                ? "build @taxkit/sdk"
-                : "pack workspace manifest for @taxkit/sdk"
+                ? "build taxkit"
+                : "pack workspace manifest for taxkit"
             );
             expect(failure.exitCode).toEqual(Option.some(23));
           }),
@@ -556,7 +564,7 @@ it.effect.each(["start", "stdout", "stderr", "exit-read"] as const)(
         onFailure: (error) => {
           Match.value(error).pipe(
             Match.tag("DownstreamCommandError", (failure) => {
-              expect(failure.stage).toBe("build @taxkit/sdk");
+              expect(failure.stage).toBe("build taxkit");
               expect(failure.exitCode).toEqual(Option.none());
               expect(String(failure)).not.toContain("TAXKIT_SECRET_SENTINEL");
             }),

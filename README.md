@@ -17,11 +17,19 @@ implemented surface includes the standalone Bun API, the native Cloudflare
 API and Website with three calculators and the accepted documentation, an Effect HTTP API package
 with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
-primitives, Australian pay, income-tax and STSL rule packages, a private
-TypeScript SDK package, private `@taxkit/docs-content` and
+primitives, Australian pay, income-tax and STSL rule packages, the installable
+`taxkit` TypeScript SDK, private `@taxkit/docs-content` and
 `@taxkit/docs-fumadocs` packages, shared testing helpers and shared TypeScript
-config. The SDK is implemented for local and downstream
-validation, but it is not published yet.
+config. The SDK includes the engine, Australian rules and typed HTTP contracts
+in one package, with Effect as its only external runtime dependency.
+
+```sh
+npm install taxkit
+```
+
+Use `taxkit/au` for Australian calculations and `taxkit/core` for checked money
+values. See the [SDK guide](./packages/sdk/typescript/README.md) for all eight
+entry points. The earlier `@taxkit/sdk@2.1.0` release remains available.
 
 ## What exists today
 
@@ -45,8 +53,8 @@ validation, but it is not published yet.
   documents derived from the accepted Content catalogue and HTTP routes.
 - [packages/observability](./packages/observability/README.md): shared safe host
   telemetry and edge identity, independent of deployment providers.
-- [packages/sdk/typescript](./packages/sdk/typescript/README.md): private
-  TypeScript SDK package with plain, safe-result, Effect and AU entrypoints.
+- [packages/sdk/typescript](./packages/sdk/typescript/README.md): the public
+  `taxkit` package with plain, safe-result, Effect and AU entry points.
 - [packages/docs-content](./packages/docs-content/README.md): private
   source-only content package for docs frontmatter, navigation, validation,
   generated source access and the docs content service.

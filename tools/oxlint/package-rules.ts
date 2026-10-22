@@ -107,7 +107,9 @@ const workspaceRoles: OxlintRule = {
           isForbiddenPackageDependency(value, address.value)
         ) ||
         (websiteSource &&
-          address.value.startsWith("@taxkit/") &&
+          (address.value === "taxkit" ||
+            address.value.startsWith("taxkit/") ||
+            address.value.startsWith("@taxkit/")) &&
           !isFrontendModule(file, address.value)) ||
         (browser &&
           (address.value === "alchemy" ||

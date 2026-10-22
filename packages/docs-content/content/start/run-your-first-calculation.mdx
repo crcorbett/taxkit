@@ -11,14 +11,14 @@ the plain SDK.
 
 ## Before you start
 
-Install `@taxkit/sdk` with [Install the SDK](./install-the-sdk.mdx), then run
+Install `taxkit` with [Install the SDK](./install-the-sdk.mdx), then run
 the script in a TypeScript runtime that supports ESM imports.
 
 ## Create a script
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -33,7 +33,7 @@ console.log({
 ## Understand the input
 
 `taxableIncome` is a canonical calculator fact. The value uses the `Money`
-schema from `@taxkit/sdk/core`, created with the `aud` constructor.
+schema from `taxkit/core`, created with the `aud` constructor.
 Pass integer cents rather than floating point dollars.
 
 ```ts
@@ -45,9 +45,9 @@ aud(Cents.make(9_000_000)); // AUD 90,000.00
 Australian helpers call the same generic facade that other SDK consumers use:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),

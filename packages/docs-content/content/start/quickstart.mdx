@@ -18,7 +18,7 @@ You need a TypeScript runtime that can import ESM packages.
 Install the SDK:
 
 ```sh
-bun add @taxkit/sdk
+npm install taxkit
 ```
 
 Inside this repository, the workspace already provides the SDK. All TaxKit
@@ -27,8 +27,8 @@ imports below come from that one package.
 ## Run a calculation
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -55,9 +55,9 @@ console.log(report.rawLiability.cents);
 Use the safe facade when you want a typed result instead of a rejected Promise:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),

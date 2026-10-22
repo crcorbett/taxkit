@@ -1,4 +1,13 @@
-# @taxkit/sdk
+# taxkit
+
+## 2.1.1
+
+### Patch Changes
+
+- Publish the single TaxKit SDK as `taxkit`, so you can install it with
+  `npm install taxkit` and use entry points such as `taxkit/au`, `taxkit/core`
+  and `taxkit/http`. The eight exports and calculation behaviour are unchanged;
+  the existing `@taxkit/sdk@2.1.0` publication remains available.
 
 ## 2.1.0
 

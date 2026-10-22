@@ -15,9 +15,9 @@ decoding still validates untrusted values before calculation.
 The selected descriptor controls the accepted facts and the returned report:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -29,9 +29,9 @@ report.liability.cents;
 If you pass facts for another calculator, the call should fail type checking:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 await TaxKit.calculate(au.calculations.annualIncomeTax, {
   grossPay: aud(Cents.make(165_400)),
@@ -41,10 +41,10 @@ await TaxKit.calculate(au.calculations.annualIncomeTax, {
 
 ## Branded values
 
-Money values use canonical branded constructors from `@taxkit/sdk/core`:
+Money values use canonical branded constructors from `taxkit/core`:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
+import { Cents, aud } from "taxkit/core";
 
 const taxableIncome = aud(Cents.make(9_000_000));
 ```
@@ -64,8 +64,8 @@ calling the typed SDK. In this example, annual tax facts fail the pay
 calculator's schema check; the valid weekly pay input reaches calculation.
 
 ```ts
-import { au } from "@taxkit/sdk/au";
 import { Effect, Schema } from "effect";
+import { au } from "taxkit/au";
 
 // Check an external JSON representation before calling a typed calculator.
 export const invalidInput = Schema.decodeEffect(
@@ -93,8 +93,8 @@ Effect consumers can preserve the full `CalculatorRunResponse` shape while
 narrowing `report` to the selected descriptor output:
 
 ```ts
-import type { SdkCalculatorRunResponse } from "@taxkit/sdk/effect";
-import type { CalculatorRunResponse } from "@taxkit/sdk/schemas";
+import type { SdkCalculatorRunResponse } from "taxkit/effect";
+import type { CalculatorRunResponse } from "taxkit/schemas";
 ```
 
 `SdkCalculatorRunResponse<Report>` keeps the canonical response shape and

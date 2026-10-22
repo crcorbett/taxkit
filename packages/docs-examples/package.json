@@ -1,6 +1,6 @@
 {
   "name": "@taxkit/docs-examples",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -14,8 +14,8 @@
   "dependencies": {
     "@taxkit/core": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
-    "@taxkit/sdk": "workspace:*",
-    "effect": "catalog:"
+    "effect": "catalog:",
+    "taxkit": "workspace:*"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",

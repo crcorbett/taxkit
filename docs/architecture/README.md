@@ -21,7 +21,7 @@ Fumadocs-compiled documentation), the
 `@taxkit/api-http` package with health, generated docs, metadata and public
 calculation endpoints, the `@taxkit/calculators` service package,
 deterministic core engine primitives, Australian pay, income-tax and STSL rule
-packages, a private TypeScript SDK package, private `@taxkit/docs-content`
+packages, the installable `taxkit` TypeScript SDK, private `@taxkit/docs-content`
 and `@taxkit/docs-fumadocs` packages, shared testing helpers, shared
 TypeScript config, private Effect-native release orchestration and
 documentation.
@@ -42,7 +42,7 @@ Implemented surfaces:
   OpenAPI JSON, public calculator metadata and public calculation routes.
 - `packages/calculators`: reusable calculator catalog, metadata, graph,
   calculation and expected-error orchestration package.
-- `packages/sdk/typescript`: private TypeScript SDK package with browser-safe,
+- `packages/sdk/typescript`: public `taxkit` package with browser-safe,
   Effect-native, schema, testing and AU entrypoints.
 - `packages/docs-content`: private source-only docs contracts, generated
   Fumadocs source access, navigation validation and docs content service.

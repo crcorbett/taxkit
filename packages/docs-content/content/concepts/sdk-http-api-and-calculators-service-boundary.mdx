@@ -22,8 +22,8 @@ Production: SDK and HTTP boundary
 
 Plain TypeScript caller
   -> TaxKit.calculate / TaxKit.safe.calculate / au.incomeTax.annual
-    -> @taxkit/sdk/effect calculateReportRequest
-      -> @taxkit/sdk/effect calculateRunRequest
+    -> taxkit/effect calculateReportRequest
+      -> taxkit/effect calculateRunRequest
         -> PublicCalculatorService.calculate
           -> CalculationEngine
 

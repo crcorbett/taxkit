@@ -1,7 +1,7 @@
 import { assert, it } from "@effect/vitest";
-import { GrossPay, au } from "@taxkit/sdk/au";
-import { Cents, aud } from "@taxkit/sdk/core";
 import { Effect, Schema } from "effect";
+import { GrossPay, au } from "taxkit/au";
+import { Cents, aud } from "taxkit/core";
 
 it.effect("calculates weekly take-home pay", () =>
   Effect.promise(() =>

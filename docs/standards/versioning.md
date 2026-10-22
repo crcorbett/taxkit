@@ -17,12 +17,12 @@ changelog for humans reading the repository as one product.
 
 ## Release Train Policy
 
-`@taxkit/sdk` owns the installable TaxKit distribution and its public version.
+`taxkit` owns the installable TaxKit distribution and its public version.
 Its archive contains the compiled engine, calculators, Australian rules and
 HTTP contracts behind explicit SDK entry points. Internal workspace packages
 remain private source owners; they are not separate publication requirements.
 
-Add a Changeset for `@taxkit/sdk` when any included module changes the public
+Add a Changeset for `taxkit` when any included module changes the public
 API, calculation behaviour or distributed files. Use the highest required bump
 for the combined public contract. Internal-only tools and app changes retain
 their own ownership and do not force an SDK release.
@@ -94,5 +94,5 @@ The repeatable procedure is [`../runbooks/versioning.md`](../runbooks/versioning
 - Public docs and specs are versioned too when they affect package behavior,
   API behavior, install guidance, route design or generated documentation.
   Docs-only typo fixes can use an explicit no-changeset rationale.
-- Only `@taxkit/sdk` is enabled for npm publication. Keep all other workspace
+- Only `taxkit` is enabled for npm publication. Keep all other workspace
   packages `private: true`; Changesets still manages their internal versions.

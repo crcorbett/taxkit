@@ -1,7 +1,7 @@
-import { TaxKit } from "@taxkit/sdk";
-import { GrossPay, au } from "@taxkit/sdk/au";
-import { audFromCents } from "@taxkit/sdk/core";
 import { Console, Effect, Match } from "effect";
+import { TaxKit } from "taxkit";
+import { GrossPay, au } from "taxkit/au";
+import { audFromCents } from "taxkit/core";
 
 export const program = audFromCents(346_200).pipe(
   Effect.flatMap((amount) =>

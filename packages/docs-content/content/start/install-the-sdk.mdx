@@ -11,29 +11,29 @@ Use the HTTP API instead when the caller cannot import TypeScript packages.
 
 ## Current package status
 
-`@taxkit/sdk` is the only TaxKit package configured for npm installation. The
+`taxkit` is the only TaxKit package configured for npm installation. The
 engine, Australian rules and HTTP contracts are included in that package.
 
 ## Install the package
 
 ```sh
-bun add @taxkit/sdk
+npm install taxkit
 ```
 
-All TaxKit entry points come from `@taxkit/sdk`. Effect is its only external
+All TaxKit entry points come from `taxkit`. Effect is its only external
 runtime dependency and your package manager installs it automatically. Use
-`@taxkit/sdk/core` for checked money values such as `aud`.
+`taxkit/core` for checked money values such as `aud`.
 
 ## Choose an entrypoint
 
-| Entrypoint            | Use when                                                               |
-| --------------------- | ---------------------------------------------------------------------- |
-| `@taxkit/sdk`         | You want `TaxKit.calculate` or `TaxKit.safe.calculate`.                |
-| `@taxkit/sdk/au`      | You want Australian helper methods such as `au.incomeTax.annual`.      |
-| `@taxkit/sdk/effect`  | You want Effect programs, service requirements and full run responses. |
-| `@taxkit/sdk/core`    | You want money values, engine services or calculator contracts.        |
-| `@taxkit/sdk/http`    | You want typed HTTP contracts for Effect's generated API client.       |
-| `@taxkit/sdk/schemas` | You want canonical calculator run schemas and SDK error schemas.       |
+| Entrypoint       | Use when                                                               |
+| ---------------- | ---------------------------------------------------------------------- |
+| `taxkit`         | You want `TaxKit.calculate` or `TaxKit.safe.calculate`.                |
+| `taxkit/au`      | You want Australian helper methods such as `au.incomeTax.annual`.      |
+| `taxkit/effect`  | You want Effect programs, service requirements and full run responses. |
+| `taxkit/core`    | You want money values, engine services or calculator contracts.        |
+| `taxkit/http`    | You want typed HTTP contracts for Effect's generated API client.       |
+| `taxkit/schemas` | You want canonical calculator run schemas and SDK error schemas.       |
 
 The existing `/au/effect`, `/schemas` and `/testing` paths remain available.
 These are paths inside one package; you do not install them separately.
@@ -41,9 +41,9 @@ These are paths inside one package; you do not install them separately.
 ## Verify an import
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),

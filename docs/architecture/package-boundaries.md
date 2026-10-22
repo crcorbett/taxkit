@@ -194,13 +194,13 @@ Implemented `@taxkit/api-http` owns:
 HTTP API packages should not own calculator catalog transformations or
 calculation business logic when a reusable API service package exists.
 
-Implemented private `@taxkit/sdk` owns:
+Implemented private `taxkit` owns:
 
 - direct in-process calculation facade
 - plain TypeScript `TaxKit.createClient(...)`, `TaxKit.calculate(...)` and safe helpers
 - caller-owned client runtimes and explicit disposal; bounded one-shot helpers
-- Effect-native `@taxkit/sdk/effect` entrypoint
-- jurisdiction-specific opt-in `@taxkit/sdk/au` and `@taxkit/sdk/au/effect` subpaths
+- Effect-native `taxkit/effect` entrypoint
+- jurisdiction-specific opt-in `taxkit/au` and `taxkit/au/effect` subpaths
 - Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
 - typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
 - browser-safe types and schemas
@@ -237,7 +237,7 @@ packages/rules/au/super      -> @taxkit/rules-au-super
 packages/domain/au/dates     -> @taxkit/domain-au-dates
 packages/api/http            -> @taxkit/api-http
 packages/calculators         -> @taxkit/calculators
-packages/sdk/typescript      -> taxkit or @taxkit/sdk
+packages/sdk/typescript      -> taxkit or taxkit
 packages/docs-content        -> @taxkit/docs-content
 packages/docs-fumadocs       -> @taxkit/docs-fumadocs
 ```

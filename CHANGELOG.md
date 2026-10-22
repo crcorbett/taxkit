@@ -1,5 +1,14 @@
 # TaxKit
 
+## 2.1.1
+
+- Publish the single SDK under the npm name `taxkit`. Install it with
+  `npm install taxkit` and use the same eight entry points under `taxkit/*`.
+  Calculations and runtime dependencies are unchanged. The existing
+  `@taxkit/sdk@2.1.0` release remains available under its original name.
+- Keep the repository root and all other workspace packages private; the
+  private root is named `@taxkit/workspace` to avoid a duplicate package name.
+
 ## 2.1.0
 
 - Prepare the first public `@taxkit/sdk` release as one package containing the

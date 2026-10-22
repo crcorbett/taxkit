@@ -7,9 +7,13 @@ last_reviewed: 2026-10-13
 review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
-# TypeScript SDK
+# TaxKit TypeScript SDK
 
 Public TaxKit TypeScript SDK package.
+
+The npm package name is `taxkit`. The earlier `@taxkit/sdk@2.1.0` release
+remains available; use `taxkit` and the matching `taxkit/*` imports for current
+versions.
 
 ## Scope
 
@@ -21,12 +25,12 @@ modules into one archive, with Effect as its only external runtime dependency.
 Install the SDK archive itself; no other TaxKit archive is required.
 
 ```sh
-npm install @taxkit/sdk
+npm install taxkit
 ```
 
 Use an ESM-capable TypeScript runtime or a browser bundler. Effect is installed
-as a dependency. Use `@taxkit/sdk/core` for checked money values and engine
-contracts, and `@taxkit/sdk/http` for typed HTTP client contracts.
+as a dependency. Use `taxkit/core` for checked money values and engine
+contracts, and `taxkit/http` for typed HTTP client contracts.
 
 The package currently exposes typed descriptor composition, an Effect-native
 facade, a plain Promise facade and Australian module helpers for the current
@@ -67,8 +71,8 @@ Report-only helpers
 ## Plain Facade
 
 ```ts
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const report = await TaxKit.calculate(au.calculations.takeHomePay, {
   grossPay,
@@ -93,7 +97,7 @@ safe results or rejected Promises.
 ## AU Subpath
 
 ```ts
-import { au } from "@taxkit/sdk/au";
+import { au } from "taxkit/au";
 
 const payReport = await au.pay.takeHomePay({
   grossPay,
@@ -172,12 +176,12 @@ time.
 The root, AU and schema entrypoints are intended to remain browser-safe. Effect
 entrypoints expose Effect-native types for consumers that want service/layer
 composition. The publish manifest is dist-only and does not expose `source`
-conditions; `bun run --filter=@taxkit/sdk check-packed-artifact` validates
+conditions; `bun run --filter=taxkit check-packed-artifact` validates
 that every public export resolves to packed files. The focused checker is an
 Effect-native Bun runtime with typed command and validation failures and a
 scope-managed temporary import workspace.
 
-`@taxkit/sdk/schemas` re-exports calculator-owned run contracts for consumer
+`taxkit/schemas` re-exports calculator-owned run contracts for consumer
 convenience:
 
 - `CalculatorRunFacts`
@@ -209,7 +213,7 @@ the workspace directory or all workspaces recursively.
 The SDK owns the first downstream consumer validation gate:
 
 ```sh
-bun run --filter=@taxkit/sdk validate:downstream
+bun run --filter=taxkit validate:downstream
 ```
 
 The command builds and packs the SDK only, installs that one archive into a
@@ -246,14 +250,14 @@ compatible. These are module paths inside one package, not extra npm packages.
 ## Commands
 
 ```sh
-bun run --filter=@taxkit/sdk test
-bun run --filter=@taxkit/sdk test:browser
-bun run --filter=@taxkit/sdk check-types
-bun run --filter=@taxkit/sdk build
-bun run --filter=@taxkit/sdk test-types
-bun run --filter=@taxkit/sdk check-boundaries
-bun run --filter=@taxkit/sdk check-packed-artifact
-bun run --filter=@taxkit/sdk validate:downstream
+bun run --filter=taxkit test
+bun run --filter=taxkit test:browser
+bun run --filter=taxkit check-types
+bun run --filter=taxkit build
+bun run --filter=taxkit test-types
+bun run --filter=taxkit check-boundaries
+bun run --filter=taxkit check-packed-artifact
+bun run --filter=taxkit validate:downstream
 ```
 
 ## Related Docs
@@ -263,7 +267,7 @@ bun run --filter=@taxkit/sdk validate:downstream
 - `docs/architecture/package-boundaries.md`
 - `docs/architecture/testing-and-quality.md`
 
-`@taxkit/sdk/schemas` also re-exports the canonical `CalculatorCapacityExceeded`
+`taxkit/schemas` also re-exports the canonical `CalculatorCapacityExceeded`
 and `CalculatorOperationTimedOut` errors. They belong to the widened checked
 service union and expose fixed manual-retry guidance for server consumers.
 Local SDK calculation does not acquire the API server's pool or time budget.
