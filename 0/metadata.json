@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M5GZC4VKDVXEPG96NM28SEJT",
+  "session_id": "01a161e5-3bcb-7d43-9bc4-a01414b2fcca",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-22T04:54:39.99283Z",
+  "branch": "codex/finish-claude-structure",
+  "checkpoints_count": 2,
+  "save_step_count": 2,
+  "files_touched": [],
+  "agent": "Codex",
+  "model": "gpt-6-astra",
+  "turn_id": "06c56ffaa39f",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 484582,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 9880960,
+    "output_tokens": 30573,
+    "api_call_count": 78,
+    "subagent_tokens_complete": true
+  },
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 977,
+      "agent_lines_removed": 10
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 977,
+      "agent_lines_removed": 10
+    }
+  ]
+}
