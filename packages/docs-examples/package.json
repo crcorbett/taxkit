@@ -12,7 +12,6 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@taxkit/api-http": "workspace:*",
     "@taxkit/core": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/sdk": "workspace:*",
@@ -20,6 +19,7 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@taxkit/api-http": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:",
