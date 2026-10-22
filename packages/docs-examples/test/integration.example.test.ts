@@ -29,7 +29,9 @@ it.effect("rejects external input before calculation", () =>
   )('{"taxableIncome":{"_tag":"Money","cents":9000000,"currency":"AUD"}}').pipe(
     Effect.flip,
     Effect.tap((error) =>
-      Effect.sync(() => assert.equal(error._tag, "SchemaError"))
+      Effect.sync(() => {
+        assert.equal(error._tag, "SchemaError");
+      })
     )
   )
 );
