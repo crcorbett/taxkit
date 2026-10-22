@@ -286,7 +286,10 @@ deploy. Use it only for commits that change maintainer documentation alone
 (`docs/`, READMEs, `AGENTS.md`). Public docs under `packages/docs-content` ship
 with the Website and need the deploy. Never use it for a code, workflow,
 package, dependency or Changeset change, or to merge a pull request that
-contains one. Release evidence does not need its own skipped commit; see
+contains one, unless the maintainer explicitly requests a local SDK-only npm
+release under the [local publication procedure](./versioning.md#local-sdk-publication).
+That exception runs the package checks locally and does not deploy the Website
+or API. Release evidence does not need its own skipped commit; see
 [Versioning](./versioning.md#release-evidence).
 
 The owner must create, as in Common Practice, two GitHub environments, each

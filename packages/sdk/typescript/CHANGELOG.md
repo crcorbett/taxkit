@@ -1,5 +1,18 @@
 # @taxkit/sdk
 
+## 2.1.0
+
+### Minor Changes
+
+- 1881ae5: Ship the SDK as one self-contained TaxKit package with root, AU, Effect, Core
+  and HTTP entry points. Include the internal engine, calculators, rules and HTTP
+  contracts in the package instead of requiring separately published TaxKit
+  dependencies. Preserve existing SDK entry points, calculation results and
+  caller-owned lifetimes. Effect remains an external dependency.
+
+  Include the MIT licence and package links. Publish only the SDK; the internal
+  workspace packages remain private and are not installed separately.
+
 ## 2.0.0
 
 ### Major Changes

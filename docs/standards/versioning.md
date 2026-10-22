@@ -44,8 +44,8 @@ Important settings:
   packages remain `private: true`.
 - `privatePackages.tag: true`: release tags can still be created for private
   package versions.
-- `access: "public"`: future npm publication for scoped packages should be
-  public by default once package `private` flags are removed.
+- `access: "public"`: the SDK's npm publication is public. Every other
+  workspace package retains `private: true`.
 - `bumpVersionsWithWorkspaceProtocolOnly: true`: internal dependency ranges are
   only rewritten where workspace protocol is used.
 
@@ -94,5 +94,5 @@ The repeatable procedure is [`../runbooks/versioning.md`](../runbooks/versioning
 - Public docs and specs are versioned too when they affect package behavior,
   API behavior, install guidance, route design or generated documentation.
   Docs-only typo fixes can use an explicit no-changeset rationale.
-- Keep package `private: true` until the package is ready for npm publication.
-  Changesets still manages versions while packages are private.
+- Only `@taxkit/sdk` is enabled for npm publication. Keep all other workspace
+  packages `private: true`; Changesets still manages their internal versions.

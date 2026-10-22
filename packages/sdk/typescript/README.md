@@ -15,10 +15,18 @@ Public TaxKit TypeScript SDK package.
 
 `packages/sdk/typescript` owns the TypeScript SDK facade for
 in-process TaxKit calculations, schema exports and typed module composition.
-The package remains private until npm publication is explicitly authorised.
-It is the sole installable TaxKit distribution: its build assembles the private
+It is the sole TaxKit package configured for public npm installation. Its
+build assembles the private
 modules into one archive, with Effect as its only external runtime dependency.
 Install the SDK archive itself; no other TaxKit archive is required.
+
+```sh
+npm install @taxkit/sdk
+```
+
+Use an ESM-capable TypeScript runtime or a browser bundler. Effect is installed
+as a dependency. Use `@taxkit/sdk/core` for checked money values and engine
+contracts, and `@taxkit/sdk/http` for typed HTTP client contracts.
 
 The package currently exposes typed descriptor composition, an Effect-native
 facade, a plain Promise facade and Australian module helpers for the current
@@ -185,16 +193,16 @@ It also exports SDK-owned safe-result and error schemas such as
 `TaxKitSchemaDecodeError`, `TaxKitUnexpectedError`,
 `TaxKitClientDisposedError` and `TaxKitClientDisposeError`.
 
-## Publication Readiness
+## Publication
 
-The package remains `private: true` until an explicit release approval removes
-that flag. Package-name availability is time-sensitive; recheck it live during
-a future release-prep slice instead of treating earlier registry results as
-current truth.
+Only this SDK is configured for publication; all other workspace packages stay
+private. Publishing still needs the maintainer's explicit request. Follow the
+[local SDK publication procedure](../../../docs/runbooks/versioning.md#local-sdk-publication).
 
-Packed artifacts should include only `dist`, `README.md` and package metadata.
-Do not run `bun run version-packages`, remove `private: true` or publish from this
-package without an explicit release-prep approval.
+Packed artifacts include `dist`, `README.md`, `LICENSE` and package metadata.
+Build and pack with the repository's pinned Bun so the packed Effect dependency
+uses a concrete version. Publish that checked archive with npm; do not publish
+the workspace directory or all workspaces recursively.
 
 ### Downstream validation
 
