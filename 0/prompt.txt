@@ -146,3 +146,27 @@ Can you send that exact handoff message to the Claude session for me? Merge all 
 ---
 
 Is everything cleaned up from branches. worktrees, chats, etc?
+
+---
+
+Yes, clean all of that up. Check the 18 branches before deleting anything, preserve any unmerged work and my changed files, archive completed chats, and get the main project folder onto main.
+
+---
+
+Can you check the preserved unmerged work and my changed files, and tell me if anything still needs to go into main?
+
+---
+
+Then remove the redundant stashes, keep the backup, and confirm everything is clean on main.
+
+---
+
+Can you confirm the live site and API are running the latest main, and that nothing is left to release?
+
+---
+
+Finish the package versioning too. Process the 56 pending changesets, run the checks locally, merge to main and clean up. Keep the packages private and don't use GitHub CI.
+
+---
+
+Finish the package versioning too. Process the 56 pending changesets, run the checks locally, merge to main and clean up. Keep the packages private and don't use GitHub CI.
