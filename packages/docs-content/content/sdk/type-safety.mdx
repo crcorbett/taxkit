@@ -64,8 +64,8 @@ calling the typed SDK. In this example, annual tax facts fail the pay
 calculator's schema check; the valid weekly pay input reaches calculation.
 
 ```ts
-import { au } from "taxkit/au";
 import { Effect, Schema } from "effect";
+import { au } from "taxkit/au";
 
 // Check an external JSON representation before calling a typed calculator.
 export const invalidInput = Schema.decodeEffect(

@@ -26,13 +26,13 @@ choices in [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx).
 ## Example
 
 ```ts
+import { Effect, Option } from "effect";
+import { HttpApiClient } from "effect/http-api";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import { GrossPay } from "taxkit/au";
 import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
 import { audFromCents } from "taxkit/core";
 import { TaxKitApi } from "taxkit/http";
-import { Effect, Option } from "effect";
-import { HttpApiClient } from "effect/http-api";
-import * as FetchHttpClient from "effect/http/FetchHttpClient";
 
 export const calculateTakeHomePay = (baseUrl: URL) =>
   Effect.gen(function* () {
