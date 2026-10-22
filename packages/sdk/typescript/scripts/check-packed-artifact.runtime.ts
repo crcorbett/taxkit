@@ -146,8 +146,7 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
   const smokePackageRootPath = path.join(
     smokeRootPath,
     "node_modules",
-    "@taxkit",
-    "sdk"
+    "taxkit"
   );
   const smokeEntrypointPath = path.join(smokeRootPath, "smoke.mjs");
 
@@ -289,6 +288,10 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
   );
 
   yield* fs.writeFileString(
+    path.join(smokeRootPath, "package.json"),
+    '{"name":"taxkit-packed-artifact-smoke","private":true,"type":"module"}\n'
+  );
+  yield* fs.writeFileString(
     smokeEntrypointPath,
     `import assert from "node:assert/strict";
 import { TaxKit } from "taxkit";
@@ -301,6 +304,7 @@ import * as core from "taxkit/core";
 import * as http from "taxkit/http";
 import { GrossPay, PayRules } from "taxkit/au";
 
+assert.equal(import.meta.resolve("taxkit"), new URL("./node_modules/taxkit/dist/index.js", import.meta.url).href, "imports select the extracted archive");
 assert.equal(typeof TaxKit.calculate, "function", "root SDK import");
 assert.ok(core.Money, "Core entrypoint");
 assert.ok(http.TaxKitApi, "HTTP contract entrypoint");
