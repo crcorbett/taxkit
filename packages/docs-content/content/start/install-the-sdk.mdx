@@ -1,6 +1,6 @@
 ---
 title: "Install the SDK"
-description: "Install the target TypeScript SDK packages and understand the current release status."
+description: "Use one TaxKit package and choose the entry points your application needs."
 status: "published"
 ---
 
@@ -11,18 +11,18 @@ Use the HTTP API instead when the caller cannot import TypeScript packages.
 
 ## Current package status
 
-The SDK is still private until release approval. These commands document the
-target public install shape and match the current workspace package names.
+The SDK is still private until release approval. Run the examples in the
+TaxKit workspace for now. The command below shows the future npm install.
 
-## Install packages
+## Install the package
 
 ```sh
-bun add @taxkit/sdk @taxkit/core
+bun add @taxkit/sdk
 ```
 
-Use `@taxkit/core` for canonical branded values such as `aud`. Use
-`@taxkit/sdk` for calculation descriptors, the plain facade, safe facade,
-Effect facade and schema re-exports.
+All TaxKit entry points come from `@taxkit/sdk`. Effect is its only external
+runtime dependency and your package manager installs it automatically. Use
+`@taxkit/sdk/core` for checked money values such as `aud`.
 
 ## Choose an entrypoint
 
@@ -31,12 +31,17 @@ Effect facade and schema re-exports.
 | `@taxkit/sdk`         | You want `TaxKit.calculate` or `TaxKit.safe.calculate`.                |
 | `@taxkit/sdk/au`      | You want Australian helper methods such as `au.incomeTax.annual`.      |
 | `@taxkit/sdk/effect`  | You want Effect programs, service requirements and full run responses. |
+| `@taxkit/sdk/core`    | You want money values, engine services or calculator contracts.        |
+| `@taxkit/sdk/http`    | You want typed HTTP contracts for Effect's generated API client.       |
 | `@taxkit/sdk/schemas` | You want canonical calculator run schemas and SDK error schemas.       |
+
+The existing `/au/effect`, `/schemas` and `/testing` paths remain available.
+These are paths inside one package; you do not install them separately.
 
 ## Verify an import
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 

@@ -13,6 +13,11 @@ Run this when `@taxkit/sdk` exports, packed files or supported dependencies
 change. It packs the SDK locally and installs it in a fresh consumer; it does
 not touch npm.
 
+The SDK archive includes its private TaxKit modules. Only Effect remains an
+external runtime dependency; the consumer installs no other TaxKit archive.
+The main paths are the root, `/au`, `/effect`, `/core` and `/http`. Existing
+`/au/effect`, `/schemas` and `/testing` paths remain available.
+
 1. `bun run sdk:check-packed-artifact` builds the SDK, packs it and checks the
    declared files and export paths in the tarball.
 2. `bun run sdk:validate-downstream` installs that tarball in a temporary

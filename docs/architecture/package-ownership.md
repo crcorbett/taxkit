@@ -100,11 +100,12 @@ modules.
 publication. It owns browser-safe schemas, typed calculation facades,
 Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
 packed-artifact checks. Its strict downstream validator may orchestrate the
-nine-package release closure and materialize package-declared publication
-exports in temporary tarballs, but package manifests and exports remain owned
-by their packages. It must not depend on `@taxkit/api-http`; HTTP
-transports call the calculator service directly; the SDK is a test-only
-comparison dependency of the HTTP package. Its Effect entrypoint owns
+single SDK archive and verify its imports in a fresh project, but package
+manifests and exports remain owned by their packages. The distribution includes
+the canonical HTTP contracts through an isolated `/http` entry; calculation
+facades do not import it. HTTP transports call the
+calculator service directly. SDK-owned tests compare the transport and facade
+without a reverse HTTP-to-SDK dependency. Its Effect entrypoint owns
 request-preserving calculator helpers such as `calculateRunRequest`,
 `calculateReportRequest` and `calculateReport`, while reusing
 calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.

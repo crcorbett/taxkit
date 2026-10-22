@@ -40,7 +40,7 @@ means a missing key, `Some(None)` means a present undefined key and
 fields; the codec handles this conversion.
 
 ```ts
-import { audFromCents } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/sdk/core";
 import { calculateRunRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 import { Effect, Option } from "effect";
@@ -65,7 +65,7 @@ Use `calculateReportRequest` when you have a full request payload but only need
 the report.
 
 ```ts
-import { audFromCents } from "@taxkit/core/primitives";
+import { audFromCents } from "@taxkit/sdk/core";
 import { calculateReportRequest } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 import { Effect, Option } from "effect";
@@ -87,7 +87,7 @@ const effect = Effect.gen(function* () {
 Use `calculateReport` when you already have descriptor-typed facts:
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
 
@@ -99,7 +99,7 @@ const effect = calculateReport(AuAnnualIncomeTaxCalculation, {
 ## Use an Effect client
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { createClient } from "@taxkit/sdk/effect";
 import {
   AuIncomeTax2025_26Module,

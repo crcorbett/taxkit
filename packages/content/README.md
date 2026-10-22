@@ -63,9 +63,9 @@ All repository exports select source under the `source` condition and compiled
 JavaScript/declarations otherwise. The proposed publish exports omit test
 subpaths and source conditions. The package remains private; a proposed publish
 manifest does not establish a packed or published consumer. The HTTP package
-now depends on these compiled contracts, so the local downstream check includes
-this package in its ten-artifact closure and fixed version group. That check
-still does not authorise registry publication.
+depends on these compiled contracts, and the SDK build includes them in its
+single archive. The local downstream check installs that SDK archive without a
+separate content package. That check does not authorise registry publication.
 
 ## Documentation impact
 

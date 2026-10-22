@@ -9,12 +9,15 @@ review_trigger: Changesets configuration, package graph, release train or releas
 
 # Versioning
 
-TaxKit uses [Changesets](https://github.com/changesets/changesets). The fixed
-group in `.changeset/config.json` versions the public packages together; see
+TaxKit uses [Changesets](https://github.com/changesets/changesets). `@taxkit/sdk`
+owns the single installable package; the other workspace packages remain
+private implementation owners. See
 the [versioning standard](../standards/versioning.md) for semver rules.
 
 1. Add a Changeset with `bun run changeset` in the same change as any public
-   package contract change. Private apps and tools do not need one.
+   package contract change. For changes to modules included in the SDK archive,
+   name `@taxkit/sdk` in the Changeset. Private apps and internal tools do not
+   need one.
 2. Check the pending release with `bun run changeset:status`.
 3. When preparing a release, run `bun run version-packages`, review the
    manifest and changelog diff, then run `bun run release:check`.

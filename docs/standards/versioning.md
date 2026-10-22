@@ -17,24 +17,15 @@ changelog for humans reading the repository as one product.
 
 ## Release Train Policy
 
-The ten release-artifact packages share one fixed version group:
+`@taxkit/sdk` owns the installable TaxKit distribution and its public version.
+Its archive contains the compiled engine, calculators, Australian rules and
+HTTP contracts behind explicit SDK entry points. Internal workspace packages
+remain private source owners; they are not separate publication requirements.
 
-- `@taxkit/core`
-- `@taxkit/api-http`
-- `@taxkit/content`
-- `@taxkit/calculators`
-- `@taxkit/rules-au-income-tax`
-- `@taxkit/rules-au-pay`
-- `@taxkit/rules-au-stsl`
-- `@taxkit/sdk`
-- `@taxkit/testing`
-- `@taxkit/tsconfig`
-
-When any package in this group is released, every package in the group receives
-the same version. This follows the Effect-style release train model: packages
-are tested, documented, and consumed as one compatible set.
-Other versioned private packages, including source-only infrastructure, use
-their own Changesets. Their versions are outside that fixed group.
+Add a Changeset for `@taxkit/sdk` when any included module changes the public
+API, calculation behaviour or distributed files. Use the highest required bump
+for the combined public contract. Internal-only tools and app changes retain
+their own ownership and do not force an SDK release.
 
 Apps are not part of the package release train and do not have independently
 managed npm package versions. Public apps can still maintain app-level
@@ -47,8 +38,8 @@ The repository config lives in `.changeset/config.json`.
 
 Important settings:
 
-- `fixed`: keeps the ten release-artifact `@taxkit/*` packages on the same
-  version.
+- `fixed: []`: the SDK is the single public version owner; internal workspace
+  packages are not a fixed public release group.
 - `privatePackages.version: true`: package versions are managed even while
   packages remain `private: true`.
 - `privatePackages.tag: true`: release tags can still be created for private
@@ -84,7 +75,7 @@ The repeatable procedure is [`../runbooks/versioning.md`](../runbooks/versioning
 
 - Every package-facing API, behavior, tooling or public documentation change
   needs a changeset.
-- Use the highest required semver bump across the release train.
+- Use the highest required semver bump across the combined SDK contract.
 - Keep changeset summaries user-facing; describe the public effect of the
   change, not the implementation mechanics only.
 - Do not manually edit package versions during normal work. Let

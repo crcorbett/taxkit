@@ -104,53 +104,8 @@ const ConsumerPackageManifest = Schema.Struct({
 const packageClosure = [
   {
     build: true,
-    packageName: "@taxkit/core",
-    relativeRoot: "packages/core",
-  },
-  {
-    build: true,
-    packageName: "@taxkit/content",
-    relativeRoot: "packages/content",
-  },
-  {
-    build: true,
-    packageName: "@taxkit/rules-au-income-tax",
-    relativeRoot: "packages/rules/au/income-tax",
-  },
-  {
-    build: true,
-    packageName: "@taxkit/rules-au-pay",
-    relativeRoot: "packages/rules/au/pay",
-  },
-  {
-    build: true,
-    packageName: "@taxkit/rules-au-stsl",
-    relativeRoot: "packages/rules/au/stsl",
-  },
-  {
-    build: true,
-    packageName: "@taxkit/calculators",
-    relativeRoot: "packages/calculators",
-  },
-  {
-    build: true,
     packageName: "@taxkit/sdk",
     relativeRoot: "packages/sdk/typescript",
-  },
-  {
-    build: true,
-    packageName: "@taxkit/api-http",
-    relativeRoot: "packages/api/http",
-  },
-  {
-    build: true,
-    packageName: "@taxkit/testing",
-    relativeRoot: "packages/testing",
-  },
-  {
-    build: false,
-    packageName: "@taxkit/tsconfig",
-    relativeRoot: "packages/tsconfig",
   },
 ] satisfies readonly PackageClosureItem[];
 
@@ -465,21 +420,21 @@ const writeConsumerFiles = (
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/typecheck.ts"),
-          `import * as MetadataSchemas from "@taxkit/calculators/schemas";
-import { CalculationError } from "@taxkit/core/errors";
-import { listCalculatorCatalogEntries } from "@taxkit/calculators/catalog";
-import type { CalculatorCatalogEntry } from "@taxkit/calculators/catalog";
-import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/request-boundary";
-import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
-import type { LedgerComponent, LedgerComponentEncoded } from "@taxkit/core/ledger";
-import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
-import type { TraceNodeEncoded } from "@taxkit/core/trace";
+          `import { CalculatorSchemas as MetadataSchemas } from "@taxkit/sdk/core";
+import { CalculationError } from "@taxkit/sdk/core";
+import { listCalculatorCatalogEntries } from "@taxkit/sdk/core";
+import type { CalculatorCatalogEntry } from "@taxkit/sdk/core";
+import { CalculatorRequestBodyPolicy, CalculatorRequestBodyTooLarge, CalculatorRequestBodyErrorEnvelope } from "@taxkit/sdk/http";
+import { PublicCalculatorServiceBounded } from "@taxkit/sdk/core";
+import type { LedgerComponent, LedgerComponentEncoded } from "@taxkit/sdk/core";
+import { RuleId, SourceRef, TraceNode } from "@taxkit/sdk/core";
+import type { TraceNodeEncoded } from "@taxkit/sdk/core";
 import type { CalculationInput } from "@taxkit/sdk";
 import { Context, Layer, Option, Schema } from "effect";
 import { Effect } from "effect";
-import { makeFactDescriptor } from "@taxkit/core/facts";
-import { makeRuleDescriptor } from "@taxkit/core/rules";
-import { makeParameterDescriptor } from "@taxkit/core/parameters";
+import { makeFactDescriptor } from "@taxkit/sdk/core";
+import { makeRuleDescriptor } from "@taxkit/sdk/core";
+import { makeParameterDescriptor } from "@taxkit/sdk/core";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { au } from "@taxkit/sdk/au";
@@ -496,8 +451,8 @@ import {
   TaxKitSuccess,
 } from "@taxkit/sdk/schemas";
 import { AuPayTakeHomeCalculation } from "@taxkit/sdk/testing";
-import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/core/primitives";
-import { GrossPay } from "@taxkit/rules-au-pay";
+import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/sdk/core";
+import { GrossPay } from "@taxkit/sdk/au";
 
 const takeHomeFacts: CalculationInput<typeof au.calculations.takeHomePay> = {
   grossPay: new GrossPay({
@@ -650,23 +605,23 @@ au.pay.takeHomePay({
         ),
         fs.writeFileString(
           path.join(workspacePath, "src/runtime.ts"),
-          `import { CalculatorRequestBodyErrorEnvelope, CalculatorRequestBodyTooLarge, CalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundary";
-import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@taxkit/calculators/work";
-import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
-import { PublicCalculatorService } from "@taxkit/calculators/service";
-import * as MetadataSchemas from "@taxkit/calculators/schemas";
-import { CalculationError } from "@taxkit/core/errors";
-import { listCalculatorCatalogEntries } from "@taxkit/calculators/catalog";
-import { CalculationEngineLive } from "@taxkit/core";
-import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/core/primitives";
-import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { FactQuestion, FactQuestionId } from "@taxkit/core/facts";
-import { RuleId, SourceArtifact, SourceRef, TraceNode } from "@taxkit/core/trace";
-import { GrossPay } from "@taxkit/rules-au-pay";
+          `import { CalculatorRequestBodyErrorEnvelope, CalculatorRequestBodyTooLarge, CalculatorRequestBodyLimit } from "@taxkit/sdk/http";
+import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "@taxkit/sdk/core";
+import { PublicCalculatorServiceLive } from "@taxkit/sdk/core";
+import { PublicCalculatorService } from "@taxkit/sdk/core";
+import { CalculatorSchemas as MetadataSchemas } from "@taxkit/sdk/core";
+import { CalculationError } from "@taxkit/sdk/core";
+import { listCalculatorCatalogEntries } from "@taxkit/sdk/core";
+import { CalculationEngineLive } from "@taxkit/sdk/core";
+import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "@taxkit/sdk/core";
+import { ComponentId, LedgerComponent } from "@taxkit/sdk/core";
+import { FactQuestion, FactQuestionId } from "@taxkit/sdk/core";
+import { RuleId, SourceArtifact, SourceRef, TraceNode } from "@taxkit/sdk/core";
+import { GrossPay } from "@taxkit/sdk/au";
 import { CryptoHasher } from "bun";
-import { AtoIncomeTaxTable, AtoIncomeTax_2025_26_Live, AtoIncomeTaxTableDescriptor, IncomeTaxTable, IncomeTaxArtifact2025_26, AtoLitoTable, AtoLito_2025_26_Live, AtoLitoTableDescriptor, LitoTable, LitoArtifact2025_26, AtoMedicareLevyTable, AtoMedicareLevy_2025_26_Live, AtoMedicareLevyTableDescriptor, MedicareLevyTable, MedicareLevyArtifact2025_26 } from "@taxkit/rules-au-income-tax/parameters";
-import { AtoSchedule1Table, AtoSchedule1_2025_26_Live, AtoSchedule1TableDescriptor, Schedule1Table, Schedule1Artifact2025_26 } from "@taxkit/rules-au-pay/parameters";
-import { AtoStslTable, AtoStsl_2025_26_Live, AtoStslTableDescriptor, StslTable, StslArtifact2025_26 } from "@taxkit/rules-au-stsl/parameters";
+import { AtoIncomeTaxTable, AtoIncomeTax_2025_26_Live, AtoIncomeTaxTableDescriptor, IncomeTaxTable, IncomeTaxArtifact2025_26, AtoLitoTable, AtoLito_2025_26_Live, AtoLitoTableDescriptor, LitoTable, LitoArtifact2025_26, AtoMedicareLevyTable, AtoMedicareLevy_2025_26_Live, AtoMedicareLevyTableDescriptor, MedicareLevyTable, MedicareLevyArtifact2025_26 } from "@taxkit/sdk/au";
+import { AtoSchedule1Table, AtoSchedule1_2025_26_Live, AtoSchedule1TableDescriptor, Schedule1Table, Schedule1Artifact2025_26 } from "@taxkit/sdk/au";
+import { AtoStslTable, AtoStsl_2025_26_Live, AtoStslTableDescriptor, StslTable, StslArtifact2025_26 } from "@taxkit/sdk/au";
 import { Array as EffectArray, Effect, Layer, Option, Record, Result, Schema } from "effect";
 import { TaxKit, TaxKitCalculationError } from "@taxkit/sdk";
 import { calculateReport } from "@taxkit/sdk/effect";
@@ -2340,11 +2295,17 @@ console.log("Downstream SDK runtime examples passed, including three caller-owne
           `import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 import { CalculatorRunRequest } from "@taxkit/sdk/schemas";
+import { Money } from "@taxkit/sdk/core";
+import { TaxKitApi } from "@taxkit/sdk/http";
+import { calculateReport } from "@taxkit/sdk/effect";
 
 export const browserSafeEntrypoints = {
   root: typeof TaxKit.calculate === "function",
   au: typeof au.pay.takeHomePay === "function",
   schemas: Boolean(CalculatorRunRequest),
+  core: Boolean(Money),
+  http: Boolean(TaxKitApi),
+  effect: typeof calculateReport === "function",
 } as const;
 `
         ),
@@ -2663,7 +2624,7 @@ export const checkDownstreamConsumer = Effect.gen(
         runCommand(
           `build ${packageItem.packageName}`,
           "bun",
-          ["run", "--filter", packageItem.packageName, "build"],
+          ["run", "build", `--filter=${packageItem.packageName}`],
           repoRootPath
         ),
       { concurrency: 1 }
@@ -2806,7 +2767,7 @@ export const checkDownstreamConsumer = Effect.gen(
       devDiagnostics,
       installResult: "passed: bun install",
       installStrategy:
-        "packed dependency closure installed through local file: references",
+        "single SDK archive installed through a local file: reference",
       packedArtifacts: EffectArray.map(
         packedPackages,
         (packedPackage) =>

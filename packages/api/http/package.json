@@ -130,8 +130,6 @@
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
     "@taxkit/rules-au-pay": "workspace:*",
-    "@taxkit/sdk": "workspace:*",
-    "@taxkit/testing": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

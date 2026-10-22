@@ -91,17 +91,16 @@ export const checkSdkImportBoundaries = (sdkRoot: string) =>
         )
       );
     const metadataFailures = Array.appendAll(
-      Array.flatMap(blockedHttpApiPackageNames, (packageName) =>
-        Array.some(Record.values(sdkManifest), (section) =>
-          section.pipe(
-            Option.flatMap((dependencies) =>
-              Record.get(dependencies, packageName)
+      sdkManifest.dependencies.pipe(
+        Option.match({
+          onNone: () => [],
+          onSome: (dependencies) =>
+            Array.flatMap(Record.keys(dependencies), (name) =>
+              name.startsWith("@taxkit/")
+                ? [`SDK runtime metadata must not depend on ${name}.`]
+                : []
             ),
-            Option.isSome
-          )
-        )
-          ? [`SDK package metadata must not depend on ${packageName}.`]
-          : []
+        })
       ),
       Array.some(Record.values(httpManifest), (section) =>
         section.pipe(
@@ -111,10 +110,8 @@ export const checkSdkImportBoundaries = (sdkRoot: string) =>
           Option.isSome
         )
       )
-        ? []
-        : [
-            "HTTP API package metadata must depend on @taxkit/sdk for the transport integration direction.",
-          ]
+        ? ["HTTP must not depend on the SDK assembly, including through tests."]
+        : []
     );
     const sourceFailures = yield* Effect.forEach(
       blockedHttpApiPackageNames,
@@ -123,7 +120,16 @@ export const checkSdkImportBoundaries = (sdkRoot: string) =>
           .exitCode(
             ChildProcess.make(
               "rg",
-              ["-q", "--fixed-strings", packageName, path.join(sdkRoot, "src")],
+              [
+                "-q",
+                "--glob",
+                "!http.ts",
+                "--glob",
+                "!http-parity.test.ts",
+                "--fixed-strings",
+                packageName,
+                path.join(sdkRoot, "src"),
+              ],
               {
                 forceKillAfter: "2 seconds",
                 stderr: "ignore",
@@ -158,7 +164,13 @@ export const checkSdkImportBoundaries = (sdkRoot: string) =>
             )
           )
     );
-    const entrypoints = ["index.ts", "au.ts", "schemas/index.ts"] as const;
+    const entrypoints = [
+      "index.ts",
+      "au.ts",
+      "schemas/index.ts",
+      "core.ts",
+      "http.ts",
+    ] as const;
     const entrypointFailures = yield* Effect.forEach(
       entrypoints,
       (entrypoint) =>

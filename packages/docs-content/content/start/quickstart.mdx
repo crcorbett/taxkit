@@ -19,15 +19,16 @@ private until release approval, so run this from the TaxKit workspace for now.
 The intended public install shape is:
 
 ```sh
-bun add @taxkit/sdk @taxkit/core
+bun add @taxkit/sdk
 ```
 
-Inside this repository, the workspace provides those packages already.
+Inside this repository, the workspace already provides the SDK. All TaxKit
+imports below come from that one package.
 
 ## Run a calculation
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
@@ -55,7 +56,7 @@ console.log(report.rawLiability.cents);
 Use the safe facade when you want a typed result instead of a rejected Promise:
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 

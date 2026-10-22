@@ -52,10 +52,9 @@ bun run verification
 
 ## Packaging
 
-The tarball contains `base.json`, this README and package metadata. Workspace
-and publication exports both expose `./base` and `./package`; the SDK-owned
-strict downstream gate validates the actual Bun tarball with the rest of the
-release closure.
+The internal package contains `base.json`, this README and package metadata.
+Its export maps expose `./base` and `./package`. It remains private and is only
+used to build repository packages; SDK consumers do not install it.
 
 ## Guardrails
 

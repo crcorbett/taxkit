@@ -1,4 +1,4 @@
-import { CalculatorApiErrorEnvelope } from "@taxkit/api-http";
+import { CalculatorApiErrorEnvelope } from "@taxkit/sdk/http";
 import { Effect, Schema } from "effect";
 import type { HttpClientResponse } from "effect/http/HttpClientResponse";
 

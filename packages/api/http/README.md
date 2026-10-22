@@ -62,7 +62,7 @@ The HTTP Calculate route supplies its checked route ID, body and query to the
 same named `calculate` operation used by native RPC. Expected service failures
 keep the existing HTTP envelope. The status declarations below describe the
 additional request and operation protections.
-The SDK is a test-only comparison dependency, rather than a server dependency.
+The SDK owns the HTTP comparison tests; this package does not depend on it.
 
 `@taxkit/api-http/server` exports `TaxKitApiRoutesLayer` for application-owned
 service and CORS composition. It also retains `TaxKitServerLayer` with the
@@ -104,7 +104,7 @@ API host
 ```ts
 Tests: in-process HTTP client
 
-HTTP API tests
+SDK HTTP comparison tests
   -> HttpApiClient.make(TaxKitApi) over TaxKitApiInProcessLive
     -> CalculatorApiHandlerLive
       -> PublicCalculatorServiceLive
@@ -299,8 +299,8 @@ For an intentional OpenAPI contract change:
 
 ## Route fixtures and live smoke
 
-The package test suite owns route contract fixtures for the current public
-surface. `__tests__/public-calculation-api.test.ts` covers:
+The SDK's `src/http-parity.test.ts` owns the comparison of the HTTP and SDK
+surfaces, keeping this package independent of the assembled SDK. It covers:
 
 - `GET /api/health`
 - `GET /api/v1/calculators`
@@ -361,8 +361,9 @@ For an intentional public API contract change:
 
 The TypeScript build removes `dist` before compiling. Workspace exports retain
 `source` conditions, while `publishConfig.exports` and `files` define the
-dist-only package surface. The SDK-owned strict downstream gate installs the
-actual API tarball and imports all JavaScript public entrypoints.
+dist-only internal package surface. The SDK build includes this package's
+compiled modules in its single archive. The SDK-owned downstream check installs
+that archive and checks its `/http` contracts and all public entry points.
 
 ## Guardrails
 
@@ -373,8 +374,8 @@ actual API tarball and imports all JavaScript public entrypoints.
   `@taxkit/calculators`.
 - Keep calculate facts imported from `@taxkit/calculators` so OpenAPI and
   typed clients reflect canonical rule-owned fact shapes.
-- Keep calculation execution in `PublicCalculatorService`; the SDK is only a
-  test comparison.
+- Keep calculation execution in `PublicCalculatorService`; the SDK owns the
+  HTTP comparison tests so this package never depends on it.
 - Keep metadata responses derived from canonical fact descriptors, rule
   descriptors, source refs, parameter periods and graph diagnostics from the
   owning engine and rule packages.
@@ -403,8 +404,9 @@ already checks `Schema.Int`, which accepts only JavaScript safe integers.
 Effect 4.0.4 makes those existing bounds explicit in the generated metadata;
 request/response decoding and accepted money values retain that contract.
 The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
-Both test files are checked by `tsconfig.test.json` in `check-types`, including
-canonical branded identities and explicit Match narrowing of report/error unions.
+The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
+`check-types` covers the HTTP comparison test. Both retain canonical branded
+identities and explicit Match narrowing of report/error unions.
 
 The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
 across HTTP and RPC, including individual batch messages, with a five-second
