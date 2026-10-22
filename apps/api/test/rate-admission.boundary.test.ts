@@ -59,6 +59,7 @@ const settings = ConfigProvider.fromUnknown({
   TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
   TAXKIT_WEBSITE_FORWARDING_KEY: forwardingCredential,
   TAXKIT_WEBSITE_FORWARDING_PREVIOUS_KEY: previousCredential,
+  WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
 
 describe("shared native host calculation admission", () => {
@@ -113,6 +114,7 @@ describe("shared native host calculation admission", () => {
             API_PUBLIC_ORIGIN: origin,
             CALCULATOR_HOST_MODE: mode,
             TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
+            WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
           })
         ),
         Effect.scoped

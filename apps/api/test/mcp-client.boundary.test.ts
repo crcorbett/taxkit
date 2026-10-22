@@ -81,7 +81,8 @@ class McpClientProbeFailed extends Schema.TaggedError<McpClientProbeFailed>()(
 
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
-  TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
+  TAXKIT_PUBLICATION_ORIGIN: "https://publication.example.com",
+  WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
 
 // Each request writes one checked fixed-field record; anything else is a
@@ -175,6 +176,7 @@ describe("real MCP client against the native API application", () => {
 
   it.effect.each([
     { admitted: true, origin: "https://website.example.com" },
+    { admitted: false, origin: "https://publication.example.com" },
     { admitted: false, origin: "https://website.example.com.evil.test" },
     { admitted: false, origin: "https://website.example.com/" },
     { admitted: false, origin: "null" },

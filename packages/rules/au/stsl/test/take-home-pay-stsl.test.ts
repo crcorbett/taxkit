@@ -8,7 +8,6 @@ import {
   NetPayRuleId,
   PaygWithholdingComponentId,
   PaygWithholdingRuleId,
-  PayWithholdingsLedgerRuleId,
   SalarySacrifice,
   SalarySacrificeFact,
   TaxFreeThresholdClaimed,
@@ -23,6 +22,7 @@ import {
   StslComponentRuleId,
   StslDebt,
   StslDebtFact,
+  PayWithholdingsLedgerWithStslRuleId,
 } from "@taxkit/rules-au-stsl";
 import { expectAt } from "@taxkit/testing";
 import { Array as EffectArray, Effect, Layer, Schema } from "effect";
@@ -46,7 +46,11 @@ const sacrifice300 = new SalarySacrifice({
 const stslEnabled = new StslDebt({ enabled: true });
 const stslDisabled = new StslDebt({ enabled: false });
 
-const stslScenario = (grossPay: GrossPay, stslDebt: StslDebt) =>
+const stslScenario = (
+  grossPay: GrossPay,
+  stslDebt: StslDebt,
+  taxFreeThresholdClaimed = true
+) =>
   CalculateTakeHomePay.pipe(
     Effect.provide(
       AuTakeHomePayWithStsl2025_26_Live.pipe(
@@ -54,7 +58,7 @@ const stslScenario = (grossPay: GrossPay, stslDebt: StslDebt) =>
           Layer.mergeAll(
             Layer.succeed(GrossPayFact)(grossPay),
             Layer.succeed(TaxFreeThresholdClaimedFact)(
-              new TaxFreeThresholdClaimed({ value: true })
+              new TaxFreeThresholdClaimed({ value: taxFreeThresholdClaimed })
             ),
             Layer.succeed(StslDebtFact)(stslDebt)
           )
@@ -106,6 +110,67 @@ const sacrificeOnlyScenario = (
   );
 
 describe("AU take-home pay with STSL", () => {
+  it.effect.each([
+    { gross: 559_432, tax: 0 },
+    { gross: 559_433, tax: 400 },
+    { gross: 559_434, tax: 400 },
+  ])(
+    "applies the Schedule 8 monthly 33-cent adjustment for $gross",
+    ({ gross, tax }) =>
+      Effect.gen(function* () {
+        const report = yield* stslScenario(
+          new GrossPay({
+            amount: new Money({ cents: Cents.make(gross), currency: "AUD" }),
+            period: "monthly",
+          }),
+          stslEnabled
+        );
+        expect(expectAt(report.withholdings.components, 1).amount.cents).toBe(
+          tax
+        );
+      })
+  );
+  it.effect("matches Schedule 8 example 3 without the tax-free threshold", () =>
+    Effect.gen(function* () {
+      const report = yield* stslScenario(
+        new GrossPay({
+          amount: new Money({ cents: Cents.make(1_062_788), currency: "AUD" }),
+          period: "monthly",
+        }),
+        stslEnabled,
+        false
+      );
+      expect(expectAt(report.withholdings.components, 1).amount.cents).toBe(
+        101_800
+      );
+    })
+  );
+
+  it.effect.each([
+    { gross: 93_700, tax: 0 },
+    { gross: 93_800, tax: 0 },
+    { gross: 94_100, tax: 100 },
+    { gross: 100_000, tax: 900 },
+    { gross: 205_200, tax: 16_700 },
+    { gross: 205_300, tax: 16_700 },
+    { gross: 259_600, tax: 26_000 },
+    { gross: 259_700, tax: 26_000 },
+  ])("uses the no-threshold table for $gross weekly cents", ({ gross, tax }) =>
+    Effect.gen(function* () {
+      const report = yield* stslScenario(
+        new GrossPay({
+          amount: new Money({ cents: Cents.make(gross), currency: "AUD" }),
+          period: "weekly",
+        }),
+        stslEnabled,
+        false
+      );
+      expect(expectAt(report.withholdings.components, 1).amount.cents).toBe(
+        tax
+      );
+    })
+  );
+
   it.effect("STSL active: PAYG + STSL both contribute", () =>
     Effect.gen(function* () {
       // $1500/week: PAYG = 304, STSL = round(0.15*1500.99 - 193.2692) = 32
@@ -198,7 +263,7 @@ describe("AU take-home pay with STSL", () => {
 
       expect(report.trace.ruleId).toBe(NetPayRuleId);
       const ledgerTrace = expectAt(report.trace.children, 0);
-      expect(ledgerTrace.ruleId).toBe(PayWithholdingsLedgerRuleId);
+      expect(ledgerTrace.ruleId).toBe(PayWithholdingsLedgerWithStslRuleId);
       expect(ledgerTrace.children.length).toBe(2);
       expect(expectAt(ledgerTrace.children, 0).ruleId).toBe(
         PaygWithholdingRuleId

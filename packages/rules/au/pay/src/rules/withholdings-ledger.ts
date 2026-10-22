@@ -32,12 +32,14 @@ export const PayWithholdingsLedgerRuleId = RuleId.make(
  *
  * @param components - Withholding ledger components to aggregate.
  * @param period - Pay period attached to the resulting ledger.
+ * @param ruleId - Owning aggregator's identity, defaulting to the PAYG-only rule.
  * @returns A derived pay-period withholding ledger.
  * @since 0.1.0
  */
 export const buildPayWithholdingsLedger = (
   components: readonly LedgerComponent[],
-  period: PayPeriod
+  period: PayPeriod,
+  ruleId: RuleId = PayWithholdingsLedgerRuleId
 ): Effect.Effect<PayWithholdingsLedger, CalculationError> =>
   Effect.gen(function* () {
     const total = yield* sumLedgerComponents(components);
@@ -56,7 +58,7 @@ export const buildPayWithholdingsLedger = (
         componentIds: EffectArray.map(components, (c) => c.id),
       },
       result: total.cents,
-      ruleId: PayWithholdingsLedgerRuleId,
+      ruleId,
       sources: [],
       title: "Pay-withholdings ledger (sum of active components)",
     });

@@ -5,7 +5,7 @@ import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import {
-  payPeriodToWeeklyFactor,
+  payPeriodToWeeklyCents,
   TaxFreeThresholdClaimedFact,
   TaxablePayFact,
   scaleWeeklyWithholdingToPayPeriodDollars,
@@ -75,8 +75,10 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     const tftClaimed = yield* TaxFreeThresholdClaimedFact;
     const table = yield* AtoSchedule1Table;
 
-    const weeklyFactor = payPeriodToWeeklyFactor(taxable.period);
-    const weeklyCents = taxable.amount.cents * weeklyFactor;
+    const weeklyCents = payPeriodToWeeklyCents(
+      taxable.amount.cents,
+      taxable.period
+    );
     const weeklyFormulaCents = Math.floor(weeklyCents / 100) * 100 + 99;
     const scale = tftClaimed.value ? "scale2" : "scale1";
     const row = yield* findRow(table, scale, weeklyFormulaCents);

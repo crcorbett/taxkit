@@ -81,50 +81,64 @@ describe("AU STSL rule graph", () => {
       Effect.gen(function* () {
         expect(yield* rulePackSnapshot(AuStslRuleDescriptors))
           .toMatchInlineSnapshot(`
-      [
-        {
-          "id": "taxkit/rules-au-stsl/rule/StslComponent",
-          "parameters": [
-            {
-              "effectivePeriod": {
-                "from": "2025-09-24",
-                "toExclusive": "2026-07-01",
+            [
+              {
+                "id": "taxkit/rules-au-stsl/rule/StslComponent",
+                "parameters": [
+                  {
+                    "effectivePeriod": {
+                      "from": "2025-09-24",
+                      "toExclusive": "2026-07-01",
+                    },
+                    "id": "taxkit/rules-au-stsl/parameter/AtoStslTable",
+                    "source": "ato-publication",
+                    "sourceArtifact": {
+                      "checksum": "sha256:59f5c35e2b9c4a05a5c50bdf3d3993e167a57fa11a0d9fd95f0fb7cc9e884f82",
+                      "retrievedOn": "2026-05-12",
+                      "rowCount": 4,
+                    },
+                  },
+                  {
+                    "effectivePeriod": {
+                      "from": "2025-09-24",
+                      "toExclusive": "2026-07-01",
+                    },
+                    "id": "taxkit/rules-au-stsl/parameter/AtoStslNoThresholdTable",
+                    "source": "ato-publication",
+                    "sourceArtifact": {
+                      "checksum": "sha256:d8881e3f6deb022166ff371ebc61349486c89e31a72e92dc4fa1e149202e1426",
+                      "retrievedOn": "2026-10-22",
+                      "rowCount": 4,
+                    },
+                  },
+                ],
+                "provides": [
+                  "taxkit/rules-au-stsl/fact/StslComponent",
+                ],
+                "requires": [
+                  "taxkit/rules-au-pay/fact/TaxablePay",
+                  "taxkit/rules-au-stsl/fact/StslDebt",
+                  "taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed",
+                ],
+                "sources": [
+                  "ato-publication",
+                ],
               },
-              "id": "taxkit/rules-au-stsl/parameter/AtoStslTable",
-              "source": "ato-publication",
-              "sourceArtifact": {
-                "checksum": "sha256:59f5c35e2b9c4a05a5c50bdf3d3993e167a57fa11a0d9fd95f0fb7cc9e884f82",
-                "retrievedOn": "2026-05-12",
-                "rowCount": 4,
+              {
+                "id": "taxkit/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl",
+                "parameters": [],
+                "provides": [
+                  "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
+                ],
+                "requires": [
+                  "taxkit/rules-au-pay/fact/GrossPay",
+                  "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
+                  "taxkit/rules-au-stsl/fact/StslComponent",
+                ],
+                "sources": [],
               },
-            },
-          ],
-          "provides": [
-            "taxkit/rules-au-stsl/fact/StslComponent",
-          ],
-          "requires": [
-            "taxkit/rules-au-pay/fact/TaxablePay",
-            "taxkit/rules-au-stsl/fact/StslDebt",
-          ],
-          "sources": [
-            "ato-publication",
-          ],
-        },
-        {
-          "id": "taxkit/rules-au-stsl/rule/PayWithholdingsLedgerWithStsl",
-          "parameters": [],
-          "provides": [
-            "taxkit/rules-au-pay/fact/PayWithholdingsLedger",
-          ],
-          "requires": [
-            "taxkit/rules-au-pay/fact/GrossPay",
-            "taxkit/rules-au-pay/fact/PaygWithholdingComponent",
-            "taxkit/rules-au-stsl/fact/StslComponent",
-          ],
-          "sources": [],
-        },
-      ]
-    `);
+            ]
+          `);
       })
   );
 });

@@ -4,11 +4,13 @@ import {
   PayWithholdingsLedgerDescriptor,
   PaygWithholdingComponentDescriptor,
   TaxablePayDescriptor,
+  TaxFreeThresholdClaimedDescriptor,
 } from "@taxkit/rules-au-pay/facts";
 
 import { StslComponentDescriptor, StslDebtDescriptor } from "../facts/stsl.js";
 import {
   AtoStslTableDescriptor,
+  AtoStslNoThresholdTableDescriptor,
   StslSource2025_26,
 } from "../parameters/stsl-table.js";
 import {
@@ -28,9 +30,13 @@ import {
 export const StslComponentRuleDescriptor = makeRuleDescriptor({
   id: StslComponentRuleId,
   layer: StslComponentLive,
-  parameters: [AtoStslTableDescriptor],
+  parameters: [AtoStslTableDescriptor, AtoStslNoThresholdTableDescriptor],
   provides: [StslComponentDescriptor],
-  requires: [TaxablePayDescriptor, StslDebtDescriptor],
+  requires: [
+    TaxablePayDescriptor,
+    StslDebtDescriptor,
+    TaxFreeThresholdClaimedDescriptor,
+  ],
   sourcePolicy: "required",
   sources: [StslSource2025_26],
   title: "STSL withholding component",

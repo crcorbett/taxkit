@@ -44,10 +44,17 @@ Root `alchemy.apps.ts` composes `TaxKitApiWorker.make` with the API-owned
 the lightweight native declaration without importing the app. The Website receives
 the API's address Output and the private `TAXKIT_API` binding. Each host binds
 its own address with native `Worker.URL`; absent addresses stay null and fail
-the application's checked Config instead of being guessed. Both receive the
+the application's checked Config instead of being guessed. Local servers use
+fixed strict ports (Website 3220, API 3221) so their addresses cannot swap across
+restarts. An occupied port stops startup. The native development test checks the
+actual API link and calculation target after live reload. Both receive the
 fixed publication address `https://taxkit.dev`, derived from `./hostnames`
-like the Production zone and custom domains. Nothing in the API depends on
-the Website, so unpatched Alchemy plans the graph without a binding cycle.
+like the Production zone and custom domains. After both declarations, native
+`api.bind("WebsiteOrigin", ...)` supplies the Website address to the API for MCP
+browser admission. The installed native Worker provider resolves this address
+cycle using precreation or existing attributes; no guessed address or planner
+patch is needed. Graph tests cover creation, no change, updates and refusal
+when a provider has no precreation support.
 
 Both Workers declare version-scoped native caching. The Website's
 `websiteBuildMemo` hashes shared package sources, manifests and authored

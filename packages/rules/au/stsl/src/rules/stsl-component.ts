@@ -1,23 +1,20 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import {
-  Cents,
-  Money,
-  audFromCents,
-  decimalDollarsToCents,
-  multiplyCentsByDecimal,
-  roundCentsToDollar,
-} from "@taxkit/core/primitives";
+import { Cents, Money, audFromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
-  payPeriodToWeeklyFactor,
+  payPeriodToWeeklyCents,
+  TaxFreeThresholdClaimedFact,
   TaxablePayFact,
   scaleWeeklyWithholdingToPayPeriodDollars,
 } from "@taxkit/rules-au-pay/facts";
 import { Array, BigDecimal, Effect, Layer, Option } from "effect";
 
 import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
-import { AtoStslTable } from "../parameters/stsl-table.js";
+import {
+  AtoStslTable,
+  AtoStslNoThresholdTable,
+} from "../parameters/stsl-table.js";
 import type { StslRow, StslTable } from "../parameters/stsl-table.js";
 
 /**
@@ -71,12 +68,16 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
   Effect.gen(function* () {
     const taxable = yield* TaxablePayFact;
     const stslDebt = yield* StslDebtFact;
-    const table = yield* AtoStslTable;
+    const threshold = yield* TaxFreeThresholdClaimedFact;
+    const table = threshold.value
+      ? yield* AtoStslTable
+      : yield* AtoStslNoThresholdTable;
 
     const baseTraceInputs = {
       enabled: stslDebt.enabled,
       period: taxable.period,
       tableYear: table.year,
+      taxFreeThresholdClaimed: threshold.value,
       taxablePeriodCents: taxable.amount.cents,
     } as const;
 
@@ -101,26 +102,30 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       return component;
     }
 
-    const weeklyFactor = payPeriodToWeeklyFactor(taxable.period);
-    const weeklyCents = taxable.amount.cents * weeklyFactor;
+    const weeklyCents = payPeriodToWeeklyCents(
+      taxable.amount.cents,
+      taxable.period
+    );
     const weeklyFormulaCents = Math.floor(weeklyCents / 100) * 100 + 99;
     const row = yield* findRow(table, weeklyFormulaCents);
     const checkedWeeklyFormulaCents =
       yield* Cents.makeEffect(weeklyFormulaCents);
-    const multiplied = yield* multiplyCentsByDecimal(
-      checkedWeeklyFormulaCents,
-      row.a
+    const weeklyWithholding = BigDecimal.subtract(
+      BigDecimal.multiply(
+        BigDecimal.make(BigInt(checkedWeeklyFormulaCents), 2),
+        row.a
+      ),
+      row.bDollars
     );
-    const subtracted = yield* decimalDollarsToCents(row.bDollars);
-    const weeklyWithholdingCentsRaw = yield* Cents.makeEffect(
-      multiplied - subtracted
+    const weeklyWithholdingDollars = Math.max(
+      0,
+      BigDecimal.toNumberUnsafe(
+        BigDecimal.round(weeklyWithholding, {
+          mode: "half-from-zero",
+          scale: 0,
+        })
+      )
     );
-    const weeklyWithholdingCentsRounded = roundCentsToDollar(
-      weeklyWithholdingCentsRaw,
-      "ato-withholding-rounding"
-    );
-    const weeklyWithholdingDollars =
-      Math.max(0, weeklyWithholdingCentsRounded) / 100;
 
     if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
@@ -172,7 +177,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         bDollars: BigDecimal.format(row.bDollars),
         weeklyEquivalentCents: weeklyCents,
         weeklyFormulaCents,
-        weeklyWithholdingCentsRaw,
+        weeklyWithholdingDollarsRaw: BigDecimal.format(weeklyWithholding),
       },
       result: periodWithholding.cents,
       rounding: Option.some(Option.some("ato-withholding-rounding")),

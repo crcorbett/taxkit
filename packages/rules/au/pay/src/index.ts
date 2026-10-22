@@ -37,6 +37,7 @@ export {
   TaxablePayDescriptor,
   TaxablePayFact,
   payPeriodToWeeklyFactor,
+  payPeriodToWeeklyCents,
   scaleWeeklyWithholdingToPayPeriodDollars,
 } from "./facts/pay.js";
 export {

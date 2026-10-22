@@ -260,8 +260,7 @@ const graphFixture = Effect.fnUntraced(function* (
                   workerId: `proof-${resource.LogicalId}`,
                   workerName: resource.LogicalId,
                 },
-          // The actual already-applied native bindings. Only the Website
-          // depends on the other host's address.
+          // Previous deployment bindings, before same-stage MCP admission.
           bindings: Match.value(resource.Type).pipe(
             Match.when(Random.Type, () => []),
             Match.orElse(() =>
@@ -675,7 +674,7 @@ describe("native paired app graph and planner", () => {
     )
   );
   it.live.each(["create", "noop", "update"] as const)(
-    "plans the one-way address graph for %s",
+    "plans the native same-stage address cycle for %s",
     (mode) =>
       Effect.gen(function* () {
         const result = yield* graphFixture(mode);
@@ -686,8 +685,10 @@ describe("native paired app graph and planner", () => {
           "TaxKitWebsite",
           "TaxKitWebsiteForwardingKey",
         ]);
-        // No binding cycle: the unpatched planner needs no deferred member.
-        expect(Array.fromIterable(plan.cycleMembers)).toEqual([]);
+        // Native Worker precreation resolves the two same-stage addresses.
+        expect(
+          Array.sort(Array.fromIterable(plan.cycleMembers), Order.String)
+        ).toEqual(["TaxKitApi", "TaxKitWebsite"]);
         expect(
           Array.sort(
             Array.map(
@@ -718,8 +719,36 @@ describe("native paired app graph and planner", () => {
           Option.filter(isWorker),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
-        expect(api.Props).toBeDefined();
-        expect(website.Props).toBeDefined();
+        expect(api.Props.dev).toEqual({
+          host: "127.0.0.1",
+          port: 3221,
+          strictPort: true,
+        });
+        expect(website.Props.dev).toEqual({
+          host: "127.0.0.1",
+          port: 3220,
+          strictPort: true,
+        });
+        const websiteOriginBinding = Record.get(
+          result.compiled.bindings,
+          "TaxKitApi"
+        ).pipe(
+          Option.flatMap(
+            Array.findFirst((binding) => binding.sid === "WebsiteOrigin")
+          ),
+          Option.getOrElse(() =>
+            expect.fail("Expected same-stage Website binding")
+          )
+        );
+        const websiteBindingValues: unknown = yield* Output.evaluate(
+          websiteOriginBinding.data,
+          {
+            TaxKitWebsite: { url: "https://fresh-website.example.com" },
+          }
+        ).pipe(Effect.provideContext(result.compiled.services));
+        expect(websiteBindingValues).toEqual({
+          env: { WEBSITE_PUBLIC_ORIGIN: "https://fresh-website.example.com" },
+        });
         expect(Record.keys(api.Props.exports ?? {})).toEqual(["default"]);
         expect(
           Record.get(website.Props.exports ?? {}, "TaxKitMcpSessions").pipe(
@@ -750,7 +779,7 @@ describe("native paired app graph and planner", () => {
           "TAXKIT_WEBSITE_FORWARDING_KEY",
           "WEBSITE_PUBLIC_ORIGIN",
         ]);
-        // The API no longer reads the Website's address.
+        // WebsiteOrigin is a native post-declaration binding, not a guessed env value.
         expect(
           Array.sort(Record.keys(api.Props.env ?? {}), Order.String)
         ).toEqual([
@@ -863,16 +892,19 @@ describe("native paired app graph and planner", () => {
         Effect.scoped
       )
   );
-  it.live("plans without provider precreation", () =>
+  it.live("refuses the address cycle without native provider precreation", () =>
     Effect.gen(function* () {
       const result = yield* graphFixture("without-precreate");
       expect(result.providerWrites).toBe(0);
-      const plan = yield* result.planned;
-      expect(Array.sort(Record.keys(plan.resources), Order.String)).toEqual([
-        "TaxKitApi",
-        "TaxKitWebsite",
-        "TaxKitWebsiteForwardingKey",
-      ]);
+      expect(Exit.isFailure(result.planned)).toBe(true);
+      if (Exit.isFailure(result.planned)) {
+        expect(Cause.pretty(result.planned.cause)).toContain(
+          "UnsatisfiedResourceCycle"
+        );
+        expect(Cause.pretty(result.planned.cause)).toContain(
+          "TaxKitApi, TaxKitWebsite"
+        );
+      }
     }).pipe(
       Effect.provideService(AlchemyContext, localContext),
       Effect.provideService(Stage, "dev_native_graph_proof"),

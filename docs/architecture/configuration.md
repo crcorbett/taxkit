@@ -113,12 +113,12 @@ Schema uses `Schema.URLFromString`. The Website does not use it.
 port: optional `API_PORT` falls back to `PORT` only when absent, and an invalid
 supplied value remains an error.
 
-The native API Worker reads `API_PUBLIC_ORIGIN` (its own `Worker.URL`) and
-`TAXKIT_PUBLICATION_ORIGIN` through `apps/api/src/worker.config.ts`, which
-composes the shared `TaxKitApiOriginConfig` and `DocsPublicationOriginConfig`. Native planning leaves resource
+The native API Worker reads `API_PUBLIC_ORIGIN` (its own `Worker.URL`),
+`WEBSITE_PUBLIC_ORIGIN` (the same-stage Website) and `TAXKIT_PUBLICATION_ORIGIN` through `apps/api/src/worker.config.ts`, which
+composes the shared `TaxKitApiOriginConfig`, `DocsWebsiteOriginConfig` and
+`DocsPublicationOriginConfig`. Native planning leaves resource
 addresses deferred; first incoming use decodes and caches them. Missing or
-invalid values produce a fixed Config error and an empty 503. The API reads no
-Website address. `CALCULATOR_RATE_NAMESPACE` comes from the stage's secrets
+invalid values produce a fixed Config error and an empty 503. MCP uses the Website address for browser admission. `CALCULATOR_RATE_NAMESPACE` comes from the stage's secrets
 provider.
 
 Configuration modules own defaults and selection. Service contracts receive

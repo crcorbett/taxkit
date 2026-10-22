@@ -96,17 +96,18 @@ decodes the address with the key Schema the host supplies. Both hosts pass the
 calculator-owned `CalculatorClientRateKey`; the Website's no-JavaScript form
 host uses the same function.
 
-The Worker checks `API_PUBLIC_ORIGIN` and `TAXKIT_PUBLICATION_ORIGIN` with the
+The Worker checks `API_PUBLIC_ORIGIN`, `WEBSITE_PUBLIC_ORIGIN` and
+`TAXKIT_PUBLICATION_ORIGIN` with the
 canonical origin policy. Its own origin comes from native `Worker.URL`; the
 publication origin is the fixed Production site `https://taxkit.dev`. The API
-does not read the Website's address. Absent or invalid settings return a fixed
+receives the same-stage Website address through native `api.bind`. Absent or invalid settings return a fixed
 native Config error without the rejected value. HTTP and RPC CORS admit any
 exact HTTP(S) browser origin with credentials disabled (`publicCors` and
 `isBrowserOrigin` in `@taxkit/api-http/response-policy`, also used by the Bun
 host routes), and allow `content-type`, the optional
 `x-taxkit-collection-policy` header and the native `b3`/`traceparent` tracing
 headers. Remote MCP admits Origin-less clients and browser pages served from
-the publication origin only: the static `TaxKitMcpHttpLayer` from
+the same-stage Website origin only: the static `TaxKitMcpHttpLayer` from
 `@taxkit/api-mcp/server` reads and checks that bound origin through Config; its
 `allowedOrigins` holds just it.
 Planning leaves those resource addresses deferred. On first incoming use, the
@@ -453,7 +454,7 @@ redeploying old code cannot recover its former sessions.
 The existing 64 KiB/five-second streamed POST limit applies. Complete native
 JSON/SSE replies, including finite request progress/log notifications, are read
 inside the request scope within ten seconds and 2 MiB. Origin-less clients work;
-a supplied Origin must exactly match the publication origin. Only `/mcp` permits
+a supplied Origin must exactly match the same-stage Website origin. Only `/mcp` permits
 modern protocol/routing headers in CORS, with credentials disabled. Expected
 failures have fixed codes and manual-retry guidance; native internal failures use
 the existing safe reply and fixed reporter. HTTP/RPC/MCP retain the shared native

@@ -12,6 +12,8 @@ export {
 } from "./facts/stsl.js";
 export {
   AtoStslTable,
+  AtoStslNoThresholdTable,
+  AtoStslNoThresholdTableDescriptor,
   AtoStslTableDescriptor,
   AtoStsl_2025_26_Live,
   StslRow,

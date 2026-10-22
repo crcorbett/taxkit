@@ -44,6 +44,26 @@ const weekly1500 = new GrossPay({
 });
 
 describe("AU take-home pay calculator (2025-26 rule pack)", () => {
+  // Schedule 1: monthly earnings ending in 33 cents are increased by one
+  // cent before conversion to weekly earnings. Neighbours do not change.
+  it.effect.each([
+    { gross: 260_432, tax: 20_800 },
+    { gross: 260_433, tax: 21_200 },
+    { gross: 260_434, tax: 21_200 },
+  ])("applies monthly earnings adjustment for $gross cents", ({ gross, tax }) =>
+    Effect.gen(function* () {
+      const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
+        grossPay: new GrossPay({
+          amount: new Money({ cents: Cents.make(gross), currency: "AUD" }),
+          period: "monthly",
+        }),
+        taxFreeThresholdClaimed: true,
+      });
+      expect(report.withholdingsTotal.cents).toBe(tax);
+      expect(report.netPay.cents + tax).toBe(gross);
+    })
+  );
+
   // Independent exact-decimal Schedule 1 oracles around half-dollar boundaries.
   it.effect.each([
     { claimed: true, gross: 101_400, tax: 14_700 },
@@ -93,7 +113,7 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         )
       ).toBe(true);
       expect(report.period).toBe("weekly");
-      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.1");
+      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.2");
     })
   );
 

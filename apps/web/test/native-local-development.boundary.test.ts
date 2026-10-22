@@ -177,6 +177,16 @@ describe("native local development", () => {
               .waitFor({ timeout: 15_000 })
           );
           yield* Effect.promise(() => page.waitForLoadState("networkidle"));
+          // A cyclic native graph must preserve the other host's address.
+          expect(
+            yield* Effect.promise(() =>
+              page
+                .getByRole("link", {
+                  name: "For developers: API documentation",
+                })
+                .getAttribute("href")
+            )
+          ).toBe(`${apiOrigin}/api/docs`);
           const payInput = page.getByLabel("Pay before tax ($)");
           yield* Effect.promise(() => payInput.fill("invalid"));
           yield* Effect.promise(() =>

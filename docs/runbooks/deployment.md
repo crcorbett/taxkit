@@ -11,13 +11,16 @@ review_trigger: Alchemy stack, stage, Doppler config, deployment command, deploy
 
 `alchemy.run.ts` declares the Cloudflare API and Website for one stage. The
 API is declared first; the Website receives the API's address and private
-binding. Deploy them together so each stage's pair matches.
+binding. After both are declared, the API receives the same-stage Website
+address through a native binding for MCP browser admission. Native Worker
+precreation resolves the address cycle. Deploy them together so each stage's
+pair matches.
 
 | Stage | Doppler config | Website | API |
 | --- | --- | --- | --- |
 | `prod` | `taxkit/prd` | `https://taxkit.dev` (`www` redirects) | `https://api.taxkit.dev` |
 | `pr-<number>` | `taxkit/stg_preview` | the stage's `workers.dev` address | the stage's `workers.dev` address |
-| `dev_native_apps` | none (local) | printed by `bun run dev` | printed by `bun run dev` |
+| `dev_native_apps` | none (local) | native local address, strict port 3220 | native local address, strict port 3221 |
 
 Deploying needs the maintainer's explicit request. The commands run locally
 from a clean checkout of the commit being deployed; the
@@ -286,10 +289,15 @@ deploy. Use it only for commits that change maintainer documentation alone
 (`docs/`, READMEs, `AGENTS.md`). Public docs under `packages/docs-content` ship
 with the Website and need the deploy. Never use it for a code, workflow,
 package, dependency or Changeset change, or to merge a pull request that
-contains one, unless the maintainer explicitly requests a local SDK-only npm
-release under the [local publication procedure](./versioning.md#local-sdk-publication).
-That exception runs the package checks locally and does not deploy the Website
-or API. Release evidence does not need its own skipped commit; see
+contains one, unless the maintainer explicitly requests a release from this workstation.
+For an authorised local Website/API release, run full verification here, merge
+through a normal pull request, and deploy the clean merge commit using the
+plan, apply and public checks above. Skip the automatic deploy for that release
+commit so it cannot overlap the local apply; do not change CI settings or bypass
+required branch checks. Local SDK-only npm releases follow the
+[local publication procedure](./versioning.md#local-sdk-publication).
+A local SDK-only release runs the package checks locally and does not deploy
+the Website or API. Release evidence does not need its own skipped commit; see
 [Versioning](./versioning.md#release-evidence).
 
 The owner must create, as in Common Practice, two GitHub environments, each

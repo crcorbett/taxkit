@@ -14,6 +14,21 @@ const takeHomeFacts = {
 };
 
 describe("AU SDK subpath", () => {
+  it.effect("keeps the monthly 33-cent correction through the public SDK", () =>
+    Effect.gen(function* () {
+      const report = yield* Effect.promise(() =>
+        au.pay.takeHomePay({
+          grossPay: new GrossPay({
+            amount: new Money({ cents: Cents.make(260_433), currency: "AUD" }),
+            period: "monthly",
+          }),
+          taxFreeThresholdClaimed: true,
+        })
+      );
+      expect(report.withholdingsTotal.cents).toBe(21_200);
+      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.2");
+    })
+  );
   it.effect("exposes typed current AU convenience helpers", () =>
     Effect.gen(function* () {
       const report = yield* Effect.promise(() =>
@@ -22,7 +37,7 @@ describe("AU SDK subpath", () => {
 
       expect(report._tag).toBe("TakeHomePayReport");
       expect(report.netPay.cents).toBe(130_100);
-      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.1");
+      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.2");
     })
   );
 
