@@ -138,3 +138,7 @@ profiles in `docs/skill-profiles/` alongside the plugin.
 ---
 
 What exactly do I need to do in Claude to unblock those branches so you can finish, merge and release them locally? Can this be our focus?
+
+---
+
+Can you send that exact handoff message to the Claude session for me? Merge all to main, and release from local not Github CI
