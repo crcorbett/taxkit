@@ -55,6 +55,7 @@ export class TaxKitCalculationError extends Schema.TaggedError<TaxKitCalculation
 
 export type TaxKitError = TaxKitCalculationError;
 
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- Data.Class preserves this payload type in its inherited constructor and fields.
 export class TaxKitSuccess<Value> extends Data.TaggedClass("TaxKitSuccess")<{
   readonly value: Value;
 }> {}

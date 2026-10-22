@@ -143,7 +143,7 @@ export const PublicCalculatorServiceLive = Layer.effect(
         Effect.succeed(
           pipe(
             query,
-            DescriptorFilterQuery.make,
+            (value) => DescriptorFilterQuery.make(value),
             filterCalculatorEntries,
             (entries) =>
               new CalculatorCatalogResponseData({

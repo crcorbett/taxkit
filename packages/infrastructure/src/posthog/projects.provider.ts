@@ -37,6 +37,7 @@ const requireSameOwner = Effect.fnUntraced(function* (
       reason: "replacement-refused",
     });
   }
+  return yield* Effect.void;
 });
 
 export const PostHogProjectProvider = Provider.effect(
@@ -58,7 +59,7 @@ export const PostHogProjectProvider = Provider.effect(
         output,
       }) {
         if (!Diff.isResolved(news)) {
-          return;
+          return yield* Effect.void;
         }
         const desired = yield* ProjectDefinition.makeEffect(news).pipe(
           Effect.mapError(

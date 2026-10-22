@@ -295,6 +295,7 @@ const runExternalConsumer = (workspacePath: string, origin: string) =>
       );
     }
     yield* Console.info("External temp-workspace HTTP consumer passed");
+    return yield* Effect.void;
   }).pipe(Effect.scoped);
 
 export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
@@ -395,6 +396,7 @@ export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
       { concurrency: "unbounded" }
     );
     yield* runExternalConsumer(workspacePath, origin);
+    return yield* Effect.void;
   }).pipe(
     Effect.mapError((failure) =>
       Match.value(failure).pipe(

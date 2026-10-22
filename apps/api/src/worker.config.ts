@@ -8,7 +8,7 @@ export const ApiWorkerSettingsConfig = Config.all({
   apiOrigin: TaxKitApiOriginConfig,
   publicationOrigin: DocsPublicationOriginConfig,
 }).pipe(
-  Effect.map(ApiWorkerSettings.make),
+  Effect.map((value) => ApiWorkerSettings.make(value)),
   Effect.mapError(
     () =>
       new Config.ConfigError(

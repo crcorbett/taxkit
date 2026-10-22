@@ -45,7 +45,10 @@ export const generateDocsImages = Effect.gen(function* generateDocsImages() {
   );
   const renderer = yield* Effect.acquireRelease(
     Effect.sync(() => new Renderer()),
-    (resource) => Effect.sync(() => resource.free())
+    (resource) =>
+      Effect.sync(() => {
+        resource.free();
+      })
   );
   // Only this generator owns the ignored og subtree. Removing former generated
   // pages keeps withdrawn/draft content out of the copied public assets.

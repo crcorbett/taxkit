@@ -1,3 +1,4 @@
+/* oxlint-disable typescript/no-deprecated -- Re-export existing compatibility aliases without breaking consumers. */
 export {
   CalculatorCatalog,
   getCalculatorCatalogEntry,

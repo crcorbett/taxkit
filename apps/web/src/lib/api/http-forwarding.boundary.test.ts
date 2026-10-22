@@ -70,9 +70,9 @@ it.effect.each([
               {
                 headers: {
                   [CollectionPolicyHeader]: collection,
-                  dnt,
                   [WebsiteForwardingCredentialHeader]: "forged",
                   [WebsiteForwardingRateKeyHeader]: "203.0.113.99",
+                  dnt,
                 },
                 method: "POST",
               }
@@ -84,7 +84,10 @@ it.effect.each([
             Layer.provide(
               Layer.succeed(WebsiteBindings)({
                 API_PUBLIC_ORIGIN: "https://api.example.com",
-                TAXKIT_API: { connect: vi.fn(), fetch },
+                TAXKIT_API: {
+                  connect: vi.fn<(...args: readonly unknown[]) => void>(),
+                  fetch,
+                },
                 TAXKIT_WEBSITE_FORWARDING_KEY: credential,
               })
             )
@@ -125,7 +128,10 @@ it.effect(
             Layer.provide(
               Layer.succeed(WebsiteBindings)({
                 API_PUBLIC_ORIGIN: "https://api.example.com",
-                TAXKIT_API: { connect: vi.fn(), fetch },
+                TAXKIT_API: {
+                  connect: vi.fn<(...args: readonly unknown[]) => void>(),
+                  fetch,
+                },
               })
             )
           )
@@ -160,7 +166,10 @@ it.effect(
             Layer.provide(
               Layer.succeed(WebsiteBindings)({
                 API_PUBLIC_ORIGIN: "https://api.example.com",
-                TAXKIT_API: { connect: vi.fn(), fetch },
+                TAXKIT_API: {
+                  connect: vi.fn<(...args: readonly unknown[]) => void>(),
+                  fetch,
+                },
                 TAXKIT_WEBSITE_FORWARDING_KEY: credential,
               })
             )
@@ -220,7 +229,10 @@ it.effect.each([
               Layer.succeed(WebsiteBindings)({
                 API_PUBLIC_ORIGIN: origin,
                 CALCULATOR_HOST_MODE: mode,
-                TAXKIT_API: { connect: vi.fn(), fetch },
+                TAXKIT_API: {
+                  connect: vi.fn<(...args: readonly unknown[]) => void>(),
+                  fetch,
+                },
                 TAXKIT_WEBSITE_FORWARDING_KEY: credential,
               })
             )
@@ -243,7 +255,10 @@ it.effect.each([301, 302, 303, 307, 308])(
           })
         )
       );
-      const binding = { connect: vi.fn(), fetch };
+      const binding = {
+        connect: vi.fn<(...args: readonly unknown[]) => void>(),
+        fetch,
+      };
       const key = yield* Schema.decodeUnknownEffect(CalculatorClientRateKey)(
         "203.0.113.19"
       );

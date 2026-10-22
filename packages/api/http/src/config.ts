@@ -14,7 +14,7 @@ export interface TaxKitHttpApiConfig {
 
 const HttpApiClientConfig = Config.all({
   baseUrl: Config.URL("BASE_URL"),
-}).pipe(Config.map(TaxKitHttpApiClientConfigSchema.make));
+}).pipe(Config.map((value) => TaxKitHttpApiClientConfigSchema.make(value)));
 
 export const TaxKitHttpApiConfig = {
   httpApi: HttpApiClientConfig,

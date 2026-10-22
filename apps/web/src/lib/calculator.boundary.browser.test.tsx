@@ -106,7 +106,10 @@ describe("browser calculator lifetime", () => {
               ],
             })
           ),
-          (value) => Effect.sync(() => value.dispose())
+          (value) =>
+            Effect.sync(() => {
+              value.dispose();
+            })
         );
         yield* Effect.sleep("750 millis");
         const unmount = registry.mount(calculateAtom);
@@ -134,8 +137,8 @@ describe("browser calculator lifetime", () => {
 
   it.effect("an edit interrupts work and removes the waiting result", () =>
     Effect.gen(function* () {
-      const started = vi.fn();
-      const cancelled = vi.fn();
+      const started = vi.fn<(...args: readonly unknown[]) => void>();
+      const cancelled = vi.fn<(...args: readonly unknown[]) => void>();
       const client = generatedClient.pipe(
         Layer.provide(
           Layer.succeed(HttpClient.HttpClient)(
@@ -160,7 +163,10 @@ describe("browser calculator lifetime", () => {
             initialValues: [[apiClientRuntime.layer, client]],
           })
         ),
-        (value) => Effect.sync(() => value.dispose())
+        (value) =>
+          Effect.sync(() => {
+            value.dispose();
+          })
       );
       const unmount = registry.mount(calculateAtom);
       yield* Effect.addFinalizer(() => Effect.sync(unmount));
@@ -183,8 +189,8 @@ describe("browser calculator lifetime", () => {
     "leaving the rendered form interrupts work before the registry is disposed",
     () =>
       Effect.gen(function* () {
-        const started = vi.fn();
-        const cancelled = vi.fn();
+        const started = vi.fn<(...args: readonly unknown[]) => void>();
+        const cancelled = vi.fn<(...args: readonly unknown[]) => void>();
         const client = generatedClient.pipe(
           Layer.provide(
             Layer.succeed(HttpClient.HttpClient)(
@@ -209,7 +215,10 @@ describe("browser calculator lifetime", () => {
               initialValues: [[apiClientRuntime.layer, client]],
             })
           ),
-          (value) => Effect.sync(() => value.dispose())
+          (value) =>
+            Effect.sync(() => {
+              value.dispose();
+            })
         );
         const host = yield* Effect.acquireRelease(
           Effect.sync(() => {
@@ -221,7 +230,10 @@ describe("browser calculator lifetime", () => {
         );
         const root = yield* Effect.acquireRelease(
           Effect.sync(() => createRoot(host)),
-          (value) => Effect.sync(() => value.unmount())
+          (value) =>
+            Effect.sync(() => {
+              value.unmount();
+            })
         );
         root.render(
           <RegistryContext.Provider value={registry}>
@@ -282,9 +294,9 @@ describe("browser calculator lifetime", () => {
     "restores $error._tag and its guidance without starting another calculation",
     ({ error, message }) =>
       Effect.gen(function* () {
-        const called = vi.fn();
-        const errors = vi.fn();
-        const hydrated = vi.fn();
+        const called = vi.fn<(...args: readonly unknown[]) => void>();
+        const errors = vi.fn<(...args: readonly unknown[]) => void>();
+        const hydrated = vi.fn<(...args: readonly unknown[]) => void>();
         const HydrationComplete = () => {
           useEffect(hydrated, []);
           return null;
@@ -298,7 +310,9 @@ describe("browser calculator lifetime", () => {
           Layer.provide(
             Layer.succeed(HttpClient.HttpClient)(
               HttpClient.make((request) =>
-                Effect.sync(() => called(request.url))
+                Effect.sync(() => {
+                  called(request.url);
+                })
                   .pipe(Effect.andThen(unreachable(request)))
                   .pipe(
                     Effect.map((response) =>
@@ -325,11 +339,17 @@ describe("browser calculator lifetime", () => {
               scheduleTask,
             })
           ),
-          (value) => Effect.sync(() => value.dispose())
+          (value) =>
+            Effect.sync(() => {
+              value.dispose();
+            })
         );
         const serverRegistry = yield* Effect.acquireRelease(
           Effect.sync(() => AtomRegistry.make()),
-          (value) => Effect.sync(() => value.dispose())
+          (value) =>
+            Effect.sync(() => {
+              value.dispose();
+            })
         );
         const restored = yield* Schema.decodeEffect(WebsiteSubmissionTransport)(
           submission
@@ -367,7 +387,10 @@ describe("browser calculator lifetime", () => {
               onUncaughtError: errors,
             })
           ),
-          (value) => Effect.sync(() => value.unmount())
+          (value) =>
+            Effect.sync(() => {
+              value.unmount();
+            })
         );
         yield* Effect.promise(() =>
           expect.poll(() => hydrated.mock.calls.length).toBe(1)
@@ -427,7 +450,10 @@ describe("browser calculator lifetime", () => {
             initialValues: [[apiClientRuntime.layer, client]],
           })
         ),
-        (value) => Effect.sync(() => value.dispose())
+        (value) =>
+          Effect.sync(() => {
+            value.dispose();
+          })
       );
       const host = yield* Effect.acquireRelease(
         Effect.sync(() => {
@@ -439,7 +465,10 @@ describe("browser calculator lifetime", () => {
       );
       const root = yield* Effect.acquireRelease(
         Effect.sync(() => createRoot(host)),
-        (value) => Effect.sync(() => value.unmount())
+        (value) =>
+          Effect.sync(() => {
+            value.unmount();
+          })
       );
       root.render(
         <RegistryContext.Provider value={registry}>

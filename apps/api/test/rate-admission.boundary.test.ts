@@ -172,8 +172,8 @@ describe("shared native host calculation admission", () => {
 
   it.effect(
     "direct HTTP, Website HTTP and public RPC batch members share one checked allowance",
-    () =>
-      Effect.gen(function* () {
+    () => {
+      const proof = Effect.gen(function* () {
         const used = yield* Ref.make(
           HashMap.empty<CalculatorClientRateKey, number>()
         );
@@ -193,7 +193,7 @@ describe("shared native host calculation admission", () => {
         const app = yield* ApiWorkerInit.pipe(
           Effect.provideService(CalculatorAdmission, admission)
         );
-        const http = HttpClient.make((request) =>
+        const http: HttpClient.HttpClient = HttpClient.make((request) =>
           app.fetch.pipe(
             Effect.provideService(
               HttpServerRequest.HttpServerRequest,
@@ -239,11 +239,11 @@ describe("shared native host calculation admission", () => {
                 {
                   body: publicBody,
                   headers: {
+                    [WebsiteForwardingCredentialHeader]: forwardingCredential,
+                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
                     "cf-connecting-ip": "198.51.100.99",
                     "cf-worker": "website.example.com",
                     "content-type": "application/json",
-                    [WebsiteForwardingCredentialHeader]: forwardingCredential,
-                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
                   },
                   method: "POST",
                 }
@@ -273,10 +273,10 @@ describe("shared native host calculation admission", () => {
               new Request("https://api.example.com/rpc", {
                 body,
                 headers: {
-                  "cf-connecting-ip": "203.0.113.75",
-                  "content-type": "application/json",
                   // RPC is public; forwarded metadata never changes its identity.
                   [WebsiteForwardingRateKeyHeader]: "198.51.100.99",
+                  "cf-connecting-ip": "203.0.113.75",
+                  "content-type": "application/json",
                 },
                 method: "POST",
               })
@@ -315,7 +315,12 @@ describe("shared native host calculation admission", () => {
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.scoped
-      )
+      );
+      // Oxlint infers any for this generated-client program inside it.effect.
+      // TypeScript declaration emit proves its final service requirement is never.
+      // oxlint-disable-next-line typescript/no-unsafe-return -- Native HttpApiClient plus scoped generator inference; checked by tsconfig.tests.json.
+      return proof;
+    }
   );
 
   it.effect(
@@ -353,11 +358,11 @@ describe("shared native host calculation admission", () => {
                 new Request(`https://api.example.com${path}`, {
                   body: method === "POST" ? payload : null,
                   headers: {
+                    [WebsiteForwardingCredentialHeader]: credential,
+                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
                     "cf-connecting-ip": "198.51.100.99",
                     "cf-worker": "website.example.com",
                     "content-type": "application/json",
-                    [WebsiteForwardingCredentialHeader]: credential,
-                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
                   },
                   method,
                 })
@@ -398,7 +403,9 @@ describe("shared native host calculation admission", () => {
           ([path, method, status]) =>
             call(path, method, body).pipe(
               Effect.tap((response) =>
-                Effect.sync(() => expect(response.status).toBe(status))
+                Effect.sync(() => {
+                  expect(response.status).toBe(status);
+                })
               )
             )
         );
@@ -429,9 +436,9 @@ describe("shared native host calculation admission", () => {
                 {
                   body,
                   headers: {
-                    "content-type": "application/json",
                     [WebsiteForwardingCredentialHeader]: forwardingCredential,
                     [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
+                    "content-type": "application/json",
                   },
                   method: "POST",
                 }

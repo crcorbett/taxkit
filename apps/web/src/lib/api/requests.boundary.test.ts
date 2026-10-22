@@ -26,7 +26,7 @@ it.effect.each([
         Schema.fromJsonString(DocsPublicPage)
       )(page);
       const binding = {
-        connect: vi.fn(),
+        connect: vi.fn<(...args: readonly unknown[]) => void>(),
         // Native Fetcher fixture: the generated client still decodes the bytes.
         fetch: vi.fn((request: Request) =>
           Promise.resolve(

@@ -38,6 +38,8 @@ export const Route = createFileRoute("/agents")({
               </a>
             </p>
             <p>
+              {/* Authored documentation page, not an API transport endpoint. */}
+              {/* oxlint-disable-next-line strict-effect/route-literal-ownership -- This is the published documentation page identity. */}
               <a href="/api/agent-tools">
                 Agent connection guide and tool list
               </a>

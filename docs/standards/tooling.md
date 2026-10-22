@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-tooling-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-10-22
 review_trigger: formatter, lint, dependency, typecheck, Changeset or root command change
 ---
 
@@ -18,11 +18,11 @@ stable boundaries.
 - `bun` is the package manager and workspace runner. Root `package.json` owns
   the workspace globs and catalogue dependency versions.
 - `oxlint.config.ts` extends `ultracite/oxlint/core` with the React and Remix
-  profiles, the vendored strict Effect policy, the anti-slop plugins and
+  profiles, the published strict Effect and anti-slop plugins and
   TaxKit's own rules under `tools/oxlint`. Native workspace import enforcement
-  comes from `@commonplaces/oxlint-plugin/package` (qualified at 0.3.1), rather
-  than a repository copy. Oxlint and the root `@oxlint/plugins` share one runtime
-  version; the shared plugin declares compatibility with that Oxlint version.
+  comes from `@commonplaces/oxlint-plugin/package`. All shared rules use
+  `@commonplaces/oxlint-plugin` 0.6.0, pinned in the root manifest and lockfile. The shared package owns its `@oxlint/plugins` dependency and declares
+  compatibility with the pinned Oxlint version.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
   wrapping.
 - TypeScript 7 is the root compiler. `@effect/tsgo` patches it at install and
@@ -38,8 +38,8 @@ stable boundaries.
 
 | Command | Use |
 | --- | --- |
-| `bun run verification` | Before merging: build, format, lint, types, Effect diagnostics, unit and browser tests, Knip, docs and path checks. |
-| `bun run lint` / `bun run fix` | Oxlint, including the boundary-directive pass. |
+| `bun run verification` | Before merging: build, format, lint, types, Effect diagnostics, unit and browser tests, Knip, docs and path checks, then the native pair suite. |
+| `bun run lint` / `bun run fix` | Type-aware Oxlint, including the boundary-directive pass. |
 | `bun run format` / `bun run format:check` | Oxfmt. |
 | `bun run check-types` | Workspace types plus the Alchemy roots and root tools. |
 | `bun run test` / `bun run test:tools` | Unit tests; `test:tools` runs only the root tool tests. |
@@ -60,7 +60,7 @@ Important enabled rules:
   of `export *`, improving API review, bundling, and code splitting.
 - `jsdoc/check-tag-names`: docstrings use only linter-recognized tags.
 
-The vendored `tools/oxlint/anti-slop` plugin owns 15 generic rules. All run at
+The published `@commonplaces/oxlint-plugin/anti-slop` export owns the generic rules. All run at
 error severity and reject chained or unexplained assertions, widening followed
 by assertion, unknown parameters, returns and aliases, unsafe dictionary and
 object parameter types, runtime `typeof`, `Reflect.get`/`Reflect.apply`, module
@@ -73,9 +73,9 @@ name.
 The generic plugin is deliberately separate from TaxKit policy. It does not
 own TaxKit content, SEO, TanStack route naming, package naming or reference-site
 rules. Those concerns are excluded unless a TaxKit semantic owner and focused
-proof are added. The plugin source is ignored by the root lint and formatter
-because it is installed verbatim; its behaviour is proved through fixtures and
-the normal source tree still receives every configured rule. TypeScript files
+proof are added. The installed package supplies its rule implementation; actual-CLI fixtures
+prove its behaviour against TaxKit configuration. Owned source still receives
+every configured rule. TypeScript files
 disable the JavaScript-only `no-redeclare` rule so a value and its derived type
 may share one name. JavaScript files keep that rule.
 
@@ -229,3 +229,15 @@ Website runtimes and the docs packages, and excludes tests and tools.
 workstation-specific home or checkout paths. Use repository-relative links,
 repository identities or pinned HTTPS references in tracked text. Findings
 contain only file, line and category so local usernames cannot leak into logs.
+
+Type-aware lint checks unsafe values, dropped Promises and callback return
+types. `promise-function-async` stays off because the Effect policy forbids
+`async`; native Promise facades remain checked for unhandled Promises. The
+actual-CLI fixture checks both sides of that choice. Narrow inline exceptions
+explain compatibility exports, secret-stringification tests and inherited
+Data/Match signatures. They are checked for unused permissions.
+
+Production hostnames belong to `packages/infrastructure/src/hostnames.ts`,
+and transport paths belong to `packages/api/http/src/routes.ts`. The shared
+ownership rules enforce these in runtime source. Independent test expectations
+keep literal addresses; the PostHog adapter owns its external API paths.

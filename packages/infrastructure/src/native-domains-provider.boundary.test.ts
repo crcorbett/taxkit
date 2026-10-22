@@ -28,7 +28,6 @@ import {
   FileSystem,
   Layer,
   Option,
-  Record,
   Redacted,
   Ref,
   Match,
@@ -315,9 +314,7 @@ const providerFixture = Effect.fnUntraced(function* (
       )
     )
   );
-  const resource = Record.get(compiled.resources, "DomainFixture").pipe(
-    Option.getOrElse(() => expect.fail("Expected native fixture Worker"))
-  );
+  const resource = compiled.output;
   const result = yield* Effect.gen(function* () {
     const provider = yield* Worker.Provider;
     return yield* provider.reconcile({

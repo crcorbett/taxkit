@@ -46,8 +46,8 @@ apply or destroy follows a matching-stage native plan without `--yes`.
 Effect diagnostics run inside every workspace's `check-types`, because the
 `prepare` script (`effect-tsgo patch`) patches the TypeScript compiler with the
 Effect language service; `bun run check:effect` is a smoke check that the patch
-and plugin are active. `bun run lint` applies the vendored Commonplace
-`strict-effect` policy (`tools/oxlint/vendor/strict-effect`), including the
+and plugin are active. `bun run lint` runs type-aware checks and the published Commonplace
+`strict-effect` policy from `@commonplaces/oxlint-plugin` 0.6.0, including the
 native request rules `static-layers`, `no-loader-request-state`,
 `no-native-client-replica`, `native-cloudflare-cache`, `website-data-proxy`,
 `website-rpc-boundary` (`apps/web/src` only) and `module-ownership`. Their
@@ -104,8 +104,8 @@ timeout without understanding the failure.
 - [Deployment](./deployment.md)
 - [Tooling standard](../standards/tooling.md)
 
-The strict-policy vendor [provenance](../../tools/oxlint/vendor/strict-effect/README.md)
-records the local Effect 4.0.2 AST-identity and Match-factory corrections.
+The pinned shared package includes the AST-identity and Match-factory
+corrections; TaxKit keeps no vendored rule fork.
 `native-request-rules.test.ts` exercises both factory spellings through the real
 CLI and a large cyclic host AST; no production or test Layer-factory exemption
 is introduced.

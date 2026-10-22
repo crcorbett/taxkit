@@ -138,8 +138,8 @@ it.effect(
         }),
         () => Effect.sync(() => vi.unstubAllGlobals())
       );
-      const started = vi.fn();
-      const cancelled = vi.fn();
+      const started = vi.fn<(...args: readonly unknown[]) => void>();
+      const cancelled = vi.fn<(...args: readonly unknown[]) => void>();
       const signals = yield* Effect.scoped(
         Effect.gen(function* () {
           const handlers = yield* WebsiteBrowserToolkit.toHandlers({

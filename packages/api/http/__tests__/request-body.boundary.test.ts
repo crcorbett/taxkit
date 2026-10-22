@@ -43,11 +43,16 @@ describe("shared HTTP request-body policy", () => {
             HttpServerRequest.fromClientRequest(request)
           ),
           Effect.provideService(Clock.Clock, {
-            ...clock,
+            currentTimeMillis: clock.currentTimeMillis,
+            currentTimeMillisUnsafe: () => clock.currentTimeMillisUnsafe(),
+            currentTimeNanos: clock.currentTimeNanos,
+            currentTimeNanosUnsafe: () => clock.currentTimeNanosUnsafe(),
             monotonicTimeNanos: Ref.modify(time, (value) => [
               value,
               5_000_000_000n,
             ]),
+            monotonicTimeNanosUnsafe: () => clock.monotonicTimeNanosUnsafe(),
+            sleep: (duration) => clock.sleep(duration),
           })
         );
         expect(response.status).toBe(408);

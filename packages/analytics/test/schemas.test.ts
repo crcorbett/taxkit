@@ -68,10 +68,13 @@ it.effect.each([
           expect(value.projectId).toBe(123);
           expect(value.stage).toBe(input.POSTHOG_STAGE);
           expect(Redacted.isRedacted(value.token)).toBe(true);
+          // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
           expect(String(value.token)).not.toContain(
             input.POSTHOG_CAPTURE_TOKEN
           );
         }),
+
+        // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
         Match.exhaustive
       );
     })

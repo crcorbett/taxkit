@@ -10,7 +10,7 @@ import { WebsiteSettingsLive } from "../settings.server.layer";
 import { WebsiteApiLive } from "./host.server";
 
 const binding = {
-  connect: vi.fn(),
+  connect: vi.fn<(...args: readonly unknown[]) => void>(),
   fetch: vi.fn(() => Promise.resolve(new Response("User-agent: *"))),
 };
 const valid = {

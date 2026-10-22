@@ -113,7 +113,7 @@ const expectReadableText = Effect.fnUntraced(function* (
   );
   const luminance = yield* Effect.forEach([foreground, background], (colour) =>
     Option.fromNullishOr(
-      colour.match(/^rgb\((?<red>\d+), (?<green>\d+), (?<blue>\d+)\)$/u)
+      /^rgb\((?<red>\d+), (?<green>\d+), (?<blue>\d+)\)$/u.exec(colour)
     ).pipe(
       Effect.fromOption,
       Effect.map((matches) => Array.drop(matches, 1)),
@@ -223,9 +223,9 @@ describe("built native API and Website", () => {
             "AlchemyContext",
           ],
           (marker) =>
-            Effect.sync(() =>
-              expect(clientCode.includes(marker), marker).toBe(false)
-            )
+            Effect.sync(() => {
+              expect(clientCode.includes(marker), marker).toBe(false);
+            })
         );
         yield* Effect.forEach(
           [
@@ -2003,6 +2003,7 @@ describe("built native API and Website", () => {
                 )
               ).toContain(calculator.savedAnswer);
               expect(yield* Queue.clear(calls)).toEqual([]);
+              return yield* Effect.void;
             })
         );
         yield* Effect.promise(() =>
@@ -2533,7 +2534,9 @@ describe("built native API and Website", () => {
             .waitFor({ timeout: 5000 })
         );
         yield* Effect.promise(() =>
-          docsPage.evaluate(() => window.scrollTo(0, 0))
+          docsPage.evaluate(() => {
+            window.scrollTo(0, 0);
+          })
         );
         yield* Effect.promise(() =>
           docsPage.screenshot({
@@ -2562,7 +2565,9 @@ describe("built native API and Website", () => {
           )
         ).toBe(null);
         yield* Effect.promise(() =>
-          docsPage.evaluate(() => window.scrollTo(0, 0))
+          docsPage.evaluate(() => {
+            window.scrollTo(0, 0);
+          })
         );
         yield* Effect.promise(() =>
           docsPage.screenshot({
@@ -2630,7 +2635,9 @@ describe("built native API and Website", () => {
         ).toBe(true);
         yield* Effect.promise(() => docsPage.keyboard.press("ArrowRight"));
         yield* Effect.promise(() =>
-          docsPage.evaluate(() => window.scrollTo(0, 0))
+          docsPage.evaluate(() => {
+            window.scrollTo(0, 0);
+          })
         );
         yield* Effect.promise(() =>
           docsPage.screenshot({
@@ -2645,7 +2652,9 @@ describe("built native API and Website", () => {
           docsPage.locator(".docs-navigation-panel summary").click()
         );
         yield* Effect.promise(() =>
-          docsPage.evaluate(() => window.scrollTo(0, 0))
+          docsPage.evaluate(() => {
+            window.scrollTo(0, 0);
+          })
         );
         yield* Effect.promise(() =>
           docsPage.screenshot({
@@ -2917,7 +2926,9 @@ describe("built native API and Website", () => {
           docsPage.setViewportSize({ height: 900, width: 1280 })
         );
         yield* Effect.promise(() =>
-          docsPage.evaluate(() => window.scrollTo(0, 0))
+          docsPage.evaluate(() => {
+            window.scrollTo(0, 0);
+          })
         );
         yield* Effect.promise(() =>
           docsPage.screenshot({
@@ -2946,7 +2957,9 @@ describe("built native API and Website", () => {
           )
         ).toBe("solid");
         yield* Effect.promise(() =>
-          docsPage.evaluate(() => window.scrollTo(0, 0))
+          docsPage.evaluate(() => {
+            window.scrollTo(0, 0);
+          })
         );
         yield* Effect.promise(() =>
           docsPage.screenshot({

@@ -123,6 +123,8 @@ describe("FumadocsSource", () => {
                 expect(sourceError.operation).toBe("getPage");
               },
             }),
+
+            // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
             Match.exhaustive
           );
         })

@@ -60,14 +60,18 @@ export const CalculatorPage = ({
   const controlBrowserTools = useAtomSet(browserTools);
   useEffect(() => {
     controlBrowserTools("register");
-    return () => controlBrowserTools(Atom.Interrupt);
+    return () => {
+      controlBrowserTools(Atom.Interrupt);
+    };
   }, [controlBrowserTools]);
   const view = useAtomValue(atoms.view);
   const edit = useAtomSet(atoms.edit);
   const submit = useAtomSet(atoms.submit);
   const controlCalculation = useAtomSet(atoms.calculation);
   useEffect(
-    () => () => controlCalculation(Atom.Interrupt),
+    () => () => {
+      controlCalculation(Atom.Interrupt);
+    },
     [controlCalculation]
   );
   return (
@@ -81,7 +85,9 @@ export const CalculatorPage = ({
       report={view.report.pipe(Option.filter(Schema.is(calculatorPageReport)))}
       stale={view.stale}
       onEdit={edit}
-      onCalculate={() => submit("calculate")}
+      onCalculate={() => {
+        submit("calculate");
+      }}
     />
   );
 };

@@ -31,6 +31,10 @@ import { BackendAnalyticsLive } from "../src/live.layer.js";
 import { BackendAnalytics } from "../src/service.js";
 import { makeBackendAnalyticsTest } from "../src/test.layer.js";
 
+const expectedTimestamp: unknown = expect.any(String);
+
+const expectedContentLength: unknown = expect.stringMatching(/^\d+$/u);
+
 const TestCrypto = Layer.succeed(
   Crypto.Crypto,
   Crypto.make({
@@ -52,7 +56,7 @@ it.effect(
           expect(request.method).toBe("POST");
           expect(request.headers).toEqual({
             "cache-control": "no-store",
-            "content-length": expect.stringMatching(/^\d+$/u),
+            "content-length": expectedContentLength,
             "content-type": "application/json",
           });
           const policy = yield* Effect.serviceOption(
@@ -110,7 +114,7 @@ it.effect(
                 schema_version: 1,
                 stage: "prod",
               },
-              timestamp: expect.any(String),
+              timestamp: expectedTimestamp,
               uuid: "00000000-0000-4000-8000-000000000000",
             },
           ],

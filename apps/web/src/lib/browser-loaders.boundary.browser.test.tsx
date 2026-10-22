@@ -80,7 +80,10 @@ const fixture = Effect.fnUntraced(function* (
         ],
       })
     ),
-    (value) => Effect.sync(() => value.dispose())
+    (value) =>
+      Effect.sync(() => {
+        value.dispose();
+      })
   );
   return { builds, context: { registry: Option.some(registry) } };
 });
@@ -249,8 +252,8 @@ describe("browser route loaders", () => {
 
   it.effect("cancels the HTTP call when the loader is aborted", () =>
     Effect.gen(function* () {
-      const started = vi.fn();
-      const interrupted = vi.fn();
+      const started = vi.fn<(...args: readonly unknown[]) => void>();
+      const interrupted = vi.fn<(...args: readonly unknown[]) => void>();
       const { context } = yield* fixture(() =>
         Effect.sync(started).pipe(
           Effect.andThen(Effect.never),

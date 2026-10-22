@@ -34,7 +34,9 @@ describe("publication discovery ingress", () => {
             Schema.decodeUnknownEffect(DocsDiscoveryDocument)(value).pipe(
               Effect.flip,
               Effect.tap((error) =>
-                Effect.sync(() => assert.equal(error._tag, "SchemaError"))
+                Effect.sync(() => {
+                  assert.equal(error._tag, "SchemaError");
+                })
               )
             )
         );

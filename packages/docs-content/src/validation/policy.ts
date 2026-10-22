@@ -142,8 +142,14 @@ const frontmatterIssue = (source: DocsSourcePath, message: string) =>
 const parseFrontmatterBody = (source: DocsSourcePath, body: string) =>
   Effect.try({
     catch: (cause) => frontmatterIssue(source, String(cause)),
-    try: () => parseYaml(body),
-  });
+    try: () => Schema.decodeUnknownResult(DocsPageFrontmatter)(parseYaml(body)),
+  }).pipe(
+    Effect.flatMap((result) =>
+      Effect.fromResult(result).pipe(
+        Effect.mapError((error) => frontmatterIssue(source, error.message))
+      )
+    )
+  );
 
 const decodeFrontmatter = (
   source: DocsSourcePath,
@@ -172,18 +178,7 @@ const decodeFrontmatter = (
                   })
                 )
               ),
-            onSome: (body) =>
-              parseFrontmatterBody(source, body).pipe(
-                Effect.flatMap((candidate) =>
-                  Schema.decodeUnknownEffect(DocsPageFrontmatter)(
-                    candidate
-                  ).pipe(
-                    Effect.mapError((error) =>
-                      frontmatterIssue(source, error.message)
-                    )
-                  )
-                )
-              ),
+            onSome: (body) => parseFrontmatterBody(source, body),
           })
         ),
     })

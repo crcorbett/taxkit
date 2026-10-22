@@ -67,15 +67,24 @@ const CalculatorApiMetadataErrorEnvelopes = [
   CalculatorApiTimeoutEnvelope,
 ] as const;
 
+const CalculatorApiRateLimitEnvelope = Schema.Struct({
+  error: CalculatorRateLimited,
+});
+const CalculatorApiRateLimitHeaders = { "retry-after": Schema.Literal("60") };
+
 const CalculatorApiErrorEnvelopes = [
   CalculatorApiRequestErrorEnvelope,
-  Schema.Struct({ error: CalculatorRateLimited }).pipe(
-    HttpApiSchema.encodeToWithHeaders(
+  CalculatorApiRateLimitEnvelope.pipe(
+    // The native curried helper cannot infer its source Schema from S["Type"].
+    // Preserve the source and its service-free contract explicitly.
+    HttpApiSchema.encodeToWithHeaders<
+      typeof CalculatorApiRateLimitEnvelope,
+      typeof CalculatorApiRateLimitEnvelope,
+      typeof CalculatorApiRateLimitHeaders
+    >(
       {
-        body: Schema.Struct({ error: CalculatorRateLimited }).pipe(
-          HttpApiSchema.status(429)
-        ),
-        headers: { "retry-after": Schema.Literal("60") },
+        body: CalculatorApiRateLimitEnvelope.pipe(HttpApiSchema.status(429)),
+        headers: CalculatorApiRateLimitHeaders,
       },
       {
         decode: ({ body }) => body,
@@ -107,6 +116,7 @@ export const CalculatorApiErrorEnvelope = Schema.Struct({
 export type CalculatorApiErrorEnvelope = typeof CalculatorApiErrorEnvelope.Type;
 
 export class CalculatorApiErrorEnvelopeData<
+  // oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- The inherited Data.Class constructor preserves the specific error.
   E extends CalculatorServiceError = CalculatorServiceError,
 > extends Data.Class<CalculatorApiErrorEnvelope & { readonly error: E }> {}
 

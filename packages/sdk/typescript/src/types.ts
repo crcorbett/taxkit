@@ -15,7 +15,7 @@ export interface SdkCalculation<
   Jurisdiction extends CalculatorJurisdiction,
   TaxYear extends CalculatorTaxYear,
   InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 > {
   readonly calculatorId: Id;
   readonly decodeOutput: (
@@ -32,7 +32,7 @@ export interface SdkCalculationDefinition<
   Jurisdiction extends CalculatorJurisdiction,
   TaxYear extends CalculatorTaxYear,
   InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 > {
   readonly calculatorId: Id;
   readonly inputSchema: InputSchema;
@@ -46,7 +46,7 @@ export type AnySdkCalculation = SdkCalculation<
   CalculatorJurisdiction,
   CalculatorTaxYear,
   Schema.Schema<CalculatorRunFacts>,
-  Schema.Decoder<CalculatorRunReport, never>
+  Schema.Decoder<CalculatorRunReport>
 >;
 
 export interface TaxKitModule<
@@ -88,7 +88,7 @@ export const defineSdkCalculation = <
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
   const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 >(
   calculation: SdkCalculationDefinition<
     Id,

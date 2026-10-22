@@ -1,5 +1,14 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Array, Context, Effect, Layer, Option, Record, Schema } from "effect";
+import {
+  Array,
+  Context,
+  Effect,
+  Layer,
+  Option,
+  Record,
+  Schema,
+  Struct,
+} from "effect";
 
 import { CalculationError } from "../src/errors/calculation-error.js";
 import {
@@ -137,7 +146,7 @@ describe("domain absence representations", () => {
               '{"_tag":"FactQuestion","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}',
             own: true,
             value: new FactQuestion({
-              ...question,
+              ...Struct.pick(question, Struct.keys(FactQuestion.fields)),
               helpText: Option.some(Option.none()),
             }),
           },
@@ -146,7 +155,7 @@ describe("domain absence representations", () => {
               '{"_tag":"FactQuestion","helpText":"Checked text","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}',
             own: true,
             value: new FactQuestion({
-              ...question,
+              ...Struct.pick(question, Struct.keys(FactQuestion.fields)),
               helpText: Option.some(Option.some("Checked text")),
             }),
           },

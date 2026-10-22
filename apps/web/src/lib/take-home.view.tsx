@@ -39,9 +39,9 @@ export const TakeHomeFormView = ({
           name="grossDollars"
           inputMode="decimal"
           value={form.grossDollars}
-          onChange={(event) =>
-            onEdit({ ...form, grossDollars: event.currentTarget.value })
-          }
+          onChange={(event) => {
+            onEdit({ ...form, grossDollars: event.currentTarget.value });
+          }}
         />
       </label>
       <label>
@@ -49,9 +49,9 @@ export const TakeHomeFormView = ({
         <select
           name="period"
           value={form.period}
-          onChange={(event) =>
-            onEdit({ ...form, period: event.currentTarget.value })
-          }
+          onChange={(event) => {
+            onEdit({ ...form, period: event.currentTarget.value });
+          }}
         >
           <option value="weekly">Weekly</option>
           <option value="fortnightly">Fortnightly</option>
@@ -63,12 +63,12 @@ export const TakeHomeFormView = ({
           name="taxFreeThresholdClaimed"
           type="checkbox"
           checked={form.taxFreeThresholdClaimed}
-          onChange={(event) =>
+          onChange={(event) => {
             onEdit({
               ...form,
               taxFreeThresholdClaimed: event.currentTarget.checked,
-            })
-          }
+            });
+          }}
         />{" "}
         Claim the tax-free threshold
       </label>
@@ -76,7 +76,7 @@ export const TakeHomeFormView = ({
         {busy ? "Calculating…" : "Calculate"}
       </button>
     </form>
-    {message && <p role="alert">{message}</p>}
+    {message !== undefined && message !== "" && <p role="alert">{message}</p>}
     <TakeHomeResultView report={report} stale={stale} />
   </section>
 );

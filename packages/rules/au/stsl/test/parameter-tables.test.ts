@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Cents, DecimalCoefficient } from "@taxkit/core/primitives";
 import { expectAt } from "@taxkit/testing";
-import { Array, BigDecimal, Effect, Result, Schema } from "effect";
+import { Array, BigDecimal, Effect, Result, Schema, Struct } from "effect";
 
 import {
   StslTable,
@@ -20,30 +20,36 @@ describe("StslTable owned relationships", () => {
         const reversedEnd = yield* Cents.makeEffect(row.weeklyMinCents - 1);
         const cases = [
           {
-            input: { ...row, weeklyMinCents: Cents.make(-1) },
+            input: {
+              ...Struct.pick(row, Struct.keys(StslRow.fields)),
+              weeklyMinCents: Cents.make(-1),
+            },
             name: "negative start",
           },
           {
-            input: { ...row, weeklyMaxCents: reversedEnd },
+            input: {
+              ...Struct.pick(row, Struct.keys(StslRow.fields)),
+              weeklyMaxCents: reversedEnd,
+            },
             name: "reversed range",
           },
           {
             input: {
-              ...row,
+              ...Struct.pick(row, Struct.keys(StslRow.fields)),
               a: DecimalCoefficient.make(BigDecimal.make(-1n, 1)),
             },
             name: "negative multiplier",
           },
           {
             input: {
-              ...row,
+              ...Struct.pick(row, Struct.keys(StslRow.fields)),
               a: DecimalCoefficient.make(BigDecimal.make(101n, 2)),
             },
             name: "multiplier above one",
           },
           {
             input: {
-              ...row,
+              ...Struct.pick(row, Struct.keys(StslRow.fields)),
               a: DecimalCoefficient.make(
                 BigDecimal.make(1n, -Number.MAX_SAFE_INTEGER)
               ),
@@ -64,13 +70,13 @@ describe("StslTable owned relationships", () => {
           })
         );
         const point = yield* StslRow.makeEffect({
-          ...row,
+          ...Struct.pick(row, Struct.keys(StslRow.fields)),
           weeklyMaxCents: row.weeklyMinCents,
         });
         expect(Schema.is(StslRow)(point)).toBe(true);
         expect(Schema.is(Schema.toEncoded(StslRow))(point)).toBe(true);
         const tiny = yield* StslRow.makeEffect({
-          ...row,
+          ...Struct.pick(row, Struct.keys(StslRow.fields)),
           a: DecimalCoefficient.make(
             BigDecimal.make(1n, Number.MAX_SAFE_INTEGER)
           ),
@@ -91,23 +97,23 @@ describe("StslTable owned relationships", () => {
         const overlapStart = yield* Cents.makeEffect(second.weeklyMinCents - 1);
         const tailEnd = yield* Cents.makeEffect(last.weeklyMinCents + 100);
         const gap = yield* StslRow.makeEffect({
-          ...second,
+          ...Struct.pick(second, Struct.keys(StslRow.fields)),
           weeklyMinCents: gapStart,
         });
         const overlap = yield* StslRow.makeEffect({
-          ...second,
+          ...Struct.pick(second, Struct.keys(StslRow.fields)),
           weeklyMinCents: overlapStart,
         });
         const closedTail = yield* StslRow.makeEffect({
-          ...last,
+          ...Struct.pick(last, Struct.keys(StslRow.fields)),
           weeklyMaxCents: tailEnd,
         });
         const missingStart = yield* StslRow.makeEffect({
-          ...first,
+          ...Struct.pick(first, Struct.keys(StslRow.fields)),
           weeklyMinCents: Cents.make(1),
         });
         const openMiddle = yield* StslRow.makeEffect({
-          ...first,
+          ...Struct.pick(first, Struct.keys(StslRow.fields)),
           weeklyMaxCents: "infinity",
         });
         const cases = [
@@ -146,7 +152,10 @@ describe("StslTable owned relationships", () => {
         ];
         yield* Effect.forEach(cases, (scenario) =>
           Effect.gen(function* () {
-            const input = { ...table, rows: scenario.rows };
+            const input = {
+              ...Struct.pick(table, Struct.keys(StslTable.fields)),
+              rows: scenario.rows,
+            };
             const result = yield* StslTable.makeEffect(input).pipe(
               Effect.result
             );

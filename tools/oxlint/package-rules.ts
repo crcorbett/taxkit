@@ -136,7 +136,9 @@ const workspaceRoles: OxlintRule = {
           if (!hasBinding(scope)) {
             Option.match(Array.head(node.arguments), {
               onNone: () => null,
-              onSome: (source) => inspect(node, source),
+              onSome: (source) => {
+                inspect(node, source);
+              },
             });
           }
         }

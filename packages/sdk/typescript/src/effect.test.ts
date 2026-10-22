@@ -4,7 +4,11 @@ import { CalculatorServiceError } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
-import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
+import {
+  AuPayCalculatorId,
+  GrossPay,
+  TakeHomePayReport,
+} from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
 import {
   Array as EffectArray,
@@ -15,6 +19,7 @@ import {
   Match,
   Option,
   Schema,
+  Struct,
 } from "effect";
 
 import { calculateReport, calculateRunRequest } from "./effect.js";
@@ -224,7 +229,7 @@ describe("Effect SDK facade", () => {
         ).pipe(Effect.exit);
         expect(Exit.isFailure(wireAsDomain)).toBe(true);
         const malformed = yield* AuPayTakeHomeCalculation.decodeOutput({
-          ...report,
+          ...Struct.pick(report, Struct.keys(TakeHomePayReport.fields)),
           trace: { ...report.trace, formula: secretSentinel },
         }).pipe(Effect.exit);
         expect(Exit.isFailure(malformed)).toBe(true);

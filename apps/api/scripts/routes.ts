@@ -87,6 +87,7 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
             "Public documentation replies did not match their owning page.",
         });
       }
+      return yield* Effect.void;
     }).pipe(
       Effect.mapError(
         () =>

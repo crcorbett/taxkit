@@ -11,6 +11,10 @@ import {
 } from "./mdx-component-policy.js";
 import { validateContent, validationSummary } from "./policy.js";
 
+const expectedComponentMessage: unknown = expect.stringContaining(
+  "MDX component not allowed:"
+);
+
 const literalExamples = [
   "`SdkCalculatorRunResponse<Report>` is inline code.",
   "```tsx\n<UnsafeComponent />\n```",
@@ -89,7 +93,7 @@ describe("docs content validation policy", () => {
         expect(issues).toHaveLength(1);
         expect(issues).toMatchObject([
           {
-            message: expect.stringContaining("MDX component not allowed:"),
+            message: expectedComponentMessage,
             path: [source],
           },
         ]);

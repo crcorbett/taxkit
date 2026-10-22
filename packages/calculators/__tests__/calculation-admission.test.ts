@@ -58,6 +58,7 @@ describe("anonymous calculation admission", () => {
         "2001:0db8:0000:0000:0000:0000:0000:0075"
       );
       expect(first).toEqual(second);
+      // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
       expect(String(first)).not.toContain("2001:");
       expect(
         Result.isFailure(
@@ -72,7 +73,9 @@ describe("anonymous calculation admission", () => {
           Schema.decodeEffect(CalculatorClientRateKey)(invalid).pipe(
             Effect.result,
             Effect.tap((result) =>
-              Effect.sync(() => expect(Result.isFailure(result)).toBe(true))
+              Effect.sync(() => {
+                expect(Result.isFailure(result)).toBe(true);
+              })
             )
           )
       );

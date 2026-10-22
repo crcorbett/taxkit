@@ -309,10 +309,10 @@ it.live(
           {
             body,
             headers: {
-              "cf-worker": "native-website-fixture",
-              "content-type": "application/json",
               [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
               [WebsiteForwardingRateKeyHeader]: alias,
+              "cf-worker": "native-website-fixture",
+              "content-type": "application/json",
             },
             method: "POST",
           }
@@ -325,10 +325,10 @@ it.live(
           {
             body,
             headers: {
-              "cf-worker": "native-website-fixture",
-              "content-type": "application/json",
               [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
               [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
+              "cf-worker": "native-website-fixture",
+              "content-type": "application/json",
             },
             method: "POST",
           }
@@ -350,10 +350,10 @@ it.live(
                 {
                   body,
                   headers: {
-                    "cf-worker": "native-website-fixture",
-                    "content-type": "application/json",
                     [WebsiteForwardingCredentialHeader]: credential,
                     [WebsiteForwardingRateKeyHeader]: "2001:db8::77",
+                    "cf-worker": "native-website-fixture",
+                    "content-type": "application/json",
                   },
                   method: "POST",
                 }
@@ -371,10 +371,10 @@ it.live(
           {
             body,
             headers: {
-              "cf-worker": "native-website-fixture",
-              "content-type": "application/json",
               [WebsiteForwardingCredentialHeader]: "e2".repeat(32),
               [WebsiteForwardingRateKeyHeader]: "2001:db8::77",
+              "cf-worker": "native-website-fixture",
+              "content-type": "application/json",
             },
             method: "POST",
           }
@@ -436,9 +436,9 @@ it.live(
           {
             body,
             headers: {
-              "content-type": "application/json",
               [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
               [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
+              "content-type": "application/json",
             },
             method: "POST",
           }
@@ -453,10 +453,10 @@ it.live(
           {
             body,
             headers: {
-              "cf-worker": "native-website-fixture",
-              "content-type": "application/json",
               [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
               [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
+              "cf-worker": "native-website-fixture",
+              "content-type": "application/json",
             },
             method: "POST",
           }
@@ -468,9 +468,9 @@ it.live(
           `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
           {
             headers: {
-              "cf-worker": "native-website-fixture",
               [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
               [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
+              "cf-worker": "native-website-fixture",
             },
             method: "GET",
           }
@@ -484,10 +484,10 @@ it.live(
         api.fetch(`${apiOrigin}/rpc`, {
           body: batch,
           headers: {
-            "cf-worker": "native-website-fixture",
-            "content-type": "application/json",
             [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
             [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
+            "cf-worker": "native-website-fixture",
+            "content-type": "application/json",
           },
           method: "POST",
         })
@@ -543,7 +543,9 @@ it.live(
           "native-private-canary",
         ],
         (sentinel) =>
-          Effect.sync(() => expect(captured).not.toContain(sentinel))
+          Effect.sync(() => {
+            expect(captured).not.toContain(sentinel);
+          })
       );
       expect(yield* Queue.clear(exceptions)).toEqual([]);
     }).pipe(Effect.provide(NodeServices.layer), Effect.scoped)

@@ -48,11 +48,11 @@ const effectImportSemantic: ImportSemantic = (
     ["effect/Schema", "Schema"],
   ]);
   const moduleSemantic = Option.getOrNull(HashMap.get(moduleSemantics, source));
-  if (!moduleSemantic) {
+  if (moduleSemantic === null) {
     return null;
   }
 
-  return specifierType === "ImportSpecifier" && imported
+  return specifierType === "ImportSpecifier" && imported !== null
     ? `${moduleSemantic}.${imported}`
     : moduleSemantic;
 };
@@ -78,7 +78,7 @@ const platformBunImportSemantic: ImportSemantic = (
   }
 
   if (source === "@effect/platform-bun/BunRuntime") {
-    return specifierType === "ImportSpecifier" && imported
+    return specifierType === "ImportSpecifier" && imported !== null
       ? `BunRuntime.${imported}`
       : "BunRuntime";
   }
@@ -105,7 +105,7 @@ const platformNodeImportSemantic: ImportSemantic = (
     return "platform-node";
   }
   if (source === "@effect/platform-node/NodeRuntime") {
-    return specifierType === "ImportSpecifier" && imported
+    return specifierType === "ImportSpecifier" && imported !== null
       ? `NodeRuntime.${imported}`
       : "NodeRuntime";
   }
@@ -178,20 +178,16 @@ const noLayerExportsInServiceFiles: OxlintRule = {
     return {
       ExportDefaultDeclaration(node) {
         reportName(node.declaration);
-        reportName(
-          node.declaration && "id" in node.declaration
-            ? node.declaration.id
-            : undefined
-        );
+        reportName("id" in node.declaration ? node.declaration.id : undefined);
       },
       ExportNamedDeclaration(node) {
         if (node.declaration?.type === "VariableDeclaration") {
-          forEach(node.declaration.declarations, (declarator) =>
-            reportName(declarator.id)
-          );
+          forEach(node.declaration.declarations, (declarator) => {
+            reportName(declarator.id);
+          });
         } else {
           reportName(
-            node.declaration && "id" in node.declaration
+            node.declaration !== null && "id" in node.declaration
               ? node.declaration.id
               : undefined
           );
@@ -316,7 +312,7 @@ const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
       pattern: SyntaxNode | null | undefined,
       source: string | null
     ): void => {
-      if (!source) {
+      if (source === null) {
         return;
       }
       if (pattern?.type === "Identifier") {
@@ -334,7 +330,7 @@ const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
           (property) => {
             if (property.type === "Property") {
               const member = propertyName(property.key);
-              if (member) {
+              if (member !== null) {
                 reportDestructuredRunner(property.value, `${source}.${member}`);
               }
             }
@@ -398,13 +394,16 @@ const noConsoleOutsideRuntime: OxlintRule = {
       CallExpression(node) {
         if (
           node.callee?.type === "Identifier" &&
-          tracker.calledSemantic(node)?.startsWith("Global.console.")
+          tracker.calledSemantic(node)?.startsWith("Global.console.") === true
         ) {
           context.report({ messageId: "noConsoleOutsideRuntime", node });
         }
       },
       MemberExpression(node) {
-        if (tracker.semanticOfExpression(node)?.startsWith("Global.console.")) {
+        if (
+          tracker.semanticOfExpression(node)?.startsWith("Global.console.") ===
+          true
+        ) {
           context.report({ messageId: "noConsoleOutsideRuntime", node });
         }
       },
@@ -477,7 +476,7 @@ const noProcessOutsideBoundaries: OxlintRule = {
         const semantic = tracker.calledSemantic(node);
         if (
           node.callee?.type === "Identifier" &&
-          semantic?.startsWith("Global.process.") &&
+          semantic?.startsWith("Global.process.") === true &&
           HashSet.has(
             processBoundaryMembers,
             semantic.slice("Global.process.".length)
@@ -489,7 +488,7 @@ const noProcessOutsideBoundaries: OxlintRule = {
       MemberExpression(node) {
         const semantic = tracker.semanticOfExpression(node);
         if (
-          semantic?.startsWith("Global.process.") &&
+          semantic?.startsWith("Global.process.") === true &&
           HashSet.has(
             processBoundaryMembers,
             semantic.slice("Global.process.".length)
@@ -578,7 +577,7 @@ const schemaCodecRule = ({
             (prefix) => semantic?.startsWith(prefix) ?? false
           ).pipe(Option.map((prefix) => semantic?.slice(prefix.length)))
         );
-        if (method && matches(method)) {
+        if (method !== null && method !== undefined && matches(method)) {
           context.report({ messageId, node: node.callee });
         }
       },

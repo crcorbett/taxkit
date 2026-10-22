@@ -107,7 +107,7 @@ describe("real MCP client against the native API application", () => {
         const app = yield* ApiWorkerApplication.pipe(
           Effect.provide(ApiContentLive)
         );
-        const context = yield* Effect.context<never>();
+        const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
           never,
           Scope.Scope | HttpServerRequest.HttpServerRequest
@@ -185,7 +185,7 @@ describe("real MCP client against the native API application", () => {
         const app = yield* ApiWorkerApplication.pipe(
           Effect.provide(ApiContentLive)
         );
-        const context = yield* Effect.context<never>();
+        const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
           never,
           Scope.Scope | HttpServerRequest.HttpServerRequest
@@ -244,7 +244,7 @@ describe("real MCP client against the native API application", () => {
             )
           )
         );
-        const context = yield* Effect.context<never>();
+        const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
           never,
           Scope.Scope | HttpServerRequest.HttpServerRequest
@@ -355,7 +355,7 @@ describe("real MCP client against the native API application", () => {
             )
           )
         );
-        const context = yield* Effect.context<never>();
+        const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
           never,
           Scope.Scope | HttpServerRequest.HttpServerRequest
@@ -412,7 +412,9 @@ describe("real MCP client against the native API application", () => {
         );
         const firstAbort = yield* Effect.fromOption(Array.head(aborts));
         const firstCall = yield* Effect.fromOption(Array.head(calls));
-        yield* Effect.sync(() => firstAbort.abort());
+        yield* Effect.sync(() => {
+          firstAbort.abort();
+        });
         expect((yield* Fiber.join(firstCall))._tag).toBe("Failure");
         expect(
           Array.some(yield* Ref.get(toolSignals), (signal) => signal.aborted)
@@ -435,7 +437,9 @@ describe("real MCP client against the native API application", () => {
         ).toEqual(yield* calculator.calculate(CalculationRequest));
         // Close the remaining client calls and wait for every owned calculation.
         yield* Effect.forEach(aborts, (abort) =>
-          Effect.sync(() => abort.abort())
+          Effect.sync(() => {
+            abort.abort();
+          })
         );
         yield* Effect.forEach(calls, Fiber.join, { concurrency: "unbounded" });
         expect(yield* Ref.get(stopped)).toBe(CalculatorConcurrencyLimit + 1);
@@ -472,7 +476,7 @@ describe("real MCP client against the native API application", () => {
             })
           )
         );
-        const context = yield* Effect.context<never>();
+        const context = yield* Effect.context();
         // The official SDK owns every HTTP frame/header. The native web bridge
         // supplies the actual request fibre and abort lifecycle; no domain runner.
         const handler = HttpEffect.toWebHandlerWith<

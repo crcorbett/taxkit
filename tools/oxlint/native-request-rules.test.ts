@@ -9,10 +9,10 @@ import { lintFiles, writeLintFixture } from "./cli-fixture.js";
 
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 
-// The vendored native request, cache and Layer rules, proved through the
+// The published native request, cache and Layer rules, proved through the
 // repository's actual Oxlint command and configuration at TaxKit paths.
-const runOxlint = (path: string) =>
-  lintFiles([path], [], "json").pipe(
+const runOxlint = (path: string, extraArgs: readonly string[] = []) =>
+  lintFiles([path], extraArgs, "json").pipe(
     Effect.flatMap((result) =>
       Schema.decodeEffect(
         Schema.fromJsonString(
@@ -32,12 +32,30 @@ describe("native request ownership rules", () => {
     "traverses a large cyclic host AST without structural hashing",
     () =>
       runOxlint("apps/web/test/native-pair.boundary.test.ts").pipe(
-        Effect.tap((codes) => Effect.sync(() => expect(codes).toEqual([]))),
+        Effect.tap((codes) =>
+          Effect.sync(() => {
+            expect(codes).toEqual([]);
+          })
+        ),
         Effect.provide(BunServices.layer)
       ),
     10_000
   );
   it.effect.each([
+    {
+      count: 1,
+      name: "rejects duplicate runtime production hostnames",
+      path: "packages/analytics/src/.generated-host-owner.ts",
+      rule: "strict-effect(public-host-literals)",
+      source: 'export const origin = "https://api.taxkit.dev";',
+    },
+    {
+      count: 1,
+      name: "rejects duplicate runtime transport paths",
+      path: "apps/api/src/.generated-route-owner.ts",
+      rule: "strict-effect(route-literal-ownership)",
+      source: 'export const route = "/api/v1/calculators";',
+    },
     {
       count: 4,
       name: "rejects exported, aliased and Match-wrapped Layer factories",
@@ -202,5 +220,19 @@ export type Values = Env;`,
         )
       ).toEqual([]);
     }).pipe(Effect.provide(BunServices.layer))
+  );
+  it.effect(
+    "checks floating Promises without requiring async SDK facades",
+    () =>
+      Effect.gen(function* () {
+        const path = "packages/sdk/typescript/src/.generated-type-aware.ts";
+        yield* writeLintFixture(
+          nodePath.join(repositoryRoot, path),
+          "export const native = () => Promise.resolve(1); native();"
+        );
+        const codes = yield* runOxlint(path, ["--type-aware"]);
+        expect(codes).toContain("typescript(no-floating-promises)");
+        expect(codes).not.toContain("typescript(promise-function-async)");
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 });

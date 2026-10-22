@@ -8,6 +8,7 @@ import { scheduleTask } from "@effect/atom-react/RegistryContext";
 import { describe, expect, it } from "@effect/vitest";
 import { Array as EffectArray, Effect, Option } from "effect";
 import * as Atom from "effect/reactivity/Atom";
+import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
 import { StrictMode, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
 import { hydrateRoot } from "react-dom/client";
@@ -23,8 +24,8 @@ const AtomHarness = ({ children }: { readonly children: ReactNode }) => (
 describe("qualified Atom / React / Scheduler lifecycle", () => {
   it.effect("runs scheduled work and cancels queued work", () =>
     Effect.gen(function* () {
-      const executed = vi.fn();
-      const cancelled = vi.fn();
+      const executed = vi.fn<(...args: readonly unknown[]) => void>();
+      const cancelled = vi.fn<(...args: readonly unknown[]) => void>();
       const cancel = scheduleTask(cancelled);
       cancel();
       scheduleTask(executed);
@@ -40,10 +41,10 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
     () =>
       Effect.gen(function* () {
         const count = Atom.make(42);
-        const disposed = vi.fn();
-        const captured = vi.fn();
-        const hydrated = vi.fn();
-        const errors = vi.fn();
+        const disposed = vi.fn<(...args: readonly unknown[]) => void>();
+        const captured = vi.fn<(registry: AtomRegistry.AtomRegistry) => void>();
+        const hydrated = vi.fn<(...args: readonly unknown[]) => void>();
+        const errors = vi.fn<(...args: readonly unknown[]) => void>();
         const resource = Atom.make((get) => {
           get.addFinalizer(disposed);
           return "mounted";
@@ -54,7 +55,12 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
             hydrated();
           }, []);
           return (
-            <button onClick={() => setValue((n) => n + 1)} type="button">
+            <button
+              onClick={() => {
+                setValue((n) => n + 1);
+              }}
+              type="button"
+            >
               {value}
             </button>
           );
@@ -102,7 +108,10 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
                   }
                 )
               ),
-              (reactRoot) => Effect.sync(() => reactRoot.unmount())
+              (reactRoot) =>
+                Effect.sync(() => {
+                  reactRoot.unmount();
+                })
             );
             yield* Effect.promise(() =>
               expect.poll(() => hydrated.mock.calls.length).toBeGreaterThan(0)
@@ -134,7 +143,10 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
             );
             yield* Effect.forEach(
               EffectArray.range(1, 50),
-              () => Effect.sync(() => button.click()),
+              () =>
+                Effect.sync(() => {
+                  button.click();
+                }),
               { discard: true }
             );
             yield* Effect.promise(() =>

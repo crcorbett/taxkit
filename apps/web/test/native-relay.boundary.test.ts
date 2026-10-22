@@ -269,9 +269,9 @@ it.live.each(["off", "invalid", "enabled", "redirect"] as const)(
                 "origin",
               ],
               (name) =>
-                Effect.sync(() =>
-                  expect(request.headers.has(name), name).toBe(false)
-                )
+                Effect.sync(() => {
+                  expect(request.headers.has(name), name).toBe(false);
+                })
             );
           }
         })

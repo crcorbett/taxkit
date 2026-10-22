@@ -35,7 +35,7 @@ const checkoutDirectoryPath = new RegExp(
 const categoryForLine = (
   line: string
 ): Option.Option<RepositoryPathCategory> => {
-  const candidate = line.replace(httpsReference, "");
+  const candidate = line.replaceAll(httpsReference, "");
 
   return Match.value(candidate).pipe(
     Match.when(

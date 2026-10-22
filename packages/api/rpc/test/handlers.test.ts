@@ -113,7 +113,9 @@ const makeHttpTransport = Effect.fnUntraced(function* (
     )
   );
   return HttpClient.make((request, url) =>
-    Effect.sync(() => expect(url.pathname).toBe("/rpc")).pipe(
+    Effect.sync(() => {
+      expect(url.pathname).toBe("/rpc");
+    }).pipe(
       Effect.andThen(handler),
       Effect.provideService(
         HttpServerRequest.HttpServerRequest,
@@ -487,6 +489,8 @@ describe("native calculator RPC", () => {
           expect(report.netPay.cents).toBe(130_100);
           expect(report.grossPay.cents).toBe(165_400);
         }),
+
+        // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
         Match.orElse(() => expect.fail("Expected take-home report"))
       );
     }).pipe(
@@ -508,9 +512,11 @@ describe("native calculator RPC", () => {
           const client = yield* TaxKitRpcClient;
           const response = yield* client.calculate(CalculationRequest);
           Match.value(response.report).pipe(
-            Match.tag("TakeHomePayReport", (report) =>
-              expect(report.netPay.cents).toBe(130_100)
-            ),
+            Match.tag("TakeHomePayReport", (report) => {
+              expect(report.netPay.cents).toBe(130_100);
+            }),
+
+            // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
             Match.orElse(() => expect.fail("Expected take-home report"))
           );
         }).pipe(
@@ -831,15 +837,15 @@ it.effect.each(
       const bodyRead = yield* Ref.make(false);
       const aborts = yield* Queue.make<boolean>();
       const transport = HttpClient.make((request, _url, signal) =>
-        Effect.sync(() =>
+        Effect.sync(() => {
           signal.addEventListener(
             "abort",
             () => {
               Queue.offerUnsafe(aborts, true);
             },
             { once: true }
-          )
-        ).pipe(
+          );
+        }).pipe(
           Effect.andThen(Ref.update(calls, (count) => count + 1)),
           Effect.as(
             HttpServerResponse.toClientResponse(

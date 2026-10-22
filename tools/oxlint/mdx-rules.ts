@@ -41,7 +41,7 @@ const hasMdxElementKey = (node: SyntaxNode | null | undefined) =>
         )
       )
     ),
-    Option.getOrUndefined
+    Option.getOrElse(() => false)
   );
 
 const noRouteLocalComponentRegistry: OxlintRule = {

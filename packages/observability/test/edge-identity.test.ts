@@ -54,6 +54,7 @@ it.effect("redacts and refuses to encode forwarding credentials", () =>
     const credential = yield* Schema.decodeUnknownEffect(
       WebsiteForwardingCredential
     )("a".repeat(64));
+    // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
     expect(String(credential)).not.toContain("a".repeat(64));
     expect(
       yield* Schema.encodeEffect(WebsiteForwardingCredential)(credential).pipe(

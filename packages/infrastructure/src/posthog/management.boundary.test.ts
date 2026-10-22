@@ -427,7 +427,9 @@ it.effect.each([
         expect(Cause.pretty(cause)).not.toContain("PRIVATE9");
         expect(Cause.pretty(cause)).not.toContain("phx_");
       },
-      onSuccess: (value) => expect(Option.isNone(value)).toBe(true),
+      onSuccess: (value) => {
+        expect(Option.isNone(value)).toBe(true);
+      },
     });
     expect(yield* Ref.get(native.calls)).toHaveLength(1);
   })
@@ -485,16 +487,18 @@ it.effect(
       ]);
       Option.match(Array.get(calls, 1), {
         onNone: () => expect.fail("Create call missing"),
-        onSome: (call) =>
+        onSome: (call) => {
           Option.match(call.body, {
             onNone: () => expect.fail("Create body missing"),
-            onSome: (body) =>
+            onSome: (body) => {
               expect(body).toEqual({
                 ...desiredProjectPrivacy,
                 name: definition.name,
                 product_description: definition.marker,
-              }),
-          }),
+              });
+            },
+          });
+        },
       });
     })
 );
@@ -537,8 +541,9 @@ it.effect.each([
       Array.map(yield* Ref.get(native.calls), (call) => call.method)
     ).toEqual(["GET", "POST"]);
     Exit.match(result, {
-      onFailure: (cause) =>
-        expect(Cause.pretty(cause)).not.toContain("PRIVATE9"),
+      onFailure: (cause) => {
+        expect(Cause.pretty(cause)).not.toContain("PRIVATE9");
+      },
       onSuccess: () => expect.fail("A refused create cannot succeed"),
     });
   })
@@ -620,15 +625,17 @@ it.effect(
       ]);
       Option.match(Array.get(calls, 1), {
         onNone: () => expect.fail("Update call missing"),
-        onSome: (call) =>
+        onSome: (call) => {
           Option.match(call.body, {
             onNone: () => expect.fail("Update body missing"),
-            onSome: (body) =>
+            onSome: (body) => {
               expect(body).toEqual({
                 ...desiredProjectPrivacy,
                 name: definition.name,
-              }),
-          }),
+              });
+            },
+          });
+        },
       });
     })
 );
@@ -643,8 +650,9 @@ it.effect.each(["oversized", "failed"] as const)(
       ).pipe(Effect.provide(native.layer), Effect.exit);
       expect(failure(result)).toBe("provider-failure");
       Exit.match(result, {
-        onFailure: (cause) =>
-          expect(Cause.pretty(cause)).not.toContain("PRIVATE9"),
+        onFailure: (cause) => {
+          expect(Cause.pretty(cause)).not.toContain("PRIVATE9");
+        },
         onSuccess: () => expect.fail("Invalid body accepted"),
       });
     })

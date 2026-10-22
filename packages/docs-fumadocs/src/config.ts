@@ -16,7 +16,7 @@ import remarkMermaid from "remark-mermaidjs";
 import { applyCodeBlockMeta } from "./code-block-meta.ts";
 
 export const effectSchemaToStandardSchema = <
-  const SourceSchema extends Schema.Decoder<unknown, never>,
+  const SourceSchema extends Schema.Decoder<unknown>,
 >(
   schema: SourceSchema
 ) => Schema.toStandardSchemaV1(schema);

@@ -51,7 +51,7 @@ export const BackendAnalyticsLive = Layer.unwrap(
                       return "denied" as const;
                     }
                     const uuid = yield* crypto.randomUUIDv4().pipe(
-                      Effect.flatMap(EventId.makeEffect),
+                      Effect.flatMap((value) => EventId.makeEffect(value)),
                       Effect.mapError(
                         () =>
                           new AnalyticsCaptureError({

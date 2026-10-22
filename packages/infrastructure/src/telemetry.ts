@@ -110,4 +110,5 @@ export const requireProductionStage = Effect.gen(function* () {
       )
     );
   }
+  return yield* Effect.void;
 });

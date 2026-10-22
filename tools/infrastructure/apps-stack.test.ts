@@ -34,12 +34,15 @@ import {
 import { BotManagement } from "alchemy/Cloudflare/BotManagement";
 import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import { Worker, isSelfUrl } from "alchemy/Cloudflare/Workers";
+import type { WorkerBindingProps } from "alchemy/Cloudflare/Workers";
 import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
 import * as Provider from "alchemy/Provider";
 import { Random } from "alchemy/Random";
+import { isResourceOfType } from "alchemy/Resource";
+import type { ResourceLike } from "alchemy/Resource";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
@@ -67,10 +70,23 @@ import { HttpClient } from "effect/http";
 
 import { declareNativeAppsStack } from "../../alchemy.apps.js";
 
+// These are Alchemy-created declarations, discriminated by the SDK resource type.
+const isWorker = (
+  resource: ResourceLike
+): resource is Worker<WorkerBindingProps> => resource.Type === Worker.Type;
+const isSetting = (resource: ResourceLike): resource is Setting =>
+  resource.Type === Setting.Type;
+const isDnsSettings = (resource: ResourceLike): resource is ZoneDnsSettings =>
+  resource.Type === ZoneDnsSettings.Type;
+const isWorkerPlan = (
+  node: Plan.Plan["resources"][string]
+): node is Plan.Apply<Worker<WorkerBindingProps>> =>
+  isResourceOfType(node.resource, Worker.Type);
+
 const graphFixture = Effect.fnUntraced(function* (
   mode: "create" | "noop" | "update" | "without-precreate" | "adopted",
   stage = "dev_native_graph_proof",
-  traceExport = stage === "prod"
+  traceExport: boolean = stage === "prod"
 ) {
   const providerWrites = yield* Ref.make(0);
   const forbiddenWrite = Ref.update(providerWrites, (count) => count + 1).pipe(
@@ -112,8 +128,10 @@ const graphFixture = Effect.fnUntraced(function* (
               createdOn: "2026-10-03T05:08:24Z",
               developmentMode: 0,
               meta: {
+                // oxlint-disable-next-line typescript/no-deprecated -- The native provider fixture includes all upstream output fields.
                 cdnOnly: undefined,
                 customCertificateQuota: undefined,
+                // oxlint-disable-next-line typescript/no-deprecated -- The native provider fixture includes all upstream output fields.
                 dnsOnly: undefined,
                 foundationDns: false,
                 pageRuleQuota: undefined,
@@ -440,7 +458,7 @@ describe("native paired app graph and planner", () => {
         ).toEqual(["create", "create", "create"]);
         const members = Array.filter(
           Record.values(result.compiled.resources),
-          (resource) => resource.Type === Worker.Type
+          isWorker
         );
         expect(
           Array.every(
@@ -451,6 +469,7 @@ describe("native paired app graph and planner", () => {
         // Other stages keep their stable workers.dev address without previews.
         expect(
           Record.get(result.compiled.resources, "TaxKitWebsite").pipe(
+            Option.filter(isWorker),
             Option.map((website) => website.Props.workersDev)
           )
         ).toEqual(Option.some({ enabled: true, previewsEnabled: false }));
@@ -488,6 +507,7 @@ describe("native paired app graph and planner", () => {
         productionZoneSettings,
         (setting) =>
           Record.get(result.compiled.resources, setting.resource).pipe(
+            Option.filter(isSetting),
             Option.getOrElse(() => expect.fail("Expected zone setting")),
             (resource) =>
               Output.evaluate(
@@ -530,15 +550,18 @@ describe("native paired app graph and planner", () => {
         result.compiled.resources,
         "TaxKitProductionDnsSettings"
       ).pipe(
+        Option.filter(isDnsSettings),
         Option.getOrElse(() => expect.fail("Expected native graph member"))
       );
       const api = Record.get(result.compiled.resources, "TaxKitApi").pipe(
+        Option.filter(isWorker),
         Option.getOrElse(() => expect.fail("Expected native graph member"))
       );
       const website = Record.get(
         result.compiled.resources,
         "TaxKitWebsite"
       ).pipe(
+        Option.filter(isWorker),
         Option.getOrElse(() => expect.fail("Expected native graph member"))
       );
       expect(zone.Adopt).toBe(true);
@@ -569,8 +592,20 @@ describe("native paired app graph and planner", () => {
           zoneId: "15103853342ab9f18f7894b7fae39c39",
         },
       });
-      expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
-      expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
+      expect(
+        isSelfUrl(
+          Option.getOrUndefined(
+            Record.get(api.Props.env ?? {}, "API_PUBLIC_ORIGIN")
+          )
+        )
+      ).toBe(true);
+      expect(
+        isSelfUrl(
+          Option.getOrUndefined(
+            Record.get(website.Props.env ?? {}, "WEBSITE_PUBLIC_ORIGIN")
+          )
+        )
+      ).toBe(true);
       // Production exports the hosts' checked console records only, through
       // the persisted trace-export destination. Invocation logs and automatic
       // traces (which carry URLs and caller details) stay off.
@@ -598,7 +633,12 @@ describe("native paired app graph and planner", () => {
       const dnssec = Record.get(
         result.compiled.resources,
         "TaxKitProductionDnssec"
-      ).pipe(Option.getOrElse(() => expect.fail("Expected DNSSEC")));
+      ).pipe(
+        Option.filter(
+          (resource): resource is Dnssec => resource.Type === Dnssec.Type
+        ),
+        Option.getOrElse(() => expect.fail("Expected DNSSEC"))
+      );
       const bots = Record.get(
         result.compiled.resources,
         "TaxKitProductionBotManagement"
@@ -652,7 +692,7 @@ describe("native paired app graph and planner", () => {
           Array.sort(
             Array.map(
               Record.values(plan.resources),
-              ({ resource, action }) => ({
+              ({ resource, action }: Plan.CRUD) => ({
                 action,
                 id: resource.LogicalId,
               })
@@ -668,12 +708,14 @@ describe("native paired app graph and planner", () => {
           },
         ]);
         const api = Record.get(result.compiled.resources, "TaxKitApi").pipe(
+          Option.filter(isWorker),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
         const website = Record.get(
           result.compiled.resources,
           "TaxKitWebsite"
         ).pipe(
+          Option.filter(isWorker),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
         expect(api.Props).toBeDefined();
@@ -684,8 +726,20 @@ describe("native paired app graph and planner", () => {
             Option.isNone
           )
         ).toBe(true);
-        expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
-        expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
+        expect(
+          isSelfUrl(
+            Option.getOrUndefined(
+              Record.get(api.Props.env ?? {}, "API_PUBLIC_ORIGIN")
+            )
+          )
+        ).toBe(true);
+        expect(
+          isSelfUrl(
+            Option.getOrUndefined(
+              Record.get(website.Props.env ?? {}, "WEBSITE_PUBLIC_ORIGIN")
+            )
+          )
+        ).toBe(true);
         expect(
           Array.sort(Record.keys(website.Props.env ?? {}), Order.String)
         ).toEqual([
@@ -711,11 +765,18 @@ describe("native paired app graph and planner", () => {
           enabled: true,
         });
         const apiNode = Record.get(plan.resources, "TaxKitApi").pipe(
+          Option.filter(isWorkerPlan),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
         const websiteNode = Record.get(plan.resources, "TaxKitWebsite").pipe(
+          Option.filter(isWorkerPlan),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
+        if (apiNode.action === "replace" || websiteNode.action === "replace") {
+          return yield* Effect.die(
+            "Native app fixture must not replace either Worker"
+          );
+        }
         const apiProps = "props" in apiNode ? apiNode.props : api.Props;
         const websiteProps =
           "props" in websiteNode ? websiteNode.props : website.Props;
@@ -759,8 +820,15 @@ describe("native paired app graph and planner", () => {
         const key = Redacted.make("a".repeat(64));
         const credentials = yield* Output.evaluate(
           {
-            api: api.Props.env?.TAXKIT_WEBSITE_FORWARDING_KEY,
-            website: website.Props.env?.TAXKIT_WEBSITE_FORWARDING_KEY,
+            api: Option.getOrUndefined(
+              Record.get(api.Props.env ?? {}, "TAXKIT_WEBSITE_FORWARDING_KEY")
+            ),
+            website: Option.getOrUndefined(
+              Record.get(
+                website.Props.env ?? {},
+                "TAXKIT_WEBSITE_FORWARDING_KEY"
+              )
+            ),
           },
           { TaxKitWebsiteForwardingKey: { text: key } }
         ).pipe(Effect.provideContext(result.compiled.services));
@@ -770,15 +838,24 @@ describe("native paired app graph and planner", () => {
         expect(result.compiled.stage).toBe("dev_native_graph_proof");
         expect(result.compiled.name).toBe("TaxKitAppsGraphProof");
         const absent = yield* Output.evaluate(
-          { api: websiteProps.env?.API_PUBLIC_ORIGIN },
+          {
+            api: Option.getOrUndefined(
+              Record.get(websiteProps.env ?? {}, "API_PUBLIC_ORIGIN")
+            ),
+          },
           { TaxKitApi: { url: undefined } }
         ).pipe(Effect.provideContext(result.compiled.services));
         expect(absent).toEqual({ api: null });
         const resolved = yield* Output.evaluate(
-          { api: websiteProps.env?.API_PUBLIC_ORIGIN },
+          {
+            api: Option.getOrUndefined(
+              Record.get(websiteProps.env ?? {}, "API_PUBLIC_ORIGIN")
+            ),
+          },
           { TaxKitApi: { url: "https://fresh-api.example.com" } }
         ).pipe(Effect.provideContext(result.compiled.services));
         expect(resolved).toEqual({ api: "https://fresh-api.example.com" });
+        return yield* Effect.void;
       }).pipe(
         Effect.provideService(AlchemyContext, localContext),
         Effect.provideService(Stage, "dev_native_graph_proof"),
@@ -1051,7 +1128,11 @@ describe("Website build-input hash", () => {
           (ignored) =>
             write(ignored, "ignored").pipe(
               Effect.andThen(hash),
-              Effect.map((value) => expect(value, ignored).toBe(original))
+              Effect.tap((value) =>
+                Effect.sync(() => {
+                  expect(value, ignored).toBe(original);
+                })
+              )
             ),
           { discard: true }
         );

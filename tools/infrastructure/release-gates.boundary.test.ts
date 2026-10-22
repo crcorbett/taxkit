@@ -100,7 +100,7 @@ const commandFixture = Effect.gen(function* () {
 const runCommand = Effect.fnUntraced(function* (
   fixture: Effect.Success<typeof commandFixture>,
   command: string,
-  fail = "",
+  fail?: string,
   args: readonly string[] = [],
   pullRequestState: "open" | "closed" = "closed"
 ) {
@@ -114,7 +114,7 @@ const runCommand = Effect.fnUntraced(function* (
         // Only harmless fixture executables precede system tools. No actual Bun,
         // Alchemy, Doppler or provider command is reached by a tested script.
         env: {
-          GATE_FAIL: fail,
+          GATE_FAIL: fail ?? "",
           GATE_FIXTURE: fixture.directory,
           GATE_PR_STATE: pullRequestState,
           GITHUB_OUTPUT: `${fixture.directory}/outputs`,
@@ -150,9 +150,9 @@ const workflow = (path: string) =>
   FileSystem.FileSystem.pipe(
     Effect.flatMap((fs) => fs.readFileString(path)),
     Effect.flatMap((source) =>
-      Effect.try(() => parse(source)).pipe(
-        Effect.flatMap(Schema.decodeUnknownEffect(Workflow))
-      )
+      Effect.try(() =>
+        Schema.decodeUnknownResult(Workflow)(parse(source))
+      ).pipe(Effect.flatMap(Effect.fromResult))
     )
   );
 
