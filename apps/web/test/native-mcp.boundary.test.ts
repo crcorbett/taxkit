@@ -208,7 +208,9 @@ it.live(
         Effect.onError(() =>
           resumeProgress.pipe(
             Effect.tap((progress) =>
-              Effect.sync(() => expect(progress.errors).toEqual([]))
+              Effect.sync(() => {
+                expect(progress.errors).toEqual([]);
+              })
             ),
             Effect.orDie
           )
@@ -697,7 +699,9 @@ it.live(
         )
       ).pipe(Effect.timeout("1 second"));
       const outgoingController = yield* Queue.take(networkControllers);
-      yield* Effect.sync(() => outgoingController.abort());
+      yield* Effect.sync(() => {
+        outgoingController.abort();
+      });
       expect(yield* Queue.take(networkStops)).toBe(true);
       expect(
         Result.isFailure(yield* Fiber.join(Array.headNonEmpty(modernCalls)))

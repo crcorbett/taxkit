@@ -8,7 +8,7 @@ import {
 // the Git objects with the checked source and emitted guide fences.
 export const docsPublicLinkProfile = DocsPublicLinkProfile.make({
   checkedExampleRevision: DocsRepositoryRevision.make(
-    "def3630768813429a9336df7a276f3da0de0fc9a"
+    "dfc4bff4958967c186f6deebe2953416224fc5c6"
   ),
   repositoryRevision: DocsRepositoryRevision.make(
     "a151e51e8a30247526fa93412df046955846eca4"

@@ -58,7 +58,10 @@ export const remarkPublicDocsLinks = ({
         return node;
       }
       if (href.startsWith("/")) {
-        const target = URL.parse(href, "https://taxkit.dev");
+        // Only the pathname of a root-relative link is checked. The base is a
+        // reserved placeholder host, not a TaxKit address: the publication
+        // origin is owned by infrastructure, which this package cannot import.
+        const target = URL.parse(href, "https://root-relative.invalid");
         if (
           target === null ||
           !Array.some(pages, (page) => page.path === target.pathname)

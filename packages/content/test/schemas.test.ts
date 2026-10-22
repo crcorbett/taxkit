@@ -41,7 +41,9 @@ describe("public catalogue ingress", () => {
               Schema.decodeUnknownEffect(DocsPublicPage)(raw).pipe(
                 Effect.result,
                 Effect.tap((result) =>
-                  Effect.sync(() => assert.isTrue(Result.isFailure(result)))
+                  Effect.sync(() => {
+                    assert.isTrue(Result.isFailure(result));
+                  })
                 )
               )
           )
@@ -83,7 +85,9 @@ describe("public catalogue ingress", () => {
             Schema.decodeUnknownEffect(DocsPublicCatalogue)(raw).pipe(
               Effect.result,
               Effect.tap((result) =>
-                Effect.sync(() => assert.isTrue(Result.isFailure(result)))
+                Effect.sync(() => {
+                  assert.isTrue(Result.isFailure(result));
+                })
               )
             )
         );
@@ -98,7 +102,9 @@ describe("public catalogue ingress", () => {
           DocsSearchTerm.makeEffect(raw).pipe(
             Effect.result,
             Effect.tap((result) =>
-              Effect.sync(() => assert.isTrue(Result.isFailure(result)))
+              Effect.sync(() => {
+                assert.isTrue(Result.isFailure(result));
+              })
             )
           )
         );

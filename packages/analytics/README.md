@@ -45,8 +45,8 @@ require separate readback.
 
 The browser contract is shared so the Website adapter can keep its SDK private.
 `WebsiteAnalyticsRelayLive` reads the same checked analytics collection/stage
-settings and, only when enabled, `WEBSITE_PUBLIC_ORIGIN` using Content's owning
-origin Schema. The Website supplies its native ConfigProvider and HTTP client;
+settings and, only when enabled, `WEBSITE_PUBLIC_ORIGIN` through Content's
+`DocsWebsiteOriginConfig`. The Website supplies its native ConfigProvider and HTTP client;
 the package never imports app bindings or constructs a runner. The relay admits
 only same-origin POSTs to `/ingest/e/`, the qualified JSON/text media types and
 bounded retry counter. It forwards unchanged bytes once to the fixed US host,
@@ -72,8 +72,7 @@ substitution proof, not SDK or browser privacy proof.
 Change required: this README, the repository
 [package ownership](../../docs/architecture/package-ownership.md),
 [Effect boundary owner](../../docs/architecture/effect-services.md) and
-[completed plan](../../docs/exec-plans/completed/common-practice-foundation-review.md)
-route these package capabilities and application composition. The focused relay
+[deployment architecture](../../docs/architecture/deployment.md) route these package capabilities and application composition. The focused relay
 boundary tests move with their policy; API request integration tests continue to
 exercise the package decorator through the host collector. Preserve: tax Schemas,
 results, HTTP and SDK contracts, and published public documentation. This versioned private package follows the

@@ -42,14 +42,6 @@ Current implemented code lives in:
 - `packages/testing`
 - `packages/tsconfig`
 
-Current planned ownership placeholder:
-
-- `packages/ui`
-
-The placeholder directories contain README guidance only. Do not route runtime
-imports, source ownership or build expectations to them until package manifests
-and source exports exist.
-
 ## Main areas
 
 `packages/core`
@@ -125,14 +117,7 @@ calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
   rules, calculations and content lookup remain package/API-owned. The app owns
   documentation page loaders, app-specific MDX composition, navigation/focus,
   search, Markdown representations, share images and responsive reading, and
-  forwards discovery file requests to the API. The old `apps/docs` workspace is
-  retired; its verified original source and dated recovery records remain
-  addressable.
-
-`apps/docs`
-: Retirement tombstone only. The strict historical source bundle retains all
-  49 original files. The deployment runbook owns inspection and separately
-  approved recovery, rather than an active old workspace.
+  forwards discovery file requests to the API.
 
 Root `alchemy.run.ts` and `alchemy.local.run.ts`
 : The deployed and local-development roots for the Website/API graph; see
@@ -140,7 +125,8 @@ Root `alchemy.run.ts` and `alchemy.local.run.ts`
 
 `packages/infrastructure`
 : Private source-only owner of the native API/Website graph (`./apps-stack`),
-  stage Schemas (`./stage`) and secret selection (`./secrets`), plus the
+  local stage Schema (`./stage`), Production hostnames and publication origin
+  (`./hostnames`) and secret selection (`./secrets`), plus the
   separate retained PostHog project through the explicit `./posthog` export and
   `alchemy.posthog.run.ts`. Its private management adapter contains Distilled;
   application packages do not receive that client or its management
@@ -158,8 +144,10 @@ and shared settings. `@taxkit/observability/edge-identity` owns shared edge call
 identity. Neither an app nor a package depends on another app.
 
 `packages/observability`
-: Private compiled, provider-free owner of shared host request records, safe
-  loggers and edge identity policy. API, Website and infrastructure dashboards
+: Private compiled, provider-free and domain-free owner (it depends on no
+  other TaxKit workspace) of shared host request records, safe
+  loggers, edge identity policy and the hosted `DeploymentStage` /
+  `PullRequestStage` Schemas that analytics and infrastructure reuse. API, Website and infrastructure dashboards
   consume its named exports; machine RPC does not own host telemetry.
 
 `packages/api/mcp`
@@ -267,8 +255,8 @@ belongs in apps or explicitly server-only package exports.
   `tools/repository-paths`; do not move it into package orchestration or browser
   code.
 - Keep app-specific MDX components in `apps/web`. Promote only generic,
-  repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
-  TaxKit UI primitives to `packages/ui`.
+  repeated Fumadocs primitives to `packages/docs-fumadocs/render`. Create a
+  shared TaxKit UI package only when apps repeat UI primitives.
 - Do not add flat engine packages once nested domain or rule ownership exists.
   `packages/calculators` is allowed because it is a cross-surface
   orchestration package rather than a jurisdiction/domain/rule package.

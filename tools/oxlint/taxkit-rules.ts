@@ -447,7 +447,7 @@ const noObjectWrites: OxlintRule = {
       pattern: SyntaxNode | null | undefined,
       source: string | null
     ): void => {
-      if (!source) {
+      if (source === null) {
         return;
       }
       if (pattern?.type === "Identifier") {
@@ -462,7 +462,7 @@ const noObjectWrites: OxlintRule = {
           (property) => {
             if (property.type === "Property") {
               const member = propertyName(property.key);
-              if (member) {
+              if (member !== null) {
                 reportDestructuredWrite(property.value, `${source}.${member}`);
               }
             }
@@ -696,7 +696,7 @@ const schemaImportSemantic: ImportSemantic = (source, kind, imported) => {
     }
   }
   if (source === "effect/Schema") {
-    return kind === "ImportSpecifier" && imported
+    return kind === "ImportSpecifier" && imported !== null
       ? `Schema.${imported}`
       : "Schema";
   }
@@ -719,8 +719,9 @@ const isSchemaDecoderSemantic = (semantic: string | null) =>
 const noDecodingOutsideBoundaries: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-    const report = (node: SyntaxNode) =>
+    const report = (node: SyntaxNode) => {
       context.report({ messageId: "noDecodingOutsideBoundaries", node });
+    };
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {

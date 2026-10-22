@@ -48,6 +48,11 @@
       "source": "./src/response-check.ts",
       "types": "./dist/response-check.d.ts",
       "default": "./dist/response-check.js"
+    },
+    "./config": {
+      "source": "./src/config.ts",
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
     }
   },
   "publishConfig": {

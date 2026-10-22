@@ -206,9 +206,11 @@ export const takeHomeFormAtom = Atom.writable(
     const form = get(home.form);
     return Schema.is(TakeHomeForm)(form) ? form : initialTakeHomeForm;
   },
-  (get, form: TakeHomeForm) => get.set(home.form, form)
+  (get, form: TakeHomeForm) => {
+    get.set(home.form, form);
+  }
 );
 export const submitTakeHomeAtom = home.submit;
-export const editTakeHomeAtom = Atom.fnSync<TakeHomeForm>()((value, get) =>
-  get.set(home.edit, value)
-);
+export const editTakeHomeAtom = Atom.fnSync<TakeHomeForm>()((value, get) => {
+  get.set(home.edit, value);
+});

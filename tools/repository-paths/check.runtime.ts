@@ -168,6 +168,8 @@ const program = Effect.gen(function* repositoryPathMain() {
 );
 
 Match.value(import.meta.main).pipe(
-  Match.when(true, () => BunRuntime.runMain(program)),
+  Match.when(true, () => {
+    BunRuntime.runMain(program);
+  }),
   Match.orElse(() => false)
 );

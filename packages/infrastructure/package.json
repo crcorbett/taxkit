@@ -15,6 +15,11 @@
       "types": "./src/axiom/resources.ts",
       "default": "./src/axiom/resources.ts"
     },
+    "./hostnames": {
+      "source": "./src/hostnames.ts",
+      "types": "./src/hostnames.ts",
+      "default": "./src/hostnames.ts"
+    },
     "./posthog": {
       "source": "./src/posthog/index.ts",
       "types": "./src/posthog/index.ts",
@@ -52,7 +57,6 @@
     }
   },
   "scripts": {
-    "build": "tsc --noEmit",
     "check-types": "tsc --noEmit",
     "test": "bun --bun vitest run"
   },

@@ -24,6 +24,7 @@ import {
   Record,
   Redacted,
   Ref,
+  Schema,
 } from "effect";
 import { HttpClient } from "effect/http";
 
@@ -151,7 +152,9 @@ it.effect(
       );
       yield* Effect.forEach(resources, (resource) =>
         Effect.gen(function* () {
-          const props = yield* ProjectDefinition.makeEffect(resource.Props);
+          const props = yield* Schema.decodeUnknownEffect(ProjectDefinition)(
+            resource.Props
+          );
           const attr = yield* management.createProject(props);
           yield* store.set({
             fqn: resource.FQN,
@@ -218,7 +221,7 @@ it.effect(
         name: PostHogManagedName.make("TaxKit renamed"),
       });
       const difference = yield* Option.match(
-        Option.fromNullishOr(provider.diff),
+        Option.fromNullishOr(provider.diff?.bind(provider)),
         {
           onNone: () => Effect.die("Native diff missing"),
           onSome: (diff) =>
@@ -317,7 +320,7 @@ it.effect(
         "find-project",
       ]);
       const unresolved = yield* Option.match(
-        Option.fromNullishOr(provider.diff),
+        Option.fromNullishOr(provider.diff?.bind(provider)),
         {
           onNone: () => Effect.die("Native diff missing"),
           onSome: (diff) =>
@@ -350,11 +353,14 @@ it.effect(
           )
         )
       );
-      const read = yield* Option.match(Option.fromNullishOr(provider.read), {
-        onNone: () => Effect.die("Native read missing"),
-        onSome: (readProject) =>
-          readProject({ ...identity, olds: definition, output: saved }),
-      }).pipe(Effect.exit);
+      const read = yield* Option.match(
+        Option.fromNullishOr(provider.read?.bind(provider)),
+        {
+          onNone: () => Effect.die("Native read missing"),
+          onSome: (readProject) =>
+            readProject({ ...identity, olds: definition, output: saved }),
+        }
+      ).pipe(Effect.exit);
       expect(Exit.isFailure(read)).toBe(true);
       const create = yield* provider
         .reconcile({

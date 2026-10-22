@@ -10,7 +10,7 @@ import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { inMemoryState } from "alchemy/State";
 import api from "api/worker";
-import { ConfigProvider, Effect, Layer, Option, Record } from "effect";
+import { ConfigProvider, Effect, Layer } from "effect";
 import { HttpClient } from "effect/http";
 
 // Source builders discover the SDK-owned Worker declaration using
@@ -79,8 +79,5 @@ export const nativeApiSourceProps = Effect.gen(function* () {
       )
     )
   );
-  const resource = yield* Record.get(compiled.resources, "TaxKitApi").pipe(
-    Option.match({ onNone: () => blocked, onSome: Effect.succeed })
-  );
-  return resource.Props;
+  return compiled.output.Props;
 });

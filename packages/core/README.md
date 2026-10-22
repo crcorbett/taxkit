@@ -129,4 +129,4 @@ artifact and its concrete dependency ranges.
 
 The browser-safe `@taxkit/core/engine/schemas` entrypoint owns `CalculationDiagnostics` without importing the live engine. Existing core/engine/root exports re-export the same class.
 
-The [transport architecture](../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
+The [transport architecture](../../docs/architecture/api-and-sdk.md) owns application use and proof limits.

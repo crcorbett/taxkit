@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Cents, TaxRate } from "@taxkit/core/primitives";
 import { expectAt } from "@taxkit/testing";
-import { Array, BigDecimal, Effect, Result, Schema } from "effect";
+import { Array, BigDecimal, Effect, Result, Schema, Struct } from "effect";
 
 import {
   AtoIncomeTaxTable,
@@ -31,28 +31,43 @@ describe("IncomeTaxTable owned relationships", () => {
         const row = expectAt(table.brackets, 1);
         const cases = [
           {
-            input: { ...row, thresholdCents: Cents.make(-1) },
+            input: {
+              ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
+              thresholdCents: Cents.make(-1),
+            },
             name: "negative threshold",
           },
           {
-            input: { ...row, baseTaxCents: Cents.make(-1) },
+            input: {
+              ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
+              baseTaxCents: Cents.make(-1),
+            },
             name: "negative amount",
           },
           {
-            input: { ...row, maxCents: row.thresholdCents },
+            input: {
+              ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
+              maxCents: row.thresholdCents,
+            },
             name: "empty range",
           },
           {
-            input: { ...row, rate: TaxRate.make(BigDecimal.make(-1n, 1)) },
+            input: {
+              ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
+              rate: TaxRate.make(BigDecimal.make(-1n, 1)),
+            },
             name: "negative rate",
           },
           {
-            input: { ...row, rate: TaxRate.make(BigDecimal.make(101n, 2)) },
+            input: {
+              ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
+              rate: TaxRate.make(BigDecimal.make(101n, 2)),
+            },
             name: "rate above one",
           },
           {
             input: {
-              ...row,
+              ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
               rate: TaxRate.make(BigDecimal.make(1n, -Number.MAX_SAFE_INTEGER)),
             },
             name: "enormous rate",
@@ -71,7 +86,7 @@ describe("IncomeTaxTable owned relationships", () => {
           })
         );
         const tiny = yield* IncomeTaxBracket.makeEffect({
-          ...row,
+          ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
           rate: TaxRate.make(BigDecimal.make(1n, Number.MAX_SAFE_INTEGER)),
         });
         expect(Schema.is(IncomeTaxBracket)(tiny)).toBe(true);
@@ -90,23 +105,23 @@ describe("IncomeTaxTable owned relationships", () => {
         const overlapStart = yield* Cents.makeEffect(second.thresholdCents - 1);
         const tailEnd = yield* Cents.makeEffect(last.thresholdCents + 100);
         const gap = yield* IncomeTaxBracket.makeEffect({
-          ...second,
+          ...Struct.pick(second, Struct.keys(IncomeTaxBracket.fields)),
           thresholdCents: gapStart,
         });
         const overlap = yield* IncomeTaxBracket.makeEffect({
-          ...second,
+          ...Struct.pick(second, Struct.keys(IncomeTaxBracket.fields)),
           thresholdCents: overlapStart,
         });
         const closedTail = yield* IncomeTaxBracket.makeEffect({
-          ...last,
+          ...Struct.pick(last, Struct.keys(IncomeTaxBracket.fields)),
           maxCents: tailEnd,
         });
         const missingStart = yield* IncomeTaxBracket.makeEffect({
-          ...first,
+          ...Struct.pick(first, Struct.keys(IncomeTaxBracket.fields)),
           thresholdCents: Cents.make(1),
         });
         const openMiddle = yield* IncomeTaxBracket.makeEffect({
-          ...first,
+          ...Struct.pick(first, Struct.keys(IncomeTaxBracket.fields)),
           maxCents: "infinity",
         });
         const cases = [
@@ -145,7 +160,10 @@ describe("IncomeTaxTable owned relationships", () => {
         ];
         yield* Effect.forEach(cases, (scenario) =>
           Effect.gen(function* () {
-            const input = { ...table, brackets: scenario.brackets };
+            const input = {
+              ...Struct.pick(table, Struct.keys(IncomeTaxTable.fields)),
+              brackets: scenario.brackets,
+            };
             const result = yield* IncomeTaxTable.makeEffect(input).pipe(
               Effect.result
             );
@@ -171,34 +189,43 @@ describe("LitoTable owned relationships", () => {
         const row = expectAt(table.brackets, 1);
         const cases = [
           {
-            input: { ...row, thresholdCents: Cents.make(-1) },
+            input: {
+              ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
+              thresholdCents: Cents.make(-1),
+            },
             name: "negative threshold",
           },
           {
-            input: { ...row, fullOffsetCents: Cents.make(-1) },
+            input: {
+              ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
+              fullOffsetCents: Cents.make(-1),
+            },
             name: "negative amount",
           },
           {
-            input: { ...row, maxCents: row.thresholdCents },
+            input: {
+              ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
+              maxCents: row.thresholdCents,
+            },
             name: "empty range",
           },
           {
             input: {
-              ...row,
+              ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
               phaseOutRate: TaxRate.make(BigDecimal.make(-1n, 1)),
             },
             name: "negative rate",
           },
           {
             input: {
-              ...row,
+              ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
               phaseOutRate: TaxRate.make(BigDecimal.make(101n, 2)),
             },
             name: "rate above one",
           },
           {
             input: {
-              ...row,
+              ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
               phaseOutRate: TaxRate.make(
                 BigDecimal.make(1n, -Number.MAX_SAFE_INTEGER)
               ),
@@ -219,7 +246,7 @@ describe("LitoTable owned relationships", () => {
           })
         );
         const tiny = yield* LitoBracket.makeEffect({
-          ...row,
+          ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
           phaseOutRate: TaxRate.make(
             BigDecimal.make(1n, Number.MAX_SAFE_INTEGER)
           ),
@@ -240,23 +267,23 @@ describe("LitoTable owned relationships", () => {
         const overlapStart = yield* Cents.makeEffect(second.thresholdCents - 1);
         const tailEnd = yield* Cents.makeEffect(last.thresholdCents + 100);
         const gap = yield* LitoBracket.makeEffect({
-          ...second,
+          ...Struct.pick(second, Struct.keys(LitoBracket.fields)),
           thresholdCents: gapStart,
         });
         const overlap = yield* LitoBracket.makeEffect({
-          ...second,
+          ...Struct.pick(second, Struct.keys(LitoBracket.fields)),
           thresholdCents: overlapStart,
         });
         const closedTail = yield* LitoBracket.makeEffect({
-          ...last,
+          ...Struct.pick(last, Struct.keys(LitoBracket.fields)),
           maxCents: tailEnd,
         });
         const missingStart = yield* LitoBracket.makeEffect({
-          ...first,
+          ...Struct.pick(first, Struct.keys(LitoBracket.fields)),
           thresholdCents: Cents.make(1),
         });
         const openMiddle = yield* LitoBracket.makeEffect({
-          ...first,
+          ...Struct.pick(first, Struct.keys(LitoBracket.fields)),
           maxCents: "infinity",
         });
         const cases = [
@@ -295,7 +322,10 @@ describe("LitoTable owned relationships", () => {
         ];
         yield* Effect.forEach(cases, (scenario) =>
           Effect.gen(function* () {
-            const input = { ...table, brackets: scenario.brackets };
+            const input = {
+              ...Struct.pick(table, Struct.keys(LitoTable.fields)),
+              brackets: scenario.brackets,
+            };
             const result = yield* LitoTable.makeEffect(input).pipe(
               Effect.result
             );
@@ -320,49 +350,58 @@ describe("MedicareLevyTable owned relationships", () => {
         const table = yield* AtoMedicareLevyTable;
         const cases = [
           {
-            input: { ...table, thresholdCents: Cents.make(-1) },
+            input: {
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
+              thresholdCents: Cents.make(-1),
+            },
             name: "negative threshold",
           },
           {
-            input: { ...table, shadeInMaxCents: table.thresholdCents },
+            input: {
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
+              shadeInMaxCents: table.thresholdCents,
+            },
             name: "equal thresholds",
           },
           {
             input: {
-              ...table,
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
               shadeInMaxCents: table.thresholdCents,
               thresholdCents: table.shadeInMaxCents,
             },
             name: "reversed thresholds",
           },
           {
-            input: { ...table, levyRate: TaxRate.make(BigDecimal.make(0n, 0)) },
+            input: {
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
+              levyRate: TaxRate.make(BigDecimal.make(0n, 0)),
+            },
             name: "zero levy rate",
           },
           {
             input: {
-              ...table,
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
               levyRate: TaxRate.make(BigDecimal.make(-1n, 2)),
             },
             name: "negative levy rate",
           },
           {
             input: {
-              ...table,
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
               shadeInRate: TaxRate.make(BigDecimal.make(1n, 2)),
             },
             name: "shade-in below full levy",
           },
           {
             input: {
-              ...table,
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
               shadeInRate: TaxRate.make(BigDecimal.make(101n, 2)),
             },
             name: "shade-in above one",
           },
           {
             input: {
-              ...table,
+              ...Struct.pick(table, Struct.keys(MedicareLevyTable.fields)),
               shadeInRate: TaxRate.make(
                 BigDecimal.make(1n, -Number.MAX_SAFE_INTEGER)
               ),

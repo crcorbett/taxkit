@@ -73,7 +73,7 @@ export const calculateRunRequest = <
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
   const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 >(
   calculation: SdkCalculation<
     Id,
@@ -121,7 +121,7 @@ export const calculateReportRequest = <
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
   const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 >(
   calculation: SdkCalculation<
     Id,
@@ -145,7 +145,7 @@ export const calculateReport = <
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
   const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 >(
   calculation: SdkCalculation<
     Id,

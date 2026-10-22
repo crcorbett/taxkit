@@ -55,9 +55,9 @@ export const CalculatorPageView = ({
             name="taxableDollars"
             inputMode="decimal"
             value={form.taxableDollars}
-            onChange={(event) =>
-              onEdit({ ...form, taxableDollars: event.currentTarget.value })
-            }
+            onChange={(event) => {
+              onEdit({ ...form, taxableDollars: event.currentTarget.value });
+            }}
           />
         </label>
       ) : (
@@ -68,9 +68,9 @@ export const CalculatorPageView = ({
               name="grossDollars"
               inputMode="decimal"
               value={form.grossDollars}
-              onChange={(event) =>
-                onEdit({ ...form, grossDollars: event.currentTarget.value })
-              }
+              onChange={(event) => {
+                onEdit({ ...form, grossDollars: event.currentTarget.value });
+              }}
             />
           </label>
           <label>
@@ -78,9 +78,9 @@ export const CalculatorPageView = ({
             <select
               name="period"
               value={form.period}
-              onChange={(event) =>
-                onEdit({ ...form, period: event.currentTarget.value })
-              }
+              onChange={(event) => {
+                onEdit({ ...form, period: event.currentTarget.value });
+              }}
             >
               <option value="weekly">Weekly</option>
               <option value="fortnightly">Fortnightly</option>
@@ -92,12 +92,12 @@ export const CalculatorPageView = ({
               name="taxFreeThresholdClaimed"
               type="checkbox"
               checked={form.taxFreeThresholdClaimed}
-              onChange={(event) =>
+              onChange={(event) => {
                 onEdit({
                   ...form,
                   taxFreeThresholdClaimed: event.currentTarget.checked,
-                })
-              }
+                });
+              }}
             />{" "}
             Claim the tax-free threshold
           </label>
@@ -107,7 +107,7 @@ export const CalculatorPageView = ({
         {busy ? "Calculating…" : "Calculate"}
       </button>
     </form>
-    {message && <p role="alert">{message}</p>}
+    {message !== undefined && message !== "" && <p role="alert">{message}</p>}
     <CalculatorPageResultView report={report} stale={stale} />
   </section>
 );

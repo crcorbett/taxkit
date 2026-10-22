@@ -14,6 +14,11 @@
       "source": "./src/edge-identity.boundary.ts",
       "types": "./dist/edge-identity.boundary.d.ts",
       "default": "./dist/edge-identity.boundary.js"
+    },
+    "./stage": {
+      "source": "./src/stage.ts",
+      "types": "./dist/stage.d.ts",
+      "default": "./dist/stage.js"
     }
   },
   "scripts": {
@@ -23,7 +28,6 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@taxkit/calculators": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

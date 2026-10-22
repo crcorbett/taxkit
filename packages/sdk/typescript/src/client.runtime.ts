@@ -80,7 +80,7 @@ export const createPlainClient = <
     const Jurisdiction extends CalculatorJurisdiction,
     const TaxYear extends CalculatorTaxYear,
     const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-    const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+    const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
   >(
     calculation: SdkCalculation<
       Id,
@@ -156,7 +156,9 @@ export const createPlainClient = <
                 )
               ),
               {
-                onFiberStart: Fiber.runIn(runtime.scope),
+                onFiberStart: (fiber) => {
+                  Fiber.runIn(runtime.scope)(fiber);
+                },
                 uninterruptible: true,
               }
             ),
@@ -165,7 +167,9 @@ export const createPlainClient = <
           Ref.getUnsafe(disposed)
             ? Effect.runPromise(Effect.succeed(disposedFailure()))
             : Effect.runPromise(safeCalculation(calculation, input), {
-                onFiberStart: Fiber.runIn(runtime.scope),
+                onFiberStart: (fiber) => {
+                  Fiber.runIn(runtime.scope)(fiber);
+                },
                 uninterruptible: true,
               }),
       },
@@ -180,7 +184,7 @@ export const calculateSafe = <
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
   const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 >(
   calculation: SdkCalculation<
     Id,
@@ -210,7 +214,7 @@ export const calculate = <
   const Jurisdiction extends CalculatorJurisdiction,
   const TaxYear extends CalculatorTaxYear,
   const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport, never>,
+  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
 >(
   calculation: SdkCalculation<
     Id,

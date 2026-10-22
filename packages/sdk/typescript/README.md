@@ -266,7 +266,6 @@ bun run --filter=@taxkit/sdk validate:downstream
 
 ## Related Docs
 
-- `docs/product-specs/typescript-sdk-and-publishing.md`
 - `docs/architecture/api-and-sdk.md`
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/package-boundaries.md`

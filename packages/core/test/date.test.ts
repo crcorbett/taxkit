@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Option, Record, Result, Schema } from "effect";
+import { Effect, Option, Record, Result, Schema, Struct } from "effect";
 
 import {
   AustralianTaxYear,
@@ -31,7 +31,7 @@ const sourceArtifact = new SourceArtifact({
 });
 
 const sourceArtifactInput = (retrievedOn: string) => ({
-  ...sourceArtifact,
+  ...Struct.pick(sourceArtifact, Struct.keys(SourceArtifact.fields)),
   retrievedOn,
 });
 

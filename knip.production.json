@@ -195,7 +195,11 @@
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
     },
     "packages/observability": {
-      "entry": ["src/host-telemetry.ts!", "src/edge-identity.boundary.ts!"],
+      "entry": [
+        "src/host-telemetry.ts!",
+        "src/edge-identity.boundary.ts!",
+        "src/stage.ts!"
+      ],
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
     },
     "packages/api/mcp": {

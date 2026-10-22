@@ -57,11 +57,21 @@ native init and the Website with `cache: { enabled: true, crossVersionCache: fal
 Response headers choose what is public; see the
 [frontend](./frontend.md) and [API and SDK](./api-and-sdk.md) owners. Authored
 content is an input to both Worker builds (the API bundles the public catalogue;
-the Website memo includes the shared packages), so a content-only change
-deploys new versions of both and starts new caches. Native gitignore rules do
-not reach the memo's `../../packages/**` paths, so the stack names those
-excludes itself; without them the hash follows linked `node_modules` into the
-package store (about 1.2 million files) and the deploy runs out of memory.
+the Website memo includes shared package sources and authored content), so a
+content-only change deploys new versions of both and starts new caches.
+`websiteBuildMemo` in `packages/infrastructure/src/apps-stack.ts` uses
+Alchemy's documented sibling-package include form: `**/*` inside `apps/web`
+(filtered by `.gitignore`, which an `exclude` list would switch off) plus
+`../` patterns for package `src`, manifests and tsconfigs at each nesting
+depth, the docs-content sources and the root tsconfig, with the lockfile
+standing for installed dependencies. `../` patterns skip `.gitignore` and
+follow links, so a wildcard depth also reaches each package's `node_modules`
+(the store holds about 1.2 million files); negated patterns prune installed,
+built and test files. `workspaces: []` turns off Vite's auto-detected
+workspaces, which hash whole package folders. Tests, READMEs and CHANGELOGs
+therefore leave the hash unchanged, so a version-packages change does not
+redeploy the Website; `tools/infrastructure/apps-stack.test.ts` proves both
+directions against the installed Alchemy.
 
 ## Observability
 
@@ -130,4 +140,3 @@ to the zone.
 - [Package ownership](package-ownership.md)
 - [Configuration](configuration.md)
 - [Testing and quality](testing-and-quality.md)
-- [Dated deployment evidence](../evidence/deployments/README.md)

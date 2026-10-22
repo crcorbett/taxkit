@@ -10,8 +10,7 @@ review_trigger: frontend runtime, API client, loader, rendering, cache, build ad
 # Frontend
 
 `apps/web` is the TanStack Start Website for the calculators and the public
-documentation. `apps/docs` is a retirement tombstone for verified original
-source and dated provider recovery records. The
+documentation. The
 [Website README](../../apps/web/README.md) owns exact settings, routes,
 response rules and commands.
 
@@ -32,12 +31,6 @@ define tax calculation rules.
 : The API: the standalone Bun host and the native Alchemy Worker. The Worker
   serves HTTP, machine RPC and MCP over the same calculator and content
   services.
-
-`apps/docs`
-: Retirement tombstone, not an active workspace.
-
-`packages/ui`
-: Planned shared UI primitives, once repeated UI patterns justify a package.
 
 ## Runtime shape
 
@@ -172,8 +165,8 @@ route loader (server or browser branch)
 Do not add a hook, provider or wrapper component only to relocate a decoder or
 silence lint. Extract React composition when it owns reusable UI policy or
 removes meaningful repetition. App-specific composition remains app-owned;
-docs accessibility and navigation UI stays in the app, and the Website does not
-depend on `packages/ui`.
+docs accessibility and navigation UI stays in the app. Add a shared UI package
+only when repeated UI patterns across apps justify one.
 
 MDX component registries follow the same composition rule. The Website owns one
 registry under its MDX adapter; routes and leaves import focused render

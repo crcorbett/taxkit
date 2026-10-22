@@ -19,7 +19,7 @@ export const lintFiles = Effect.fn("OxlintFixture.lintFiles")(function* (
   extraArgs: readonly string[] = [],
   format: "json" | "unix" = "unix",
   configuration = "oxlint.config.ts",
-  workingDirectory = repositoryRoot
+  workingDirectory: string = repositoryRoot
 ) {
   const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
   const child = yield* spawner.spawn(
@@ -53,9 +53,13 @@ export const makeIsolatedLintWorkspace = Effect.fn(
   "OxlintFixture.makeIsolatedLintWorkspace"
 )(function* () {
   const fs = yield* FileSystem.FileSystem;
-  const workingDirectory = yield* fs.makeTempDirectoryScoped({
-    prefix: "taxkit-lint-workspace-",
-  });
+  // macOS exposes temp files under /var while child processes use /private/var.
+  // Use one physical root for the child cwd, config and checked source paths.
+  const workingDirectory = yield* fs
+    .makeTempDirectoryScoped({
+      prefix: "taxkit-lint-workspace-",
+    })
+    .pipe(Effect.flatMap((directory) => fs.realPath(directory)));
   yield* fs.makeDirectory(join(workingDirectory, "tools"));
   yield* fs.copy(
     join(repositoryRoot, "tools/oxlint"),
@@ -103,7 +107,7 @@ export const writeTemporaryLintFixture = Effect.fn(
 )(function* (
   source: string,
   extension = "ts",
-  directory = fileURLToPath(new URL("fixtures", import.meta.url))
+  directory: string = fileURLToPath(new URL("fixtures", import.meta.url))
 ) {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* fs.makeTempFileScoped({

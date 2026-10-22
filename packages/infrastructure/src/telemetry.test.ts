@@ -206,12 +206,10 @@ const plan = <A>(compiled: Stack.CompiledStack<A>) =>
 const member = (compiled: Stack.CompiledStack, id: string) =>
   Record.get(compiled.resources, id).pipe(
     Effect.fromOption,
-    Effect.flatMap((resource) =>
-      Output.evaluate(
-        { props: resource.Props, removal: resource.RemovalPolicy },
-        {}
-      )
-    ),
+    Effect.flatMap((resource) => {
+      const props: unknown = resource.Props;
+      return Output.evaluate({ props, removal: resource.RemovalPolicy }, {});
+    }),
     Effect.provideContext(compiled.services)
   );
 

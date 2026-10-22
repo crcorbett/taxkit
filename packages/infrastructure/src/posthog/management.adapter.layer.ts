@@ -626,7 +626,7 @@ export const PostHogManagementLive = Layer.effect(
       },
       (effect) =>
         effect.pipe(
-          writePermit.withPermit,
+          (value) => writePermit.withPermit(value),
           Effect.timeoutOrElse({
             duration: "75 seconds",
             orElse: () =>
@@ -744,7 +744,7 @@ export const PostHogManagementLive = Layer.effect(
       },
       (effect) =>
         effect.pipe(
-          writePermit.withPermit,
+          (value) => writePermit.withPermit(value),
           Effect.timeoutOrElse({
             duration: "15 seconds",
             orElse: () =>

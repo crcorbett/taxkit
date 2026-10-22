@@ -22,6 +22,6 @@ remain supported, and the initial browser list is `https://taxkit.dev`. Add
 other browser sites only for a known need. No Effect predicate patch is selected.
 TaxKit's on-page tools remain independent of that remote endpoint policy.
 
-The [foundation proposal](../product-specs/common-practice-foundation-review.md)
-owns the migration, including caller/rate/body/work checks and safe errors.
+[API and SDK](../architecture/api-and-sdk.md) owns the current caller, rate,
+body and work checks and safe errors.
 This records the agreed design; it does not claim deployed behaviour.

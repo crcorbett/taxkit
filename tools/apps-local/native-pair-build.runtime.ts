@@ -103,6 +103,7 @@ const program = Effect.gen(function* () {
               })
             )
             .pipe(Effect.provide(artifacts));
+          return yield* Effect.void;
         }).pipe(Effect.scoped)
     );
     // Corrupt one field in the actual native encoded reply. The native message
@@ -165,6 +166,7 @@ const program = Effect.gen(function* () {
           })
         )
         .pipe(Effect.provide(artifacts));
+      return yield* Effect.void;
     }).pipe(Effect.scoped);
     // The native JSON RPC encoder returns an owned byte body. Delay either
     // headers or the remaining bytes after real encoding; keep its framing.
@@ -258,6 +260,7 @@ const program = Effect.gen(function* () {
             })
           )
           .pipe(Effect.provide(artifacts));
+        return yield* Effect.void;
       }).pipe(Effect.scoped)
     );
     // Qualify mismatched API/presentation activations through real native
@@ -338,6 +341,7 @@ const program = Effect.gen(function* () {
               })
             )
             .pipe(Effect.provide(artifacts));
+          return yield* Effect.void;
         }).pipe(Effect.scoped)
     );
     const apiProps = {
@@ -409,6 +413,7 @@ const program = Effect.gen(function* () {
         path.join(defectOutput, "server"),
         { overwrite: true }
       );
+      return yield* Effect.void;
     }).pipe(Effect.scoped);
     const websiteArtifacts = scopedArtifacts("TaxKitWebsite");
     const websiteSource = yield* resolveSource(websiteProps).pipe(

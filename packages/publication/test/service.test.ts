@@ -47,7 +47,9 @@ describe("publication discovery service", () => {
             "Canonical page: https://website.example.com/start/overview"
           );
           yield* Effect.forEach(catalogue.pages, (page) =>
-            Effect.sync(() => assert.include(full.body, page.markdown))
+            Effect.sync(() => {
+              assert.include(full.body, page.markdown);
+            })
           );
         }).pipe(Effect.provide(setup.layer));
         assert.deepEqual(

@@ -21,9 +21,10 @@ implementation; this package imports no application implementation.
 | --- | --- |
 | `./apps-stack` | `declareNativeAppsInfrastructure` declares retained Production resources; `declareNativeAppsHosts` declares the Website using a supplied API Worker; `nativeApiHostProps` owns native API deployment settings. |
 | `./api-worker` | Lightweight `TaxKitApiWorker` declaration and native-derived `TaxKitApiBinding`, with the native HTTP binding. |
+| `./hostnames` | `HostName` and every Production hostname (`taxkit.dev`, `www.taxkit.dev`, `api.taxkit.dev`), written once with the derived `publicationOrigin`. Provider-free. |
 | `./worker-settings` | Shared compatibility date/flags and `disabledWorkerObservability` policy. |
 | `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. |
-| `./stage` | Stage Schemas: `prod`, `pr-<number>` and `dev_<name>`. |
+| `./stage` | Local `dev_<name>` stage and the `AppStage` union. Hosted `prod` and `pr-<number>` stages reuse [`@taxkit/observability/stage`](../observability/README.md). |
 | `./posthog` | The retained PostHog project stack. |
 | `./telemetry` | The `TaxKitObservability` and `TaxKitTraceExport` stack classes, their shared providers, state and secrets, the `prod`-only guard, Site's shared dataset names and the Production trace-export reference the apps graph reads. |
 | `./axiom` | `declareTaxKitObservability`: the retained ingest token and four dashboards. |
@@ -44,11 +45,14 @@ the lightweight native declaration without importing the app. The Website receiv
 the API's address Output and the private `TAXKIT_API` binding. Each host binds
 its own address with native `Worker.URL`; absent addresses stay null and fail
 the application's checked Config instead of being guessed. Both receive the
-fixed publication address `https://taxkit.dev`. Nothing in the API depends on
+fixed publication address `https://taxkit.dev`, derived from `./hostnames`
+like the Production zone and custom domains. Nothing in the API depends on
 the Website, so unpatched Alchemy plans the graph without a binding cycle.
 
-Both Workers declare version-scoped native caching, and the Website's build memo
-includes the shared packages so content changes rebuild it. In `prod` both
+Both Workers declare version-scoped native caching. The Website's
+`websiteBuildMemo` hashes shared package sources, manifests and authored
+content, not tests, READMEs or CHANGELOGs; see the
+[deployment architecture](../../docs/architecture/deployment.md#caching). In `prod` both
 Workers export console logs only, at sampling rate 1, to the
 `taxkit-axiom-logs` destination read from `TaxKitTraceExport/prod`; invocation
 logs, Cloudflare persistence and traces stay off. Every other stage disables

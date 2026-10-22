@@ -201,7 +201,9 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
           "location",
         ],
         (name) =>
-          Effect.sync(() => expect(request.headers.has(name), name).toBe(false))
+          Effect.sync(() => {
+            expect(request.headers.has(name), name).toBe(false);
+          })
       );
       const bytes = yield* Effect.promise(() => request.text());
       const batch = yield* Schema.decodeEffect(
@@ -341,7 +343,9 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
         // The native send has completed with its checked deadline. Miniflare's
         // Node response bridge does not expose workerd body cancellation here;
         // finish only this controlled upstream stream before host disposal.
-        yield* Effect.sync(() => controller.close());
+        yield* Effect.sync(() => {
+          controller.close();
+        });
       }
       expect(yield* Queue.clear(outgoing)).toEqual([]);
       expect(yield* Queue.clear(exceptions)).toEqual([]);

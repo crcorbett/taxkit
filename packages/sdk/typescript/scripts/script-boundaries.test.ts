@@ -265,7 +265,7 @@ it.effect.each(["start", "stdout", "stderr", "exit-read", "nonzero"] as const)(
         Effect.result
       );
       Result.match(result, {
-        onFailure: (error) =>
+        onFailure: (error) => {
           Match.value(error).pipe(
             Match.tag("PackedArtifactCommandError", (failure) => {
               expect(failure.stage).toBe("pack SDK artifact");
@@ -274,8 +274,11 @@ it.effect.each(["start", "stdout", "stderr", "exit-read", "nonzero"] as const)(
               );
               expect(String(failure)).not.toContain("TAXKIT_SECRET_SENTINEL");
             }),
+
+            // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
             Match.orElse(() => expect.unreachable())
-          ),
+          );
+        },
         onSuccess: () => expect.unreachable(),
       });
       expect(yield* Ref.get(removed)).toBe(1);
@@ -428,9 +431,11 @@ it.effect.each([
             );
             expect(failure.exitCode).toEqual(Option.some(23));
           }),
-          Match.orElse(() =>
-            expect(["root-manifest", "staged-manifest"]).toContain(mode)
-          )
+
+          // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
+          Match.orElse(() => {
+            expect(["root-manifest", "staged-manifest"]).toContain(mode);
+          })
         );
         expect(String(error)).not.toContain("TAXKIT_SECRET_SENTINEL");
       },
@@ -550,15 +555,18 @@ it.effect.each(["start", "stdout", "stderr", "exit-read"] as const)(
         Effect.result
       );
       Result.match(result, {
-        onFailure: (error) =>
+        onFailure: (error) => {
           Match.value(error).pipe(
             Match.tag("DownstreamCommandError", (failure) => {
               expect(failure.stage).toBe("build @taxkit/core");
               expect(failure.exitCode).toEqual(Option.none());
               expect(String(failure)).not.toContain("TAXKIT_SECRET_SENTINEL");
             }),
+
+            // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
             Match.orElse(() => expect.unreachable())
-          ),
+          );
+        },
         onSuccess: () => expect.unreachable(),
       });
       expect(yield* Ref.get(closed)).toBe(mode === "start" ? 0 : 1);
@@ -602,11 +610,15 @@ it.effect.each(["packed", "downstream"] as const)(
       );
       Match.value(error).pipe(
         Match.tags({
-          DownstreamCommandError: (failure) =>
-            expect(failure.reason).toBe("output-limit"),
-          PackedArtifactCommandError: (failure) =>
-            expect(failure.reason).toBe("output-limit"),
+          DownstreamCommandError: (failure) => {
+            expect(failure.reason).toBe("output-limit");
+          },
+          PackedArtifactCommandError: (failure) => {
+            expect(failure.reason).toBe("output-limit");
+          },
         }),
+
+        // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
         Match.orElse(() => expect.unreachable())
       );
       expect(yield* Ref.get(closed)).toBe(1);

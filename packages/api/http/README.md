@@ -143,6 +143,10 @@ incompatible calculator/facts combinations.
   config source.
 - `src/in-process.layer.ts`: in-process `HttpClient` over the routes, for
   tests and examples.
+- `src/origin.ts`: internal `TaxKitApiOrigin` Schema and its one
+  `TaxKitApiOriginConfig` (`API_PUBLIC_ORIGIN`) host binding, reused by the API
+  Worker and the Website. It is a source export only, not in the published
+  export map.
 - `src/response-policy.ts`: `publicCors` and `isBrowserOrigin` (credential-free
   CORS for any exact HTTP(S) origin), the public read paths and
   `cacheHeaders`/`applyCachePolicy`, the one cache decision for API and Website
@@ -206,8 +210,10 @@ and OpenAPI documents; health, calculation, RPC and MCP are never shared.
 
 `@taxkit/api-http/config` owns the reusable client config schema, type and
 keyed config fragment (`baseUrl`). The package owns its env namespaces,
-`TAXKIT_API_*` and `VITE_TAXKIT_API_*`. The Website does not use it; it reads
-its own origins. See `docs/architecture/configuration.md`.
+`TAXKIT_API_*` and `VITE_TAXKIT_API_*`. The Website does not use it; the API
+Worker and Website read the API address through the internal
+`@taxkit/api-http/origin` export instead. See
+`docs/architecture/configuration.md`.
 
 Current responses are schema-backed with Effect Schema. Calculator response
 schemas are imported from `@taxkit/calculators`; route-only HTTP envelopes and
@@ -386,7 +392,6 @@ actual API tarball and imports all JavaScript public entrypoints.
 - `docs/architecture/effect-services.md`
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/testing-and-quality.md`
-- `docs/product-specs/documentation-improvement-roadmap.md`
 
 ## Contract verification boundaries
 

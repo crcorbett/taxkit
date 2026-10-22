@@ -12,6 +12,12 @@ import { Stage } from "alchemy/Stage";
 import { Context, Effect, Option } from "effect";
 
 import { TaxKitApiWorker } from "./api-worker.js";
+import {
+  apiHostName,
+  publicationOrigin,
+  taxKitZoneName,
+  websiteRedirectHostName,
+} from "./hostnames.js";
 import { checkedStage } from "./secrets.js";
 import { taxKitLogsDestinationProduction } from "./telemetry.js";
 import {
@@ -73,10 +79,6 @@ export const productionBotPolicy = {
   isRobotsTxtManaged: false,
 } as const;
 
-// Published pages and discovery documents name the Production site in every
-// stage, including Preview. Each host still binds its own native address.
-export const publicationOrigin = "https://taxkit.dev";
-
 // Native resource construction is idempotent within the stack. Both host
 // declarations yield this same owning Effect to share its unresolved Output.
 const websiteForwardingKey = Random("TaxKitWebsiteForwardingKey", {
@@ -110,12 +112,12 @@ const productionObservability = Effect.gen(function* () {
 // scoped cache is declared in its native init (`Cloudflare.cache`).
 export const nativeApiHostProps = Effect.gen(function* () {
   return {
-    // Production serves only api.taxkit.dev, as in Common Practice; other
+    // Production serves only its API hostname, as in Common Practice; other
     // stages keep the native workers.dev default.
     ...Option.match(yield* NativeProductionZone, {
       onNone: () => ({ workersDev: true }),
       onSome: (zone) => ({
-        domain: { name: "api.taxkit.dev", zoneId: zone.zoneId },
+        domain: { name: apiHostName, zoneId: zone.zoneId },
         workersDev: false,
       }),
     }),
@@ -132,6 +134,44 @@ export const nativeApiHostProps = Effect.gen(function* () {
   };
 });
 
+/**
+ * The Website's build-input hash, in Alchemy's documented sibling-package
+ * form. `**\/*` keeps `.gitignore` filtering inside `apps/web`; setting
+ * `exclude` would switch it off. Each `../` pattern names only what the build
+ * reads: package sources (at each nesting depth), manifests, tsconfigs and the
+ * authored documentation content. Those patterns skip `.gitignore` and follow
+ * links, so a wildcard depth also reaches each package's `node_modules`; the
+ * negations prune installed, built and test files. Tests, READMEs and
+ * CHANGELOGs therefore leave the hash unchanged, so a version-packages change
+ * does not redeploy the Website. `workspaces: []` turns off Vite's
+ * auto-detected workspaces, which would hash whole package directories. The
+ * lockfile stands for installed dependencies.
+ */
+export const websiteBuildMemo = {
+  include: [
+    "**/*",
+    "../../tsconfig.base.json",
+    "../../packages/*/src/**",
+    "../../packages/*/*/src/**",
+    "../../packages/*/*/*/src/**",
+    "../../packages/*/package.json",
+    "../../packages/*/*/package.json",
+    "../../packages/*/*/*/package.json",
+    "../../packages/*/tsconfig.json",
+    "../../packages/*/*/tsconfig.json",
+    "../../packages/*/*/*/tsconfig.json",
+    "../../packages/docs-content/content/**",
+    "../../packages/docs-content/navigation.json",
+    "../../packages/docs-content/source.config.ts",
+    "!../../packages/**/node_modules/**",
+    "!../../packages/**/dist/**",
+    "!../../packages/**/*.test.ts",
+    "!../../packages/**/*.test.tsx",
+  ],
+  lockfile: true,
+  workspaces: [],
+};
+
 // The Website receives the same stage's API address and private binding.
 export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
   "TaxKitWebsite",
@@ -147,8 +187,8 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
         }),
         onSome: (zone) => ({
           domain: {
-            name: "taxkit.dev",
-            redirects: ["www.taxkit.dev"],
+            name: taxKitZoneName,
+            redirects: [websiteRedirectHostName],
             zoneId: zone.zoneId,
           },
           workersDev: false,
@@ -167,33 +207,9 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
         TAXKIT_WEBSITE_FORWARDING_KEY: (yield* websiteForwardingKey).text,
         WEBSITE_PUBLIC_ORIGIN: Worker.URL,
       },
-      // Authored content and shared packages are build inputs, so a
+      // Authored content and shared package sources are build inputs, so a
       // content-only change deploys a new Website version.
-      // Hash the Website and the workspace packages it bundles. Native
-      // gitignore excludes do not reach `../` paths, so name them here;
-      // otherwise the hash follows linked node_modules into the package store.
-      memo: {
-        exclude: [
-          "**/node_modules/**",
-          "**/dist/**",
-          "**/.alchemy/**",
-          "**/.output/**",
-          "**/.tanstack/**",
-          "**/.turbo/**",
-          "**/.wrangler/**",
-          "**/.vitest/**",
-          "**/.env",
-          "**/.env.*",
-          "public/og/**",
-          "../../packages/**/node_modules/**",
-          "../../packages/**/dist/**",
-          "../../packages/**/.source/**",
-          "../../packages/**/.turbo/**",
-          "../../packages/**/*.tsbuildinfo",
-        ],
-        include: ["**/*", "../../packages/**"],
-        lockfile: true,
-      },
+      memo: websiteBuildMemo,
       // Same policy as the API: Production exports checked console records
       // only; other stages keep every platform channel off.
       observability: Option.isSome(yield* NativeProductionZone)
@@ -213,7 +229,7 @@ export const declareNativeAppsInfrastructure = Effect.gen(function* () {
     stage === "prod"
       ? Option.some(
           yield* Zone("TaxKitProductionZone", {
-            name: "taxkit.dev",
+            name: taxKitZoneName,
             paused: false,
             type: "full",
           }).pipe(adopt(true), retain())

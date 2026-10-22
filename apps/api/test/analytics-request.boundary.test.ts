@@ -18,6 +18,8 @@ import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
 
+const expectedCalculatorName: unknown = expect.any(String);
+
 const AnalyticsCalculatorLive = ApiCalculatorAnalyticsLive.pipe(
   Layer.provide(CalculatorLive)
 );
@@ -28,7 +30,7 @@ it.effect.each([
   { count: 0, headers: { [CollectionPolicyHeader]: "deny" } },
   { count: 0, headers: { [CollectionPolicyHeader]: "malformed-policy" } },
   { count: 0, headers: { dnt: "1" } },
-  { count: 0, headers: { dnt: "1", [CollectionPolicyHeader]: "allow" } },
+  { count: 0, headers: { [CollectionPolicyHeader]: "allow", dnt: "1" } },
 ])(
   "checked request policy keeps successful calculation independent of collection %j",
   ({ headers, count }) =>
@@ -75,7 +77,7 @@ it.effect.each([
         expect(events).toEqual([
           {
             calculatorId: CalculationRequest.calculatorId,
-            calculatorName: expect.any(String),
+            calculatorName: expectedCalculatorName,
             collectionPolicy: "allow",
           },
         ]);

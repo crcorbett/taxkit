@@ -25,7 +25,7 @@ const bunImportSemantic: ImportSemantic = (source, specifierType, imported) => {
   }
 
   if (source === "@effect/platform-bun/BunRuntime") {
-    return specifierType === "ImportSpecifier" && imported
+    return specifierType === "ImportSpecifier" && imported !== null
       ? `BunRuntime.${imported}`
       : "BunRuntime";
   }
@@ -57,7 +57,7 @@ const destructuresBunHostMethod = (pattern: SyntaxNode | null | undefined) =>
   );
 
 const isHostMethod = (semantic: string | null) =>
-  semantic?.startsWith("Global.Bun.") &&
+  semantic?.startsWith("Global.Bun.") === true &&
   HashSet.has(bunHostMethods, semantic.slice("Global.Bun.".length));
 
 const noHostApiOutsideAdapters: OxlintRule = {

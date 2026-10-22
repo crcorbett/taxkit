@@ -32,6 +32,7 @@ export type TaxKitClient = HttpApiClient.ForApi<typeof TaxKitApi>;
 
 // Transport, decoding and deadline failures have one safe Website meaning.
 // The bounded adapter marks an over-limit reply with its named cause.
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- The transport reports several native error families; this callback immediately classifies them.
 const transportFailure = <E>(error: E): WebsiteApiFailure => {
   if (Predicate.isTagged(error, "TimeoutError")) {
     return new WebsiteApiDeadlineExceeded();

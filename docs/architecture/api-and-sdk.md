@@ -25,10 +25,9 @@ calculation capabilities through stable, documented boundaries.
 
 ## Current API runtime
 
-See [TypeScript SDK and publishing](../product-specs/typescript-sdk-and-publishing.md)
-and [SDK public naming and export contract](../product-specs/sdk-public-naming-and-export-contract.md)
-for the SDK facade, plain TypeScript entrypoint, Effect entrypoint and export
-contract specs.
+See [TypeScript SDK facade](#typescript-sdk-facade) and
+[Export boundaries](#export-boundaries) for the SDK entrypoints and export
+contract.
 
 `apps/api` is the current API runtime owner. It is a standalone Bun process
 that owns host/port config, process startup through

@@ -46,7 +46,7 @@ export const propertyName = (node: SyntaxNode | null | undefined) => {
 
 export const importSourceValue = (node: SyntaxKind<"ImportDeclaration">) => {
   const value = node?.source?.value;
-  return String(value) === value ? value : "";
+  return value;
 };
 
 const declaredVariable = (
@@ -124,7 +124,7 @@ export const createBindingTracker = (
         !node.computed || node.property?.type === "Literal"
           ? propertyName(node.property)
           : null;
-      return object && member ? `${object}.${member}` : null;
+      return object !== null && member !== null ? `${object}.${member}` : null;
     }
 
     if (
@@ -150,7 +150,7 @@ export const createBindingTracker = (
     if (node?.type === "TSQualifiedName") {
       const left = semanticOfTypeName(node.left);
       const right = propertyName(node.right);
-      return left && right ? `${left}.${right}` : null;
+      return left !== null && right !== null ? `${left}.${right}` : null;
     }
 
     return null;
@@ -162,7 +162,7 @@ export const createBindingTracker = (
     semantic: string | null
   ) => {
     const variable = declaredVariable(sourceCode, node, name);
-    if (variable && semantic) {
+    if (variable && semantic !== null) {
       MutableRef.update(
         bindingSemantics.ref,
         HashMap.set(referenceIdentity(variable), semantic)
@@ -176,7 +176,7 @@ export const createBindingTracker = (
         Option.map((reference) => reference.resolved ?? null)
       )
     );
-    if (variable && semantic) {
+    if (variable && semantic !== null) {
       MutableRef.update(
         bindingSemantics.ref,
         HashMap.set(referenceIdentity(variable), semantic)
@@ -189,7 +189,7 @@ export const createBindingTracker = (
     sourceSemantic: string | null,
     declarationNode: SyntaxNode | null = null
   ): void => {
-    if (!sourceSemantic) {
+    if (sourceSemantic === null) {
       return;
     }
 
@@ -214,7 +214,7 @@ export const createBindingTracker = (
         }
 
         const member = propertyName(property.key);
-        if (!member) {
+        if (member === null) {
           return;
         }
 
@@ -271,13 +271,13 @@ export const createBindingTracker = (
       ),
     semanticOfExpression,
     semanticOfTypeName,
-    trackAssignment(node: SyntaxKind<"AssignmentExpression">) {
+    trackAssignment: (node: SyntaxKind<"AssignmentExpression">) => {
       if (node.operator === "=") {
         const semantic = semanticOfExpression(node.right);
-        if (semantic) {
-          trackPattern(node.left, semantic);
-        } else {
+        if (semantic === null) {
           clearPattern(node.left);
+        } else {
+          trackPattern(node.left, semantic);
         }
       }
     },
@@ -292,12 +292,12 @@ export const createBindingTracker = (
             ? propertyName(specifier.imported)
             : null;
         const semantic = importSemantic(source, specifier.type, imported);
-        if (semantic && specifier.local?.type === "Identifier") {
+        if (semantic !== null && specifier.local?.type === "Identifier") {
           setDeclaredSemantic(specifier, specifier.local.name, semantic);
         }
       });
     },
-    trackVariable(node: SyntaxKind<"VariableDeclarator">) {
+    trackVariable: (node: SyntaxKind<"VariableDeclarator">) => {
       trackPattern(node.id, semanticOfExpression(node.init), node);
     },
   };

@@ -94,8 +94,10 @@ describe("TaxKit OpenAPI snapshot", () => {
             normalized: normalizedTaxKitOpenApiSpec,
             snapshot: readOpenApiSnapshot,
           }).pipe(
-            Effect.map(({ normalized, snapshot }) =>
-              expect(normalized).toEqual(snapshot)
+            Effect.tap(({ normalized, snapshot }) =>
+              Effect.sync(() => {
+                expect(normalized).toEqual(snapshot);
+              })
             )
           )
         )

@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-configuration-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-10-20
 review_trigger: config Schema, namespace, source selection or secret handling change
 ---
 
@@ -35,16 +35,16 @@ Doppler project `taxkit` holds operator-set credentials:
 | `prd` | the `prod` stage | Cloudflare account and Production token |
 | `stg_preview` | `pr-<number>` stages | Cloudflare account and Preview token |
 | `dev` | other `dev_*` stages of `alchemy.run.ts` | Cloudflare account and development token |
-| `ci` | the Checks workflow | Turbo team and token |
+| `ci` | the Checks workflow's `checks` job | Turbo team and token |
 
 `deploymentSecrets` in `@taxkit/infrastructure/secrets` decodes the stage first
 (an unsupported stage fails with a fixed Config error before any credential is
 read), then reads the stage's Doppler config, the stage's calculator rate-limit
 namespace and an ignored `.env`; the shell environment is disabled. Deployment
 commands run locally; the [deployment runbook](../runbooks/deployment.md) owns
-how to pass the Doppler login. The Checks workflow reads `ci` through the
-Doppler action, checks the project and config names and passes only the Turbo
-values to its steps.
+how to pass the Doppler login. The Checks workflow's `checks` job reads `ci`
+through the Doppler action, checks the project and config names and passes only
+the Turbo values to its steps; its deploy jobs do not receive them.
 
 `alchemy.local.run.ts` runs only local emulation at the `dev_native_apps`
 stage, with local state and no Doppler. The root `bun run dev` command sets an
@@ -72,8 +72,12 @@ the Website's own keys from the Worker bindings, through Alchemy's
 - `POSTHOG_*`: analytics relay settings, read through the analytics package's
   Config. The current graph binds none, so the relay reports off.
 
-Each origin is read with `Config.schema` and its owning Schema; deferred or
-missing outputs do not become guessed URLs. `TAXKIT_API` is a native service
+Each origin binding has one Config declaration beside its owning Schema:
+`TaxKitApiOriginConfig` in the internal `@taxkit/api-http/origin` export and
+`DocsPublicationOriginConfig`/`DocsWebsiteOriginConfig` in the internal
+`@taxkit/content/config` export. The Website, API Worker, MCP Layer and
+analytics relay reuse them; deferred or missing outputs do not become guessed
+URLs. `TAXKIT_API` is a native service
 binding, not string configuration: an owning Schema checks the object
 (`fetch`, `connect`) separately and keeps its receiver. The Website's narrow
 host adapter enforces standard manual redirects, preserving the native signal
@@ -110,8 +114,8 @@ port: optional `API_PORT` falls back to `PORT` only when absent, and an invalid
 supplied value remains an error.
 
 The native API Worker reads `API_PUBLIC_ORIGIN` (its own `Worker.URL`) and
-`TAXKIT_PUBLICATION_ORIGIN` through `apps/api/src/worker.config.ts` and the
-origin Schemas in the app's `schemas.ts`. Native planning leaves resource
+`TAXKIT_PUBLICATION_ORIGIN` through `apps/api/src/worker.config.ts`, which
+composes the shared `TaxKitApiOriginConfig` and `DocsPublicationOriginConfig`. Native planning leaves resource
 addresses deferred; first incoming use decodes and caches them. Missing or
 invalid values produce a fixed Config error and an empty 503. The API reads no
 Website address. `CALCULATOR_RATE_NAMESPACE` comes from the stage's secrets

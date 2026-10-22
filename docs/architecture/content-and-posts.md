@@ -106,7 +106,7 @@ remain addressable.
 : Durable implementation architecture.
 
 `docs/product-specs`
-: Current product/spec intent for repo development.
+: Product/spec intent for active repo development.
 
 ## Public docs graph
 
@@ -133,8 +133,7 @@ docs implementation
     -> MDX component allowlist
     -> examples and OpenAPI reference checks
   -> bun run check:docs
-    -> maintainer metadata in docs/
-    -> relative links and documented commands in current documents
+    -> relative links and documented commands in docs/, AGENTS.md and READMEs
   -> @taxkit/docs-fumadocs tests
   -> apps/web native build and real browser/Worker checks when rendering changes
   -> bun run verification
@@ -174,7 +173,7 @@ docs implementation
 
 - [API and SDK](./api-and-sdk.md)
 - [Package ownership](./package-ownership.md)
-- [../product-specs/index.md](../product-specs/index.md)
+- [Product specs](../product-specs/index.md)
 
 ## Generated collection boundary
 

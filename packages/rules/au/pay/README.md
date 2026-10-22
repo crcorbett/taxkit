@@ -76,7 +76,7 @@ tarball validated by the SDK-owned strict downstream gate.
 
 Use `@taxkit/rules-au-pay/schemas` for canonical calculator metadata, `TakeHomePayReport`, `PayWithholdingsLedger` and `TakeHomeScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
 
-The [transport architecture](../../../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
+The [transport architecture](../../../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
 
 
 The salary-sacrifice fact module imports canonical fact definitions through

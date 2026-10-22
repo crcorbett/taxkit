@@ -11,10 +11,10 @@ it.effect.each(["headers", "body"] as const)(
   "bounds discovery %s stalls and cancels the request",
   (stall) =>
     Effect.gen(function* () {
-      const aborted = vi.fn();
+      const aborted = vi.fn<(...args: readonly unknown[]) => void>();
       // Promise and stream callbacks are the native fetch host fixture.
       const binding = {
-        connect: vi.fn(),
+        connect: vi.fn<(...args: readonly unknown[]) => void>(),
         fetch: vi.fn((_url: string, init?: RequestInit) => {
           init?.signal?.addEventListener("abort", aborted);
           return stall === "headers"
@@ -62,7 +62,7 @@ it.effect.each([
   ({ status, body, succeeds }) =>
     Effect.gen(function* () {
       const binding = {
-        connect: vi.fn(),
+        connect: vi.fn<(...args: readonly unknown[]) => void>(),
         fetch: vi.fn(() =>
           Promise.resolve(
             new Response(body, {

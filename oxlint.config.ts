@@ -16,6 +16,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Native heterogeneous resource-map props in the in-memory provider lifecycle test.
+  "packages/infrastructure/src/posthog/projects.test.ts",
   "apps/api/src/website-forwarding.boundary.ts",
   "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
   "packages/observability/test/edge-identity.test.ts",
@@ -398,55 +400,62 @@ export default defineConfig({
     ".tanstack/**",
     ".turbo/**",
     ".vercel/**",
-    "tools/oxlint/anti-slop/**",
-    "tools/oxlint/vendor/**",
   ],
   jsPlugins: [
-    {
-      name: "strict-effect",
-      specifier: "./tools/oxlint/vendor/strict-effect/effect-policy.ts",
-    },
+    "@commonplaces/oxlint-plugin/strict-effect",
     "./tools/oxlint/bun-rules.ts",
     "./tools/oxlint/effect-rules.ts",
     "./tools/oxlint/mdx-rules.ts",
     "@commonplaces/oxlint-plugin/package",
     "./tools/oxlint/package-rules.ts",
     "./tools/oxlint/taxkit-rules.ts",
-    {
-      name: "anti-slop",
-      specifier: "./tools/oxlint/anti-slop/index.ts",
-    },
-    {
-      name: "anti-slop-effect",
-      specifier: "./tools/oxlint/anti-slop/effect/index.ts",
-    },
+    "@commonplaces/oxlint-plugin/anti-slop",
+    "@commonplaces/oxlint-plugin/anti-slop-effect",
   ],
   overrides: [
+    // Runtime addresses come from the hostname and transport-route owners.
     {
-      files: portableEffectSourceFiles,
+      files: [
+        "apps/*/src/**/*.{ts,tsx}",
+        "packages/infrastructure/src/**/*.ts",
+        "packages/api/*/src/**/*.ts",
+        "packages/analytics/src/**/*.ts",
+        "packages/content/src/**/*.ts",
+        "packages/observability/src/**/*.ts",
+      ],
       rules: {
-        "no-restricted-imports": [
+        "strict-effect/public-host-literals": [
           "error",
           {
-            patterns: [
+            allowTestFiles: true,
+            allowedDeclarations: [
               {
-                group: [
-                  "@distilled.cloud/posthog",
-                  "@distilled.cloud/posthog/*",
-                ],
-                message:
-                  "Use the closed PostHogManagement service; the SDK belongs only in its private management adapter.",
+                file: "packages/infrastructure/src/hostnames.ts",
+                names: ["taxKitZoneName"],
               },
             ],
+            allowedFiles: ["packages/infrastructure/src/hostnames.ts"],
+            hosts: ["taxkit.dev"],
+          },
+        ],
+        "strict-effect/route-literal-ownership": [
+          "error",
+          {
+            allowTestFiles: true,
+            allowedFiles: [
+              "packages/api/http/src/routes.ts",
+              "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+            ],
+            prefixes: ["/api", "/rpc", "/mcp"],
           },
         ],
       },
     },
     {
-      files: [
-        "packages/infrastructure/src/posthog/management.adapter.layer.ts",
-      ],
-      rules: { "no-restricted-imports": "off" },
+      // strict-effect forbids async functions; Promise-returning SDK facades
+      // and native host callbacks cannot satisfy both rules.
+      files: ["**/*.{ts,tsx}"],
+      rules: { "typescript/promise-function-async": "off" },
     },
     {
       // The analytics owners use native HttpClient. A decoder/encoder permission
@@ -1221,6 +1230,13 @@ export default defineConfig({
       "error",
       {
         owners: [
+          {
+            allowTypes: false,
+            allowedFiles: [
+              "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+            ],
+            module: "@distilled.cloud/posthog",
+          },
           // Worker bindings are read at the Website's server runtime only.
           {
             allowTypes: true,

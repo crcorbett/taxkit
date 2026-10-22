@@ -13,8 +13,8 @@ import {
 import { WebsiteRootView } from "./schemas";
 
 const binding = {
-  connect: vi.fn(),
-  fetch: vi.fn(),
+  connect: vi.fn<(...args: readonly unknown[]) => void>(),
+  fetch: vi.fn<(...args: readonly unknown[]) => void>(),
 };
 const settings = {
   API_PUBLIC_ORIGIN: "https://api.taxkit.example",

@@ -75,21 +75,21 @@ it.effect.each([
   {
     allowed: false,
     path: "packages/infrastructure/src/posthog/projects.provider.ts",
-    rule: "no-restricted-imports",
+    rule: "module-ownership",
     source:
       'export { getOrganizationsProject as result } from "@distilled.cloud/posthog/organizations";',
   },
   {
     allowed: false,
     path: "apps/api/src/posthog-adjacent.ts",
-    rule: "no-restricted-imports",
+    rule: "module-ownership",
     source:
       'export { getOrganizationsProject } from "@distilled.cloud/posthog/organizations";',
   },
   {
     allowed: false,
     path: "apps/api/src/posthog-adjacent.ts",
-    rule: "no-restricted-imports",
+    rule: "module-ownership",
     source:
       'export const result = import("@distilled.cloud/posthog/organizations");',
   },
@@ -114,7 +114,7 @@ it.effect.each([
   {
     allowed: false,
     path: "packages/infrastructure/src/posthog/management.boundary.test.ts",
-    rule: "no-restricted-imports",
+    rule: "module-ownership",
     source:
       'export { getOrganizationsProject as result } from "@distilled.cloud/posthog/organizations";',
   },

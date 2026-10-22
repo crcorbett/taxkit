@@ -26,14 +26,16 @@ export const withMcpRequestCancellation = Effect.fnUntraced(function* <A, E, R>(
       // AbortSignal requires a synchronous host listener. Register first, then
       // check again: cancellation can arrive before this race branch starts.
       Effect.callback<never>((resume) => {
-        const abort = () => resume(Effect.interrupt);
+        const abort = () => {
+          resume(Effect.interrupt);
+        };
         signal.value.addEventListener("abort", abort, { once: true });
         if (signal.value.aborted) {
           abort();
         }
-        return Effect.sync(() =>
-          signal.value.removeEventListener("abort", abort)
-        );
+        return Effect.sync(() => {
+          signal.value.removeEventListener("abort", abort);
+        });
       })
     )
   );

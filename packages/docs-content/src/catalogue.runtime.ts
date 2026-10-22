@@ -68,9 +68,13 @@ const program = Effect.gen(function* () {
   yield* Console.log(
     `Built ${catalogue.pages.length} published documentation pages.`
   );
+  return yield* Effect.void;
 }).pipe(
   Effect.provide(
     DocsContentServiceLive.pipe(Layer.provide(DocsCatalogueSourceLive))
+  ),
+  Effect.tapErrorTag("DocsValidationFailedError", (error) =>
+    Console.error(Array.join(error.issues, "\n"))
   ),
   Effect.tapErrorTag("DocsCatalogueBuildError", (error) =>
     Console.error(`Catalogue not written: ${error.operation} failed.`)

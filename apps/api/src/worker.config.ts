@@ -1,18 +1,14 @@
+import { TaxKitApiOriginConfig } from "@taxkit/api-http/origin";
+import { DocsPublicationOriginConfig } from "@taxkit/content/config";
 import { Config, ConfigProvider, Effect } from "effect";
 
 import { ApiWorkerSettings } from "./schemas.js";
 
 export const ApiWorkerSettingsConfig = Config.all({
-  apiOrigin: Config.schema(
-    ApiWorkerSettings.fields.apiOrigin,
-    "API_PUBLIC_ORIGIN"
-  ),
-  publicationOrigin: Config.schema(
-    ApiWorkerSettings.fields.publicationOrigin,
-    "TAXKIT_PUBLICATION_ORIGIN"
-  ),
+  apiOrigin: TaxKitApiOriginConfig,
+  publicationOrigin: DocsPublicationOriginConfig,
 }).pipe(
-  Effect.map(ApiWorkerSettings.make),
+  Effect.map((value) => ApiWorkerSettings.make(value)),
   Effect.mapError(
     () =>
       new Config.ConfigError(

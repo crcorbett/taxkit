@@ -70,7 +70,9 @@ export const TakeHomeCalculator = ({
   const controlBrowserTools = useAtomSet(browserTools);
   useEffect(() => {
     controlBrowserTools("register");
-    return () => controlBrowserTools(Atom.Interrupt);
+    return () => {
+      controlBrowserTools(Atom.Interrupt);
+    };
   }, [controlBrowserTools]);
   const form = useAtomValue(takeHomeFormAtom);
   const view = useAtomValue(atoms.view);
@@ -78,7 +80,9 @@ export const TakeHomeCalculator = ({
   const submit = useAtomSet(submitTakeHomeAtom);
   const controlCalculation = useAtomSet(calculateAtom);
   useEffect(
-    () => () => controlCalculation(Atom.Interrupt),
+    () => () => {
+      controlCalculation(Atom.Interrupt);
+    },
     [controlCalculation]
   );
   return (
@@ -89,7 +93,9 @@ export const TakeHomeCalculator = ({
       report={view.report.pipe(Option.filter(Schema.is(TakeHomePayReport)))}
       stale={view.stale}
       onEdit={edit}
-      onCalculate={() => submit("calculate")}
+      onCalculate={() => {
+        submit("calculate");
+      }}
     />
   );
 };

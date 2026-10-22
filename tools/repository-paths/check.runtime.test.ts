@@ -20,13 +20,16 @@ describe("repository path runtime", () => {
           return yield* checkRepositoryPaths(directory).pipe(Effect.result);
         }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
         Result.match(result, {
-          onFailure: (error) =>
+          onFailure: (error) => {
             Match.value(error).pipe(
               Match.tag("RepositoryInventoryError", (failure) => {
                 expect(failure.operation).toBe("list-tracked-files");
               }),
+
+              // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
               Match.orElse(() => expect.unreachable())
-            ),
+            );
+          },
           onSuccess: () => expect.unreachable(),
         });
       })
@@ -84,15 +87,18 @@ describe("repository path runtime", () => {
           return yield* checkRepositoryPaths(directory).pipe(Effect.result);
         }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
         Result.match(result, {
-          onFailure: (error) =>
+          onFailure: (error) => {
             Match.value(error).pipe(
               Match.tag("RepositoryFileReadError", (failure) => {
                 expect(failure.file).toBe(
                   RepositoryRelativeFile.make("removed-after-index.md")
                 );
               }),
+
+              // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
               Match.orElse(() => expect.unreachable())
-            ),
+            );
+          },
           onSuccess: () => expect.unreachable(),
         });
       })

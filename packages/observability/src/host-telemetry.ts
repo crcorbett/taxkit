@@ -109,15 +109,15 @@ const safeLogger = (
 
 // The fixed reporter keeps an empty Cause and one fixed message.
 const safeReporter = (logger: ReturnType<typeof safeLogger>) =>
-  ErrorReporter.make(({ fiber }) =>
+  ErrorReporter.make(({ fiber }) => {
     logger.log({
       cause: Cause.empty,
       date: new Date(fiber.getRef(Clock.Clock).currentTimeMillisUnsafe()),
       fiber,
       logLevel: "Error",
       message: "Calculation host failure",
-    })
-  );
+    });
+  });
 
 const apiLogger = safeLogger("taxkit-api", "api.runtime.event");
 const websiteLogger = safeLogger("taxkit-web", "website.runtime.event");

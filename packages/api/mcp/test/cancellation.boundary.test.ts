@@ -24,7 +24,9 @@ describe("MCP request cancellation", () => {
     () =>
       Effect.gen(function* () {
         const controller = yield* Effect.sync(() => new AbortController());
-        yield* Effect.sync(() => controller.abort());
+        yield* Effect.sync(() => {
+          controller.abort();
+        });
         const entered = yield* Ref.make(false);
         const exit = yield* Ref.set(entered, true).pipe(
           withMcpRequestCancellation,
@@ -66,7 +68,9 @@ describe("MCP request cancellation", () => {
         Effect.forkScoped
       );
       yield* Deferred.await(entered);
-      yield* Effect.sync(() => disconnected.abort());
+      yield* Effect.sync(() => {
+        disconnected.abort();
+      });
       expect(Exit.hasInterrupts(yield* Fiber.await(first))).toBe(true);
       expect(yield* Ref.get(released)).toBe(true);
       expect(yield* Ref.get(otherReleased)).toBe(false);

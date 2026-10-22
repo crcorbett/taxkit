@@ -2,8 +2,8 @@
 
 <!-- impeccable:product-schema 1 -->
 
-This is the shared product record for the TaxKit monorepo. `apps/web` and
-`apps/docs` inherit it. It records confirmed product truth only; visual
+This is the shared product record for the TaxKit monorepo. `apps/web`
+inherits it. It records confirmed product truth only; visual
 direction belongs to DESIGN.md and surface briefs, which do not exist yet.
 
 ## Platform
@@ -68,19 +68,17 @@ Supporting facts that reinforce it, not replace it:
   fact, derived fact, rule, parameter, scenario, report, trace. Avoid "mode",
   "formula", "tax return" and "personal tax advice".
 - The repository is public and so are its AI work-history transcripts
-  (Entire). Maintainer docs under `docs/` carry a lifecycle: SPECs, execution
-  plans, architecture and runbooks. Ordinary commits, pull requests and
-  `bun run verification` are the process; `docs/evidence/` holds dated
-  historical records only.
+  (Entire). Maintainer docs under `docs/` hold architecture, standards,
+  runbooks and any active SPEC or execution plan. Ordinary commits, pull
+  requests and `bun run verification` are the process and the record of
+  completed work.
 - Current apps: `apps/web` is the native TanStack Start Website. It calls the
   API through native generated HTTP clients: server rendering uses
   `HttpApiClient` over the private API binding, and the browser uses an
   `AtomHttpApi.Service` that calls the public API directly. It reads the
   published documentation pages from the API. Tax calculation stays in the
-  separate `apps/api`. `apps/docs` is a retirement tombstone. The Common
-  Practice foundation (`docs/product-specs/common-practice-foundation-review.md`)
-  records the implemented Website/API design and delivery history. Current
-  architecture and runbooks own ongoing implementation and operations.
+  separate `apps/api`. Current architecture and runbooks own the
+  Website/API design and operations.
 - Production addresses are agreed as `taxkit.dev` and `api.taxkit.dev` on
   Cloudflare via Alchemy. Check the deployed Website and API directly before
   claiming what is live.
@@ -154,8 +152,6 @@ Explicitly undecided or absent:
 - 62 published MDX pages in `packages/docs-content/content` with a reader
   persona per page in `packages/docs-content/navigation.json`.
 - Generated OpenAPI snapshot and route fixtures under `packages/api/http`.
-- Dated historical deployment and release records under `docs/evidence/`.
-  They are history, not proof of what is deployed now.
 
 Absences future work must not fabricate: no customers, testimonials, case
 studies, usage numbers, press, pricing, published package, or production

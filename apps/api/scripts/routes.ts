@@ -5,6 +5,12 @@ import {
   HealthResponse,
 } from "@taxkit/api-http";
 import {
+  calculatorPaths,
+  docsPaths,
+  healthPath,
+  openApiPath,
+} from "@taxkit/api-http/routes";
+import {
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
@@ -31,21 +37,21 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
   (origin: string) =>
     Effect.gen(function* () {
       const page = yield* HttpClient.get(
-        new URL("/api/v1/docs/page?path=%2Fstart%2Fquickstart", origin),
+        new URL(`${docsPaths.page}?path=%2Fstart%2Fquickstart`, origin),
         { acceptJson: true }
       ).pipe(
         Effect.flatMap(HttpClientResponse.filterStatusOk),
         Effect.flatMap(HttpIncomingMessage.schemaBodyJson(DocsPublicPage))
       );
       const navigation = yield* HttpClient.get(
-        new URL("/api/v1/docs/navigation", origin),
+        new URL(docsPaths.navigation, origin),
         { acceptJson: true }
       ).pipe(
         Effect.flatMap(HttpClientResponse.filterStatusOk),
         Effect.flatMap(HttpIncomingMessage.schemaBodyJson(DocsPublicNavigation))
       );
       const search = yield* HttpClient.get(
-        new URL("/api/v1/docs/search?term=Quickstart", origin),
+        new URL(`${docsPaths.search}?term=Quickstart`, origin),
         { acceptJson: true }
       ).pipe(
         Effect.flatMap(HttpClientResponse.filterStatusOk),
@@ -54,7 +60,7 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
         )
       );
       const markdown = yield* HttpClient.get(
-        new URL("/api/v1/docs/markdown?path=%2Fstart%2Fquickstart", origin)
+        new URL(`${docsPaths.markdown}?path=%2Fstart%2Fquickstart`, origin)
       ).pipe(
         Effect.flatMap(HttpClientResponse.filterStatusOk),
         Effect.flatMap((response) => response.text)
@@ -81,6 +87,7 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
             "Public documentation replies did not match their owning page.",
         });
       }
+      return yield* Effect.void;
     }).pipe(
       Effect.mapError(
         () =>
@@ -103,7 +110,7 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
 );
 
 export const waitForApiHealth = (origin: string) =>
-  HttpClient.get(new URL("/api/health", origin), { acceptJson: true }).pipe(
+  HttpClient.get(new URL(healthPath, origin), { acceptJson: true }).pipe(
     Effect.flatMap(HttpClientResponse.filterStatusOk),
     Effect.flatMap(HttpIncomingMessage.schemaBodyJson(HealthResponse)),
     Effect.retry(
@@ -126,7 +133,7 @@ export const waitForApiHealth = (origin: string) =>
   );
 
 export const checkApiCatalog = (origin: string) =>
-  HttpClient.get(new URL("/api/v1/calculators", origin), {
+  HttpClient.get(new URL(calculatorPaths.calculators, origin), {
     acceptJson: true,
   }).pipe(
     Effect.flatMap(HttpClientResponse.filterStatusOk),
@@ -179,7 +186,10 @@ export const checkApiCalculation = (origin: string) =>
   }).pipe(
     Effect.flatMap((body) =>
       HttpClient.post(
-        new URL("/api/v1/calculators/au.pay.take-home/calculate", origin),
+        new URL(
+          `${calculatorPaths.calculators}/au.pay.take-home/calculate`,
+          origin
+        ),
         { acceptJson: true, body }
       )
     ),
@@ -211,7 +221,7 @@ export const checkApiCalculation = (origin: string) =>
   );
 
 export const checkApiOpenApi = (origin: string) =>
-  HttpClient.get(new URL("/api/docs/openapi.json", origin), {
+  HttpClient.get(new URL(openApiPath, origin), {
     acceptJson: true,
   }).pipe(
     Effect.flatMap(HttpClientResponse.filterStatusOk),

@@ -25,7 +25,7 @@ export const browserCalculatorToolsAtom = Atom.family(
       Effect.gen(function* () {
         const settings = get.registry.get(publicSettingsAtom);
         if (Option.isNone(settings)) {
-          return;
+          return yield* Effect.void;
         }
         // Reads made by a later native callback do not retain an idle atom.
         // Hold the current attempt for this page's entire registration lifetime.

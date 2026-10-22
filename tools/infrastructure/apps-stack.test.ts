@@ -3,30 +3,46 @@ import { describe, expect, it } from "@effect/vitest";
 import {
   productionBotPolicy,
   productionZoneSettings,
-  publicationOrigin,
+  websiteBuildMemo,
 } from "@taxkit/infrastructure/apps-stack";
+import { publicationOrigin } from "@taxkit/infrastructure/hostnames";
 import {
   checkedStage,
   deploymentSecrets,
   dopplerConfig,
 } from "@taxkit/infrastructure/secrets";
-import { disabledWorkerObservability } from "@taxkit/infrastructure/worker-settings";
+import {
+  disabledWorkerObservability,
+  workerCompatibility,
+} from "@taxkit/infrastructure/worker-settings";
 import { Unowned } from "alchemy/AdoptPolicy";
 import { AlchemyContext } from "alchemy/AlchemyContext";
-import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
+import {
+  Artifacts,
+  ArtifactStore,
+  createArtifactStore,
+  makeScopedArtifacts,
+} from "alchemy/Artifacts";
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
-import { Providers } from "alchemy/Cloudflare";
+import {
+  makeSourceContext,
+  Providers,
+  resolveSource,
+} from "alchemy/Cloudflare";
 import { BotManagement } from "alchemy/Cloudflare/BotManagement";
 import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
 import { Worker, isSelfUrl } from "alchemy/Cloudflare/Workers";
+import type { WorkerBindingProps } from "alchemy/Cloudflare/Workers";
 import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
 import * as Provider from "alchemy/Provider";
 import { Random } from "alchemy/Random";
+import { isResourceOfType } from "alchemy/Resource";
+import type { ResourceLike } from "alchemy/Resource";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
@@ -39,10 +55,12 @@ import {
   ConfigProvider,
   Effect,
   Exit,
+  FileSystem,
   Layer,
   Match,
   Option,
   Order,
+  Path,
   Record,
   Redacted,
   Ref,
@@ -52,10 +70,23 @@ import { HttpClient } from "effect/http";
 
 import { declareNativeAppsStack } from "../../alchemy.apps.js";
 
+// These are Alchemy-created declarations, discriminated by the SDK resource type.
+const isWorker = (
+  resource: ResourceLike
+): resource is Worker<WorkerBindingProps> => resource.Type === Worker.Type;
+const isSetting = (resource: ResourceLike): resource is Setting =>
+  resource.Type === Setting.Type;
+const isDnsSettings = (resource: ResourceLike): resource is ZoneDnsSettings =>
+  resource.Type === ZoneDnsSettings.Type;
+const isWorkerPlan = (
+  node: Plan.Plan["resources"][string]
+): node is Plan.Apply<Worker<WorkerBindingProps>> =>
+  isResourceOfType(node.resource, Worker.Type);
+
 const graphFixture = Effect.fnUntraced(function* (
   mode: "create" | "noop" | "update" | "without-precreate" | "adopted",
   stage = "dev_native_graph_proof",
-  traceExport = stage === "prod"
+  traceExport: boolean = stage === "prod"
 ) {
   const providerWrites = yield* Ref.make(0);
   const forbiddenWrite = Ref.update(providerWrites, (count) => count + 1).pipe(
@@ -97,8 +128,10 @@ const graphFixture = Effect.fnUntraced(function* (
               createdOn: "2026-10-03T05:08:24Z",
               developmentMode: 0,
               meta: {
+                // oxlint-disable-next-line typescript/no-deprecated -- The native provider fixture includes all upstream output fields.
                 cdnOnly: undefined,
                 customCertificateQuota: undefined,
+                // oxlint-disable-next-line typescript/no-deprecated -- The native provider fixture includes all upstream output fields.
                 dnsOnly: undefined,
                 foundationDns: false,
                 pageRuleQuota: undefined,
@@ -425,7 +458,7 @@ describe("native paired app graph and planner", () => {
         ).toEqual(["create", "create", "create"]);
         const members = Array.filter(
           Record.values(result.compiled.resources),
-          (resource) => resource.Type === Worker.Type
+          isWorker
         );
         expect(
           Array.every(
@@ -436,6 +469,7 @@ describe("native paired app graph and planner", () => {
         // Other stages keep their stable workers.dev address without previews.
         expect(
           Record.get(result.compiled.resources, "TaxKitWebsite").pipe(
+            Option.filter(isWorker),
             Option.map((website) => website.Props.workersDev)
           )
         ).toEqual(Option.some({ enabled: true, previewsEnabled: false }));
@@ -473,6 +507,7 @@ describe("native paired app graph and planner", () => {
         productionZoneSettings,
         (setting) =>
           Record.get(result.compiled.resources, setting.resource).pipe(
+            Option.filter(isSetting),
             Option.getOrElse(() => expect.fail("Expected zone setting")),
             (resource) =>
               Output.evaluate(
@@ -515,15 +550,18 @@ describe("native paired app graph and planner", () => {
         result.compiled.resources,
         "TaxKitProductionDnsSettings"
       ).pipe(
+        Option.filter(isDnsSettings),
         Option.getOrElse(() => expect.fail("Expected native graph member"))
       );
       const api = Record.get(result.compiled.resources, "TaxKitApi").pipe(
+        Option.filter(isWorker),
         Option.getOrElse(() => expect.fail("Expected native graph member"))
       );
       const website = Record.get(
         result.compiled.resources,
         "TaxKitWebsite"
       ).pipe(
+        Option.filter(isWorker),
         Option.getOrElse(() => expect.fail("Expected native graph member"))
       );
       expect(zone.Adopt).toBe(true);
@@ -554,8 +592,20 @@ describe("native paired app graph and planner", () => {
           zoneId: "15103853342ab9f18f7894b7fae39c39",
         },
       });
-      expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
-      expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
+      expect(
+        isSelfUrl(
+          Option.getOrUndefined(
+            Record.get(api.Props.env ?? {}, "API_PUBLIC_ORIGIN")
+          )
+        )
+      ).toBe(true);
+      expect(
+        isSelfUrl(
+          Option.getOrUndefined(
+            Record.get(website.Props.env ?? {}, "WEBSITE_PUBLIC_ORIGIN")
+          )
+        )
+      ).toBe(true);
       // Production exports the hosts' checked console records only, through
       // the persisted trace-export destination. Invocation logs and automatic
       // traces (which carry URLs and caller details) stay off.
@@ -583,7 +633,12 @@ describe("native paired app graph and planner", () => {
       const dnssec = Record.get(
         result.compiled.resources,
         "TaxKitProductionDnssec"
-      ).pipe(Option.getOrElse(() => expect.fail("Expected DNSSEC")));
+      ).pipe(
+        Option.filter(
+          (resource): resource is Dnssec => resource.Type === Dnssec.Type
+        ),
+        Option.getOrElse(() => expect.fail("Expected DNSSEC"))
+      );
       const bots = Record.get(
         result.compiled.resources,
         "TaxKitProductionBotManagement"
@@ -637,7 +692,7 @@ describe("native paired app graph and planner", () => {
           Array.sort(
             Array.map(
               Record.values(plan.resources),
-              ({ resource, action }) => ({
+              ({ resource, action }: Plan.CRUD) => ({
                 action,
                 id: resource.LogicalId,
               })
@@ -653,12 +708,14 @@ describe("native paired app graph and planner", () => {
           },
         ]);
         const api = Record.get(result.compiled.resources, "TaxKitApi").pipe(
+          Option.filter(isWorker),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
         const website = Record.get(
           result.compiled.resources,
           "TaxKitWebsite"
         ).pipe(
+          Option.filter(isWorker),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
         expect(api.Props).toBeDefined();
@@ -669,8 +726,20 @@ describe("native paired app graph and planner", () => {
             Option.isNone
           )
         ).toBe(true);
-        expect(isSelfUrl(api.Props.env?.API_PUBLIC_ORIGIN)).toBe(true);
-        expect(isSelfUrl(website.Props.env?.WEBSITE_PUBLIC_ORIGIN)).toBe(true);
+        expect(
+          isSelfUrl(
+            Option.getOrUndefined(
+              Record.get(api.Props.env ?? {}, "API_PUBLIC_ORIGIN")
+            )
+          )
+        ).toBe(true);
+        expect(
+          isSelfUrl(
+            Option.getOrUndefined(
+              Record.get(website.Props.env ?? {}, "WEBSITE_PUBLIC_ORIGIN")
+            )
+          )
+        ).toBe(true);
         expect(
           Array.sort(Record.keys(website.Props.env ?? {}), Order.String)
         ).toEqual([
@@ -696,11 +765,18 @@ describe("native paired app graph and planner", () => {
           enabled: true,
         });
         const apiNode = Record.get(plan.resources, "TaxKitApi").pipe(
+          Option.filter(isWorkerPlan),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
         const websiteNode = Record.get(plan.resources, "TaxKitWebsite").pipe(
+          Option.filter(isWorkerPlan),
           Option.getOrElse(() => expect.fail("Expected native graph member"))
         );
+        if (apiNode.action === "replace" || websiteNode.action === "replace") {
+          return yield* Effect.die(
+            "Native app fixture must not replace either Worker"
+          );
+        }
         const apiProps = "props" in apiNode ? apiNode.props : api.Props;
         const websiteProps =
           "props" in websiteNode ? websiteNode.props : website.Props;
@@ -744,8 +820,15 @@ describe("native paired app graph and planner", () => {
         const key = Redacted.make("a".repeat(64));
         const credentials = yield* Output.evaluate(
           {
-            api: api.Props.env?.TAXKIT_WEBSITE_FORWARDING_KEY,
-            website: website.Props.env?.TAXKIT_WEBSITE_FORWARDING_KEY,
+            api: Option.getOrUndefined(
+              Record.get(api.Props.env ?? {}, "TAXKIT_WEBSITE_FORWARDING_KEY")
+            ),
+            website: Option.getOrUndefined(
+              Record.get(
+                website.Props.env ?? {},
+                "TAXKIT_WEBSITE_FORWARDING_KEY"
+              )
+            ),
           },
           { TaxKitWebsiteForwardingKey: { text: key } }
         ).pipe(Effect.provideContext(result.compiled.services));
@@ -755,15 +838,24 @@ describe("native paired app graph and planner", () => {
         expect(result.compiled.stage).toBe("dev_native_graph_proof");
         expect(result.compiled.name).toBe("TaxKitAppsGraphProof");
         const absent = yield* Output.evaluate(
-          { api: websiteProps.env?.API_PUBLIC_ORIGIN },
+          {
+            api: Option.getOrUndefined(
+              Record.get(websiteProps.env ?? {}, "API_PUBLIC_ORIGIN")
+            ),
+          },
           { TaxKitApi: { url: undefined } }
         ).pipe(Effect.provideContext(result.compiled.services));
         expect(absent).toEqual({ api: null });
         const resolved = yield* Output.evaluate(
-          { api: websiteProps.env?.API_PUBLIC_ORIGIN },
+          {
+            api: Option.getOrUndefined(
+              Record.get(websiteProps.env ?? {}, "API_PUBLIC_ORIGIN")
+            ),
+          },
           { TaxKitApi: { url: "https://fresh-api.example.com" } }
         ).pipe(Effect.provideContext(result.compiled.services));
         expect(resolved).toEqual({ api: "https://fresh-api.example.com" });
+        return yield* Effect.void;
       }).pipe(
         Effect.provideService(AlchemyContext, localContext),
         Effect.provideService(Stage, "dev_native_graph_proof"),
@@ -920,5 +1012,131 @@ describe("native app root secret selection", () => {
         graphEnvironment,
         Effect.scoped
       )
+  );
+});
+
+describe("Website build-input hash", () => {
+  it.live(
+    "changes for package sources, manifests and docs content, not tests, READMEs, CHANGELOGs or installed files",
+    () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const path = yield* Path.Path;
+        const directory = yield* fs.makeTempDirectoryScoped({
+          prefix: "taxkit-website-memo-",
+        });
+        const write = (relative: string, text: string) =>
+          fs
+            .makeDirectory(path.dirname(path.join(directory, relative)), {
+              recursive: true,
+            })
+            .pipe(
+              Effect.andThen(
+                fs.writeFileString(path.join(directory, relative), text)
+              )
+            );
+        // Alchemy reads .gitignore up to the folder holding .git, so use the
+        // repository's own.
+        yield* fs.makeDirectory(path.join(directory, ".git"));
+        yield* fs.copyFile(
+          yield* path.fromFileUrl(new URL("../../.gitignore", import.meta.url)),
+          path.join(directory, ".gitignore")
+        );
+        // Flat, transport-nested and rule-nested packages, manifests,
+        // tsconfigs, authored documentation and the lockfile are inputs.
+        const inputs = [
+          "apps/web/src/server.ts",
+          "packages/content/src/service.ts",
+          "packages/content/package.json",
+          "packages/api/http/src/routes.ts",
+          "packages/api/http/tsconfig.json",
+          "packages/rules/au/pay/src/index.ts",
+          "packages/rules/au/pay/package.json",
+          "packages/docs-content/content/start/quickstart.mdx",
+          "packages/docs-content/navigation.json",
+          "tsconfig.base.json",
+          "bun.lock",
+        ];
+        yield* Effect.forEach(inputs, (input) => write(input, "original"), {
+          discard: true,
+        });
+        const props = {
+          vite: {
+            memo: websiteBuildMemo,
+            rootDir: path.join(directory, "apps/web"),
+          },
+        };
+        const artifacts = makeScopedArtifacts(createArtifactStore(), "Website");
+        const source = yield* resolveSource(props).pipe(
+          Effect.provideService(Artifacts, artifacts)
+        );
+        const context = makeSourceContext({
+          compatibility: workerCompatibility,
+          fqn: "TaxKitWebsite",
+          id: "TaxKitWebsite",
+          props,
+          stack: { name: "TaxKitApps", stage: "dev_website_memo" },
+          workerName: "taxkit-website-memo",
+        });
+        // A previous build may have recorded auto-detected workspaces; the
+        // explicit empty workspace list keeps whole package folders out.
+        const hashAfter = (additionalWorkspaces: string[]) =>
+          source
+            .hash(context, {
+              additionalWorkspaces,
+              assets: undefined,
+              bundle: undefined,
+              input: undefined,
+            })
+            .pipe(
+              Effect.map(({ input }) => input),
+              Effect.provideService(Artifacts, artifacts)
+            );
+        const hash = hashAfter([]);
+        const original = yield* hash;
+        expect(original).toBeDefined();
+        expect(yield* hash).toBe(original);
+        yield* Effect.forEach(
+          inputs,
+          (input) =>
+            Effect.gen(function* () {
+              yield* write(input, "changed");
+              expect(yield* hash, input).not.toBe(original);
+              yield* write(input, "original");
+              expect(yield* hash, input).toBe(original);
+            }),
+          { discard: true }
+        );
+        // Version-packages edits, tests, installed links, build output,
+        // generated sources and API-only code never reach the hash.
+        yield* Effect.forEach(
+          [
+            "packages/content/CHANGELOG.md",
+            "packages/content/README.md",
+            "packages/rules/au/pay/CHANGELOG.md",
+            "packages/content/test/service.test.ts",
+            "packages/api/http/__tests__/routes.test.ts",
+            "packages/infrastructure/src/hostnames.test.ts",
+            "packages/content/node_modules/effect/src/index.ts",
+            "packages/content/node_modules/effect/package.json",
+            "packages/content/dist/schemas.js",
+            "packages/docs-content/.source/index.ts",
+            "apps/web/node_modules/dep/index.js",
+            "apps/web/dist/server/index.js",
+            "apps/api/src/worker.ts",
+          ],
+          (ignored) =>
+            write(ignored, "ignored").pipe(
+              Effect.andThen(hash),
+              Effect.tap((value) =>
+                Effect.sync(() => {
+                  expect(value, ignored).toBe(original);
+                })
+              )
+            ),
+          { discard: true }
+        );
+        expect(yield* hashAfter(["../../packages/content"])).toBe(original);
+      }).pipe(Effect.provide(BunServices.layer), Effect.scoped)
   );
 });

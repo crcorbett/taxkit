@@ -61,19 +61,17 @@ export const registerWebsiteBrowserTools = Effect.fnUntraced(function* (
   if (Option.isNone(host)) {
     return;
   }
-  const run =
-    yield* FiberSet.makeRuntimePromise<
-      Tool.HandlerServices<
-        (typeof WebsiteBrowserToolkit.tools)[keyof typeof WebsiteBrowserToolkit.tools]
-      >
-    >();
+  const run = yield* FiberSet.makeRuntimePromise();
   yield* Effect.forEach(
     Record.toEntries(toolkit.tools),
     ([name, tool]) =>
       Effect.gen(function* () {
         const registration = yield* Effect.acquireRelease(
           Effect.sync(() => new AbortController()),
-          (controller) => Effect.sync(() => controller.abort())
+          (controller) =>
+            Effect.sync(() => {
+              controller.abort();
+            })
         );
         // Inputs are plain JSON form fields or the checked EmptyParams record.
         // Advertise that checked shape, including the unknown -> EmptyParams

@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-21
+last_reviewed: 2026-10-22
 review_trigger: Alchemy stack, stage, Doppler config, deployment command, deploy workflow or public check change
 ---
 
@@ -21,7 +21,7 @@ binding. Deploy them together so each stage's pair matches.
 
 Deploying needs the maintainer's explicit request. The commands run locally
 from a clean checkout of the commit being deployed; the
-[GitHub Actions](#github-actions) workflows run the same commands once their
+[GitHub Actions](#github-actions) deploy jobs run the same commands once their
 secrets exist and Actions can start.
 
 ## Credentials
@@ -72,7 +72,7 @@ The Production token (`taxkit/prd`) is an account-owned token. On the
 (DNSSEC), Bot Management Write, Dynamic URL Redirects Write and Workers Routes
 Write; on the account, Workers Scripts, Workers Observability and Secrets Store
 Write. Change it with `cf accounts tokens update`, keeping its name, expiry and
-existing policies, and record the change here. It expires on 19 January 2027.
+existing policies, and record the change here. It expires on 18 November 2026.
 
 ## Forwarding credential rotation
 
@@ -218,18 +218,6 @@ the same scope. Native state holds the ingest token value; never print it.
 
 ## GitHub Actions
 
-Two workflows run the same native commands as the sections above. Each passes
-a read-only, config-scoped Doppler service token to Alchemy as `DOPPLER_TOKEN`;
-GitHub sets `CI=true`. Neither workflow installs the Doppler CLI or holds a
-Cloudflare value. As in Common Practice, every deploy first runs
-`bun run verification` with the same Bun and Playwright setup as the Checks
-workflow, before any deployment credential is used. Verification finishes with
-the required credential-free `test:native` build and suite, sequentially after
-all source-rewriting tests and earlier builds. A native failure prevents both
-planning and deployment. `release:check` inherits the same gate locally; run
-verification before an authorised local deployment. Deploys use the local Turbo cache
-only: the remote cache needs Checks' separate `DOPPLER_CI_TOKEN`.
-
 Every job that uses `DOPPLER_TOKEN` first checks that its environment secret is
 set. Only a true/false value reaches that step, so a missing secret stops the
 job in seconds instead of at the first native command after verification. The
@@ -246,24 +234,60 @@ version, and the `--yes` step runs only after it passes. Run local commands the
 same way: `--no-input`, and `--yes` only after a clean plan. A deploy with no
 changes needs only `--no-input`.
 
-- `.github/workflows/preview.yml` runs on same-repository pull requests. Opened,
-  reopened and synchronised pull requests run verification, then `pr:plan` and `pr:deploy` for
-  `pr-<number>`, read both stage addresses from the deploy's stack outputs and
-  check the Website, `/api/health` and `/api/v1/calculators` for 200. Closing
-  the pull request runs the stage-validated `pr:destroy`, first as a dry run
-  and then with `--yes`, including its cold catalogue build prerequisite.
-  Cleanup provisions Chromium and its system
-  libraries in its own runner after the closed-PR and stage guards; it cannot
-  borrow a deploy job's browser cache. Fork pull requests get no job and no
-  secret. Runs for one pull request share a concurrency group and never
-  overlap; each rechecks the pull request's state before it plans or destroys.
-- `.github/workflows/production.yml` runs on push to `main` and manual dispatch
-  from `main`. It runs verification, `production:plan`, `production:deploy --yes --no-input`, then checks
+
+`.github/workflows/checks.yml` is the only workflow. As in Common Practice,
+verification runs once per revision and the deploy jobs reuse that result:
+
+- `checks` runs `bun run verification` on pull requests, pushes to `main` and
+  manual dispatch. It checks out the pull request head (or the pushed commit),
+  the same revision the deploy jobs check out. Trusted runs read the Turbo
+  remote cache values from Doppler `taxkit/ci` through `DOPPLER_CI_TOKEN`;
+  fork pull requests run the same verification with the local cache and no
+  credential. Verification finishes with the required credential-free
+  `test:native` build and suite, sequentially after all source-rewriting tests
+  and earlier builds. A pull request is verified as its head commit, not
+  GitHub's merge preview; the push to `main` verifies the merged result before
+  Production deploys. A newer push cancels superseded verification.
+- `deploy` (Deploy preview) `needs: checks`, so it starts only after
+  verification of that head commit succeeds. It runs for opened, reopened and
+  synchronised same-repository pull requests: `pr:plan` and `pr:deploy` for
+  `pr-<number>`, then it reads both stage addresses from the deploy's stack
+  outputs and checks the Website, `/api/health` and `/api/v1/calculators` for
+  200.
+- `cleanup` (Destroy preview) runs when a same-repository pull request closes:
+  the stage-validated `pr:destroy --dry-run --no-input`, then `pr:destroy --yes --no-input`, including its cold catalogue build
+  prerequisite. It provisions Chromium and its system libraries in its own
+  runner after the closed-PR and stage guards; it cannot borrow a deploy job's
+  browser cache. Fork pull requests get no deploy or cleanup job and no secret.
+  Deploy and cleanup for one pull request share a concurrency group and never
+  overlap or cancel each other; each rechecks the pull request's state before
+  it plans or destroys.
+- `production` (Deploy production) `needs: checks` and runs only for a push to
+  `main` or a manual dispatch from `main`, deploying the commit `checks` just
+  verified: `production:plan`, `production:deploy --yes --no-input`, then checks
   `https://taxkit.dev` for 200, a `www` 301 that keeps path and query, and
   `https://api.taxkit.dev/api/health` for 200. `production:drift` runs last as
   information only: on Alchemy beta.81 it can report Workers with custom
   domains as changed after a clean deploy. Production runs share one
-  concurrency group and never cancel a run in progress.
+  concurrency group and never cancel an apply in progress.
+
+Each deploy job passes a read-only, config-scoped Doppler service token to
+Alchemy as `DOPPLER_TOKEN`; GitHub sets `CI=true`. No job installs the Doppler
+CLI or holds a Cloudflare value. A failed `checks` job, including a native
+failure, prevents both planning and deployment. Deploy builds use the local
+Turbo cache only; `DOPPLER_CI_TOKEN` stays with `checks`, so a remote cache
+written by unmerged pull request runs never feeds a deployed build.
+`release:check` inherits the same verification gate locally; run verification
+before an authorised local deployment.
+
+`[skip ci]` in a commit message, including a merge commit, skips the whole
+workflow: that commit gets no verification and, on `main`, no Production
+deploy. Use it only for commits that change maintainer documentation alone
+(`docs/`, READMEs, `AGENTS.md`). Public docs under `packages/docs-content` ship
+with the Website and need the deploy. Never use it for a code, workflow,
+package, dependency or Changeset change, or to merge a pull request that
+contains one. Release evidence does not need its own skipped commit; see
+[Versioning](./versioning.md#release-evidence).
 
 The owner must create, as in Common Practice, two GitHub environments, each
 with one environment secret named `DOPPLER_TOKEN`:
@@ -285,8 +309,8 @@ Check current workflow runs and environment configuration before selecting the
 release path; dated billing or secret-availability observations are not a
 current gate. Use the local commands above when the maintainer requests a local
 release or a current runner limitation prevents CI from starting. A local
-Production apply must run only while the Production workflow is idle; GitHub
-concurrency does not lock a local terminal.
+Production apply must run only while no `production` job is running or queued;
+GitHub concurrency does not lock a local terminal.
 
 ## Rollback
 

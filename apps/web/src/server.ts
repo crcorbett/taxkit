@@ -10,8 +10,9 @@ import {
 } from "@taxkit/api-http/request-boundary";
 import { applyCachePolicy } from "@taxkit/api-http/response-policy";
 import { DiscoveryPath, discoveryApiPath } from "@taxkit/api-http/routes";
+import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
-import { calculatorEdgeRateKey } from "@taxkit/observability/edge-identity";
+import { edgeCallerKey } from "@taxkit/observability/edge-identity";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
@@ -257,7 +258,10 @@ const handleRequest = createServerOnlyFn((request: Request) =>
       }),
       Effect.provideService(
         CalculatorRequestRateKey,
-        calculatorEdgeRateKey(EffectHeaders.fromInput(request.headers))
+        edgeCallerKey(
+          EffectHeaders.fromInput(request.headers),
+          CalculatorClientRateKey
+        )
       ),
       Effect.provideService(
         HttpServerRequest.HttpServerRequest,

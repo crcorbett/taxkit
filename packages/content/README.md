@@ -48,6 +48,11 @@ and `DocsPublicationOrigin` preserve their separate checked identities.
   page/search failures.
 - `./service`: `ContentServiceContract`, `ContentService` and `ContentCatalogue`.
 - `./live`: page/search implementation over a supplied checked catalogue.
+- `./config` (internal, not in the published export map):
+  `DocsPublicationOriginConfig` (`TAXKIT_PUBLICATION_ORIGIN`) and
+  `DocsWebsiteOriginConfig` (`WEBSITE_PUBLIC_ORIGIN`), the one declaration of
+  each host binding beside its Schema. MCP, the analytics relay, the API Worker
+  and the Website reuse them.
 - `./response-check`: request/reply page identity predicate for checked docs
   pages, used after generated-client decoding.
 - `./test`: the same implementation with controlled request observations.

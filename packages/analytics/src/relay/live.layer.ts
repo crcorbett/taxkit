@@ -1,5 +1,6 @@
+import { DocsWebsiteOriginConfig } from "@taxkit/content/config";
 import { DocsWebsiteOrigin } from "@taxkit/content/schemas";
-import { Config, Effect, Layer, Match, Option, Schema, Stream } from "effect";
+import { Effect, Layer, Match, Option, Schema, Stream } from "effect";
 import {
   FetchHttpClient,
   Headers,
@@ -47,7 +48,7 @@ export const WebsiteAnalyticsRelayLive = Layer.unwrap(
           )
         ),
         Match.tag("AnalyticsEnabled", () =>
-          Config.schema(DocsWebsiteOrigin, "WEBSITE_PUBLIC_ORIGIN").pipe(
+          DocsWebsiteOriginConfig.pipe(
             Effect.mapError(
               () => new WebsiteRelayFailure({ reason: "configuration" })
             ),

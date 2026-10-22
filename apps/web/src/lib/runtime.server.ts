@@ -47,9 +47,9 @@ const rejectServerLoad = <E>(
 ): Effect.Effect<never, E | NotFoundError | WebsiteLoadError> =>
   Cause.hasInterruptsOnly(cause)
     ? Effect.failCause(cause)
-    : Effect.sync(() => setResponseStatus(loadFailureStatus(cause))).pipe(
-        Effect.andThen(rejectRouteLoad(cause))
-      );
+    : Effect.sync(() => {
+        setResponseStatus(loadFailureStatus(cause));
+      }).pipe(Effect.andThen(rejectRouteLoad(cause)));
 
 const client = WebsiteApi.pipe(
   Effect.flatMap((host) => Effect.fromResult(host.client))

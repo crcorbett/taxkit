@@ -232,11 +232,16 @@ describe("shared calculation work policy", () => {
         const time = yield* Ref.make(0n);
         const exit = yield* Effect.exit(invoke(service)).pipe(
           Effect.provideService(Clock.Clock, {
-            ...clock,
+            currentTimeMillis: clock.currentTimeMillis,
+            currentTimeMillisUnsafe: () => clock.currentTimeMillisUnsafe(),
+            currentTimeNanos: clock.currentTimeNanos,
+            currentTimeNanosUnsafe: () => clock.currentTimeNanosUnsafe(),
             monotonicTimeNanos: Ref.modify(time, (value) => [
               value,
               5_000_000_000n,
             ]),
+            monotonicTimeNanosUnsafe: () => clock.monotonicTimeNanosUnsafe(),
+            sleep: (duration) => clock.sleep(duration),
           })
         );
         expect(failure(exit)).toEqual(
@@ -362,11 +367,16 @@ describe("shared calculation work policy", () => {
       const time = yield* Ref.make(0n);
       const exit = yield* Effect.exit(service.calculate(Request)).pipe(
         Effect.provideService(Clock.Clock, {
-          ...clock,
+          currentTimeMillis: clock.currentTimeMillis,
+          currentTimeMillisUnsafe: () => clock.currentTimeMillisUnsafe(),
+          currentTimeNanos: clock.currentTimeNanos,
+          currentTimeNanosUnsafe: () => clock.currentTimeNanosUnsafe(),
           monotonicTimeNanos: Ref.modify(time, (value) => [
             value,
             5_000_000_000n,
           ]),
+          monotonicTimeNanosUnsafe: () => clock.monotonicTimeNanosUnsafe(),
+          sleep: (duration) => clock.sleep(duration),
         })
       );
       expect(failure(exit)).toEqual(
@@ -417,7 +427,9 @@ describe("shared calculation work policy", () => {
               Cause.findDefect(exit.cause).pipe(
                 Result.match({
                   onFailure: () => expect.fail("Expected the original defect"),
-                  onSuccess: (actual) => expect(actual).toBe(defect),
+                  onSuccess: (actual) => {
+                    expect(actual).toBe(defect);
+                  },
                 })
               );
             }

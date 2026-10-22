@@ -211,9 +211,11 @@ it.live(
         )
       );
       Match.value(result.report).pipe(
-        Match.tag("TakeHomePayReport", (report) =>
-          expect(report.netPay.cents).toBe(130_100)
-        ),
+        Match.tag("TakeHomePayReport", (report) => {
+          expect(report.netPay.cents).toBe(130_100);
+        }),
+
+        // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
         Match.orElse(() => expect.fail("Expected retained take-home report"))
       );
       const payload = yield* Schema.encodeEffect(CalculatorRpcPayload)({
@@ -738,7 +740,11 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
         Effect.flatMap((log) =>
           Schema.decodeUnknownEffect(NativeRuntimeLog)(log.message)
         ),
-        Effect.tap((log) => Effect.sync(() => expect(log.level).toBe("Warn")))
+        Effect.tap((log) =>
+          Effect.sync(() => {
+            expect(log.level).toBe("Warn");
+          })
+        )
       )
     ).pipe(
       Effect.raceFirst(
@@ -881,7 +887,11 @@ it.live("shares native HTTP, RPC batch and browser work limits", () =>
         Effect.flatMap((log) =>
           Schema.decodeUnknownEffect(NativeRuntimeLog)(log.message)
         ),
-        Effect.tap((log) => Effect.sync(() => expect(log.level).toBe("Warn")))
+        Effect.tap((log) =>
+          Effect.sync(() => {
+            expect(log.level).toBe("Warn");
+          })
+        )
       )
     );
     const metadataResponse = yield* Fiber.join(metadataHttp);
