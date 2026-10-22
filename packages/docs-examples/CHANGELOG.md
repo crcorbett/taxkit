@@ -1,5 +1,12 @@
 # @taxkit/docs-examples
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [7a9dede]
+  - taxkit@2.1.2
+
 ## 0.0.3
 
 ### Patch Changes
