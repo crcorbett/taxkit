@@ -2,6 +2,11 @@ import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
+  calculatorPaths,
+  healthPath,
+  openApiPath,
+} from "@taxkit/api-http/routes";
+import {
   Array,
   Config,
   Console,
@@ -35,6 +40,7 @@ import {
 
 // This string is the deliberately plain JavaScript consumer outside the repo.
 // Its fetch/Promise/JSON behaviour proves consumption without TaxKit internals.
+// Route addresses are written into it from the HTTP route catalogue.
 const externalConsumerScript = (
   parameters: string
 ) => `const { origin, takeHomeCalculatorId, annualTaxCalculatorId, simulateFailure } = ${parameters};
@@ -62,10 +68,10 @@ const readJson = async (method, path, init = {}) => {
   return await response.json();
 };
 
-const health = await readJson("GET", "/api/health");
+const health = await readJson("GET", "${healthPath}");
 assert(health.status === "ok", "Health route did not return ok status.");
 
-const catalog = await readJson("GET", "/api/v1/calculators");
+const catalog = await readJson("GET", "${calculatorPaths.calculators}");
 assert(
   Array.isArray(catalog.calculators) &&
     catalog.calculators.some(
@@ -76,7 +82,7 @@ assert(
 
 const calculation = await readJson(
   "POST",
-  \`/api/v1/calculators/\${takeHomeCalculatorId}/calculate\`,
+  \`${calculatorPaths.calculators}/\${takeHomeCalculatorId}/calculate\`,
   {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -112,7 +118,7 @@ assert(
 
 const annualTaxCalculation = await readJson(
   "POST",
-  \`/api/v1/calculators/\${annualTaxCalculatorId}/calculate\`,
+  \`${calculatorPaths.calculators}/\${annualTaxCalculatorId}/calculate\`,
   {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -138,7 +144,7 @@ assert(
   "Annual-tax calculate route returned the wrong ruleset version."
 );
 
-const openApi = await readJson("GET", "/api/docs/openapi.json");
+const openApi = await readJson("GET", "${openApiPath}");
 assert(openApi.openapi, "OpenAPI route did not return an OpenAPI document.");
 assert(
   openApi.paths?.["/api/v1/calculators/{calculatorId}/calculate"],

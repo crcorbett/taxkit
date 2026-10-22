@@ -11,6 +11,7 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { referencePath } from "@taxkit/api-http/routes";
 import { CalculatorSummaries } from "@taxkit/calculators/summaries";
 import { Array, Function, Option, Result, Schema } from "effect";
 import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
@@ -142,7 +143,7 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
                     </li>
                   ))}
                 </ul>
-                <a href={new URL("/api/docs", settings.apiOrigin).href}>
+                <a href={new URL(referencePath, settings.apiOrigin).href}>
                   For developers: API documentation
                 </a>
                 <Link activeProps={{ "aria-current": "page" }} to="/agents">

@@ -290,8 +290,11 @@ also rejects Alchemy and local `.server`/`.server.layer` imports. Exact local
 host grants retain the isomorphic loader's `./runtime.server` import and the
 settings Layer's `./config.server` import; neighbouring browser modules receive
 neither permission. Non-infrastructure package
-source cannot acquire deployment/provider implementations. No package runtime
-SDK exception is currently required.
+source cannot acquire deployment/provider implementations. Domain-free runtime
+support (`packages/observability`) cannot depend on or import any other TaxKit
+workspace; consuming domains supply their Schemas, such as the calculator
+admission key passed to `edgeCallerKey`. No package runtime SDK exception is
+currently required.
 
 The CLI fixtures in `tools/oxlint/workspace-imports.boundary.test.ts` exercise
 accepted contracts/clients and actual host files, rejected backend/private and

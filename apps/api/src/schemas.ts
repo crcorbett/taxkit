@@ -1,4 +1,4 @@
-import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
+import { TaxKitApiOrigin } from "@taxkit/api-http/origin";
 import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { Schema } from "effect";
 
@@ -35,7 +35,7 @@ export class ApiServerConfigError extends Schema.TaggedError<ApiServerConfigErro
 ) {}
 
 export const ApiWorkerSettings = Schema.Struct({
-  apiOrigin: CalculatorRpcOrigin,
+  apiOrigin: TaxKitApiOrigin,
   publicationOrigin: DocsPublicationOrigin,
 });
 

@@ -91,8 +91,10 @@ the OpenAPI documents) without `Set-Cookie` gets
 Health, calculation, RPC, MCP and every error reply get `no-store`.
 
 `@taxkit/observability/edge-identity` owns `CalculatorHostMode` and
-`calculatorEdgeRateKey`, which reads the checked `cf-connecting-ip` and refuses Worker subrequests. The Website's no-JavaScript
-form host uses the same function.
+`edgeCallerKey`, which reads `cf-connecting-ip`, refuses Worker subrequests and
+decodes the address with the key Schema the host supplies. Both hosts pass the
+calculator-owned `CalculatorClientRateKey`; the Website's no-JavaScript form
+host uses the same function.
 
 The Worker checks `API_PUBLIC_ORIGIN` and `TAXKIT_PUBLICATION_ORIGIN` with the
 canonical origin policy. Its own origin comes from native `Worker.URL`; the

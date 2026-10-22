@@ -19,13 +19,24 @@ tax facts, calculation results and arbitrary Causes never become event fields.
 The deployment dashboards consume the same event identity and service Schema.
 
 `./edge-identity` owns the shared Cloudflare caller-key admission and host-mode
-Schema. It rejects Worker subrequests and accepts only checked direct edge
-identity; shared calculation services never read Cloudflare headers. Website
+Schema. `edgeCallerKey` rejects Worker subrequests and decodes only direct edge
+identity, with a key Schema the consuming host supplies (calculator admission
+passes `CalculatorClientRateKey`); shared calculation services never read
+Cloudflare headers. The package is domain-free: it depends on no other TaxKit
+workspace, which `taxkit-package/workspace-roles` enforces. Website
 forwarding uses native HTTP with a separately verified private credential and
 checked original caller key on canonical calculation POSTs. This export owns
 the forwarding header names and redacted credential Schema; the API host owns
 authentication and method/path policy. Neither field enters financial payloads,
 public settings, logs or cache keys.
+
+`./stage` owns the hosted stage Schemas: branded `PullRequestStage`
+(`pr-1` to `pr-9999999`) and `DeploymentStage` (`prod` or one pull-request
+stage). Analytics capture settings and infrastructure secret selection reuse
+them; infrastructure adds only its local `dev_<name>` stage. The root `pr:plan`,
+`pr:deploy` and `pr:destroy` host scripts check the same bounded
+`pr-[1-9][0-9]{0,6}` pattern in shell before Alchemy starts, so keep the two in
+step.
 
 The native Worker declaration and binding types belong to
 [`@taxkit/infrastructure`](../infrastructure/README.md). Root composition joins

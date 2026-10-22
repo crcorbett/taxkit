@@ -60,6 +60,11 @@
       "source": "./src/routes.ts",
       "types": "./dist/routes.d.ts",
       "default": "./dist/routes.js"
+    },
+    "./origin": {
+      "source": "./src/origin.ts",
+      "types": "./dist/origin.d.ts",
+      "default": "./dist/origin.js"
     }
   },
   "publishConfig": {

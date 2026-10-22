@@ -3,6 +3,7 @@ import {
   CalculatorCatalogItem,
 } from "@taxkit/calculators/schemas";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
+import { DeploymentStage } from "@taxkit/observability/stage";
 import { Schema } from "effect";
 
 export const PostHogProjectId = Schema.Int.check(Schema.isGreaterThan(0)).pipe(
@@ -12,16 +13,12 @@ export type PostHogProjectId = typeof PostHogProjectId.Type;
 export const CaptureToken = Schema.String.check(
   Schema.isPattern(/^phc_[A-Za-z0-9_-]{20,160}$/u)
 ).pipe(Schema.brand("taxkit/PublicCaptureToken"));
-export const CaptureStage = Schema.String.check(
-  Schema.isMaxLength(64),
-  Schema.isPattern(/^(?:prod|pr-[1-9]\d*)$/u)
-).pipe(Schema.brand("taxkit/AnalyticsCaptureStage"));
 export const AnalyticsDisabled = Schema.TaggedStruct("AnalyticsDisabled", {});
 export const AnalyticsEnabled = Schema.TaggedStruct("AnalyticsEnabled", {
   environment: Schema.Literals(["production", "controlled-preview"]),
   projectId: PostHogProjectId,
   region: Schema.Literal("us"),
-  stage: CaptureStage,
+  stage: DeploymentStage,
   token: Schema.RedactedFromValue(CaptureToken),
 }).check(
   Schema.makeFilter(
@@ -94,7 +91,7 @@ export const CalculatorCaptureBatch = Schema.Struct({
         calculator_name: CalculatorUse.fields.calculatorName,
         project: Schema.Literal("taxkit"),
         schema_version: Schema.Literal(1),
-        stage: CaptureStage,
+        stage: DeploymentStage,
       }),
       timestamp: Schema.DateTimeUtcFromString,
       uuid: EventId,

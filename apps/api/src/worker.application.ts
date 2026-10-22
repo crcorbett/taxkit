@@ -33,7 +33,7 @@ import {
   CalculatorHostMode,
   WebsiteForwardingCredentialHeader,
   WebsiteForwardingRateKeyHeader,
-  calculatorEdgeRateKey,
+  edgeCallerKey,
 } from "@taxkit/observability/edge-identity";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
@@ -224,7 +224,9 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       const request = yield* HttpServerRequest.HttpServerRequest;
       const forwardedKey = yield* websiteForwarding.authenticate(request);
       const callerKey = forwardedKey.pipe(
-        Option.orElse(() => calculatorEdgeRateKey(request.headers))
+        Option.orElse(() =>
+          edgeCallerKey(request.headers, CalculatorClientRateKey)
+        )
       );
       const key = Option.isSome(callerKey) ? callerKey : yield* localKey;
       const admittedRequest = request.modify({

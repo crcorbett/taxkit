@@ -1,5 +1,11 @@
 import { useAtomValue } from "@effect/atom-react";
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  calculatorPaths,
+  mcpPath,
+  openApiPath,
+  referencePath,
+} from "@taxkit/api-http/routes";
 import { Option } from "effect";
 
 import { publicSettingsAtom } from "#/lib/api/client.atoms";
@@ -25,9 +31,9 @@ export const Route = createFileRoute("/agents")({
         {Option.isSome(settings) && (
           <>
             <p>
-              <a href={new URL("/mcp", settings.value.apiOrigin).href}>
+              <a href={new URL(mcpPath, settings.value.apiOrigin).href}>
                 <code className="agent-endpoint">
-                  {new URL("/mcp", settings.value.apiOrigin).href}
+                  {new URL(mcpPath, settings.value.apiOrigin).href}
                 </code>
               </a>
             </p>
@@ -38,27 +44,24 @@ export const Route = createFileRoute("/agents")({
             </p>
             <ul>
               <li>
-                <a
-                  href={
-                    new URL("/api/docs/openapi.json", settings.value.apiOrigin)
-                      .href
-                  }
-                >
+                <a href={new URL(openApiPath, settings.value.apiOrigin).href}>
                   API description for software (OpenAPI)
                 </a>
               </li>
               <li>
                 <a
                   href={
-                    new URL("/api/v1/calculators", settings.value.apiOrigin)
-                      .href
+                    new URL(
+                      calculatorPaths.calculators,
+                      settings.value.apiOrigin
+                    ).href
                   }
                 >
                   Supported calculator list
                 </a>
               </li>
               <li>
-                <a href={new URL("/api/docs", settings.value.apiOrigin).href}>
+                <a href={new URL(referencePath, settings.value.apiOrigin).href}>
                   API documentation and input details
                 </a>
               </li>

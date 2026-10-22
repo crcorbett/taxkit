@@ -8,6 +8,7 @@ const frontendModules = [
   "@taxkit/analytics/errors",
   "@taxkit/analytics/service",
   "@taxkit/api-http/api",
+  "@taxkit/api-http/origin",
   "@taxkit/api-http/request-boundary",
   "@taxkit/api-http/response-policy",
   "@taxkit/api-http/routes",
@@ -50,6 +51,10 @@ const hostModuleExceptions = [
   { file: "apps/web/src/server.ts", module: "@taxkit/analytics/relay/service" },
   {
     file: "apps/web/src/server.ts",
+    module: "@taxkit/calculators/admission.schemas",
+  },
+  {
+    file: "apps/web/src/server.ts",
     module: "@taxkit/calculators/admission.service",
   },
   {
@@ -63,6 +68,10 @@ const hostModuleExceptions = [
   {
     file: "apps/web/src/lib/runtime.server.ts",
     module: "@taxkit/observability/host-telemetry",
+  },
+  {
+    file: "apps/web/src/lib/config.server.ts",
+    module: "@taxkit/content/config",
   },
   {
     file: "apps/web/src/lib/config.server.ts",
@@ -101,15 +110,20 @@ const isDeploymentDependency = (dependency: string) =>
   dependency.startsWith("@distilled.cloud/");
 const isInfrastructureOwner = (owner: string) =>
   owner === "packages/infrastructure";
+// Runtime support is consumed by domain packages and hosts, never the reverse:
+// these owners depend on no other TaxKit workspace package.
+const domainFreeOwners = ["packages/observability"];
 export const isForbiddenPackageDependency = (
   owner: string,
   dependency: string
 ) =>
-  owner.startsWith("packages/") &&
-  !isInfrastructureOwner(owner) &&
-  (isDeploymentDependency(dependency) ||
-    dependency === "alchemy" ||
-    dependency.startsWith("alchemy/"));
+  (Array.contains(domainFreeOwners, owner) &&
+    dependency.startsWith("@taxkit/")) ||
+  (owner.startsWith("packages/") &&
+    !isInfrastructureOwner(owner) &&
+    (isDeploymentDependency(dependency) ||
+      dependency === "alchemy" ||
+      dependency.startsWith("alchemy/")));
 export const isFrontendModule = (file: string, address: string) =>
   Array.contains(frontendModules, address) ||
   (/\.(?:test|spec)\.[cm]?[jt]sx?$/u.test(file) &&
