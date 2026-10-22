@@ -1,5 +1,14 @@
 # TaxKit
 
+## 2.1.2
+
+- Correct monthly PAYG and student-loan withholding for earnings ending in
+  33 cents. Select the student-loan table using the tax-free-threshold answer
+  and show the correct rule in calculation explanations. Pay reports identify
+  the corrected rules as `rules-au-pay/1.0.2`.
+- Release these fixes under the npm name `taxkit`. See the
+  [SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
+
 ## 2.1.1
 
 - Publish the single SDK under the npm name `taxkit`. Install it with
