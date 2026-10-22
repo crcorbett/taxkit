@@ -12,9 +12,6 @@ export default defineConfig({
     "docs/**",
     "apps/web/src/routeTree.gen.ts",
     "apps/web/src/worker-runtime.generated.d.ts",
-    "tools/oxlint/anti-slop/**",
-    // Vendored byte for byte from the published plugin; see its README.
-    "tools/oxlint/vendor/**",
   ],
   // Preserve authored Markdown wrapping. Ultracite 7.10 otherwise rewrites
   // current and historical documentation wholesale.

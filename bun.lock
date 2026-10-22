@@ -11,7 +11,7 @@
       },
       "devDependencies": {
         "@changesets/cli": "3.0.3",
-        "@commonplaces/oxlint-plugin": "0.3.1",
+        "@commonplaces/oxlint-plugin": "0.4.0",
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
         "@effect/tsgo": "0.48.0",
@@ -554,7 +554,7 @@
 
     "@cloudflare/workers-types": ["@cloudflare/workers-types@5.20261016.1", "", {}, "sha512-I8OJdPl3M6TIl9ksU3wtEyWVhSE8E8txJ/vGOv3SkhjcvN8uMjyFmMvRsNOZgzMe5xYFQ0LctmiGqTwR7DbZ6w=="],
 
-    "@commonplaces/oxlint-plugin": ["@commonplaces/oxlint-plugin@0.3.1", "", { "dependencies": { "@oxlint/plugins": "1.80.0", "effect": "4.0.2" }, "peerDependencies": { "oxlint": "1.80.0 || 1.85.0 || 1.86.0" } }, "sha512-UWbtTtyLVCEravL8zLw1cXZWA9o1ccnPIBgRFGAD+W4VRATNS03tl3Hp0B70ZsyNPS05ZcaqaIvONhEb8crK+Q=="],
+    "@commonplaces/oxlint-plugin": ["@commonplaces/oxlint-plugin@0.4.0", "", { "dependencies": { "@oxlint/plugins": "1.80.0", "effect": "4.0.2" }, "peerDependencies": { "oxlint": "1.80.0 || 1.85.0 || 1.86.0" } }, "sha512-3Vnnsp+xlCm+2B+7BvrLgDsLijZdFdf7iqRlkgLyVWrRRcOov6GdAgy5jc7bxGz+pgYKmH7lZ4gjSBBAnOMoaw=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 
