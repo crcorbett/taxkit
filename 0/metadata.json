@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M5HQKQCCQWZZE7XPRV12R370",
+  "session_id": "01a161e5-3bcb-7d43-9bc4-a01414b2fcca",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-22T11:58:15.388527Z",
+  "branch": "codex/publish-taxkit",
+  "checkpoints_count": 4,
+  "save_step_count": 1,
+  "files_touched": [
+    "packages/docs-content/src/public-links.profile.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "883c9eac1f85",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 2110329,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 104229632,
+    "output_tokens": 309143,
+    "api_call_count": 631
+  },
+  "session_metrics": {
+    "turn_count": 17
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-22T11:58:15.053481Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 10,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 10,
+    "total_lines_changed": 21,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
