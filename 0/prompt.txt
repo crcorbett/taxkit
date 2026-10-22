@@ -125,3 +125,19 @@ documentation linked above.
 ---
 
 Set a goal to address these defects, and align to [@Development Workflows](plugin://development-workflows@commonplace/) . Also ensure website/mcp/api is very closely aligned to the common practice reference implementations. Merge and release to prod from here when done
+
+---
+
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. For every annotation you address, include its inline directive `:codex-annotation{index="N"}`, where N is its one-based array position (for example, `:codex-annotation{index="1"}`). Do not use unstructured annotation labels.
+<response-annotations>
+[{"text":"SDK patch Changeset is ready","annotation":"What was patched? Or doyou just mean updated. Also im back at the keyboard, lets do the taxkit npm update and 'taxkit' package name","source":{"messageId":"msg_025bb9af2f1f6547016ada12aee76081919975071fc29b400a","startOffset":521,"endOffset":549}}]
+</response-annotations>
+
+## My request:
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_93fe919bda1a4077898b7f7841ccb216\",0]","question":"Please complete the npm sign-in in the browser that just opened, including any security-key check. Let me know once it is done; I’ll keep preparing the release.","answer":"Signed in"}]
+</send_user_message_question_reply>
