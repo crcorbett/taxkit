@@ -1,6 +1,6 @@
 {
   "name": "@taxkit/sdk",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "description": "TypeScript SDK for in-process TaxKit calculations.",
   "license": "MIT",

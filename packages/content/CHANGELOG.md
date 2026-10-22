@@ -1,0 +1,53 @@
+# @taxkit/content
+
+## 2.0.0
+
+### Major Changes
+
+- 501d419: Add checked discovery documents derived from the accepted documentation catalogue
+  and the configured Website/API addresses. Native documentation calls now require
+  revision 2 and gain the closed discovery operation and fixed unavailable error.
+  API and Website origins reuse one checked public-address policy with
+  separate identities. No calculator request or retained answer changes.
+- 049b04f: Add four checked native documentation operations and their separate client. The RPC server now requires the caller's ContentService as well as its calculator service. Keep calculator methods and revision 4, and check documentation revision 1 separately.
+
+  Own the bounded public page address and fixed page/search errors in the compiled content package, shared by HTTP and RPC. Both private JSON clients use the same scoped 2 MiB response reader; their existing error vocabularies stay separate.
+
+- 48f4681: Discovery documents now name the TaxKit publication address. `DocsDiscoverySettings`
+  replaces `websiteOrigin` with `publicationOrigin`, checked by the new
+  `DocsPublicationOrigin` Schema, so canonical links name the published site even
+  when a separate Preview serves the page. The acceptance-record Schemas
+  (`PublicPageAcceptanceRecord`, its versions and `DocsAcceptedSourceDigest`) are
+  removed; page frontmatter now decides publication. Packages use Effect 4.0.2.
+- 4b75366: Content and Fumadocs source Layers are static. `ContentDiscoveryLive` now
+  requires `ContentDiscoverySettings`; supply the lazy settings Effect with
+  `Layer.succeed(ContentDiscoverySettings)(settings)`. A settings failure still
+  fails `getDocument`, not Layer construction. `makeFumadocsSourceLive(adapter)`
+  is replaced by `FumadocsSourceLive`, which requires
+  `FumadocsGeneratedCollection` from `@taxkit/docs-fumadocs/service`; the
+  `FumadocsGeneratedCollectionAdapter` type moves to that export.
+  `makeFumadocsSourceTest(fixtures)` and `makeDocsContentServiceTest(fixtures)`
+  are replaced by `FumadocsSourceTest` and `DocsContentServiceTest`, which require
+  `FumadocsSourceFixtures` from `@taxkit/docs-fumadocs/test`.
+
+### Minor Changes
+
+- dc9d0ba: Add a compiled content contract and service for accepted pages, navigation and
+  bounded search. Drafts and inconsistent catalogue entries fail validation.
+  Keep the existing docs-content schema and error imports as compatibility
+  re-exports; authored MDX and its compiler remain in docs-content.
+- bd9df35: Add source-bound acceptance record contracts, an independent native MDX build
+  connection and checked public snippet validation. Retain older acceptance
+  records and the current docs app while the accepted catalogue is introduced.
+
+### Patch Changes
+
+- 20a9dcc: Record individual reviewed source acceptance for the existing documentation
+  pages and navigation. Bind each decision to exact file bytes so the local
+  catalogue builder can include accepted pages and reject later unreviewed edits.
+  Preserve the existing examples, retained tax results and private package status.
+- 1fea106: Reject documentation replies that do not match the requested page and keep Website settings available when its API binding fails.
+
+  Separate native host composition, observability, MCP, analytics relay and discovery publication into their owning packages. Centralize API paths while preserving HTTP/RPC/MCP wire contracts, private calculation admission and telemetry privacy.
+
+  Keep native modern MCP invocations alive through their existing work deadline after a client disconnect so calculation capacity is released reliably.

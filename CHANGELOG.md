@@ -1,5 +1,33 @@
 # TaxKit
 
+## 2.0.0
+
+### Major Changes
+
+- Version the ten-package release train together at `2.0.0`. Core and SDK
+  callers now use checked money/date operations, Schema-owned Option values,
+  static Layers and resource-owning SDK clients. See the generated
+  [Core](./packages/core/CHANGELOG.md),
+  [calculators](./packages/calculators/CHANGELOG.md) and
+  [SDK](./packages/sdk/typescript/CHANGELOG.md) migration notes.
+- Record the API's bounded calculation work, shared request allowance, safe
+  errors, public documentation routes and native modern-only MCP transport.
+  Website calculations use the native HTTP API; public content uses the
+  reviewed cache policy. See the [API changelog](./apps/api/CHANGELOG.md) and
+  [HTTP package notes](./packages/api/http/CHANGELOG.md).
+- Include the corrected 2025–26 Medicare thresholds, salary-sacrifice
+  deduction, PAYG rounding and zero-income handling in the versioned release.
+  Independent ruleset identifiers remain separate from package versions;
+  see the [income-tax](./packages/rules/au/income-tax/CHANGELOG.md),
+  [pay](./packages/rules/au/pay/CHANGELOG.md) and
+  [STSL](./packages/rules/au/stsl/CHANGELOG.md) notes.
+
+### Package Versioning
+
+- Process the 56 accumulated Changesets into 19 package versions and their
+  changelogs. Packages outside the fixed release train keep their own versions.
+  Every package remains private; npm publication is separate from this update.
+
 ## 1.0.0
 
 ### Major Changes
