@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-configuration-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-10-20
 review_trigger: config Schema, namespace, source selection or secret handling change
 ---
 
@@ -35,16 +35,16 @@ Doppler project `taxkit` holds operator-set credentials:
 | `prd` | the `prod` stage | Cloudflare account and Production token |
 | `stg_preview` | `pr-<number>` stages | Cloudflare account and Preview token |
 | `dev` | other `dev_*` stages of `alchemy.run.ts` | Cloudflare account and development token |
-| `ci` | the Checks workflow | Turbo team and token |
+| `ci` | the Checks workflow's `checks` job | Turbo team and token |
 
 `deploymentSecrets` in `@taxkit/infrastructure/secrets` decodes the stage first
 (an unsupported stage fails with a fixed Config error before any credential is
 read), then reads the stage's Doppler config, the stage's calculator rate-limit
 namespace and an ignored `.env`; the shell environment is disabled. Deployment
 commands run locally; the [deployment runbook](../runbooks/deployment.md) owns
-how to pass the Doppler login. The Checks workflow reads `ci` through the
-Doppler action, checks the project and config names and passes only the Turbo
-values to its steps.
+how to pass the Doppler login. The Checks workflow's `checks` job reads `ci`
+through the Doppler action, checks the project and config names and passes only
+the Turbo values to its steps; its deploy jobs do not receive them.
 
 `alchemy.local.run.ts` runs only local emulation at the `dev_native_apps`
 stage, with local state and no Doppler. The root `bun run dev` command sets an
