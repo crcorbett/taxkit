@@ -285,7 +285,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
               allowedMethods: publicCors.allowedMethods,
               allowedOrigins: (origin) =>
                 isMcp
-                  ? origin === config.publicationOrigin.origin
+                  ? origin === config.websiteOrigin.origin
                   : isBrowserOrigin(origin),
               credentials: false,
             })

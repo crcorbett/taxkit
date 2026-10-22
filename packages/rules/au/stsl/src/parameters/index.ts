@@ -5,6 +5,8 @@
  */
 export {
   AtoStslTable,
+  AtoStslNoThresholdTable,
+  AtoStslNoThresholdTableDescriptor,
   AtoStslTableDescriptor,
   AtoStsl_2025_26_Live,
   StslArtifact2025_26,

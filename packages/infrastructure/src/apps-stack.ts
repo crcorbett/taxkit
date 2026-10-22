@@ -122,6 +122,7 @@ export const nativeApiHostProps = Effect.gen(function* () {
       }),
     }),
     compatibility: workerCompatibility,
+    dev: { host: "127.0.0.1", port: 3221, strictPort: true },
     env: {
       API_PUBLIC_ORIGIN: Worker.URL,
       CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
@@ -197,6 +198,7 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       // Each deployed Website version starts its own cache.
       cache: { crossVersionCache: false, enabled: true },
       compatibility: workerCompatibility,
+      dev: { host: "127.0.0.1", port: 3220, strictPort: true },
       env: {
         API_PUBLIC_ORIGIN: api.url.pipe(
           Output.map((url) => Option.getOrNull(Option.fromNullishOr(url)))
@@ -271,5 +273,10 @@ export const declareNativeAppsInfrastructure = Effect.gen(function* () {
 export const declareNativeAppsHosts = Effect.gen(function* () {
   const api = yield* TaxKitApiWorker;
   const website = yield* TaxKitWebsite;
+  // Attach the Website's native address after both Workers exist. Native
+  // binding env resolves this dependency without a props declaration cycle.
+  yield* api.bind("WebsiteOrigin", {
+    env: { WEBSITE_PUBLIC_ORIGIN: website.url },
+  });
   return { apiUrl: api.url, websiteUrl: website.url };
 });

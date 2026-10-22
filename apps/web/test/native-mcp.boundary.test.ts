@@ -803,7 +803,7 @@ it.live(
             )
         )
       );
-      const publicationOrigin = "http://127.0.0.1:4354";
+      const websiteOrigin = "http://127.0.0.1:4354";
       const foreignOrigin = "http://127.0.0.1:4355";
       const exceptions = yield* Queue.make<string>();
       const host = yield* Effect.acquireRelease(
@@ -829,11 +829,11 @@ it.live(
                       },
                       TAXKIT_PUBLICATION_ORIGIN: {
                         type: "json",
-                        value: publicationOrigin,
+                        value: "https://publication.example.com",
                       },
                       WEBSITE_PUBLIC_ORIGIN: {
                         type: "json",
-                        value: publicationOrigin,
+                        value: websiteOrigin,
                       },
                       WORKER_URL: {
                         type: "json",
@@ -991,7 +991,7 @@ it.live(
       yield* Effect.promise(() => network.send("Network.enable"));
       // MCP traffic is never intercepted, stripped of Origin, or given a
       // custom fetch adapter. Chromium owns the actual cross-origin requests.
-      yield* Effect.promise(() => page.goto(publicationOrigin));
+      yield* Effect.promise(() => page.goto(websiteOrigin));
       yield* Effect.promise(() => page.addScriptTag({ content: script.code }));
       // Playwright's serialized browser callback is a required host boundary.
       // The official SDK owns discovery, frames, transport headers and close.
@@ -1072,7 +1072,7 @@ it.live(
           const headers = Headers.fromInput(event.request.headers);
           return (
             Headers.get(headers, "origin").pipe(
-              Option.contains(publicationOrigin)
+              Option.contains(websiteOrigin)
             ) &&
             Headers.get(headers, "access-control-request-headers").pipe(
               Option.exists((value) =>
@@ -1106,7 +1106,7 @@ it.live(
           return (
             event.request.method === "POST" &&
             Headers.get(headers, "origin").pipe(
-              Option.contains(publicationOrigin)
+              Option.contains(websiteOrigin)
             ) &&
             Headers.get(headers, "mcp-protocol-version").pipe(
               Option.contains("2026-07-28")
@@ -1129,7 +1129,7 @@ it.live(
             Headers.get(
               Headers.fromInput(event.response.headers),
               "access-control-allow-origin"
-            ).pipe(Option.contains(publicationOrigin))
+            ).pipe(Option.contains(websiteOrigin))
         )
       ).toBe(true);
       // Chromium can cache every header granted by the first preflight, so

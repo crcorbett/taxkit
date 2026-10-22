@@ -7,6 +7,7 @@ import {
   StslTable,
   StslRow,
   AtoStslTable,
+  AtoStslNoThresholdTable,
   AtoStsl_2025_26_Live,
 } from "../src/parameters/stsl-table.js";
 
@@ -85,11 +86,11 @@ describe("StslTable owned relationships", () => {
       }).pipe(Effect.provide(AtoStsl_2025_26_Live))
   );
 
-  it.effect(
-    "rejects gaps, overlaps and open middle bounds in the saved table representation",
-    () =>
+  it.effect.each([AtoStslTable, AtoStslNoThresholdTable])(
+    "rejects gaps, overlaps and open middle bounds in each saved table",
+    (tableService) =>
       Effect.gen(function* () {
-        const table = yield* AtoStslTable;
+        const table = yield* tableService;
         const first = expectAt(table.rows, 0);
         const second = expectAt(table.rows, 1);
         const last = expectAt(table.rows, table.rows.length - 1);

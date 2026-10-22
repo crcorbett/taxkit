@@ -70,6 +70,7 @@ const ApiWorkerInit = ApiWorkerApplicationInit.pipe(
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
   TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
+  WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
 const Json = Schema.fromJsonString(Schema.Unknown);
 const NativeRequest = Schema.TaggedStruct("Request", {
@@ -771,6 +772,7 @@ describe("native API application", () => {
           ConfigProvider.fromUnknown({
             API_PUBLIC_ORIGIN: sensitiveSentinel,
             TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
+            WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
           })
         ),
         Effect.exit

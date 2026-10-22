@@ -636,7 +636,7 @@ const restoreRuleCorrectionHistory = (name: string, bytes: string): string => {
     ? bytes.replaceAll('"inputs":{"a":"0.32","bDollars":"176.5769","period":"fortnightly","scale":"scale2","scheduleYear":"2025-26","taxablePeriodCents":346200,"weeklyEquivalentCents":173100,"weeklyFormulaCents":173199,"weeklyWithholdingDollarsRaw":"377.6599"}', '"inputs":{"a":"0.32","bDollars":"176.5769","period":"fortnightly","scale":"scale2","scheduleYear":"2025-26","taxablePeriodCents":346200,"weeklyEquivalentCents":173100,"weeklyFormulaCents":173199,"weeklyWithholdingCentsRaw":37766}')
     : bytes;
   const pay = name.startsWith("report/au.pay.take-home/") && payTrace.includes('"_tag":"TakeHomePayReport"')
-    ? payTrace.replaceAll('"rulePackVersion":"rules-au-pay/1.0.1","taxablePay":', '"rulePackVersion":"rules-au-pay/1.0.0","taxablePay":')
+    ? payTrace.replaceAll('"rulePackVersion":"rules-au-pay/1.0.2","taxablePay":', '"rulePackVersion":"rules-au-pay/1.0.0","taxablePay":')
     : payTrace;
   const annual = name.startsWith("report/au.income-tax.annual/") && bytes.includes('"_tag":"AnnualTaxReport"')
     ? pay
@@ -648,7 +648,7 @@ const restoreRuleCorrectionHistory = (name: string, bytes: string): string => {
     .replaceAll('{"_tag":"MedicareLevyTable","levyRate":{"_id":"BigDecimal","value":"2","scale":2},"shadeInMaxCents":3501300,"shadeInRate":{"_id":"BigDecimal","value":"1","scale":1},"source":{"_tag":"SourceRef","kind":"legislation","reference":"https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf","title":"Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26"},"thresholdCents":2801100,"year":"2025-26"}', '{"_tag":"MedicareLevyTable","levyRate":{"_id":"BigDecimal","value":"2","scale":2},"shadeInMaxCents":3402700,"shadeInRate":{"_id":"BigDecimal","value":"1","scale":1},"source":{"_tag":"SourceRef","kind":"ato-publication","reference":"https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners","title":"ATO Medicare levy reduction thresholds for low-income earners"},"thresholdCents":2722200,"year":"2025-26"}')
     .replaceAll('{"_tag":"SourceRef","kind":"legislation","reference":"https://www.legislation.gov.au/C2026A00058/asmade/2026-06-30/text/original/pdf","title":"Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26"}', '{"_tag":"SourceRef","kind":"ato-publication","reference":"https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction/medicare-levy-reduction-for-low-income-earners","title":"ATO Medicare levy reduction thresholds for low-income earners"}');
 };
-const unrelatedPayCorrectionNeighbour = '{"rulePackVersion":"rules-au-pay/1.0.1","weeklyWithholdingDollarsRaw":"377.6599","amount":37766}';
+const unrelatedPayCorrectionNeighbour = '{"rulePackVersion":"rules-au-pay/1.0.2","weeklyWithholdingDollarsRaw":"377.6599","amount":37766}';
 if (restoreRuleCorrectionHistory("report/au.pay.take-home/missing/missing", unrelatedPayCorrectionNeighbour) !== unrelatedPayCorrectionNeighbour) {
   throw new Error("Pay history restoration rewrote an unrelated value.");
 }
@@ -2250,11 +2250,11 @@ if (effectReport._tag !== "TakeHomePayReport") {
   throw new Error("Effect SDK downstream calculation returned the wrong report.");
 }
 
-if (plainReport.rulePackVersion !== "rules-au-pay/1.0.1") {
+if (plainReport.rulePackVersion !== "rules-au-pay/1.0.2") {
   throw new Error("Plain SDK downstream calculation returned the wrong pay ruleset version.");
 }
 
-if (effectReport.rulePackVersion !== "rules-au-pay/1.0.1") {
+if (effectReport.rulePackVersion !== "rules-au-pay/1.0.2") {
   throw new Error("Effect SDK downstream calculation returned the wrong pay ruleset version.");
 }
 

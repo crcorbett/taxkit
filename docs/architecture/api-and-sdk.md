@@ -721,7 +721,7 @@ and deletes its namespace through Alchemy's native migration. Its data and
 former sessions cannot be recovered by redeploying old code. The
 [deployment runbook](../runbooks/deployment.md) owns plan/readback and rollback.
 
-Origin-less clients and the checked publication origin remain admitted; foreign
+Origin-less clients and the checked same-stage Website origin remain admitted; foreign
 browser origins are refused. The public [agent guide](../../packages/docs-content/content/api/agent-tools.mdx)
 owns client compatibility and connection steps. The Website agents page uses
 checked same-stage API settings; public documentation/discovery keeps its

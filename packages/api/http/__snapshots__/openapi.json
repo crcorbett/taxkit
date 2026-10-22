@@ -679,7 +679,7 @@
             "type": "string"
           },
           "rulePackVersion": {
-            "enum": ["rules-au-pay/1.0.1"],
+            "enum": ["rules-au-pay/1.0.2"],
             "type": "string"
           },
           "taxablePay": {

@@ -1,5 +1,8 @@
 import { TaxKitApiOrigin } from "@taxkit/api-http/origin";
-import { DocsPublicationOrigin } from "@taxkit/content/schemas";
+import {
+  DocsPublicationOrigin,
+  DocsWebsiteOrigin,
+} from "@taxkit/content/schemas";
 import { Schema } from "effect";
 
 const ApiServerHostSchema = Schema.NonEmptyString;
@@ -37,6 +40,7 @@ export class ApiServerConfigError extends Schema.TaggedError<ApiServerConfigErro
 export const ApiWorkerSettings = Schema.Struct({
   apiOrigin: TaxKitApiOrigin,
   publicationOrigin: DocsPublicationOrigin,
+  websiteOrigin: DocsWebsiteOrigin,
 });
 
 export type ApiWorkerSettings = typeof ApiWorkerSettings.Type;

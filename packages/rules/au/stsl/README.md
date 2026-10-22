@@ -18,6 +18,11 @@ withholding components.
 STSL withholding components, STSL-aware withholdings ledger integration,
 descriptors, rule packs and golden tests.
 
+Schedule 8 selects separate coefficient tables according to whether the
+employee claims the tax-free threshold. It rounds the full decimal weekly
+formula directly to whole dollars. The combined ledger trace uses the STSL
+ledger rule ID, which is present in the selected rule graph.
+
 ## Guardrails
 
 - Reuse canonical schemas, facts, parameter services, rule IDs and component
@@ -32,8 +37,8 @@ descriptors, rule packs and golden tests.
   its final bound open. Saved and decoded table forms enforce the same coverage
   check. Retained coefficients, effective dates and source bytes stay unchanged.
 - Derived money and combined withholding totals use core fallible constructors
-  and return safe `CalculationError` failures for unsupported amounts. Retained
-  Schedule 8 coefficients, source records and known STSL results stay unchanged.
+  and return safe `CalculationError` failures for unsupported amounts. The existing threshold-claimed table and source record stay unchanged; the
+  no-threshold table has its own descriptor and source checksum.
 
 ## Commands
 
@@ -59,5 +64,4 @@ Trace formula and rounding values now use Core's nested Option contract. Use
 the owning trace codec for transport or saved snapshots, and `Option.flatten`
 to read content when missing and undefined mean the same thing. Descriptor
 questions/source artifacts use Option and rule parameters are total arrays.
-See the [Core owner](../../../core/README.md). Existing formulas, tax amounts,
-source records and snapshot expectations are unchanged.
+See the [Core owner](../../../core/README.md). The trace retains the selected threshold setting and coefficient table.

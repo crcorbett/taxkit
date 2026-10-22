@@ -44,7 +44,7 @@ before other work and gives the token only to native commands. Every `--yes`
 apply or destroy follows a matching-stage native plan without `--yes`.
 
 Effect diagnostics run inside every workspace's `check-types`, because the
-`prepare` script (`effect-tsgo patch`) patches the TypeScript compiler with the
+`prepare` script (`effect-tsgo patch --oxlint`) patches TypeScript and Oxlint with the
 Effect language service; `bun run check:effect` is a smoke check that the patch
 and plugin are active. `bun run lint` runs type-aware checks and the published Commonplace
 `strict-effect` policy from `@commonplaces/oxlint-plugin` 0.6.0, including the

@@ -101,6 +101,12 @@ export class AtoStslTable extends Context.Service<AtoStslTable, StslTable>()(
   "taxkit/rules-au-stsl/parameter/AtoStslTable"
 ) {}
 
+/** Schedule 8 coefficients when the tax-free threshold is not claimed. @since 2.1.2 */
+export class AtoStslNoThresholdTable extends Context.Service<
+  AtoStslNoThresholdTable,
+  StslTable
+>()("taxkit/rules-au-stsl/parameter/AtoStslNoThresholdTable") {}
+
 /**
  * Source reference for ATO Schedule 8 STSL withholding formulas for 2025-26.
  *
@@ -181,9 +187,63 @@ const table2025_26 = new StslTable({
   year: taxYear("2025-26"),
 });
 
+const noThresholdTable2025_26 = new StslTable({
+  rows: [
+    new StslRow({
+      a: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
+      weeklyMaxCents: Cents.make(93_799),
+      weeklyMinCents: Cents.make(0),
+    }),
+    new StslRow({
+      a: DecimalCoefficient.make(BigDecimal.make(15n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(1_407_692n, 4)),
+      weeklyMaxCents: Cents.make(205_299),
+      weeklyMinCents: Cents.make(93_800),
+    }),
+    new StslRow({
+      a: DecimalCoefficient.make(BigDecimal.make(17n, 2)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(1_818_462n, 4)),
+      weeklyMaxCents: Cents.make(259_699),
+      weeklyMinCents: Cents.make(205_300),
+    }),
+    new StslRow({
+      a: DecimalCoefficient.make(BigDecimal.make(1n, 1)),
+      bDollars: DecimalCoefficient.make(BigDecimal.make(0n, 0)),
+      weeklyMaxCents: "infinity",
+      weeklyMinCents: Cents.make(259_700),
+    }),
+  ],
+  source: StslSource2025_26,
+  year: taxYear("2025-26"),
+});
+
+/** The no-threshold table has a separate identity; existing saved tables stay valid. @since 2.1.2 */
+export const AtoStslNoThresholdTableDescriptor = makeParameterDescriptor({
+  effectivePeriod: AtoStslTableDescriptor.effectivePeriod,
+  id: "taxkit/rules-au-stsl/parameter/AtoStslNoThresholdTable",
+  schema: StslTable,
+  source: StslSource2025_26,
+  // SHA-256 of JSON.stringify(Schema.encode(StslRow[])(rows)), without a newline.
+  sourceArtifact: new SourceArtifact({
+    checksum: sourceChecksum(
+      "sha256:d8881e3f6deb022166ff371ebc61349486c89e31a72e92dc4fa1e149202e1426"
+    ),
+    documentVersion: "2025-09-24 to 2026-06-30; no tax-free threshold claimed",
+    extract: new SourceExtract({ rowContract: "StslRow[]", rowCount: 4 }),
+    retrievedOn: IsoDate.make("2026-10-22"),
+    source: StslSource2025_26,
+  }),
+  tag: AtoStslNoThresholdTable,
+  title: "ATO Schedule 8 STSL coefficients without the tax-free threshold",
+});
+
 /**
  * Live ATO Schedule 8 STSL parameter layer for 2025-26.
  *
  * @since 0.1.0
  */
-export const AtoStsl_2025_26_Live = Layer.succeed(AtoStslTable)(table2025_26);
+export const AtoStsl_2025_26_Live = Layer.merge(
+  Layer.succeed(AtoStslTable)(table2025_26),
+  Layer.succeed(AtoStslNoThresholdTable)(noThresholdTable2025_26)
+);

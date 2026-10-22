@@ -43,7 +43,7 @@ describe("plain SDK facade", () => {
 
       expect(report._tag).toBe("TakeHomePayReport");
       expect(report.netPay.cents).toBe(130_100);
-      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.1");
+      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.2");
     })
   );
 

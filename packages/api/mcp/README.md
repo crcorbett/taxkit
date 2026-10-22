@@ -33,12 +33,12 @@ There is no duplicate calculator/content service, client or runtime to acquire.
 Host integration tests substitute domain Layers and supply a fresh private
 cancellation signal.
 The host provides native configuration and owns the application scope. The MCP
-Layer reads and checks `TAXKIT_PUBLICATION_ORIGIN` through Content's
-`DocsPublicationOriginConfig` when registering
+Layer reads and checks `WEBSITE_PUBLIC_ORIGIN` through Content's
+`DocsWebsiteOriginConfig` when registering
 its route; the native adapter owns each request's protocol lifetime.
 
 Originless remote clients are accepted. Browser Origins must exactly match the
-checked publication origin. `TaxKitMcpHttpLayer` selects only native
+checked same-stage Website origin. `TaxKitMcpHttpLayer` selects only native
 `2026-07-28` with `McpServer.layerHttpRequestScoped`. Registration reuses the
 existing calculator/content services; each POST owns its protocol server and
 notification consumer until its complete response body has been read. No

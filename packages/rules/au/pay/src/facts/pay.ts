@@ -4,6 +4,7 @@ import {
   makeFactDescriptor,
 } from "@taxkit/core/facts";
 import { Money } from "@taxkit/core/primitives";
+import type { Cents } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Context, Match, Schema } from "effect";
 
@@ -43,6 +44,19 @@ export const payPeriodToWeeklyFactor = (period: PayPeriod): number =>
     Match.when("monthly", () => 3 / 13),
     Match.exhaustive
   );
+
+/**
+ * Weekly earnings for Schedule 1 and Schedule 8 formula lookup. Monthly
+ * earnings ending in 33 cents gain one cent before the weekly conversion.
+ * The caller then ignores weekly cents and adds 99 cents as the schedules require.
+ * @since 2.1.2
+ */
+export const payPeriodToWeeklyCents = (
+  cents: Cents,
+  period: PayPeriod
+): number =>
+  (period === "monthly" && cents % 100 === 33 ? cents + 1 : cents) *
+  payPeriodToWeeklyFactor(period);
 
 /**
  * Scales a rounded weekly withholding amount back to the original pay period.
