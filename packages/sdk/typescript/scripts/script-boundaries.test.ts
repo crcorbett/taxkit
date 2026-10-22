@@ -113,7 +113,7 @@ describe("SDK direct import command", () => {
                   Match.value(path).pipe(
                     Match.when(
                       (value) => value.endsWith("/api/http/package.json"),
-                      () => '{"dependencies":{"@taxkit/sdk":"workspace:*"}}'
+                      () => "{}"
                     ),
                     Match.when(
                       (value) => value.endsWith("package.json"),
@@ -132,23 +132,23 @@ describe("SDK direct import command", () => {
   it.effect.each([
     {
       code: 1,
-      http: '{"dependencies":{"@taxkit/sdk":"1.0.0"}}',
+      http: "{}",
       name: "blocked metadata",
-      sdk: '{"devDependencies":{"@taxkit/api-http":"1.0.0"}}',
+      sdk: '{"dependencies":{"@taxkit/core":"1.0.0"}}',
       source: "export {};",
       tag: "SdkImportPolicyError",
     },
     {
       code: 1,
-      http: "{}",
-      name: "missing transport direction",
+      http: '{"devDependencies":{"@taxkit/sdk":"workspace:*"}}',
+      name: "reverse transport dependency",
       sdk: "{}",
       source: "export {};",
       tag: "SdkImportPolicyError",
     },
     {
       code: 0,
-      http: '{"dependencies":{"@taxkit/sdk":"1.0.0"}}',
+      http: "{}",
       name: "direct HTTP reference",
       sdk: "{}",
       source: "export {};",
@@ -156,7 +156,7 @@ describe("SDK direct import command", () => {
     },
     {
       code: 1,
-      http: '{"dependencies":{"@taxkit/sdk":"1.0.0"}}',
+      http: "{}",
       name: "root AU reference",
       sdk: "{}",
       source: 'import "./au";',
@@ -164,7 +164,7 @@ describe("SDK direct import command", () => {
     },
     {
       code: 1,
-      http: '{"dependencies":{"@taxkit/sdk":"1.0.0"}}',
+      http: "{}",
       name: "browser server reference",
       sdk: "{}",
       source: 'import "node:fs";',
@@ -180,7 +180,7 @@ describe("SDK direct import command", () => {
     },
     {
       code: 2,
-      http: '{"dependencies":{"@taxkit/sdk":"1.0.0"}}',
+      http: "{}",
       name: "failed search",
       sdk: "{}",
       source: "",
@@ -426,8 +426,8 @@ it.effect.each([
           Match.tag("DownstreamCommandError", (failure) => {
             expect(failure.stage).toBe(
               mode === "build"
-                ? "build @taxkit/core"
-                : "pack workspace manifest for @taxkit/core"
+                ? "build @taxkit/sdk"
+                : "pack workspace manifest for @taxkit/sdk"
             );
             expect(failure.exitCode).toEqual(Option.some(23));
           }),
@@ -506,9 +506,7 @@ it.effect.each(["read", "search-start"] as const)(
                 mode === "read"
                   ? Effect.fail(nativeFault)
                   : Effect.succeed(
-                      path.endsWith("/api/http/package.json")
-                        ? '{"dependencies":{"@taxkit/sdk":"workspace:*"}}'
-                        : "{}"
+                      path.endsWith("/api/http/package.json") ? "{}" : "{}"
                     ),
             })
           )
@@ -558,7 +556,7 @@ it.effect.each(["start", "stdout", "stderr", "exit-read"] as const)(
         onFailure: (error) => {
           Match.value(error).pipe(
             Match.tag("DownstreamCommandError", (failure) => {
-              expect(failure.stage).toBe("build @taxkit/core");
+              expect(failure.stage).toBe("build @taxkit/sdk");
               expect(failure.exitCode).toEqual(Option.none());
               expect(String(failure)).not.toContain("TAXKIT_SECRET_SENTINEL");
             }),

@@ -250,9 +250,11 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
   const dependencyFailures = EffectArray.flatMap(
     EffectRecord.toEntries(packageManifest.dependencies),
     ([dependencyName, range]) =>
-      range.startsWith("workspace:") || range.startsWith("catalog:")
+      dependencyName.startsWith("@taxkit/") ||
+      range.startsWith("workspace:") ||
+      range.startsWith("catalog:")
         ? [
-            `Packed dependency ${dependencyName} must use a concrete range, received ${range}.`,
+            `Packed runtime dependency ${dependencyName} must be external and use a concrete range, received ${range}.`,
           ]
         : []
   );
@@ -295,8 +297,16 @@ import { au } from "@taxkit/sdk/au";
 import { auEffect } from "@taxkit/sdk/au/effect";
 import * as schemas from "@taxkit/sdk/schemas";
 import * as testing from "@taxkit/sdk/testing";
+import * as core from "@taxkit/sdk/core";
+import * as http from "@taxkit/sdk/http";
+import { GrossPay, PayRules } from "@taxkit/sdk/au";
 
 assert.equal(typeof TaxKit.calculate, "function", "root SDK import");
+assert.ok(core.Money, "Core entrypoint");
+assert.ok(http.TaxKitApi, "HTTP contract entrypoint");
+assert.equal(http.CalculatorRunResponse, schemas.CalculatorRunResponse, "one HTTP/SDK Schema identity");
+assert.equal(core.CalculatorSchemas.CalculatorRunResponse, schemas.CalculatorRunResponse, "one Core/SDK Schema identity");
+assert.equal(GrossPay, PayRules.GrossPay, "one AU rule identity");
 assert.equal(typeof effect.calculateRunRequest, "function", "Effect run import");
 assert.equal(typeof effect.calculateReportRequest, "function", "Effect report request import");
 assert.equal(typeof effect.calculateReport, "function", "Effect report import");

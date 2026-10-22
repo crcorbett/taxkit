@@ -12,7 +12,7 @@ rejected Promises.
 ## Call `TaxKit.safe.calculate`
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
@@ -35,7 +35,7 @@ The result is either `TaxKitSuccess` with the calculator report or
 ## Call AU safe helpers
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { au } from "@taxkit/sdk/au";
 
 const result = await au.incomeTax.safe.annual({

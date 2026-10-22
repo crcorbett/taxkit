@@ -112,7 +112,7 @@
     },
     "packages/analytics": {
       "name": "@taxkit/analytics",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -129,7 +129,7 @@
     },
     "packages/api/http": {
       "name": "@taxkit/api-http",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -140,8 +140,6 @@
         "@effect/platform-node": "catalog:",
         "@effect/vitest": "catalog:",
         "@taxkit/rules-au-pay": "workspace:*",
-        "@taxkit/sdk": "workspace:*",
-        "@taxkit/testing": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
@@ -149,7 +147,7 @@
     },
     "packages/api/mcp": {
       "name": "@taxkit/api-mcp",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
@@ -165,7 +163,7 @@
     },
     "packages/api/rpc": {
       "name": "@taxkit/api-rpc",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
@@ -184,7 +182,7 @@
     },
     "packages/calculators": {
       "name": "@taxkit/calculators",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
@@ -200,7 +198,7 @@
     },
     "packages/content": {
       "name": "@taxkit/content",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -212,7 +210,7 @@
     },
     "packages/core": {
       "name": "@taxkit/core",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -224,7 +222,7 @@
     },
     "packages/docs-content": {
       "name": "@taxkit/docs-content",
-      "version": "0.0.3",
+      "version": "1.0.0",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
@@ -252,10 +250,9 @@
     },
     "packages/docs-examples": {
       "name": "@taxkit/docs-examples",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
-        "@taxkit/calculators": "workspace:*",
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
         "@taxkit/sdk": "workspace:*",
@@ -272,7 +269,7 @@
     },
     "packages/docs-fumadocs": {
       "name": "@taxkit/docs-fumadocs",
-      "version": "0.0.3",
+      "version": "1.0.0",
       "dependencies": {
         "@shikijs/core": "4.5.0",
         "@shikijs/transformers": "4.5.0",
@@ -292,7 +289,7 @@
     },
     "packages/infrastructure": {
       "name": "@taxkit/infrastructure",
-      "version": "0.0.1",
+      "version": "1.0.0",
       "dependencies": {
         "@distilled.cloud/posthog": "1.0.0-rc.13",
         "@taxkit/analytics": "workspace:*",
@@ -310,7 +307,7 @@
     },
     "packages/observability": {
       "name": "@taxkit/observability",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -323,7 +320,7 @@
     },
     "packages/publication": {
       "name": "@taxkit/publication",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -337,7 +334,7 @@
     },
     "packages/rules/au/income-tax": {
       "name": "@taxkit/rules-au-income-tax",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "effect": "catalog:",
@@ -352,7 +349,7 @@
     },
     "packages/rules/au/pay": {
       "name": "@taxkit/rules-au-pay",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "effect": "catalog:",
@@ -367,7 +364,7 @@
     },
     "packages/rules/au/stsl": {
       "name": "@taxkit/rules-au-stsl",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -383,28 +380,32 @@
     },
     "packages/sdk/typescript": {
       "name": "@taxkit/sdk",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
-        "@taxkit/calculators": "workspace:*",
-        "@taxkit/core": "workspace:*",
-        "@taxkit/rules-au-income-tax": "workspace:*",
-        "@taxkit/rules-au-pay": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/vitest": "catalog:",
+        "@taxkit/api-http": "workspace:*",
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/content": "workspace:*",
+        "@taxkit/core": "workspace:*",
+        "@taxkit/rules-au-income-tax": "workspace:*",
+        "@taxkit/rules-au-pay": "workspace:*",
+        "@taxkit/rules-au-stsl": "workspace:*",
         "@taxkit/testing": "workspace:*",
         "@types/bun": "catalog:",
         "@vitest/browser-playwright": "5.0.3",
         "typescript": "catalog:",
+        "typescript-ast": "npm:typescript@5.9.3",
         "vite": "catalog:",
         "vitest": "catalog:",
       },
     },
     "packages/testing": {
       "name": "@taxkit/testing",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "@effect/vitest": "catalog:",
         "effect": "catalog:",
@@ -416,7 +417,7 @@
     },
     "packages/tsconfig": {
       "name": "@taxkit/tsconfig",
-      "version": "1.0.0",
+      "version": "2.0.0",
     },
   },
   "overrides": {
@@ -2196,6 +2197,8 @@
     "turbo": ["turbo@2.11.7", "", { "optionalDependencies": { "@turbo/darwin-64": "2.11.7", "@turbo/darwin-arm64": "2.11.7", "@turbo/linux-64": "2.11.7", "@turbo/linux-arm64": "2.11.7", "@turbo/windows-64": "2.11.7", "@turbo/windows-arm64": "2.11.7" }, "bin": { "turbo": "bin/turbo" } }, "sha512-RhXHbqfvY6o3xt/zSHCwSNwLrZlXiqHzewi4eAj9PtZ1T1CqgMJ2yIDb7SKPTG9IikTm925mfzL6hldQVdyNWw=="],
 
     "typescript": ["typescript@7.0.2", "", { "optionalDependencies": { "@typescript/typescript-aix-ppc64": "7.0.2", "@typescript/typescript-darwin-arm64": "7.0.2", "@typescript/typescript-darwin-x64": "7.0.2", "@typescript/typescript-freebsd-arm64": "7.0.2", "@typescript/typescript-freebsd-x64": "7.0.2", "@typescript/typescript-linux-arm": "7.0.2", "@typescript/typescript-linux-arm64": "7.0.2", "@typescript/typescript-linux-loong64": "7.0.2", "@typescript/typescript-linux-mips64el": "7.0.2", "@typescript/typescript-linux-ppc64": "7.0.2", "@typescript/typescript-linux-riscv64": "7.0.2", "@typescript/typescript-linux-s390x": "7.0.2", "@typescript/typescript-linux-x64": "7.0.2", "@typescript/typescript-netbsd-arm64": "7.0.2", "@typescript/typescript-netbsd-x64": "7.0.2", "@typescript/typescript-openbsd-arm64": "7.0.2", "@typescript/typescript-openbsd-x64": "7.0.2", "@typescript/typescript-sunos-x64": "7.0.2", "@typescript/typescript-win32-arm64": "7.0.2", "@typescript/typescript-win32-x64": "7.0.2" }, "bin": { "tsc": "bin/tsc" } }, "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA=="],
+
+    "typescript-ast": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "ufo": ["ufo@1.6.4", "", {}, "sha512-JFNbkD1Svwe0KvGi8GOeLcP4kAWQ609twvCdcHxq1oSL8svv39ZuSvajcD8B+5D0eL4+s1Is2D/O6KN3qcTeRA=="],
 

@@ -1,0 +1,236 @@
+import * as BunRuntime from "@effect/platform-bun/BunRuntime";
+import * as BunServices from "@effect/platform-bun/BunServices";
+import {
+  Array,
+  Console,
+  Effect,
+  FileSystem,
+  Match,
+  Number,
+  Option,
+  Path,
+  Record,
+  Schema,
+} from "effect";
+import * as TypeScript from "typescript-ast";
+
+class PackageAssemblyError extends Schema.TaggedError<PackageAssemblyError>()(
+  "PackageAssemblyError",
+  { operation: Schema.String }
+) {}
+
+const LibraryManifest = Schema.Struct({
+  exports: Schema.Record(
+    Schema.String,
+    Schema.Struct({ default: Schema.String })
+  ),
+  name: Schema.String,
+});
+
+// These are the source owners included in the SDK, not separately installed
+// packages. Their manifests remain the owner of each module's compiled path.
+const libraries = [
+  { directory: "core", root: "packages/core" },
+  { directory: "calculators", root: "packages/calculators" },
+  { directory: "content", root: "packages/content" },
+  { directory: "http", root: "packages/api/http" },
+  { directory: "income-tax", root: "packages/rules/au/income-tax" },
+  { directory: "pay", root: "packages/rules/au/pay" },
+  { directory: "stsl", root: "packages/rules/au/stsl" },
+] as const;
+
+const ModuleReference = Schema.Struct({
+  end: Schema.Finite,
+  specifier: Schema.String,
+  start: Schema.Finite,
+});
+type ModuleReference = typeof ModuleReference.Type;
+
+// This compiler adapter visits module syntax only. Service identifiers,
+// documentation strings and other literals must never be rewritten.
+const moduleReferences = (
+  source: TypeScript.SourceFile,
+  node: TypeScript.Node = source
+): readonly ModuleReference[] => {
+  const literal = Match.value(node).pipe(
+    Match.when(
+      (value) =>
+        TypeScript.isImportDeclaration(value) ||
+        TypeScript.isExportDeclaration(value),
+      (value) => value.moduleSpecifier
+    ),
+    Match.when(TypeScript.isImportTypeNode, (value) =>
+      TypeScript.isLiteralTypeNode(value.argument)
+        ? value.argument.literal
+        : undefined
+    ),
+    Match.when(TypeScript.isCallExpression, (value) =>
+      value.expression.kind === TypeScript.SyntaxKind.ImportKeyword
+        ? Array.head(value.arguments).pipe(Option.getOrUndefined)
+        : undefined
+    ),
+    Match.orElse(() => {
+      // Other compiler nodes do not own a module reference.
+    })
+  );
+  const own =
+    literal !== undefined &&
+    TypeScript.isStringLiteral(literal) &&
+    literal.text.startsWith("@taxkit/")
+      ? [
+          {
+            end: literal.getEnd() - 1,
+            specifier: literal.text,
+            start: literal.getStart(source) + 1,
+          },
+        ]
+      : [];
+  return Array.appendAll(
+    own,
+    Array.flatMap(node.getChildren(source), (child) =>
+      moduleReferences(source, child)
+    )
+  );
+};
+
+export const relocateModuleImports = (
+  source: string,
+  file: string,
+  resolve: (specifier: string) => Option.Option<string>
+) => {
+  const parsed = TypeScript.createSourceFile(
+    file,
+    source,
+    TypeScript.ScriptTarget.Latest,
+    true
+  );
+  return Effect.forEach(moduleReferences(parsed), (reference) =>
+    resolve(reference.specifier).pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new PackageAssemblyError({
+            operation: `unresolved module ${reference.specifier}`,
+          })
+      ),
+      Effect.map((replacement) => ({ ...reference, replacement }))
+    )
+  ).pipe(
+    Effect.map((references) =>
+      Array.reduce(
+        Array.sort(
+          references,
+          (left: ModuleReference, right: ModuleReference) =>
+            Number.Order(right.start, left.start)
+        ),
+        source.replace(/\n\/\/# sourceMappingURL=.*$/u, ""),
+        (text, reference) =>
+          `${text.slice(0, reference.start)}${reference.replacement}${text.slice(reference.end)}`
+      )
+    )
+  );
+};
+
+export const assemblePackage = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const root = yield* path.fromFileUrl(
+    new URL("../../../../", import.meta.url)
+  );
+  const destination = yield* path.fromFileUrl(
+    new URL("../dist/", import.meta.url)
+  );
+  const owners = yield* Effect.forEach(libraries, (library) =>
+    fs.readFileString(path.join(root, library.root, "package.json")).pipe(
+      Effect.flatMap(
+        Schema.decodeEffect(Schema.fromJsonString(LibraryManifest))
+      ),
+      Effect.map((manifest) => ({ ...library, manifest }))
+    )
+  );
+  const modules = Record.fromEntries(
+    Array.flatMap(owners, (owner) =>
+      Array.map(
+        Record.toEntries(owner.manifest.exports),
+        ([key, target]) =>
+          [
+            `${owner.manifest.name}${key === "." ? "" : key.slice(1)}`,
+            path.join(
+              destination,
+              "internal",
+              owner.directory,
+              path.relative("dist", target.default)
+            ),
+          ] as const
+      )
+    )
+  );
+  const inputs = Array.prepend(
+    Array.map(owners, (owner) => ({
+      from: path.join(root, owner.root, "dist"),
+      to: path.join(destination, "internal", owner.directory),
+    })),
+    { from: destination, to: destination }
+  );
+  yield* Effect.forEach(
+    inputs,
+    (input) =>
+      Effect.gen(function* () {
+        const files = yield* fs.readDirectory(input.from, { recursive: true });
+        yield* Effect.forEach(
+          Array.filter(
+            files,
+            (file) => file.endsWith(".js") || file.endsWith(".d.ts")
+          ),
+          (file) =>
+            Effect.gen(function* () {
+              const target = path.join(input.to, file);
+              const contents = yield* fs.readFileString(
+                path.join(input.from, file)
+              );
+              const relocated = yield* relocateModuleImports(
+                contents,
+                file,
+                (specifier) =>
+                  Record.get(modules, specifier).pipe(
+                    Option.map((module) => {
+                      const relative = path
+                        .relative(path.dirname(target), module)
+                        .split(path.sep)
+                        .join("/");
+                      return relative.startsWith(".")
+                        ? relative
+                        : `./${relative}`;
+                    })
+                  )
+              );
+              yield* fs.makeDirectory(path.dirname(target), {
+                recursive: true,
+              });
+              yield* fs.writeFileString(target, relocated);
+            }),
+          { discard: true }
+        );
+      }),
+    { discard: true }
+  );
+  yield* Console.info(
+    "Assembled one SDK package with internal JavaScript and declarations."
+  );
+}).pipe(
+  Effect.mapError((error) =>
+    Match.value(error).pipe(
+      Match.tag("PackageAssemblyError", (failure) => failure),
+      Match.orElse(
+        () =>
+          new PackageAssemblyError({
+            operation: "read or write compiled package",
+          })
+      )
+    )
+  )
+);
+
+if (import.meta.main) {
+  BunRuntime.runMain(assemblePackage.pipe(Effect.provide(BunServices.layer)));
+}

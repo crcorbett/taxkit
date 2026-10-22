@@ -8,6 +8,14 @@ import {
 } from "./internal/au-descriptors.js";
 import type { CalculationInput } from "./types.js";
 
+export { GrossPay } from "@taxkit/rules-au-pay";
+export * as PayRules from "@taxkit/rules-au-pay";
+export * as IncomeTaxRules from "@taxkit/rules-au-income-tax";
+export * as StslRules from "@taxkit/rules-au-stsl";
+export * from "@taxkit/rules-au-pay/parameters";
+export * from "@taxkit/rules-au-income-tax/parameters";
+export * from "@taxkit/rules-au-stsl/parameters";
+
 export {
   AuAnnualIncomeTaxCalculation,
   AuIncomeTax2025_26Module,

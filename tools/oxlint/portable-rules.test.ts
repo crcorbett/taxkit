@@ -1012,6 +1012,7 @@ test.each([
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+  "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
   "tools/repository-paths/check.runtime.ts",

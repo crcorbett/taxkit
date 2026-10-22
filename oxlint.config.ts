@@ -163,7 +163,7 @@ const decodingBoundaryFiles = [
   // Public API normalisation and focused API contract tests.
   "packages/api/http/src/openapi.ts",
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
-  "packages/api/http/__tests__/public-calculation-api.test.ts",
+  "packages/sdk/typescript/src/http-parity.test.ts",
 
   // Focused lint integration test: CLI output is decoded at the process boundary.
   "tools/oxlint/cli-fixture.ts",
@@ -193,6 +193,7 @@ const decodingBoundaryFiles = [
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+  "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   "packages/sdk/typescript/src/effect.ts",
   "packages/sdk/typescript/src/types.ts",
 ];
@@ -306,7 +307,7 @@ const schemaEncoderEgressFiles = [
   "packages/docs-examples/src/node-server.ts",
   // Exact historical skill representation test uses the Candidate-owned Schema.
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
-  "packages/api/http/__tests__/public-calculation-api.test.ts",
+  "packages/sdk/typescript/src/http-parity.test.ts",
   // Exact representation-boundary tests: deterministic report bytes and secret-negative error JSON.
   "packages/rules/au/pay/test/take-home-pay.test.ts",
   "packages/calculators/__tests__/public-calculator-service.test.ts",
@@ -325,6 +326,7 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   // Synthetic fetch Promise entrypoint for deterministic discovery cancellation.
   "apps/web/src/lib/api/forward.boundary.test.ts",
   "packages/docs-content/src/catalogue-index.runtime.ts",
@@ -372,6 +374,7 @@ const bunAdapterFiles = [
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   "packages/docs-content/src/catalogue-index.runtime.ts",
   "packages/docs-content/src/catalogue.runtime.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
@@ -413,6 +416,16 @@ export default defineConfig({
     "@commonplaces/oxlint-plugin/anti-slop-effect",
   ],
   overrides: [
+    {
+      // Public package entry points aggregate the intended API. The actual
+      // browser bundle and one-archive consumer prove their runtime boundaries.
+      files: [
+        "packages/sdk/typescript/src/core.ts",
+        "packages/sdk/typescript/src/http.ts",
+        "packages/sdk/typescript/src/au.ts",
+      ],
+      rules: { "oxc/no-barrel-file": "off" },
+    },
     // Runtime addresses come from the hostname and transport-route owners.
     {
       files: [
@@ -503,6 +516,7 @@ export default defineConfig({
       files: [
         "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
         "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+        "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
         "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
       ],
       rules: { "unicorn/throw-new-error": "off" },
@@ -808,6 +822,19 @@ export default defineConfig({
           {
             allowedFiles: [
               "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ["packages/sdk/typescript/scripts/assemble-package.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
             ],
           },
         ],

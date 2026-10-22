@@ -207,7 +207,7 @@ The matching test graph is:
 ```ts
 Tests: HTTP compared with SDK
 
-HTTP API tests
+SDK HTTP comparison tests
   -> HttpApiClient.make(TaxKitApi) over TaxKitApiInProcessLive
     -> CalculatorApiHandlerLive
       -> PublicCalculatorServiceLive
@@ -435,12 +435,13 @@ It owns:
 - typed calculator request builders
 - examples for Node and browser usage
 
-The SDK must not import `@taxkit/api-http`, server handlers or Node-only
-modules from browser-safe entrypoints. It also must not expose Effect runtime
-types from the plain TypeScript entrypoint. HTTP clients and OpenAPI transport
-helpers stay in `@taxkit/api-http`. The SDK is a test-only comparison
-dependency of the HTTP package; the production HTTP adapter calls the owning
-calculator service directly.
+The SDK root, AU and Effect entry points stay independent from HTTP; `/http`
+re-exports the canonical HTTP contracts from `@taxkit/api-http` without server
+handlers or Node-only modules. The plain facade keeps its Promise-facing
+signatures. SDK-owned integration tests compare HTTP and SDK results; the HTTP
+package never depends on the SDK. The single SDK archive includes the private
+modules and their declarations, while Effect remains external. Its fresh
+consumer installs no other TaxKit package.
 
 The plain facade maps typed calculator failures, output Schema failures and
 unexpected defects into stable SDK-owned messages. It preserves a typed

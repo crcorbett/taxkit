@@ -1,4 +1,13 @@
 import { describe, expect, it } from "@effect/vitest";
+import {
+  CalculatorApiErrorEnvelope,
+  CalculatorCatalogResponse,
+  CalculatorRunResponse,
+  CalculatorServiceError,
+} from "@taxkit/api-http";
+import { TaxKitApi } from "@taxkit/api-http/api";
+import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
+import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import {
   CalculationQuery,
@@ -6,6 +15,9 @@ import {
   CalculatorOperationTimedOut,
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
+import { ContentServiceLive } from "@taxkit/content/live";
+import { ContentCatalogue } from "@taxkit/content/service";
+import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents, audFromCents } from "@taxkit/core/primitives";
 import {
@@ -38,16 +50,9 @@ import {
 } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
-import { TaxKitApi } from "../src/api.js";
-import {
-  CalculatorApiErrorEnvelope,
-  CalculatorCatalogResponse,
-  CalculatorRunResponse,
-  CalculatorServiceError,
-} from "../src/groups/calculators.js";
-import { TaxKitApiInProcessLive } from "../src/in-process.layer.js";
-import { TaxKitApiRoutesLayer } from "../src/server.js";
-import { ContentTestLive } from "./content.fixture.js";
+const ContentTestLive = ContentServiceLive.pipe(
+  Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
+);
 
 // The native generated client over the in-process routes.
 const inProcessClient = HttpApiClient.make(TaxKitApi, {

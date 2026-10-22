@@ -1,7 +1,6 @@
-import { audFromCents } from "@taxkit/core/primitives";
-import { GrossPay } from "@taxkit/rules-au-pay";
 import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { GrossPay, au } from "@taxkit/sdk/au";
+import { audFromCents } from "@taxkit/sdk/core";
 import { Console, Effect, Match } from "effect";
 
 export const program = audFromCents(346_200).pipe(

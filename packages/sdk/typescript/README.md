@@ -15,8 +15,10 @@ Public TaxKit TypeScript SDK package.
 
 `packages/sdk/typescript` owns the TypeScript SDK facade for
 in-process TaxKit calculations, schema exports and typed module composition.
-The package is private while the SDK surface is implemented and downstream
-consumer validation is recorded.
+The package remains private until npm publication is explicitly authorised.
+It is the sole installable TaxKit distribution: its build assembles the private
+modules into one archive, with Effect as its only external runtime dependency.
+Install the SDK archive itself; no other TaxKit archive is required.
 
 The package currently exposes typed descriptor composition, an Effect-native
 facade, a plain Promise facade and Australian module helpers for the current
@@ -24,7 +26,8 @@ public calculator catalog. The descriptor and facade generics consume
 calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
 `CalculatorServiceError` contracts rather than HTTP transport aliases.
 The HTTP API and SDK call the same owning calculator service independently.
-The SDK remains independent from `@taxkit/api-http`.
+The root, AU and Effect facades do not import HTTP. The separate `/http` entry
+re-exports the canonical HTTP contracts without importing server handlers.
 
 Effect-native report helpers are named for the report-only boundary:
 `calculateReport` accepts descriptor-typed facts and `calculateReportRequest`
@@ -127,6 +130,14 @@ time.
     "types": "./dist/index.d.ts",
     "default": "./dist/index.js"
   },
+  "./core": {
+    "types": "./dist/core.d.ts",
+    "default": "./dist/core.js"
+  },
+  "./http": {
+    "types": "./dist/http.d.ts",
+    "default": "./dist/http.js"
+  },
   "./effect": {
     "types": "./dist/effect.d.ts",
     "default": "./dist/effect.js"
@@ -193,63 +204,36 @@ The SDK owns the first downstream consumer validation gate:
 bun run --filter=@taxkit/sdk validate:downstream
 ```
 
-The command builds and Bun-packs the ten-package release closure, including the
-compiled public-content contracts now required by the HTTP package. It materializes
-each package's dist-only `publishConfig.exports` in a staged tarball and
-rejects source files, missing export targets or unresolved `workspace:*` and
-`catalog:` ranges. It installs all unpublished tarballs into a temporary
-consumer outside the repo, typechecks and runs SDK examples, imports every
-JavaScript public entrypoint and bundles the browser-safe SDK surface.
+The command builds and packs the SDK only, installs that one archive into a
+fresh temporary project outside the repository, and checks its declarations,
+all public imports, calculation/report behaviour, rule parameters and browser
+bundle. The runtime dependencies contain no `@taxkit/*` packages. Both the
+normal packed-artifact check and this consumer use the assembled distribution.
 
-All three SDK checking scripts use Effect FileSystem and scoped child
-processes. Manifests are decoded once with the shared script Schemas; staged
-publication manifests keep unrelated package metadata and missing dependency
-keys. JSON field order may change when the staged manifest is encoded, but
-package fields and declared publication targets are preserved. Each command
-closes its process before continuing. Collected stdout is limited to 1 MiB;
-stderr is drained without retaining or printing its contents. Failure reports
-name the step and retain an available exit code, without copying native errors
-or captured command output. A cleanup failure fails the check; if work has
-already failed, both failures remain available.
+`assemble-package.runtime.ts` retains the private modules' compiled paths in
+`dist/internal`, rewriting only import/export syntax through the TypeScript AST.
+It relocates both JavaScript and declarations, preserving Schema and class
+identity across entry points. Runtime service identifiers and data strings are
+unchanged. Effect stays external. No deployment, provider SDK, repository test
+runner or compiler becomes a runtime dependency.
 
-`check-boundaries` checks package dependency direction and direct source
-references. Only ripgrep exit 1 means no match; a failed search fails the check.
-It does not prove the full browser dependency graph. Packed installation,
-browser bundling and the Chromium suite provide their own separate evidence.
-`check-types` checks both SDK source and the scripts' TypeScript project. The
-native `test` suite includes controlled script failures; `test:browser` keeps
-these Bun-only command fixtures out of the browser suite.
-
-The command is always strict. Consumer-only file overrides connect unpublished
-internal tarballs without changing their concrete registry-ready dependency
-ranges. Any manifest or consumer regression prints evidence and exits nonzero;
-there is no audit-only success mode.
-
-Use this SDK release-gate order before any future publication work:
-
-```sh
-bun run --filter=@taxkit/sdk check-packed-artifact
-bun run --filter=@taxkit/sdk validate:downstream
-bun run --filter=@taxkit/sdk check-boundaries
-bun run --filter=@taxkit/sdk test-types
-bun run --filter=@taxkit/sdk test
-bun run --filter=@taxkit/sdk test:browser
-bun run --filter=@taxkit/sdk build
-```
-
-`validate:downstream` is the strict final package-installation gate. Supporting
-workspace tests and the focused SDK tarball check do not replace it.
+`/core` exposes engine primitives and calculator composition; `/au` also exposes
+Pay, IncomeTax and STSL rule namespaces and parameter contracts. `/http` exposes
+`TaxKitApi` and checked request-body contracts for native Effect HTTP clients.
+The existing `/au/effect`, `/schemas` and `/testing` descriptor entries remain
+compatible. These are module paths inside one package, not extra npm packages.
 
 ## Guardrails
 
-- Keep this package independent from `@taxkit/api-http`.
+- Keep HTTP imports confined to `src/http.ts`; root, AU and Effect facades
+  remain independent of the HTTP entry.
 - Do not import AU rule packages from the root entrypoint.
 - Reuse canonical schemas, branded ids, service contracts, tagged errors and
   constructors from owning packages when implementation starts.
 - Use `@taxkit/calculators` as the calculator execution boundary instead of
   duplicating catalog lookup or calculation dispatch.
-- Keep transport-owned HTTP clients and OpenAPI helpers in
-  `@taxkit/api-http`.
+- Keep transport contracts owned by `@taxkit/api-http`; the SDK exposes them
+  through its HTTP entry rather than copying their implementation.
 
 ## Commands
 

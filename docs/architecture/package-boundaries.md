@@ -311,6 +311,7 @@ Engine packages should contain tax-domain primitives, facts, rule packs, calcula
 
 Shared streamed HTTP-body admission belongs to the existing HTTP transport
 package's narrow `request-boundary` export. The private RPC transport depends
-inward on that owner; no new package, reverse HTTP-to-RPC runtime dependency or
-SDK-to-HTTP runtime dependency is introduced. Native hosts compose admission
-outside their HTTP/RPC routes; the retained standalone HTTP server mounts it.
+inward on that owner. The SDK exposes the same contracts through `/http` while
+its calculation facades stay independent of HTTP. Native hosts compose
+admission outside their HTTP/RPC routes; the retained standalone HTTP server
+mounts it. The HTTP transport never depends on RPC or the SDK.

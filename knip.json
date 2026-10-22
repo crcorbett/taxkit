@@ -150,7 +150,9 @@
         "scripts/**/*.test.ts",
         "src/**/*.test.ts",
         "vitest*.config.ts",
-        "type-tests/**/*.ts"
+        "type-tests/**/*.ts",
+        "src/core.ts",
+        "src/http.ts"
       ],
       "project": [
         "src/**/*.ts",

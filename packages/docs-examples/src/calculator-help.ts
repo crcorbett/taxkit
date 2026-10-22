@@ -1,6 +1,6 @@
-import { TaxKitApi } from "@taxkit/api-http/api";
-import { HelpQuery } from "@taxkit/calculators/schemas";
 import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { CalculatorSchemas } from "@taxkit/sdk/core";
+import { TaxKitApi } from "@taxkit/sdk/http";
 import { Array, Effect, Option } from "effect";
 import { HttpApiClient } from "effect/http-api";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
@@ -8,7 +8,7 @@ import * as FetchHttpClient from "effect/http/FetchHttpClient";
 export const loadCalculatorHelp = (baseUrl: URL) =>
   Effect.gen(function* () {
     const client = yield* HttpApiClient.make(TaxKitApi, { baseUrl });
-    const query = yield* HelpQuery.makeEffect({
+    const query = yield* CalculatorSchemas.HelpQuery.makeEffect({
       help: Option.some(Option.some("schema")),
     });
     const schema = yield* client.calculatorApi.getCalculatorSchema({

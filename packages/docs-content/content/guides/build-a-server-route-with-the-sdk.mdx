@@ -25,11 +25,14 @@ TaxKit for the calculation.
 ## Example
 
 ```ts
-import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
-import { CalculationEngineLive } from "@taxkit/core";
-import { Cents, Money } from "@taxkit/core/primitives";
-import { GrossPay } from "@taxkit/rules-au-pay";
+import { GrossPay } from "@taxkit/sdk/au";
 import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import {
+  PublicCalculatorServiceLive,
+  CalculationEngineLive,
+  Cents,
+  Money,
+} from "@taxkit/sdk/core";
 import { calculateReport } from "@taxkit/sdk/effect";
 import { Effect, Layer, Schema } from "effect";
 import * as HttpServerRequest from "effect/http/HttpServerRequest";

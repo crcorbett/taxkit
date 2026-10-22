@@ -134,7 +134,9 @@
         "src/au.ts!",
         "src/au-effect.ts!",
         "src/schemas/index.ts!",
-        "src/testing/index.ts!"
+        "src/testing/index.ts!",
+        "src/core.ts!",
+        "src/http.ts!"
       ],
       "project": ["src/**/*.ts!"]
     },

@@ -17,7 +17,7 @@ or adapt the imports after the SDK is published.
 ## Create a script
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
@@ -33,7 +33,7 @@ console.log({
 ## Understand the input
 
 `taxableIncome` is a canonical calculator fact. The value uses the `Money`
-schema from `@taxkit/core/primitives`, created with the `aud` constructor.
+schema from `@taxkit/sdk/core`, created with the `aud` constructor.
 Pass integer cents rather than floating point dollars.
 
 ```ts
@@ -45,7 +45,7 @@ aud(Cents.make(9_000_000)); // AUD 90,000.00
 Australian helpers call the same generic facade that other SDK consumers use:
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 

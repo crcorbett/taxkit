@@ -17,8 +17,10 @@ programs for an application-owned host; they do not start a server or own a
 runtime. `test/examples.boundary.test.ts` retains the weekly pay result and
 invalid-request expectations from the former docs-content example owner.
 
-The examples depend on calculator, SDK and HTTP contracts. Keeping those
-dependencies here lets the HTTP API consume docs-content contracts without
+Application examples use the single SDK package, including its Core, AU and
+HTTP entry points. The contributor fact example still uses the internal source
+owners; HTTP integration tests use the private in-process server. Keeping
+examples here lets the HTTP API consume docs-content contracts without
 creating a circular package build graph. This package owns no content Schemas,
 docs service, renderer, public route or generated catalogue.
 
@@ -31,9 +33,9 @@ declaration contract.
 `test` checks the exported server program. Consumers
 copy these application templates rather than import a published package.
 
-The docs-content Changeset records the command/dependency migration. This
-workspace stays outside the fixed publication train. The move proves neither
-package publication nor any deployed example. Operational
+The SDK Changeset records changes to these public package examples. This
+workspace stays private and is not a publication requirement. Checks prove
+neither package publication nor any deployed example. Operational
 runbooks are N/A because this workspace performs no release or provider work.
 Content validation remains owned by
 [`docs-content`](../docs-content/README.md); package dependency direction is

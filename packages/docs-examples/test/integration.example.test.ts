@@ -1,7 +1,6 @@
 import { assert, it } from "@effect/vitest";
-import { Cents, aud } from "@taxkit/core/primitives";
-import { GrossPay } from "@taxkit/rules-au-pay";
-import { au } from "@taxkit/sdk/au";
+import { GrossPay, au } from "@taxkit/sdk/au";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { Effect, Schema } from "effect";
 
 it.effect("calculates weekly take-home pay", () =>

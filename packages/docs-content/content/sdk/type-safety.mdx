@@ -15,7 +15,7 @@ decoding still validates untrusted values before calculation.
 The selected descriptor controls the accepted facts and the returned report:
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
@@ -29,7 +29,7 @@ report.liability.cents;
 If you pass facts for another calculator, the call should fail type checking:
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
@@ -41,10 +41,10 @@ await TaxKit.calculate(au.calculations.annualIncomeTax, {
 
 ## Branded values
 
-Money values use canonical branded constructors from `@taxkit/core`:
+Money values use canonical branded constructors from `@taxkit/sdk/core`:
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 
 const taxableIncome = aud(Cents.make(9_000_000));
 ```

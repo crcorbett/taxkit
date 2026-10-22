@@ -11,6 +11,9 @@ in-process. The plain facade is the beginner path. The safe facade returns
 typed result values. The Effect facade is for advanced service composition and
 in-process transports.
 
+All entry points below are included in one `@taxkit/sdk` package. The package
+remains private until npm release approval.
+
 ## Entrypoints
 
 | Entrypoint            | Use when                                                                                                    |
@@ -18,12 +21,14 @@ in-process transports.
 | `@taxkit/sdk`         | You want `TaxKit.calculate`, `TaxKit.safe.calculate` or `TaxKit.createClient`.                              |
 | `@taxkit/sdk/au`      | You want Australian calculator helpers and descriptors.                                                     |
 | `@taxkit/sdk/effect`  | You want `calculateRunRequest`, `calculateReportRequest`, `calculateReport` or Effect service requirements. |
+| `@taxkit/sdk/core`    | You want money values, engine services or calculator contracts.                                             |
+| `@taxkit/sdk/http`    | You want typed HTTP contracts for Effect's generated API client.                                            |
 | `@taxkit/sdk/schemas` | You want `CalculatorRunRequest`, `CalculatorRunResponse`, `CalculatorServiceError` and SDK result schemas.  |
 
 ## Beginner path
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { au } from "@taxkit/sdk/au";
 
 const report = await au.incomeTax.annual({
@@ -37,7 +42,7 @@ same descriptor and schema contracts as the generic SDK facade.
 ## Generic path
 
 ```ts
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Cents, aud } from "@taxkit/sdk/core";
 import { TaxKit } from "@taxkit/sdk";
 import { au } from "@taxkit/sdk/au";
 
