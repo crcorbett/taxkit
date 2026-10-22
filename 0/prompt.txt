@@ -186,3 +186,7 @@ Should we adopt the approach that Effect has taken in v4 where there's one packa
 ---
 
 Yes, implement the single-package approach with those entry points. Run the checks locally, merge to main and clean up. Keep GitHub CI off and don't publish to npm yet.
+
+---
+
+What’s left to do before we can publish @taxkit/sdk to npm locally, keeping GitHub CI off and the other packages private? Otherwise lets start publishing the package
