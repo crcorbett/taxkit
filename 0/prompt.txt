@@ -190,3 +190,23 @@ Yes, implement the single-package approach with those entry points. Run the chec
 ---
 
 What’s left to do before we can publish @taxkit/sdk to npm locally, keeping GitHub CI off and the other packages private? Otherwise lets start publishing the package
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_50317a8c622343bb963558b93809cb1b\",0]","question":"Please complete npm’s security check in the browser window just opened for publishing @taxkit/sdk@2.1.0, then tell me when it’s done. This is npm’s two-factor requirement for your account; no codes or tokens need to be pasted here.","answer":"Done"}]
+</send_user_message_question_reply>
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_b354ef3edd8f48ac80d1b1a6ad96d09e\",0]","question":"Npm opened a fresh “Security Key” tab for crcorbett. Please click “Use security key”, complete the passkey check, and tell me when the page confirms success. The previous link had expired; this is npm’s required identity check for publishing @taxkit/sdk@2.1.0.","answer":"done"}]
+</send_user_message_question_reply>
+
+---
+
+Can't it just be npm install taxkit?
+
+---
+
+Can we claim it please
