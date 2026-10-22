@@ -1,12 +1,22 @@
 {
   "name": "@taxkit/sdk",
-  "version": "2.0.0",
-  "private": true,
+  "version": "2.1.0",
+  "private": false,
   "description": "TypeScript SDK for in-process TaxKit calculations.",
+  "homepage": "https://taxkit.dev",
+  "bugs": {
+    "url": "https://github.com/crcorbett/taxkit/issues"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crcorbett/taxkit.git",
+    "directory": "packages/sdk/typescript"
+  },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "type": "module",
   "sideEffects": false,

@@ -96,8 +96,8 @@ must not depend on HTTP handlers, SDK clients, CLI commands or app runtime
 modules.
 
 `packages/sdk/typescript`
-: Implemented private TypeScript SDK package for a future public SDK
-publication. It owns browser-safe schemas, typed calculation facades,
+: The sole TypeScript package configured for public npm installation.
+It owns browser-safe schemas, typed calculation facades,
 Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
 packed-artifact checks. Its strict downstream validator may orchestrate the
 single SDK archive and verify its imports in a fresh project, but package

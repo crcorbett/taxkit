@@ -1,5 +1,16 @@
 # TaxKit
 
+## 2.1.0
+
+- Prepare the first public `@taxkit/sdk` release as one package containing the
+  engine, calculators, Australian rules and HTTP contracts. Use the root,
+  `/au`, `/effect`, `/core` and `/http` entry points; existing SDK paths remain
+  available. Effect is the only external runtime dependency. See the
+  [SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
+- Include the MIT licence and npm package links. Other workspace packages
+  remain private; the private docs examples receive their dependent patch
+  version. Package publication runs locally after the release checks.
+
 ## 2.0.0
 
 ### Major Changes
