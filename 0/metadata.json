@@ -1,0 +1,63 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M5HXA0CVQFJP18B0DP86ATZ6",
+  "session_id": "01a16396-0f26-7ef2-a34d-9042d31e6009",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-22T13:37:47.143936Z",
+  "branch": "codex/withholding-and-host-alignment",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".changeset/fix-withholding-and-rule-identities.md",
+    "apps/api/src/schemas.ts",
+    "apps/api/src/worker.application.ts",
+    "apps/api/src/worker.config.ts",
+    "package.json",
+    "packages/api/mcp/src/server.ts",
+    "packages/infrastructure/src/apps-stack.ts",
+    "packages/rules/au/pay/src/facts/index.ts",
+    "packages/rules/au/pay/src/facts/pay.ts",
+    "packages/rules/au/pay/src/index.ts",
+    "packages/rules/au/pay/src/rules/payg-withholding.ts",
+    "packages/rules/au/pay/src/rules/withholdings-ledger.ts",
+    "packages/rules/au/pay/test/take-home-pay.test.ts",
+    "packages/rules/au/stsl/src/index.ts",
+    "packages/rules/au/stsl/src/parameters/index.ts",
+    "packages/rules/au/stsl/src/parameters/stsl-table.ts",
+    "packages/rules/au/stsl/src/rule-pack/descriptors.ts",
+    "packages/rules/au/stsl/src/rules/stsl-component.ts",
+    "packages/rules/au/stsl/src/rules/withholdings-ledger-with-stsl.ts",
+    "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6-astra",
+  "turn_id": "383eba35c9ea",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 677826,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 24474240,
+    "output_tokens": 71481,
+    "api_call_count": 167
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-22T13:37:47.025537Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 432,
+    "human_modified": 50,
+    "human_removed": 0,
+    "total_committed": 432,
+    "total_lines_changed": 621,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
