@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M5HQ39NV42KRBSNQ377G5ESJ",
+  "strategy": "manual-commit",
+  "branch": "codex/publish-taxkit",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "CHANGELOG.md",
+    "README.md",
+    "bun.lock",
+    "docs/architecture/README.md",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/package-ownership.md",
+    "docs/runbooks/versioning.md",
+    "package.json",
+    "packages/docs-content/content/start/install-the-sdk.mdx",
+    "packages/docs-content/content/start/quickstart.mdx",
+    "packages/sdk/typescript/CHANGELOG.md",
+    "packages/sdk/typescript/README.md",
+    "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+    "packages/sdk/typescript/scripts/script-boundaries.test.ts",
+    "tools/oxlint/package-roles.ts",
+    "tools/oxlint/package-rules.ts",
+    "tools/oxlint/workspace-imports.boundary.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 2070326,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 98615680,
+    "output_tokens": 295752,
+    "api_call_count": 605,
+    "subagent_tokens_complete": true
+  }
+}

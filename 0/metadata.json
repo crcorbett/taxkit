@@ -1,0 +1,72 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M5HQ39NV42KRBSNQ377G5ESJ",
+  "session_id": "01a161e5-3bcb-7d43-9bc4-a01414b2fcca",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-22T11:49:16.819246Z",
+  "branch": "codex/publish-taxkit",
+  "checkpoints_count": 4,
+  "save_step_count": 2,
+  "files_touched": [
+    "CHANGELOG.md",
+    "README.md",
+    "bun.lock",
+    "docs/architecture/README.md",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/package-ownership.md",
+    "docs/runbooks/versioning.md",
+    "package.json",
+    "packages/docs-content/content/start/install-the-sdk.mdx",
+    "packages/docs-content/content/start/quickstart.mdx",
+    "packages/sdk/typescript/CHANGELOG.md",
+    "packages/sdk/typescript/README.md",
+    "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+    "packages/sdk/typescript/scripts/script-boundaries.test.ts",
+    "tools/oxlint/package-roles.ts",
+    "tools/oxlint/package-rules.ts",
+    "tools/oxlint/workspace-imports.boundary.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "883c9eac1f85",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 2070326,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 98615680,
+    "output_tokens": 295752,
+    "api_call_count": 605,
+    "subagent_tokens_complete": true
+  },
+  "session_metrics": {
+    "turn_count": 17
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-22T11:49:16.508526Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 294,
+    "human_modified": 89,
+    "human_removed": 0,
+    "total_committed": 294,
+    "total_lines_changed": 615,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}
