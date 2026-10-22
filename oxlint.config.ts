@@ -398,30 +398,25 @@ export default defineConfig({
     ".tanstack/**",
     ".turbo/**",
     ".vercel/**",
-    "tools/oxlint/anti-slop/**",
-    "tools/oxlint/vendor/**",
   ],
   jsPlugins: [
-    {
-      name: "strict-effect",
-      specifier: "./tools/oxlint/vendor/strict-effect/effect-policy.ts",
-    },
+    "@commonplaces/oxlint-plugin/strict-effect",
     "./tools/oxlint/bun-rules.ts",
     "./tools/oxlint/effect-rules.ts",
     "./tools/oxlint/mdx-rules.ts",
     "@commonplaces/oxlint-plugin/package",
     "./tools/oxlint/package-rules.ts",
     "./tools/oxlint/taxkit-rules.ts",
-    {
-      name: "anti-slop",
-      specifier: "./tools/oxlint/anti-slop/index.ts",
-    },
-    {
-      name: "anti-slop-effect",
-      specifier: "./tools/oxlint/anti-slop/effect/index.ts",
-    },
+    "@commonplaces/oxlint-plugin/anti-slop",
+    "@commonplaces/oxlint-plugin/anti-slop-effect",
   ],
   overrides: [
+    {
+      // strict-effect forbids async functions; Promise-returning SDK facades
+      // and native host callbacks cannot satisfy both rules.
+      files: ["**/*.{ts,tsx}"],
+      rules: { "typescript/promise-function-async": "off" },
+    },
     {
       files: portableEffectSourceFiles,
       rules: {
