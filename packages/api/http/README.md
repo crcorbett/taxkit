@@ -308,7 +308,7 @@ surfaces, keeping this package independent of the assembled SDK. It covers:
 - schema-guided calculator input errors through `CalculatorApiErrorEnvelope`
 
 The calculate success fixture compares the HTTP response with
-`@taxkit/sdk/effect` `calculateRunRequest`. The typed client decodes the transport
+`taxkit/effect` `calculateRunRequest`. The typed client decodes the transport
 response once. These fixtures check the
 already decoded response and error against the owning Schema Type, including
 trace and question Options, rather than applying wire decoding a second time.

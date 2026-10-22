@@ -140,8 +140,8 @@ Code snippets should be useful, short and current.
 Include imports when the snippet is meant to be copied:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 ```
 
 Use canonical schema-owned values and branded constructors where required.

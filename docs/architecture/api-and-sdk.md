@@ -187,7 +187,7 @@ The SDK Effect full-run graph is:
 Production: SDK Effect full run
 
 Effect consumer
-  -> @taxkit/sdk/effect calculateRunRequest(descriptor, request)
+  -> taxkit/effect calculateRunRequest(descriptor, request)
     -> PublicCalculatorService.calculate({ calculatorId, ...request })
       -> CalculatorRunServiceRequest
       -> CalculatorRunResponse
@@ -401,7 +401,7 @@ The Website has no RPC client, server functions or API proxy. The
 
 ## TypeScript SDK facade
 
-The current private SDK package lives under:
+The public SDK package lives under:
 
 ```txt
 packages/sdk/typescript
@@ -410,17 +410,11 @@ packages/sdk/typescript
 Current package name:
 
 ```txt
-@taxkit/sdk
-```
-
-Preferred public package name at release time:
-
-```txt
 taxkit
 ```
 
-If the unscoped package name is unavailable at first publish, continue with
-`@taxkit/sdk` and keep the same export contract.
+The existing `@taxkit/sdk@2.1.0` npm release remains available. Current versions
+use the unscoped `taxkit` name and the same eight entry points.
 
 It owns:
 

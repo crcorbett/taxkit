@@ -1,9 +1,9 @@
-import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
-import { CalculatorSchemas } from "@taxkit/sdk/core";
-import { TaxKitApi } from "@taxkit/sdk/http";
 import { Array, Effect, Option } from "effect";
 import { HttpApiClient } from "effect/http-api";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
+import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
+import { CalculatorSchemas } from "taxkit/core";
+import { TaxKitApi } from "taxkit/http";
 
 export const loadCalculatorHelp = (baseUrl: URL) =>
   Effect.gen(function* () {

@@ -9,7 +9,7 @@ review_trigger: SDK source, export map, packed file set, package manifest or dow
 
 # Packed consumer check
 
-Run this when `@taxkit/sdk` exports, packed files or supported dependencies
+Run this when `taxkit` exports, packed files or supported dependencies
 change. It packs the SDK locally and installs it in a fresh consumer; it does
 not touch npm.
 

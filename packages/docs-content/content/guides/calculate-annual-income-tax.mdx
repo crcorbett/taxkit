@@ -25,8 +25,8 @@ calculator from TypeScript.
 ## Example
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -64,9 +64,9 @@ tax-return assessment or proof that a deployed installation has been updated.
 Use `TaxKit.safe.calculate` when you need a result value:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),

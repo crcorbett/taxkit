@@ -1,10 +1,10 @@
-import { GrossPay } from "@taxkit/sdk/au";
-import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
-import { audFromCents } from "@taxkit/sdk/core";
-import { TaxKitApi } from "@taxkit/sdk/http";
 import { Effect, Option } from "effect";
 import { HttpApiClient } from "effect/http-api";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
+import { GrossPay } from "taxkit/au";
+import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
+import { audFromCents } from "taxkit/core";
+import { TaxKitApi } from "taxkit/http";
 
 export const calculateTakeHomePay = (baseUrl: URL) =>
   Effect.gen(function* () {

@@ -9,14 +9,14 @@ review_trigger: Changesets configuration, package graph, release train or releas
 
 # Versioning
 
-TaxKit uses [Changesets](https://github.com/changesets/changesets). `@taxkit/sdk`
+TaxKit uses [Changesets](https://github.com/changesets/changesets). `taxkit`
 owns the single installable package; the other workspace packages remain
 private implementation owners. See
 the [versioning standard](../standards/versioning.md) for semver rules.
 
 1. Add a Changeset with `bun run changeset` in the same change as any public
    package contract change. For changes to modules included in the SDK archive,
-   name `@taxkit/sdk` in the Changeset. Private apps and internal tools do not
+   name `taxkit` in the Changeset. Private apps and internal tools do not
    need one.
 2. Check the pending release with `bun run changeset:status`.
 3. When preparing a release, run `bun run version-packages`, review the
@@ -28,12 +28,16 @@ request. Roll back an unpublished version change by reverting its commit.
 
 ## Local SDK publication
 
-Only `@taxkit/sdk` is configured for public npm publication. Keep the root,
+Only `taxkit` is configured for public npm publication. Keep the root,
 apps and all other workspace packages private. Never publish all workspaces.
 
-1. Verify the npm account with `npm whoami` and its `taxkit` organisation role
-   with `npm org ls taxkit --json`, using `https://registry.npmjs.org`. Check
-   whether the exact SDK version already exists before attempting publication.
+1. Verify the npm account with `npm whoami`, using
+   `https://registry.npmjs.org`. For an existing `taxkit` package, check its
+   maintainers with `npm owner ls taxkit`; organisation membership does not
+   establish ownership of an unscoped package. Before a first publication,
+   a registry 404 is only a preflight result: the successful publication and
+   owner readback establish the claim. Check whether the exact SDK version
+   already exists before attempting publication.
 2. Apply the queued Changeset, update the root changelog and keep only the SDK
    publishable. Run `bun install --frozen-lockfile` with the repository's pinned
    Bun after updating the lockfile, then `bun run release:check` locally.
@@ -48,7 +52,7 @@ apps and all other workspace packages private. Never publish all workspaces.
    publication from the workspace directory does not perform that build step.
 5. Inspect the archive: the SDK name/version, only Effect as a runtime
    dependency with a concrete version, compiled public exports, MIT licence,
-   README and package links. Run `npm publish ./taxkit-sdk-<version>.tgz
+   README and package links. Run `npm publish ./taxkit-<version>.tgz
    --dry-run --access public --registry=https://registry.npmjs.org --ignore-scripts
    --provenance=false` from the external release directory. A dry run does not
    prove registry write access.
@@ -61,7 +65,9 @@ apps and all other workspace packages private. Never publish all workspaces.
    public path, calculation, declarations and browser build. Record the source
    commit, archive integrity, registry result and CI status in the release PR.
    Tag only the SDK version after successful readback, then remove the working
-   branch and keep the project clean on `main`.
+   branch and keep the project clean on `main`. The public version tag is
+   `taxkit@<version>`; leave the previous `@taxkit/sdk` publication and tags
+   intact.
 
 A published name/version cannot be overwritten. If publication fails, read the
 registry before retrying; a failed local response may still have published it.

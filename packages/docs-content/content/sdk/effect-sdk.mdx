@@ -40,9 +40,9 @@ means a missing key, `Some(None)` means a present undefined key and
 fields; the codec handles this conversion.
 
 ```ts
-import { audFromCents } from "@taxkit/sdk/core";
-import { calculateRunRequest } from "@taxkit/sdk/effect";
-import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
+import { audFromCents } from "taxkit/core";
+import { calculateRunRequest } from "taxkit/effect";
+import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
 import { Effect, Option } from "effect";
 
 const effect = Effect.gen(function* () {
@@ -65,9 +65,9 @@ Use `calculateReportRequest` when you have a full request payload but only need
 the report.
 
 ```ts
-import { audFromCents } from "@taxkit/sdk/core";
-import { calculateReportRequest } from "@taxkit/sdk/effect";
-import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
+import { audFromCents } from "taxkit/core";
+import { calculateReportRequest } from "taxkit/effect";
+import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
 import { Effect, Option } from "effect";
 
 const effect = Effect.gen(function* () {
@@ -87,9 +87,9 @@ const effect = Effect.gen(function* () {
 Use `calculateReport` when you already have descriptor-typed facts:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { calculateReport } from "@taxkit/sdk/effect";
-import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
+import { Cents, aud } from "taxkit/core";
+import { calculateReport } from "taxkit/effect";
+import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
 
 const effect = calculateReport(AuAnnualIncomeTaxCalculation, {
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -99,12 +99,12 @@ const effect = calculateReport(AuAnnualIncomeTaxCalculation, {
 ## Use an Effect client
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { createClient } from "@taxkit/sdk/effect";
+import { Cents, aud } from "taxkit/core";
+import { createClient } from "taxkit/effect";
 import {
   AuIncomeTax2025_26Module,
   AuAnnualIncomeTaxCalculation,
-} from "@taxkit/sdk/au/effect";
+} from "taxkit/au/effect";
 
 const client = createClient(AuIncomeTax2025_26Module);
 

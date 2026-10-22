@@ -17,7 +17,7 @@ calling HTTP. The same Money schema owns both forms.
 ## How it works
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
+import { Cents, aud } from "taxkit/core";
 
 const taxableIncome = aud(Cents.make(9_000_000));
 ```
@@ -39,7 +39,7 @@ produces Money or `InvalidMoneyValue`. `audDollars` uses the same check after
 rounding dollars to cents. Your application host runs the Effect.
 
 ```ts
-import { audFromCents, moneyAdd } from "@taxkit/sdk/core";
+import { audFromCents, moneyAdd } from "taxkit/core";
 import { Effect } from "effect";
 
 const amountProgram = Effect.gen(function* () {

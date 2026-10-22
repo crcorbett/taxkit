@@ -1,5 +1,5 @@
-import { au } from "@taxkit/sdk/au";
 import { Effect, Schema } from "effect";
+import { au } from "taxkit/au";
 
 // Check an external JSON representation before calling a typed calculator.
 export const invalidInput = Schema.decodeEffect(

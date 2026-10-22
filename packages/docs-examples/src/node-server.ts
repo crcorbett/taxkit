@@ -1,14 +1,14 @@
-import { GrossPay } from "@taxkit/sdk/au";
-import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { Effect, Layer, Schema } from "effect";
+import * as HttpServerRequest from "effect/http/HttpServerRequest";
+import { GrossPay } from "taxkit/au";
+import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
 import {
   PublicCalculatorServiceLive,
   CalculationEngineLive,
   Cents,
   Money,
-} from "@taxkit/sdk/core";
-import { calculateReport } from "@taxkit/sdk/effect";
-import { Effect, Layer, Schema } from "effect";
-import * as HttpServerRequest from "effect/http/HttpServerRequest";
+} from "taxkit/core";
+import { calculateReport } from "taxkit/effect";
 
 class PayPreviewRequestError extends Schema.TaggedError<PayPreviewRequestError>()(
   "PayPreviewRequestError",

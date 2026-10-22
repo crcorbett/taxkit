@@ -18,8 +18,8 @@ application uses.
 ## How it works
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(Cents.make(9_000_000)),

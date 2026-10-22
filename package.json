@@ -1,5 +1,5 @@
 {
-  "name": "taxkit",
+  "name": "@taxkit/workspace",
   "private": true,
   "license": "MIT",
   "workspaces": {
@@ -65,8 +65,8 @@
     "production:drift": "BUN_OPTIONS=--conditions=source alchemy drift --stage prod",
     "production:plan": "BUN_OPTIONS=--conditions=source alchemy plan --stage prod",
     "release:check": "bun run verification && bun run sdk:check-packed-artifact && bun run sdk:validate-downstream && bun run api:smoke && bun run docs:validate && bun run changeset:status",
-    "sdk:check-packed-artifact": "turbo run check-packed-artifact --filter=@taxkit/sdk",
-    "sdk:validate-downstream": "turbo run validate:downstream --filter=@taxkit/sdk",
+    "sdk:check-packed-artifact": "turbo run check-packed-artifact --filter=taxkit",
+    "sdk:validate-downstream": "turbo run validate:downstream --filter=taxkit",
     "test": "bun run test:tools && turbo run test",
     "test:browser": "turbo run test:browser",
     "test:native": "bun run --filter=web build:native-pair && bun run --filter=web test:native-pair",

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "taxkit",
+      "name": "@taxkit/workspace",
       "dependencies": {
         "@taxkit/infrastructure": "workspace:*",
         "alchemy": "catalog:",
@@ -250,12 +250,12 @@
     },
     "packages/docs-examples": {
       "name": "@taxkit/docs-examples",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
-        "@taxkit/sdk": "workspace:*",
         "effect": "catalog:",
+        "taxkit": "workspace:*",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -379,8 +379,8 @@
       },
     },
     "packages/sdk/typescript": {
-      "name": "@taxkit/sdk",
-      "version": "2.1.0",
+      "name": "taxkit",
+      "version": "2.1.1",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -1183,8 +1183,6 @@
     "@taxkit/rules-au-pay": ["@taxkit/rules-au-pay@workspace:packages/rules/au/pay"],
 
     "@taxkit/rules-au-stsl": ["@taxkit/rules-au-stsl@workspace:packages/rules/au/stsl"],
-
-    "@taxkit/sdk": ["@taxkit/sdk@workspace:packages/sdk/typescript"],
 
     "@taxkit/testing": ["@taxkit/testing@workspace:packages/testing"],
 
@@ -2171,6 +2169,8 @@
     "stylis": ["stylis@4.4.0", "", {}, "sha512-5Z9ZpRzfuH6l/UAvCPAPUo3665Nk2wLaZU3x+TLHKVzIz33+sbJqbtrYoC3KD4/uVOr2Zp+L0LySezP9OHV9yA=="],
 
     "supports-color": ["supports-color@10.2.2", "", {}, "sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g=="],
+
+    "taxkit": ["taxkit@workspace:packages/sdk/typescript"],
 
     "tinybench": ["tinybench@6.1.4", "", {}, "sha512-9APumHG7r4yOk4X4WlkmE71aZcv1gvin1czO3OQ1U9iJcFA5Ja/ygyb0vPOVHTthFozUYs8CLoLUlM8grb2lTQ=="],
 

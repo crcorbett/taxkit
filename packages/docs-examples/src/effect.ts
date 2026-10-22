@@ -1,12 +1,12 @@
-import { GrossPay } from "@taxkit/sdk/au";
-import { AuPayTakeHomeCalculation } from "@taxkit/sdk/au/effect";
+import { Effect, Layer, Option } from "effect";
+import { GrossPay } from "taxkit/au";
+import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
 import {
   PublicCalculatorServiceLive,
   CalculationEngineLive,
   audFromCents,
-} from "@taxkit/sdk/core";
-import { calculateRunRequest } from "@taxkit/sdk/effect";
-import { Effect, Layer, Option } from "effect";
+} from "taxkit/core";
+import { calculateRunRequest } from "taxkit/effect";
 
 const TaxKitLayer = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)

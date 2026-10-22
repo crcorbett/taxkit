@@ -13,8 +13,8 @@ support browser calculations on the device.
 ## Call a helper
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -24,9 +24,9 @@ const report = await au.incomeTax.annual({
 ## Call the generic facade
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -39,8 +39,8 @@ the descriptor you pass.
 ## Use a module-scoped client
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const client = au.createClient();
 

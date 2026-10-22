@@ -12,7 +12,7 @@ None of the marks is registered. Ownership rests on use.
 - Say that your project uses, integrates with or is built on TaxKit.
 - Refer to TaxKit by name in articles, talks, teaching and reviews.
 - Install and redistribute unmodified TaxKit packages under their published
-  names, such as `@taxkit/sdk`.
+  names, such as `taxkit`.
 - Show the unaltered mark beside a link to TaxKit, for example in a list of
   integrations.
 

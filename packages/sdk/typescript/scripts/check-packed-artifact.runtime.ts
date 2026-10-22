@@ -291,15 +291,15 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
   yield* fs.writeFileString(
     smokeEntrypointPath,
     `import assert from "node:assert/strict";
-import { TaxKit } from "@taxkit/sdk";
-import * as effect from "@taxkit/sdk/effect";
-import { au } from "@taxkit/sdk/au";
-import { auEffect } from "@taxkit/sdk/au/effect";
-import * as schemas from "@taxkit/sdk/schemas";
-import * as testing from "@taxkit/sdk/testing";
-import * as core from "@taxkit/sdk/core";
-import * as http from "@taxkit/sdk/http";
-import { GrossPay, PayRules } from "@taxkit/sdk/au";
+import { TaxKit } from "taxkit";
+import * as effect from "taxkit/effect";
+import { au } from "taxkit/au";
+import { auEffect } from "taxkit/au/effect";
+import * as schemas from "taxkit/schemas";
+import * as testing from "taxkit/testing";
+import * as core from "taxkit/core";
+import * as http from "taxkit/http";
+import { GrossPay, PayRules } from "taxkit/au";
 
 assert.equal(typeof TaxKit.calculate, "function", "root SDK import");
 assert.ok(core.Money, "Core entrypoint");

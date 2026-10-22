@@ -11,18 +11,18 @@ integration path.
 
 ## Entry points
 
-| Import                  | Use                                                                                                  |
-| ----------------------- | ---------------------------------------------------------------------------------------------------- |
-| `@taxkit/sdk`           | Use `TaxKit.calculate`, `TaxKit.safe.calculate` and `TaxKit.createClient`.                           |
-| `@taxkit/sdk/au`        | Use Australian calculator helpers such as `au.incomeTax.annual`.                                     |
-| `@taxkit/sdk/effect`    | Use `calculateRunRequest`, `calculateReportRequest`, `calculateReport` and the Effect client helper. |
-| `@taxkit/sdk/core`      | Import money values, the engine and calculator contracts.                                            |
-| `@taxkit/sdk/http`      | Import `TaxKitApi` and request-body contracts for typed HTTP clients.                                |
-| `@taxkit/sdk/au/effect` | Use Australian calculation descriptors in Effect programs.                                           |
-| `@taxkit/sdk/schemas`   | Import schema-facing types that are re-exported for SDK consumers.                                   |
-| `@taxkit/sdk/testing`   | Import calculation descriptors for integration tests.                                                |
+| Import             | Use                                                                                                  |
+| ------------------ | ---------------------------------------------------------------------------------------------------- |
+| `taxkit`           | Use `TaxKit.calculate`, `TaxKit.safe.calculate` and `TaxKit.createClient`.                           |
+| `taxkit/au`        | Use Australian calculator helpers such as `au.incomeTax.annual`.                                     |
+| `taxkit/effect`    | Use `calculateRunRequest`, `calculateReportRequest`, `calculateReport` and the Effect client helper. |
+| `taxkit/core`      | Import money values, the engine and calculator contracts.                                            |
+| `taxkit/http`      | Import `TaxKitApi` and request-body contracts for typed HTTP clients.                                |
+| `taxkit/au/effect` | Use Australian calculation descriptors in Effect programs.                                           |
+| `taxkit/schemas`   | Import schema-facing types that are re-exported for SDK consumers.                                   |
+| `taxkit/testing`   | Import calculation descriptors for integration tests.                                                |
 
-Every entry point belongs to the one `@taxkit/sdk` package. Install it using
+Every entry point belongs to the one `taxkit` package. Install it using
 [Install the SDK](../start/install-the-sdk.mdx); no other TaxKit package is
 needed.
 
@@ -32,9 +32,9 @@ Use `TaxKit.calculate` when you already have descriptor-typed input and want a
 Promise for the report:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -44,8 +44,8 @@ const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
 Use the AU helper when you do not need to pass the descriptor yourself:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -57,9 +57,9 @@ const report = await au.incomeTax.annual({
 Use `TaxKit.safe.calculate` when expected calculator failures should be values:
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -76,9 +76,9 @@ Use `calculateRunRequest` when you need a full `CalculatorRunResponse` with the
 descriptor-decoded report:
 
 ```ts
-import { audFromCents } from "@taxkit/sdk/core";
-import { AuAnnualIncomeTaxCalculation } from "@taxkit/sdk/au/effect";
-import { calculateRunRequest } from "@taxkit/sdk/effect";
+import { audFromCents } from "taxkit/core";
+import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
+import { calculateRunRequest } from "taxkit/effect";
 import { Effect, Option } from "effect";
 
 const effect = Effect.gen(function* () {

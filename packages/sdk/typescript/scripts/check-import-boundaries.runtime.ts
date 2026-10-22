@@ -103,11 +103,13 @@ export const checkSdkImportBoundaries = (sdkRoot: string) =>
         })
       ),
       Array.some(Record.values(httpManifest), (section) =>
-        section.pipe(
-          Option.flatMap((dependencies) =>
-            Record.get(dependencies, "@taxkit/sdk")
-          ),
-          Option.isSome
+        Array.some(["taxkit", "@taxkit/sdk"], (packageName) =>
+          section.pipe(
+            Option.flatMap((dependencies) =>
+              Record.get(dependencies, packageName)
+            ),
+            Option.isSome
+          )
         )
       )
         ? ["HTTP must not depend on the SDK assembly, including through tests."]

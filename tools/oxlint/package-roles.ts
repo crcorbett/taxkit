@@ -118,7 +118,9 @@ export const isForbiddenPackageDependency = (
   dependency: string
 ) =>
   (Array.contains(domainFreeOwners, owner) &&
-    dependency.startsWith("@taxkit/")) ||
+    (dependency === "taxkit" ||
+      dependency.startsWith("taxkit/") ||
+      dependency.startsWith("@taxkit/"))) ||
   (owner.startsWith("packages/") &&
     !isInfrastructureOwner(owner) &&
     (isDeploymentDependency(dependency) ||

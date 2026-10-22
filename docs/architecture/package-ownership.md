@@ -96,7 +96,7 @@ must not depend on HTTP handlers, SDK clients, CLI commands or app runtime
 modules.
 
 `packages/sdk/typescript`
-: The sole TypeScript package configured for public npm installation.
+: The sole TypeScript package configured for public npm installation as `taxkit`.
 It owns browser-safe schemas, typed calculation facades,
 Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
 packed-artifact checks. Its strict downstream validator may orchestrate the
@@ -109,6 +109,11 @@ without a reverse HTTP-to-SDK dependency. Its Effect entrypoint owns
 request-preserving calculator helpers such as `calculateRunRequest`,
 `calculateReportRequest` and `calculateReport`, while reusing
 calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
+
+The private repository root is named `@taxkit/workspace` to keep its workspace
+identity distinct from the installable SDK. The existing `@taxkit/sdk@2.1.0`
+release remains available under its original npm name; current development and
+future public versions belong to `taxkit`.
 
 `apps/web`
 : TanStack Start Website. It owns form presentation/commands, the server

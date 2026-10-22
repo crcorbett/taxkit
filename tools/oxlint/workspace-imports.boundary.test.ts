@@ -109,6 +109,12 @@ it.effect(
             'import "@taxkit/calculators/admission.schemas";',
             "taxkit-package(workspace-roles)",
           ],
+          [
+            "packages/observability/src/.generated-workspace-role.ts",
+            'import "taxkit/core";',
+            "taxkit-package(workspace-roles)",
+          ],
+          [browser, 'import "taxkit/au";', "taxkit-package(workspace-roles)"],
         ] as const,
         ([file, source, code]) => rejected(file, source, code),
         { concurrency: 1, discard: true }

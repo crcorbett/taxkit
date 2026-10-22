@@ -11,25 +11,25 @@ in-process. The plain facade is the beginner path. The safe facade returns
 typed result values. The Effect facade is for advanced service composition and
 in-process transports.
 
-All entry points below are included in one `@taxkit/sdk` package. You do not
+All entry points below are included in one `taxkit` package. You do not
 need to install other TaxKit packages.
 
 ## Entrypoints
 
-| Entrypoint            | Use when                                                                                                    |
-| --------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `@taxkit/sdk`         | You want `TaxKit.calculate`, `TaxKit.safe.calculate` or `TaxKit.createClient`.                              |
-| `@taxkit/sdk/au`      | You want Australian calculator helpers and descriptors.                                                     |
-| `@taxkit/sdk/effect`  | You want `calculateRunRequest`, `calculateReportRequest`, `calculateReport` or Effect service requirements. |
-| `@taxkit/sdk/core`    | You want money values, engine services or calculator contracts.                                             |
-| `@taxkit/sdk/http`    | You want typed HTTP contracts for Effect's generated API client.                                            |
-| `@taxkit/sdk/schemas` | You want `CalculatorRunRequest`, `CalculatorRunResponse`, `CalculatorServiceError` and SDK result schemas.  |
+| Entrypoint       | Use when                                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| `taxkit`         | You want `TaxKit.calculate`, `TaxKit.safe.calculate` or `TaxKit.createClient`.                              |
+| `taxkit/au`      | You want Australian calculator helpers and descriptors.                                                     |
+| `taxkit/effect`  | You want `calculateRunRequest`, `calculateReportRequest`, `calculateReport` or Effect service requirements. |
+| `taxkit/core`    | You want money values, engine services or calculator contracts.                                             |
+| `taxkit/http`    | You want typed HTTP contracts for Effect's generated API client.                                            |
+| `taxkit/schemas` | You want `CalculatorRunRequest`, `CalculatorRunResponse`, `CalculatorServiceError` and SDK result schemas.  |
 
 ## Beginner path
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
 
 const report = await au.incomeTax.annual({
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -42,9 +42,9 @@ same descriptor and schema contracts as the generic SDK facade.
 ## Generic path
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { TaxKit } from "@taxkit/sdk";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { TaxKit } from "taxkit";
+import { au } from "taxkit/au";
 
 const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
   taxableIncome: aud(Cents.make(9_000_000)),
@@ -58,7 +58,7 @@ your own Effect layer or when an in-process transport needs the full
 `CalculatorRunResponse`.
 
 ```ts
-import { calculateRunRequest } from "@taxkit/sdk/effect";
+import { calculateRunRequest } from "taxkit/effect";
 ```
 
 ## Next steps

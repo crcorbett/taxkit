@@ -26,9 +26,9 @@ The SDK path keeps the calculation in-process and avoids HTTP transport.
 ## Example
 
 ```ts
-import { Cents, aud } from "@taxkit/sdk/core";
-import { GrossPay } from "@taxkit/sdk/au";
-import { au } from "@taxkit/sdk/au";
+import { Cents, aud } from "taxkit/core";
+import { GrossPay } from "taxkit/au";
+import { au } from "taxkit/au";
 
 const report = await au.pay.takeHomePay({
   grossPay: new GrossPay({
