@@ -42,14 +42,6 @@ Current implemented code lives in:
 - `packages/testing`
 - `packages/tsconfig`
 
-Current planned ownership placeholder:
-
-- `packages/ui`
-
-The placeholder directories contain README guidance only. Do not route runtime
-imports, source ownership or build expectations to them until package manifests
-and source exports exist.
-
 ## Main areas
 
 `packages/core`
@@ -125,14 +117,7 @@ calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
   rules, calculations and content lookup remain package/API-owned. The app owns
   documentation page loaders, app-specific MDX composition, navigation/focus,
   search, Markdown representations, share images and responsive reading, and
-  forwards discovery file requests to the API. The old `apps/docs` workspace is
-  retired; its verified original source and dated recovery records remain
-  addressable.
-
-`apps/docs`
-: Retirement tombstone only. The strict historical source bundle retains all
-  49 original files. The deployment runbook owns inspection and separately
-  approved recovery, rather than an active old workspace.
+  forwards discovery file requests to the API.
 
 Root `alchemy.run.ts` and `alchemy.local.run.ts`
 : The deployed and local-development roots for the Website/API graph; see
@@ -267,8 +252,8 @@ belongs in apps or explicitly server-only package exports.
   `tools/repository-paths`; do not move it into package orchestration or browser
   code.
 - Keep app-specific MDX components in `apps/web`. Promote only generic,
-  repeated Fumadocs primitives to `packages/docs-fumadocs/render` or repeated
-  TaxKit UI primitives to `packages/ui`.
+  repeated Fumadocs primitives to `packages/docs-fumadocs/render`. Create a
+  shared TaxKit UI package only when apps repeat UI primitives.
 - Do not add flat engine packages once nested domain or rule ownership exists.
   `packages/calculators` is allowed because it is a cross-surface
   orchestration package rather than a jurisdiction/domain/rule package.

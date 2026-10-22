@@ -354,7 +354,6 @@ curl -X POST https://api.taxkit.localhost/api/v1/calculators/au.pay.take-home/ca
 - `docs/architecture/api-and-sdk.md`
 - `docs/architecture/effect-services.md`
 - `docs/architecture/package-ownership.md`
-- `docs/product-specs/extract-api-app.md`
 
 
 The private `api/worker` app export supplies native instance composition to
@@ -481,7 +480,4 @@ covers on-page tools.
 
 The root-owned native source builder discovers the actual SDK Worker declaration
 through memory-only compilation. Provider, credential and network operations
-refuse; this performs no provider plan/apply. Historical
-[modern](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp.json)
-and [session](../../docs/documentation-audit/clean-slate-foundation/2026-10-07-native-mcp-sessions.json)
-records describe the prior artifacts and do not define current support.
+refuse; this performs no provider plan/apply.

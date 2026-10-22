@@ -153,16 +153,11 @@ routes, layers or services unless the spec explicitly creates them. Link to
 the owning architecture doc for durable boundary rules instead of expanding
 the diagram into a tutorial.
 
-## Freshness Metadata
+## Lifetime
 
-Canonical specs should include:
-
-```yaml
-status: canonical | draft | historical
-last_reviewed: YYYY-MM-DD
-source_of_truth: docs
-confidence: high | medium | low
-```
+A SPEC, its task list and its execution plan exist only while the work is
+active. Delete them in the change that completes the work, after the
+architecture, standards and package READMEs describe the result.
 
 ## Quality Bar
 

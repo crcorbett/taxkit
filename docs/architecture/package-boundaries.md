@@ -42,11 +42,6 @@ Implemented packages and apps:
 - `packages/testing`
 - `packages/tsconfig`
 
-Planned ownership directory with README guidance but no package manifest or
-runtime source yet:
-
-- `packages/ui`
-
 The proposed package map below should guide new work, but callers should not
 import from a planned package until the corresponding package exists with
 exports and verification.
@@ -55,8 +50,8 @@ exports and verification.
 
 ```txt
 apps/
-  docs/
   api/
+  web/
 
 packages/
   core/

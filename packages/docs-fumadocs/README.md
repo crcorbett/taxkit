@@ -69,7 +69,6 @@ application runtime or execute Effects.
 
 ## Related docs
 
-- `docs/product-specs/docs-application-architecture.md`
 - `docs/architecture/content-and-posts.md`
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/package-boundaries.md`

@@ -7,18 +7,15 @@ const scripts = {
   root: HashSet.make("verification"),
   workspaces: HashMap.make(["web", HashSet.make("build")]),
 };
-const metadata =
-  "---\ndocument_type: guide\nlifecycle: current\nowner: maintainers\n---\n";
-
 describe("documentation inspection", () => {
-  it("accepts resolved links, known commands and metadata", () => {
+  it("accepts resolved links and known commands", () => {
     assert.deepEqual(
       inspectDocumentation({
         exists: (path) => path === "docs/other.md",
         files: [
           {
             path: "docs/guide.md",
-            text: `${metadata}See [other](./other.md#part), [site](https://taxkit.dev) and run \`bun run verification\` or \`bun run --filter=web build\`.`,
+            text: `See [other](./other.md#part), [site](https://taxkit.dev) and run \`bun run verification\` or \`bun run --filter=web build\`.`,
           },
         ],
         scripts,
@@ -27,14 +24,14 @@ describe("documentation inspection", () => {
     );
   });
 
-  it("reports broken links and unknown commands in current documents", () => {
+  it("reports broken links and unknown commands", () => {
     assert.deepEqual(
       inspectDocumentation({
         exists: () => false,
         files: [
           {
             path: "docs/guide.md",
-            text: `${metadata}[gone](./gone.md) [out](../../outside.md) \`bun run release:present\` \`bun run --filter=web deploy\``,
+            text: `[gone](./gone.md) [out](../../outside.md) \`bun run release:present\` \`bun run --filter=web deploy\``,
           },
         ],
         scripts,
@@ -48,20 +45,39 @@ describe("documentation inspection", () => {
     );
   });
 
-  it("requires metadata and leaves historical references alone", () => {
+  it("checks every document regardless of front matter", () => {
     assert.deepEqual(
       inspectDocumentation({
         exists: () => false,
         files: [
-          { path: "docs/untitled.md", text: "No metadata." },
+          { path: "docs/untitled.md", text: "No front matter." },
           {
             path: "docs/history.md",
-            text: "---\ndocument_type: plan\nlifecycle: historical\nowner: maintainers\n---\n[gone](./gone.md) `bun run release:present`",
+            text: "---\nlifecycle: historical\n---\n[gone](./gone.md) `bun run release:present`",
           },
         ],
         scripts,
       }),
-      ["docs/untitled.md: missing maintainer metadata"]
+      [
+        "docs/history.md: broken link: ./gone.md",
+        "docs/history.md: unknown root command: bun run release:present",
+      ]
+    );
+  });
+
+  it("ignores links and commands inside code", () => {
+    assert.deepEqual(
+      inspectDocumentation({
+        exists: () => false,
+        files: [
+          {
+            path: "README.md",
+            text: "```md\n[gone](./gone.md)\n```\n`[gone](./gone.md)`",
+          },
+        ],
+        scripts,
+      }),
+      []
     );
   });
 });

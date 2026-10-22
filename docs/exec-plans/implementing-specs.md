@@ -130,7 +130,7 @@ follow-up before accepting the task; a fixed audit count is not a substitute.
 - Do not defer Changesets to the final slice for package-facing work. Each
   coherent package-facing slice must include a changeset before commit, unless
   the user explicitly asks to batch changesets.
-- Do not run `bun run version-repo` during normal implementation unless the user
+- Do not run `bun run version-packages` during normal implementation unless the user
   explicitly asks to version the repo. Versioning consumes pending Changesets
   into package versions and changelogs and should be a deliberate release-prep
   slice.

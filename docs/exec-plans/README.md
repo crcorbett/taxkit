@@ -1,17 +1,9 @@
----
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: docs
-confidence: medium
----
+# Exec plans
 
-# Exec Plans
+Exec plans record live implementation progress, decisions and follow-on work
+for substantial SPECs.
 
-Exec plans record active implementation progress, validation evidence,
-decisions and follow-on debt for substantial specs.
+- [`active/`](active/README.md) holds plans for work in progress.
+- [Implementing specs](./implementing-specs.md) is the rollout contract.
 
-Use:
-
-- `active/` for live implementation plans
-- `completed/` for finished plans worth preserving
-- [Implementing specs](./implementing-specs.md) for the rollout contract
+Finished plans are deleted when their work merges; Git keeps the history.

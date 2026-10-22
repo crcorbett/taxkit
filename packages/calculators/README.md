@@ -133,7 +133,7 @@ follow the deployed application version; full discovery metadata remains an
 API operation. `CalculatorSummaries` lists the supported summaries; the named
 exports identify the take-home, pay-withholdings and annual-tax calculators.
 
-The [transport architecture](../../docs/architecture/api-and-sdk.md) and active clean-slate plan own application use and proof limits.
+The [transport architecture](../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
 
 ## Shared calculation work limits
 

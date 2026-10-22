@@ -27,8 +27,6 @@ validation, but it is not published yet.
 
 - [apps/api](./apps/api/README.md): standalone Bun process that owns API
   startup, listening config and Effect runtime teardown for `/api/*`.
-- [apps/docs](./apps/docs/README.md): retirement tombstone and retained-source
-  recovery route; no active documentation workspace.
 - [apps/web](./apps/web/README.md): TanStack Start Website with the three
   calculators, reading the API through the generated HTTP client over the
   private server binding and, in the browser, the public API origin. It also
@@ -65,8 +63,6 @@ validation, but it is not published yet.
   workspace packages.
 - [packages/tsconfig](./packages/tsconfig/README.md): shared TypeScript config
   presets.
-- [packages/ui](./packages/ui/README.md): documented planned shared UI
-  ownership without a package manifest or runtime code yet.
 
 ## Planned package families
 
@@ -135,7 +131,7 @@ desktop chats have no direct importer in this CLI version.
 
 See [Entire's setup guide](https://docs.entire.io/quickstart),
 [import guide](https://docs.entire.io/guides/sessions/import-past-agent-history)
-and the [setup spec](./docs/product-specs/entire-session-history.md).
+and the repository's [Entire settings](./.entire/settings.json).
 
 ## Commands
 
@@ -176,8 +172,8 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
 ## Documentation entry points
 
 - [AGENTS.md](./AGENTS.md): short atlas for agents and task routing.
-- [Maintainer documentation](./docs/README.md): lifecycle, truth layers,
-  semantic owners, public/maintainer separation and known owner gaps.
+- [Maintainer documentation](./docs/README.md): truth layers, semantic
+  owners and public/maintainer separation.
 - [CLAUDE.md](./CLAUDE.md): Claude-compatible pointer to the canonical root
   operating rules.
 - [CHANGELOG.md](./CHANGELOG.md): root release-train changelog. Package-level
@@ -186,28 +182,13 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
 - Engineering conventions start with [Effect services](./docs/architecture/effect-services.md),
   [Configuration](./docs/architecture/configuration.md), [Package ownership](./docs/architecture/package-ownership.md)
   and [Code patterns](./docs/standards/code-patterns.md).
-- [Product specs](./docs/product-specs/index.md): current, implemented and
-  historical intent inventory and task lists.
-- [Exec plans](./docs/exec-plans/README.md): live and completed rollout plans.
+- [Product specs](./docs/product-specs/index.md) and
+  [exec plans](./docs/exec-plans/README.md): active work only; finished work
+  lives in Git history.
 - [Design docs](./docs/design-docs/index.md): documentation and design
   conventions.
-- [Documentation audit](./docs/documentation-audit/README.md): current docs
-  inventory, README coverage, missing docs and migration priorities.
 - [References](./docs/references/README.md): external or imported reference
   material.
-
-## Status snapshot
-
-[docs/repo-status-outline.html](./docs/repo-status-outline.html) is a local,
-static status snapshot for a quick visual overview. It is useful for review in a
-browser, but it is not canonical; refresh it when repo structure or implemented
-surfaces materially change.
-
-Open it directly at:
-
-```text
-open docs/repo-status-outline.html
-```
 
 ## Runtime boundary
 
@@ -216,9 +197,7 @@ open docs/repo-status-outline.html
   scoped resources on shutdown; its native Worker serves HTTP, RPC and MCP.
 - `apps/web` owns the replacement documentation reader over the accepted
   backend catalogue and compiled MDX. Canonical page fields and reusable
-  Fumadocs internals remain package-owned. `apps/docs` is a
-  retirement tombstone; exact original source and deployed recovery identities
-  remain historical evidence.
+  Fumadocs internals remain package-owned.
 - `apps/web/src/lib/runtime.server.ts` owns one server runtime; the browser
   `ApiClient` Atom runtime and one shared registry own browser execution and
   cleanup. Both read the separate API with Effect's generated `HttpApiClient`;

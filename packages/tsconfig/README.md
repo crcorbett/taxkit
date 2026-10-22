@@ -69,4 +69,3 @@ release closure.
 
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/testing-and-quality.md`
-- `docs/product-specs/documentation-improvement-roadmap.md`

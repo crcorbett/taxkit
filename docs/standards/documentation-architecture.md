@@ -28,6 +28,10 @@ TaxKit uses different docs layers for different readers:
 Do not collapse these layers. Public docs may link to architecture docs, but
 they should not become architecture manuals.
 
+Product specs and exec plans exist only while their work is active. Delete
+them, and any dated receipts, when the work merges; Git and pull requests keep
+the history. Maintainer documents need no lifecycle front matter.
+
 ## Public docs navigation
 
 The public MDX docs should use one primary navigation model:
