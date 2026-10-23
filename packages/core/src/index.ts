@@ -49,6 +49,11 @@ export {
   moneySub,
 } from "./primitives/money.js";
 export {
+  DollarsTextIssue,
+  MoneyFromDollarsString,
+  moneyFromDollarsString,
+} from "./primitives/dollars.js";
+export {
   RoundingMode,
   roundCentsToDollar,
   roundMoney,

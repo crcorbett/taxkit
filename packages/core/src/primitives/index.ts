@@ -18,6 +18,11 @@ export {
   moneyEquals,
   moneySub,
 } from "./money.js";
+export {
+  DollarsTextIssue,
+  MoneyFromDollarsString,
+  moneyFromDollarsString,
+} from "./dollars.js";
 export { RoundingMode, roundCentsToDollar, roundMoney } from "./rounding.js";
 export {
   CentsOrInfinity,

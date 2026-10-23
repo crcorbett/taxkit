@@ -81,6 +81,8 @@ const decodingBoundaryFiles = [
   // No runtime, raw JSON or synchronous codec admission.
   "packages/core/src/primitives/date.ts",
   "packages/core/test/date.test.ts",
+  // Typed dollar text representation ingress and Money round trips.
+  "packages/core/test/dollars.test.ts",
   // Historical trace and question representation round trips only.
   "packages/core/test/domain-absence.boundary.test.ts",
   // Native app root stage ingress, checked before constructing secret Layers.
@@ -250,6 +252,7 @@ const schemaEncoderEgressFiles = [
   "packages/rules/au/stsl/test/rule-graph.test.ts",
   // Exact historical primitive bytes and safe failure representation tests.
   "packages/core/test/date.test.ts",
+  "packages/core/test/dollars.test.ts",
   "packages/core/test/money.test.ts",
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-settings-failure.boundary.test.ts",
