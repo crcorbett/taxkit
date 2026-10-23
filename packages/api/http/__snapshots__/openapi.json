@@ -2999,6 +2999,1747 @@
                 "schema": {
                   "additionalProperties": false,
                   "properties": {
+                    "body": {
+                      "items": {
+                        "anyOf": [
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "content": {
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "kind": {
+                                          "enum": ["text"],
+                                          "type": "string"
+                                        },
+                                        "text": {
+                                          "minLength": 1,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["kind", "text"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "kind": {
+                                          "enum": ["inline-code"],
+                                          "type": "string"
+                                        },
+                                        "text": {
+                                          "minLength": 1,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["kind", "text"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "content": {
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["text"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["inline-code"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              }
+                                            ]
+                                          },
+                                          "minItems": 1,
+                                          "type": "array"
+                                        },
+                                        "kind": {
+                                          "enum": ["strong"],
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["content", "kind"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "content": {
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["text"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["inline-code"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              }
+                                            ]
+                                          },
+                                          "minItems": 1,
+                                          "type": "array"
+                                        },
+                                        "kind": {
+                                          "enum": ["emphasis"],
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["content", "kind"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "content": {
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["text"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["inline-code"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "content": {
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": ["text"],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        },
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": [
+                                                                "inline-code"
+                                                              ],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "minItems": 1,
+                                                    "type": "array"
+                                                  },
+                                                  "kind": {
+                                                    "enum": ["strong"],
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["content", "kind"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "content": {
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": ["text"],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        },
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": [
+                                                                "inline-code"
+                                                              ],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "minItems": 1,
+                                                    "type": "array"
+                                                  },
+                                                  "kind": {
+                                                    "enum": ["emphasis"],
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["content", "kind"],
+                                                "type": "object"
+                                              }
+                                            ]
+                                          },
+                                          "minItems": 1,
+                                          "type": "array"
+                                        },
+                                        "href": {
+                                          "maxLength": 2048,
+                                          "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                          "type": "string"
+                                        },
+                                        "kind": {
+                                          "enum": ["link"],
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["content", "href", "kind"],
+                                      "type": "object"
+                                    }
+                                  ]
+                                },
+                                "minItems": 1,
+                                "type": "array"
+                              },
+                              "depth": {
+                                "enum": [2, 3, 4],
+                                "type": "number"
+                              },
+                              "id": {
+                                "maxLength": 120,
+                                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": ["heading"],
+                                "type": "string"
+                              }
+                            },
+                            "required": ["content", "depth", "id", "kind"],
+                            "type": "object"
+                          },
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "content": {
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "kind": {
+                                          "enum": ["text"],
+                                          "type": "string"
+                                        },
+                                        "text": {
+                                          "minLength": 1,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["kind", "text"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "kind": {
+                                          "enum": ["inline-code"],
+                                          "type": "string"
+                                        },
+                                        "text": {
+                                          "minLength": 1,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["kind", "text"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "content": {
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["text"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["inline-code"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              }
+                                            ]
+                                          },
+                                          "minItems": 1,
+                                          "type": "array"
+                                        },
+                                        "kind": {
+                                          "enum": ["strong"],
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["content", "kind"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "content": {
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["text"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["inline-code"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              }
+                                            ]
+                                          },
+                                          "minItems": 1,
+                                          "type": "array"
+                                        },
+                                        "kind": {
+                                          "enum": ["emphasis"],
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["content", "kind"],
+                                      "type": "object"
+                                    },
+                                    {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "content": {
+                                          "items": {
+                                            "anyOf": [
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["text"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "kind": {
+                                                    "enum": ["inline-code"],
+                                                    "type": "string"
+                                                  },
+                                                  "text": {
+                                                    "minLength": 1,
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["kind", "text"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "content": {
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": ["text"],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        },
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": [
+                                                                "inline-code"
+                                                              ],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "minItems": 1,
+                                                    "type": "array"
+                                                  },
+                                                  "kind": {
+                                                    "enum": ["strong"],
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["content", "kind"],
+                                                "type": "object"
+                                              },
+                                              {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                  "content": {
+                                                    "items": {
+                                                      "anyOf": [
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": ["text"],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        },
+                                                        {
+                                                          "additionalProperties": false,
+                                                          "properties": {
+                                                            "kind": {
+                                                              "enum": [
+                                                                "inline-code"
+                                                              ],
+                                                              "type": "string"
+                                                            },
+                                                            "text": {
+                                                              "minLength": 1,
+                                                              "type": "string"
+                                                            }
+                                                          },
+                                                          "required": [
+                                                            "kind",
+                                                            "text"
+                                                          ],
+                                                          "type": "object"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "minItems": 1,
+                                                    "type": "array"
+                                                  },
+                                                  "kind": {
+                                                    "enum": ["emphasis"],
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": ["content", "kind"],
+                                                "type": "object"
+                                              }
+                                            ]
+                                          },
+                                          "minItems": 1,
+                                          "type": "array"
+                                        },
+                                        "href": {
+                                          "maxLength": 2048,
+                                          "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                          "type": "string"
+                                        },
+                                        "kind": {
+                                          "enum": ["link"],
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["content", "href", "kind"],
+                                      "type": "object"
+                                    }
+                                  ]
+                                },
+                                "minItems": 1,
+                                "type": "array"
+                              },
+                              "kind": {
+                                "enum": ["paragraph"],
+                                "type": "string"
+                              }
+                            },
+                            "required": ["content", "kind"],
+                            "type": "object"
+                          },
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "items": {
+                                "items": {
+                                  "items": {
+                                    "anyOf": [
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "enum": ["text"],
+                                            "type": "string"
+                                          },
+                                          "text": {
+                                            "minLength": 1,
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["kind", "text"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "enum": ["inline-code"],
+                                            "type": "string"
+                                          },
+                                          "text": {
+                                            "minLength": 1,
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["kind", "text"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "content": {
+                                            "items": {
+                                              "anyOf": [
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["text"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["inline-code"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                }
+                                              ]
+                                            },
+                                            "minItems": 1,
+                                            "type": "array"
+                                          },
+                                          "kind": {
+                                            "enum": ["strong"],
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["content", "kind"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "content": {
+                                            "items": {
+                                              "anyOf": [
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["text"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["inline-code"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                }
+                                              ]
+                                            },
+                                            "minItems": 1,
+                                            "type": "array"
+                                          },
+                                          "kind": {
+                                            "enum": ["emphasis"],
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["content", "kind"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "content": {
+                                            "items": {
+                                              "anyOf": [
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["text"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["inline-code"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "content": {
+                                                      "items": {
+                                                        "anyOf": [
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "text"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          },
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "inline-code"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          }
+                                                        ]
+                                                      },
+                                                      "minItems": 1,
+                                                      "type": "array"
+                                                    },
+                                                    "kind": {
+                                                      "enum": ["strong"],
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "content",
+                                                    "kind"
+                                                  ],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "content": {
+                                                      "items": {
+                                                        "anyOf": [
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "text"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          },
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "inline-code"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          }
+                                                        ]
+                                                      },
+                                                      "minItems": 1,
+                                                      "type": "array"
+                                                    },
+                                                    "kind": {
+                                                      "enum": ["emphasis"],
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "content",
+                                                    "kind"
+                                                  ],
+                                                  "type": "object"
+                                                }
+                                              ]
+                                            },
+                                            "minItems": 1,
+                                            "type": "array"
+                                          },
+                                          "href": {
+                                            "maxLength": 2048,
+                                            "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                            "type": "string"
+                                          },
+                                          "kind": {
+                                            "enum": ["link"],
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["content", "href", "kind"],
+                                        "type": "object"
+                                      }
+                                    ]
+                                  },
+                                  "minItems": 1,
+                                  "type": "array"
+                                },
+                                "minItems": 1,
+                                "type": "array"
+                              },
+                              "kind": {
+                                "enum": ["list"],
+                                "type": "string"
+                              },
+                              "ordered": {
+                                "type": "boolean"
+                              },
+                              "start": {
+                                "maximum": 9007199254740991,
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "required": ["items", "kind", "ordered", "start"],
+                            "type": "object"
+                          },
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "align": {
+                                "items": {
+                                  "enum": ["left", "center", "right", "none"],
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "header": {
+                                "items": {
+                                  "items": {
+                                    "anyOf": [
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "enum": ["text"],
+                                            "type": "string"
+                                          },
+                                          "text": {
+                                            "minLength": 1,
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["kind", "text"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "kind": {
+                                            "enum": ["inline-code"],
+                                            "type": "string"
+                                          },
+                                          "text": {
+                                            "minLength": 1,
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["kind", "text"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "content": {
+                                            "items": {
+                                              "anyOf": [
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["text"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["inline-code"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                }
+                                              ]
+                                            },
+                                            "minItems": 1,
+                                            "type": "array"
+                                          },
+                                          "kind": {
+                                            "enum": ["strong"],
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["content", "kind"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "content": {
+                                            "items": {
+                                              "anyOf": [
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["text"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["inline-code"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                }
+                                              ]
+                                            },
+                                            "minItems": 1,
+                                            "type": "array"
+                                          },
+                                          "kind": {
+                                            "enum": ["emphasis"],
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["content", "kind"],
+                                        "type": "object"
+                                      },
+                                      {
+                                        "additionalProperties": false,
+                                        "properties": {
+                                          "content": {
+                                            "items": {
+                                              "anyOf": [
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["text"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "kind": {
+                                                      "enum": ["inline-code"],
+                                                      "type": "string"
+                                                    },
+                                                    "text": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": ["kind", "text"],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "content": {
+                                                      "items": {
+                                                        "anyOf": [
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "text"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          },
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "inline-code"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          }
+                                                        ]
+                                                      },
+                                                      "minItems": 1,
+                                                      "type": "array"
+                                                    },
+                                                    "kind": {
+                                                      "enum": ["strong"],
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "content",
+                                                    "kind"
+                                                  ],
+                                                  "type": "object"
+                                                },
+                                                {
+                                                  "additionalProperties": false,
+                                                  "properties": {
+                                                    "content": {
+                                                      "items": {
+                                                        "anyOf": [
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "text"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          },
+                                                          {
+                                                            "additionalProperties": false,
+                                                            "properties": {
+                                                              "kind": {
+                                                                "enum": [
+                                                                  "inline-code"
+                                                                ],
+                                                                "type": "string"
+                                                              },
+                                                              "text": {
+                                                                "minLength": 1,
+                                                                "type": "string"
+                                                              }
+                                                            },
+                                                            "required": [
+                                                              "kind",
+                                                              "text"
+                                                            ],
+                                                            "type": "object"
+                                                          }
+                                                        ]
+                                                      },
+                                                      "minItems": 1,
+                                                      "type": "array"
+                                                    },
+                                                    "kind": {
+                                                      "enum": ["emphasis"],
+                                                      "type": "string"
+                                                    }
+                                                  },
+                                                  "required": [
+                                                    "content",
+                                                    "kind"
+                                                  ],
+                                                  "type": "object"
+                                                }
+                                              ]
+                                            },
+                                            "minItems": 1,
+                                            "type": "array"
+                                          },
+                                          "href": {
+                                            "maxLength": 2048,
+                                            "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                            "type": "string"
+                                          },
+                                          "kind": {
+                                            "enum": ["link"],
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["content", "href", "kind"],
+                                        "type": "object"
+                                      }
+                                    ]
+                                  },
+                                  "type": "array"
+                                },
+                                "minItems": 1,
+                                "type": "array"
+                              },
+                              "kind": {
+                                "enum": ["table"],
+                                "type": "string"
+                              },
+                              "rows": {
+                                "items": {
+                                  "items": {
+                                    "items": {
+                                      "anyOf": [
+                                        {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "kind": {
+                                              "enum": ["text"],
+                                              "type": "string"
+                                            },
+                                            "text": {
+                                              "minLength": 1,
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": ["kind", "text"],
+                                          "type": "object"
+                                        },
+                                        {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "kind": {
+                                              "enum": ["inline-code"],
+                                              "type": "string"
+                                            },
+                                            "text": {
+                                              "minLength": 1,
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": ["kind", "text"],
+                                          "type": "object"
+                                        },
+                                        {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "content": {
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "kind": {
+                                                        "enum": ["text"],
+                                                        "type": "string"
+                                                      },
+                                                      "text": {
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "text"
+                                                    ],
+                                                    "type": "object"
+                                                  },
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "kind": {
+                                                        "enum": ["inline-code"],
+                                                        "type": "string"
+                                                      },
+                                                      "text": {
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "text"
+                                                    ],
+                                                    "type": "object"
+                                                  }
+                                                ]
+                                              },
+                                              "minItems": 1,
+                                              "type": "array"
+                                            },
+                                            "kind": {
+                                              "enum": ["strong"],
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": ["content", "kind"],
+                                          "type": "object"
+                                        },
+                                        {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "content": {
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "kind": {
+                                                        "enum": ["text"],
+                                                        "type": "string"
+                                                      },
+                                                      "text": {
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "text"
+                                                    ],
+                                                    "type": "object"
+                                                  },
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "kind": {
+                                                        "enum": ["inline-code"],
+                                                        "type": "string"
+                                                      },
+                                                      "text": {
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "text"
+                                                    ],
+                                                    "type": "object"
+                                                  }
+                                                ]
+                                              },
+                                              "minItems": 1,
+                                              "type": "array"
+                                            },
+                                            "kind": {
+                                              "enum": ["emphasis"],
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": ["content", "kind"],
+                                          "type": "object"
+                                        },
+                                        {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                            "content": {
+                                              "items": {
+                                                "anyOf": [
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "kind": {
+                                                        "enum": ["text"],
+                                                        "type": "string"
+                                                      },
+                                                      "text": {
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "text"
+                                                    ],
+                                                    "type": "object"
+                                                  },
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "kind": {
+                                                        "enum": ["inline-code"],
+                                                        "type": "string"
+                                                      },
+                                                      "text": {
+                                                        "minLength": 1,
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "text"
+                                                    ],
+                                                    "type": "object"
+                                                  },
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "content": {
+                                                        "items": {
+                                                          "anyOf": [
+                                                            {
+                                                              "additionalProperties": false,
+                                                              "properties": {
+                                                                "kind": {
+                                                                  "enum": [
+                                                                    "text"
+                                                                  ],
+                                                                  "type": "string"
+                                                                },
+                                                                "text": {
+                                                                  "minLength": 1,
+                                                                  "type": "string"
+                                                                }
+                                                              },
+                                                              "required": [
+                                                                "kind",
+                                                                "text"
+                                                              ],
+                                                              "type": "object"
+                                                            },
+                                                            {
+                                                              "additionalProperties": false,
+                                                              "properties": {
+                                                                "kind": {
+                                                                  "enum": [
+                                                                    "inline-code"
+                                                                  ],
+                                                                  "type": "string"
+                                                                },
+                                                                "text": {
+                                                                  "minLength": 1,
+                                                                  "type": "string"
+                                                                }
+                                                              },
+                                                              "required": [
+                                                                "kind",
+                                                                "text"
+                                                              ],
+                                                              "type": "object"
+                                                            }
+                                                          ]
+                                                        },
+                                                        "minItems": 1,
+                                                        "type": "array"
+                                                      },
+                                                      "kind": {
+                                                        "enum": ["strong"],
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "content",
+                                                      "kind"
+                                                    ],
+                                                    "type": "object"
+                                                  },
+                                                  {
+                                                    "additionalProperties": false,
+                                                    "properties": {
+                                                      "content": {
+                                                        "items": {
+                                                          "anyOf": [
+                                                            {
+                                                              "additionalProperties": false,
+                                                              "properties": {
+                                                                "kind": {
+                                                                  "enum": [
+                                                                    "text"
+                                                                  ],
+                                                                  "type": "string"
+                                                                },
+                                                                "text": {
+                                                                  "minLength": 1,
+                                                                  "type": "string"
+                                                                }
+                                                              },
+                                                              "required": [
+                                                                "kind",
+                                                                "text"
+                                                              ],
+                                                              "type": "object"
+                                                            },
+                                                            {
+                                                              "additionalProperties": false,
+                                                              "properties": {
+                                                                "kind": {
+                                                                  "enum": [
+                                                                    "inline-code"
+                                                                  ],
+                                                                  "type": "string"
+                                                                },
+                                                                "text": {
+                                                                  "minLength": 1,
+                                                                  "type": "string"
+                                                                }
+                                                              },
+                                                              "required": [
+                                                                "kind",
+                                                                "text"
+                                                              ],
+                                                              "type": "object"
+                                                            }
+                                                          ]
+                                                        },
+                                                        "minItems": 1,
+                                                        "type": "array"
+                                                      },
+                                                      "kind": {
+                                                        "enum": ["emphasis"],
+                                                        "type": "string"
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "content",
+                                                      "kind"
+                                                    ],
+                                                    "type": "object"
+                                                  }
+                                                ]
+                                              },
+                                              "minItems": 1,
+                                              "type": "array"
+                                            },
+                                            "href": {
+                                              "maxLength": 2048,
+                                              "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                              "type": "string"
+                                            },
+                                            "kind": {
+                                              "enum": ["link"],
+                                              "type": "string"
+                                            }
+                                          },
+                                          "required": [
+                                            "content",
+                                            "href",
+                                            "kind"
+                                          ],
+                                          "type": "object"
+                                        }
+                                      ]
+                                    },
+                                    "type": "array"
+                                  },
+                                  "minItems": 1,
+                                  "type": "array"
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "required": ["align", "header", "kind", "rows"],
+                            "type": "object"
+                          },
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "kind": {
+                                "enum": ["code"],
+                                "type": "string"
+                              },
+                              "language": {
+                                "enum": ["json", "md", "sh", "ts", "txt"],
+                                "type": "string"
+                              },
+                              "lines": {
+                                "items": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "color": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      },
+                                      "style": {
+                                        "enum": [
+                                          "normal",
+                                          "italic",
+                                          "bold",
+                                          "bold-italic"
+                                        ],
+                                        "type": "string"
+                                      },
+                                      "text": {
+                                        "minLength": 1,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["color", "style", "text"],
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "minItems": 1,
+                                "type": "array"
+                              }
+                            },
+                            "required": ["kind", "language", "lines"],
+                            "type": "object"
+                          },
+                          {
+                            "additionalProperties": false,
+                            "properties": {
+                              "kind": {
+                                "enum": ["diagram"],
+                                "type": "string"
+                              },
+                              "source": {
+                                "maxLength": 10000,
+                                "minLength": 1,
+                                "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                "type": "string"
+                              },
+                              "svg": {
+                                "maxLength": 500000,
+                                "pattern": "^<svg[\\s>][\\s\\S]*<\\/svg>\\s*$",
+                                "type": "string"
+                              },
+                              "title": {
+                                "maxLength": 200,
+                                "minLength": 1,
+                                "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+                                "type": "string"
+                              }
+                            },
+                            "required": ["kind", "source", "svg", "title"],
+                            "type": "object"
+                          }
+                        ]
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    },
                     "frontmatter": {
                       "additionalProperties": false,
                       "properties": {
@@ -3049,6 +4790,7 @@
                     }
                   },
                   "required": [
+                    "body",
                     "frontmatter",
                     "markdown",
                     "path",
