@@ -3,7 +3,7 @@ import { workerCompatibility } from "@taxkit/infrastructure/worker-settings";
 import { AlchemyContext } from "alchemy/AlchemyContext";
 import { provideFreshArtifactStore, scopedArtifacts } from "alchemy/Artifacts";
 import { makeSourceContext, resolveSource } from "alchemy/Cloudflare/Workers";
-import { Effect, FileSystem, Match, Path } from "effect";
+import { Effect, FileSystem, Path } from "effect";
 
 import { nativeApiSourceProps } from "./native-api-source.boundary.js";
 
@@ -194,86 +194,72 @@ const program = Effect.gen(function* () {
         return yield* Effect.void;
       }).pipe(Effect.scoped)
     );
-    // Qualify mismatched API/presentation activations through real native
-    // ContentService replies. Each replacement is scoped and restored before
-    // the ordinary build; no product test mode or request flag is introduced.
-    yield* Effect.forEach(
-      ["Body", "Metadata", "MissingModule"] as const,
-      (mode) =>
-        Effect.gen(function* nativeDocsPresentationFixtureBuild() {
-          const owner = path.join(root, "apps/api/src/worker.ts");
-          const original = yield* Effect.acquireRelease(
-            fs.readFileString(owner),
-            (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
+    // Qualify an API that answers with another page's identity through a real
+    // native ContentService reply. The replacement is scoped and restored
+    // before the ordinary build; no product test mode or request flag is
+    // introduced.
+    yield* Effect.forEach(["Address"] as const, (mode) =>
+      Effect.gen(function* nativeDocsPresentationFixtureBuild() {
+        const owner = path.join(root, "apps/api/src/worker.ts");
+        const original = yield* Effect.acquireRelease(
+          fs.readFileString(owner),
+          (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
+        );
+        const declaration = "  ApiContentLive,";
+        if (!original.includes(declaration)) {
+          return yield* Effect.die(
+            "Native docs presentation fixture no longer matches its source owner"
           );
-          const declaration = "  ApiContentLive,";
-          if (!original.includes(declaration)) {
-            return yield* Effect.die(
-              "Native docs presentation fixture no longer matches its source owner"
-            );
-          }
-          const replacement = Match.value(mode).pipe(
-            Match.when(
-              "Body",
-              () => '({ ...page, markdown: page.markdown + "\\n\\nPRIVATE9" })'
-            ),
-            Match.when(
-              "Metadata",
-              () =>
-                '({ ...page, frontmatter: { ...page.frontmatter, title: "PRIVATE9" } })'
-            ),
-            Match.orElse(
-              () =>
-                'DocsPublicPage.make({ ...page, path: DocsPublicPagePath.make("/private9"), slugs: [DocsPageSlug.make("private9")], source: DocsSourcePath.make("content/private9.mdx") })'
-            )
-          );
-          const injected = original
-            .replace(
-              'import { ApiContentLive } from "./content.boundary.js";',
-              'import { ApiContentLive } from "./content.boundary.js";\nimport { ContentService } from "@taxkit/content/service";\nimport { DocsPublicPage, DocsPublicPagePath, DocsPageSlug, DocsSourcePath } from "@taxkit/content/schemas";'
-            )
-            .replace(
-              declaration,
-              `Layer.effect(ContentService, Effect.gen(function* () {
+        }
+        const replacement =
+          'DocsPublicPage.make({ ...page, path: DocsPublicPagePath.make("/private9"), slugs: [DocsPageSlug.make("private9")], source: DocsSourcePath.make("private9.mdx") })';
+        const injected = original
+          .replace(
+            'import { ApiContentLive } from "./content.boundary.js";',
+            'import { ApiContentLive } from "./content.boundary.js";\nimport { ContentService } from "@taxkit/content/service";\nimport { DocsPublicPage, DocsPublicPagePath, DocsPageSlug, DocsSourcePath } from "@taxkit/content/schemas";'
+          )
+          .replace(
+            declaration,
+            `Layer.effect(ContentService, Effect.gen(function* () {
           const content = yield* ContentService;
           return ContentService.of({ ...content,
             getPage: (path) => content.getPage(path).pipe(Effect.map((page) => ${replacement})),
           });
         })).pipe(Layer.provideMerge(ApiContentLive)),`
-            );
-          yield* fs.writeFileString(owner, injected);
-          const fixtureId = `TaxKitApiDocs${mode}`;
-          yield* fs.remove(path.join(output, "bundles", fixtureId), {
-            force: true,
-            recursive: true,
-          });
-          const props = {
-            ...apiDeclaration,
-            compatibility,
-            main: path.join(root, "apps/api/src/worker.ts"),
-          };
-          const artifacts = scopedArtifacts(fixtureId);
-          const source = yield* resolveSource(props).pipe(
-            Effect.provide(artifacts)
           );
-          yield* source
-            .build(
-              makeSourceContext({
-                compatibility,
-                dotAlchemy: output,
-                fqn: fixtureId,
-                id: fixtureId,
-                props,
-                stack: {
-                  name: "TaxKitAppsLocalProof",
-                  stage: "dev_native_pair",
-                },
-                workerName: `taxkit-api-local-docs-${mode.toLowerCase()}`,
-              })
-            )
-            .pipe(Effect.provide(artifacts));
-          return yield* Effect.void;
-        }).pipe(Effect.scoped)
+        yield* fs.writeFileString(owner, injected);
+        const fixtureId = `TaxKitApiDocs${mode}`;
+        yield* fs.remove(path.join(output, "bundles", fixtureId), {
+          force: true,
+          recursive: true,
+        });
+        const props = {
+          ...apiDeclaration,
+          compatibility,
+          main: path.join(root, "apps/api/src/worker.ts"),
+        };
+        const artifacts = scopedArtifacts(fixtureId);
+        const source = yield* resolveSource(props).pipe(
+          Effect.provide(artifacts)
+        );
+        yield* source
+          .build(
+            makeSourceContext({
+              compatibility,
+              dotAlchemy: output,
+              fqn: fixtureId,
+              id: fixtureId,
+              props,
+              stack: {
+                name: "TaxKitAppsLocalProof",
+                stage: "dev_native_pair",
+              },
+              workerName: `taxkit-api-local-docs-${mode.toLowerCase()}`,
+            })
+          )
+          .pipe(Effect.provide(artifacts));
+        return yield* Effect.void;
+      }).pipe(Effect.scoped)
     );
     const apiProps = {
       ...apiDeclaration,

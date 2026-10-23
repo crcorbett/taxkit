@@ -1,8 +1,10 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
-import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
+import { Array, Effect, Path, Queue, Record, Schema } from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
+
+import { readWorkerModules } from "./native-modules.fixture";
 
 const origin = "http://127.0.0.1:4198";
 const Json = Schema.fromJsonString(Schema.Unknown);
@@ -11,26 +13,13 @@ it.live(
   "contains a real internal settings defect before native framework error egress",
   () =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const root = path.resolve("../..");
       const modulesRoot = path.join(
         root,
         ".alchemy/native-pair/settings-defect/server"
       );
-      const files = yield* fs.glob("**/*.js", { root: modulesRoot });
-      const modules = Record.fromEntries(
-        yield* Effect.forEach(files, (file) =>
-          fs
-            .readFileString(path.join(modulesRoot, file))
-            .pipe(
-              Effect.map(
-                (contents) =>
-                  [file, { contents, type: "esm" as const }] as const
-              )
-            )
-        )
-      );
+      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
       expect(files).toContain("server.js");
       // The actual source-built application must contain the injected operation.
       // An ordinary artifact or an empty fake cannot satisfy this fault oracle.
@@ -83,7 +72,11 @@ it.live(
                         value: origin,
                       },
                     },
-                    manifest: { mainModule: "server.js", modules, modulesRoot },
+                    manifest: {
+                      mainModule: "server.js",
+                      modules: { ...modules, ...wasm },
+                      modulesRoot,
+                    },
                     name: "taxkit-website-settings-defect",
                   },
                 },

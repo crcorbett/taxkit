@@ -12,24 +12,14 @@ import {
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
-import {
-  Clock,
-  Effect,
-  FileSystem,
-  Layer,
-  Path,
-  Queue,
-  Record,
-  Ref,
-  Schema,
-  Stream,
-} from "effect";
+import { Clock, Effect, Layer, Path, Queue, Ref, Schema, Stream } from "effect";
 import { McpSchema } from "effect/ai";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 import { Miniflare, Response } from "miniflare";
 import type { Request, WorkerdStructuredLog } from "miniflare";
 
+import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const origin = "http://127.0.0.1:4219";
@@ -43,25 +33,12 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
   "the built native API returns tax results independently of %s analytics",
   (mode) =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
       expect(files).toContain("worker.js");
-      const modules = Record.fromEntries(
-        yield* Effect.forEach(files, (file) =>
-          fs
-            .readFileString(path.join(modulesRoot, file))
-            .pipe(
-              Effect.map(
-                (contents) =>
-                  [file, { contents, type: "esm" as const }] as const
-              )
-            )
-        )
-      );
       const outgoing = yield* Queue.make<Request>();
       const replies =
         yield* Queue.make<ReadableStreamDefaultController<Uint8Array>>();
@@ -114,7 +91,11 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
                       WORKER_URL: { type: "json", value: origin },
                     },
 
-                    manifest: { mainModule: "worker.js", modules, modulesRoot },
+                    manifest: {
+                      mainModule: "worker.js",
+                      modules: { ...modules, ...wasm },
+                      modulesRoot,
+                    },
                     name: "api-analytics",
                   },
                   dev: {

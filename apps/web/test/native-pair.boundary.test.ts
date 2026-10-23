@@ -46,6 +46,7 @@ import {
   WebsiteDocsArticleJson,
   WebsiteDocsImageSize,
 } from "../src/lib/docs/social.schemas";
+import { readWorkerModules } from "./native-modules.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -150,32 +151,13 @@ describe("built native API and Website", () => {
           ".alchemy/native-pair/bundles/TaxKitApi"
         );
         const websiteRoot = path.join(root, "apps/web/dist/server");
-        const apiFiles = yield* fs.glob("**/*.js", { root: apiRoot });
-        const websiteFiles = yield* fs.glob("**/*.js", { root: websiteRoot });
-        const apiModules = Record.fromEntries(
-          yield* Effect.forEach(apiFiles, (file) =>
-            fs
-              .readFileString(path.join(apiRoot, file))
-              .pipe(
-                Effect.map(
-                  (contents) =>
-                    [file, { contents, type: "esm" as const }] as const
-                )
-              )
-          )
-        );
-        const websiteModules = Record.fromEntries(
-          yield* Effect.forEach(websiteFiles, (file) =>
-            fs
-              .readFileString(path.join(websiteRoot, file))
-              .pipe(
-                Effect.map(
-                  (contents) =>
-                    [file, { contents, type: "esm" as const }] as const
-                )
-              )
-          )
-        );
+        const {
+          files: apiFiles,
+          modules: apiModules,
+          wasm: apiWasm,
+        } = yield* readWorkerModules(apiRoot);
+        const { files: websiteFiles, modules: websiteModules } =
+          yield* readWorkerModules(websiteRoot);
         expect(apiFiles).toContain("worker.js");
         expect(websiteFiles).toContain("server.js");
         const clientFiles = yield* fs.glob("**/*.js", {
@@ -257,7 +239,7 @@ describe("built native API and Website", () => {
 
             manifest: {
               mainModule: "worker.js",
-              modules: apiModules,
+              modules: { ...apiModules, ...apiWasm },
               modulesRoot: apiRoot,
             },
             name,
@@ -336,27 +318,16 @@ describe("built native API and Website", () => {
           },
         });
         const docsFixtureWorkers = yield* Effect.forEach(
-          ["Body", "Metadata", "MissingModule"] as const,
+          ["Address"] as const,
           (mode) =>
             Effect.gen(function* () {
               const modulesRoot = path.join(
                 root,
                 `.alchemy/native-pair/bundles/TaxKitApiDocs${mode}`
               );
-              const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+              const { files, modules, wasm } =
+                yield* readWorkerModules(modulesRoot);
               expect(files).toContain("worker.js");
-              const modules = Record.fromEntries(
-                yield* Effect.forEach(files, (file) =>
-                  fs
-                    .readFileString(path.join(modulesRoot, file))
-                    .pipe(
-                      Effect.map(
-                        (contents) =>
-                          [file, { contents, type: "esm" as const }] as const
-                      )
-                    )
-                )
-              );
               expect(
                 Array.some(
                   Record.values(modules),
@@ -375,7 +346,7 @@ describe("built native API and Website", () => {
                       ...ordinary.config,
                       manifest: {
                         mainModule: "worker.js",
-                        modules,
+                        modules: { ...modules, ...wasm },
                         modulesRoot,
                       },
                     },
@@ -2042,9 +2013,9 @@ describe("built native API and Website", () => {
               worker.fetch(`${websiteOrigin}/start/quickstart`)
             );
             const html = yield* Effect.promise(() => response.text());
-            // The server checks the API page against its compiled
-            // presentation before rendering and fails closed through
-            // TanStack's native route error egress.
+            // The server checks that the API page is the requested address
+            // before rendering and fails closed through TanStack's native
+            // route error egress.
             expect(response.status, mode).toBe(500);
             expect(response.headers.get("cache-control")).toBe("no-store");
             expect(html).toContain("Documentation could not load");
@@ -2203,11 +2174,20 @@ describe("built native API and Website", () => {
             )
           )
         ).toBe(true);
+        // The server-drawn diagram arrives as an image named by its title and
+        // decodes in the browser without any diagram script.
         expect(
           yield* Effect.promise(() =>
-            docsPage.locator(".docs-article svg").count()
+            docsPage
+              .getByRole("img", {
+                name: "Which contribution guide matches your change",
+              })
+              .evaluate(
+                (image: HTMLImageElement) =>
+                  image.complete && image.naturalWidth > 0
+              )
           )
-        ).toBeGreaterThan(0);
+        ).toBe(true);
         expect(
           yield* Effect.promise(() =>
             docsPage

@@ -26,7 +26,6 @@ import {
   Duration,
   Effect,
   Fiber,
-  FileSystem,
   Match,
   Option,
   Path,
@@ -46,6 +45,7 @@ import {
   NativeMcpResumeProgress,
   nativeMcpResumeFixture,
 } from "./native-mcp.fixture";
+import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 class NativeMcpClientFailed extends Schema.TaggedError<NativeMcpClientFailed>()(
@@ -79,25 +79,12 @@ it.live(
   "serves real MCP client calls through the built native API and shares its HTTP allowance",
   () =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
       expect(files).toContain("worker.js");
-      const modules = Record.fromEntries(
-        yield* Effect.forEach(files, (file) =>
-          fs
-            .readFileString(path.join(modulesRoot, file))
-            .pipe(
-              Effect.map(
-                (contents) =>
-                  [file, { contents, type: "esm" as const }] as const
-              )
-            )
-        )
-      );
       expect(
         Array.some(Record.values(modules), (module) =>
           /[\w$]+\.runInAsyncScope\(this\.evaluate,this,/u.test(module.contents)
@@ -149,7 +136,7 @@ it.live(
                     },
                     manifest: {
                       mainModule: "mcp-resume-probe.js",
-                      modules: nativeMcpResumeFixture(modules),
+                      modules: { ...nativeMcpResumeFixture(modules), ...wasm },
                       modulesRoot,
                     },
                     name: "api-mcp",
@@ -509,7 +496,6 @@ it.live(
   "bounds modern remote disconnect work and recovers every calculation place",
   () =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const root = path.resolve("../..");
       const logs = yield* Queue.make<WorkerdStructuredLog>();
@@ -538,20 +524,9 @@ it.live(
               ".alchemy/native-pair/bundles",
               fixture.artifact
             );
-            const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+            const { files, modules, wasm } =
+              yield* readWorkerModules(modulesRoot);
             expect(files).toContain("worker.js");
-            const modules = Record.fromEntries(
-              yield* Effect.forEach(files, (file) =>
-                fs
-                  .readFileString(path.join(modulesRoot, file))
-                  .pipe(
-                    Effect.map(
-                      (contents) =>
-                        [file, { contents, type: "esm" as const }] as const
-                    )
-                  )
-              )
-            );
             {
               expect(
                 Record.get(modules, "worker.js").pipe(
@@ -589,7 +564,11 @@ it.live(
                     value: "http://127.0.0.1:4238",
                   },
                 },
-                manifest: { mainModule: "worker.js", modules, modulesRoot },
+                manifest: {
+                  mainModule: "worker.js",
+                  modules: { ...modules, ...wasm },
+                  modulesRoot,
+                },
                 name: fixture.name,
               },
               dev: { unsafeDirectSockets: [{ host: "127.0.0.1", port: 0 }] },
@@ -784,25 +763,12 @@ it.live(
   "uses the official modern MCP client from Chromium with native origin and CORS admission",
   () =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
       expect(files).toContain("worker.js");
-      const modules = Record.fromEntries(
-        yield* Effect.forEach(files, (file) =>
-          fs
-            .readFileString(path.join(modulesRoot, file))
-            .pipe(
-              Effect.map(
-                (contents) =>
-                  [file, { contents, type: "esm" as const }] as const
-              )
-            )
-        )
-      );
       const websiteOrigin = "http://127.0.0.1:4354";
       const foreignOrigin = "http://127.0.0.1:4355";
       const exceptions = yield* Queue.make<string>();
@@ -840,7 +806,11 @@ it.live(
                         value: "http://127.0.0.1:4353",
                       },
                     },
-                    manifest: { mainModule: "worker.js", modules, modulesRoot },
+                    manifest: {
+                      mainModule: "worker.js",
+                      modules: { ...modules, ...wasm },
+                      modulesRoot,
+                    },
                     name: "browser-mcp-api",
                   },
                 },
