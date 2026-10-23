@@ -29,7 +29,7 @@ npm install taxkit
 
 Use `taxkit/au` for Australian calculations and `taxkit/core` for checked money
 values. See the [SDK guide](./packages/sdk/typescript/README.md) for all eight
-entry points. The earlier `@taxkit/sdk@2.1.0` release remains available.
+entry points.
 
 ## What exists today
 

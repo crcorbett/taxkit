@@ -1,5 +1,13 @@
 # taxkit
 
+## 2.1.3
+
+### Patch Changes
+
+- Remove obsolete package-name instructions from the README. Install `taxkit`
+  and use its eight public entry points. Calculation code and dependencies are
+  unchanged.
+
 ## 2.1.2
 
 ### Patch Changes

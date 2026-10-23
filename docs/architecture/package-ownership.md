@@ -111,9 +111,7 @@ request-preserving calculator helpers such as `calculateRunRequest`,
 calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
 
 The private repository root is named `@taxkit/workspace` to keep its workspace
-identity distinct from the installable SDK. The existing `@taxkit/sdk@2.1.0`
-release remains available under its original npm name; current development and
-future public versions belong to `taxkit`.
+identity distinct from `taxkit`, the sole public npm package.
 
 `apps/web`
 : TanStack Start Website. It owns form presentation/commands, the server
