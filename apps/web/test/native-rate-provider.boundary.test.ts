@@ -3,33 +3,22 @@ import { expect, it } from "@effect/vitest";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
-import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
+import { Array, Effect, Path, Queue, Schema } from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
+
+import { readWorkerModules } from "./native-modules.fixture";
 
 it.live.each(["missing", "invalid", "throwing"] as const)(
   "contains a %s native limiter binding without exposing provider data",
   (mode) =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
       expect(files).toContain("worker.js");
-      const modules = Record.fromEntries(
-        yield* Effect.forEach(files, (file) =>
-          fs
-            .readFileString(path.join(modulesRoot, file))
-            .pipe(
-              Effect.map(
-                (contents) =>
-                  [file, { contents, type: "esm" as const }] as const
-              )
-            )
-        )
-      );
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
       const origins = {
@@ -84,7 +73,11 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
                       ...env,
                     },
 
-                    manifest: { mainModule: "worker.js", modules, modulesRoot },
+                    manifest: {
+                      mainModule: "worker.js",
+                      modules: { ...modules, ...wasm },
+                      modulesRoot,
+                    },
                     name: "api-provider-proof",
                   },
                 },

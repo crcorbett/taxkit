@@ -12,23 +12,34 @@ export const exampleContentCatalogue = Schema.decodeEffect(DocsPublicCatalogue)(
           pages: [],
           path: "/start/overview",
           primaryReader: "New contributor",
-          source: "content/start/overview.mdx",
+          source: "start/overview.mdx",
           title: "Start here",
         },
       ],
     },
     pages: [
       {
+        body: [
+          {
+            content: [
+              {
+                kind: "text",
+                text: "The supported calculator returns checked results.",
+              },
+            ],
+            kind: "paragraph",
+          },
+        ],
         frontmatter: {
           description: "Read the checked public guide.",
           status: "published",
           title: "Start here",
         },
         markdown:
-          "# Start here\n\nThe supported calculator returns checked results.",
+          "# Start here\n\nThe supported calculator returns checked results.\n",
         path: "/start/overview",
         slugs: ["start", "overview"],
-        source: "content/start/overview.mdx",
+        source: "start/overview.mdx",
       },
     ],
     schemaVersion: 1,

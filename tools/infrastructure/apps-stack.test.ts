@@ -1014,8 +1014,8 @@ describe("Website build-input hash", () => {
           "packages/api/http/tsconfig.json",
           "packages/rules/au/pay/src/index.ts",
           "packages/rules/au/pay/package.json",
-          "packages/docs-content/content/start/quickstart.mdx",
-          "packages/docs-content/navigation.json",
+          "content/docs/start/quickstart.mdx",
+          "content/docs/navigation.json",
           "tsconfig.base.json",
           "bun.lock",
         ];
@@ -1082,7 +1082,6 @@ describe("Website build-input hash", () => {
             "packages/content/node_modules/effect/src/index.ts",
             "packages/content/node_modules/effect/package.json",
             "packages/content/dist/schemas.js",
-            "packages/docs-content/.source/index.ts",
             "apps/web/node_modules/dep/index.js",
             "apps/web/dist/server/index.js",
             "apps/api/src/worker.ts",

@@ -90,6 +90,9 @@ describe("public content service", () => {
     () =>
       Effect.gen(function* () {
         const pages = Array.map(Array.range(1, 25), (number) => ({
+          body: [
+            { content: [{ kind: "text", text: "Match." }], kind: "paragraph" },
+          ],
           frontmatter: {
             description: "Accepted guide.",
             status: "published",
@@ -98,7 +101,7 @@ describe("public content service", () => {
           markdown: "match ".repeat(100),
           path: `/page-${number}`,
           slugs: [`page-${number}`],
-          source: `content/page-${number}.mdx`,
+          source: `page-${number}.mdx`,
         }));
         const catalogue = yield* Schema.decodeUnknownEffect(
           DocsPublicCatalogue

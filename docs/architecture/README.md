@@ -17,12 +17,13 @@ Maintainer documentation and public/maintainer separation are routed by
 
 TaxKit is the open-source engine repository. Today it contains a standalone
 Bun API app, the native Cloudflare API and Website (calculators and
-Fumadocs-compiled documentation), the
+documentation), the
 `@taxkit/api-http` package with health, generated docs, metadata and public
 calculation endpoints, the `@taxkit/calculators` service package,
 deterministic core engine primitives, Australian pay, income-tax and STSL rule
-packages, the installable `taxkit` TypeScript SDK, private `@taxkit/docs-content`
-and `@taxkit/docs-fumadocs` packages, shared testing helpers, shared
+packages, the installable `taxkit` TypeScript SDK, the authored `@content/docs`
+pages, private `@taxkit/content`, `@taxkit/mdx` and `@taxkit/diagrams`
+packages, shared testing helpers, shared
 TypeScript config, private Effect-native release orchestration and
 documentation.
 
@@ -42,10 +43,13 @@ Implemented surfaces:
   calculation and expected-error orchestration package.
 - `packages/sdk/typescript`: public `taxkit` package with browser-safe,
   Effect-native, schema, testing and AU entrypoints.
-- `packages/docs-content`: private source-only docs contracts, generated
-  Fumadocs source access, navigation validation and docs content service.
-- `packages/docs-fumadocs`: private reusable Fumadocs configuration, source
-  adapter and render primitive package.
+- `content/docs`: private source-only `@content/docs` package with the authored
+  MDX pages, navigation, repository link revisions and the raw page list.
+- `packages/content`: private docs page Schemas, checked reading body, link
+  resolution, catalogue and content service.
+- `packages/mdx`: private MDX page reader and code highlighter for Content.
+- `packages/diagrams`: private server-side Mermaid to SVG renderer for
+  Content.
 - `packages/core`: deterministic primitives, fact/rule/parameter descriptors,
   graph validation, trace and ledger contracts and calculation engine service.
 - `packages/rules/au/pay`: Australian take-home pay and PAYG withholding rule

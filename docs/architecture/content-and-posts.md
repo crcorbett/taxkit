@@ -21,72 +21,70 @@ on the open-source tax engine and avoid downstream private-product specifics.
 
 `apps/web`
 : Public documentation site. It owns the TanStack Start route runtime, app
-  shell, app-specific MDX component composition and browser rendering.
+  shell and browser rendering of each page's checked reading body.
 
-`packages/docs-content/content`
-: Public MDX content root. It owns the Start, SDK, API, Guides, Concepts,
-  Contributing and Reference section directories.
+`content/docs`
+: Source-only `@content/docs` package and public MDX content root. It owns the
+  Start, SDK, API, Guides, Concepts, Contributing and Reference section
+  directories, `repository.json` (the GitHub revisions that repository-file
+  links use) and `sources.ts` (every page as a `?raw` import). See
+  [its README](../../content/docs/README.md).
 
-`packages/docs-content/navigation.json`
+`content/docs/navigation.json`
 : Public docs navigation contract. It owns top-level section order, section
   source files, stable paths and primary reader metadata. It is authored,
   decoded and enforced beside the package-owned content and examples.
 
 `packages/content`
 : Private compiled owner of canonical docs page, frontmatter, navigation and
-  source error contracts. Its public catalogue Schema admits published pages
-  with matching navigation; its service reads that checked catalogue and limits
-  search to twenty short results. It does not read authored sources or decide
-  which pages are published.
+  source error contracts, including the checked reading `body`: headings with
+  ids, paragraphs, lists, tables, highlighted code as coloured token lines and
+  diagrams with Mermaid source, title and SVG. Its public catalogue Schema
+  admits published pages with matching navigation. `ContentCatalogueLive` builds
+  that catalogue once from `DocsSources` through `DocsPageReader`; its service
+  reads the checked catalogue and limits search to twenty short results.
+  `src/links.ts` turns a relative `.mdx` link into the page's public address and
+  any other relative link into a GitHub link at the revision in
+  `repository.json`. `src/reading-markdown.egress.ts` writes the processed
+  Markdown. Content declares the consumed `DocsPageReader`,
+  `DocsCodeHighlighter` and `DocsDiagramRenderer` contracts and never imports
+  their implementations. See [its README](../../packages/content/README.md).
 
-`packages/docs-content`
-: Private source-only package for authored navigation, meta, MDX, validation
-  policy, validation errors and generated Fumadocs source access. Its existing
-  page/navigation/source-error exports re-export `@taxkit/content` contracts;
-  its source service exposes only build-time `listPages` and `getNavigation`.
-  The local validation CLI imports its policy directly. The unused generated-source,
-  server and executable validation package subpaths are retired; private compiler
-  type references remain internal. Its independent native MDX index and build-only
-  source Layer retain the installed compiler, checked ingress and deterministic
-  source substitution.
-  Its compiler-only link policy maps parsed page links through checked navigation
-  and repository references to a recorded immutable revision before both HTML
-  and processed Markdown are produced. It rejects unowned page destinations
-  and paths outside the checkout, preserving code examples and source bytes.
-  Current checked-example links select a separately accepted immutable snapshot;
-  historical citations keep their recorded revision. Local validation compares
-  linked example files byte-for-byte with Git objects at that snapshot. Catalogue
-  publication additionally checks emitted complete guide fences and example URLs
-  before JSON is written. Those Git objects must be available in the checkout;
-  this validation performs no network fetch.
+`packages/mdx`
+: Private `@taxkit/mdx`. `./live` implements `DocsPageReader` with micromark MDX
+  and GFM tables and a Schema-checked syntax tree; JSX, images, raw HTML and
+  quotes fail the page. `./highlights` implements `DocsCodeHighlighter` and is
+  the only `@pierre/highlights` caller. See
+  [its README](../../packages/mdx/README.md).
+
+`packages/diagrams`
+: Private `@taxkit/diagrams`. `./mermaid` implements `DocsDiagramRenderer` and is
+  the only `beautiful-mermaid` caller. It renders SVG on the server, with no
+  browser or Chromium. See [its README](../../packages/diagrams/README.md).
 
 `packages/docs-examples`
 : Private checked integration templates and their compiler/runtime proof. It
   depends on HTTP/SDK/calculator contracts independently of the content package,
   preventing a cycle when the backend consumes content contracts. Public MDX
-  references these retained templates; content validation checks those links.
+  references these retained templates; `test/published-snippets.test.ts`
+  checks that copied guide snippets equal their checked example files and that
+  the examples at the `repository.json` checked-example revision equal the
+  current files, through `git show`.
 
-`packages/docs-fumadocs`
-: Private reusable package for generic Fumadocs configuration, Effect Schema to
-  Standard Schema bridging, the generic source service and live/test Layers,
-  and generic MDX render primitives.
-
-`packages/docs-content/src/catalogue.runtime.ts`
-: Local public-catalogue build step, run by
-`bun run --filter=@taxkit/docs-content build`. Page frontmatter and
-`navigation.json` decide publication: `catalogue.policy.ts` keeps pages whose
-`status` is `published`, requires published navigation, rejects a published
-child under a draft section page, and builds the one catalogue through the
-canonical constructor. No published pages is a failure. It writes ignored
-`.source/public-catalogue.json` only on success. The compiler's browser path is
-a build environment input. Its JSON-only `./public-catalogue` export is
-checked once by each API host; it imports no compiler into request handling.
+`apps/api/src/content.boundary.ts`
+: Composes the public catalogue. It bundles `@content/docs/sources` and
+supplies the `@taxkit/mdx` reader and highlighter and the `@taxkit/diagrams`
+renderer to `ContentCatalogueLive`. Page frontmatter and `navigation.json`
+decide publication: Content keeps pages whose `status` is `published`, requires
+published navigation and rejects a published child under a draft section page.
+Any unreadable page fails the Layer. The catalogue is built once per Worker
+isolate on its first request.
 The HTTP documentation group delegates page/navigation/search and processed
 Markdown to the `ContentService`. Its compiled public-path refinement and fixed
 missing-page/search errors serve HTTP and MCP. The
 Website reads pages, navigation, search and Markdown from the API's public HTTP
-content routes with the generated client and renders browser-safe compiled
-presentation. Its `/search` GET form shows published titles and descriptions
+content routes with the generated client and renders each page's checked
+`body` with `apps/web/src/lib/docs/reading-body.view.tsx`. Its `/search` GET form shows published titles and descriptions
 with the existing document links. No second index is added.
 `@taxkit/publication` owns `ContentDiscovery`, which derives four discovery files from the same public
 catalogue, the API origin and the publication origin `https://taxkit.dev`. The
@@ -117,24 +115,25 @@ browser or Website SSR
   -> apps/web route loader
     -> generated HttpApiClient (public origin or private binding)
       -> API content routes -> ContentService
-        -> public JSON catalogue
-    -> browser-safe compiled MDX presentation
-    -> @taxkit/docs-fumadocs/render primitives
-    -> app-local MDX component map
+        -> ContentCatalogue (built once per isolate from @content/docs)
+    -> DocsHeading and reading-body.view.tsx over page.body
 ```
 
 ```ts
 Tests: docs structure
 
 docs implementation
-  -> @taxkit/docs-content validate
-    -> frontmatter and navigation schema decode
-    -> navigation coverage and local link checks
-    -> MDX component allowlist
-    -> examples and OpenAPI reference checks
+  -> apps/api/test/docs-sources.test.ts
+    -> source list matches the files in content/docs
+    -> wording rules and required reference text
+    -> every page builds with real highlighting and diagrams
+    -> every repository link names a real file
+  -> packages/docs-examples/test/published-snippets.test.ts
+    -> copied guide snippets equal their checked example files
+    -> examples at the checked-example revision equal the current files
   -> bun run check:docs
     -> relative links and documented commands in docs/, AGENTS.md and READMEs
-  -> @taxkit/docs-fumadocs tests
+  -> @taxkit/content, @taxkit/mdx and @taxkit/diagrams unit tests
   -> apps/web native build and real browser/Worker checks when rendering changes
   -> bun run verification
 ```
@@ -149,24 +148,20 @@ docs implementation
   related standards suite before writing or reviewing public docs.
 - Keep public MDX pages task-first. Use architecture docs for durable
   ownership and runtime detail.
-- Validate public MDX through `@taxkit/docs-content`, which owns Effect Schema
-  frontmatter, navigation coverage, source-text policy, local link, MDX
-  component allowlist, examples and OpenAPI reference checks. The compiler and
-  standalone validator classify code, inline code and MDX JSX through the same
-  installed MDX parser AST, including its ESTree Programs for JavaScript
-  expressions, ESM and JSX attribute payloads. The native ESTree visitor and
-  per-traversal VFile diagnostics preserve literal strings and template text;
-  fence delimiters are not a second handwritten grammar. JSX member bindings
-  follow the component allowlist even when their namespace begins lowercase;
-  plain lowercase intrinsic HTML tags remain permitted.
-- `draft` means authored, locally renderable, visibly labelled candidate public
-  documentation; it is not publication, deployment, external availability,
+- Check public MDX through `@taxkit/content` and `@taxkit/mdx`, which decode
+  frontmatter, navigation and the supported Markdown when the catalogue is
+  built, and through `apps/api/test/docs-sources.test.ts`, which checks the
+  source list, wording rules, required reference text and repository links.
+  JSX, images, raw HTML and quotes fail the page.
+- `draft` means authored candidate public documentation that Content leaves
+  out of the catalogue; it is not publication, deployment, external availability,
   correctness, or user visibility. `published` puts the page in the public
   catalogue; it still does not establish runtime or external availability.
   Change a page from `draft` to `published` in its frontmatter in an ordinary
   pull request.
-- Keep reusable Fumadocs code in `@taxkit/docs-fumadocs`; keep TaxKit
-  content contracts in `@taxkit/docs-content`; keep route composition and
+- Keep authored pages in `@content/docs`; keep TaxKit content contracts in
+  `@taxkit/content`; keep MDX reading and highlighting in `@taxkit/mdx` and
+  diagram rendering in `@taxkit/diagrams`; keep route composition and
   app-specific rendering in `apps/web`.
 
 ## Related docs
@@ -175,21 +170,14 @@ docs implementation
 - [Package ownership](./package-ownership.md)
 - [Product specs](../product-specs/index.md)
 
-## Generated collection boundary
+## Published page share assets
 
-Generated collection adapters expose named Effect operations with safe tagged
-failures. The collection owner wraps synchronous loader calls and processed-text
-Promise reads, preserving the SDK receiver. The reusable Fumadocs live Layer
-decodes raw representations through its owning Schemas. Shiki metadata
-transformation returns replacement nodes instead of mutating SDK-owned input.
-
-### Published page share assets
-
-The Website Vite build derives PNG share assets from the existing public
-catalogue through `apps/web/scripts/docs-images.build.ts`. The same page address
+The Website Vite build derives PNG share assets through
+`apps/web/scripts/docs-images.build.ts`, which builds the same catalogue from
+the files in `content/docs` via `readDocsCatalogue`. The same page address
 mapping supplies HTML metadata; there is no separate page list or dynamic image
 API. The exact current Takumi 2.14.0 WebAssembly renderer and embedded font are
 build-only dependencies. Generator, dimensions/byte Schema, metadata egress and
 Website config are tracked inputs; generated `apps/web/public/og/**` is ignored
-and declared as a Turbo build output. Static generation reads only the built
+and declared as a Turbo build output. Static generation reads only that checked
 catalogue and accepts no calculation values.

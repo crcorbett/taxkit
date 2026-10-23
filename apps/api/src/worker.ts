@@ -65,6 +65,15 @@ export const ApiWorkerNativeInit = Effect.gen(function* () {
         })
       )
     )
+  ),
+  Effect.catchTag("DocsSourceError", () =>
+    Effect.fail(
+      new Config.ConfigError(
+        new ConfigProvider.SourceError({
+          message: "The public documentation catalogue could not be loaded.",
+        })
+      )
+    )
   )
 );
 

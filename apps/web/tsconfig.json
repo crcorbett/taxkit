@@ -22,7 +22,6 @@
     "paths": {
       "#/*": ["./src/*"]
     },
-    "types": ["vite/client", "node"],
-    "customConditions": ["bun", "source"]
+    "types": ["vite/client", "node"]
   }
 }

@@ -24,6 +24,11 @@
       "types": "./dist/service.d.ts",
       "default": "./dist/service.js"
     },
+    "./links": {
+      "source": "./src/links.ts",
+      "types": "./dist/links.d.ts",
+      "default": "./dist/links.js"
+    },
     "./live": {
       "source": "./src/live.layer.ts",
       "types": "./dist/live.layer.d.ts",
@@ -69,6 +74,10 @@
         "types": "./dist/service.d.ts",
         "default": "./dist/service.js"
       },
+      "./links": {
+        "types": "./dist/links.d.ts",
+        "default": "./dist/links.js"
+      },
       "./live": {
         "types": "./dist/live.layer.d.ts",
         "default": "./dist/live.layer.js"
@@ -87,6 +96,7 @@
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
+    "@content/docs": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

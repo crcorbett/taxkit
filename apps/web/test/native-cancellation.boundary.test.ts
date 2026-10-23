@@ -8,7 +8,6 @@ import {
   Clock,
   Effect,
   Fiber,
-  FileSystem,
   Path,
   Queue,
   Record,
@@ -23,6 +22,7 @@ import { chromium } from "playwright";
 import { boundedResponses } from "../src/lib/api/bounded-response";
 import { WebsiteApiDeadlineExceeded } from "../src/lib/api/errors";
 import { calculate } from "../src/lib/api/requests";
+import { readWorkerModules } from "./native-modules.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -42,7 +42,6 @@ it.live(
   "keeps native headers/body deadlines and cancels browser reads on editing and departure",
   () =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const root = path.resolve("../..");
       const logs = yield* Queue.make<WorkerdStructuredLog>();
@@ -73,20 +72,9 @@ it.live(
         (artifact) =>
           Effect.gen(function* () {
             const modulesRoot = path.join(root, artifact.output);
-            const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+            const { files, modules, wasm } =
+              yield* readWorkerModules(modulesRoot);
             expect(files).toContain(artifact.entry);
-            const modules = Record.fromEntries(
-              yield* Effect.forEach(files, (file) =>
-                fs
-                  .readFileString(path.join(modulesRoot, file))
-                  .pipe(
-                    Effect.map(
-                      (contents) =>
-                        [file, { contents, type: "esm" as const }] as const
-                    )
-                  )
-              )
-            );
             if (
               artifact.name === "api-body" ||
               artifact.name === "api-headers"
@@ -139,7 +127,11 @@ it.live(
                       }
                     : origins,
 
-                manifest: { mainModule: artifact.entry, modules, modulesRoot },
+                manifest: {
+                  mainModule: artifact.entry,
+                  modules: { ...modules, ...wasm },
+                  modulesRoot,
+                },
                 name: artifact.name,
               },
             };

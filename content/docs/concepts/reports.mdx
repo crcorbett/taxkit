@@ -1,0 +1,57 @@
+---
+title: "Reports"
+description: "Understand calculator output, ledgers and report-specific fields."
+status: "published"
+---
+
+# Reports
+
+A report is the calculator-specific output returned by the SDK or HTTP API.
+Reports are schema-backed values, not untyped result bags.
+
+## When this matters
+
+Read the report when your application needs final amounts, ledger components
+or trace-linked explanation. Keep assertions focused on fields your
+application uses.
+
+## How it works
+
+```ts
+import { Cents, aud } from "taxkit/core";
+import { au } from "taxkit/au";
+
+const report = await au.incomeTax.annual({
+  taxableIncome: aud(Cents.make(9_000_000)),
+});
+
+console.log(report._tag);
+console.log(report.liability.cents);
+console.log(report.ledger.components.length);
+```
+
+Expected output includes:
+
+```txt
+AnnualTaxReport
+1958800
+3
+```
+
+This is the unchanged $90,000 example for 2025–26. The
+[annual calculation guide](../guides/calculate-annual-income-tax.mdx) explains
+the corrected Medicare thresholds in rules-au-income-tax/1.0.1 and the supported
+case. This example does not cover every tax-return circumstance or establish
+that a deployed installation uses that edition.
+
+## Ledgers
+
+Ledgers break a calculation into components such as income tax, offsets and
+Medicare levy. Components preserve trace information so a reviewer can inspect
+how a total was assembled.
+
+## Related concepts
+
+- [Diagnostics](./diagnostics.mdx)
+- [Graph, trace and ledgers architecture](../../../docs/architecture/graph-trace-ledgers.md)
+- [Calculate annual income tax](../guides/calculate-annual-income-tax.mdx)

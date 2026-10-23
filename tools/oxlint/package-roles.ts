@@ -22,8 +22,6 @@ const frontendModules = [
   "@taxkit/core/primitives",
   "@taxkit/core/ledger",
   "@taxkit/core/trace",
-  "@taxkit/docs-content/client",
-  "@taxkit/docs-fumadocs/render",
   "@taxkit/observability/edge-identity",
   "@taxkit/rules-au-income-tax/schemas",
   "@taxkit/rules-au-pay/schemas",

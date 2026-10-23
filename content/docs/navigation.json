@@ -1,0 +1,455 @@
+{
+  "$schema": "./navigation.schema.json",
+  "status": "published",
+  "contentRoot": "content/docs",
+  "primaryNavigation": [
+    {
+      "title": "Start",
+      "path": "/start",
+      "source": "start/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "SDK evaluator",
+      "pages": [
+        {
+          "title": "Overview",
+          "path": "/start/overview",
+          "source": "start/overview.mdx",
+          "pageType": "section index",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Quickstart",
+          "path": "/start/quickstart",
+          "source": "start/quickstart.mdx",
+          "pageType": "quickstart",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Install the SDK",
+          "path": "/start/install-the-sdk",
+          "source": "start/install-the-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Run your first calculation",
+          "path": "/start/run-your-first-calculation",
+          "source": "start/run-your-first-calculation.mdx",
+          "pageType": "guide",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Choose SDK or HTTP API",
+          "path": "/start/choose-sdk-or-api",
+          "source": "start/choose-sdk-or-api.mdx",
+          "pageType": "decision page",
+          "primaryReader": "Application integrator"
+        }
+      ]
+    },
+    {
+      "title": "SDK",
+      "path": "/sdk",
+      "source": "sdk/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "SDK evaluator",
+      "pages": [
+        {
+          "title": "TypeScript SDK",
+          "path": "/sdk/typescript-sdk",
+          "source": "sdk/typescript-sdk.mdx",
+          "pageType": "concept",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Plain SDK",
+          "path": "/sdk/plain-sdk",
+          "source": "sdk/plain-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Safe SDK",
+          "path": "/sdk/safe-sdk",
+          "source": "sdk/safe-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Effect SDK",
+          "path": "/sdk/effect-sdk",
+          "source": "sdk/effect-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Schemas",
+          "path": "/sdk/schemas",
+          "source": "sdk/schemas.mdx",
+          "pageType": "reference",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Type safety",
+          "path": "/sdk/type-safety",
+          "source": "sdk/type-safety.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        }
+      ]
+    },
+    {
+      "title": "API",
+      "path": "/api",
+      "source": "api/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "API consumer",
+      "pages": [
+        {
+          "title": "API overview",
+          "path": "/api/overview",
+          "source": "api/overview.mdx",
+          "pageType": "api reference overview",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Authentication and deployment assumptions",
+          "path": "/api/authentication-and-deployment-assumptions",
+          "source": "api/authentication-and-deployment-assumptions.mdx",
+          "pageType": "reference",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "API errors",
+          "path": "/api/errors",
+          "source": "api/errors.mdx",
+          "pageType": "troubleshooting",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "OpenAPI reference",
+          "path": "/api/openapi-reference",
+          "source": "api/openapi-reference.mdx",
+          "pageType": "api reference overview",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Endpoints",
+          "path": "/api/endpoints",
+          "source": "api/endpoints.mdx",
+          "pageType": "reference",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Agent connection guide",
+          "path": "/api/agent-tools",
+          "source": "api/agent-tools.mdx",
+          "pageType": "guide",
+          "primaryReader": "API consumer"
+        }
+      ]
+    },
+    {
+      "title": "Guides",
+      "path": "/guides",
+      "source": "guides/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "Application integrator",
+      "pages": [
+        {
+          "title": "Calculate Australian take-home pay",
+          "path": "/guides/calculate-australian-take-home-pay",
+          "source": "guides/calculate-australian-take-home-pay.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Calculate annual income tax",
+          "path": "/guides/calculate-annual-income-tax",
+          "source": "guides/calculate-annual-income-tax.mdx",
+          "pageType": "guide",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Handle validation errors",
+          "path": "/guides/handle-validation-errors",
+          "source": "guides/handle-validation-errors.mdx",
+          "pageType": "guide",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Show calculator help to users",
+          "path": "/guides/show-calculator-help-to-users",
+          "source": "guides/show-calculator-help-to-users.mdx",
+          "pageType": "guide",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Build a server route with the SDK",
+          "path": "/guides/build-a-server-route-with-the-sdk",
+          "source": "guides/build-a-server-route-with-the-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Build a browser app with the HTTP API",
+          "path": "/guides/build-a-browser-app-with-the-http-api",
+          "source": "guides/build-a-browser-app-with-the-http-api.mdx",
+          "pageType": "guide",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Test your integration",
+          "path": "/guides/test-your-integration",
+          "source": "guides/test-your-integration.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Migrate from raw HTTP to SDK",
+          "path": "/guides/migrate-from-raw-http-to-sdk",
+          "source": "guides/migrate-from-raw-http-to-sdk.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        }
+      ]
+    },
+    {
+      "title": "Concepts",
+      "path": "/concepts",
+      "source": "concepts/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "Type-safety focused developer",
+      "pages": [
+        {
+          "title": "Calculators",
+          "path": "/concepts/calculators",
+          "source": "concepts/calculators.mdx",
+          "pageType": "concept",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Facts",
+          "path": "/concepts/facts",
+          "source": "concepts/facts.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Rules",
+          "path": "/concepts/rules",
+          "source": "concepts/rules.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Jurisdictions and tax years",
+          "path": "/concepts/jurisdictions-and-tax-years",
+          "source": "concepts/jurisdictions-and-tax-years.mdx",
+          "pageType": "concept",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Money and branded values",
+          "path": "/concepts/money-and-branded-values",
+          "source": "concepts/money-and-branded-values.mdx",
+          "pageType": "concept",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Reports",
+          "path": "/concepts/reports",
+          "source": "concepts/reports.mdx",
+          "pageType": "concept",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Diagnostics",
+          "path": "/concepts/diagnostics",
+          "source": "concepts/diagnostics.mdx",
+          "pageType": "concept",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "SDK, HTTP API and calculators service boundary",
+          "path": "/concepts/sdk-http-api-and-calculators-service-boundary",
+          "source": "concepts/sdk-http-api-and-calculators-service-boundary.mdx",
+          "pageType": "concept",
+          "primaryReader": "Application integrator"
+        }
+      ]
+    },
+    {
+      "title": "Contributing",
+      "path": "/contributing",
+      "source": "contributing/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "New contributor",
+      "pages": [
+        {
+          "title": "What are you changing?",
+          "path": "/contributing/what-are-you-changing",
+          "source": "contributing/what-are-you-changing.mdx",
+          "pageType": "decision page",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a fact",
+          "path": "/contributing/add-a-fact",
+          "source": "contributing/add-a-fact.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a rule",
+          "path": "/contributing/add-a-rule",
+          "source": "contributing/add-a-rule.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a calculator",
+          "path": "/contributing/add-a-calculator",
+          "source": "contributing/add-a-calculator.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Add a tax year",
+          "path": "/contributing/add-a-tax-year",
+          "source": "contributing/add-a-tax-year.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Fix an incorrect result",
+          "path": "/contributing/fix-an-incorrect-result",
+          "source": "contributing/fix-an-incorrect-result.mdx",
+          "pageType": "contribution guide",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Testing standards",
+          "path": "/contributing/testing-standards",
+          "source": "contributing/testing-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Source citation standards",
+          "path": "/contributing/source-citation-standards",
+          "source": "contributing/source-citation-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Naming and schema standards",
+          "path": "/contributing/naming-and-schema-standards",
+          "source": "contributing/naming-and-schema-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Effect service standards",
+          "path": "/contributing/effect-service-standards",
+          "source": "contributing/effect-service-standards.mdx",
+          "pageType": "reference",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "Backward compatibility",
+          "path": "/contributing/backward-compatibility",
+          "source": "contributing/backward-compatibility.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Changesets",
+          "path": "/contributing/changesets",
+          "source": "contributing/changesets.mdx",
+          "pageType": "reference",
+          "primaryReader": "New contributor"
+        },
+        {
+          "title": "PR evidence checklist",
+          "path": "/contributing/pr-evidence-checklist",
+          "source": "contributing/pr-evidence-checklist.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        },
+        {
+          "title": "Review expectations",
+          "path": "/contributing/review-expectations",
+          "source": "contributing/review-expectations.mdx",
+          "pageType": "reference",
+          "primaryReader": "Correctness reviewer"
+        }
+      ]
+    },
+    {
+      "title": "Reference",
+      "path": "/reference",
+      "source": "reference/index.mdx",
+      "pageType": "section index",
+      "primaryReader": "Application integrator",
+      "pages": [
+        {
+          "title": "SDK reference",
+          "path": "/reference/sdk",
+          "source": "reference/sdk.mdx",
+          "pageType": "reference",
+          "primaryReader": "SDK evaluator"
+        },
+        {
+          "title": "Schema reference",
+          "path": "/reference/schemas",
+          "source": "reference/schemas.mdx",
+          "pageType": "reference",
+          "primaryReader": "Type-safety focused developer"
+        },
+        {
+          "title": "Error reference",
+          "path": "/reference/errors",
+          "source": "reference/errors.mdx",
+          "pageType": "reference",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "API reference",
+          "path": "/reference/api",
+          "source": "reference/api.mdx",
+          "pageType": "reference",
+          "primaryReader": "API consumer"
+        },
+        {
+          "title": "Examples",
+          "path": "/reference/examples",
+          "source": "reference/examples.mdx",
+          "pageType": "guide",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Changelog",
+          "path": "/reference/changelog",
+          "source": "reference/changelog.mdx",
+          "pageType": "changelog or release note",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Versioning",
+          "path": "/reference/versioning",
+          "source": "reference/versioning.mdx",
+          "pageType": "reference",
+          "primaryReader": "Application integrator"
+        },
+        {
+          "title": "Release notes",
+          "path": "/reference/release-notes",
+          "source": "reference/release-notes.mdx",
+          "pageType": "changelog or release note",
+          "primaryReader": "Application integrator"
+        }
+      ]
+    }
+  ]
+}

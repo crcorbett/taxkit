@@ -21,8 +21,6 @@ const decodingBoundaryFiles = [
   "packages/observability/test/edge-identity.test.ts",
   "tools/infrastructure/release-gates.boundary.test.ts",
   "apps/web/src/lib/root-load.boundary.test.ts",
-  "packages/docs-content/src/validation/checked-example-publication.boundary.ts",
-  "packages/docs-content/src/validation/checked-example-publication.boundary.test.ts",
   // Local package-manifest ingress for the documentation command check.
   "tools/documentation/check.boundary.ts",
   "tools/workspace/dependencies.boundary.test.ts",
@@ -57,13 +55,19 @@ const decodingBoundaryFiles = [
   // Exact build catalogue/renderer bytes and adversarial metadata fixture ingress.
   "apps/web/scripts/docs-images.build.ts",
   "apps/web/src/lib/docs/social.boundary.test.ts",
-  // Exact imported navigation ingress at the synchronous Fumadocs config host.
-  // No synchronous throwing codec, encoder or runtime execution admission.
-  "packages/docs-content/source.config.ts",
   // Exact acceptance JSON, external example JSON and raw HTTP error ingress.
   "packages/docs-examples/src/validate-external-input.ts",
   "packages/docs-examples/src/api-error-envelope.ts",
   "packages/docs-examples/test/integration.example.test.ts",
+  // Authored docs ingress: Content's navigation and link profile JSON, the
+  // MDX parser and its syntax tree, and the highlighter and diagram replies.
+  "packages/content/src/live.layer.ts",
+  "packages/mdx/src/mdx.ingress.ts",
+  "packages/mdx/src/body.ingress.ts",
+  "packages/mdx/src/highlights.adapter.layer.ts",
+  "packages/diagrams/src/mermaid.adapter.layer.ts",
+  "packages/content/test/reading.test.ts",
+  "packages/mdx/test/reader.test.ts",
   // Exact public catalogue wire and adversarial ingress fixtures only.
   "packages/content/src/__testing__/fixtures.ts",
   "packages/content/test/schemas.test.ts",
@@ -100,7 +104,6 @@ const decodingBoundaryFiles = [
   // Scenario input Schema rejection tests.
   "packages/rules/au/income-tax/test/annual-tax.test.ts",
   "packages/rules/au/pay/test/take-home-pay.test.ts",
-  "apps/web/src/lib/docs/mdx.boundary.tsx",
   "apps/web/src/lib/docs/search-location.boundary.ts",
   // Exact original-URL/representation-header HTTP ingress and bounded fixtures.
   // No encoder, runner or neighbouring-module admission.
@@ -124,18 +127,6 @@ const decodingBoundaryFiles = [
 
   "packages/infrastructure/src/cloudflare/website.test.ts",
   "packages/infrastructure/src/cloudflare/website.ts",
-
-  "packages/docs-content/src/navigation.ts",
-
-  // Docs content and rendering-library representation boundaries.
-  "packages/docs-content/src/live.layer.ts",
-  "packages/docs-content/src/validation/mdx-component-policy.ts",
-  "packages/docs-content/src/validation/policy.runtime.test.ts",
-  "packages/docs-content/src/validation/policy.ts",
-  "packages/docs-fumadocs/src/code-block-meta.ts",
-  "packages/docs-fumadocs/src/live.layer.ts",
-  "packages/docs-fumadocs/src/test.layer.ts",
-  "packages/docs-fumadocs/src/config.ts",
 
   // Native built request egress and standalone HTTP body tests decode only
   // actual representation responses; service internals remain excluded.
@@ -218,7 +209,6 @@ const schemaEncoderEgressFiles = [
   "apps/web/src/lib/api/requests.boundary.test.ts",
   "apps/web/src/lib/root.load.server.ts",
   // Generated public catalogue file egress.
-  "packages/docs-content/src/catalogue.runtime.ts",
   // Synthetic PostHog HTTP fixture representation only.
   "packages/infrastructure/src/posthog/management.boundary.test.ts",
   // Exact native PostHog capture request and safe configuration error bytes.
@@ -281,9 +271,6 @@ const schemaEncoderEgressFiles = [
   // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
   // Exact saved-plan JSON and synthetic provider fixture representations.
   // Exact credential/YAML/receipt negative-fixture representations only.
-  "packages/docs-content/src/service.test.ts",
-  "packages/docs-content/src/generated-page.boundary.test.ts",
-  "packages/docs-fumadocs/src/service.test.ts",
   "packages/docs-examples/src/node-server.ts",
   // Exact historical skill representation test uses the Candidate-owned Schema.
   "packages/api/http/__tests__/openapi-snapshot.test.ts",
@@ -301,16 +288,12 @@ const schemaEncoderEgressFiles = [
 const throwingCodecTestFiles = [
   // Oxlint requires synchronous checked configuration before creating rules.
   "tools/oxlint/workspaces.boundary.ts",
-  // Pure policy fixtures encode their Schema-owned accepted record bytes.
-  "packages/docs-content/src/validation/policy.runtime.test.ts",
 ];
 
 const runtimeBoundaryFiles = [
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   // Synthetic fetch Promise entrypoint for deterministic discovery cancellation.
   "apps/web/src/lib/api/forward.boundary.test.ts",
-  "packages/docs-content/src/catalogue-index.runtime.ts",
-  "packages/docs-content/src/catalogue.runtime.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
 
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
@@ -323,7 +306,6 @@ const runtimeBoundaryFiles = [
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/loaders.ts",
   "apps/web/src/server.ts",
-  "packages/docs-content/src/validate.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
@@ -341,7 +323,6 @@ const processBoundaryFiles = [
 ];
 
 const consoleBoundaryFiles = [
-  "packages/docs-content/src/validate.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/documentation/check.runtime.ts",
@@ -355,15 +336,12 @@ const bunAdapterFiles = [
 
 const bunRuntimeEntrypointFiles = [
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
-  "packages/docs-content/src/catalogue-index.runtime.ts",
-  "packages/docs-content/src/catalogue.runtime.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
 
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
 
-  "packages/docs-content/src/validate.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
@@ -388,7 +366,6 @@ export default defineConfig({
     "@commonplaces/oxlint-plugin/strict-effect",
     "./tools/oxlint/bun-rules.ts",
     "./tools/oxlint/effect-rules.ts",
-    "./tools/oxlint/mdx-rules.ts",
     "@commonplaces/oxlint-plugin/package",
     "./tools/oxlint/package-rules.ts",
     "./tools/oxlint/taxkit-rules.ts",
@@ -514,7 +491,6 @@ export default defineConfig({
         "tools/oxlint/binding-tracker.ts",
         "tools/oxlint/bun-rules.ts",
         "tools/oxlint/effect-rules.ts",
-        "tools/oxlint/mdx-rules.ts",
         "tools/oxlint/package-rules.ts",
         "tools/oxlint/taxkit-rules.ts",
         "tools/oxlint/.generated-strict-bindings.js",
@@ -531,8 +507,6 @@ export default defineConfig({
         "packages/sdk/typescript/vitest*.config.ts",
         "packages/testing/**",
         "packages/api/http/**",
-        "packages/docs-content/**",
-        "packages/docs-fumadocs/**",
       ],
       rules: {
         "effect/no-runtime-references-outside-boundaries": "error",
@@ -816,40 +790,11 @@ export default defineConfig({
       },
     },
     {
-      files: [
-        "packages/docs-content/src/catalogue-index.runtime.ts",
-        "packages/docs-content/src/catalogue.runtime.ts",
-        "packages/docs-content/src/catalogue.runtime.ts",
-      ],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "packages/docs-content/src/catalogue-index.runtime.ts",
-              "packages/docs-content/src/catalogue.runtime.ts",
-              "packages/docs-content/src/catalogue.runtime.ts",
-              "packages/docs-content/src/catalogue.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
       files: ["tools/documentation/check.runtime.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["tools/documentation/check.runtime.ts"] },
-        ],
-      },
-    },
-    {
-      files: ["packages/docs-content/src/validate.runtime.ts"],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: ["packages/docs-content/src/validate.runtime.ts"] },
         ],
       },
     },
@@ -929,15 +874,6 @@ export default defineConfig({
       rules: {
         "effect/no-effect-test-global-mix": "error",
         "effect/no-module-level-mutable-test-state": "error",
-      },
-    },
-    {
-      files: [
-        "tools/oxlint/fixtures/mdx-accepted.tsx",
-        "tools/oxlint/fixtures/.generated-mdx-rejected.tsx",
-      ],
-      rules: {
-        "mdx/no-route-local-component-registry": "error",
       },
     },
     {
@@ -1035,7 +971,6 @@ export default defineConfig({
       // binding Promise; host-contract tests drive Playwright, Miniflare, MCP
       // and the plain SDK. promiseOnlyFiles admit Effect.promise only.
       files: [
-        "packages/docs-content/src/validation/checked-example-publication.boundary.test.ts",
         "apps/api/test/mcp-client.boundary.test.ts",
         "apps/api/test/rate-admission.boundary.test.ts",
         "apps/api/test/worker.boundary.test.ts",
@@ -1050,7 +985,6 @@ export default defineConfig({
         "apps/web/src/lib/browser-tools.boundary.test.ts",
         "apps/web/src/lib/browser-tools.boundary.ts",
         "apps/web/src/lib/calculator.boundary.browser.test.tsx",
-        "apps/web/src/lib/docs/mdx.boundary.tsx",
         "apps/web/src/server.ts",
         "apps/web/test/native-analytics.boundary.test.ts",
         "apps/web/test/native-browser-tools.boundary.test.ts",
@@ -1061,11 +995,6 @@ export default defineConfig({
         "apps/web/test/native-rate-provider.boundary.test.ts",
         "apps/web/test/native-rate.boundary.test.ts",
         "apps/web/test/native-settings-failure.boundary.test.ts",
-        "packages/docs-content/src/catalogue-index.runtime.ts",
-        "packages/docs-content/src/catalogue-source.layer.ts",
-        "packages/docs-content/src/generated-page.boundary.ts",
-        "packages/docs-content/src/live.layer.ts",
-        "packages/docs-content/src/public-links.boundary.test.ts",
         "packages/docs-examples/src/error-handling.ts",
         "packages/docs-examples/src/validate-external-input.ts",
         "packages/docs-examples/test/integration.example.test.ts",
@@ -1079,7 +1008,6 @@ export default defineConfig({
           "error",
           {
             allowedFiles: [
-              "packages/docs-content/src/validation/checked-example-publication.boundary.test.ts",
               "apps/api/test/mcp-client.boundary.test.ts",
               "apps/web/scripts/docs-images.build.ts",
               "apps/web/src/lib/api/host.server.ts",
@@ -1090,14 +1018,9 @@ export default defineConfig({
               "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
               "apps/web/src/lib/browser-tools.boundary.test.ts",
               "apps/web/src/lib/browser-tools.boundary.ts",
-              "apps/web/src/lib/docs/mdx.boundary.tsx",
               "apps/web/src/server.ts",
               "apps/web/test/native-analytics.boundary.test.ts",
               "apps/web/test/native-mcp.boundary.test.ts",
-              "packages/docs-content/src/catalogue-index.runtime.ts",
-              "packages/docs-content/src/catalogue-source.layer.ts",
-              "packages/docs-content/src/generated-page.boundary.ts",
-              "packages/docs-content/src/public-links.boundary.test.ts",
               "packages/sdk/typescript/src/client-lifetime.test.ts",
               "packages/sdk/typescript/src/client.runtime.ts",
               "packages/sdk/typescript/src/index.test.ts",
@@ -1114,7 +1037,6 @@ export default defineConfig({
               "apps/web/test/native-rate-provider.boundary.test.ts",
               "apps/web/test/native-rate.boundary.test.ts",
               "apps/web/test/native-settings-failure.boundary.test.ts",
-              "packages/docs-content/src/live.layer.ts",
               "packages/docs-examples/src/error-handling.ts",
               "packages/docs-examples/src/validate-external-input.ts",
               "packages/docs-examples/test/integration.example.test.ts",

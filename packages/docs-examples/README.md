@@ -14,13 +14,13 @@ server and browser integrations, Effect calculation, error handling, calculator
 help, input validation and a fact definition, plus the integration-test fixture
 in `test/`. Public MDX links to these source files. The templates return
 programs for an application-owned host; they do not start a server or own a
-runtime. `test/examples.boundary.test.ts` retains the weekly pay result and
-invalid-request expectations from the former docs-content example owner.
+runtime. `test/examples.boundary.test.ts` retains the original weekly pay result and
+invalid-request expectations.
 
 Application examples use the single SDK package, including its Core, AU and
 HTTP entry points. The contributor fact example still uses the internal source
 owners; HTTP integration tests use the private in-process server. Keeping
-examples here lets the HTTP API consume docs-content contracts without
+examples here lets the HTTP API consume Content contracts without
 creating a circular package build graph. This package owns no content Schemas,
 docs service, renderer, public route or generated catalogue.
 
@@ -37,14 +37,14 @@ The SDK Changeset records changes to these public package examples. This
 workspace stays private and is not a publication requirement. Checks prove
 neither package publication nor any deployed example. Operational
 runbooks are N/A because this workspace performs no release or provider work.
-Content validation remains owned by
-[`docs-content`](../docs-content/README.md); package dependency direction is
+Content checks remain owned by
+[`@taxkit/content`](../content/README.md); package dependency direction is
 owned by [package boundaries](../../docs/architecture/package-boundaries.md).
 
 
 The validation, calculator-help and raw HTTP error examples are checked sources
-for their complete copied public MDX fences. Authored-content validation rejects
-copy drift. The checker uses the root's selected Node types for standard
+for their complete copied public MDX fences.
+`test/published-snippets.test.ts` rejects copy drift. The checker uses the root's selected Node types for standard
 Node/browser request APIs; the templates do not use Bun-specific globals.
 Tests keep the original weekly-pay oracle and invalid-request cases and add
 external-input rejection, error-envelope decoding and actual HTTP metadata
@@ -55,10 +55,10 @@ The fact definition and integration-test guides also use complete checked
 fences. The integration example executes as a real test suite; the fact
 example compiles against the owning Money and PayPeriod schemas.
 
-Current example links use the accepted immutable source revision owned by
-`docs-content/src/public-links.profile.ts`. Its standalone validator compares
-every linked checked file byte-for-byte with that Git snapshot; catalogue
-publication also checks the emitted guide fences and source URLs. Advancing a
-template therefore requires accepting a matching immutable revision. Historical
-repository citations keep their original revision. No network lookup or branch
-name is used by this check.
+Current example links use the checked-example revision recorded in
+[`content/docs/repository.json`](../../content/docs/repository.json).
+`test/published-snippets.test.ts` checks that each copied guide fence equals
+its checked example file, and uses `git show` to compare every linked checked
+file byte-for-byte with that revision. Advancing a template therefore requires
+recording a matching revision. No network lookup or branch name is used by this
+check.

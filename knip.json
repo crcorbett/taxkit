@@ -103,41 +103,6 @@
       "entry": ["src/index.ts"],
       "project": ["src/**/*.ts"]
     },
-    "packages/docs-content": {
-      "entry": [
-        "source.config.ts",
-        "src/client.ts",
-        "src/errors.ts",
-        "src/live.layer.ts",
-        "src/schemas.ts",
-        "src/server.ts",
-        "src/service.ts",
-        "src/test.layer.ts",
-        "src/validate.runtime.ts",
-        "src/**/*.test.ts",
-        "vitest.config.ts",
-        "src/catalogue-index.runtime.ts",
-        "src/catalogue-source.layer.ts",
-        "src/catalogue.runtime.ts"
-      ],
-      "project": ["source.config.ts", "src/**/*.ts", "vitest.config.ts"],
-      "ignoreDependencies": ["@shikijs/core", "@taxkit/tsconfig", "typescript"]
-    },
-    "packages/docs-fumadocs": {
-      "entry": [
-        "src/config.ts",
-        "src/errors.ts",
-        "src/live.layer.ts",
-        "src/render/index.ts",
-        "src/schemas.ts",
-        "src/service.ts",
-        "src/test.layer.ts",
-        "src/**/*.test.ts",
-        "vitest.config.ts"
-      ],
-      "project": ["src/**/*.ts", "vitest.config.ts"],
-      "ignoreDependencies": ["@taxkit/tsconfig", "typescript"]
-    },
     "packages/sdk/typescript": {
       "entry": [
         "src/index.ts",
@@ -185,8 +150,26 @@
         "src/errors.ts",
         "src/service.ts",
         "src/live.layer.ts",
+        "src/links.ts",
         "src/test.layer.ts",
         "src/__testing__/*.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/mdx": {
+      "entry": [
+        "src/live.layer.ts",
+        "src/highlights.adapter.layer.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/diagrams": {
+      "entry": [
+        "src/mermaid.adapter.layer.ts",
         "test/**/*.test.ts",
         "vitest.config.ts"
       ],

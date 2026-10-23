@@ -60,41 +60,6 @@
       ],
       "project": ["src/**/*.ts!"]
     },
-    "packages/docs-content": {
-      "entry": [
-        "source.config.ts!",
-        "src/client.ts!",
-        "src/errors.ts!",
-        "src/live.layer.ts!",
-        "src/schemas.ts!",
-        "src/server.ts!",
-        "src/service.ts!",
-        "src/validate.runtime.ts!",
-        "src/catalogue-index.runtime.ts!",
-        "src/catalogue-source.layer.ts!",
-        "src/catalogue.runtime.ts!"
-      ],
-      "project": [
-        ".source/browser.ts!",
-        ".source/server.ts!",
-        "source.config.ts!",
-        "src/**/*.ts!",
-        "!src/**/*.test.ts!",
-        "!src/test.layer.ts!"
-      ],
-      "ignoreDependencies": ["vite/client"]
-    },
-    "packages/docs-fumadocs": {
-      "entry": [
-        "src/config.ts!",
-        "src/errors.ts!",
-        "src/live.layer.ts!",
-        "src/render/index.ts!",
-        "src/schemas.ts!",
-        "src/service.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/**/*.test.ts!", "!src/test.layer.ts!"]
-    },
     "packages/rules/au/income-tax": {
       "entry": [
         "src/index.ts!",
@@ -170,6 +135,7 @@
         "src/schemas.ts!",
         "src/errors.ts!",
         "src/service.ts!",
+        "src/links.ts!",
         "src/live.layer.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
@@ -203,6 +169,14 @@
         "src/response-budget.boundary.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
+    },
+    "packages/mdx": {
+      "entry": ["src/live.layer.ts!", "src/highlights.adapter.layer.ts!"],
+      "project": ["src/**/*.ts!"]
+    },
+    "packages/diagrams": {
+      "entry": ["src/mermaid.adapter.layer.ts!"],
+      "project": ["src/**/*.ts!"]
     }
   },
   "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]

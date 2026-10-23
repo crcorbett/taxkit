@@ -9,7 +9,6 @@ import type { WebsiteLoadError } from "./api/errors";
 import { WebsiteApiLive } from "./api/host.server";
 import { readDocsPage, readDocsSearch } from "./api/requests";
 import { WebsiteBindings } from "./config.server";
-import { preloadDocsPresentation } from "./docs/mdx.boundary";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.boundary";
 import { WebsiteApi, WebsiteSettings } from "./host.service";
 import { loadFailureStatus, rejectRouteLoad } from "./load.failure";
@@ -59,7 +58,6 @@ export const loadDocsPage = ({
       const host = yield* WebsiteSettings;
       const settings = yield* Effect.fromResult(host.settings);
       const { navigation, page } = yield* readDocsPage(yield* client, path);
-      yield* preloadDocsPresentation(page);
       return {
         navigation,
         page,

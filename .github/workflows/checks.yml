@@ -147,24 +147,6 @@ jobs:
         with:
           path: ${{ steps.bun-cache-path.outputs.path }}
           key: ${{ steps.bun-cache-restore.outputs.cache-primary-key }}
-      # The deploy build compiles the docs catalogue, whose Mermaid diagrams
-      # render through Playwright.
-      - run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
-      - id: playwright-identity
-        run: echo "version=$(apps/web/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
-      - id: playwright-cache-restore
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: playwright-chromium-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-identity.outputs.version }}-${{ hashFiles('bun.lock') }}
-      - run: apps/web/node_modules/.bin/playwright install --with-deps chromium
-      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: steps.playwright-cache-restore.outputs.cache-hit != 'true'
-        continue-on-error: true
-        with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
       - name: Check that the pull request is still open
         id: pull-request
         env:
@@ -263,7 +245,7 @@ jobs:
           state="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PULL_REQUEST" --jq .state)"
           echo "closed=$([ "$state" = closed ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       # Allowlist, not denylist: cleanup only ever destroys pr-<number> stages.
-      # `pr:destroy` repeats this check before generation or credential loading.
+      # `pr:destroy` repeats this check before credential loading.
       - name: Safety check
         id: stage-safety
         if: steps.pull-request.outputs.closed == 'true'
@@ -273,16 +255,6 @@ jobs:
             echo "Cleanup only destroys pr-<number> stages, got '$STAGE'" >&2
             exit 1
           fi
-      # Catalogue compilation renders Mermaid diagrams through Playwright.
-      # Cleanup has a fresh runner too; provision its browser before the build.
-      - name: Prepare catalogue browser path
-        id: catalogue-browser-path
-        if: steps.pull-request.outputs.closed == 'true'
-        run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
-      - name: Install catalogue Chromium
-        id: catalogue-chromium
-        if: steps.pull-request.outputs.closed == 'true'
-        run: apps/web/node_modules/.bin/playwright install --with-deps chromium
       - name: Plan preview destroy with native Alchemy
         if: steps.pull-request.outputs.closed == 'true'
         run: bun run pr:destroy "$STAGE" --dry-run --no-input
@@ -341,24 +313,6 @@ jobs:
         with:
           path: ${{ steps.bun-cache-path.outputs.path }}
           key: ${{ steps.bun-cache-restore.outputs.cache-primary-key }}
-      # The deploy build compiles the docs catalogue, whose Mermaid diagrams
-      # render through Playwright.
-      - run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"
-      - id: playwright-identity
-        run: echo "version=$(apps/web/node_modules/.bin/playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
-      - id: playwright-cache-restore
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        continue-on-error: true
-        with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: playwright-chromium-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright-identity.outputs.version }}-${{ hashFiles('bun.lock') }}
-      - run: apps/web/node_modules/.bin/playwright install --with-deps chromium
-      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: steps.playwright-cache-restore.outputs.cache-hit != 'true'
-        continue-on-error: true
-        with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: ${{ steps.playwright-cache-restore.outputs.cache-primary-key }}
       # Deploy builds use the local Turbo cache only; the remote cache credential
       # stays with the checks job.
       - name: Plan production with native Alchemy

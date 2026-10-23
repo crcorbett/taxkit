@@ -143,11 +143,11 @@ never calculates, and a POST to any Website page returns an empty 404.
 ## Documentation pages
 
 The catch-all route loads the page and navigation from the API's documentation
-routes; the server uses the original pathname. The MDX presentation is compiled
-at build time from the same content collection. Before display, its processed
-Markdown and frontmatter must match the API's page; a mismatch, or a missing
-compiled module, shows fixed guidance. Missing pages use TanStack's not-found
-state and HTTP 404. Internal links are router links; client navigation moves
+routes; the server uses the original pathname. The route shows the page title
+as `DocsHeading`, and `src/lib/docs/reading-body.view.tsx` renders the page's
+checked `body`: code tokens as coloured spans, diagrams as images with an SVG
+data address and tables in a labelled scroll region. Missing pages use
+TanStack's not-found state and HTTP 404. Internal links are router links; client navigation moves
 focus to the new heading and initial hydration does not.
 
 `/search` has a plain GET form with one `term` field and works without
@@ -204,7 +204,7 @@ A caller's cancellation or an edit cancels only the request that call owns;
 another unfinished calculation is reported as busy. Page cleanup removes the
 tools. Failures carry fixed codes without input values. `/agents` links the
 remote MCP address on the API origin, the OpenAPI description and the
-[agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx).
+[agent connection guide](../../content/docs/api/agent-tools.mdx).
 
 ## Analytics
 
@@ -257,8 +257,7 @@ App source changes reload; shared-package changes need that package's build,
 because the API bundler reads compiled exports.
 
 `bun run --filter=web dev` runs the Website alone through portless. It still
-needs a native API binding, which the standalone Bun API cannot supply. Build
-the accepted catalogue first with `bun run --filter=@taxkit/docs-content build`.
+needs a native API binding, which the standalone Bun API cannot supply.
 
 The Vite config reads Alchemy's native plugin flag through a fresh
 ConfigProvider so it does not add a second Cloudflare plugin. Server code

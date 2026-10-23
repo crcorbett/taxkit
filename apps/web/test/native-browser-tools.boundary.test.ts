@@ -4,7 +4,6 @@ import { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
 import {
   Array,
   Effect,
-  FileSystem,
   HashMap,
   Option,
   Order,
@@ -22,6 +21,7 @@ import type { Route } from "playwright";
 import { WebsiteBrowserToolFailure } from "../src/lib/browser-tools.schemas";
 import { WebsiteBrowserToolkit } from "../src/lib/browser-tools.toolkit";
 import { WebsiteCalculatorViewState } from "../src/lib/schemas";
+import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4231";
@@ -45,39 +45,19 @@ it.live(
   "calls mounted calculator tools through Chrome's real native caller",
   () =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
       const path = yield* Path.Path;
       const root = path.resolve("../..");
       const apiRoot = path.join(root, ".alchemy/native-pair/bundles/TaxKitApi");
       const websiteRoot = path.join(root, "apps/web/dist/server");
-      const apiFiles = yield* fs.glob("**/*.js", { root: apiRoot });
-      const websiteFiles = yield* fs.glob("**/*.js", { root: websiteRoot });
+      const {
+        files: apiFiles,
+        modules: apiModules,
+        wasm: apiWasm,
+      } = yield* readWorkerModules(apiRoot);
+      const { files: websiteFiles, modules: websiteModules } =
+        yield* readWorkerModules(websiteRoot);
       expect(apiFiles).toContain("worker.js");
       expect(websiteFiles).toContain("server.js");
-      const apiModules = Record.fromEntries(
-        yield* Effect.forEach(apiFiles, (file) =>
-          fs
-            .readFileString(path.join(apiRoot, file))
-            .pipe(
-              Effect.map(
-                (contents) =>
-                  [file, { contents, type: "esm" as const }] as const
-              )
-            )
-        )
-      );
-      const websiteModules = Record.fromEntries(
-        yield* Effect.forEach(websiteFiles, (file) =>
-          fs
-            .readFileString(path.join(websiteRoot, file))
-            .pipe(
-              Effect.map(
-                (contents) =>
-                  [file, { contents, type: "esm" as const }] as const
-              )
-            )
-        )
-      );
       const exceptions = yield* Queue.make<string>();
       const apiWorker = (name: string) => ({
         config: {
@@ -99,7 +79,7 @@ it.live(
 
           manifest: {
             mainModule: "worker.js",
-            modules: apiModules,
+            modules: { ...apiModules, ...apiWasm },
             modulesRoot: apiRoot,
           },
           name,

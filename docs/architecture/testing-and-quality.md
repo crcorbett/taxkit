@@ -72,8 +72,9 @@ and an updated OpenAPI snapshot.
 - **Infrastructure**: `bun run check-types` covers the Alchemy roots. A native
   plan (`bun run pr:plan pr-<number>` or `bun run production:plan`) shows the
   intended resource changes before a deployment.
-- **Documentation**: `bun run check:docs`; public MDX also needs
-  `bun run docs:validate`.
+- **Documentation**: `bun run check:docs`; public MDX is also checked by
+  `apps/api/test/docs-sources.test.ts` and
+  `packages/docs-examples/test/published-snippets.test.ts` in `bun run test`.
 
 ## Checks that stay separate
 

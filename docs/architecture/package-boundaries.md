@@ -22,10 +22,11 @@ Implemented packages and apps:
 
 - `apps/api`
 - `apps/web`
+- `content/docs`
 - `packages/calculators`
-- `packages/docs-content`
+- `packages/diagrams`
 - `packages/docs-examples`
-- `packages/docs-fumadocs`
+- `packages/mdx`
 - `packages/core`
 - `packages/api/http`
 - `packages/api/mcp`
@@ -51,6 +52,9 @@ exports and verification.
 apps/
   api/
   web/
+
+content/
+  docs/
 
 packages/
   core/
@@ -90,9 +94,10 @@ packages/
   sdk/
     typescript/
 
-  docs-content/
+  content/
+  mdx/
+  diagrams/
   docs-examples/
-  docs-fumadocs/
   scripts/
 
   cli/
@@ -100,7 +105,7 @@ packages/
 
 Current packages such as `@taxkit/api-http` and the TanStack Start app sit
 outside the calculation engine. As the repo matures, the app layer should
-settle into a public Fumadocs documentation site and reusable API server. They
+settle into a public documentation site and reusable API server. They
 will expose and consume engine capabilities once those capabilities exist, but
 the deterministic engine must not import from them.
 
@@ -205,21 +210,27 @@ Implemented private `taxkit` owns:
 - browser-safe types and schemas
 - SDK examples and compatibility tests
 
-Implemented `@taxkit/docs-content` owns:
+Implemented source-only `@content/docs` owns:
 
-- authored TaxKit MDX and navigation
-- TaxKit docs frontmatter, meta, navigation and validation schemas
-- navigation and source-text validation policy
-- docs content service tags and live layers
-- server-only generated Fumadocs source wiring for TaxKit docs content
+- the authored TaxKit MDX pages and `navigation.json`
+- `repository.json`, the GitHub revisions that repository-file links use
+- `sources.ts`, every page as a `?raw` import
 
-Implemented `@taxkit/docs-fumadocs` owns:
+Implemented `@taxkit/mdx` owns:
 
-- reusable Fumadocs configuration helpers
-- Effect Schema to Standard Schema bridges
-- generic source representation Schemas and safe tagged errors
-- the named `FumadocsSource` service and generated-loader live/test Layers
-- generic browser-safe MDX render primitives
+- `DocsPageReaderLive` (`./live`): micromark MDX and GFM tables with a
+  Schema-checked syntax tree; JSX, images, raw HTML and quotes fail
+- `DocsCodeHighlighterLive` (`./highlights`), the only `@pierre/highlights`
+  caller
+
+Implemented `@taxkit/diagrams` owns:
+
+- `DocsDiagramRendererLive` (`./mermaid`), the only `beautiful-mermaid` caller,
+  which renders SVG on the server with no browser or Chromium
+
+`@taxkit/content` declares the `DocsPageReader`, `DocsCodeHighlighter` and
+`DocsDiagramRenderer` contracts these packages implement, and never imports
+the implementations.
 
 Docs packages must not own rule-pack algorithms, API endpoint business logic
 or SDK calculation facades.
@@ -237,8 +248,10 @@ packages/domain/au/dates     -> @taxkit/domain-au-dates
 packages/api/http            -> @taxkit/api-http
 packages/calculators         -> @taxkit/calculators
 packages/sdk/typescript      -> taxkit or taxkit
-packages/docs-content        -> @taxkit/docs-content
-packages/docs-fumadocs       -> @taxkit/docs-fumadocs
+content/docs                 -> @content/docs
+packages/content             -> @taxkit/content
+packages/mdx                 -> @taxkit/mdx
+packages/diagrams            -> @taxkit/diagrams
 ```
 
 Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and

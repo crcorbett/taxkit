@@ -9,21 +9,12 @@ import {
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
-import {
-  Array,
-  Clock,
-  Duration,
-  Effect,
-  FileSystem,
-  Path,
-  Queue,
-  Record,
-  Schema,
-} from "effect";
+import { Array, Clock, Duration, Effect, Path, Queue, Schema } from "effect";
 import { McpSchema } from "effect/ai";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
+import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4214";
@@ -33,7 +24,6 @@ const alias = "2001:0db8:0000:0000:0000:0000:0000:0075";
 
 it.live("shares the built native allowance across HTTP and MCP", () =>
   Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
     const root = path.resolve("../..");
     const logs = yield* Queue.make<WorkerdStructuredLog>();
@@ -49,20 +39,9 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
       (artifact) =>
         Effect.gen(function* () {
           const modulesRoot = path.join(root, artifact.output);
-          const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+          const { files, modules, wasm } =
+            yield* readWorkerModules(modulesRoot);
           expect(files).toContain(artifact.entry);
-          const modules = Record.fromEntries(
-            yield* Effect.forEach(files, (file) =>
-              fs
-                .readFileString(path.join(modulesRoot, file))
-                .pipe(
-                  Effect.map(
-                    (contents) =>
-                      [file, { contents, type: "esm" as const }] as const
-                  )
-                )
-            )
-          );
           return {
             config: {
               compatibilityDate: "2026-10-04",
@@ -91,7 +70,11 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
                 },
               },
 
-              manifest: { mainModule: artifact.entry, modules, modulesRoot },
+              manifest: {
+                mainModule: artifact.entry,
+                modules: { ...modules, ...wasm },
+                modulesRoot,
+              },
               name: artifact.name,
             },
           };

@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
 import {
+  DocsCodeLanguage,
   DocsNonEmptyText,
   DocsPagePath,
   DocsPageSlug,
@@ -8,11 +9,13 @@ import {
 } from "./schemas.js";
 
 export const DocsSourceOperation = Schema.Literals([
+  "buildCatalogue",
   "decode",
   "getDiscoveryDocument",
   "getNavigation",
   "getPage",
   "listPages",
+  "parse",
   "read",
   "searchPages",
   "validateContent",
@@ -54,4 +57,20 @@ export class DocsSourceError extends Schema.TaggedError<DocsSourceError>()(
     operation: DocsSourceOperation,
     source: Schema.optional(DocsSourcePath),
   }
+) {}
+
+// The highlighter refused the code or returned tokens Content could not read.
+// No source text or provider cause is kept.
+export class DocsCodeHighlightError extends Schema.TaggedError<DocsCodeHighlightError>()(
+  "DocsCodeHighlightError",
+  {
+    language: DocsCodeLanguage,
+    reason: Schema.Literals(["highlight", "tokens"]),
+  }
+) {}
+
+// The diagram renderer refused the Mermaid source or returned an unusable SVG.
+export class DocsDiagramRenderError extends Schema.TaggedError<DocsDiagramRenderError>()(
+  "DocsDiagramRenderError",
+  { reason: Schema.Literals(["render", "svg"]) }
 ) {}
