@@ -56,26 +56,32 @@ schema at your application boundary; do not cast the input to Money.
 
 ## Read an amount someone typed
 
-`MoneyFromDollarsString` is a Schema codec from typed dollar text, such as
-`"80000"` or `"1234.50"`, to non-negative Money. It ignores surrounding
-spaces and converts exactly to whole cents. It refuses blank text, commas,
-signs, symbols and more than two decimal places, and amounts too large for
-safe cents. Each refusal has a reason (`empty`, `format` or `range`) and a
-message. Use `moneyFromDollarsString` to replace the message for a reason.
+`moneyFromDollarsText` reads typed dollar text, such as `"80000"` or
+`"1234.50"`, as Money. It ignores surrounding spaces and converts exactly to
+whole cents. It refuses blank text, commas, signs, symbols, more than two
+decimal places and amounts too large for safe cents. A refusal is an
+`InvalidDollarsText` failure whose `reason` is `empty`, `format` or `range`, so
+you can match it and write your own message.
 
 ```ts
-import { moneyFromDollarsString } from "taxkit/core";
-import { Schema } from "effect";
+import { moneyFromDollarsText } from "taxkit/core";
+import { Effect, Match } from "effect";
 
-const TaxableIncome = moneyFromDollarsString({
-  messages: { empty: "Enter your annual taxable income." },
-});
-
-const incomeProgram = Schema.decodeUnknownEffect(TaxableIncome)("80000");
+const incomeProgram = moneyFromDollarsText("80000").pipe(
+  Effect.mapError(({ reason }) =>
+    Match.value(reason).pipe(
+      Match.when("empty", () => "Enter your annual taxable income."),
+      Match.when("format", () => "Use dollars and cents, without commas."),
+      Match.when("range", () => "That amount is too large."),
+      Match.exhaustive
+    )
+  )
+);
 ```
 
-Encoding writes plain dollars with two decimal places, so a form can show a
-Money value again.
+`dollarsTextFromMoney` writes Money back as plain dollars with two decimal
+places. `MoneyFromDollarsString` joins both as a Schema codec with TaxKit's
+default messages.
 
 `CalculatorId`, `Jurisdiction` and `TaxYear` are also branded or literal
 boundary values owned by packages. Use exported values and schemas instead of

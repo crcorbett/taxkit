@@ -19,9 +19,9 @@ export {
   moneySub,
 } from "./money.js";
 export {
-  DollarsTextIssue,
   MoneyFromDollarsString,
-  moneyFromDollarsString,
+  dollarsTextFromMoney,
+  moneyFromDollarsText,
 } from "./dollars.js";
 export { RoundingMode, roundCentsToDollar, roundMoney } from "./rounding.js";
 export {
@@ -37,7 +37,9 @@ export {
 } from "./tax.js";
 
 export {
+  DollarsTextIssue,
   InvalidCalendarValue,
   InvalidDecimalValue,
+  InvalidDollarsText,
   InvalidMoneyValue,
 } from "./errors.js";

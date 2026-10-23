@@ -3,7 +3,8 @@
 "taxkit": minor
 ---
 
-Add `MoneyFromDollarsString` and `moneyFromDollarsString`, an Effect Schema
-codec from typed dollar text to non-negative `Money`. It converts exactly to
-whole cents and refuses blank, unplain or unsafe amounts with a typed reason
-(`DollarsTextIssue`) and a replaceable message.
+Add `moneyFromDollarsText`, which reads typed dollar text as non-negative
+`Money` exactly and fails with `InvalidDollarsText` and a matchable `reason`
+(`empty`, `format` or `range`). `dollarsTextFromMoney` writes Money back as
+plain dollars, and `MoneyFromDollarsString` joins both as a Schema codec with
+default messages.

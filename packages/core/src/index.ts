@@ -49,9 +49,9 @@ export {
   moneySub,
 } from "./primitives/money.js";
 export {
-  DollarsTextIssue,
   MoneyFromDollarsString,
-  moneyFromDollarsString,
+  dollarsTextFromMoney,
+  moneyFromDollarsText,
 } from "./primitives/dollars.js";
 export {
   RoundingMode,
@@ -105,7 +105,9 @@ export {
 } from "./trace/node.js";
 
 export {
+  DollarsTextIssue,
   InvalidCalendarValue,
   InvalidDecimalValue,
+  InvalidDollarsText,
   InvalidMoneyValue,
 } from "./primitives/errors.js";
