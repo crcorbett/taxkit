@@ -29,8 +29,7 @@ adds no invented modification dates. Robots allows every path and links the
 sitemap. The short agent index links the declared HTTP Markdown endpoint for
 every page. The full index preserves processed bodies and their canonical page
 addresses, including fenced examples. Projection errors remain safe checked
-`DocsSourceError` values; RPC maps failures to `DocsDiscoveryUnavailable` and
-the API discovery adapter returns an empty 503.
+`DocsSourceError` values; the API discovery adapter returns an empty 503.
 
 The document Schema relates each path to its XML or text media type and bounds
 bodies to 300,000 characters. No source compiler, second catalogue or document
@@ -53,8 +52,8 @@ declarations otherwise:
 
 [Content architecture](../../docs/architecture/content-and-posts.md) and
 [package ownership](../../docs/architecture/package-ownership.md) explain the
-publication boundary. HTTP and Content READMEs route here; API and RPC hosts
-compose this capability. Public page status and API wire contracts stay stable.
+publication boundary. HTTP and Content READMEs route here; the API host
+composes this capability. Public page status and API wire contracts stay stable.
 Focused proof includes settings laziness, failure, escaping, media and size
 tests. The link regression checks generated Markdown addresses against the
 native HTTP contract.

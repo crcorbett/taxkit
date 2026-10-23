@@ -5,7 +5,6 @@ import {
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
 import { McpDocsSearchResponse } from "@taxkit/api-mcp/schemas";
-import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import {
   CalculatorCatalogResponse,
   CalculatorSchemaResponse,
@@ -13,6 +12,7 @@ import {
   CalculatorRunResponse,
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
   DocsPublicPage,
   DocsPublicNavigation,

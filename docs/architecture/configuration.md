@@ -85,7 +85,7 @@ and receiver before the stock Alchemy HTTP conversion. The API verifies the
 current key, or an explicitly configured previous key during rotation, before
 accepting the separately decoded caller IP. Both headers are stripped before
 domain dispatch. Neither credential reaches public settings, browser clients,
-cached reads, machine RPC or MCP. Doppler owns deployment credentials; generated
+cached reads or MCP. Doppler owns deployment credentials; generated
 forwarding-key custody remains in stage-scoped Alchemy state.
 Settings errors contain only fixed safe fields.
 

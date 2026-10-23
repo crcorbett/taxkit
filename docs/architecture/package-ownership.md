@@ -25,7 +25,6 @@ Current implemented code lives in:
 - `packages/analytics`
 - `packages/api/http`
 - `packages/api/mcp`
-- `packages/api/rpc`
 - `packages/calculators`
 - `packages/content`
 - `packages/core`
@@ -76,10 +75,8 @@ schemas, thin server handlers, OpenAPI and HTTP status/transport annotations.
 Callers use Effect's generated `HttpApiClient` for its `TaxKitApi` directly;
 `./in-process` supplies an in-process `HttpClient` for tests and examples. Its
 narrow `request-boundary` export owns the shared streamed HTTP-body admission
-used by the RPC and native app hosts, and `response-policy` owns the shared
-public CORS and cache decision. The RPC package depends inward on that export
-and retains its compatibility alias; the HTTP package has no RPC runtime
-dependency.
+used by the native app hosts, and `response-policy` owns the shared
+public CORS and cache decision.
 
 `packages/calculators`
 : Implemented reusable calculator orchestration package. It owns calculator
@@ -140,7 +137,7 @@ Root `alchemy.run.ts` and `alchemy.local.run.ts`
 : API application owner. It retains standalone Bun config/startup/shutdown
 and the native Alchemy Worker. The native instance owns one router and
 calculator service; incoming requests own body limits, dispatch and cleanup.
-HTTP, RPC and MCP share the named calculator service operations; the Worker
+HTTP and MCP share the named calculator service operations; the Worker
 also serves the discovery documents and authenticates the Website's private
 canonical calculation HTTP requests. The private `api/worker` export supplies native implementation
 to root `alchemy.apps.ts`; infrastructure owns the lightweight Worker declaration
@@ -152,17 +149,12 @@ identity. Neither an app nor a package depends on another app.
   other TaxKit workspace) of shared host request records, safe
   loggers, edge identity policy and the hosted `DeploymentStage` /
   `PullRequestStage` Schemas that analytics and infrastructure reuse. API, Website and infrastructure dashboards
-  consume its named exports; machine RPC does not own host telemetry.
+  consume its named exports.
 
 `packages/api/mcp`
 : Private compiled MCP transport owner: tool contracts, handlers, request
   cancellation and response budgets over domain services. Native session storage,
   dispatch and app lifecycle remain in the API app.
-
-`packages/api/rpc`
-: Private compiled machine RPC transport with versioned calculator/documentation
-  procedures, thin handlers and checked client Layers. Domain Schemas stay with
-  Content, calculators and Publication; runtime composition remains app-owned.
 
 `packages/publication`
 : Private compiled discovery owner. `ContentDiscovery` and its static live/test
@@ -175,12 +167,11 @@ identity. Neither an app nor a package depends on another app.
   errors, the accepted public catalogue Schema and `ContentService`. Application
   composition injects one checked catalogue; the service reads accepted pages,
   navigation and bounded search without filesystem or runtime execution. This
-  owner does not perform source acceptance or compile MDX. HTTP and native RPC
-  content groups consume this compiled contract instead of the source-only
+  owner does not perform source acceptance or compile MDX. The HTTP
+  content group consumes this compiled contract instead of the source-only
   Fumadocs collection. The public path refinement and fixed page/search errors
   have one owner here. `./response-check` correlates an already-decoded page with
-  its requested path. Shared public-origin policy lives in its Schema owner;
-  RPC retains a distinct API identity.
+  its requested path. Shared public-origin policy lives in its Schema owner.
 
 `packages/analytics`
 : Private compiled owner of checked page/calculator events, collection policy,
@@ -282,6 +273,6 @@ belongs in apps or explicitly server-only package exports.
 through explicit source-only exports. It has no application dependency. Root
 `alchemy.apps.ts` joins the graph and the API's named implementation export;
 the native Worker declaration and common compatibility settings live in deployment-only
-exports. Engine, HTTP, RPC, MCP, analytics and observability packages have no
+exports. Engine, HTTP, MCP, analytics and observability packages have no
 infrastructure dependency. The API app retains native request/instance behaviour;
 root composition retains provider and state selection.

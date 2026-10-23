@@ -106,8 +106,8 @@ checked original caller key. The native Fetcher/HttpClient adapter carries the
 generated HTTP contract to the API's default fetch host. The Website host sets
 standard native `RequestInit.redirect: "manual"` before binding dispatch, so
 redirect replies cannot replay the credential or original IP on another URL.
-The generated client rejects undeclared redirect responses; no HTTP-over-RPC
-method or legacy MCP Durable Object remains. Public HTTP, RPC, modern MCP and public
+The generated client rejects undeclared redirect responses; no legacy MCP
+Durable Object remains. Public HTTP, modern MCP and public
 reads require no forwarding credential. Both hosts keep `nodejs_compat` for the
 API's native constant-time verifier. The
 [deployment runbook](../../docs/runbooks/deployment.md) owns deliberate key

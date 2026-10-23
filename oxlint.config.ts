@@ -91,18 +91,8 @@ const decodingBoundaryFiles = [
   "packages/core/test/domain-absence.boundary.test.ts",
   // Native app root stage ingress, checked before constructing secret Layers.
   "packages/infrastructure/src/secrets.ts",
-  "apps/web/test/native-rpc-failures.boundary.test.ts",
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-local-development.boundary.test.ts",
-  // Native RPC parser unknown envelopes and exact adversarial transport fixtures.
-  "packages/api/rpc/src/server-serialization.boundary.ts",
-  "packages/api/rpc/src/client-response.boundary.ts",
-  "packages/api/rpc/src/content-client-response.boundary.ts",
-  "packages/api/rpc/test/handlers.test.ts",
-  "packages/api/rpc/test/deadline.test.ts",
-  "packages/api/rpc/test/content.fixture.ts",
-  "packages/api/rpc/test/content.boundary.test.ts",
-  "packages/api/rpc/test/content-deadline.boundary.test.ts",
   // Exact native website settings, form and hydration boundaries.
   "apps/web/src/lib/config.boundary.test.ts",
   "apps/web/src/lib/config.server.ts",
@@ -201,7 +191,6 @@ const decodingBoundaryFiles = [
 const effectContractFiles = [
   "apps/**/{config,errors,schema,schemas,service,services}.ts",
   "packages/**/{config,errors,schema,schemas,service,services}.ts",
-  "packages/api/rpc/src/content.{errors,schemas,service}.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
@@ -210,7 +199,6 @@ const effectContractFiles = [
 const effectServiceContractFiles = [
   "apps/**/{service,services}.ts",
   "packages/**/{service,services}.ts",
-  "packages/api/rpc/src/content.service.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
@@ -220,7 +208,6 @@ const effectErrorContractFiles = [
   "apps/web/scripts/docs-images.build.ts",
   "apps/**/{errors,schema,schemas}.ts",
   "packages/**/{errors,schema,schemas}.ts",
-  "packages/api/rpc/src/content.errors.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
   "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
   "tools/oxlint/fixtures/.generated-effect-rejected.ts",
@@ -270,15 +257,11 @@ const schemaEncoderEgressFiles = [
   // Exact historical primitive bytes and safe failure representation tests.
   "packages/core/test/date.test.ts",
   "packages/core/test/money.test.ts",
-  "apps/web/test/native-rpc-failures.boundary.test.ts",
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-settings-failure.boundary.test.ts",
   "apps/web/test/native-analytics.boundary.test.ts",
   "apps/web/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
-  // Test-only native request/reply bytes; no production encoder admission.
-  "packages/api/rpc/test/handlers.test.ts",
-  "packages/api/rpc/test/content.boundary.test.ts",
 
   "apps/web/src/lib/calculator.boundary.browser.test.tsx",
   // Route loader data egress and checked local input-error transport egress.
@@ -459,7 +442,7 @@ export default defineConfig({
               "packages/api/http/src/routes.ts",
               "packages/infrastructure/src/posthog/management.adapter.layer.ts",
             ],
-            prefixes: ["/api", "/rpc", "/mcp"],
+            prefixes: ["/api", "/mcp"],
           },
         ],
       },
@@ -499,11 +482,6 @@ export default defineConfig({
         "apps/web/test/native-mcp.boundary.test.ts",
         "apps/web/test/native-analytics.boundary.test.ts",
         "apps/web/scripts/docs-images.build.ts",
-        "packages/api/rpc/src/live.layer.ts",
-        "packages/api/rpc/src/content.live.layer.ts",
-        "packages/api/rpc/src/content.errors.ts",
-        "packages/api/rpc/src/response-budget.boundary.ts",
-        "packages/api/rpc/src/server-serialization.boundary.ts",
         "apps/web/src/lib/config.ts",
         "apps/web/src/lib/docs/errors.ts",
         "apps/web/src/lib/form.boundary.ts",
@@ -629,23 +607,6 @@ export default defineConfig({
                 file: "apps/web/test/native-cancellation.boundary.test.ts",
                 method: "fill",
                 receiver: "payInput",
-              },
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: ["apps/web/test/native-rpc-failures.boundary.test.ts"],
-      rules: {
-        "strict-effect/no-imperative-collections": [
-          "error",
-          {
-            allowedMethods: [
-              {
-                file: "apps/web/test/native-rpc-failures.boundary.test.ts",
-                method: "fill",
-                receiver: "invalidPayInput",
               },
             ],
           },
@@ -1105,7 +1066,6 @@ export default defineConfig({
         "apps/web/test/native-rate-provider.boundary.test.ts",
         "apps/web/test/native-rate.boundary.test.ts",
         "apps/web/test/native-relay.boundary.test.ts",
-        "apps/web/test/native-rpc-failures.boundary.test.ts",
         "apps/web/test/native-settings-failure.boundary.test.ts",
         "packages/docs-content/src/catalogue-index.runtime.ts",
         "packages/docs-content/src/catalogue-source.layer.ts",
@@ -1160,7 +1120,6 @@ export default defineConfig({
               "apps/web/test/native-rate-provider.boundary.test.ts",
               "apps/web/test/native-rate.boundary.test.ts",
               "apps/web/test/native-relay.boundary.test.ts",
-              "apps/web/test/native-rpc-failures.boundary.test.ts",
               "apps/web/test/native-settings-failure.boundary.test.ts",
               "packages/docs-content/src/live.layer.ts",
               "packages/docs-examples/src/error-handling.ts",
@@ -1310,7 +1269,7 @@ export default defineConfig({
     "strict-effect/website-data-proxy": [
       "error",
       {
-        publicApiPaths: ["/api", "/rpc", "/mcp"],
+        publicApiPaths: ["/api", "/mcp"],
         websiteDirectory: "apps/web/src",
       },
     ],

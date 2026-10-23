@@ -5,11 +5,12 @@ import {
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
 import { CalculatorCaptureBatch } from "@taxkit/analytics/schemas";
-import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
-import { CalculatorRpcOrigin } from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
-import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
-import { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
+import { TaxKitApi } from "@taxkit/api-http/api";
+import {
+  CalculationQuery,
+  CalculatorRunServiceRequest,
+} from "@taxkit/calculators/schemas";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import {
   Array,
@@ -28,6 +29,7 @@ import {
 } from "effect";
 import { McpSchema } from "effect/ai";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 import { Miniflare, Response } from "miniflare";
 import type { Request, WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
@@ -218,9 +220,6 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
       expect(bytes).not.toContain("165400");
       if (mode === "rejected") {
         const address = yield* Effect.promise(() => host.ready);
-        const rpcOrigin = yield* Schema.decodeEffect(CalculatorRpcOrigin)(
-          address.origin
-        );
         const transport = Layer.effect(
           HttpClient.HttpClient,
           HttpClient.HttpClient.pipe(
@@ -234,15 +233,19 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
             )
           )
         ).pipe(Layer.provide(FetchHttpClient.layer));
-        const rpc = yield* TaxKitRpcClient.pipe(
-          Effect.flatMap((client) => client.calculate(CalculationRequest)),
-          Effect.provide(
-            TaxKitRpcClientLive.pipe(
-              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(rpcOrigin))
-            ).pipe(Layer.provide(transport))
-          )
+        const calculated = yield* HttpApiClient.make(TaxKitApi, {
+          baseUrl: address.origin,
+        }).pipe(
+          Effect.flatMap((client) =>
+            client.calculatorApi.calculate({
+              params: { calculatorId: CalculationRequest.calculatorId },
+              payload: CalculationRequest.payload,
+              query: CalculationQuery.make({}),
+            })
+          ),
+          Effect.provide(transport)
         );
-        expect(rpc.calculator.calculatorId).toBe("au.pay.take-home");
+        expect(calculated.calculator.calculatorId).toBe("au.pay.take-home");
         const nextCapture = Queue.take(outgoing).pipe(
           Effect.timeout("2 seconds"),
           Effect.flatMap((sent) => Effect.promise(() => sent.text())),

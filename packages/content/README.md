@@ -19,9 +19,7 @@ The authored MDX, its frontmatter status and the Fumadocs compiler remain in
 [`docs-content`](../docs-content/README.md), whose catalogue build decides which
 pages are published. This package cannot itself publish an authored page. The checked
 [HTTP package](../api/http/README.md) now delegates public content routes to
-this service. The [native RPC package](../api/rpc/README.md#documentation-connection)
-delegates page, navigation, Markdown and search to Content, and discovery to
-[Publication](../publication/README.md), for machine callers. The Website reads pages, navigation,
+this service, and discovery to [Publication](../publication/README.md). The Website reads pages, navigation,
 search and Markdown through the API's HTTP routes.
 Existing docs-content imports re-export
 the canonical page, navigation and lookup error contracts for compatibility.
@@ -87,7 +85,7 @@ Service tests and compiled output do not prove page correctness, an installed
 HTTP consumer, app routes, deployment, public availability or publication.
 
 `DocsPublicPagePath` refines the existing page identity to a canonical lowercase
-public address of at most 256 characters. The public page Schema and HTTP/RPC
+public address of at most 256 characters. The public page Schema and HTTP
 request contracts reuse it. `DocsPageUnavailable` and `DocsSearchUnavailable`
 contain fixed messages with no request path or source diagnostic. Internal
 content lookup/source errors retain their existing checked fields; the two

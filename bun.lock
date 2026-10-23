@@ -39,7 +39,6 @@
         "@taxkit/analytics": "workspace:*",
         "@taxkit/api-http": "workspace:*",
         "@taxkit/api-mcp": "workspace:*",
-        "@taxkit/api-rpc": "workspace:*",
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
@@ -90,7 +89,6 @@
         "@modelcontextprotocol/client": "2.3.1",
         "@takumi-rs/wasm": "2.14.0",
         "@taxkit/api-mcp": "workspace:*",
-        "@taxkit/api-rpc": "workspace:*",
         "@taxkit/calculators": "workspace:*",
         "@taxkit/infrastructure": "workspace:*",
         "@taxkit/publication": "workspace:*",
@@ -156,25 +154,6 @@
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
-        "typescript": "catalog:",
-        "vite": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
-    "packages/api/rpc": {
-      "name": "@taxkit/api-rpc",
-      "version": "1.0.0",
-      "dependencies": {
-        "@taxkit/api-http": "workspace:*",
-        "@taxkit/calculators": "workspace:*",
-        "@taxkit/content": "workspace:*",
-        "@taxkit/publication": "workspace:*",
-        "effect": "catalog:",
-      },
-      "devDependencies": {
-        "@effect/vitest": "catalog:",
-        "@taxkit/core": "workspace:*",
-        "@taxkit/rules-au-pay": "workspace:*",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:",
@@ -1157,8 +1136,6 @@
     "@taxkit/api-http": ["@taxkit/api-http@workspace:packages/api/http"],
 
     "@taxkit/api-mcp": ["@taxkit/api-mcp@workspace:packages/api/mcp"],
-
-    "@taxkit/api-rpc": ["@taxkit/api-rpc@workspace:packages/api/rpc"],
 
     "@taxkit/calculators": ["@taxkit/calculators@workspace:packages/calculators"],
 

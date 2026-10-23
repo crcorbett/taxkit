@@ -29,8 +29,7 @@ define tax calculation rules.
 
 `apps/api`
 : The API: the standalone Bun host and the native Alchemy Worker. The Worker
-  serves HTTP, machine RPC and MCP over the same calculator and content
-  services.
+  serves HTTP and MCP over the same calculator and content services.
 
 ## Runtime shape
 
@@ -55,8 +54,8 @@ The Website has exactly two places that run Effects:
 Both clients read replies through the same 2 MiB bound and give each call one
 ten-second deadline. Declared API errors keep their owning types; transport,
 deadline, size and mismatch failures become the Website's own tagged errors.
-The Website declares no server functions, has no proxy at the API's `/api`,
-`/rpc` or `/mcp` paths and does not mount the API in process.
+The Website declares no server functions, has no proxy at the API's `/api`
+or `/mcp` paths and does not mount the API in process.
 
 `src/router.tsx` creates one registry before loaders run and React reuses it.
 TanStack owns loader data and its freshness: intent preloading, a one-minute

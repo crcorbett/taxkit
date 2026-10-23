@@ -15,7 +15,7 @@ work without knowing which host runs them. Each app host supplies its server,
 configuration and platform services to the same checked operations.
 
 Cloudflare setup is the priority. Bun remains supported at its current HTTP
-coverage and uses the same shared packages; equal RPC/MCP coverage is not part
+coverage and uses the same shared packages; equal MCP coverage is not part
 of this change. Its application-wide calculation pool correction follows the
 Cloudflare work.
 

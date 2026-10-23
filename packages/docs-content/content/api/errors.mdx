@@ -38,11 +38,11 @@ HTTP 504 with `CalculatorOperationTimedOut`. Both include a fixed `code`,
 `message` and `retry: "try-again-manually"`. Display the message and let the
 caller choose when to retry; do not automatically repeat calculations.
 
-The server shares eight active calculation places across HTTP and RPC. Each
-calculation in a batch takes a place. This budget does not claim that a
+The server shares eight active calculation places across HTTP and MCP. Each
+calculation takes a place. This budget does not claim that a
 JavaScript timer can forcibly stop synchronous CPU work. Current per-client
 rate admission in the native API adds 60 calculations per minute per checked
-connection address across HTTP, RPC and Website forms. Every batch calculation
+connection address across HTTP, MCP and Website forms. Every calculation
 counts separately; metadata reads do not count. A rejected calculation returns
 HTTP 429 with `CalculatorRateLimited` and `Retry-After: 60`. Missing/invalid
 connection identity or a failed limiter returns HTTP 503 with

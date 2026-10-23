@@ -18,22 +18,16 @@ const program = Effect.gen(function* () {
   yield* fs.makeDirectory(output, { recursive: true });
   yield* Effect.gen(function* () {
     const apiDeclaration = yield* nativeApiSourceProps;
-    // Qualify native fatal RPC replies using the real application entry and
+    // Qualify stalled calculation work using the real application entry and
     // operation. Restore the root before the ordinary API source build.
     yield* Effect.forEach(
       [
         {
-          fixtureId: "TaxKitApiRpcDefect",
-          mode: "defect",
-          workerName: "taxkit-api-local-rpc-defect",
-        },
-        {
           fixtureId: "TaxKitApiStalledWork",
-          mode: "stalled-work",
           workerName: "taxkit-api-local-stalled-work",
         },
       ] as const,
-      ({ fixtureId, mode, workerName }) =>
+      ({ fixtureId, workerName }) =>
         Effect.gen(function* nativeCalculationPolicyBuild() {
           const owner = path.join(root, "apps/api/src/worker.ts");
           const original = yield* Effect.acquireRelease(
@@ -47,7 +41,7 @@ const program = Effect.gen(function* () {
             !original.includes("Layer.provide(PublicCalculatorServiceLive)")
           ) {
             return yield* Effect.die(
-              "Native RPC defect fixture no longer matches its source owner"
+              "Native stalled-work fixture no longer matches its source owner"
             );
           }
           const injected = original
@@ -63,12 +57,8 @@ const program = Effect.gen(function* () {
               const calculator = yield* PublicCalculatorService;
               return PublicCalculatorService.of({
                 ...calculator,
-                calculate: (request) => ${
-                  mode === "defect"
-                    ? 'calculator.calculate(request).pipe(Effect.andThen(Effect.die("PRIVATE9")))'
-                    : 'Effect.logWarning("PRIVATE9 work started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.calculate(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 work released")))'
-                },
-                ${mode === "defect" ? "" : 'getCalculatorSchema: (request) => Effect.logWarning("PRIVATE9 metadata started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.getCalculatorSchema(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 metadata released"))),'}
+                calculate: (request) => Effect.logWarning("PRIVATE9 work started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.calculate(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 work released"))),
+                getCalculatorSchema: (request) => Effect.logWarning("PRIVATE9 metadata started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.getCalculatorSchema(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 metadata released"))),
               });
             })
           ).pipe(Layer.provide(PublicCalculatorServiceLive)))`
@@ -106,70 +96,8 @@ const program = Effect.gen(function* () {
           return yield* Effect.void;
         }).pipe(Effect.scoped)
     );
-    // Corrupt one field in the actual native encoded reply. The native message
-    // framing and server remain intact; this qualifies the client's decoder.
-    yield* Effect.gen(function* nativeInvalidReplyBuild() {
-      const owner = path.join(root, "apps/api/src/worker.application.ts");
-      const original = yield* Effect.acquireRelease(
-        fs.readFileString(owner),
-        (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)
-      );
-      const declaration =
-        "  ).pipe(\n    // Every reply, including native error responses, gets one cache decision.";
-      if (!original.includes(declaration)) {
-        return yield* Effect.die(
-          "Native invalid-reply fixture no longer matches its source owner"
-        );
-      }
-      const injected = original.replace(
-        declaration,
-        `  ).pipe(
-          Effect.flatMap((response) =>
-            Effect.promise(() => HttpServerResponse.toWeb(response).text()).pipe(
-              Effect.map((text) => HttpServerResponse.text(
-                text.replace('"netPay":', '"PRIVATE9":'),
-                {
-                  contentType: "application/json",
-                  headers: Headers.remove(response.headers, "content-length"),
-                  status: response.status,
-                }
-              ))
-            ).pipe(Effect.provideContext(telemetry))
-          ),
-          // Every reply, including native error responses, gets one cache decision.`
-      );
-      yield* fs.writeFileString(owner, injected);
-      const fixtureId = "TaxKitApiInvalidReply";
-      yield* fs.remove(path.join(output, "bundles", fixtureId), {
-        force: true,
-        recursive: true,
-      });
-      const props = {
-        ...apiDeclaration,
-        compatibility,
-        main: path.join(root, "apps/api/src/worker.ts"),
-      };
-      const artifacts = scopedArtifacts(fixtureId);
-      const source = yield* resolveSource(props).pipe(
-        Effect.provide(artifacts)
-      );
-      yield* source
-        .build(
-          makeSourceContext({
-            compatibility,
-            dotAlchemy: output,
-            fqn: fixtureId,
-            id: fixtureId,
-            props,
-            stack: { name: "TaxKitAppsLocalProof", stage: "dev_native_pair" },
-            workerName: "taxkit-api-local-invalid-reply",
-          })
-        )
-        .pipe(Effect.provide(artifacts));
-      return yield* Effect.void;
-    }).pipe(Effect.scoped);
-    // The native JSON RPC encoder returns an owned byte body. Delay either
-    // headers or the remaining bytes after real encoding; keep its framing.
+    // The native JSON encoder returns an owned byte body. Delay either
+    // headers or the remaining bytes after real encoding.
     yield* Effect.forEach(["body", "headers"] as const, (phase) =>
       Effect.gen(function* nativeStalledReplyBuild() {
         const owner = path.join(root, "apps/api/src/worker.application.ts");

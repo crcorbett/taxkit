@@ -275,14 +275,14 @@ interruption/scopes release resources.
 
 The API Worker uses the native Alchemy Worker class and `.make`.
 `ApiWorkerApplication` constructs its router in the native instance scope and
-receives one calculator service for HTTP and RPC. It creates no ManagedRuntime.
+receives one calculator service for HTTP and MCP. It creates no ManagedRuntime.
 Each handler runs in the incoming native fibre and request scope; tests observe
 both request paths and the corresponding finalisers. The selected native
 workerd instance scope has no teardown hook, so no isolate-finaliser claim is
 made; request-coupled I/O belongs inside incoming dispatch.
 
 Origins stay deferred during native planning. A cached native Config effect
-decodes bound addresses on first incoming runtime use. HTTP/RPC handling builds
+decodes bound addresses on first incoming runtime use. HTTP handling builds
 no live Layer. The modern MCP registration is built once after addresses resolve,
 excluding first-caller capabilities. Native `layerHttpRequestScoped` owns each
 POST's protocol server/notification consumer through body completion; shared
@@ -299,7 +299,7 @@ calculation POSTs alone receive the stage-owned native Random secret and checked
 original IP. The API's static `ApiWebsiteForwardingLive` verifies request-time
 Config with the native constant-time primitive and strips private fields before
 domain dispatch. No credential memo retains an incoming request's fibre or
-context. Public RPC/MCP retain direct-edge identity and the same shared limiter.
+context. Public MCP retains direct-edge identity and the same shared limiter.
 
 ## Promise boundaries
 
@@ -529,13 +529,6 @@ runner or live Layer is built inside a calculation, and no transport gains a
 competing application contract. The owning package records timeout and CPU limits.
 
 
-The [RPC owner](../../packages/api/rpc/README.md#complete-named-operation-contract)
-exposes all nine existing calculator operations. Its private concrete native
-operation transformation shares scope/deadline/safe transport policy across
-those named methods; application work remains at the calculator service. No
-operation constructs a Layer or runner, and callers receive no raw client.
-
-
 ## Native calculation rate admission
 
 `CalculatorAdmission` is a closed named service; its [owning contract](../../packages/calculators/README.md#native-calculation-rate-admission) and redacted key Schema live with calculators. The request Context reference carries checked identity separately from facts. `PublicCalculatorServiceRateLimited` provides calculation-only admission; the native API composes it once below bounded work. Its provider Layer, installed live Layer and mock test Layer remain separate. Native provider replies are decoded immediately and failures become fixed errors without provider causes or addresses.
@@ -549,13 +542,6 @@ ingress, reject runners at every admitted file and reject decoding in the
 nearby calculator admission Layer. No wildcard or new unknown-parameter
 exception is added. The Website Layer accepts the generated native Fetcher
 capability; its settings boundary checks the richer API binding once.
-
-The native documentation RPC handler Layer captures the same supplied
-`ContentService` as public HTTP. It owns no runtime or catalogue fallback. A
-separate `DocsRpcClient` provides five closed named operations over native RPC,
-with its own revision/error vocabulary and per-call resource scope. Only the
-concrete closed JSON byte reader is shared with the calculator client; no raw
-client callback or provider object enters either service contract.
 
 The native API composes the publication package’s static `ContentDiscoveryLive` once from the
 checked catalogue and supplies its existing cached settings Effect as

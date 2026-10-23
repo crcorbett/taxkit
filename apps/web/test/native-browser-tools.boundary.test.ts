@@ -1,6 +1,6 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
-import { CalculatorCatalogResponse } from "@taxkit/api-rpc/schemas";
+import { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
 import {
   Array,
   Effect,
@@ -228,7 +228,7 @@ it.live(
       caller.on("WebMCP.toolsRemoved", (event) => {
         Queue.offerUnsafe(removed, event);
       });
-      // Calls are calculations plus any retired Website or RPC transport path;
+      // Calls are calculations plus any retired Website transport path;
       // public API reads are recorded separately.
       const reads = yield* Queue.make<string>();
       page.on("request", (request) => {
@@ -238,7 +238,6 @@ it.live(
           Queue.offerUnsafe(reads, call);
         } else if (
           url.origin === apiOrigin ||
-          url.pathname.startsWith("/rpc") ||
           url.pathname.startsWith("/_serverFn")
         ) {
           Queue.offerUnsafe(calls, `${call}${url.search}`);

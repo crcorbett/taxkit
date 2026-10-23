@@ -81,9 +81,9 @@ canonical constructor. No published pages is a failure. It writes ignored
 `.source/public-catalogue.json` only on success. The compiler's browser path is
 a build environment input. Its JSON-only `./public-catalogue` export is
 checked once by each API host; it imports no compiler into request handling.
-HTTP and native RPC documentation groups delegate page/navigation/search and
-processed Markdown to the same `ContentService`. Its compiled public-path
-refinement and fixed missing-page/search errors serve both transports. The
+The HTTP documentation group delegates page/navigation/search and processed
+Markdown to the `ContentService`. Its compiled public-path refinement and fixed
+missing-page/search errors serve HTTP and MCP. The
 Website reads pages, navigation, search and Markdown from the API's public HTTP
 content routes with the generated client and renders browser-safe compiled
 presentation. Its `/search` GET form shows published titles and descriptions

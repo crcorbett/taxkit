@@ -28,12 +28,10 @@ Both API hosts provide `ContentService` from the generated public catalogue.
 `src/content.boundary.ts` imports only `@taxkit/docs-content/public-catalogue`
 JSON, checks it once when the host is built and reports a fixed configuration
 failure if it is invalid. Incoming requests do not load authored MDX or run
-the compiler. Public HTTP and native RPC documentation operations serve
-navigation, checked page values, bounded search and exact processed Markdown
-from that same service. Documentation calls consume no calculator allowance.
-See the [HTTP package](../../packages/api/http/README.md) for paths/response rules
-and the [RPC owner](../../packages/api/rpc/README.md#documentation-connection)
-for the separate documentation revision and client.
+the compiler. Public HTTP documentation operations serve navigation, checked
+page values, bounded search and exact processed Markdown from that same service.
+Documentation calls consume no calculator allowance. See the
+[HTTP package](../../packages/api/http/README.md) for paths/response rules.
 
 The native Worker also serves the four discovery documents at GET (and HEAD)
 `/api/v1/docs/discovery/sitemap.xml`, `/robots.txt`, `/llms.txt` and
@@ -66,19 +64,18 @@ native implementation and standalone `.make` entry. Root `alchemy.apps.ts`
 joins that implementation with deployment resources through the same native
 `.make` API. Infrastructure and the Website do not import this app.
 `src/worker.application.ts` constructs one router and shared
-`PublicCalculatorService` in the native instance scope. HTTP and
-POST `/rpc` delegate to the same calculator service. Its named RPC operations
-match all nine existing calculator-service calls using the canonical request/result contracts. Native requests keep their own
+`PublicCalculatorService` in the native instance scope. HTTP and MCP
+delegate to the same calculator service. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
-The Worker exposes the native default `fetch` entrypoint for public HTTP, RPC,
+The Worker exposes the native default `fetch` entrypoint for public HTTP,
 MCP and the Website's private HTTP binding. Canonical Website calculation POSTs
 carry a stage-owned secret and a separately checked original IP in private
 headers. `ApiWebsiteForwarding` authenticates them before supplying the shared
 rate key and strips both fields before router dispatch. Partial, malformed or
-incorrect metadata fails closed. Public HTTP/RPC/MCP retain their direct-edge
+incorrect metadata fails closed. Public HTTP and MCP retain their direct-edge
 identity and credential-free contracts; forwarding metadata grants no authority
-on other methods or paths. There is no calculation RPC tunnel.
+on other methods or paths.
 
 The native init declares Cloudflare Workers Cache with
 `cache({ crossVersionCache: false })`, so each deployed version starts its own
@@ -88,7 +85,7 @@ HEAD on a public read path (documentation, discovery, calculator metadata and
 the OpenAPI documents) without `Set-Cookie` gets
 `Cache-Control: public, max-age=0` and
 `Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
-Health, calculation, RPC, MCP and every error reply get `no-store`.
+Health, calculation, MCP and every error reply get `no-store`.
 
 `@taxkit/observability/edge-identity` owns `CalculatorHostMode` and
 `edgeCallerKey`, which reads `cf-connecting-ip`, refuses Worker subrequests and
@@ -101,7 +98,7 @@ The Worker checks `API_PUBLIC_ORIGIN`, `WEBSITE_PUBLIC_ORIGIN` and
 canonical origin policy. Its own origin comes from native `Worker.URL`; the
 publication origin is the fixed Production site `https://taxkit.dev`. The API
 receives the same-stage Website address through native `api.bind`. Absent or invalid settings return a fixed
-native Config error without the rejected value. HTTP and RPC CORS admit any
+native Config error without the rejected value. HTTP CORS admits any
 exact HTTP(S) browser origin with credentials disabled (`publicCors` and
 `isBrowserOrigin` in `@taxkit/api-http/response-policy`, also used by the Bun
 host routes), and allow `content-type`, the optional
@@ -133,7 +130,7 @@ Local plans and transport tests do not show a deployment works.
 
 `@taxkit/analytics/api-usage` owns the calculator analytics decorator, composed
 here after native hosted calculation succeeds. It collects only the catalogue
-calculator ID and name. HTTP, native RPC and the two MCP protocols use this same decorator;
+calculator ID and name. HTTP and the two MCP protocols use this same decorator;
 pure tax packages and local SDK calls have no analytics dependency. Metadata,
 failed or interrupted calculations add no successful-use event. A request can
 collect at most 64 successes; excess analytics are dropped without changing
@@ -157,7 +154,7 @@ local and does not acquire analytics.
 
 Focused tests cover the event owner, request isolation, policies and controlled
 transport. The built native API additionally checks real Fetch sends after HTTP
-and RPC calculations and both official MCP client protocols. Each MCP
+calculations and both official MCP client protocols. Each MCP
 conversation changes deny → allow → deny without retaining its first choice.
 Rejected or redirected capture keeps the tax reply successful; a stalled capture
 reply reaches the native five-second drop while the tax reply returns within two
@@ -366,12 +363,12 @@ binding and addresses; root composition provides the app implementation. The
 API app owns request handling and checked runtime configuration. This export
 does not make a public package or change the existing HTTP/OpenAPI contract.
 
-`@taxkit/api-http/request-boundary` owns the native streamed POST limit
-(`@taxkit/api-rpc/request-boundary` re-exports it). `@taxkit/observability/host-telemetry`
+`@taxkit/api-http/request-boundary` owns the native streamed POST limit.
+`@taxkit/observability/host-telemetry`
 owns the same fixed logging/reporting policy used by the Website, and the one
 `taxkit.request` record each host writes per request. The API maps its paths to
 a closed route family (`health`, `calculate`, `catalogue`, `docs`,
-`discovery`, `reference`, `rpc`, `mcp` or `other`); calls through the private
+`discovery`, `reference`, `mcp` or `other`); calls through the private
 binding are recorded too. The record never reads the URL, headers or either
 body. This reuse does not qualify native trace export or every framework
 logging path.
@@ -387,13 +384,13 @@ why invocation logs and traces stay off. Local graph/state checks establish the
 declared settings, not uploaded Cloudflare settings or safe stored rows.
 
 The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
-across HTTP and RPC, including individual batch messages, with a five-second
+across HTTP and MCP, with a five-second
 operation budget for all nine methods. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC revision `4` errors. Website guidance requests
+503/504 envelopes. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
-seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
-browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
+eight HTTP calculations, rejected extra HTTP/SSR/
+browser calls, HTTP 504 timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. The native rate policy below is separate.
 
@@ -404,15 +401,14 @@ Options. Raw public HTTP JSON still uses ordinary optional fields. The
 
 
 Known requests in work-pool, exact body-limit and defect fixtures encode through
-their owning HTTP/RPC Schemas before JSON framing. Bad tag/id tests mutate the
-encoded frame, so another request-shape error cannot mask the intended fault.
-The original capacity, body size, cleanup and safe-reporter assertions remain.
+their owning HTTP Schemas before JSON framing. The capacity, body size, cleanup
+and safe-reporter assertions remain.
 
 
 ## Native calculation rate admission
 
 The native API builds `PublicCalculatorServiceRateLimited` once underneath its
-bounded service. HTTP, RPC, modern MCP and authenticated Website HTTP share the
+bounded service. HTTP, modern MCP and authenticated Website HTTP share the
 [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission).
 Public requests need a checked original Cloudflare connection address;
 arbitrary Worker headers cannot select a key. Website canonical calculation
@@ -443,7 +439,7 @@ its own capabilities.
 
 The six tools list calculators, read an input Schema, calculate, read docs
 navigation, search docs and read a processed Markdown page. They use canonical
-calculator/content Schemas and the same service implementations as HTTP/RPC.
+calculator/content Schemas and the same service implementations as HTTP.
 Discovery advertises `tools.listChanged: false`. Legacy sessions, subscriptions,
 GET streams, DELETE termination and resumption are unsupported. The retired
 `TaxKitMcpSessions` class/export/binding is absent from the desired native graph;
@@ -457,7 +453,7 @@ inside the request scope within ten seconds and 2 MiB. Origin-less clients work;
 a supplied Origin must exactly match the same-stage Website origin. Only `/mcp` permits
 modern protocol/routing headers in CORS, with credentials disabled. Expected
 failures have fixed codes and manual-retry guidance; native internal failures use
-the existing safe reply and fixed reporter. HTTP/RPC/MCP retain the shared native
+the existing safe reply and fixed reporter. HTTP and MCP retain the shared native
 anonymous per-IP allowance and five-second calculation budget.
 
 In-process AbortSignal cancellation interrupts actual work. On the pinned native

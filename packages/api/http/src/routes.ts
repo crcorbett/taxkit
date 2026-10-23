@@ -4,7 +4,6 @@ import { Schema } from "effect";
 // Transport addresses have one owner. Authored page identities stay in Content;
 // Website file routes stay in the Website application.
 export const healthPath = "/api/health";
-export const rpcPath = "/rpc";
 export const mcpPath = "/mcp";
 export const referencePath = "/api/docs";
 export const openApiPath = "/api/docs/openapi.json";
@@ -61,7 +60,6 @@ export const McpRoutePath = Schema.Union([
   Schema.Literal(mcpPath),
   Schema.TemplateLiteral([mcpPath, "/", Schema.String]),
 ]);
-export const RpcRoutePath = Schema.Literal(rpcPath);
 
 const CalculatorCollectionPath = Schema.Literals([
   calculatorPaths.jurisdictions,
@@ -107,6 +105,3 @@ export const PublicReadApiPath = Schema.Union([
   ApiReferencePath,
 ]);
 export const isPublicReadApiPath = Schema.is(PublicReadApiPath);
-export const isTrustedCalculationPath = Schema.is(
-  Schema.Union([RpcRoutePath, CalculationPath])
-);

@@ -4,20 +4,16 @@ import {
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/request-boundary";
-import {
-  CalculatorRpcPayload,
-  CalculatorRpcVersion,
-} from "@taxkit/api-rpc/schemas";
+import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
 import {
   CalculationRequest,
   CalculatorFixture,
   CalculatorFixtureMode,
   CalculatorLive,
   sensitiveSentinel,
-} from "@taxkit/api-rpc/testing/fixtures";
-import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
-import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
-import { PublicCalculatorService } from "@taxkit/calculators/service";
+} from "@taxkit/calculators/testing/fixtures";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import {
   ApiHostTelemetryLive,
@@ -37,7 +33,6 @@ import {
   Order,
   Record,
   Ref,
-  References,
   Schema,
   Scope,
   Stream,
@@ -73,12 +68,7 @@ const settings = ConfigProvider.fromUnknown({
   WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
 const Json = Schema.fromJsonString(Schema.Unknown);
-const NativeRequest = Schema.TaggedStruct("Request", {
-  headers: Schema.Array(Schema.Tuple([Schema.String, Schema.String])),
-  id: Schema.String,
-  payload: CalculatorRpcPayload,
-  tag: Schema.Literal("Calculate"),
-});
+const calculatePath = "/api/v1/calculators/au.pay.take-home/calculate";
 
 // Each request writes one checked fixed-field record; anything else is a
 // runtime log line.
@@ -165,7 +155,7 @@ describe("native API application", () => {
     }).pipe(Effect.provideService(ConfigProvider.ConfigProvider, settings))
   );
 
-  it.effect("shares eight calculation places across HTTP and RPC batches", () =>
+  it.effect("shares eight calculation places across HTTP calls", () =>
     Effect.gen(function* () {
       const live = yield* PublicCalculatorService;
       const active = yield* Ref.make(0);
@@ -198,98 +188,63 @@ describe("native API application", () => {
           )
         )
       );
-      const invoke = (
-        path: "/rpc" | "/api/v1/calculators/au.pay.take-home/calculate",
-        body: string
-      ) =>
+      const httpBody = yield* Schema.encodeEffect(
+        Schema.fromJsonString(CalculatorRunRequest)
+      )(CalculationRequest.payload);
+      // A request body can be read once, so each call builds its own request.
+      const invoke = Effect.suspend(() =>
         app.fetch.pipe(
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromWeb(
-              new Request(`https://api.example.com${path}`, {
-                body,
-                headers: {
-                  "content-type": "application/json",
-                  origin: "https://website.example.com",
-                },
-                method: "POST",
-              })
+              new Request(
+                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+                {
+                  body: httpBody,
+                  headers: {
+                    "content-type": "application/json",
+                    origin: "https://website.example.com",
+                  },
+                  method: "POST",
+                }
+              )
             )
           ),
           Effect.scoped
-        );
-      const rpcBody = yield* Schema.encodeEffect(
-        Schema.fromJsonString(Schema.Array(NativeRequest))
-      )(
-        Array.map(Array.range(1, 7), (id) =>
-          NativeRequest.make({
-            headers: [],
-            id: String(id),
-            payload: {
-              request: CalculationRequest,
-              version: CalculatorRpcVersion,
-            },
-            tag: "Calculate",
-          })
         )
       );
-      const httpBody = yield* Schema.encodeEffect(
-        Schema.fromJsonString(CalculatorRunRequest)
-      )(CalculationRequest.payload);
-      const http = yield* invoke(
-        "/api/v1/calculators/au.pay.take-home/calculate",
-        httpBody
-      ).pipe(Effect.forkScoped);
-      const rpc = yield* invoke("/rpc", rpcBody).pipe(Effect.forkScoped);
-      yield* Deferred.await(started).pipe(
-        Effect.raceFirst(
-          Fiber.join(http).pipe(
-            Effect.flatMap((response) =>
-              Effect.die(`HTTP fixture ended early: ${response.status}`)
-            )
-          )
-        ),
-        Effect.raceFirst(
-          Fiber.join(rpc).pipe(
-            Effect.flatMap((response) =>
-              Effect.die(`RPC fixture ended early: ${response.status}`)
-            )
-          )
-        )
+      const running = yield* Effect.forEach(Array.range(1, 8), () =>
+        invoke.pipe(Effect.forkScoped)
       );
-      const busyHttp = yield* invoke(
-        "/api/v1/calculators/au.pay.take-home/calculate",
-        httpBody
+      yield* Deferred.await(started);
+      const busy = yield* invoke;
+      expect(busy.status).toBe(503);
+      const busyText = yield* Effect.promise(() =>
+        HttpServerResponse.toWeb(busy).text()
       );
-      expect(busyHttp.status).toBe(503);
-      const busyHttpText = yield* Effect.promise(() =>
-        HttpServerResponse.toWeb(busyHttp).text()
-      );
-      expect(busyHttpText).toContain("CalculatorCapacityExceeded");
-      const busyRpc = yield* invoke("/rpc", rpcBody);
-      const busyRpcText = yield* Effect.promise(() =>
-        HttpServerResponse.toWeb(busyRpc).text()
-      );
-      expect(busyRpc.status).toBe(200);
-      expect(busyRpcText).toContain("CalculatorCapacityExceeded");
+      expect(busyText).toContain("CalculatorCapacityExceeded");
       expect(yield* Ref.get(active)).toBe(8);
       yield* TestClock.adjust("4 seconds");
       expect(yield* Ref.get(released)).toBe(0);
       yield* TestClock.adjust("1 second");
-      const timedHttp = yield* Fiber.join(http);
-      expect(timedHttp.status).toBe(504);
-      const timedHttpText = yield* Effect.promise(() =>
-        HttpServerResponse.toWeb(timedHttp).text()
+      const timed = yield* Effect.forEach(running, (fibre) =>
+        Fiber.join(fibre).pipe(
+          Effect.flatMap((response) =>
+            Effect.promise(() =>
+              HttpServerResponse.toWeb(response).text()
+            ).pipe(Effect.map((text) => ({ status: response.status, text })))
+          )
+        )
       );
-      const timedRpc = yield* Fiber.join(rpc);
-      const timedRpcText = yield* Effect.promise(() =>
-        HttpServerResponse.toWeb(timedRpc).text()
+      yield* Effect.forEach(timed, ({ status, text }) =>
+        Effect.sync(() => {
+          expect(status).toBe(504);
+          expect(text).toContain("CalculatorOperationTimedOut");
+        })
       );
-      expect(timedHttpText).toContain("CalculatorOperationTimedOut");
-      expect(timedRpcText).toContain("CalculatorOperationTimedOut");
       expect(yield* Ref.get(released)).toBe(8);
       yield* Effect.forEach(
-        [busyHttpText, busyRpcText, timedHttpText, timedRpcText],
+        [busyText, ...Array.map(timed, ({ text }) => text)],
         (text) =>
           Effect.sync(() => {
             expect(text).not.toContain(sensitiveSentinel);
@@ -364,69 +319,6 @@ describe("native API application", () => {
       )
   );
 
-  it.effect(
-    "returns safe global protocol errors with no native console output",
-    () =>
-      Effect.gen(function* () {
-        const app = yield* ApiWorkerInit;
-        const request = yield* Schema.encodeEffect(NativeRequest)(
-          NativeRequest.make({
-            headers: [],
-            id: "1",
-            payload: {
-              request: CalculationRequest,
-              version: CalculatorRpcVersion,
-            },
-            tag: "Calculate",
-          })
-        );
-        const wrongTag = yield* Schema.encodeEffect(Json)({
-          ...request,
-          tag: sensitiveSentinel,
-        });
-        const wrongId = yield* Schema.encodeEffect(Json)({
-          ...request,
-          id: sensitiveSentinel,
-        });
-        yield* Effect.forEach(["{", wrongTag, wrongId], (body) =>
-          app.fetch.pipe(
-            Effect.provideService(
-              HttpServerRequest.HttpServerRequest,
-              HttpServerRequest.fromWeb(
-                new Request("https://api.example.com/rpc", {
-                  body,
-                  headers: {
-                    "cf-connecting-ip": "203.0.113.75",
-                    "content-type": "application/json",
-                  },
-                  method: "POST",
-                })
-              )
-            ),
-            Effect.flatMap((response) =>
-              Effect.promise(() => HttpServerResponse.toWeb(response).text())
-            ),
-            Effect.tap((text) =>
-              Effect.sync(() => {
-                expect(text).toContain("Calculation service failed");
-                expect(text).not.toContain(sensitiveSentinel);
-                expect(text).not.toContain("stack");
-              })
-            ),
-            Effect.scoped
-          )
-        );
-        // These native parser failures send fixed global replies without logging.
-        // The separate reporter/formatter fixtures exercise positive log egress.
-        expect(runtimeLines(yield* TestConsole.logLines)).toEqual([]);
-      }).pipe(
-        Effect.provideService(ConfigProvider.ConfigProvider, settings),
-        Effect.provideService(References.MinimumLogLevel, "Debug"),
-        Effect.provide(TestConsole.layer),
-        Effect.scoped
-      )
-  );
-
   it.effect("closes a stalled body at its total read deadline", () =>
     Effect.gen(function* () {
       const started = yield* Deferred.make<boolean>();
@@ -436,7 +328,7 @@ describe("native API application", () => {
         Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
       ).pipe(Stream.ensuring(Ref.set(released, true)));
       const request = HttpServerRequest.fromClientRequest(
-        HttpClientRequest.post("https://api.example.com/rpc").pipe(
+        HttpClientRequest.post(`https://api.example.com${calculatePath}`).pipe(
           HttpClientRequest.bodyStream(body, {
             contentType: "application/json",
           })
@@ -452,7 +344,9 @@ describe("native API application", () => {
       const response = yield* Fiber.join(fibre);
       expect(response.status).toBe(408);
       const json = yield* HttpServerResponse.toClientResponse(response, {
-        request: HttpClientRequest.post("https://api.example.com/rpc"),
+        request: HttpClientRequest.post(
+          `https://api.example.com${calculatePath}`
+        ),
       }).json;
       expect(
         yield* Schema.decodeUnknownEffect(CalculatorRequestBodyErrorEnvelope)(
@@ -488,7 +382,9 @@ describe("native API application", () => {
         Effect.provideService(
           HttpServerRequest.HttpServerRequest,
           HttpServerRequest.fromClientRequest(
-            HttpClientRequest.post("https://api.example.com/rpc").pipe(
+            HttpClientRequest.post(
+              `https://api.example.com${calculatePath}`
+            ).pipe(
               HttpClientRequest.bodyStream(body, {
                 contentType: "application/json",
               })
@@ -530,7 +426,10 @@ describe("native API application", () => {
           ),
           Effect.scoped
         );
-      const other = yield* preflight("/rpc", "https://other.example.com");
+      const other = yield* preflight(
+        calculatePath,
+        "https://other.example.com"
+      );
       expect(other.status).toBe(204);
       expect(allowOrigin(other)).toBe("https://other.example.com");
       expect(
@@ -549,9 +448,12 @@ describe("native API application", () => {
       );
       expect(allowOrigin(http)).toBe("http://127.0.0.1:3000");
       // A malformed or non-HTTP origin is never echoed.
-      const malformed = yield* preflight("/rpc", "https://other.example.com/");
+      const malformed = yield* preflight(
+        calculatePath,
+        "https://other.example.com/"
+      );
       expect(allowOrigin(malformed)).toBeUndefined();
-      const opaque = yield* preflight("/rpc", "null");
+      const opaque = yield* preflight(calculatePath, "null");
       expect(allowOrigin(opaque)).toBeUndefined();
       // Remote MCP keeps its exact browser list.
       const mcpListed = yield* preflight("/mcp", "https://website.example.com");
@@ -565,8 +467,6 @@ describe("native API application", () => {
   );
 
   it.effect.each([
-    { pathname: "/rpc", representation: "chunks" },
-    { pathname: "/rpc", representation: "utf-8" },
     {
       pathname: "/api/v1/calculators/au.pay.take-home/calculate",
       representation: "chunks",
@@ -628,7 +528,7 @@ describe("native API application", () => {
   );
 
   it.effect(
-    "accepts exactly 64 KiB across HTTP and native RPC with one shared operation",
+    "accepts exactly 64 KiB and shares one calculator operation across requests",
     () =>
       Effect.gen(function* () {
         const calls = yield* Ref.make(0);
@@ -691,19 +591,6 @@ describe("native API application", () => {
         const httpBody = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
         )(CalculationRequest.payload);
-        const rpcBody = yield* Schema.encodeEffect(
-          Schema.fromJsonString(NativeRequest)
-        )(
-          NativeRequest.make({
-            headers: [],
-            id: "1",
-            payload: {
-              request: CalculationRequest,
-              version: CalculatorRpcVersion,
-            },
-            tag: "Calculate",
-          })
-        );
         const http = yield* transport.execute(
           HttpClientRequest.post(
             "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate"
@@ -717,27 +604,21 @@ describe("native API application", () => {
             )
           )
         );
-        const rpc = yield* transport.execute(
-          HttpClientRequest.post("https://api.example.com/rpc").pipe(
-            HttpClientRequest.bodyText(
-              rpcBody +
-                " ".repeat(
-                  65_536 - new TextEncoder().encode(rpcBody).byteLength
-                ),
-              "application/json"
-            )
-          )
+        const second = yield* transport.execute(
+          HttpClientRequest.post(
+            `https://api.example.com${calculatePath}`
+          ).pipe(HttpClientRequest.bodyText(httpBody, "application/json"))
         );
         expect(http.status).toBe(200);
-        expect(rpc.status).toBe(200);
+        expect(second.status).toBe(200);
         expect(yield* http.text).toContain('"netPay"');
-        expect(yield* rpc.text).toContain('"netPay"');
+        expect(yield* second.text).toContain('"netPay"');
         expect(yield* Ref.get(calls)).toBe(2);
         expect(yield* Ref.get(constructions)).toBe(1);
         expect(yield* Ref.get(releases)).toBe(2);
         expect(yield* Ref.get(incomingPaths)).toEqual([
           "/api/v1/calculators/au.pay.take-home/calculate",
-          "/rpc",
+          "/api/v1/calculators/au.pay.take-home/calculate",
         ]);
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
@@ -979,59 +860,51 @@ describe("native API application", () => {
     )
   );
 
-  it.effect("captures a native RPC defect in the installed safe reporter", () =>
-    Effect.gen(function* () {
-      const app = yield* ApiWorkerApplication.pipe(
-        Effect.provide(ApiContentLive),
-        Effect.provide(
-          CalculatorFixture.pipe(
-            Layer.provide(Layer.succeed(CalculatorFixtureMode)("defect"))
+  it.effect(
+    "captures a calculation defect in the installed safe reporter",
+    () =>
+      Effect.gen(function* () {
+        const app = yield* ApiWorkerApplication.pipe(
+          Effect.provide(ApiContentLive),
+          Effect.provide(
+            CalculatorFixture.pipe(
+              Layer.provide(Layer.succeed(CalculatorFixtureMode)("defect"))
+            )
           )
-        )
-      );
-      const body = yield* Schema.encodeEffect(
-        Schema.fromJsonString(NativeRequest)
-      )(
-        NativeRequest.make({
-          headers: [],
-          id: "1",
-          payload: {
-            request: CalculationRequest,
-            version: CalculatorRpcVersion,
-          },
-          tag: "Calculate",
-        })
-      );
-      const response = yield* app.fetch.pipe(
-        Effect.provideService(
-          HttpServerRequest.HttpServerRequest,
-          HttpServerRequest.fromWeb(
-            new Request("https://api.example.com/rpc", {
-              body,
-              headers: {
-                "cf-connecting-ip": "203.0.113.75",
-                "content-type": "application/json",
-              },
-              method: "POST",
-            })
-          )
-        ),
+        );
+        const body = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CalculatorRunRequest)
+        )(CalculationRequest.payload);
+        const response = yield* app.fetch.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromWeb(
+              new Request(`https://api.example.com${calculatePath}`, {
+                body,
+                headers: {
+                  "cf-connecting-ip": "203.0.113.75",
+                  "content-type": "application/json",
+                },
+                method: "POST",
+              })
+            )
+          ),
+          Effect.scoped
+        );
+        const text = yield* Effect.promise(() =>
+          HttpServerResponse.toWeb(response).text()
+        );
+        const lines = yield* TestConsole.logLines;
+        expect(response.status).toBe(500);
+        expect(text).toBe("");
+        expect(lines.length).toBeGreaterThan(0);
+        expect(yield* Schema.encodeEffect(Json)(lines)).not.toContain(
+          sensitiveSentinel
+        );
+      }).pipe(
+        Effect.provideService(ConfigProvider.ConfigProvider, settings),
+        Effect.provide(TestConsole.layer),
         Effect.scoped
-      );
-      const text = yield* Effect.promise(() =>
-        HttpServerResponse.toWeb(response).text()
-      );
-      const lines = yield* TestConsole.logLines;
-      expect(text).toContain("Calculation service failed");
-      expect(text).not.toContain(sensitiveSentinel);
-      expect(lines.length).toBeGreaterThan(0);
-      expect(yield* Schema.encodeEffect(Json)(lines)).not.toContain(
-        sensitiveSentinel
-      );
-    }).pipe(
-      Effect.provideService(ConfigProvider.ConfigProvider, settings),
-      Effect.provide(TestConsole.layer),
-      Effect.scoped
-    )
+      )
   );
 });

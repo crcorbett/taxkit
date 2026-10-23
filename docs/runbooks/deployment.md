@@ -107,7 +107,8 @@ bun run pr:deploy pr-<number>
 bun run pr:destroy pr-<number>
 ```
 
-`pr:deploy` builds the repository first. Preview uses its own API, never the
+`pr:deploy` builds the repository first. `pr:plan` and `production:plan` build
+the documentation catalogue first, because the API imports it while planning. Preview uses its own API, never the
 Production API. Destroy the stage when its pull request closes.
 
 `pr:destroy` validates the first-argument `pr-<number>` stage and rejects

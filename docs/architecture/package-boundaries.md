@@ -28,7 +28,6 @@ Implemented packages and apps:
 - `packages/docs-fumadocs`
 - `packages/core`
 - `packages/api/http`
-- `packages/api/rpc`
 - `packages/api/mcp`
 - `packages/content`
 - `packages/publication`
@@ -282,8 +281,7 @@ another app.
 The separate `taxkit-package/workspace-roles` rule owns frontend and deployment
 roles. A public export or declared dependency does not make a backend handler,
 server, domain live Layer or content compiler browser-safe. Website source uses
-the contract/client modules listed in `tools/oxlint/package-roles.ts`; the RPC
-`live` entries are transport clients. Exact host exceptions admit the existing
+the contract/client modules listed in `tools/oxlint/package-roles.ts`. Exact host exceptions admit the existing
 server relay, host telemetry, admission and infrastructure binding types. These
 exceptions do not bypass exports or declared-dependency checks. Browser code
 also rejects Alchemy and local `.server`/`.server.layer` imports. Exact local
@@ -310,8 +308,7 @@ Engine packages should contain tax-domain primitives, facts, rule packs, calcula
 
 
 Shared streamed HTTP-body admission belongs to the existing HTTP transport
-package's narrow `request-boundary` export. The private RPC transport depends
-inward on that owner. The SDK exposes the same contracts through `/http` while
+package's narrow `request-boundary` export. The SDK exposes the same contracts through `/http` while
 its calculation facades stay independent of HTTP. Native hosts compose
-admission outside their HTTP/RPC routes; the retained standalone HTTP server
-mounts it. The HTTP transport never depends on RPC or the SDK.
+admission outside their HTTP routes; the retained standalone HTTP server
+mounts it. The HTTP transport never depends on the SDK.

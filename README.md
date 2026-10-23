@@ -202,7 +202,7 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
 
 - `apps/api` is the API runtime owner. Its standalone entry runs through
   `BunRuntime.runMain`, serves `packages/api/http` through Bun and disposes
-  scoped resources on shutdown; its native Worker serves HTTP, RPC and MCP.
+  scoped resources on shutdown; its native Worker serves HTTP and MCP.
 - `apps/web` owns the replacement documentation reader over the accepted
   backend catalogue and compiled MDX. Canonical page fields and reusable
   Fumadocs internals remain package-owned.

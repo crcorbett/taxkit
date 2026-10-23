@@ -5,14 +5,14 @@ import {
 } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
+import { GetCalculatorRequest } from "@taxkit/calculators/schemas";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
 import {
   CalculationRequest,
   CalculatorFixture,
   CalculatorFixtureMode,
   CalculatorLive,
-} from "@taxkit/api-rpc/testing/fixtures";
-import { GetCalculatorRequest } from "@taxkit/calculators/schemas";
-import { PublicCalculatorService } from "@taxkit/calculators/service";
+} from "@taxkit/calculators/testing/fixtures";
 import { Array, Cause, Effect, Exit, Layer, Option, Ref } from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
@@ -62,9 +62,12 @@ it.effect.each([
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromWeb(
-              new Request("https://api.example.com/rpc?private-query=ignored", {
-                headers,
-              })
+              new Request(
+                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate?private-query=ignored",
+                {
+                  headers,
+                }
+              )
             )
           ),
           Effect.provide(AnalyticsCalculatorLive),

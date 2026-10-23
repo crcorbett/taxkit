@@ -31,13 +31,11 @@ documentation.
 Implemented surfaces:
 
 - `apps/api`: standalone Bun API and native Worker sharing the public HTTP
-  contract and calculator service; the Worker also serves RPC, MCP and the
+  contract and calculator service; the Worker also serves MCP and the
   discovery documents.
 - `apps/web`: TanStack Start Website for the calculators and documentation. It
   reads the API with the generated HTTP client, over the private binding on the
   server and the public origin in the browser.
-- `packages/api/rpc`: private native RPC transport for machine callers over the
-  same services.
 - `packages/api/http`: Effect HTTP API package for health, generated docs,
   OpenAPI JSON, public calculator metadata and public calculation routes.
 - `packages/calculators`: reusable calculator catalog, metadata, graph,
