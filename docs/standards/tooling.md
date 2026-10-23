@@ -90,7 +90,7 @@ Current TaxKit-specific overrides are narrow:
 - `unicorn/no-array-method-this-argument`: Effect `Array` helpers are not native
   JavaScript array method `thisArg` usage.
 
-Portable custom rules live under `effect/*`, `bun/*` and `mdx/*`; tax,
+Portable custom rules live under `effect/*` and `bun/*`; tax,
 calculator and decoder policy remains under `taxkit/*`.
 
 The native `package/workspace-import-boundaries` rule consumes checked current
@@ -156,8 +156,6 @@ Important portable rules include:
   named `Bun` or `BunRuntime` as host APIs. Non-host global Bun members such as
   `Bun.version` remain outside this rule, including direct and destructured
   access.
-- `mdx/no-route-local-component-registry`: keeps the MDX registry app-owned and
-  route components composition-only.
 
 Current TaxKit-specific custom rules include:
 

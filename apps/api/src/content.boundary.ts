@@ -1,25 +1,35 @@
-import { ContentServiceLive } from "@taxkit/content/live";
-import { DocsPublicCatalogue } from "@taxkit/content/schemas";
-import { ContentCatalogue } from "@taxkit/content/service";
-import catalogue from "@taxkit/docs-content/public-catalogue" with { type: "json" };
-import { Config, ConfigProvider, Effect, Layer, Schema } from "effect";
+import { docsSources } from "@content/docs/sources";
+import { DocsSourceError } from "@taxkit/content/errors";
+import { ContentCatalogueLive, ContentServiceLive } from "@taxkit/content/live";
+import { DocsSource } from "@taxkit/content/schemas";
+import { DocsSources } from "@taxkit/content/service";
+import { DocsDiagramRendererLive } from "@taxkit/diagrams/mermaid";
+import { DocsCodeHighlighterLive } from "@taxkit/mdx/highlights";
+import { DocsPageReaderLive } from "@taxkit/mdx/live";
+import { Effect, Layer, Schema } from "effect";
 
-// This application boundary receives a generated JSON value. Compiler and filesystem
-// Layers remain with the build command, outside incoming request handling.
+// The API bundles the authored MDX list and chooses the reader, highlighter and
+// diagram renderer. Content builds the checked catalogue once per isolate.
 export const ApiContentLive = ContentServiceLive.pipe(
-  Layer.provideMerge(
+  Layer.provideMerge(ContentCatalogueLive),
+  Layer.provide(
     Layer.effect(
-      ContentCatalogue,
-      Schema.decodeUnknownEffect(DocsPublicCatalogue)(catalogue).pipe(
+      DocsSources,
+      Schema.decodeEffect(Schema.Array(DocsSource))(docsSources).pipe(
         Effect.mapError(
           () =>
-            new Config.ConfigError(
-              new ConfigProvider.SourceError({
-                message:
-                  "The public documentation catalogue could not be loaded.",
-              })
-            )
+            new DocsSourceError({
+              message: "A bundled docs source path is invalid.",
+              operation: "decode",
+            })
         )
+      )
+    )
+  ),
+  Layer.provide(
+    DocsPageReaderLive.pipe(
+      Layer.provide(
+        Layer.merge(DocsCodeHighlighterLive, DocsDiagramRendererLive)
       )
     )
   )

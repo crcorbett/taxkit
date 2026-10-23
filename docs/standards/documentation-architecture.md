@@ -74,7 +74,7 @@ Use these homes unless a spec chooses a different implementation path:
 
 | Content | Home |
 | --- | --- |
-| Public MDX pages | `packages/docs-content/content` |
+| Public MDX pages | `content/docs` |
 | Developer docs style | `docs/standards/*` |
 | Package-local docs | package `README.md` |
 | Architecture | `docs/architecture/*` |

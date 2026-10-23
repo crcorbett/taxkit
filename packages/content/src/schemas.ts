@@ -96,14 +96,234 @@ export type DocsNavigationItem = typeof DocsNavigationItem.Type;
 
 export const DocsNavigation = Schema.Struct({
   $schema: Schema.optional(Schema.String),
-  contentRoot: Schema.Literal("packages/docs-content/content"),
+  contentRoot: Schema.Literal("content/docs"),
   primaryNavigation: Schema.Array(DocsNavigationItem),
   status: DocsContentStatus,
 });
 export type DocsNavigation = typeof DocsNavigation.Type;
 
-export const DocsContentPage = Schema.Struct({
+// One authored page as the API bundles it: its path inside `content/docs` and
+// the raw MDX text. Content checks everything else when it builds the catalogue.
+export const DocsSource = Schema.Struct({
+  path: DocsSourcePath,
+  text: Schema.String,
+});
+export type DocsSource = typeof DocsSource.Type;
+
+// Where repository links in the docs point. Page links never use these.
+export const DocsRepositoryRevision = Schema.String.check(
+  Schema.isPattern(/^[a-f0-9]{40}$/u)
+).pipe(Schema.brand("taxkit/DocsRepositoryRevision"));
+export type DocsRepositoryRevision = typeof DocsRepositoryRevision.Type;
+
+export const DocsRepositoryProfile = Schema.Struct({
+  checkedExampleRevision: DocsRepositoryRevision,
+  repositoryRevision: DocsRepositoryRevision,
+  repositoryUrl: Schema.URLFromString,
+});
+export type DocsRepositoryProfile = typeof DocsRepositoryProfile.Type;
+
+// A link target after Content resolves it: a public page path with an optional
+// fragment, a fragment on the same page, or an absolute HTTPS address.
+export const DocsLinkHref = Schema.String.check(
+  Schema.isMaxLength(2048),
+  Schema.isPattern(
+    /^(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\/\/\S+)$/u
+  )
+).pipe(Schema.brand("taxkit/DocsLinkHref"));
+export type DocsLinkHref = typeof DocsLinkHref.Type;
+
+export const DocsHeadingId = Schema.String.check(
+  Schema.isMaxLength(120),
+  Schema.isPattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u)
+).pipe(Schema.brand("taxkit/DocsHeadingId"));
+export type DocsHeadingId = typeof DocsHeadingId.Type;
+
+const DocsInlineText = Schema.String.check(Schema.isMinLength(1));
+
+export const DocsText = Schema.Struct({
+  kind: Schema.Literal("text"),
+  text: DocsInlineText,
+});
+export const DocsInlineCode = Schema.Struct({
+  kind: Schema.Literal("inline-code"),
+  text: DocsInlineText,
+});
+const DocsLeaf = Schema.Union([DocsText, DocsInlineCode]);
+const DocsLeaves = Schema.Array(DocsLeaf).check(Schema.isMinLength(1));
+export const DocsStrong = Schema.Struct({
+  content: DocsLeaves,
+  kind: Schema.Literal("strong"),
+});
+export const DocsEmphasis = Schema.Struct({
+  content: DocsLeaves,
+  kind: Schema.Literal("emphasis"),
+});
+const DocsFormatted = Schema.Union([
+  DocsText,
+  DocsInlineCode,
+  DocsStrong,
+  DocsEmphasis,
+]);
+export const DocsLink = Schema.Struct({
+  content: Schema.Array(DocsFormatted).check(Schema.isMinLength(1)),
+  href: DocsLinkHref,
+  kind: Schema.Literal("link"),
+});
+export const DocsInline = Schema.Union([
+  DocsText,
+  DocsInlineCode,
+  DocsStrong,
+  DocsEmphasis,
+  DocsLink,
+]).pipe(Schema.toTaggedUnion("kind"));
+export type DocsInline = typeof DocsInline.Type;
+export const DocsInlines = Schema.Array(DocsInline).check(
+  Schema.isMinLength(1)
+);
+export type DocsInlines = typeof DocsInlines.Type;
+
+export const DocsCodeLanguage = Schema.Literals([
+  "json",
+  "md",
+  "sh",
+  "ts",
+  "txt",
+]);
+export type DocsCodeLanguage = typeof DocsCodeLanguage.Type;
+
+export const DocsCodeSnippet = Schema.Struct({
+  language: DocsCodeLanguage,
+  text: Schema.String.check(Schema.isMaxLength(20_000)),
+});
+export type DocsCodeSnippet = typeof DocsCodeSnippet.Type;
+
+export const DocsTokenColor = Schema.String.check(
+  Schema.isPattern(/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/iu)
+).pipe(Schema.brand("taxkit/DocsTokenColor"));
+export type DocsTokenColor = typeof DocsTokenColor.Type;
+
+export const DocsTokenStyle = Schema.Literals([
+  "normal",
+  "italic",
+  "bold",
+  "bold-italic",
+]);
+export type DocsTokenStyle = typeof DocsTokenStyle.Type;
+
+export const DocsCodeToken = Schema.Struct({
+  color: Schema.OptionFromNullOr(DocsTokenColor),
+  style: DocsTokenStyle,
+  text: DocsInlineText,
+});
+export type DocsCodeToken = typeof DocsCodeToken.Type;
+
+// Each line keeps its tokens; an empty line has none.
+export const DocsCodeLines = Schema.Array(Schema.Array(DocsCodeToken)).check(
+  Schema.isMinLength(1)
+);
+export type DocsCodeLines = typeof DocsCodeLines.Type;
+
+export const DocsDiagramTitle = DocsNonEmptyText.check(
+  Schema.isMaxLength(200)
+).pipe(Schema.brand("taxkit/DocsDiagramTitle"));
+export type DocsDiagramTitle = typeof DocsDiagramTitle.Type;
+
+export const DocsDiagramSource = DocsNonEmptyText.check(
+  Schema.isMaxLength(10_000)
+).pipe(Schema.brand("taxkit/DocsDiagramSource"));
+export type DocsDiagramSource = typeof DocsDiagramSource.Type;
+
+// A finished standalone SVG document from the diagram renderer.
+export const DocsDiagramSvg = Schema.String.check(
+  Schema.isMaxLength(500_000),
+  Schema.isPattern(/^<svg[\s>][\s\S]*<\/svg>\s*$/u)
+).pipe(Schema.brand("taxkit/DocsDiagramSvg"));
+export type DocsDiagramSvg = typeof DocsDiagramSvg.Type;
+
+export const DocsHeadingBlock = Schema.Struct({
+  content: DocsInlines,
+  depth: Schema.Literals([2, 3, 4]),
+  id: DocsHeadingId,
+  kind: Schema.Literal("heading"),
+});
+export const DocsParagraphBlock = Schema.Struct({
+  content: DocsInlines,
+  kind: Schema.Literal("paragraph"),
+});
+export const DocsListBlock = Schema.Struct({
+  items: Schema.Array(DocsInlines).check(Schema.isMinLength(1)),
+  kind: Schema.Literal("list"),
+  ordered: Schema.Boolean,
+  start: Schema.Int.check(Schema.isGreaterThanOrEqualTo(1)),
+});
+export const DocsTableAlign = Schema.Literals([
+  "left",
+  "center",
+  "right",
+  "none",
+]);
+const DocsTableCells = Schema.Array(Schema.Array(DocsInline)).check(
+  Schema.isMinLength(1)
+);
+export const DocsTableBlock = Schema.Struct({
+  align: Schema.Array(DocsTableAlign),
+  header: DocsTableCells,
+  kind: Schema.Literal("table"),
+  rows: Schema.Array(DocsTableCells),
+}).check(
+  Schema.makeFilter(
+    (table) =>
+      table.align.length === table.header.length &&
+      Array.every(table.rows, (row) => row.length === table.header.length),
+    { message: "Every table row must have the header's column count." }
+  )
+);
+export const DocsCodeBlock = Schema.Struct({
+  kind: Schema.Literal("code"),
+  language: DocsCodeLanguage,
+  lines: DocsCodeLines,
+});
+export const DocsDiagramBlock = Schema.Struct({
+  kind: Schema.Literal("diagram"),
+  source: DocsDiagramSource,
+  svg: DocsDiagramSvg,
+  title: DocsDiagramTitle,
+});
+export const DocsBlock = Schema.Union([
+  DocsHeadingBlock,
+  DocsParagraphBlock,
+  DocsListBlock,
+  DocsTableBlock,
+  DocsCodeBlock,
+  DocsDiagramBlock,
+]).pipe(Schema.toTaggedUnion("kind"));
+export type DocsBlock = typeof DocsBlock.Type;
+
+// The page body after its `#` title. Heading ids are unique within a page.
+export const DocsReadingBody = Schema.Array(DocsBlock).check(
+  Schema.isMinLength(1),
+  Schema.makeFilter(
+    (blocks) => {
+      const ids = Array.flatMap(blocks, (block) =>
+        block.kind === "heading" ? [block.id] : []
+      );
+      return HashSet.size(HashSet.fromIterable(ids)) === ids.length;
+    },
+    { message: "Heading ids must be unique within a page." }
+  )
+);
+export type DocsReadingBody = typeof DocsReadingBody.Type;
+
+// One authored page after its MDX is read: checked frontmatter and body.
+export const DocsReadPage = Schema.Struct({
+  body: DocsReadingBody,
   frontmatter: DocsPageFrontmatter,
+});
+export type DocsReadPage = typeof DocsReadPage.Type;
+
+export const DocsContentPage = Schema.Struct({
+  ...DocsReadPage.fields,
   markdown: Schema.String,
   path: DocsPagePath,
   slugs: Schema.Array(DocsPageSlug),
@@ -124,8 +344,7 @@ export const DocsPublicPage = Schema.Struct({
       const path = page.slugs.join("/");
       return (
         page.path === `/${path}` &&
-        (page.source === `content/${path}.mdx` ||
-          page.source === `content/${path}/index.mdx`)
+        (page.source === `${path}.mdx` || page.source === `${path}/index.mdx`)
       );
     },
     { message: "The public page address and source must agree." }

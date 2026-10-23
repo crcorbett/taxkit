@@ -2,7 +2,14 @@
   "extends": "./tsconfig.json",
   "include": ["test/**/*.ts", "scripts/**/*.ts", "vitest.config.ts"],
   "compilerOptions": {
+    // `bun` keeps eventsource on its built types. beautiful-mermaid publishes
+    // raw TypeScript under `bun`, so it keeps its built types too.
     "customConditions": ["bun", "source"],
+    "paths": {
+      "beautiful-mermaid": [
+        "../../packages/diagrams/node_modules/beautiful-mermaid/dist/index.d.ts"
+      ]
+    },
     "rootDir": ".",
     "noEmit": true,
     "tsBuildInfoFile": "tests.tsbuildinfo"

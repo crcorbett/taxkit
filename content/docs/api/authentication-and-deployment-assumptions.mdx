@@ -1,0 +1,57 @@
+---
+title: "Authentication and deployment assumptions"
+description: "Understand the current HTTP API deployment boundary before you call it."
+status: "published"
+---
+
+# Authentication and deployment assumptions
+
+Use this page before wiring a public client to the HTTP API. It records the
+current deployment assumptions without turning them into a field-level endpoint
+reference.
+
+## Current assumptions
+
+The API app is `apps/api`. It serves the reusable HTTP contract from
+`@taxkit/api-http`. The standalone process uses `127.0.0.1:4000` by default;
+the native local API and website pair has addresses supplied by its launcher.
+
+There is no public authentication contract in this documentation slice. Treat
+authentication, tenant routing and public hosting as application-owned until a
+future API deployment spec defines them.
+
+## Local routes
+
+For the native API and website pair, run `bun run dev` from the repository
+root. The launcher prints both local addresses. See the
+[API app README](../../../apps/api/README.md) for this route and its build
+requirements.
+
+For the retained standalone API process, use:
+
+```sh
+bun run --filter=api start
+curl http://127.0.0.1:4000/api/health
+curl http://127.0.0.1:4000/api/docs/openapi.json
+```
+
+To run that standalone process through Portless, use:
+
+```sh
+bun run --filter=api dev
+curl https://api.taxkit.localhost/api/health
+```
+
+## Caller responsibilities
+
+- Send `content-type: application/json` for calculate requests.
+- Pass canonical calculator facts in the request body.
+- Keep application authentication outside the calculator payload.
+- Read endpoint fields from the generated [OpenAPI reference](./openapi-reference.mdx).
+- Handle `CalculatorApiErrorEnvelope` for expected calculator service errors.
+
+## Related pages
+
+- [API overview](./overview.mdx)
+- [Endpoints](./endpoints.mdx)
+- [Errors](./errors.mdx)

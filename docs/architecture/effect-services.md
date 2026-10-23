@@ -199,20 +199,16 @@ only at final SDK construction. A provider service must have an explicit live
 Layer and deterministic mock Layer with focused encoding, failure, malformed
 output and substitution tests.
 
-The Fumadocs generated-source boundary follows the same rule.
-`@taxkit/docs-fumadocs/service` exposes only named `getPage` and `listPages`
-Effects over schema-decoded generic page values. The static
-`FumadocsSourceLive` requires the `FumadocsGeneratedCollection` adapter
-service, contains unknown provider output and emits safe tagged errors;
-`FumadocsSourceTest` requires `FumadocsSourceFixtures`.
-`@taxkit/docs-content` privately supplies the TaxKit collection adapter and
-decodes the generic value into its canonical content Schemas. Its build-only
-source service exposes only `listPages` and `getNavigation`; retired source
-subpaths and the executable validation import are removed, while the validation
-CLI remains. Neither package executes a runtime from a service import.
-The accepted catalogue is built through the generated adapter;
-`apps/api` owns its checked content service and `apps/web` reads documentation
-from the API.
+The docs reading boundary follows the same rule. `@taxkit/content` declares
+the consumed `DocsPageReader`, `DocsCodeHighlighter` and `DocsDiagramRenderer`
+contracts and never imports their implementations. `@taxkit/mdx` implements the
+reader (`./live`) and the highlighter (`./highlights`, the only
+`@pierre/highlights` caller); `@taxkit/diagrams` implements the renderer
+(`./mermaid`, the only `beautiful-mermaid` caller). Each checks its reply at
+once and fails with a safe tagged error. `ContentCatalogueLive` builds the
+checked catalogue once from `DocsSources`. `apps/api/src/content.boundary.ts`
+chooses the live Layers, tests use Content's deterministic highlighter and
+diagram renderer, and `apps/web` reads documentation from the API.
 
 The infrastructure-owned `PostHogManagement` contract has only find, read,
 create and update operations over checked TaxKit identities. Its private

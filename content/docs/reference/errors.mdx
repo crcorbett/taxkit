@@ -1,0 +1,95 @@
+---
+title: "Error reference"
+description: "Handle expected TaxKit SDK, calculator service and HTTP API errors."
+status: "published"
+---
+
+# Error reference
+
+Use this page when you need to map expected failures from SDK calls or HTTP
+responses.
+
+## SDK errors
+
+`TaxKit.safe.calculate` returns a tagged success or failure value.
+
+| Result          | Meaning                                               |
+| --------------- | ----------------------------------------------------- |
+| `TaxKitSuccess` | The calculation returned a descriptor-decoded report. |
+| `TaxKitFailure` | The calculation failed with `TaxKitCalculationError`. |
+
+`TaxKitCalculationError.error` can contain a `CalculatorServiceError`, a
+schema decode error from descriptor output decoding or an unexpected defect
+wrapper. It can also contain `TaxKitClientDisposedError` when the client has
+already closed. A safe disposal failure is `TaxKitClientDisposeError`; the
+[Plain SDK](../sdk/plain-sdk.mdx) explains the client lifetime.
+
+## CalculatorServiceError
+
+The calculator service uses `CalculatorServiceError` for expected failures.
+
+| Error                               | Handling guidance                                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `CalculatorInputDecodeError`        | Show issue paths and optional descriptor help.                                                  |
+| `UnsupportedCalculatorError`        | Treat the calculator id as an integration error.                                                |
+| `UnsupportedCalculatorContextError` | Ask the caller to choose a supported jurisdiction and tax year.                                 |
+| `CalculationError`                  | The rule calculation could not produce a supported result.                                      |
+| `CalculatorCapacityExceeded`        | The server has no free calculation place. Retry manually after the current work finishes.       |
+| `CalculatorOperationTimedOut`       | The operation reached its time limit. Retry manually.                                           |
+| `CalculatorRateLimited`             | The native per-client calculation limit was reached. Wait for `Retry-After` and retry manually. |
+| `CalculatorAdmissionUnavailable`    | The native request identity or rate limiter is unavailable. Retry manually.                     |
+
+## HTTP errors
+
+The HTTP API wraps expected calculator service failures in
+`CalculatorApiErrorEnvelope`. The envelope is owned by `@taxkit/api-http`
+because it describes transport status encoding.
+
+```json
+{
+  "error": {
+    "_tag": "CalculatorInputDecodeError",
+    "calculatorId": "au.pay.take-home",
+    "issues": [
+      {
+        "_tag": "CalculatorInputIssue",
+        "path": ["grossPay"],
+        "message": "Expected GrossPay"
+      }
+    ],
+    "message": "Invalid facts for au.pay.take-home"
+  }
+}
+```
+
+Use `?help=errors` when you want descriptor-backed field help for invalid
+facts.
+
+## Error flow
+
+```ts
+Production: expected calculator failure
+
+Caller
+  -> TaxKit.safe.calculate or HTTP calculate
+    -> PublicCalculatorService.calculate
+      -> CalculatorServiceError
+    -> TaxKitFailure or CalculatorApiErrorEnvelope
+```
+
+## Owning sources
+
+- SDK errors: [`packages/sdk/typescript/src/errors.ts`](../../../packages/sdk/typescript/src/errors.ts)
+- Calculator service errors: [`packages/calculators/src/schemas.ts`](../../../packages/calculators/src/schemas.ts)
+- HTTP API error envelope: [`packages/api/http/src/groups/calculators.ts`](../../../packages/api/http/src/groups/calculators.ts)
+
+## Used by
+
+- [Handle validation errors](../guides/handle-validation-errors.mdx)
+- [API errors](../api/errors.mdx)
+- [Schema reference](./schemas.mdx)
+
+In checked TypeScript, `CalculationError.cause` uses nested Options and defaults
+to a missing field. Its encoded error keeps the existing missing, undefined,
+null and diagnostic-value forms. The current rules omit this field. Existing
+diagnostic values are not safe to send to logs, traces or product events.

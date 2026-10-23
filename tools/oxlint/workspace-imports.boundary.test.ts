@@ -123,7 +123,6 @@ it.effect(
         browser,
         `import "@taxkit/content/schemas";
 import "@taxkit/api-http/api";
-import "@taxkit/docs-content/client";
 import "@taxkit/calculators/summaries";
 `
       );

@@ -80,22 +80,14 @@ bun run pr:deploy pr-<number>
 bun run pr:destroy pr-<number>
 ```
 
-`pr:deploy` builds the repository first. `pr:plan` and `production:plan` build
-the documentation catalogue first, because the API imports it while planning. Preview uses its own API, never the
-Production API. Destroy the stage when its pull request closes.
+`pr:deploy` builds the repository first. `pr:plan` and `production:plan` need
+no build step first. Preview uses its own API, never the Production API.
+Destroy the stage when its pull request closes.
 
 `pr:destroy` validates the first-argument `pr-<number>` stage and rejects
-`--stage` overrides before doing work. It then builds the docs-content dependency
-closure, generating the catalogue needed by the eager stack import even in a
-cold checkout, before invoking native Alchemy destroy. Catalogue compilation
-renders the authored Mermaid diagrams through Playwright, so this build needs
-the matching Chromium binary and system libraries even though it is not a
-browser test. Before local cleanup, provision them with
-`apps/web/node_modules/.bin/playwright install --with-deps chromium`; when using
-`PLAYWRIGHT_BROWSERS_PATH`, keep that same path for setup and cleanup. The
-workflow rechecks that the pull request is closed and validates its stage before
-setting an isolated browser path and running this native setup. Browser setup
-failure stops cleanup before the catalogue build or provider command.
+`--stage` overrides before doing work. It then invokes native Alchemy destroy
+with no build step and no browser. The workflow rechecks that the pull request
+is closed and validates its stage before running it.
 
 ## Production
 
@@ -232,10 +224,8 @@ verification runs once per revision and the deploy jobs reuse that result:
   outputs and checks the Website, `/api/health` and `/api/v1/calculators` for
   200.
 - `cleanup` (Destroy preview) runs when a same-repository pull request closes:
-  the stage-validated `pr:destroy --dry-run --no-input`, then `pr:destroy --yes --no-input`, including its cold catalogue build
-  prerequisite. It provisions Chromium and its system libraries in its own
-  runner after the closed-PR and stage guards; it cannot borrow a deploy job's
-  browser cache. Fork pull requests get no deploy or cleanup job and no secret.
+  the stage-validated `pr:destroy --dry-run --no-input`, then `pr:destroy --yes --no-input`.
+  It installs no browser. Fork pull requests get no deploy or cleanup job and no secret.
   Deploy and cleanup for one pull request share a concurrency group and never
   overlap or cancel each other; each rechecks the pull request's state before
   it plans or destroys.
@@ -260,7 +250,7 @@ before an authorised local deployment.
 `[skip ci]` in a commit message, including a merge commit, skips the whole
 workflow: that commit gets no verification and, on `main`, no Production
 deploy. Use it only for commits that change maintainer documentation alone
-(`docs/`, READMEs, `AGENTS.md`). Public docs under `packages/docs-content` ship
+(`docs/`, READMEs, `AGENTS.md`). Public docs under `content/docs` ship
 with the Website and need the deploy. Never use it for a code, workflow,
 package, dependency or Changeset change, or to merge a pull request that
 contains one, unless the maintainer explicitly requests a release from this workstation.

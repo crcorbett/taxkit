@@ -524,7 +524,7 @@ browser-safe and re-export calculator-owned `CalculatorRun*` schemas and
 `CalculatorServiceError` without duplicating them. `./testing` may expose
 test-only descriptors and helpers for consumers validating type behaviour.
 
-## Fumadocs site
+## Documentation site
 
 The current local documentation reader lives under:
 
@@ -532,11 +532,13 @@ The current local documentation reader lives under:
 apps/web
 ```
 
-Reusable docs content and Fumadocs integration live under:
+Authored docs pages and the packages that read and check them live under:
 
 ```txt
-packages/docs-content
-packages/docs-fumadocs
+content/docs
+packages/content
+packages/mdx
+packages/diagrams
 ```
 
 The docs app should document:
@@ -653,7 +655,7 @@ former sessions cannot be recovered by redeploying old code. The
 [deployment runbook](../runbooks/deployment.md) owns plan/readback and rollback.
 
 Origin-less clients and the checked same-stage Website origin remain admitted; foreign
-browser origins are refused. The public [agent guide](../../packages/docs-content/content/api/agent-tools.mdx)
+browser origins are refused. The public [agent guide](../../content/docs/api/agent-tools.mdx)
 owns client compatibility and connection steps. The Website agents page uses
 checked same-stage API settings; public documentation/discovery keeps its
 existing catalogue owner.

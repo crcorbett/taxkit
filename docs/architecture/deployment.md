@@ -56,14 +56,14 @@ version: the API with `Cloudflare.cache({ crossVersionCache: false })` in its
 native init and the Website with `cache: { enabled: true, crossVersionCache: false }`.
 Response headers choose what is public; see the
 [frontend](./frontend.md) and [API and SDK](./api-and-sdk.md) owners. Authored
-content is an input to both Worker builds (the API bundles the public catalogue;
+content is an input to both Worker builds (the API bundles `@content/docs/sources`;
 the Website memo includes shared package sources and authored content), so a
 content-only change deploys new versions of both and starts new caches.
 `websiteBuildMemo` in `packages/infrastructure/src/apps-stack.ts` uses
 Alchemy's documented sibling-package include form: `**/*` inside `apps/web`
 (filtered by `.gitignore`, which an `exclude` list would switch off) plus
 `../` patterns for package `src`, manifests and tsconfigs at each nesting
-depth, the docs-content sources and the root tsconfig, with the lockfile
+depth, the authored `content/docs` sources and the root tsconfig, with the lockfile
 standing for installed dependencies. `../` patterns skip `.gitignore` and
 follow links, so a wildcard depth also reaches each package's `node_modules`
 (the store holds about 1.2 million files); negated patterns prune installed,

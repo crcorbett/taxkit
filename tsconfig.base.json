@@ -9,7 +9,7 @@
       }
     ],
     "target": "ES2024",
-    "module": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
     "noFallthroughCasesInSwitch": true,
@@ -27,5 +27,6 @@
     "declarationMap": true,
     "customConditions": ["source"],
     "sourceMap": true
-  }
+  },
+  "files": ["content/docs/raw-modules.d.ts"]
 }

@@ -28,7 +28,7 @@ receipts are removed rather than kept as documents.
 | Standards | [`standards/README.md`](standards/README.md) |
 | Design principles | [`design-docs/index.md`](design-docs/index.md) |
 | Current intent | [`product-specs/index.md`](product-specs/index.md) and [`exec-plans/active/README.md`](exec-plans/active/README.md) |
-| Public docs product | [`../apps/web/README.md`](../apps/web/README.md), [`../packages/docs-content/README.md`](../packages/docs-content/README.md) and [`../packages/docs-fumadocs/README.md`](../packages/docs-fumadocs/README.md) |
+| Public docs product | [`../apps/web/README.md`](../apps/web/README.md), [`../content/docs/README.md`](../content/docs/README.md), [`../packages/content/README.md`](../packages/content/README.md), [`../packages/mdx/README.md`](../packages/mdx/README.md) and [`../packages/diagrams/README.md`](../packages/diagrams/README.md) |
 | Versioning, packed SDK checks and deployment | [`runbooks/README.md`](runbooks/README.md) |
 | Checks and quality | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md) |
 | References | [`references/README.md`](references/README.md) |
@@ -56,6 +56,7 @@ workspace README. Some documents still carry YAML front matter; it is
 informational and not required or checked.
 
 Public pages are published when their MDX frontmatter and
-`packages/docs-content/navigation.json` say `status: published`. The
-`@taxkit/docs-content` build compiles them into the public catalogue the API and
-Website read; see [`../packages/docs-content/README.md`](../packages/docs-content/README.md).
+`content/docs/navigation.json` say `status: published`. The API builds them into
+the checked public catalogue the Website reads; see
+[`../content/docs/README.md`](../content/docs/README.md) and
+[`../packages/content/README.md`](../packages/content/README.md).

@@ -12,7 +12,6 @@ import {
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
 import {
-  DocsPublicCatalogue,
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
@@ -37,13 +36,17 @@ import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 import type { Page, Request as BrowserRequest } from "playwright";
 
-import { generateDocsImages } from "../scripts/docs-images.build";
+import {
+  generateDocsImages,
+  readDocsCatalogue,
+} from "../scripts/docs-images.build";
 import { WebsiteDocsImageBytes } from "../scripts/docs-images.schemas";
 import {
   docsImagePath,
   WebsiteDocsArticleJson,
   WebsiteDocsImageSize,
 } from "../src/lib/docs/social.schemas";
+import { readWorkerModules } from "./native-modules.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -148,32 +151,13 @@ describe("built native API and Website", () => {
           ".alchemy/native-pair/bundles/TaxKitApi"
         );
         const websiteRoot = path.join(root, "apps/web/dist/server");
-        const apiFiles = yield* fs.glob("**/*.js", { root: apiRoot });
-        const websiteFiles = yield* fs.glob("**/*.js", { root: websiteRoot });
-        const apiModules = Record.fromEntries(
-          yield* Effect.forEach(apiFiles, (file) =>
-            fs
-              .readFileString(path.join(apiRoot, file))
-              .pipe(
-                Effect.map(
-                  (contents) =>
-                    [file, { contents, type: "esm" as const }] as const
-                )
-              )
-          )
-        );
-        const websiteModules = Record.fromEntries(
-          yield* Effect.forEach(websiteFiles, (file) =>
-            fs
-              .readFileString(path.join(websiteRoot, file))
-              .pipe(
-                Effect.map(
-                  (contents) =>
-                    [file, { contents, type: "esm" as const }] as const
-                )
-              )
-          )
-        );
+        const {
+          files: apiFiles,
+          modules: apiModules,
+          wasm: apiWasm,
+        } = yield* readWorkerModules(apiRoot);
+        const { files: websiteFiles, modules: websiteModules } =
+          yield* readWorkerModules(websiteRoot);
         expect(apiFiles).toContain("worker.js");
         expect(websiteFiles).toContain("server.js");
         const clientFiles = yield* fs.glob("**/*.js", {
@@ -255,7 +239,7 @@ describe("built native API and Website", () => {
 
             manifest: {
               mainModule: "worker.js",
-              modules: apiModules,
+              modules: { ...apiModules, ...apiWasm },
               modulesRoot: apiRoot,
             },
             name,
@@ -334,27 +318,16 @@ describe("built native API and Website", () => {
           },
         });
         const docsFixtureWorkers = yield* Effect.forEach(
-          ["Body", "Metadata", "MissingModule"] as const,
+          ["Address"] as const,
           (mode) =>
             Effect.gen(function* () {
               const modulesRoot = path.join(
                 root,
                 `.alchemy/native-pair/bundles/TaxKitApiDocs${mode}`
               );
-              const files = yield* fs.glob("**/*.js", { root: modulesRoot });
+              const { files, modules, wasm } =
+                yield* readWorkerModules(modulesRoot);
               expect(files).toContain("worker.js");
-              const modules = Record.fromEntries(
-                yield* Effect.forEach(files, (file) =>
-                  fs
-                    .readFileString(path.join(modulesRoot, file))
-                    .pipe(
-                      Effect.map(
-                        (contents) =>
-                          [file, { contents, type: "esm" as const }] as const
-                      )
-                    )
-                )
-              );
               expect(
                 Array.some(
                   Record.values(modules),
@@ -373,7 +346,7 @@ describe("built native API and Website", () => {
                       ...ordinary.config,
                       manifest: {
                         mainModule: "worker.js",
-                        modules,
+                        modules: { ...modules, ...wasm },
                         modulesRoot,
                       },
                     },
@@ -415,18 +388,7 @@ describe("built native API and Website", () => {
         );
         // Compare the actual built Worker with the owning checked catalogue,
         // including every body rather than accepting a count or a placeholder.
-        const publicContent = yield* fs
-          .readFileString(
-            path.join(
-              root,
-              "packages/docs-content/.source/public-catalogue.json"
-            )
-          )
-          .pipe(
-            Effect.flatMap(
-              Schema.decodeEffect(Schema.fromJsonString(DocsPublicCatalogue))
-            )
-          );
+        const publicContent = yield* readDocsCatalogue;
         expect(publicContent.pages).toHaveLength(62);
         // Repeat the actual build-only generator, then compare every fresh
         // output with the already built asset. This checks determinism and
@@ -2051,9 +2013,9 @@ describe("built native API and Website", () => {
               worker.fetch(`${websiteOrigin}/start/quickstart`)
             );
             const html = yield* Effect.promise(() => response.text());
-            // The server checks the API page against its compiled
-            // presentation before rendering and fails closed through
-            // TanStack's native route error egress.
+            // The server checks that the API page is the requested address
+            // before rendering and fails closed through TanStack's native
+            // route error egress.
             expect(response.status, mode).toBe(500);
             expect(response.headers.get("cache-control")).toBe("no-store");
             expect(html).toContain("Documentation could not load");
@@ -2212,11 +2174,20 @@ describe("built native API and Website", () => {
             )
           )
         ).toBe(true);
+        // The server-drawn diagram arrives as an image named by its title and
+        // decodes in the browser without any diagram script.
         expect(
           yield* Effect.promise(() =>
-            docsPage.locator(".docs-article svg").count()
+            docsPage
+              .getByRole("img", {
+                name: "Which contribution guide matches your change",
+              })
+              .evaluate(
+                (image: HTMLImageElement) =>
+                  image.complete && image.naturalWidth > 0
+              )
           )
-        ).toBeGreaterThan(0);
+        ).toBe(true);
         expect(
           yield* Effect.promise(() =>
             docsPage
@@ -2315,45 +2286,6 @@ describe("built native API and Website", () => {
         // server HTML. Wait for hydration, or the next click bypasses the
         // intercepted reply as a server-rendered document navigation.
         yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
-        // A valid page whose body differs from the compiled presentation (a
-        // differently activated API) is not rendered in the browser either.
-        const plainSdkReply = yield* Effect.promise(() =>
-          publicApi.dispatchFetch(docsPageAddress("/sdk/plain-sdk"), {
-            headers: { origin: websiteOrigin },
-          })
-        );
-        expect(plainSdkReply.status).toBe(200);
-        const plainSdkBody = yield* Effect.promise(() => plainSdkReply.text());
-        expect(plainSdkBody).toContain('"markdown":"');
-        yield* Effect.promise(() =>
-          docsPage.route(
-            docsPageAddress("/sdk/plain-sdk"),
-            (route) =>
-              route.fulfill({
-                body: plainSdkBody.replace(
-                  '"markdown":"',
-                  `"markdown":"${frameworkSentinel} `
-                ),
-                headers: Record.fromEntries(plainSdkReply.headers),
-                status: 200,
-              }),
-            { times: 1 }
-          )
-        );
-        yield* Effect.promise(() =>
-          docsPage.locator('.docs-navigation a[href="/sdk/plain-sdk"]').click()
-        );
-        yield* Effect.promise(() =>
-          docsPage
-            .getByRole("heading", {
-              exact: true,
-              name: "This documentation page needs to be reloaded",
-            })
-            .waitFor({ timeout: 5000 })
-        );
-        expect(
-          yield* Effect.promise(() => docsPage.locator("body").textContent())
-        ).not.toContain(frameworkSentinel);
         yield* Effect.promise(() =>
           docsPage.goto(`${websiteOrigin}/start/quickstart`)
         );
