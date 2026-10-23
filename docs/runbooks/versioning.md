@@ -66,8 +66,7 @@ apps and all other workspace packages private. Never publish all workspaces.
    commit, archive integrity, registry result and CI status in the release PR.
    Tag only the SDK version after successful readback, then remove the working
    branch and keep the project clean on `main`. The public version tag is
-   `taxkit@<version>`; leave the previous `@taxkit/sdk` publication and tags
-   intact.
+   `taxkit@<version>`. Keep historical Git tags as release records.
 
 A published name/version cannot be overwritten. If publication fails, read the
 registry before retrying; a failed local response may still have published it.

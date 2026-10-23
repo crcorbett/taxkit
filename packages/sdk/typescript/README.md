@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-sdk-owner
-last_reviewed: 2026-10-13
+last_reviewed: 2026-10-23
 review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
@@ -11,9 +11,7 @@ review_trigger: SDK contracts, lifetime, exports, examples or consumer validatio
 
 Public TaxKit TypeScript SDK package.
 
-The npm package name is `taxkit`. The earlier `@taxkit/sdk@2.1.0` release
-remains available; use `taxkit` and the matching `taxkit/*` imports for current
-versions.
+Install `taxkit` from npm and use the `taxkit` and `taxkit/*` imports.
 
 ## Scope
 

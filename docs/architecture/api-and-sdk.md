@@ -407,14 +407,13 @@ The public SDK package lives under:
 packages/sdk/typescript
 ```
 
-Current package name:
+Package name:
 
 ```txt
 taxkit
 ```
 
-The existing `@taxkit/sdk@2.1.0` npm release remains available. Current versions
-use the unscoped `taxkit` name and the same eight entry points.
+The sole public npm package is `taxkit`, with eight entry points.
 
 It owns:
 
