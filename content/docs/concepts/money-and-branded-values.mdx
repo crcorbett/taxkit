@@ -54,6 +54,35 @@ when a result is too large. You can handle `InvalidMoneyValue` through the
 Effect error channel. For JSON or other unknown input, decode the owning
 schema at your application boundary; do not cast the input to Money.
 
+## Read an amount someone typed
+
+`moneyFromDollarsText` reads typed dollar text, such as `"80000"` or
+`"1234.50"`, as Money. It ignores surrounding spaces and converts exactly to
+whole cents. It refuses blank text, commas, signs, symbols, more than two
+decimal places and amounts too large for safe cents. A refusal is an
+`InvalidDollarsText` failure whose `reason` is `empty`, `format` or `range`, so
+you can match it and write your own message.
+
+```ts
+import { moneyFromDollarsText } from "taxkit/core";
+import { Effect, Match } from "effect";
+
+const incomeProgram = moneyFromDollarsText("80000").pipe(
+  Effect.mapError(({ reason }) =>
+    Match.value(reason).pipe(
+      Match.when("empty", () => "Enter your annual taxable income."),
+      Match.when("format", () => "Use dollars and cents, without commas."),
+      Match.when("range", () => "That amount is too large."),
+      Match.exhaustive
+    )
+  )
+);
+```
+
+`dollarsTextFromMoney` writes Money back as plain dollars with two decimal
+places. `MoneyFromDollarsString` joins both as a Schema codec with TaxKit's
+default messages.
+
 `CalculatorId`, `Jurisdiction` and `TaxYear` are also branded or literal
 boundary values owned by packages. Use exported values and schemas instead of
 duplicating string fields in reusable code.

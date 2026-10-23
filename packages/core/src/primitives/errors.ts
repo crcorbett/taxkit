@@ -38,3 +38,33 @@ export class InvalidDecimalValue extends Schema.TaggedError<InvalidDecimalValue>
     message: Schema.tag("The decimal value is invalid."),
   }
 ) {}
+
+/**
+ * Why dollar text could not become Money: it was blank, was not plain decimal
+ * dollars, or does not fit in safe whole cents.
+ *
+ * @since 2.2.0
+ */
+export const DollarsTextIssue = Schema.Literals(["empty", "format", "range"]);
+
+/**
+ * Why dollar text could not become Money.
+ *
+ * @since 2.2.0
+ */
+export type DollarsTextIssue = typeof DollarsTextIssue.Type;
+
+/**
+ * Safe failure for dollar text that cannot become Money. Match on `reason` to
+ * choose your own wording.
+ *
+ * @since 2.2.0
+ */
+export class InvalidDollarsText extends Schema.TaggedError<InvalidDollarsText>()(
+  "InvalidDollarsText",
+  {
+    code: Schema.tag("invalid-dollars-text"),
+    message: Schema.tag("The dollar amount is invalid."),
+    reason: DollarsTextIssue,
+  }
+) {}

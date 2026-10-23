@@ -18,6 +18,11 @@ export {
   moneyEquals,
   moneySub,
 } from "./money.js";
+export {
+  MoneyFromDollarsString,
+  dollarsTextFromMoney,
+  moneyFromDollarsText,
+} from "./dollars.js";
 export { RoundingMode, roundCentsToDollar, roundMoney } from "./rounding.js";
 export {
   CentsOrInfinity,
@@ -32,7 +37,9 @@ export {
 } from "./tax.js";
 
 export {
+  DollarsTextIssue,
   InvalidCalendarValue,
   InvalidDecimalValue,
+  InvalidDollarsText,
   InvalidMoneyValue,
 } from "./errors.js";
