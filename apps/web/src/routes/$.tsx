@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Option, Result } from "effect";
 
-import { MdxDocument } from "#/lib/docs/mdx.boundary";
+import { DocsHeading } from "#/lib/docs/components";
 import { docsMetadata } from "#/lib/docs/metadata.egress";
 import {
   DocsPageNotFound,
   DocsPageUnavailable,
   DocsNavigation,
 } from "#/lib/docs/page.view";
+import { DocsReadingBodyView } from "#/lib/docs/reading-body.view";
 import { loadDocsPage } from "#/lib/loaders";
 import type { WebsiteDocsPageView } from "#/lib/schemas";
 
@@ -33,7 +34,8 @@ export const Route = createFileRoute("/$")({
           />
         </aside>
         <article className="docs-article">
-          <MdxDocument page={page} />
+          <DocsHeading>{page.frontmatter.title}</DocsHeading>
+          <DocsReadingBodyView body={page.body} />
           <p className="docs-markdown-link">
             <a href={new URL(`${page.path}.md`, publicationOrigin).href}>
               Read this page as Markdown

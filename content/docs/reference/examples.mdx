@@ -1,0 +1,51 @@
+---
+title: "Examples"
+description: "Run copyable SDK, HTTP, Effect and error-handling examples."
+status: "published"
+---
+
+# Examples
+
+Use these examples when you want a short, typechecked file that exercises one
+public integration path. The files export Effect programs or handlers. Your
+application runtime decides how to run them.
+
+## Example files
+
+| Example             | Path                                                                                                    | Covers                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Node server route   | [`packages/docs-examples/src/node-server.ts`](../../../packages/docs-examples/src/node-server.ts)       | Returning an Effect that validates requests and calls `calculateReport` from a server route. |
+| Browser HTTP caller | [`packages/docs-examples/src/browser-http.ts`](../../../packages/docs-examples/src/browser-http.ts)     | Returning an Effect that calls the typed HTTP client with canonical facts.                   |
+| Effect request      | [`packages/docs-examples/src/effect.ts`](../../../packages/docs-examples/src/effect.ts)                 | Constructing a `calculateRunRequest` program for an Effect application.                      |
+| Error handling      | [`packages/docs-examples/src/error-handling.ts`](../../../packages/docs-examples/src/error-handling.ts) | Reading a `TaxKit.safe.calculate` failure value.                                             |
+
+The validation, calculator-help, fact-definition, integration-test and raw HTTP error guides also copy their
+complete TypeScript fences from checked example files. Authored-content
+validation rejects a fence that differs from its source. Source links select
+an accepted immutable revision with the same checked file bytes; publication
+also checks the emitted guide fences and links.
+
+- [External input validation](../../../packages/docs-examples/src/validate-external-input.ts)
+- [Typed calculator help](../../../packages/docs-examples/src/calculator-help.ts)
+- [Raw HTTP error envelope](../../../packages/docs-examples/src/api-error-envelope.ts)
+- [Fact definition](../../../packages/docs-examples/src/define-gross-pay-fact.ts)
+- [Integration tests](../../../packages/docs-examples/test/integration.example.test.ts)
+
+## Typecheck examples
+
+Typecheck every checked example:
+
+```sh
+bun run --filter=@taxkit/docs-examples check-examples
+```
+
+The browser HTTP example takes an explicit `URL` and uses the typed API client
+with `FetchHttpClient.layer`. The application host owns Effect execution and
+error handling; the example does not start a runtime.
+
+## Related pages
+
+- [SDK reference](./sdk.mdx)
+- [API reference](./api.mdx)
+- [Error reference](./errors.mdx)
+- [Test your integration](../guides/test-your-integration.mdx)

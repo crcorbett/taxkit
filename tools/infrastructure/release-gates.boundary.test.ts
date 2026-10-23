@@ -453,111 +453,69 @@ describe("required native release gate", () => {
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 
-  it.effect(
-    "builds the docs closure before native preview destroy and forwards flags",
-    () =>
-      Effect.gen(function* () {
-        const fixture = yield* commandFixture;
-        const result = yield* runCommand(
-          fixture,
-          script(fixture.scripts, "pr:destroy"),
-          "",
-          ["pr-123", "--yes"]
-        );
-        expect(result.code).toBe(0);
-        expect(result.calls).toEqual([
-          "run build --filter=@taxkit/docs-content",
-          "alchemy destroy --stage pr-123 --yes",
-        ]);
-      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
-  );
-
-  it.effect("does not import the destroy stack if docs generation fails", () =>
+  it.effect("forwards flags to native preview destroy", () =>
     Effect.gen(function* () {
       const fixture = yield* commandFixture;
       const result = yield* runCommand(
         fixture,
         script(fixture.scripts, "pr:destroy"),
-        "run build --filter=@taxkit/docs-content",
+        "",
         ["pr-123", "--yes"]
       );
-      expect(result.code).not.toBe(0);
-      expect(result.calls).toEqual(["run build --filter=@taxkit/docs-content"]);
+      expect(result.code).toBe(0);
+      expect(result.calls).toEqual(["alchemy destroy --stage pr-123 --yes"]);
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 
-  it.effect(
-    "prepares required catalogue Chromium after cleanup guards and before destroy",
-    () =>
-      Effect.gen(function* () {
-        const configuration = yield* workflow(checksWorkflow);
-        const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
-          Option.getOrElse(() => expect.fail("Missing cleanup job"))
-        );
-        const { "continue-on-error": cleanupMayFail } = cleanup;
-        const required = Array.map(
-          [
-            "pull-request",
-            "stage-safety",
-            "catalogue-browser-path",
-            "catalogue-chromium",
-          ],
-          (id) =>
-            Array.findFirst(cleanup.steps, (step) =>
-              Option.contains(step.id, id)
-            ).pipe(
-              Option.getOrElse(() =>
-                expect.fail(`Missing cleanup prerequisite: ${id}`)
-              )
-            )
-        );
-        const destroy = Array.findFirst(cleanup.steps, (step) =>
-          Option.exists(step.run, (run) => run.startsWith("bun run pr:destroy"))
-        ).pipe(Option.getOrElse(() => expect.fail("Missing cleanup command")));
-        const { "continue-on-error": destroyMayFail } = destroy;
-        expect(Option.getOrElse(cleanupMayFail, () => false)).toBe(false);
-        yield* Effect.forEach(required, (step, index) => {
-          const { "continue-on-error": stepMayFail } = step;
-          expect(Option.getOrElse(stepMayFail, () => false)).toBe(false);
-          if (index > 0) {
-            expect(step.if).toEqual(
-              Option.some("steps.pull-request.outputs.closed == 'true'")
-            );
-          }
-          expect(cleanup.steps.indexOf(step)).toBeLessThan(
-            cleanup.steps.indexOf(destroy)
-          );
-          return Array.get(required, index + 1).pipe(
-            Option.match({
-              onNone: () => Effect.void,
-              onSome: (next) =>
-                Effect.sync(() => {
-                  expect(cleanup.steps.indexOf(step)).toBeLessThan(
-                    cleanup.steps.indexOf(next)
-                  );
-                }),
-            })
-          );
-        });
-        expect(
-          Array.get(required, 2).pipe(Option.flatMap((step) => step.run))
-        ).toEqual(
-          Option.some(
-            'echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/ms-playwright" >> "$GITHUB_ENV"'
+  it.effect("runs the cleanup guards before destroy", () =>
+    Effect.gen(function* () {
+      const configuration = yield* workflow(checksWorkflow);
+      const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
+        Option.getOrElse(() => expect.fail("Missing cleanup job"))
+      );
+      const { "continue-on-error": cleanupMayFail } = cleanup;
+      const required = Array.map(["pull-request", "stage-safety"], (id) =>
+        Array.findFirst(cleanup.steps, (step) =>
+          Option.contains(step.id, id)
+        ).pipe(
+          Option.getOrElse(() =>
+            expect.fail(`Missing cleanup prerequisite: ${id}`)
           )
+        )
+      );
+      const destroy = Array.findFirst(cleanup.steps, (step) =>
+        Option.exists(step.run, (run) => run.startsWith("bun run pr:destroy"))
+      ).pipe(Option.getOrElse(() => expect.fail("Missing cleanup command")));
+      const { "continue-on-error": destroyMayFail } = destroy;
+      expect(Option.getOrElse(cleanupMayFail, () => false)).toBe(false);
+      yield* Effect.forEach(required, (step, index) => {
+        const { "continue-on-error": stepMayFail } = step;
+        expect(Option.getOrElse(stepMayFail, () => false)).toBe(false);
+        if (index > 0) {
+          expect(step.if).toEqual(
+            Option.some("steps.pull-request.outputs.closed == 'true'")
+          );
+        }
+        expect(cleanup.steps.indexOf(step)).toBeLessThan(
+          cleanup.steps.indexOf(destroy)
         );
-        expect(
-          Array.get(required, 3).pipe(Option.flatMap((step) => step.run))
-        ).toEqual(
-          Option.some(
-            "apps/web/node_modules/.bin/playwright install --with-deps chromium"
-          )
+        return Array.get(required, index + 1).pipe(
+          Option.match({
+            onNone: () => Effect.void,
+            onSome: (next) =>
+              Effect.sync(() => {
+                expect(cleanup.steps.indexOf(step)).toBeLessThan(
+                  cleanup.steps.indexOf(next)
+                );
+              }),
+          })
         );
-        expect(destroy.if).toEqual(
-          Option.some("steps.pull-request.outputs.closed == 'true'")
-        );
-        expect(Option.getOrElse(destroyMayFail, () => false)).toBe(false);
-      }).pipe(Effect.provide(BunServices.layer))
+      });
+      expect(destroy.if).toEqual(
+        Option.some("steps.pull-request.outputs.closed == 'true'")
+      );
+      expect(Option.getOrElse(destroyMayFail, () => false)).toBe(false);
+    }).pipe(Effect.provide(BunServices.layer))
   );
 
   it.effect.each(["open", "closed"] as const)(

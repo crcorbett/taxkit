@@ -1,14 +1,26 @@
 import { Context } from "effect";
 import type { Effect } from "effect";
 
-import type { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
 import type {
+  DocsCodeHighlightError,
+  DocsDiagramRenderError,
+  DocsPageNotFoundError,
+  DocsSourceError,
+} from "./errors.js";
+import type { DocsLinkContext } from "./links.js";
+import type {
+  DocsCodeLines,
+  DocsCodeSnippet,
+  DocsDiagramSource,
+  DocsDiagramSvg,
   DocsPagePath,
   DocsPublicCatalogue,
   DocsPublicNavigation,
   DocsPublicPage,
+  DocsReadPage,
   DocsSearchResult,
   DocsSearchTerm,
+  DocsSource,
 } from "./schemas.js";
 
 export class ContentCatalogue extends Context.Service<
@@ -31,3 +43,40 @@ export class ContentService extends Context.Service<
   ContentService,
   ContentServiceContract
 >()("@taxkit/content/ContentService") {}
+
+// The authored MDX files, as the host bundles them. The API supplies the list;
+// Content checks it against the navigation when it builds the catalogue.
+export class DocsSources extends Context.Service<
+  DocsSources,
+  readonly DocsSource[]
+>()("@taxkit/content/DocsSources") {}
+
+// Contracts Content consumes. `@taxkit/mdx` reads MDX and highlights code;
+// `@taxkit/diagrams` draws Mermaid. Content never imports either package.
+export class DocsPageReader extends Context.Service<
+  DocsPageReader,
+  {
+    readonly read: (
+      source: DocsSource,
+      links: DocsLinkContext
+    ) => Effect.Effect<DocsReadPage, DocsSourceError>;
+  }
+>()("@taxkit/content/DocsPageReader") {}
+
+export class DocsCodeHighlighter extends Context.Service<
+  DocsCodeHighlighter,
+  {
+    readonly highlight: (
+      snippet: DocsCodeSnippet
+    ) => Effect.Effect<DocsCodeLines, DocsCodeHighlightError>;
+  }
+>()("@taxkit/content/DocsCodeHighlighter") {}
+
+export class DocsDiagramRenderer extends Context.Service<
+  DocsDiagramRenderer,
+  {
+    readonly render: (
+      source: DocsDiagramSource
+    ) => Effect.Effect<DocsDiagramSvg, DocsDiagramRenderError>;
+  }
+>()("@taxkit/content/DocsDiagramRenderer") {}

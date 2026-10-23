@@ -149,8 +149,8 @@ Explicitly undecided or absent:
   rates, LITO and Medicare levy reduction pages.
 - Golden tests in `packages/rules/au/*/test` and known-result contracts the
   rebuild must preserve (CSF-001).
-- 62 published MDX pages in `packages/docs-content/content` with a reader
-  persona per page in `packages/docs-content/navigation.json`.
+- 62 published MDX pages in `content/docs` with a reader persona per page in
+  `content/docs/navigation.json`.
 - Generated OpenAPI snapshot and route fixtures under `packages/api/http`.
 
 Absences future work must not fabricate: no customers, testimonials, case

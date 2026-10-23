@@ -24,12 +24,15 @@ handlers, cancellation and reply budgets;
 [`@taxkit/publication`](../../packages/publication/README.md) owns discovery
 contracts and document generation. Native hosting remains in this app.
 
-Both API hosts provide `ContentService` from the generated public catalogue.
-`src/content.boundary.ts` imports only `@taxkit/docs-content/public-catalogue`
-JSON, checks it once when the host is built and reports a fixed configuration
-failure if it is invalid. Incoming requests do not load authored MDX or run
-the compiler. Public HTTP documentation operations serve navigation, checked
-page values, bounded search and exact processed Markdown from that same service.
+Both API hosts provide `ContentService` through `src/content.boundary.ts`. It
+bundles the authored page list from `@content/docs/sources` and composes
+Content's `ContentCatalogueLive` with the `@taxkit/mdx` page reader and code
+highlighter and the `@taxkit/diagrams` Mermaid renderer. The checked catalogue
+is built once when the host's Layer is built; the native Worker builds it once
+per isolate, on its first request. A page that cannot be read fails the Layer
+with Content's `DocsSourceError`. Public HTTP documentation operations serve
+navigation, checked page values, bounded search and exact processed Markdown
+from that same service.
 Documentation calls consume no calculator allowance. See the
 [HTTP package](../../packages/api/http/README.md) for paths/response rules.
 
@@ -44,9 +47,9 @@ failure is an empty 503. The Website forwards its own `/sitemap.xml`,
 `/robots.txt` and `/llms*.txt` requests here once. The standalone Bun host does
 not serve these routes. Discovery takes no calculator allowance.
 
-The API dependency build generates the public catalogue before TypeScript
-or native bundling consumes it. Its ESNext module profile preserves the JSON
-import attribute for ordinary Node loading of emitted modules. The Website,
+Content reads the `@content/docs` navigation and repository JSON with an
+import attribute. The ESNext module profile preserves that attribute for
+ordinary Node loading of emitted modules. The Website,
 infrastructure and Alchemy source-checking profiles also admit that attribute
 when they inspect the API Worker source. Compiled public packages retain their
 existing module profiles.
@@ -450,7 +453,7 @@ completes it when the handler exits. This keeps the invocation alive for cleanup
 tax work stays in its original request fibre. Prompt remote server cleanup is
 not guaranteed.
 
-The [agent connection guide](../../packages/docs-content/content/api/agent-tools.mdx)
+The [agent connection guide](../../content/docs/api/agent-tools.mdx)
 documents the supported protocol, six tools, limits and exact Origin admission.
 The Website's `/agents` page derives its MCP address from checked API settings,
 including Preview. `bun run test:native` exercises official clients over loopback

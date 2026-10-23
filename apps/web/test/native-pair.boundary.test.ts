@@ -12,7 +12,6 @@ import {
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
 import {
-  DocsPublicCatalogue,
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
@@ -37,7 +36,10 @@ import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 import type { Page, Request as BrowserRequest } from "playwright";
 
-import { generateDocsImages } from "../scripts/docs-images.build";
+import {
+  generateDocsImages,
+  readDocsCatalogue,
+} from "../scripts/docs-images.build";
 import { WebsiteDocsImageBytes } from "../scripts/docs-images.schemas";
 import {
   docsImagePath,
@@ -415,18 +417,7 @@ describe("built native API and Website", () => {
         );
         // Compare the actual built Worker with the owning checked catalogue,
         // including every body rather than accepting a count or a placeholder.
-        const publicContent = yield* fs
-          .readFileString(
-            path.join(
-              root,
-              "packages/docs-content/.source/public-catalogue.json"
-            )
-          )
-          .pipe(
-            Effect.flatMap(
-              Schema.decodeEffect(Schema.fromJsonString(DocsPublicCatalogue))
-            )
-          );
+        const publicContent = yield* readDocsCatalogue;
         expect(publicContent.pages).toHaveLength(62);
         // Repeat the actual build-only generator, then compare every fresh
         // output with the already built asset. This checks determinism and

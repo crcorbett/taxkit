@@ -22,16 +22,17 @@ Current implemented code lives in:
 
 - `apps/api`
 - `apps/web`
+- `content/docs`
 - `packages/analytics`
 - `packages/api/http`
 - `packages/api/mcp`
 - `packages/calculators`
 - `packages/content`
 - `packages/core`
-- `packages/docs-content`
+- `packages/diagrams`
 - `packages/docs-examples`
-- `packages/docs-fumadocs`
 - `packages/infrastructure`
+- `packages/mdx`
 - `packages/observability`
 - `packages/publication`
 - `packages/rules/au/income-tax`
@@ -116,7 +117,7 @@ identity distinct from `taxkit`, the sole public npm package.
   registry. It reads the separate API through the generated HTTP client, over
   the private binding on the server and the public origin in the browser. Tax
   rules, calculations and content lookup remain package/API-owned. The app owns
-  documentation page loaders, app-specific MDX composition, navigation/focus,
+  documentation page loaders, reading-body rendering, navigation/focus,
   search, Markdown representations, share images and responsive reading, and
   forwards discovery file requests to the API.
 
@@ -165,11 +166,14 @@ identity. Neither an app nor a package depends on another app.
 `packages/content`
 : Private compiled owner of canonical docs page/navigation contracts, source
   errors, the accepted public catalogue Schema and `ContentService`. Application
-  composition injects one checked catalogue; the service reads accepted pages,
-  navigation and bounded search without filesystem or runtime execution. This
-  owner does not perform source acceptance or compile MDX. The HTTP
-  content group consumes this compiled contract instead of the source-only
-  Fumadocs collection. The public path refinement and fixed page/search errors
+  composition supplies `DocsSources`; `ContentCatalogueLive` builds the checked
+  catalogue once through `DocsPageReader`, and the service reads accepted
+  pages, navigation and bounded search from it. It owns the checked reading
+  `body`, link resolution (`src/links.ts`) and the processed Markdown writer
+  (`src/reading-markdown.egress.ts`). It declares the consumed
+  `DocsPageReader`, `DocsCodeHighlighter` and `DocsDiagramRenderer` contracts and
+  never imports their implementations. The HTTP content group consumes this
+  compiled contract. The public path refinement and fixed page/search errors
   have one owner here. `./response-check` correlates an already-decoded page with
   its requested path. Shared public-origin policy lives in its Schema owner.
 
@@ -183,40 +187,31 @@ identity. Neither an app nor a package depends on another app.
   T008 application and provider qualification remain in progress; package tests
   alone do not prove browser privacy or ingestion.
 
-`packages/docs-content`
-: Implemented private source-only content package. It owns TaxKit docs
-  authored MDX, authored navigation, meta, validation issues,
-  validation errors, `DocsContentService`, the Fumadocs `source.config.ts`
-  and the generated `.source/*` boundary. Its schema/error exports retain
-  compatibility re-exports from `@taxkit/content`. Navigation decoding is independent
-  of the Node-only validation module. Validation and generated raw-text access
-  may read MDX files only through their explicit non-runtime operations; app
-  routes use processed generated content through the service and client
-  exports. Service interfaces use the precise `Contract` suffix.
-  The independent native MDX index and `./catalogue-source` Layer belong only
-  to the local accepted-catalogue builder. Request/browser code consumes its
-  checked generated representation; it must not initialise that compiler.
-  The package build emits the accepted JSON catalogue; `./public-catalogue`
-  exports that value without importing the source compiler or live Layers.
+`content/docs`
+: Private source-only `@content/docs` package with the 62 authored `.mdx`
+  pages, `navigation.json`, `repository.json` (the GitHub revisions that
+  repository-file links use) and `sources.ts` (every page as a `?raw` import).
+  It has no Schemas, services or runtime.
+
+`packages/mdx`
+: Private compiled `@taxkit/mdx`. `./live` implements Content's
+  `DocsPageReader` with micromark MDX and GFM tables and a Schema-checked syntax
+  tree; JSX, images, raw HTML and quotes fail the page. `./highlights`
+  implements `DocsCodeHighlighter` and is the only `@pierre/highlights` caller.
+
+`packages/diagrams`
+: Private compiled `@taxkit/diagrams`. `./mermaid` implements Content's
+  `DocsDiagramRenderer` and is the only `beautiful-mermaid` caller. It renders
+  SVG on the server, with no browser or Chromium.
 
 `packages/docs-examples`
 : Private owner of the four retained integration templates, additional checked
   public snippet sources and their
   compiler/runtime checks. It depends on HTTP, SDK and calculator contracts.
-  Those dependencies stay outside docs-content so HTTP can consume content
+  Those dependencies stay outside Content so HTTP can consume content
   contracts without a circular build graph. It has no exports, generated
   content, service runtime or publication entrypoint. Its standard compiler
   build emits the templates without exporting a runtime package.
-
-`packages/docs-fumadocs`
-: Implemented private reusable package for generic Fumadocs integration. It
-  owns Effect Schema to Standard Schema bridging, shared MDX compile config,
-  the schema-decoded `FumadocsSource` service, safe tagged errors, the static
-  `FumadocsSourceLive` (over a supplied `FumadocsGeneratedCollection`) and
-  `FumadocsSourceTest` (over `FumadocsSourceFixtures`) Layers, and generic
-  browser-safe MDX render primitives. It must not own TaxKit-specific
-  frontmatter, navigation, validation policy, routes or generated content.
-  Service interfaces use the precise `Contract` suffix.
 
 ## Runtime shape
 
@@ -248,9 +243,8 @@ belongs in apps or explicitly server-only package exports.
 - Keep repository path classification and safe reporting in
   `tools/repository-paths`; do not move it into package orchestration or browser
   code.
-- Keep app-specific MDX components in `apps/web`. Promote only generic,
-  repeated Fumadocs primitives to `packages/docs-fumadocs/render`. Create a
-  shared TaxKit UI package only when apps repeat UI primitives.
+- Keep docs presentation components in `apps/web`. Create a shared TaxKit UI
+  package only when apps repeat UI primitives.
 - Do not add flat engine packages once nested domain or rule ownership exists.
   `packages/calculators` is allowed because it is a cross-surface
   orchestration package rather than a jurisdiction/domain/rule package.

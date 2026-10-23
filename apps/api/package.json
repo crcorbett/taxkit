@@ -22,6 +22,7 @@
     "test": "bun --bun vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "@content/docs": "workspace:*",
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
     "@taxkit/analytics": "workspace:*",
@@ -30,8 +31,9 @@
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
-    "@taxkit/docs-content": "workspace:*",
+    "@taxkit/diagrams": "workspace:*",
     "@taxkit/infrastructure": "workspace:*",
+    "@taxkit/mdx": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "@taxkit/publication": "workspace:*",
     "alchemy": "catalog:",

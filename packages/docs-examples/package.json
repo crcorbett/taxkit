@@ -18,6 +18,8 @@
     "taxkit": "workspace:*"
   },
   "devDependencies": {
+    "@content/docs": "workspace:*",
+    "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
     "@taxkit/api-http": "workspace:*",
     "@taxkit/content": "workspace:*",

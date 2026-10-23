@@ -1,0 +1,61 @@
+---
+title: "OpenAPI reference"
+description: "Use the generated OpenAPI document as the endpoint contract."
+status: "published"
+---
+
+# OpenAPI reference
+
+Use generated OpenAPI for endpoint paths, parameters, request bodies and
+response schemas. Narrative API pages explain when to use HTTP, how errors
+work and how the API relates to the SDK.
+
+## Generated source
+
+The current API package generates the OpenAPI document from
+`@taxkit/api-http` route definitions. The API app serves it at:
+
+```txt
+GET /api/docs/openapi.json
+```
+
+The local Scalar viewer is served at:
+
+```txt
+GET /api/docs
+```
+
+## Smoke check
+
+Run the API locally, then fetch the generated document:
+
+```sh
+bun run --filter=api start
+curl http://127.0.0.1:4000/api/docs/openapi.json
+```
+
+The document should include the calculate path and `CalculatorRunRequest`
+payload schema. Use this generated document for clients and endpoint reference
+pages rather than copying endpoint fields by hand.
+
+```txt
+/api/v1/calculators/{calculatorId}/calculate
+CalculatorRunRequest
+```
+
+## Review the contract in the repository
+
+You can also read the
+[checked OpenAPI snapshot](../../../packages/api/http/__snapshots__/openapi.json).
+The API package's snapshot test regenerates the contract from its route
+definitions. Run it when changing an endpoint:
+
+```sh
+bun run --filter=@taxkit/api-http test:openapi
+```
+
+## Related pages
+
+- [Endpoints](./endpoints.mdx)
+- [API overview](./overview.mdx)
+- [API and SDK architecture](../../../docs/architecture/api-and-sdk.md)

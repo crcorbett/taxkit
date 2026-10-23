@@ -164,11 +164,6 @@ removes meaningful repetition. App-specific composition remains app-owned;
 docs accessibility and navigation UI stays in the app. Add a shared UI package
 only when repeated UI patterns across apps justify one.
 
-MDX component registries follow the same composition rule. The Website owns one
-registry under its MDX adapter; routes and leaves import focused render
-primitives or that registry. `mdx/no-route-local-component-registry` enforces
-route placement.
-
 ## Calculator state
 
 `calculator.atoms.ts` holds one `Atom.family` group per calculator: form,
@@ -200,13 +195,16 @@ registration and interrupt it on cleanup.
 ## Documentation
 
 The catch-all route loads page and navigation from the API's documentation
-routes and renders browser-safe compiled MDX presentation; its processed
-Markdown and frontmatter must match the API page before display. `/search`
+routes. The route renders the title as `DocsHeading` and the checked
+`page.body` through `src/lib/docs/reading-body.view.tsx`: code tokens as
+coloured spans, diagrams as `<img>` with an SVG data address, tables in a
+labelled scroll region and page links through the TanStack router. `/search`
 reads the raw address once and calls the API's search route. Markdown
 representations (`.md` and `Accept` negotiation) are a named HTTP policy over
 the HTML Effect in `src/server.ts`; discovery documents belong to the API and
 are forwarded once. Share metadata comes from `metadata.egress.ts` and share
-images from a build-only Vite step. No Website request reads authored MDX,
+images from a build-only Vite step, which builds the same catalogue from
+`content/docs` through `readDocsCatalogue`. No Website request reads authored MDX,
 builds a content index or constructs a Layer.
 
 ## Analytics
@@ -231,10 +229,9 @@ event allowlist and stored-event readback are not built.
 - Read Worker bindings only in `runtime.server.ts` and adapt the private binding
   only in `api/host.server.ts`.
 - Keep frontend docs and component details out of rule packages.
-- Keep browser docs modules on browser-safe exports such as
-  `@taxkit/docs-content/client` and `@taxkit/docs-fumadocs/render`; do not import
-  generated `.source/server` files or `@taxkit/docs-content/server` from browser
-  modules.
+- Keep browser docs modules on browser-safe Content exports such as
+  `@taxkit/content/schemas`; do not import `@content/docs`, `@taxkit/mdx` or
+  `@taxkit/diagrams` from browser modules.
 - Use TanStack router links for internal docs routes so client navigation runs
   the route loader. Keep ordinary anchors for external, mail, download,
   repository-source and same-document destinations.

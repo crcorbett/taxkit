@@ -18,9 +18,9 @@ API and Website with three calculators and the accepted documentation, an Effect
 with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, the installable
-`taxkit` TypeScript SDK, private `@taxkit/docs-content` and
-`@taxkit/docs-fumadocs` packages, shared testing helpers and shared TypeScript
-config. The SDK includes the engine, Australian rules and typed HTTP contracts
+`taxkit` TypeScript SDK, the authored `@content/docs` pages, private
+`@taxkit/content`, `@taxkit/mdx` and `@taxkit/diagrams` packages, shared
+testing helpers and shared TypeScript config. The SDK includes the engine, Australian rules and typed HTTP contracts
 in one package, with Effect as its only external runtime dependency.
 
 ```sh
@@ -55,12 +55,15 @@ entry points.
   telemetry and edge identity, independent of deployment providers.
 - [packages/sdk/typescript](./packages/sdk/typescript/README.md): the public
   `taxkit` package with plain, safe-result, Effect and AU entry points.
-- [packages/docs-content](./packages/docs-content/README.md): private
-  source-only content package for docs frontmatter, navigation, validation,
-  generated source access and the docs content service.
-- [packages/docs-fumadocs](./packages/docs-fumadocs/README.md): private
-  reusable package for generic Fumadocs configuration, source adapters and
-  MDX render primitives.
+- [content/docs](./content/docs/README.md): private source-only `@content/docs`
+  package with the authored MDX pages, navigation, repository link revisions
+  and the raw page list.
+- [packages/content](./packages/content/README.md): private docs page Schemas,
+  checked reading body, link resolution, catalogue and content service.
+- [packages/mdx](./packages/mdx/README.md): private MDX page reader and code
+  highlighter that implement Content's contracts.
+- [packages/diagrams](./packages/diagrams/README.md): private server-side
+  Mermaid to SVG renderer that implements Content's diagram contract.
 - [packages/core](./packages/core/README.md): deterministic engine primitives,
   schema-backed facts, rule descriptors, graph validation, trace and ledger
   contracts and calculation engine service.
@@ -204,8 +207,8 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
   `BunRuntime.runMain`, serves `packages/api/http` through Bun and disposes
   scoped resources on shutdown; its native Worker serves HTTP and MCP.
 - `apps/web` owns the replacement documentation reader over the accepted
-  backend catalogue and compiled MDX. Canonical page fields and reusable
-  Fumadocs internals remain package-owned.
+  backend catalogue. It renders each page's checked reading body; canonical
+  page fields and MDX reading remain package-owned.
 - `apps/web/src/lib/runtime.server.ts` owns one server runtime; the browser
   `ApiClient` Atom runtime and one shared registry own browser execution and
   cleanup. Both read the separate API with Effect's generated `HttpApiClient`;
