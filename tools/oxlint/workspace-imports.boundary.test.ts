@@ -46,7 +46,7 @@ it.effect(
           ],
           [
             browser,
-            'import "@taxkit/api-rpc/server";',
+            'import "@taxkit/api-mcp/server";',
             "taxkit-package(workspace-roles)",
           ],
           [
@@ -61,12 +61,12 @@ it.effect(
           ],
           [
             browser,
-            `const owner = "@taxkit/api-rpc"; export const load = () => import(\`\${owner}/server\`);`,
+            `const owner = "@taxkit/api-mcp"; export const load = () => import(\`\${owner}/server\`);`,
             "taxkit-package(workspace-roles)",
           ],
           [
             browser,
-            'export type Backend = import("@taxkit/api-rpc/server");',
+            'export type Backend = import("@taxkit/api-mcp/server");',
             "taxkit-package(workspace-roles)",
           ],
           [
@@ -123,7 +123,6 @@ it.effect(
         browser,
         `import "@taxkit/content/schemas";
 import "@taxkit/api-http/api";
-import "@taxkit/api-rpc/live";
 import "@taxkit/docs-content/client";
 import "@taxkit/calculators/summaries";
 `

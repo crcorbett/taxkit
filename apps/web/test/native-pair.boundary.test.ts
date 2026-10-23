@@ -1,22 +1,16 @@
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
 import { DocsPageUnavailable } from "@taxkit/api-http";
+import { TaxKitApi } from "@taxkit/api-http/api";
 import {
   CalculatorRequestBodyErrorEnvelope,
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/request-boundary";
-import { DocsRpcClientLive } from "@taxkit/api-rpc/content/live";
-import { DocsRpcClient } from "@taxkit/api-rpc/content/service";
-import { CalculatorRpcRequestTooLarge } from "@taxkit/api-rpc/errors";
-import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
 import {
-  CalculatorRpcOrigin,
   DescriptorFilterQuery,
-  GetCalculatorGraphRequest,
-  GetCalculatorRequest,
+  HelpQuery,
   MetadataQuery,
-} from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
+} from "@taxkit/calculators/schemas";
 import {
   DocsPublicCatalogue,
   DocsPublicPage,
@@ -33,7 +27,6 @@ import {
   Array,
   Effect,
   FileSystem,
-  Layer,
   Option,
   Order,
   Path,
@@ -41,12 +34,8 @@ import {
   Record,
   Schema,
 } from "effect";
-import {
-  FetchHttpClient,
-  Headers,
-  HttpClient,
-  HttpClientRequest,
-} from "effect/http";
+import { FetchHttpClient, Headers, HttpClient } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
@@ -437,7 +426,6 @@ describe("built native API and Website", () => {
         yield* Effect.promise(() => website.ready).pipe(
           Effect.timeout("10 seconds")
         );
-        const catalogueOrigin = CalculatorRpcOrigin.make(new URL(apiOrigin));
         // Compare the actual built Worker with the owning checked catalogue,
         // including every body rather than accepting a count or a placeholder.
         const publicContent = yield* fs
@@ -510,36 +498,57 @@ describe("built native API and Website", () => {
           })
         );
 
-        // Native RPC restores the same catalogue values across separate
-        // actual Worker requests. No authored source or compiler is consulted.
-        const discoveryDocuments = yield* Effect.gen(function* () {
-          const client = yield* DocsRpcClient;
-          expect(yield* client.getNavigation()).toEqual(
+        // The generated HTTP client restores the same catalogue values across
+        // separate actual Worker requests. No authored source or compiler is consulted.
+        yield* Effect.gen(function* () {
+          const client = yield* HttpApiClient.make(TaxKitApi, {
+            baseUrl: apiOrigin,
+          });
+          expect(yield* client.content.getNavigation()).toEqual(
             publicContent.navigation
           );
           yield* Effect.forEach(publicContent.pages, (page) =>
             Effect.gen(function* () {
-              expect(yield* client.getPage(page.path)).toEqual(page);
-              expect(yield* client.getMarkdown(page.path)).toBe(page.markdown);
+              expect(
+                yield* client.content.getPage({ query: { path: page.path } })
+              ).toEqual(page);
+              expect(
+                yield* client.content.getMarkdown({
+                  query: { path: page.path },
+                })
+              ).toBe(page.markdown);
             })
           );
           const term = yield* Schema.decodeEffect(DocsSearchTerm)("Quickstart");
-          const results = yield* client.searchPages(term);
+          const results = yield* client.content.searchPages({
+            query: { term },
+          });
           expect(results.length).toBeGreaterThan(0);
           expect(results.length).toBeLessThanOrEqual(20);
           expect(
             Array.every(results, (result) => result.excerpt.length <= 240)
           ).toBe(true);
-          return yield* Effect.forEach(
-            DocsDiscoveryPath.literals,
-            client.getDiscovery
-          );
-        }).pipe(
-          Effect.provide(
-            DocsRpcClientLive.pipe(
-              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
-            ).pipe(Layer.provide(FetchHttpClient.layer))
-          )
+        }).pipe(Effect.provide(FetchHttpClient.layer));
+        // The API's own discovery routes are the reference documents.
+        const discoveryDocuments = yield* Effect.forEach(
+          DocsDiscoveryPath.literals,
+          (documentPath) =>
+            Effect.gen(function* () {
+              const owned = yield* Effect.promise(() =>
+                publicApi.dispatchFetch(
+                  `${apiOrigin}/api/v1/docs/discovery${documentPath}`
+                )
+              );
+              expect(owned.status).toBe(200);
+              return {
+                body: yield* Effect.promise(() => owned.text()),
+                contentType: (owned.headers.get("content-type") ?? "").replace(
+                  "; charset=utf-8",
+                  ""
+                ),
+                path: documentPath,
+              };
+            })
         );
         const unavailableDiscoveryWorker = yield* Effect.promise(() =>
           website.getWorker("taxkit-website-unavailable")
@@ -980,15 +989,15 @@ describe("built native API and Website", () => {
             if (attempt === "after idle") {
               yield* Effect.sleep("750 millis");
             }
-            const catalogue = yield* TaxKitRpcClient.pipe(
+            const catalogue = yield* HttpApiClient.make(TaxKitApi, {
+              baseUrl: apiOrigin,
+            }).pipe(
               Effect.flatMap((client) =>
-                client.listCalculators(MetadataQuery.make({}))
+                client.calculatorApi.listCalculators({
+                  query: MetadataQuery.make({}),
+                })
               ),
-              Effect.provide(
-                TaxKitRpcClientLive.pipe(
-                  Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
-                ).pipe(Layer.provide(FetchHttpClient.layer))
-              )
+              Effect.provide(FetchHttpClient.layer)
             );
             expect(catalogue.calculators).toHaveLength(3);
             expect(
@@ -1004,84 +1013,57 @@ describe("built native API and Website", () => {
         );
         // Exercise the seven additional checked calls against the real built Worker.
         yield* Effect.gen(function* () {
-          const client = yield* TaxKitRpcClient;
-          const catalogue = yield* client.listCalculators(
-            MetadataQuery.make({})
-          );
+          const { calculatorApi } = yield* HttpApiClient.make(TaxKitApi, {
+            baseUrl: apiOrigin,
+          });
+          const catalogue = yield* calculatorApi.listCalculators({
+            query: MetadataQuery.make({}),
+          });
           const pay = Array.findFirst(
             catalogue.calculators,
             (calculator) => calculator.calculatorId === "au.pay.take-home"
           ).pipe(
             Option.getOrElse(() => expect.fail("Missing retained calculator"))
           );
-          const request = GetCalculatorRequest.make({
-            calculatorId: pay.calculatorId,
+          const params = { calculatorId: pay.calculatorId };
+          expect(
+            yield* calculatorApi.getCalculator({
+              params,
+              query: HelpQuery.make({}),
+            })
+          ).toEqual(pay);
+          const schema = yield* calculatorApi.getCalculatorSchema({
+            params,
+            query: HelpQuery.make({}),
           });
-          expect(yield* client.getCalculator(request)).toEqual(pay);
-          const schema = yield* client.getCalculatorSchema(request);
           expect(schema.calculator).toEqual(pay);
           expect(schema.inputFacts.length).toBeGreaterThan(0);
-          const graph = yield* client.getCalculatorGraph(
-            GetCalculatorGraphRequest.make({ calculatorId: pay.calculatorId })
-          );
+          const graph = yield* calculatorApi.getCalculatorGraph({
+            params,
+            query: MetadataQuery.make({}),
+          });
           expect(graph.calculator).toEqual(pay);
           expect(graph.edges.length).toBeGreaterThan(0);
           expect(graph.validationIssues).toEqual([]);
-          const facts = yield* client.listFacts(
-            DescriptorFilterQuery.make({
-              calculator: Option.some(Option.some(pay.calculatorId)),
-            })
-          );
+          const filter = DescriptorFilterQuery.make({
+            calculator: Option.some(Option.some(pay.calculatorId)),
+          });
+          const facts = yield* calculatorApi.listFacts({ query: filter });
           expect(facts.facts.length).toBeGreaterThan(0);
-          const rules = yield* client.listRules(
-            DescriptorFilterQuery.make({
-              calculator: Option.some(Option.some(pay.calculatorId)),
-            })
-          );
+          const rules = yield* calculatorApi.listRules({ query: filter });
           expect(rules.rules).toEqual(
             expect.arrayContaining(Array.fromIterable(schema.rules))
           );
           expect(rules.rules).toHaveLength(schema.rules.length);
-          expect(yield* client.listJurisdictions()).toEqual({
+          expect(yield* calculatorApi.getJurisdictions()).toEqual({
             jurisdictions: [{ code: "AU", title: "Australia" }],
           });
-          expect(yield* client.listTaxYears(MetadataQuery.make({}))).toEqual({
+          expect(
+            yield* calculatorApi.getTaxYears({ query: MetadataQuery.make({}) })
+          ).toEqual({
             taxYears: [{ jurisdiction: "AU", taxYear: "2025-26" }],
           });
-        }).pipe(
-          Effect.provide(
-            TaxKitRpcClientLive.pipe(
-              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
-            ).pipe(Layer.provide(FetchHttpClient.layer))
-          )
-        );
-        // Deliberately oversize only this controlled transport's encoded body;
-        // preserve the actual native API and the checked catalogue operation.
-        const oversizedTransport = Layer.effect(
-          HttpClient.HttpClient,
-          HttpClient.HttpClient.pipe(
-            Effect.map(
-              HttpClient.mapRequest(
-                HttpClientRequest.bodyText(
-                  "é".repeat(32_769),
-                  "application/json"
-                )
-              )
-            )
-          )
-        ).pipe(Layer.provide(FetchHttpClient.layer));
-        const rejected = yield* TaxKitRpcClient.pipe(
-          Effect.flatMap((client) =>
-            client.listCalculators(MetadataQuery.make({}))
-          ),
-          Effect.flip,
-          Effect.provide(
-            TaxKitRpcClientLive.pipe(
-              Layer.provide(Layer.succeed(TaxKitRpcOrigin)(catalogueOrigin))
-            ).pipe(Layer.provide(oversizedTransport))
-          )
-        );
-        expect(rejected).toEqual(new CalculatorRpcRequestTooLarge());
+        }).pipe(Effect.provide(FetchHttpClient.layer));
         // The Website declares no server functions: the generated resolver
         // manifest is empty and the framework base path serves nothing.
         expect(
@@ -1212,7 +1194,7 @@ describe("built native API and Website", () => {
             })
         );
         yield* Effect.forEach(
-          ["/rpc", "/api/v1/calculators/au.pay.take-home/calculate"],
+          ["/api/v1/calculators/au.pay.take-home/calculate"],
           (pathname) =>
             Effect.gen(function* () {
               const oversized = yield* Effect.promise(() =>
@@ -1298,14 +1280,10 @@ describe("built native API and Website", () => {
           readonly url: string;
           readonly request: BrowserRequest;
         }>();
-        // Record calculations and any retired RPC or server-function call.
+        // Record calculations and any retired server-function call.
         const recordCalls = (request: BrowserRequest) => {
           const url = new URL(request.url());
-          if (
-            isCalculation(url) ||
-            url.pathname.startsWith("/rpc") ||
-            url.pathname.startsWith("/_serverFn")
-          ) {
+          if (isCalculation(url) || url.pathname.startsWith("/_serverFn")) {
             Queue.offerUnsafe(calls, {
               method: request.method(),
               request,
@@ -2176,8 +2154,7 @@ describe("built native API and Website", () => {
           if (
             (url.origin === apiOrigin &&
               url.pathname.startsWith("/api/v1/docs/")) ||
-            url.pathname.startsWith("/_serverFn") ||
-            url.pathname.startsWith("/rpc")
+            url.pathname.startsWith("/_serverFn")
           ) {
             Queue.offerUnsafe(
               docsCalls,

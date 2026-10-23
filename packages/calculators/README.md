@@ -123,7 +123,7 @@ artifact, public entrypoints and concrete dependency ranges.
 
 ## Browser Schema entrypoints
 
-`@taxkit/calculators/schemas` consumes narrow core/rule Schema entrypoints and owns no live runtime or rule pack. The RPC contract reuses its existing request and report Schemas; calculation remains with `PublicCalculatorService.calculate`.
+`@taxkit/calculators/schemas` consumes narrow core/rule Schema entrypoints and owns no live runtime or rule pack. The HTTP contract reuses its existing request and report Schemas; calculation remains with `PublicCalculatorService.calculate`.
 
 `@taxkit/calculators/summaries` owns checked calculator IDs, names and contexts
 using the schema-derived `CalculatorSummary`. Catalogue composition reuses
@@ -139,9 +139,9 @@ The [transport architecture](../../docs/architecture/api-and-sdk.md) owns applic
 
 `@taxkit/calculators/work` exports `PublicCalculatorServiceBounded`. A host builds
 this Layer once over its calculator implementation. It owns one pool of eight
-active calculations; each calculation in an RPC batch takes a separate place.
+active calculations; each calculation takes a separate place.
 There is no waiting queue. A full pool returns `CalculatorCapacityExceeded`.
-The native API instance supplies the same service to HTTP and RPC. The retained
+The native API instance supplies the same service to HTTP and MCP. The retained
 standalone HTTP Layer builds its pool once when the router is constructed.
 Metadata does not take a calculation place. Direct engine and local SDK use
 remain outside this anonymous server policy; their retained results are unchanged.
@@ -157,8 +157,7 @@ the response; this is not a claim of forced CPU or remote Worker cancellation.
 Both new errors contain only fixed code, message and manual-retry fields, with
 no request values. HTTP maps capacity to 503 and operation timeout to 504, using
 the existing `error` envelope. Existing calculator request errors keep 400.
-The current [native RPC contract](../api/rpc/README.md) preserves the canonical errors; older clients get
-an explicit mismatch. Website forms display the fixed guidance and never retry
+Website forms display the fixed guidance and never retry
 a calculation automatically. Metadata lookup errors use the canonical
 `CalculatorMetadataError` union; all eight metadata methods admit the checked
 operation timeout. Their lazy invocation counts eager metadata construction
@@ -193,8 +192,8 @@ object. The package test command retains the original tax and cleanup assertions
 `CalculatorAdmission` owns the closed `admitCalculation` operation and
 `PublicCalculatorServiceRateLimited` places it before calculation work. The
 native API builds this Layer once, underneath its existing bounded service.
-HTTP, RPC and the Website private binding therefore share one allowance. Each
-batch calculation consumes one unit; all metadata operations remain outside it.
+HTTP, MCP and the Website private binding therefore share one allowance. Each
+calculation consumes one unit; all metadata operations remain outside it.
 Direct engine, local SDK and the standalone Bun server keep their existing
 contracts. Those hosts do not automatically acquire this native policy.
 
@@ -209,7 +208,7 @@ The Website's binding-only operation carries its original checked key separately
 from the request JSON; no public route admits that argument.
 
 `CalculatorRateLimited` has fixed safe code/message/manual-retry fields. HTTP
-uses 429 and `Retry-After: 60`; native RPC revision 4 carries the same error.
+uses 429 and `Retry-After: 60`.
 Missing/invalid identity or a failed/invalid native limiter returns fixed
 `CalculatorAdmissionUnavailable` (HTTP 503). These errors carry no address,
 pay facts, provider message or cause. Both browser and HTML forms ask the visitor

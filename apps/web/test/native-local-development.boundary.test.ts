@@ -74,14 +74,10 @@ describe("native local development", () => {
         const page = yield* Effect.promise(() => browser.newPage());
         const calls = yield* Queue.make<string>();
         const exceptions = yield* Queue.make<string>();
-        // Record every browser call to a calculator route, including the
-        // retired machine RPC path, so only the HTTP calculation can satisfy it.
+        // Record every browser call to a calculator calculation route.
         page.on("request", (request) => {
           const { pathname } = new URL(request.url());
-          if (
-            pathname === "/rpc" ||
-            /^\/api\/v1\/calculators\/[^/]+\/calculate$/u.test(pathname)
-          ) {
+          if (/^\/api\/v1\/calculators\/[^/]+\/calculate$/u.test(pathname)) {
             Queue.offerUnsafe(calls, `${request.method()} ${request.url()}`);
           }
         });

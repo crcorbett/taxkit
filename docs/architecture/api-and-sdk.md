@@ -69,8 +69,7 @@ GET /api/v1/docs/markdown?path=/start/quickstart
 ```
 
 The native API Worker also serves GET/HEAD `/api/v1/docs/discovery/*`
-(`sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`), POST `/rpc` for
-machine callers and `/mcp`.
+(`sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`) and `/mcp`.
 
 `apps/web` reads the separate API with Effect's generated
 `HttpApiClient` for `TaxKitApi`, over the private service binding on the server
@@ -345,7 +344,7 @@ decodes/caches `API_PUBLIC_ORIGIN` and `TAXKIT_PUBLICATION_ORIGIN` through
 Config on first incoming use. Absent or invalid origins return an empty 503; no
 address is invented. The API reads no Website address.
 
-HTTP and RPC use public credential-free CORS for any exact HTTP(S) origin
+HTTP uses public credential-free CORS for any exact HTTP(S) origin
 (`publicCors`/`isBrowserOrigin` in `@taxkit/api-http/response-policy`, shared
 with the Bun host routes). MCP admits Origin-less clients and the publication
 origin only. The native init declares Cloudflare Workers Cache with
@@ -359,14 +358,14 @@ replies are `no-store`. Accept-only negotiation answers remain separate public
 variants. The package README owns the detailed response policy.
 
 The native default `fetch` serves the Website's private HTTP binding as well
-as public HTTP/RPC/MCP. Website canonical calculation POSTs carry a checked
+as public HTTP and MCP. Website canonical calculation POSTs carry a checked
 original IP and a stage-owned native Alchemy secret in private headers.
 `ApiWebsiteForwarding` authenticates them before installing the request-local
 rate key and strips them before router dispatch. Partial, malformed or wrong
 metadata fails closed; other methods/paths gain no authority from those fields.
 The same native limiter and work pool serve every transport. Direct edge
 callers retain `@taxkit/observability/edge-identity`; public clients require no
-forwarding credential. There is no private calculation RPC method.
+forwarding credential.
 
 POST bodies are read through the native Effect stream with a 64-KiB limit
 and a total five-second read deadline, before native JSON decoding. Oversized
@@ -396,7 +395,7 @@ The Website calls the API only through the generated client for `TaxKitApi`:
   directly.
 
 Both read replies with a 2 MiB cap and give each call one ten-second deadline.
-The Website has no RPC client, server functions or API proxy. The
+The Website has no server functions or API proxy. The
 [frontend owner](frontend.md) describes its loaders and failure handling.
 
 ## TypeScript SDK facade
@@ -459,30 +458,6 @@ Both plain paths reuse `calculateReport`; dispatch and output decoding have one
 owner. The Effect interface remains caller-composed and creates no runtime.
 These lifetime changes fulfil part of the accepted fresh interface work; they
 do not establish the later calculator UI, transport limits or whole-task acceptance.
-
-## Native RPC
-
-`@taxkit/api-rpc` owns all nine named calculator-service procedures over canonical
-calculator request/result/query/metadata Schemas. Its native server mounts POST
-`/rpc` with JSON; handlers delegate to the corresponding
-named `PublicCalculatorService` operation.
-The protocol lives in the caller's Layer scope; each named operation acquires and
-releases its native generated client's receive loop. Expected
-calculator failures project to fixed reasons, while version disagreement,
-unavailable transport, invalid replies and a complete-response deadline remain
-separate checked failures. Independent adapter defects remain defects.
-
-Native parser ingress checks procedure tags, bounded identities/batches/headers
-and a 64-KiB UTF-8 input before dispatch. Native per-procedure and global defect
-encoding use a fixed value. The client marks only the native exit reply decoder;
-it does not classify every SchemaError as an invalid response. Installed Effect
-4.0.0 source and actual wire tests qualify these hooks. RPC APIs remain unstable.
-
-The [package README](../../packages/api/rpc/README.md) owns its explicit exports
-and limits. The native API serves this protocol for machine callers; the
-package's checked RPC clients are used by its tests and the Website's native
-tests, not by the Website. Public HTTP/OpenAPI keeps its existing contract and
-shared application operation.
 
 Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and
 report/input definitions have separate canonical modules; old entrypoints
@@ -589,10 +564,9 @@ private reply decoder marks only the group's owning native exit Schemas; an
 unrelated adapter Schema error remains a defect. Public HTTP/OpenAPI and SDK
 interfaces do not change.
 
-The native body reader and RPC byte admission share
-`CalculatorRequestBodyLimit` from `@taxkit/api-http/request-boundary`: 64 KiB.
-The RPC export preserves its original four-symbol compatibility alias.
-The API applies it to public HTTP and native RPC POST, and the Website applies
+The native body reader uses `CalculatorRequestBodyLimit` from
+`@taxkit/api-http/request-boundary`: 64 KiB.
+The API applies it to public HTTP POST, and the Website applies
 it before decoding any supported standard HTML calculator form. At exactly
 the limit, valid JSON still reaches the same named calculation operation;
 exceeding it releases the source before its remaining tail is consumed.
@@ -600,42 +574,25 @@ The retained standalone HTTP server mounts the same admission middleware.
 Oversized/stalled bodies return fixed Schema-owned 413/408 JSON guidance; native
 Website forms select fixed HTML guidance and a link back to the calculators.
 The five-second total reader budget also rejects late synchronous completion.
-Custom route/RPC-only hosts must supply request admission at their composition.
+Custom route hosts must supply request admission at their composition.
 The native rate policy is described below; whole T004 qualification remains active.
-
-The private RPC client owns one ten-second complete-response deadline and a
-2 MiB byte cap for all nine closed JSON replies. Its concrete native HTTP adapter
-scopes each request through status validation and bounded stream reading before
-reusing native Response/Protocol/exit codecs. HTTP 408, 413 and 429 have distinct
-checked errors with fixed codes, literal safe messages and manual retry guidance;
-no rejected body or raw HTTP cause reaches the caller. The public SDK and
-standalone HTTP server retain their separate contracts.
 
 ## Shared calculation work limits
 
 The [calculator-owned policy](../../packages/calculators/README.md#shared-calculation-work-limits)
-supplies one eight-calculation pool and five-second operation budget to the native HTTP/RPC
+supplies one eight-calculation pool and five-second operation budget to the native API
 instance and one per standalone HTTP router. Calculation errors use separately
 declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
-methods declare checked 504 timeouts without using calculation places. RPC revision 3 preserves the canonical fixed capacity and
-timeout errors. Website forms request manual retry. SDK Schemas re-export these
+methods declare checked 504 timeouts without using calculation places. Website forms request manual retry. SDK Schemas re-export these
 errors, while local SDK execution keeps its caller-owned lifetime and tax results.
 The owning package records cleanup and CPU proof limits. The native rate policy
 and qualified MCP operations are described below; T006 retains the observed
 modern five-second remote cleanup limit.
 
 
-The [complete RPC contract](../../packages/api/rpc/README.md#complete-named-operation-contract)
-keeps the nine application methods closed and named. The existing group is the
-single source for native tag admission and owned reply-decoder identities.
-Its private operation transformation owns native receive-loop cleanup and safe
-transport policy over an already constructed Effect. It is not a client callback
-escape. Public HTTP/OpenAPI and local SDK operations keep their existing owners.
-
-
 SDK descriptor output narrowing checks `Schema.toType(outputSchema)` because
 the calculator service already returns a domain report. Applying the transport
-decoder again fails once trace fields are Options. HTTP/RPC representations
+decoder again fails once trace fields are Options. HTTP representations
 still encode/decode through their owning codecs. The packed consumer compares
 22 saved metadata responses and the original trace/ledger bytes while its
 declarations expose the new Core Option types and checked constructor inputs.
@@ -650,7 +607,7 @@ they mean the same thing; do not invent a jurisdiction or tax year.
 
 SDK constructor-input aliases retain the selected descriptor facts relation.
 The SDK checks context/help through their owning Schemas and leaves facts to
-the selected calculator decoder. HTTP/RPC use canonical Types internally and
+the selected calculator decoder. HTTP uses canonical Types internally and
 representation codecs at serialisation. Their existing wire/OpenAPI fields and
 values remain the compatibility contract.
 
@@ -659,34 +616,16 @@ Core calculation errors now retain diagnostic-key identity through nested
 Options. Current rule errors omit diagnostics; historical opaque/null values
 remain codec values and are not safe telemetry. Catalogue entries use their
 checked selected continuation without the unused generic `program` field.
-The fresh package declarations change deliberately; retained HTTP/RPC, report,
+The fresh package declarations change deliberately; retained HTTP, report,
 metadata and table/source values stay fixed. The HTTP OpenAPI snapshot and the
-HTTP/RPC package tests check that they do.
+HTTP package tests check that they do.
 
 
 ## Native calculation rate admission
 
-The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP/RPC/private Website calls share an allowance and each batch member takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance; RPC revision 4 preserves the same errors. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities to the published RPC exports.
-
-### Native documentation RPC
-
-The same API POST endpoint mounts five documentation procedures through
-`TaxKitPublicRpcGroup`, composed with the nine-procedure calculator group.
-Documentation has its own client and revision `2`; calculator revision `4` is
-unchanged. The server requires the calculator, content lookup and discovery
-services, supplied once at API composition. The content handlers reuse the
-generated public catalogue; they run no calculation and take no calculator
-allowance. Both client groups share the 2 MiB reader, ten-second deadline,
-credential/redirect/tracing policy and checked version skew. Their fixed
-page/search errors and path bounds belong to `@taxkit/content`; discovery contracts
-and failures belong to `@taxkit/publication`.
+The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP, MCP and private Website calls share an allowance and each calculation takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities.
 
 ### Documentation over HTTP
-
-The documentation RPC client's `getPage` applies Content's existing
-`isRequestedDocsPage` after native decoding. A schema-valid page for another
-requested path returns the existing `DocsRpcInvalidResponse`; there is no
-additional decoder or wire revision.
 
 The Website reads documentation through the public HTTP content routes
 (`/api/v1/docs/navigation`, `page`, `search` and `markdown`) and serves

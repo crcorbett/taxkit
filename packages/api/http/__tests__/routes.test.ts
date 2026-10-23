@@ -15,10 +15,8 @@ import {
   DocsDiscoveryApiPath,
   HealthPath,
   McpRoutePath,
-  RpcRoutePath,
   discoveryApiPath,
   healthPath,
-  isTrustedCalculationPath,
 } from "../src/routes.js";
 
 const calculator = AuPayCalculatorId.make("au.pay.take-home");
@@ -68,7 +66,7 @@ describe("transport route catalogue", () => {
   );
 
   it.effect(
-    "refuses unknown calculator identifiers and suffixes for public cache and trusted admission",
+    "refuses unknown calculator identifiers and suffixes for public cache",
     () =>
       Effect.forEach(
         [
@@ -78,26 +76,21 @@ describe("transport route catalogue", () => {
           "/api/v1/calculators/au.pay.take-home/schema/extra",
           "/api/v1/docs/discovery/unknown.txt",
           "/api/v1/docs/markdown/extra",
-          "/rpc/extra",
           "/mcp",
         ],
         (path) =>
           Effect.sync(() => {
             assert.isFalse(isPublicReadPath(path), path);
-            assert.isFalse(isTrustedCalculationPath(path), path);
           })
       )
   );
 
-  it("admits only the checked calculation endpoint and exact native RPC address", () => {
+  it("admits only the checked calculation endpoint and the MCP address", () => {
     const path = `/api/v1/calculators/${calculator}/calculate`;
     assert.isTrue(Schema.is(CalculationPath)(path));
-    assert.isTrue(isTrustedCalculationPath(path));
-    assert.isTrue(isTrustedCalculationPath("/rpc"));
     assert.isFalse(
-      isTrustedCalculationPath("/api/v1/calculators/unknown/calculate")
+      Schema.is(CalculationPath)("/api/v1/calculators/unknown/calculate")
     );
-    assert.isTrue(Schema.is(RpcRoutePath)("/rpc"));
     assert.isTrue(Schema.is(McpRoutePath)("/mcp/session"));
     assert.isFalse(Schema.is(McpRoutePath)("/mcpo"));
   });

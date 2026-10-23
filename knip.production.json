@@ -144,19 +144,6 @@
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.ts!"]
     },
-    "packages/api/rpc": {
-      "entry": [
-        "src/group.ts!",
-        "src/handlers.ts!",
-        "src/service.ts!",
-        "src/server.ts!",
-        "src/live.layer.ts!",
-        "src/schemas.ts!",
-        "src/errors.ts!",
-        "src/request-boundary.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
-    },
     "apps/web": {
       "entry": [
         "src/router.tsx!",

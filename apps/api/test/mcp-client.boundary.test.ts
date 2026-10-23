@@ -8,13 +8,6 @@ import {
   McpDocsSearchResponse,
   McpToolUnavailable,
 } from "@taxkit/api-mcp/schemas";
-import {
-  CalculationRequest,
-  CalculatorLive,
-  CalculatorFixture,
-  CalculatorFixtureMode,
-  sensitiveSentinel,
-} from "@taxkit/api-rpc/testing/fixtures";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import {
   CalculatorCatalogResponse,
@@ -25,6 +18,13 @@ import {
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
+import {
+  CalculationRequest,
+  CalculatorLive,
+  CalculatorFixture,
+  CalculatorFixtureMode,
+  sensitiveSentinel,
+} from "@taxkit/calculators/testing/fixtures";
 import {
   CalculatorConcurrencyLimit,
   PublicCalculatorServiceBounded,

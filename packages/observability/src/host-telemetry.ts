@@ -36,7 +36,6 @@ export const HostRoute = Schema.Literals([
   "mcp",
   "page",
   "reference",
-  "rpc",
   "search",
   "other",
 ]);

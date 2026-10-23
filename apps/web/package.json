@@ -44,7 +44,6 @@
     "@modelcontextprotocol/client": "2.3.1",
     "@takumi-rs/wasm": "2.14.0",
     "@taxkit/api-mcp": "workspace:*",
-    "@taxkit/api-rpc": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@taxkit/infrastructure": "workspace:*",
     "@taxkit/publication": "workspace:*",

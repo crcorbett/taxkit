@@ -41,34 +41,18 @@ const antiSlopRules = [
 const fixtureCases = [
   {
     accepted: [
-      "packages/api/rpc/src/group.ts",
-      "packages/api/rpc/src/handlers.ts",
-      "packages/api/rpc/src/live.layer.ts",
-      "packages/api/rpc/src/schemas.ts",
-      "packages/api/rpc/src/errors.ts",
-      "packages/api/rpc/src/server.ts",
-      "packages/api/rpc/src/server-serialization.boundary.ts",
-      "packages/api/rpc/src/client-response.boundary.ts",
-      "packages/api/rpc/src/content-client-response.boundary.ts",
-      "packages/api/rpc/src/content.errors.ts",
-      "packages/api/rpc/src/content.group.ts",
-      "packages/api/rpc/src/content.handlers.ts",
-      "packages/api/rpc/src/content.live.layer.ts",
-      "packages/api/rpc/src/content.schemas.ts",
-      "packages/api/rpc/src/content.service.ts",
-      "packages/api/rpc/src/content.test.layer.ts",
-      "packages/api/rpc/src/response-budget.boundary.ts",
-      "packages/api/rpc/src/service.ts",
-      "packages/api/rpc/src/test.layer.ts",
-      "packages/api/rpc/src/__testing__/fixtures.ts",
-      "packages/api/rpc/test/handlers.test.ts",
-      "packages/api/rpc/test/deadline.test.ts",
-      "packages/api/rpc/test/content.fixture.ts",
-      "packages/api/rpc/test/content.boundary.test.ts",
-      "packages/api/rpc/test/content-deadline.boundary.test.ts",
-      "packages/api/rpc/vitest.config.ts",
+      "packages/api/mcp/src/cancellation.boundary.ts",
+      "packages/api/mcp/src/handlers.layer.ts",
+      "packages/api/mcp/src/request.service.ts",
+      "packages/api/mcp/src/response-budget.boundary.ts",
+      "packages/api/mcp/src/schemas.ts",
+      "packages/api/mcp/src/server.ts",
+      "packages/api/mcp/src/tools.ts",
+      "packages/api/mcp/test/cancellation.boundary.test.ts",
+      "packages/api/mcp/test/response-budget.boundary.test.ts",
+      "packages/api/mcp/vitest.config.ts",
     ],
-    generated: "packages/api/rpc/src/.generated-strict-rejected.ts",
+    generated: "packages/api/mcp/src/.generated-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -182,7 +166,6 @@ const fixtureCases = [
       "tools/apps-local/native-pair-build.runtime.ts",
       // native-pair takes over a minute to lint alone; `bun run lint` covers it.
       "apps/web/test/native-settings-failure.boundary.test.ts",
-      "apps/web/test/native-rpc-failures.boundary.test.ts",
       "apps/web/test/native-cancellation.boundary.test.ts",
       "apps/web/test/native-local-development.boundary.test.ts",
       "apps/web/vitest.native.config.ts",
@@ -1113,9 +1096,9 @@ describe("exact native RPC lint boundaries", () => {
       expect(result.codes).toContain("taxkit(no-decoding-outside-boundaries)");
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-  test.effect("rejects decoding in a neighbouring RPC source file", () =>
+  test.effect("rejects decoding in a neighbouring transport source file", () =>
     Effect.gen(function* () {
-      const path = "packages/api/rpc/src/.generated-decoder-neighbour.ts";
+      const path = "packages/api/mcp/src/.generated-decoder-neighbour.ts";
       yield* writeLintFixture(
         join(repositoryRoot, path),
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);'
@@ -1248,46 +1231,6 @@ describe("exact native RPC lint boundaries", () => {
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
-    ...Array.flatMap(
-      [
-        {
-          encoder: false,
-          path: "packages/api/rpc/src/content-client-response.boundary.ts",
-        },
-        { encoder: false, path: "packages/api/rpc/test/content.fixture.ts" },
-        {
-          encoder: false,
-          path: "packages/api/rpc/test/content-deadline.boundary.test.ts",
-        },
-        {
-          encoder: true,
-          path: "packages/api/rpc/test/content.boundary.test.ts",
-        },
-      ],
-      ({ encoder, path }) => [
-        {
-          path,
-          rejected: false,
-          rule: "taxkit(no-decoding-outside-boundaries)",
-          source:
-            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-        },
-        {
-          path,
-          rejected: !encoder,
-          rule: "effect(no-schema-encoder-outside-egress)",
-          source:
-            'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-        },
-        {
-          path,
-          rejected: true,
-          rule: "strict-effect(no-runtime-outside-boundary)",
-          source:
-            'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-        },
-      ]
-    ),
     {
       path: "apps/web/test/native-pair.boundary.test.ts",
       rejected: false,
@@ -1367,27 +1310,6 @@ describe("exact native RPC lint boundaries", () => {
     },
     {
       path: "apps/web/test/native-cancellation.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/test/native-rpc-failures.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-rpc-failures.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-rpc-failures.boundary.test.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
@@ -1476,55 +1398,6 @@ describe("exact native RPC lint boundaries", () => {
       rule: "strict-effect(no-imperative-collections)",
       source:
         "export const run = () => { const values = [1]; values.push(2); return values; };",
-    },
-    {
-      path: "packages/api/rpc/src/client-response.boundary.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/rpc/src/server-serialization.boundary.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/rpc/src/server-serialization.boundary.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/rpc/src/server-serialization.boundary.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/api/rpc/test/handlers.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String); export const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/rpc/test/deadline.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/rpc/test/deadline.test.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
       path: "apps/api/test/worker.boundary.test.ts",

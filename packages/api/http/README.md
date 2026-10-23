@@ -23,7 +23,7 @@ calculation dispatch and schema-guided expected error shaping live in
 `@taxkit/calculators`.
 
 `./routes` owns transport path constants and Schema families for the native
-HTTP declaration, reference endpoints, RPC, MCP and discovery addresses. Cache
+HTTP declaration, reference endpoints, MCP and discovery addresses. Cache
 eligibility admits only checked calculator identifiers and exact public read
 paths. Worker classification and trusted calculation admission, Website
 discovery forwarding, and [Publication](../../publication/README.md) links use
@@ -59,7 +59,7 @@ The public calculation API routes use the reusable calculator catalogue,
 fact and rule descriptors and graph diagnostics from `@taxkit/calculators`.
 Every handler, including Calculate, calls `PublicCalculatorService` directly.
 The HTTP Calculate route supplies its checked route ID, body and query to the
-same named `calculate` operation used by native RPC. Expected service failures
+same named `calculate` operation used by MCP. Expected service failures
 keep the existing HTTP envelope. The status declarations below describe the
 additional request and operation protections.
 The SDK owns the HTTP comparison tests; this package does not depend on it.
@@ -70,7 +70,7 @@ existing calculator engine and `publicCors` for Bun and in-process consumers.
 Both server Layers require the caller's `ContentService`. API hosts supply the
 accepted build output; the HTTP package imports only the compiled content
 contracts. The native API host supplies its shared calculator service to HTTP
-and RPC.
+and MCP.
 
 The `content` group delegates navigation, page lookup and search to that same
 content service. Markdown returns the owning processed page body as
@@ -206,7 +206,7 @@ Cloudflare freshness. Explicit handler lifetimes are preserved, and `no-cache`,
 receiving that default. Restrictions are checked across browser, CDN and
 Cloudflare CDN cache-control headers. Non-public replies are `no-store`.
 Public read paths are documentation and discovery routes, calculator metadata
-and OpenAPI documents; health, calculation, RPC and MCP are never shared.
+and OpenAPI documents; health, calculation and MCP are never shared.
 
 `@taxkit/api-http/config` owns the reusable client config schema, type and
 keyed config fragment (`baseUrl`). The package owns its env namespaces,
@@ -409,13 +409,13 @@ The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
 identities and explicit Match narrowing of report/error unions.
 
 The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
-across HTTP and RPC, including individual batch messages, with a five-second
+across HTTP and MCP, with a five-second
 operation budget for all nine service methods. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes or canonical RPC errors. Website guidance requests
+503/504 envelopes. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
-seven-calculation RPC batch plus one HTTP calculation, rejected extra HTTP/SSR/
-browser calls, HTTP 504/RPC timeouts and reached cleanup. Synchronous CPU work
+eight HTTP calculations, rejected extra HTTP/SSR/
+browser calls, HTTP 504 timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. The native rate policy below is implemented separately; MCP and whole T004
 qualification remain unfinished.
@@ -427,9 +427,8 @@ qualification remain unfinished.
 five-second total read deadline. It counts encoded bytes before parsing, closes
 rejected/interrupted readers and rejects late synchronous reads after control
 returns. The retained standalone server applies it before calculator decoding;
-native API and Website hosts use the same owner. `@taxkit/api-rpc/request-boundary`
-re-exports its four symbols. Only the native API host's outer
-composition covers both HTTP and RPC; a custom route host must supply its own
+native API and Website hosts use the same owner. Only the native API host's
+outer composition covers its routes; a custom route host must supply its own
 admission middleware.
 
 Fixed Schema-owned request errors use HTTP 413 (`request-too-large`, reduce the
@@ -464,6 +463,6 @@ a diagnostic sanitiser; do not export legacy diagnostic values to telemetry.
 The [calculator-owned rate contract](../../calculators/README.md#native-calculation-rate-admission) adds canonical rate/unavailable errors to calculation responses. The native API maps them to HTTP 429 with `Retry-After: 60` and fixed 503 guidance, using the existing error envelope. Metadata consumes no rate unit. Owning group Schemas drive generated clients and the OpenAPI snapshot; the standalone Bun host keeps its existing policy.
 
 The public page-address refinement and fixed documentation errors now belong
-to `@taxkit/content`, shared with native documentation RPC. This package retains
+to `@taxkit/content`. This package retains
 its existing error exports and HTTP status/media rules. Generated OpenAPI names
 the same canonical address bound for both the request and returned page.

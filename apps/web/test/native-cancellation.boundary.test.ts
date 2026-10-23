@@ -1,32 +1,28 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
-import { CalculatorRpcDeadlineExceeded } from "@taxkit/api-rpc/errors";
-import { TaxKitRpcClientLive } from "@taxkit/api-rpc/live";
-import {
-  CalculatorRpcOrigin,
-  CalculatorRpcPayload,
-  CalculatorRpcVersion,
-} from "@taxkit/api-rpc/schemas";
-import { TaxKitRpcClient, TaxKitRpcOrigin } from "@taxkit/api-rpc/service";
-import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
+import { TaxKitApi } from "@taxkit/api-http/api";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
   Array,
   Clock,
   Effect,
   Fiber,
   FileSystem,
-  Layer,
   Path,
   Queue,
   Record,
   Schema,
 } from "effect";
-import { FetchHttpClient } from "effect/http";
+import { FetchHttpClient, HttpClient } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
+import { boundedResponses } from "../src/lib/api/bounded-response";
 import { WebsiteApiDeadlineExceeded } from "../src/lib/api/errors";
+import { calculate } from "../src/lib/api/requests";
 import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import {
   nativeLocalModeFixture,
@@ -42,12 +38,6 @@ const calculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`
 const isCalculation = (
   request: Readonly<{ method: () => string; url: () => string }>
 ) => request.method() === "POST" && request.url() === calculation;
-const NativeRequestFixture = Schema.TaggedStruct("Request", {
-  headers: Schema.Unknown,
-  id: Schema.Unknown,
-  payload: Schema.Unknown,
-  tag: Schema.Unknown,
-});
 
 it.live(
   "keeps native headers/body deadlines and cancels browser reads on editing and departure",
@@ -178,23 +168,14 @@ it.live(
       yield* Effect.promise(() => host.ready).pipe(
         Effect.timeout("10 seconds")
       );
-      const payload = yield* Schema.encodeEffect(CalculatorRpcPayload)({
-        request: CalculationRequest,
-        version: CalculatorRpcVersion,
-      });
-      const body = yield* Schema.encodeEffect(Json)(
-        NativeRequestFixture.make({
-          headers: [],
-          id: "1",
-          payload,
-          tag: "Calculate",
-        })
-      );
+      const body = yield* Schema.encodeEffect(
+        Schema.fromJsonString(CalculatorRunRequest)
+      )(CalculationRequest.payload);
       const ordinary = yield* Effect.promise(() =>
         host.getWorker("api-normal")
       );
       const control = yield* Effect.promise(() =>
-        ordinary.fetch(`${apiOrigin}/rpc`, {
+        ordinary.fetch(calculation, {
           body,
           headers: { "content-type": "application/json" },
           method: "POST",
@@ -243,24 +224,26 @@ it.live(
       );
       yield* Effect.forEach([apiOrigin, headersOrigin], (address) =>
         Effect.gen(function* () {
-          const origin =
-            yield* Schema.decodeUnknownEffect(CalculatorRpcOrigin)(address);
           const started = yield* Clock.currentTimeMillis;
-          const error = yield* TaxKitRpcClient.pipe(
-            Effect.flatMap((client) => client.calculate(CalculationRequest)),
+          // The Website's own generated client and deadline, as the server and
+          // browser use them.
+          const error = yield* HttpClient.HttpClient.pipe(
+            Effect.flatMap((http) =>
+              HttpApiClient.makeWith(TaxKitApi, {
+                baseUrl: address,
+                httpClient: boundedResponses(http),
+              })
+            ),
+            Effect.flatMap((client) => calculate(client, CalculationRequest)),
             Effect.flip,
-            Effect.provide(
-              TaxKitRpcClientLive.pipe(
-                Layer.provide(Layer.succeed(TaxKitRpcOrigin)(origin))
-              ).pipe(Layer.provide(FetchHttpClient.layer))
-            )
+            Effect.provide(FetchHttpClient.layer)
           );
           const elapsed = (yield* Clock.currentTimeMillis) - started;
           // The native client exposes a closed safe error union. Report only
           // its tag and the fixed fixture phase; never inspect raw causes or
           // request/response bytes to diagnose a transport regression.
           expect(
-            Schema.is(CalculatorRpcDeadlineExceeded)(error),
+            Schema.is(WebsiteApiDeadlineExceeded)(error),
             `Native ${address === apiOrigin ? "body" : "headers"} fixture returned ${error._tag} after ${elapsed}ms`
           ).toBe(true);
           expect(elapsed).toBeGreaterThanOrEqual(9500);
@@ -314,12 +297,9 @@ it.live(
         Queue.offerUnsafe(exceptions, error.message);
       });
       page.on("request", (request) => {
-        // Record calculator routes and the retired machine RPC path.
+        // Record calculator routes.
         const { pathname } = new URL(request.url());
-        if (
-          pathname === "/rpc" ||
-          pathname.startsWith("/api/v1/calculators/")
-        ) {
+        if (pathname.startsWith("/api/v1/calculators/")) {
           Queue.offerUnsafe(calls, `${request.method()} ${request.url()}`);
         }
       });

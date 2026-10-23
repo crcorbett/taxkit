@@ -1,5 +1,6 @@
 import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
+import { withCalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundary";
 import {
   applyCachePolicy,
   isBrowserOrigin,
@@ -14,7 +15,6 @@ import {
   DocsDiscoveryApiPath,
   HealthPath,
   McpRoutePath,
-  RpcRoutePath,
   DiscoveryPath,
   discoveryApiPath,
   mcpPath,
@@ -23,7 +23,6 @@ import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
 import { withBoundedMcpReply } from "@taxkit/api-mcp/response-budget";
 import { TaxKitMcpHttpLayer } from "@taxkit/api-mcp/server";
-import { TaxKitRpcHttpLayer } from "@taxkit/api-rpc/server";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
@@ -74,7 +73,6 @@ import {
   ApiWebsiteForwarding,
   ApiWebsiteForwardingLive,
 } from "./website-forwarding.boundary.js";
-import { withApiRequestBodyLimit } from "./worker-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
 
@@ -83,7 +81,6 @@ import { ApiWorkerSettingsConfig } from "./worker.config.js";
 const apiRoute = (pathname: string): HostRoute =>
   Match.value(pathname).pipe(
     Match.when(Schema.is(HealthPath), () => "health" as const),
-    Match.when(Schema.is(RpcRoutePath), () => "rpc" as const),
     Match.when(Schema.is(McpRoutePath), () => "mcp" as const),
     Match.when(Schema.is(CalculationFamilyPath), () => "calculate" as const),
     Match.when(Schema.is(DocsDiscoveryApiPath), () => "discovery" as const),
@@ -116,7 +113,7 @@ const DiscoveryRoutes = HttpRouter.addAll(
   )
 );
 
-// Construct once in the native instance scope. Both transports receive this
+// Construct once in the native instance scope. HTTP and MCP receive this
 // same application service; native requests keep their own scope and fibre.
 export const ApiWorkerApplication = Effect.gen(function* () {
   const analytics = yield* ApiCalculatorDelivery;
@@ -178,7 +175,6 @@ export const ApiWorkerApplication = Effect.gen(function* () {
   );
   const routes = Layer.mergeAll(
     TaxKitApiRoutesLayer,
-    TaxKitRpcHttpLayer.pipe(Layer.provide(calculator)),
     DiscoveryRoutes.pipe(HttpRouter.provideRequest(discovery))
   ).pipe(
     Layer.provide(Layer.merge(content, discovery)),
@@ -265,9 +261,11 @@ export const ApiWorkerApplication = Effect.gen(function* () {
           return completed;
         }),
         () =>
-          withCalculatorAnalytics(withApiRequestBodyLimit(selected)).pipe(
+          withCalculatorAnalytics(
+            withCalculatorRequestBodyLimit(selected)
+          ).pipe(
             Effect.provideService(ApiCalculatorDelivery, analytics),
-            // The shared public browser policy for HTTP and RPC, plus the
+            // The shared public browser policy for HTTP, plus the
             // Website's collection header. Remote MCP keeps its own exact
             // browser origin list.
             HttpMiddleware.cors({

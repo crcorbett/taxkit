@@ -27,7 +27,6 @@
     "@taxkit/analytics": "workspace:*",
     "@taxkit/api-http": "workspace:*",
     "@taxkit/api-mcp": "workspace:*",
-    "@taxkit/api-rpc": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",

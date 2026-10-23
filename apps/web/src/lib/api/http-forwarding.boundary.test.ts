@@ -1,9 +1,9 @@
 import { expect, it } from "@effect/vitest";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
-import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { CalculationQuery, MetadataQuery } from "@taxkit/calculators/schemas";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
   WebsiteForwardingCredentialHeader,
   WebsiteForwardingRateKeyHeader,

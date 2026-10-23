@@ -162,7 +162,7 @@ deployment.
 1. Correctness is visible. Show the year, rule pack, parameters and trace
    behind every number; never show a figure the engine cannot justify.
 2. One owner per contract. Schemas, errors and operations live with the
-   calculator and are reused unchanged by SDK, HTTP, RPC and agent surfaces.
+   calculator and are reused unchanged by SDK, HTTP and agent surfaces.
 3. Fail explicitly. Unsupported years, invalid facts and overloaded requests
    return typed, documented failures rather than approximations.
 4. Keep nothing personal. Facts travel in a bounded request and die with it.

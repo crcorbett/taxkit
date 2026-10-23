@@ -70,6 +70,11 @@
       "source": "./src/admission.layer.ts",
       "types": "./dist/admission.layer.d.ts",
       "default": "./dist/admission.layer.js"
+    },
+    "./testing/fixtures": {
+      "source": "./src/__testing__/fixtures.ts",
+      "types": "./dist/__testing__/fixtures.d.ts",
+      "default": "./dist/__testing__/fixtures.js"
     }
   },
   "publishConfig": {

@@ -64,7 +64,7 @@ it.effect(
               {
                 code: "taxkit-package(workspace-roles)",
                 path: "apps/web/src/.generated-isolated-workspace.ts",
-                source: 'import "@taxkit/api-rpc/server";',
+                source: 'import "@taxkit/api-mcp/server";',
               },
             ],
             ({ path, source, code }) =>

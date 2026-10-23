@@ -1,7 +1,7 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
-import { CalculatorRpcPayload } from "@taxkit/api-rpc/schemas";
-import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
 import { Miniflare } from "miniflare";
@@ -124,9 +124,7 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
         host.getWorker("api-provider-proof")
       );
       const body = yield* Schema.encodeEffect(
-        Schema.fromJsonString(
-          CalculatorRpcPayload.fields.request.fields.payload
-        )
+        Schema.fromJsonString(CalculatorRunRequest)
       )(CalculationRequest.payload);
       const response = yield* Effect.promise(() =>
         api.fetch(

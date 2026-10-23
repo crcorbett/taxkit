@@ -1,11 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
 import { TaxKitApi } from "@taxkit/api-http/api";
-import {
-  CalculatorRpcPayload,
-  CalculatorRpcVersion,
-  MetadataQuery,
-} from "@taxkit/api-rpc/schemas";
-import { CalculationRequest } from "@taxkit/api-rpc/testing/fixtures";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import {
   CalculatorAdmission,
@@ -13,8 +7,11 @@ import {
 } from "@taxkit/calculators/admission.service";
 import {
   CalculatorRateLimited,
+  CalculatorRunRequest,
   CalculationQuery,
+  MetadataQuery,
 } from "@taxkit/calculators/schemas";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
   edgeCallerKey,
   WebsiteForwardingCredentialHeader,
@@ -45,13 +42,6 @@ import { HttpApiClient } from "effect/http-api";
 import { ApiCalculatorAdmission } from "../src/worker-admission.layer.js";
 import { ApiWorkerInit } from "../src/worker.js";
 
-const Frame = Schema.TaggedStruct("Request", {
-  headers: Schema.Array(Schema.Tuple([Schema.String, Schema.String])),
-  id: Schema.String,
-  payload: CalculatorRpcPayload,
-  tag: Schema.Literal("Calculate"),
-});
-const Json = Schema.fromJsonString(Schema.Unknown);
 const forwardingCredential = "a".repeat(64);
 const previousCredential = "b".repeat(64);
 const settings = ConfigProvider.fromUnknown({
@@ -86,9 +76,7 @@ describe("shared native host calculation admission", () => {
           )
         );
         const body = yield* Schema.encodeEffect(
-          Schema.fromJsonString(
-            CalculatorRpcPayload.fields.request.fields.payload
-          )
+          Schema.fromJsonString(CalculatorRunRequest)
         )(CalculationRequest.payload);
         const response = yield* app.fetch.pipe(
           Effect.provideService(
@@ -173,7 +161,7 @@ describe("shared native host calculation admission", () => {
   );
 
   it.effect(
-    "direct HTTP, Website HTTP and public RPC batch members share one checked allowance",
+    "direct and Website HTTP calculations share one checked allowance",
     () => {
       const proof = Effect.gen(function* () {
         const used = yield* Ref.make(
@@ -226,9 +214,7 @@ describe("shared native host calculation admission", () => {
         const first = yield* calculate;
         yield* Effect.forEach(Array.range(1, 57), () => calculate);
         const publicBody = yield* Schema.encodeEffect(
-          Schema.fromJsonString(
-            CalculatorRpcPayload.fields.request.fields.payload
-          )
+          Schema.fromJsonString(CalculatorRunRequest)
         )(CalculationRequest.payload);
         // The Website uses canonical HTTP and a separately authenticated key,
         // even if the service hop carries another apparent edge IP.
@@ -254,44 +240,9 @@ describe("shared native host calculation admission", () => {
           )
         );
         expect(website.status).toBe(200);
-        const batch = yield* Effect.forEach(Array.range(1, 3), (id) =>
-          Schema.encodeEffect(Frame)(
-            Frame.make({
-              headers: [],
-              id: String(id),
-              payload: {
-                request: CalculationRequest,
-                version: CalculatorRpcVersion,
-              },
-              tag: "Calculate",
-            })
-          )
-        );
-        const body = yield* Schema.encodeEffect(Json)(batch);
-        const reply = yield* app.fetch.pipe(
-          Effect.provideService(
-            HttpServerRequest.HttpServerRequest,
-            HttpServerRequest.fromWeb(
-              new Request("https://api.example.com/rpc", {
-                body,
-                headers: {
-                  // RPC is public; forwarded metadata never changes its identity.
-                  [WebsiteForwardingRateKeyHeader]: "198.51.100.99",
-                  "cf-connecting-ip": "203.0.113.75",
-                  "content-type": "application/json",
-                },
-                method: "POST",
-              })
-            )
-          ),
-          Effect.map(HttpServerResponse.toWeb)
-        );
-        const text = yield* Effect.promise(() => reply.text());
-        expect(reply.status).toBe(200);
-        expect(text.match(/CalculatorRateLimited/gu)?.length).toBe(2);
-        expect(text).toContain('"Success"');
-        expect(text).not.toContain("203.0.113.75");
-        expect(text).not.toContain("198.51.100.99");
+        // The sixtieth call uses the last place; the next one is refused.
+        const last = yield* calculate;
+        expect(last.report).toBeDefined();
         const rejected = yield* calculate.pipe(Effect.result);
         expect(Result.isFailure(rejected)).toBe(true);
         if (Result.isFailure(rejected)) {
@@ -343,9 +294,7 @@ describe("shared native host calculation admission", () => {
           )
         );
         const body = yield* Schema.encodeEffect(
-          Schema.fromJsonString(
-            CalculatorRpcPayload.fields.request.fields.payload
-          )
+          Schema.fromJsonString(CalculatorRunRequest)
         )(CalculationRequest.payload);
         const call = (
           path: string,

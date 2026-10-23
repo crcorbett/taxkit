@@ -40,7 +40,6 @@ describe("public response cache policy", () => {
   it.each([
     "/api/health",
     "/api/v1/calculators/au.pay.take-home/calculate",
-    "/rpc",
     "/mcp",
     "/api/v1/docs/discovery/other.txt",
   ])("never shares %s", (path) => {

@@ -107,7 +107,6 @@ it.effect.each([
 it.effect.each([
   { method: "GET", route: path },
   { method: "HEAD", route: path },
-  { method: "POST", route: "/rpc" },
   { method: "POST", route: "/mcp" },
   { method: "POST", route: "/api/v1/calculators/unknown/calculate" },
   { method: "GET", route: "/api/v1/calculators" },
