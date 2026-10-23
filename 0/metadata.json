@@ -1,0 +1,76 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M5K3ZTTY7CE7TVS3NFA4BSTJ",
+  "session_id": "01a16396-0f26-7ef2-a34d-9042d31e6009",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-23T00:53:48.236953Z",
+  "branch": "codex/remove-scoped-package",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [
+    "CHANGELOG.md",
+    "README.md",
+    "docs/architecture/api-and-sdk.md",
+    "docs/architecture/package-ownership.md",
+    "docs/runbooks/versioning.md",
+    "packages/sdk/typescript/README.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6-astra",
+  "turn_id": "5f6695bf8aa1",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 1104717,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 37790976,
+    "output_tokens": 103306,
+    "api_call_count": 273
+  },
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-23T00:53:48.093572Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 15,
+    "human_modified": 30,
+    "human_removed": 0,
+    "total_committed": 15,
+    "total_lines_changed": 49,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 32,
+      "user_lines_removed": 17,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "CHANGELOG.md": 6,
+        "README.md": 1,
+        "bun.lock": 2,
+        "docs/architecture/api-and-sdk.md": 2,
+        "docs/architecture/package-ownership.md": 1,
+        "docs/runbooks/versioning.md": 1,
+        "packages/docs-examples/CHANGELOG.md": 7,
+        "packages/docs-examples/package.json": 1,
+        "packages/sdk/typescript/CHANGELOG.md": 8,
+        "packages/sdk/typescript/README.md": 2,
+        "packages/sdk/typescript/package.json": 1
+      },
+      "user_removed_per_file": {
+        "README.md": 1,
+        "bun.lock": 2,
+        "docs/architecture/api-and-sdk.md": 3,
+        "docs/architecture/package-ownership.md": 3,
+        "docs/runbooks/versioning.md": 2,
+        "packages/docs-examples/package.json": 1,
+        "packages/sdk/typescript/README.md": 4,
+        "packages/sdk/typescript/package.json": 1
+      }
+    }
+  ]
+}
