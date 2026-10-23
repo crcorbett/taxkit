@@ -138,8 +138,8 @@ Root `alchemy.run.ts` and `alchemy.local.run.ts`
 and the native Alchemy Worker. The native instance owns one router and
 calculator service; incoming requests own body limits, dispatch and cleanup.
 HTTP and MCP share the named calculator service operations; the Worker
-also serves the discovery documents and authenticates the Website's private
-canonical calculation HTTP requests. The private `api/worker` export supplies native implementation
+also serves the discovery documents and the Website's private read-only
+binding. The private `api/worker` export supplies native implementation
 to root `alchemy.apps.ts`; infrastructure owns the lightweight Worker declaration
 and shared settings. `@taxkit/observability/edge-identity` owns shared edge caller
 identity. Neither an app nor a package depends on another app.
@@ -177,8 +177,7 @@ identity. Neither an app nor a package depends on another app.
 : Private compiled owner of checked page/calculator events, collection policy,
   settings, safe errors and named browser/backend service contracts. Its native
   backend capture Layer has one bounded HTTP attempt. The application owns
-  execution and best-effort delivery. Analytics owns the calculator usage decorator
-  and bounded relay; the Website owns its private browser SDK and mounts the relay.
+  execution and best-effort delivery. Analytics owns the calculator usage decorator.
   Infrastructure owns retained provider
   projects. Calculators, rules and the local SDK have no analytics dependency.
   T008 application and provider qualification remain in progress; package tests

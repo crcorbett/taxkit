@@ -18,10 +18,6 @@ import {
   DocsSearchResult,
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
-import {
-  WebsiteForwardingCredentialHeader,
-  WebsiteForwardingRateKeyHeader,
-} from "@taxkit/observability/edge-identity";
 import { DocsDiscoveryPath } from "@taxkit/publication/schemas";
 import {
   Array,
@@ -43,16 +39,11 @@ import type { Page, Request as BrowserRequest } from "playwright";
 
 import { generateDocsImages } from "../scripts/docs-images.build";
 import { WebsiteDocsImageBytes } from "../scripts/docs-images.schemas";
-import { WebsiteApiUnavailable } from "../src/lib/api/errors";
 import {
   docsImagePath,
   WebsiteDocsArticleJson,
   WebsiteDocsImageSize,
 } from "../src/lib/docs/social.schemas";
-import {
-  nativeForwardingFixture,
-  nativeForwardingKey,
-} from "./native-forwarding.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -248,8 +239,6 @@ describe("built native API and Website", () => {
             compatibilityDate: "2026-10-04",
             compatibilityFlags: ["nodejs_compat"],
             env: {
-              ...nativeForwardingFixture,
-
               ...nativeLocalModeFixture,
               ...nativeRateFixture("10075"),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
@@ -302,7 +291,6 @@ describe("built native API and Website", () => {
           config: {
             ...unavailableApi.config,
             env: {
-              ...nativeForwardingFixture,
               ...nativeLocalModeFixture,
               ...unavailableApi.config.env,
               API_PUBLIC_ORIGIN: {
@@ -322,7 +310,6 @@ describe("built native API and Website", () => {
             compatibilityDate: "2026-10-04",
             compatibilityFlags: ["nodejs_compat"],
             env: {
-              ...nativeForwardingFixture,
               ...nativeLocalModeFixture,
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               TAXKIT_API: {
@@ -1134,35 +1121,7 @@ describe("built native API and Website", () => {
         );
         expect(initialHtml).toContain('href="/agents"');
         expect(initialHtml).not.toContain("Take-home pay:");
-        expect(initialHtml).not.toContain(nativeForwardingKey);
-        yield* Effect.logInfo("native-pair: private binding calculation");
-        const server = yield* Effect.promise(() =>
-          website.dispatchFetch(`${websiteOrigin}/`, {
-            body: form,
-            headers: { "content-type": "application/x-www-form-urlencoded" },
-            method: "POST",
-          })
-        );
-        expect(server.status).toBe(200);
-        // A personal no-JavaScript result is never shared.
-        expect(server.headers.get("cache-control")).toBe("no-store");
-        expect(server.headers.get("cloudflare-cdn-cache-control")).toBe(
-          "no-store"
-        );
-        const serverHtml = yield* Effect.promise(() => server.text());
-        expect(serverHtml).toContain("$1,301.00");
-        expect(serverHtml).not.toContain(nativeForwardingKey);
-        const invalid = yield* Effect.promise(() =>
-          website.dispatchFetch(`${websiteOrigin}/`, {
-            body: "grossDollars=invalid&period=weekly",
-            headers: { "content-type": "application/x-www-form-urlencoded" },
-            method: "POST",
-          })
-        );
-        expect(invalid.status).toBe(200);
-        expect(yield* Effect.promise(() => invalid.text())).toContain(
-          "Enter a valid pay amount and pay period."
-        );
+        // Calculators need JavaScript; the Website accepts no form POST.
         yield* Effect.forEach(
           [
             "/",
@@ -1171,26 +1130,18 @@ describe("built native API and Website", () => {
           ],
           (pathname) =>
             Effect.gen(function* () {
-              const oversized = yield* Effect.promise(() =>
+              const posted = yield* Effect.promise(() =>
                 website.dispatchFetch(`${websiteOrigin}${pathname}`, {
-                  body: "é".repeat(32_769),
+                  body: form,
                   headers: {
                     "content-type": "application/x-www-form-urlencoded",
                   },
                   method: "POST",
                 })
               );
-              expect(oversized.status).toBe(413);
-              expect(oversized.headers.get("content-type")).toContain(
-                "text/html"
-              );
-              const html = yield* Effect.promise(() => oversized.text());
-              expect(html).toContain(
-                new CalculatorRequestBodyTooLarge().message
-              );
-              expect(html).toContain('href="/"');
-              expect(html).not.toContain("é");
-              expect(html).not.toContain("PRIVATE9");
+              expect(posted.status, pathname).toBe(404);
+              expect(posted.headers.get("cache-control")).toBe("no-store");
+              expect(yield* Effect.promise(() => posted.text())).toBe("");
             })
         );
         yield* Effect.forEach(
@@ -1220,38 +1171,6 @@ describe("built native API and Website", () => {
               expect(body).not.toContain("PRIVATE9");
               expect(body).not.toContain("stack");
             })
-        );
-        const unavailableWorker = yield* Effect.promise(() =>
-          website.getWorker("taxkit-website-unavailable")
-        );
-        const unavailable = yield* Effect.promise(() =>
-          unavailableWorker.fetch(`${websiteOrigin}/`, {
-            body: form,
-            headers: { "content-type": "application/x-www-form-urlencoded" },
-            method: "POST",
-          })
-        );
-        expect(unavailable.status).toBe(200);
-        const unavailableHtml = yield* Effect.promise(() => unavailable.text());
-        // The unconfigured API's reply is an unavailable service; the visitor
-        // keeps the form and gets the Website's safe retry guidance.
-        expect(unavailableHtml).toContain(new WebsiteApiUnavailable().message);
-        expect(unavailableHtml).toContain('value="1654"');
-        expect(unavailableHtml).not.toContain("invalid-local-fixture");
-        // A second request after the isolate has been idle catches native receive
-        // loops that were incorrectly retained from an earlier request.
-        yield* Effect.sleep("750 millis");
-        yield* Effect.logInfo("native-pair: second private calculation");
-        const repeated = yield* Effect.promise(() =>
-          website.dispatchFetch(`${websiteOrigin}/`, {
-            body: form,
-            headers: { "content-type": "application/x-www-form-urlencoded" },
-            method: "POST",
-          })
-        );
-        expect(repeated.status).toBe(200);
-        expect(yield* Effect.promise(() => repeated.text())).toContain(
-          "$1,301.00"
         );
         yield* Effect.logInfo("native-pair: Chromium");
         const browser = yield* Effect.acquireRelease(
@@ -1365,8 +1284,8 @@ describe("built native API and Website", () => {
             url: request.url,
           }))
         ).toEqual([{ method: "POST", url: takeHomeCalculation }]);
-        // Credentials are omitted and no trace correlation is sent; the
-        // visitor's collection preference travels as its own header.
+        // Credentials are omitted and no trace correlation or collection
+        // header is sent.
         const sentHeaders = yield* Effect.forEach(requests, (call) =>
           Effect.promise(() => call.request.allHeaders())
         );
@@ -1377,15 +1296,9 @@ describe("built native API and Website", () => {
               !Record.has(headers, "b3") &&
               !Record.has(headers, "traceparent") &&
               !Record.has(headers, "cookie") &&
-              !Record.has(headers, WebsiteForwardingCredentialHeader) &&
-              !Record.has(headers, WebsiteForwardingRateKeyHeader)
+              !Record.has(headers, "x-taxkit-collection-policy")
           )
         ).toBe(true);
-        expect(
-          Array.map(sentHeaders, (headers) =>
-            Record.get(headers, "x-taxkit-collection-policy")
-          )
-        ).toEqual([Option.some("allow")]);
         const payInput = page.getByLabel("Pay before tax ($)");
         yield* Effect.promise(() => payInput.fill("2000"));
         yield* Effect.promise(() =>
@@ -1503,196 +1416,6 @@ describe("built native API and Website", () => {
           )
         ).toBe(1);
         expect(yield* Queue.clear(calls)).toEqual([]);
-        const errorContext = yield* Effect.acquireRelease(
-          Effect.promise(() => browser.newContext()),
-          (value) => Effect.promise(() => value.close())
-        );
-        const errorPage = yield* Effect.promise(() => errorContext.newPage());
-        errorPage.on("pageerror", (error) => {
-          Queue.offerUnsafe(exceptions, error.message);
-        });
-        errorPage.on("request", recordCalls);
-        // Feed the native Worker-generated error document to a fresh browser.
-        // Its real assets and transport state still perform the hydration.
-        yield* Effect.promise(() =>
-          errorPage.route(`${websiteOrigin}/`, (route) =>
-            route.fulfill({
-              body: unavailableHtml,
-              contentType: "text/html",
-              status: 200,
-            })
-          )
-        );
-        yield* Effect.promise(() => errorPage.goto(websiteOrigin));
-        yield* Effect.promise(() => errorPage.waitForLoadState("networkidle"));
-        yield* Effect.promise(() =>
-          errorPage.getByRole("alert").waitFor({ timeout: 5000 })
-        );
-        expect(
-          yield* Effect.promise(() =>
-            errorPage.getByRole("alert").textContent({ timeout: 5000 })
-          )
-        ).toBe(new WebsiteApiUnavailable().message);
-        const errorPayInput = errorPage.getByLabel("Pay before tax ($)");
-        yield* Effect.promise(() => errorPayInput.fill("2000"));
-        yield* Effect.promise(() =>
-          errorPage
-            .getByRole("alert")
-            .waitFor({ state: "hidden", timeout: 5000 })
-        );
-        expect(yield* Queue.clear(calls)).toEqual([]);
-        const savedContext = yield* Effect.acquireRelease(
-          Effect.promise(() => browser.newContext()),
-          (value) => Effect.promise(() => value.close())
-        );
-        const savedPage = yield* Effect.promise(() => savedContext.newPage());
-        savedPage.on("pageerror", (error) => {
-          Queue.offerUnsafe(exceptions, error.message);
-        });
-        savedPage.on("request", recordCalls);
-        // Obtain actual private POST HTML over the document's real local connection.
-        // Synthetic navigation fulfillment misclassifies its address space in Chromium.
-        yield* Effect.promise(() =>
-          savedPage.route(
-            `${websiteOrigin}/`,
-            (route) =>
-              route.continue({
-                headers: {
-                  ...route.request().headers(),
-                  "content-type": "application/x-www-form-urlencoded",
-                  origin: websiteOrigin,
-                },
-                method: "POST",
-                postData: form,
-              }),
-            { times: 1 }
-          )
-        );
-        yield* Effect.promise(() => savedPage.goto(websiteOrigin));
-        yield* Effect.promise(() => savedPage.waitForLoadState("networkidle"));
-        expect(yield* Queue.clear(calls)).toEqual([]);
-        const savedPayInput = savedPage.getByLabel("Pay before tax ($)");
-        yield* Effect.promise(() => savedPayInput.fill("2000"));
-        yield* Effect.promise(() =>
-          savedPage.getByLabel("Claim the tax-free threshold").uncheck()
-        );
-        yield* Effect.promise(() =>
-          savedPage
-            .getByText("How this answer was worked out", { exact: true })
-            .click({ timeout: 5000 })
-        );
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .getByText("Tax-free threshold claimed.", { exact: true })
-              .count()
-          )
-        ).toBe(1);
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .locator(".calculation-details")
-              .getByText("$1,654.00", { exact: true })
-              .count()
-          )
-        ).toBe(2);
-        yield* Effect.promise(() =>
-          savedPage
-            .getByText(
-              "This answer is out of date. Calculate again to update it.",
-              {
-                exact: true,
-              }
-            )
-            .waitFor({ timeout: 5000 })
-        );
-        expect(
-          yield* Effect.promise(() =>
-            savedPage.getByText("$1,301.00", { exact: true }).count()
-          )
-        ).toBe(1);
-        expect(yield* Queue.clear(calls)).toEqual([]);
-        yield* Effect.promise(() =>
-          savedPage.route(
-            isCalculation,
-            (route) =>
-              route.fulfill({
-                body: "",
-                headers: { "access-control-allow-origin": websiteOrigin },
-                status: 503,
-              }),
-            { times: 1 }
-          )
-        );
-        yield* Effect.promise(() =>
-          savedPage
-            .getByRole("button", { exact: true, name: "Calculate" })
-            .click()
-        );
-        yield* Effect.promise(() =>
-          savedPage.getByRole("alert").waitFor({ timeout: 5000 })
-        );
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .getByRole("status", { name: "Calculation result" })
-              .textContent()
-          )
-        ).toContain("$1,301.00");
-        expect(yield* Queue.clear(calls)).toHaveLength(1);
-        expect(savedPage.url()).toBe(`${websiteOrigin}/`);
-        // A distinct real result must replace both the answer and its explanation.
-        yield* Effect.promise(() =>
-          savedPage
-            .getByRole("button", { exact: true, name: "Calculate" })
-            .click()
-        );
-        yield* Effect.promise(() =>
-          savedPage
-            .getByText("$1,425.00", { exact: true })
-            .waitFor({ timeout: 5000 })
-        );
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .locator(".calculation-details")
-              .getByText("$2,000.00", { exact: true })
-              .count()
-          )
-        ).toBe(2);
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .locator(".calculation-details")
-              .getByText("$575.00", { exact: true })
-              .count()
-          )
-        ).toBe(2);
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .getByText("Tax-free threshold not claimed.", { exact: true })
-              .count()
-          )
-        ).toBe(1);
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .getByText("Tax-free threshold claimed.", { exact: true })
-              .count()
-          )
-        ).toBe(0);
-        expect(
-          yield* Effect.promise(() =>
-            savedPage
-              .getByText(
-                "This answer is out of date. Calculate again to update it.",
-                { exact: true }
-              )
-              .count()
-          )
-        ).toBe(0);
-        expect(yield* Queue.clear(calls)).toHaveLength(1);
         yield* Effect.logInfo("native-pair: no JavaScript");
         const noJavaScript = yield* Effect.acquireRelease(
           Effect.promise(() =>
@@ -1727,14 +1450,12 @@ describe("built native API and Website", () => {
               ).toBe(href);
             })
         );
+        // Without JavaScript the page explains that calculators need it.
         yield* Effect.promise(() =>
           plainPage
-            .getByRole("button", { exact: true, name: "Calculate" })
-            .click()
-        );
-        yield* Effect.promise(() =>
-          plainPage
-            .getByText("$1,301.00", { exact: true })
+            .getByText("Turn on JavaScript to use this calculator.", {
+              exact: true,
+            })
             .waitFor({ timeout: 5000 })
         );
         // Both remaining pages use the deployed calculator summaries and
@@ -1748,9 +1469,6 @@ describe("built native API and Website", () => {
               error: "Enter a valid pay amount and pay period.",
               id: "au.pay.withholdings",
               label: "Pay before tax ($)",
-              savedAmount: "1654",
-              savedAnswer: "$353.00",
-              savedForm: form,
               title: "AU pay withholdings",
             },
             {
@@ -1760,9 +1478,6 @@ describe("built native API and Website", () => {
               error: "Enter a valid annual taxable income.",
               id: "au.income-tax.annual",
               label: "Annual taxable income ($)",
-              savedAmount: "30000",
-              savedAnswer: "$1,386.90",
-              savedForm: "taxableDollars=30000",
               title: "AU annual income tax",
             },
           ] as const,
@@ -1893,93 +1608,6 @@ describe("built native API and Website", () => {
                     .textContent()
                 )
               ).toContain(calculator.answer);
-              expect(yield* Queue.clear(calls)).toEqual([]);
-              yield* Effect.promise(() =>
-                plainPage
-                  .getByRole("navigation", { exact: true, name: "Calculators" })
-                  .getByRole("link", { exact: true, name: calculator.title })
-                  .click()
-              );
-              const plainCalculatorInput = plainPage.getByLabel(
-                calculator.label
-              );
-              yield* Effect.promise(() =>
-                plainCalculatorInput.fill(calculator.amount)
-              );
-              yield* Effect.promise(() =>
-                plainPage
-                  .getByRole("button", { exact: true, name: "Calculate" })
-                  .click()
-              );
-              yield* Effect.promise(() =>
-                plainPage
-                  .getByRole("status", { name: "Calculation result" })
-                  .getByText(calculator.answer, { exact: true })
-                  .waitFor({ timeout: 5000 })
-              );
-              expect(
-                yield* Effect.promise(() =>
-                  plainPage.getByLabel(calculator.label).inputValue()
-                )
-              ).toBe(calculator.amount);
-              expect(plainPage.url()).toBe(
-                `${websiteOrigin}/calculators/${calculator.id}`
-              );
-              // A different actual private submission proves restoration cannot
-              // be imitated by each page's initial example.
-              yield* Effect.promise(() =>
-                savedPage.route(
-                  `${websiteOrigin}/calculators/${calculator.id}`,
-                  (route) =>
-                    route.continue({
-                      headers: {
-                        ...route.request().headers(),
-                        "content-type": "application/x-www-form-urlencoded",
-                        origin: websiteOrigin,
-                      },
-                      method: "POST",
-                      postData: calculator.savedForm,
-                    }),
-                  { times: 1 }
-                )
-              );
-              const restoredResponse = yield* Effect.promise(() =>
-                savedPage.goto(`${websiteOrigin}/calculators/${calculator.id}`)
-              );
-              yield* Effect.promise(() =>
-                savedPage.waitForLoadState("networkidle")
-              );
-              if (restoredResponse === null) {
-                return yield* Effect.die("Missing native form document reply");
-              }
-              const restoredHtml = yield* Effect.promise(() =>
-                restoredResponse.text()
-              );
-              expect(
-                restoredHtml.includes(`value="${calculator.savedAmount}"`)
-              ).toBe(true);
-              expect(restoredHtml.includes(calculator.savedAnswer)).toBe(true);
-              yield* Effect.promise(() =>
-                savedPage.screenshot({
-                  fullPage: true,
-                  path: path.join(
-                    screenshotRoot,
-                    `restored-${calculator.id}.png`
-                  ),
-                })
-              );
-              expect(
-                yield* Effect.promise(() =>
-                  savedPage.getByLabel(calculator.label).inputValue()
-                )
-              ).toBe(calculator.savedAmount);
-              expect(
-                yield* Effect.promise(() =>
-                  savedPage
-                    .getByRole("status", { name: "Calculation result" })
-                    .textContent()
-                )
-              ).toContain(calculator.savedAnswer);
               expect(yield* Queue.clear(calls)).toEqual([]);
               return yield* Effect.void;
             })

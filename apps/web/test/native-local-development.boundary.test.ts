@@ -259,14 +259,12 @@ describe("native local development", () => {
           );
           const plainPage = yield* Effect.promise(() => plainContext.newPage());
           yield* Effect.promise(() => plainPage.goto(websiteOrigin));
+          // Without JavaScript the page explains that calculators need it.
           yield* Effect.promise(() =>
             plainPage
-              .getByRole("button", { exact: true, name: "Calculate" })
-              .click()
-          );
-          yield* Effect.promise(() =>
-            plainPage
-              .getByText("$1,301.00", { exact: true })
+              .getByText("Turn on JavaScript to use this calculator.", {
+                exact: true,
+              })
               .waitFor({ timeout: 10_000 })
           );
           const workerPath = path.join(root, "apps/api/src/worker.ts");

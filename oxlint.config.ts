@@ -18,8 +18,6 @@ const taxkitReact = defineConfig({
 const decodingBoundaryFiles = [
   // Native heterogeneous resource-map props in the in-memory provider lifecycle test.
   "packages/infrastructure/src/posthog/projects.test.ts",
-  "apps/api/src/website-forwarding.boundary.ts",
-  "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
   "packages/observability/test/edge-identity.test.ts",
   "tools/infrastructure/release-gates.boundary.test.ts",
   "apps/web/src/lib/root-load.boundary.test.ts",
@@ -36,15 +34,11 @@ const decodingBoundaryFiles = [
   "packages/publication/test/service.test.ts",
   "packages/publication/test/discovery-links.test.ts",
   "apps/web/src/lib/api/host.boundary.test.ts",
-  "packages/analytics/src/relay/live.layer.ts",
-  "packages/analytics/test/relay.boundary.test.ts",
-  "apps/web/test/native-relay.boundary.test.ts",
   // Closed native PostHog SDK ingress; no runner or neighbouring-file permission.
   "packages/infrastructure/src/posthog/management.adapter.layer.ts",
   "packages/infrastructure/src/posthog/management.boundary.test.ts",
   // Exact collection header and native browser preference ingress only.
   "packages/analytics/src/collection-policy.boundary.ts",
-  "apps/web/src/lib/calculator-policy.browser.layer.ts",
   // Exact synthetic analytics representation fixture; no runtime or encoder.
   "packages/analytics/src/__testing__/fixtures.ts",
   // Actual installed provider request bytes at the mocked network boundary.
@@ -459,10 +453,8 @@ export default defineConfig({
       files: [
         "packages/analytics/src/**/*.ts",
         "packages/infrastructure/src/posthog/**/*.ts",
-        "packages/analytics/src/relay/**/*.ts",
         "apps/api/src/analytics-request.boundary.ts",
         "packages/analytics/src/api-usage.layer.ts",
-        "apps/web/src/lib/calculator-policy.browser.layer.ts",
       ],
       rules: {
         "no-restricted-globals": [
@@ -1049,7 +1041,7 @@ export default defineConfig({
         "apps/web/src/lib/api/forward.boundary.test.ts",
         "apps/web/src/lib/api/requests.boundary.test.ts",
         "apps/web/src/lib/api/host.boundary.test.ts",
-        "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
+        "apps/web/src/lib/api/binding-redirect.boundary.test.ts",
         "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
         "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
         "apps/web/src/lib/browser-tools.boundary.test.ts",
@@ -1065,7 +1057,6 @@ export default defineConfig({
         "apps/web/test/native-pair.boundary.test.ts",
         "apps/web/test/native-rate-provider.boundary.test.ts",
         "apps/web/test/native-rate.boundary.test.ts",
-        "apps/web/test/native-relay.boundary.test.ts",
         "apps/web/test/native-settings-failure.boundary.test.ts",
         "packages/docs-content/src/catalogue-index.runtime.ts",
         "packages/docs-content/src/catalogue-source.layer.ts",
@@ -1092,7 +1083,7 @@ export default defineConfig({
               "apps/web/src/lib/api/forward.boundary.test.ts",
               "apps/web/src/lib/api/requests.boundary.test.ts",
               "apps/web/src/lib/api/host.boundary.test.ts",
-              "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
+              "apps/web/src/lib/api/binding-redirect.boundary.test.ts",
               "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
               "apps/web/src/lib/browser-tools.boundary.test.ts",
               "apps/web/src/lib/browser-tools.boundary.ts",
@@ -1119,7 +1110,6 @@ export default defineConfig({
               "apps/web/test/native-pair.boundary.test.ts",
               "apps/web/test/native-rate-provider.boundary.test.ts",
               "apps/web/test/native-rate.boundary.test.ts",
-              "apps/web/test/native-relay.boundary.test.ts",
               "apps/web/test/native-settings-failure.boundary.test.ts",
               "packages/docs-content/src/live.layer.ts",
               "packages/docs-examples/src/error-handling.ts",

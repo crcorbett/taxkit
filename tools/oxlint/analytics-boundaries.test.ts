@@ -16,26 +16,20 @@ const decoder =
 // replace or delete the real owner to exercise its file-specific permission.
 it.effect.each([
   {
-    allowed: true,
-    path: "packages/analytics/src/relay/live.layer.ts",
-    rule: "",
-    source: decoder,
-  },
-  {
     allowed: false,
-    path: "packages/analytics/src/relay/adjacent.layer.ts",
+    path: "packages/analytics/src/adjacent.layer.ts",
     rule: "no-decoding-outside-boundaries",
     source: decoder,
   },
   {
     allowed: false,
-    path: "packages/analytics/src/relay/live.layer.ts",
+    path: "packages/analytics/src/live.layer.ts",
     rule: "no-restricted-globals",
     source: 'export const result = fetch("https://invalid.example");',
   },
   {
     allowed: false,
-    path: "packages/analytics/src/relay/live.layer.ts",
+    path: "packages/analytics/src/live.layer.ts",
     rule: "no-runtime-execution-outside-boundaries",
     source:
       'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
@@ -176,37 +170,6 @@ it.effect.each([
   {
     allowed: false,
     path: "apps/api/src/analytics-adjacent.ts",
-    rule: "no-decoding-outside-boundaries",
-    source: decoder,
-  },
-  {
-    allowed: true,
-    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
-    rule: "",
-    source: decoder,
-  },
-  {
-    allowed: false,
-    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
-    rule: "no-schema-encoder-outside-egress",
-    source: encoder,
-  },
-  {
-    allowed: false,
-    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
-    rule: "no-runtime-execution-outside-boundaries",
-    source:
-      'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
-  },
-  {
-    allowed: false,
-    path: "apps/web/src/lib/calculator-policy.browser.layer.ts",
-    rule: "no-restricted-globals",
-    source: 'export const result = fetch("https://invalid.example");',
-  },
-  {
-    allowed: false,
-    path: "apps/web/src/lib/calculator-policy.browser.adjacent.ts",
     rule: "no-decoding-outside-boundaries",
     source: decoder,
   },

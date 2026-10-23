@@ -2,12 +2,11 @@ import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
 import { websiteSearchParameters } from "#/lib/docs/search-location.boundary";
 import { createLoaderRegistry } from "#/lib/loaders";
-import type { WebsiteServerRenderContext } from "#/lib/schemas";
 
 import { routeTree } from "./routeTree.gen";
 
 // Public documentation loader data is reused for one minute, including intent
-// preloads. Routes with personal or live data opt out.
+// preloads. Routes with live data opt out.
 export const getRouter = () =>
   createTanStackRouter({
     context: { registry: createLoaderRegistry() },
@@ -22,6 +21,5 @@ export const getRouter = () =>
 declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof getRouter>;
-    server: { requestContext: WebsiteServerRenderContext };
   }
 }

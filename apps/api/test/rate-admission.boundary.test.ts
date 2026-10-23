@@ -12,11 +12,7 @@ import {
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
-import {
-  edgeCallerKey,
-  WebsiteForwardingCredentialHeader,
-  WebsiteForwardingRateKeyHeader,
-} from "@taxkit/observability/edge-identity";
+import { edgeCallerKey } from "@taxkit/observability/edge-identity";
 import { RateLimit } from "alchemy/Cloudflare/Workers";
 import {
   Array,
@@ -42,13 +38,9 @@ import { HttpApiClient } from "effect/http-api";
 import { ApiCalculatorAdmission } from "../src/worker-admission.layer.js";
 import { ApiWorkerInit } from "../src/worker.js";
 
-const forwardingCredential = "a".repeat(64);
-const previousCredential = "b".repeat(64);
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
   TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
-  TAXKIT_WEBSITE_FORWARDING_KEY: forwardingCredential,
-  TAXKIT_WEBSITE_FORWARDING_PREVIOUS_KEY: previousCredential,
   WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
 
@@ -161,7 +153,7 @@ describe("shared native host calculation admission", () => {
   );
 
   it.effect(
-    "direct and Website HTTP calculations share one checked allowance",
+    "direct HTTP calculations from one caller share one checked allowance",
     () => {
       const proof = Effect.gen(function* () {
         const used = yield* Ref.make(
@@ -216,30 +208,7 @@ describe("shared native host calculation admission", () => {
         const publicBody = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
         )(CalculationRequest.payload);
-        // The Website uses canonical HTTP and a separately authenticated key,
-        // even if the service hop carries another apparent edge IP.
-        const website = yield* app.fetch.pipe(
-          Effect.provideService(
-            HttpServerRequest.HttpServerRequest,
-            HttpServerRequest.fromWeb(
-              new Request(
-                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
-                {
-                  body: publicBody,
-                  headers: {
-                    [WebsiteForwardingCredentialHeader]: forwardingCredential,
-                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
-                    "cf-connecting-ip": "198.51.100.99",
-                    "cf-worker": "website.example.com",
-                    "content-type": "application/json",
-                  },
-                  method: "POST",
-                }
-              )
-            )
-          )
-        );
-        expect(website.status).toBe(200);
+        yield* calculate;
         // The sixtieth call uses the last place; the next one is refused.
         const last = yield* calculate;
         expect(last.report).toBeDefined();
@@ -277,7 +246,7 @@ describe("shared native host calculation admission", () => {
   );
 
   it.effect(
-    "admits the trusted caller key on the canonical HTTP calculation only",
+    "admits the direct edge key on the canonical HTTP calculation only",
     () =>
       Effect.gen(function* () {
         const keys = yield* Ref.make<readonly string[]>([]);
@@ -296,11 +265,15 @@ describe("shared native host calculation admission", () => {
         const body = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
         )(CalculationRequest.payload);
+        const direct = {
+          "cf-connecting-ip": "203.0.113.75",
+          "content-type": "application/json",
+        };
         const call = (
           path: string,
           method: string,
           payload: string,
-          credential = forwardingCredential
+          relayed = false
         ) =>
           app.fetch.pipe(
             Effect.provideService(
@@ -308,13 +281,9 @@ describe("shared native host calculation admission", () => {
               HttpServerRequest.fromWeb(
                 new Request(`https://api.example.com${path}`, {
                   body: method === "POST" ? payload : null,
-                  headers: {
-                    [WebsiteForwardingCredentialHeader]: credential,
-                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
-                    "cf-connecting-ip": "198.51.100.99",
-                    "cf-worker": "website.example.com",
-                    "content-type": "application/json",
-                  },
+                  headers: relayed
+                    ? { ...direct, "cf-worker": "website.example.com" }
+                    : direct,
                   method,
                 })
               )
@@ -327,14 +296,7 @@ describe("shared native host calculation admission", () => {
           body
         );
         expect(accepted.status).toBe(200);
-        expect(yield* Ref.get(keys)).toHaveLength(1);
-        const previous = yield* call(
-          "/api/v1/calculators/au.pay.take-home/calculate",
-          "POST",
-          body,
-          previousCredential
-        );
-        expect(previous.status).toBe(200);
+        expect(yield* Ref.get(keys)).toEqual(["203.0.113.75"]);
         // An error reply keeps its real status instead of a rebuilt 200.
         const rejected = yield* call(
           "/api/v1/calculators/au.pay.take-home/calculate",
@@ -360,15 +322,16 @@ describe("shared native host calculation admission", () => {
               )
             )
         );
-        expect(yield* Ref.get(keys)).toHaveLength(2);
-        const forged = yield* call(
+        expect(yield* Ref.get(keys)).toHaveLength(1);
+        // A Worker subrequest cannot borrow the edge address it carries.
+        const relayed = yield* call(
           "/api/v1/calculators/au.pay.take-home/calculate",
           "POST",
           body,
-          "c".repeat(64)
+          true
         );
-        expect(forged.status).toBe(503);
-        expect(yield* Ref.get(keys)).toHaveLength(2);
+        expect(relayed.status).toBe(503);
+        expect(yield* Ref.get(keys)).toHaveLength(1);
         // A declared 4xx keeps its status, headers and checked body.
         const limited = yield* ApiWorkerInit.pipe(
           Effect.provideService(
@@ -387,8 +350,7 @@ describe("shared native host calculation admission", () => {
                 {
                   body,
                   headers: {
-                    [WebsiteForwardingCredentialHeader]: forwardingCredential,
-                    [WebsiteForwardingRateKeyHeader]: "203.0.113.75",
+                    "cf-connecting-ip": "203.0.113.75",
                     "content-type": "application/json",
                   },
                   method: "POST",

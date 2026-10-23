@@ -51,13 +51,8 @@ export const calculatorPageAtoms = Atom.family(
       (request) =>
         ApiClient.pipe(Effect.flatMap((client) => calculate(client, request)))
     );
-    const showSaved = Atom.make(true);
     const showCalculation = Atom.make(false);
     const formError = Atom.make(Option.none<string>());
-    const savedReport = Atom.make(
-      Option.none<CalculatorRunResponse["report"]>()
-    );
-    const savedMessage = Atom.make(Option.none<string>());
     // Checked request identity belongs to one visible attempt. An edit or a
     // newer manual/tool submission invalidates a waiter for the older attempt.
     const attempt = Atom.make(Option.none<CalculatorRunServiceRequest>());
@@ -70,7 +65,6 @@ export const calculatorPageAtoms = Atom.family(
       get.set(attempt, Option.none());
       get.set(calculation, Atom.Interrupt);
       get.set(showCalculation, false);
-      get.set(showSaved, false);
       get.set(formError, Option.none());
       get.set(form, value);
     });
@@ -98,7 +92,6 @@ export const calculatorPageAtoms = Atom.family(
             );
       });
       get.set(showCalculation, true);
-      get.set(showSaved, false);
       if (Result.isFailure(request)) {
         get.set(attempt, Option.none());
         get.set(calculation, Atom.Interrupt);
@@ -116,14 +109,10 @@ export const calculatorPageAtoms = Atom.family(
       edit,
       form,
       formError,
-      savedMessage,
-      savedReport,
       showCalculation,
-      showSaved,
       submit,
       // The registry retains this in-memory page snapshot across an uncommitted
-      // React render. Otherwise idle cleanup can erase once-seeded SSR values
-      // before hydration subscribes. Page cleanup still interrupts live work.
+      // React render. Page cleanup still interrupts live work.
       // The retained view also holds its whole weak-family description group.
       // Otherwise browser GC can replace that group on a return visit while the
       // old values remain in the registry. The callback runs after group creation.
@@ -131,14 +120,12 @@ export const calculatorPageAtoms = Atom.family(
       view: Atom.make((get): WebsiteCalculatorViewState => {
         const current = get(calculation);
         const submitted = get(showCalculation);
-        const saved = get(showSaved);
         const inputError = get(formError);
         const report = AsyncResult.value(current).pipe(
           Option.filter(
             (value) => value.calculator.calculatorId === calculatorId
           ),
           Option.map((value) => value.report),
-          Option.orElse(() => get(savedReport)),
           Option.filter((value) =>
             Match.value(calculatorId).pipe(
               Match.when("au.income-tax.annual", () =>
@@ -169,7 +156,7 @@ export const calculatorPageAtoms = Atom.family(
                 "The calculation could not finish. Please try again."
               );
             }
-            return saved ? get(savedMessage) : Option.none<string>();
+            return Option.none<string>();
           },
           onSome: Option.some,
         });
@@ -181,7 +168,6 @@ export const calculatorPageAtoms = Atom.family(
           report,
           stale:
             Option.isSome(report) &&
-            !saved &&
             (!submitted ||
               current.waiting ||
               !AsyncResult.isSuccess(current) ||

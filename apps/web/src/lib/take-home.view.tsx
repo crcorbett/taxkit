@@ -25,9 +25,10 @@ export const TakeHomeFormView = ({
     <h1>TaxKit</h1>
     <h2>Australian take-home pay</h2>
     <p>2025–26 tax year</p>
+    <noscript>
+      <p role="alert">Turn on JavaScript to use this calculator.</p>
+    </noscript>
     <form
-      action="/"
-      method="post"
       onSubmit={(event) => {
         event.preventDefault();
         onCalculate();

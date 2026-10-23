@@ -42,8 +42,8 @@ The server shares eight active calculation places across HTTP and MCP. Each
 calculation takes a place. This budget does not claim that a
 JavaScript timer can forcibly stop synchronous CPU work. Current per-client
 rate admission in the native API adds 60 calculations per minute per checked
-connection address across HTTP, MCP and Website forms. Every calculation
-counts separately; metadata reads do not count. A rejected calculation returns
+connection address across HTTP and MCP, including calls from the Website
+calculators. Every calculation counts separately; metadata reads do not count. A rejected calculation returns
 HTTP 429 with `CalculatorRateLimited` and `Retry-After: 60`. Missing/invalid
 connection identity or a failed limiter returns HTTP 503 with
 `CalculatorAdmissionUnavailable`. Both contain fixed safe guidance and manual

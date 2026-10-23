@@ -87,38 +87,15 @@ refuses anything other than `alchemy dev` in local provider mode at stage
 mode and the local rate namespace `10075`, and uses no Doppler or Cloudflare
 credentials.
 
-## Private Website calculation forwarding
+## Private Website binding
 
-One native `Alchemy.Random` resource, `TaxKitWebsiteForwardingKey`, owns 32
-random bytes per stack/stage. Its redacted hex Output is bound as
-`TAXKIT_WEBSITE_FORWARDING_KEY` to both Workers. Ordinary deploys preserve its
-state identity. Hosted Alchemy state owns this key; Doppler continues owning
-deployment credentials. Local development uses its isolated native local state.
-The key is resolved through native runtime Config only when a calculation needs
-it, never from deploy-time Doppler configuration. During an explicit rotation,
-the API alone may bind `TAXKIT_WEBSITE_FORWARDING_PREVIOUS_KEY` to the previous
-Random Output and accept either checked key. The Website sends the current key
-only; a malformed previous binding fails forwarded admission closed. Normal
-deployments declare no previous binding or additional key resource.
-
-Only the Website server's canonical calculation POST adds the credential and
-checked original caller key. The native Fetcher/HttpClient adapter carries the
-generated HTTP contract to the API's default fetch host. The Website host sets
-standard native `RequestInit.redirect: "manual"` before binding dispatch, so
-redirect replies cannot replay the credential or original IP on another URL.
-The generated client rejects undeclared redirect responses; no legacy MCP
-Durable Object remains. Public HTTP, modern MCP and public
-reads require no forwarding credential. Both hosts keep `nodejs_compat` for the
-API's native constant-time verifier. The
-[deployment runbook](../../docs/runbooks/deployment.md) owns deliberate key
-rotation, old/new overlap and rollback. Rotation first introduces a new native
-Random identity, binds the former Output to the API's previous-key field and
-updates both current-key bindings with the API deployed before the Website.
-After both hosts and old/new admission are verified, a second native update
-removes the previous-key binding. Preserve the former resource/state for the
-qualified rollback interval. Changing Random's byte count does not rotate an
-existing value. Memory graph and boundary tests do not establish a successful
-live rotation.
+The Website's private service binding to the API only reads documentation,
+the catalogue and discovery files; it never calculates and carries no
+credential. The native Fetcher/HttpClient adapter carries the generated HTTP
+contract to the API's default fetch host. The Website host sets standard native
+`RequestInit.redirect: "manual"` before binding dispatch. The generated client
+rejects undeclared redirect responses; no legacy MCP Durable Object remains.
+Only the API binds `CALCULATOR_HOST_MODE`.
 
 ## Production telemetry stacks
 

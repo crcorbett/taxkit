@@ -161,9 +161,7 @@ describe("browser route loaders", () => {
             )
       );
       const { signal } = new AbortController();
-      const root = yield* Effect.promise(() =>
-        loadRoot({ context, signal, submission: undefined })
-      );
+      const root = yield* Effect.promise(() => loadRoot({ context, signal }));
       const view = yield* Schema.decodeUnknownEffect(WebsiteRootView)(
         root.view
       );

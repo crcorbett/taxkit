@@ -23,7 +23,6 @@ import { chromium } from "playwright";
 import { boundedResponses } from "../src/lib/api/bounded-response";
 import { WebsiteApiDeadlineExceeded } from "../src/lib/api/errors";
 import { calculate } from "../src/lib/api/requests";
-import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
@@ -101,7 +100,6 @@ it.live(
               ).toBe(true);
             }
             const origins = {
-              ...nativeForwardingFixture,
               ...(artifact.entry === "worker.js"
                 ? {
                     ...nativeRateFixture("10078"),
@@ -189,7 +187,6 @@ it.live(
           config: {
             ...worker.config,
             env: {
-              ...nativeForwardingFixture,
               ...nativeLocalModeFixture,
               ...worker.config.env,
               API_PUBLIC_ORIGIN: {

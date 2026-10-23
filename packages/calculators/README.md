@@ -192,7 +192,7 @@ object. The package test command retains the original tax and cleanup assertions
 `CalculatorAdmission` owns the closed `admitCalculation` operation and
 `PublicCalculatorServiceRateLimited` places it before calculation work. The
 native API builds this Layer once, underneath its existing bounded service.
-HTTP, MCP and the Website private binding therefore share one allowance. Each
+HTTP and MCP therefore share one allowance. Each
 calculation consumes one unit; all metadata operations remain outside it.
 Direct engine, local SDK and the standalone Bun server keep their existing
 contracts. Those hosts do not automatically acquire this native policy.
@@ -204,15 +204,13 @@ request Context reference, never a calculation fact, URL or analytics identity.
 Public native requests need Cloudflare's connection header and must not be
 forwarded Worker calls; hosts pass this Schema to the domain-free
 `edgeCallerKey` in `@taxkit/observability/edge-identity`. Arbitrary forwarded headers cannot choose a key.
-The Website's binding-only operation carries its original checked key separately
-from the request JSON; no public route admits that argument.
 
 `CalculatorRateLimited` has fixed safe code/message/manual-retry fields. HTTP
 uses 429 and `Retry-After: 60`.
 Missing/invalid identity or a failed/invalid native limiter returns fixed
 `CalculatorAdmissionUnavailable` (HTTP 503). These errors carry no address,
-pay facts, provider message or cause. Both browser and HTML forms ask the visitor
-to retry manually. Rate checking is included in the five-second work budget.
+pay facts, provider message or cause. The browser forms ask the visitor to retry
+manually. Rate checking is included in the five-second work budget.
 
 The API's native Layer declares Cloudflare's 60/60 RateLimit binding and requires
 checked `CALCULATOR_RATE_NAMESPACE`. Operators must choose an account-wide

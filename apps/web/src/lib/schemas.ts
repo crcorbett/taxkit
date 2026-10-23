@@ -13,30 +13,17 @@ import {
   DocsWebsiteOrigin,
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
-import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
-import {
-  PayWithholdingsLedger,
-  TakeHomePayReport,
-} from "@taxkit/rules-au-pay/schemas";
 import {
   Array,
   Data,
   Match,
   Option,
   Record,
-  Result,
   Schema,
   SchemaGetter,
 } from "effect";
 
-import { WebsiteCalculationFailure } from "./api/errors";
-import { TaxKitWebConfigError } from "./config";
-import {
-  AnnualTaxForm,
-  TakeHomeForm,
-  WebsiteCalculatorForm,
-  WebsiteInputError,
-} from "./form.boundary";
+import { WebsiteCalculatorForm } from "./form.boundary";
 
 export const WebsitePublicSettings = Schema.Struct({
   // The same stage's public API address, used by browser clients.
@@ -106,43 +93,6 @@ export const WebsiteDocsSearchLocation = Schema.String.check(
     ),
   })
 );
-export const WebsiteSubmission = Schema.Struct({
-  calculatorId: CalculatorRunServiceRequest.fields.calculatorId,
-  form: WebsiteCalculatorForm,
-  result: Schema.Result(
-    CalculatorRunResponse,
-    Schema.Union([
-      WebsiteCalculationFailure,
-      TaxKitWebConfigError,
-      WebsiteInputError,
-    ])
-  ),
-}).check(
-  Schema.makeFilter((value) => {
-    const annual = value.calculatorId === "au.income-tax.annual";
-    if (
-      !(annual
-        ? Schema.is(AnnualTaxForm)(value.form)
-        : Schema.is(TakeHomeForm)(value.form))
-    ) {
-      return false;
-    }
-    if (Result.isFailure(value.result)) {
-      return true;
-    }
-    const response = value.result.success;
-    if (response.calculator.calculatorId !== value.calculatorId) {
-      return false;
-    }
-    if (annual) {
-      return Schema.is(AnnualTaxReport)(response.report);
-    }
-    return value.calculatorId === "au.pay.take-home"
-      ? Schema.is(TakeHomePayReport)(response.report)
-      : Schema.is(PayWithholdingsLedger)(response.report);
-  })
-);
-export const WebsiteSubmissionTransport = Schema.toCodecJson(WebsiteSubmission);
 // One presentation value is shared by the visible form and its browser tools.
 // A retained answer stays visible, with an explicit stale flag after an edit,
 // failed refresh or cancelled attempt.
@@ -155,10 +105,6 @@ export const WebsiteCalculatorViewState = Schema.Struct({
   stale: Schema.Boolean,
 });
 export type WebsiteCalculatorViewState = typeof WebsiteCalculatorViewState.Type;
-export const WebsiteServerRenderContext = Schema.Struct({
-  submission: Schema.optional(Schema.toEncoded(WebsiteSubmissionTransport)),
-});
-export type WebsiteServerRenderContext = typeof WebsiteServerRenderContext.Type;
 
 // A transport-only selection: no preference means HTML, and equal preferences
 // keep ordinary pages HTML. Invalid or wholly excluded representations remain

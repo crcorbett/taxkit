@@ -61,14 +61,9 @@ The modern-only MCP cutover removes `TaxKitMcpSessions` from the native Worker
 class/export/binding graph. Review the native deletion migration for exactly
 that namespace before apply and confirm its absence afterward. This deletion
 is permanent; an old-code redeploy cannot recover its data or former sessions.
-The expected graph also creates one stage-owned Random resource for HTTP
-forwarding; other resource deletions remain outside this release.
-
-The Website's calculation forwarding credential is separate: one native
-Alchemy Random resource in the stage's state supplies the same redacted Output
-to both Workers. Doppler supplies deployment credentials. The generated key
-and original caller identity travel only on the Website server's calculation
-POST through the native HTTP binding; public clients supply neither.
+The graph no longer declares the former `TaxKitWebsiteForwardingKey` Random
+resource, so the first plan after its removal deletes it from a stage that still
+holds it. Doppler supplies deployment credentials.
 
 The Production token (`taxkit/prd`) is an account-owned token. On the
 `taxkit.dev` zone it holds Zone DNS Settings Read, Zone Settings Write, DNS Write
@@ -76,28 +71,6 @@ The Production token (`taxkit/prd`) is an account-owned token. On the
 Write; on the account, Workers Scripts, Workers Observability and Secrets Store
 Write. Change it with `cf accounts tokens update`, keeping its name, expiry and
 existing policies, and record the change here. It expires on 18 November 2026.
-
-## Forwarding credential rotation
-
-Normal releases preserve `TaxKitWebsiteForwardingKey` and its stage-owned
-value. Rotate only through the native resource graph. Keep the former Random
-declaration, introduce a deliberately named replacement, bind its redacted
-Output as the current key on both Workers, and bind the former Output as
-`TAXKIT_WEBSITE_FORWARDING_PREVIOUS_KEY` on the API alone.
-
-Review the stage's native plan, then deploy the API before the Website through
-their existing dependency order. Verify Website calculation admission and
-old/new overlap before removing the previous-key binding in a second native
-update. Keep the former resource and state through the rollback interval;
-changing Random's byte count does not rotate its stored value. Never print a
-key or turn it into a stack output. The credential-free native suite proves
-the verifier's current/previous overlap; a hosted rotation needs its own
-deployment and readback evidence.
-
-During overlap, rollback restores the former Website binding while the API
-still accepts both keys. After overlap has been removed, restore API acceptance
-of the former key before rolling back the Website. MCP namespace deletion is
-independent and remains irreversible.
 
 ## Preview
 
@@ -142,7 +115,8 @@ state.
 1. Note both active Worker version IDs from Cloudflare deployment readback;
    the native deploy summary may omit them.
 2. Load the Website, a docs page and its `.md` page; calculate at `/` with
-   and without JavaScript. The take-home form posts to `/`.
+   JavaScript, and check that with JavaScript off it shows "Turn on JavaScript
+   to use this calculator."
 3. Check `https://www.taxkit.dev/<path>?<query>` returns a 301 to the same path
    and query on `taxkit.dev`.
 4. Check API CORS from a browser page on another origin: public GETs and the
@@ -199,8 +173,7 @@ dashboard-only change updates the four dashboards and nothing else.
 1. Read both Production Workers' settings in Cloudflare: logs enabled at
    sampling rate 1 with destination `taxkit-axiom-logs`, invocation logs,
    persistence and traces off, and no Axiom binding.
-2. Request a few uncached Website pages, one no-JavaScript calculation and one
-   API calculation with a unique query string. Record the time window.
+2. Request a few uncached Website pages and one API calculation with a unique query string. Record the time window.
 3. After the delivery delay, query `site-prod-logs` for that window and the
    `taxkit-api` and `taxkit-web` services. Expect one `taxkit.request` record
    per request and inspect complete envelopes: no URL, query, header, user

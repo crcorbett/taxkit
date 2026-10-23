@@ -21,7 +21,7 @@ Website/API. Detailed rule-package expectations live in
 | `bun run verification` | Before merging. Build, format, lint, workspace and Alchemy-root types, Effect diagnostics, unit tests, Chromium tests, both Knip graphs, documentation links/commands and portable paths, then the required credential-free native pair suite. |
 | `bun run test` | Unit tests in every workspace plus the root tool tests, including the actual-Oxlint rule fixtures. |
 | `bun run test:browser` | Website and SDK tests in Chromium: Atom registry lifetime, calculator commands, loader cancellation and SDK browser imports. |
-| `bun run test:native` | Builds the API and Website and runs them together in Miniflare: first HTML, docs pages, Markdown, discovery files, calculation with and without JavaScript, MCP and request limits. |
+| `bun run test:native` | Builds the API and Website and runs them together in Miniflare: first HTML, docs pages, Markdown, discovery files, browser calculation, the no-JavaScript notice, MCP and request limits. |
 | `bun run release:check` | `verification`, including the native pair suite, plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
 
 The Checks workflow runs `verification` once per revision in its `checks` job;
@@ -32,7 +32,7 @@ tests have finished. A native failure fails `checks`, so no deploy job reaches
 deployment credentials, planning or apply. Do not run these artifact-owning
 checks concurrently in one checkout. The native suite covers request-scoped MCP
 progress and async context across requests, shared work/rate limits, reply
-cleanup and the Website's private HTTP identity boundary.
+cleanup and the Website's refusal of POSTs.
 
 `tools/infrastructure/release-gates.boundary.test.ts` executes the real root
 command composition with safe leaf replacements and reads the workflow. It
@@ -79,8 +79,8 @@ and an updated OpenAPI snapshot.
 
 Local checks do not show hosted behaviour. After a deployment, check the
 deployed Website and API directly, as the [deployment runbook](../runbooks/deployment.md)
-describes: page and API responses, browser CORS, calculation with and without
-JavaScript, `www` redirects and Cloudflare cache hits.
+describes: page and API responses, browser CORS, browser calculation, the
+no-JavaScript notice, `www` redirects and Cloudflare cache hits.
 
 A green check also does not show that a package was published. Do not turn a
 failing meaningful check into a pass by removing its assertion or raising a

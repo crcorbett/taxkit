@@ -1,62 +1,12 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import type { CalculatorSummary } from "@taxkit/calculators/schemas";
 import { CalculatorSummaries } from "@taxkit/calculators/summaries";
-import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
-import { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
-import { Array, Option, Result, Schema } from "effect";
-import { useContext } from "react";
+import { Array, Option } from "effect";
 
 import { CalculatorPage } from "#/lib/calculator-page.container";
-import type { WebsiteSubmission } from "#/lib/schemas";
-
-import { WebsiteSubmissionContext } from "./__root";
-
-const CalculatorRoutePage = ({
-  calculator,
-  submission,
-}: {
-  readonly calculator: CalculatorSummary;
-  readonly submission: Option.Option<typeof WebsiteSubmission.Type>;
-}) => {
-  const saved = submission.pipe(
-    Option.filter((value) => value.calculatorId === calculator.calculatorId)
-  );
-  // Restore only the checked server answer here. The shared page state owns
-  // later client answers for both the visible form and browser tools.
-  const report = saved.pipe(
-    Option.flatMap((value) => Result.getSuccess(value.result)),
-    Option.filter(
-      (value) => value.calculator.calculatorId === calculator.calculatorId
-    ),
-    Option.flatMap(
-      (value): Option.Option<AnnualTaxReport | PayWithholdingsLedger> => {
-        if (calculator.calculatorId === "au.income-tax.annual") {
-          return Schema.is(AnnualTaxReport)(value.report)
-            ? Option.some(value.report)
-            : Option.none();
-        }
-        return Schema.is(PayWithholdingsLedger)(value.report)
-          ? Option.some(value.report)
-          : Option.none();
-      }
-    )
-  );
-  return (
-    <CalculatorPage
-      calculator={calculator}
-      report={report}
-      savedForm={saved.pipe(Option.map((value) => value.form))}
-      savedError={saved.pipe(
-        Option.flatMap((value) => Result.getFailure(value.result))
-      )}
-    />
-  );
-};
 
 export const Route = createFileRoute("/calculators/$calculatorId")({
   component: function CalculatorRoute() {
     const { calculatorId } = Route.useParams();
-    const submission = useContext(WebsiteSubmissionContext);
     const calculator = Array.findFirst(
       CalculatorSummaries,
       (entry) => entry.calculatorId === calculatorId
@@ -76,10 +26,9 @@ export const Route = createFileRoute("/calculators/$calculatorId")({
       return <Navigate to="/" />;
     }
     return (
-      <CalculatorRoutePage
+      <CalculatorPage
         key={calculator.value.calculatorId}
         calculator={calculator.value}
-        submission={submission}
       />
     );
   },

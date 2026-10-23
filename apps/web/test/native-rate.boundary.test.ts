@@ -10,16 +10,11 @@ import {
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
-  WebsiteForwardingCredentialHeader,
-  WebsiteForwardingRateKeyHeader,
-} from "@taxkit/observability/edge-identity";
-import {
   Array,
   Clock,
   Duration,
   Effect,
   FileSystem,
-  Match,
   Path,
   Queue,
   Record,
@@ -29,12 +24,6 @@ import { McpSchema } from "effect/ai";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
-import {
-  nativeForwardingFixture,
-  nativeForwardingKey,
-  nativeForwardingOverlapFixture,
-  nativePreviousForwardingKey,
-} from "./native-forwarding.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4214";
@@ -42,7 +31,7 @@ const websiteOrigin = "http://127.0.0.1:4213";
 const key = "2001:db8::75";
 const alias = "2001:0db8:0000:0000:0000:0000:0000:0075";
 
-it.live("shares the built native allowance across HTTP, Website and MCP", () =>
+it.live("shares the built native allowance across HTTP and MCP", () =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
@@ -55,16 +44,6 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
           entry: "worker.js",
           name: "api-rate",
           output: ".alchemy/native-pair/bundles/TaxKitApi",
-        },
-        {
-          entry: "worker.js",
-          name: "api-missing-forwarding-key",
-          output: ".alchemy/native-pair/bundles/TaxKitApi",
-        },
-        {
-          entry: "server.js",
-          name: "website-rate",
-          output: "apps/web/dist/server",
         },
       ] as const,
       (artifact) =>
@@ -84,32 +63,12 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
                 )
             )
           );
-          const forwarding = Match.value(artifact.name).pipe(
-            Match.when("api-missing-forwarding-key", () =>
-              Record.remove(
-                nativeForwardingFixture,
-                "TAXKIT_WEBSITE_FORWARDING_KEY"
-              )
-            ),
-            Match.when("api-rate", () => nativeForwardingOverlapFixture),
-            Match.orElse(() => nativeForwardingFixture)
-          );
           return {
             config: {
               compatibilityDate: "2026-10-04",
               compatibilityFlags: ["nodejs_compat"],
               env: {
-                ...forwarding,
-                ...(artifact.entry === "worker.js"
-                  ? {
-                      ...nativeRateFixture("10079"),
-                    }
-                  : {
-                      TAXKIT_API: {
-                        type: "worker" as const,
-                        worker: "api-rate",
-                      },
-                    }),
+                ...nativeRateFixture("10079"),
                 API_PUBLIC_ORIGIN: {
                   type: "json" as const,
                   value: apiOrigin,
@@ -128,8 +87,7 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
                 },
                 WORKER_URL: {
                   type: "json" as const,
-                  value:
-                    artifact.entry === "worker.js" ? apiOrigin : websiteOrigin,
+                  value: apiOrigin,
                 },
               },
 
@@ -158,10 +116,6 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
       (value) => Effect.promise(() => value.dispose())
     );
     const api = yield* Effect.promise(() => host.getWorker("api-rate"));
-    const website = yield* Effect.promise(() => host.getWorker("website-rate"));
-    const missingKeyApi = yield* Effect.promise(() =>
-      host.getWorker("api-missing-forwarding-key")
-    );
     const client = yield* Effect.acquireRelease(
       Effect.sync(
         () =>
@@ -214,17 +168,6 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
     const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
       CalculationRequest
     );
-    const submit = Effect.promise(() =>
-      website.fetch(`${websiteOrigin}/`, {
-        body: "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on",
-        headers: {
-          "cf-connecting-ip": key,
-          "content-type": "application/x-www-form-urlencoded",
-        },
-        method: "POST",
-      })
-    ).pipe(Effect.flatMap((response) => Effect.promise(() => response.text())));
-    expect(yield* submit).toContain("$1,301.00");
     const mcp = yield* Effect.promise(() =>
       client.callTool({
         arguments: input,
@@ -234,15 +177,12 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
     expect(
       (yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(mcp)).isError
     ).not.toBe(true);
-    // The sixtieth calculation uses the last place in the shared allowance.
-    const last = yield* calculate(alias);
-    expect(last.status).toBe(200);
+    // The fifty-ninth and sixtieth calculations use the last places.
+    expect((yield* calculate(alias)).status).toBe(200);
+    expect((yield* calculate(key)).status).toBe(200);
     const rejected = yield* calculate(key);
     expect(rejected.status).toBe(429);
     expect(rejected.headers.get("retry-after")).toBe("60");
-    expect(yield* submit).toContain(
-      "Too many calculations were sent. Wait a minute before trying again."
-    );
     expect((yield* calculate("198.51.100.99")).status).toBe(200);
     const exhaustedMcp = yield* Effect.promise(() =>
       client.callTool({
@@ -259,174 +199,7 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
         )
       )
     ).toContain("rate-limited");
-    // Valid private HTTP metadata selects the original caller even when
-    // the immediate caller is a Worker. The exhausted alias stays exhausted.
-    const privateReply = yield* Effect.promise(() =>
-      api.fetch(`${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`, {
-        body,
-        headers: {
-          [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
-          [WebsiteForwardingRateKeyHeader]: alias,
-          "cf-worker": "native-website-fixture",
-          "content-type": "application/json",
-        },
-        method: "POST",
-      })
-    );
-    expect(privateReply.status).toBe(429);
-    const independent = yield* Effect.promise(() =>
-      api.fetch(`${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`, {
-        body,
-        headers: {
-          [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
-          [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
-          "cf-worker": "native-website-fixture",
-          "content-type": "application/json",
-        },
-        method: "POST",
-      })
-    );
-    expect(independent.status).toBe(200);
-    expect(yield* Effect.promise(() => independent.text())).toContain(
-      '"cents":130100'
-    );
-    // A separate caller exercises native rotation overlap without changing
-    // the original caller's sixty-call allowance proof above.
-    yield* Effect.forEach(
-      [nativeForwardingKey, nativePreviousForwardingKey],
-      (credential) =>
-        Effect.gen(function* () {
-          const rotated = yield* Effect.promise(() =>
-            api.fetch(
-              `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
-              {
-                body,
-                headers: {
-                  [WebsiteForwardingCredentialHeader]: credential,
-                  [WebsiteForwardingRateKeyHeader]: "2001:db8::77",
-                  "cf-worker": "native-website-fixture",
-                  "content-type": "application/json",
-                },
-                method: "POST",
-              }
-            )
-          );
-          expect(rotated.status).toBe(200);
-          expect(yield* Effect.promise(() => rotated.text())).toContain(
-            '"cents":130100'
-          );
-        })
-    );
-    const unrelated = yield* Effect.promise(() =>
-      api.fetch(`${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`, {
-        body,
-        headers: {
-          [WebsiteForwardingCredentialHeader]: "e2".repeat(32),
-          [WebsiteForwardingRateKeyHeader]: "2001:db8::77",
-          "cf-worker": "native-website-fixture",
-          "content-type": "application/json",
-        },
-        method: "POST",
-      })
-    );
-    expect(unrelated.status).toBe(503);
-    const unrelatedText = yield* Effect.promise(() => unrelated.text());
-    expect(unrelatedText).not.toContain(nativePreviousForwardingKey);
-    expect(unrelatedText).not.toContain("2001:db8::77");
-    // Partial, spoofed, wrong, duplicated or malformed capabilities must
-    // refuse before tax work and must not fall back to the direct edge key.
-    yield* Effect.forEach(
-      [
-        { [WebsiteForwardingRateKeyHeader]: key },
-        { [WebsiteForwardingCredentialHeader]: nativeForwardingKey },
-        {
-          [WebsiteForwardingCredentialHeader]: "e2".repeat(32),
-          [WebsiteForwardingRateKeyHeader]: key,
-        },
-        {
-          [WebsiteForwardingCredentialHeader]: "native-private-canary",
-          [WebsiteForwardingRateKeyHeader]: key,
-        },
-        {
-          [WebsiteForwardingCredentialHeader]: `${nativeForwardingKey}, ${nativeForwardingKey}`,
-          [WebsiteForwardingRateKeyHeader]: key,
-        },
-        {
-          [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
-          [WebsiteForwardingRateKeyHeader]: "native-private-canary",
-        },
-      ],
-      (headers) =>
-        Effect.gen(function* () {
-          const refused = yield* Effect.promise(() =>
-            api.fetch(
-              `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
-              {
-                body,
-                headers: {
-                  ...headers,
-                  "cf-connecting-ip": "198.51.100.99",
-                  "content-type": "application/json",
-                },
-                method: "POST",
-              }
-            )
-          );
-          expect(refused.status).toBe(503);
-          const text = yield* Effect.promise(() => refused.text());
-          expect(text).not.toContain(nativeForwardingKey);
-          expect(text).not.toContain(key);
-          expect(text).not.toContain("130100");
-        })
-    );
-    const missing = yield* Effect.promise(() =>
-      missingKeyApi.fetch(
-        `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
-        {
-          body,
-          headers: {
-            [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
-            [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
-            "content-type": "application/json",
-          },
-          method: "POST",
-        }
-      )
-    );
-    expect(missing.status).toBe(503);
-    // Forwarding is admitted only on the canonical calculation POST. It
-    // cannot confer caller authority on a look-alike path.
-    const noncanonical = yield* Effect.promise(() =>
-      api.fetch(
-        `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate/extra`,
-        {
-          body,
-          headers: {
-            [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
-            [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
-            "cf-worker": "native-website-fixture",
-            "content-type": "application/json",
-          },
-          method: "POST",
-        }
-      )
-    );
-    expect(noncanonical.status).toBe(404);
-    const wrongMethod = yield* Effect.promise(() =>
-      api.fetch(`${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`, {
-        headers: {
-          [WebsiteForwardingCredentialHeader]: nativeForwardingKey,
-          [WebsiteForwardingRateKeyHeader]: "2001:db8::76",
-          "cf-worker": "native-website-fixture",
-        },
-        method: "GET",
-      })
-    );
-    expect(wrongMethod.status).toBeGreaterThanOrEqual(400);
-    expect(yield* Effect.promise(() => wrongMethod.text())).not.toContain(
-      "130100"
-    );
-
+    // Spoofed or Worker-relayed identity cannot choose a caller key.
     yield* Effect.forEach(
       [
         {},
@@ -461,18 +234,7 @@ it.live("shares the built native allowance across HTTP, Website and MCP", () =>
       Schema.fromJsonString(Schema.Unknown)
     )(Array.map(yield* Queue.clear(logs), (log) => log.message));
     yield* Effect.forEach(
-      [
-        key,
-        alias,
-        "198.51.100.99",
-        "1654",
-        "130100",
-        nativeForwardingKey,
-        nativePreviousForwardingKey,
-        "2001:db8::77",
-        "e2".repeat(32),
-        "native-private-canary",
-      ],
+      [key, alias, "198.51.100.99", "1654", "130100"],
       (sentinel) =>
         Effect.sync(() => {
           expect(captured).not.toContain(sentinel);

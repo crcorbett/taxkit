@@ -25,7 +25,7 @@ calculation dispatch and schema-guided expected error shaping live in
 `./routes` owns transport path constants and Schema families for the native
 HTTP declaration, reference endpoints, MCP and discovery addresses. Cache
 eligibility admits only checked calculator identifiers and exact public read
-paths. Worker classification and trusted calculation admission, Website
+paths. Worker classification and calculation admission, Website
 discovery forwarding, and [Publication](../../publication/README.md) links use
 that catalogue. OpenAPI coverage tests require every declared endpoint to belong
 to one data family and give each path its expected cache eligibility. Authored
@@ -414,7 +414,7 @@ operation budget for all nine service methods. Checked capacity and operation-ti
 503/504 envelopes. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
-eight HTTP calculations, rejected extra HTTP/SSR/
+eight HTTP calculations, rejected extra HTTP and
 browser calls, HTTP 504 timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. The native rate policy below is implemented separately; MCP and whole T004
@@ -427,14 +427,15 @@ qualification remain unfinished.
 five-second total read deadline. It counts encoded bytes before parsing, closes
 rejected/interrupted readers and rejects late synchronous reads after control
 returns. The retained standalone server applies it before calculator decoding;
-native API and Website hosts use the same owner. Only the native API host's
+the native API host uses the same owner. Only the native API host's
 outer composition covers its routes; a custom route host must supply its own
 admission middleware.
 
 Fixed Schema-owned request errors use HTTP 413 (`request-too-large`, reduce the
 request) and 408 (`request-timeout`, retry manually). JSON responses use the
-`error` envelope. Website form hosts select the checked HTML policy, producing a
-fixed message and link back to the calculators without reflecting input or URLs.
+`error` envelope. The package keeps a checked HTML policy, with a fixed message
+and link back to the calculators, that no current host selects; the Website
+accepts no form POST.
 The calculation endpoint declares both statuses in OpenAPI. Every metadata
 endpoint declares 504 for the shared operation timeout; lookup failures retain
 400. Metadata never consumes a calculation place. No automatic retry is added.

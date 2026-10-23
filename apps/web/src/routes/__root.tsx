@@ -15,21 +15,17 @@ import { referencePath } from "@taxkit/api-http/routes";
 import { CalculatorSummaries } from "@taxkit/calculators/summaries";
 import { Array, Function, Option, Result, Schema } from "effect";
 import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
-import { createContext, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 
 import { publicSettingsAtom } from "#/lib/api/client.atoms";
 import type { LoaderContext } from "#/lib/loader-context";
 import { loadRoot } from "#/lib/loaders";
-import { WebsiteRootView, WebsiteSubmissionTransport } from "#/lib/schemas";
-import type { WebsitePublicSettings, WebsiteSubmission } from "#/lib/schemas";
+import { WebsiteRootView } from "#/lib/schemas";
+import type { WebsitePublicSettings } from "#/lib/schemas";
 
 import "../styles.css";
 
-// Only the root route restores these values. Children receive checked values.
-export const WebsiteSubmissionContext = createContext<
-  Option.Option<typeof WebsiteSubmission.Type>
->(Option.none());
 const SettingsUnavailable = () => (
   <main className="home">
     <h1>TaxKit</h1>
@@ -100,17 +96,6 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
       () => Schema.decodeUnknownResult(WebsiteRootView)(data.view),
       [data.view]
     );
-    const submission = useMemo(
-      () =>
-        Option.fromNullishOr(data.submission).pipe(
-          Option.flatMap((encoded) =>
-            Schema.decodeResult(WebsiteSubmissionTransport)(encoded).pipe(
-              Result.getSuccess
-            )
-          )
-        ),
-      [data.submission]
-    );
     if (Result.isFailure(view)) {
       return <SettingsUnavailable />;
     }
@@ -118,46 +103,44 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
     return (
       <RootRegistry registry={registry}>
         <InitialSettings settings={settings}>
-          <WebsiteSubmissionContext.Provider value={submission}>
-            <div className="app-shell">
-              <a className="skip-link" href="#main-content">
-                Skip to content
+          <div className="app-shell">
+            <a className="skip-link" href="#main-content">
+              Skip to content
+            </a>
+            <nav aria-label="Calculators">
+              <ul>
+                {Array.map(CalculatorSummaries, (calculator) => (
+                  <li key={calculator.calculatorId}>
+                    {calculator.calculatorId === "au.pay.take-home" ? (
+                      <Link activeProps={{ "aria-current": "page" }} to="/">
+                        {calculator.title}
+                      </Link>
+                    ) : (
+                      <Link
+                        activeProps={{ "aria-current": "page" }}
+                        to="/calculators/$calculatorId"
+                        params={{ calculatorId: calculator.calculatorId }}
+                      >
+                        {calculator.title}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <a href={new URL(referencePath, settings.apiOrigin).href}>
+                For developers: API documentation
               </a>
-              <nav aria-label="Calculators">
-                <ul>
-                  {Array.map(CalculatorSummaries, (calculator) => (
-                    <li key={calculator.calculatorId}>
-                      {calculator.calculatorId === "au.pay.take-home" ? (
-                        <Link activeProps={{ "aria-current": "page" }} to="/">
-                          {calculator.title}
-                        </Link>
-                      ) : (
-                        <Link
-                          activeProps={{ "aria-current": "page" }}
-                          to="/calculators/$calculatorId"
-                          params={{ calculatorId: calculator.calculatorId }}
-                        >
-                          {calculator.title}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-                <a href={new URL(referencePath, settings.apiOrigin).href}>
-                  For developers: API documentation
-                </a>
-                <Link activeProps={{ "aria-current": "page" }} to="/agents">
-                  For agents: API access
-                </Link>
-                <Link params={{ _splat: "start/quickstart" }} to="/$">
-                  Documentation
-                </Link>
-              </nav>
-              <main id="main-content" tabIndex={-1}>
-                <Outlet />
-              </main>
-            </div>
-          </WebsiteSubmissionContext.Provider>
+              <Link activeProps={{ "aria-current": "page" }} to="/agents">
+                For agents: API access
+              </Link>
+              <Link params={{ _splat: "start/quickstart" }} to="/$">
+                Documentation
+              </Link>
+            </nav>
+            <main id="main-content" tabIndex={-1}>
+              <Outlet />
+            </main>
+          </div>
         </InitialSettings>
       </RootRegistry>
     );
@@ -175,16 +158,10 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
       },
     ],
   }),
-  // A no-JavaScript calculation result is personal; it is read from this
-  // request's server context and never reused as public loader data.
-  loader: ({ context, abortController, serverContext }) =>
-    loadRoot({
-      context,
-      signal: abortController.signal,
-      submission: serverContext?.submission,
-    }),
+  loader: ({ context, abortController }) =>
+    loadRoot({ context, signal: abortController.signal }),
   shellComponent: RootShell,
-  // Live settings and any personal submission are never treated as fresh
-  // public data; the one-minute default applies to documentation routes.
+  // Live settings are never treated as fresh public data; the one-minute
+  // default applies to documentation routes.
   staleTime: 0,
 });

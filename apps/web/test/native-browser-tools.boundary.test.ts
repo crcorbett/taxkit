@@ -22,7 +22,6 @@ import type { Route } from "playwright";
 import { WebsiteBrowserToolFailure } from "../src/lib/browser-tools.schemas";
 import { WebsiteBrowserToolkit } from "../src/lib/browser-tools.toolkit";
 import { WebsiteCalculatorViewState } from "../src/lib/schemas";
-import { nativeForwardingFixture } from "./native-forwarding.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const apiOrigin = "http://127.0.0.1:4231";
@@ -85,8 +84,6 @@ it.live(
           compatibilityDate: "2026-10-04",
           compatibilityFlags: ["nodejs_compat"],
           env: {
-            ...nativeForwardingFixture,
-
             ...nativeRateFixture("10090"),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
             TAXKIT_PUBLICATION_ORIGIN: {
@@ -144,7 +141,6 @@ it.live(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
-                      ...nativeForwardingFixture,
                       ...nativeRateFixture("10091"),
                       API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },
                       TAXKIT_API: {

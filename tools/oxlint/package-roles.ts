@@ -31,29 +31,8 @@ const frontendModules = [
 ];
 const hostModuleExceptions = [
   {
-    file: "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
-    module: "@taxkit/calculators/admission.schemas",
-  },
-  {
-    file: "apps/web/src/lib/api/http-forwarding.boundary.test.ts",
-    module: "@taxkit/calculators/admission.service",
-  },
-  { file: "apps/web/src/server.ts", module: "@taxkit/analytics/relay/service" },
-  {
-    file: "apps/web/src/server.ts",
-    module: "@taxkit/calculators/admission.schemas",
-  },
-  {
-    file: "apps/web/src/server.ts",
-    module: "@taxkit/calculators/admission.service",
-  },
-  {
     file: "apps/web/src/server.ts",
     module: "@taxkit/observability/host-telemetry",
-  },
-  {
-    file: "apps/web/src/lib/runtime.server.ts",
-    module: "@taxkit/analytics/relay/live",
   },
   {
     file: "apps/web/src/lib/runtime.server.ts",
@@ -70,14 +49,6 @@ const hostModuleExceptions = [
   {
     file: "apps/web/src/lib/api/host.server.ts",
     module: "@taxkit/infrastructure/api-worker",
-  },
-  {
-    file: "apps/web/src/lib/api/host.server.ts",
-    module: "@taxkit/calculators/admission.schemas",
-  },
-  {
-    file: "apps/web/src/lib/api/host.server.ts",
-    module: "@taxkit/calculators/admission.service",
   },
 ];
 // Native isomorphic/server composition imports these local server boundaries.
