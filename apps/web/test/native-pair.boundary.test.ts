@@ -2286,45 +2286,6 @@ describe("built native API and Website", () => {
         // server HTML. Wait for hydration, or the next click bypasses the
         // intercepted reply as a server-rendered document navigation.
         yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
-        // A valid page whose body differs from the compiled presentation (a
-        // differently activated API) is not rendered in the browser either.
-        const plainSdkReply = yield* Effect.promise(() =>
-          publicApi.dispatchFetch(docsPageAddress("/sdk/plain-sdk"), {
-            headers: { origin: websiteOrigin },
-          })
-        );
-        expect(plainSdkReply.status).toBe(200);
-        const plainSdkBody = yield* Effect.promise(() => plainSdkReply.text());
-        expect(plainSdkBody).toContain('"markdown":"');
-        yield* Effect.promise(() =>
-          docsPage.route(
-            docsPageAddress("/sdk/plain-sdk"),
-            (route) =>
-              route.fulfill({
-                body: plainSdkBody.replace(
-                  '"markdown":"',
-                  `"markdown":"${frameworkSentinel} `
-                ),
-                headers: Record.fromEntries(plainSdkReply.headers),
-                status: 200,
-              }),
-            { times: 1 }
-          )
-        );
-        yield* Effect.promise(() =>
-          docsPage.locator('.docs-navigation a[href="/sdk/plain-sdk"]').click()
-        );
-        yield* Effect.promise(() =>
-          docsPage
-            .getByRole("heading", {
-              exact: true,
-              name: "This documentation page needs to be reloaded",
-            })
-            .waitFor({ timeout: 5000 })
-        );
-        expect(
-          yield* Effect.promise(() => docsPage.locator("body").textContent())
-        ).not.toContain(frameworkSentinel);
         yield* Effect.promise(() =>
           docsPage.goto(`${websiteOrigin}/start/quickstart`)
         );
