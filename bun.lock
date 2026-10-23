@@ -34,7 +34,6 @@
     "apps/api": {
       "name": "api",
       "dependencies": {
-        "@content/docs": "workspace:*",
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
         "@taxkit/analytics": "workspace:*",
@@ -43,17 +42,18 @@
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
-        "@taxkit/diagrams": "workspace:*",
         "@taxkit/infrastructure": "workspace:*",
-        "@taxkit/mdx": "workspace:*",
         "@taxkit/observability": "workspace:*",
         "@taxkit/publication": "workspace:*",
         "alchemy": "catalog:",
         "effect": "catalog:",
       },
       "devDependencies": {
+        "@content/docs": "workspace:*",
         "@effect/vitest": "catalog:",
         "@modelcontextprotocol/client": "2.3.1",
+        "@taxkit/diagrams": "workspace:*",
+        "@taxkit/mdx": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
         "@taxkit/tsconfig": "workspace:*",
         "@types/bun": "catalog:",

@@ -71,14 +71,15 @@ on the open-source tax engine and avoid downstream private-product specifics.
   the examples at the `repository.json` checked-example revision equal the
   current files, through `git show`.
 
-`apps/api/src/content.boundary.ts`
-: Composes the public catalogue. It bundles `@content/docs/sources` and
-supplies the `@taxkit/mdx` reader and highlighter and the `@taxkit/diagrams`
-renderer to `ContentCatalogueLive`. Page frontmatter and `navigation.json`
+`apps/api/scripts/docs-catalogue.runtime.ts` and `apps/api/src/content.boundary.ts`
+: The API build composes the public catalogue ahead of time. It supplies
+`@content/docs/sources`, the `@taxkit/mdx` reader and highlighter and the
+`@taxkit/diagrams` renderer to `ContentCatalogueLive` and writes the checked
+catalogue to `apps/api/src/generated/docs-catalogue.json`. The Worker only
+decodes that file. Page frontmatter and `navigation.json`
 decide publication: Content keeps pages whose `status` is `published`, requires
 published navigation and rejects a published child under a draft section page.
-Any unreadable page fails the Layer. The catalogue is built once per Worker
-isolate on its first request.
+Any unreadable page fails the build.
 The HTTP documentation group delegates page/navigation/search and processed
 Markdown to the `ContentService`. Its compiled public-path refinement and fixed
 missing-page/search errors serve HTTP and MCP. The
@@ -115,7 +116,7 @@ browser or Website SSR
   -> apps/web route loader
     -> generated HttpApiClient (public origin or private binding)
       -> API content routes -> ContentService
-        -> ContentCatalogue (built once per isolate from @content/docs)
+        -> ContentCatalogue (decoded from the catalogue the API build wrote)
     -> DocsHeading and reading-body.view.tsx over page.body
 ```
 

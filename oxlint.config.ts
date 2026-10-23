@@ -16,6 +16,8 @@ const taxkitReact = defineConfig({
 });
 
 const decodingBoundaryFiles = [
+  // Build-time ingress of the bundled authored docs source list.
+  "apps/api/scripts/docs-catalogue.layer.ts",
   // Native heterogeneous resource-map props in the in-memory provider lifecycle test.
   "packages/infrastructure/src/posthog/projects.test.ts",
   "packages/observability/test/edge-identity.test.ts",
@@ -202,6 +204,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Persisted docs catalogue written by the API build.
+  "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/observability/test/edge-identity.test.ts",
   "apps/web/src/lib/root-load.boundary.test.ts",
   "apps/web/src/lib/api/requests.boundary.test.ts",
@@ -288,6 +292,7 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   // Synthetic fetch Promise entrypoint for deterministic discovery cancellation.
   "apps/web/src/lib/api/forward.boundary.test.ts",
@@ -332,6 +337,7 @@ const bunAdapterFiles = [
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
 
@@ -697,6 +703,15 @@ export default defineConfig({
         "strict-effect/no-runtime-outside-boundary": [
           "error",
           { allowedFiles: ["apps/api/src/index.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/api/scripts/docs-catalogue.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/api/scripts/docs-catalogue.runtime.ts"] },
         ],
       },
     },

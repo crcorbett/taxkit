@@ -9,9 +9,8 @@
 ---
 
 Documentation pages now come from plain MDX in `content/docs` (`@content/docs`)
-instead of a Fumadocs build. The API bundles the pages as raw text and
-`@taxkit/content` builds the checked catalogue once per Worker isolate. Nothing
-is generated before planning or deploying.
+instead of a Fumadocs build. `@taxkit/content` builds the checked catalogue from
+them during the API build.
 
 Each public page now carries `body`, a checked list of reading blocks:
 headings with ids, paragraphs, lists, tables, highlighted code as coloured

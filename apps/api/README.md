@@ -24,13 +24,17 @@ handlers, cancellation and reply budgets;
 [`@taxkit/publication`](../../packages/publication/README.md) owns discovery
 contracts and document generation. Native hosting remains in this app.
 
-Both API hosts provide `ContentService` through `src/content.boundary.ts`. It
-bundles the authored page list from `@content/docs/sources` and composes
-Content's `ContentCatalogueLive` with the `@taxkit/mdx` page reader and code
-highlighter and the `@taxkit/diagrams` Mermaid renderer. The checked catalogue
-is built once when the host's Layer is built; the native Worker builds it once
-per isolate, on its first request. A page that cannot be read fails the Layer
-with Content's `DocsSourceError`. Public HTTP documentation operations serve
+The API build builds the docs catalogue ahead of time.
+`scripts/docs-catalogue.runtime.ts` composes Content's `ContentCatalogueLive`
+with the `@content/docs/sources` page list, the `@taxkit/mdx` page reader and
+code highlighter and the `@taxkit/diagrams` Mermaid renderer, then writes the
+checked catalogue to `src/generated/docs-catalogue.json` (ignored by Git) before
+`tsc` runs. A page that cannot be read fails the build. Both API hosts provide
+`ContentService` through `src/content.boundary.ts`, which decodes that file once
+(about 10 ms) instead of parsing MDX, highlighting code and drawing diagrams on a
+Worker's first request. The parser, highlighter and Mermaid stay out of the
+Worker bundle. Run `bun run build --filter=api` after editing docs; a test fails
+if the bundled catalogue differs from a fresh build. Public HTTP documentation operations serve
 navigation, checked page values, bounded search and exact processed Markdown
 from that same service.
 Documentation calls consume no calculator allowance. See the

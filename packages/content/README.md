@@ -24,8 +24,9 @@ and search from `ContentCatalogue`.
 Content declares the contracts it consumes and never imports their
 implementations: `DocsPageReader` and `DocsCodeHighlighter` are implemented by
 [`@taxkit/mdx`](../mdx/README.md), and `DocsDiagramRenderer` by
-[`@taxkit/diagrams`](../diagrams/README.md). The API supplies `DocsSources` and
-chooses those Layers. The checked [HTTP package](../api/http/README.md)
+[`@taxkit/diagrams`](../diagrams/README.md). The API build supplies `DocsSources`
+and those Layers and writes the catalogue to JSON; the API Worker decodes it with
+`DocsPublicCatalogue` and provides it as `ContentCatalogue`. The checked [HTTP package](../api/http/README.md)
 delegates public content routes to this service, and discovery to
 [Publication](../publication/README.md). The Website reads pages, navigation,
 search and Markdown through the API's HTTP routes.
