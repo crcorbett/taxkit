@@ -4,8 +4,6 @@ import { Array, Effect, FileSystem, Path, Queue, Record, Schema } from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
-import { nativeForwardingFixture } from "./native-forwarding.fixture";
-
 const origin = "http://127.0.0.1:4198";
 const Json = Schema.fromJsonString(Schema.Unknown);
 
@@ -68,7 +66,6 @@ it.live(
                     compatibilityDate: "2026-10-04",
                     compatibilityFlags: ["nodejs_compat"],
                     env: {
-                      ...nativeForwardingFixture,
                       API_PUBLIC_ORIGIN: {
                         type: "json" as const,
                         value: "http://127.0.0.1:4197",
@@ -98,20 +95,10 @@ it.live(
       yield* Effect.promise(() => host.ready).pipe(
         Effect.timeout("10 seconds")
       );
-      // The root loader's settings read reaches the injected defect on both a
-      // plain page request and a no-JavaScript form submission.
+      // The root loader's settings read reaches the injected defect on a
+      // plain page request.
       yield* Effect.forEach(
-        [
-          { body: null, headers: { accept: "text/html" }, method: "GET" },
-          {
-            body: "grossDollars=1654&period=weekly&taxFreeThresholdClaimed=on",
-            headers: {
-              accept: "text/html",
-              "content-type": "application/x-www-form-urlencoded",
-            },
-            method: "POST",
-          },
-        ],
+        [{ body: null, headers: { accept: "text/html" }, method: "GET" }],
         (request) =>
           Effect.gen(function* () {
             const response = yield* Effect.promise(() =>

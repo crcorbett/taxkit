@@ -69,13 +69,10 @@ delegate to the same calculator service. Native requests keep their own
 fibre and cleanup scope; the app constructs no backend ManagedRuntime.
 
 The Worker exposes the native default `fetch` entrypoint for public HTTP,
-MCP and the Website's private HTTP binding. Canonical Website calculation POSTs
-carry a stage-owned secret and a separately checked original IP in private
-headers. `ApiWebsiteForwarding` authenticates them before supplying the shared
-rate key and strips both fields before router dispatch. Partial, malformed or
-incorrect metadata fails closed. Public HTTP and MCP retain their direct-edge
-identity and credential-free contracts; forwarding metadata grants no authority
-on other methods or paths.
+MCP and the Website's private HTTP binding. The Website uses that binding only
+to read documentation, the catalogue and discovery files; it never calculates
+through it. A calculation's rate key comes only from the direct edge identity
+or the explicit local-emulator loopback fallback.
 
 The native init declares Cloudflare Workers Cache with
 `cache({ crossVersionCache: false })`, so each deployed version starts its own
@@ -89,9 +86,8 @@ Health, calculation, MCP and every error reply get `no-store`.
 
 `@taxkit/observability/edge-identity` owns `CalculatorHostMode` and
 `edgeCallerKey`, which reads `cf-connecting-ip`, refuses Worker subrequests and
-decodes the address with the key Schema the host supplies. Both hosts pass the
-calculator-owned `CalculatorClientRateKey`; the Website's no-JavaScript form
-host uses the same function.
+decodes the address with the key Schema the host supplies. The API passes the
+calculator-owned `CalculatorClientRateKey`.
 
 The Worker checks `API_PUBLIC_ORIGIN`, `WEBSITE_PUBLIC_ORIGIN` and
 `TAXKIT_PUBLICATION_ORIGIN` with the
@@ -161,11 +157,8 @@ reply reaches the native five-second drop while the tax reply returns within two
 seconds. The controlled Node response bridge does not expose upstream body
 cancellation; that is not claimed.
 
-The Website sends the choice to this same boundary in the
-`x-taxkit-collection-policy` header. Browser calls read `navigator.doNotTrack`
-at each dispatch: `1`, an unreadable value or an unexpected value means deny.
-Server-rendered calls forward the incoming page request's choice, and a server
-call with no incoming request sends deny. The API's CORS policy admits that
+Direct callers may send the choice in the `x-taxkit-collection-policy`
+header, which the API's CORS policy admits. The Website sends no collection
 header. Tests cover this request boundary only; provider-side storage is not
 checked here.
 
@@ -389,7 +382,7 @@ operation budget for all nine methods. Checked capacity and operation-timeout er
 503/504 envelopes. Website guidance requests
 manual retry only. This is separate from the body-read and ten-second client
 budgets. Metadata does not use a calculation place. Native built proof covers a
-eight HTTP calculations, rejected extra HTTP/SSR/
+eight HTTP calculations, rejected extra HTTP and
 browser calls, HTTP 504 timeouts and reached cleanup. Synchronous CPU work
 cannot be stopped by a JavaScript timer; a late-result check rejects it after
 control returns. The native rate policy below is separate.
@@ -408,17 +401,10 @@ and safe-reporter assertions remain.
 ## Native calculation rate admission
 
 The native API builds `PublicCalculatorServiceRateLimited` once underneath its
-bounded service. HTTP, modern MCP and authenticated Website HTTP share the
+bounded service. HTTP and modern MCP share the
 [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission).
 Public requests need a checked original Cloudflare connection address;
-arbitrary Worker headers cannot select a key. Website canonical calculation
-POSTs use `ApiWebsiteForwarding` and the same checked key outside financial
-JSON. The native Alchemy Random resource persists one private secret per stage,
-bound to both Workers. An optional checked previous API key supports an
-explicit two-step rotation; the Website sends only the current key. Ordinary
-deployments preserve the resource identity. The
-[infrastructure owner](../../packages/infrastructure/README.md) owns custody and
-rotation, and Website calls retain their complete-reply size/deadline bounds.
+arbitrary Worker headers cannot select a key.
 
 `ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. The operator must select an account-wide unique stage value before a cloud plan/apply; no provider value is invented. The [infrastructure owner](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns graph and local-root selection. Hosted mode defaults to `edge`. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
 

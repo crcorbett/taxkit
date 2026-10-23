@@ -282,7 +282,7 @@ The separate `taxkit-package/workspace-roles` rule owns frontend and deployment
 roles. A public export or declared dependency does not make a backend handler,
 server, domain live Layer or content compiler browser-safe. Website source uses
 the contract/client modules listed in `tools/oxlint/package-roles.ts`. Exact host exceptions admit the existing
-server relay, host telemetry, admission and infrastructure binding types. These
+host telemetry, content settings and infrastructure binding types. These
 exceptions do not bypass exports or declared-dependency checks. Browser code
 also rejects Alchemy and local `.server`/`.server.layer` imports. Exact local
 host grants retain the isomorphic loader's `./runtime.server` import and the

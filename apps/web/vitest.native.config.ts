@@ -6,7 +6,6 @@ export default defineConfig({
     include: [
       "test/native-pair.boundary.test.ts",
       "test/native-analytics.boundary.test.ts",
-      "test/native-relay.boundary.test.ts",
       "test/native-mcp.boundary.test.ts",
       "test/native-browser-tools.boundary.test.ts",
       "test/native-rate.boundary.test.ts",

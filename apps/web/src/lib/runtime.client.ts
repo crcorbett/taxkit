@@ -8,7 +8,6 @@ import type { WebsiteDocsSearchQuery } from "./docs/search-location.boundary";
 import { rejectRouteLoad } from "./load.failure";
 import type { LoaderContext } from "./loader-context";
 import { WebsiteDocsSearchView, WebsiteRootView } from "./schemas";
-import type { WebsiteServerRenderContext } from "./schemas";
 
 const settingsUnavailable = new TaxKitWebConfigError({
   message: "TaxKit web settings are missing or invalid.",
@@ -49,7 +48,6 @@ export const loadRoot = (
   request: Readonly<{
     context: LoaderContext;
     signal: AbortSignal;
-    submission: WebsiteServerRenderContext["submission"];
   }>
 ) =>
   runForLoader({
@@ -57,7 +55,6 @@ export const loadRoot = (
     effect: Effect.gen(function* () {
       const current = yield* settings;
       return {
-        submission: request.submission,
         view: yield* Schema.encodeEffect(WebsiteRootView)({
           settings: current,
         }),

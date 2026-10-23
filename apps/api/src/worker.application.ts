@@ -30,8 +30,6 @@ import { DocsSourceError } from "@taxkit/content/errors";
 import { ContentCatalogue, ContentService } from "@taxkit/content/service";
 import {
   CalculatorHostMode,
-  WebsiteForwardingCredentialHeader,
-  WebsiteForwardingRateKeyHeader,
   edgeCallerKey,
 } from "@taxkit/observability/edge-identity";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
@@ -58,7 +56,6 @@ import {
   Scope,
 } from "effect";
 import {
-  Headers,
   HttpMiddleware,
   HttpRouter,
   HttpServerRequest,
@@ -69,10 +66,6 @@ import {
   ApiCalculatorDelivery,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
-import {
-  ApiWebsiteForwarding,
-  ApiWebsiteForwardingLive,
-} from "./website-forwarding.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
 
@@ -117,7 +110,6 @@ const DiscoveryRoutes = HttpRouter.addAll(
 // same application service; native requests keep their own scope and fibre.
 export const ApiWorkerApplication = Effect.gen(function* () {
   const analytics = yield* ApiCalculatorDelivery;
-  const websiteForwarding = yield* ApiWebsiteForwarding;
   // Native planning binds deferred resource addresses. Read their runtime
   // values once on first incoming use, without inventing planning URLs.
   const settings = yield* Effect.cached(ApiWorkerSettingsConfig);
@@ -218,19 +210,8 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Effect.gen(function* () {
       const config = yield* settings;
       const request = yield* HttpServerRequest.HttpServerRequest;
-      const forwardedKey = yield* websiteForwarding.authenticate(request);
-      const callerKey = forwardedKey.pipe(
-        Option.orElse(() =>
-          edgeCallerKey(request.headers, CalculatorClientRateKey)
-        )
-      );
+      const callerKey = edgeCallerKey(request.headers, CalculatorClientRateKey);
       const key = Option.isSome(callerKey) ? callerKey : yield* localKey;
-      const admittedRequest = request.modify({
-        headers: Headers.removeMany(request.headers, [
-          WebsiteForwardingCredentialHeader,
-          WebsiteForwardingRateKeyHeader,
-        ]),
-      });
       const isMcp = new URL(request.url, config.apiOrigin).pathname === mcpPath;
       const selected = isMcp
         ? mcp.pipe(
@@ -289,20 +270,11 @@ export const ApiWorkerApplication = Effect.gen(function* () {
             })
           ),
         (completed) => Deferred.succeed(completed, true)
-      ).pipe(
-        Effect.provideService(CalculatorRequestRateKey, key),
-        Effect.provideService(
-          HttpServerRequest.HttpServerRequest,
-          admittedRequest
-        )
-      );
+      ).pipe(Effect.provideService(CalculatorRequestRateKey, key));
     }).pipe(
-      Effect.catchTags({
-        CalculatorAdmissionUnavailable: () =>
-          Effect.succeed(HttpServerResponse.empty({ status: 503 })),
-        ConfigError: () =>
-          Effect.succeed(HttpServerResponse.empty({ status: 503 })),
-      })
+      Effect.catchTag("ConfigError", () =>
+        Effect.succeed(HttpServerResponse.empty({ status: 503 }))
+      )
     )
   ).pipe(
     // Every reply, including native error responses, gets one cache decision.
@@ -336,4 +308,4 @@ export const ApiWorkerApplication = Effect.gen(function* () {
   );
 
   return { fetch };
-}).pipe(Effect.provide(ApiWebsiteForwardingLive));
+});

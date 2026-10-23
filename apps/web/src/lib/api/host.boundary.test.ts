@@ -35,11 +35,6 @@ it.effect.each([
   },
   {
     apiValid: false,
-    changed: { CALCULATOR_HOST_MODE: "invalid" },
-    settingsValid: true,
-  },
-  {
-    apiValid: false,
     changed: { API_PUBLIC_ORIGIN: "invalid" },
     settingsValid: false,
   },
@@ -62,7 +57,7 @@ it.effect.each([
       }
       if (!apiValid && settingsValid) {
         // A broken binding leaves the root loader's public settings available.
-        const loaded = yield* loadRootView();
+        const loaded = yield* loadRootView;
         const root = yield* Schema.decodeUnknownEffect(WebsiteRootView)(
           loaded.view
         );

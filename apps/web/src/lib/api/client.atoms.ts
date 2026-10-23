@@ -10,7 +10,6 @@ import * as Atom from "effect/reactivity/Atom";
 import * as AtomHttpApi from "effect/reactivity/AtomHttpApi";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
-import { BrowserCalculatorPolicyLive } from "../calculator-policy.browser.layer";
 import type { WebsitePublicSettings } from "../schemas";
 import { boundedResponses } from "./bounded-response";
 
@@ -80,10 +79,7 @@ export class ApiClient extends AtomHttpApi.Service<ApiClient>()(
             })
           )
         )
-      ).pipe(
-        Layer.provide(BrowserCalculatorPolicyLive),
-        Layer.provide(get(browserTransportAtom))
-      ),
+      ).pipe(Layer.provide(get(browserTransportAtom))),
     runtime: browserRuntime.factory,
   }
 ) {}

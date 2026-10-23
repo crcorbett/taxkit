@@ -10,9 +10,9 @@ review_trigger: API or SDK contracts, exports, lifetime or caller composition ch
 # API and SDK
 
 The active T008 candidate adds minimal analytics only in the native API app.
-The Website supplies fresh browser or original HTML preferences through the
-shared private header boundary. Its checked flag carries allow/deny without browser identity and
-cannot bypass normal calculator admission. One app decorator collects catalogue
+Direct callers may supply a collection preference through the shared private
+header boundary. Its checked flag carries allow/deny without browser identity and
+cannot bypass normal calculator admission. The Website sends no such header. One app decorator collects catalogue
 ID/name after success. Pure calculators and SDK package calls remain free of
 analytics. The [API README](../../apps/api/README.md#analytics-candidate) owns
 the current bounded collector, background delivery design and remaining proof.
@@ -358,14 +358,11 @@ replies are `no-store`. Accept-only negotiation answers remain separate public
 variants. The package README owns the detailed response policy.
 
 The native default `fetch` serves the Website's private HTTP binding as well
-as public HTTP and MCP. Website canonical calculation POSTs carry a checked
-original IP and a stage-owned native Alchemy secret in private headers.
-`ApiWebsiteForwarding` authenticates them before installing the request-local
-rate key and strips them before router dispatch. Partial, malformed or wrong
-metadata fails closed; other methods/paths gain no authority from those fields.
-The same native limiter and work pool serve every transport. Direct edge
-callers retain `@taxkit/observability/edge-identity`; public clients require no
-forwarding credential.
+as public HTTP and MCP. The Website uses that binding only to read; it never
+calculates through it. The same native limiter and work pool serve every
+transport. A calculation's rate key comes only from the direct edge identity in
+`@taxkit/observability/edge-identity` or the explicit local-emulator loopback
+fallback; public clients require no credential.
 
 POST bodies are read through the native Effect stream with a 64-KiB limit
 and a total five-second read deadline, before native JSON decoding. Oversized
@@ -384,12 +381,10 @@ The Website calls the API only through the generated client for `TaxKitApi`:
 
 - Server: `HttpApiClient.makeWith(TaxKitApi, ...)` over
   `toHttpClient(fromCloudflareFetcher(TAXKIT_API))`, inside the Website's one
-  `ManagedRuntime`. Reads and canonical calculation POSTs use native HTTP;
-  only the latter receive authenticated original-IP metadata. A narrow native
-  binding adapter enforces `redirect: "manual"`, retaining the original
-  receiver and abort signal. The visitor's
-  collection-policy header is forwarded. Discovery files are forwarded once to
-  the API's discovery routes.
+  `ManagedRuntime`. The server only reads (documentation, catalogue and
+  discovery); it never calculates. A narrow native binding adapter enforces
+  `redirect: "manual"`, retaining the original receiver and abort signal.
+  Discovery files are forwarded once to the API's discovery routes.
 - Browser: `ApiClient`, an `AtomHttpApi.Service` over `FetchHttpClient` with
   `credentials: "omit"` and `redirect: "error"`, calling the public API origin
   directly.
@@ -566,13 +561,11 @@ interfaces do not change.
 
 The native body reader uses `CalculatorRequestBodyLimit` from
 `@taxkit/api-http/request-boundary`: 64 KiB.
-The API applies it to public HTTP POST, and the Website applies
-it before decoding any supported standard HTML calculator form. At exactly
+The API applies it to public HTTP POST. At exactly
 the limit, valid JSON still reaches the same named calculation operation;
 exceeding it releases the source before its remaining tail is consumed.
 The retained standalone HTTP server mounts the same admission middleware.
-Oversized/stalled bodies return fixed Schema-owned 413/408 JSON guidance; native
-Website forms select fixed HTML guidance and a link back to the calculators.
+Oversized/stalled bodies return fixed Schema-owned 413/408 JSON guidance.
 The five-second total reader budget also rejects late synchronous completion.
 Custom route hosts must supply request admission at their composition.
 The native rate policy is described below; whole T004 qualification remains active.
@@ -623,7 +616,7 @@ HTTP package tests check that they do.
 
 ## Native calculation rate admission
 
-The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP, MCP and private Website calls share an allowance and each calculation takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities.
+The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP and MCP share an allowance and each calculation takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities.
 
 ### Documentation over HTTP
 

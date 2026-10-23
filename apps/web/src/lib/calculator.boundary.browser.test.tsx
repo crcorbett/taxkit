@@ -1,33 +1,21 @@
-import { RegistryContext, scheduleTask } from "@effect/atom-react";
+import { RegistryContext } from "@effect/atom-react";
 import { describe, expect, it } from "@effect/vitest";
 import { TaxKitApi } from "@taxkit/api-http/api";
-import {
-  CalculatorRequestBodyTimedOut,
-  CalculatorRequestBodyTooLarge,
-} from "@taxkit/api-http/request-boundary";
-import {
-  CalculatorAdmissionUnavailable,
-  CalculatorCapacityExceeded,
-  CalculatorOperationTimedOut,
-  CalculatorRateLimited,
-} from "@taxkit/calculators/schemas";
 import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { Cents, aud } from "@taxkit/core/primitives";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
 import {
-  AuPayCalculatorId,
   PayWithholdingsLedger,
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
-import { Array, Effect, Layer, Option, Ref, Result, Schema } from "effect";
+import { Effect, Layer, Option, Ref, Result, Schema } from "effect";
 import { HttpClient, HttpClientError, HttpClientResponse } from "effect/http";
 import type { HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
-import { useEffect } from "react";
-import { createRoot, hydrateRoot } from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { vi } from "vitest";
 
@@ -37,27 +25,12 @@ import {
   publicSettingsAtom,
 } from "./api/client.atoms";
 import {
-  WebsiteApiDeadlineExceeded,
-  WebsiteApiResponseTooLarge,
-  WebsiteApiUnavailable,
-} from "./api/errors";
-import {
   calculateAtom,
-  calculatorPageAtoms,
   editTakeHomeAtom,
   submitTakeHomeAtom,
-  takeHomeFormAtom,
 } from "./calculator.atoms";
-import {
-  initialTakeHomeForm,
-  takeHomeRequestFromForm,
-  TakeHomeForm,
-} from "./form.boundary";
-import {
-  WebsitePublicSettings,
-  WebsiteSubmission,
-  WebsiteSubmissionTransport,
-} from "./schemas";
+import { initialTakeHomeForm, takeHomeRequestFromForm } from "./form.boundary";
+import { WebsitePublicSettings } from "./schemas";
 import { TakeHomeResultView } from "./take-home-result.view";
 import { TakeHomeCalculator } from "./take-home.container";
 
@@ -237,7 +210,7 @@ describe("browser calculator lifetime", () => {
         );
         root.render(
           <RegistryContext.Provider value={registry}>
-            <TakeHomeCalculator submission={Option.none()} />
+            <TakeHomeCalculator />
           </RegistryContext.Provider>
         );
         yield* Effect.promise(() =>
@@ -256,169 +229,6 @@ describe("browser calculator lifetime", () => {
           expect.poll(() => cancelled.mock.calls.length).toBe(1)
         );
         expect(host.textContent).toBe("Another page");
-      }).pipe(Effect.scoped)
-  );
-
-  it.live.each([
-    {
-      error: new WebsiteApiUnavailable(),
-      message: "could not be reached",
-    },
-    {
-      error: new WebsiteApiDeadlineExceeded(),
-      message: "within ten seconds",
-    },
-    { error: new CalculatorRateLimited(), message: "Wait a minute" },
-    {
-      error: new CalculatorAdmissionUnavailable(),
-      message: "Try again when you are ready",
-    },
-    {
-      error: new CalculatorRequestBodyTimedOut(),
-      message: "within five seconds",
-    },
-    {
-      error: new CalculatorCapacityExceeded(),
-      message: "The calculators are busy",
-    },
-    {
-      error: new CalculatorOperationTimedOut(),
-      message: "within five seconds",
-    },
-    { error: new CalculatorRequestBodyTooLarge(), message: "64 KiB or less" },
-    {
-      error: new WebsiteApiResponseTooLarge(),
-      message: "Reduce the request",
-    },
-  ])(
-    "restores $error._tag and its guidance without starting another calculation",
-    ({ error, message }) =>
-      Effect.gen(function* () {
-        const called = vi.fn<(...args: readonly unknown[]) => void>();
-        const errors = vi.fn<(...args: readonly unknown[]) => void>();
-        const hydrated = vi.fn<(...args: readonly unknown[]) => void>();
-        const HydrationComplete = () => {
-          useEffect(hydrated, []);
-          return null;
-        };
-        const restoredForm = TakeHomeForm.make({
-          grossDollars: "2000",
-          period: "fortnightly",
-          taxFreeThresholdClaimed: false,
-        });
-        const client = generatedClient.pipe(
-          Layer.provide(
-            Layer.succeed(HttpClient.HttpClient)(
-              HttpClient.make((request) =>
-                Effect.sync(() => {
-                  called(request.url);
-                })
-                  .pipe(Effect.andThen(unreachable(request)))
-                  .pipe(
-                    Effect.map((response) =>
-                      HttpClientResponse.fromWeb(request, response)
-                    )
-                  )
-              )
-            )
-          )
-        );
-        const submission = yield* Schema.encodeEffect(
-          WebsiteSubmissionTransport
-        )(
-          WebsiteSubmission.make({
-            calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
-            form: restoredForm,
-            result: Result.fail(error),
-          })
-        );
-        const registry = yield* Effect.acquireRelease(
-          Effect.sync(() =>
-            AtomRegistry.make({
-              initialValues: [[apiClientRuntime.layer, client]],
-              scheduleTask,
-            })
-          ),
-          (value) =>
-            Effect.sync(() => {
-              value.dispose();
-            })
-        );
-        const serverRegistry = yield* Effect.acquireRelease(
-          Effect.sync(() => AtomRegistry.make()),
-          (value) =>
-            Effect.sync(() => {
-              value.dispose();
-            })
-        );
-        const restored = yield* Schema.decodeEffect(WebsiteSubmissionTransport)(
-          submission
-        );
-        const view = (
-          <RegistryContext.Provider value={registry}>
-            <TakeHomeCalculator submission={Option.some(restored)} />
-            <HydrationComplete />
-          </RegistryContext.Provider>
-        );
-        const host = yield* Effect.acquireRelease(
-          Effect.sync(() => {
-            const element = document.createElement("div");
-            element.insertAdjacentHTML(
-              "afterbegin",
-              renderToString(
-                <RegistryContext.Provider value={serverRegistry}>
-                  <TakeHomeCalculator submission={Option.some(restored)} />
-                </RegistryContext.Provider>
-              )
-            );
-            document.body.appendChild(element);
-            return element;
-          }),
-          (element) => Effect.sync(() => element.remove())
-        );
-        // A first render may be abandoned before React subscribes. Exercise
-        // registry cleanup before the real client mount; the server is separate.
-        yield* Effect.sync(() => renderToString(view));
-        yield* Effect.sleep("100 millis");
-        yield* Effect.acquireRelease(
-          Effect.sync(() =>
-            hydrateRoot(host, view, {
-              onRecoverableError: errors,
-              onUncaughtError: errors,
-            })
-          ),
-          (value) =>
-            Effect.sync(() => {
-              value.unmount();
-            })
-        );
-        yield* Effect.promise(() =>
-          expect.poll(() => hydrated.mock.calls.length).toBe(1)
-        );
-        // Check after client hydration and queued idle cleanup, not just SSR HTML.
-        yield* Effect.sleep("100 millis");
-        expect(host.querySelector('[role="alert"]')?.textContent).toContain(
-          message
-        );
-        expect(called).not.toHaveBeenCalled();
-        expect(errors).not.toHaveBeenCalled();
-        expect(host.textContent).not.toContain("Take-home pay:");
-        const page = calculatorPageAtoms(
-          AuPayCalculatorId.make("au.pay.take-home")
-        );
-        expect(registry.get(page.view).form).toEqual(restoredForm);
-        expect(registry.get(takeHomeFormAtom)).toEqual(restoredForm);
-        const amount = host.querySelector('input[name="grossDollars"]');
-        expect(amount?.getAttribute("value")).toBe("2000");
-        registry.set(submitTakeHomeAtom, "calculate");
-        yield* Effect.promise(() =>
-          expect.poll(() => called.mock.calls.length).toBe(1)
-        );
-        expect(
-          yield* Array.head(called.mock.calls).pipe(Effect.fromOption)
-        ).toEqual([
-          "http://127.0.0.1:49999/api/v1/calculators/au.pay.take-home/calculate",
-        ]);
       }).pipe(Effect.scoped)
   );
 
@@ -472,7 +282,7 @@ describe("browser calculator lifetime", () => {
       );
       root.render(
         <RegistryContext.Provider value={registry}>
-          <TakeHomeCalculator submission={Option.none()} />
+          <TakeHomeCalculator />
         </RegistryContext.Provider>
       );
       yield* Effect.promise(() =>

@@ -6,7 +6,6 @@ import * as Website from "alchemy/Cloudflare/Website";
 import { Worker } from "alchemy/Cloudflare/Workers";
 import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import * as Output from "alchemy/Output";
-import { Random } from "alchemy/Random";
 import { retain } from "alchemy/RemovalPolicy";
 import { Stage } from "alchemy/Stage";
 import { Context, Effect, Option } from "effect";
@@ -79,12 +78,6 @@ export const productionBotPolicy = {
   isRobotsTxtManaged: false,
 } as const;
 
-// Native resource construction is idempotent within the stack. Both host
-// declarations yield this same owning Effect to share its unresolved Output.
-const websiteForwardingKey = Random("TaxKitWebsiteForwardingKey", {
-  bytes: 32,
-});
-
 /**
  * Production exports only the hosts' own checked console records, through the
  * retained `taxkit-axiom-logs` destination. Cloudflare's invocation logs and
@@ -127,7 +120,6 @@ export const nativeApiHostProps = Effect.gen(function* () {
       API_PUBLIC_ORIGIN: Worker.URL,
       CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
       TAXKIT_PUBLICATION_ORIGIN: publicationOrigin,
-      TAXKIT_WEBSITE_FORWARDING_KEY: (yield* websiteForwardingKey).text,
     },
     observability: Option.isSome(yield* NativeProductionZone)
       ? yield* productionObservability
@@ -203,10 +195,8 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
         API_PUBLIC_ORIGIN: api.url.pipe(
           Output.map((url) => Option.getOrNull(Option.fromNullishOr(url)))
         ),
-        CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
         TAXKIT_API: api,
         TAXKIT_PUBLICATION_ORIGIN: publicationOrigin,
-        TAXKIT_WEBSITE_FORWARDING_KEY: (yield* websiteForwardingKey).text,
         WEBSITE_PUBLIC_ORIGIN: Worker.URL,
       },
       // Authored content and shared package sources are build inputs, so a
@@ -224,9 +214,6 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
 
 export const declareNativeAppsInfrastructure = Effect.gen(function* () {
   const stage = yield* checkedStage(yield* Stage);
-  // One stable resource per native stack/stage. Both Workers bind its redacted
-  // Output; Doppler supplies deployment credentials, never this generated key.
-  yield* websiteForwardingKey;
   const zone =
     stage === "prod"
       ? Option.some(

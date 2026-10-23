@@ -24,8 +24,8 @@ export const withDocsRepresentation = (
           status: 405,
         });
       }
-      // Calculator POSTs are already selected by the host. Ordinary POSTs
-      // retain its empty 404 without invoking a framework body parser.
+      // The Website accepts no POST; reply with an empty 404 without
+      // invoking a framework body parser.
       if (incoming.method === "POST") {
         return HttpServerResponse.empty({ status: 404 });
       }

@@ -40,9 +40,10 @@ export const CalculatorPageView = ({
         current thresholds before relying on the answer.
       </p>
     )}
+    <noscript>
+      <p role="alert">Turn on JavaScript to use this calculator.</p>
+    </noscript>
     <form
-      action={`/calculators/${calculatorId}`}
-      method="post"
       onSubmit={(event) => {
         event.preventDefault();
         onCalculate();

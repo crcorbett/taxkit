@@ -1,10 +1,9 @@
 import { expect, it } from "@effect/vitest";
-import { Effect, Option, Schema } from "effect";
+import { Option, Schema } from "effect";
 import { Headers } from "effect/http";
 
 import {
   CalculatorHostMode,
-  WebsiteForwardingCredential,
   edgeCallerKey,
 } from "../src/edge-identity.boundary.js";
 
@@ -48,24 +47,3 @@ it("admits only checked direct edge identity and rejects Worker subrequests", ()
   expect(Schema.is(CalculatorHostMode)("local-emulator")).toBe(true);
   expect(Schema.is(CalculatorHostMode)("untrusted")).toBe(false);
 });
-
-it.effect("redacts and refuses to encode forwarding credentials", () =>
-  Effect.gen(function* () {
-    const credential = yield* Schema.decodeUnknownEffect(
-      WebsiteForwardingCredential
-    )("a".repeat(64));
-    // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
-    expect(String(credential)).not.toContain("a".repeat(64));
-    expect(
-      yield* Schema.encodeEffect(WebsiteForwardingCredential)(credential).pipe(
-        Effect.isFailure
-      )
-    ).toBe(true);
-    expect(
-      Schema.decodeUnknownOption(WebsiteForwardingCredential)("A".repeat(64))
-    ).toEqual(Option.none());
-    expect(
-      Schema.decodeUnknownOption(WebsiteForwardingCredential)("a".repeat(63))
-    ).toEqual(Option.none());
-  })
-);

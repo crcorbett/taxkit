@@ -22,18 +22,9 @@ two accepted event contracts. Its native backend Layer encodes a fixed provider
 request and maps transport failures to safe errors. The exact encoder admission
 in `oxlint.config.ts` covers that provider egress and its safe error-byte test;
 it does not admit runtime execution, raw JSON or decoding in neighbouring code.
-The package’s collection-header boundary is reused by the API and Website.
-The analytics package’s private `WebsiteAnalyticsRelay` exposes one native request handler with
-checked failures and no service requirements escaping its caller. Its named
-adapter captures native HttpClient once, decodes metadata at that explicit
-boundary, forwards bounded complete bytes, and owns each request scope and
-whole-operation deadline. It uses the existing server runner. Exact decoder
-permissions admit neither neighbouring decoders, raw fetch nor another runner;
-actual lint fixtures enforce those limits.
-The browser API client reads its native preference at dispatch, and the
-server client reads the current original request; neither freezes policy when
-its Layer is built. A server call with no incoming request, or a browser host
-that throws, refuses collection.
+The package’s collection-header boundary is used by the API, which reads each
+direct request's header at dispatch rather than when its Layer is built. The
+Website sends no collection header.
 The application owns when to capture and which checked collection policy applies.
 The API application captures its delivery service during initialisation, then
 supplies it to each returned request operation. The native Worker owns
@@ -293,13 +284,10 @@ initialisation and supplied to both native router construction and dispatch;
 T009 retains unqualified safe native trace exports. T003's local connection
 acceptance does not establish that later requirement.
 
-The Website's generated HTTP client uses the private native binding for reads
-and calculations. Its host adapter enforces manual redirects; canonical server
-calculation POSTs alone receive the stage-owned native Random secret and checked
-original IP. The API's static `ApiWebsiteForwardingLive` verifies request-time
-Config with the native constant-time primitive and strips private fields before
-domain dispatch. No credential memo retains an incoming request's fibre or
-context. Public MCP retains direct-edge identity and the same shared limiter.
+The Website's generated HTTP client uses the private native binding only for
+reads; the Website server never calculates. Its host adapter enforces manual
+redirects. Public HTTP and MCP retain direct-edge identity and the same shared
+limiter.
 
 ## Promise boundaries
 
@@ -457,8 +445,7 @@ flow remains a review concern rather than a reason for broad suppressions.
 Loader data must be plain values TanStack can serialise; the Website declares
 no server functions. The generated client has already decoded API replies, and
 documentation page and search views are plain public data. When a loader returns a Schema-encoded value
-(the root route's settings and catalogue, or a no-JavaScript submission
-encoded with `WebsiteSubmissionTransport`), the direct route component that
+(the root route's settings), the direct route component that
 first reads `Route.useLoaderData` restores it once and matches the resulting
 `Result` before passing canonical values into React composition. Ordinary
 hooks, containers and leaf components must not receive encoded loader data,
@@ -524,7 +511,7 @@ transports and counts individual batch calculations. Scope and semaphore release
 own cleanup on every exit. Metadata remains outside calculation capacity, while
 all nine calls share the five-second completion budget. Lazy invocation counts
 metadata construction within it. The HTTP-owned streamed body policy provides
-Schema-owned JSON errors or fixed HTML guidance at the host boundary. No
+Schema-owned JSON errors at the host boundary. No
 runner or live Layer is built inside a calculation, and no transport gains a
 competing application contract. The owning package records timeout and CPU limits.
 

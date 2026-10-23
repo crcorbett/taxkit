@@ -20,8 +20,8 @@ the Website reads them through Effect's generated `HttpApiClient` for
 **Server rendering.** `src/lib/runtime.server.ts` owns one `ManagedRuntime`
 (`runtime`) per loaded Worker module. It provides `WebsiteSettingsLive`
 (`src/lib/settings.server.layer.ts`), `WebsiteApiLive`
-(`src/lib/api/host.server.ts`), the fixed host telemetry and the analytics
-relay. The contracts in `src/lib/host.service.ts` fail independently:
+(`src/lib/api/host.server.ts`) and the fixed host telemetry. The contracts in
+`src/lib/host.service.ts` fail independently:
 
 - `WebsiteSettings` holds checked public settings;
 - `WebsiteApi` holds the generated client, `HttpApiClient.makeWith(TaxKitApi, ...)`, over the
@@ -31,7 +31,7 @@ relay. The contracts in `src/lib/host.service.ts` fail independently:
   response (used for discovery files), with a ten-second deadline covering
   headers and the complete body, a 2 MiB cap, and scoped cancellation.
 
-A malformed binding or calculator host mode fails only the API capability;
+A malformed binding fails only the API capability;
 invalid Website or publication origins fail only public settings. The API origin
 is required by both. Configuration failures expose fixed safe errors
 (`TaxKitWebConfigError` for settings, `WebsiteApiConfigError` for the API).
@@ -39,23 +39,18 @@ The root load policy in `src/lib/root.load.server.ts` can therefore retain its
 settings without waiting for an optional remote catalogue. It owns
 the root transport encoding; `runtime.server.ts` owns execution and cancellation.
 
-Canonical calculation POSTs use the same native HTTP binding as reads. The
-server adds a checked original-IP header and the stage-owned forwarding
-credential; the API authenticates them before supplying its shared admission
-service. Incoming forwarding fields are overwritten, and neither field enters
-financial JSON or public settings. The binding boundary uses standard
+The server only reads through the binding (documentation, catalogue and
+discovery files); it never calculates. The binding boundary uses standard
 `redirect: "manual"` while preserving the native receiver and abort signal.
-Caller interruption cancels the outbound call; remote cleanup still needs the
-API's work/reply bounds. Every server call forwards the visitor's
-analytics collection choice (`deny` when there is no incoming request).
+Caller interruption cancels the outbound call.
 
 **Browser.** `src/lib/api/client.atoms.ts` declares `ApiClient`, an
 `AtomHttpApi.Service` for `TaxKitApi` built with `runtime:
 browserRuntime.factory`. It calls the API's public origin directly with
 `FetchHttpClient` (`credentials: "omit"`, `redirect: "error"`), sends no
-`b3`/`traceparent` headers (`HttpClient.TracerDisabledWhen`) and adds the
-Do Not Track collection choice to each request. The Website has no proxy for
-API paths and declares no TanStack server functions.
+`b3`/`traceparent` headers (`HttpClient.TracerDisabledWhen`) and adds no
+collection header. The Website has no proxy for API paths and declares no
+TanStack server functions.
 
 **Both.** `boundedResponses` (`src/lib/api/bounded-response.ts`) reads each
 reply into memory with a 2 MiB cap, keeping its status and headers so the
@@ -80,7 +75,7 @@ its own registry.
 TanStack owns loader data. There are no request atoms or a second cache.
 `defaultPreload` is `"intent"` and `defaultStaleTime`/`defaultPreloadStaleTime`
 are 60 seconds. The root route sets `staleTime: 0` because it carries the live
-settings and any personal no-JavaScript submission.
+settings.
 
 `src/lib/loaders.ts` uses `createIsomorphicFn`: server loads call
 `runtime.server.ts`, browser loads call `runtime.client.ts`. Both call the same
@@ -100,12 +95,9 @@ bindings, through `reifyBoundConfigProvider`:
 
 | Key | Source | Use |
 | --- | --- | --- |
-| `WEBSITE_PUBLIC_ORIGIN` | the Website's own `Worker.URL` | browser-tool registration and the analytics relay origin check |
+| `WEBSITE_PUBLIC_ORIGIN` | the Website's own `Worker.URL` | browser-tool registration |
 | `API_PUBLIC_ORIGIN` | the API's address Output | browser client base URL and the server client's base URL |
 | `TAXKIT_PUBLICATION_ORIGIN` | fixed `https://taxkit.dev` | canonical, Markdown alternate and share-image links |
-| `CALCULATOR_HOST_MODE` | the apps graph | `local-emulator` allows the loopback rate key in local development; default `edge` |
-| `TAXKIT_WEBSITE_FORWARDING_KEY` | native Alchemy Random Output, private to the stage | authenticated server calculation POSTs only; resolved through native Config at request time |
-| `POSTHOG_*` | not bound by the current graph | analytics relay settings; collection stays off |
 
 `TAXKIT_API` is checked separately as the binding object (it must expose
 `fetch` and `connect`) so its methods keep their receiver. Its small host
@@ -113,7 +105,7 @@ adapter enforces manual redirects before the stock Alchemy HTTP conversion.
 Missing or invalid settings produce `TaxKitWebConfigError` with fixed fields.
 The root loader encodes the public settings into its loader data; the root
 route restores them and seeds `publicSettingsAtom`, which the browser client
-reads. No binding, credential or Effect Context reaches the browser. Vite sets
+reads. No binding or Effect Context reaches the browser. Vite sets
 `envPrefix: []`; there is no build-time API address.
 
 `wrangler.jsonc` owns the standalone local fixture. Wrangler generates
@@ -136,21 +128,17 @@ form, the calculation (`apiClientRuntime.fn` over the generated client) and the
 shared readonly view. Calculate sends the checked request. Editing interrupts
 unfinished work and keeps the last successful answer, marked out of date, until
 an explicit calculation succeeds. Leaving the page interrupts its work. The
-view is kept alive for the registry's lifetime so a restored server answer
-survives a paused first render and a return visit. No figures go to browser
-storage or the URL.
+view is kept alive for the registry's lifetime so an answer survives a paused
+first render and a return visit. No figures go to browser storage or the URL.
 
 The take-home result shows the answer first, with native `details` for the
 breakdown, assumptions, year and sources. Explanations come from the checked
 report and its trace, not the edited form. Source references become links only
 for valid HTTPS addresses.
 
-**Without JavaScript.** `src/server.ts` handles form POSTs to the three
-calculator paths before TanStack. It applies the shared 64 KiB, five-second
-body limit (HTML 413/408 guidance), decodes the form (empty 400 if invalid),
-calculates through the same server client and renders the page with the result
-in the request's server context. The root loader returns that submission beside
-the public data, never inside it.
+**Without JavaScript.** Calculators need JavaScript. Each calculator page shows
+a `<noscript>` notice, "Turn on JavaScript to use this calculator." The server
+never calculates, and a POST to any Website page returns an empty 404.
 
 ## Documentation pages
 
@@ -195,13 +183,13 @@ stays out of the Worker and browser bundles.
 ## Caching
 
 `src/server.ts` makes one cache decision for every reply with
-`applyCachePolicy` from `@taxkit/api-http/response-policy`. A successful GET or
-HEAD without `Set-Cookie` or a stricter instruction gets
+`applyCachePolicy` from `@taxkit/api-http/response-policy`, with
+`publicRead: true`. A successful GET or HEAD without `Set-Cookie` or a stricter
+instruction gets
 `Cache-Control: public, max-age=0` and
 `Cloudflare-CDN-Cache-Control: public, max-age=604800, stale-if-error=0`.
-Everything else, including form submissions, errors and the `/ingest/` relay,
-gets `no-store`. The apps graph enables the Website's native Workers Cache
-scoped to the deployed version. `/_serverFn` and `/_serverFn/*` return an empty
+Everything else, including other methods and errors, gets `no-store`. The apps
+graph enables the Website's native Workers Cache scoped to the deployed version. `/_serverFn` and `/_serverFn/*` return an empty
 404.
 
 ## Browser tools
@@ -220,20 +208,9 @@ remote MCP address on the API origin, the OpenAPI description and the
 
 ## Analytics
 
-The browser client reads `navigator.doNotTrack` at each request: `1` refuses
-collection; `0`, `unspecified` or no value permit it; an unexpected value or a
-host that throws refuses it. HTML form calculations read the original request's headers
-through the analytics package's header boundary. Only the allow/deny flag is
-sent; it carries no identity.
-
-POST `/ingest/e/` is a private relay to `https://us.i.posthog.com/e/`. It admits
-only the Website origin, checked media types and one `retry_count` query field;
-bodies are limited to 65,536 bytes and one five-second scope covers the body,
-upstream headers and reply. It strips cookies, authorisation, forwarded IP and
-trace headers and refuses redirects. Denied collection returns an empty 204;
-configured-off returns 404; invalid enabled settings return 503. Replies are
-`no-store`. The current apps graph binds no PostHog settings, so collection is
-off.
+The Website collects no analytics: it has no PostHog relay or settings, and
+its browser client sends no collection header. The API's own calculator
+analytics is described in the [API app](../api/README.md#analytics-candidate).
 
 ## Checks
 
@@ -262,9 +239,9 @@ instead, so run the native build immediately before its test. The root
 
 The native tests in `test/` run the built pair in Miniflare and Chromium. They
 cover first HTML for every page, documentation pages, search, Markdown and
-discovery files with their cache headers, calculation with and without
-JavaScript, request and reply limits, cancellation, rate admission, settings
-failure, the analytics relay and collection choice, MCP clients and the WebMCP
+discovery files with their cache headers, browser calculation, the
+no-JavaScript notice and refused POSTs, request and reply limits, cancellation,
+rate admission, settings failure, API analytics, MCP clients and the WebMCP
 browser tools. They need Node 24.16.0 and the installed Chromium, and they do
 not show hosted behaviour.
 

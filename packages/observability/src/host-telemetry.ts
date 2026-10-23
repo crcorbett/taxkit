@@ -26,7 +26,6 @@ export const hostRequestEvent = "taxkit.request";
  * query string or calculator input never becomes a field.
  */
 export const HostRoute = Schema.Literals([
-  "analytics-relay",
   "calculate",
   "calculator-page",
   "catalogue",

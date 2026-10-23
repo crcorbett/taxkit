@@ -38,12 +38,9 @@ The Website has exactly two places that run Effects:
 - `apps/web/src/lib/runtime.server.ts`: one `ManagedRuntime` with
   independent `WebsiteSettingsLive` and `WebsiteApiLive` Layers. The API Layer
   builds the generated client over the binding with
-  `toHttpClient(fromCloudflareFetcher(binding))`. Only the canonical calculation
-  POST adds the private stage-owned forwarding credential and separately checked
-  original caller identity. The API verifies the credential, method and path
-  before accepting that identity into the shared allowance. Public metadata
-  GET/HEAD requests remain credential-free; financial JSON carries neither
-  credential nor caller key. The native adapter forwards the fetch AbortSignal;
+  `toHttpClient(fromCloudflareFetcher(binding))`. The server only reads
+  through it (documentation, catalogue and discovery); it never calculates and
+  carries no credential. The native adapter forwards the fetch AbortSignal;
   that alone does not prove remote Effect interruption or late-body cleanup.
 - `apps/web/src/lib/runtime.client.ts`: the browser loader bridge. It runs one
   request Effect with the shared `AtomRegistry` and the loader's `AbortSignal`.
@@ -60,7 +57,7 @@ or `/mcp` paths and does not mount the API in process.
 `src/router.tsx` creates one registry before loaders run and React reuses it.
 TanStack owns loader data and its freshness: intent preloading, a one-minute
 default stale time and `staleTime: 0` on the root route, which carries live
-settings and any personal submission. Root loading performs no catalogue API
+settings. Root loading performs no catalogue API
 read and does not acquire the generated client. Loaders hold no request atoms
 and add no second cache. `loaders.ts` selects the server or browser branch with
 `createIsomorphicFn`; failures become TanStack `notFound()` or a
@@ -72,7 +69,7 @@ origin `https://taxkit.dev`. `config.server.ts` reads only the Website's keys
 through `reifyBoundConfigProvider`. Settings and the API binding retain independent
 checked failures: a broken binding leaves settings available, and invalid Website
 settings do not block valid API forwarding. `root.load.server.ts` requires only
-settings and preserves the request's submission alongside them.
+settings.
 Vite exposes no ambient public env prefix or build-time API address.
 
 Calculator navigation and calculator page names/contexts use the browser-safe
@@ -91,11 +88,12 @@ remote refresh. The browser's catalogue tool still reads the API for full
 discovery metadata. Root-loader completion and SSR response timing are separate
 claims; the absence of catalogue I/O does not establish first-byte timing.
 
-`src/server.ts` is the Worker entry. Before TanStack it handles the analytics
-relay, discovery files (forwarded once to the API), the no-JavaScript
-calculator form POSTs and an empty 404 for `/_serverFn`. Every reply then gets
-one cache decision from `applyCachePolicy` in
-`@taxkit/api-http/response-policy`: public GET/HEAD replies and their Accept-only
+`src/server.ts` is the Worker entry. Before TanStack it handles discovery
+files (forwarded once to the API) and an empty 404 for `/_serverFn`.
+Calculators need JavaScript: the server never calculates, calculator pages show
+a `<noscript>` notice and a POST to any Website page gets an empty 404. Every
+reply then gets one cache decision from `applyCachePolicy` in
+`@taxkit/api-http/response-policy` with `publicRead: true`: public GET/HEAD replies and their Accept-only
 negotiation answers may be shared. Handler lifetimes and revalidation rules are
 preserved; cookie-bearing responses and storage restrictions prevent sharing.
 The [HTTP package response policy](../../packages/api/http/README.md#response-policy)
@@ -113,8 +111,7 @@ route file also renders React; do not allowlist a mixed `.tsx` route merely
 because its loader needs a decoder.
 
 Loader data must be plain values TanStack can serialise. When a loader returns a
-Schema-encoded value (the root route's settings, or a
-no-JavaScript submission), the direct route component is its first consumer:
+Schema-encoded value (the root route's settings), the direct route component is its first consumer:
 it restores the value once and matches the `Result` before composing React.
 It must not forward the encoded value or whole route `Result` to a child, and
 must not hide restoration in a hook, provider, higher-order component, callback
@@ -179,15 +176,13 @@ calculation (`apiClientRuntime.fn` over the generated client), commands and one
 shared readonly view (`WebsiteCalculatorViewState`). Editing interrupts work and
 keeps the last success, visibly out of date, until an explicit calculation
 succeeds; an old error is hidden while a new request runs. The view is kept
-alive for the registry's lifetime and holds its whole family group, so a
-restored server answer survives a paused first render and a return visit after
-browser garbage collection. Page cleanup still interrupts work and browser-tool
+alive for the registry's lifetime and holds its whole family group, so an
+answer survives a paused first render and a return visit after browser garbage
+collection. Page cleanup still interrupts work and browser-tool
 callbacks; registry disposal releases the snapshot and client. No figure
 reaches navigation, metadata, browser storage or a query string.
 
-Routes restore only the checked no-JavaScript submission for their calculator;
-the container seeds the saved form with `useAtomInitialValues` on the page's
-form atom. The take-home result leaf receives only the checked report and stale
+The take-home result leaf receives only the checked report and stale
 flag; explanations come from the report and its trace, not the edited form.
 
 ## Page-owned browser tools
@@ -216,11 +211,9 @@ builds a content index or constructs a Layer.
 
 ## Analytics
 
-The browser client adds the Do Not Track collection choice to each request; the
-server client forwards the incoming request's choice. Only allow/deny is sent.
-The private POST `/ingest/e/` relay is the one provider-ingress exception; the
-current graph binds no analytics settings, so it reports off. Browser delivery,
-the event allowlist and stored-event readback are not built.
+The Website collects no analytics. It has no provider relay, and neither its
+browser nor its server client sends a collection header. Browser delivery, the
+event allowlist and stored-event readback are not built.
 
 ## Guardrails
 

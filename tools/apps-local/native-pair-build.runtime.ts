@@ -107,8 +107,7 @@ const program = Effect.gen(function* () {
         );
         const declaration =
           "  ).pipe(\n    // Every reply, including native error responses, gets one cache decision.";
-        const imports = "Headers,";
-        if (!original.includes(declaration) || !original.includes(imports)) {
+        if (!original.includes(declaration)) {
           return yield* Effect.die(
             "Native stalled-reply fixture no longer matches its source owner"
           );
@@ -129,7 +128,7 @@ const program = Effect.gen(function* () {
                 ),
                 {
                   contentType: "application/json",
-                  headers: Headers.set(Headers.remove(response.headers, "content-length"), "content-encoding", "identity"),
+                  headers: NativeFixtureHeaders.set(NativeFixtureHeaders.remove(response.headers, "content-length"), "content-encoding", "identity"),
                   status: response.status,
                 }
               )
@@ -147,9 +146,13 @@ const program = Effect.gen(function* () {
           declaration,
           `  ).pipe(${operation},\n    // Every reply, including native error responses, gets one cache decision.`
         );
-        // This artificial stream owns its import. Product HTTP composition no
-        // longer needs Stream after the private calculation tunnel retired.
-        if (phase === "body" && original.includes("NativeFixtureStream")) {
+        // This artificial stream owns its imports; product HTTP composition
+        // needs neither Stream nor Headers.
+        if (
+          phase === "body" &&
+          (original.includes("NativeFixtureStream") ||
+            original.includes("NativeFixtureHeaders"))
+        ) {
           return yield* Effect.die(
             "Native stalled-body fixture import collides with its source owner"
           );
@@ -157,7 +160,7 @@ const program = Effect.gen(function* () {
         yield* fs.writeFileString(
           owner,
           phase === "body"
-            ? `import * as NativeFixtureStream from "effect/Stream";\n${injected}`
+            ? `import * as NativeFixtureStream from "effect/Stream";\nimport { Headers as NativeFixtureHeaders } from "effect/http";\n${injected}`
             : injected
         );
         const fixtureId =

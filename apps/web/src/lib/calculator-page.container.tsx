@@ -1,8 +1,4 @@
-import {
-  useAtomInitialValues,
-  useAtomSet,
-  useAtomValue,
-} from "@effect/atom-react";
+import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import type { CalculatorSummary } from "@taxkit/calculators/schemas";
 import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
@@ -10,13 +6,9 @@ import { Option, Schema } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
-import type { WebsiteCalculationFailure } from "./api/errors";
 import { browserCalculatorToolsAtom } from "./browser-tools.atoms";
-import { calculationFailureMessage } from "./calculation-failure";
 import { CalculatorPageView } from "./calculator-page.view";
 import { calculatorPageAtoms } from "./calculator.atoms";
-import type { TaxKitWebConfigError } from "./config";
-import type { WebsiteInputError, WebsiteCalculatorForm } from "./form.boundary";
 
 const calculatorPageReport = Schema.Union([
   AnnualTaxReport,
@@ -25,16 +17,8 @@ const calculatorPageReport = Schema.Union([
 
 export const CalculatorPage = ({
   calculator,
-  report,
-  savedError,
-  savedForm,
 }: {
   readonly calculator: CalculatorSummary;
-  readonly report: Option.Option<AnnualTaxReport | PayWithholdingsLedger>;
-  readonly savedError: Option.Option<
-    WebsiteCalculationFailure | TaxKitWebConfigError | WebsiteInputError
-  >;
-  readonly savedForm: Option.Option<WebsiteCalculatorForm>;
 }) => {
   const atoms = useMemo(
     () => calculatorPageAtoms(calculator.calculatorId),
@@ -44,19 +28,6 @@ export const CalculatorPage = ({
     () => browserCalculatorToolsAtom(calculator.calculatorId),
     [calculator.calculatorId]
   );
-  useAtomInitialValues(
-    Option.match(savedForm, {
-      onNone: () => [],
-      onSome: (value) => [[atoms.form, value]],
-    })
-  );
-  useAtomInitialValues([
-    [atoms.savedReport, report],
-    [
-      atoms.savedMessage,
-      savedError.pipe(Option.map(calculationFailureMessage)),
-    ],
-  ]);
   const controlBrowserTools = useAtomSet(browserTools);
   useEffect(() => {
     controlBrowserTools("register");

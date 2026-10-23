@@ -67,7 +67,6 @@
         "@effect/atom-react": "4.0.4",
         "@tanstack/react-router": "catalog:",
         "@tanstack/react-start": "catalog:",
-        "@taxkit/analytics": "workspace:*",
         "@taxkit/api-http": "workspace:*",
         "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
@@ -88,6 +87,7 @@
         "@effect/vitest": "catalog:",
         "@modelcontextprotocol/client": "2.3.1",
         "@takumi-rs/wasm": "2.14.0",
+        "@taxkit/analytics": "workspace:*",
         "@taxkit/api-mcp": "workspace:*",
         "@taxkit/calculators": "workspace:*",
         "@taxkit/infrastructure": "workspace:*",
@@ -118,7 +118,6 @@
         "effect": "catalog:",
       },
       "devDependencies": {
-        "@effect/platform-bun": "catalog:",
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

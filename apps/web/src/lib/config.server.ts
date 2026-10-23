@@ -5,14 +5,9 @@ import {
   DocsWebsiteOriginConfig,
 } from "@taxkit/content/config";
 import type { TaxKitApiBinding } from "@taxkit/infrastructure/api-worker";
-import {
-  CalculatorHostMode,
-  WebsiteForwardingCredential,
-} from "@taxkit/observability/edge-identity";
 import { reifyBoundConfigProvider } from "alchemy/Runtime";
 import {
   Array,
-  Config,
   ConfigProvider,
   Context,
   Effect,
@@ -47,18 +42,11 @@ const PrivateApiBinding: Schema.Codec<TaxKitApiBinding> =
 // protected binding format; nothing here inspects those markers itself.
 const websiteKeys = [
   "API_PUBLIC_ORIGIN",
-  "CALCULATOR_HOST_MODE",
-  "POSTHOG_CAPTURE_TOKEN",
-  "POSTHOG_COLLECTION_MODE",
-  "POSTHOG_PROJECT_ID",
-  "POSTHOG_REGION",
-  "POSTHOG_STAGE",
   "TAXKIT_PUBLICATION_ORIGIN",
-  "TAXKIT_WEBSITE_FORWARDING_KEY",
   "WEBSITE_PUBLIC_ORIGIN",
 ] as const;
 
-export const websiteConfigProvider = WebsiteBindings.pipe(
+const websiteConfigProvider = WebsiteBindings.pipe(
   Effect.map((bindings) => {
     const selected = Record.filter(bindings, (_, key) =>
       Array.contains(websiteKeys, key)
@@ -95,20 +83,6 @@ export const WebsiteApiConfig = Effect.gen(function* () {
     apiOrigin: TaxKitApiOriginConfig,
     binding: Schema.decodeUnknownEffect(PrivateApiBinding)(
       Record.get(bindings, "TAXKIT_API").pipe(Option.getOrUndefined)
-    ),
-    // Defer the generated Output-backed key until a calculation executes.
-    // Missing private credentials cannot make public metadata reads unavailable.
-    forwardingCredential: Effect.succeed(
-      Config.schema(
-        WebsiteForwardingCredential,
-        "TAXKIT_WEBSITE_FORWARDING_KEY"
-      ).pipe(
-        Effect.provideService(ConfigProvider.ConfigProvider, provider),
-        Effect.mapError(() => new WebsiteApiConfigError())
-      )
-    ),
-    hostMode: Config.schema(CalculatorHostMode, "CALCULATOR_HOST_MODE").pipe(
-      Config.withDefault("edge")
     ),
   }).pipe(Effect.provideService(ConfigProvider.ConfigProvider, provider));
 }).pipe(Effect.mapError(() => new WebsiteApiConfigError()));
