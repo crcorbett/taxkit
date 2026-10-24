@@ -1,5 +1,33 @@
 # @taxkit/api-http
 
+## 3.1.0
+
+### Minor Changes
+
+- 6ff0743: Content now owns each published page's addresses, share-image contracts
+  (`DocsOgImage`, `DocsPngBytes`, `DocsPageRenderer`, `DocsOgImages`) and head
+  metadata (`@taxkit/content/publication`). The HTTP route catalogue adds the
+  share-image path family `DocsImageApiPath`, and the shared cache policy now
+  stores a 307 Markdown redirect that varies on `Accept` beside its page, like
+  the existing 400 and 406 answers. The new `@taxkit/aeo` and `@taxkit/og-image`
+  packages serve the discovery documents and render share images on the API,
+  replacing `@taxkit/publication` and the Website's build-time images.
+- 889f0cf: The HTTP package now owns the generated client's named reads
+  (`@taxkit/api-http/requests`, with `boundedReplies` and a ten-second deadline),
+  their transport errors (`@taxkit/api-http/errors`) and `Accept` negotiation
+  (`@taxkit/api-http/negotiation`). The calculators package owns the browser
+  calculator page: its forms (`./form`), page state (`./page`), view and tool
+  failure Schemas (`./page-schemas`) and page tools (`./page-tools`). The new
+  private `@taxkit/webmcp` package registers those tools with the browser's
+  WebMCP host.
+
+### Patch Changes
+
+- Updated dependencies [6ff0743]
+- Updated dependencies [889f0cf]
+  - @taxkit/content@3.1.0
+  - @taxkit/calculators@2.2.0
+
 ## 3.0.0
 
 ### Major Changes

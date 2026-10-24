@@ -13,6 +13,11 @@
 - The documentation site now reads plain MDX from `content/docs`. The API builds
   the docs catalogue ahead of time, so new API instances no longer parse pages
   on their first request.
+- The API now renders documentation share images on request and serves the
+  discovery files from `@taxkit/aeo`; a Markdown `Accept` preference at a
+  documentation page redirects (307) to its `.md` file. The Website's logic
+  moved into packages. The SDK's public entry points and calculations are
+  unchanged.
 - The native RPC endpoint, the no-JavaScript calculator form and the Website
   analytics relay are removed. Use the public HTTP API, its OpenAPI description
   or remote MCP. See the [SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
