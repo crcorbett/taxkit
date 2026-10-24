@@ -21,7 +21,7 @@ stable boundaries.
   profiles, the published strict Effect and anti-slop plugins and
   TaxKit's own rules under `tools/oxlint`. Native workspace import enforcement
   comes from `@commonplaces/oxlint-plugin/package`. All shared rules use
-  `@commonplaces/oxlint-plugin` 0.6.0, pinned in the root manifest and lockfile. The shared package owns its `@oxlint/plugins` dependency and declares
+  the latest `@commonplaces/oxlint-plugin`, recorded in the lockfile. The shared package owns its `@oxlint/plugins` dependency and declares
   compatibility with the pinned Oxlint version.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
   wrapping.
@@ -38,13 +38,13 @@ stable boundaries.
 
 | Command | Use |
 | --- | --- |
-| `bun run verification` | Before merging: build, format, lint, types, Effect diagnostics, unit and browser tests, Knip, docs and path checks, then the native pair suite. |
-| `bun run lint` / `bun run fix` | Type-aware Oxlint, including the boundary-directive pass. |
-| `bun run format` / `bun run format:check` | Oxfmt. |
-| `bun run check-types` | Workspace types plus the Alchemy roots and root tools. |
-| `bun run test` / `bun run test:tools` | Unit tests; `test:tools` runs only the root tool tests. |
-| `bun run test:browser` | Chromium tests for the Website and SDK. |
-| `bun run test:native` | The slower native Website/API pair tests. |
+| `bun run verification` | Before merging: the five checks `build`, `lint`, `check-types`, `knip` and `test`. |
+| `bun run lint` / `bun run fix` | Formatting, type-aware Oxlint with the boundary-directive pass, docs and path checks. |
+| `bun run format` | Oxfmt. |
+| `bun run check-types` | Workspace types plus the Alchemy roots, root tools and Effect diagnostics. |
+| `bun run knip` | Both Knip graphs. |
+| `bun run test` | Root tool tests, workspace unit tests, Chromium tests, then the native pair suite. |
+| `bun run test:tools` / `bun run test:native` | Only the root tool tests, or only the slower native Website/API pair tests. |
 | `bun run release:check` | `verification` plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. |
 
 ## Ultracite Rules

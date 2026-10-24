@@ -13,7 +13,7 @@ package READMEs and scripts. Contributors do not need the plugin.
 - `development-workflows:prd-writer`, `prd-review`, `prd-implementer`: product
   requirements and implementation.
 - `development-workflows:repo-structure`: repository structure reviews.
+- `development-workflows:linear`: Linear tracking, Changesets and release notes.
 
-Repository-owned skills under `.agents/skills/` cover public copy
-(`docs-writer`), Linear tracking and local `portless` URLs. Local source and
-configuration determine the actual commands and boundaries.
+The repository keeps no copies of these skills. Local source and configuration
+determine the actual commands and boundaries.

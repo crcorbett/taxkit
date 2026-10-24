@@ -11,7 +11,7 @@
       },
       "devDependencies": {
         "@changesets/cli": "3.0.3",
-        "@commonplaces/oxlint-plugin": "0.6.0",
+        "@commonplaces/oxlint-plugin": "latest",
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
         "@effect/tsgo": "0.55.0",
@@ -33,6 +33,7 @@
     },
     "apps/api": {
       "name": "api",
+      "version": "2.0.0",
       "dependencies": {
         "@effect/platform-bun": "catalog:",
         "@effect/platform-node": "catalog:",
@@ -66,6 +67,7 @@
     },
     "apps/web": {
       "name": "web",
+      "version": "0.0.0",
       "dependencies": {
         "@effect/atom-react": "4.0.4",
         "@tanstack/react-router": "catalog:",
@@ -209,7 +211,7 @@
     },
     "packages/core": {
       "name": "@taxkit/core",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -558,7 +560,7 @@
 
     "@cloudflare/workers-types": ["@cloudflare/workers-types@5.20261016.1", "", {}, "sha512-I8OJdPl3M6TIl9ksU3wtEyWVhSE8E8txJ/vGOv3SkhjcvN8uMjyFmMvRsNOZgzMe5xYFQ0LctmiGqTwR7DbZ6w=="],
 
-    "@commonplaces/oxlint-plugin": ["@commonplaces/oxlint-plugin@0.6.0", "", { "dependencies": { "@effect/tsgo": "0.55.0", "@oxlint/plugins": "1.89.0", "effect": "4.0.5", "oxlint-tsgolint": "7.0.2004", "ultracite": "8.0.1" }, "peerDependencies": { "oxlint": "1.87.0 || 1.88.0 || 1.89.0" } }, "sha512-zN0sD9m7NqDKW49gHOW+L/MZ6nGJZTbOssgXYliEXja8Rw2gdMpfc4wwRlppZalU/v+doMG1Ll7PMBVH2WuKaA=="],
+    "@commonplaces/oxlint-plugin": ["@commonplaces/oxlint-plugin@0.6.1", "", { "dependencies": { "@effect/tsgo": "0.55.0", "@oxlint/plugins": "1.89.0", "effect": "4.0.5", "oxlint-tsgolint": "7.0.2004", "ultracite": "8.0.1" }, "peerDependencies": { "oxlint": "1.87.0 || 1.88.0 || 1.89.0" } }, "sha512-vkuT4kf26r0UCN8IJ/qb6mELQHlAxRLVIJI+2g61YTddcIbGM6K6yRvExSo64h7C3Sbq7sPGbY2JRtkQDkVq6A=="],
 
     "@content/docs": ["@content/docs@workspace:content/docs"],
 
