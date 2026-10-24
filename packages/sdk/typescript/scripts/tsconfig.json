@@ -5,5 +5,5 @@
     "rootDir": "../../../..",
     "types": ["bun"]
   },
-  "include": ["./**/*.ts"]
+  "include": ["./**/*.ts", "../test/scripts/**/*.ts"]
 }

@@ -131,8 +131,8 @@
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
     "test": "vitest run",
-    "test:openapi": "vitest run __tests__/openapi-snapshot.test.ts",
-    "update-openapi-snapshot": "UPDATE_TAXKIT_OPENAPI_SNAPSHOT=true vitest run __tests__/openapi-snapshot.test.ts",
+    "test:openapi": "vitest run test/openapi-snapshot.test.ts",
+    "update-openapi-snapshot": "UPDATE_TAXKIT_OPENAPI_SNAPSHOT=true vitest run test/openapi-snapshot.test.ts",
     "clean": "rm -rf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {

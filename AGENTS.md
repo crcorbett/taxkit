@@ -57,8 +57,8 @@ change; maintainers with the shared plugin can use
   [`docs/runbooks/README.md`](docs/runbooks/README.md).
 - References: [`docs/references/README.md`](docs/references/README.md).
 
-Use the repository-owned [Linear skill](.agents/skills/linear/SKILL.md) when
-work is tracked in Linear.
+Use the shared `development-workflows:linear` skill when work is tracked in
+Linear.
 
 ## Engineering guardrails
 

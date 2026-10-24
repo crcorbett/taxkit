@@ -47,8 +47,6 @@ receipts are removed rather than kept as documents.
 Each material change decides which documents change: owner documents,
 READMEs, runbooks, public content, skills, lint/config/CI and any active
 SPEC/plan. Update the owner document and its pointers in the same change.
-`$docs-writer` is limited to public-copy wording after the owner has been
-chosen.
 
 `bun run check:docs` checks relative links and documented `bun run` commands
 in `AGENTS.md`, `README.md`, every Markdown file under `docs/` and every

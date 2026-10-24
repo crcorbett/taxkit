@@ -55,7 +55,7 @@ const statusOverride = /\b(?:always|failure|cancelled)\s*\(/u;
 // credential. The orchestration scripts themselves are read from the repository.
 const bunFixture = `#!/bin/sh
 case "$*" in
-  'run verification'|'run release:check'|'run test:native')
+  'run verification'|'run release:check'|'run test'|'run test:native')
     exec sh "$GATE_FIXTURE/$2"
     ;;
 esac
@@ -64,6 +64,9 @@ test "$*" != "$GATE_FAIL"
 `;
 const alchemyFixture = `#!/bin/sh
 printf 'alchemy %s\\n' "$*" >> "$GATE_FIXTURE/calls"
+`;
+const turboFixture = `#!/bin/sh
+printf 'turbo %s\\n' "$*" >> "$GATE_FIXTURE/calls"
 `;
 
 const commandFixture = Effect.gen(function* () {
@@ -79,13 +82,14 @@ const commandFixture = Effect.gen(function* () {
       )
     );
   yield* Effect.forEach(
-    ["verification", "release:check", "test:native"],
+    ["verification", "release:check", "test", "test:native"],
     (name) =>
       fs.writeFileString(`${directory}/${name}`, script(manifest.scripts, name))
   );
   yield* fs.writeFileString(`${directory}/calls`, "");
   yield* fs.writeFileString(`${directory}/bun`, bunFixture);
   yield* fs.writeFileString(`${directory}/alchemy`, alchemyFixture);
+  yield* fs.writeFileString(`${directory}/turbo`, turboFixture);
   yield* fs.writeFileString(
     `${directory}/gh`,
     '#!/bin/sh\nprintf "%s\\n" "$GATE_PR_STATE"\n'
@@ -93,6 +97,7 @@ const commandFixture = Effect.gen(function* () {
   yield* fs.writeFileString(`${directory}/outputs`, "");
   yield* fs.chmod(`${directory}/bun`, 0o700);
   yield* fs.chmod(`${directory}/alchemy`, 0o700);
+  yield* fs.chmod(`${directory}/turbo`, 0o700);
   yield* fs.chmod(`${directory}/gh`, 0o700);
   return { directory, scripts: manifest.scripts };
 });
@@ -168,7 +173,7 @@ describe("required native release gate", () => {
           "run --filter=web build:native-pair",
           "run --filter=web test:native-pair",
         ]);
-        expect(result.calls.indexOf("run test")).toBeLessThan(
+        expect(result.calls.indexOf("run test:tools")).toBeLessThan(
           result.calls.indexOf("run --filter=web build:native-pair")
         );
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))

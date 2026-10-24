@@ -166,10 +166,10 @@ local addresses and supplies the browser API address and private server binding.
 It uses local state and needs no Cloudflare or Doppler login. Stop it with
 Ctrl-C. `bun run --filter=api dev` starts the separate Bun HTTP host.
 
-`bun run verification` is the check to run before merging: build, formatting,
-lint, types, Effect diagnostics, unit and browser tests, unused-code checks,
-documentation links and portable paths. `bun run test:native` runs the slower
-native Website/API pair tests. `bun run release:check` adds the packed SDK,
+`bun run verification` is the check to run before merging. It runs the five
+checks in order: `build`, `lint` (formatting, Oxlint, documentation links and
+portable paths), `check-types` (with Effect diagnostics), `knip` and `test`
+(tool, unit and browser tests, then the native Website/API pair suite). `bun run release:check` adds the packed SDK,
 downstream consumer, API smoke and Changeset checks before a package release.
 The [testing guide](./docs/architecture/testing-and-quality.md) lists focused
 checks for each kind of change.

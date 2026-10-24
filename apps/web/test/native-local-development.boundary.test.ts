@@ -92,10 +92,6 @@ describe("native local development", () => {
                 "run",
                 "node_modules/alchemy/bin/cli.js",
                 "dev",
-                "--config",
-                "alchemy.local.run.ts",
-                "--env-file",
-                "tools/apps-local/no-local-env",
                 "--stage",
                 "dev_native_apps_proof",
               ],
@@ -323,7 +319,7 @@ describe("native local development", () => {
               .readFileString(
                 path.join(
                   root,
-                  ".alchemy/state/TaxKitAppsLocal/dev_native_apps_proof",
+                  ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof",
                   `${resource}.json`
                 )
               )
@@ -332,7 +328,7 @@ describe("native local development", () => {
           const apiState = yield* fs.readFileString(
             path.join(
               root,
-              ".alchemy/state/TaxKitAppsLocal/dev_native_apps_proof/TaxKitApi.json"
+              ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof/TaxKitApi.json"
             )
           );
           expect(apiState).toContain("/apps/api/src/worker.ts");
@@ -404,10 +400,6 @@ describe("native local development", () => {
                     "run",
                     "node_modules/alchemy/bin/cli.js",
                     attempt.command,
-                    "--config",
-                    "alchemy.local.run.ts",
-                    "--env-file",
-                    "tools/apps-local/no-local-env",
                     "--stage",
                     attempt.stage,
                   ],
@@ -451,7 +443,7 @@ describe("native local development", () => {
                   yield* fs.exists(
                     path.join(
                       root,
-                      ".alchemy/state/TaxKitAppsLocal",
+                      ".alchemy/state/TaxKitAppsCloudflare",
                       attempt.stage,
                       "__stack_output__.json"
                     )

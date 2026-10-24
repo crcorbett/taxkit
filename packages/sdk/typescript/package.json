@@ -98,7 +98,7 @@
     "check-boundaries": "bun run scripts/check-import-boundaries.runtime.ts",
     "check-packed-artifact": "bun run scripts/check-packed-artifact.runtime.ts",
     "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
-    "check-types": "tsc --noEmit && tsc -p scripts/tsconfig.json --noEmit",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p scripts/tsconfig.json --noEmit",
     "test": "vitest run",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
     "clean": "rm -rf dist .turbo *.tsbuildinfo",

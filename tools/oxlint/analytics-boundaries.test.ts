@@ -95,19 +95,19 @@ it.effect.each([
   },
   {
     allowed: true,
-    path: "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    path: "packages/infrastructure/test/posthog/management.boundary.test.ts",
     rule: "",
     source: decoder,
   },
   {
     allowed: true,
-    path: "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    path: "packages/infrastructure/test/posthog/management.boundary.test.ts",
     rule: "",
     source: encoder,
   },
   {
     allowed: false,
-    path: "packages/infrastructure/src/posthog/management.boundary.test.ts",
+    path: "packages/infrastructure/test/posthog/management.boundary.test.ts",
     rule: "module-ownership",
     source:
       'export { getOrganizationsProject as result } from "@distilled.cloud/posthog/organizations";',

@@ -123,8 +123,8 @@ identity distinct from `taxkit`, the sole public npm package.
   search, Markdown representations, share images and responsive reading, and
   forwards discovery file requests to the API.
 
-Root `alchemy.run.ts` and `alchemy.local.run.ts`
-: The deployed and local-development roots for the Website/API graph; see
+Root `alchemy.run.ts`
+: The one root for the Website/API graph, deployed and in local development; see
   [deployment](./deployment.md).
 
 `packages/infrastructure`

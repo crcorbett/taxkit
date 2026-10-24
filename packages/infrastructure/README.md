@@ -11,8 +11,8 @@ review_trigger: Alchemy resource, stage, provider, state, or package-export chan
 
 This private source-only package owns the native Website/API graph, stage
 rules, native secret selection, the retained PostHog project and the
-production-only telemetry stacks. Root `alchemy.run.ts` deploys the pair;
-`alchemy.local.run.ts` runs it locally; `alchemy.posthog.run.ts` owns the
+production-only telemetry stacks. Root `alchemy.run.ts` deploys the pair and
+runs it locally under `alchemy dev`; `alchemy.posthog.run.ts` owns the
 PostHog project; `alchemy.axiom.run.ts` and `alchemy.trace.run.ts` own the
 Axiom and Cloudflare telemetry resources. Root `alchemy.apps.ts` joins the lightweight native declaration with the API
 implementation; this package imports no application implementation.
@@ -81,11 +81,11 @@ the focused provider test records that limit.
 
 ## Local development
 
-`alchemy.local.run.ts` uses the same graph with `Alchemy.localState()`. It
-refuses anything other than `alchemy dev` in local provider mode at stage
-`dev_native_apps` or `dev_native_apps_proof`, sets the `local-emulator` host
-mode and the local rate namespace `10075`, and uses no Doppler or Cloudflare
-credentials.
+A `dev_*` stage of `alchemy.run.ts` uses `Alchemy.localState()` and reads only
+the shell. Root `declareLocalAppsStack` refuses anything other than
+`alchemy dev` in local provider mode at stage `dev_native_apps` or
+`dev_native_apps_proof`, sets the `local-emulator` host mode and the local rate
+namespace `10075`, and uses no Doppler or Cloudflare credentials.
 
 ## Private Website binding
 

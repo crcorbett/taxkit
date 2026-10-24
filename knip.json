@@ -18,7 +18,6 @@
         "tools/effect-language-service/compatibility.ts",
         "tools/repository-paths/check.runtime.ts",
         "tools/repository-paths/*.test.ts",
-        "alchemy.local.run.ts",
         "alchemy.posthog.run.ts",
         "alchemy.axiom.run.ts",
         "alchemy.trace.run.ts",
@@ -62,12 +61,10 @@
         "src/server.ts",
         "src/routes/**/*.{ts,tsx}",
         "vite.config.ts",
-        "src/**/*.test.ts",
         "vitest.config.ts",
         "vitest.browser.config.ts",
         "scripts/**/*.ts",
-        "test/**/*.ts",
-        "src/**/*.browser.test.tsx",
+        "test/**/*.{ts,tsx}",
         "vitest.native.config.ts"
       ],
       "project": [
@@ -76,7 +73,7 @@
         "vitest.config.ts",
         "vitest.browser.config.ts",
         "scripts/**/*.ts",
-        "test/**/*.ts",
+        "test/**/*.{ts,tsx}",
         "vitest.native.config.ts"
       ],
       "ignoreDependencies": ["@taxkit/tsconfig", "cloudflare"]
@@ -112,18 +109,18 @@
         "src/schemas/index.ts",
         "src/testing/index.ts",
         "scripts/check-import-boundaries.runtime.ts",
-        "scripts/**/*.test.ts",
-        "src/**/*.test.ts",
         "vitest*.config.ts",
         "type-tests/**/*.ts",
         "src/core.ts",
-        "src/http.ts"
+        "src/http.ts",
+        "test/**/*.test.ts"
       ],
       "project": [
         "src/**/*.ts",
         "scripts/**/*.ts",
         "vitest*.config.ts",
-        "type-tests/**/*.ts"
+        "type-tests/**/*.ts",
+        "test/**/*.ts"
       ],
       "ignoreDependencies": ["@types/bun"]
     },

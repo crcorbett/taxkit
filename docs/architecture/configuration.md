@@ -46,11 +46,10 @@ how to pass the Doppler login. The Checks workflow's `checks` job reads `ci`
 through the Doppler action, checks the project and config names and passes only
 the Turbo values to its steps; its deploy jobs do not receive them.
 
-`alchemy.local.run.ts` runs only local emulation at the `dev_native_apps`
-stage, with local state and no Doppler. The root `bun run dev` command sets an
-isolated `ALCHEMY_HOME` and an empty env file
-(`tools/apps-local/no-local-env`), so ambient `.env` values do not reach the
-apps.
+A `dev_*` stage of `alchemy.run.ts` runs only local emulation under
+`alchemy dev` (`dev_native_apps`), with local state, no Doppler and no `.env`:
+its secrets read only the shell, where `alchemy dev` sets its own values. The
+root `bun run dev` command also sets an isolated `ALCHEMY_HOME`.
 
 Host-created values, GitHub event data, portless values and Alchemy state
 credentials stay with their own owners.

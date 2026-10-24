@@ -18,10 +18,12 @@ Website/API. Detailed rule-package expectations live in
 
 | Command | What it shows |
 | --- | --- |
-| `bun run verification` | Before merging. Build, format, lint, workspace and Alchemy-root types, Effect diagnostics, unit tests, Chromium tests, both Knip graphs, documentation links/commands and portable paths, then the required credential-free native pair suite. |
-| `bun run test` | Unit tests in every workspace plus the root tool tests, including the actual-Oxlint rule fixtures. |
-| `bun run test:browser` | Website and SDK tests in Chromium: Atom registry lifetime, calculator commands, loader cancellation and SDK browser imports. |
-| `bun run test:native` | Builds the API and Website and runs them together in Miniflare: first HTML, docs pages, Markdown, discovery files, browser calculation, the no-JavaScript notice, MCP and request limits. |
+| `bun run verification` | Before merging. The five checks in order: `build`, `lint`, `check-types`, `knip` and `test`. |
+| `bun run build` | Every workspace build, including the API's docs catalogue. |
+| `bun run lint` | Formatting, type-aware Oxlint with the boundary-directive pass, documentation links/commands and portable paths. |
+| `bun run check-types` | Workspace, Alchemy-root and tool types, and Effect diagnostics. |
+| `bun run knip` | The development and production Knip graphs. |
+| `bun run test` | Root tool tests (including the actual-Oxlint rule fixtures), unit tests in every workspace, Website and SDK tests in Chromium, then the required credential-free native pair suite (`test:native`): both apps built and run together in Miniflare for first HTML, docs pages, Markdown, discovery files, share images, browser calculation, the no-JavaScript notice, MCP and request limits. |
 | `bun run release:check` | `verification`, including the native pair suite, plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
 
 The Checks workflow runs `verification` once per revision in its `checks` job;
@@ -45,9 +47,9 @@ apply or destroy follows a matching-stage native plan without `--yes`.
 
 Effect diagnostics run inside every workspace's `check-types`, because the
 `prepare` script (`effect-tsgo patch --oxlint`) patches TypeScript and Oxlint with the
-Effect language service; `bun run check:effect` is a smoke check that the patch
-and plugin are active. `bun run lint` runs type-aware checks and the published Commonplace
-`strict-effect` policy from `@commonplaces/oxlint-plugin` 0.6.0, including the
+Effect language service; `check-types` ends with `check:effect`, a smoke check
+that the patch and plugin are active. `bun run lint` runs type-aware checks and the published Commonplace
+`strict-effect` policy from the latest `@commonplaces/oxlint-plugin`, including the
 native request rules `static-layers`, `no-loader-request-state`,
 `no-native-client-replica`, `native-cloudflare-cache`, `website-data-proxy`,
 `website-rpc-boundary` (`apps/web/src` only) and `module-ownership`. Their
@@ -72,7 +74,7 @@ and an updated OpenAPI snapshot.
 - **Infrastructure**: `bun run check-types` covers the Alchemy roots. A native
   plan (`bun run pr:plan pr-<number>` or `bun run production:plan`) shows the
   intended resource changes before a deployment.
-- **Documentation**: `bun run check:docs`; public MDX is also checked by
+- **Documentation**: `bun run lint` (its `check:docs` step); public MDX is also checked by
   `apps/api/test/docs-sources.test.ts` and
   `packages/docs-examples/test/published-snippets.test.ts` in `bun run test`.
 

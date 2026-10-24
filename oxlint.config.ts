@@ -19,29 +19,29 @@ const decodingBoundaryFiles = [
   // Build-time ingress of the bundled authored docs source list.
   "apps/api/scripts/docs-catalogue.layer.ts",
   // Native heterogeneous resource-map props in the in-memory provider lifecycle test.
-  "packages/infrastructure/src/posthog/projects.test.ts",
+  "packages/infrastructure/test/posthog/projects.test.ts",
   "packages/observability/test/edge-identity.test.ts",
   "tools/infrastructure/release-gates.boundary.test.ts",
-  "apps/web/src/lib/pages/root-load.boundary.test.ts",
+  "apps/web/test/pages/root-load.boundary.test.ts",
   // Local package-manifest ingress for the documentation command check.
   "tools/documentation/check.boundary.ts",
   "tools/workspace/dependencies.boundary.test.ts",
   "tools/oxlint/workspaces.boundary.ts",
   "tools/oxlint/workspace-imports.boundary.test.ts",
   "packages/observability/test/host-telemetry.boundary.test.ts",
-  "apps/web/src/lib/host/binding.boundary.test.ts",
+  "apps/web/test/host/binding.boundary.test.ts",
   // Closed native PostHog SDK ingress; no runner or neighbouring-file permission.
   "packages/infrastructure/src/posthog/management.adapter.layer.ts",
-  "packages/infrastructure/src/posthog/management.boundary.test.ts",
+  "packages/infrastructure/test/posthog/management.boundary.test.ts",
   // Exact collection header and native browser preference ingress only.
   "packages/analytics/src/collection-policy.boundary.ts",
   // Exact synthetic analytics representation fixture; no runtime or encoder.
   "packages/analytics/src/__testing__/fixtures.ts",
   // Actual installed provider request bytes at the mocked network boundary.
   // No provider, credential, profile or runtime-execution permission.
-  "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
+  "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
   // Evaluated memory-plan props of the telemetry stacks; no provider writes.
-  "packages/infrastructure/src/telemetry.test.ts",
+  "packages/infrastructure/test/telemetry.test.ts",
   // Exact native browser capability/refusal ingress; no runner permission.
   "packages/webmcp/src/model-context.adapter.layer.ts",
   "packages/webmcp/test/registration.test.ts",
@@ -51,7 +51,7 @@ const decodingBoundaryFiles = [
   "apps/web/test/native-mcp.boundary.test.ts",
   "apps/web/test/native-rate.boundary.test.ts",
   // Exact Accept header ingress fixtures.
-  "packages/api/http/__tests__/negotiation.test.ts",
+  "packages/api/http/test/negotiation.test.ts",
   // Exact Takumi PNG reply, bundled font and forwarded share-image ingress.
   "packages/og-image/src/takumi.adapter.layer.ts",
   "packages/og-image/test/render.test.ts",
@@ -61,7 +61,7 @@ const decodingBoundaryFiles = [
   "packages/aeo/test/documents.test.ts",
   "packages/aeo/test/routes.test.ts",
   "apps/web/src/lib/http/image.ingress.ts",
-  "apps/web/src/lib/http/image.boundary.test.ts",
+  "apps/web/test/http/image.boundary.test.ts",
   // Exact acceptance JSON, external example JSON and raw HTTP error ingress.
   "packages/docs-examples/src/validate-external-input.ts",
   "packages/docs-examples/src/api-error-envelope.ts",
@@ -87,7 +87,7 @@ const decodingBoundaryFiles = [
   // Exact native rate wire/provider fixtures and redacted-key codec checks.
   "apps/api/test/rate-admission.boundary.test.ts",
   "apps/api/test/worker-admission.boundary.test.ts",
-  "packages/calculators/__tests__/calculation-admission.test.ts",
+  "packages/calculators/test/calculation-admission.test.ts",
   // Exact encoded date representation ingress and historical round-trip test.
   // No runtime, raw JSON or synchronous codec admission.
   "packages/core/src/primitives/date.ts",
@@ -101,28 +101,28 @@ const decodingBoundaryFiles = [
   "apps/web/test/native-cancellation.boundary.test.ts",
   "apps/web/test/native-local-development.boundary.test.ts",
   // Exact native website settings, form and hydration boundaries.
-  "apps/web/src/lib/host/config.boundary.test.ts",
+  "apps/web/test/host/config.boundary.test.ts",
   "apps/web/src/lib/host/config.server.ts",
   // Native API host binding ingress, route-address ingress and generated
   // reply kind checks; loader fixtures restore only their own route data.
   "apps/web/src/lib/host/binding.server.ts",
   "packages/api/http/src/requests.ts",
-  "apps/web/src/lib/pages/browser-loaders.boundary.browser.test.tsx",
+  "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
   // Scenario input Schema rejection tests.
   "packages/rules/au/income-tax/test/annual-tax.test.ts",
   "packages/rules/au/pay/test/take-home-pay.test.ts",
   "apps/web/src/lib/docs/search-location.ingress.ts",
   // Exact original-URL/representation-header HTTP ingress and bounded fixtures.
   // No encoder, runner or neighbouring-module admission.
-  "apps/web/src/lib/http/negotiation.boundary.test.ts",
+  "apps/web/test/http/negotiation.boundary.test.ts",
   "apps/web/src/lib/http/negotiation.server.ts",
-  "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
+  "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
   "packages/calculators/src/form.ingress.ts",
   "apps/web/src/routes/__root.tsx",
   "apps/web/src/server.ts",
   "apps/api/scripts/routes.ts",
   "apps/api/test/config.test.ts",
-  "packages/sdk/typescript/scripts/script-boundaries.test.ts",
+  "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
   // Exact synthetic register fixture ingress; no command execution admission.
   // Exact synchronous Oxlint rule-options ingress, decoded once and fail-closed.
   "tools/oxlint/taxkit-rules.ts",
@@ -140,14 +140,14 @@ const decodingBoundaryFiles = [
   "apps/web/test/native-pair.boundary.test.ts",
   "apps/web/test/native-analytics.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
-  "packages/api/http/__tests__/request-body.boundary.test.ts",
-  "packages/api/http/__tests__/public-content.boundary.test.ts",
+  "packages/api/http/test/request-body.boundary.test.ts",
+  "packages/api/http/test/public-content.boundary.test.ts",
   "apps/api/src/content.boundary.ts",
 
   // Public API normalisation and focused API contract tests.
   "packages/api/http/src/openapi.ts",
-  "packages/api/http/__tests__/openapi-snapshot.test.ts",
-  "packages/sdk/typescript/src/http-parity.test.ts",
+  "packages/api/http/test/openapi-snapshot.test.ts",
+  "packages/sdk/typescript/test/http-parity.test.ts",
 
   // Focused lint integration test: CLI output is decoded at the process boundary.
   "tools/oxlint/cli-fixture.ts",
@@ -170,10 +170,10 @@ const decodingBoundaryFiles = [
   // Cross-process command output restored by the release-readiness live layer.
 
   // SDK rejected Promise ingress and descriptor/process boundaries.
-  "packages/sdk/typescript/src/index.test.ts",
+  "packages/sdk/typescript/test/index.test.ts",
   // Selected domain-report Type versus encoded representation regression test.
-  "packages/sdk/typescript/src/effect.test.ts",
-  "packages/sdk/typescript/src/client-lifetime.test.ts",
+  "packages/sdk/typescript/test/effect.test.ts",
+  "packages/sdk/typescript/test/client-lifetime.test.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
@@ -213,18 +213,18 @@ const schemaEncoderEgressFiles = [
   // Persisted docs catalogue written by the API build.
   "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/observability/test/edge-identity.test.ts",
-  "apps/web/src/lib/pages/root-load.boundary.test.ts",
-  "apps/web/src/lib/host/requests.boundary.test.ts",
+  "apps/web/test/pages/root-load.boundary.test.ts",
+  "apps/web/test/host/requests.boundary.test.ts",
   "apps/web/src/lib/pages/root.load.server.ts",
   // Generated public catalogue file egress.
   // Synthetic PostHog HTTP fixture representation only.
-  "packages/infrastructure/src/posthog/management.boundary.test.ts",
+  "packages/infrastructure/test/posthog/management.boundary.test.ts",
   // Exact native PostHog capture request and safe configuration error bytes.
   // No decoder, runtime runner, raw JSON or neighbouring-file permission.
   "packages/analytics/src/live.layer.ts",
   "packages/analytics/test/schemas.test.ts",
   // Mock Cloudflare HTTP reply egress for the actual installed provider tests.
-  "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
+  "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
   // Exact fixed browser-tool failure response at the native callback.
   "packages/webmcp/src/model-context.adapter.layer.ts",
   // Actual MCP client request bytes and secret-negative response assertions.
@@ -241,7 +241,7 @@ const schemaEncoderEgressFiles = [
   "apps/api/test/worker-admission.boundary.test.ts",
   "apps/web/test/native-rate.boundary.test.ts",
   "apps/web/test/native-rate-provider.boundary.test.ts",
-  "packages/calculators/__tests__/calculation-admission.test.ts",
+  "packages/calculators/test/calculation-admission.test.ts",
   // Exact historical domain bytes and rule snapshots, using their owning codecs.
   "packages/core/test/domain-absence.boundary.test.ts",
   "packages/rules/au/income-tax/test/annual-tax.test.ts",
@@ -260,34 +260,34 @@ const schemaEncoderEgressFiles = [
   "apps/web/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
 
-  "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
+  "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
   // Route loader data egress and checked local input-error transport egress.
   "apps/web/src/lib/pages/loaders.ts",
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
-  "apps/web/src/lib/pages/browser-loaders.boundary.browser.test.tsx",
+  "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
   "apps/web/src/server.ts",
-  "apps/web/src/lib/host/config.boundary.test.ts",
+  "apps/web/test/host/config.boundary.test.ts",
   // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
 
-  "apps/api/scripts/smoke-boundaries.test.ts",
+  "apps/api/test/smoke-boundaries.test.ts",
   "apps/api/test/config.test.ts",
-  "packages/sdk/typescript/scripts/script-boundaries.test.ts",
+  "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   // Plain Promise rejection and calculator error representations: secret-negative tests only.
-  "packages/sdk/typescript/src/index.test.ts",
-  "packages/sdk/typescript/src/effect.test.ts",
-  "packages/sdk/typescript/src/client-lifetime.test.ts",
+  "packages/sdk/typescript/test/index.test.ts",
+  "packages/sdk/typescript/test/effect.test.ts",
+  "packages/sdk/typescript/test/client-lifetime.test.ts",
   // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
   // Exact saved-plan JSON and synthetic provider fixture representations.
   // Exact credential/YAML/receipt negative-fixture representations only.
   "packages/docs-examples/src/node-server.ts",
   // Exact historical skill representation test uses the Candidate-owned Schema.
-  "packages/api/http/__tests__/openapi-snapshot.test.ts",
-  "packages/sdk/typescript/src/http-parity.test.ts",
+  "packages/api/http/test/openapi-snapshot.test.ts",
+  "packages/sdk/typescript/test/http-parity.test.ts",
   // Exact representation-boundary tests: deterministic report bytes and secret-negative error JSON.
   "packages/rules/au/pay/test/take-home-pay.test.ts",
-  "packages/calculators/__tests__/public-calculator-service.test.ts",
+  "packages/calculators/test/public-calculator-service.test.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
 
   "tools/oxlint/fixtures/effect-accepted.ts",
@@ -304,7 +304,7 @@ const runtimeBoundaryFiles = [
   "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   // Synthetic fetch Promise entrypoint for deterministic discovery cancellation.
-  "apps/web/src/lib/host/forward.boundary.test.ts",
+  "apps/web/test/host/forward.boundary.test.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
 
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
@@ -540,11 +540,11 @@ export default defineConfig({
     {
       // The synthetic fetch host must return a Promise. Its never Effect is
       // cancelled through the native binding's AbortSignal in the deadline test.
-      files: ["apps/web/src/lib/host/forward.boundary.test.ts"],
+      files: ["apps/web/test/host/forward.boundary.test.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
-          { allowedFiles: ["apps/web/src/lib/host/forward.boundary.test.ts"] },
+          { allowedFiles: ["apps/web/test/host/forward.boundary.test.ts"] },
         ],
       },
     },
@@ -554,8 +554,8 @@ export default defineConfig({
     },
     {
       files: [
-        "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
-        "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
+        "apps/web/test/atom-lifecycle.browser.test.tsx",
+        "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
       ],
       rules: { "unicorn/prefer-dom-node-append": "off" },
     },
@@ -829,8 +829,8 @@ export default defineConfig({
       // mistakes its class declaration for an Error thrown without `new`.
       files: [
         "**/errors.ts",
-        "packages/sdk/typescript/src/index.test.ts",
-        "packages/sdk/typescript/src/client-lifetime.test.ts",
+        "packages/sdk/typescript/test/index.test.ts",
+        "packages/sdk/typescript/test/client-lifetime.test.ts",
         "packages/docs-examples/src/node-server.ts",
         "**/errors/*.ts",
         "**/schemas.ts",
@@ -996,15 +996,15 @@ export default defineConfig({
         "apps/api/test/worker.boundary.test.ts",
         "packages/og-image/src/takumi.adapter.layer.ts",
         "apps/web/src/lib/host/binding.server.ts",
-        "apps/web/src/lib/host/forward.boundary.test.ts",
-        "apps/web/src/lib/host/requests.boundary.test.ts",
-        "apps/web/src/lib/host/binding.boundary.test.ts",
-        "apps/web/src/lib/host/binding-redirect.boundary.test.ts",
-        "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
-        "apps/web/src/lib/pages/browser-loaders.boundary.browser.test.tsx",
+        "apps/web/test/host/forward.boundary.test.ts",
+        "apps/web/test/host/requests.boundary.test.ts",
+        "apps/web/test/host/binding.boundary.test.ts",
+        "apps/web/test/host/binding-redirect.boundary.test.ts",
+        "apps/web/test/atom-lifecycle.browser.test.tsx",
+        "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
         "packages/webmcp/test/registration.test.ts",
         "packages/webmcp/src/model-context.adapter.layer.ts",
-        "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
+        "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
         "apps/web/src/server.ts",
         "apps/web/test/native-analytics.boundary.test.ts",
         "apps/web/test/native-browser-tools.boundary.test.ts",
@@ -1018,10 +1018,10 @@ export default defineConfig({
         "packages/docs-examples/src/error-handling.ts",
         "packages/docs-examples/src/validate-external-input.ts",
         "packages/docs-examples/test/integration.example.test.ts",
-        "packages/sdk/typescript/src/au.test.ts",
-        "packages/sdk/typescript/src/client-lifetime.test.ts",
+        "packages/sdk/typescript/test/au.test.ts",
+        "packages/sdk/typescript/test/client-lifetime.test.ts",
         "packages/sdk/typescript/src/client.runtime.ts",
-        "packages/sdk/typescript/src/index.test.ts",
+        "packages/sdk/typescript/test/index.test.ts",
       ],
       rules: {
         "strict-effect/no-promise-workflow": [
@@ -1031,25 +1031,25 @@ export default defineConfig({
               "apps/api/test/mcp-client.boundary.test.ts",
               "packages/og-image/src/takumi.adapter.layer.ts",
               "apps/web/src/lib/host/binding.server.ts",
-              "apps/web/src/lib/host/forward.boundary.test.ts",
-              "apps/web/src/lib/host/requests.boundary.test.ts",
-              "apps/web/src/lib/host/binding.boundary.test.ts",
-              "apps/web/src/lib/host/binding-redirect.boundary.test.ts",
-              "apps/web/src/lib/pages/browser-loaders.boundary.browser.test.tsx",
+              "apps/web/test/host/forward.boundary.test.ts",
+              "apps/web/test/host/requests.boundary.test.ts",
+              "apps/web/test/host/binding.boundary.test.ts",
+              "apps/web/test/host/binding-redirect.boundary.test.ts",
+              "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
               "packages/webmcp/test/registration.test.ts",
               "packages/webmcp/src/model-context.adapter.layer.ts",
               "apps/web/src/server.ts",
               "apps/web/test/native-analytics.boundary.test.ts",
               "apps/web/test/native-mcp.boundary.test.ts",
-              "packages/sdk/typescript/src/client-lifetime.test.ts",
+              "packages/sdk/typescript/test/client-lifetime.test.ts",
               "packages/sdk/typescript/src/client.runtime.ts",
-              "packages/sdk/typescript/src/index.test.ts",
+              "packages/sdk/typescript/test/index.test.ts",
             ],
             promiseOnlyFiles: [
               "apps/api/test/rate-admission.boundary.test.ts",
               "apps/api/test/worker.boundary.test.ts",
-              "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
-              "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
+              "apps/web/test/atom-lifecycle.browser.test.tsx",
+              "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
               "apps/web/test/native-browser-tools.boundary.test.ts",
               "apps/web/test/native-cancellation.boundary.test.ts",
               "apps/web/test/native-local-development.boundary.test.ts",
@@ -1060,7 +1060,7 @@ export default defineConfig({
               "packages/docs-examples/src/error-handling.ts",
               "packages/docs-examples/src/validate-external-input.ts",
               "packages/docs-examples/test/integration.example.test.ts",
-              "packages/sdk/typescript/src/au.test.ts",
+              "packages/sdk/typescript/test/au.test.ts",
             ],
           },
         ],
@@ -1076,8 +1076,8 @@ export default defineConfig({
           {
             browserRuntime: "apps/web/src/lib/api-client.atoms.ts",
             registryTests: [
-              "apps/web/src/lib/pages/browser-loaders.boundary.browser.test.tsx",
-              "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
+              "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
+              "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
             ],
             serverRuntime: "apps/web/src/lib/runtime.server.ts",
           },

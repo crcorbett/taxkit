@@ -9,6 +9,7 @@
     "vitest.browser.config.ts",
     "scripts/**/*.ts",
     "test/**/*.ts",
+    "test/**/*.tsx",
     "vitest.native.config.ts"
   ],
   "compilerOptions": {
