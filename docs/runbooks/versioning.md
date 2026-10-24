@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-20
+last_reviewed: 2026-10-24
 review_trigger: Changesets configuration, package graph, release train or release evidence change
 ---
 
@@ -16,8 +16,9 @@ the [versioning standard](../standards/versioning.md) for semver rules.
 
 1. Add a Changeset with `bun run changeset` in the same change as any public
    package contract change. For changes to modules included in the SDK archive,
-   name `taxkit` in the Changeset. Private apps and internal tools do not
-   need one.
+   name `taxkit` in the Changeset. Name `api` or `web` for an app change worth
+   a changelog entry; both carry private versions for that. Internal tools do
+   not need one.
 2. Check the pending release with `bun run changeset:status`.
 3. When preparing a release, run `bun run version-packages`, review the
    manifest and changelog diff, then run `bun run release:check`.

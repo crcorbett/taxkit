@@ -1,5 +1,15 @@
 # taxkit
 
+## 2.2.0
+
+### Minor Changes
+
+- 221ee31: Add `moneyFromDollarsText`, which reads typed dollar text as non-negative
+  `Money` exactly and fails with `InvalidDollarsText` and a matchable `reason`
+  (`empty`, `format` or `range`). `dollarsTextFromMoney` writes Money back as
+  plain dollars, and `MoneyFromDollarsString` joins both as a Schema codec with
+  default messages.
+
 ## 2.1.3
 
 ### Patch Changes

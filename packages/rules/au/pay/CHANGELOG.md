@@ -1,5 +1,12 @@
 # @taxkit/rules-au-pay
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [221ee31]
+  - @taxkit/core@2.1.0
+
 ## 2.0.0
 
 ### Major Changes

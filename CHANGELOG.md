@@ -1,5 +1,16 @@
 # TaxKit
 
+## 2.2.0
+
+- Read typed dollar text as `Money` with `moneyFromDollarsText`. It converts
+  exactly to whole cents and fails with `InvalidDollarsText` and a `reason`
+  (`empty`, `format` or `range`) that callers match for their own wording.
+  `dollarsTextFromMoney` writes Money back, and `MoneyFromDollarsString` is a
+  Schema codec with default messages. See the
+  [SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
+- The private `api` and `web` apps now carry versions, so Changesets writes
+  their changelogs. This release records API 3.0.0 and Website 1.0.0.
+
 ## 2.1.3
 
 - Remove obsolete package-name instructions from the SDK README and current
