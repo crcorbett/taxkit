@@ -548,13 +548,13 @@ Its exact decoder admission and adjacent rejected paths have actual CLI proof.
 ### Share-image rendering
 
 `@taxkit/og-image` follows the provider-package pattern: Content declares
-`DocsPageRenderer` and `DocsOgImages`, the package implements them and the API
-Worker composes them. `DocsPageRendererLive` decodes the bundled font once at
-Layer construction, calls Takumi's `render` once per operation through
-`Effect.tryPromise` with its abort signal, and decodes the reply as
-`DocsPngBytes`. `DocsOgImagesLive` wraps it with a one-permit semaphore, a
-30-second deadline and a `Cache` that keeps successes for five minutes and
-never keeps failures. `@taxkit/content/publication` encodes the owning public
+`DocsPageRenderer`, the package implements it and the API build composes it.
+`DocsPageRendererLive` decodes the bundled font once at Layer construction,
+calls Takumi's `render` once per operation through `Effect.tryPromise` with its
+abort signal, and decodes the reply as `DocsPngBytes`. `renderDocsImageArchive`
+draws every catalogue page into a `DocsImageArchive`, which the build encodes
+as JSON. The API's `DocsOgImages` checks that archive once at startup and
+decodes one PNG per request; a page with no image fails with reason `missing`. `@taxkit/content/publication` encodes the owning public
 TechArticle Schema for head metadata. Exact lint selectors admit these crossings
 only.
 

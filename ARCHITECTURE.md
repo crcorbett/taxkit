@@ -21,7 +21,7 @@ everything from the API. There is no database or sign-in.
 | `packages/mdx` — `@taxkit/mdx`                       | MDX page reader and code highlighter for Content                                                                                                            |
 | `packages/diagrams` — `@taxkit/diagrams`             | Mermaid to SVG renderer for Content                                                                                                                         |
 | `packages/aeo` — `@taxkit/aeo`                       | Robots, sitemap, `llms.txt`, `llms-full.txt` and share-image routes                                                                                         |
-| `packages/og-image` — `@taxkit/og-image`             | Takumi share-image renderer and its bounded cache                                                                                                           |
+| `packages/og-image` — `@taxkit/og-image`             | Build-time Takumi share-image renderer                                                                                                                      |
 | `packages/webmcp` — `@taxkit/webmcp`                 | Browser WebMCP host adapter and calculator page tool registration                                                                                           |
 | `packages/analytics` — `@taxkit/analytics`           | Hosted calculator usage events, with no tax inputs or results                                                                                               |
 | `packages/observability` — `@taxkit/observability`   | Stage names, edge identity and the one host request record                                                                                                  |
@@ -114,8 +114,8 @@ GET or HEAD gets `Cache-Control: public, max-age=0` and seven days of CDN
 freshness. A Markdown redirect, 400 or 406 that varies on `Accept` is stored
 beside its page, because an uncacheable reply at a page address would evict the
 cached page. Errors, other methods and anything setting a cookie are
-`no-store`. Share images render on request, one at a time with a small cache;
-the CDN then keeps each image for the deployed version.
+`no-store`. Share images are rendered when the API is built; the Worker only
+reads the finished PNG, and the CDN keeps it for the deployed version.
 
 ## Deployment and local development
 

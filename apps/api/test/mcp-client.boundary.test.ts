@@ -36,7 +36,6 @@ import {
   DocsSearchTerm,
 } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
-import { DocsOgImagesTest } from "@taxkit/content/test";
 import { HostRequestRecord } from "@taxkit/observability/host-telemetry";
 import {
   Array,
@@ -80,9 +79,6 @@ class McpClientProbeFailed extends Schema.TaggedError<McpClientProbeFailed>()(
   }
 ) {}
 
-// The bundled content with deterministic share images.
-const ApiContentTest = Layer.merge(ApiContentLive, DocsOgImagesTest);
-
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
   TAXKIT_PUBLICATION_ORIGIN: "https://publication.example.com",
@@ -110,7 +106,7 @@ describe("real MCP client against the native API application", () => {
       Effect.gen(function* () {
         const observed = yield* Ref.make(Option.none<number>());
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentTest)
+          Effect.provide(ApiContentLive)
         );
         const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
@@ -189,7 +185,7 @@ describe("real MCP client against the native API application", () => {
     ({ origin, admitted }) =>
       Effect.gen(function* () {
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentTest)
+          Effect.provide(ApiContentLive)
         );
         const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
@@ -243,7 +239,7 @@ describe("real MCP client against the native API application", () => {
     ({ mode, message }) =>
       Effect.gen(function* () {
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentTest),
+          Effect.provide(ApiContentLive),
           Effect.provide(
             CalculatorFixture.pipe(
               Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode))
@@ -320,7 +316,7 @@ describe("real MCP client against the native API application", () => {
         const toolSignals = yield* Ref.make<readonly AbortSignal[]>([]);
         const calculator = yield* PublicCalculatorService;
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentTest),
+          Effect.provide(ApiContentLive),
           Effect.provide(
             PublicCalculatorServiceBounded.pipe(
               Layer.provide(
@@ -708,7 +704,7 @@ describe("real MCP client against the native API application", () => {
         expect(runtimeLines(yield* TestConsole.logLines)).toEqual([]);
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
-        Effect.provide(ApiContentTest),
+        Effect.provide(ApiContentLive),
         Effect.provide(TestConsole.layer),
         // Direct retained-report oracle keeps admission outside the pure engine.
         Effect.provide(CalculatorLive),

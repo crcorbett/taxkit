@@ -172,7 +172,7 @@
       "project": ["src/**/*.ts!", "!src/__testing__/**!"]
     },
     "packages/og-image": {
-      "entry": ["src/cache.layer.ts!", "src/takumi.adapter.layer.ts!"],
+      "entry": ["src/image-archive.ts!", "src/takumi.adapter.layer.ts!"],
       "project": ["src/**/*.{ts,tsx}!"]
     },
     "packages/webmcp": {

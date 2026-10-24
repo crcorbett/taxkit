@@ -3,7 +3,6 @@ import {
   discoveryPaths,
   docsImageApiPath,
 } from "@taxkit/api-http/routes";
-import { docsOgImage } from "@taxkit/content/publication";
 import { ContentCatalogue, DocsOgImages } from "@taxkit/content/service";
 import { Array, Effect, Layer } from "effect";
 import { HttpRouter, HttpServerResponse } from "effect/http";
@@ -65,7 +64,7 @@ export const aeoRoutes = Layer.unwrap(
         HttpRouter.route(
           "GET",
           docsImageApiPath(page.path),
-          images.renderPage(docsOgImage(page)).pipe(
+          images.getImage(page.path).pipe(
             Effect.map((bytes) =>
               HttpServerResponse.uint8Array(bytes, {
                 contentType: "image/png",

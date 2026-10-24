@@ -12,7 +12,7 @@ const unavailable = HttpServerResponse.empty({
   status: 503,
 });
 
-// A published page's share image. The API renders and owns the PNG; the
+// A published page's share image. The API owns the prebuilt PNG; the
 // Website forwards its own /og/<page>.png address once and checks the bytes.
 export const docsImageRepresentation = Effect.gen(function* () {
   const request = yield* HttpServerRequest.HttpServerRequest;

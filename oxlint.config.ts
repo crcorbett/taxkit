@@ -56,7 +56,6 @@ const decodingBoundaryFiles = [
   "packages/og-image/src/takumi.adapter.layer.ts",
   "packages/og-image/test/render.test.ts",
   "packages/og-image/test/font.test.ts",
-  "packages/og-image/test/cache.test.ts",
   "packages/aeo/src/__testing__/fixtures.ts",
   "packages/aeo/test/documents.test.ts",
   "packages/aeo/test/routes.test.ts",

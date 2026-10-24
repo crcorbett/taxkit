@@ -9,10 +9,10 @@
   ],
   "type": "module",
   "exports": {
-    "./live": {
-      "source": "./src/cache.layer.ts",
-      "types": "./dist/cache.layer.d.ts",
-      "default": "./dist/cache.layer.js"
+    "./archive": {
+      "source": "./src/image-archive.ts",
+      "types": "./dist/image-archive.d.ts",
+      "default": "./dist/image-archive.js"
     },
     "./takumi": {
       "source": "./src/takumi.adapter.layer.ts",

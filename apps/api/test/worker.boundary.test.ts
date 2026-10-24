@@ -15,7 +15,6 @@ import {
   sensitiveSentinel,
 } from "@taxkit/calculators/testing/fixtures";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
-import { DocsOgImagesTest } from "@taxkit/content/test";
 import {
   ApiHostTelemetryLive,
   HostRequestRecord,
@@ -54,9 +53,6 @@ import { ApiWorkerInit as ApiWorkerApplicationInit } from "../src/worker.js";
 
 // These retained tests isolate body, protocol and lifetime behaviour. Actual
 // admission and native provider counters are qualified in their owning tests.
-// The bundled content with deterministic share images.
-const ApiContentTest = Layer.merge(ApiContentLive, DocsOgImagesTest);
-
 const ApiWorkerInit = ApiWorkerApplicationInit.pipe(
   Effect.provideService(
     CalculatorAdmission,
@@ -166,7 +162,7 @@ describe("native API application", () => {
       const started = yield* Deferred.make<boolean>();
       const released = yield* Ref.make(0);
       const app = yield* ApiWorkerApplication.pipe(
-        Effect.provide(ApiContentTest),
+        Effect.provide(ApiContentLive),
         Effect.provide(
           PublicCalculatorServiceBounded.pipe(
             Layer.provide(
@@ -577,7 +573,7 @@ describe("native API application", () => {
           })
         ).pipe(Layer.provide(CalculatorLive));
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentTest),
+          Effect.provide(ApiContentLive),
           Effect.provide(calculator)
         );
         const transport = HttpClient.make((request) =>
@@ -869,7 +865,7 @@ describe("native API application", () => {
     () =>
       Effect.gen(function* () {
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentTest),
+          Effect.provide(ApiContentLive),
           Effect.provide(
             CalculatorFixture.pipe(
               Layer.provide(Layer.succeed(CalculatorFixtureMode)("defect"))

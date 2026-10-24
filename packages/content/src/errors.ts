@@ -78,7 +78,7 @@ export class DocsDiagramRenderError extends Schema.TaggedError<DocsDiagramRender
 // A share image could not be produced. No page text or provider cause is kept.
 export class DocsImageRenderError extends Schema.TaggedError<DocsImageRenderError>()(
   "DocsImageRenderError",
-  { reason: Schema.Literals(["font", "render", "output", "timeout"]) }
+  { reason: Schema.Literals(["font", "render", "output", "missing"]) }
 ) {}
 
 // A published page's head metadata could not be built from its checked values.

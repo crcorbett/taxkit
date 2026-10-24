@@ -48,7 +48,7 @@ export const DocsDiscoveryApiPath = Schema.TemplateLiteral([
   DiscoveryPath,
 ]);
 
-// One share image per published page, rendered by the API. The Website serves
+// One share image per published page, drawn when the API is built. The Website serves
 // the same image at /og<page>.png by forwarding here.
 export const docsImagePrefix = "/api/v1/docs/og";
 export const docsImageApiPath = (pagePath: string) =>

@@ -22,7 +22,7 @@ by endpoint declarations, forwarding, cache policy and native admission.
 [`@taxkit/api-mcp`](../../packages/api/mcp/README.md) owns remote tool contracts,
 handlers, cancellation and reply budgets;
 [`@taxkit/aeo`](../../packages/aeo/README.md) owns the answer-engine routes and
-[`@taxkit/og-image`](../../packages/og-image/README.md) the share-image renderer.
+[`@taxkit/og-image`](../../packages/og-image/README.md) the build-time share-image renderer.
 Native hosting remains in this app.
 
 The API build builds the docs catalogue ahead of time.
@@ -48,10 +48,11 @@ image at `/api/v1/docs/og/<page>.png`. The routes come from that same catalogue.
 `PublicationOrigins` is supplied from the app's cached checked API and
 publication origins, so deferred native addresses are read on first use. A
 document is plain text or XML with `nosniff`; settings failure is an empty 503.
-Images render on request through `DocsOgImagesLive` over the Takumi
-`DocsPageRendererLive`: one render at a time, a 30-second deadline and an
-eight-entry, five-minute cache, with the CDN keeping each image for seven days.
-A render failure is an empty 503. The Website forwards its own `/sitemap.xml`,
+Images are rendered at build time: the same script draws every published
+page's PNG with `@taxkit/og-image` and writes `src/generated/docs-images.json`.
+`ApiContentLive` checks that archive once at startup and its `DocsOgImages`
+decodes one PNG per request; no renderer is in the Worker. The CDN keeps each
+image for seven days. A missing or unusable image is an empty 503. The Website forwards its own `/sitemap.xml`,
 `/robots.txt`, `/llms*.txt` and `/og/*.png` requests here once. The standalone
 Bun host does not serve these routes. They take no calculator allowance.
 

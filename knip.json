@@ -185,7 +185,7 @@
     },
     "packages/og-image": {
       "entry": [
-        "src/cache.layer.ts",
+        "src/image-archive.ts",
         "src/takumi.adapter.layer.ts",
         "test/**/*.test.ts",
         "vitest.config.ts"

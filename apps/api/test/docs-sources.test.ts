@@ -3,7 +3,7 @@ import { docsSources } from "@content/docs/sources";
 import { NodeServices } from "@effect/platform-node";
 import { assert, describe, it } from "@effect/vitest";
 import type { DocsBlock, DocsInline } from "@taxkit/content/schemas";
-import { ContentCatalogue } from "@taxkit/content/service";
+import { ContentCatalogue, DocsOgImages } from "@taxkit/content/service";
 import { Array, Effect, FileSystem, Layer, Match, Order } from "effect";
 
 import { DocsCatalogueBuildLive } from "../scripts/docs-catalogue.layer.js";
@@ -153,5 +153,16 @@ describe("bundled docs sources", () => {
         );
         assert.deepEqual(bundled, built);
       })
+  );
+
+  it.effect("bundles one checked share image for every published page", () =>
+    Effect.gen(function* () {
+      const { pages } = yield* ContentCatalogue;
+      const images = yield* DocsOgImages;
+      const sizes = yield* Effect.forEach(pages, (page) =>
+        images.getImage(page.path).pipe(Effect.map((png) => png.byteLength))
+      );
+      assert.isTrue(Array.every(sizes, (size) => size > 1000));
+    }).pipe(Effect.provide(ApiContentLive))
   );
 });
