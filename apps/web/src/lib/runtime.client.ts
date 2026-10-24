@@ -1,3 +1,4 @@
+import { docsPageMetadata } from "@taxkit/content/publication";
 import { Effect, Schema } from "effect";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
@@ -76,9 +77,9 @@ export const loadDocsPage = (
       const client = yield* browserApiClient;
       const { navigation, page } = yield* readDocsPage(client, request.path);
       return {
+        metadata: yield* docsPageMetadata(page, current.publicationOrigin),
         navigation,
         page,
-        publicationOrigin: current.publicationOrigin.href,
       };
     }),
   });

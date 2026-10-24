@@ -26,7 +26,7 @@ calculation dispatch and schema-guided expected error shaping live in
 HTTP declaration, reference endpoints, MCP and discovery addresses. Cache
 eligibility admits only checked calculator identifiers and exact public read
 paths. Worker classification and calculation admission, Website
-discovery forwarding, and [Publication](../../publication/README.md) links use
+discovery and share-image forwarding, and [AEO](../../aeo/README.md) routes use
 that catalogue. OpenAPI coverage tests require every declared endpoint to belong
 to one data family and give each path its expected cache eligibility. Authored
 page identities remain in Content and Website file routes remain in the app.

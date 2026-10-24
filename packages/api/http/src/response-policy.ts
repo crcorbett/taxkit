@@ -35,12 +35,13 @@ const restrictive = /(?:^|,)\s*(?:private|no-store)\s*(?:=|,|$)/iu;
 const revalidation =
   /(?:^|,)\s*(?:no-cache|must-revalidate|proxy-revalidate)\s*(?:=|,|$)/iu;
 
-// A 400 or 406 that answers only the Accept header is a stable variant of a
-// public page. Workers Cache drops a page's stored entry when an uncacheable
-// reply arrives at the same address, so these answers are stored as their own
-// variant rather than letting any odd Accept header empty the page's cache.
+// A Markdown redirect, 400 or 406 that answers only the Accept header is a
+// stable variant of a public page. Workers Cache drops a page's stored entry
+// when an uncacheable reply arrives at the same address, so these answers are
+// stored as their own variant rather than letting any Accept header empty the
+// page's cache.
 const negotiationAnswer = (status: number, headers: Headers.Headers) =>
-  (status === 400 || status === 406) &&
+  (status === 307 || status === 400 || status === 406) &&
   Option.exists(Headers.get(headers, "vary"), (vary) =>
     Array.some(
       vary.split(","),

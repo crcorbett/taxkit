@@ -4,6 +4,7 @@ import type { Effect } from "effect";
 import type {
   DocsCodeHighlightError,
   DocsDiagramRenderError,
+  DocsImageRenderError,
   DocsPageNotFoundError,
   DocsSourceError,
 } from "./errors.js";
@@ -13,7 +14,9 @@ import type {
   DocsCodeSnippet,
   DocsDiagramSource,
   DocsDiagramSvg,
+  DocsOgImage,
   DocsPagePath,
+  DocsPngBytes,
   DocsPublicCatalogue,
   DocsPublicNavigation,
   DocsPublicPage,
@@ -80,3 +83,23 @@ export class DocsDiagramRenderer extends Context.Service<
     ) => Effect.Effect<DocsDiagramSvg, DocsDiagramRenderError>;
   }
 >()("@taxkit/content/DocsDiagramRenderer") {}
+
+// Share images. `@taxkit/og-image` implements both: the renderer draws one
+// image, and the bounded, cached service is what routes call.
+export class DocsPageRenderer extends Context.Service<
+  DocsPageRenderer,
+  {
+    readonly renderPage: (
+      image: DocsOgImage
+    ) => Effect.Effect<DocsPngBytes, DocsImageRenderError>;
+  }
+>()("@taxkit/content/DocsPageRenderer") {}
+
+export class DocsOgImages extends Context.Service<
+  DocsOgImages,
+  {
+    readonly renderPage: (
+      image: DocsOgImage
+    ) => Effect.Effect<DocsPngBytes, DocsImageRenderError>;
+  }
+>()("@taxkit/content/DocsOgImages") {}

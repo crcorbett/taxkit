@@ -423,3 +423,54 @@ export const DocsSearchResult = Schema.Struct({
   title: DocsNonEmptyText,
 });
 export type DocsSearchResult = typeof DocsSearchResult.Type;
+
+// The share image for one published page: its title, description and address.
+// Effect's cache compares these immutable checked keys structurally.
+export const DocsOgImage = Schema.Struct({
+  description: DocsNonEmptyText,
+  path: DocsPublicPagePath,
+  title: DocsNonEmptyText,
+});
+export type DocsOgImage = typeof DocsOgImage.Type;
+
+export const docsOgImageSize = { height: 630, width: 1200 } as const;
+
+// A rendered share image: the PNG signature, the owned dimensions and a byte
+// bound. Browsers and crawlers decode the pixels themselves.
+export const DocsPngBytes = Schema.Uint8Array.check(
+  Schema.makeFilter(
+    (bytes) => {
+      if (bytes.byteLength < 24 || bytes.byteLength > 500_000) {
+        return false;
+      }
+      const data = new DataView(
+        bytes.buffer,
+        bytes.byteOffset,
+        bytes.byteLength
+      );
+      return (
+        data.getBigUint64(0) === 0x89_50_4e_47_0d_0a_1a_0an &&
+        data.getUint32(16) === docsOgImageSize.width &&
+        data.getUint32(20) === docsOgImageSize.height
+      );
+    },
+    {
+      message:
+        "A share image must be a PNG of the owned dimensions and byte bound.",
+    }
+  )
+).pipe(Schema.brand("taxkit/DocsPngBytes"));
+export type DocsPngBytes = typeof DocsPngBytes.Type;
+
+// One page's public addresses and head metadata on the publication origin.
+// The JSON-LD leaves as checked script text, ready for its HTML output.
+export const DocsPageMetadata = Schema.Struct({
+  canonical: Schema.String,
+  description: DocsNonEmptyText,
+  image: Schema.String,
+  imageAlt: DocsNonEmptyText,
+  jsonLd: Schema.String,
+  markdown: Schema.String,
+  title: DocsNonEmptyText,
+});
+export type DocsPageMetadata = typeof DocsPageMetadata.Type;

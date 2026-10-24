@@ -38,8 +38,8 @@ entry points.
 - [apps/web](./apps/web/README.md): TanStack Start Website with the three
   calculators, reading the API through the generated HTTP client over the
   private server binding and, in the browser, the public API origin. It also
-  renders accepted documentation, search, Markdown and share images and
-  forwards discovery files to the API.
+  renders accepted documentation, search and Markdown, and forwards discovery
+  files and share images to the API.
 - [packages/api/http](./packages/api/http/README.md): Effect HTTP API contract,
   generated docs, public calculator routes, thin handler adapters, server
   handler exports, the shared CORS/cache policy and the browser-safe `api`
@@ -49,8 +49,11 @@ entry points.
   calculation dispatch and schema-guided expected error shaping.
 - [packages/api/mcp](./packages/api/mcp/README.md): native MCP tool contracts,
   handlers, cancellation and response budgets.
-- [packages/publication](./packages/publication/README.md): bounded discovery
-  documents derived from the accepted Content catalogue and HTTP routes.
+- [packages/aeo](./packages/aeo/README.md): the API's answer-engine routes:
+  `robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt` and share images,
+  derived from the accepted Content catalogue.
+- [packages/og-image](./packages/og-image/README.md): the Takumi share-image
+  renderer and its bounded cache, behind Content's `DocsOgImages` contract.
 - [packages/observability](./packages/observability/README.md): shared safe host
   telemetry and edge identity, independent of deployment providers.
 - [packages/sdk/typescript](./packages/sdk/typescript/README.md): the public

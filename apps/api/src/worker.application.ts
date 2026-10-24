@@ -1,3 +1,5 @@
+import { aeoRoutes } from "@taxkit/aeo/routes";
+import { PublicationOrigins } from "@taxkit/aeo/service";
 import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import { withCalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundary";
@@ -13,10 +15,9 @@ import {
   CalculatorApiPath,
   DocsApiPath,
   DocsDiscoveryApiPath,
+  DocsImageApiPath,
   HealthPath,
   McpRoutePath,
-  DiscoveryPath,
-  discoveryApiPath,
   mcpPath,
 } from "@taxkit/api-http/routes";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
@@ -27,24 +28,21 @@ import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { DocsSourceError } from "@taxkit/content/errors";
-import { ContentCatalogue, ContentService } from "@taxkit/content/service";
+import {
+  ContentCatalogue,
+  ContentService,
+  DocsOgImages,
+} from "@taxkit/content/service";
 import {
   CalculatorHostMode,
   edgeCallerKey,
 } from "@taxkit/observability/edge-identity";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
-import { ContentDiscoveryLive } from "@taxkit/publication/live";
-import { DocsDiscoverySettings } from "@taxkit/publication/schemas";
-import {
-  ContentDiscovery,
-  ContentDiscoverySettings,
-} from "@taxkit/publication/service";
 import { WorkerExecutionContext } from "alchemy/Cloudflare/Workers";
 import { safeHttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
-  Array,
   Config,
   Context,
   Deferred,
@@ -77,34 +75,12 @@ const apiRoute = (pathname: string): HostRoute =>
     Match.when(Schema.is(McpRoutePath), () => "mcp" as const),
     Match.when(Schema.is(CalculationFamilyPath), () => "calculate" as const),
     Match.when(Schema.is(DocsDiscoveryApiPath), () => "discovery" as const),
+    Match.when(Schema.is(DocsImageApiPath), () => "docs" as const),
     Match.when(Schema.is(DocsApiPath), () => "docs" as const),
     Match.when(Schema.is(CalculatorApiPath), () => "catalogue" as const),
     Match.when(Schema.is(ApiReferencePath), () => "reference" as const),
     Match.orElse(() => "other" as const)
   );
-
-// The finished public discovery documents. The Website forwards its own
-// /sitemap.xml, /robots.txt and /llms*.txt requests here once.
-const DiscoveryRoutes = HttpRouter.addAll(
-  Array.map(DiscoveryPath.literals, (path) =>
-    HttpRouter.route(
-      "GET",
-      discoveryApiPath(path),
-      ContentDiscovery.pipe(
-        Effect.flatMap((discovery) => discovery.getDocument(path)),
-        Effect.map((document) =>
-          HttpServerResponse.text(document.body, {
-            contentType: `${document.contentType}; charset=utf-8`,
-            headers: { "x-content-type-options": "nosniff" },
-          })
-        ),
-        Effect.catchTag("DocsSourceError", () =>
-          Effect.succeed(HttpServerResponse.empty({ status: 503 }))
-        )
-      )
-    )
-  )
-);
 
 // Construct once in the native instance scope. HTTP and MCP receive this
 // same application service; native requests keep their own scope and fibre.
@@ -143,33 +119,31 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     yield* PublicCalculatorService
   );
   const content = Layer.succeed(ContentService, yield* ContentService);
-  const discovery = ContentDiscoveryLive.pipe(
+  // The answer-engine documents and share images. Stage origins resolve on
+  // first use, after native planning binds them.
+  const aeo = aeoRoutes.pipe(
     Layer.provide(
-      Layer.succeed(ContentDiscoverySettings)(
+      Layer.succeed(PublicationOrigins)(
         settings.pipe(
-          Effect.map((config) =>
-            DocsDiscoverySettings.make({
-              apiOrigin: config.apiOrigin,
-              publicationOrigin: config.publicationOrigin,
-            })
-          ),
+          Effect.map(({ apiOrigin, publicationOrigin }) => ({
+            apiOrigin,
+            publicationOrigin,
+          })),
           Effect.mapError(
             () =>
               new DocsSourceError({
-                message: "Documentation discovery settings are unavailable.",
+                message: "Documentation publication settings are unavailable.",
                 operation: "getDiscoveryDocument",
               })
           )
         )
       )
     ),
-    Layer.provide(Layer.succeed(ContentCatalogue, yield* ContentCatalogue))
+    Layer.provide(Layer.succeed(ContentCatalogue, yield* ContentCatalogue)),
+    Layer.provide(Layer.succeed(DocsOgImages, yield* DocsOgImages))
   );
-  const routes = Layer.mergeAll(
-    TaxKitApiRoutesLayer,
-    DiscoveryRoutes.pipe(HttpRouter.provideRequest(discovery))
-  ).pipe(
-    Layer.provide(Layer.merge(content, discovery)),
+  const routes = Layer.mergeAll(TaxKitApiRoutesLayer, aeo).pipe(
+    Layer.provide(content),
     HttpRouter.provideRequest(calculator)
   );
   const handler = yield* HttpRouter.toHttpEffect(routes).pipe(

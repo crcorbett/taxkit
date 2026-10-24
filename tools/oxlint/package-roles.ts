@@ -17,6 +17,7 @@ const frontendModules = [
   "@taxkit/calculators/summaries",
   "@taxkit/content/schemas",
   "@taxkit/content/errors",
+  "@taxkit/content/publication",
   "@taxkit/content/service",
   "@taxkit/content/response-check",
   "@taxkit/core/primitives",

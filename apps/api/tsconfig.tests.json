@@ -3,11 +3,15 @@
   "include": ["test/**/*.ts", "scripts/**/*.ts", "vitest.config.ts"],
   "compilerOptions": {
     // `bun` keeps eventsource on its built types. beautiful-mermaid publishes
-    // raw TypeScript under `bun`, so it keeps its built types too.
+    // raw TypeScript under `bun`, and Takumi's `bun` types omit the default
+    // module, so both keep the types every other program sees.
     "customConditions": ["bun", "source"],
     "paths": {
       "beautiful-mermaid": [
         "../../packages/diagrams/node_modules/beautiful-mermaid/dist/index.d.ts"
+      ],
+      "@takumi-rs/wasm/auto": [
+        "../../packages/og-image/node_modules/@takumi-rs/wasm/bundlers/wasm-module.d.ts"
       ]
     },
     "rootDir": ".",

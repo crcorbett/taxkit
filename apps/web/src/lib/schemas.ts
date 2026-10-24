@@ -4,6 +4,7 @@ import {
   CalculatorRunServiceRequest,
 } from "@taxkit/calculators/schemas";
 import type {
+  DocsPageMetadata,
   DocsPublicNavigation,
   DocsPublicPage,
   DocsSearchResult,
@@ -42,9 +43,9 @@ export const WebsiteRootView = Schema.Struct({
 // A documentation page as its route renders it. Every field is plain public
 // data, so TanStack serialises it natively.
 export interface WebsiteDocsPageView {
+  readonly metadata: DocsPageMetadata;
   readonly navigation: DocsPublicNavigation;
   readonly page: DocsPublicPage;
-  readonly publicationOrigin: string;
 }
 // The search route's two page states. Invalid words are a normal page, not a
 // failed load. Variants are plain data, so TanStack serialises them natively.

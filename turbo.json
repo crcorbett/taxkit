@@ -41,7 +41,7 @@
         "TAXKIT_API_BASE_URL",
         "VITE_*"
       ],
-      "outputs": ["dist/**", ".output/**", ".vercel/output/**", "public/og/**"],
+      "outputs": ["dist/**", ".output/**", ".vercel/output/**"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/docs/**"]
     },
     "web#test": {
@@ -62,7 +62,7 @@
         "TAXKIT_API_BASE_URL",
         "VITE_*"
       ],
-      "outputs": ["dist/**", ".output/**", ".vercel/output/**", "public/og/**"]
+      "outputs": ["dist/**", ".output/**", ".vercel/output/**"]
     },
     "check-types": {
       "dependsOn": ["^build"],

@@ -26,6 +26,7 @@
   "dependencies": {
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
+    "@taxkit/aeo": "workspace:*",
     "@taxkit/analytics": "workspace:*",
     "@taxkit/api-http": "workspace:*",
     "@taxkit/api-mcp": "workspace:*",
@@ -34,7 +35,7 @@
     "@taxkit/core": "workspace:*",
     "@taxkit/infrastructure": "workspace:*",
     "@taxkit/observability": "workspace:*",
-    "@taxkit/publication": "workspace:*",
+    "@taxkit/og-image": "workspace:*",
     "alchemy": "catalog:",
     "effect": "catalog:"
   },

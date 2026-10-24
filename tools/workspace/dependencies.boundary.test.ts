@@ -128,7 +128,7 @@ describe("workspace dependency direction", () => {
       Array.map(
         [
           ["packages/api/mcp", "@distilled.cloud/cloudflare"],
-          ["packages/publication", "@taxkit/infrastructure"],
+          ["packages/aeo", "@taxkit/infrastructure"],
           ["packages/core", "alchemy"],
           ["apps/api", "alchemy"],
           ["apps/web", "alchemy"],

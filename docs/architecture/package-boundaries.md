@@ -31,7 +31,8 @@ Implemented packages and apps:
 - `packages/api/http`
 - `packages/api/mcp`
 - `packages/content`
-- `packages/publication`
+- `packages/aeo`
+- `packages/og-image`
 - `packages/analytics`
 - `packages/observability`
 - `packages/sdk/typescript`

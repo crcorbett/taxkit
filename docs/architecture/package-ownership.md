@@ -23,6 +23,7 @@ Current implemented code lives in:
 - `apps/api`
 - `apps/web`
 - `content/docs`
+- `packages/aeo`
 - `packages/analytics`
 - `packages/api/http`
 - `packages/api/mcp`
@@ -34,7 +35,7 @@ Current implemented code lives in:
 - `packages/infrastructure`
 - `packages/mdx`
 - `packages/observability`
-- `packages/publication`
+- `packages/og-image`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
@@ -157,11 +158,18 @@ identity. Neither an app nor a package depends on another app.
   cancellation and response budgets over domain services. Native session storage,
   dispatch and app lifecycle remain in the API app.
 
-`packages/publication`
-: Private compiled discovery owner. `ContentDiscovery` and its static live/test
-  Layers derive four documents from Content and checked publication/API settings.
-  It consumes HTTP route constants for links; Content never imports HTTP and HTTP
-  never imports Publication, keeping the dependency graph acyclic.
+`packages/aeo`
+: Private compiled answer-engine owner. `aeoRoutes` serves the four discovery
+  documents and one share-image route per published page from Content's
+  catalogue, `DocsOgImages` and the host-supplied `PublicationOrigins`. It
+  consumes HTTP route constants; Content never imports HTTP and HTTP never
+  imports AEO, keeping the dependency graph acyclic.
+
+`packages/og-image`
+: Private compiled share-image provider. `DocsPageRendererLive` keeps every
+  Takumi call and the bundled Geist font; `DocsOgImagesLive` adds one render at
+  a time, a deadline and a small cache. It implements Content's contracts and is
+  composed only by the API Worker.
 
 `packages/content`
 : Private compiled owner of canonical docs page/navigation contracts, source

@@ -2,11 +2,7 @@ import { describe, expect, it } from "@effect/vitest";
 import { isNotFound } from "@tanstack/react-router";
 import { TaxKitApi } from "@taxkit/api-http/api";
 import { DocsPageUnavailable } from "@taxkit/content/errors";
-import {
-  DocsPublicationOrigin,
-  DocsPublicNavigation,
-  DocsPublicPage,
-} from "@taxkit/content/schemas";
+import { DocsPublicNavigation, DocsPublicPage } from "@taxkit/content/schemas";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
 import {
   Array,
@@ -173,14 +169,16 @@ describe("browser route loaders", () => {
         loadDocsPage({ context, path: page.path, signal })
       );
       expect(loaded.page.path).toBe(page.path);
-      expect(loaded.publicationOrigin).toBe("https://taxkit.example/");
+      expect(loaded.metadata.canonical).toBe(
+        `https://taxkit.example${page.path}`
+      );
       yield* Effect.promise(() =>
         loadDocsPage({ context, path: page.path, signal })
       );
       expect(yield* Ref.get(builds)).toBe(1);
-      expect(
-        DocsPublicationOrigin.make(new URL(loaded.publicationOrigin))
-      ).toBeInstanceOf(URL);
+      expect(loaded.metadata.markdown).toBe(
+        `https://taxkit.example${page.path}.md`
+      );
     }).pipe(Effect.scoped)
   );
 

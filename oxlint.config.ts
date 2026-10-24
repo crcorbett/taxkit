@@ -29,10 +29,6 @@ const decodingBoundaryFiles = [
   "tools/oxlint/workspaces.boundary.ts",
   "tools/oxlint/workspace-imports.boundary.test.ts",
   "packages/observability/test/host-telemetry.boundary.test.ts",
-  "packages/publication/src/__testing__/fixtures.ts",
-  "packages/publication/test/schemas.test.ts",
-  "packages/publication/test/service.test.ts",
-  "packages/publication/test/discovery-links.test.ts",
   "apps/web/src/lib/api/host.boundary.test.ts",
   // Closed native PostHog SDK ingress; no runner or neighbouring-file permission.
   "packages/infrastructure/src/posthog/management.adapter.layer.ts",
@@ -54,9 +50,16 @@ const decodingBoundaryFiles = [
   "apps/api/test/mcp-client.boundary.test.ts",
   "apps/web/test/native-mcp.boundary.test.ts",
   "apps/web/test/native-rate.boundary.test.ts",
-  // Exact build catalogue/renderer bytes and adversarial metadata fixture ingress.
-  "apps/web/scripts/docs-images.build.ts",
-  "apps/web/src/lib/docs/social.boundary.test.ts",
+  // Exact Takumi PNG reply, bundled font and forwarded share-image ingress.
+  "packages/og-image/src/takumi.adapter.layer.ts",
+  "packages/og-image/test/render.test.ts",
+  "packages/og-image/test/font.test.ts",
+  "packages/og-image/test/cache.test.ts",
+  "packages/aeo/src/__testing__/fixtures.ts",
+  "packages/aeo/test/documents.test.ts",
+  "packages/aeo/test/routes.test.ts",
+  "apps/web/src/lib/docs/image.ingress.ts",
+  "apps/web/src/lib/docs/image.boundary.test.ts",
   // Exact acceptance JSON, external example JSON and raw HTTP error ingress.
   "packages/docs-examples/src/validate-external-input.ts",
   "packages/docs-examples/src/api-error-envelope.ts",
@@ -194,7 +197,6 @@ const effectServiceContractFiles = [
 ];
 
 const effectErrorContractFiles = [
-  "apps/web/scripts/docs-images.build.ts",
   "apps/**/{errors,schema,schemas}.ts",
   "packages/**/{errors,schema,schemas}.ts",
   "tools/oxlint/fixtures/effect-accepted.ts",
@@ -227,7 +229,7 @@ const schemaEncoderEgressFiles = [
   "apps/api/test/mcp-client.boundary.test.ts",
   "apps/web/test/native-mcp.boundary.test.ts",
   // Exact checked public structured-data script egress; no decoder/runtime permission.
-  "apps/web/src/lib/docs/metadata.egress.ts",
+  "packages/content/src/publication.egress.ts",
   // Exact public catalogue representation round-trip proof, not a service encoder.
   "packages/content/test/schemas.test.ts",
   // Exact rate wire/secret-negative fixtures; no production encoding permission.
@@ -459,7 +461,6 @@ export default defineConfig({
         "apps/api/test/mcp-client.boundary.test.ts",
         "apps/web/test/native-mcp.boundary.test.ts",
         "apps/web/test/native-analytics.boundary.test.ts",
-        "apps/web/scripts/docs-images.build.ts",
         "apps/web/src/lib/config.ts",
         "apps/web/src/lib/docs/errors.ts",
         "apps/web/src/lib/form.boundary.ts",
@@ -989,7 +990,7 @@ export default defineConfig({
         "apps/api/test/mcp-client.boundary.test.ts",
         "apps/api/test/rate-admission.boundary.test.ts",
         "apps/api/test/worker.boundary.test.ts",
-        "apps/web/scripts/docs-images.build.ts",
+        "packages/og-image/src/takumi.adapter.layer.ts",
         "apps/web/src/lib/api/host.server.ts",
         "apps/web/src/lib/api/forward.boundary.test.ts",
         "apps/web/src/lib/api/requests.boundary.test.ts",
@@ -1024,7 +1025,7 @@ export default defineConfig({
           {
             allowedFiles: [
               "apps/api/test/mcp-client.boundary.test.ts",
-              "apps/web/scripts/docs-images.build.ts",
+              "packages/og-image/src/takumi.adapter.layer.ts",
               "apps/web/src/lib/api/host.server.ts",
               "apps/web/src/lib/api/forward.boundary.test.ts",
               "apps/web/src/lib/api/requests.boundary.test.ts",

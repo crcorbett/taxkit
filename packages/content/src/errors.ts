@@ -74,3 +74,15 @@ export class DocsDiagramRenderError extends Schema.TaggedError<DocsDiagramRender
   "DocsDiagramRenderError",
   { reason: Schema.Literals(["render", "svg"]) }
 ) {}
+
+// A share image could not be produced. No page text or provider cause is kept.
+export class DocsImageRenderError extends Schema.TaggedError<DocsImageRenderError>()(
+  "DocsImageRenderError",
+  { reason: Schema.Literals(["font", "render", "output", "timeout"]) }
+) {}
+
+// A published page's head metadata could not be built from its checked values.
+export class DocsMetadataError extends Schema.TaggedError<DocsMetadataError>()(
+  "DocsMetadataError",
+  { reason: Schema.Literal("invalid-metadata") }
+) {}

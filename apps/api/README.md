@@ -21,8 +21,9 @@ Its `./routes` export owns public path constants and checked path families used
 by endpoint declarations, forwarding, cache policy and native admission.
 [`@taxkit/api-mcp`](../../packages/api/mcp/README.md) owns remote tool contracts,
 handlers, cancellation and reply budgets;
-[`@taxkit/publication`](../../packages/publication/README.md) owns discovery
-contracts and document generation. Native hosting remains in this app.
+[`@taxkit/aeo`](../../packages/aeo/README.md) owns the answer-engine routes and
+[`@taxkit/og-image`](../../packages/og-image/README.md) the share-image renderer.
+Native hosting remains in this app.
 
 The API build builds the docs catalogue ahead of time.
 `scripts/docs-catalogue.runtime.ts` composes Content's `ContentCatalogueLive`
@@ -40,16 +41,19 @@ from that same service.
 Documentation calls consume no calculator allowance. See the
 [HTTP package](../../packages/api/http/README.md) for paths/response rules.
 
-The native Worker also serves the four discovery documents at GET (and HEAD)
-`/api/v1/docs/discovery/sitemap.xml`, `/robots.txt`, `/llms.txt` and
-`/llms-full.txt`. It builds the publication package's static
-`ContentDiscoveryLive` once from that same catalogue, supplying its
-`ContentDiscoverySettings` from the app's cached checked API and publication
-origins, so deferred native addresses are read on first
-use. A document is plain text or XML with `nosniff`; settings or projection
-failure is an empty 503. The Website forwards its own `/sitemap.xml`,
-`/robots.txt` and `/llms*.txt` requests here once. The standalone Bun host does
-not serve these routes. Discovery takes no calculator allowance.
+The native Worker also serves the AEO package's `aeoRoutes`: the four discovery
+documents at GET (and HEAD) `/api/v1/docs/discovery/sitemap.xml`, `/robots.txt`,
+`/llms.txt` and `/llms-full.txt`, and each published page's 1200×630 PNG share
+image at `/api/v1/docs/og/<page>.png`. The routes come from that same catalogue.
+`PublicationOrigins` is supplied from the app's cached checked API and
+publication origins, so deferred native addresses are read on first use. A
+document is plain text or XML with `nosniff`; settings failure is an empty 503.
+Images render on request through `DocsOgImagesLive` over the Takumi
+`DocsPageRendererLive`: one render at a time, a 30-second deadline and an
+eight-entry, five-minute cache, with the CDN keeping each image for seven days.
+A render failure is an empty 503. The Website forwards its own `/sitemap.xml`,
+`/robots.txt`, `/llms*.txt` and `/og/*.png` requests here once. The standalone
+Bun host does not serve these routes. They take no calculator allowance.
 
 Content reads the `@content/docs` navigation and repository JSON with an
 import attribute. The ESNext module profile preserves that attribute for

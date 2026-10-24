@@ -76,6 +76,7 @@ describe("public response cache policy", () => {
     };
     expect(cacheHeaders({ ...negotiated, status: 400 })).toEqual(shared);
     expect(cacheHeaders({ ...negotiated, status: 406 })).toEqual(shared);
+    expect(cacheHeaders({ ...negotiated, status: 307 })).toEqual(shared);
     // Missing and unavailable pages are never stored, whatever they vary on.
     expect(cacheHeaders({ ...negotiated, status: 404 })).toEqual(unshared);
     expect(cacheHeaders({ ...negotiated, status: 503 })).toEqual(unshared);
@@ -260,7 +261,7 @@ describe("native cache policy response boundary", () => {
 
   it.each(
     EffectArray.flatMap(["GET", "HEAD"], (method) =>
-      EffectArray.map([200, 400, 406], (status) => ({ method, status }))
+      EffectArray.map([200, 307, 400, 406], (status) => ({ method, status }))
     )
   )(
     "keeps existing defaults and Accept variants for $method $status",

@@ -17,6 +17,7 @@
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
     "skipLibCheck": true,
+    "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
@@ -28,5 +29,5 @@
     "customConditions": ["source"],
     "sourceMap": true
   },
-  "files": ["content/docs/raw-modules.d.ts"]
+  "files": ["raw-modules.d.ts"]
 }

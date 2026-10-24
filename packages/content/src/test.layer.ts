@@ -1,9 +1,9 @@
 import { Array, Effect, Layer, Option, Ref } from "effect";
 
 import type { ContentObservations } from "./__testing__/observations.js";
-import { DocsDiagramRenderError } from "./errors.js";
+import { DocsDiagramRenderError, DocsImageRenderError } from "./errors.js";
 import { ContentServiceLive } from "./live.layer.js";
-import { DocsDiagramSvg } from "./schemas.js";
+import { DocsDiagramSvg, DocsPngBytes, docsOgImageSize } from "./schemas.js";
 import type {
   DocsCodeSnippet,
   DocsPagePath,
@@ -15,6 +15,7 @@ import {
   ContentService,
   DocsCodeHighlighter,
   DocsDiagramRenderer,
+  DocsOgImages,
 } from "./service.js";
 
 export const makeContentTest = Effect.fnUntraced(function* (
@@ -77,6 +78,25 @@ export const DocsDiagramRendererTest = Layer.succeed(DocsDiagramRenderer)(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"></svg>'
       ).pipe(
         Effect.mapError(() => new DocsDiagramRenderError({ reason: "svg" }))
+      ),
+  })
+);
+
+// Deterministic share images: one fixed PNG header of the owned size for
+// every page.
+export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(
+  DocsOgImages.of({
+    renderPage: () =>
+      Effect.sync(() => {
+        const bytes = new Uint8Array(24);
+        const data = new DataView(bytes.buffer);
+        data.setBigUint64(0, 0x89_50_4e_47_0d_0a_1a_0an);
+        data.setUint32(16, docsOgImageSize.width);
+        data.setUint32(20, docsOgImageSize.height);
+        return bytes;
+      }).pipe(
+        Effect.flatMap((bytes) => DocsPngBytes.makeEffect(bytes)),
+        Effect.mapError(() => new DocsImageRenderError({ reason: "output" }))
       ),
   })
 );
