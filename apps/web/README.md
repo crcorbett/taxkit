@@ -157,12 +157,12 @@ and words over 100 characters are a normal invalid-search page state. Empty
 words load navigation only. Search pages are `noindex, follow`.
 
 **Markdown.** Accepted pages also serve their processed Markdown at the `.md`
-address and at the page address with a preferring `Accept` header
-(`markdown.response.server.ts`). HTML wins ties and a missing preference.
-Invalid or wholly excluding `Accept` fields return empty 400/406, stored as
-their own public variant: Workers Cache drops a page's stored HTML when an
-uncacheable reply arrives at the same address, so an odd `Accept` header must
-not be able to empty it. Other methods on `.md` return 405; query input 400;
+address (`markdown.response.server.ts`). A page address with a preferring
+`Accept` header answers 307 to that `.md` address. HTML wins ties and a missing
+preference. Invalid or wholly excluding `Accept` fields return empty 400/406.
+The redirect, 400 and 406 are stored as their own public variant: Workers Cache
+drops a page's stored HTML when an uncacheable reply arrives at the same
+address, so an `Accept` header must not be able to empty it. Other methods on `.md` return 405; query input 400;
 missing or unavailable pages 404/503, all `no-store`. Every reply at a docs
 address carries `Vary: Accept`; Markdown also carries `nosniff` and a canonical
 link to the publication origin.
@@ -172,13 +172,14 @@ are forwarded once to the API's `/api/v1/docs/discovery/*` routes, which own the
 documents. GET and HEAD only (other methods 405 with `Allow: GET, HEAD`); query
 input 400; an unreachable API 503.
 
-**Share metadata.** `metadata.egress.ts` derives canonical, Markdown alternate,
-Open Graph and Twitter addresses from the page and the publication origin, and
-encodes TechArticle data with script-breaking characters escaped. The Vite
-config runs `scripts/docs-images.build.ts` before copying public assets: it
-renders one 1200 × 630 PNG per accepted page into the ignored `public/og`
-directory with the build-only `@takumi-rs/wasm` 2.14.0 renderer. The renderer
-stays out of the Worker and browser bundles.
+**Share metadata.** Each docs loader returns Content's `docsPageMetadata`:
+canonical, Markdown alternate and image addresses on the publication origin and
+TechArticle data with script-breaking characters escaped. `seo/head.ts` renders
+it as the page title, description, Open Graph and Twitter tags. `/og/<page>.png`
+is forwarded once to the API's `/api/v1/docs/og/<page>.png` route
+(`docs/image.ingress.ts`), which renders the 1200 × 630 PNG; the Website checks
+the type and bytes. GET and HEAD only; an unknown page 404 and an unusable
+reply 503, both `no-store`. No renderer is in the Website or browser bundles.
 
 ## Caching
 

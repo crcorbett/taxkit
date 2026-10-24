@@ -526,15 +526,13 @@ nearby calculator admission Layer. No wildcard or new unknown-parameter
 exception is added. The Website Layer accepts the generated native Fetcher
 capability; its settings boundary checks the richer API binding once.
 
-The native API composes the publication package’s static `ContentDiscoveryLive` once from the
-checked catalogue and supplies its existing cached settings Effect as
-`ContentDiscoverySettings` (`Layer.succeed(ContentDiscoverySettings)(...)`).
-Configuration remains application-owned; the publication capability lazily reads
-checked addresses and returns one bounded document for a closed file identity.
-`ContentDiscovery` is contract-only; the live and observed test Layers remain
-separate. The API serves each document on its discovery HTTP route and the
-Website forwards its conventional file addresses there once. No incoming
-request builds a Layer, compiler, content cache or runtime.
+The native API composes the AEO package's static `aeoRoutes` once from the
+checked catalogue and `DocsOgImages`, and supplies its existing cached settings
+Effect as `PublicationOrigins` (`Layer.succeed(PublicationOrigins)(...)`).
+Configuration remains application-owned; the routes read checked addresses
+lazily on first use. The API serves each document and share image on its HTTP
+route and the Website forwards its conventional addresses there once. No
+incoming request builds a Layer, renderer, content cache or runtime.
 
 
 Website Markdown composition uses a named HTTP policy over the existing native
@@ -545,17 +543,18 @@ request scope. No request builds a Layer or executes another runtime. The
 policy preserves existing HTML Vary fields and expected/fatal error separation.
 Its exact decoder admission and adjacent rejected paths have actual CLI proof.
 
-### Website build-only share rendering
+### Share-image rendering
 
-`apps/web/scripts/docs-images.build.ts` is a lazy scoped build program, composed
-and executed by the existing Vite host with NodeServices. Filesystem catalogue
-input and private native renderer bytes are decoded at this exact ingress.
-`acquireRelease` owns the renderer's lifetime, sequential page Effects own fixed
-catalogue/render/image/write failures, and the scoped finaliser releases native
-memory. No client or runner escapes into content/page logic. The named metadata
-output module separately encodes the owning public TechArticle Schema. Exact
-lint selectors admit these crossings only; adjacent route/rendering modules
-retain their restrictions.
+`@taxkit/og-image` follows the provider-package pattern: Content declares
+`DocsPageRenderer` and `DocsOgImages`, the package implements them and the API
+Worker composes them. `DocsPageRendererLive` decodes the bundled font once at
+Layer construction, calls Takumi's `render` once per operation through
+`Effect.tryPromise` with its abort signal, and decodes the reply as
+`DocsPngBytes`. `DocsOgImagesLive` wraps it with a one-permit semaphore, a
+30-second deadline and a `Cache` that keeps successes for five minutes and
+never keeps failures. `@taxkit/content/publication` encodes the owning public
+TechArticle Schema for head metadata. Exact lint selectors admit these crossings
+only.
 
 
 The `@taxkit/api-mcp` package owns native tools and uses `Toolkit.toLayer` and `McpServer.toolkit`; no replacement

@@ -115,7 +115,7 @@ const fixtureCases = [
   })),
   {
     accepted: [],
-    generated: "apps/web/scripts/.generated-retired-built-strict-rejected.ts",
+    generated: "apps/api/scripts/.generated-retired-built-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -134,7 +134,7 @@ const fixtureCases = [
 
   {
     accepted: [],
-    generated: "apps/web/scripts/.generated-retired-hosted-strict-rejected.ts",
+    generated: "apps/api/scripts/.generated-retired-hosted-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -255,7 +255,7 @@ const fixtureCases = [
   },
   {
     accepted: [],
-    generated: "apps/web/scripts/.generated-retired-imports-strict-rejected.ts",
+    generated: "apps/api/scripts/.generated-retired-imports-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -1106,8 +1106,8 @@ describe("exact native RPC lint boundaries", () => {
         "apps/web/src/lib/docs/search-location.boundary.ts",
         "apps/web/src/lib/docs/markdown.boundary.test.ts",
         "apps/web/src/lib/docs/markdown.response.server.ts",
-        "apps/web/scripts/docs-images.build.ts",
-        "apps/web/src/lib/docs/social.boundary.test.ts",
+        "apps/web/src/lib/docs/image.ingress.ts",
+        "apps/web/src/lib/docs/image.boundary.test.ts",
       ],
       (path) => [
         {
@@ -1156,7 +1156,7 @@ describe("exact native RPC lint boundaries", () => {
       ],
       (fixture) => ({
         ...fixture,
-        path: "apps/web/src/lib/docs/metadata.egress.ts",
+        path: "packages/content/src/publication.egress.ts",
       })
     ),
     ...Array.flatMap(
@@ -1164,8 +1164,7 @@ describe("exact native RPC lint boundaries", () => {
         "apps/web/src/lib/docs/components.tsx",
         "apps/web/src/lib/docs/page.view.tsx",
         "apps/web/src/lib/docs/search.view.tsx",
-        "apps/web/src/lib/docs/social.schemas.ts",
-        "apps/web/scripts/docs-images.schemas.ts",
+        "apps/web/src/lib/seo/head.ts",
         "apps/web/src/routes/search.tsx",
         "apps/web/src/routes/$.tsx",
       ],

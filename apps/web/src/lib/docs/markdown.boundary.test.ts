@@ -123,3 +123,41 @@ describe("documentation HTML response headers", () => {
     )
   );
 });
+
+describe("documentation Markdown negotiation", () => {
+  it.effect("moves a Markdown preference at a page to its Markdown file", () =>
+    withDocsRepresentation(
+      Effect.succeed(HttpServerResponse.text("accepted HTML"))
+    ).pipe(
+      Effect.provideService(
+        HttpServerRequest.HttpServerRequest,
+        HttpServerRequest.fromWeb(
+          new Request("http://127.0.0.1:4196/start/quickstart", {
+            headers: { accept: "text/markdown" },
+          })
+        )
+      ),
+      // The redirect needs neither the API nor the Website settings.
+      Effect.provide(
+        Layer.mergeAll(
+          Layer.mock(WebsiteApi, {
+            client: Result.fail(new WebsiteApiConfigError()),
+          }),
+          Layer.mock(WebsiteSettings, { settings: Result.fail(unconfigured) })
+        )
+      ),
+      Effect.scoped,
+      Effect.tap((response) =>
+        Effect.sync(() => {
+          expect(response.status).toBe(307);
+          expect(Headers.get(response.headers, "location")).toEqual(
+            Option.some("/start/quickstart.md")
+          );
+          expect(Headers.get(response.headers, "vary")).toEqual(
+            Option.some("Accept")
+          );
+        })
+      )
+    )
+  );
+});

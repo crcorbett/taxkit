@@ -27,9 +27,9 @@ implementations: `DocsPageReader` and `DocsCodeHighlighter` are implemented by
 [`@taxkit/diagrams`](../diagrams/README.md). The API build supplies `DocsSources`
 and those Layers and writes the catalogue to JSON; the API Worker decodes it with
 `DocsPublicCatalogue` and provides it as `ContentCatalogue`. The checked [HTTP package](../api/http/README.md)
-delegates public content routes to this service, and discovery to
-[Publication](../publication/README.md). The Website reads pages, navigation,
-search and Markdown through the API's HTTP routes.
+delegates public content routes to this service, and the answer-engine routes
+to [AEO](../aeo/README.md). The Website reads pages, navigation, search and
+Markdown through the API's HTTP routes.
 
 ## Reading body
 
@@ -48,13 +48,17 @@ include a whitespace-normalised excerpt of at most 240 characters. The caller
 checks the search term once, including its 100-character limit. The excerpt uses its owning checked type;
 projection failure stays in the safe `DocsSourceError` channel.
 
-## Publication boundary
+## Publication
 
-[Publication](../publication/README.md) owns discovery settings, document
-Schemas and generation. It consumes the checked catalogue and HTTP route
-catalogue, keeping transport addresses out of Content. `PublicHttpOrigin`
-retains the shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin`
-and `DocsPublicationOrigin` preserve their separate checked identities.
+`./publication` owns each published page's Website addresses (`docsMarkdownPath`
+and `docsImagePath`), the share-image input `docsOgImage` and its head metadata
+`docsPageMetadata`: canonical, Markdown and image addresses, the image text and
+escaped TechArticle JSON-LD, all on the publication origin. Content declares the
+share-image contracts `DocsPageRenderer` and `DocsOgImages` with
+`DocsPngBytes`; [`@taxkit/og-image`](../og-image/README.md) implements them and
+[`@taxkit/aeo`](../aeo/README.md) serves them. `PublicHttpOrigin` retains the
+shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
+`DocsPublicationOrigin` preserve their separate checked identities.
 
 ## Exports
 
@@ -63,8 +67,9 @@ and `DocsPublicationOrigin` preserve their separate checked identities.
 - `./errors`: internal checked source/lookup failures and shared fixed public
   page/search failures.
 - `./service`: `ContentServiceContract`, `ContentService`, `ContentCatalogue`,
-  `DocsSources` and the consumed `DocsPageReader`, `DocsCodeHighlighter` and
-  `DocsDiagramRenderer` contracts.
+  `DocsSources` and the consumed `DocsPageReader`, `DocsCodeHighlighter`,
+  `DocsDiagramRenderer`, `DocsPageRenderer` and `DocsOgImages` contracts.
+- `./publication`: page addresses, share-image input and head metadata.
 - `./links`: `DocsLinkContext` and `resolveDocsHref`, used by the MDX reader.
 - `./live`: `ContentCatalogueLive` and the page/search `ContentServiceLive`.
 - `./config` (internal, not in the published export map):
@@ -75,7 +80,8 @@ and `DocsPublicationOrigin` preserve their separate checked identities.
 - `./response-check`: request/reply page identity predicate for checked docs
   pages, used after generated-client decoding.
 - `./test`: the same implementation with controlled request observations, plus
-  deterministic `DocsCodeHighlighterTest` and `DocsDiagramRendererTest`.
+  deterministic `DocsCodeHighlighterTest`, `DocsDiagramRendererTest` and
+  `DocsOgImagesTest`.
 - `./testing/fixtures`: checked synthetic catalogue inputs for tests.
 - `./testing/observations`: typed test observations.
 

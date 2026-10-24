@@ -1,6 +1,7 @@
 import "@tanstack/react-start/server-only";
 import type { NotFoundError } from "@tanstack/react-router";
 import { setResponseStatus } from "@tanstack/react-start/server";
+import { docsPageMetadata } from "@taxkit/content/publication";
 import { WebsiteHostTelemetryLive } from "@taxkit/observability/host-telemetry";
 import { env } from "cloudflare:workers";
 import { Cause, Effect, Layer, ManagedRuntime } from "effect";
@@ -59,9 +60,9 @@ export const loadDocsPage = ({
       const settings = yield* Effect.fromResult(host.settings);
       const { navigation, page } = yield* readDocsPage(yield* client, path);
       return {
+        metadata: yield* docsPageMetadata(page, settings.publicationOrigin),
         navigation,
         page,
-        publicationOrigin: settings.publicationOrigin.href,
       };
     }).pipe(Effect.catchCause(rejectServerLoad)),
     { signal }

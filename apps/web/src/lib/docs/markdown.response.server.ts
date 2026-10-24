@@ -1,3 +1,4 @@
+import { docsMarkdownPath } from "@taxkit/content/publication";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import type { HttpEffect } from "alchemy/Http";
 import { Array, Effect, Match, Option, Result, Schema } from "effect";
@@ -96,6 +97,17 @@ export const withDocsRepresentation = (
       return HttpServerResponse.empty({
         headers: { "cache-control": "no-store", vary: "Accept" },
         status: 400,
+      });
+    }
+    if (!markdownFile) {
+      // A Markdown preference at a page address moves to its own Markdown
+      // file, so each address keeps one representation for the cache.
+      return HttpServerResponse.empty({
+        headers: {
+          location: docsMarkdownPath(docsPath.success),
+          vary: "Accept",
+        },
+        status: 307,
       });
     }
     const api = yield* WebsiteApi;

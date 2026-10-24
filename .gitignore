@@ -18,8 +18,6 @@ tmp/
 # Vitest browser failure attachments
 .vitest/
 
-# Catalogue-derived static public documentation images
-/apps/web/public/og/
 
 # API docs catalogue, written by the API build from content/docs
 /apps/api/src/generated/

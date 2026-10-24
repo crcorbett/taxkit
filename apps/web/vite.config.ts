@@ -1,11 +1,8 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { NodeServices } from "@effect/platform-node";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { Config, ConfigProvider, Effect, Schema } from "effect";
 import { defineConfig } from "vite";
-
-import { generateDocsImages } from "./scripts/docs-images.build.ts";
 
 export default defineConfig(() => {
   const alchemyOwnsCloudflareVite = Effect.runSync(
@@ -21,16 +18,6 @@ export default defineConfig(() => {
   return {
     envPrefix: [],
     plugins: [
-      {
-        configResolved: () =>
-          Effect.runPromise(
-            generateDocsImages.pipe(
-              Effect.asVoid,
-              Effect.provide(NodeServices.layer)
-            )
-          ),
-        name: "taxkit-accepted-doc-images",
-      },
       ...(alchemyOwnsCloudflareVite
         ? []
         : [cloudflare({ viteEnvironment: { name: "ssr" } })]),

@@ -7,13 +7,14 @@ import { applyCachePolicy } from "@taxkit/api-http/response-policy";
 import { DiscoveryPath, discoveryApiPath } from "@taxkit/api-http/routes";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
-import { Effect, ErrorReporter, Match, Schema } from "effect";
+import { Effect, ErrorReporter, Match, Option, Schema } from "effect";
 import {
   HttpServerError,
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
 
+import { docsImageRepresentation } from "./lib/docs/image.ingress";
 import { withDocsRepresentation } from "./lib/docs/markdown.response.server";
 import { WebsiteApi } from "./lib/host.service";
 import { runtime } from "./lib/runtime.server";
@@ -25,6 +26,10 @@ const render = createStartHandler(defaultStreamHandler);
 const websiteRoute = (pathname: string): HostRoute =>
   Match.value(pathname).pipe(
     Match.when(Schema.is(DiscoveryPath), () => "discovery" as const),
+    Match.when(
+      (path) => path.startsWith("/og/") && path.endsWith(".png"),
+      () => "docs" as const
+    ),
     Match.when(
       (path) => path === "/" || path.startsWith("/calculators/"),
       () => "calculator-page" as const
@@ -61,6 +66,10 @@ const handleRequest = createServerOnlyFn((request: Request) =>
             Effect.succeed(HttpServerResponse.empty({ status: 503 }))
           )
         );
+      }
+      const image = yield* docsImageRepresentation;
+      if (Option.isSome(image)) {
+        return image.value;
       }
       // The framework still mounts its server-function base. The Website
       // declares no server functions, so every such address is absent.

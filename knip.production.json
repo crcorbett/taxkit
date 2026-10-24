@@ -140,15 +140,6 @@
       ],
       "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
     },
-    "packages/publication": {
-      "entry": [
-        "src/schemas.ts!",
-        "src/errors.ts!",
-        "src/service.ts!",
-        "src/live.layer.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
-    },
     "packages/observability": {
       "entry": [
         "src/host-telemetry.ts!",
@@ -177,6 +168,18 @@
     "packages/diagrams": {
       "entry": ["src/mermaid.adapter.layer.ts!"],
       "project": ["src/**/*.ts!"]
+    },
+    "packages/aeo": {
+      "entry": [
+        "src/documents.egress.ts!",
+        "src/routes.layer.ts!",
+        "src/service.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/__testing__/**!"]
+    },
+    "packages/og-image": {
+      "entry": ["src/cache.layer.ts!", "src/takumi.adapter.layer.ts!"],
+      "project": ["src/**/*.{ts,tsx}!"]
     }
   },
   "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]

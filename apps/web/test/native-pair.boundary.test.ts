@@ -6,18 +6,22 @@ import {
   CalculatorRequestBodyErrorEnvelope,
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/request-boundary";
+import { DiscoveryPath } from "@taxkit/api-http/routes";
 import {
   DescriptorFilterQuery,
   HelpQuery,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
+import { docsImagePath } from "@taxkit/content/publication";
 import {
+  DocsPngBytes,
+  DocsPublicCatalogue,
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
   DocsSearchTerm,
+  docsOgImageSize,
 } from "@taxkit/content/schemas";
-import { DocsDiscoveryPath } from "@taxkit/publication/schemas";
 import {
   Array,
   Effect,
@@ -36,21 +40,22 @@ import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 import type { Page, Request as BrowserRequest } from "playwright";
 
-import {
-  generateDocsImages,
-  readDocsCatalogue,
-} from "../scripts/docs-images.build";
-import { WebsiteDocsImageBytes } from "../scripts/docs-images.schemas";
-import {
-  docsImagePath,
-  WebsiteDocsArticleJson,
-  WebsiteDocsImageSize,
-} from "../src/lib/docs/social.schemas";
 import { readWorkerModules } from "./native-modules.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
 } from "./native-rate.fixture";
+
+// The page's checked structured data, as a search engine reads it.
+const TechArticleJson = Schema.fromJsonString(
+  Schema.Struct({
+    description: Schema.String,
+    headline: Schema.String,
+    image: Schema.URLFromString,
+    inLanguage: Schema.Literal("en-AU"),
+    url: Schema.URLFromString,
+  })
+);
 
 const apiOrigin = "http://127.0.0.1:4197";
 const websiteOrigin = "http://127.0.0.1:4196";
@@ -191,14 +196,14 @@ describe("built native API and Website", () => {
               expect(clientCode.includes(marker), marker).toBe(false);
             })
         );
+        // Only the API renders share images; the Website and browser carry
+        // no renderer, font or WebAssembly.
+        expect(apiCode).toContain("DocsPageRenderer.renderPage");
+        expect(
+          Array.some(Record.keys(apiWasm), (file) => file.includes("takumi"))
+        ).toBe(true);
         yield* Effect.forEach(
-          [
-            "taxkit/WebsiteDocsImageBytes",
-            "@takumi-rs",
-            "takumi_wasm",
-            "Public documentation images could not be built.",
-            "taxkit-accepted-doc-images",
-          ],
+          ["@takumi-rs", "takumi_wasm", "DocsPageRenderer.renderPage"],
           (marker) =>
             Effect.sync(() => {
               expect(clientCode.includes(marker), marker).toBe(false);
@@ -208,7 +213,6 @@ describe("built native API and Website", () => {
                 ),
                 marker
               ).toBe(false);
-              expect(apiCode.includes(marker), marker).toBe(false);
             })
         );
         expect(
@@ -388,53 +392,48 @@ describe("built native API and Website", () => {
         );
         // Compare the actual built Worker with the owning checked catalogue,
         // including every body rather than accepting a count or a placeholder.
-        const publicContent = yield* readDocsCatalogue;
-        expect(publicContent.pages).toHaveLength(62);
-        // Repeat the actual build-only generator, then compare every fresh
-        // output with the already built asset. This checks determinism and
-        // Vite's public-copy ordering rather than a separate renderer probe.
-        const repeatedImages = yield* generateDocsImages;
-        expect(repeatedImages).toHaveLength(publicContent.pages.length);
-        const copiedImages = yield* fs.glob("og/**/*.png", {
-          root: path.join(root, "apps/web/dist/client"),
-        });
-        expect(Array.sort(copiedImages, Order.String)).toEqual(
-          Array.sort(
-            Array.map(publicContent.pages, (page) =>
-              docsImagePath(page).slice(1)
-            ),
-            Order.String
+        const publicContent = yield* fs
+          .readFileString(
+            path.join(root, "apps/api/src/generated/docs-catalogue.json")
           )
-        );
-        yield* Effect.forEach(repeatedImages, (image) =>
+          .pipe(
+            Effect.flatMap(
+              Schema.decodeEffect(Schema.fromJsonString(DocsPublicCatalogue))
+            )
+          );
+        expect(publicContent.pages).toHaveLength(62);
+        // The API renders each share image on request; the Website forwards
+        // its own /og address once and checks the PNG.
+        yield* Effect.forEach(Array.take(publicContent.pages, 3), (page) =>
           Effect.gen(function* () {
-            const built = yield* fs
-              .readFile(
-                path.join(root, "apps/web/dist/client", image.path.slice(1))
-              )
-              .pipe(Effect.flatMap(Schema.decodeEffect(WebsiteDocsImageBytes)));
-            expect(Array.fromIterable(built)).toEqual(
-              Array.fromIterable(image.bytes)
-            );
+            const address = `${websiteOrigin}${docsImagePath(page.path)}`;
             const served = yield* Effect.promise(() =>
-              website.dispatchFetch(`${websiteOrigin}${image.path}`)
+              website.dispatchFetch(address)
             );
-            expect(served.status).toBe(200);
-            expect(served.headers.get("content-type")).toContain("image/png");
+            expect(served.status, page.path).toBe(200);
+            expect(served.headers.get("content-type")).toBe("image/png");
             expect(served.headers.get("cache-control")).toBe(
-              "public, max-age=0, must-revalidate"
+              publicCache.browser
             );
+            expect(served.headers.get("cloudflare-cdn-cache-control")).toBe(
+              publicCache.cdn
+            );
+            const bytes = yield* Schema.decodeEffect(DocsPngBytes)(
+              new Uint8Array(yield* Effect.promise(() => served.arrayBuffer()))
+            );
+            const owned = yield* Effect.promise(() =>
+              publicApi.dispatchFetch(
+                `${apiOrigin}/api/v1/docs/og${page.path}.png`
+              )
+            );
+            expect(owned.status).toBe(200);
             expect(
               Array.fromIterable(
-                new Uint8Array(
-                  yield* Effect.promise(() => served.arrayBuffer())
-                )
+                new Uint8Array(yield* Effect.promise(() => owned.arrayBuffer()))
               )
-            ).toEqual(Array.fromIterable(built));
+            ).toEqual(Array.fromIterable(bytes));
             const head = yield* Effect.promise(() =>
-              website.dispatchFetch(`${websiteOrigin}${image.path}`, {
-                method: "HEAD",
-              })
+              website.dispatchFetch(address, { method: "HEAD" })
             );
             expect(head.status).toBe(200);
             expect(head.headers.get("content-type")).toBe(
@@ -445,6 +444,20 @@ describe("built native API and Website", () => {
             );
             expect(yield* Effect.promise(() => head.text())).toBe("");
           })
+        );
+        yield* Effect.forEach(
+          [
+            { address: "/og/private9.png", status: 404 },
+            { address: "/og/invalid.path.png", status: 404 },
+          ],
+          (missing) =>
+            Effect.gen(function* () {
+              const response = yield* Effect.promise(() =>
+                website.dispatchFetch(`${websiteOrigin}${missing.address}`)
+              );
+              expect(response.status, missing.address).toBe(missing.status);
+              expect(response.headers.get("cache-control")).toBe("no-store");
+            })
         );
 
         // The generated HTTP client restores the same catalogue values across
@@ -480,7 +493,7 @@ describe("built native API and Website", () => {
         }).pipe(Effect.provide(FetchHttpClient.layer));
         // The API's own discovery routes are the reference documents.
         const discoveryDocuments = yield* Effect.forEach(
-          DocsDiscoveryPath.literals,
+          DiscoveryPath.literals,
           (documentPath) =>
             Effect.gen(function* () {
               const owned = yield* Effect.promise(() =>
@@ -593,9 +606,15 @@ describe("built native API and Website", () => {
           (document) => document.path === "/robots.txt"
         ).pipe(Effect.fromOption);
         // Nothing remains behind a retired server-function path.
-        expect(discoveryRobots.body).toBe(
-          `User-agent: *\nAllow: /\nSitemap: ${websiteOrigin}/sitemap.xml\n`
+        expect(discoveryRobots.body).toContain(
+          "User-agent: *\nContent-Signal: search=yes, ai-input=yes, ai-train=yes\nAllow: /\n"
         );
+        expect(discoveryRobots.body).toContain("User-agent: ClaudeBot\n");
+        expect(
+          discoveryRobots.body.endsWith(
+            `\nSitemap: ${websiteOrigin}/sitemap.xml\n`
+          )
+        ).toBe(true);
         const discoverySitemap = yield* Array.findFirst(
           discoveryDocuments,
           (document) => document.path === "/sitemap.xml"
@@ -691,12 +710,24 @@ describe("built native API and Website", () => {
             expect(html).toContain('class="docs-article"');
           })
         );
-        // Both original page URLs and explicit files must read the owning
-        // processed body. A count, copied source or forged native header cannot
-        // satisfy these actual built-Worker responses.
+        // A Markdown preference at a page moves to its Markdown file, and
+        // every file reads the owning processed body. A count, copied source or
+        // forged native header cannot satisfy these actual built-Worker responses.
         yield* Effect.forEach(publicContent.pages, (page) =>
           Effect.gen(function* () {
-            yield* Effect.forEach(["", ".md"] as const, (suffix) =>
+            const moved = yield* Effect.promise(() =>
+              website.dispatchFetch(`${websiteOrigin}${page.path}`, {
+                headers: { accept: "text/markdown" },
+                redirect: "manual",
+              })
+            );
+            expect(moved.status, page.path).toBe(307);
+            expect(moved.headers.get("location")).toBe(`${page.path}.md`);
+            expect(moved.headers.get("vary")).toBe("Accept");
+            expect(moved.headers.get("cache-control")).toBe(
+              publicCache.browser
+            );
+            yield* Effect.forEach([".md"] as const, (suffix) =>
               Effect.gen(function* () {
                 const address = `${websiteOrigin}${page.path}${suffix}`;
                 const headers = {
@@ -760,12 +791,12 @@ describe("built native API and Website", () => {
             {
               accept: "text/markdown;q=0.9, text/html;q=0.7",
               markdown: true,
-              status: 200,
+              status: 307,
             },
             {
               accept: 'application/json;note="a,b;c", text/markdown',
               markdown: true,
-              status: 200,
+              status: 307,
             },
             { accept: "text/markdown;q=0, */*", markdown: false, status: 200 },
             {
@@ -797,6 +828,7 @@ describe("built native API and Website", () => {
               const response = yield* Effect.promise(() =>
                 website.dispatchFetch(`${websiteOrigin}/start/quickstart`, {
                   headers: { accept: choice.accept },
+                  redirect: "manual",
                 })
               );
               expect(response.status, choice.accept).toBe(choice.status);
@@ -804,7 +836,17 @@ describe("built native API and Website", () => {
               // Cache keeps the HTML and Markdown variants side by side.
               expect(response.headers.get("vary")).toBe("Accept");
               const body = yield* Effect.promise(() => response.text());
-              if (choice.status !== 200) {
+              if (choice.markdown) {
+                expect(response.headers.get("location")).toBe(
+                  "/start/quickstart.md"
+                );
+              }
+              if (choice.status === 200) {
+                expect(response.headers.get("content-type")).toContain(
+                  "text/html"
+                );
+                expect(body).toContain("docs-article");
+              } else {
                 // Negotiation answers are stored as their own public variant
                 // so they never evict the page's cached HTML.
                 expect(response.headers.get("cache-control")).toBe(
@@ -814,13 +856,6 @@ describe("built native API and Website", () => {
                   response.headers.get("cloudflare-cdn-cache-control")
                 ).toBe("public, max-age=604800, stale-if-error=0");
                 expect(body).toBe("");
-              } else if (choice.markdown) {
-                expect(body).toBe(quickstart.markdown);
-              } else {
-                expect(response.headers.get("content-type")).toContain(
-                  "text/html"
-                );
-                expect(body).toContain("docs-article");
               }
             })
         );
@@ -848,7 +883,7 @@ describe("built native API and Website", () => {
             },
             { address: "/invalid.path.md", method: "GET", status: 400 },
             { address: "/private9.md", method: "GET", status: 404 },
-            { address: "/private9", method: "GET", status: 404 },
+            { address: "/private9", method: "GET", status: 307 },
             { address: "/search.md", method: "GET", status: 404 },
             { address: "/agents.md", method: "GET", status: 404 },
             { address: "/start/quickstart.md", method: "POST", status: 405 },
@@ -861,6 +896,7 @@ describe("built native API and Website", () => {
                 website.dispatchFetch(`${websiteOrigin}${invalid.address}`, {
                   headers: { accept: "text/markdown" },
                   method: invalid.method,
+                  redirect: "manual",
                 })
               );
               expect(response.status).toBe(invalid.status);
@@ -870,7 +906,7 @@ describe("built native API and Website", () => {
               expect(yield* Effect.promise(() => response.text())).toBe("");
             })
         );
-        yield* Effect.forEach(["", ".md"] as const, (suffix) =>
+        yield* Effect.forEach([".md"] as const, (suffix) =>
           Effect.gen(function* () {
             const unavailable = yield* Effect.promise(() =>
               unavailableDiscoveryWorker.fetch(
@@ -1900,22 +1936,18 @@ describe("built native API and Website", () => {
               }, html)
             );
 
-            const article = yield* Schema.decodeEffect(WebsiteDocsArticleJson)(
+            const article = yield* Schema.decodeEffect(TechArticleJson)(
               rendered.articleJson
             );
             expect(article.headline).toBe(expected.frontmatter.title);
             expect(article.description).toBe(expected.frontmatter.description);
             expect(article.url.href).toBe(`${websiteOrigin}${expected.path}`);
             expect(article.image.href).toBe(
-              `${websiteOrigin}${docsImagePath(expected)}`
+              `${websiteOrigin}${docsImagePath(expected.path)}`
             );
             expect(rendered.image).toBe(article.image.href);
-            expect(rendered.imageWidth).toBe(
-              String(WebsiteDocsImageSize.width)
-            );
-            expect(rendered.imageHeight).toBe(
-              String(WebsiteDocsImageSize.height)
-            );
+            expect(rendered.imageWidth).toBe(String(docsOgImageSize.width));
+            expect(rendered.imageHeight).toBe(String(docsOgImageSize.height));
             expect(rendered.twitterCard).toBe("summary_large_image");
             // Browser-native decode returns its own Promise at this required
             // Playwright host callback. No renderer runs in the browser.
@@ -1938,7 +1970,7 @@ describe("built native API and Website", () => {
                     width: image.naturalWidth,
                   }))
               )
-            ).toEqual(WebsiteDocsImageSize);
+            ).toEqual(docsOgImageSize);
             expect(rendered.heading).toBe(expected.frontmatter.title);
             expect(rendered.title).toBe(
               `${expected.frontmatter.title} | TaxKit`

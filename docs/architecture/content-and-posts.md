@@ -87,17 +87,17 @@ Website reads pages, navigation, search and Markdown from the API's public HTTP
 content routes with the generated client and renders each page's checked
 `body` with `apps/web/src/lib/docs/reading-body.view.tsx`. Its `/search` GET form shows published titles and descriptions
 with the existing document links. No second index is added.
-`@taxkit/publication` owns `ContentDiscovery`, which derives four discovery files from the same public
-catalogue, the API origin and the publication origin `https://taxkit.dev`. The
-API serves them at `/api/v1/docs/discovery/*`; the Website forwards its
-conventional addresses there once. Robots allows everything (`Allow: /`) and
+`@taxkit/aeo` owns the answer-engine routes, which derive four discovery files
+from the same public catalogue, the API origin and the publication origin
+`https://taxkit.dev`. The API serves them at `/api/v1/docs/discovery/*`; the
+Website forwards its conventional addresses there once. Robots allows everything (`Allow: /`) and
 names the sitemap. The short agent index links to published processed Markdown;
 the full index retains those bodies, including fenced examples. No authored
 source, personal report, guessed origin or competing content catalogue is
-exposed. The Website serves the processed body through same-address Accept
-negotiation and explicit `.md` links; the
+exposed. The Website serves the processed body at explicit `.md` addresses, and
+a Markdown `Accept` preference at a page redirects there; the
 [frontend owner](frontend.md#documentation) records representation policy.
-Share images are derived during the Website build. The old app workspace is
+Share images are rendered by the API on request. The old app workspace is
 retired; verified original-source data and dated provider recovery identities
 remain addressable.
 
@@ -173,12 +173,14 @@ docs implementation
 
 ## Published page share assets
 
-The Website Vite build derives PNG share assets through
-`apps/web/scripts/docs-images.build.ts`, which builds the same catalogue from
-the files in `content/docs` via `readDocsCatalogue`. The same page address
-mapping supplies HTML metadata; there is no separate page list or dynamic image
-API. The exact current Takumi 2.14.0 WebAssembly renderer and embedded font are
-build-only dependencies. Generator, dimensions/byte Schema, metadata egress and
-Website config are tracked inputs; generated `apps/web/public/og/**` is ignored
-and declared as a Turbo build output. Static generation reads only that checked
-catalogue and accepts no calculation values.
+Content declares the share-image contracts (`DocsOgImage`, `DocsPngBytes`,
+`DocsPageRenderer`, `DocsOgImages`) and the page addresses and head metadata in
+`@taxkit/content/publication`. `@taxkit/og-image` implements them with the
+Takumi 2.14.0 WebAssembly renderer and the bundled Geist font, behind one
+render at a time, a 30-second deadline and a small five-minute cache. The AEO
+package serves one image route per published page at `/api/v1/docs/og/<page>.png`,
+from the same catalogue; there is no separate page list. The Website forwards
+`/og/<page>.png` there and checks the PNG. Images read only checked page titles,
+descriptions and addresses and accept no calculation values. The CDN keeps each
+image for seven days per deployed version, so a page costs one render per
+version and edge.

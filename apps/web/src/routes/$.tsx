@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Option, Result } from "effect";
+import { Option } from "effect";
 
 import { DocsHeading } from "#/lib/docs/components";
-import { docsMetadata } from "#/lib/docs/metadata.egress";
 import {
   DocsPageNotFound,
   DocsPageUnavailable,
@@ -11,20 +10,11 @@ import {
 import { DocsReadingBodyView } from "#/lib/docs/reading-body.view";
 import { loadDocsPage } from "#/lib/loaders";
 import type { WebsiteDocsPageView } from "#/lib/schemas";
-
-const docsHead = (loaderData: WebsiteDocsPageView | undefined) =>
-  Option.fromNullishOr(loaderData).pipe(
-    Option.flatMap(({ page, publicationOrigin }) =>
-      Result.getSuccess(docsMetadata(page, new URL(publicationOrigin)))
-    ),
-    Option.getOrElse(() => ({
-      meta: [{ title: "Documentation | TaxKit" }],
-    }))
-  );
+import { docsHead } from "#/lib/seo/head";
 
 export const Route = createFileRoute("/$")({
   component: function DocumentationRoute() {
-    const { navigation, page, publicationOrigin } = Route.useLoaderData();
+    const { metadata, navigation, page } = Route.useLoaderData();
     return (
       <div className="docs-layout">
         <aside className="docs-sidebar">
@@ -37,9 +27,7 @@ export const Route = createFileRoute("/$")({
           <DocsHeading>{page.frontmatter.title}</DocsHeading>
           <DocsReadingBodyView body={page.body} />
           <p className="docs-markdown-link">
-            <a href={new URL(`${page.path}.md`, publicationOrigin).href}>
-              Read this page as Markdown
-            </a>
+            <a href={metadata.markdown}>Read this page as Markdown</a>
           </p>
         </article>
       </div>
@@ -50,7 +38,12 @@ export const Route = createFileRoute("/$")({
   head: ({
     loaderData,
   }: Readonly<{ loaderData?: WebsiteDocsPageView | undefined }>) =>
-    docsHead(loaderData),
+    Option.fromNullishOr(loaderData).pipe(
+      Option.map(({ metadata }) => docsHead(metadata)),
+      Option.getOrElse(() => ({
+        meta: [{ title: "Documentation | TaxKit" }],
+      }))
+    ),
   loader: ({ params, context, abortController }) =>
     loadDocsPage({
       context,
