@@ -11,7 +11,7 @@ export default defineConfig({
       instances: [{ browser: "chromium" }],
       provider: playwright(),
     },
-    include: ["src/**/*.test.ts"],
+    include: ["test/*.test.ts"],
     passWithNoTests: false,
   },
 });

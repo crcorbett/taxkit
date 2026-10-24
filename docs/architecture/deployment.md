@@ -16,7 +16,8 @@ This owner describes the deployed resources and their boundaries. The
 
 `alchemy.run.ts` declares the `TaxKitAppsCloudflare` stack with Cloudflare
 providers, `Cloudflare.state()` and the native secrets in
-`@taxkit/infrastructure/secrets`. Root `alchemy.apps.ts` composes the app
+`@taxkit/infrastructure/secrets` (local state and the shell only for a `dev_*`
+stage). Root `alchemy.apps.ts` composes the app
 implementation with the lightweight `@taxkit/infrastructure/api-worker` declaration
 and `./worker-settings`. `@taxkit/infrastructure/apps-stack` declares infrastructure
 and host props without importing an app. Together these declare:
