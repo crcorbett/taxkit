@@ -101,11 +101,8 @@ Share images are rendered by the API on request. The old app workspace is
 retired; verified original-source data and dated provider recovery identities
 remain addressable.
 
-`docs/architecture`
+`ARCHITECTURE.md` and `docs/architecture`
 : Durable implementation architecture.
-
-`docs/product-specs`
-: Product/spec intent for active repo development.
 
 ## Public docs graph
 
@@ -145,8 +142,7 @@ docs implementation
 - Do not document private downstream product strategy here.
 - Link to canonical architecture docs rather than duplicating them.
 - Treat old planning material as historical until revalidated.
-- Use [Documentation style](../standards/documentation-style.md) and the
-  related standards suite before writing or reviewing public docs.
+- Write public docs in plain, simple Australian English, task first.
 - Keep public MDX pages task-first. Use architecture docs for durable
   ownership and runtime detail.
 - Check public MDX through `@taxkit/content` and `@taxkit/mdx`, which decode
@@ -169,7 +165,6 @@ docs implementation
 
 - [API and SDK](./api-and-sdk.md)
 - [Package ownership](./package-ownership.md)
-- [Product specs](../product-specs/index.md)
 
 ## Published page share assets
 

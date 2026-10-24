@@ -9,32 +9,31 @@ last_reviewed: 2026-10-20
 # TaxKit repository guide
 
 TaxKit is the public monorepo for the open-source tax engine, API, SDK, and
-documentation site. Start with [`docs/README.md`](docs/README.md), the
-maintainer-document and truth-layer router. `CLAUDE.md` points to this
-file; edit `AGENTS.md` only.
+documentation site. Start with [`ARCHITECTURE.md`](ARCHITECTURE.md) and the
+short [docs index](docs/README.md). `CLAUDE.md` points to this file; edit
+`AGENTS.md` only.
 
 ## Operating loop
 
-1. Read `docs/README.md`, then only the owner document for the task.
+1. Read `ARCHITECTURE.md`, then only the owner document for the task.
 2. Confirm the claim against code, configuration, Schemas, exports or the
    running system it describes.
-3. Put current implementation intent in an active SPEC and plan; delete them
-   when the work is done. Git keeps the history.
-4. Update the owner document and its pointers in the same change.
-5. Run focused checks while working and `bun run verification` before merging.
-   Public package changes also need a Changeset.
-6. Use ordinary Git commits and pull requests. Describe what changed, the
+3. Update the owner document and its pointers in the same change. Record a
+   lasting choice as an ADR; keep finished plans and reports in Git history.
+4. Run focused checks while working and `bun run verification` (the five
+   checks: build, lint, types, Knip and tests) before merging. Public package
+   changes also need a Changeset.
+5. Use ordinary Git commits and pull requests. Describe what changed, the
    checks that ran and anything not checked.
 
 For a material calculator, rule, Schema, SDK, HTTP/OpenAPI, public docs,
-package, command, deployment, SPEC or plan change, decide which documents
-change; maintainers with the shared plugin can use
+package, command or deployment change, decide which documents change;
+maintainers with the shared plugin can use
 `development-workflows:docs-maintainer` for that.
 
 ## Task routes
 
-- Repository and package topology:
-  [`docs/architecture/README.md`](docs/architecture/README.md), then
+- Repository and package topology: [`ARCHITECTURE.md`](ARCHITECTURE.md), then
   [`docs/architecture/package-ownership.md`](docs/architecture/package-ownership.md).
 - Effect services and boundaries:
   [`docs/architecture/effect-services.md`](docs/architecture/effect-services.md)
@@ -48,14 +47,12 @@ change; maintainers with the shared plugin can use
   [`docs/architecture/frontend.md`](docs/architecture/frontend.md),
   [`docs/architecture/content-and-posts.md`](docs/architecture/content-and-posts.md),
   and [`apps/web/README.md`](apps/web/README.md).
-- Current work: [`docs/product-specs/index.md`](docs/product-specs/index.md) and
-  [`docs/exec-plans/active/README.md`](docs/exec-plans/active/README.md).
 - Standards, tests, and release checks:
-  [`docs/standards/README.md`](docs/standards/README.md) and
+  [`docs/standards/code-patterns.md`](docs/standards/code-patterns.md),
+  [`docs/standards/tooling.md`](docs/standards/tooling.md) and
   [`docs/architecture/testing-and-quality.md`](docs/architecture/testing-and-quality.md).
 - Versioning, packed SDK checks and Website/API deployment:
   [`docs/runbooks/README.md`](docs/runbooks/README.md).
-- References: [`docs/references/README.md`](docs/references/README.md).
 
 Use the shared `development-workflows:linear` skill when work is tracked in
 Linear.

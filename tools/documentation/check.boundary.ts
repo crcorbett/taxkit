@@ -187,7 +187,7 @@ export const checkDocumentation = Effect.fn("Documentation.check")(function* (
     (readme) => fs.exists(path.join(repositoryRoot, readme))
   );
   const files = yield* Effect.forEach(
-    ["AGENTS.md", "README.md", ...docs, ...readmes],
+    ["AGENTS.md", "ARCHITECTURE.md", "README.md", ...docs, ...readmes],
     (file) =>
       fs
         .readFileString(path.join(repositoryRoot, file))
