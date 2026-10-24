@@ -6,7 +6,11 @@ its work is active, together with an entry in
 SPEC and its task list when the work merges; Git and the pull request keep the
 history, and the architecture, standards and package READMEs own the result.
 
-There is no active SPEC.
+Active SPECs:
+
+- [effect-mdx](./effect-mdx.md), with its
+  [task list](./effect-mdx.tasks.json): extract authored-MDX handling into one
+  domain-free package.
 
 Authoring guides:
 

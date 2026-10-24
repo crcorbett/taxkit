@@ -1,0 +1,216 @@
+{
+  "$schema": "https://taxkit.local/schemas/product-spec-task-plan.v1.json",
+  "spec": "docs/product-specs/effect-mdx.md",
+  "title": "effect-mdx Implementation Tasks",
+  "status": "draft",
+  "last_reviewed": "2026-10-24",
+  "principles": [
+    "Every task keeps the generated docs catalogue and the OpenAPI snapshot byte-identical to the base commit.",
+    "@taxkit/effect-mdx never imports a @taxkit/* package.",
+    "Move code before changing it; behaviour changes come only in TASK-004.",
+    "Static Layers, named Effect.fn on public operations, Schema decoding at ingress and exhaustive Match, as in docs/architecture/effect-services.md."
+  ],
+  "globalVerification": {
+    "commitPolicy": "One commit per accepted task.",
+    "requiredBeforeFinalPR": [
+      "bun run verification",
+      "bun run changeset (effect-mdx new, content major, api and web patch)"
+    ],
+    "evidenceRequired": [
+      "cmp of the baseline and current apps/api/src/generated/docs-catalogue.json",
+      "git diff --exit-code packages/api/http/__snapshots__/openapi.json",
+      "Final call graph checked against SPEC section 3",
+      "Negative rg audits from SPEC section 8"
+    ]
+  },
+  "downstreamArtifactImpact": [
+    "See the SPEC section 11 ledger; each Change required row maps to the task named there."
+  ],
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "Create @taxkit/effect-mdx with the format Schemas, errors and contracts",
+      "type": "foundation",
+      "dependsOn": [],
+      "goal": "Give the authored format one domain-free owner without changing any output.",
+      "scope": [
+        "Before editing, build the catalogue at the base commit and save a copy in the scratchpad as the baseline.",
+        "Create packages/effect-mdx (private, compiled) with ./schemas, ./errors and ./service.",
+        "Move the block, inline, token, diagram, heading id and href Schemas out of packages/content/src/schemas.ts as Mdx* names, with effect-mdx/* brands; make MdxCodeLanguage a bounded identifier instead of a fixed list.",
+        "Add the MdxDocument(frontmatter) and MdxCollection(frontmatter) Schema constructors and MdxFrontmatterBase.",
+        "Point content, web, mcp and publication imports at @taxkit/effect-mdx/schemas.",
+        "Add packages/effect-mdx to domainFreeOwners and its ./schemas, ./errors and ./service exports to frontendModules in tools/oxlint/package-roles.ts."
+      ],
+      "outputs": [
+        "packages/effect-mdx/{package.json,README.md,src/schemas.ts,src/errors.ts,src/service.ts,test/schemas.test.ts}",
+        "Updated imports and the lint role lists"
+      ],
+      "mandatoryVerification": [
+        "bun run --filter=@taxkit/effect-mdx check-types",
+        "bun run --filter=@taxkit/effect-mdx test",
+        "Catalogue byte gate and OpenAPI gate",
+        "bun run verification"
+      ],
+      "browserVerification": [],
+      "qualityAudits": [
+        "rg \"@taxkit/\" packages/effect-mdx/src returns nothing.",
+        "No Schema is defined twice; content keeps no copy of a block Schema."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+        "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
+      },
+      "completionCriteria": [
+        "The byte gates pass and lint enforces the domain-free rule."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TASK-002",
+      "title": "Add compileCollection, the three seams and one build composition",
+      "type": "vertical-slice",
+      "dependsOn": ["TASK-001"],
+      "goal": "Replace DocsPageReader and the two hand-wired compositions with compileCollection and DocsCatalogueBuildLive.",
+      "scope": [
+        "Move packages/mdx/src/{mdx.ingress,body.ingress,schemas}.ts into effect-mdx behind ./compile; make the frontmatter Schema a caller input and derive addresses from source paths.",
+        "Split link resolution: generic rules in effect-mdx, and MdxFileLinks for other relative links; add MdxFileLinksNone (./links) and DocsRepositoryFileLinksLive (content).",
+        "Move the highlighter to ./highlights and the Mermaid renderer to ./mermaid; add MdxDiagramTheme and supply the Website palette from content.",
+        "Move readingMarkdown to ./markdown as toMarkdown.",
+        "Add ./test adapters: MdxCodeHighlighterTest, MdxDiagramRendererTest, MdxFileLinksTest.",
+        "Add the content ./build export with DocsCatalogueBuildLive; use it in apps/api/scripts/docs-catalogue.layer.ts (then delete that file), apps/web/scripts/docs-images.build.ts and apps/api/test.",
+        "Delete packages/mdx, packages/diagrams and DocsPageReader, DocsSources, DocsCodeHighlighter and DocsDiagramRenderer; update knip, oxlint.config.ts, portable-rules.test.ts and manifests."
+      ],
+      "outputs": [
+        "packages/effect-mdx/src/{compile,body.ingress,mdx.ingress,syntax.schemas,links,markdown,highlights.adapter.layer,mermaid.adapter.layer,test.layer}.ts",
+        "packages/content/src/{build.layer,links.layer}.ts"
+      ],
+      "mandatoryVerification": [
+        "bun run --filter=@taxkit/effect-mdx test",
+        "bun run --filter=@taxkit/content test",
+        "bun run --filter=api test",
+        "Catalogue byte gate and OpenAPI gate",
+        "bun run verification"
+      ],
+      "browserVerification": [],
+      "qualityAudits": [
+        "rg \"@pierre/highlights|beautiful-mermaid\" outside packages/effect-mdx returns nothing.",
+        "rg \"DocsPageReader|@taxkit/mdx|@taxkit/diagrams\" returns nothing.",
+        "compileCollection stays flat and sequential, with no Layer factories and no casts.",
+        "Exactly one composition site wires the adapters."
+      ],
+      "parentAudit": {
+        "required": true,
+        "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+        "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
+      },
+      "completionCriteria": [
+        "The build call graph matches SPEC section 3 and the byte gates pass."
+      ],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TASK-003",
+      "title": "Discover sources from the content directory",
+      "type": "vertical-slice",
+      "dependsOn": ["TASK-002"],
+      "goal": "Adding a page needs only the .mdx file and its navigation entry.",
+      "scope": [
+        "Add readSources(root) at ./sources over Effect FileSystem and Path.",
+        "Export the content root from @content/docs; use readSources in DocsCatalogueBuildLive.",
+        "Delete content/docs/sources.ts and raw-modules.d.ts; update docs-sources.test.ts and published-snippets.test.ts.",
+        "Update content/docs/README.md and apps/api/README.md."
+      ],
+      "outputs": ["packages/effect-mdx/src/sources.ts"],
+      "mandatoryVerification": [
+        "A test that adds a stray .mdx to a fixture directory and fails the navigation check",
+        "Catalogue byte gate",
+        "bun run verification"
+      ],
+      "browserVerification": [],
+      "qualityAudits": ["rg \"content/docs/sources|\\?raw\" returns nothing in owned code."],
+      "parentAudit": {
+        "required": true,
+        "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+        "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
+      },
+      "completionCriteria": ["sources.ts is gone and the byte gate passes."],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TASK-004",
+      "title": "Report every broken page with line numbers and check fragment links",
+      "type": "behaviour",
+      "dependsOn": ["TASK-002"],
+      "goal": "Authors see every problem, with its place, in one run.",
+      "scope": [
+        "Give MdxSourceError a closed reason and an optional line from the mdast position.",
+        "Accumulate every source failure into one failure.",
+        "Check #fragment links against the target document's heading ids; fix any real broken links in content/docs."
+      ],
+      "outputs": ["Tests for each reason and for multi-page failures"],
+      "mandatoryVerification": [
+        "bun run --filter=@taxkit/effect-mdx test",
+        "Catalogue byte gate, or a reviewed diff limited to fixed content links",
+        "bun run verification"
+      ],
+      "browserVerification": [],
+      "qualityAudits": ["Error fields carry no source text."],
+      "parentAudit": {
+        "required": true,
+        "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+        "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
+      },
+      "completionCriteria": ["Every reason has a failing-input test."],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TASK-005",
+      "title": "Move the reading body view into @taxkit/effect-mdx/react",
+      "type": "frontend",
+      "dependsOn": ["TASK-001"],
+      "goal": "Render any MdxBody with typed component overrides.",
+      "scope": [
+        "Move apps/web/src/lib/docs/reading-body.view.tsx into ./react as MdxBodyView with an MdxComponents map; React becomes a peer dependency.",
+        "apps/web supplies only the link override (TanStack Link and navigation focus).",
+        "Add ./react to frontendModules."
+      ],
+      "outputs": ["packages/effect-mdx/src/react.view.tsx", "apps/web/src/lib/docs/router-link.view.tsx"],
+      "mandatoryVerification": ["bun run --filter=web test", "bun run verification"],
+      "browserVerification": [
+        "On the local Website, a page with a table, code, a diagram and page and fragment links renders as before; page links navigate client-side and keep the focus behaviour."
+      ],
+      "qualityAudits": ["The view keeps route → container → leaf ownership from docs/architecture/frontend.md; the leaf holds no data loading."],
+      "parentAudit": {
+        "required": true,
+        "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+        "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
+      },
+      "completionCriteria": ["Browser proof is recorded."],
+      "commitAfterPassing": true
+    },
+    {
+      "id": "TASK-006",
+      "title": "Close out documentation, Changesets and the SPEC",
+      "type": "closeout",
+      "dependsOn": ["TASK-003", "TASK-004", "TASK-005"],
+      "goal": "Owner documents describe the result; the SPEC is deleted.",
+      "scope": [
+        "Update every Change required documentation row in the SPEC ledger.",
+        "Add the Changesets from SPEC section 10.",
+        "Delete this SPEC and task list; restore docs/product-specs/index.md."
+      ],
+      "outputs": ["Updated architecture docs and READMEs", ".changeset/*.md"],
+      "mandatoryVerification": ["bun run check:docs", "bun run verification"],
+      "browserVerification": [],
+      "qualityAudits": ["No document still names @taxkit/mdx, @taxkit/diagrams, DocsPageReader or sources.ts."],
+      "parentAudit": {
+        "required": true,
+        "basis": "Review the diff, task gates, architecture, and path-evidenced ledger.",
+        "recovery": "Correct, re-scope, or seek a decision when an observed blocker cannot be resolved safely."
+      },
+      "completionCriteria": ["bun run verification passes on the final head."],
+      "commitAfterPassing": true
+    }
+  ]
+}
