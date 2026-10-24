@@ -1,5 +1,32 @@
 # @taxkit/analytics
 
+## 1.0.0
+
+### Major Changes
+
+- cafcc71: The Website calculators now need JavaScript. The Website no longer accepts
+  HTML form POSTs and shows a notice when JavaScript is off; browsers keep
+  calling the public API directly.
+
+  The private Website forwarding key is removed with the server form path. The
+  API takes a calculation caller's rate key only from the direct Cloudflare
+  connection or the local emulator fallback. `@taxkit/observability/edge-identity`
+  no longer exports the forwarding headers or credential Schema, and the
+  `TaxKitWebsiteForwardingKey` resource leaves the native apps stack.
+
+  The unused Website analytics relay (`/ingest/e/`) and the browser's collection
+  header are removed, with the `@taxkit/analytics/relay/*` exports and the
+  `analytics-relay` host route. The API's own calculator analytics is unchanged.
+
+### Patch Changes
+
+- Updated dependencies [cafcc71]
+- Updated dependencies [b88ee2d]
+- Updated dependencies [b533bc7]
+  - @taxkit/observability@1.0.0
+  - @taxkit/content@3.0.0
+  - @taxkit/calculators@2.1.0
+
 ## 0.1.1
 
 ### Patch Changes

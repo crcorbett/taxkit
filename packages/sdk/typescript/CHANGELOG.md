@@ -1,5 +1,15 @@
 # taxkit
 
+## 2.2.0
+
+### Minor Changes
+
+- b88ee2d: Documentation page responses in `taxkit/http` (`TaxKitApi`) now
+  include `body`, a checked list of reading blocks: headings with ids,
+  paragraphs, lists, tables, highlighted code as coloured tokens and Mermaid
+  diagrams as SVG. Existing page fields are unchanged. Calculation code and
+  runtime dependencies are unchanged.
+
 ## 2.1.3
 
 ### Patch Changes

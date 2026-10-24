@@ -1,5 +1,17 @@
 # TaxKit
 
+## 2.2.0
+
+- Documentation page responses in `taxkit/http` now include `body`, the page as
+  checked reading blocks with highlighted code and server-drawn Mermaid
+  diagrams. Existing page fields, calculations and dependencies are unchanged.
+- The documentation site now reads plain MDX from `content/docs`. The API builds
+  the docs catalogue ahead of time, so new API instances no longer parse pages
+  on their first request.
+- The native RPC endpoint, the no-JavaScript calculator form and the Website
+  analytics relay are removed. Use the public HTTP API, its OpenAPI description
+  or remote MCP. See the [SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
+
 ## 2.1.3
 
 - Remove obsolete package-name instructions from the SDK README and current
