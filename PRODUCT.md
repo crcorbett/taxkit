@@ -17,8 +17,7 @@ application. They arrive evaluating whether TaxKit can run the calculation
 they need, want to run one quickly, and then decide between the SDK and the
 HTTP API. Confirmed by Cooper on 2026-10-07.
 
-Secondary audiences, each already named in the documentation journey index
-(`docs/standards/documentation-user-journeys.md`):
+Secondary audiences:
 
 - Application integrator choosing and wiring an integration surface.
 - Type-safety focused developer who wants compile-time guarantees and
@@ -68,8 +67,8 @@ Supporting facts that reinforce it, not replace it:
   fact, derived fact, rule, parameter, scenario, report, trace. Avoid "mode",
   "formula", "tax return" and "personal tax advice".
 - The repository is public and so are its AI work-history transcripts
-  (Entire). Maintainer docs under `docs/` hold architecture, standards,
-  runbooks and any active SPEC or execution plan. Ordinary commits, pull
+  (Entire). `ARCHITECTURE.md` and the maintainer docs under `docs/` hold
+  architecture, standards, decisions and runbooks. Ordinary commits, pull
   requests and `bun run verification` are the process and the record of
   completed work.
 - Current apps: `apps/web` is the native TanStack Start Website. It calls the

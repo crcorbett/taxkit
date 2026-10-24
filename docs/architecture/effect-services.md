@@ -333,7 +333,9 @@ reduces complex duplication.
 ## Abstraction admission
 
 Effect abstractions follow the repository-wide
-[abstraction admission contract](../design-docs/abstraction-admission.md).
+[abstraction rule](../../AGENTS.md#engineering-guardrails): semantic weight, an
+owner, a real reuse or substitution point, a simpler call graph and focused
+proof.
 Before adding a shared service, layer, runtime wrapper, codec helper or program
 fragment, record its owner, semantic policy, second consumer or real
 substitution point, simpler before/after call graph and focused tests.

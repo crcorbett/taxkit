@@ -243,8 +243,8 @@ event allowlist and stored-event readback are not built.
   semantics, focus intent and responsive disclosure app-owned. Client
   navigation may move focus to the page heading; initial hydration must not.
 - Keep all information and focus behaviour available without animation.
-- Apply the [abstraction admission
-  contract](../design-docs/abstraction-admission.md) before sharing a hook,
+- Apply the [abstraction rule](../../AGENTS.md#engineering-guardrails) before
+  sharing a hook,
   provider, component family or UI package.
 
 ## Related docs

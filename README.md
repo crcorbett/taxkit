@@ -89,7 +89,7 @@ matching package root and package README say otherwise.
 
 Start with:
 
-- [Architecture overview](./docs/architecture/README.md)
+- [Architecture overview](./ARCHITECTURE.md)
 - [Package ownership](./docs/architecture/package-ownership.md)
 - [Package boundaries](./docs/architecture/package-boundaries.md)
 - [API and SDK architecture](./docs/architecture/api-and-sdk.md)
@@ -188,8 +188,10 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
 ## Documentation entry points
 
 - [AGENTS.md](./AGENTS.md): short atlas for agents and task routing.
-- [Maintainer documentation](./docs/README.md): truth layers, semantic
-  owners and public/maintainer separation.
+- [ARCHITECTURE.md](./ARCHITECTURE.md): apps, packages, requests, runtimes,
+  caching and deployment.
+- [Maintainer documentation](./docs/README.md): the short index of owners and
+  decisions.
 - [CLAUDE.md](./CLAUDE.md): Claude-compatible pointer to the canonical root
   operating rules.
 - [CHANGELOG.md](./CHANGELOG.md): root release-train changelog. Package-level
@@ -198,13 +200,7 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
 - Engineering conventions start with [Effect services](./docs/architecture/effect-services.md),
   [Configuration](./docs/architecture/configuration.md), [Package ownership](./docs/architecture/package-ownership.md)
   and [Code patterns](./docs/standards/code-patterns.md).
-- [Product specs](./docs/product-specs/index.md) and
-  [exec plans](./docs/exec-plans/README.md): active work only; finished work
-  lives in Git history.
-- [Design docs](./docs/design-docs/index.md): documentation and design
-  conventions.
-- [References](./docs/references/README.md): external or imported reference
-  material.
+- Finished plans and reports live in Git history, not in documents.
 
 ## Runtime boundary
 

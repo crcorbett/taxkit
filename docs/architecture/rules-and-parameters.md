@@ -128,8 +128,8 @@ rounding or supported inputs still require rule review and golden-result proof.
 Use schema-checked data tables where they express the actual rule, including
 marginal rates, coefficient formulas, caps and ledger components. Add a shared
 rule builder only when it owns repeated policy and makes the call graph simpler;
-the [abstraction admission owner](../design-docs/abstraction-admission.md)
-defines that review.
+the [abstraction rule](../../AGENTS.md#engineering-guardrails) defines that
+review.
 
 
 Rule descriptors always expose a parameter array. Their ordinary metadata fields
