@@ -88,12 +88,21 @@ const workspaceRoles: OxlintRule = {
       .slice(context.cwd.replaceAll("\\", "/").replace(/\/$/u, "").length + 1);
     const owner = workspaceOwner(workspaceContracts, file);
     const websiteSource = file.startsWith("apps/web/src/");
+    // TanStack Start keeps a module out of the browser when it imports the
+    // server-only marker; the runtime entry and Worker host are named too.
+    const serverOnly = Array.some(
+      context.sourceCode.ast.body,
+      (statement) =>
+        statement.type === "ImportDeclaration" &&
+        statement.source.value === "@tanstack/react-start/server-only"
+    );
     const browser =
       websiteSource &&
       (!/\.(?:test|spec)\.[cm]?[jt]sx?$/u.test(file) ||
         file.includes(".browser.test.")) &&
       file !== "apps/web/src/server.ts" &&
-      !file.endsWith(".server.ts");
+      !file.endsWith(".server.ts") &&
+      !serverOnly;
     const inspect = (node: SyntaxNode, source: SyntaxNode) => {
       const address = moduleAddress(context, source);
       if (Option.isNone(address)) {

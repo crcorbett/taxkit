@@ -1,3 +1,4 @@
+import "@tanstack/react-start/server-only";
 import { DocsAccept } from "@taxkit/api-http/negotiation";
 import { requestDocsMarkdown } from "@taxkit/api-http/requests";
 import { docsMarkdownPath } from "@taxkit/content/publication";

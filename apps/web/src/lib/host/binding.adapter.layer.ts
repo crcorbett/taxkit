@@ -6,7 +6,7 @@ import { fromCloudflareFetcher, toHttpClient } from "alchemy/Cloudflare/Bridge";
 import { Effect, Layer, Result } from "effect";
 import { HttpApiClient } from "effect/http-api";
 
-import { WebsiteApiConfig } from "./config.server";
+import { WebsiteApiConfig } from "./config.ingress";
 import { WebsiteApi } from "./service";
 
 // Native Alchemy bindings: the selected keys only, with protected values

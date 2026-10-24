@@ -9,13 +9,13 @@ import { Cause, Effect, Layer, ManagedRuntime } from "effect";
 
 import { WebsiteDocsSearchView } from "./docs/schemas";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
-import { WebsiteApiLive } from "./host/binding.server";
-import { WebsiteBindings } from "./host/config.server";
+import { WebsiteApiLive } from "./host/binding.adapter.layer";
+import { WebsiteBindings } from "./host/config.ingress";
 import type { WebsiteLoadError } from "./host/errors";
 import { WebsiteApi, WebsiteSettings } from "./host/service";
-import { WebsiteSettingsLive } from "./host/settings.server.layer";
+import { WebsiteSettingsLive } from "./host/settings.layer";
 import { loadFailureStatus, rejectRouteLoad } from "./pages/load.failure";
-import { loadRootView } from "./pages/root.load.server";
+import { loadRootView } from "./pages/root.load";
 
 // The Worker's bindings object, read at this host edge only.
 const bindings = Layer.sync(WebsiteBindings, () => ({ ...env }));

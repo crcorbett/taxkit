@@ -102,10 +102,10 @@ const decodingBoundaryFiles = [
   "apps/web/test/native-local-development.boundary.test.ts",
   // Exact native website settings, form and hydration boundaries.
   "apps/web/test/host/config.boundary.test.ts",
-  "apps/web/src/lib/host/config.server.ts",
+  "apps/web/src/lib/host/config.ingress.ts",
   // Native API host binding ingress, route-address ingress and generated
   // reply kind checks; loader fixtures restore only their own route data.
-  "apps/web/src/lib/host/binding.server.ts",
+  "apps/web/src/lib/host/binding.adapter.layer.ts",
   "packages/api/http/src/requests.ts",
   "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
   // Scenario input Schema rejection tests.
@@ -115,7 +115,7 @@ const decodingBoundaryFiles = [
   // Exact original-URL/representation-header HTTP ingress and bounded fixtures.
   // No encoder, runner or neighbouring-module admission.
   "apps/web/test/http/negotiation.boundary.test.ts",
-  "apps/web/src/lib/http/negotiation.server.ts",
+  "apps/web/src/lib/http/negotiation.ingress.ts",
   "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
   "packages/calculators/src/form.ingress.ts",
   "apps/web/src/routes/__root.tsx",
@@ -215,7 +215,7 @@ const schemaEncoderEgressFiles = [
   "packages/observability/test/edge-identity.test.ts",
   "apps/web/test/pages/root-load.boundary.test.ts",
   "apps/web/test/host/requests.boundary.test.ts",
-  "apps/web/src/lib/pages/root.load.server.ts",
+  "apps/web/src/lib/pages/root.load.ts",
   // Generated public catalogue file egress.
   // Synthetic PostHog HTTP fixture representation only.
   "packages/infrastructure/test/posthog/management.boundary.test.ts",
@@ -549,7 +549,7 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/src/lib/host/config.server.ts"],
+      files: ["apps/web/src/lib/host/config.ingress.ts"],
       rules: { "anti-slop/no-unknown-parameters": "off" },
     },
     {
@@ -995,7 +995,7 @@ export default defineConfig({
         "apps/api/test/rate-admission.boundary.test.ts",
         "apps/api/test/worker.boundary.test.ts",
         "packages/og-image/src/takumi.adapter.layer.ts",
-        "apps/web/src/lib/host/binding.server.ts",
+        "apps/web/src/lib/host/binding.adapter.layer.ts",
         "apps/web/test/host/forward.boundary.test.ts",
         "apps/web/test/host/requests.boundary.test.ts",
         "apps/web/test/host/binding.boundary.test.ts",
@@ -1030,7 +1030,7 @@ export default defineConfig({
             allowedFiles: [
               "apps/api/test/mcp-client.boundary.test.ts",
               "packages/og-image/src/takumi.adapter.layer.ts",
-              "apps/web/src/lib/host/binding.server.ts",
+              "apps/web/src/lib/host/binding.adapter.layer.ts",
               "apps/web/test/host/forward.boundary.test.ts",
               "apps/web/test/host/requests.boundary.test.ts",
               "apps/web/test/host/binding.boundary.test.ts",
@@ -1172,7 +1172,7 @@ export default defineConfig({
           {
             allowTypes: true,
             allowedFiles: [
-              "apps/web/src/lib/host/binding.server.ts",
+              "apps/web/src/lib/host/binding.adapter.layer.ts",
               "apps/web/test/native-rate.boundary.test.ts",
             ],
             module: "alchemy/Cloudflare/Bridge",

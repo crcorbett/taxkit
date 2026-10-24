@@ -15,7 +15,7 @@ import {
 } from "effect/http";
 
 import { earlyReply } from "./lib/http/early-reply.ingress";
-import { withDocsRepresentation } from "./lib/http/negotiation.server";
+import { withDocsRepresentation } from "./lib/http/negotiation.ingress";
 import { runtime } from "./lib/runtime.server";
 
 const render = createStartHandler(defaultStreamHandler);

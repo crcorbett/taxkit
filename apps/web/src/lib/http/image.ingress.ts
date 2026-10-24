@@ -1,3 +1,4 @@
+import "@tanstack/react-start/server-only";
 import { docsImageApiPath } from "@taxkit/api-http/routes";
 import { DocsPngBytes, DocsPublicPagePath } from "@taxkit/content/schemas";
 import { Effect, Option, Record, Schema } from "effect";

@@ -132,14 +132,20 @@ import "@taxkit/calculators/summaries";
       // Real approved host paths continue to use Alchemy runtime helpers and
       // exact infrastructure type exports. A neighbouring file gains no grant.
       const host = yield* lintFiles([
-        "apps/web/src/lib/host/config.server.ts",
-        "apps/web/src/lib/host/binding.server.ts",
+        "apps/web/src/lib/host/config.ingress.ts",
+        "apps/web/src/lib/host/binding.adapter.layer.ts",
         "apps/api/src/worker.ts",
       ]);
       expect(host.exitCode, host.output).toBe(0);
       yield* rejected(
         "apps/web/src/lib/.generated-host-neighbour.server.ts",
         'import "@taxkit/infrastructure/api-worker";',
+        "taxkit-package(workspace-roles)"
+      );
+      // Only a module marked server-only may import Alchemy.
+      yield* rejected(
+        "apps/web/src/lib/.generated-unmarked-host.ts",
+        'import "alchemy/Runtime";',
         "taxkit-package(workspace-roles)"
       );
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
@@ -152,14 +158,15 @@ it.effect(
     Effect.gen(function* () {
       const host = yield* lintFiles([
         "apps/web/src/lib/pages/loaders.ts",
-        "apps/web/src/lib/host/settings.server.layer.ts",
+        "apps/web/src/lib/host/settings.layer.ts",
+        "apps/web/src/lib/http/negotiation.ingress.ts",
       ]);
       expect(host.exitCode, host.output).toBe(0);
       yield* Effect.forEach(
         [
           "./runtime.server",
-          "./config.server",
-          "./settings.server.layer",
+          "./other.server",
+          "./other.server.layer",
           "#/lib/runtime.server",
           "./runtime.server?raw",
         ],

@@ -3,8 +3,8 @@ import { MetadataQuery } from "@taxkit/calculators/schemas";
 import { Array, Effect, Layer, Option } from "effect";
 import { vi } from "vitest";
 
-import { WebsiteApiLive } from "../../src/lib/host/binding.server";
-import { WebsiteBindings } from "../../src/lib/host/config.server";
+import { WebsiteApiLive } from "../../src/lib/host/binding.adapter.layer";
+import { WebsiteBindings } from "../../src/lib/host/config.ingress";
 import { WebsiteApi } from "../../src/lib/host/service";
 
 it.effect.each([301, 302, 303, 307, 308])(

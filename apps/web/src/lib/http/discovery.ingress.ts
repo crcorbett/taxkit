@@ -1,3 +1,4 @@
+import "@tanstack/react-start/server-only";
 import { DiscoveryPath, discoveryApiPath } from "@taxkit/api-http/routes";
 import { Effect, Option, Schema } from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";

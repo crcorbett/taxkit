@@ -65,10 +65,10 @@ and add no second cache. `pages/loaders.ts` selects the server or browser branch
 
 The Website's own address comes from its native `Worker.URL`, the API address
 from the API resource's Output and canonical links from the fixed publication
-origin `https://taxkit.dev`. `host/config.server.ts` reads only the Website's keys
+origin `https://taxkit.dev`. `host/config.ingress.ts` reads only the Website's keys
 through `reifyBoundConfigProvider`. Settings and the API binding retain independent
 checked failures: a broken binding leaves settings available, and invalid Website
-settings do not block valid API forwarding. `pages/root.load.server.ts` requires only
+settings do not block valid API forwarding. `pages/root.load.ts` requires only
 settings.
 Vite exposes no ambient public env prefix or build-time API address.
 
@@ -206,7 +206,7 @@ labelled scroll region and page links through the TanStack router. `/search`
 reads the raw address once and calls the API's search route. Markdown
 representations (`.md` files, and a 307 to them for a Markdown `Accept`
 preference) are a named HTTP policy over the HTML Effect in `src/server.ts`
-(`http/negotiation.server.ts`). Discovery documents and share images belong to
+(`http/negotiation.ingress.ts`). Discovery documents and share images belong to
 the API and are forwarded once (`http/early-reply.ingress.ts`). Each docs loader
 returns Content's `docsPageMetadata`, rendered by `seo/head.ts`. No Website
 request reads authored MDX, builds a content index or constructs a Layer.
@@ -231,7 +231,7 @@ event allowlist and stored-event readback are not built.
 - Do not import server-only API exports from browser routes, and do not mount
   the API inside TanStack Start.
 - Read Worker bindings only in `runtime.server.ts` and adapt the private binding
-  only in `host/binding.server.ts`.
+  only in `host/binding.adapter.layer.ts`.
 - Keep frontend docs and component details out of rule packages.
 - Keep browser docs modules on browser-safe Content exports such as
   `@taxkit/content/schemas`; do not import `@content/docs`, `@taxkit/mdx` or

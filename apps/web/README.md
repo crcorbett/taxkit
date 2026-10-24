@@ -34,7 +34,7 @@ page state, tools and WebMCP live in their packages.
 
 **Server rendering.** `src/lib/runtime.server.ts` owns one `ManagedRuntime`
 (`runtime`) per loaded Worker module. It provides `WebsiteSettingsLive`
-(`host/settings.server.layer.ts`), `WebsiteApiLive` (`host/binding.server.ts`)
+(`host/settings.layer.ts`), `WebsiteApiLive` (`host/binding.adapter.layer.ts`)
 and the fixed host telemetry. The contracts in `host/service.ts` fail
 independently:
 
@@ -51,7 +51,7 @@ A malformed binding fails only the API capability;
 invalid Website or publication origins fail only public settings. The API origin
 is required by both. Configuration failures expose fixed safe errors
 (`TaxKitWebConfigError` for settings, `WebsiteApiConfigError` for the API).
-The root load policy in `pages/root.load.server.ts` can therefore retain its
+The root load policy in `pages/root.load.ts` can therefore retain its
 settings without waiting for an optional remote catalogue. It owns
 the root transport encoding; `runtime.server.ts` owns execution and cancellation.
 
@@ -103,7 +103,7 @@ unavailable, a documentation build mismatch, search unavailable) reply 500 with
 
 ## Settings
 
-`src/lib/host/config.server.ts` reads only the Website's own keys from the Worker
+`src/lib/host/config.ingress.ts` reads only the Website's own keys from the Worker
 bindings, through `reifyBoundConfigProvider`:
 
 | Key | Source | Use |
@@ -173,7 +173,7 @@ and words over 100 characters are a normal invalid-search page state. Empty
 words load navigation only. Search pages are `noindex, follow`.
 
 **Markdown.** Accepted pages also serve their processed Markdown at the `.md`
-address (`http/negotiation.server.ts`). A page address with a preferring
+address (`http/negotiation.ingress.ts`). A page address with a preferring
 `Accept` header answers 307 to that `.md` address. HTML wins ties and a missing
 preference; `@taxkit/api-http/negotiation` reads the header. Invalid or wholly
 excluding `Accept` fields return empty 400/406.

@@ -49,15 +49,15 @@ const hostModuleExceptions = [
     module: "@taxkit/observability/host-telemetry",
   },
   {
-    file: "apps/web/src/lib/host/config.server.ts",
+    file: "apps/web/src/lib/host/config.ingress.ts",
     module: "@taxkit/content/config",
   },
   {
-    file: "apps/web/src/lib/host/config.server.ts",
+    file: "apps/web/src/lib/host/config.ingress.ts",
     module: "@taxkit/infrastructure/api-worker",
   },
   {
-    file: "apps/web/src/lib/host/binding.server.ts",
+    file: "apps/web/src/lib/host/binding.adapter.layer.ts",
     module: "@taxkit/infrastructure/api-worker",
   },
 ];
@@ -65,10 +65,6 @@ const hostModuleExceptions = [
 // The grant is for one source and one module address, never a browser subtree.
 const hostSourceImports = [
   { file: "apps/web/src/lib/pages/loaders.ts", module: "../runtime.server" },
-  {
-    file: "apps/web/src/lib/host/settings.server.layer.ts",
-    module: "./config.server",
-  },
 ];
 export const isHostSourceImport = (file: string, address: string) =>
   Array.some(
