@@ -1,5 +1,11 @@
 # @taxkit/infrastructure
 
+## 1.1.1
+
+### Patch Changes
+
+- @taxkit/analytics@1.0.1
+
 ## 1.1.0
 
 ### Minor Changes
