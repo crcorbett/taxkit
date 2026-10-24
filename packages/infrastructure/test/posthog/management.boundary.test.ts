@@ -30,15 +30,15 @@ import {
 } from "effect/http";
 import { TestClock } from "effect/testing";
 
-import type { PostHogManagementError } from "./errors.js";
-import { PostHogManagementLive } from "./management.adapter.layer.js";
+import type { PostHogManagementError } from "../../src/posthog/errors.js";
+import { PostHogManagementLive } from "../../src/posthog/management.adapter.layer.js";
 import {
   PostHogManagedName,
   PostHogOrganisationId,
   ProjectDefinition,
   desiredProjectPrivacy,
-} from "./schemas.js";
-import { PostHogManagement } from "./service.js";
+} from "../../src/posthog/schemas.js";
+import { PostHogManagement } from "../../src/posthog/service.js";
 
 const organisation = "00000000-0000-4000-8000-000000000079";
 const definition = ProjectDefinition.make({

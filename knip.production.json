@@ -116,12 +116,7 @@
         "src/routes/**/*.{ts,tsx}!",
         "vite.config.ts!"
       ],
-      "project": [
-        "src/**/*.{ts,tsx}!",
-        "!src/**/*.test.ts!",
-        "!src/**/*.browser.test.tsx!",
-        "vite.config.ts!"
-      ],
+      "project": ["src/**/*.{ts,tsx}!", "vite.config.ts!"],
       "vite": false,
       "ignoreDependencies": ["cloudflare"],
       "ignoreExportsUsedInFile": true

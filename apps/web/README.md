@@ -246,7 +246,7 @@ bun run --filter=web build:native-pair
 bun run --filter=web test:native-pair
 ```
 
-`test:browser` runs the Chromium tests in `src/lib/**/*.browser.test.tsx`: the
+`test:browser` runs the Chromium tests in `test/**/*.browser.test.tsx`: the
 shared loader registry and client reuse, not-found and load-error translation,
 loader cancellation, invalid search words, calculator commands, editing,
 hydration and form unmount.

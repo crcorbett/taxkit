@@ -1,10 +1,13 @@
 import { expect, it } from "@effect/vitest";
 import { Effect, Result, Schema } from "effect";
 
-import { TaxKitWebConfigError } from "../host/errors";
-import { WebsitePublicSettings, WebsiteRootView } from "../host/schemas";
-import { WebsiteSettings } from "../host/service";
-import { loadRootView } from "./root.load.server";
+import { TaxKitWebConfigError } from "../../src/lib/host/errors";
+import {
+  WebsitePublicSettings,
+  WebsiteRootView,
+} from "../../src/lib/host/schemas";
+import { WebsiteSettings } from "../../src/lib/host/service";
+import { loadRootView } from "../../src/lib/pages/root.load.server";
 
 it.effect("loads settings without an API capability", () =>
   Effect.gen(function* () {

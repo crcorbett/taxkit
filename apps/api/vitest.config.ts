@@ -7,5 +7,5 @@ const conditions = ["source", "node", "development|production"];
 export default defineConfig({
   resolve: { conditions },
   ssr: { resolve: { conditions } },
-  test: { include: ["test/**/*.test.ts", "scripts/**/*.test.ts"] },
+  test: { include: ["test/**/*.test.ts"] },
 });

@@ -16,12 +16,15 @@ import {
   Schema,
 } from "effect";
 
-import { createPlainClient } from "./client.runtime.js";
-import { TaxKitCalculationError, TaxKitClientDisposeError } from "./errors.js";
+import { createPlainClient } from "../src/client.runtime.js";
+import {
+  TaxKitCalculationError,
+  TaxKitClientDisposeError,
+} from "../src/errors.js";
 import {
   AuPay2025_26Module,
   AuPayTakeHomeCalculation,
-} from "./testing/index.js";
+} from "../src/testing/index.js";
 
 class SdkPromiseRejectionError extends Schema.TaggedError<SdkPromiseRejectionError>()(
   "SdkPromiseRejectionError",

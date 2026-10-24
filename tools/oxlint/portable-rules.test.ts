@@ -154,7 +154,7 @@ const fixtureCases = [
     accepted: [
       "apps/web/src/lib/host/errors.ts",
       "apps/web/src/lib/host/config.server.ts",
-      "apps/web/src/lib/host/config.boundary.test.ts",
+      "apps/web/test/host/config.boundary.test.ts",
       "apps/web/src/lib/runtime.server.ts",
       "apps/web/src/lib/runtime.client.ts",
       "apps/web/src/lib/host/binding.server.ts",
@@ -162,7 +162,7 @@ const fixtureCases = [
       "packages/api/http/src/requests.ts",
       "apps/web/src/lib/calculators/page.atoms.ts",
       "apps/web/src/lib/pages/loaders.ts",
-      "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
+      "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
       "tools/apps-local/native-pair-build.runtime.ts",
       // native-pair takes over a minute to lint alone; `bun run lint` covers it.
       "apps/web/test/native-settings-failure.boundary.test.ts",
@@ -172,8 +172,8 @@ const fixtureCases = [
       "packages/calculators/src/form.ingress.ts",
       "apps/web/src/server.ts",
       "apps/web/src/routes/index.tsx",
-      "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
-      "apps/web/src/lib/pages/browser-loaders.boundary.browser.test.tsx",
+      "apps/web/test/atom-lifecycle.browser.test.tsx",
+      "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
       "apps/web/vite.config.ts",
       "apps/web/vitest.config.ts",
       "apps/web/vitest.browser.config.ts",
@@ -280,7 +280,7 @@ const fixtureCases = [
       "apps/api/scripts/routes.ts",
       "apps/api/scripts/schemas.ts",
       "apps/api/scripts/smoke-public-routes.runtime.ts",
-      "apps/api/scripts/smoke-boundaries.test.ts",
+      "apps/api/test/smoke-boundaries.test.ts",
       "apps/api/test/config.test.ts",
       "apps/api/vitest.config.ts",
     ],
@@ -306,7 +306,7 @@ const fixtureCases = [
       "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
       "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
       "packages/sdk/typescript/scripts/schemas.ts",
-      "packages/sdk/typescript/scripts/script-boundaries.test.ts",
+      "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
     ],
     generated: "packages/sdk/typescript/scripts/.generated-strict-rejected.ts",
     namespace: "strict-effect",
@@ -327,15 +327,15 @@ const fixtureCases = [
 
   {
     accepted: [
-      "packages/sdk/typescript/src/au.test.ts",
+      "packages/sdk/typescript/test/au.test.ts",
       "packages/sdk/typescript/src/au.ts",
       "packages/sdk/typescript/src/au-effect.ts",
-      "packages/sdk/typescript/src/client-lifetime.test.ts",
+      "packages/sdk/typescript/test/client-lifetime.test.ts",
       "packages/sdk/typescript/src/client.runtime.ts",
-      "packages/sdk/typescript/src/effect.test.ts",
+      "packages/sdk/typescript/test/effect.test.ts",
       "packages/sdk/typescript/src/effect.ts",
       "packages/sdk/typescript/src/errors.ts",
-      "packages/sdk/typescript/src/index.test.ts",
+      "packages/sdk/typescript/test/index.test.ts",
       "packages/sdk/typescript/src/index.ts",
       "packages/sdk/typescript/src/internal/au-descriptors.ts",
       "packages/sdk/typescript/src/live.layer.ts",
@@ -590,10 +590,8 @@ const fixtureCases = [
     ],
   },
   {
-    accepted: [
-      "packages/calculators/__tests__/public-calculator-service.test.ts",
-    ],
-    generated: "packages/calculators/__tests__/.generated-strict-rejected.ts",
+    accepted: ["packages/calculators/test/public-calculator-service.test.ts"],
+    generated: "packages/calculators/test/.generated-strict-rejected.ts",
     namespace: "strict-effect",
     rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
     rules: [
@@ -1104,10 +1102,10 @@ describe("exact native RPC lint boundaries", () => {
     ...Array.flatMap(
       [
         "apps/web/src/lib/docs/search-location.ingress.ts",
-        "apps/web/src/lib/http/negotiation.boundary.test.ts",
+        "apps/web/test/http/negotiation.boundary.test.ts",
         "apps/web/src/lib/http/negotiation.server.ts",
         "apps/web/src/lib/http/image.ingress.ts",
-        "apps/web/src/lib/http/image.boundary.test.ts",
+        "apps/web/test/http/image.boundary.test.ts",
       ],
       (path) => [
         {
@@ -1410,7 +1408,7 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "packages/api/http/__tests__/request-body.boundary.test.ts",
+      path: "packages/api/http/test/request-body.boundary.test.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
@@ -1585,21 +1583,21 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "packages/sdk/typescript/src/effect.test.ts",
+      path: "packages/sdk/typescript/test/effect.test.ts",
       rejected: false,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "packages/sdk/typescript/src/effect.test.ts",
+      path: "packages/sdk/typescript/test/effect.test.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
     },
     {
-      path: "packages/sdk/typescript/src/effect.test.ts",
+      path: "packages/sdk/typescript/test/effect.test.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
@@ -1676,21 +1674,21 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
+      path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
+      path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
       rejected: false,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "packages/infrastructure/src/native-domains-provider.boundary.test.ts",
+      path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
@@ -2002,21 +2000,21 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "packages/calculators/__tests__/calculation-admission.test.ts",
+      path: "packages/calculators/test/calculation-admission.test.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "packages/calculators/__tests__/calculation-admission.test.ts",
+      path: "packages/calculators/test/calculation-admission.test.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "packages/calculators/__tests__/calculation-admission.test.ts",
+      path: "packages/calculators/test/calculation-admission.test.ts",
       rejected: false,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:

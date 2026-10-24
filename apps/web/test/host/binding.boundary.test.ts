@@ -2,12 +2,12 @@ import { expect, it } from "@effect/vitest";
 import { Effect, Layer, Result, Schema } from "effect";
 import { vi } from "vitest";
 
-import { loadRootView } from "../pages/root.load.server";
-import { WebsiteApiLive } from "./binding.server";
-import { WebsiteBindings } from "./config.server";
-import { WebsiteRootView } from "./schemas";
-import { WebsiteApi, WebsiteSettings } from "./service";
-import { WebsiteSettingsLive } from "./settings.server.layer";
+import { WebsiteApiLive } from "../../src/lib/host/binding.server";
+import { WebsiteBindings } from "../../src/lib/host/config.server";
+import { WebsiteRootView } from "../../src/lib/host/schemas";
+import { WebsiteApi, WebsiteSettings } from "../../src/lib/host/service";
+import { WebsiteSettingsLive } from "../../src/lib/host/settings.server.layer";
+import { loadRootView } from "../../src/lib/pages/root.load.server";
 
 const binding = {
   connect: vi.fn<(...args: readonly unknown[]) => void>(),

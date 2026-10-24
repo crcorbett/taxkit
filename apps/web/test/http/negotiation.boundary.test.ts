@@ -2,9 +2,12 @@ import { describe, expect, it } from "@effect/vitest";
 import { Effect, Layer, Option, Result } from "effect";
 import { Headers, HttpServerRequest, HttpServerResponse } from "effect/http";
 
-import { TaxKitWebConfigError, WebsiteApiConfigError } from "../host/errors";
-import { WebsiteApi, WebsiteSettings } from "../host/service";
-import { withDocsRepresentation } from "./negotiation.server";
+import {
+  TaxKitWebConfigError,
+  WebsiteApiConfigError,
+} from "../../src/lib/host/errors";
+import { WebsiteApi, WebsiteSettings } from "../../src/lib/host/service";
+import { withDocsRepresentation } from "../../src/lib/http/negotiation.server";
 
 const unconfigured = new TaxKitWebConfigError({
   message: "TaxKit web settings are missing or invalid.",

@@ -2,9 +2,9 @@ import { describe, expect, it } from "@effect/vitest";
 import { Effect, Layer, Option, Ref, Result } from "effect";
 import { Headers, HttpServerRequest } from "effect/http";
 
-import { WebsiteApiConfigError } from "../host/errors";
-import { WebsiteApi } from "../host/service";
-import { docsImageRepresentation } from "./image.ingress";
+import { WebsiteApiConfigError } from "../../src/lib/host/errors";
+import { WebsiteApi } from "../../src/lib/host/service";
+import { docsImageRepresentation } from "../../src/lib/http/image.ingress";
 
 const png = () => {
   const bytes = new Uint8Array(24);

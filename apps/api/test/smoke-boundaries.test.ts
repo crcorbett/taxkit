@@ -49,24 +49,24 @@ import * as HttpClientResponse from "effect/http/HttpClientResponse";
 import { ChildProcessSpawner } from "effect/process";
 import { TestClock } from "effect/testing";
 
-import { ApiContentLive } from "../src/content.boundary.js";
 import {
   checkApiCalculation,
   checkApiCatalog,
   checkApiOpenApi,
   checkApiPublicContent,
   waitForApiHealth,
-} from "./routes.js";
+} from "../scripts/routes.js";
 import {
   ApiSmokeConsumerEvidence,
   ApiSmokeOpenApiProjection,
   ApiSmokeSettings,
   ApiSmokeValidationError,
-} from "./schemas.js";
+} from "../scripts/schemas.js";
 import {
   checkApiPublicRoutes,
   loadApiSmokeSettings,
-} from "./smoke-public-routes.runtime.js";
+} from "../scripts/smoke-public-routes.runtime.js";
+import { ApiContentLive } from "../src/content.boundary.js";
 
 const origin = "http://127.0.0.1:4173";
 const fault = PlatformError.badArgument({

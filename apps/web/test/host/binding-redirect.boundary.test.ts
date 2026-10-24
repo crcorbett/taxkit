@@ -3,9 +3,9 @@ import { MetadataQuery } from "@taxkit/calculators/schemas";
 import { Array, Effect, Layer, Option } from "effect";
 import { vi } from "vitest";
 
-import { WebsiteApiLive } from "./binding.server";
-import { WebsiteBindings } from "./config.server";
-import { WebsiteApi } from "./service";
+import { WebsiteApiLive } from "../../src/lib/host/binding.server";
+import { WebsiteBindings } from "../../src/lib/host/config.server";
+import { WebsiteApi } from "../../src/lib/host/service";
 
 it.effect.each([301, 302, 303, 307, 308])(
   "returns native redirect %s without following it or losing its receiver/signal",

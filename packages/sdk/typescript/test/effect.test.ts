@@ -22,11 +22,11 @@ import {
   Struct,
 } from "effect";
 
-import { calculateReport, calculateRunRequest } from "./effect.js";
+import { calculateReport, calculateRunRequest } from "../src/effect.js";
 import {
   AuAnnualIncomeTaxCalculation,
   AuPayTakeHomeCalculation,
-} from "./testing/index.js";
+} from "../src/testing/index.js";
 
 const ServiceLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)

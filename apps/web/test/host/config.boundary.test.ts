@@ -6,9 +6,12 @@ import {
   WebsiteSettingsConfig,
   WebsiteApiConfig,
   WebsiteBindings,
-} from "./config.server";
-import { TaxKitWebConfigError, WebsiteApiConfigError } from "./errors";
-import { WebsiteRootView } from "./schemas";
+} from "../../src/lib/host/config.server";
+import {
+  TaxKitWebConfigError,
+  WebsiteApiConfigError,
+} from "../../src/lib/host/errors";
+import { WebsiteRootView } from "../../src/lib/host/schemas";
 
 const binding = {
   connect: vi.fn<(...args: readonly unknown[]) => void>(),

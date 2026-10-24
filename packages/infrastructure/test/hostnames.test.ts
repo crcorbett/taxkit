@@ -7,7 +7,7 @@ import {
   publicationOrigin,
   taxKitZoneName,
   websiteRedirectHostName,
-} from "./hostnames.js";
+} from "../src/hostnames.js";
 
 it("derives every Production hostname and the publication origin from the zone", () => {
   expect([

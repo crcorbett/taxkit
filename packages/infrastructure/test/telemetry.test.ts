@@ -31,8 +31,8 @@ import {
 } from "effect";
 import { HttpClient } from "effect/http";
 
-import { declareTaxKitObservability } from "./axiom/resources.js";
-import { declareTaxKitTraceExport } from "./trace-export.js";
+import { declareTaxKitObservability } from "../src/axiom/resources.js";
+import { declareTaxKitTraceExport } from "../src/trace-export.js";
 
 // A synthetic stand-in for the retained ingest token. It is not a credential.
 const ingestSentinel = "synthetic-ingest-token-fixture";

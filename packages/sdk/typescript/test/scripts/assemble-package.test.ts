@@ -1,7 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import { Effect, Option } from "effect";
 
-import { relocateModuleImports } from "./assemble-package.runtime.js";
+import { relocateModuleImports } from "../../scripts/assemble-package.runtime.js";
 
 it.effect(
   "relocates module references while preserving service identity strings",

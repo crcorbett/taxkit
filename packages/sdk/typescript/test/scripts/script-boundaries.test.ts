@@ -21,13 +21,13 @@ import {
 } from "effect";
 import { ChildProcessSpawner } from "effect/process";
 
-import { checkSdkImportBoundaries } from "./check-import-boundaries.runtime.js";
-import { checkPackedArtifact } from "./check-packed-artifact.runtime.js";
+import { checkSdkImportBoundaries } from "../../scripts/check-import-boundaries.runtime.js";
+import { checkPackedArtifact } from "../../scripts/check-packed-artifact.runtime.js";
 import {
   DependencySectionsManifest,
   PackedPackageManifest,
-} from "./schemas.js";
-import { checkDownstreamConsumer } from "./validate-downstream-consumer.runtime.js";
+} from "../../scripts/schemas.js";
+import { checkDownstreamConsumer } from "../../scripts/validate-downstream-consumer.runtime.js";
 
 const nativeFault = PlatformError.badArgument({
   description: "TAXKIT_SECRET_SENTINEL",

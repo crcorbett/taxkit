@@ -28,11 +28,11 @@ import {
   ApiClient,
   apiClientRuntime,
   publicSettingsAtom,
-} from "../api-client.atoms";
-import { WebsitePublicSettings } from "../host/schemas";
-import { calculatorPageAtoms } from "./page.atoms";
-import { TakeHomeResultView } from "./take-home-result.view";
-import { TakeHomeCalculator } from "./take-home.container";
+} from "../../src/lib/api-client.atoms";
+import { calculatorPageAtoms } from "../../src/lib/calculators/page.atoms";
+import { TakeHomeResultView } from "../../src/lib/calculators/take-home-result.view";
+import { TakeHomeCalculator } from "../../src/lib/calculators/take-home.container";
+import { WebsitePublicSettings } from "../../src/lib/host/schemas";
 
 // The home page's calculator state and commands.
 const home = calculatorPageAtoms(AuPayCalculatorId.make("au.pay.take-home"));

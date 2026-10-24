@@ -3,9 +3,9 @@ import { Effect, Fiber, Layer, Result } from "effect";
 import { TestClock } from "effect/testing";
 import { vi } from "vitest";
 
-import { WebsiteApiLive } from "./binding.server";
-import { WebsiteBindings } from "./config.server";
-import { WebsiteApi } from "./service";
+import { WebsiteApiLive } from "../../src/lib/host/binding.server";
+import { WebsiteBindings } from "../../src/lib/host/config.server";
+import { WebsiteApi } from "../../src/lib/host/service";
 
 it.effect.each(["headers", "body"] as const)(
   "bounds discovery %s stalls and cancels the request",

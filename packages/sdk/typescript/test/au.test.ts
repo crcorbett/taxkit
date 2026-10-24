@@ -3,7 +3,7 @@ import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { Effect } from "effect";
 
-import { au } from "./au.js";
+import { au } from "../src/au.js";
 
 const takeHomeFacts = {
   grossPay: new GrossPay({

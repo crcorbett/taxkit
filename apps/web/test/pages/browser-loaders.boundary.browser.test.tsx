@@ -25,12 +25,19 @@ import {
   ApiClient,
   apiClientRuntime,
   publicSettingsAtom,
-} from "../api-client.atoms";
-import { WebsiteDocsSearchView } from "../docs/schemas";
-import { readDocsSearchTerm } from "../docs/search-location.ingress";
-import { WebsiteLoadError } from "../host/errors";
-import { WebsitePublicSettings, WebsiteRootView } from "../host/schemas";
-import { loadDocsPage, loadDocsSearch, loadRoot } from "../runtime.client";
+} from "../../src/lib/api-client.atoms";
+import { WebsiteDocsSearchView } from "../../src/lib/docs/schemas";
+import { readDocsSearchTerm } from "../../src/lib/docs/search-location.ingress";
+import { WebsiteLoadError } from "../../src/lib/host/errors";
+import {
+  WebsitePublicSettings,
+  WebsiteRootView,
+} from "../../src/lib/host/schemas";
+import {
+  loadDocsPage,
+  loadDocsSearch,
+  loadRoot,
+} from "../../src/lib/runtime.client";
 
 const json = { headers: { "content-type": "application/json" } };
 

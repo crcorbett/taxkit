@@ -3,14 +3,17 @@ import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import { Cause, Effect, Match, Schema } from "effect";
 
-import { TaxKitCalculationError, toTaxKitCalculationError } from "./errors.js";
-import { TaxKit } from "./index.js";
+import {
+  TaxKitCalculationError,
+  toTaxKitCalculationError,
+} from "../src/errors.js";
+import { TaxKit } from "../src/index.js";
 import {
   AuAnnualIncomeTaxCalculation,
   AuPay2025_26Module,
   AuPayTakeHomeCalculation,
-} from "./testing/index.js";
-import { defineSdkCalculation } from "./types.js";
+} from "../src/testing/index.js";
+import { defineSdkCalculation } from "../src/types.js";
 
 class SdkPromiseRejectionError extends Schema.TaggedError<SdkPromiseRejectionError>()(
   "SdkPromiseRejectionError",

@@ -28,18 +28,21 @@ import {
 } from "effect";
 import { HttpClient } from "effect/http";
 
-import { PostHogProjectProviderLive } from "./projects.live.layer.js";
-import { PostHogProject, PostHogProjectProvider } from "./projects.provider.js";
+import { PostHogProjectProviderLive } from "../../src/posthog/projects.live.layer.js";
+import {
+  PostHogProject,
+  PostHogProjectProvider,
+} from "../../src/posthog/projects.provider.js";
 import {
   ManagedProject,
   PostHogManagedName,
   PostHogOrganisationId,
   ProjectDefinition,
   desiredProjectPrivacy,
-} from "./schemas.js";
-import { PostHogManagement } from "./service.js";
-import { declarePostHogProjects } from "./stack.js";
-import { makePostHogManagementTest } from "./test.layer.js";
+} from "../../src/posthog/schemas.js";
+import { PostHogManagement } from "../../src/posthog/service.js";
+import { declarePostHogProjects } from "../../src/posthog/stack.js";
+import { makePostHogManagementTest } from "../../src/posthog/test.layer.js";
 
 const organisation = PostHogOrganisationId.make(
   "00000000-0000-4000-8000-000000000079"
