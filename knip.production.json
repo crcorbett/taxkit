@@ -180,6 +180,15 @@
     "packages/og-image": {
       "entry": ["src/cache.layer.ts!", "src/takumi.adapter.layer.ts!"],
       "project": ["src/**/*.{ts,tsx}!"]
+    },
+    "packages/webmcp": {
+      "entry": [
+        "src/model-context.adapter.layer.ts!",
+        "src/registration.egress.ts!",
+        "src/schemas.ts!",
+        "src/service.ts!"
+      ],
+      "project": ["src/**/*.ts!"]
     }
   },
   "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]

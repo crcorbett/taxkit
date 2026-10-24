@@ -33,6 +33,7 @@ Implemented packages and apps:
 - `packages/content`
 - `packages/aeo`
 - `packages/og-image`
+- `packages/webmcp`
 - `packages/analytics`
 - `packages/observability`
 - `packages/sdk/typescript`
@@ -299,7 +300,7 @@ the contract/client modules listed in `tools/oxlint/package-roles.ts`. Exact hos
 host telemetry, content settings and infrastructure binding types. These
 exceptions do not bypass exports or declared-dependency checks. Browser code
 also rejects Alchemy and local `.server`/`.server.layer` imports. Exact local
-host grants retain the isomorphic loader's `./runtime.server` import and the
+host grants retain the isomorphic loader's `../runtime.server` import and the
 settings Layer's `./config.server` import; neighbouring browser modules receive
 neither permission. Non-infrastructure package
 source cannot acquire deployment/provider implementations. Domain-free runtime

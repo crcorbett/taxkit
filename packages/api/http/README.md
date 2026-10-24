@@ -132,6 +132,16 @@ incompatible calculator/facts combinations.
 - `src/groups/calculators.ts`: public calculation HTTP route schemas, bad
   request envelope, OpenAPI annotations and compatibility exports from
   `@taxkit/calculators`.
+- `src/requests.ts` (`./requests`): the generated client's named reads for its
+  callers, `requestDocsPage`, `requestDocsSearch`, `requestDocsMarkdown`,
+  `requestCatalogue` and `requestCalculation`. Each has one ten-second deadline
+  over headers, body and decoding; `boundedReplies` caps each reply at 2 MiB.
+  A reply must answer its request (`ApiReplyMismatch` otherwise).
+- `src/errors.ts` (`./errors`): the client's own transport outcomes
+  (`ApiUnavailable`, `ApiDeadlineExceeded`, `ApiReplyTooLarge`,
+  `ApiReplyMismatch`) and `CalculationCallFailure`.
+- `src/negotiation.ingress.ts` (`./negotiation`): `DocsAccept`, which reads one
+  `Accept` header as HTML, Markdown, unacceptable or invalid.
 - `src/openapi.ts`: package-owned OpenAPI generation, structured
   normalization and snapshot formatting for compatibility checks.
 - `src/handlers/`: server-side thin handler adapters and handler layers.
@@ -196,7 +206,7 @@ same `publicCors` policy.
 `publicCors` admits any exact HTTP(S) browser origin without credentials, for
 GET, HEAD, POST and OPTIONS, with `content-type`, `b3` and `traceparent`
 headers. `applyCachePolicy` shares only a successful public GET/HEAD reply, or
-a 400/406 that varies on `Accept` (a stable negotiation answer that would
+a 307/400/406 that varies on `Accept` (a stable negotiation answer that would
 otherwise evict the cached page). A `Set-Cookie` header, Effect response cookies,
 or a `private`/`no-store` instruction prevents sharing.
 

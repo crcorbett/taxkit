@@ -8,7 +8,7 @@ import {
 } from "@taxkit/api-http/routes";
 import { Option } from "effect";
 
-import { publicSettingsAtom } from "#/lib/api/client.atoms";
+import { publicSettingsAtom } from "#/lib/api-client.atoms";
 
 export const Route = createFileRoute("/agents")({
   component: function AgentsRoute() {

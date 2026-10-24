@@ -71,11 +71,12 @@
         "@tanstack/react-router": "catalog:",
         "@tanstack/react-start": "catalog:",
         "@taxkit/api-http": "workspace:*",
+        "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
-        "@taxkit/core": "workspace:*",
         "@taxkit/observability": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
+        "@taxkit/webmcp": "workspace:*",
         "alchemy": "catalog:",
         "effect": "catalog:",
         "react": "catalog:",
@@ -89,7 +90,7 @@
         "@modelcontextprotocol/client": "2.3.1",
         "@taxkit/analytics": "workspace:*",
         "@taxkit/api-mcp": "workspace:*",
-        "@taxkit/calculators": "workspace:*",
+        "@taxkit/core": "workspace:*",
         "@taxkit/infrastructure": "workspace:*",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
@@ -102,7 +103,6 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:",
-        "webmcp-types": "0.1.10",
         "wrangler": "catalog:",
       },
     },
@@ -150,12 +150,13 @@
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
         "@taxkit/core": "workspace:*",
+        "@taxkit/rules-au-income-tax": "workspace:*",
+        "@taxkit/rules-au-pay": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/platform-node": "catalog:",
         "@effect/vitest": "catalog:",
-        "@taxkit/rules-au-pay": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
@@ -410,6 +411,21 @@
     "packages/tsconfig": {
       "name": "@taxkit/tsconfig",
       "version": "2.0.0",
+    },
+    "packages/webmcp": {
+      "name": "@taxkit/webmcp",
+      "version": "0.1.0",
+      "dependencies": {
+        "@taxkit/calculators": "workspace:*",
+        "@taxkit/content": "workspace:*",
+        "effect": "catalog:",
+        "webmcp-types": "0.1.10",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "typescript": "catalog:",
+        "vitest": "catalog:",
+      },
     },
   },
   "overrides": {
@@ -1167,6 +1183,8 @@
     "@taxkit/testing": ["@taxkit/testing@workspace:packages/testing"],
 
     "@taxkit/tsconfig": ["@taxkit/tsconfig@workspace:packages/tsconfig"],
+
+    "@taxkit/webmcp": ["@taxkit/webmcp@workspace:packages/webmcp"],
 
     "@turbo/darwin-64": ["@turbo/darwin-64@2.11.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-Z2LFOxwbiJueD1miByXJS/BrW21vv6YaQXZustty5jEX4vQYw6zyh101Sz1QO7WG0mqBzKagZ/DoAeeujI0/Sw=="],
 

@@ -447,7 +447,7 @@ first reads `Route.useLoaderData` restores it once and matches the resulting
 hooks, containers and leaf components must not receive encoded loader data,
 call the restore operation or run Effect runtimes.
 
-Loader failures are translated once, in `apps/web/src/lib/load.failure.ts`:
+Loader failures are translated once, in `apps/web/src/lib/pages/load.failure.ts`:
 a missing page becomes TanStack's `notFound()` and other failures a
 `WebsiteLoadError` for the route's error component. Interruption stays
 interruption.

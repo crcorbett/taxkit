@@ -8,12 +8,19 @@ const frontendModules = [
   "@taxkit/analytics/errors",
   "@taxkit/analytics/service",
   "@taxkit/api-http/api",
+  "@taxkit/api-http/errors",
+  "@taxkit/api-http/negotiation",
   "@taxkit/api-http/origin",
   "@taxkit/api-http/request-boundary",
+  "@taxkit/api-http/requests",
   "@taxkit/api-http/response-policy",
   "@taxkit/api-http/routes",
   "@taxkit/calculators/schemas",
   "@taxkit/calculators/errors",
+  "@taxkit/calculators/form",
+  "@taxkit/calculators/page",
+  "@taxkit/calculators/page-schemas",
+  "@taxkit/calculators/page-tools",
   "@taxkit/calculators/summaries",
   "@taxkit/content/schemas",
   "@taxkit/content/errors",
@@ -27,6 +34,10 @@ const frontendModules = [
   "@taxkit/rules-au-income-tax/schemas",
   "@taxkit/rules-au-pay/schemas",
   "@taxkit/rules-au-pay/facts",
+  "@taxkit/webmcp/host",
+  "@taxkit/webmcp/registration",
+  "@taxkit/webmcp/schemas",
+  "@taxkit/webmcp/service",
 ];
 const hostModuleExceptions = [
   {
@@ -38,24 +49,24 @@ const hostModuleExceptions = [
     module: "@taxkit/observability/host-telemetry",
   },
   {
-    file: "apps/web/src/lib/config.server.ts",
+    file: "apps/web/src/lib/host/config.server.ts",
     module: "@taxkit/content/config",
   },
   {
-    file: "apps/web/src/lib/config.server.ts",
+    file: "apps/web/src/lib/host/config.server.ts",
     module: "@taxkit/infrastructure/api-worker",
   },
   {
-    file: "apps/web/src/lib/api/host.server.ts",
+    file: "apps/web/src/lib/host/binding.server.ts",
     module: "@taxkit/infrastructure/api-worker",
   },
 ];
 // Native isomorphic/server composition imports these local server boundaries.
 // The grant is for one source and one module address, never a browser subtree.
 const hostSourceImports = [
-  { file: "apps/web/src/lib/loaders.ts", module: "./runtime.server" },
+  { file: "apps/web/src/lib/pages/loaders.ts", module: "../runtime.server" },
   {
-    file: "apps/web/src/lib/settings.server.layer.ts",
+    file: "apps/web/src/lib/host/settings.server.layer.ts",
     module: "./config.server",
   },
 ];

@@ -194,6 +194,17 @@
         "vitest.config.ts"
       ],
       "project": ["src/**/*.{ts,tsx}", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/webmcp": {
+      "entry": [
+        "src/model-context.adapter.layer.ts",
+        "src/registration.egress.ts",
+        "src/schemas.ts",
+        "src/service.ts",
+        "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     }
   }
 }

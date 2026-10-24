@@ -1,21 +1,21 @@
 import "@tanstack/react-start/server-only";
 import type { NotFoundError } from "@tanstack/react-router";
 import { setResponseStatus } from "@tanstack/react-start/server";
+import { requestDocsPage, requestDocsSearch } from "@taxkit/api-http/requests";
 import { docsPageMetadata } from "@taxkit/content/publication";
 import { WebsiteHostTelemetryLive } from "@taxkit/observability/host-telemetry";
 import { env } from "cloudflare:workers";
 import { Cause, Effect, Layer, ManagedRuntime } from "effect";
 
-import type { WebsiteLoadError } from "./api/errors";
-import { WebsiteApiLive } from "./api/host.server";
-import { readDocsPage, readDocsSearch } from "./api/requests";
-import { WebsiteBindings } from "./config.server";
-import type { WebsiteDocsSearchQuery } from "./docs/search-location.boundary";
-import { WebsiteApi, WebsiteSettings } from "./host.service";
-import { loadFailureStatus, rejectRouteLoad } from "./load.failure";
-import { loadRootView } from "./root.load.server";
-import { WebsiteDocsSearchView } from "./schemas";
-import { WebsiteSettingsLive } from "./settings.server.layer";
+import { WebsiteDocsSearchView } from "./docs/schemas";
+import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
+import { WebsiteApiLive } from "./host/binding.server";
+import { WebsiteBindings } from "./host/config.server";
+import type { WebsiteLoadError } from "./host/errors";
+import { WebsiteApi, WebsiteSettings } from "./host/service";
+import { WebsiteSettingsLive } from "./host/settings.server.layer";
+import { loadFailureStatus, rejectRouteLoad } from "./pages/load.failure";
+import { loadRootView } from "./pages/root.load.server";
 
 // The Worker's bindings object, read at this host edge only.
 const bindings = Layer.sync(WebsiteBindings, () => ({ ...env }));
@@ -58,7 +58,7 @@ export const loadDocsPage = ({
     Effect.gen(function* () {
       const host = yield* WebsiteSettings;
       const settings = yield* Effect.fromResult(host.settings);
-      const { navigation, page } = yield* readDocsPage(yield* client, path);
+      const { navigation, page } = yield* requestDocsPage(yield* client, path);
       return {
         metadata: yield* docsPageMetadata(page, settings.publicationOrigin),
         navigation,
@@ -79,7 +79,7 @@ export const loadDocsSearch = ({
         onFailure: () => Effect.succeed(WebsiteDocsSearchView.InvalidSearch()),
         onSuccess: (term) =>
           client.pipe(
-            Effect.flatMap((generated) => readDocsSearch(generated, term)),
+            Effect.flatMap((generated) => requestDocsSearch(generated, term)),
             Effect.map((found) =>
               WebsiteDocsSearchView.Found({ ...found, term })
             )

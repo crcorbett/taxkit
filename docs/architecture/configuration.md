@@ -57,7 +57,7 @@ credentials stay with their own owners.
 
 ## Website settings
 
-[Website server settings](../../apps/web/src/lib/config.server.ts) read only
+[Website server settings](../../apps/web/src/lib/host/config.server.ts) read only
 the Website's own keys from the Worker bindings, through Alchemy's
 `reifyBoundConfigProvider` over the selected keys:
 

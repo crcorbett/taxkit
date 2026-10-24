@@ -52,6 +52,19 @@ not escape through direct, SDK or HTTP consumers.
 deprecated transitional API-era aliases. New SDK, HTTP and in-process code
 should use the canonical `CalculatorRun*` and `CalculatorServiceError` names.
 
+It also owns the browser calculator page, shared by the Website and its page
+tools:
+
+- `./form`: the visible take-home and annual forms, their worked examples, and
+  `requestFromForm`, which turns a form into a checked
+  `CalculatorRunServiceRequest` or a safe `CalculatorInputError`;
+- `./page`: `makeCalculatorPages`, one `Atom.family` group per calculator with
+  the form, commands and readonly view. The host supplies the cancellable
+  calculation command and its safe failure text;
+- `./page-schemas`: `CalculatorViewState` and `CalculatorToolFailure`;
+- `./page-tools`: `CalculatorPageToolkit`, the five page tools, and
+  `calculatorPageToolHandlers`, which drive the page's own commands.
+
 This package must not own:
 
 - HTTP endpoints, OpenAPI annotations or HTTP status mapping
