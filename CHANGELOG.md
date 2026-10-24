@@ -2,6 +2,11 @@
 
 ## 2.2.0
 
+- Read typed dollar text as `Money` with `moneyFromDollarsText` in
+  `taxkit/core`. It converts exactly to whole cents and fails with
+  `InvalidDollarsText` and a `reason` (`empty`, `format` or `range`) that
+  callers match for their own wording. `dollarsTextFromMoney` writes Money
+  back, and `MoneyFromDollarsString` is a Schema codec with default messages.
 - Documentation page responses in `taxkit/http` now include `body`, the page as
   checked reading blocks with highlighted code and server-drawn Mermaid
   diagrams. Existing page fields, calculations and dependencies are unchanged.

@@ -4,6 +4,11 @@
 
 ### Minor Changes
 
+- 221ee31: Add `moneyFromDollarsText`, which reads typed dollar text as non-negative
+  `Money` exactly and fails with `InvalidDollarsText` and a matchable `reason`
+  (`empty`, `format` or `range`). `dollarsTextFromMoney` writes Money back as
+  plain dollars, and `MoneyFromDollarsString` joins both as a Schema codec with
+  default messages.
 - b88ee2d: Documentation page responses in `taxkit/http` (`TaxKitApi`) now
   include `body`, a checked list of reading blocks: headings with ids,
   paragraphs, lists, tables, highlighted code as coloured tokens and Mermaid
