@@ -153,11 +153,11 @@ const fixtureCases = [
   {
     accepted: [
       "apps/web/src/lib/host/errors.ts",
-      "apps/web/src/lib/host/config.server.ts",
+      "apps/web/src/lib/host/config.ingress.ts",
       "apps/web/test/host/config.boundary.test.ts",
       "apps/web/src/lib/runtime.server.ts",
       "apps/web/src/lib/runtime.client.ts",
-      "apps/web/src/lib/host/binding.server.ts",
+      "apps/web/src/lib/host/binding.adapter.layer.ts",
       "apps/web/src/lib/api-client.atoms.ts",
       "packages/api/http/src/requests.ts",
       "apps/web/src/lib/calculators/page.atoms.ts",
@@ -1034,7 +1034,7 @@ test("keeps every Promise admission exact and listed once", () => {
   expect(Array.map(admissions, (entry) => entry.files)).toEqual([
     ["tools/oxlint/.generated-fetch-host.ts"],
     expect.arrayContaining([
-      "apps/web/src/lib/host/binding.server.ts",
+      "apps/web/src/lib/host/binding.adapter.layer.ts",
       "apps/web/src/server.ts",
       "packages/sdk/typescript/src/client.runtime.ts",
     ]),
@@ -1103,7 +1103,7 @@ describe("exact native RPC lint boundaries", () => {
       [
         "apps/web/src/lib/docs/search-location.ingress.ts",
         "apps/web/test/http/negotiation.boundary.test.ts",
-        "apps/web/src/lib/http/negotiation.server.ts",
+        "apps/web/src/lib/http/negotiation.ingress.ts",
         "apps/web/src/lib/http/image.ingress.ts",
         "apps/web/test/http/image.boundary.test.ts",
       ],
@@ -1191,7 +1191,7 @@ describe("exact native RPC lint boundaries", () => {
       ]
     ),
     {
-      path: "apps/web/src/lib/host/binding.server.ts",
+      path: "apps/web/src/lib/host/binding.adapter.layer.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
@@ -1317,14 +1317,14 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/web/src/lib/host/config.server.ts",
+      path: "apps/web/src/lib/host/config.ingress.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/host/config.server.ts",
+      path: "apps/web/src/lib/host/config.ingress.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:

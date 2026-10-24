@@ -7,7 +7,7 @@ import {
   WebsiteApiConfigError,
 } from "../../src/lib/host/errors";
 import { WebsiteApi, WebsiteSettings } from "../../src/lib/host/service";
-import { withDocsRepresentation } from "../../src/lib/http/negotiation.server";
+import { withDocsRepresentation } from "../../src/lib/http/negotiation.ingress";
 
 const unconfigured = new TaxKitWebConfigError({
   message: "TaxKit web settings are missing or invalid.",

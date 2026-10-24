@@ -56,6 +56,10 @@ native request rules `static-layers`, `no-loader-request-state`,
 accept/reject fixtures are in `tools/oxlint/native-request-rules.test.ts`, run
 by `bun run test:tools`.
 
+The Chromium tests need the browser that matches the pinned Playwright, as CI
+installs it: run `apps/web/node_modules/.bin/playwright install chromium` once.
+An older Chromium lacks WebMCP, so the native browser-tools test fails on it.
+
 Focused checks are the owning workspace's `test`, `check-types` and
 `test:browser` scripts. Rule and calculator changes need their golden and
 boundary tests; HTTP contract changes need `bun run --filter=@taxkit/api-http test`

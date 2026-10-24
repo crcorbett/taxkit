@@ -198,7 +198,7 @@ export type Values = Env;`,
 
   it.effect.each([
     "apps/web/src/lib/api-client.atoms.ts",
-    "apps/web/src/lib/host/binding.server.ts",
+    "apps/web/src/lib/host/binding.adapter.layer.ts",
     "apps/web/src/lib/pages/loaders.ts",
     "apps/web/src/lib/runtime.client.ts",
     "apps/web/src/lib/runtime.server.ts",

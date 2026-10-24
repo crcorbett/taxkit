@@ -56,7 +56,7 @@ credentials stay with their own owners.
 
 ## Website settings
 
-[Website server settings](../../apps/web/src/lib/host/config.server.ts) read only
+[Website server settings](../../apps/web/src/lib/host/config.ingress.ts) read only
 the Website's own keys from the Worker bindings, through Alchemy's
 `reifyBoundConfigProvider` over the selected keys:
 
@@ -142,8 +142,8 @@ resources and exported fields.
   entrypoints.
 - Package config fragments MUST own package-specific config namespaces and env
   prefixes such as `SERVICE` or `VITE_SERVICE`.
-- MUST compose package schemas from app-owned `config.server.ts` and
-  `config.client.ts` modules when runtime values differ. Apps should spread
+- MUST compose package schemas from app-owned server-only config modules
+  (`host/config.ingress.ts`) and browser config modules when runtime values differ. Apps should spread
   package config fragments instead of re-declaring package-owned keys or
   prefixes.
 - Apps SHOULD use `ConfigProvider.constantCase` at the runtime provider source

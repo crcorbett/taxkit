@@ -6,7 +6,7 @@ import {
   WebsiteSettingsConfig,
   WebsiteApiConfig,
   WebsiteBindings,
-} from "../../src/lib/host/config.server";
+} from "../../src/lib/host/config.ingress";
 import {
   TaxKitWebConfigError,
   WebsiteApiConfigError,

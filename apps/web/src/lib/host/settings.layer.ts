@@ -1,7 +1,7 @@
 import "@tanstack/react-start/server-only";
 import { Effect, Layer } from "effect";
 
-import { WebsiteSettingsConfig } from "./config.server";
+import { WebsiteSettingsConfig } from "./config.ingress";
 import { WebsiteSettings } from "./service";
 
 export const WebsiteSettingsLive = Layer.effect(

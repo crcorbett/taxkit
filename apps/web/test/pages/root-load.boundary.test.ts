@@ -7,7 +7,7 @@ import {
   WebsiteRootView,
 } from "../../src/lib/host/schemas";
 import { WebsiteSettings } from "../../src/lib/host/service";
-import { loadRootView } from "../../src/lib/pages/root.load.server";
+import { loadRootView } from "../../src/lib/pages/root.load";
 
 it.effect("loads settings without an API capability", () =>
   Effect.gen(function* () {

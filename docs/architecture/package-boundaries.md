@@ -298,11 +298,13 @@ roles. A public export or declared dependency does not make a backend handler,
 server, domain live Layer or content compiler browser-safe. Website source uses
 the contract/client modules listed in `tools/oxlint/package-roles.ts`. Exact host exceptions admit the existing
 host telemetry, content settings and infrastructure binding types. These
-exceptions do not bypass exports or declared-dependency checks. Browser code
-also rejects Alchemy and local `.server`/`.server.layer` imports. Exact local
-host grants retain the isomorphic loader's `../runtime.server` import and the
-settings Layer's `./config.server` import; neighbouring browser modules receive
-neither permission. Non-infrastructure package
+exceptions do not bypass exports or declared-dependency checks. A Website
+module is server-only when it imports TanStack Start's
+`@tanstack/react-start/server-only` marker (or is `runtime.server.ts` or the
+Worker host); only those may import Alchemy, and TanStack's import protection
+keeps them out of the browser. Browser code also rejects local `.server`
+imports; one exact grant keeps the isomorphic loader's `../runtime.server`
+import, and neighbouring browser modules receive no such permission. Non-infrastructure package
 source cannot acquire deployment/provider implementations. Domain-free runtime
 support (`packages/observability`) cannot depend on or import any other TaxKit
 workspace; consuming domains supply their Schemas, such as the calculator
