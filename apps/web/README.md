@@ -269,7 +269,8 @@ not show hosted behaviour.
 ## Local development
 
 From the repository root, `bun run dev` starts the native API and Website pair
-with `alchemy.local.run.ts` at the `dev_native_apps` stage. The Website uses
+with `alchemy dev` on the root `alchemy.run.ts` stack at the `dev_native_apps`
+stage. The Website uses
 port 3220 and the API uses port 3221, with native strict-port checks so they
 cannot swap addresses. An occupied port stops startup. Alchemy prints both
 addresses, binds the private API and supplies the origins, using local state

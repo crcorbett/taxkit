@@ -37,8 +37,9 @@ publication address `https://taxkit.dev` (`TAXKIT_PUBLICATION_ORIGIN`) in every
 stage. API endpoint entries in discovery documents use that stage's own API
 address. The unpatched Alchemy planner plans this graph without a cycle.
 
-`alchemy.local.run.ts` declares the same graph for local development in the
-`dev_native_apps` stage with local state and local Worker emulation.
+The same stack runs local development: under `alchemy dev` a `dev_*` stage
+(`dev_native_apps`) uses local state, local Worker emulation and no
+credentials, as Common Practice's `bun run dev` does.
 
 ## Secrets and stages
 

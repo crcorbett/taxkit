@@ -8,7 +8,6 @@
     ".": {
       "entry": [
         "alchemy.run.ts!",
-        "alchemy.local.run.ts!",
         "alchemy.posthog.run.ts!",
         "alchemy.axiom.run.ts!",
         "alchemy.trace.run.ts!"
