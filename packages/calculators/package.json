@@ -75,6 +75,26 @@
       "source": "./src/__testing__/fixtures.ts",
       "types": "./dist/__testing__/fixtures.d.ts",
       "default": "./dist/__testing__/fixtures.js"
+    },
+    "./form": {
+      "source": "./src/form.ingress.ts",
+      "types": "./dist/form.ingress.d.ts",
+      "default": "./dist/form.ingress.js"
+    },
+    "./page": {
+      "source": "./src/page.atoms.ts",
+      "types": "./dist/page.atoms.d.ts",
+      "default": "./dist/page.atoms.js"
+    },
+    "./page-schemas": {
+      "source": "./src/page.schemas.ts",
+      "types": "./dist/page.schemas.d.ts",
+      "default": "./dist/page.schemas.js"
+    },
+    "./page-tools": {
+      "source": "./src/page.tools.ts",
+      "types": "./dist/page.tools.d.ts",
+      "default": "./dist/page.tools.js"
     }
   },
   "publishConfig": {

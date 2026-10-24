@@ -52,6 +52,8 @@ entry points.
 - [packages/aeo](./packages/aeo/README.md): the API's answer-engine routes:
   `robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt` and share images,
   derived from the accepted Content catalogue.
+- [packages/webmcp](./packages/webmcp/README.md): registers the Website's
+  calculator page tools with the browser's WebMCP host.
 - [packages/og-image](./packages/og-image/README.md): the Takumi share-image
   renderer and its bounded cache, behind Content's `DocsOgImages` contract.
 - [packages/observability](./packages/observability/README.md): shared safe host

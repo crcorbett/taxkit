@@ -1,7 +1,7 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
-import { websiteSearchParameters } from "#/lib/docs/search-location.boundary";
-import { createLoaderRegistry } from "#/lib/loaders";
+import { websiteSearchParameters } from "#/lib/docs/search-location.ingress";
+import { createLoaderRegistry } from "#/lib/pages/loaders";
 
 import { routeTree } from "./routeTree.gen";
 

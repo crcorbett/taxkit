@@ -1,14 +1,15 @@
+import { requestDocsPage, requestDocsSearch } from "@taxkit/api-http/requests";
 import { docsPageMetadata } from "@taxkit/content/publication";
 import { Effect, Schema } from "effect";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
-import { browserApiClient, publicSettingsAtom } from "./api/client.atoms";
-import { readDocsPage, readDocsSearch } from "./api/requests";
-import { TaxKitWebConfigError } from "./config";
-import type { WebsiteDocsSearchQuery } from "./docs/search-location.boundary";
-import { rejectRouteLoad } from "./load.failure";
-import type { LoaderContext } from "./loader-context";
-import { WebsiteDocsSearchView, WebsiteRootView } from "./schemas";
+import { browserApiClient, publicSettingsAtom } from "./api-client.atoms";
+import { WebsiteDocsSearchView } from "./docs/schemas";
+import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
+import { TaxKitWebConfigError } from "./host/errors";
+import { WebsiteRootView } from "./host/schemas";
+import { rejectRouteLoad } from "./pages/load.failure";
+import type { LoaderContext } from "./pages/loader-context";
 
 const settingsUnavailable = new TaxKitWebConfigError({
   message: "TaxKit web settings are missing or invalid.",
@@ -75,7 +76,7 @@ export const loadDocsPage = (
     effect: Effect.gen(function* () {
       const current = yield* settings;
       const client = yield* browserApiClient;
-      const { navigation, page } = yield* readDocsPage(client, request.path);
+      const { navigation, page } = yield* requestDocsPage(client, request.path);
       return {
         metadata: yield* docsPageMetadata(page, current.publicationOrigin),
         navigation,
@@ -98,7 +99,7 @@ export const loadDocsSearch = (
         onFailure: () => Effect.succeed(WebsiteDocsSearchView.InvalidSearch()),
         onSuccess: (term) =>
           browserApiClient.pipe(
-            Effect.flatMap((client) => readDocsSearch(client, term)),
+            Effect.flatMap((client) => requestDocsSearch(client, term)),
             Effect.map((found) =>
               WebsiteDocsSearchView.Found({ ...found, term })
             )

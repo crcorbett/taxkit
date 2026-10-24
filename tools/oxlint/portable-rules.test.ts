@@ -152,28 +152,28 @@ const fixtureCases = [
   },
   {
     accepted: [
-      "apps/web/src/lib/config.ts",
-      "apps/web/src/lib/config.server.ts",
-      "apps/web/src/lib/config.boundary.test.ts",
+      "apps/web/src/lib/host/errors.ts",
+      "apps/web/src/lib/host/config.server.ts",
+      "apps/web/src/lib/host/config.boundary.test.ts",
       "apps/web/src/lib/runtime.server.ts",
       "apps/web/src/lib/runtime.client.ts",
-      "apps/web/src/lib/api/host.server.ts",
-      "apps/web/src/lib/api/client.atoms.ts",
-      "apps/web/src/lib/api/requests.ts",
-      "apps/web/src/lib/calculator.atoms.ts",
-      "apps/web/src/lib/loaders.ts",
-      "apps/web/src/lib/calculator.boundary.browser.test.tsx",
+      "apps/web/src/lib/host/binding.server.ts",
+      "apps/web/src/lib/api-client.atoms.ts",
+      "packages/api/http/src/requests.ts",
+      "apps/web/src/lib/calculators/page.atoms.ts",
+      "apps/web/src/lib/pages/loaders.ts",
+      "apps/web/src/lib/calculators/calculator.boundary.browser.test.tsx",
       "tools/apps-local/native-pair-build.runtime.ts",
       // native-pair takes over a minute to lint alone; `bun run lint` covers it.
       "apps/web/test/native-settings-failure.boundary.test.ts",
       "apps/web/test/native-cancellation.boundary.test.ts",
       "apps/web/test/native-local-development.boundary.test.ts",
       "apps/web/vitest.native.config.ts",
-      "apps/web/src/lib/form.boundary.ts",
+      "packages/calculators/src/form.ingress.ts",
       "apps/web/src/server.ts",
       "apps/web/src/routes/index.tsx",
       "apps/web/src/lib/atom-lifecycle.browser.test.tsx",
-      "apps/web/src/lib/browser-loaders.boundary.browser.test.tsx",
+      "apps/web/src/lib/pages/browser-loaders.boundary.browser.test.tsx",
       "apps/web/vite.config.ts",
       "apps/web/vitest.config.ts",
       "apps/web/vitest.browser.config.ts",
@@ -1036,7 +1036,7 @@ test("keeps every Promise admission exact and listed once", () => {
   expect(Array.map(admissions, (entry) => entry.files)).toEqual([
     ["tools/oxlint/.generated-fetch-host.ts"],
     expect.arrayContaining([
-      "apps/web/src/lib/api/host.server.ts",
+      "apps/web/src/lib/host/binding.server.ts",
       "apps/web/src/server.ts",
       "packages/sdk/typescript/src/client.runtime.ts",
     ]),
@@ -1103,11 +1103,11 @@ describe("exact native RPC lint boundaries", () => {
   test.effect.each([
     ...Array.flatMap(
       [
-        "apps/web/src/lib/docs/search-location.boundary.ts",
-        "apps/web/src/lib/docs/markdown.boundary.test.ts",
-        "apps/web/src/lib/docs/markdown.response.server.ts",
-        "apps/web/src/lib/docs/image.ingress.ts",
-        "apps/web/src/lib/docs/image.boundary.test.ts",
+        "apps/web/src/lib/docs/search-location.ingress.ts",
+        "apps/web/src/lib/http/negotiation.boundary.test.ts",
+        "apps/web/src/lib/http/negotiation.server.ts",
+        "apps/web/src/lib/http/image.ingress.ts",
+        "apps/web/src/lib/http/image.boundary.test.ts",
       ],
       (path) => [
         {
@@ -1193,28 +1193,28 @@ describe("exact native RPC lint boundaries", () => {
       ]
     ),
     {
-      path: "apps/web/src/lib/api/host.server.ts",
+      path: "apps/web/src/lib/host/binding.server.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/loader-context.ts",
+      path: "apps/web/src/lib/pages/loader-context.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/loader-context.ts",
+      path: "apps/web/src/lib/pages/loader-context.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/loader-context.ts",
+      path: "apps/web/src/lib/pages/loader-context.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
@@ -1235,7 +1235,7 @@ describe("exact native RPC lint boundaries", () => {
         'declare const plainCalculatorInput: { readonly fill: (value: string) => void };\nexport const filled = plainCalculatorInput.fill("67000");',
     },
     {
-      path: "apps/web/src/lib/calculator-page.view.tsx",
+      path: "apps/web/src/lib/calculators/calculator-page.view.tsx",
       rejected: true,
       rule: "strict-effect(no-imperative-collections)",
       source:
@@ -1256,7 +1256,7 @@ describe("exact native RPC lint boundaries", () => {
         'declare const unrelatedInput: { readonly fill: (value: string) => void };\nexport const filled = unrelatedInput.fill("2000");',
     },
     {
-      path: "apps/web/src/lib/take-home.view.tsx",
+      path: "apps/web/src/lib/calculators/take-home.view.tsx",
       rejected: true,
       rule: "strict-effect(no-imperative-collections)",
       source:
@@ -1319,49 +1319,49 @@ describe("exact native RPC lint boundaries", () => {
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/web/src/lib/config.server.ts",
+      path: "apps/web/src/lib/host/config.server.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/config.server.ts",
+      path: "apps/web/src/lib/host/config.server.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/web/src/lib/calculator.atoms.ts",
+      path: "apps/web/src/lib/calculators/page.atoms.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/web/src/lib/calculator.atoms.ts",
+      path: "apps/web/src/lib/calculators/page.atoms.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/loaders.ts",
+      path: "apps/web/src/lib/pages/loaders.ts",
       rejected: false,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/web/src/lib/loaders.ts",
+      path: "apps/web/src/lib/pages/loaders.ts",
       rejected: false,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/loaders.ts",
+      path: "apps/web/src/lib/pages/loaders.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
@@ -1844,81 +1844,81 @@ describe("exact native RPC lint boundaries", () => {
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownOption(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      path: "packages/webmcp/test/registration.test.ts",
       rejected: false,
       rule: "strict-effect(no-promise-workflow)",
       source:
         'import { Predicate, Schema } from "effect";\n\nexport const Callback = Schema.declare<Promise<unknown>>(Predicate.isPromise);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      path: "packages/webmcp/test/registration.test.ts",
       rejected: true,
       rule: "strict-effect(no-promise-workflow)",
       source: "export const run = async () => 1;",
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      path: "packages/webmcp/test/registration.test.ts",
       rejected: true,
       rule: "strict-effect(no-promise-workflow)",
       source: "export const run = new Promise<void>((resolve) => resolve());",
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      path: "packages/webmcp/test/registration.test.ts",
       rejected: true,
       rule: "strict-effect(no-promise-workflow)",
       source:
         "export const run = (source: Promise<number>) => source.then((value) => value);",
     },
     {
-      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      path: "apps/web/src/lib/calculators/tools.atoms.ts",
       rejected: true,
       rule: "strict-effect(no-promise-workflow)",
       source: "export const run = (source: Promise<number>) => source;",
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.ts",
+      path: "packages/webmcp/src/model-context.adapter.layer.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.ts",
+      path: "packages/webmcp/src/model-context.adapter.layer.ts",
       rejected: false,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.ts",
+      path: "packages/webmcp/src/model-context.adapter.layer.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      path: "apps/web/src/lib/calculators/tools.atoms.ts",
       rejected: true,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:
         'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      path: "apps/web/src/lib/calculators/tools.atoms.ts",
       rejected: true,
       rule: "effect(no-schema-encoder-outside-egress)",
       source:
         'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.atoms.ts",
+      path: "apps/web/src/lib/calculators/tools.atoms.ts",
       rejected: true,
       rule: "strict-effect(no-runtime-outside-boundary)",
       source:
         'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
     },
     {
-      path: "apps/web/src/lib/browser-tools.boundary.test.ts",
+      path: "packages/webmcp/test/registration.test.ts",
       rejected: false,
       rule: "taxkit(no-decoding-outside-boundaries)",
       source:

@@ -4,7 +4,7 @@ import {
   defaultStreamHandler,
 } from "@tanstack/react-start/server";
 import { applyCachePolicy } from "@taxkit/api-http/response-policy";
-import { DiscoveryPath, discoveryApiPath } from "@taxkit/api-http/routes";
+import { DiscoveryPath } from "@taxkit/api-http/routes";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
 import { Effect, ErrorReporter, Match, Option, Schema } from "effect";
@@ -14,9 +14,8 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
-import { docsImageRepresentation } from "./lib/docs/image.ingress";
-import { withDocsRepresentation } from "./lib/docs/markdown.response.server";
-import { WebsiteApi } from "./lib/host.service";
+import { earlyReply } from "./lib/http/early-reply.ingress";
+import { withDocsRepresentation } from "./lib/http/negotiation.server";
 import { runtime } from "./lib/runtime.server";
 
 const render = createStartHandler(defaultStreamHandler);
@@ -46,38 +45,9 @@ const websiteRoute = (pathname: string): HostRoute =>
 const handleRequest = createServerOnlyFn((request: Request) =>
   runtime.runPromise(
     Effect.gen(function* websiteRequest() {
-      const url = new URL(request.url);
-      const discoveryPath = url.pathname;
-      if (Schema.is(DiscoveryPath)(discoveryPath)) {
-        if (request.method !== "GET" && request.method !== "HEAD") {
-          return HttpServerResponse.empty({
-            headers: { allow: "GET, HEAD" },
-            status: 405,
-          });
-        }
-        if (url.search !== "") {
-          return HttpServerResponse.empty({ status: 400 });
-        }
-        // The API owns the finished document; forward it once.
-        const host = yield* WebsiteApi;
-        return yield* host.forward(discoveryApiPath(discoveryPath)).pipe(
-          Effect.map(HttpServerResponse.fromWeb),
-          Effect.catch(() =>
-            Effect.succeed(HttpServerResponse.empty({ status: 503 }))
-          )
-        );
-      }
-      const image = yield* docsImageRepresentation;
-      if (Option.isSome(image)) {
-        return image.value;
-      }
-      // The framework still mounts its server-function base. The Website
-      // declares no server functions, so every such address is absent.
-      if (
-        url.pathname === "/_serverFn" ||
-        url.pathname.startsWith("/_serverFn/")
-      ) {
-        return HttpServerResponse.empty({ status: 404 });
+      const early = yield* earlyReply;
+      if (Option.isSome(early)) {
+        return early.value;
       }
       return yield* Effect.gen(function* websiteHtml() {
         const incoming = yield* HttpServerRequest.HttpServerRequest;

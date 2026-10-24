@@ -8,8 +8,8 @@ import {
   DocsNavigation,
 } from "#/lib/docs/page.view";
 import { DocsReadingBodyView } from "#/lib/docs/reading-body.view";
-import { loadDocsPage } from "#/lib/loaders";
-import type { WebsiteDocsPageView } from "#/lib/schemas";
+import type { WebsiteDocsPageView } from "#/lib/docs/schemas";
+import { loadDocsPage } from "#/lib/pages/loaders";
 import { docsHead } from "#/lib/seo/head";
 
 export const Route = createFileRoute("/$")({

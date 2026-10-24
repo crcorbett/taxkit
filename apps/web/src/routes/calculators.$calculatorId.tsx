@@ -2,7 +2,7 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { CalculatorSummaries } from "@taxkit/calculators/summaries";
 import { Array, Option } from "effect";
 
-import { CalculatorPage } from "#/lib/calculator-page.container";
+import { CalculatorPage } from "#/lib/calculators/calculator-page.container";
 
 export const Route = createFileRoute("/calculators/$calculatorId")({
   component: function CalculatorRoute() {

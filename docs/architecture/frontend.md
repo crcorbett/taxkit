@@ -59,16 +59,16 @@ TanStack owns loader data and its freshness: intent preloading, a one-minute
 default stale time and `staleTime: 0` on the root route, which carries live
 settings. Root loading performs no catalogue API
 read and does not acquire the generated client. Loaders hold no request atoms
-and add no second cache. `loaders.ts` selects the server or browser branch with
+and add no second cache. `pages/loaders.ts` selects the server or browser branch with
 `createIsomorphicFn`; failures become TanStack `notFound()` or a
 `WebsiteLoadError` for the route's error component.
 
 The Website's own address comes from its native `Worker.URL`, the API address
 from the API resource's Output and canonical links from the fixed publication
-origin `https://taxkit.dev`. `config.server.ts` reads only the Website's keys
+origin `https://taxkit.dev`. `host/config.server.ts` reads only the Website's keys
 through `reifyBoundConfigProvider`. Settings and the API binding retain independent
 checked failures: a broken binding leaves settings available, and invalid Website
-settings do not block valid API forwarding. `root.load.server.ts` requires only
+settings do not block valid API forwarding. `pages/root.load.server.ts` requires only
 settings.
 Vite exposes no ambient public env prefix or build-time API address.
 
@@ -166,9 +166,10 @@ only when repeated UI patterns across apps justify one.
 
 ## Calculator state
 
-`calculator.atoms.ts` holds one `Atom.family` group per calculator: form,
-calculation (`apiClientRuntime.fn` over the generated client), commands and one
-shared readonly view (`WebsiteCalculatorViewState`). Editing interrupts work and
+`@taxkit/calculators/page` holds one `Atom.family` group per calculator: form,
+calculation, commands and one shared readonly view (`CalculatorViewState`). The
+Website's `calculators/page.atoms.ts` supplies the calculation
+(`apiClientRuntime.fn` over `requestCalculation`) and its safe failure text. Editing interrupts work and
 keeps the last success, visibly out of date, until an explicit calculation
 succeeds; an old error is hidden while a new request runs. The view is kept
 alive for the registry's lifetime and holds its whole family group, so an
@@ -182,12 +183,15 @@ flag; explanations come from the report and its trace, not the edited form.
 
 ## Page-owned browser tools
 
-`WebsiteBrowserToolkit` describes five visible calculator commands, separate
-from the API's remote MCP tools. Arguments reuse the form Schemas and results
-reuse `WebsiteCalculatorViewState`. `browser-tools.atoms.ts` registers them with
-`apiClientRuntime.fn`; handlers call the page's existing edit and submit
-commands and the same `ApiClient`, never another client or runtime. The
-registration scope's `FiberSet.makeRuntimePromise` is the only callback bridge.
+`CalculatorPageToolkit` (`@taxkit/calculators/page-tools`) describes five
+visible calculator commands, separate from the API's remote MCP tools.
+Arguments reuse the form Schemas and results reuse `CalculatorViewState`; its
+handlers call the page's existing edit and submit commands. `@taxkit/webmcp`
+registers the toolkit through `ModelContextHost`, whose live adapter is the one
+WebMCP Promise bridge: the registration scope's `FiberSet.makeRuntimePromise`
+runs each callback. The Website's `calculators/tools.atoms.ts` composes them
+with `apiClientRuntime.fn` and the same `ApiClient`, never another client or
+runtime.
 One checked request object identifies each attempt, so an old callback cannot
 return a newer answer or cancel a newer manual request. Containers start
 registration and interrupt it on cleanup.
@@ -200,12 +204,12 @@ routes. The route renders the title as `DocsHeading` and the checked
 coloured spans, diagrams as `<img>` with an SVG data address, tables in a
 labelled scroll region and page links through the TanStack router. `/search`
 reads the raw address once and calls the API's search route. Markdown
-representations (`.md` and `Accept` negotiation) are a named HTTP policy over
-the HTML Effect in `src/server.ts`; discovery documents belong to the API and
-are forwarded once. Share metadata comes from `metadata.egress.ts` and share
-images from a build-only Vite step, which builds the same catalogue from
-`content/docs` through `readDocsCatalogue`. No Website request reads authored MDX,
-builds a content index or constructs a Layer.
+representations (`.md` files, and a 307 to them for a Markdown `Accept`
+preference) are a named HTTP policy over the HTML Effect in `src/server.ts`
+(`http/negotiation.server.ts`). Discovery documents and share images belong to
+the API and are forwarded once (`http/early-reply.ingress.ts`). Each docs loader
+returns Content's `docsPageMetadata`, rendered by `seo/head.ts`. No Website
+request reads authored MDX, builds a content index or constructs a Layer.
 
 ## Analytics
 
@@ -227,7 +231,7 @@ event allowlist and stored-event readback are not built.
 - Do not import server-only API exports from browser routes, and do not mount
   the API inside TanStack Start.
 - Read Worker bindings only in `runtime.server.ts` and adapt the private binding
-  only in `api/host.server.ts`.
+  only in `host/binding.server.ts`.
 - Keep frontend docs and component details out of rule packages.
 - Keep browser docs modules on browser-safe Content exports such as
   `@taxkit/content/schemas`; do not import `@content/docs`, `@taxkit/mdx` or

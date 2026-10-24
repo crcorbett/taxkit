@@ -132,8 +132,8 @@ import "@taxkit/calculators/summaries";
       // Real approved host paths continue to use Alchemy runtime helpers and
       // exact infrastructure type exports. A neighbouring file gains no grant.
       const host = yield* lintFiles([
-        "apps/web/src/lib/config.server.ts",
-        "apps/web/src/lib/api/host.server.ts",
+        "apps/web/src/lib/host/config.server.ts",
+        "apps/web/src/lib/host/binding.server.ts",
         "apps/api/src/worker.ts",
       ]);
       expect(host.exitCode, host.output).toBe(0);
@@ -151,8 +151,8 @@ it.effect(
   () =>
     Effect.gen(function* () {
       const host = yield* lintFiles([
-        "apps/web/src/lib/loaders.ts",
-        "apps/web/src/lib/settings.server.layer.ts",
+        "apps/web/src/lib/pages/loaders.ts",
+        "apps/web/src/lib/host/settings.server.layer.ts",
       ]);
       expect(host.exitCode, host.output).toBe(0);
       yield* Effect.forEach(

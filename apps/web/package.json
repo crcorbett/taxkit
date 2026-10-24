@@ -24,11 +24,12 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@taxkit/api-http": "workspace:*",
+    "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
-    "@taxkit/core": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "@taxkit/rules-au-income-tax": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
+    "@taxkit/webmcp": "workspace:*",
     "alchemy": "catalog:",
     "effect": "catalog:",
     "react": "catalog:",
@@ -42,7 +43,7 @@
     "@modelcontextprotocol/client": "2.3.1",
     "@taxkit/analytics": "workspace:*",
     "@taxkit/api-mcp": "workspace:*",
-    "@taxkit/calculators": "workspace:*",
+    "@taxkit/core": "workspace:*",
     "@taxkit/infrastructure": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -55,7 +56,6 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "webmcp-types": "0.1.10",
     "wrangler": "catalog:"
   }
 }

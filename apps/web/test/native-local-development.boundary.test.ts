@@ -201,7 +201,7 @@ describe("native local development", () => {
           );
           const viewPath = path.join(
             root,
-            "apps/web/src/lib/take-home.view.tsx"
+            "apps/web/src/lib/calculators/take-home.view.tsx"
           );
           const originalView = yield* fs.readFileString(viewPath);
           expect(originalView).toContain("<h2>Australian take-home pay</h2>");

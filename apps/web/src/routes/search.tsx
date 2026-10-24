@@ -3,9 +3,9 @@ import { Match, Option } from "effect";
 
 import { DocsHeading } from "#/lib/docs/components";
 import { DocsNavigation } from "#/lib/docs/page.view";
-import { readDocsSearchTerm } from "#/lib/docs/search-location.boundary";
+import { readDocsSearchTerm } from "#/lib/docs/search-location.ingress";
 import { DocsSearchForm, DocsSearchResults } from "#/lib/docs/search.view";
-import { loadDocsSearch } from "#/lib/loaders";
+import { loadDocsSearch } from "#/lib/pages/loaders";
 
 const SearchUnavailable = () => (
   <section className="docs-state" role="alert">

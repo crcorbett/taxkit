@@ -288,7 +288,10 @@ const program = Effect.gen(function* () {
     // compiler. The scoped source replacement is restored before the ordinary
     // build; no production test flag, alternate handler or protocol is added.
     yield* Effect.gen(function* nativeSettingsDefectBuild() {
-      const owner = path.join(root, "apps/web/src/lib/root.load.server.ts");
+      const owner = path.join(
+        root,
+        "apps/web/src/lib/pages/root.load.server.ts"
+      );
       const original = yield* Effect.acquireRelease(
         fs.readFileString(owner),
         (saved) => fs.writeFileString(owner, saved).pipe(Effect.orDie)

@@ -18,11 +18,11 @@ import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
 import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 
-import { publicSettingsAtom } from "#/lib/api/client.atoms";
-import type { LoaderContext } from "#/lib/loader-context";
-import { loadRoot } from "#/lib/loaders";
-import { WebsiteRootView } from "#/lib/schemas";
-import type { WebsitePublicSettings } from "#/lib/schemas";
+import { publicSettingsAtom } from "#/lib/api-client.atoms";
+import { WebsiteRootView } from "#/lib/host/schemas";
+import type { WebsitePublicSettings } from "#/lib/host/schemas";
+import type { LoaderContext } from "#/lib/pages/loader-context";
+import { loadRoot } from "#/lib/pages/loaders";
 
 import "../styles.css";
 

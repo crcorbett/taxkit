@@ -1,5 +1,10 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
+import {
+  CalculatorToolFailure,
+  CalculatorViewState,
+} from "@taxkit/calculators/page-schemas";
+import { CalculatorPageToolkit } from "@taxkit/calculators/page-tools";
 import { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
 import {
   Array,
@@ -18,9 +23,6 @@ import { Miniflare } from "miniflare";
 import { chromium } from "playwright";
 import type { Route } from "playwright";
 
-import { WebsiteBrowserToolFailure } from "../src/lib/browser-tools.schemas";
-import { WebsiteBrowserToolkit } from "../src/lib/browser-tools.toolkit";
-import { WebsiteCalculatorViewState } from "../src/lib/schemas";
 import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
@@ -35,8 +37,8 @@ const isAnnualCalculation = (url: URL) =>
   url.pathname === "/api/v1/calculators/au.income-tax.annual/calculate";
 const BrowserReply = Schema.toCodecJson(
   Schema.Union([
-    WebsiteCalculatorViewState,
-    WebsiteBrowserToolFailure,
+    CalculatorViewState,
+    CalculatorToolFailure,
     CalculatorCatalogResponse,
   ])
 );
@@ -279,12 +281,12 @@ it.live(
           Order.String
         )
       ).toEqual(
-        Array.sort(Record.keys(WebsiteBrowserToolkit.tools), Order.String)
+        Array.sort(Record.keys(CalculatorPageToolkit.tools), Order.String)
       );
       expect(yield* Queue.clear(calls)).toEqual([]);
       const call = Effect.fnUntraced(function* (
         currentTools: readonly Added["tools"][number][],
-        name: keyof typeof WebsiteBrowserToolkit.tools,
+        name: keyof typeof CalculatorPageToolkit.tools,
         input: Input = {}
       ) {
         const tool = yield* Array.findFirst(
@@ -312,9 +314,9 @@ it.live(
       const catalogue = yield* call(tools, "taxkit_find_calculators");
       expect(Schema.is(CalculatorCatalogResponse)(catalogue)).toBe(true);
       const read = yield* call(tools, "taxkit_read_calculator");
-      expect(Schema.is(WebsiteCalculatorViewState)(read)).toBe(true);
+      expect(Schema.is(CalculatorViewState)(read)).toBe(true);
       const initial = yield* call(tools, "taxkit_calculate_visible_form");
-      expect(Schema.is(WebsiteCalculatorViewState)(initial)).toBe(true);
+      expect(Schema.is(CalculatorViewState)(initial)).toBe(true);
       yield* Effect.promise(() =>
         page.getByText("$1,301.00", { exact: true }).waitFor()
       );
@@ -323,8 +325,8 @@ it.live(
       const invalid = yield* call(tools, "taxkit_calculate_visible_form", {
         unexpected: "PRIVATE9",
       });
-      expect(Schema.is(WebsiteBrowserToolFailure)(invalid)).toBe(true);
-      if (Schema.is(WebsiteBrowserToolFailure)(invalid)) {
+      expect(Schema.is(CalculatorToolFailure)(invalid)).toBe(true);
+      if (Schema.is(CalculatorToolFailure)(invalid)) {
         expect(invalid.code).toBe("invalid-input");
       }
       // The catalogue tool reads the API; one visible calculation follows.
@@ -341,7 +343,7 @@ it.live(
       const filled = yield* call(annualTools, "taxkit_fill_calculator", {
         taxableDollars: "75000",
       });
-      expect(Schema.is(WebsiteCalculatorViewState)(filled)).toBe(true);
+      expect(Schema.is(CalculatorViewState)(filled)).toBe(true);
       expect(
         yield* Effect.promise(() =>
           page.getByLabel("Annual taxable income").inputValue()
@@ -349,7 +351,7 @@ it.live(
       ).toBe("75000");
       expect(yield* Queue.clear(calls)).toEqual([]);
       const annual = yield* call(annualTools, "taxkit_calculate_visible_form");
-      expect(Schema.is(WebsiteCalculatorViewState)(annual)).toBe(true);
+      expect(Schema.is(CalculatorViewState)(annual)).toBe(true);
       yield* Effect.promise(() =>
         page.getByText("$14,788.00", { exact: true }).first().waitFor()
       );
@@ -383,12 +385,10 @@ it.live(
         taxableDollars: "76000",
       });
       const edited = yield* call(annualTools, "taxkit_read_result");
-      if (Schema.is(WebsiteCalculatorViewState)(edited)) {
+      if (Schema.is(CalculatorViewState)(edited)) {
         expect(edited.stale).toBe(true);
         expect(edited.report).toEqual(
-          Schema.is(WebsiteCalculatorViewState)(annual)
-            ? annual.report
-            : Option.none()
+          Schema.is(CalculatorViewState)(annual) ? annual.report : Option.none()
         );
       }
       // Hold actual requests at the browser transport. Observe caller abort,
@@ -422,7 +422,7 @@ it.live(
           .toBe(false)
       );
       const busy = yield* call(annualTools, "taxkit_calculate_visible_form");
-      if (Schema.is(WebsiteBrowserToolFailure)(busy)) {
+      if (Schema.is(CalculatorToolFailure)(busy)) {
         expect(busy.code).toBe("calculation-busy");
       } else {
         expect.fail("Busy calculator admitted a second tool call");
@@ -445,7 +445,7 @@ it.live(
           .toBe(true)
       );
       const afterAbort = yield* call(annualTools, "taxkit_read_calculator");
-      if (Schema.is(WebsiteCalculatorViewState)(afterAbort)) {
+      if (Schema.is(CalculatorViewState)(afterAbort)) {
         expect(afterAbort.busy).toBe(false);
         expect(afterAbort.stale).toBe(true);
       } else {
@@ -485,7 +485,7 @@ it.live(
           .toBe(true)
       );
       const retry = yield* call(annualTools, "taxkit_read_result");
-      if (Schema.is(WebsiteCalculatorViewState)(retry)) {
+      if (Schema.is(CalculatorViewState)(retry)) {
         expect(retry.busy).toBe(false);
         expect(retry.stale).toBe(false);
         expect(retry.form).toEqual({ taxableDollars: "77000" });
@@ -518,12 +518,10 @@ it.live(
           .toBe("77000")
       );
       const returned = yield* call(returnedTools, "taxkit_read_result");
-      if (Schema.is(WebsiteCalculatorViewState)(returned)) {
+      if (Schema.is(CalculatorViewState)(returned)) {
         expect(returned.form).toEqual({ taxableDollars: "77000" });
         expect(returned.report).toEqual(
-          Schema.is(WebsiteCalculatorViewState)(retry)
-            ? retry.report
-            : Option.none()
+          Schema.is(CalculatorViewState)(retry) ? retry.report : Option.none()
         );
         expect(returned.busy).toBe(false);
         expect(returned.stale).toBe(true);

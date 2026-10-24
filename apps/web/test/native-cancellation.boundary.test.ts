@@ -1,6 +1,8 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
 import { TaxKitApi } from "@taxkit/api-http/api";
+import { ApiDeadlineExceeded } from "@taxkit/api-http/errors";
+import { boundedReplies, requestCalculation } from "@taxkit/api-http/requests";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
@@ -19,9 +21,6 @@ import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
-import { boundedResponses } from "../src/lib/api/bounded-response";
-import { WebsiteApiDeadlineExceeded } from "../src/lib/api/errors";
-import { calculate } from "../src/lib/api/requests";
 import { readWorkerModules } from "./native-modules.fixture";
 import {
   nativeLocalModeFixture,
@@ -220,10 +219,12 @@ it.live(
             Effect.flatMap((http) =>
               HttpApiClient.makeWith(TaxKitApi, {
                 baseUrl: address,
-                httpClient: boundedResponses(http),
+                httpClient: boundedReplies(http),
               })
             ),
-            Effect.flatMap((client) => calculate(client, CalculationRequest)),
+            Effect.flatMap((client) =>
+              requestCalculation(client, CalculationRequest)
+            ),
             Effect.flip,
             Effect.provide(FetchHttpClient.layer)
           );
@@ -232,7 +233,7 @@ it.live(
           // its tag and the fixed fixture phase; never inspect raw causes or
           // request/response bytes to diagnose a transport regression.
           expect(
-            Schema.is(WebsiteApiDeadlineExceeded)(error),
+            Schema.is(ApiDeadlineExceeded)(error),
             `Native ${address === apiOrigin ? "body" : "headers"} fixture returned ${error._tag} after ${elapsed}ms`
           ).toBe(true);
           expect(elapsed).toBeGreaterThanOrEqual(9500);
@@ -332,7 +333,7 @@ it.live(
       expect(deadlineElapsed).toBeLessThan(12_000);
       expect(
         yield* Effect.promise(() => page.getByRole("alert").textContent())
-      ).toBe(new WebsiteApiDeadlineExceeded().message);
+      ).toBe(new ApiDeadlineExceeded().message);
       expect(yield* Queue.clear(calls)).toEqual([`POST ${calculation}`]);
       expect(yield* Queue.take(failed)).toContain("ERR_ABORTED");
       yield* Effect.promise(() => payInput.fill("1700"));

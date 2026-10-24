@@ -36,6 +36,7 @@ Current implemented code lives in:
 - `packages/mdx`
 - `packages/observability`
 - `packages/og-image`
+- `packages/webmcp`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
 - `packages/rules/au/stsl`
@@ -164,6 +165,11 @@ identity. Neither an app nor a package depends on another app.
   catalogue, `DocsOgImages` and the host-supplied `PublicationOrigins`. It
   consumes HTTP route constants; Content never imports HTTP and HTTP never
   imports AEO, keeping the dependency graph acyclic.
+
+`packages/webmcp`
+: Private compiled WebMCP owner. `ModelContextHost` and its live adapter are the
+  one browser Promise bridge for page tools; `registerCalculatorPageTools`
+  registers the calculator page toolkit for the enclosing Scope.
 
 `packages/og-image`
 : Private compiled share-image provider. `DocsPageRendererLive` keeps every
