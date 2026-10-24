@@ -1,7 +1,7 @@
 import { Effect, FileSystem, Path, Record } from "effect";
 
 // Every module in one built Worker folder: JavaScript chunks as ES modules and
-// WebAssembly (the API's code highlighter) as compiled modules. Tests read the
+// any WebAssembly as compiled modules. Tests read the
 // JavaScript text; Miniflare needs both.
 export const readWorkerModules = Effect.fnUntraced(function* (
   modulesRoot: string

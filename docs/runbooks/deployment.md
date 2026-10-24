@@ -80,13 +80,14 @@ bun run pr:deploy pr-<number>
 bun run pr:destroy pr-<number>
 ```
 
-`pr:deploy` builds the repository first. `pr:plan` and `production:plan` need
-no build step first. Preview uses its own API, never the Production API.
+`pr:deploy` builds the repository first. `pr:plan` and `production:plan` build
+the API first, because the API Worker imports the docs catalogue its build
+writes. Preview uses its own API, never the Production API.
 Destroy the stage when its pull request closes.
 
 `pr:destroy` validates the first-argument `pr-<number>` stage and rejects
-`--stage` overrides before doing work. It then invokes native Alchemy destroy
-with no build step and no browser. The workflow rechecks that the pull request
+`--stage` overrides before doing work. It then builds the API, for the same
+reason, and invokes native Alchemy destroy. No browser is needed. The workflow rechecks that the pull request
 is closed and validates its stage before running it.
 
 ## Production

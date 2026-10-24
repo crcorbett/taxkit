@@ -1,35 +1,25 @@
-import { docsSources } from "@content/docs/sources";
 import { DocsSourceError } from "@taxkit/content/errors";
-import { ContentCatalogueLive, ContentServiceLive } from "@taxkit/content/live";
-import { DocsSource } from "@taxkit/content/schemas";
-import { DocsSources } from "@taxkit/content/service";
-import { DocsDiagramRendererLive } from "@taxkit/diagrams/mermaid";
-import { DocsCodeHighlighterLive } from "@taxkit/mdx/highlights";
-import { DocsPageReaderLive } from "@taxkit/mdx/live";
+import { ContentServiceLive } from "@taxkit/content/live";
+import { DocsPublicCatalogue } from "@taxkit/content/schemas";
+import { ContentCatalogue } from "@taxkit/content/service";
 import { Effect, Layer, Schema } from "effect";
 
-// The API bundles the authored MDX list and chooses the reader, highlighter and
-// diagram renderer. Content builds the checked catalogue once per isolate.
+import catalogue from "./generated/docs-catalogue.json" with { type: "json" };
+
+// The API build writes the checked catalogue from the authored MDX. The
+// Worker decodes it once per isolate; it never parses MDX at request time.
 export const ApiContentLive = ContentServiceLive.pipe(
-  Layer.provideMerge(ContentCatalogueLive),
-  Layer.provide(
+  Layer.provideMerge(
     Layer.effect(
-      DocsSources,
-      Schema.decodeEffect(Schema.Array(DocsSource))(docsSources).pipe(
+      ContentCatalogue,
+      Schema.decodeUnknownEffect(DocsPublicCatalogue)(catalogue).pipe(
         Effect.mapError(
           () =>
             new DocsSourceError({
-              message: "A bundled docs source path is invalid.",
+              message: "The built docs catalogue is invalid.",
               operation: "decode",
             })
         )
-      )
-    )
-  ),
-  Layer.provide(
-    DocsPageReaderLive.pipe(
-      Layer.provide(
-        Layer.merge(DocsCodeHighlighterLive, DocsDiagramRendererLive)
       )
     )
   )

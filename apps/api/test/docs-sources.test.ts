@@ -6,6 +6,7 @@ import type { DocsBlock, DocsInline } from "@taxkit/content/schemas";
 import { ContentCatalogue } from "@taxkit/content/service";
 import { Array, Effect, FileSystem, Layer, Match, Order } from "effect";
 
+import { DocsCatalogueBuildLive } from "../scripts/docs-catalogue.layer.js";
 import { ApiContentLive } from "../src/content.boundary.js";
 
 const contentRoot = "../../content/docs";
@@ -135,6 +136,22 @@ describe("bundled docs sources", () => {
             )
           )
         );
-      }).pipe(Effect.provide(Layer.merge(ApiContentLive, NodeServices.layer)))
+      }).pipe(
+        Effect.provide(Layer.merge(DocsCatalogueBuildLive, NodeServices.layer))
+      )
+  );
+
+  it.effect(
+    "bundles the catalogue the authored files build to (run the API build after editing docs)",
+    () =>
+      Effect.gen(function* () {
+        const built = yield* ContentCatalogue.pipe(
+          Effect.provide(DocsCatalogueBuildLive)
+        );
+        const bundled = yield* ContentCatalogue.pipe(
+          Effect.provide(ApiContentLive)
+        );
+        assert.deepEqual(bundled, built);
+      })
   );
 });

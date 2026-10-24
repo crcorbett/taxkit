@@ -1,5 +1,14 @@
 # @taxkit/publication
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [b88ee2d]
+- Updated dependencies [b533bc7]
+  - @taxkit/content@3.0.0
+  - @taxkit/api-http@3.0.0
+
 ## 1.0.1
 
 ### Patch Changes

@@ -12,17 +12,17 @@
     }
   },
   "scripts": {
-    "dev": "portless run --name api.taxkit bun --watch src/index.ts",
-    "start": "bun src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "dev": "bun run docs-catalogue && portless run --name api.taxkit bun --watch src/index.ts",
+    "start": "bun run docs-catalogue && bun src/index.ts",
+    "build": "bun run docs-catalogue && tsc -p tsconfig.json",
     "check-types": "tsc --noEmit && tsc -p tsconfig.scripts.json && tsc -p tsconfig.tests.json",
     "smoke": "bun run smoke:public-routes",
     "smoke:public-routes": "bun scripts/smoke-public-routes.runtime.ts",
     "clean": "rm -rf dist .turbo *.tsbuildinfo",
-    "test": "bun --bun vitest run --config vitest.config.ts"
+    "test": "bun --bun vitest run --config vitest.config.ts",
+    "docs-catalogue": "bun --conditions=source scripts/docs-catalogue.runtime.ts"
   },
   "dependencies": {
-    "@content/docs": "workspace:*",
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
     "@taxkit/analytics": "workspace:*",
@@ -31,17 +31,18 @@
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
-    "@taxkit/diagrams": "workspace:*",
     "@taxkit/infrastructure": "workspace:*",
-    "@taxkit/mdx": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "@taxkit/publication": "workspace:*",
     "alchemy": "catalog:",
     "effect": "catalog:"
   },
   "devDependencies": {
+    "@content/docs": "workspace:*",
     "@effect/vitest": "catalog:",
     "@modelcontextprotocol/client": "2.3.1",
+    "@taxkit/diagrams": "workspace:*",
+    "@taxkit/mdx": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/tsconfig": "workspace:*",
     "@types/bun": "catalog:",

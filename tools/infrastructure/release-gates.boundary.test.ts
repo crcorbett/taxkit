@@ -453,17 +453,36 @@ describe("required native release gate", () => {
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 
-  it.effect("forwards flags to native preview destroy", () =>
+  it.effect(
+    "builds the API docs catalogue before native preview destroy and forwards flags",
+    () =>
+      Effect.gen(function* () {
+        const fixture = yield* commandFixture;
+        const result = yield* runCommand(
+          fixture,
+          script(fixture.scripts, "pr:destroy"),
+          "",
+          ["pr-123", "--yes"]
+        );
+        expect(result.code).toBe(0);
+        expect(result.calls).toEqual([
+          "run build --filter=api",
+          "alchemy destroy --stage pr-123 --yes",
+        ]);
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
+
+  it.effect("does not import the destroy stack if the API build fails", () =>
     Effect.gen(function* () {
       const fixture = yield* commandFixture;
       const result = yield* runCommand(
         fixture,
         script(fixture.scripts, "pr:destroy"),
-        "",
+        "run build --filter=api",
         ["pr-123", "--yes"]
       );
-      expect(result.code).toBe(0);
-      expect(result.calls).toEqual(["alchemy destroy --stage pr-123 --yes"]);
+      expect(result.code).not.toBe(0);
+      expect(result.calls).toEqual(["run build --filter=api"]);
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 

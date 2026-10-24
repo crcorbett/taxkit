@@ -10,6 +10,6 @@ package.
   `DocsDiagramSvg`.
 
 Rejected Mermaid becomes `DocsDiagramRenderError` with reason `render`; an
-unusable reply becomes reason `svg`. The API composes the Layer with the MDX
-reader. The Website shows the stored SVG as an image, so the diagram carries its
+unusable reply becomes reason `svg`. The API build composes the Layer with the
+MDX reader, so diagrams are drawn before deployment. The Website shows the stored SVG as an image, so the diagram carries its
 own colours and needs no browser script.

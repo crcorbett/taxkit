@@ -13,8 +13,23 @@
     "uploadTimeout": 20
   },
   "tasks": {
-    "api#test": {
+    "api#build": {
       "dependsOn": ["^build"],
+      "env": [
+        "ALCHEMY_CLOUDFLARE_VITE_INJECTED",
+        "NODE_ENV",
+        "TAXKIT_API_BASE_URL",
+        "VITE_*"
+      ],
+      "outputs": ["dist/**", "src/generated/**"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/docs/**"]
+    },
+    "api#check-types": {
+      "dependsOn": ["^build", "build"],
+      "outputs": []
+    },
+    "api#test": {
+      "dependsOn": ["^build", "build"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/docs/**"],
       "outputs": []
     },
