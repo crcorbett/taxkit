@@ -238,9 +238,6 @@ describe("shared native host calculation admission", () => {
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.scoped
       );
-      // Oxlint infers any for this generated-client program inside it.effect.
-      // TypeScript declaration emit proves its final service requirement is never.
-      // oxlint-disable-next-line typescript/no-unsafe-return -- Native HttpApiClient plus scoped generator inference; checked by tsconfig.tests.json.
       return proof;
     }
   );
