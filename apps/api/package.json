@@ -6,22 +6,18 @@
   "type": "module",
   "main": "dist/index.js",
   "exports": {
-    "./worker": {
-      "source": "./src/worker.ts",
-      "types": "./dist/worker.d.ts",
-      "default": "./dist/worker.js"
-    }
+    "./worker": "./src/worker.ts"
   },
   "scripts": {
     "dev": "bun run docs-catalogue && portless run --name api.taxkit bun --watch src/index.ts",
     "start": "bun run docs-catalogue && bun src/index.ts",
-    "build": "bun run docs-catalogue && tsc -p tsconfig.json",
+    "build": "bun run docs-catalogue",
     "check-types": "tsc --noEmit && tsc -p tsconfig.scripts.json && tsc -p tsconfig.tests.json",
     "smoke": "bun run smoke:public-routes",
     "smoke:public-routes": "bun scripts/smoke-public-routes.runtime.ts",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo",
+    "clean": "rm -rf .turbo src/generated",
     "test": "bun --bun vitest run --config vitest.config.ts",
-    "docs-catalogue": "bun --conditions=source scripts/docs-catalogue.runtime.ts"
+    "docs-catalogue": "bun scripts/docs-catalogue.runtime.ts"
   },
   "dependencies": {
     "@effect/platform-bun": "catalog:",

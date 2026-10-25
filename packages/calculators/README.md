@@ -105,15 +105,13 @@ This package must not own:
 
 ```sh
 bun run --filter=@taxkit/calculators check-types
-bun run --filter=@taxkit/calculators build
 ```
 
 ## Packaging
 
-The build removes `dist` before compiling. Workspace exports retain `source`
-conditions, while `publishConfig.exports` and `files` define a dist-only
-tarball. The SDK-owned strict downstream gate validates the actual Bun-packed
-artifact, public entrypoints and concrete dependency ranges.
+This private package exports its TypeScript source and has no build. The SDK
+compiles it into its single archive; the SDK-owned downstream check validates
+that packed archive, its public entry points and dependency ranges.
 
 ## Public Exports
 

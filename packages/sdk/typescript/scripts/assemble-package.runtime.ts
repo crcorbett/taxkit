@@ -22,13 +22,13 @@ class PackageAssemblyError extends Schema.TaggedError<PackageAssemblyError>()(
 const LibraryManifest = Schema.Struct({
   exports: Schema.Record(
     Schema.String,
-    Schema.Struct({ default: Schema.String })
+    Schema.String.check(Schema.isPattern(/^\.\/src\/.+\.ts$/u))
   ),
   name: Schema.String,
 });
 
-// These are the source owners included in the SDK, not separately installed
-// packages. Their manifests remain the owner of each module's compiled path.
+// These are the private source owners compiled into the SDK, not separately
+// installed packages. Their manifests remain the owner of each module's path.
 const libraries = [
   { directory: "core", root: "packages/core" },
   { directory: "calculators", root: "packages/calculators" },
@@ -140,6 +140,11 @@ export const assemblePackage = Effect.gen(function* () {
   const destination = yield* path.fromFileUrl(
     new URL("../dist/", import.meta.url)
   );
+  // tsc compiles the SDK and the private sources it imports in one program,
+  // keeping their repository paths under .compiled.
+  const compiled = yield* path.fromFileUrl(
+    new URL("../.compiled/", import.meta.url)
+  );
   const owners = yield* Effect.forEach(libraries, (library) =>
     fs.readFileString(path.join(root, library.root, "package.json")).pipe(
       Effect.flatMap(
@@ -159,7 +164,7 @@ export const assemblePackage = Effect.gen(function* () {
               destination,
               "internal",
               owner.directory,
-              path.relative("dist", target.default)
+              path.relative("src", target).replace(/\.ts$/u, ".js")
             ),
           ] as const
       )
@@ -167,10 +172,13 @@ export const assemblePackage = Effect.gen(function* () {
   );
   const inputs = Array.prepend(
     Array.map(owners, (owner) => ({
-      from: path.join(root, owner.root, "dist"),
+      from: path.join(compiled, owner.root, "src"),
       to: path.join(destination, "internal", owner.directory),
     })),
-    { from: destination, to: destination }
+    {
+      from: path.join(compiled, "packages/sdk/typescript/src"),
+      to: destination,
+    }
   );
   yield* Effect.forEach(
     inputs,
@@ -214,6 +222,7 @@ export const assemblePackage = Effect.gen(function* () {
       }),
     { discard: true }
   );
+  yield* fs.remove(compiled, { recursive: true });
   yield* Console.info(
     "Assembled one SDK package with internal JavaScript and declarations."
   );

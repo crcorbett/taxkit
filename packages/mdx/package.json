@@ -3,28 +3,14 @@
   "version": "0.2.1",
   "private": true,
   "license": "MIT",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "type": "module",
   "exports": {
-    "./live": {
-      "source": "./src/live.layer.ts",
-      "types": "./dist/live.layer.d.ts",
-      "default": "./dist/live.layer.js"
-    },
-    "./highlights": {
-      "source": "./src/highlights.adapter.layer.ts",
-      "types": "./dist/highlights.adapter.layer.d.ts",
-      "default": "./dist/highlights.adapter.layer.js"
-    }
+    "./live": "./src/live.layer.ts",
+    "./highlights": "./src/highlights.adapter.layer.ts"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
-    "test": "vitest run",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+    "test": "vitest run"
   },
   "dependencies": {
     "@pierre/highlights": "0.1.3",

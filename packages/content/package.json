@@ -3,106 +3,23 @@
   "version": "3.1.0",
   "private": true,
   "license": "MIT",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "type": "module",
   "exports": {
-    "./schemas": {
-      "source": "./src/schemas.ts",
-      "types": "./dist/schemas.d.ts",
-      "default": "./dist/schemas.js"
-    },
-    "./errors": {
-      "source": "./src/errors.ts",
-      "types": "./dist/errors.d.ts",
-      "default": "./dist/errors.js"
-    },
-    "./service": {
-      "source": "./src/service.ts",
-      "types": "./dist/service.d.ts",
-      "default": "./dist/service.js"
-    },
-    "./links": {
-      "source": "./src/links.ts",
-      "types": "./dist/links.d.ts",
-      "default": "./dist/links.js"
-    },
-    "./publication": {
-      "source": "./src/publication.egress.ts",
-      "types": "./dist/publication.egress.d.ts",
-      "default": "./dist/publication.egress.js"
-    },
-    "./live": {
-      "source": "./src/live.layer.ts",
-      "types": "./dist/live.layer.d.ts",
-      "default": "./dist/live.layer.js"
-    },
-    "./test": {
-      "source": "./src/test.layer.ts",
-      "types": "./dist/test.layer.d.ts",
-      "default": "./dist/test.layer.js"
-    },
-    "./testing/fixtures": {
-      "source": "./src/__testing__/fixtures.ts",
-      "types": "./dist/__testing__/fixtures.d.ts",
-      "default": "./dist/__testing__/fixtures.js"
-    },
-    "./testing/observations": {
-      "source": "./src/__testing__/observations.ts",
-      "types": "./dist/__testing__/observations.d.ts",
-      "default": "./dist/__testing__/observations.js"
-    },
-    "./response-check": {
-      "source": "./src/response-check.ts",
-      "types": "./dist/response-check.d.ts",
-      "default": "./dist/response-check.js"
-    },
-    "./config": {
-      "source": "./src/config.ts",
-      "types": "./dist/config.d.ts",
-      "default": "./dist/config.js"
-    }
-  },
-  "publishConfig": {
-    "exports": {
-      "./schemas": {
-        "types": "./dist/schemas.d.ts",
-        "default": "./dist/schemas.js"
-      },
-      "./errors": {
-        "types": "./dist/errors.d.ts",
-        "default": "./dist/errors.js"
-      },
-      "./service": {
-        "types": "./dist/service.d.ts",
-        "default": "./dist/service.js"
-      },
-      "./links": {
-        "types": "./dist/links.d.ts",
-        "default": "./dist/links.js"
-      },
-      "./publication": {
-        "types": "./dist/publication.egress.d.ts",
-        "default": "./dist/publication.egress.js"
-      },
-      "./live": {
-        "types": "./dist/live.layer.d.ts",
-        "default": "./dist/live.layer.js"
-      },
-      "./response-check": {
-        "types": "./dist/response-check.d.ts",
-        "default": "./dist/response-check.js"
-      }
-    },
-    "access": "public"
+    "./schemas": "./src/schemas.ts",
+    "./errors": "./src/errors.ts",
+    "./service": "./src/service.ts",
+    "./links": "./src/links.ts",
+    "./publication": "./src/publication.egress.ts",
+    "./live": "./src/live.layer.ts",
+    "./test": "./src/test.layer.ts",
+    "./testing/fixtures": "./src/__testing__/fixtures.ts",
+    "./testing/observations": "./src/__testing__/observations.ts",
+    "./response-check": "./src/response-check.ts",
+    "./config": "./src/config.ts"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
-    "test": "vitest run",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+    "test": "vitest run"
   },
   "dependencies": {
     "@content/docs": "workspace:*",

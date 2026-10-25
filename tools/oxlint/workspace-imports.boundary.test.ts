@@ -199,11 +199,11 @@ it.effect(
   "name": "@taxkit/workspace-boundary-fixture",
   "peerDependencies": {"@taxkit/content": "workspace:*"},
   "exports": {
-    "./conditional": {"source": "./src/source.ts", "default": null},
+    "./conditional": {"import": "./src/module.ts", "default": null},
     "./array": [null, "./src/fallback.ts"],
     "./features/*": "./src/*.ts",
     "./features/private/*": null,
-    "./blocked": {"source": null, "default": "./src/fallback.ts"}
+    "./blocked": {"import": null, "default": "./src/fallback.ts"}
   }
 }`
       );

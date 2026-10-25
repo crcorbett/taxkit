@@ -26,10 +26,7 @@ export default defineConfig(() => {
       }),
       viteReact(),
     ],
-    resolve: { conditions: ["source"], tsconfigPaths: true },
-    ssr: {
-      noExternal: [/^@taxkit\//u],
-      resolve: { conditions: ["source", "node"] },
-    },
+    resolve: { tsconfigPaths: true },
+    ssr: { noExternal: [/^@taxkit\//u] },
   };
 });

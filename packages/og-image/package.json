@@ -3,28 +3,14 @@
   "version": "0.1.1",
   "private": true,
   "license": "MIT",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "type": "module",
   "exports": {
-    "./archive": {
-      "source": "./src/image-archive.ts",
-      "types": "./dist/image-archive.d.ts",
-      "default": "./dist/image-archive.js"
-    },
-    "./takumi": {
-      "source": "./src/takumi.adapter.layer.ts",
-      "types": "./dist/takumi.adapter.layer.d.ts",
-      "default": "./dist/takumi.adapter.layer.js"
-    }
+    "./archive": "./src/image-archive.ts",
+    "./takumi": "./src/takumi.adapter.layer.ts"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && cp src/geist-latin.base64.txt dist/",
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
-    "test": "vitest run",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+    "test": "vitest run"
   },
   "dependencies": {
     "@takumi-rs/wasm": "2.14.0",

@@ -1,6 +1,6 @@
 # @taxkit/og-image
 
-Private compiled package that draws TaxKit's 1200 × 630 PNG share images at
+Private source package that draws TaxKit's 1200 × 630 PNG share images at
 build time. It implements Content's `DocsPageRenderer` contract; Content never
 imports this package. Only the API build script composes it, so no Worker
 bundles Takumi.

@@ -9,7 +9,7 @@ review_trigger: host identity, observation vocabulary, redaction or runtime expo
 
 # `@taxkit/observability`
 
-Private compiled runtime support shared by API and Website hosts and deployment
+Private source runtime support shared by API and Website hosts and deployment
 queries. This package has no Alchemy, infrastructure or provider SDK dependency.
 
 `./host-telemetry` owns the fixed request event Schema, closed service and route

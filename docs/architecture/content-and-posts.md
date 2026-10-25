@@ -36,7 +36,7 @@ on the open-source tax engine and avoid downstream private-product specifics.
   decoded and enforced beside the package-owned content and examples.
 
 `packages/content`
-: Private compiled owner of canonical docs page, frontmatter, navigation and
+: Private source owner of canonical docs page, frontmatter, navigation and
   source error contracts, including the checked reading `body`: headings with
   ids, paragraphs, lists, tables, highlighted code as coloured token lines and
   diagrams with Mermaid source, title and SVG. Its public catalogue Schema

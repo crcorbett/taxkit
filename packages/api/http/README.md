@@ -252,7 +252,6 @@ bun run update-openapi-snapshot
 From the repo root:
 
 ```sh
-bun run --filter=@taxkit/api-http build
 bun run --filter=@taxkit/api-http check-types
 bun run --filter=@taxkit/api-http test
 bun run --filter=@taxkit/api-http test:openapi
@@ -300,7 +299,6 @@ For an intentional OpenAPI contract change:
    ```sh
    bun run --filter=@taxkit/api-http test
    bun run --filter=@taxkit/api-http check-types
-   bun run --filter=@taxkit/api-http build
    ```
 
 5. Add a Changeset when the OpenAPI change reflects package-facing API
@@ -358,7 +356,6 @@ For an intentional public API contract change:
    ```sh
    bun run --filter=@taxkit/api-http test
    bun run --filter=@taxkit/api-http check-types
-   bun run --filter=@taxkit/api-http build
    bun run --filter=api smoke:public-routes
    ```
 
@@ -369,10 +366,8 @@ For an intentional public API contract change:
 
 ## Packaging
 
-The TypeScript build removes `dist` before compiling. Workspace exports retain
-`source` conditions, while `publishConfig.exports` and `files` define the
-dist-only internal package surface. The SDK build includes this package's
-compiled modules in its single archive. The SDK-owned downstream check installs
+This private package exports its TypeScript source and has no build. The SDK
+build compiles the modules it uses into its single archive. The SDK-owned downstream check installs
 that archive and checks its `/http` contracts and all public entry points.
 
 ## Guardrails

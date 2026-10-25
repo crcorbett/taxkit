@@ -3,159 +3,30 @@
   "version": "2.2.0",
   "private": true,
   "license": "MIT",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./catalog": {
-      "source": "./src/catalog.ts",
-      "types": "./dist/catalog.d.ts",
-      "default": "./dist/catalog.js"
-    },
-    "./errors": {
-      "source": "./src/errors.ts",
-      "types": "./dist/errors.d.ts",
-      "default": "./dist/errors.js"
-    },
-    "./summaries": {
-      "source": "./src/summaries.ts",
-      "types": "./dist/summaries.d.ts",
-      "default": "./dist/summaries.js"
-    },
-    "./metadata": {
-      "source": "./src/metadata.ts",
-      "types": "./dist/metadata.d.ts",
-      "default": "./dist/metadata.js"
-    },
-    "./service": {
-      "source": "./src/service.ts",
-      "types": "./dist/service.d.ts",
-      "default": "./dist/service.js"
-    },
-    "./live": {
-      "source": "./src/live.layer.ts",
-      "types": "./dist/live.layer.d.ts",
-      "default": "./dist/live.layer.js"
-    },
-    "./schemas": {
-      "source": "./src/schemas.ts",
-      "types": "./dist/schemas.d.ts",
-      "default": "./dist/schemas.js"
-    },
-    "./work": {
-      "source": "./src/work.layer.ts",
-      "types": "./dist/work.layer.d.ts",
-      "default": "./dist/work.layer.js"
-    },
-    "./admission.schemas": {
-      "source": "./src/admission.schemas.ts",
-      "types": "./dist/admission.schemas.d.ts",
-      "default": "./dist/admission.schemas.js"
-    },
-    "./admission.service": {
-      "source": "./src/admission.service.ts",
-      "types": "./dist/admission.service.d.ts",
-      "default": "./dist/admission.service.js"
-    },
-    "./admission.layer": {
-      "source": "./src/admission.layer.ts",
-      "types": "./dist/admission.layer.d.ts",
-      "default": "./dist/admission.layer.js"
-    },
-    "./testing/fixtures": {
-      "source": "./src/__testing__/fixtures.ts",
-      "types": "./dist/__testing__/fixtures.d.ts",
-      "default": "./dist/__testing__/fixtures.js"
-    },
-    "./form": {
-      "source": "./src/form.ingress.ts",
-      "types": "./dist/form.ingress.d.ts",
-      "default": "./dist/form.ingress.js"
-    },
-    "./page": {
-      "source": "./src/page.atoms.ts",
-      "types": "./dist/page.atoms.d.ts",
-      "default": "./dist/page.atoms.js"
-    },
-    "./page-schemas": {
-      "source": "./src/page.schemas.ts",
-      "types": "./dist/page.schemas.d.ts",
-      "default": "./dist/page.schemas.js"
-    },
-    "./page-tools": {
-      "source": "./src/page.tools.ts",
-      "types": "./dist/page.tools.d.ts",
-      "default": "./dist/page.tools.js"
-    }
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "./catalog": {
-        "types": "./dist/catalog.d.ts",
-        "default": "./dist/catalog.js"
-      },
-      "./errors": {
-        "types": "./dist/errors.d.ts",
-        "default": "./dist/errors.js"
-      },
-      "./summaries": {
-        "types": "./dist/summaries.d.ts",
-        "default": "./dist/summaries.js"
-      },
-      "./metadata": {
-        "types": "./dist/metadata.d.ts",
-        "default": "./dist/metadata.js"
-      },
-      "./service": {
-        "types": "./dist/service.d.ts",
-        "default": "./dist/service.js"
-      },
-      "./live": {
-        "types": "./dist/live.layer.d.ts",
-        "default": "./dist/live.layer.js"
-      },
-      "./schemas": {
-        "types": "./dist/schemas.d.ts",
-        "default": "./dist/schemas.js"
-      },
-      "./work": {
-        "types": "./dist/work.layer.d.ts",
-        "default": "./dist/work.layer.js"
-      },
-      "./admission.schemas": {
-        "types": "./dist/admission.schemas.d.ts",
-        "default": "./dist/admission.schemas.js"
-      },
-      "./admission.service": {
-        "types": "./dist/admission.service.d.ts",
-        "default": "./dist/admission.service.js"
-      },
-      "./admission.layer": {
-        "types": "./dist/admission.layer.d.ts",
-        "default": "./dist/admission.layer.js"
-      }
-    },
-    "access": "public"
+    ".": "./src/index.ts",
+    "./catalog": "./src/catalog.ts",
+    "./errors": "./src/errors.ts",
+    "./summaries": "./src/summaries.ts",
+    "./metadata": "./src/metadata.ts",
+    "./service": "./src/service.ts",
+    "./live": "./src/live.layer.ts",
+    "./schemas": "./src/schemas.ts",
+    "./work": "./src/work.layer.ts",
+    "./admission.schemas": "./src/admission.schemas.ts",
+    "./admission.service": "./src/admission.service.ts",
+    "./admission.layer": "./src/admission.layer.ts",
+    "./testing/fixtures": "./src/__testing__/fixtures.ts",
+    "./form": "./src/form.ingress.ts",
+    "./page": "./src/page.atoms.ts",
+    "./page-schemas": "./src/page.schemas.ts",
+    "./page-tools": "./src/page.tools.ts"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
-    "test": "vitest run",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+    "test": "vitest run"
   },
   "dependencies": {
     "@taxkit/core": "workspace:*",

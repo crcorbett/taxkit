@@ -34,7 +34,7 @@ const RootManifest = Schema.Struct({
   }),
 });
 const root = fileURLToPath(new URL("../../", import.meta.url));
-const conditions = ["source", "import", "node", "default"];
+const conditions = ["import", "node", "default"];
 const isExportArray = Schema.is(Schema.Array(ExportTarget));
 // Preserve insertion order and selected conditional null fences. Null array
 // alternatives can fall through, matching native package export resolution.

@@ -5,56 +5,16 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./apps-stack": {
-      "source": "./src/apps-stack.ts",
-      "types": "./src/apps-stack.ts",
-      "default": "./src/apps-stack.ts"
-    },
-    "./axiom": {
-      "source": "./src/axiom/resources.ts",
-      "types": "./src/axiom/resources.ts",
-      "default": "./src/axiom/resources.ts"
-    },
-    "./hostnames": {
-      "source": "./src/hostnames.ts",
-      "types": "./src/hostnames.ts",
-      "default": "./src/hostnames.ts"
-    },
-    "./posthog": {
-      "source": "./src/posthog/index.ts",
-      "types": "./src/posthog/index.ts",
-      "default": "./src/posthog/index.ts"
-    },
-    "./secrets": {
-      "source": "./src/secrets.ts",
-      "types": "./src/secrets.ts",
-      "default": "./src/secrets.ts"
-    },
-    "./stage": {
-      "source": "./src/stage.ts",
-      "types": "./src/stage.ts",
-      "default": "./src/stage.ts"
-    },
-    "./telemetry": {
-      "source": "./src/telemetry.ts",
-      "types": "./src/telemetry.ts",
-      "default": "./src/telemetry.ts"
-    },
-    "./trace-export": {
-      "source": "./src/trace-export.ts",
-      "types": "./src/trace-export.ts",
-      "default": "./src/trace-export.ts"
-    },
-    "./api-worker": {
-      "source": "./src/api-worker.ts",
-      "types": "./src/api-worker.ts",
-      "default": "./src/api-worker.ts"
-    },
-    "./worker-settings": {
-      "source": "./src/worker-settings.ts",
-      "types": "./src/worker-settings.ts",
-      "default": "./src/worker-settings.ts"
-    }
+    "./apps-stack": "./src/apps-stack.ts",
+    "./axiom": "./src/axiom/resources.ts",
+    "./hostnames": "./src/hostnames.ts",
+    "./posthog": "./src/posthog/index.ts",
+    "./secrets": "./src/secrets.ts",
+    "./stage": "./src/stage.ts",
+    "./telemetry": "./src/telemetry.ts",
+    "./trace-export": "./src/trace-export.ts",
+    "./api-worker": "./src/api-worker.ts",
+    "./worker-settings": "./src/worker-settings.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

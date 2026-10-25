@@ -30,8 +30,9 @@ everything from the API. There is no database or sign-in.
 | `apps/api`                                           | Builds the docs catalogue ahead of time; composes the native API Worker and the standalone Bun host                                                         |
 | `apps/web`                                           | TanStack Start Website: routes, views, host settings, the private API binding and the two runtimes                                                          |
 
-Each package has explicit exports, a `source` condition for repository use and
-no runtime of its own. No package imports an app. Engine packages do not
+Each private package exports its TypeScript source directly (no build, `dist`
+or export condition) and has no runtime of its own. Only the SDK builds; it
+compiles the private sources it includes. No package imports an app. Engine packages do not
 import application packages; callers turn their own state into checked input
 facts before calculating. All owned code follows the strict Effect skill.
 

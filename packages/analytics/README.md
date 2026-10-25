@@ -9,7 +9,7 @@ review_trigger: analytics event, settings, service, export, transport or privacy
 
 # `@taxkit/analytics`
 
-Private compiled analytics contracts and successful hosted calculator usage
+Private source analytics contracts and successful hosted calculator usage
 decoration. The current backend Layer sends only the catalogue ID and
 name, fixed application/stage labels, an event UUID and timestamp. It never
 accepts tax inputs, results, browser identity, request URLs or request headers.
