@@ -23,7 +23,7 @@ page state, tools and WebMCP live in their packages.
 | Folder | Owns |
 | --- | --- |
 | `host/` | checked settings and API binding: `service.ts` contracts, `config.server.ts`, `binding.server.ts`, `settings.server.layer.ts`, `schemas.ts`, `errors.ts` |
-| `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.server.ts` (Markdown files and `Accept`) |
+| `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.ingress.ts` (Markdown files and `Accept`) |
 | `pages/` | `loaders.ts`, `load.failure.ts`, `loader-context.ts` and the root load |
 | `docs/` | documentation views, view types and the search address reader |
 | `calculators/` | calculator containers and views, `page.atoms.ts`, `tools.atoms.ts` and the safe failure text |
@@ -194,7 +194,8 @@ canonical, Markdown alternate and image addresses on the publication origin and
 TechArticle data with script-breaking characters escaped. `seo/head.ts` renders
 it as the page title, description, Open Graph and Twitter tags. `/og/<page>.png`
 is forwarded once to the API's `/api/v1/docs/og/<page>.png` route
-(`http/image.ingress.ts`), which renders the 1200 × 630 PNG; the Website checks
+(`http/image.ingress.ts`), which serves the 1200 × 630 PNG drawn when the API
+was built; the Website checks
 the type and bytes. GET and HEAD only; an unknown page 404 and an unusable
 reply 503, both `no-store`. No renderer is in the Website or browser bundles.
 

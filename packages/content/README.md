@@ -55,7 +55,8 @@ and `docsImagePath`), the share-image input `docsOgImage` and its head metadata
 `docsPageMetadata`: canonical, Markdown and image addresses, the image text and
 escaped TechArticle JSON-LD, all on the publication origin. Content declares the
 share-image contracts `DocsPageRenderer` and `DocsOgImages` with
-`DocsPngBytes`; [`@taxkit/og-image`](../og-image/README.md) implements them and
+`DocsPngBytes` and the build's `DocsImageArchive`;
+[`@taxkit/og-image`](../og-image/README.md) draws them at build time and
 [`@taxkit/aeo`](../aeo/README.md) serves them. `PublicHttpOrigin` retains the
 shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
 `DocsPublicationOrigin` preserve their separate checked identities.

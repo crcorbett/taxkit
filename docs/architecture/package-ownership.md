@@ -172,10 +172,10 @@ identity. Neither an app nor a package depends on another app.
   registers the calculator page toolkit for the enclosing Scope.
 
 `packages/og-image`
-: Private compiled share-image provider. `DocsPageRendererLive` keeps every
-  Takumi call and the bundled Geist font; `DocsOgImagesLive` adds one render at
-  a time, a deadline and a small cache. It implements Content's contracts and is
-  composed only by the API Worker.
+: Private compiled build-time share-image provider. `DocsPageRendererLive`
+  keeps every Takumi call and the bundled Geist font; `renderDocsImageArchive`
+  draws every published page. Only the API build script composes it; no Worker
+  bundles it.
 
 `packages/content`
 : Private compiled owner of canonical docs page/navigation contracts, source

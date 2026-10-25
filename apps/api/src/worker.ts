@@ -10,8 +10,6 @@ import {
   disabledWorkerObservability,
   workerCompatibility,
 } from "@taxkit/infrastructure/worker-settings";
-import { DocsOgImagesLive } from "@taxkit/og-image/live";
-import { DocsPageRendererLive } from "@taxkit/og-image/takumi";
 import { RateLimitBinding, Worker, cache } from "alchemy/Cloudflare/Workers";
 import { Config, ConfigProvider, Effect, Layer } from "effect";
 import { FetchHttpClient } from "effect/http";
@@ -23,8 +21,6 @@ import { ApiWorkerApplication } from "./worker.application.js";
 
 const ApiWorkerServicesLive = Layer.mergeAll(
   ApiContentLive,
-  // One bounded share-image cache over the bundled Takumi renderer.
-  DocsOgImagesLive.pipe(Layer.provide(DocsPageRendererLive)),
   ApiCalculatorAnalyticsLive.pipe(
     Layer.provide(
       PublicCalculatorServiceBounded.pipe(
@@ -75,15 +71,6 @@ export const ApiWorkerNativeInit = Effect.gen(function* () {
       new Config.ConfigError(
         new ConfigProvider.SourceError({
           message: "The public documentation catalogue could not be loaded.",
-        })
-      )
-    )
-  ),
-  Effect.catchTag("DocsImageRenderError", () =>
-    Effect.fail(
-      new Config.ConfigError(
-        new ConfigProvider.SourceError({
-          message: "The share-image font could not be loaded.",
         })
       )
     )

@@ -462,6 +462,11 @@ export const DocsPngBytes = Schema.Uint8Array.check(
 ).pipe(Schema.brand("taxkit/DocsPngBytes"));
 export type DocsPngBytes = typeof DocsPngBytes.Type;
 
+// Every published page's share image, keyed by page address. The API build
+// renders them; its JSON form carries each PNG as base64.
+export const DocsImageArchive = Schema.Record(DocsPublicPagePath, DocsPngBytes);
+export type DocsImageArchive = typeof DocsImageArchive.Type;
+
 // One page's public addresses and head metadata on the publication origin.
 // The JSON-LD leaves as checked script text, ready for its HTML output.
 export const DocsPageMetadata = Schema.Struct({

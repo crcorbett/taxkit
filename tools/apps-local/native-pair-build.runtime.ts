@@ -15,6 +15,11 @@ const program = Effect.gen(function* () {
   const root = path.resolve(".");
   const output = path.join(root, ".alchemy/native-pair");
   const compatibility = workerCompatibility;
+  // Start from empty bundles so the suites never read an earlier build's files.
+  yield* fs.remove(path.join(output, "bundles"), {
+    force: true,
+    recursive: true,
+  });
   yield* fs.makeDirectory(output, { recursive: true });
   yield* Effect.gen(function* () {
     const apiDeclaration = yield* nativeApiSourceProps;

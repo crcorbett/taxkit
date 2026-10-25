@@ -18,6 +18,7 @@ import type {
   DocsPagePath,
   DocsPngBytes,
   DocsPublicCatalogue,
+  DocsPublicPagePath,
   DocsPublicNavigation,
   DocsPublicPage,
   DocsReadPage,
@@ -84,8 +85,8 @@ export class DocsDiagramRenderer extends Context.Service<
   }
 >()("@taxkit/content/DocsDiagramRenderer") {}
 
-// Share images. `@taxkit/og-image` implements both: the renderer draws one
-// image, and the bounded, cached service is what routes call.
+// Share images. `@taxkit/og-image` implements the renderer, which draws one
+// image at build time; routes read finished images through `DocsOgImages`.
 export class DocsPageRenderer extends Context.Service<
   DocsPageRenderer,
   {
@@ -95,11 +96,12 @@ export class DocsPageRenderer extends Context.Service<
   }
 >()("@taxkit/content/DocsPageRenderer") {}
 
+// Each published page's finished share image, rendered ahead of time.
 export class DocsOgImages extends Context.Service<
   DocsOgImages,
   {
-    readonly renderPage: (
-      image: DocsOgImage
+    readonly getImage: (
+      path: DocsPublicPagePath
     ) => Effect.Effect<DocsPngBytes, DocsImageRenderError>;
   }
 >()("@taxkit/content/DocsOgImages") {}

@@ -196,17 +196,16 @@ describe("built native API and Website", () => {
               expect(clientCode.includes(marker), marker).toBe(false);
             })
         );
-        // Only the API renders share images; the Website and browser carry
-        // no renderer, font or WebAssembly.
-        expect(apiCode).toContain("DocsPageRenderer.renderPage");
-        expect(
-          Array.some(Record.keys(apiWasm), (file) => file.includes("takumi"))
-        ).toBe(true);
+        // Share images are rendered by the API build. No Worker or browser
+        // carries the renderer, its font or its WebAssembly.
+        expect(apiCode).toContain("DocsOgImages.getImage");
+        expect(Record.keys(apiWasm)).toEqual([]);
         yield* Effect.forEach(
           ["@takumi-rs", "takumi_wasm", "DocsPageRenderer.renderPage"],
           (marker) =>
             Effect.sync(() => {
               expect(clientCode.includes(marker), marker).toBe(false);
+              expect(apiCode.includes(marker), marker).toBe(false);
               expect(
                 Array.some(Record.values(websiteModules), (module) =>
                   module.contents.includes(marker)
@@ -402,7 +401,7 @@ describe("built native API and Website", () => {
             )
           );
         expect(publicContent.pages).toHaveLength(62);
-        // The API renders each share image on request; the Website forwards
+        // The API serves each share image drawn at build time; the Website forwards
         // its own /og address once and checks the PNG.
         yield* Effect.forEach(Array.take(publicContent.pages, 3), (page) =>
           Effect.gen(function* () {

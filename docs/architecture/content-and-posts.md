@@ -97,7 +97,7 @@ source, personal report, guessed origin or competing content catalogue is
 exposed. The Website serves the processed body at explicit `.md` addresses, and
 a Markdown `Accept` preference at a page redirects there; the
 [frontend owner](frontend.md#documentation) records representation policy.
-Share images are rendered by the API on request. The old app workspace is
+Share images are rendered when the API is built. The old app workspace is
 retired; verified original-source data and dated provider recovery identities
 remain addressable.
 
@@ -171,11 +171,11 @@ docs implementation
 Content declares the share-image contracts (`DocsOgImage`, `DocsPngBytes`,
 `DocsPageRenderer`, `DocsOgImages`) and the page addresses and head metadata in
 `@taxkit/content/publication`. `@taxkit/og-image` implements them with the
-Takumi 2.14.0 WebAssembly renderer and the bundled Geist font, behind one
-render at a time, a 30-second deadline and a small five-minute cache. The AEO
+Takumi 2.14.0 WebAssembly renderer and the bundled Geist font. The API build
+renders every published page once (about three seconds) into
+`docs-images.json`; the Worker decodes one stored PNG per request. The AEO
 package serves one image route per published page at `/api/v1/docs/og/<page>.png`,
 from the same catalogue; there is no separate page list. The Website forwards
 `/og/<page>.png` there and checks the PNG. Images read only checked page titles,
 descriptions and addresses and accept no calculation values. The CDN keeps each
-image for seven days per deployed version, so a page costs one render per
-version and edge.
+image for seven days per deployed version. No Worker carries the renderer.

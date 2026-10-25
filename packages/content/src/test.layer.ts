@@ -86,7 +86,7 @@ export const DocsDiagramRendererTest = Layer.succeed(DocsDiagramRenderer)(
 // every page.
 export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(
   DocsOgImages.of({
-    renderPage: () =>
+    getImage: () =>
       Effect.sync(() => {
         const bytes = new Uint8Array(24);
         const data = new DataView(bytes.buffer);

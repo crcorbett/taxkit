@@ -26,7 +26,7 @@ longer needs.
 ## Adopted
 
 - `@taxkit/aeo` and `@taxkit/og-image`, matching Common Practice's packages:
-  the API serves discovery files and renders share images on request; the
+  the API serves discovery files and share images, drawn when it is built; the
   Website forwards its own addresses once. A Markdown `Accept` preference at a
   page answers 307 to its `.md` file, cached beside the page.
 - Logic lives in packages and `apps/web/src/lib` stays thin, in Common
