@@ -463,14 +463,12 @@ calculation composition.
 
 ## Export boundaries
 
-The SDK package should publish a dist-only export map. Workspace-local source
-conditions are useful during early scaffolding, but they must not appear in the
-publish manifest unless source files are also intentionally packed and
-supported.
-
-Release packages express the two views separately: workspace `exports` may
-retain `source`, while `publishConfig.exports` owns built `types` and `default`
-targets and `files` limits the tarball. Because Bun resolves workspace and
+Private workspace packages export TypeScript source directly; they have no
+build or `dist`. The SDK is the only built package. Its `tsconfig.build.json`
+compiles its own source together with the private sources it includes, and
+`scripts/assemble-package.runtime.ts` moves those under `dist/internal`. The SDK
+publishes a dist-only export map: `publishConfig.exports` owns built `types` and
+`default` targets and `files` limits the tarball. Because Bun resolves workspace and
 catalogue dependency protocols during packing but does not apply
 `publishConfig.exports`, the SDK-owned strict validator stages that declared
 publication view and Bun-packs it again. Acceptance is based on the final

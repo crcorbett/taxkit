@@ -1,6 +1,6 @@
 # @taxkit/mdx
 
-Private compiled package that reads TaxKit's authored MDX. It implements two
+Private source package that reads TaxKit's authored MDX. It implements two
 contracts that [`@taxkit/content`](../content/README.md) declares; Content never
 imports this package.
 

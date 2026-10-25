@@ -5,7 +5,7 @@
     // `bun` keeps eventsource on its built types. beautiful-mermaid publishes
     // raw TypeScript under `bun`, and Takumi's `bun` types omit the default
     // module, so both keep the types every other program sees.
-    "customConditions": ["bun", "source"],
+    "customConditions": ["bun"],
     "paths": {
       "beautiful-mermaid": [
         "../../packages/diagrams/node_modules/beautiful-mermaid/dist/index.d.ts"

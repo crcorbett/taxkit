@@ -3,88 +3,19 @@
   "version": "2.0.0",
   "private": true,
   "license": "MIT",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./facts": {
-      "source": "./src/facts/index.ts",
-      "types": "./dist/facts/index.d.ts",
-      "default": "./dist/facts/index.js"
-    },
-    "./parameters": {
-      "source": "./src/parameters/index.ts",
-      "types": "./dist/parameters/index.d.ts",
-      "default": "./dist/parameters/index.js"
-    },
-    "./rules": {
-      "source": "./src/rules/index.ts",
-      "types": "./dist/rules/index.d.ts",
-      "default": "./dist/rules/index.js"
-    },
-    "./calculator": {
-      "source": "./src/calculator/index.ts",
-      "types": "./dist/calculator/index.d.ts",
-      "default": "./dist/calculator/index.js"
-    },
-    "./rule-pack": {
-      "source": "./src/rule-pack/index.ts",
-      "types": "./dist/rule-pack/index.d.ts",
-      "default": "./dist/rule-pack/index.js"
-    },
-    "./schemas": {
-      "source": "./src/calculator/schemas.ts",
-      "types": "./dist/calculator/schemas.d.ts",
-      "default": "./dist/calculator/schemas.js"
-    }
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "./facts": {
-        "types": "./dist/facts/index.d.ts",
-        "default": "./dist/facts/index.js"
-      },
-      "./parameters": {
-        "types": "./dist/parameters/index.d.ts",
-        "default": "./dist/parameters/index.js"
-      },
-      "./rules": {
-        "types": "./dist/rules/index.d.ts",
-        "default": "./dist/rules/index.js"
-      },
-      "./calculator": {
-        "types": "./dist/calculator/index.d.ts",
-        "default": "./dist/calculator/index.js"
-      },
-      "./rule-pack": {
-        "types": "./dist/rule-pack/index.d.ts",
-        "default": "./dist/rule-pack/index.js"
-      },
-      "./schemas": {
-        "types": "./dist/calculator/schemas.d.ts",
-        "default": "./dist/calculator/schemas.js"
-      }
-    },
-    "access": "public"
+    ".": "./src/index.ts",
+    "./facts": "./src/facts/index.ts",
+    "./parameters": "./src/parameters/index.ts",
+    "./rules": "./src/rules/index.ts",
+    "./calculator": "./src/calculator/index.ts",
+    "./rule-pack": "./src/rule-pack/index.ts",
+    "./schemas": "./src/calculator/schemas.ts"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
-    "test": "vitest run",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo"
+    "test": "vitest run"
   },
   "dependencies": {
     "@taxkit/core": "workspace:*",

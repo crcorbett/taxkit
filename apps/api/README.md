@@ -178,10 +178,9 @@ checked here.
 
 Run `bun run dev` from the repository root for the native API and Website
 pair. Alchemy owns both local addresses and the private binding; no cloud login
-is required. The root builds the API dependency graph first and passes Bun's
-source selection through the native launcher. API app source edits reload in
-the current local Worker. Shared-package edits need that package's build because
-native API bundling selects compiled package exports. Ctrl-C releases the pair.
+is required. The root builds the API's docs catalogue first. Workspace packages
+export TypeScript source, so API and shared-package edits reload in the current
+local Worker. Ctrl-C releases the pair.
 See the [Website setup](../web/README.md) for the saved browser and shutdown checks.
 
 ## Runtime Shape

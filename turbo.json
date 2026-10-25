@@ -21,7 +21,7 @@
         "TAXKIT_API_BASE_URL",
         "VITE_*"
       ],
-      "outputs": ["dist/**", "src/generated/**"],
+      "outputs": ["src/generated/**"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/docs/**"]
     },
     "api#check-types": {

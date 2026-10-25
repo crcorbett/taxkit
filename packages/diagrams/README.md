@@ -1,6 +1,6 @@
 # @taxkit/diagrams
 
-Private compiled package that draws Mermaid diagrams for TaxKit's docs. It
+Private source package that draws Mermaid diagrams for TaxKit's docs. It
 implements Content's `DocsDiagramRenderer` contract; Content never imports this
 package.
 

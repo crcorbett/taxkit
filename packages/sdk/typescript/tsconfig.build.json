@@ -1,6 +1,22 @@
 {
   "extends": "./tsconfig.json",
+  // The private sources the SDK includes are compiled in this same program.
+  // TypeScript never emits files it reaches through node_modules, so each
+  // owner is listed here; scripts/assemble-package.runtime.ts names the same
+  // owners and moves their output under dist/internal.
+  "include": [
+    "src/**/*.ts",
+    "../../core/src/**/*.ts",
+    "../../calculators/src/**/*.ts",
+    "../../content/src/**/*.ts",
+    "../../api/http/src/**/*.ts",
+    "../../rules/au/income-tax/src/**/*.ts",
+    "../../rules/au/pay/src/**/*.ts",
+    "../../rules/au/stsl/src/**/*.ts"
+  ],
   "compilerOptions": {
+    "rootDir": "../../..",
+    "outDir": ".compiled",
     "noEmit": false,
     "strictNullChecks": true,
     "sourceMap": false,

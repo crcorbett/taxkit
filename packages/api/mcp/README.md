@@ -27,8 +27,7 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 - `./response-budget`: `withBoundedMcpReply`, which buffers complete native
   JSON/SSE replies within 2 MiB and ten seconds, preserving status and headers.
 
-These are compiled internal source/types/default exports. The repository's
-`source` condition resolves TypeScript; ordinary imports use built JavaScript.
+These exports point at TypeScript source; the package has no build.
 There is no duplicate calculator/content service, client or runtime to acquire.
 Host integration tests substitute domain Layers and supply a fresh private
 cancellation signal.

@@ -148,37 +148,37 @@ and shared settings. `@taxkit/observability/edge-identity` owns shared edge call
 identity. Neither an app nor a package depends on another app.
 
 `packages/observability`
-: Private compiled, provider-free and domain-free owner (it depends on no
+: Private source, provider-free and domain-free owner (it depends on no
   other TaxKit workspace) of shared host request records, safe
   loggers, edge identity policy and the hosted `DeploymentStage` /
   `PullRequestStage` Schemas that analytics and infrastructure reuse. API, Website and infrastructure dashboards
   consume its named exports.
 
 `packages/api/mcp`
-: Private compiled MCP transport owner: tool contracts, handlers, request
+: Private source MCP transport owner: tool contracts, handlers, request
   cancellation and response budgets over domain services. Native session storage,
   dispatch and app lifecycle remain in the API app.
 
 `packages/aeo`
-: Private compiled answer-engine owner. `aeoRoutes` serves the four discovery
+: Private source answer-engine owner. `aeoRoutes` serves the four discovery
   documents and one share-image route per published page from Content's
   catalogue, `DocsOgImages` and the host-supplied `PublicationOrigins`. It
   consumes HTTP route constants; Content never imports HTTP and HTTP never
   imports AEO, keeping the dependency graph acyclic.
 
 `packages/webmcp`
-: Private compiled WebMCP owner. `ModelContextHost` and its live adapter are the
+: Private source WebMCP owner. `ModelContextHost` and its live adapter are the
   one browser Promise bridge for page tools; `registerCalculatorPageTools`
   registers the calculator page toolkit for the enclosing Scope.
 
 `packages/og-image`
-: Private compiled build-time share-image provider. `DocsPageRendererLive`
+: Private source build-time share-image provider. `DocsPageRendererLive`
   keeps every Takumi call and the bundled Geist font; `renderDocsImageArchive`
   draws every published page. Only the API build script composes it; no Worker
   bundles it.
 
 `packages/content`
-: Private compiled owner of canonical docs page/navigation contracts, source
+: Private source owner of canonical docs page/navigation contracts, source
   errors, the accepted public catalogue Schema and `ContentService`. Application
   composition supplies `DocsSources`; `ContentCatalogueLive` builds the checked
   catalogue once through `DocsPageReader`, and the service reads accepted
@@ -192,7 +192,7 @@ identity. Neither an app nor a package depends on another app.
   its requested path. Shared public-origin policy lives in its Schema owner.
 
 `packages/analytics`
-: Private compiled owner of checked page/calculator events, collection policy,
+: Private source owner of checked page/calculator events, collection policy,
   settings, safe errors and named browser/backend service contracts. Its native
   backend capture Layer has one bounded HTTP attempt. The application owns
   execution and best-effort delivery. Analytics owns the calculator usage decorator.
@@ -208,13 +208,13 @@ identity. Neither an app nor a package depends on another app.
   It has no Schemas, services or runtime.
 
 `packages/mdx`
-: Private compiled `@taxkit/mdx`. `./live` implements Content's
+: Private source `@taxkit/mdx`. `./live` implements Content's
   `DocsPageReader` with micromark MDX and GFM tables and a Schema-checked syntax
   tree; JSX, images, raw HTML and quotes fail the page. `./highlights`
   implements `DocsCodeHighlighter` and is the only `@pierre/highlights` caller.
 
 `packages/diagrams`
-: Private compiled `@taxkit/diagrams`. `./mermaid` implements Content's
+: Private source `@taxkit/diagrams`. `./mermaid` implements Content's
   `DocsDiagramRenderer` and is the only `beautiful-mermaid` caller. It renders
   SVG on the server, with no browser or Chromium.
 

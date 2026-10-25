@@ -102,21 +102,17 @@ HTTP handlers or filesystem adapters.
 ```sh
 bun run --filter=@taxkit/core check-types
 bun run --filter=@taxkit/core test
-bun run --filter=@taxkit/core build
 ```
 
-`check-types` includes source and deterministic tests. The build uses its
-separate source-only configuration, preserving the existing `dist` paths.
-Core requests no automatically loaded type packages (`types: []`). Its source
-and tests use explicit imports, so a clean build does not depend on Node types
+`check-types` includes source and deterministic tests. Core requests no automatically loaded type packages (`types: []`). Its source
+and tests use explicit imports, so a clean check does not depend on Node types
 being available through another workspace package.
 
 ## Packaging
 
-The build removes `dist` before compiling. Workspace exports retain `source`
-conditions, while `publishConfig.exports` and `files` define a dist-only
-tarball. The SDK-owned strict downstream gate validates the actual Bun-packed
-artifact and its concrete dependency ranges.
+This private package exports its TypeScript source and has no build. The SDK
+compiles it into its single archive; the SDK-owned downstream check validates
+that packed archive and its dependency ranges.
 
 ## Related Docs
 

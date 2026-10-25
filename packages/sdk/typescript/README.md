@@ -173,8 +173,7 @@ time.
 
 The root, AU and schema entrypoints are intended to remain browser-safe. Effect
 entrypoints expose Effect-native types for consumers that want service/layer
-composition. The publish manifest is dist-only and does not expose `source`
-conditions; `bun run --filter=taxkit check-packed-artifact` validates
+composition. The publish manifest is dist-only; `bun run --filter=taxkit check-packed-artifact` validates
 that every public export resolves to packed files. The focused checker is an
 Effect-native Bun runtime with typed command and validation failures and a
 scope-managed temporary import workspace.
@@ -220,8 +219,10 @@ all public imports, calculation/report behaviour, rule parameters and browser
 bundle. The runtime dependencies contain no `@taxkit/*` packages. Both the
 normal packed-artifact check and this consumer use the assembled distribution.
 
-`assemble-package.runtime.ts` retains the private modules' compiled paths in
-`dist/internal`, rewriting only import/export syntax through the TypeScript AST.
+`tsconfig.build.json` compiles the SDK and the private sources it includes in
+one program; TypeScript does not emit files reached through `node_modules`, so
+it lists each private source folder. `assemble-package.runtime.ts` moves each
+owner's output to `dist/internal`, rewriting only import/export syntax through the TypeScript AST.
 It relocates both JavaScript and declarations, preserving Schema and class
 identity across entry points. Runtime service identifiers and data strings are
 unchanged. Effect stays external. No deployment, provider SDK, repository test

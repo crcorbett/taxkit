@@ -1,6 +1,6 @@
 # @taxkit/aeo
 
-Private compiled package that serves TaxKit's answer-engine routes from the
+Private source package that serves TaxKit's answer-engine routes from the
 accepted docs catalogue. The API Worker composes it; the Website forwards its
 own conventional addresses to these routes once.
 

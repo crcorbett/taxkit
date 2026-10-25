@@ -9,7 +9,7 @@ review_trigger: content contracts, search policy or package exports change
 
 # @taxkit/content
 
-Private compiled package for TaxKit docs contracts and published public page
+Private source package for TaxKit docs contracts and published public page
 lookup, navigation and search. `DocsPublicCatalogue` rejects draft pages,
 duplicate addresses and navigation that does not match the pages.
 
@@ -86,12 +86,8 @@ shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
 - `./testing/fixtures`: checked synthetic catalogue inputs for tests.
 - `./testing/observations`: typed test observations.
 
-All repository exports select source under the `source` condition and compiled
-JavaScript/declarations otherwise. The proposed publish exports omit test
-subpaths and source conditions. The package remains private; a proposed publish
-manifest does not establish a packed or published consumer. The HTTP package
-depends on these compiled contracts, and the SDK build includes them in its
-single archive. The local downstream check installs that SDK archive without a
+All exports point at TypeScript source; the private package has no build. The
+SDK build compiles the contracts it uses into its single archive. The local downstream check installs that SDK archive without a
 separate content package. That check does not authorise registry publication.
 
 ## Documentation impact

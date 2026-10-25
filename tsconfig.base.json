@@ -26,7 +26,6 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
-    "customConditions": ["source"],
     "sourceMap": true
   },
   "files": ["raw-modules.d.ts"]

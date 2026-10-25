@@ -2,7 +2,6 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "allowImportingTsExtensions": false,
-    "customConditions": [],
     "declaration": false,
     "declarationMap": false,
     "module": "ES2022",

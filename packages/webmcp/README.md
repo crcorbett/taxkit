@@ -1,6 +1,6 @@
 # @taxkit/webmcp
 
-Private compiled package that registers the Website's calculator page tools
+Private source package that registers the Website's calculator page tools
 with the browser's WebMCP host (`document.modelContext`). The tools themselves,
 their handlers and their failure belong to
 [`@taxkit/calculators`](../calculators/README.md); the Website composes them for

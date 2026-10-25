@@ -58,7 +58,7 @@ describe("native local development", () => {
         const environment = {
           ALCHEMY_HOME: auth,
           ALCHEMY_TELEMETRY_DISABLED: "1",
-          BUN_OPTIONS: "--conditions=source --no-env-file",
+          BUN_OPTIONS: "--no-env-file",
           // Exercise the non-polling watcher used on the Linux CI runner.
           CHOKIDAR_USEPOLLING: "0",
           CI: "1",
@@ -380,7 +380,7 @@ describe("native local development", () => {
         const environment = {
           ALCHEMY_HOME: auth,
           ALCHEMY_TELEMETRY_DISABLED: "1",
-          BUN_OPTIONS: "--conditions=source --no-env-file",
+          BUN_OPTIONS: "--no-env-file",
           CI: "1",
           HOME: yield* Config.schema(Schema.String, "HOME"),
           NO_COLOR: "1",
