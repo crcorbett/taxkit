@@ -1,5 +1,12 @@
 # @taxkit/webmcp
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [148fee7]
+  - @taxkit/content@3.2.0
+
 ## 0.1.1
 
 ### Patch Changes
