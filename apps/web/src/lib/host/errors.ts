@@ -15,9 +15,9 @@ export class WebsiteApiConfigError extends Schema.TaggedError<WebsiteApiConfigEr
   { message: Schema.tag("TaxKit API settings are missing or invalid.") }
 ) {}
 
-// A page load that could not reach or use the API. TanStack renders the
-// route's error component; the server reply carries this status.
+// TanStack renders the route's error component with 503 for unavailable API
+// reads or 500 for internal defects and mismatched checked replies.
 export class WebsiteLoadError extends Schema.TaggedError<WebsiteLoadError>()(
   "WebsiteLoadError",
-  { status: Schema.Literal(503) }
+  { status: Schema.Literals([500, 503]) }
 ) {}

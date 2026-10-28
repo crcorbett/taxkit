@@ -182,8 +182,8 @@ export const registry = AtomRegistry.make();`,
       rule: "strict-effect(module-ownership)",
       source: `import { env } from "cloudflare:workers";
 import type { Env } from "cloudflare:workers";
-import { toHttpClient } from "alchemy/Cloudflare/Bridge";
-const address = "alchemy/Cloudflare/" + "Bridge";
+import { toHttpClient } from "@alchemy.run/cloudflare/Bridge";
+const address = "@alchemy.run/cloudflare/" + "Bridge";
 export const bridge = import(address);
 export const values = [env, toHttpClient];
 export type Values = Env;`,

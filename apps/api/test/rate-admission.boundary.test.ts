@@ -1,3 +1,4 @@
+import { RateLimit } from "@alchemy.run/cloudflare/Workers";
 import { describe, expect, it } from "@effect/vitest";
 import { TaxKitApi } from "@taxkit/api-http/api";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
@@ -13,7 +14,6 @@ import {
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { edgeCallerKey } from "@taxkit/observability/edge-identity";
-import { RateLimit } from "alchemy/Cloudflare/Workers";
 import {
   Array,
   ConfigProvider,

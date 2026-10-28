@@ -1,7 +1,7 @@
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import { deploymentSecrets } from "@taxkit/infrastructure/secrets";
 import { LocalStage } from "@taxkit/infrastructure/stage";
 import * as Alchemy from "alchemy";
-import * as Cloudflare from "alchemy/Cloudflare";
 import * as Secrets from "alchemy/Secrets";
 import { Effect, Layer, Schema } from "effect";
 

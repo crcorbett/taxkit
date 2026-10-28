@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-tooling-owner
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-28
 review_trigger: formatter, lint, dependency, typecheck, Changeset or root command change
 ---
 
@@ -27,8 +27,18 @@ stable boundaries.
   wrapping.
 - TypeScript 7 is the root compiler. `@effect/tsgo` patches it at install and
   supplies Effect diagnostics; `bun run check:effect` runs them.
+  The SDK assembler separately uses `typescript-ast`, an alias for TypeScript
+  6.0.3, for its JavaScript compiler API; TypeScript 7 supplies the native
+  compiler rather than that API.
+- Effect and its versioned platform, Atom, SQL and test packages use 4.0.6.
+  Alchemy and its provider/framework packages use beta.84. Miniflare follows
+  the v5 beta line used by Wrangler; its `latest` tag still points to v4.
 - `knip.json` checks development reachability and `knip.production.json`
-  checks the published package and runtime graph.
+  checks the published package and runtime graph, including the standalone
+  API server Layer as an explicit host entry alongside the API Worker.
+- The SDK's type and unit-test tasks depend on its own build: its package
+  imports resolve through `dist`, so those tasks must wait while a rebuild
+  replaces the assembled package.
 - `tools/documentation` owns `bun run check:docs` and
   `tools/repository-paths` owns `bun run check:repository-paths`.
 - Changesets record package-facing changes; see

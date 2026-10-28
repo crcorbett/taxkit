@@ -28,6 +28,14 @@
       "dependsOn": ["^build", "build"],
       "outputs": []
     },
+    "taxkit#check-types": {
+      "dependsOn": ["^build", "build"],
+      "outputs": []
+    },
+    "taxkit#test": {
+      "dependsOn": ["^build", "build"],
+      "outputs": []
+    },
     "api#test": {
       "dependsOn": ["^build", "build"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/docs/**"],

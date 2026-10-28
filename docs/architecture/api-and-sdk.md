@@ -313,10 +313,10 @@ that is valid for a different calculator must fail as
 `CalculatorInputDecodeError` with descriptor-backed help for the selected
 calculator.
 
-The Effect `4.0.0-rc.117` upgrade changes generated OpenAPI component names
-to encoded-side names ending in `Encoded` and adds a nested union around
-supported tax years. The API package owns this document change and its
-snapshot. Public route paths, status codes and JSON field names remain stable;
+Effect generates OpenAPI component names from encoded-side names ending in
+`Encoded`. Effect 4.0.6 flattens redundant nested `anyOf` groups without changing
+their accepted values. The API package owns this document and its snapshot.
+Public route paths, status codes and JSON field names remain stable;
 route tests and the standalone API smoke check cover those runtime claims.
 
 Public JSON examples must use canonical schema values, including tagged values
@@ -629,7 +629,7 @@ publication origins through the static `ContentDiscoveryLive`.
 
 ## Native remote MCP
 
-The native API mounts `@taxkit/api-mcp` at `/mcp` with Effect 4.0.4's native
+The native API mounts `@taxkit/api-mcp` at `/mcp` with Effect 4.0.6's native
 `McpServer.layerHttpRequestScoped`, `Tool` and `Toolkit`. Only modern
 `2026-07-28` is supported. The six tools reuse canonical calculator/content
 Schemas and the captured shared services, work pool and native rate limiter.

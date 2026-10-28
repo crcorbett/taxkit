@@ -1,5 +1,5 @@
+import * as Doppler from "@alchemy.run/doppler";
 import { PullRequestStage } from "@taxkit/observability/stage";
-import * as Doppler from "alchemy/Doppler";
 import * as Secrets from "alchemy/Secrets";
 import type { SecretsContext } from "alchemy/Secrets";
 import type { StackSecrets } from "alchemy/Stack";

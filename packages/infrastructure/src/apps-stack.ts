@@ -1,10 +1,10 @@
+import { BotManagement } from "@alchemy.run/cloudflare/BotManagement";
+import { Dnssec, ZoneDnsSettings } from "@alchemy.run/cloudflare/DNS";
+import * as Website from "@alchemy.run/cloudflare/Website";
+import { Worker } from "@alchemy.run/cloudflare/Workers";
+import { Setting, Zone } from "@alchemy.run/cloudflare/Zone";
 import type { CalculatorHostMode } from "@taxkit/observability/edge-identity";
 import { adopt } from "alchemy/AdoptPolicy";
-import { BotManagement } from "alchemy/Cloudflare/BotManagement";
-import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
-import * as Website from "alchemy/Cloudflare/Website";
-import { Worker } from "alchemy/Cloudflare/Workers";
-import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import * as Output from "alchemy/Output";
 import { retain } from "alchemy/RemovalPolicy";
 import { Stage } from "alchemy/Stage";
@@ -128,36 +128,31 @@ export const nativeApiHostProps = Effect.gen(function* () {
 });
 
 /**
- * The Website's build-input hash, in Alchemy's documented sibling-package
- * form. `**\/*` keeps `.gitignore` filtering inside `apps/web`; setting
- * `exclude` would switch it off. Each `../` pattern names only what the build
- * reads: package sources (at each nesting depth), manifests, tsconfigs and the
- * authored documentation content. Those patterns skip `.gitignore` and follow
- * links, so a wildcard depth also reaches each package's `node_modules`; the
- * negations prune installed, built and test files. Tests, READMEs and
- * CHANGELOGs therefore leave the hash unchanged, so a version-packages change
- * does not redeploy the Website. `workspaces: []` turns off Vite's
- * auto-detected workspaces, which would hash whole package directories. The
- * lockfile stands for installed dependencies.
+ * The Website's build-input hash. The app keeps native `.gitignore` filtering;
+ * sibling inputs follow the root manifest's workspace paths. Parent-directory
+ * globs bypass `.gitignore`, so use real workspace roots rather than wildcard
+ * depths that also reach installed packages. Sources, manifests, tsconfigs and
+ * authored content participate; separate test and build directories do not.
+ * `workspaces: []` disables whole-package auto-detection, and the lockfile
+ * represents installed dependencies.
  */
 export const websiteBuildMemo = {
   include: [
     "**/*",
     "../../tsconfig.base.json",
     "../../packages/*/src/**",
-    "../../packages/*/*/src/**",
-    "../../packages/*/*/*/src/**",
+    "../../packages/api/*/src/**",
+    "../../packages/sdk/*/src/**",
+    "../../packages/rules/au/*/src/**",
     "../../packages/*/package.json",
-    "../../packages/*/*/package.json",
-    "../../packages/*/*/*/package.json",
+    "../../packages/api/*/package.json",
+    "../../packages/sdk/*/package.json",
+    "../../packages/rules/au/*/package.json",
     "../../packages/*/tsconfig.json",
-    "../../packages/*/*/tsconfig.json",
-    "../../packages/*/*/*/tsconfig.json",
+    "../../packages/api/*/tsconfig.json",
+    "../../packages/sdk/*/tsconfig.json",
+    "../../packages/rules/au/*/tsconfig.json",
     "../../content/docs/**",
-    "!../../packages/**/node_modules/**",
-    "!../../packages/**/dist/**",
-    "!../../packages/**/*.test.ts",
-    "!../../packages/**/*.test.tsx",
   ],
   lockfile: true,
   workspaces: [],

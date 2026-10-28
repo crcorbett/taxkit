@@ -107,7 +107,7 @@ export const PostHogManagementLive = Layer.effect(
       Credentials,
       Effect.sync(() => ({
         apiBaseUrl: "https://us.posthog.com",
-        apiKey: Redacted.value(key),
+        apiKey: key,
       }))
     );
     // The current SDK turns response-body failures into defects. Fully collect
