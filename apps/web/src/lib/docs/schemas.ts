@@ -22,6 +22,7 @@ export type WebsiteDocsSearchView = Data.TaggedEnum<{
     readonly results: readonly DocsSearchResult[];
     readonly term: "" | DocsSearchTerm;
   };
+  // oxlint-disable-next-line typescript/no-generated-empty-object-type -- Data.TaggedEnum requires an empty payload for a zero-argument variant and adds its own discriminant.
   InvalidSearch: Readonly<Record<never, never>>;
 }>;
 export const WebsiteDocsSearchView = Data.taggedEnum<WebsiteDocsSearchView>();

@@ -1,8 +1,11 @@
+import {
+  makeSourceContext,
+  resolveSource,
+} from "@alchemy.run/cloudflare/Workers";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { workerCompatibility } from "@taxkit/infrastructure/worker-settings";
 import { AlchemyContext } from "alchemy/AlchemyContext";
 import { provideFreshArtifactStore, scopedArtifacts } from "alchemy/Artifacts";
-import { makeSourceContext, resolveSource } from "alchemy/Cloudflare/Workers";
 import { Effect, FileSystem, Path } from "effect";
 
 import { nativeApiSourceProps } from "./native-api-source.boundary.js";
@@ -75,6 +78,12 @@ const program = Effect.gen(function* () {
           });
           const props = {
             ...apiDeclaration,
+            build: {
+              output: {
+                dir: path.join(output, "bundles", fixtureId),
+                entryFileNames: "worker.js",
+              },
+            },
             compatibility,
             main: path.join(root, "apps/api/src/worker.ts"),
           };
@@ -176,6 +185,12 @@ const program = Effect.gen(function* () {
         });
         const props = {
           ...apiDeclaration,
+          build: {
+            output: {
+              dir: path.join(output, "bundles", fixtureId),
+              entryFileNames: "worker.js",
+            },
+          },
           compatibility,
           main: path.join(root, "apps/api/src/worker.ts"),
         };
@@ -240,6 +255,12 @@ const program = Effect.gen(function* () {
         });
         const props = {
           ...apiDeclaration,
+          build: {
+            output: {
+              dir: path.join(output, "bundles", fixtureId),
+              entryFileNames: "worker.js",
+            },
+          },
           compatibility,
           main: path.join(root, "apps/api/src/worker.ts"),
         };
@@ -268,6 +289,12 @@ const program = Effect.gen(function* () {
     );
     const apiProps = {
       ...apiDeclaration,
+      build: {
+        output: {
+          dir: path.join(output, "bundles", "TaxKitApi"),
+          entryFileNames: "worker.js",
+        },
+      },
       compatibility,
       main: path.join(root, "apps/api/src/worker.ts"),
     };

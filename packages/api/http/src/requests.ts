@@ -119,19 +119,17 @@ export const requestDocsPage = Effect.fn("TaxKitApi.requestDocsPage")(
             message: "The documentation page was not found.",
           })
       ),
-      Effect.flatMap((path) =>
-        Effect.all(
-          {
-            navigation: client.content.getNavigation(),
-            page: client.content.getPage({ query: { path } }).pipe(
-              Effect.filterOrFail(
-                (page) => isRequestedDocsPage(path, page),
-                () => new ApiReplyMismatch()
-              )
-            ),
-          },
-          { concurrency: 2 }
-        ).pipe(
+      Effect.flatMap((path) => {
+        // Resolve the client's default payload services before Effect.all's
+        // contextual type can widen these bodyless requests to any.
+        const navigation = client.content.getNavigation();
+        const page = client.content.getPage({ query: { path } }).pipe(
+          Effect.filterOrFail(
+            (reply) => isRequestedDocsPage(path, reply),
+            () => new ApiReplyMismatch()
+          )
+        );
+        return Effect.all({ navigation, page }, { concurrency: 2 }).pipe(
           Effect.timeout(apiReadTimeout),
           Effect.mapError((error) =>
             Schema.is(DocsPageUnavailable)(error) ||
@@ -139,32 +137,28 @@ export const requestDocsPage = Effect.fn("TaxKitApi.requestDocsPage")(
               ? error
               : transportFailure(error)
           )
-        )
-      )
+        );
+      })
     )
 );
 
 /** Navigation alone for an empty search, or navigation and matching pages. */
-export const requestDocsSearch = Effect.fn("TaxKitApi.requestDocsSearch")(
-  (client: TaxKitClient, term: "" | DocsSearchTerm) =>
-    Effect.all(
-      {
-        navigation: client.content.getNavigation(),
-        results:
-          term === ""
-            ? Effect.succeed([])
-            : client.content.searchPages({ query: { term } }),
-      },
-      { concurrency: 2 }
-    ).pipe(
-      Effect.timeout(apiReadTimeout),
-      Effect.mapError((error) =>
-        Schema.is(DocsSearchUnavailable)(error)
-          ? error
-          : transportFailure(error)
-      )
+export const requestDocsSearch = Effect.fn("TaxKitApi.requestDocsSearch")((
+  client: TaxKitClient,
+  term: "" | DocsSearchTerm
+) => {
+  const navigation = client.content.getNavigation();
+  const results =
+    term === ""
+      ? Effect.succeed([])
+      : client.content.searchPages({ query: { term } });
+  return Effect.all({ navigation, results }, { concurrency: 2 }).pipe(
+    Effect.timeout(apiReadTimeout),
+    Effect.mapError((error) =>
+      Schema.is(DocsSearchUnavailable)(error) ? error : transportFailure(error)
     )
-);
+  );
+});
 
 export const requestDocsMarkdown = Effect.fn("TaxKitApi.requestDocsMarkdown")(
   (client: TaxKitClient, path: DocsPagePath) =>

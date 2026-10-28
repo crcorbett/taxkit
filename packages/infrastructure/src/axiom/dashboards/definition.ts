@@ -1,4 +1,4 @@
-import type * as Axiom from "alchemy/Axiom";
+import type * as Axiom from "@alchemy.run/axiom";
 import { Array, pipe } from "effect";
 
 type DashboardDocument = Omit<

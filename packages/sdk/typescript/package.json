@@ -119,9 +119,9 @@
     "@taxkit/rules-au-stsl": "workspace:*",
     "@taxkit/testing": "workspace:*",
     "@types/bun": "catalog:",
-    "@vitest/browser-playwright": "5.0.3",
+    "@vitest/browser-playwright": "5.0.5",
     "typescript": "catalog:",
-    "typescript-ast": "npm:typescript@5.9.3",
+    "typescript-ast": "npm:typescript@6.0.3",
     "vite": "catalog:",
     "vitest": "catalog:"
   }

@@ -1174,7 +1174,7 @@ export default defineConfig({
               "apps/web/src/lib/host/binding.adapter.layer.ts",
               "apps/web/test/native-rate.boundary.test.ts",
             ],
-            module: "alchemy/Cloudflare/Bridge",
+            module: "@alchemy.run/cloudflare/Bridge",
           },
         ],
       },

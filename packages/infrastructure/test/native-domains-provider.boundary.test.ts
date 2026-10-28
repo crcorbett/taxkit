@@ -1,3 +1,9 @@
+import {
+  Providers,
+  Credentials,
+  CloudflareEnvironment,
+} from "@alchemy.run/cloudflare";
+import { LiveWorkerProvider, Worker } from "@alchemy.run/cloudflare/Workers";
 import { BunServices } from "@effect/platform-bun";
 import { describe, expect, it } from "@effect/vitest";
 import { AlchemyContext } from "alchemy/AlchemyContext";
@@ -9,25 +15,21 @@ import {
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
-import {
-  Providers,
-  Credentials,
-  CloudflareEnvironment,
-} from "alchemy/Cloudflare";
-import { LiveWorkerProvider, Worker } from "alchemy/Cloudflare/Workers";
-import { InstanceId } from "alchemy/InstanceId";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Provider from "alchemy/Provider";
+import { ResourceContext } from "alchemy/ResourceContext";
 import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { inMemoryState } from "alchemy/State";
 import {
   Array,
+  Cause,
   Effect,
   Exit,
   FileSystem,
   Layer,
   Option,
+  Predicate,
   Redacted,
   Ref,
   Match,
@@ -209,6 +211,25 @@ const providerFixture = Effect.fnUntraced(function* (
             })
         ),
         Match.when(
+          (v) =>
+            v.path.endsWith(`/workers/scripts/${name}/deployments`) &&
+            v.method === "GET",
+          () =>
+            mockProviderSuccess({
+              deployments: [
+                {
+                  created_on: "2026-10-07T00:00:00Z",
+                  id: "fixture-deployment-id",
+                  source: "api",
+                  strategy: "percentage",
+                  versions: [
+                    { percentage: 100, version_id: "fixture-version-id" },
+                  ],
+                },
+              ],
+            })
+        ),
+        Match.when(
           (v) => v.path.endsWith("/schedules"),
           () => mockProviderSuccess({ schedules: [] })
         ),
@@ -222,7 +243,10 @@ const providerFixture = Effect.fnUntraced(function* (
         Match.option
       );
       const selected = yield* Option.match(reply, {
-        onNone: () => Effect.die("Unexpected native provider fixture request"),
+        onNone: () =>
+          Effect.die(
+            `Unexpected native provider fixture request: ${request.method} ${path}`
+          ),
         onSome: Effect.succeed,
       });
       const encoded = yield* Schema.encodeEffect(ProviderReply)({
@@ -307,6 +331,9 @@ const providerFixture = Effect.fnUntraced(function* (
             delete: () => blocked,
             deleteProfile: () => blocked,
             read: () => blocked,
+            scoped() {
+              return this;
+            },
             write: () => blocked,
           })
         ),
@@ -336,7 +363,12 @@ const providerFixture = Effect.fnUntraced(function* (
       Layer.mergeAll(LiveWorkerProvider(), scopedArtifacts(resource.FQN))
     ),
     Effect.provideContext(compiled.services),
-    Effect.provideService(InstanceId, "fixture-instance"),
+    Effect.provideService(ResourceContext, {
+      fqn: resource.FQN,
+      instanceId: "fixture-instance",
+      logicalId: resource.LogicalId,
+      type: resource.Type,
+    }),
     Effect.provideService(
       Credentials,
       Effect.succeed({
@@ -362,11 +394,7 @@ const providerFixture = Effect.fnUntraced(function* (
 });
 
 describe("actual installed native redirect provider", () => {
-  // Known unpatched Alchemy limit: the native provider treats every failed
-  // shared-ruleset read as an empty phase. A later successful write then holds
-  // only this Worker's redirect and can omit rules owned elsewhere in the zone.
-  // TaxKit's zone holds only its own redirect; see the deployment runbook.
-  it.live("records that a failed shared-rule read is treated as absent", () =>
+  it.live("refuses redirect writes after a forbidden shared-rule read", () =>
     Effect.gen(function* () {
       const fixture = yield* providerFixture("forbidden");
       const reads = Array.filter(
@@ -374,23 +402,23 @@ describe("actual installed native redirect provider", () => {
         (x) => x.method === "GET" && x.path.includes("/rulesets/")
       );
       expect(reads).toHaveLength(1);
-      const writes = Array.filter(
-        fixture.calls,
-        (x) => x.method === "PUT" && x.path.includes("/rulesets/")
-      );
-      expect(Exit.isSuccess(fixture.result)).toBe(true);
-      expect(writes).toHaveLength(1);
-      const write = Array.head(writes).pipe(
-        Option.getOrElse(() => expect.fail("Expected one rule request"))
-      );
-      const rules = yield* Schema.decodeEffect(
-        Schema.fromJsonString(
-          Schema.Struct({
-            rules: Schema.Array(Schema.Record(Schema.String, Schema.Unknown)),
-          })
+      expect(Exit.isFailure(fixture.result)).toBe(true);
+      if (Exit.isFailure(fixture.result)) {
+        expect(
+          Array.some(
+            fixture.result.cause.reasons,
+            (reason) =>
+              Cause.isFailReason(reason) &&
+              Predicate.isTagged(reason.error, "Forbidden")
+          )
+        ).toBe(true);
+      }
+      expect(
+        Array.filter(
+          fixture.calls,
+          (x) => x.method === "PUT" && x.path.includes("/rulesets/")
         )
-      )(write.body);
-      expect(rules.rules).toHaveLength(1);
+      ).toHaveLength(0);
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
   it.live.each(["absent", "existing"] as const)(
@@ -398,7 +426,13 @@ describe("actual installed native redirect provider", () => {
     (mode) =>
       Effect.gen(function* () {
         const fixture = yield* providerFixture(mode);
-        expect(Exit.isSuccess(fixture.result)).toBe(true);
+        expect(
+          Exit.isSuccess(fixture.result),
+          Exit.match(fixture.result, {
+            onFailure: Cause.pretty,
+            onSuccess: () => "",
+          })
+        ).toBe(true);
         const calls = Array.filter(
           fixture.calls,
           (x) => x.method === "PUT" && x.path.includes("/rulesets/")
@@ -459,6 +493,10 @@ describe("actual installed native redirect provider", () => {
         });
         if (Exit.isSuccess(fixture.result)) {
           expect(fixture.result.value.url).toBe("https://example.com");
+          expect(fixture.result.value.versionId).toBe("fixture-version-id");
+          expect(fixture.result.value.deploymentId).toBe(
+            "fixture-deployment-id"
+          );
         }
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );

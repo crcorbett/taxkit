@@ -13,11 +13,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@takumi-rs/wasm": "2.14.0",
+    "@takumi-rs/wasm": "2.18.2",
     "@taxkit/content": "workspace:*",
     "effect": "catalog:",
     "react": "catalog:",
-    "takumi-js": "2.14.0"
+    "takumi-js": "2.18.2"
   },
   "devDependencies": {
     "@effect/platform-node": "catalog:",

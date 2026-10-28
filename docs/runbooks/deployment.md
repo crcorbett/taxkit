@@ -3,7 +3,7 @@ document_type: runbook
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-28
 review_trigger: Alchemy stack, stage, Doppler config, deployment command, deploy workflow or public check change
 ---
 
@@ -90,6 +90,17 @@ Destroy the stage when its pull request closes.
 reason, and invokes native Alchemy destroy. No browser is needed. The workflow rechecks that the pull request
 is closed and validates its stage before running it.
 
+## Local development
+
+`bun run dev` builds the API catalogue and starts the native local pair at
+`dev_native_apps`. Alchemy beta.84's Bun dev path selects a TypeScript Vite
+runner whose `register-dev-mode.js` loader is omitted from the published
+package. The script therefore uses Alchemy's native Node entrypoint with its
+published `register-oxc.js` loader. This uses the installed package without a
+dependency patch. The native local suite exercises the same Node entrypoint,
+source reload and process cleanup. Review this compatibility choice when
+upgrading Alchemy again.
+
 ## Production
 
 ```sh
@@ -161,6 +172,14 @@ Each stack accepts only `--stage prod`. A plan that would replace the ingest
 token, or replace or delete a destination or dashboard, must stop. A
 dashboard-only change updates the four dashboards and nothing else.
 
+Alchemy beta.84 migrates an older destination's saved `destinationConf` from
+a plain string to `Redacted`. That produces an in-place update for each
+destination. The native reconciler reads the existing destination and patches
+only real configuration drift; this migration does not rotate the ingest token
+or replace a destination. Keep the bearer header redacted in the declaration,
+review the names and update actions, then require a fresh no-change plan after
+applying. Do not print saved destination configuration or headers.
+
 ### Check after a Production release
 
 1. Read both Production Workers' settings in Cloudflare: logs enabled at
@@ -193,7 +212,7 @@ set. Only a true/false value reaches that step, so a missing secret stops the
 job in seconds instead of at the first native command after verification. The
 token itself reaches only the native plan, deploy, destroy and drift steps.
 
-On the installed Alchemy (beta.81, unchanged in beta.83), `deploy --yes` and
+On the installed Alchemy beta.84, `deploy --yes` and
 `destroy --yes` both approve the plan and let Alchemy set up or upgrade the
 shared Cloudflare state store. The stack disables the shell as a config source,
 so the state store never sees `CI=true` and CI alone does not stop that. Each
@@ -297,11 +316,9 @@ of old and new versions is possible.
 
 ## Known limits
 
-- The native Alchemy redirect provider treats a failed read of the zone's
-  shared redirect ruleset as an empty ruleset. A later successful write then
-  holds only TaxKit's `www` rule and can remove redirect rules owned elsewhere
-  in the zone. The `taxkit.dev` zone holds only TaxKit's own rule; check the
-  zone's redirect rules before adding another owner. The Worker upload happens
-  before the redirect rule is written.
+- The Worker upload happens before redirect reconciliation. Alchemy beta.84
+  stops redirect writes on a failed shared-ruleset read, except for a checked
+  `RulesetNotFound`. If reconciliation fails, inspect the live Worker versions
+  and redirect rules before retrying; the Worker may already have changed.
 - Seven-day Cloudflare freshness lets Cloudflare reuse a response; it does not
   guarantee that the cache keeps it.

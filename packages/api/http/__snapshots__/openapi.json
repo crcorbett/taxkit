@@ -195,20 +195,12 @@
           "calculatorId": {
             "anyOf": [
               {
-                "anyOf": [
-                  {
-                    "enum": ["au.pay.take-home", "au.pay.withholdings"],
-                    "type": "string"
-                  },
-                  {
-                    "anyOf": [
-                      {
-                        "enum": ["au.income-tax.annual"],
-                        "type": "string"
-                      }
-                    ]
-                  }
-                ]
+                "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                "type": "string"
+              },
+              {
+                "enum": ["au.income-tax.annual"],
+                "type": "string"
               },
               {
                 "type": "null"
@@ -721,24 +713,12 @@
               "jurisdiction": {
                 "anyOf": [
                   {
-                    "anyOf": [
-                      {
-                        "anyOf": [
-                          {
-                            "enum": ["AU"],
-                            "type": "string"
-                          }
-                        ]
-                      },
-                      {
-                        "anyOf": [
-                          {
-                            "enum": ["AU"],
-                            "type": "string"
-                          }
-                        ]
-                      }
-                    ]
+                    "enum": ["AU"],
+                    "type": "string"
+                  },
+                  {
+                    "enum": ["AU"],
+                    "type": "string"
                   },
                   {
                     "type": "null"
@@ -748,16 +728,12 @@
               "taxYear": {
                 "anyOf": [
                   {
-                    "anyOf": [
-                      {
-                        "enum": ["2025-26"],
-                        "type": "string"
-                      },
-                      {
-                        "enum": ["2025-26"],
-                        "type": "string"
-                      }
-                    ]
+                    "enum": ["2025-26"],
+                    "type": "string"
+                  },
+                  {
+                    "enum": ["2025-26"],
+                    "type": "string"
                   },
                   {
                     "type": "null"
@@ -777,12 +753,8 @@
                 "type": "string"
               },
               {
-                "anyOf": [
-                  {
-                    "enum": ["au.income-tax.annual"],
-                    "type": "string"
-                  }
-                ]
+                "enum": ["au.income-tax.annual"],
+                "type": "string"
               }
             ]
           }
@@ -862,24 +834,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -894,16 +854,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    },
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -933,12 +889,8 @@
                                 "type": "string"
                               },
                               {
-                                "anyOf": [
-                                  {
-                                    "enum": ["au.income-tax.annual"],
-                                    "type": "string"
-                                  }
-                                ]
+                                "enum": ["au.income-tax.annual"],
+                                "type": "string"
                               }
                             ]
                           },
@@ -948,20 +900,12 @@
                               "jurisdiction": {
                                 "anyOf": [
                                   {
-                                    "anyOf": [
-                                      {
-                                        "enum": ["AU"],
-                                        "type": "string"
-                                      }
-                                    ]
+                                    "enum": ["AU"],
+                                    "type": "string"
                                   },
                                   {
-                                    "anyOf": [
-                                      {
-                                        "enum": ["AU"],
-                                        "type": "string"
-                                      }
-                                    ]
+                                    "enum": ["AU"],
+                                    "type": "string"
                                   }
                                 ]
                               },
@@ -1084,12 +1028,8 @@
                   "type": "string"
                 },
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["au.income-tax.annual"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
                 }
               ]
             }
@@ -1124,24 +1064,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -1156,16 +1084,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    },
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -1188,12 +1112,8 @@
                           "type": "string"
                         },
                         {
-                          "anyOf": [
-                            {
-                              "enum": ["au.income-tax.annual"],
-                              "type": "string"
-                            }
-                          ]
+                          "enum": ["au.income-tax.annual"],
+                          "type": "string"
                         }
                       ]
                     },
@@ -1203,20 +1123,12 @@
                         "jurisdiction": {
                           "anyOf": [
                             {
-                              "anyOf": [
-                                {
-                                  "enum": ["AU"],
-                                  "type": "string"
-                                }
-                              ]
+                              "enum": ["AU"],
+                              "type": "string"
                             },
                             {
-                              "anyOf": [
-                                {
-                                  "enum": ["AU"],
-                                  "type": "string"
-                                }
-                              ]
+                              "enum": ["AU"],
+                              "type": "string"
                             }
                           ]
                         },
@@ -1363,12 +1275,8 @@
                   "type": "string"
                 },
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["au.income-tax.annual"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
                 }
               ]
             }
@@ -1433,24 +1341,12 @@
                   "jurisdiction": {
                     "anyOf": [
                       {
-                        "anyOf": [
-                          {
-                            "anyOf": [
-                              {
-                                "enum": ["AU"],
-                                "type": "string"
-                              }
-                            ]
-                          },
-                          {
-                            "anyOf": [
-                              {
-                                "enum": ["AU"],
-                                "type": "string"
-                              }
-                            ]
-                          }
-                        ]
+                        "enum": ["AU"],
+                        "type": "string"
+                      },
+                      {
+                        "enum": ["AU"],
+                        "type": "string"
                       },
                       {
                         "type": "null"
@@ -1460,16 +1356,12 @@
                   "taxYear": {
                     "anyOf": [
                       {
-                        "anyOf": [
-                          {
-                            "enum": ["2025-26"],
-                            "type": "string"
-                          },
-                          {
-                            "enum": ["2025-26"],
-                            "type": "string"
-                          }
-                        ]
+                        "enum": ["2025-26"],
+                        "type": "string"
+                      },
+                      {
+                        "enum": ["2025-26"],
+                        "type": "string"
                       },
                       {
                         "type": "null"
@@ -1504,12 +1396,8 @@
                               "type": "string"
                             },
                             {
-                              "anyOf": [
-                                {
-                                  "enum": ["au.income-tax.annual"],
-                                  "type": "string"
-                                }
-                              ]
+                              "enum": ["au.income-tax.annual"],
+                              "type": "string"
                             }
                           ]
                         },
@@ -1519,20 +1407,12 @@
                             "jurisdiction": {
                               "anyOf": [
                                 {
-                                  "anyOf": [
-                                    {
-                                      "enum": ["AU"],
-                                      "type": "string"
-                                    }
-                                  ]
+                                  "enum": ["AU"],
+                                  "type": "string"
                                 },
                                 {
-                                  "anyOf": [
-                                    {
-                                      "enum": ["AU"],
-                                      "type": "string"
-                                    }
-                                  ]
+                                  "enum": ["AU"],
+                                  "type": "string"
                                 }
                               ]
                             },
@@ -1790,12 +1670,8 @@
                   "type": "string"
                 },
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["au.income-tax.annual"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
                 }
               ]
             }
@@ -1807,24 +1683,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -1839,16 +1703,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    },
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -1877,12 +1737,8 @@
                               "type": "string"
                             },
                             {
-                              "anyOf": [
-                                {
-                                  "enum": ["au.income-tax.annual"],
-                                  "type": "string"
-                                }
-                              ]
+                              "enum": ["au.income-tax.annual"],
+                              "type": "string"
                             }
                           ]
                         },
@@ -1892,20 +1748,12 @@
                             "jurisdiction": {
                               "anyOf": [
                                 {
-                                  "anyOf": [
-                                    {
-                                      "enum": ["AU"],
-                                      "type": "string"
-                                    }
-                                  ]
+                                  "enum": ["AU"],
+                                  "type": "string"
                                 },
                                 {
-                                  "anyOf": [
-                                    {
-                                      "enum": ["AU"],
-                                      "type": "string"
-                                    }
-                                  ]
+                                  "enum": ["AU"],
+                                  "type": "string"
                                 }
                               ]
                             },
@@ -2276,12 +2124,8 @@
                   "type": "string"
                 },
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["au.income-tax.annual"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
                 }
               ]
             }
@@ -2316,24 +2160,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -2348,16 +2180,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    },
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -2386,12 +2214,8 @@
                               "type": "string"
                             },
                             {
-                              "anyOf": [
-                                {
-                                  "enum": ["au.income-tax.annual"],
-                                  "type": "string"
-                                }
-                              ]
+                              "enum": ["au.income-tax.annual"],
+                              "type": "string"
                             }
                           ]
                         },
@@ -2401,20 +2225,12 @@
                             "jurisdiction": {
                               "anyOf": [
                                 {
-                                  "anyOf": [
-                                    {
-                                      "enum": ["AU"],
-                                      "type": "string"
-                                    }
-                                  ]
+                                  "enum": ["AU"],
+                                  "type": "string"
                                 },
                                 {
-                                  "anyOf": [
-                                    {
-                                      "enum": ["AU"],
-                                      "type": "string"
-                                    }
-                                  ]
+                                  "enum": ["AU"],
+                                  "type": "string"
                                 }
                               ]
                             },
@@ -4899,20 +4715,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["au.pay.take-home", "au.pay.withholdings"],
-                      "type": "string"
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["au.income-tax.annual"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -4927,24 +4735,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -4959,16 +4755,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    },
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -5066,20 +4858,12 @@
                           "code": {
                             "anyOf": [
                               {
-                                "anyOf": [
-                                  {
-                                    "enum": ["AU"],
-                                    "type": "string"
-                                  }
-                                ]
+                                "enum": ["AU"],
+                                "type": "string"
                               },
                               {
-                                "anyOf": [
-                                  {
-                                    "enum": ["AU"],
-                                    "type": "string"
-                                  }
-                                ]
+                                "enum": ["AU"],
+                                "type": "string"
                               }
                             ]
                           },
@@ -5134,20 +4918,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["au.pay.take-home", "au.pay.withholdings"],
-                      "type": "string"
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["au.income-tax.annual"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -5162,24 +4938,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -5194,16 +4958,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    },
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -5417,24 +5177,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    },
-                    {
-                      "anyOf": [
-                        {
-                          "enum": ["AU"],
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ]
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -5449,16 +5197,12 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    },
-                    {
-                      "enum": ["2025-26"],
-                      "type": "string"
-                    }
-                  ]
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
                 },
                 {
                   "type": "null"
@@ -5481,20 +5225,12 @@
                           "jurisdiction": {
                             "anyOf": [
                               {
-                                "anyOf": [
-                                  {
-                                    "enum": ["AU"],
-                                    "type": "string"
-                                  }
-                                ]
+                                "enum": ["AU"],
+                                "type": "string"
                               },
                               {
-                                "anyOf": [
-                                  {
-                                    "enum": ["AU"],
-                                    "type": "string"
-                                  }
-                                ]
+                                "enum": ["AU"],
+                                "type": "string"
                               }
                             ]
                           },

@@ -62,6 +62,9 @@ read and does not acquire the generated client. Loaders hold no request atoms
 and add no second cache. `pages/loaders.ts` selects the server or browser branch with
 `createIsomorphicFn`; failures become TanStack `notFound()` or a
 `WebsiteLoadError` for the route's error component.
+The host sets 404 for missing documentation, 503 for unavailable reads and 500
+for internal defects or a checked API reply for the wrong page. These explicit
+statuses survive TanStack's native error rendering; error details remain private.
 
 The Website's own address comes from its native `Worker.URL`, the API address
 from the API resource's Output and canonical links from the fixed publication

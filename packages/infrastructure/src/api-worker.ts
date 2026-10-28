@@ -1,5 +1,5 @@
-import { Worker } from "alchemy/Cloudflare/Workers";
-import type { InferEnv } from "alchemy/Cloudflare/Workers";
+import { Worker } from "@alchemy.run/cloudflare/Workers";
+import type { InferEnv } from "@alchemy.run/cloudflare/Workers";
 import type { HttpEffect } from "alchemy/Http";
 
 // Deployment identity only. Root composition supplies the app implementation;

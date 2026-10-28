@@ -1,3 +1,13 @@
+import {
+  makeSourceContext,
+  Providers,
+  resolveSource,
+} from "@alchemy.run/cloudflare";
+import { BotManagement } from "@alchemy.run/cloudflare/BotManagement";
+import { Dnssec, ZoneDnsSettings } from "@alchemy.run/cloudflare/DNS";
+import { Worker, isSelfUrl } from "@alchemy.run/cloudflare/Workers";
+import type { WorkerBindingProps } from "@alchemy.run/cloudflare/Workers";
+import { Setting, Zone } from "@alchemy.run/cloudflare/Zone";
 import { BunServices } from "@effect/platform-bun";
 import { describe, expect, it } from "@effect/vitest";
 import {
@@ -26,16 +36,6 @@ import {
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
-import {
-  makeSourceContext,
-  Providers,
-  resolveSource,
-} from "alchemy/Cloudflare";
-import { BotManagement } from "alchemy/Cloudflare/BotManagement";
-import { Dnssec, ZoneDnsSettings } from "alchemy/Cloudflare/DNS";
-import { Worker, isSelfUrl } from "alchemy/Cloudflare/Workers";
-import type { WorkerBindingProps } from "alchemy/Cloudflare/Workers";
-import { Setting, Zone } from "alchemy/Cloudflare/Zone";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
@@ -389,6 +389,9 @@ const graphEnvironment = Effect.provide(
         delete: () => Effect.die("Unexpected credential write"),
         deleteProfile: () => Effect.die("Unexpected credential write"),
         read: () => Effect.die("Unexpected credential read"),
+        scoped() {
+          return this;
+        },
         write: () => Effect.die("Unexpected credential write"),
       })
     ),
@@ -1080,6 +1083,8 @@ describe("Website build-input hash", () => {
             "packages/api/http/test/routes.test.ts",
             "packages/infrastructure/test/hostnames.test.ts",
             "packages/content/node_modules/effect/src/index.ts",
+            "packages/api/http/node_modules/effect/src/index.ts",
+            "packages/rules/au/pay/node_modules/effect/src/index.ts",
             "packages/content/node_modules/effect/package.json",
             "packages/content/dist/schemas.js",
             "apps/web/node_modules/dep/index.js",

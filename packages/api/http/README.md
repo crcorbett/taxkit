@@ -406,8 +406,10 @@ codec; the committed normalized snapshot remains the wire-contract oracle.
 Generated OpenAPI explicitly bounds `Money.cents` from -9007199254740991 to
 9007199254740991. Core's [Cents schema](../../core/src/primitives/money.ts)
 already checks `Schema.Int`, which accepts only JavaScript safe integers.
-Effect 4.0.4 makes those existing bounds explicit in the generated metadata;
+Effect 4 makes those existing bounds explicit in the generated metadata;
 request/response decoding and accepted money values retain that contract.
+Effect 4.0.6 flattens redundant nested `anyOf` groups in the generated snapshot;
+the allowed request and response values stay the same.
 The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
 The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
 `check-types` covers the HTTP comparison test. Both retain canonical branded

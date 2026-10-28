@@ -4,7 +4,6 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "main": "dist/index.js",
   "exports": {
     "./worker": "./src/worker.ts"
   },
@@ -20,6 +19,7 @@
     "docs-catalogue": "bun scripts/docs-catalogue.runtime.ts"
   },
   "dependencies": {
+    "@alchemy.run/cloudflare": "catalog:",
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
     "@taxkit/aeo": "workspace:*",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@content/docs": "workspace:*",
     "@effect/vitest": "catalog:",
-    "@modelcontextprotocol/client": "2.3.1",
+    "@modelcontextprotocol/client": "2.4.0",
     "@taxkit/diagrams": "workspace:*",
     "@taxkit/mdx": "workspace:*",
     "@taxkit/og-image": "workspace:*",

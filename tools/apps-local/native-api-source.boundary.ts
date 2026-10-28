@@ -1,9 +1,9 @@
+import { Providers } from "@alchemy.run/cloudflare";
+import { Worker } from "@alchemy.run/cloudflare/Workers";
 import { TaxKitApiWorker } from "@taxkit/infrastructure/api-worker";
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
-import { Providers } from "alchemy/Cloudflare";
-import { Worker } from "alchemy/Cloudflare/Workers";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Provider from "alchemy/Provider";
 import * as Stack from "alchemy/Stack";
@@ -70,6 +70,9 @@ export const nativeApiSourceProps = Effect.gen(function* () {
             delete: () => blocked,
             deleteProfile: () => blocked,
             read: () => blocked,
+            scoped() {
+              return this;
+            },
             write: () => blocked,
           })
         ),

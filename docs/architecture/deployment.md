@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-28
 review_trigger: Alchemy graph, stage, provider resource, state, domain, cache or rollback change
 ---
 
@@ -17,7 +17,13 @@ This owner describes the deployed resources and their boundaries. The
 `alchemy.run.ts` declares the `TaxKitAppsCloudflare` stack with Cloudflare
 providers, `Cloudflare.state()` and the native secrets in
 `@taxkit/infrastructure/secrets` (local state and the shell only for a `dev_*`
-stage). Root `alchemy.apps.ts` composes the app
+stage). Alchemy beta.84 supplies Cloudflare, Axiom and Doppler through the
+separate `@alchemy.run/cloudflare`, `@alchemy.run/axiom` and
+`@alchemy.run/doppler` packages; their versions match `alchemy`. The native CLI
+discovers provider contributions from the installed packages. Website builds
+also need the optional `@alchemy.run/frontend-frameworks` peer. The package
+split preserves the existing stack, stage, resource and hosted-state identities.
+Root `alchemy.apps.ts` composes the app
 implementation with the lightweight `@taxkit/infrastructure/api-worker` declaration
 and `./worker-settings`. `@taxkit/infrastructure/apps-stack` declares infrastructure
 and host props without importing an app. Together these declare:
@@ -64,12 +70,13 @@ content-only change deploys new versions of both and starts new caches.
 `websiteBuildMemo` in `packages/infrastructure/src/apps-stack.ts` uses
 Alchemy's documented sibling-package include form: `**/*` inside `apps/web`
 (filtered by `.gitignore`, which an `exclude` list would switch off) plus
-`../` patterns for package `src`, manifests and tsconfigs at each nesting
-depth, the authored `content/docs` sources and the root tsconfig, with the lockfile
-standing for installed dependencies. `../` patterns skip `.gitignore` and
-follow links, so a wildcard depth also reaches each package's `node_modules`
-(the store holds about 1.2 million files); negated patterns prune installed,
-built and test files. `workspaces: []` turns off Vite's auto-detected
+`../` patterns for package `src`, manifests and tsconfigs under the actual
+workspace roots (`packages/*`, `packages/api/*`, `packages/sdk/*` and
+`packages/rules/au/*`), the authored `content/docs` sources and the root tsconfig.
+The lockfile stands for installed dependencies. Parent-directory patterns bypass
+`.gitignore`; following workspace roots keeps them from traversing installed
+packages. Tests and built output live outside each package's `src`.
+`workspaces: []` turns off Vite's auto-detected
 workspaces, which hash whole package folders. Tests, READMEs and CHANGELOGs
 therefore leave the hash unchanged, so a version-packages change does not
 redeploy the Website; `tools/infrastructure/apps-stack.test.ts` proves both
@@ -92,7 +99,9 @@ state, own TaxKit's part:
 | `TaxKitTraceExport/prod` | `TaxKitAxiomTraces` | Retained destination named `taxkit-axiom-traces` for Site's traces dataset. No Worker attaches it (see below). |
 
 Both stacks use `@taxkit/infrastructure/telemetry` for providers, state and
-the ordinary native secrets, and refuse every stage but `prod`. The Axiom
+the ordinary native secrets, and refuse every stage but `prod`. Destination
+authorization headers stay `Redacted` through resource declaration and state;
+only the native provider unwraps them for its HTTP request. The Axiom
 provider reads the TaxKit management key `AXIOM_TOKEN` from `taxkit/prd`.
 
 The Production API and Website read `TaxKitTraceExport/prod`'s persisted
@@ -130,12 +139,14 @@ declared only for `prod` and its provider never deletes it. PostHog collection
 remains postponed; the app graph references no analytics project. The
 [infrastructure guide](../../packages/infrastructure/README.md) owns its details.
 
-## Known limit
+## Redirect reconciliation
 
-The native redirect provider treats a failed read of the zone's shared redirect
-ruleset as an empty ruleset, and uploads the Worker before writing the redirect
-rule. See the runbook's known limits before another owner adds redirect rules
-to the zone.
+Alchemy beta.84 treats only `RulesetNotFound` as an absent shared redirect
+ruleset. Authentication and other read failures stop redirect writes; existing
+rules owned elsewhere in the zone are preserved after a successful read.
+The Worker upload still precedes redirect reconciliation, so a failed redirect
+operation can leave the new Worker live. The native provider fixture covers
+forbidden, absent and existing rulesets and reads back deployment/version IDs.
 
 ## Related owners
 

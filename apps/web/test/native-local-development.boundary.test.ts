@@ -23,6 +23,7 @@ const LocalOrigin = Schema.String.check(
 const LocalResource = Schema.fromJsonString(
   Schema.Struct({
     props: Schema.Struct({
+      main: Schema.OptionFromOptionalKey(Schema.String),
       observability: Schema.Struct({
         enabled: Schema.Literal(false),
         headSamplingRate: Schema.Literal(0),
@@ -87,10 +88,11 @@ describe("native local development", () => {
         const origins = yield* Effect.gen(function* () {
           const child = yield* spawner.spawn(
             ChildProcess.make(
-              "bun",
+              "node",
               [
-                "run",
-                "node_modules/alchemy/bin/cli.js",
+                "--import",
+                "./node_modules/alchemy/bin/register-oxc.js",
+                "node_modules/alchemy/bin/alchemy.js",
                 "dev",
                 "--stage",
                 "dev_native_apps_proof",
@@ -120,7 +122,12 @@ describe("native local development", () => {
               while: (text) =>
                 !text.includes("apiUrl:") || !text.includes("websiteUrl:"),
             }),
-            Effect.timeout("35 seconds")
+            Effect.timeout("35 seconds"),
+            Effect.tapError(() =>
+              Ref.get(output).pipe(
+                Effect.flatMap((text) => Effect.logError(text.slice(-12_000)))
+              )
+            )
           );
           const apiAddress = yield* Schema.decodeUnknownEffect(
             Schema.Struct({ origin: LocalOrigin })
@@ -325,13 +332,18 @@ describe("native local development", () => {
               )
               .pipe(Effect.flatMap(Schema.decodeUnknownEffect(LocalResource)))
           );
-          const apiState = yield* fs.readFileString(
-            path.join(
-              root,
-              ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof/TaxKitApi.json"
+          const apiState = yield* fs
+            .readFileString(
+              path.join(
+                root,
+                ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof/TaxKitApi.json"
+              )
             )
+            .pipe(Effect.flatMap(Schema.decodeEffect(LocalResource)));
+          // Native state stores a portable entry relative to the stack root.
+          expect(apiState.props.main).toEqual(
+            Option.some("apps/api/src/worker.ts")
           );
-          expect(apiState).toContain("/apps/api/src/worker.ts");
           expect(yield* fs.readDirectory(auth)).toEqual(["logs", "profiles"]);
           expect(
             yield* fs.glob("**/*", { root: path.join(auth, "profiles") })
@@ -395,10 +407,11 @@ describe("native local development", () => {
             Effect.gen(function* () {
               const child = yield* spawner.spawn(
                 ChildProcess.make(
-                  "bun",
+                  "node",
                   [
-                    "run",
-                    "node_modules/alchemy/bin/cli.js",
+                    "--import",
+                    "./node_modules/alchemy/bin/register-oxc.js",
+                    "node_modules/alchemy/bin/alchemy.js",
                     attempt.command,
                     "--stage",
                     attempt.stage,

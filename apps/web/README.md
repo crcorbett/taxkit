@@ -97,9 +97,10 @@ loader or the incoming request is aborted; browser loads use the loader's own
 `AbortSignal`, which cancels the HTTP call. `src/lib/pages/load.failure.ts` turns a
 missing documentation page into TanStack `notFound()` (HTTP 404) and any other
 failure into `WebsiteLoadError`, rendered by the route's error component.
-Interruption stays interruption. Failed server page loads (settings
-unavailable, a documentation build mismatch, search unavailable) reply 500 with
-`no-store`.
+Internal defects and mismatched checked pages carry 500; unavailable reads
+carry 503, and missing documentation remains a native 404.
+Interruption stays interruption. Failed server page loads retain their error
+status and reply with `no-store`.
 
 ## Settings
 
@@ -254,7 +255,9 @@ hydration and form unmount.
 
 `build:native-pair` builds the API dependency graph and then both apps with
 Alchemy's native builders, without a cloud provider, state or credentials. Its
-API output is under the ignored `.alchemy/native-pair`; the Website output is
+API output is under the ignored `.alchemy/native-pair`; the harness explicitly
+sets each fixture's output directory because Alchemy beta.84 keeps standalone
+bundles in memory by default. The Website output is
 `dist/server/server.js`. A standalone Vite build writes `dist/server/index.js`
 instead, so run the native build immediately before its test. The root
 `bun run test:native` does both.
@@ -284,7 +287,7 @@ needs a native API binding, which the standalone Bun API cannot supply.
 
 The Vite config reads Alchemy's native plugin flag through a fresh
 ConfigProvider so it does not add a second Cloudflare plugin. Server code
-imports the runtime-only `alchemy/Cloudflare/Bridge` export.
+imports the runtime-only `@alchemy.run/cloudflare/Bridge` export.
 
 ## Related owners
 

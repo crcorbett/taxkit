@@ -1,5 +1,5 @@
-import * as Axiom from "alchemy/Axiom";
-import * as Cloudflare from "alchemy/Cloudflare";
+import * as Axiom from "@alchemy.run/axiom";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Output from "alchemy/Output";
 import { retain } from "alchemy/RemovalPolicy";
 import { Effect, Redacted } from "effect";
@@ -21,7 +21,7 @@ const ingestAuthorization = Effect.gen(function* () {
     taxKitObservabilityProduction
   );
   return token.token.pipe(
-    Output.map((secret) => `Bearer ${Redacted.value(secret)}`)
+    Output.map((secret) => Redacted.make(`Bearer ${Redacted.value(secret)}`))
   );
 });
 

@@ -76,8 +76,10 @@ DNSSEC and a bot policy that bans no user agent, as in Common Practice, attaches
 redirect) to the Website and `api.taxkit.dev` to the API. Neither
 Production Worker has a `workers.dev` address; Local and Preview graphs declare no
 domains and keep their stable `workers.dev` address without version previews.
-The native redirect provider treats a failed shared-ruleset read as absence;
-the focused provider test records that limit.
+The native redirect provider treats only `RulesetNotFound` as absence and stops
+redirect writes on other read failures. The focused provider test proves that
+behavior and preservation of existing foreign rules, and checks the native
+deployment/version readback.
 
 ## Local development
 

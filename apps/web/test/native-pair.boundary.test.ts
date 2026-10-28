@@ -2464,8 +2464,8 @@ describe("built native API and Website", () => {
             `${websiteOrigin}/search?term=Quickstart`
           )
         );
-        // A failed search load is a server error page, never a shared reply.
-        expect(unavailableSearch.status).toBe(500);
+        // TanStack preserves the explicit unavailable status; this is never a shared reply.
+        expect(unavailableSearch.status).toBe(503);
         expect(unavailableSearch.headers.get("cache-control")).toBe("no-store");
         expect(
           unavailableSearch.headers.get("cloudflare-cdn-cache-control")

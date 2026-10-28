@@ -104,6 +104,9 @@ const graphEnvironment = Effect.provide(
         delete: () => Effect.die("Unexpected credential write"),
         deleteProfile: () => Effect.die("Unexpected credential write"),
         read: () => Effect.die("Unexpected credential read"),
+        scoped() {
+          return this;
+        },
         write: () => Effect.die("Unexpected credential write"),
       })
     ),

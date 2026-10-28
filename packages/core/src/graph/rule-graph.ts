@@ -201,19 +201,16 @@ export const validateRuleGraph = (args: {
     (issues, rule) => {
       const sources = HashSet.fromIterable(Array.map(rule.sources, sourceKey));
 
-      return Array.reduce(
-        rule.parameters,
-        issues,
-        (updatedIssues, parameter) =>
-          HashSet.has(sources, sourceKey(parameter.source))
-            ? updatedIssues
-            : Array.append(
-                updatedIssues,
-                makeIssue(
-                  "parameter-source-mismatch",
-                  `${rule.id} parameter ${parameter.id} source must be listed on rule sources`
-                )
+      return Array.reduce(rule.parameters, issues, (updatedIssues, parameter) =>
+        HashSet.has(sources, sourceKey(parameter.source))
+          ? updatedIssues
+          : Array.append(
+              updatedIssues,
+              makeIssue(
+                "parameter-source-mismatch",
+                `${rule.id} parameter ${parameter.id} source must be listed on rule sources`
               )
+            )
       );
     }
   );

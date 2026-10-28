@@ -1,6 +1,6 @@
+import * as Axiom from "@alchemy.run/axiom";
+import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Alchemy from "alchemy";
-import * as Axiom from "alchemy/Axiom";
-import * as Cloudflare from "alchemy/Cloudflare";
 import * as Output from "alchemy/Output";
 import { Stage } from "alchemy/Stage";
 import { Config, ConfigProvider, Effect, Layer, Schema } from "effect";
@@ -89,9 +89,14 @@ export const taxKitLogsDestinationProduction =
  * the ordinary native sources. Both provider Layers read HttpClient from the
  * stack services, so neither depends on the other.
  */
+const telemetryProviders: Layer.Layer<
+  Cloudflare.Providers | Axiom.Providers,
+  never,
+  Alchemy.StackServices
+> = Layer.mergeAll(Cloudflare.providers(), Axiom.providers());
+
 export const telemetryStackProps = {
-  // @effect-diagnostics-next-line layerMergeAllWithDependencies:off
-  providers: Layer.mergeAll(Cloudflare.providers(), Axiom.providers()),
+  providers: telemetryProviders,
   secrets: deploymentSecrets,
   state: Cloudflare.state(),
 };

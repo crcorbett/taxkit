@@ -1,3 +1,6 @@
+import * as Axiom from "@alchemy.run/axiom";
+import * as Cloudflare from "@alchemy.run/cloudflare";
+import { ObservabilityDestination } from "@alchemy.run/cloudflare/Workers";
 import { BunServices } from "@effect/platform-bun";
 import { describe, expect, it } from "@effect/vitest";
 import { AlchemyContext } from "alchemy/AlchemyContext";
@@ -5,9 +8,6 @@ import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
 import { AuthProviders } from "alchemy/Auth/AuthProvider";
 import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
-import * as Axiom from "alchemy/Axiom";
-import * as Cloudflare from "alchemy/Cloudflare";
-import { ObservabilityDestination } from "alchemy/Cloudflare/Workers";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
@@ -64,6 +64,9 @@ const environment = Effect.provide(
         delete: () => Effect.die("Unexpected credential write"),
         deleteProfile: () => Effect.die("Unexpected credential write"),
         read: () => Effect.die("Unexpected credential read"),
+        scoped() {
+          return this;
+        },
         write: () => Effect.die("Unexpected credential write"),
       })
     ),
@@ -225,7 +228,7 @@ const Destination = Schema.Struct({
   props: Schema.Struct({
     enabled: Schema.Literal(true),
     headers: Schema.Struct({
-      Authorization: Schema.String,
+      Authorization: Schema.Redacted(Schema.String),
       "X-Axiom-Dataset": Schema.String,
     }),
     logpushDataset: Schema.String,
@@ -386,7 +389,8 @@ describe("production-only telemetry stacks", () => {
           Array.every(
             destinations,
             ({ props }) =>
-              props.headers.Authorization === `Bearer ${ingestSentinel}`
+              Redacted.value(props.headers.Authorization) ===
+              `Bearer ${ingestSentinel}`
           )
         ).toBe(true);
         // Workers read only the two names; headers never become outputs.

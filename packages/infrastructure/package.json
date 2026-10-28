@@ -21,7 +21,11 @@
     "test": "bun --bun vitest run"
   },
   "dependencies": {
-    "@distilled.cloud/posthog": "1.0.0-rc.13",
+    "@alchemy.run/axiom": "catalog:",
+    "@alchemy.run/cloudflare": "catalog:",
+    "@alchemy.run/doppler": "catalog:",
+    "@alchemy.run/frontend-frameworks": "catalog:",
+    "@distilled.cloud/posthog": "1.0.0-rc.17",
     "@taxkit/analytics": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "alchemy": "catalog:",

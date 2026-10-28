@@ -1,4 +1,4 @@
-import * as Doppler from "alchemy/Doppler";
+import * as Doppler from "@alchemy.run/doppler";
 import { retain } from "alchemy/RemovalPolicy";
 import * as Secrets from "alchemy/Secrets";
 import type { StackSecrets } from "alchemy/Stack";
