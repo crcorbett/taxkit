@@ -287,10 +287,8 @@ describe("native cache policy response boundary", () => {
       const checked = applyCachePolicy(native, publicReadRequest);
       const outgoing = HttpServerResponse.toWeb(checked);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          cacheHeaderNames,
-          EffectArray.map((name) => outgoing.headers.get(name))
-        ),
+        cacheHeaderNames,
+        EffectArray.map((name) => outgoing.headers.get(name)),
         (actual) => {
           expect(actual).toStrictEqual([
             privateCacheControl,
@@ -437,10 +435,8 @@ describe("native cache policy response boundary", () => {
     const checked = applyCachePolicy(native, publicReadRequest);
     const outgoing = HttpServerResponse.toWeb(checked);
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        cacheHeaderNames,
-        EffectArray.map((name) => outgoing.headers.get(name))
-      ),
+      cacheHeaderNames,
+      EffectArray.map((name) => outgoing.headers.get(name)),
       (actual) => {
         expect(actual).toStrictEqual([
           privateCacheControl,

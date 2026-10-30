@@ -275,10 +275,8 @@ it.effect.each([200, 204, 302, 500])(
       const signals = yield* Ref.get(seen);
       expect(signals).toHaveLength(1);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          signals,
-          Array.every((signal) => signal.aborted)
-        ),
+        signals,
+        Array.every((signal) => signal.aborted),
         (actual) => {
           expect(actual).toBeTruthy();
         }

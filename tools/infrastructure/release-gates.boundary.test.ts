@@ -241,12 +241,10 @@ describe("required native release gate", () => {
         // One trusted gate with the remote cache, one credential-free fork gate.
         expect(gates).toHaveLength(2);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            gates,
-            Array.every(
-              ({ "continue-on-error": stepMayFail }) =>
-                !Option.getOrElse(stepMayFail, () => false)
-            )
+          gates,
+          Array.every(
+            ({ "continue-on-error": stepMayFail }) =>
+              !Option.getOrElse(stepMayFail, () => false)
           ),
           (actual) => {
             expect(actual).toBeTruthy();
@@ -254,21 +252,19 @@ describe("required native release gate", () => {
         );
         // No other job repeats verification for the same revision.
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            Record.toEntries(configuration.jobs),
-            Array.flatMap(([name, job]) =>
-              EffectBoolean.match(
-                EffectFunction.pipe(
-                  job.steps,
-                  Array.some((step) =>
-                    Option.contains(step.run, "bun run verification")
-                  )
-                ),
-                {
-                  onFalse: () => [],
-                  onTrue: () => [name],
-                }
-              )
+          Record.toEntries(configuration.jobs),
+          Array.flatMap(([name, job]) =>
+            EffectBoolean.match(
+              EffectFunction.pipe(
+                job.steps,
+                Array.some((step) =>
+                  Option.contains(step.run, "bun run verification")
+                )
+              ),
+              {
+                onFalse: () => [],
+                onTrue: () => [name],
+              }
             )
           ),
           (actual) => {
@@ -324,10 +320,8 @@ describe("required native release gate", () => {
             )
         ).pipe(Effect.map(Array.flatten));
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            providerJobs,
-            Array.map(({ file, name }) => `${file}#${name}`)
-          ),
+          providerJobs,
+          Array.map(({ file, name }) => `${file}#${name}`),
           (actual) => {
             expect(actual).toStrictEqual([
               "checks.yml#deploy",
@@ -387,12 +381,10 @@ describe("required native release gate", () => {
                 }
               );
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  job.steps,
-                  Array.some((step) =>
-                    Option.exists(step.if, (condition) =>
-                      statusOverride.test(condition)
-                    )
+                job.steps,
+                Array.some((step) =>
+                  Option.exists(step.if, (condition) =>
+                    statusOverride.test(condition)
                   )
                 ),
                 (actual) => {
@@ -400,11 +392,9 @@ describe("required native release gate", () => {
                 }
               );
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  job.steps,
-                  Array.filter((step) =>
-                    Option.exists(step.run, (run) => providerCommand.test(run))
-                  )
+                job.steps,
+                Array.filter((step) =>
+                  Option.exists(step.run, (run) => providerCommand.test(run))
                 ),
                 (actual) => {
                   expect(actual).toHaveLength(2);
@@ -458,19 +448,17 @@ describe("required native release gate", () => {
                 }
               );
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  job.steps,
-                  Array.every(
-                    (step) =>
-                      !Option.exists(step.env, (env) =>
-                        Record.has(env, "DOPPLER_TOKEN")
-                      ) ||
-                      Option.exists(step.run, (run) =>
-                        /^bun run (?:pr|production):(?:plan|deploy|destroy|drift)\b/u.test(
-                          run
-                        )
+                job.steps,
+                Array.every(
+                  (step) =>
+                    !Option.exists(step.env, (env) =>
+                      Record.has(env, "DOPPLER_TOKEN")
+                    ) ||
+                    Option.exists(step.run, (run) =>
+                      /^bun run (?:pr|production):(?:plan|deploy|destroy|drift)\b/u.test(
+                        run
                       )
-                  )
+                    )
                 ),
                 (actual) => {
                   expect(actual).toBeTruthy();
@@ -506,11 +494,9 @@ describe("required native release gate", () => {
           Record.values(configuration.jobs),
           Array.flatMap((job) =>
             EffectFunction.pipe(
-              EffectFunction.pipe(
-                job.steps,
-                Array.filter((step) =>
-                  Option.exists(step.run, (run) => run.includes("--yes"))
-                )
+              job.steps,
+              Array.filter((step) =>
+                Option.exists(step.run, (run) => run.includes("--yes"))
               ),
               Array.map((step) => ({ job, step }))
             )
@@ -573,22 +559,13 @@ describe("required native release gate", () => {
     ({ args }) =>
       Effect.gen(function* () {
         const fixture = yield* commandFixture;
-        const result = yield* EffectFunction.pipe(fixture, (argument1) =>
-          EffectFunction.pipe(
-            script(fixture.scripts, "pr:destroy"),
-            (argument2) =>
-              EffectFunction.pipe("", (argument3) =>
-                EffectFunction.pipe(args, (argument4) =>
-                  runCommand({
-                    fixture: argument1,
-                    command: argument2,
-                    fail: argument3,
-                    args: argument4,
-                  })
-                )
-              )
-          )
-        );
+        const destroyCommand = script(fixture.scripts, "pr:destroy");
+        const result = yield* runCommand({
+          fixture,
+          command: destroyCommand,
+          fail: "",
+          args,
+        });
         expect(result.code).toBe(64);
         expect(result.calls).toStrictEqual([]);
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
@@ -598,22 +575,13 @@ describe("required native release gate", () => {
     () =>
       Effect.gen(function* () {
         const fixture = yield* commandFixture;
-        const result = yield* EffectFunction.pipe(fixture, (argument5) =>
-          EffectFunction.pipe(
-            script(fixture.scripts, "pr:destroy"),
-            (argument6) =>
-              EffectFunction.pipe("", (argument7) =>
-                EffectFunction.pipe(["pr-123", "--yes"], (argument8) =>
-                  runCommand({
-                    fixture: argument5,
-                    command: argument6,
-                    fail: argument7,
-                    args: argument8,
-                  })
-                )
-              )
-          )
-        );
+        const destroyCommand = script(fixture.scripts, "pr:destroy");
+        const result = yield* runCommand({
+          fixture,
+          command: destroyCommand,
+          fail: "",
+          args: ["pr-123", "--yes"],
+        });
         expect(result.code).toBe(0);
         expect(result.calls).toStrictEqual([
           "run build --filter=api",
@@ -624,22 +592,13 @@ describe("required native release gate", () => {
   it.effect("does not import the destroy stack if the API build fails", () =>
     Effect.gen(function* () {
       const fixture = yield* commandFixture;
-      const result = yield* EffectFunction.pipe(fixture, (argument9) =>
-        EffectFunction.pipe(
-          script(fixture.scripts, "pr:destroy"),
-          (argument10) =>
-            EffectFunction.pipe("run build --filter=api", (argument11) =>
-              EffectFunction.pipe(["pr-123", "--yes"], (argument12) =>
-                runCommand({
-                  fixture: argument9,
-                  command: argument10,
-                  fail: argument11,
-                  args: argument12,
-                })
-              )
-            )
-        )
-      );
+      const destroyCommand = script(fixture.scripts, "pr:destroy");
+      const result = yield* runCommand({
+        fixture,
+        command: destroyCommand,
+        fail: "run build --filter=api",
+        args: ["pr-123", "--yes"],
+      });
       expect(result.code).not.toBe(0);
       expect(result.calls).toStrictEqual(["run build --filter=api"]);
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))

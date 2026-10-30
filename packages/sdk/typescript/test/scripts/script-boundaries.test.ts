@@ -337,32 +337,22 @@ it.effect.each([
       Effect.gen(function* () {
         const call = yield* Ref.getAndUpdate(calls, (n) => n + 1);
         expect(yield* Ref.get(closed)).toBe(call);
-        return yield* Effect.acquireRelease(
-          Effect.succeed(
-            EffectFunction.pipe(
-              Stream.make(
-                new TextEncoder().encode(
-                  Match.value(call).pipe(
-                    Match.when(0, (): "/tmp/fixture.tgz" => "/tmp/fixture.tgz"),
-                    Match.when(1, () => packedListing),
-                    Match.orElse((): "" => "")
-                  )
-                )
-              ),
-              (argument1) =>
-                EffectFunction.pipe("success", (argument2) =>
-                  EffectFunction.pipe(
-                    Match.value(mode).pipe(
-                      Match.when("failed-command-and-cleanup", (): 23 => 23),
-                      Match.orElse((): 0 => 0)
-                    ),
-                    (argument3) =>
-                      handleFixture(argument1, argument2, argument3)
-                  )
-                )
+        const stdout = Stream.make(
+          new TextEncoder().encode(
+            Match.value(call).pipe(
+              Match.when(0, (): "/tmp/fixture.tgz" => "/tmp/fixture.tgz"),
+              Match.when(1, () => packedListing),
+              Match.orElse((): "" => "")
             )
-          ),
-          () => Ref.update(closed, (n) => n + 1)
+          )
+        );
+        const exitCode = Match.value(mode).pipe(
+          Match.when("failed-command-and-cleanup", (): 23 => 23),
+          Match.orElse((): 0 => 0)
+        );
+        const handle = handleFixture(stdout, "success", exitCode);
+        return yield* Effect.acquireRelease(Effect.succeed(handle), () =>
+          Ref.update(closed, (n) => n + 1)
         );
       })
     );
@@ -450,22 +440,15 @@ it.effect.each([
             onTrue: (): 23 => 23,
           }
         );
-        return EffectFunction.pipe(
-          Stream.make(
-            new TextEncoder().encode(
-              EffectBoolean.match(packing, {
-                onFalse: (): "" => "",
-                onTrue: (): "/tmp/fixture.tgz" => "/tmp/fixture.tgz",
-              })
-            )
-          ),
-          (argument4) =>
-            EffectFunction.pipe("success", (argument5) =>
-              EffectFunction.pipe(code, (argument6) =>
-                handleFixture(argument4, argument5, argument6)
-              )
-            )
+        const stdout = Stream.make(
+          new TextEncoder().encode(
+            EffectBoolean.match(packing, {
+              onFalse: (): "" => "",
+              onTrue: (): "/tmp/fixture.tgz" => "/tmp/fixture.tgz",
+            })
+          )
         );
+        return handleFixture(stdout, "success", code);
       })
     );
     const result = yield* checkDownstreamConsumer.pipe(
@@ -549,17 +532,10 @@ it.effect(
       const started = yield* Deferred.make<true>();
       const closed = yield* Ref.make(0);
       const removed = yield* Ref.make(0);
-      const handle = EffectFunction.pipe(
-        Stream.fromEffect(
-          Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
-        ),
-        (argument7) =>
-          EffectFunction.pipe("success", (argument8) =>
-            EffectFunction.pipe(0, (argument9) =>
-              handleFixture(argument7, argument8, argument9)
-            )
-          )
+      const stdout = Stream.fromEffect(
+        Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
       );
+      const handle = handleFixture(stdout, "success", 0);
       const spawner = ChildProcessSpawner.make(() =>
         Effect.acquireRelease(Effect.succeed(handle), () =>
           Ref.update(closed, (n) => n + 1)
@@ -705,15 +681,10 @@ it.effect.each(["packed", "downstream"] as const)(
     Effect.gen(function* () {
       const closed = yield* Ref.make(0);
       const removed = yield* Ref.make(0);
-      const handle = EffectFunction.pipe(
-        Stream.make(new TextEncoder().encode("x".repeat(1_048_577))),
-        (argument10) =>
-          EffectFunction.pipe("success", (argument11) =>
-            EffectFunction.pipe(0, (argument12) =>
-              handleFixture(argument10, argument11, argument12)
-            )
-          )
+      const stdout = Stream.make(
+        new TextEncoder().encode("x".repeat(1_048_577))
       );
+      const handle = handleFixture(stdout, "success", 0);
       const spawner = ChildProcessSpawner.make(() =>
         Effect.acquireRelease(Effect.succeed(handle), () =>
           Ref.update(closed, (n) => n + 1)

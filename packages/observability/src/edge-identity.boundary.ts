@@ -1,4 +1,4 @@
-import { Match, Option, Schema } from "effect";
+import { Option, Schema } from "effect";
 import { Headers } from "effect/http";
 
 export const CalculatorHostMode = Schema.Literals(["edge", "local-emulator"]);
@@ -13,11 +13,12 @@ export const edgeCallerKey = <Key>(
   headers: Headers.Headers,
   key: Schema.ConstraintDecoder<Key>
 ): Option.Option<Key> =>
-  Match.value(Headers.get(headers, "cf-worker")).pipe(
-    Match.when(Option.isSome, () => Option.none()),
-    Match.orElse(() =>
-      Headers.get(headers, "cf-connecting-ip").pipe(
-        Option.flatMap(Schema.decodeUnknownOption(key))
-      )
-    )
+  Headers.get(headers, "cf-worker").pipe(
+    Option.match({
+      onNone: () =>
+        Headers.get(headers, "cf-connecting-ip").pipe(
+          Option.flatMap(Schema.decodeUnknownOption(key))
+        ),
+      onSome: () => Option.none(),
+    })
   );

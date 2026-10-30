@@ -346,19 +346,15 @@ const nativeCollectionSemantics = HashSet.fromIterable(
 );
 const noNativeCollections: OxlintRule = {
   create(context) {
-    const tracker = EffectFunction.pipe(context.sourceCode, (argument1) =>
-      EffectFunction.pipe(
-        HashMap.fromIterable([
-          ...EffectFunction.pipe(
-            [...nativeCollectionConstructors],
-            EffectArray.map((name) => [name, `Native.${name}`] as const)
-          ),
-          ["globalThis", "Global"],
-          ["window", "Global"],
-        ]),
-        (argument2) => createBindingTracker(argument1, argument2)
-      )
-    );
+    const bindings = HashMap.fromIterable([
+      ...EffectFunction.pipe(
+        [...nativeCollectionConstructors],
+        EffectArray.map((name) => [name, `Native.${name}`] as const)
+      ),
+      ["globalThis", "Global"],
+      ["window", "Global"],
+    ]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     return {
       AssignmentExpression: tracker.trackAssignment,
       NewExpression(node) {
@@ -404,17 +400,13 @@ const objectWriteSemantics = HashSet.fromIterable([
 ]);
 const noObjectWrites: OxlintRule = {
   create(context) {
-    const tracker = EffectFunction.pipe(context.sourceCode, (argument3) =>
-      EffectFunction.pipe(
-        HashMap.fromIterable([
-          ["Object", "Global.Object"],
-          ["Reflect", "Global.Reflect"],
-          ["globalThis", "Global"],
-          ["window", "Global"],
-        ]),
-        (argument4) => createBindingTracker(argument3, argument4)
-      )
-    );
+    const bindings = HashMap.fromIterable([
+      ["Object", "Global.Object"],
+      ["Reflect", "Global.Reflect"],
+      ["globalThis", "Global"],
+      ["window", "Global"],
+    ]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     const reportReference = (node: SyntaxNode) => {
       if (node.type === "Identifier" && !tracker.isReadReference(node)) {
         return;

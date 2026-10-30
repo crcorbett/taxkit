@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
-import { Money, Cents, moneyEquals } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
   AuTakeHomePay2024_25_Live,
@@ -99,21 +99,18 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: true,
       });
       expect({
-        length: moneyEquals(
-          report.withholdingsTotal,
-          new Money({ cents: Cents.make(30_400), currency: "AUD" })
-        ),
-        length2: moneyEquals(
-          report.netPay,
-          new Money({ cents: Cents.make(119_600), currency: "AUD" })
-        ),
+        withholdingsTotal: report.withholdingsTotal,
+        netPay: report.netPay,
         reportIdentity: {
           reportPeriod: report.period,
           reportRulePackVersion: report.rulePackVersion,
         },
       }).toStrictEqual({
-        length: true,
-        length2: true,
+        withholdingsTotal: new Money({
+          cents: Cents.make(30_400),
+          currency: "AUD",
+        }),
+        netPay: new Money({ cents: Cents.make(119_600), currency: "AUD" }),
         reportIdentity: {
           reportPeriod: "weekly",
           reportRulePackVersion: "rules-au-pay/1.0.2",
@@ -272,17 +269,11 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: true,
       });
       expect({
-        length: moneyEquals(
-          report.withholdingsTotal,
-          new Money({ cents: Cents.make(0), currency: "AUD" })
-        ),
-        length2: moneyEquals(
-          report.netPay,
-          new Money({ cents: Cents.make(30_000), currency: "AUD" })
-        ),
+        withholdingsTotal: report.withholdingsTotal,
+        netPay: report.netPay,
       }).toStrictEqual({
-        length: true,
-        length2: true,
+        withholdingsTotal: new Money({ cents: Cents.make(0), currency: "AUD" }),
+        netPay: new Money({ cents: Cents.make(30_000), currency: "AUD" }),
       });
     })
   );
@@ -293,17 +284,14 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: false,
       });
       expect({
-        length: moneyEquals(
-          report.withholdingsTotal,
-          new Money({ cents: Cents.make(41_500), currency: "AUD" })
-        ),
-        length2: moneyEquals(
-          report.netPay,
-          new Money({ cents: Cents.make(108_500), currency: "AUD" })
-        ),
+        withholdingsTotal: report.withholdingsTotal,
+        netPay: report.netPay,
       }).toStrictEqual({
-        length: true,
-        length2: true,
+        withholdingsTotal: new Money({
+          cents: Cents.make(41_500),
+          currency: "AUD",
+        }),
+        netPay: new Money({ cents: Cents.make(108_500), currency: "AUD" }),
       });
       const ledgerTrace = expectAt(report.trace.children, 0);
       const paygTrace = expectAt(ledgerTrace.children, 0);
@@ -333,17 +321,14 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         taxFreeThresholdClaimed: true,
       });
       expect({
-        length: moneyEquals(
-          report.withholdingsTotal,
-          new Money({ cents: Cents.make(60_800), currency: "AUD" })
-        ),
-        length2: moneyEquals(
-          report.netPay,
-          new Money({ cents: Cents.make(239_200), currency: "AUD" })
-        ),
+        withholdingsTotal: report.withholdingsTotal,
+        netPay: report.netPay,
       }).toStrictEqual({
-        length: true,
-        length2: true,
+        withholdingsTotal: new Money({
+          cents: Cents.make(60_800),
+          currency: "AUD",
+        }),
+        netPay: new Money({ cents: Cents.make(239_200), currency: "AUD" }),
       });
     })
   );
@@ -359,17 +344,14 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
           taxFreeThresholdClaimed: true,
         });
         expect({
-          length: moneyEquals(
-            report.withholdingsTotal,
-            new Money({ cents: Cents.make(131_700), currency: "AUD" })
-          ),
-          length2: moneyEquals(
-            report.netPay,
-            new Money({ cents: Cents.make(518_300), currency: "AUD" })
-          ),
+          withholdingsTotal: report.withholdingsTotal,
+          netPay: report.netPay,
         }).toStrictEqual({
-          length: true,
-          length2: true,
+          withholdingsTotal: new Money({
+            cents: Cents.make(131_700),
+            currency: "AUD",
+          }),
+          netPay: new Money({ cents: Cents.make(518_300), currency: "AUD" }),
         });
       })
   );
@@ -384,17 +366,14 @@ describe("AU take-home pay calculator (2024-25 rule pack)", () => {
           taxFreeThresholdClaimed: true,
         });
         expect({
-          length: moneyEquals(
-            report.withholdingsTotal,
-            new Money({ cents: Cents.make(30_400), currency: "AUD" })
-          ),
-          length2: moneyEquals(
-            report.netPay,
-            new Money({ cents: Cents.make(119_600), currency: "AUD" })
-          ),
+          withholdingsTotal: report.withholdingsTotal,
+          netPay: report.netPay,
         }).toStrictEqual({
-          length: true,
-          length2: true,
+          withholdingsTotal: new Money({
+            cents: Cents.make(30_400),
+            currency: "AUD",
+          }),
+          netPay: new Money({ cents: Cents.make(119_600), currency: "AUD" }),
         });
       })
   );

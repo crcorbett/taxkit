@@ -97,13 +97,9 @@ it.live(
       });
       expect(files).toContain("worker.js");
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          Record.values(modules),
-          Array.some((module) =>
-            /[\w$]+\.runInAsyncScope\(this\.evaluate,this,/u.test(
-              module.contents
-            )
-          )
+        Record.values(modules),
+        Array.some((module) =>
+          /[\w$]+\.runInAsyncScope\(this\.evaluate,this,/u.test(module.contents)
         ),
         (actual) => {
           expect(actual).toBeTruthy();
@@ -314,10 +310,8 @@ it.live(
         )(checkedCatalogue.structuredContent);
         expect(catalogueReply.calculators).toHaveLength(3);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            catalogueReply.calculators,
-            Array.map((calculator) => calculator.calculatorId)
-          ),
+          catalogueReply.calculators,
+          Array.map((calculator) => calculator.calculatorId),
           (actual) => {
             expect(actual).toStrictEqual(
               expect.arrayContaining([
@@ -390,10 +384,8 @@ it.live(
           McpDocsSearchResponse
         )(checkedSearch.structuredContent);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            searchReply.results,
-            Array.some((result) => result.path === "/start/quickstart")
-          ),
+          searchReply.results,
+          Array.some((result) => result.path === "/start/quickstart"),
           (actual) => {
             expect(actual).toBeTruthy();
           }
@@ -699,31 +691,30 @@ it.live(
             new StreamableHTTPClientTransport(new URL("/mcp", workAddress), {
               fetch: (address, init) => {
                 const request = new Request(address, init);
-                if (request.headers.get("mcp-method") === "tools/call") {
-                  const controller = new AbortController();
-                  Queue.offerUnsafe(networkControllers, controller);
-                  const signal = AbortSignal.any([
-                    request.signal,
-                    controller.signal,
-                  ]);
-                  signal.addEventListener(
-                    "abort",
-                    () => {
-                      Queue.offerUnsafe(networkStops, true);
+                const signal = EffectBoolean.match(
+                  request.headers.get("mcp-method") === "tools/call",
+                  {
+                    onFalse: () => request.signal,
+                    onTrue: () => {
+                      const controller = new AbortController();
+                      Queue.offerUnsafe(networkControllers, controller);
+                      const combined = AbortSignal.any([
+                        request.signal,
+                        controller.signal,
+                      ]);
+                      combined.addEventListener(
+                        "abort",
+                        () => {
+                          Queue.offerUnsafe(networkStops, true);
+                        },
+                        { once: true }
+                      );
+                      return combined;
                     },
-                    { once: true }
-                  );
-                  return Effect.runPromise(
-                    httpClient
-                      .execute(HttpClientRequest.fromWeb(request))
-                      .pipe(
-                        Effect.flatMap((response) =>
-                          Effect.fromOption(HttpClientResponse.toWeb(response))
-                        )
-                      ),
-                    { signal }
-                  );
-                }
+                  }
+                );
+                // The official transport requires a Promise<Response>. This
+                // callback owns its sole bridge and the caller's abort signal.
                 return Effect.runPromise(
                   httpClient
                     .execute(HttpClientRequest.fromWeb(request))
@@ -732,7 +723,7 @@ it.live(
                         Effect.fromOption(HttpClientResponse.toWeb(response))
                       )
                     ),
-                  { signal: request.signal }
+                  { signal }
                 );
               },
               requestInit: { headers: { "cf-connecting-ip": "127.0.0.1" } },
@@ -1172,67 +1163,61 @@ it.live(
         );
         expect(preflights.length).toBeGreaterThan(0);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            preflights,
-            Array.some((event) => {
-              const headers = Headers.fromInput(event.request.headers);
-              return (
-                Headers.get(headers, "origin").pipe(
-                  Option.contains(websiteOrigin)
-                ) &&
-                Headers.get(headers, "access-control-request-headers").pipe(
-                  Option.exists((value) =>
-                    EffectFunction.pipe(
-                      [
-                        "b3",
-                        "content-type",
-                        "mcp-method",
-                        "mcp-protocol-version",
-                        "traceparent",
-                      ],
-                      Array.every((header) =>
-                        value.toLowerCase().includes(header)
-                      )
+          preflights,
+          Array.some((event) => {
+            const headers = Headers.fromInput(event.request.headers);
+            return (
+              Headers.get(headers, "origin").pipe(
+                Option.contains(websiteOrigin)
+              ) &&
+              Headers.get(headers, "access-control-request-headers").pipe(
+                Option.exists((value) =>
+                  EffectFunction.pipe(
+                    [
+                      "b3",
+                      "content-type",
+                      "mcp-method",
+                      "mcp-protocol-version",
+                      "traceparent",
+                    ],
+                    Array.every((header) =>
+                      value.toLowerCase().includes(header)
                     )
                   )
                 )
-              );
-            })
-          ),
+              )
+            );
+          }),
           (actual) => {
             expect(actual).toBeTruthy();
           }
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            allowedRequests,
-            Array.some((event) => {
-              const headers = Headers.merge(
-                Headers.fromInput(event.request.headers),
-                EffectFunction.pipe(
-                  allowedExtraRequests,
-                  Array.findFirst(
-                    (extra) => extra.requestId === event.requestId
-                  )
-                ).pipe(
-                  Option.map((extra) => Headers.fromInput(extra.headers)),
-                  Option.getOrElse(() => Headers.empty)
-                )
-              );
-              return (
-                event.request.method === "POST" &&
-                Headers.get(headers, "origin").pipe(
-                  Option.contains(websiteOrigin)
-                ) &&
-                Headers.get(headers, "mcp-protocol-version").pipe(
-                  Option.contains("2026-07-28")
-                ) &&
-                Headers.get(headers, "mcp-name").pipe(
-                  Option.contains("taxkit_list_calculators")
-                )
-              );
-            })
-          ),
+          allowedRequests,
+          Array.some((event) => {
+            const headers = Headers.merge(
+              Headers.fromInput(event.request.headers),
+              EffectFunction.pipe(
+                allowedExtraRequests,
+                Array.findFirst((extra) => extra.requestId === event.requestId)
+              ).pipe(
+                Option.map((extra) => Headers.fromInput(extra.headers)),
+                Option.getOrElse(() => Headers.empty)
+              )
+            );
+            return (
+              event.request.method === "POST" &&
+              Headers.get(headers, "origin").pipe(
+                Option.contains(websiteOrigin)
+              ) &&
+              Headers.get(headers, "mcp-protocol-version").pipe(
+                Option.contains("2026-07-28")
+              ) &&
+              Headers.get(headers, "mcp-name").pipe(
+                Option.contains("taxkit_list_calculators")
+              )
+            );
+          }),
           (actual) => {
             expect(actual).toBeTruthy();
           }
@@ -1244,16 +1229,14 @@ it.live(
           Array.filter((event) => event.response.url === endpoint)
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            allowedResponses,
-            Array.some(
-              (event) =>
-                event.response.status === 200 &&
-                Headers.get(
-                  Headers.fromInput(event.response.headers),
-                  "access-control-allow-origin"
-                ).pipe(Option.contains(websiteOrigin))
-            )
+          allowedResponses,
+          Array.some(
+            (event) =>
+              event.response.status === 200 &&
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-origin"
+              ).pipe(Option.contains(websiteOrigin))
           ),
           (actual) => {
             expect(actual).toBeTruthy();
@@ -1262,46 +1245,42 @@ it.live(
         // Chromium can cache every header granted by the first preflight, so
         // tools/call need not issue a second OPTIONS for its added mcp-name.
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            allowedResponses,
-            Array.some(
-              (event) =>
-                event.response.status === 204 &&
-                Headers.get(
-                  Headers.fromInput(event.response.headers),
-                  "access-control-allow-headers"
-                ).pipe(
-                  Option.exists((value) =>
-                    EffectFunction.pipe(
-                      [
-                        "b3",
-                        "content-type",
-                        "mcp-method",
-                        "mcp-name",
-                        "mcp-protocol-version",
-                        "traceparent",
-                      ],
-                      Array.every((header) =>
-                        value.toLowerCase().includes(header)
-                      )
+          allowedResponses,
+          Array.some(
+            (event) =>
+              event.response.status === 204 &&
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-headers"
+              ).pipe(
+                Option.exists((value) =>
+                  EffectFunction.pipe(
+                    [
+                      "b3",
+                      "content-type",
+                      "mcp-method",
+                      "mcp-name",
+                      "mcp-protocol-version",
+                      "traceparent",
+                    ],
+                    Array.every((header) =>
+                      value.toLowerCase().includes(header)
                     )
                   )
                 )
-            )
+              )
           ),
           (actual) => {
             expect(actual).toBeTruthy();
           }
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            allowedResponses,
-            Array.every((event) =>
-              Option.isNone(
-                Headers.get(
-                  Headers.fromInput(event.response.headers),
-                  "access-control-allow-credentials"
-                )
+          allowedResponses,
+          Array.every((event) =>
+            Option.isNone(
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-credentials"
               )
             )
           ),
@@ -1318,12 +1297,10 @@ it.live(
           expect(actual).toBeTruthy();
         });
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            yield* Queue.clear(responses),
-            Array.some(
-              (event) =>
-                event.response.url === endpoint && event.response.status === 400
-            )
+          yield* Queue.clear(responses),
+          Array.some(
+            (event) =>
+              event.response.url === endpoint && event.response.status === 400
           ),
           (actual) => {
             expect(actual).toBeTruthy();
@@ -1352,10 +1329,8 @@ it.live(
             Array.filter((event) => event.request.url === endpoint)
           );
           EffectFunction.pipe(
-            EffectFunction.pipe(
-              foreignNetworkRequests,
-              Array.some((event) => event.request.method === "OPTIONS")
-            ),
+            foreignNetworkRequests,
+            Array.some((event) => event.request.method === "OPTIONS"),
             (actual) => {
               expect(actual).toBeTruthy();
             }
@@ -1363,18 +1338,14 @@ it.live(
           // requestWillBeSent also describes a planned POST before Chromium
           // resolves its preflight. ExtraInfo identifies actual network headers.
           const foreignPostIds = EffectFunction.pipe(
-            EffectFunction.pipe(
-              foreignNetworkRequests,
-              Array.filter((event) => event.request.method === "POST")
-            ),
+            foreignNetworkRequests,
+            Array.filter((event) => event.request.method === "POST"),
             Array.map((event) => event.requestId)
           );
           EffectFunction.pipe(
-            EffectFunction.pipe(
-              yield* Queue.clear(extraRequests),
-              Array.some((event) =>
-                Array.contains(foreignPostIds, event.requestId)
-              )
+            yield* Queue.clear(extraRequests),
+            Array.some((event) =>
+              Array.contains(foreignPostIds, event.requestId)
             ),
             (actual) => {
               expect(actual).toBeFalsy();
@@ -1389,14 +1360,12 @@ it.live(
           Array.filter((event) => event.response.url === endpoint)
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            foreignResponses,
-            Array.every((event) =>
-              Option.isNone(
-                Headers.get(
-                  Headers.fromInput(event.response.headers),
-                  "access-control-allow-origin"
-                )
+          foreignResponses,
+          Array.every((event) =>
+            Option.isNone(
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-origin"
               )
             )
           ),
@@ -1405,10 +1374,8 @@ it.live(
           }
         );
         const foreignPreflightIds = EffectFunction.pipe(
-          EffectFunction.pipe(
-            foreignRequests,
-            Array.filter((event) => event.request.method === "OPTIONS")
-          ),
+          foreignRequests,
+          Array.filter((event) => event.request.method === "OPTIONS"),
           Array.map((event) => event.requestId)
         );
         const foreignPreflightReplies = EffectFunction.pipe(
@@ -1419,14 +1386,12 @@ it.live(
         );
         expect(foreignPreflightReplies.length).toBeGreaterThan(0);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            foreignPreflightReplies,
-            Array.every((event) =>
-              Option.isNone(
-                Headers.get(
-                  Headers.fromInput(event.headers),
-                  "access-control-allow-origin"
-                )
+          foreignPreflightReplies,
+          Array.every((event) =>
+            Option.isNone(
+              Headers.get(
+                Headers.fromInput(event.headers),
+                "access-control-allow-origin"
               )
             )
           ),
@@ -1460,13 +1425,11 @@ it.live(
           Array.map((event) => event.requestId)
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            yield* Queue.clear(extras),
-            Array.some(
-              (event) =>
-                event.statusCode === 403 &&
-                Array.contains(forbiddenIds, event.requestId)
-            )
+          yield* Queue.clear(extras),
+          Array.some(
+            (event) =>
+              event.statusCode === 403 &&
+              Array.contains(forbiddenIds, event.requestId)
           ),
           (actual) => {
             expect(actual).toBeTruthy();

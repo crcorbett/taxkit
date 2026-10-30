@@ -66,10 +66,10 @@ describe("shared HTTP request-body policy", () => {
         );
         expect({
           responseStatus: response.status,
-          length: !(yield* Ref.get(entered)),
+          handlerNotEntered: !(yield* Ref.get(entered)),
         }).toStrictEqual({
           responseStatus: 408,
-          length: true,
+          handlerNotEntered: true,
         });
       }).pipe(Effect.scoped)
   );
@@ -118,20 +118,14 @@ describe("shared HTTP request-body policy", () => {
             { contentType: "application/json" }
           )
         );
-        const call = yield* EffectFunction.pipe(
-          Ref.set(entered, true).pipe(
-            Effect.as(HttpServerResponse.empty({ status: 200 }))
-          ),
-          (argument1) =>
-            EffectFunction.pipe(
-              CalculatorRequestBodyPolicy.make({ responseFormat }),
-              (argument2) =>
-                withCalculatorRequestBodyLimit({
-                  handler: argument1,
-                  policy: argument2,
-                })
-            )
-        ).pipe(
+        const requestHandler = Ref.set(entered, true).pipe(
+          Effect.as(HttpServerResponse.empty({ status: 200 }))
+        );
+        const bodyPolicy = CalculatorRequestBodyPolicy.make({ responseFormat });
+        const call = yield* withCalculatorRequestBodyLimit({
+          handler: requestHandler,
+          policy: bodyPolicy,
+        }).pipe(
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromClientRequest(request)
@@ -146,10 +140,10 @@ describe("shared HTTP request-body policy", () => {
         const response = yield* Fiber.join(call);
         expect({
           responseStatus: response.status,
-          length: !(yield* Ref.get(entered)),
+          handlerNotEntered: !(yield* Ref.get(entered)),
         }).toStrictEqual({
           responseStatus: 408,
-          length: true,
+          handlerNotEntered: true,
         });
         const body = yield* HttpServerResponse.toClientResponse(response, {
           request,

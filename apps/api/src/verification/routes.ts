@@ -87,10 +87,8 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
           )
         ) ||
         !EffectFunction.pipe(
-          EffectFunction.pipe(
-            navigation.primaryNavigation,
-            Array.flatMap((item) => [item, ...item.pages])
-          ),
+          navigation.primaryNavigation,
+          Array.flatMap((item) => [item, ...item.pages]),
           Array.some(
             (item) =>
               item.path === page.path && item.title === page.frontmatter.title

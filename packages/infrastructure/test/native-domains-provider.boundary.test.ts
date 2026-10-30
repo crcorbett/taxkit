@@ -427,14 +427,12 @@ describe("actual installed native redirect provider", () => {
       });
       if (Exit.isFailure(fixture.result)) {
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            fixture.result.cause.reasons,
-            Array.some(
-              (reason) =>
-                Cause.isFailReason(reason) &&
-                Schema.is(NativeProviderError)(reason.error) &&
-                Predicate.isTagged(reason.error.cause, "Forbidden")
-            )
+          fixture.result.cause.reasons,
+          Array.some(
+            (reason) =>
+              Cause.isFailReason(reason) &&
+              Schema.is(NativeProviderError)(reason.error) &&
+              Predicate.isTagged(reason.error.cause, "Forbidden")
           ),
           (actual) => {
             expect(actual).toBeTruthy();
@@ -442,11 +440,9 @@ describe("actual installed native redirect provider", () => {
         );
       }
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          fixture.calls,
-          Array.filter(
-            (x) => x.method === "PUT" && x.path.includes("/rulesets/")
-          )
+        fixture.calls,
+        Array.filter(
+          (x) => x.method === "PUT" && x.path.includes("/rulesets/")
         ),
         (actual) => {
           expect(actual).toHaveLength(0);
@@ -459,17 +455,12 @@ describe("actual installed native redirect provider", () => {
     (mode) =>
       Effect.gen(function* () {
         const fixture = yield* providerFixture(mode);
-        EffectFunction.pipe(Exit.isSuccess(fixture.result), (argument1) => {
-          EffectFunction.pipe(
-            Exit.match(fixture.result, {
-              onFailure: Cause.pretty,
-              onSuccess: () => "",
-            }),
-            (argument2) => {
-              expect(argument1, argument2).toBeTruthy();
-            }
-          );
+        const succeeded = Exit.isSuccess(fixture.result);
+        const message = Exit.match(fixture.result, {
+          onFailure: Cause.pretty,
+          onSuccess: () => "",
         });
+        expect(succeeded, message).toBeTruthy();
         const calls = EffectFunction.pipe(
           fixture.calls,
           Array.filter(

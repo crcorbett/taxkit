@@ -1,4 +1,4 @@
-import { Match, Effect, Option } from "effect";
+import { Effect, Option } from "effect";
 import "@tanstack/react-start/server-only";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
@@ -23,15 +23,19 @@ const serverFunctionBase = HttpServerRequest.HttpServerRequest.pipe(
  */
 export const earlyReply = discoveryRepresentation.pipe(
   Effect.flatMap((discovery) =>
-    Match.value(discovery).pipe(
-      Match.when(Option.isSome, (matchedValue) => Effect.succeed(matchedValue)),
-      Match.orElse(() => docsImageRepresentation)
+    discovery.pipe(
+      Option.match({
+        onNone: () => docsImageRepresentation,
+        onSome: Effect.succeedSome,
+      })
     )
   ),
   Effect.flatMap((image) =>
-    Match.value(image).pipe(
-      Match.when(Option.isSome, (matchedValue) => Effect.succeed(matchedValue)),
-      Match.orElse(() => serverFunctionBase)
+    image.pipe(
+      Option.match({
+        onNone: () => serverFunctionBase,
+        onSome: Effect.succeedSome,
+      })
     )
   ),
   Effect.withSpan("Website.earlyReply")

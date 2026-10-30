@@ -55,28 +55,20 @@ describe("dollar text to Money", () => {
 
   it("writes Money as plain dollars that read back unchanged", () => {
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        EffectFunction.pipe(Cents.make(3_501_301), aud),
-        dollarsTextFromMoney
-      ),
+      Cents.make(3_501_301),
+      aud,
+      dollarsTextFromMoney,
       (actual) => {
         expect(actual).toBe("35013.01");
       }
     );
+    EffectFunction.pipe(Cents.make(5), aud, dollarsTextFromMoney, (actual) => {
+      expect(actual).toBe("0.05");
+    });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        EffectFunction.pipe(Cents.make(5), aud),
-        dollarsTextFromMoney
-      ),
-      (actual) => {
-        expect(actual).toBe("0.05");
-      }
-    );
-    EffectFunction.pipe(
-      EffectFunction.pipe(
-        EffectFunction.pipe(Cents.make(-150), aud),
-        dollarsTextFromMoney
-      ),
+      Cents.make(-150),
+      aud,
+      dollarsTextFromMoney,
       (actual) => {
         expect(actual).toBe("-1.50");
       }

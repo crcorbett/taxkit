@@ -158,6 +158,8 @@ const isInputFact = HashSet.has(inputFacts, required.id);
 Use `Option.match`, `Option.isSome`, or `Option.isNone` for lookups. Do not
 encode missing values with `undefined` or `null` branches in validation
 algorithms.
+Use `Result.match` and `Exit.match` for their own success/failure alternatives;
+reserve `Match` for domain unions rather than inspecting native containers.
 
 ```ts
 const row = pipe(
@@ -210,6 +212,9 @@ pipe(query, filterCalculatorEntries, toFactsResponse);
 
 Use named reusable operations only when they own a real policy or are reused.
 Do not extract tiny one-off wrappers just to hide a single function call.
+Keep one call with several inputs direct: bind any substantial input expression
+to a meaningful local value rather than introducing a nested pipe callback for
+each argument. Flatten consecutive transformations into one pipe.
 
 Service contract files MUST NOT export `Live`, `Mock` or `Test` layers. Keep
 `service.ts` focused on the `Context.Service` contract and canonical

@@ -708,19 +708,13 @@ describe("portable rules", () => {
       )
     );
     expect(promiseScope).toHaveLength(1);
-    EffectFunction.pipe(
-      Array.head(promiseScope).pipe(
-        Option.map((entry) => entry.files),
-        Option.getOrUndefined
-      ),
-      (argument1) => {
-        EffectFunction.pipe("Owned Promise mapping coverage", (argument2) => {
-          expect(argument1, argument2).toStrictEqual([
-            "**/*.{cjs,mjs,jsx,js,tsx,ts}",
-          ]);
-        });
-      }
+    const actual = Array.head(promiseScope).pipe(
+      Option.map((entry) => entry.files),
+      Option.getOrUndefined
     );
+    expect(actual, "Owned Promise mapping coverage").toStrictEqual([
+      "**/*.{cjs,mjs,jsx,js,tsx,ts}",
+    ]);
     expect(scope.excludeFiles, "Owned-source fixture exclusions").toStrictEqual(
       [
         "tools/oxlint/fixtures/bun-accepted.ts",
@@ -741,29 +735,22 @@ describe("portable rules", () => {
       ".generated-promise-mapping.mjs",
     ])("enforces inline Promise error mapping at $name", (path) =>
       Effect.gen(function* () {
-        yield* EffectFunction.pipe(join(repositoryRoot, path), (argument3) =>
-          EffectFunction.pipe(
-            `import { Effect } from "effect";
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source: `import { Effect } from "effect";
 export const rejected = Effect.tryPromise(() => Promise.resolve("bad"));
 export const accepted = Effect.tryPromise({ try: () => Promise.resolve("good"), catch: () => "fixed" });`,
-            (argument4) =>
-              writeLintFixture({
-                path: argument3,
-                source: argument4,
-              })
-          )
-        );
+        });
         const result = yield* runOxlint({
           path,
         });
         expect(result.files).toBe(1);
         expect(result.exitCode).toBe(1);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            result.codes,
-            Array.filter(
-              (code) => code === "taxkit-effect(no-bare-effect-try-promise)"
-            )
+          result.codes,
+          Array.filter(
+            (code) => code === "taxkit-effect(no-bare-effect-try-promise)"
           ),
           (actual) => {
             expect(actual).toHaveLength(1);
@@ -824,32 +811,25 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     ])("$name", ({ source, rule, count }) =>
       Effect.gen(function* () {
         const path = "tools/oxlint/.generated-binding-policy.ts";
-        yield* EffectFunction.pipe(join(repositoryRoot, path), (argument5) =>
-          EffectFunction.pipe(source, (argument6) =>
-            writeLintFixture({
-              path: argument5,
-              source: argument6,
-            })
-          )
-        );
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source,
+        });
         const result = yield* runOxlint({
           path,
         });
         expect(result.files).toBe(1);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            result.codes,
-            Array.filter((code) => code === rule)
-          ),
+          result.codes,
+          Array.filter((code) => code === rule),
           (actual) => {
             expect(actual).toHaveLength(count);
           }
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            result.codes,
-            Array.some((code) => code.includes("plugin"))
-          ),
+          result.codes,
+          Array.some((code) => code.includes("plugin")),
           (actual) => {
             expect(!actual).toBeTruthy();
           }
@@ -896,16 +876,11 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           const source = yield* fs.readFileString(
             join(repositoryRoot, fixture.rejected)
           );
-          yield* EffectFunction.pipe(
-            join(repositoryRoot, fixture.generated),
-            (argument7) =>
-              EffectFunction.pipe(source, (argument8) =>
-                writeLintFixture({
-                  path: argument7,
-                  source: argument8,
-                })
-              )
-          );
+          const fixturePath = join(repositoryRoot, fixture.generated);
+          yield* writeLintFixture({
+            path: fixturePath,
+            source,
+          });
           const result = yield* runOxlint({
             path: fixture.generated,
           });
@@ -948,14 +923,11 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     },
   ])("$name", ({ path, source, rejected }) =>
     Effect.gen(function* () {
-      yield* EffectFunction.pipe(join(repositoryRoot, path), (argument9) =>
-        EffectFunction.pipe(source, (argument10) =>
-          writeLintFixture({
-            path: argument9,
-            source: argument10,
-          })
-        )
-      );
+      const fixturePath = join(repositoryRoot, path);
+      yield* writeLintFixture({
+        path: fixturePath,
+        source,
+      });
       const result = yield* lintFiles({
         paths: [path],
       });
@@ -1032,32 +1004,20 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     },
   ])("$name", ({ path, rejected, source }) =>
     Effect.gen(function* () {
-      yield* EffectFunction.pipe(join(repositoryRoot, path), (argument11) =>
-        EffectFunction.pipe(source, (argument12) =>
-          writeLintFixture({
-            path: argument11,
-            source: argument12,
-          })
-        )
-      );
+      const fixturePath = join(repositoryRoot, path);
+      yield* writeLintFixture({
+        path: fixturePath,
+        source,
+      });
       const result = yield* runOxlint({
         path,
       });
       expect(result.files).toBe(1);
-      EffectFunction.pipe(
-        Array.contains(
-          result.codes,
-          "strict-effect(no-imperative-collections)"
-        ),
-        (argument13) => {
-          EffectFunction.pipe(
-            "Strict collection admission canary",
-            (argument14) => {
-              expect(argument13, argument14).toBe(rejected);
-            }
-          );
-        }
+      const actual = Array.contains(
+        result.codes,
+        "strict-effect(no-imperative-collections)"
       );
+      expect(actual, "Strict collection admission canary").toBe(rejected);
       expect(result.exitCode).toBe(
         EffectBoolean.match(rejected, {
           onFalse: (): 0 => 0,
@@ -1084,15 +1044,13 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     "tools/documentation/check.runtime.ts",
   ])("keeps the execution runtime admission exact: %s", (path) => {
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        oxlintConfig.overrides ?? [],
-        Array.filter(
-          (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
-            Array.contains(entry.files ?? [], path) &&
-            Record.get<string>("strict-effect/no-runtime-outside-boundary")(
-              entry.rules ?? {}
-            ).pipe(Option.exists(Array.isArray))
-        )
+      oxlintConfig.overrides ?? [],
+      Array.filter(
+        (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
+          Array.contains(entry.files ?? [], path) &&
+          Record.get<string>("strict-effect/no-runtime-outside-boundary")(
+            entry.rules ?? {}
+          ).pipe(Option.exists(Array.isArray))
       ),
       (actual) => {
         expect(actual).toStrictEqual([
@@ -1129,10 +1087,8 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     // One override owns production adapters, host-contract tests and the CLI
     // fixture; each admitted path is named exactly, never by glob.
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        admissions,
-        Array.map((entry) => entry.files)
-      ),
+      admissions,
+      Array.map((entry) => entry.files),
       (actual) => {
         // One override owns production adapters, host-contract tests and the CLI
         // fixture; each admitted path is named exactly, never by glob.
@@ -1167,10 +1123,8 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       }))
     );
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        listed,
-        Array.map(({ named }) => named)
-      ),
+      listed,
+      Array.map(({ named }) => named),
       (actual) => {
         expect(actual).toStrictEqual(
           EffectFunction.pipe(
@@ -1181,13 +1135,9 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       }
     );
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        EffectFunction.pipe(
-          listed,
-          Array.flatMap(({ files }) => files)
-        ),
-        Array.some((path) => path.includes("*"))
-      ),
+      listed,
+      Array.flatMap(({ files }) => files),
+      Array.some((path) => path.includes("*")),
       (actual) => {
         expect(!actual).toBeTruthy();
       }
@@ -1198,16 +1148,12 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       Effect.gen(function* () {
         const path =
           "packages/infrastructure/src/.generated-app-decoder-neighbour.ts";
-        yield* EffectFunction.pipe(join(repositoryRoot, path), (argument15) =>
-          EffectFunction.pipe(
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source:
             'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-            (argument16) =>
-              writeLintFixture({
-                path: argument15,
-                source: argument16,
-              })
-          )
-        );
+        });
         const result = yield* runOxlint({
           path,
         });
@@ -1221,16 +1167,12 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     it.effect("rejects decoding in a neighbouring transport source file", () =>
       Effect.gen(function* () {
         const path = "packages/api/mcp/src/.generated-decoder-neighbour.ts";
-        yield* EffectFunction.pipe(join(repositoryRoot, path), (argument17) =>
-          EffectFunction.pipe(
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source:
             'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-            (argument18) =>
-              writeLintFixture({
-                path: argument17,
-                source: argument18,
-              })
-          )
-        );
+        });
         const result = yield* runOxlint({
           path,
         });
@@ -2183,11 +2125,9 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           expect(result.exitCode).not.toBe(0);
           expect(result.codes).toContain(rule);
         } else {
-          EffectFunction.pipe(result.exitCode, (argument19) => {
-            EffectFunction.pipe(result.codes.join(", "), (argument20) => {
-              expect(argument19, argument20).toBe(0);
-            });
-          });
+          const actual = result.exitCode;
+          const message = result.codes.join(", ");
+          expect(actual, message).toBe(0);
           expect(result.codes).not.toContain(rule);
         }
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))

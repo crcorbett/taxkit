@@ -85,13 +85,10 @@ it.live(
               artifact.name === "api-headers"
             ) {
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  Record.toEntries(modules),
-                  Array.some(
-                    ([file, module]) =>
-                      file === "worker.js" &&
-                      module.contents.includes("PRIVATE9")
-                  )
+                Record.toEntries(modules),
+                Array.some(
+                  ([file, module]) =>
+                    file === "worker.js" && module.contents.includes("PRIVATE9")
                 ),
                 (actual) => {
                   expect(actual).toBeTruthy();
@@ -185,10 +182,8 @@ it.live(
       );
       expect(yield* Effect.promise(() => control.text())).toContain("130100");
       const headerWorker = EffectFunction.pipe(
-        EffectFunction.pipe(
-          workers,
-          Array.filter((worker) => worker.config.name === "api-headers")
-        ),
+        workers,
+        Array.filter((worker) => worker.config.name === "api-headers"),
         Array.map((worker) => ({
           config: {
             ...worker.config,

@@ -143,19 +143,15 @@ it.effect(
       const resources = Record.values(compiled.resources);
       expect(resources).toHaveLength(1);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          resources,
-          Array.map((resource) => resource.LogicalId)
-        ),
+        resources,
+        Array.map((resource) => resource.LogicalId),
         (actual) => {
           expect(actual).toStrictEqual(["TaxKitProject"]);
         }
       );
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          resources,
-          Array.every((resource) => resource.RemovalPolicy === "retain")
-        ),
+        resources,
+        Array.every((resource) => resource.RemovalPolicy === "retain"),
         (actual) => {
           expect(actual).toBeTruthy();
         }
@@ -164,10 +160,8 @@ it.effect(
         Effect.provideContext(compiled.services)
       );
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          Record.values(created.resources),
-          Array.map((node) => node.action)
-        ),
+        Record.values(created.resources),
+        Array.map((node) => node.action),
         (actual) => {
           expect(actual).toStrictEqual(["create"]);
         }
@@ -211,10 +205,8 @@ it.effect(
         Effect.provideContext(compiled.services)
       );
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          Record.values(noop.resources),
-          Array.map((node) => node.action)
-        ),
+        Record.values(noop.resources),
+        Array.map((node) => node.action),
         (actual) => {
           expect(actual).toStrictEqual(["noop"]);
         }
@@ -223,15 +215,13 @@ it.effect(
         Effect.provideContext(compiled.services)
       );
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          Record.values(removed.deletions),
-          Array.flatMap((node) =>
-            Option.fromNullishOr(node).pipe(
-              Option.match({
-                onNone: () => [],
-                onSome: (checked) => [checked.action],
-              })
-            )
+        Record.values(removed.deletions),
+        Array.flatMap((node) =>
+          Option.fromNullishOr(node).pipe(
+            Option.match({
+              onNone: () => [],
+              onSome: (checked) => [checked.action],
+            })
           )
         ),
         (actual) => {
@@ -242,10 +232,8 @@ it.effect(
       const scanned = yield* Nuke.list({ context, mode: "live" });
       expect(scanned).toStrictEqual({ failures: [], resources: [] });
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          yield* Ref.get(native.operations),
-          Array.filter((operation) => operation === "create-project")
-        ),
+        yield* Ref.get(native.operations),
+        Array.filter((operation) => operation === "create-project"),
         (actual) => {
           expect(actual).toHaveLength(1);
         }

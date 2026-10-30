@@ -64,10 +64,8 @@ describe("Effect SDK facade", () => {
           Match.tag("CalculatorInputDecodeError", (failure) =>
             Effect.gen(function* () {
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  failure.issues,
-                  EffectArray.map((issue) => issue.path)
-                ),
+                failure.issues,
+                EffectArray.map((issue) => issue.path),
                 (actual) => {
                   expect(actual).toContainEqual(["grossPay"]);
                 }
@@ -193,26 +191,16 @@ describe("Effect SDK facade", () => {
         expect(actual).toBeTruthy();
       });
       if (Exit.isFailure(sdkExit) && Exit.isFailure(serviceExit)) {
-        const sdkFailure = EffectFunction.pipe(
-          EffectFunction.pipe(
-            sdkExit.cause.reasons,
-            EffectArray.filter(Cause.isFailReason)
-          ),
-          (argument1) =>
-            EffectFunction.pipe(0, (argument2) =>
-              expectAt(argument1, argument2)
-            )
+        const sdkFailures = EffectFunction.pipe(
+          sdkExit.cause.reasons,
+          EffectArray.filter(Cause.isFailReason)
         );
-        const serviceFailure = EffectFunction.pipe(
-          EffectFunction.pipe(
-            serviceExit.cause.reasons,
-            EffectArray.filter(Cause.isFailReason)
-          ),
-          (argument3) =>
-            EffectFunction.pipe(0, (argument4) =>
-              expectAt(argument3, argument4)
-            )
+        const sdkFailure = expectAt(sdkFailures, 0);
+        const serviceFailures = EffectFunction.pipe(
+          serviceExit.cause.reasons,
+          EffectArray.filter(Cause.isFailReason)
         );
+        const serviceFailure = expectAt(serviceFailures, 0);
         expect(sdkFailure.error).toStrictEqual(serviceFailure.error);
         EffectFunction.pipe(
           Predicate.isTagged(sdkFailure.error, "CalculatorInputDecodeError"),

@@ -875,11 +875,9 @@ describe("native API application", () => {
           )
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            records,
-            Array.map((record) =>
-              EffectFunction.pipe(Record.keys(record), Array.sort(Order.String))
-            )
+          records,
+          Array.map((record) =>
+            EffectFunction.pipe(Record.keys(record), Array.sort(Order.String))
           ),
           (actual) => {
             expect(actual).toStrictEqual(
@@ -907,15 +905,13 @@ describe("native API application", () => {
           )
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            decoded,
-            Array.map(({ method, outcome, route, service }) => ({
-              method,
-              outcome,
-              route,
-              service,
-            }))
-          ),
+          decoded,
+          Array.map(({ method, outcome, route, service }) => ({
+            method,
+            outcome,
+            route,
+            service,
+          })),
           (actual) => {
             expect(actual).toStrictEqual([
               {
@@ -979,15 +975,13 @@ describe("native API application", () => {
         )
       );
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          decoded,
-          Array.map(({ method, outcome, status, statusClass }) => ({
-            method,
-            outcome,
-            status,
-            statusClass,
-          }))
-        ),
+        decoded,
+        Array.map(({ method, outcome, status, statusClass }) => ({
+          method,
+          outcome,
+          status,
+          statusClass,
+        })),
         (actual) => {
           expect(actual).toStrictEqual([
             {

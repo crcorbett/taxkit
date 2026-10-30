@@ -75,19 +75,12 @@ describe("StslTable owned relationships", () => {
               const result = yield* StslRow.makeEffect(scenario.input).pipe(
                 Effect.result
               );
-              EffectFunction.pipe(Result.isFailure(result), (argument1) => {
-                EffectFunction.pipe(scenario.name, (argument2) => {
-                  expect(argument1, argument2).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(StslRow))(scenario.input),
-                (argument3) => {
-                  EffectFunction.pipe(scenario.name, (argument4) => {
-                    expect(argument3, argument4).toBeFalsy();
-                  });
-                }
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(Schema.toEncoded(StslRow))(
+                scenario.input
               );
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );
@@ -221,19 +214,12 @@ describe("StslTable owned relationships", () => {
               const result = yield* StslTable.makeEffect(input).pipe(
                 Effect.result
               );
-              EffectFunction.pipe(Result.isFailure(result), (argument5) => {
-                EffectFunction.pipe(scenario.name, (argument6) => {
-                  expect(argument5, argument6).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(StslTable))(input),
-                (argument7) => {
-                  EffectFunction.pipe(scenario.name, (argument8) => {
-                    expect(argument7, argument8).toBeFalsy();
-                  });
-                }
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(Schema.toEncoded(StslTable))(
+                input
               );
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );

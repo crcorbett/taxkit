@@ -157,10 +157,8 @@ export const ContentCatalogueLive = Layer.effect(
     return yield* DocsPublicCatalogue.makeEffect({
       navigation: {
         primaryNavigation: EffectFunction.pipe(
-          EffectFunction.pipe(
-            navigation.primaryNavigation,
-            Array.filter((item) => HashSet.has(published, item.path))
-          ),
+          navigation.primaryNavigation,
+          Array.filter((item) => HashSet.has(published, item.path)),
           Array.map((item) => ({
             ...item,
             pages: EffectFunction.pipe(

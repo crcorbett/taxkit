@@ -37,7 +37,8 @@ export const WebsiteApiLive = Layer.effect(
             }),
         };
         const reads = EffectFunction.pipe(
-          EffectFunction.pipe(fromCloudflareFetcher(binding), toHttpClient),
+          fromCloudflareFetcher(binding),
+          toHttpClient,
           boundedReplies
         );
         return {

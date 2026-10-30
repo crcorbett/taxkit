@@ -58,30 +58,28 @@ describe("MDX page reader", () => {
   it.effect("reads supported Markdown into checked reading blocks", () =>
     Effect.gen(function* () {
       const result = yield* EffectFunction.pipe(
-        EffectFunction.pipe(
-          [
-            "Use **the SDK** and `calculate`; see [Start](../start/index.mdx#install).",
-            "",
-            "## Run it",
-            "",
-            "1. Install it.",
-            "2. Read [the example](../../../packages/docs-examples/src/a.ts).",
-            "",
-            "| Field | Value |",
-            "| :--- | ---: |",
-            "| `netPay` | cents |",
-            "",
-            "```ts",
-            "const a = 1;",
-            "```",
-            "",
-            '```mermaid title="Two steps"',
-            "flowchart LR",
-            "  A --> B",
-            "```",
-          ].join("\n"),
-          page
-        ),
+        [
+          "Use **the SDK** and `calculate`; see [Start](../start/index.mdx#install).",
+          "",
+          "## Run it",
+          "",
+          "1. Install it.",
+          "2. Read [the example](../../../packages/docs-examples/src/a.ts).",
+          "",
+          "| Field | Value |",
+          "| :--- | ---: |",
+          "| `netPay` | cents |",
+          "",
+          "```ts",
+          "const a = 1;",
+          "```",
+          "",
+          '```mermaid title="Two steps"',
+          "flowchart LR",
+          "  A --> B",
+          "```",
+        ].join("\n"),
+        page,
         read
       );
       assert.strictEqual(result.frontmatter.title, "First guide");

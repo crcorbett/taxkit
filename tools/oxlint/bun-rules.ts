@@ -65,11 +65,8 @@ const isHostMethod = (semantic: Option.Option<string>) =>
   );
 const noHostApiOutsideAdapters: OxlintRule = {
   create(context) {
-    const tracker = EffectFunction.pipe(context.sourceCode, (argument1) =>
-      EffectFunction.pipe(HashMap.make(["Bun", "Global.Bun"]), (argument2) =>
-        createBindingTracker(argument1, argument2)
-      )
-    );
+    const bindings = HashMap.make(["Bun", "Global.Bun"]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     return {
       AssignmentExpression(node) {
         const source = tracker.semanticOfExpression(node.right);

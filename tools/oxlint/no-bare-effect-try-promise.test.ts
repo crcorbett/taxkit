@@ -6,20 +6,14 @@ import { Function as EffectFunction, Effect } from "effect";
 
 import { lintFiles, writeTemporaryLintFixture } from "./cli-fixture.js";
 
-const writeFixture = (source: string) =>
-  EffectFunction.pipe(source, (argument1) =>
-    EffectFunction.pipe("ts", (argument2) =>
-      EffectFunction.pipe(
-        fileURLToPath(new URL("fixtures", import.meta.url)),
-        (argument3) =>
-          writeTemporaryLintFixture({
-            source: argument1,
-            extension: argument2,
-            directory: argument3,
-          })
-      )
-    )
-  );
+const writeFixture = (source: string) => {
+  const fixtureDirectory = fileURLToPath(new URL("fixtures", import.meta.url));
+  return writeTemporaryLintFixture({
+    source,
+    extension: "ts",
+    directory: fixtureDirectory,
+  });
+};
 const diagnostics = (output: string) =>
   output.match(/effect\(no-bare-effect-try-promise\)/gu) ?? [];
 const runOxlint = (path: string) =>

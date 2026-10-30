@@ -222,10 +222,8 @@ export const checkDocumentation = Effect.fn("Documentation.check")(function* ({
     .pipe(
       Effect.map((entries) =>
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            entries,
-            Array.filter((entry) => entry.endsWith(".md"))
-          ),
+          entries,
+          Array.filter((entry) => entry.endsWith(".md")),
           Array.map((entry) => `docs/${entry}`)
         )
       )

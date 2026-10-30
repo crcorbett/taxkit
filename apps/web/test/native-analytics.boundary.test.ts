@@ -15,7 +15,6 @@ import { packEnvValue } from "alchemy/RuntimeContext";
 import {
   Array,
   Match,
-  Function as EffectFunction,
   Clock,
   Effect,
   Layer,
@@ -220,11 +219,8 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
           ],
           (name) =>
             Effect.sync(() => {
-              EffectFunction.pipe(request.headers.has(name), (argument1) => {
-                EffectFunction.pipe(name, (argument2) => {
-                  expect(argument1, argument2).toBeFalsy();
-                });
-              });
+              const actual = request.headers.has(name);
+              expect(actual, name).toBeFalsy();
             })
         );
         const bytes = yield* Effect.promise(() => request.text());

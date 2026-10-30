@@ -90,19 +90,12 @@ describe("IncomeTaxTable owned relationships", () => {
               const result = yield* IncomeTaxBracket.makeEffect(
                 scenario.input
               ).pipe(Effect.result);
-              EffectFunction.pipe(Result.isFailure(result), (argument1) => {
-                EffectFunction.pipe(scenario.name, (argument2) => {
-                  expect(argument1, argument2).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(IncomeTaxBracket))(scenario.input),
-                (argument3) => {
-                  EffectFunction.pipe(scenario.name, (argument4) => {
-                    expect(argument3, argument4).toBeFalsy();
-                  });
-                }
-              );
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(
+                Schema.toEncoded(IncomeTaxBracket)
+              )(scenario.input);
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );
@@ -221,19 +214,12 @@ describe("IncomeTaxTable owned relationships", () => {
               const result = yield* IncomeTaxTable.makeEffect(input).pipe(
                 Effect.result
               );
-              EffectFunction.pipe(Result.isFailure(result), (argument5) => {
-                EffectFunction.pipe(scenario.name, (argument6) => {
-                  expect(argument5, argument6).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(IncomeTaxTable))(input),
-                (argument7) => {
-                  EffectFunction.pipe(scenario.name, (argument8) => {
-                    expect(argument7, argument8).toBeFalsy();
-                  });
-                }
-              );
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(
+                Schema.toEncoded(IncomeTaxTable)
+              )(input);
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );
@@ -309,19 +295,12 @@ describe("LitoTable owned relationships", () => {
               const result = yield* LitoBracket.makeEffect(scenario.input).pipe(
                 Effect.result
               );
-              EffectFunction.pipe(Result.isFailure(result), (argument9) => {
-                EffectFunction.pipe(scenario.name, (argument10) => {
-                  expect(argument9, argument10).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(LitoBracket))(scenario.input),
-                (argument11) => {
-                  EffectFunction.pipe(scenario.name, (argument12) => {
-                    expect(argument11, argument12).toBeFalsy();
-                  });
-                }
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(Schema.toEncoded(LitoBracket))(
+                scenario.input
               );
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );
@@ -442,19 +421,12 @@ describe("LitoTable owned relationships", () => {
               const result = yield* LitoTable.makeEffect(input).pipe(
                 Effect.result
               );
-              EffectFunction.pipe(Result.isFailure(result), (argument13) => {
-                EffectFunction.pipe(scenario.name, (argument14) => {
-                  expect(argument13, argument14).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(LitoTable))(input),
-                (argument15) => {
-                  EffectFunction.pipe(scenario.name, (argument16) => {
-                    expect(argument15, argument16).toBeFalsy();
-                  });
-                }
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(Schema.toEncoded(LitoTable))(
+                input
               );
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );
@@ -544,19 +516,12 @@ describe("MedicareLevyTable owned relationships", () => {
               const result = yield* MedicareLevyTable.makeEffect(
                 scenario.input
               ).pipe(Effect.result);
-              EffectFunction.pipe(Result.isFailure(result), (argument17) => {
-                EffectFunction.pipe(scenario.name, (argument18) => {
-                  expect(argument17, argument18).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(MedicareLevyTable))(scenario.input),
-                (argument19) => {
-                  EffectFunction.pipe(scenario.name, (argument20) => {
-                    expect(argument19, argument20).toBeFalsy();
-                  });
-                }
-              );
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(
+                Schema.toEncoded(MedicareLevyTable)
+              )(scenario.input);
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );

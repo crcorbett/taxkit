@@ -290,10 +290,8 @@ it.live(
         ).pipe(Effect.andThen(discover()));
         expect({
           toolNames: EffectFunction.pipe(
-            EffectFunction.pipe(
-              initialTools,
-              Array.map((tool) => tool.name)
-            ),
+            initialTools,
+            Array.map((tool) => tool.name),
             Array.sort(Order.String)
           ),
           QueueClearCalls: yield* Queue.clear(calls),
@@ -416,7 +414,7 @@ it.live(
           },
         });
         expect({
-          length: Schema.is(CalculatorViewState)(filled),
+          viewChecked: Schema.is(CalculatorViewState)(filled),
           annualForm: {
             taxableIncomeInput: yield* Effect.promise(() =>
               page.getByLabel("Annual taxable income").inputValue()
@@ -424,7 +422,7 @@ it.live(
             QueueClearCalls: yield* Queue.clear(calls),
           },
         }).toStrictEqual({
-          length: true,
+          viewChecked: true,
           annualForm: {
             taxableIncomeInput: "75000",
             QueueClearCalls: [],
@@ -500,10 +498,10 @@ it.live(
         });
         if (Schema.is(CalculatorViewState)(edited)) {
           expect({
-            length: edited.stale,
+            isStale: edited.stale,
             editedReport: edited.report,
           }).toStrictEqual({
-            length: true,
+            isStale: true,
             editedReport: Match.value(annualResult).pipe(
               Match.when(
                 Schema.is(CalculatorViewState),
@@ -597,11 +595,11 @@ it.live(
           });
           if (Schema.is(CalculatorViewState)(afterAbort)) {
             expect({
-              length: !afterAbort.busy,
-              length2: afterAbort.stale,
+              isIdle: !afterAbort.busy,
+              isStale: afterAbort.stale,
             }).toStrictEqual({
-              length: true,
-              length2: true,
+              isIdle: true,
+              isStale: true,
             });
           } else {
             expect.fail(
@@ -664,12 +662,12 @@ it.live(
         });
         if (Schema.is(CalculatorViewState)(retriedCalculation)) {
           expect({
-            length: !retriedCalculation.busy,
-            length2: !retriedCalculation.stale,
+            isIdle: !retriedCalculation.busy,
+            isFresh: !retriedCalculation.stale,
             retryForm: retriedCalculation.form,
           }).toStrictEqual({
-            length: true,
-            length2: true,
+            isIdle: true,
+            isFresh: true,
             retryForm: { taxableDollars: "77000" },
           });
         } else {
@@ -728,8 +726,8 @@ it.live(
               returnedForm: returned.form,
               returnedReport: returned.report,
             },
-            length: !returned.busy,
-            length2: returned.stale,
+            isIdle: !returned.busy,
+            isStale: returned.stale,
           }).toStrictEqual({
             restoredCalculation: {
               returnedForm: { taxableDollars: "77000" },
@@ -741,8 +739,8 @@ it.live(
                 Match.orElse(() => Option.none())
               ),
             },
-            length: true,
-            length2: true,
+            isIdle: true,
+            isStale: true,
           });
         } else {
           expect.fail("Returned calculator lost its retained page snapshot");

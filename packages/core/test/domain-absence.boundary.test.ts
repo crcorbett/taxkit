@@ -232,14 +232,14 @@ describe("domain absence representations", () => {
         ...factInput,
         question: undefined,
       }).question,
-      makeFactDescriptorFactInputQuestionQuestion: makeFactDescriptor({
+      question: makeFactDescriptor({
         ...factInput,
         question,
       }).question,
     }).toStrictEqual({
       factQuestion: Option.none(),
       optionalQuestion: Option.none(),
-      makeFactDescriptorFactInputQuestionQuestion: Option.some(question),
+      question: Option.some(question),
     });
     expect(makeFactDescriptor({ ...factInput, question }).schema).toBe(
       Schema.Number
@@ -267,14 +267,13 @@ describe("domain absence representations", () => {
         title: "Fixture parameter",
       };
       expect({
-        makeParameterDescriptorInputSourceArtifact:
-          makeParameterDescriptor(input).sourceArtifact,
+        sourceArtifact: makeParameterDescriptor(input).sourceArtifact,
         optionalSourceArtifact: makeParameterDescriptor({
           ...input,
           sourceArtifact: undefined,
         }).sourceArtifact,
       }).toStrictEqual({
-        makeParameterDescriptorInputSourceArtifact: Option.none(),
+        sourceArtifact: Option.none(),
         optionalSourceArtifact: Option.none(),
       });
       const provided = makeParameterDescriptor({
@@ -344,19 +343,15 @@ describe("domain absence representations", () => {
       id: RuleId.make("fixture/other"),
     });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        validateRuleGraph({ inputFacts: [], rules: [missing, duplicate] }),
-        Array.map((issue) => issue.kind)
-      ),
+      validateRuleGraph({ inputFacts: [], rules: [missing, duplicate] }),
+      Array.map((issue) => issue.kind),
       (actual) => {
         expect(actual).toContain("duplicate-provider");
       }
     );
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        validateRuleGraph({ inputFacts: [], rules: [denied, duplicate] }),
-        Array.map((issue) => issue.kind)
-      ),
+      validateRuleGraph({ inputFacts: [], rules: [denied, duplicate] }),
+      Array.map((issue) => issue.kind),
       (actual) => {
         expect(actual).toContain("duplicate-provider");
       }
@@ -431,11 +426,11 @@ describe("calculation error diagnostic absence", () => {
               );
               expect({
                 decodedCause: decoded.cause,
-                SchemaEncodeEffectCalculationErrorDecoded:
+                encodedError:
                   yield* Schema.encodeEffect(CalculationError)(decoded),
               }).toStrictEqual({
                 decodedCause: form.cause,
-                SchemaEncodeEffectCalculationErrorDecoded: encoded,
+                encodedError: encoded,
               });
             })
           )

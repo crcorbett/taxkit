@@ -120,19 +120,11 @@ describe("derived money", () => {
       expect((yield* moneySub(minimum, zero)).cents).toBe(
         Number.MIN_SAFE_INTEGER
       );
+      const twoCents = EffectFunction.pipe(Cents.make(2), aud);
+      expect((yield* moneySub(oneCent, twoCents)).cents).toBe(-1);
+      const unrounded = EffectFunction.pipe(Cents.make(12_345), aud);
       expect(
-        (yield* EffectFunction.pipe(oneCent, (argument1) =>
-          EffectFunction.pipe(
-            EffectFunction.pipe(Cents.make(2), aud),
-            (argument2) => moneySub(argument1, argument2)
-          )
-        )).cents
-      ).toBe(-1);
-      expect(
-        (yield* EffectFunction.pipe(
-          EffectFunction.pipe(Cents.make(12_345), aud),
-          (argument3) => roundMoney(argument3, "ato-withholding-rounding")
-        )).cents
+        (yield* roundMoney(unrounded, "ato-withholding-rounding")).cents
       ).toBe(12_300);
     })
   );
@@ -194,20 +186,10 @@ describe("exact decimal operations", () => {
         }
       );
       const coefficient = yield* decimalCoefficient("0.5");
-      expect(
-        yield* EffectFunction.pipe(Cents.make(3), (argument5) =>
-          EffectFunction.pipe(coefficient, (argument6) =>
-            multiplyCentsByDecimal(argument5, argument6)
-          )
-        )
-      ).toBe(2);
-      expect(
-        yield* EffectFunction.pipe(Cents.make(-3), (argument7) =>
-          EffectFunction.pipe(coefficient, (argument8) =>
-            multiplyCentsByDecimal(argument7, argument8)
-          )
-        )
-      ).toBe(-2);
+      const positive = Cents.make(3);
+      const negative = Cents.make(-3);
+      expect(yield* multiplyCentsByDecimal(positive, coefficient)).toBe(2);
+      expect(yield* multiplyCentsByDecimal(negative, coefficient)).toBe(-2);
       expect(
         yield* decimalDollarsToCents(yield* decimalCoefficient("1.235"))
       ).toBe(124);

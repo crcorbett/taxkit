@@ -282,10 +282,8 @@ describe("production-only telemetry stacks", () => {
         const planned = yield* plan(compiled);
         expect(yield* Ref.get(stack.writes)).toBe(0);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            Record.keys(planned.resources),
-            Array.sort(Order.String)
-          ),
+          Record.keys(planned.resources),
+          Array.sort(Order.String),
           (actual) => {
             expect(actual).toStrictEqual([
               "TaxKitRequestFailures",
@@ -297,10 +295,8 @@ describe("production-only telemetry stacks", () => {
           }
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            Record.values(planned.resources),
-            Array.every(({ action }) => action === "create")
-          ),
+          Record.values(planned.resources),
+          Array.every(({ action }) => action === "create"),
           (actual) => {
             expect(actual).toBeTruthy();
           }
@@ -332,10 +328,8 @@ describe("production-only telemetry stacks", () => {
             )
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            dashboards,
-            Array.map(({ props }) => props.uid)
-          ),
+          dashboards,
+          Array.map(({ props }) => props.uid),
           (actual) => {
             expect(actual).toStrictEqual([
               "taxkit-request-overview",
@@ -357,18 +351,14 @@ describe("production-only telemetry stacks", () => {
         );
         expect(queries.length).toBeGreaterThan(15);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            queries,
-            Array.filter(
-              ({ query }) =>
-                !query.apl.includes("['site-prod-logs']") ||
-                !query.apl.includes(
-                  "Service in ('taxkit-api', 'taxkit-web')"
-                ) ||
-                /site-prod-traces|site-prod-metrics|url|header|salary|income|gross/iu.test(
-                  query.apl
-                )
-            )
+          queries,
+          Array.filter(
+            ({ query }) =>
+              !query.apl.includes("['site-prod-logs']") ||
+              !query.apl.includes("Service in ('taxkit-api', 'taxkit-web')") ||
+              /site-prod-traces|site-prod-metrics|url|header|salary|income|gross/iu.test(
+                query.apl
+              )
           ),
           (actual) => {
             expect(actual).toStrictEqual([]);
@@ -388,10 +378,8 @@ describe("production-only telemetry stacks", () => {
         const planned = yield* plan(compiled);
         expect(yield* Ref.get(stack.writes)).toBe(0);
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            Record.keys(planned.resources),
-            Array.sort(Order.String)
-          ),
+          Record.keys(planned.resources),
+          Array.sort(Order.String),
           (actual) => {
             expect(actual).toStrictEqual([
               "TaxKitAxiomLogs",
@@ -407,15 +395,13 @@ describe("production-only telemetry stacks", () => {
             )
         );
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            destinations,
-            Array.map(({ props }) => [
-              props.name,
-              props.logpushDataset,
-              props.url,
-              Record.get(props.headers, "X-Axiom-Dataset"),
-            ])
-          ),
+          destinations,
+          Array.map(({ props }) => [
+            props.name,
+            props.logpushDataset,
+            props.url,
+            Record.get(props.headers, "X-Axiom-Dataset"),
+          ]),
           (actual) => {
             expect(actual).toStrictEqual([
               [
@@ -436,13 +422,11 @@ describe("production-only telemetry stacks", () => {
         // The bearer header comes from the retained token. Compare without
         // printing it.
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            destinations,
-            Array.every(
-              ({ props }) =>
-                Redacted.value(props.headers.Authorization) ===
-                `Bearer ${ingestSentinel}`
-            )
+          destinations,
+          Array.every(
+            ({ props }) =>
+              Redacted.value(props.headers.Authorization) ===
+              `Bearer ${ingestSentinel}`
           ),
           (actual) => {
             // The bearer header comes from the retained token. Compare without
@@ -452,10 +436,8 @@ describe("production-only telemetry stacks", () => {
         );
         // Workers read only the two names; headers never become outputs.
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            Record.keys(compiled.output),
-            Array.sort(Order.String)
-          ),
+          Record.keys(compiled.output),
+          Array.sort(Order.String),
           (actual) => {
             // Workers read only the two names; headers never become outputs.
             expect(actual).toStrictEqual([

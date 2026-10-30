@@ -67,13 +67,9 @@ const selectedTarget = (target: ExportTarget): boolean | undefined => {
     return undefined;
   }
   return EffectFunction.pipe(
-    EffectFunction.pipe(
-      EffectFunction.pipe(
-        Record.toEntries(target),
-        Array.filter(([condition]) => Array.contains(conditions, condition))
-      ),
-      Array.map(([, value]) => selectedTarget(value))
-    ),
+    Record.toEntries(target),
+    Array.filter(([condition]) => Array.contains(conditions, condition)),
+    Array.map(([, value]) => selectedTarget(value)),
     Array.findFirst((value): value is boolean => !Predicate.isUndefined(value))
   ).pipe(Option.getOrUndefined);
 };

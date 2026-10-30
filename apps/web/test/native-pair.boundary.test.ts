@@ -222,17 +222,11 @@ describe("built native API and Website", () => {
               Effect.sync(() => {
                 expect(clientCode).not.toContain(marker);
                 expect(apiCode).not.toContain(marker);
-                EffectFunction.pipe(
-                  EffectFunction.pipe(
-                    Record.values(websiteModules),
-                    Array.some((module) => module.contents.includes(marker))
-                  ),
-                  (argument1) => {
-                    EffectFunction.pipe(marker, (argument2) => {
-                      expect(argument1, argument2).toBeFalsy();
-                    });
-                  }
+                const actual = EffectFunction.pipe(
+                  Record.values(websiteModules),
+                  Array.some((module) => module.contents.includes(marker))
                 );
+                expect(actual, marker).toBeFalsy();
               })
           );
           expect(
@@ -354,13 +348,11 @@ describe("built native API and Website", () => {
               });
               expect(files).toContain("worker.js");
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  Record.values(modules),
-                  Array.some(
-                    (module) =>
-                      module.contents.includes("PRIVATE9") ||
-                      module.contents.includes("/private9")
-                  )
+                Record.values(modules),
+                Array.some(
+                  (module) =>
+                    module.contents.includes("PRIVATE9") ||
+                    module.contents.includes("/private9")
                 ),
                 (actual) => {
                   expect(actual).toBeTruthy();
@@ -542,10 +534,8 @@ describe("built native API and Website", () => {
               expect(results.length).toBeGreaterThan(0);
               expect(results.length).toBeLessThanOrEqual(20);
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  results,
-                  Array.every((result) => result.excerpt.length <= 240)
-                ),
+                results,
+                Array.every((result) => result.excerpt.length <= 240),
                 (actual) => {
                   expect(actual).toBeTruthy();
                 }
@@ -1059,12 +1049,13 @@ describe("built native API and Website", () => {
                     expect({
                       responseHeadersGetCacheControl:
                         response.headers.get("cache-control"),
-                      responseHeadersGetCloudflareCdnCacheControl:
-                        response.headers.get("cloudflare-cdn-cache-control"),
+                      cdnCacheControl: response.headers.get(
+                        "cloudflare-cdn-cache-control"
+                      ),
                       body,
                     }).toStrictEqual({
                       responseHeadersGetCacheControl: "public, max-age=0",
-                      responseHeadersGetCloudflareCdnCacheControl:
+                      cdnCacheControl:
                         "public, max-age=604800, stale-if-error=0",
                       body: "",
                     });
@@ -1171,20 +1162,16 @@ describe("built native API and Website", () => {
             Schema.fromJsonString(Schema.Array(DocsSearchResult))
           )(yield* Effect.promise(() => docsSearch.text()));
           EffectFunction.pipe(
-            EffectFunction.pipe(
-              docsResults,
-              Array.some((result) => result.path === "/start/quickstart")
-            ),
+            docsResults,
+            Array.some((result) => result.path === "/start/quickstart"),
             (actual) => {
               expect(actual).toBeTruthy();
             }
           );
           expect(docsResults.length).toBeLessThanOrEqual(20);
           EffectFunction.pipe(
-            EffectFunction.pipe(
-              docsResults,
-              Array.every((result) => result.excerpt.length <= 240)
-            ),
+            docsResults,
+            Array.every((result) => result.excerpt.length <= 240),
             (actual) => {
               expect(actual).toBeTruthy();
             }
@@ -1246,14 +1233,14 @@ describe("built native API and Website", () => {
                   Effect.provide(FetchHttpClient.layer)
                 );
                 expect({
-                  length: catalogue.calculators.length,
+                  calculatorCount: catalogue.calculators.length,
                   calculatorIds: EffectFunction.pipe(
                     catalogue.calculators,
                     Array.map((value) => value.calculatorId),
                     Array.sort(Order.String)
                   ),
                 }).toStrictEqual({
-                  length: 3,
+                  calculatorCount: 3,
                   calculatorIds: [
                     "au.income-tax.annual",
                     "au.pay.take-home",
@@ -1334,21 +1321,21 @@ describe("built native API and Website", () => {
             });
           }).pipe(Effect.provide(FetchHttpClient.layer));
           expect({
-            length: !EffectFunction.pipe(
+            serverFunctionsAbsent: !EffectFunction.pipe(
               Record.values(websiteModules),
               Array.some((module) =>
                 /"[a-f0-9]{64}":\s*\{\s*functionName:/u.test(module.contents)
               )
             ),
-            length2: !EffectFunction.pipe(
+            serverFunctionHandlerAbsent: !EffectFunction.pipe(
               Record.values(websiteModules),
               Array.some((module) =>
                 module.contents.includes("_createServerFn_handler")
               )
             ),
           }).toStrictEqual({
-            length: true,
-            length2: true,
+            serverFunctionsAbsent: true,
+            serverFunctionHandlerAbsent: true,
           });
           yield* Effect.forEach(
             [
@@ -1603,7 +1590,7 @@ describe("built native API and Website", () => {
             });
             const requests = yield* Queue.clear(calculationCalls);
             expect({
-              length: requests.length,
+              requestCount: requests.length,
               calculationRequests: EffectFunction.pipe(
                 requests,
                 Array.map((request) => ({
@@ -1612,7 +1599,7 @@ describe("built native API and Website", () => {
                 }))
               ),
             }).toStrictEqual({
-              length: 1,
+              requestCount: 1,
               calculationRequests: [
                 { method: "POST", url: takeHomeCalculation },
               ],
@@ -1626,15 +1613,13 @@ describe("built native API and Website", () => {
               )
             );
             EffectFunction.pipe(
-              EffectFunction.pipe(
-                sentHeaders,
-                Array.every(
-                  (headers) =>
-                    !Record.has(headers, "b3") &&
-                    !Record.has(headers, "traceparent") &&
-                    !Record.has(headers, "cookie") &&
-                    !Record.has(headers, "x-taxkit-collection-policy")
-                )
+              sentHeaders,
+              Array.every(
+                (headers) =>
+                  !Record.has(headers, "b3") &&
+                  !Record.has(headers, "traceparent") &&
+                  !Record.has(headers, "cookie") &&
+                  !Record.has(headers, "x-taxkit-collection-policy")
               ),
               (actual) => {
                 expect(actual).toBeTruthy();
@@ -1722,10 +1707,10 @@ describe("built native API and Website", () => {
             retainedNetPayCount: yield* Effect.promise(() =>
               page.getByText("$1,301.00", { exact: true }).count()
             ),
-            length: (yield* Queue.clear(calls)).length,
+            calculationCount: (yield* Queue.clear(calls)).length,
           }).toStrictEqual({
             retainedNetPayCount: 1,
-            length: 1,
+            calculationCount: 1,
           });
           return { payInput: savedPayInput };
         }).pipe(Effect.withSpan("NativePair.verifyRecalculation"));
@@ -2190,7 +2175,7 @@ describe("built native API and Website", () => {
               }, discoverySitemap.body)
             );
             expect({
-              length: !parsedSitemap.hasParserError,
+              sitemapParsed: !parsedSitemap.hasParserError,
               sitemapDocument: {
                 parsedSitemapNamespace: parsedSitemap.namespace,
                 parsedSitemapLocationCount: parsedSitemap.locationCount,
@@ -2199,7 +2184,7 @@ describe("built native API and Website", () => {
                 .trim()
                 .split(/\s+/u),
             }).toStrictEqual({
-              length: true,
+              sitemapParsed: true,
               sitemapDocument: {
                 parsedSitemapNamespace:
                   "http://www.sitemaps.org/schemas/sitemap/0.9",
@@ -2252,16 +2237,15 @@ describe("built native API and Website", () => {
                   documentationPage.locator(".docs-article h1").count()
                 ),
               },
-              length: !(yield* Effect.promise(() =>
+              headingUnfocused: !(yield* Effect.promise(() =>
                 documentationPage
                   .locator(".docs-article h1")
                   .evaluate((heading) => heading === document.activeElement)
               )),
               articleLandmarks: {
-                EffectPromiseDocsPageGetByRoleArticleCount:
-                  yield* Effect.promise(() =>
-                    documentationPage.getByRole("article").count()
-                  ),
+                articleCount: yield* Effect.promise(() =>
+                  documentationPage.getByRole("article").count()
+                ),
                 documentationNavigationCount: yield* Effect.promise(() =>
                   documentationPage
                     .getByRole("navigation", {
@@ -2271,7 +2255,7 @@ describe("built native API and Website", () => {
                     .count()
                 ),
               },
-              length2: yield* Effect.promise(() =>
+              bodyFocused: yield* Effect.promise(() =>
                 documentationPage.evaluate(
                   () => document.activeElement === document.body
                 )
@@ -2281,12 +2265,12 @@ describe("built native API and Website", () => {
                 EffectPromiseDocsPageLocatorMainCount: 1,
                 pageHeadingCount: 1,
               },
-              length: true,
+              headingUnfocused: true,
               articleLandmarks: {
-                EffectPromiseDocsPageGetByRoleArticleCount: 1,
+                articleCount: 1,
                 documentationNavigationCount: 1,
               },
-              length2: true,
+              bodyFocused: true,
             });
             yield* expectReadableText({
               page: documentationPage,
@@ -2579,7 +2563,7 @@ describe("built native API and Website", () => {
               .waitFor()
           );
           expect({
-            length: yield* Effect.promise(() =>
+            headingFocused: yield* Effect.promise(() =>
               docsPage
                 .locator(".docs-article h1")
                 .evaluate((heading) => heading === document.activeElement)
@@ -2594,7 +2578,7 @@ describe("built native API and Website", () => {
               Array.sort(Order.String)
             ),
           }).toStrictEqual({
-            length: true,
+            headingFocused: true,
             currentNavigationHref: "/sdk/typescript-sdk",
             documentationRequests: [
               `GET ${docsNavigationAddress}`,
@@ -2609,8 +2593,8 @@ describe("built native API and Website", () => {
             )
           );
           expect({
-            length: docsHeaders.length,
-            length2: EffectFunction.pipe(
+            headerCount: docsHeaders.length,
+            privateHeadersAbsent: EffectFunction.pipe(
               docsHeaders,
               Array.every(
                 (headers) =>
@@ -2621,8 +2605,8 @@ describe("built native API and Website", () => {
             ),
             QueueClearDocsDocuments: yield* Queue.clear(docsDocuments),
           }).toStrictEqual({
-            length: 2,
-            length2: true,
+            headerCount: 2,
+            privateHeadersAbsent: true,
             QueueClearDocsDocuments: [],
           });
           yield* Effect.promise(() =>
@@ -2738,12 +2722,12 @@ describe("built native API and Website", () => {
             docsPage.locator(".docs-navigation-panel summary").click()
           );
           expect({
-            length: yield* Effect.promise(() =>
+            fitsViewport: yield* Effect.promise(() =>
               docsPage.evaluate(
                 () => document.documentElement.scrollWidth <= window.innerWidth
               )
             ),
-            length2: yield* Effect.promise(() =>
+            diagramLoaded: yield* Effect.promise(() =>
               docsPage
                 .getByRole("img", {
                   name: "Which contribution guide matches your change",
@@ -2754,8 +2738,8 @@ describe("built native API and Website", () => {
                 )
             ),
           }).toStrictEqual({
-            length: true,
-            length2: true,
+            fitsViewport: true,
+            diagramLoaded: true,
           });
           expect(
             yield* Effect.promise(() =>

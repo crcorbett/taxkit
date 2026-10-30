@@ -76,9 +76,9 @@ it.effect.each([
           Match.orElse(() => page.path)
         ),
       }).pipe(Effect.result);
-      const outcome = Match.value(result).pipe(
-        Match.when(Result.isSuccess, (): "Success" => "Success"),
-        Match.orElse(({ failure }) =>
+      const outcome = Result.match(result, {
+        onSuccess: (): "Success" => "Success",
+        onFailure: (failure) =>
           Match.value(failure).pipe(
             Match.tag("ApiReplyMismatch", () => "ApiReplyMismatch"),
             Match.tag("ApiUnavailable", () => "ApiUnavailable"),
@@ -89,9 +89,8 @@ it.effect.each([
             Match.tag("SchemaError", () => "SchemaError"),
             Match.tag("TimeoutError", () => "TimeoutError"),
             Match.exhaustive
-          )
-        )
-      );
+          ),
+      });
       expect(outcome).toBe(expected);
       if (Result.isSuccess(result)) {
         expect(result.success.page.path).toBe(page.path);

@@ -395,12 +395,8 @@ const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
 };
 const noConsoleOutsideRuntime: OxlintRule = {
   create(context) {
-    const tracker = EffectFunction.pipe(context.sourceCode, (argument1) =>
-      EffectFunction.pipe(
-        HashMap.fromIterable([["console", "Global.console"]]),
-        (argument2) => createBindingTracker(argument1, argument2)
-      )
-    );
+    const bindings = HashMap.fromIterable([["console", "Global.console"]]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     return {
       AssignmentExpression(node) {
         const source = tracker.semanticOfExpression(node.right);
@@ -462,12 +458,8 @@ const processBoundaryMembers = HashSet.fromIterable([
 ]);
 const noProcessOutsideBoundaries: OxlintRule = {
   create(context) {
-    const tracker = EffectFunction.pipe(context.sourceCode, (argument3) =>
-      EffectFunction.pipe(
-        HashMap.fromIterable([["process", "Global.process"]]),
-        (argument4) => createBindingTracker(argument3, argument4)
-      )
-    );
+    const bindings = HashMap.fromIterable([["process", "Global.process"]]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     const reportDestructuredMembers = (
       pattern: SyntaxNode | null | undefined,
       source: Option.Option<string>,
@@ -532,16 +524,8 @@ const noProcessOutsideBoundaries: OxlintRule = {
       },
       VariableDeclarator(node) {
         tracker.trackVariable(node);
-        EffectFunction.pipe(node.id, (argument5) => {
-          EffectFunction.pipe(
-            tracker.semanticOfExpression(node.init),
-            (argument6) => {
-              EffectFunction.pipe(node.id, (argument7) => {
-                reportDestructuredMembers(argument5, argument6, argument7);
-              });
-            }
-          );
-        });
+        const semantic = tracker.semanticOfExpression(node.init);
+        reportDestructuredMembers(node.id, semantic, node.id);
       },
     };
   },
@@ -683,15 +667,13 @@ const noBareEffectTryPromise: OxlintRule = {
           );
         const inlineFunctionKeys = HashSet.fromIterable(
           EffectFunction.pipe(
-            EffectFunction.pipe(
-              optionProperties,
-              EffectArray.filter(
-                (property) =>
-                  property.type === "Property" &&
-                  property.kind === "init" &&
-                  (property.value?.type === "ArrowFunctionExpression" ||
-                    property.value?.type === "FunctionExpression")
-              )
+            optionProperties,
+            EffectArray.filter(
+              (property) =>
+                property.type === "Property" &&
+                property.kind === "init" &&
+                (property.value?.type === "ArrowFunctionExpression" ||
+                  property.value?.type === "FunctionExpression")
             ),
             EffectArray.map((property) =>
               Match.value(property).pipe(

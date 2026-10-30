@@ -157,14 +157,13 @@ export const observeHostRequest =
         Effect.onExit((exit) =>
           Effect.gen(function* () {
             const finished = yield* Clock.currentTimeMillis;
-            const status = Match.value(exit).pipe(
-              Match.when(Exit.isSuccess, (matchedValue) =>
-                Option.some(matchedValue.value.status).pipe(
+            const status = Exit.match(exit, {
+              onFailure: () => Option.none(),
+              onSuccess: (response) =>
+                Option.some(response.status).pipe(
                   Option.filter(Schema.is(HttpStatus))
-                )
-              ),
-              Match.orElse(() => Option.none())
-            );
+                ),
+            });
             yield* Effect.logInfo(
               HostRequestRecord.make({
                 durationMs: Math.max(0, Math.round(finished - started)),

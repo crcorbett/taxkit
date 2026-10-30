@@ -380,12 +380,10 @@ const failure = <A, E>(exit: Exit.Exit<A, E>) => {
   EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
     expect(actual).toBeTruthy();
   });
-  return Match.value(exit).pipe(
-    Match.when(Exit.isFailure, (matchedValue) =>
-      Cause.findErrorOption(matchedValue.cause)
-    ),
-    Match.orElse(() => Option.none())
-  );
+  return Exit.match(exit, {
+    onFailure: Cause.findErrorOption,
+    onSuccess: () => Option.none(),
+  });
 };
 describe("shared calculation work policy", () => {
   it.effect.each(MetadataWorkCases)(
@@ -416,10 +414,10 @@ describe("shared calculation work policy", () => {
         expect(!(yield* Ref.get(released))).toBeTruthy();
         yield* TestClock.adjust("1 second");
         expect({
-          length: yield* Ref.get(released),
+          resourcesReleased: yield* Ref.get(released),
           failureYieldFiberAwaitCall: failure(yield* Fiber.await(call)),
         }).toStrictEqual({
-          length: true,
+          resourcesReleased: true,
           failureYieldFiberAwaitCall: Option.some(
             new CalculatorOperationTimedOut()
           ),
@@ -434,18 +432,12 @@ describe("shared calculation work policy", () => {
         const live = yield* PublicCalculatorService;
         const started = yield* Deferred.make<boolean>();
         const released = yield* Ref.make(false);
-        const service = yield* EffectFunction.pipe(
-          EffectFunction.pipe(live, (argument1) =>
-            EffectFunction.pipe(
-              Deferred.succeed(started, true).pipe(
-                Effect.andThen(Effect.never),
-                Effect.ensuring(Ref.set(released, true))
-              ),
-              (argument2) => substitute(argument1, argument2)
-            )
-          ),
-          bounded
+        const work = Deferred.succeed(started, true).pipe(
+          Effect.andThen(Effect.never),
+          Effect.ensuring(Ref.set(released, true))
         );
+        const implementation = substitute(live, work);
+        const service = yield* bounded(implementation);
         const call = yield* invoke(service).pipe(Effect.forkScoped);
         yield* Deferred.await(started);
         yield* TestClock.adjust("1 second");
@@ -546,7 +538,7 @@ describe("shared calculation work policy", () => {
         );
         yield* Effect.yieldNow;
         expect({
-          length: yield* Deferred.isDone(refused),
+          requestRefused: yield* Deferred.isDone(refused),
           failureYieldFiberJoinNinth: failure(yield* Fiber.join(ninth)),
           admissionState: {
             RefGetActive: yield* Ref.get(active),
@@ -554,7 +546,7 @@ describe("shared calculation work policy", () => {
               .calculators.length,
           },
         }).toStrictEqual({
-          length: true,
+          requestRefused: true,
           failureYieldFiberJoinNinth: Option.some(
             new CalculatorCapacityExceeded()
           ),
@@ -636,10 +628,10 @@ describe("shared calculation work policy", () => {
         expect(!(yield* Ref.get(released))).toBeTruthy();
         yield* TestClock.adjust("1 second");
         expect({
-          length: yield* Ref.get(released),
+          resourcesReleased: yield* Ref.get(released),
           failureYieldFiberAwaitCall: failure(yield* Fiber.await(call)),
         }).toStrictEqual({
-          length: true,
+          resourcesReleased: true,
           failureYieldFiberAwaitCall: Option.some(
             new CalculatorOperationTimedOut()
           ),
@@ -916,20 +908,12 @@ describe("shared calculation work policy", () => {
       yield* Deferred.await(started);
       expect({
         RefGetCount: yield* Ref.get(count),
-        failureYieldEffectExitFirstCalculateRequest: failure(
-          yield* Effect.exit(first.calculate(Request))
-        ),
-        failureYieldEffectExitSecondCalculateRequest: failure(
-          yield* Effect.exit(second.calculate(Request))
-        ),
+        firstFailure: failure(yield* Effect.exit(first.calculate(Request))),
+        secondFailure: failure(yield* Effect.exit(second.calculate(Request))),
       }).toStrictEqual({
         RefGetCount: 16,
-        failureYieldEffectExitFirstCalculateRequest: Option.some(
-          new CalculatorCapacityExceeded()
-        ),
-        failureYieldEffectExitSecondCalculateRequest: Option.some(
-          new CalculatorCapacityExceeded()
-        ),
+        firstFailure: Option.some(new CalculatorCapacityExceeded()),
+        secondFailure: Option.some(new CalculatorCapacityExceeded()),
       });
     }).pipe(Effect.provide(Live), Effect.scoped)
   );

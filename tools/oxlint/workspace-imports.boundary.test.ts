@@ -39,10 +39,8 @@ const rejected = (file: string, source: string, code: string) =>
       expect(result.exitCode, `${file}: ${source}\n${result.output}`).toBe(1);
       expect(result.report.number_of_files).toBe(1);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          result.report.diagnostics,
-          Array.map((entry) => entry.code)
-        ),
+        result.report.diagnostics,
+        Array.map((entry) => entry.code),
         (actual) => {
           expect(actual).toContain(code);
         }

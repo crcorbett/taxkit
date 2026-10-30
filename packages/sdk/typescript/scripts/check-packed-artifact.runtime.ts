@@ -179,10 +179,8 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
     sdkRootPath
   );
   const packedFiles = EffectFunction.pipe(
-    EffectFunction.pipe(
-      tarListing.stdout.split("\n"),
-      EffectArray.filter((packedFile) => packedFile.startsWith("package/"))
-    ),
+    tarListing.stdout.split("\n"),
+    EffectArray.filter((packedFile) => packedFile.startsWith("package/")),
     EffectArray.map((packedFile) => packedFile.replace(/^package\//u, ""))
   );
   yield* runCommand(

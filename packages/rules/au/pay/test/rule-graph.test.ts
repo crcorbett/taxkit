@@ -457,10 +457,8 @@ describe("AU take-home pay rule graph", () => {
       rules: AuTakeHomePayRuleDescriptors,
     });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        issues,
-        EffectArray.map((issue) => issue.kind)
-      ),
+      issues,
+      EffectArray.map((issue) => issue.kind),
       (actual) => {
         expect(actual).toContain("missing-provider");
       }
@@ -518,10 +516,8 @@ describe("AU take-home pay rule graph", () => {
       ],
     });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        issues,
-        EffectArray.map((issue) => issue.kind)
-      ),
+      issues,
+      EffectArray.map((issue) => issue.kind),
       (actual) => {
         expect(actual).toContain("parameter-source-mismatch");
       }
@@ -560,10 +556,8 @@ describe("AU take-home pay rule graph", () => {
       ],
     });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        issues,
-        EffectArray.map((issue) => issue.kind)
-      ),
+      issues,
+      EffectArray.map((issue) => issue.kind),
       (actual) => {
         expect(actual).toContain("parameter-overlap");
       }

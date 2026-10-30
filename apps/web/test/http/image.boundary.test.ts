@@ -103,16 +103,11 @@ describe("documentation share images", () => {
   ])(
     "answers $expected for an unusable API reply",
     Effect.fnUntraced(function* ({ expected, reply }) {
-      const { response } = yield* EffectFunction.pipe(
-        "/og/start/quickstart.png",
-        (argument1) =>
-          EffectFunction.pipe(reply(), (argument2) =>
-            answer({
-              address: argument1,
-              reply: argument2,
-            })
-          )
-      );
+      const upstreamResponse = reply();
+      const { response } = yield* answer({
+        address: "/og/start/quickstart.png",
+        reply: upstreamResponse,
+      });
       const answered = yield* Effect.fromOption(response);
       expect(answered.status).toBe(expected);
       EffectFunction.pipe(
@@ -133,10 +128,8 @@ describe("documentation share images", () => {
       });
       expect(posted.forwarded).toStrictEqual([]);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          posted.response,
-          Option.map((reply) => reply.status)
-        ),
+        posted.response,
+        Option.map((reply) => reply.status),
         (actual) => {
           expect(actual).toStrictEqual(Option.some(405));
         }
@@ -147,10 +140,8 @@ describe("documentation share images", () => {
       });
       expect(invalid.forwarded).toStrictEqual([]);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          invalid.response,
-          Option.map((reply) => reply.status)
-        ),
+        invalid.response,
+        Option.map((reply) => reply.status),
         (actual) => {
           expect(actual).toStrictEqual(Option.some(404));
         }

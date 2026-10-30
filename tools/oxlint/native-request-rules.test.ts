@@ -195,22 +195,15 @@ export type Values = Env;`,
     },
   ])("$name", ({ count, path, rule, source }) =>
     Effect.gen(function* () {
-      yield* EffectFunction.pipe(
-        nodePath.join(repositoryRoot, path),
-        (argument1) =>
-          EffectFunction.pipe(source, (argument2) =>
-            writeLintFixture({
-              path: argument1,
-              source: argument2,
-            })
-          )
-      );
+      const fixturePath = nodePath.join(repositoryRoot, path);
+      yield* writeLintFixture({
+        path: fixturePath,
+        source,
+      });
       const codes = yield* runOxlint(path);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          codes,
-          Array.filter((code) => code === rule)
-        ),
+        codes,
+        Array.filter((code) => code === rule),
         (actual) => {
           expect(actual).toHaveLength(count);
         }
@@ -230,16 +223,14 @@ export type Values = Env;`,
     Effect.gen(function* () {
       const codes = yield* runOxlint(path);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          codes,
-          Array.filter(
-            (code) =>
-              code.startsWith("strict-effect(website-") ||
-              code === "strict-effect(no-loader-request-state)" ||
-              code === "strict-effect(static-layers)" ||
-              code === "strict-effect(native-cloudflare-cache)" ||
-              code === "strict-effect(no-native-client-replica)"
-          )
+        codes,
+        Array.filter(
+          (code) =>
+            code.startsWith("strict-effect(website-") ||
+            code === "strict-effect(no-loader-request-state)" ||
+            code === "strict-effect(static-layers)" ||
+            code === "strict-effect(native-cloudflare-cache)" ||
+            code === "strict-effect(no-native-client-replica)"
         ),
         (actual) => {
           expect(actual).toStrictEqual([]);
@@ -252,18 +243,11 @@ export type Values = Env;`,
     () =>
       Effect.gen(function* () {
         const path = "packages/sdk/typescript/src/.generated-type-aware.ts";
-        yield* EffectFunction.pipe(
-          nodePath.join(repositoryRoot, path),
-          (argument3) =>
-            EffectFunction.pipe(
-              "export const native = () => Promise.resolve(1); native();",
-              (argument4) =>
-                writeLintFixture({
-                  path: argument3,
-                  source: argument4,
-                })
-            )
-        );
+        const fixturePath = nodePath.join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source: "export const native = () => Promise.resolve(1); native();",
+        });
         const codes = yield* runOxlint(path, ["--type-aware"]);
         expect(codes).toContain("typescript(no-floating-promises)");
         expect(codes).not.toContain("typescript(promise-function-async)");

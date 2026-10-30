@@ -59,20 +59,14 @@ describe("repository path policy", () => {
         [checkoutDirectory, "/site/packages/content"].join(""),
       ],
     ] as const;
-    const findings = EffectFunction.pipe(fixtureFile, (argument1) =>
-      EffectFunction.pipe(
-        EffectFunction.pipe(
-          rejected,
-          Array.map(([, value]) => value)
-        ).join("\n"),
-        (argument2) => inspectRepositoryText(argument1, argument2)
-      )
-    );
+    const text = EffectFunction.pipe(
+      rejected,
+      Array.map(([, value]) => value)
+    ).join("\n");
+    const findings = inspectRepositoryText(fixtureFile, text);
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        findings,
-        Array.map((finding) => finding.category)
-      ),
+      findings,
+      Array.map((finding) => finding.category),
       (actual) => {
         expect(actual).toStrictEqual(
           EffectFunction.pipe(
@@ -83,19 +77,15 @@ describe("repository path policy", () => {
       }
     );
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        findings,
-        Array.map((finding) => finding.line)
-      ),
+      findings,
+      Array.map((finding) => finding.line),
       (actual) => {
         expect(actual).toStrictEqual([1, 2, 3, 4, 5]);
       }
     );
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        findings,
-        EffectArray.every((finding) => !Predicate.hasProperty(finding, "match"))
-      ),
+      findings,
+      EffectArray.every((finding) => !Predicate.hasProperty(finding, "match")),
       (actual) => {
         expect(actual).toBeTruthy();
       }
@@ -110,16 +100,9 @@ describe("repository path policy", () => {
       "Several projects are useful references.",
       "~/.portless/config.json",
     ];
-    EffectFunction.pipe(
-      EffectFunction.pipe(fixtureFile, (argument3) =>
-        EffectFunction.pipe(accepted.join("\n"), (argument4) =>
-          inspectRepositoryText(argument3, argument4)
-        )
-      ),
-      (actual) => {
-        expect(actual).toStrictEqual([]);
-      }
-    );
+    const source = accepted.join("\n");
+    const findings = inspectRepositoryText(fixtureFile, source);
+    expect(findings).toStrictEqual([]);
   });
 
   it.each([
@@ -130,13 +113,9 @@ describe("repository path policy", () => {
     "NOTICE",
   ])("reports portable line locations for %s", (file) => {
     const rejectedPath = ["~", "/", checkoutDirectory, "/taxkit"].join("");
-    const findings = EffectFunction.pipe(
-      RepositoryRelativeFile.make(file),
-      (argument5) =>
-        EffectFunction.pipe(`portable\r\n${rejectedPath}`, (argument6) =>
-          inspectRepositoryText(argument5, argument6)
-        )
-    );
+    const relativeFile = RepositoryRelativeFile.make(file);
+    const text = `portable\r\n${rejectedPath}`;
+    const findings = inspectRepositoryText(relativeFile, text);
     expect(findings).toHaveLength(1);
     const finding = Array.head(findings).pipe(
       Option.getOrElse(() => expect.fail("Expected a path finding"))
@@ -178,21 +157,12 @@ describe("repository path policy", () => {
       checkoutDirectory,
       "/taxkit",
     ].join("");
+    const lastFile = RepositoryRelativeFile.make("z-last.md");
+    const firstFile = RepositoryRelativeFile.make("a-first.md");
+    const source = `portable\n${privatePath}`;
     const findings = [
-      ...EffectFunction.pipe(
-        RepositoryRelativeFile.make("z-last.md"),
-        (argument7) =>
-          EffectFunction.pipe(`portable\n${privatePath}`, (argument8) =>
-            inspectRepositoryText(argument7, argument8)
-          )
-      ),
-      ...EffectFunction.pipe(
-        RepositoryRelativeFile.make("a-first.md"),
-        (argument9) =>
-          EffectFunction.pipe(privatePath, (argument10) =>
-            inspectRepositoryText(argument9, argument10)
-          )
-      ),
+      ...inspectRepositoryText(lastFile, source),
+      ...inspectRepositoryText(firstFile, privatePath),
     ];
     const report = createRepositoryPathReport({
       binaryFiles: 1,
@@ -202,10 +172,8 @@ describe("repository path policy", () => {
     });
     const rendered = renderRepositoryPathReport(report);
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        report.findings,
-        Array.map((finding) => `${finding.file}:${finding.line}`)
-      ),
+      report.findings,
+      Array.map((finding) => `${finding.file}:${finding.line}`),
       (actual) => {
         expect(actual).toStrictEqual(["a-first.md:1", "z-last.md:2"]);
       }

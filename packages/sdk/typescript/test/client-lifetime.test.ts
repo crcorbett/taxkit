@@ -113,22 +113,17 @@ it.effect("closes an unused client without starting its Layer", () =>
     const resources = yield* Ref.make(0);
     const started = yield* Deferred.make<boolean>();
     const release = yield* Deferred.make<boolean>();
-    const client = EffectFunction.pipe(
-      FixtureLayer.pipe(
-        Layer.provide(
-          Layer.succeed(LifetimeFixture)({
-            mode: "normal",
-            release,
-            resources,
-            started,
-          })
-        )
-      ),
-      (argument1) =>
-        EffectFunction.pipe(AuPay2025_26Module, (argument2) =>
-          createPlainClient(argument1, argument2)
-        )
+    const layer = FixtureLayer.pipe(
+      Layer.provide(
+        Layer.succeed(LifetimeFixture)({
+          mode: "normal",
+          release,
+          resources,
+          started,
+        })
+      )
     );
+    const client = createPlainClient(layer, AuPay2025_26Module);
     yield* Effect.promise(() => client.dispose());
     yield* Effect.promise(() => client.dispose());
     expect(yield* Ref.get(resources)).toBe(0);
@@ -139,13 +134,13 @@ it.effect("closes an unused client without starting its Layer", () =>
       Match.tag("TaxKitFailure", ({ error }) =>
         Effect.sync(() => {
           expect({
-            errorError_tag: Predicate.isTagged(
+            isDisposed: Predicate.isTagged(
               error.error,
               "TaxKitClientDisposedError"
             ),
             errorErrorMessage: error.error.message,
           }).toStrictEqual({
-            errorError_tag: true,
+            isDisposed: true,
             errorErrorMessage: "TaxKit client is closed",
           });
         })
@@ -187,10 +182,10 @@ it.effect("keeps separate client lifetimes even with the same Layer", () =>
       { concurrency: "unbounded" }
     );
     expect({
-      length: reports.length,
+      reportCount: reports.length,
       RefGetResources: yield* Ref.get(resources),
     }).toStrictEqual({
-      length: 2,
+      reportCount: 2,
       RefGetResources: 2,
     });
     yield* Effect.promise(() => first.dispose());
@@ -212,22 +207,17 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = EffectFunction.pipe(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode,
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        (argument3) =>
-          EffectFunction.pipe(AuPay2025_26Module, (argument4) =>
-            createPlainClient(argument3, argument4)
-          )
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode,
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       const pending = yield* Effect.promise(() =>
         client.calculations.safe.calculate(AuPayTakeHomeCalculation, facts)
       ).pipe(Effect.forkChild);
@@ -265,22 +255,17 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = EffectFunction.pipe(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode,
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        (argument5) =>
-          EffectFunction.pipe(AuPay2025_26Module, (argument6) =>
-            createPlainClient(argument5, argument6)
-          )
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode,
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       const pending = yield* Effect.tryPromise({
         catch: (rejection) => new SdkPromiseRejectionError({ rejection }),
         try: () =>
@@ -296,13 +281,13 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       yield* Effect.promise(() => client.dispose());
       const error = yield* Fiber.join(pending);
       expect({
-        errorError_tag: Predicate.isTagged(
+        isDisposed: Predicate.isTagged(
           error.error,
           "TaxKitClientDisposedError"
         ),
         RefGetResources: yield* Ref.get(resources),
       }).toStrictEqual({
-        errorError_tag: true,
+        isDisposed: true,
         RefGetResources: 0,
       });
     })
@@ -314,22 +299,17 @@ it.effect.each(["startupDefect", "operationDefect"] as const)(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = EffectFunction.pipe(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode,
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        (argument7) =>
-          EffectFunction.pipe(AuPay2025_26Module, (argument8) =>
-            createPlainClient(argument7, argument8)
-          )
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode,
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       const result = yield* Effect.promise(() =>
         client.calculations.safe.calculate(AuPayTakeHomeCalculation, facts)
       );
@@ -362,22 +342,17 @@ it.effect("all overlapping dispose calls await the same finalisers", () =>
     const resources = yield* Ref.make(0);
     const started = yield* Deferred.make<boolean>();
     const release = yield* Deferred.make<boolean>();
-    const client = EffectFunction.pipe(
-      FixtureLayer.pipe(
-        Layer.provide(
-          Layer.succeed(LifetimeFixture)({
-            mode: "finalizerBlocked",
-            release,
-            resources,
-            started,
-          })
-        )
-      ),
-      (argument9) =>
-        EffectFunction.pipe(AuPay2025_26Module, (argument10) =>
-          createPlainClient(argument9, argument10)
-        )
+    const layer = FixtureLayer.pipe(
+      Layer.provide(
+        Layer.succeed(LifetimeFixture)({
+          mode: "finalizerBlocked",
+          release,
+          resources,
+          started,
+        })
+      )
     );
+    const client = createPlainClient(layer, AuPay2025_26Module);
     yield* Effect.promise(() =>
       client.calculations.calculate(AuPayTakeHomeCalculation, facts)
     );
@@ -415,22 +390,17 @@ it.effect(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = EffectFunction.pipe(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode: "finalizerDefect",
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        (argument11) =>
-          EffectFunction.pipe(AuPay2025_26Module, (argument12) =>
-            createPlainClient(argument11, argument12)
-          )
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode: "finalizerDefect",
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       yield* Effect.promise(() =>
         client.calculations.calculate(AuPayTakeHomeCalculation, facts)
       );

@@ -105,10 +105,8 @@ const Schedule1TableCoverageCheck = Schema.makeFilter<
       ["scale1", "scale2"] as const,
       Array.every((scale) =>
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            rows,
-            Array.filter((row) => row.scale === scale)
-          ),
+          rows,
+          Array.filter((row) => row.scale === scale),
           hasCompleteWeeklyScale
         )
       )

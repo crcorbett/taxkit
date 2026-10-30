@@ -236,14 +236,11 @@ export const program = Effect.gen(function* () {
 ])("$name", ({ source, rule, count, name }) =>
   Effect.gen(function* () {
     const path = "tools/oxlint/.generated-lexical-policy.ts";
-    yield* EffectFunction.pipe(join(repositoryRoot, path), (argument1) =>
-      EffectFunction.pipe(source, (argument2) =>
-        writeLintFixture({
-          path: argument1,
-          source: argument2,
-        })
-      )
-    );
+    const fixturePath = join(repositoryRoot, path);
+    yield* writeLintFixture({
+      path: fixturePath,
+      source,
+    });
     const result = yield* lintFiles({
       paths: [path],
       extraArgs: [],
@@ -259,19 +256,15 @@ export const program = Effect.gen(function* () {
     )(result.stdout);
     expect(report.number_of_files).toBe(1);
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        report.diagnostics,
-        Array.filter((finding) => finding.code === rule)
-      ),
+      report.diagnostics,
+      Array.filter((finding) => finding.code === rule),
       (actual) => {
         expect(actual).toHaveLength(count);
       }
     );
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        report.diagnostics,
-        Array.some((finding) => finding.code.includes("plugin"))
-      ),
+      report.diagnostics,
+      Array.some((finding) => finding.code.includes("plugin")),
       (actual) => {
         expect(!actual).toBeTruthy();
       }

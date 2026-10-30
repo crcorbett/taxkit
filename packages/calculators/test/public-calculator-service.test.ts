@@ -345,16 +345,11 @@ describe("public calculator service", () => {
         expect(actual).toBeTruthy();
       });
       if (Exit.isFailure(exit)) {
-        const failure = EffectFunction.pipe(
-          EffectFunction.pipe(
-            exit.cause.reasons,
-            EffectArray.filter(Cause.isFailReason)
-          ),
-          (argument1) =>
-            EffectFunction.pipe(0, (argument2) =>
-              expectAt(argument1, argument2)
-            )
+        const items = EffectFunction.pipe(
+          exit.cause.reasons,
+          EffectArray.filter(Cause.isFailReason)
         );
+        const failure = expectAt(items, 0);
         const error = Match.value(failure.error).pipe(
           Match.tag("CalculatorInputDecodeError", (value) => value),
           Match.orElse(() => expect.fail("Expected calculator input error"))
@@ -407,16 +402,11 @@ describe("public calculator service", () => {
           expect(actual).toBeTruthy();
         });
         if (Exit.isFailure(exit)) {
-          const failure = EffectFunction.pipe(
-            EffectFunction.pipe(
-              exit.cause.reasons,
-              EffectArray.filter(Cause.isFailReason)
-            ),
-            (argument3) =>
-              EffectFunction.pipe(0, (argument4) =>
-                expectAt(argument3, argument4)
-              )
+          const items = EffectFunction.pipe(
+            exit.cause.reasons,
+            EffectArray.filter(Cause.isFailReason)
           );
+          const failure = expectAt(items, 0);
           const error = Match.value(failure.error).pipe(
             Match.tag("CalculatorInputDecodeError", (value) => value),
             Match.orElse(() => expect.fail("Expected calculator input error"))

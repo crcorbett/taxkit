@@ -126,11 +126,9 @@ export const relocateModuleImports = (
   ).pipe(
     Effect.map((references) =>
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          references,
-          Array.sort((left: ModuleReference, right: ModuleReference) =>
-            Number.Order(right.start, left.start)
-          )
+        references,
+        Array.sort((left: ModuleReference, right: ModuleReference) =>
+          Number.Order(right.start, left.start)
         ),
         Array.reduce(
           source.replace(/\n\/\/# sourceMappingURL=.*$/u, ""),

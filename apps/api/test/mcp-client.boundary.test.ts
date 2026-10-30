@@ -486,14 +486,17 @@ describe("real MCP client against the native API application", () => {
           firstAbort.abort();
         });
         expect({
-          length: Predicate.isTagged(yield* Fiber.join(firstCall), "Failure"),
-          length2: EffectFunction.pipe(
+          firstCallFailed: Predicate.isTagged(
+            yield* Fiber.join(firstCall),
+            "Failure"
+          ),
+          callerAborted: EffectFunction.pipe(
             yield* Ref.get(toolSignals),
             Array.some((signal) => signal.aborted)
           ),
         }).toStrictEqual({
-          length: true,
-          length2: true,
+          firstCallFailed: true,
+          callerAborted: true,
         });
         yield* Deferred.await(released);
         expect(yield* Ref.get(stopped)).toBe(1);
@@ -506,12 +509,12 @@ describe("real MCP client against the native API application", () => {
           McpSchema.CallToolResult
         )(replacement);
         expect({
-          length: checked.isError === false,
+          callSucceeded: checked.isError === false,
           calculation: yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
             checked.structuredContent
           ).pipe(Effect.flatMap(Schema.encodeEffect(CalculatorRunResponse))),
         }).toStrictEqual({
-          length: true,
+          callSucceeded: true,
           calculation: yield* calculator
             .calculate(CalculationRequest)
             .pipe(Effect.flatMap(Schema.encodeEffect(CalculatorRunResponse))),
@@ -637,13 +640,9 @@ describe("real MCP client against the native API application", () => {
                 try: () => client.listTools(),
               });
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  EffectFunction.pipe(
-                    listed.tools,
-                    Array.map((tool) => tool.name)
-                  ),
-                  Array.sort(Order.String)
-                ),
+                listed.tools,
+                Array.map((tool) => tool.name),
+                Array.sort(Order.String),
                 (actual) => {
                   expect(actual).toStrictEqual([
                     "taxkit_calculate",
@@ -765,14 +764,14 @@ describe("real MCP client against the native API application", () => {
                 McpSchema.CallToolResult
               )(calculated);
               expect({
-                length: checked.isError === false,
+                callSucceeded: checked.isError === false,
                 calculation: yield* Schema.decodeUnknownEffect(
                   CalculatorRunResponse
                 )(checked.structuredContent).pipe(
                   Effect.flatMap(Schema.encodeEffect(CalculatorRunResponse))
                 ),
               }).toStrictEqual({
-                length: true,
+                callSucceeded: true,
                 calculation: yield* Schema.encodeEffect(CalculatorRunResponse)(
                   expected
                 ),

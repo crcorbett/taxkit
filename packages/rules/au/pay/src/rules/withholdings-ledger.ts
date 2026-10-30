@@ -59,10 +59,8 @@ export const buildPayWithholdingsLedger = (
       ),
       inputs: {
         activeComponentIds: EffectFunction.pipe(
-          EffectFunction.pipe(
-            components,
-            EffectArray.filter(isComponentContributing)
-          ),
+          components,
+          EffectArray.filter(isComponentContributing),
           EffectArray.map((c) => c.id)
         ),
         componentIds: EffectFunction.pipe(

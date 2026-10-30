@@ -182,18 +182,13 @@ describe("TaxKit public calculation HTTP API", () => {
         const decoded = yield* Schema.decodeUnknownEffect(
           Schema.toType(CalculatorCatalogResponse)
         )(response);
-        const takeHomeCalculator = EffectFunction.pipe(
-          EffectFunction.pipe(
-            response.calculators,
-            Array.filter(
-              (calculator) => calculator.calculatorId === takeHomeCalculatorId
-            )
-          ),
-          (argument1) =>
-            EffectFunction.pipe(0, (argument2) =>
-              expectAt(argument1, argument2)
-            )
+        const items = EffectFunction.pipe(
+          response.calculators,
+          Array.filter(
+            (calculator) => calculator.calculatorId === takeHomeCalculatorId
+          )
         );
+        const takeHomeCalculator = expectAt(items, 0);
         const receivedRepresentation = yield* Schema.encodeEffect(
           CalculatorCatalogResponse
         )(decoded);
@@ -271,7 +266,7 @@ describe("TaxKit public calculation HTTP API", () => {
         takeHomeReportWithholdingsTotalCents:
           takeHomeReport.withholdingsTotal.cents,
         takeHomeReportNetPayCents: takeHomeReport.netPay.cents,
-        length: response.diagnostics.graphIssues.length,
+        graphIssueCount: response.diagnostics.graphIssues.length,
       }).toStrictEqual({
         responseCalculatorCalculatorId: "au.pay.take-home",
         responseReport_tag: true,
@@ -282,7 +277,7 @@ describe("TaxKit public calculation HTTP API", () => {
         ),
         takeHomeReportWithholdingsTotalCents: 75_600,
         takeHomeReportNetPayCents: 270_600,
-        length: 0,
+        graphIssueCount: 0,
       });
       const annualTaxResponse = yield* client.calculatorApi.calculate({
         params: {
@@ -400,36 +395,21 @@ describe("TaxKit public calculation HTTP API", () => {
               new Error("Expected the calculator service fixture to fail")
             ),
         });
-        const failure = EffectFunction.pipe(
-          EffectFunction.pipe(
-            httpCause.reasons,
-            Array.filter(Cause.isFailReason)
-          ),
-          (argument3) =>
-            EffectFunction.pipe(0, (argument4) =>
-              expectAt(argument3, argument4)
-            )
+        const httpFailures = EffectFunction.pipe(
+          httpCause.reasons,
+          Array.filter(Cause.isFailReason)
         );
-        const sdkFailure = EffectFunction.pipe(
-          EffectFunction.pipe(
-            sdkCause.reasons,
-            Array.filter(Cause.isFailReason)
-          ),
-          (argument5) =>
-            EffectFunction.pipe(0, (argument6) =>
-              expectAt(argument5, argument6)
-            )
+        const failure = expectAt(httpFailures, 0);
+        const sdkFailures = EffectFunction.pipe(
+          sdkCause.reasons,
+          Array.filter(Cause.isFailReason)
         );
-        const serviceFailure = EffectFunction.pipe(
-          EffectFunction.pipe(
-            serviceCause.reasons,
-            Array.filter(Cause.isFailReason)
-          ),
-          (argument7) =>
-            EffectFunction.pipe(0, (argument8) =>
-              expectAt(argument7, argument8)
-            )
+        const sdkFailure = expectAt(sdkFailures, 0);
+        const serviceFailures = EffectFunction.pipe(
+          serviceCause.reasons,
+          Array.filter(Cause.isFailReason)
         );
+        const serviceFailure = expectAt(serviceFailures, 0);
         const envelope = yield* Schema.decodeUnknownEffect(
           Schema.toType(CalculatorApiErrorEnvelope)
         )(failure.error);

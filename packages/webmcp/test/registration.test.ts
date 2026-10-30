@@ -181,10 +181,8 @@ it.effect(
           yield* registerTools(toolkit);
           expect(register).toHaveBeenCalledTimes(5);
           EffectFunction.pipe(
-            EffectFunction.pipe(
-              register.mock.contexts,
-              Array.every((receiver) => receiver === host)
-            ),
+            register.mock.contexts,
+            Array.every((receiver) => receiver === host),
             (actual) => {
               expect(actual).toBeTruthy();
             }
@@ -301,11 +299,9 @@ it.effect(
             Array.map(([, options]) => Option.fromNullishOr(options?.signal))
           );
           EffectFunction.pipe(
-            EffectFunction.pipe(
-              current,
-              Array.every((value) =>
-                value.pipe(Option.exists((entry) => !entry.aborted))
-              )
+            current,
+            Array.every((value) =>
+              value.pipe(Option.exists((entry) => !entry.aborted))
             ),
             (actual) => {
               expect(actual).toBeTruthy();
@@ -315,11 +311,9 @@ it.effect(
         })
       );
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          signals,
-          Array.every((value) =>
-            value.pipe(Option.exists((entry) => entry.aborted))
-          )
+        signals,
+        Array.every((value) =>
+          value.pipe(Option.exists((entry) => entry.aborted))
         ),
         (actual) => {
           expect(actual).toBeTruthy();

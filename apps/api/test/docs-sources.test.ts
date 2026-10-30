@@ -83,17 +83,13 @@ describe("bundled docs sources", () => {
       const files = yield* fs.readDirectory(contentRoot, { recursive: true });
       assert.deepEqual(
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            docsSources,
-            Array.map((source) => source.path)
-          ),
+          docsSources,
+          Array.map((source) => source.path),
           Array.sort(Order.String)
         ),
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            files,
-            Array.filter((file) => file.endsWith(".mdx"))
-          ),
+          files,
+          Array.filter((file) => file.endsWith(".mdx")),
           Array.sort(Order.String)
         )
       );

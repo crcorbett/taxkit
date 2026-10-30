@@ -293,10 +293,8 @@ it.effect(
       const signals = yield* Ref.get(seen);
       expect(signals).toHaveLength(1);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          signals,
-          Array.every((signal) => signal.aborted)
-        ),
+        signals,
+        Array.every((signal) => signal.aborted),
         (actual) => {
           expect(actual).toBeTruthy();
         }
@@ -317,6 +315,7 @@ it.effect(
   () =>
     Effect.gen(function* () {
       const foreignId = PostHogProjectId.make(75);
+      const repeatedPage = page([{ id }], 2);
       const native = yield* fixture({
         replies: [
           EffectFunction.pipe(
@@ -327,9 +326,7 @@ it.effect(
             ),
             getPage
           ),
-          EffectFunction.pipe(page([{ id }], 2), (argument1) =>
-            EffectFunction.pipe(1, (argument2) => getPage(argument1, argument2))
-          ),
+          getPage(repeatedPage, 1),
           getProject(
             {
               id: foreignId,
@@ -361,15 +358,13 @@ it.effect(
       const calls = yield* Ref.get(native.calls);
       expect(calls).toHaveLength(4);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          calls,
-          Array.every(
-            (call) =>
-              call.authenticated &&
-              call.credentialsOmitted &&
-              call.manualRedirect &&
-              call.tracingDisabled
-          )
+        calls,
+        Array.every(
+          (call) =>
+            call.authenticated &&
+            call.credentialsOmitted &&
+            call.manualRedirect &&
+            call.tracingDisabled
         ),
         (actual) => {
           expect(actual).toBeTruthy();
@@ -433,10 +428,8 @@ it.effect.each([
         expect(actual).toBe(reason);
       });
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          yield* Ref.get(native.calls),
-          Array.map((call) => call.method)
-        ),
+        yield* Ref.get(native.calls),
+        Array.map((call) => call.method),
         (actual) => {
           expect(actual).toStrictEqual(["GET"]);
         }
@@ -511,10 +504,8 @@ it.effect(
         expect(actual).toBe("ambiguous-ownership");
       });
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          yield* Ref.get(ambiguous.calls),
-          Array.every((call) => call.method === "GET")
-        ),
+        yield* Ref.get(ambiguous.calls),
+        Array.every((call) => call.method === "GET"),
         (actual) => {
           expect(actual).toBeTruthy();
         }
@@ -538,10 +529,8 @@ it.effect(
       expect(result.id).toBe(id);
       const calls = yield* Ref.get(native.calls);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          calls,
-          Array.map((call) => call.method)
-        ),
+        calls,
+        Array.map((call) => call.method),
         (actual) => {
           expect(actual).toStrictEqual(["GET", "POST", "GET"]);
         }
@@ -581,10 +570,8 @@ it.effect(
       ).pipe(Effect.provide(native.layer));
       expect(result.id).toBe(id);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          yield* Ref.get(native.calls),
-          Array.map((call) => call.method)
-        ),
+        yield* Ref.get(native.calls),
+        Array.map((call) => call.method),
         (actual) => {
           expect(actual).toStrictEqual(["GET", "POST", "GET", "GET", "GET"]);
         }
@@ -609,10 +596,8 @@ it.effect.each([
       expect(actual).toBe(reason);
     });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        yield* Ref.get(native.calls),
-        Array.map((call) => call.method)
-      ),
+      yield* Ref.get(native.calls),
+      Array.map((call) => call.method),
       (actual) => {
         expect(actual).toStrictEqual(["GET", "POST"]);
       }
@@ -652,10 +637,8 @@ it.effect.each([
       expect(actual).toBe("write-not-converged");
     });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        yield* Ref.get(native.calls),
-        Array.map((call) => call.method)
-      ),
+      yield* Ref.get(native.calls),
+      Array.map((call) => call.method),
       (actual) => {
         expect(actual).toStrictEqual(["GET", "PATCH", "GET"]);
       }
@@ -678,10 +661,8 @@ it.effect("stops an uncertain create when readback remains absent", () =>
       expect(actual).toBe("uncertain-create");
     });
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        yield* Ref.get(native.calls),
-        Array.filter((call) => call.method === "POST")
-      ),
+      yield* Ref.get(native.calls),
+      Array.filter((call) => call.method === "POST"),
       (actual) => {
         expect(actual).toHaveLength(1);
       }
@@ -716,10 +697,8 @@ it.effect(
       expect(result.name).toBe(definition.name);
       const calls = yield* Ref.get(update.calls);
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          calls,
-          Array.map((call) => call.method)
-        ),
+        calls,
+        Array.map((call) => call.method),
         (actual) => {
           expect(actual).toStrictEqual(["GET", "PATCH", "GET"]);
         }

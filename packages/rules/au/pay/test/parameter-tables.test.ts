@@ -75,19 +75,12 @@ describe("Schedule1Table owned relationships", () => {
               const result = yield* Schedule1Row.makeEffect(
                 scenario.input
               ).pipe(Effect.result);
-              EffectFunction.pipe(Result.isFailure(result), (argument1) => {
-                EffectFunction.pipe(scenario.name, (argument2) => {
-                  expect(argument1, argument2).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(Schedule1Row))(scenario.input),
-                (argument3) => {
-                  EffectFunction.pipe(scenario.name, (argument4) => {
-                    expect(argument3, argument4).toBeFalsy();
-                  });
-                }
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(Schema.toEncoded(Schedule1Row))(
+                scenario.input
               );
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );
@@ -235,19 +228,12 @@ describe("Schedule1Table owned relationships", () => {
               const result = yield* Schedule1Table.makeEffect(input).pipe(
                 Effect.result
               );
-              EffectFunction.pipe(Result.isFailure(result), (argument5) => {
-                EffectFunction.pipe(scenario.name, (argument6) => {
-                  expect(argument5, argument6).toBeTruthy();
-                });
-              });
-              EffectFunction.pipe(
-                Schema.is(Schema.toEncoded(Schedule1Table))(input),
-                (argument7) => {
-                  EffectFunction.pipe(scenario.name, (argument8) => {
-                    expect(argument7, argument8).toBeFalsy();
-                  });
-                }
-              );
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(
+                Schema.toEncoded(Schedule1Table)
+              )(input);
+              expect(encodedAccepted, scenario.name).toBeFalsy();
             })
           )
         );
@@ -302,7 +288,7 @@ describe("Schedule1Table owned relationships", () => {
           weeklyMaxCents: "infinity",
           weeklyMinCents: Cents.make(1),
         });
-        const scale2 = yield* Schedule1Row.makeEffect({
+        const invalidScale = yield* Schedule1Row.makeEffect({
           ...Struct.pick(
             expectAt(current.rows, 0),
             Struct.keys(Schedule1Row.fields)
@@ -312,7 +298,7 @@ describe("Schedule1Table owned relationships", () => {
         });
         const interleaved = yield* Schedule1Table.makeEffect({
           ...Struct.pick(current, Struct.keys(Schedule1Table.fields)),
-          rows: [point, scale2, next],
+          rows: [point, invalidScale, next],
         });
         EffectFunction.pipe(
           Schema.is(Schema.toEncoded(Schedule1Table))(interleaved),

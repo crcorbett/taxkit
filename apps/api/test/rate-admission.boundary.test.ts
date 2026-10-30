@@ -123,18 +123,14 @@ describe("shared native host calculation admission", () => {
     { "cf-connecting-ip": "203.0.113.75", "cf-worker": "private-canary" },
   ])("rejects absent, invalid and forwarded public identity", (headers) =>
     Effect.gen(function* () {
+      const incomingHeaders = Headers.fromInput(headers);
+      const caller = edgeCallerKey(incomingHeaders, CalculatorClientRateKey);
       expect({
-        length: Option.isNone(
-          EffectFunction.pipe(Headers.fromInput(headers), (argument1) =>
-            EffectFunction.pipe(CalculatorClientRateKey, (argument2) =>
-              edgeCallerKey(argument1, argument2)
-            )
-          )
-        ),
-        CalculatorRequestRateKey: yield* CalculatorRequestRateKey,
+        caller,
+        requestKey: yield* CalculatorRequestRateKey,
       }).toStrictEqual({
-        length: true,
-        CalculatorRequestRateKey: Option.none(),
+        caller: Option.none(),
+        requestKey: Option.none(),
       });
     })
   );
@@ -266,13 +262,13 @@ describe("shared native host calculation admission", () => {
             raw.headers,
             "retry-after"
           ),
-          length: (yield* client.calculatorApi.listCalculators({
+          calculatorCount: (yield* client.calculatorApi.listCalculators({
             query: MetadataQuery.make({}),
           })).calculators.length,
         }).toStrictEqual({
           rawStatus: 429,
           HeadersGetRawHeadersRetryAfter: Option.some("60"),
-          length: 3,
+          calculatorCount: 3,
         });
         expect(first.report).toBeDefined();
       }).pipe(
@@ -385,10 +381,10 @@ describe("shared native host calculation admission", () => {
         );
         expect({
           relayedStatus: relayed.status,
-          length: (yield* Ref.get(keys)).length,
+          rateKeyCount: (yield* Ref.get(keys)).length,
         }).toStrictEqual({
           relayedStatus: 503,
-          length: 1,
+          rateKeyCount: 1,
         });
         yield* Effect.gen(function* verifyRateLimitedResponse() {
           // A declared 4xx keeps its status, headers and checked body.

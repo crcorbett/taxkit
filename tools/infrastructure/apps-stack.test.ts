@@ -437,10 +437,8 @@ describe("native paired app graph and planner", () => {
         });
         const plan = yield* result.planned;
         EffectFunction.pipe(
-          EffectFunction.pipe(
-            Record.keys(plan.resources),
-            Array.sort(Order.String)
-          ),
+          Record.keys(plan.resources),
+          Array.sort(Order.String),
           (actual) => {
             expect(actual).toStrictEqual(["TaxKitApi", "TaxKitWebsite"]);
           }
@@ -461,7 +459,7 @@ describe("native paired app graph and planner", () => {
           Array.filter(isWorker)
         );
         expect({
-          length: EffectFunction.pipe(
+          membersOmitDomains: EffectFunction.pipe(
             members,
             Array.every((resource) => !Object.hasOwn(resource.Props, "domain"))
           ),
@@ -477,7 +475,7 @@ describe("native paired app graph and planner", () => {
             Array.map((resource) => resource.Props.observability)
           ),
         }).toStrictEqual({
-          length: true,
+          membersOmitDomains: true,
           websiteProps: Option.some({ enabled: true, previewsEnabled: false }),
           observabilitySettings: [
             disabledWorkerObservability,
@@ -498,10 +496,8 @@ describe("native paired app graph and planner", () => {
       });
       const plan = yield* result.planned;
       EffectFunction.pipe(
-        EffectFunction.pipe(
-          Record.keys(plan.resources),
-          Array.sort(Order.String)
-        ),
+        Record.keys(plan.resources),
+        Array.sort(Order.String),
         (actual) => {
           expect(actual).toStrictEqual([
             "TaxKitApi",
@@ -547,7 +543,7 @@ describe("native paired app graph and planner", () => {
           zoneSettings,
           resultProviderWrites: result.providerWrites,
         },
-        length: EffectFunction.pipe(
+        noReplacements: EffectFunction.pipe(
           Record.values(plan.resources),
           Array.every(({ action }) => action !== "replace")
         ),
@@ -564,7 +560,7 @@ describe("native paired app graph and planner", () => {
           ),
           resultProviderWrites: 0,
         },
-        length: true,
+        noReplacements: true,
       });
       const zone = Record.get(
         result.compiled.resources,
@@ -594,14 +590,14 @@ describe("native paired app graph and planner", () => {
         Option.getOrElse(() => expect.fail("Expected native graph member"))
       );
       expect({
-        length: zone.Adopt === true,
+        zoneAdopted: zone.Adopt === true,
         zoneOwnership: {
           zoneRemovalPolicy: zone.RemovalPolicy,
           settingsRemovalPolicy: settings.RemovalPolicy,
           zoneProps: zone.Props,
         },
       }).toStrictEqual({
-        length: true,
+        zoneAdopted: true,
         zoneOwnership: {
           zoneRemovalPolicy: "retain",
           settingsRemovalPolicy: "retain",
@@ -622,13 +618,13 @@ describe("native paired app graph and planner", () => {
       ).pipe(Effect.provideContext(result.compiled.services));
       expect({
         domains,
-        length: EffectFunction.pipe(
+        apiUsesSelfUrl: EffectFunction.pipe(
           Option.getOrUndefined(
             Record.get(api.Props.env ?? {}, "API_PUBLIC_ORIGIN")
           ),
           isSelfUrl
         ),
-        length2: EffectFunction.pipe(
+        websiteUsesSelfUrl: EffectFunction.pipe(
           Option.getOrUndefined(
             Record.get(website.Props.env ?? {}, "WEBSITE_PUBLIC_ORIGIN")
           ),
@@ -647,8 +643,8 @@ describe("native paired app graph and planner", () => {
             zoneId: "15103853342ab9f18f7894b7fae39c39",
           },
         },
-        length: true,
-        length2: true,
+        apiUsesSelfUrl: true,
+        websiteUsesSelfUrl: true,
       });
       // Production exports the hosts' checked console records only, through
       // the persisted trace-export destination. Invocation logs and automatic
@@ -699,15 +695,15 @@ describe("native paired app graph and planner", () => {
         });
         expect(bots.Props).toMatchObject(productionBotPolicy);
         expect({
-          length: website.Props.workersDev === false,
-          length2: api.Props.workersDev === false,
-          length3: !Object.hasOwn(settings.Props, "soa"),
-          length4: !Object.hasOwn(settings.Props, "internalDns"),
+          websiteWorkersDevDisabled: website.Props.workersDev === false,
+          apiWorkersDevDisabled: api.Props.workersDev === false,
+          omitsSoa: !Object.hasOwn(settings.Props, "soa"),
+          omitsInternalDns: !Object.hasOwn(settings.Props, "internalDns"),
         }).toStrictEqual({
-          length: true,
-          length2: true,
-          length3: true,
-          length4: true,
+          websiteWorkersDevDisabled: true,
+          apiWorkersDevDisabled: true,
+          omitsSoa: true,
+          omitsInternalDns: true,
         });
       }).pipe(Effect.withSpan("verifyProductionDnsPolicy"));
     }).pipe(
@@ -759,13 +755,11 @@ describe("native paired app graph and planner", () => {
             Array.sort(Order.String)
           ),
           resourceTypes: EffectFunction.pipe(
-            EffectFunction.pipe(
-              Record.values(plan.resources),
-              Array.map(({ resource, action }: Plan.CRUD) => ({
-                action,
-                id: resource.LogicalId,
-              }))
-            ),
+            Record.values(plan.resources),
+            Array.map(({ resource, action }: Plan.CRUD) => ({
+              action,
+              id: resource.LogicalId,
+            })),
             Array.sort(
               Order.mapInput(
                 Order.String,
@@ -827,17 +821,17 @@ describe("native paired app graph and planner", () => {
         expect({
           websiteBindingValues,
           RecordKeysApiPropsExports: Record.keys(api.Props.exports ?? {}),
-          length: Record.get(
+          omitsSessionBinding: Record.get(
             website.Props.exports ?? {},
             "TaxKitMcpSessions"
           ).pipe(Option.isNone),
-          length2: EffectFunction.pipe(
+          apiUsesSelfUrl: EffectFunction.pipe(
             Option.getOrUndefined(
               Record.get(api.Props.env ?? {}, "API_PUBLIC_ORIGIN")
             ),
             isSelfUrl
           ),
-          length3: EffectFunction.pipe(
+          websiteUsesSelfUrl: EffectFunction.pipe(
             Option.getOrUndefined(
               Record.get(website.Props.env ?? {}, "WEBSITE_PUBLIC_ORIGIN")
             ),
@@ -857,9 +851,9 @@ describe("native paired app graph and planner", () => {
             env: { WEBSITE_PUBLIC_ORIGIN: "https://fresh-website.example.com" },
           },
           RecordKeysApiPropsExports: ["default"],
-          length: true,
-          length2: true,
-          length3: true,
+          omitsSessionBinding: true,
+          apiUsesSelfUrl: true,
+          websiteUsesSelfUrl: true,
           websiteBindingNames: [
             "API_PUBLIC_ORIGIN",
             "TAXKIT_API",
@@ -918,13 +912,15 @@ describe("native paired app graph and planner", () => {
           }),
         });
         expect({
-          length: Schema.is(disabledPlatformTelemetry)(apiProps.observability),
-          length2: Schema.is(disabledPlatformTelemetry)(
+          apiTelemetryDisabled: Schema.is(disabledPlatformTelemetry)(
+            apiProps.observability
+          ),
+          websiteTelemetryDisabled: Schema.is(disabledPlatformTelemetry)(
             websiteProps.observability
           ),
         }).toStrictEqual({
-          length: true,
-          length2: true,
+          apiTelemetryDisabled: true,
+          websiteTelemetryDisabled: true,
         });
         yield* Effect.gen(function* verifyLocalBindings() {
           const privateBinding = Option.fromNullishOr(website.Props.env).pipe(
@@ -975,10 +971,10 @@ describe("native paired app graph and planner", () => {
       });
       expect({
         resultProviderWrites: result.providerWrites,
-        length: Exit.isFailure(result.planned),
+        planFailed: Exit.isFailure(result.planned),
       }).toStrictEqual({
         resultProviderWrites: 0,
-        length: true,
+        planFailed: true,
       });
       if (Exit.isFailure(result.planned)) {
         const report = Cause.pretty(result.planned.cause);
@@ -1228,13 +1224,8 @@ describe("Website build-input hash", () => {
             rootDir: path.join(directory, "apps/web"),
           },
         };
-        const artifacts = EffectFunction.pipe(
-          createArtifactStore(),
-          (argument1) =>
-            EffectFunction.pipe("Website", (argument2) =>
-              makeScopedArtifacts(argument1, argument2)
-            )
-        );
+        const store = createArtifactStore();
+        const artifacts = makeScopedArtifacts(store, "Website");
         const source = yield* resolveSource(props).pipe(
           Effect.provideService(Artifacts, artifacts)
         );

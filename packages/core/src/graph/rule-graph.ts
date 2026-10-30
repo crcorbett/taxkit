@@ -1,5 +1,4 @@
 import {
-  Match,
   Function as EffectFunction,
   Array,
   Chunk,
@@ -82,11 +81,12 @@ const collectProviders = (
           Array.reduce(providers, (updatedProviders, provided) => {
             const key = factKey(provided);
             const existing = HashMap.get(updatedProviders, key);
-            const nextProviders = Match.value(existing).pipe(
-              Match.when(Option.isSome, (matchedValue) =>
-                Array.append(matchedValue.value, rule)
-              ),
-              Match.orElse(() => Array.of(rule))
+            const nextProviders = existing.pipe(
+              Option.match({
+                onNone: () => Array.of(rule),
+                onSome: (existingProviders) =>
+                  Array.append(existingProviders, rule),
+              })
             );
             return HashMap.set(updatedProviders, key, nextProviders);
           })
@@ -105,11 +105,12 @@ const collectParameters = (
           rule.parameters,
           Array.reduce(parameters, (updatedParameters, parameter) => {
             const existing = HashMap.get(updatedParameters, parameter.id);
-            const nextParameters = Match.value(existing).pipe(
-              Match.when(Option.isSome, (matchedValue) =>
-                Array.append(matchedValue.value, parameter)
-              ),
-              Match.orElse(() => Array.of(parameter))
+            const nextParameters = existing.pipe(
+              Option.match({
+                onNone: () => Array.of(parameter),
+                onSome: (existingParameters) =>
+                  Array.append(existingParameters, parameter),
+              })
             );
             return HashMap.set(updatedParameters, parameter.id, nextParameters);
           })
@@ -132,26 +133,24 @@ const buildDependencyGraph = (
   );
   return Graph.fromSnapshot({
     edges: EffectFunction.pipe(
-      EffectFunction.pipe(
-        rules,
-        Array.flatMap((rule) =>
-          EffectFunction.pipe(
-            rule.requires,
-            Array.flatMap((required) =>
-              EffectFunction.pipe(
-                rule.provides,
-                Array.flatMap((provided) =>
-                  Option.all([
-                    HashMap.get(nodeIndices, factKey(required)),
-                    HashMap.get(nodeIndices, factKey(provided)),
-                  ]).pipe(
-                    Option.map(([source, target]) => ({
-                      data: `${factKey(required)} -> ${factKey(provided)}`,
-                      source,
-                      target,
-                    })),
-                    Option.toArray
-                  )
+      rules,
+      Array.flatMap((rule) =>
+        EffectFunction.pipe(
+          rule.requires,
+          Array.flatMap((required) =>
+            EffectFunction.pipe(
+              rule.provides,
+              Array.flatMap((provided) =>
+                Option.all([
+                  HashMap.get(nodeIndices, factKey(required)),
+                  HashMap.get(nodeIndices, factKey(provided)),
+                ]).pipe(
+                  Option.map(([source, target]) => ({
+                    data: `${factKey(required)} -> ${factKey(provided)}`,
+                    source,
+                    target,
+                  })),
+                  Option.toArray
                 )
               )
             )
@@ -278,17 +277,18 @@ export const validateRuleGraph = (args: {
                   parametersOverlap(candidate, parameter)
               )
             );
-            return Match.value(overlapping).pipe(
-              Match.when(Option.isSome, () =>
-                Chunk.append(
-                  updatedIssues,
-                  makeIssue(
-                    "parameter-overlap",
-                    `${parameterId} has overlapping effective periods`
-                  )
-                )
-              ),
-              Match.orElse(() => updatedIssues)
+            return overlapping.pipe(
+              Option.match({
+                onNone: () => updatedIssues,
+                onSome: () =>
+                  Chunk.append(
+                    updatedIssues,
+                    makeIssue(
+                      "parameter-overlap",
+                      `${parameterId} has overlapping effective periods`
+                    )
+                  ),
+              })
             );
           })
         )

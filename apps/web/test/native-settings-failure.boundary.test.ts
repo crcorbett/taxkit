@@ -31,19 +31,19 @@ it.live(
       });
       expect(files).toContain("entry.server.js");
       expect({
-        length: EffectFunction.pipe(
+        includesDefect: EffectFunction.pipe(
           Record.values(modules),
           Array.some((module) => module.contents.includes('die("PRIVATE9")'))
         ),
-        length2: !EffectFunction.pipe(
+        serverFunctionHandlerAbsent: !EffectFunction.pipe(
           Record.values(modules),
           Array.some((module) =>
             module.contents.includes("_createServerFn_handler")
           )
         ),
       }).toStrictEqual({
-        length: true,
-        length2: true,
+        includesDefect: true,
+        serverFunctionHandlerAbsent: true,
       });
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
@@ -121,12 +121,12 @@ it.live(
             expect({
               responseHeadersGetCacheControl:
                 response.headers.get("cache-control"),
-              responseHeadersGetCloudflareCdnCacheControl: response.headers.get(
+              cdnCacheControl: response.headers.get(
                 "cloudflare-cdn-cache-control"
               ),
             }).toStrictEqual({
               responseHeadersGetCacheControl: "no-store",
-              responseHeadersGetCloudflareCdnCacheControl: "no-store",
+              cdnCacheControl: "no-store",
             });
             // The root error component is the only page content.
             expect(body).toContain(

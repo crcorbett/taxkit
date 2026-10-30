@@ -9,10 +9,8 @@ describe("calculator summaries", () => {
   it("shares every deployed summary with the API catalogue", () => {
     expect(CalculatorSummaries).toHaveLength(CalculatorCatalogItems.length);
     EffectFunction.pipe(
-      EffectFunction.pipe(
-        CalculatorSummaries,
-        Array.every(Schema.is(CalculatorSummary))
-      ),
+      CalculatorSummaries,
+      Array.every(Schema.is(CalculatorSummary)),
       (actual) => {
         expect(actual).toBeTruthy();
       }

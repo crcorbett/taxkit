@@ -113,11 +113,9 @@ export const workspaceOwner = (
   file: string
 ) =>
   EffectFunction.pipe(
-    EffectFunction.pipe(
-      owners,
-      Array.sort((left: WorkspaceOwner, right: WorkspaceOwner) =>
-        Number.Order(right.owner.length, left.owner.length)
-      )
+    owners,
+    Array.sort((left: WorkspaceOwner, right: WorkspaceOwner) =>
+      Number.Order(right.owner.length, left.owner.length)
     ),
     Array.findFirst(({ owner }) => file.startsWith(`${owner}/`))
   ).pipe(Option.map(({ owner }) => owner));

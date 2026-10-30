@@ -13,12 +13,8 @@ import {
 
 describe("calculator form admission", () => {
   it("keeps the chosen pay calculator and checked annual facts", () => {
-    const pay = EffectFunction.pipe(initialTakeHomeForm, (argument1) =>
-      EffectFunction.pipe(
-        AuPayCalculatorId.make("au.pay.withholdings"),
-        (argument2) => takeHomeRequestFromForm(argument1, argument2)
-      )
-    );
+    const withholdingsId = AuPayCalculatorId.make("au.pay.withholdings");
+    const pay = takeHomeRequestFromForm(initialTakeHomeForm, withholdingsId);
     expect(Result.isSuccess(pay) && pay.success.calculatorId).toBe(
       "au.pay.withholdings"
     );
@@ -68,33 +64,21 @@ describe("calculator form admission", () => {
   });
 
   it("refuses a form of the other calculator's kind", () => {
+    const annualId = AuAnnualTaxCalculatorId.make("au.income-tax.annual");
     EffectFunction.pipe(
-      Result.isFailure(
-        EffectFunction.pipe(
-          AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
-          (argument3) =>
-            EffectFunction.pipe(initialTakeHomeForm, (argument4) =>
-              requestFromForm(argument3, argument4)
-            )
-        )
-      ),
-      (actual) => {
-        expect(actual).toBeTruthy();
+      requestFromForm(annualId, initialTakeHomeForm),
+      Result.isFailure,
+      (refused) => {
+        expect(refused).toBeTruthy();
       }
     );
+    const payId = AuPayCalculatorId.make("au.pay.take-home");
+    const annualForm = AnnualTaxForm.make({ taxableDollars: "67000" });
     EffectFunction.pipe(
-      Result.isFailure(
-        EffectFunction.pipe(
-          AuPayCalculatorId.make("au.pay.take-home"),
-          (argument5) =>
-            EffectFunction.pipe(
-              AnnualTaxForm.make({ taxableDollars: "67000" }),
-              (argument6) => requestFromForm(argument5, argument6)
-            )
-        )
-      ),
-      (actual) => {
-        expect(actual).toBeTruthy();
+      requestFromForm(payId, annualForm),
+      Result.isFailure,
+      (refused) => {
+        expect(refused).toBeTruthy();
       }
     );
   });

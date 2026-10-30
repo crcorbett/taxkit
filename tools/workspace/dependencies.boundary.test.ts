@@ -89,11 +89,9 @@ describe("workspace dependency direction", () => {
             manifests,
             Array.flatMap(({ manifest, path }) =>
               EffectFunction.pipe(
-                EffectFunction.pipe(
-                  dependencyNames(manifest),
-                  Array.filter((dependency) =>
-                    isForbiddenPackageDependency(path, dependency)
-                  )
+                dependencyNames(manifest),
+                Array.filter((dependency) =>
+                  isForbiddenPackageDependency(path, dependency)
                 ),
                 Array.map((dependency) => `${manifest.name} -> ${dependency}`)
               )
