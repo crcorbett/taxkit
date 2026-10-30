@@ -48,13 +48,8 @@ const websiteConfigProvider = WebsiteBindings.pipe(
       bindings,
       Record.filter((_, key) => Array.contains(websiteKeys, key))
     );
-    return EffectFunction.pipe(
-      ConfigProvider.fromUnknown(selected),
-      (argument1) =>
-        EffectFunction.pipe(selected, (argument2) =>
-          reifyBoundConfigProvider(argument1, argument2)
-        )
-    );
+    const provider = ConfigProvider.fromUnknown(selected);
+    return reifyBoundConfigProvider(provider, selected);
   })
 );
 export const WebsiteSettingsConfig = Effect.gen(function* () {

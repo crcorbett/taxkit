@@ -56,6 +56,9 @@ describe("native local development", () => {
         const auth = yield* fs.makeTempDirectoryScoped({
           prefix: "taxkit-native-dev-auth-",
         });
+        const state = yield* fs.makeTempDirectoryScoped({
+          prefix: "taxkit-native-dev-state-",
+        });
         const environment = {
           ALCHEMY_HOME: auth,
           ALCHEMY_TELEMETRY_DISABLED: "1",
@@ -66,6 +69,8 @@ describe("native local development", () => {
           HOME: yield* Config.schema(Schema.String, "HOME"),
           NO_COLOR: "1",
           PATH: yield* Config.schema(Schema.String, "PATH"),
+          // Native dev registry writes belong to this test's scoped directory.
+          XDG_STATE_HOME: state,
         };
         const output = yield* Ref.make("");
         const browser = yield* Effect.acquireRelease(
@@ -407,6 +412,9 @@ describe("native local development", () => {
         const auth = yield* fs.makeTempDirectoryScoped({
           prefix: "taxkit-native-dev-rejection-",
         });
+        const state = yield* fs.makeTempDirectoryScoped({
+          prefix: "taxkit-native-dev-state-",
+        });
         const environment = {
           ALCHEMY_HOME: auth,
           ALCHEMY_TELEMETRY_DISABLED: "1",
@@ -415,6 +423,8 @@ describe("native local development", () => {
           HOME: yield* Config.schema(Schema.String, "HOME"),
           NO_COLOR: "1",
           PATH: yield* Config.schema(Schema.String, "PATH"),
+          // Native dev registry writes belong to this test's scoped directory.
+          XDG_STATE_HOME: state,
         };
         yield* Effect.forEach(
           [

@@ -29,7 +29,7 @@ it.live(
       const { files, modules, wasm } = yield* readWorkerModules({
         modulesRoot,
       });
-      expect(files).toContain("index.js");
+      expect(files).toContain("entry.server.js");
       expect({
         length: EffectFunction.pipe(
           Record.values(modules),
@@ -84,7 +84,7 @@ it.live(
                       },
                     },
                     manifest: {
-                      mainModule: "index.js",
+                      mainModule: "entry.server.js",
                       modules: { ...modules, ...wasm },
                       modulesRoot,
                     },

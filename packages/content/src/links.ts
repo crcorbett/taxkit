@@ -81,13 +81,12 @@ export const resolveDocsHref = (
           Option.getOrElse(() => "")
         );
       const fragment = part("fragment");
-      return EffectFunction.pipe(
-        Array.dropRight(`${docsRoot}/${context.source}`.split("/"), 1),
-        (argument1) =>
-          EffectFunction.pipe(part("path").split("/"), (argument2) =>
-            joinSegments(argument1, argument2)
-          )
-      ).pipe(
+      const parents = EffectFunction.pipe(
+        `${docsRoot}/${context.source}`.split("/"),
+        Array.dropRight(1)
+      );
+      const relative = part("path").split("/");
+      return joinSegments(parents, relative).pipe(
         Option.map((segments) => segments.join("/")),
         Effect.fromOption,
         Effect.mapError(() => fail),

@@ -473,37 +473,21 @@ export const PostHogManagementLive = Layer.effect(
                     reason: "incomplete-inventory",
                   });
                 }
-                return yield* EffectFunction.pipe(query.offset, (argument1) =>
-                  EffectFunction.pipe(HashSet.add(seen, offset), (argument2) =>
-                    EffectFunction.pipe(Option.some(page.count), (argument3) =>
-                      EffectFunction.pipe(collected, (argument4) =>
-                        readPage({
-                          offset: argument1,
-                          seen: argument2,
-                          expectedCount: argument3,
-                          ids: argument4,
-                        })
-                      )
-                    )
-                  )
-                );
+                return yield* readPage({
+                  offset: query.offset,
+                  seen: HashSet.add(seen, offset),
+                  expectedCount: Option.some(page.count),
+                  ids: collected,
+                });
               }),
           });
         });
-        const ids = yield* EffectFunction.pipe(0, (argument5) =>
-          EffectFunction.pipe(HashSet.empty(), (argument6) =>
-            EffectFunction.pipe(Option.none(), (argument7) =>
-              EffectFunction.pipe([], (argument8) =>
-                readPage({
-                  offset: argument5,
-                  seen: argument6,
-                  expectedCount: argument7,
-                  ids: argument8,
-                })
-              )
-            )
-          )
-        );
+        const ids = yield* readPage({
+          offset: 0,
+          seen: HashSet.empty(),
+          expectedCount: Option.none(),
+          ids: [],
+        });
         const projects = yield* EffectFunction.pipe(
           ids,
           Effect.forEach((id) =>

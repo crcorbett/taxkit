@@ -68,7 +68,7 @@ it.live(
             output: ".alchemy/native-pair/bundles/TaxKitApi",
           },
           {
-            entry: "index.js",
+            entry: "entry.server.js",
             name: "website",
             output: "apps/web/dist/server",
           },
@@ -119,7 +119,7 @@ it.live(
             return {
               config: {
                 assets: Match.value(artifact).pipe(
-                  Match.when({ entry: "index.js" }, () => ({
+                  Match.when({ entry: "entry.server.js" }, () => ({
                     directory: path.join(root, "apps/web/dist/client"),
                     hasUserWorker: true,
                     runWorkerFirst: false,
@@ -129,7 +129,7 @@ it.live(
                 compatibilityDate: "2026-10-04",
                 compatibilityFlags: ["nodejs_compat"],
                 env: Match.value(artifact).pipe(
-                  Match.when({ entry: "index.js" }, () => ({
+                  Match.when({ entry: "entry.server.js" }, () => ({
                     ...origins,
                     TAXKIT_API: {
                       type: "worker" as const,

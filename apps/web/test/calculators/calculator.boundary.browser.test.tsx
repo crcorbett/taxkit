@@ -114,7 +114,6 @@ describe("browser calculator lifetime", () => {
             schedule: Schedule.spaced("50 millis"),
           }),
           Effect.timeout(1000),
-          TestClock.withLive,
           Effect.tap((observed) =>
             Effect.sync(() => {
               expect(observed).toBeTruthy();

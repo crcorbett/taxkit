@@ -645,7 +645,7 @@ describe("portable rules", () => {
     {
       accepted: ["tools/oxlint/fixtures/package-accepted.ts"],
       generated: "apps/web/src/.generated-package-rejected.ts",
-      namespace: "taxkit-package",
+      namespace: "package",
       rejected: "tools/oxlint/fixtures/package-rejected.ts.txt",
       rules: ["no-cross-package-source-imports"],
     },

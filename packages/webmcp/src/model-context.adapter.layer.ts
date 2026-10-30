@@ -1,6 +1,5 @@
 import { DocsWebsiteOrigin } from "@taxkit/content/schemas";
 import {
-  Function as EffectFunction,
   Duration,
   Effect,
   FiberSet,
@@ -94,13 +93,10 @@ export const ModelContextHostLive = Layer.effect(
                   untrustedContentHint: true,
                 },
                 description: tool.description,
-                execute: (input, options) =>
-                  EffectFunction.pipe(tool.execute(input), (argument1) =>
-                    EffectFunction.pipe(
-                      { signal: options.signal },
-                      (argument2) => run(argument1, argument2)
-                    )
-                  ),
+                execute: (input, options) => {
+                  const program = tool.execute(input);
+                  return run(program, { signal: options.signal });
+                },
                 inputSchema: tool.inputSchema,
                 name: tool.name,
               },

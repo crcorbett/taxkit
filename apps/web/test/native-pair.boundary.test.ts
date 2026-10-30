@@ -23,7 +23,6 @@ import {
   docsOgImageSize,
 } from "@taxkit/content/schemas";
 import {
-  Predicate,
   Schedule,
   Match,
   Function as EffectFunction,
@@ -174,7 +173,7 @@ describe("built native API and Website", () => {
           });
         yield* Effect.gen(function* verifyBundles() {
           expect(apiFiles).toContain("worker.js");
-          expect(websiteFiles).toContain("index.js");
+          expect(websiteFiles).toContain("entry.server.js");
           const clientFiles = yield* fs.glob("**/*.js", {
             root: path.join(root, "apps/web/dist/client"),
           });
@@ -335,7 +334,7 @@ describe("built native API and Website", () => {
               },
             },
             manifest: {
-              mainModule: "index.js",
+              mainModule: "entry.server.js",
               modules: websiteModules,
               modulesRoot: websiteRoot,
             },
@@ -2182,9 +2181,8 @@ describe("built native API and Website", () => {
                   "application/xml"
                 );
                 return {
-                  hasParserError: !Predicate.isNull(
-                    document.querySelector("parsererror")
-                  ),
+                  hasParserError:
+                    document.querySelectorAll("parsererror").length > 0,
                   locationCount: document.querySelectorAll("loc").length,
                   locationText: document.documentElement.textContent ?? "",
                   namespace: document.documentElement.namespaceURI,

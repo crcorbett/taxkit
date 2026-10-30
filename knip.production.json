@@ -16,7 +16,7 @@
     },
     "apps/api": {
       "entry": ["src/index.ts!", "src/worker.ts!", "src/server.ts!"],
-      "project": ["src/**/*.ts!"]
+      "project": ["src/**/*.ts!", "!src/build/**!", "!src/verification/**!"]
     },
     "packages/api/http": {
       "entry": [
@@ -102,7 +102,7 @@
         "src/core.ts!",
         "src/http.ts!"
       ],
-      "project": ["src/**/*.ts!"]
+      "project": ["src/**/*.ts!", "!src/internal/artifact-schemas.ts!"]
     },
     "packages/testing": {
       "entry": ["src/index.ts!"],

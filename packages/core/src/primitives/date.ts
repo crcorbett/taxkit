@@ -74,25 +74,20 @@ const isIntervalOrdered = (from: string, end: Option.Option<string>): boolean =>
 export const DateInterval = Schema.toEncoded(DateIntervalFields)
   .check(
     Schema.makeFilter(
-      ({ from, toExclusive }) =>
-        EffectFunction.pipe(from, (argument1) =>
-          EffectFunction.pipe(
-            Option.fromUndefinedOr(toExclusive),
-            (argument2) => isIntervalOrdered(argument1, argument2)
-          )
-        ),
+      ({ from, toExclusive }) => {
+        const end = Option.fromUndefinedOr(toExclusive);
+        return isIntervalOrdered(from, end);
+      },
       { expected: "interval start before end" }
     )
   )
   .pipe(Schema.decodeTo(DateIntervalFields))
   .check(
     Schema.makeFilter(
-      ({ from, toExclusive }) =>
-        EffectFunction.pipe(from, (argument3) =>
-          EffectFunction.pipe(Option.flatten(toExclusive), (argument4) =>
-            isIntervalOrdered(argument3, argument4)
-          )
-        ),
+      ({ from, toExclusive }) => {
+        const end = Option.flatten(toExclusive);
+        return isIntervalOrdered(from, end);
+      },
       { expected: "interval start before end" }
     )
   );

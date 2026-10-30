@@ -1080,9 +1080,6 @@ export default defineConfig({
     ],
 
     "package/workspace-import-boundaries": ["error", workspaceBoundaryOptions],
-    // Effect pipelines intentionally use callback combinators like
-    // Effect.mapError/Effect.flatMap instead of async/await.
-
     "strict-effect/module-ownership": [
       "error",
       {
@@ -1116,8 +1113,6 @@ export default defineConfig({
         ],
       },
     ],
-    // The Cloudflare cache belongs to native Alchemy Worker/Website caching.
-
     "strict-effect/no-loader-request-state": [
       "error",
       {
@@ -1142,14 +1137,5 @@ export default defineConfig({
       },
     ],
     "taxkit-package/workspace-roles": "error",
-    "typescript/consistent-type-assertions": [
-      "error",
-      {
-        assertionStyle: "never",
-      },
-    ],
-
-    // Effect Array supports data-first calls like Array.filter(items, predicate);
-    // this Unicorn rule misreads that second argument as a native Array thisArg.
   },
 });

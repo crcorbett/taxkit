@@ -65,7 +65,7 @@ it.live(
           modulesRoot: websiteRoot,
         });
       expect(apiFiles).toContain("worker.js");
-      expect(websiteFiles).toContain("index.js");
+      expect(websiteFiles).toContain("entry.server.js");
       const exceptions = yield* Queue.make<string>();
       const apiWorker = (name: string) => ({
         config: {
@@ -144,7 +144,7 @@ it.live(
                       },
                     },
                     manifest: {
-                      mainModule: "index.js",
+                      mainModule: "entry.server.js",
                       modules: websiteModules,
                       modulesRoot: websiteRoot,
                     },
