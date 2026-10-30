@@ -1,5 +1,5 @@
 import { assert, it } from "@effect/vitest";
-import { Effect, Schema } from "effect";
+import { Predicate, Function as EffectFunction, Effect, Schema } from "effect";
 import { GrossPay, au } from "taxkit/au";
 import { Cents, aud } from "taxkit/core";
 
@@ -7,7 +7,7 @@ it.effect("calculates weekly take-home pay", () =>
   Effect.promise(() =>
     au.pay.takeHomePay({
       grossPay: new GrossPay({
-        amount: aud(Cents.make(165_400)),
+        amount: EffectFunction.pipe(Cents.make(165_400), aud),
         period: "weekly",
       }),
       taxFreeThresholdClaimed: true,
@@ -15,13 +15,12 @@ it.effect("calculates weekly take-home pay", () =>
   ).pipe(
     Effect.tap((report) =>
       Effect.sync(() => {
-        assert.equal(report._tag, "TakeHomePayReport");
+        assert.isTrue(Predicate.isTagged(report, "TakeHomePayReport"));
         assert.equal(report.netPay.cents, 130_100);
       })
     )
   )
 );
-
 it.effect("rejects external input before calculation", () =>
   Schema.decodeEffect(
     Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
@@ -29,7 +28,7 @@ it.effect("rejects external input before calculation", () =>
     Effect.flip,
     Effect.tap((error) =>
       Effect.sync(() => {
-        assert.equal(error._tag, "SchemaError");
+        assert.isTrue(Predicate.isTagged(error, "SchemaError"));
       })
     )
   )
