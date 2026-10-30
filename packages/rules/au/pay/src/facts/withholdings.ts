@@ -5,7 +5,6 @@ import { TraceNode } from "@taxkit/core/trace";
 import { Context, Schema } from "effect";
 
 import { PayPeriod } from "./pay.js";
-
 /**
  * Context tag for the PAYG withholding ledger component.
  *
@@ -18,7 +17,6 @@ export class PaygWithholdingComponentFact extends Context.Service<
   PaygWithholdingComponentFact,
   LedgerComponent
 >()("taxkit/rules-au-pay/fact/PaygWithholdingComponent") {}
-
 /**
  * Fact descriptor for the PAYG withholding component.
  *
@@ -31,7 +29,6 @@ export const PaygWithholdingComponentDescriptor = makeFactDescriptor({
   tag: PaygWithholdingComponentFact,
   title: "PAYG withholding ledger component for a single pay period",
 });
-
 /**
  * Aggregated withholding ledger for a single pay period.
  *
@@ -41,16 +38,17 @@ export const PaygWithholdingComponentDescriptor = makeFactDescriptor({
  *
  * @since 0.1.0
  */
-export class PayWithholdingsLedger extends Schema.TaggedClass<PayWithholdingsLedger>()(
-  "PayWithholdingsLedger",
+export class PayWithholdingsLedger extends Schema.TaggedClass<
+  PayWithholdingsLedger,
   {
-    components: Schema.Array(LedgerComponent),
-    period: PayPeriod,
-    total: Money,
-    trace: TraceNode,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("PayWithholdingsLedger", {
+  components: Schema.Array(LedgerComponent),
+  period: PayPeriod,
+  total: Money,
+  trace: TraceNode,
+}) {}
 /**
  * Context tag for the derived pay-period withholding ledger.
  *
@@ -60,7 +58,6 @@ export class PayWithholdingsLedgerFact extends Context.Service<
   PayWithholdingsLedgerFact,
   PayWithholdingsLedger
 >()("taxkit/rules-au-pay/fact/PayWithholdingsLedger") {}
-
 /**
  * Fact descriptor for the aggregated pay-period withholding ledger.
  *

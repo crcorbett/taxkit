@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { Effect } from "effect";
+import { Predicate, Function as EffectFunction, Effect } from "effect";
 import * as HttpClientRequest from "effect/http/HttpClientRequest";
 import * as HttpClientResponse from "effect/http/HttpClientResponse";
 
@@ -13,7 +13,9 @@ it.effect("the server example preserves the documented weekly pay result", () =>
         method: "POST",
       })
     );
-    expect(response.headers.get("content-type")).toBe("application/json");
+    EffectFunction.pipe(response.headers.get("content-type"), (actual) => {
+      expect(actual).toBe("application/json");
+    });
     const body = yield* HttpClientResponse.fromWeb(
       HttpClientRequest.get("https://example.test/pay"),
       response
@@ -21,7 +23,6 @@ it.effect("the server example preserves the documented weekly pay result", () =>
     expect(body).toBe('{"netPayCents":130100,"withholdingsCents":35300}');
   })
 );
-
 it.effect.each([
   '{"grossPayCents":1.5,"period":"weekly","taxFreeThresholdClaimed":true}',
   '{"grossPayCents":165400,"period":"unsupported","taxFreeThresholdClaimed":true}',
@@ -34,7 +35,12 @@ it.effect.each([
         method: "POST",
       })
     ).pipe(Effect.flip);
-    expect(error._tag).toBe("PayPreviewRequestError");
+    EffectFunction.pipe(
+      Predicate.isTagged(error, "PayPreviewRequestError"),
+      (matches) => {
+        expect(matches).toBeTruthy();
+      }
+    );
     expect(error.message).toBe("Invalid pay preview request.");
   })
 );

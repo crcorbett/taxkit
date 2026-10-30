@@ -8,7 +8,15 @@ import {
   TaxablePayFact,
   scaleWeeklyWithholdingToPayPeriodDollars,
 } from "@taxkit/rules-au-pay/facts";
-import { Array, BigDecimal, Effect, Layer, Option } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  BigDecimal,
+  Boolean as EffectBoolean,
+  Effect,
+  Layer,
+  Option,
+} from "effect";
 
 import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
 import {
@@ -16,7 +24,6 @@ import {
   AtoStslNoThresholdTable,
 } from "../parameters/stsl-table.js";
 import type { StslRow, StslTable } from "../parameters/stsl-table.js";
-
 /**
  * Rule id for the STSL withholding component.
  *
@@ -25,7 +32,6 @@ import type { StslRow, StslTable } from "../parameters/stsl-table.js";
 export const StslComponentRuleId = RuleId.make(
   "taxkit/rules-au-stsl/rule/StslComponent"
 );
-
 /**
  * Ledger component id for STSL withholding.
  *
@@ -34,19 +40,19 @@ export const StslComponentRuleId = RuleId.make(
 export const StslComponentId = ComponentId.make(
   "taxkit/rules-au-stsl/component/Stsl"
 );
-
 const findRow = (
   table: StslTable,
   weeklyFormulaCents: number
 ): Effect.Effect<StslRow, CalculationError> => {
-  const row = Array.findFirst(
+  const row = EffectFunction.pipe(
     table.rows,
-    (r) =>
-      weeklyFormulaCents >= r.weeklyMinCents &&
-      (r.weeklyMaxCents === "infinity" ||
-        weeklyFormulaCents <= r.weeklyMaxCents)
+    Array.findFirst(
+      (r) =>
+        weeklyFormulaCents >= r.weeklyMinCents &&
+        (r.weeklyMaxCents === "infinity" ||
+          weeklyFormulaCents <= r.weeklyMaxCents)
+    )
   );
-
   return Option.match(row, {
     onNone: () =>
       Effect.fail(
@@ -57,7 +63,6 @@ const findRow = (
     onSome: Effect.succeed,
   });
 };
-
 /**
  * Current STSL component using ATO Schedule 8 marginal component rows.
  *
@@ -69,10 +74,10 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     const taxable = yield* TaxablePayFact;
     const stslDebt = yield* StslDebtFact;
     const threshold = yield* TaxFreeThresholdClaimedFact;
-    const table = threshold.value
-      ? yield* AtoStslTable
-      : yield* AtoStslNoThresholdTable;
-
+    const table = yield* EffectBoolean.match(threshold.value, {
+      onTrue: () => AtoStslTable,
+      onFalse: () => AtoStslNoThresholdTable,
+    });
     const baseTraceInputs = {
       enabled: stslDebt.enabled,
       period: taxable.period,
@@ -80,7 +85,6 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       taxFreeThresholdClaimed: threshold.value,
       taxablePeriodCents: taxable.amount.cents,
     } as const;
-
     if (!stslDebt.enabled) {
       const trace = TraceNode.make({
         children: [taxable.trace],
@@ -101,7 +105,6 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       });
       return component;
     }
-
     const weeklyCents = payPeriodToWeeklyCents(
       taxable.amount.cents,
       taxable.period
@@ -126,7 +129,6 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         })
       )
     );
-
     if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
         children: [taxable.trace],
@@ -156,14 +158,12 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       });
       return component;
     }
-
     const periodWithholding = yield* audFromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period
       ) * 100
     );
-
     const trace = TraceNode.make({
       children: [taxable.trace],
       formula: Option.some(
@@ -185,7 +185,6 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       sources: [table.source],
       title: "STSL withholding (Schedule 8)",
     });
-
     const component = LedgerComponent.make({
       amount: periodWithholding,
       effect: "additive",

@@ -1,3 +1,4 @@
+import type { Option } from "effect";
 import type { RuleTester } from "oxlint/plugins-dev";
 
 // Oxlint exports RuleTester as its supported plugin type surface. Derive the
@@ -15,5 +16,5 @@ export type SyntaxKind<Kind extends SyntaxNode["type"]> = SyntaxNode & {
 export type ImportSemantic = (
   source: string,
   specifierType: SyntaxKind<"ImportDeclaration">["specifiers"][number]["type"],
-  imported: string | null
-) => string | null;
+  imported: Option.Option<string>
+) => Option.Option<string>;

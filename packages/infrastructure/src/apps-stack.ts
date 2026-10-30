@@ -8,7 +8,13 @@ import { adopt } from "alchemy/AdoptPolicy";
 import * as Output from "alchemy/Output";
 import { retain } from "alchemy/RemovalPolicy";
 import { Stage } from "alchemy/Stage";
-import { Context, Effect, Option } from "effect";
+import {
+  Boolean as EffectBoolean,
+  Context,
+  Effect,
+  Option,
+  Function as EffectFunction,
+} from "effect";
 
 import { TaxKitApiWorker } from "./api-worker.js";
 import {
@@ -28,12 +34,10 @@ export const NativeAppsHostMode = Context.Reference<CalculatorHostMode>(
   "@taxkit/infrastructure/NativeAppsHostMode",
   { defaultValue: () => "edge" }
 );
-
 export const NativeProductionZone = Context.Reference<Option.Option<Zone>>(
   "@taxkit/infrastructure/NativeProductionZone",
   { defaultValue: Option.none }
 );
-
 /**
  * Production zone settings, one retained native resource each. TLS 1.3 is on
  * with a TLS 1.2 minimum (a 1.3 minimum would refuse TLS 1.2 clients, including
@@ -64,7 +68,6 @@ export const productionZoneSettings = [
     value: "on",
   },
 ] as const;
-
 /**
  * A bot policy that bans no user agent: no Bot Fight Mode, no AI-bot blocking
  * or link maze, no content-bot blocking, and no Cloudflare-managed robots.txt
@@ -77,7 +80,6 @@ export const productionBotPolicy = {
   fightMode: false,
   isRobotsTxtManaged: false,
 } as const;
-
 /**
  * Production exports only the hosts' own checked console records, through the
  * retained `taxkit-axiom-logs` destination. Cloudflare's invocation logs and
@@ -100,7 +102,6 @@ const productionObservability = Effect.gen(function* () {
     traces: { enabled: false, persist: false },
   };
 });
-
 // The API is declared first and knows nothing of the Website. Its version
 // scoped cache is declared in its native init (`Cloudflare.cache`).
 export const nativeApiHostProps = Effect.gen(function* () {
@@ -121,12 +122,12 @@ export const nativeApiHostProps = Effect.gen(function* () {
       CALCULATOR_HOST_MODE: yield* NativeAppsHostMode,
       TAXKIT_PUBLICATION_ORIGIN: publicationOrigin,
     },
-    observability: Option.isSome(yield* NativeProductionZone)
-      ? yield* productionObservability
-      : disabledWorkerObservability,
+    observability: yield* Option.match(yield* NativeProductionZone, {
+      onNone: () => Effect.succeed(disabledWorkerObservability),
+      onSome: () => productionObservability,
+    }),
   };
 });
-
 /**
  * The Website's build-input hash. The app keeps native `.gitignore` filtering;
  * sibling inputs follow the root manifest's workspace paths. Parent-directory
@@ -157,7 +158,6 @@ export const websiteBuildMemo = {
   lockfile: true,
   workspaces: [],
 };
-
 // The Website receives the same stage's API address and private binding.
 export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
   "TaxKitWebsite",
@@ -186,7 +186,11 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       dev: { host: "127.0.0.1", port: 3220, strictPort: true },
       env: {
         API_PUBLIC_ORIGIN: api.url.pipe(
-          Output.map((url) => Option.getOrNull(Option.fromNullishOr(url)))
+          Output.map((url) =>
+            Option.fromNullishOr(url).pipe(
+              Option.match({ onNone: () => null, onSome: (address) => address })
+            )
+          )
         ),
         TAXKIT_API: api,
         TAXKIT_PUBLICATION_ORIGIN: publicationOrigin,
@@ -197,26 +201,25 @@ export class TaxKitWebsite extends Website.Vite<TaxKitWebsite>()(
       memo: websiteBuildMemo,
       // Same policy as the API: Production exports checked console records
       // only; other stages keep every platform channel off.
-      observability: Option.isSome(yield* NativeProductionZone)
-        ? yield* productionObservability
-        : disabledWorkerObservability,
+      observability: yield* Option.match(yield* NativeProductionZone, {
+        onNone: () => Effect.succeed(disabledWorkerObservability),
+        onSome: () => productionObservability,
+      }),
       rootDir: "apps/web",
     };
   })
 ) {}
-
 export const declareNativeAppsInfrastructure = Effect.gen(function* () {
   const stage = yield* checkedStage(yield* Stage);
-  const zone =
-    stage === "prod"
-      ? Option.some(
-          yield* Zone("TaxKitProductionZone", {
-            name: taxKitZoneName,
-            paused: false,
-            type: "full",
-          }).pipe(adopt(true), retain())
-        )
-      : Option.none<Zone>();
+  const zone = yield* EffectBoolean.match(stage === "prod", {
+    onTrue: () =>
+      Zone("TaxKitProductionZone", {
+        name: taxKitZoneName,
+        paused: false,
+        type: "full",
+      }).pipe(adopt(true), retain(), Effect.map(Option.some)),
+    onFalse: () => Effect.succeed(Option.none<Zone>()),
+  });
   if (Option.isSome(zone)) {
     // Preserve the DNS settings independently read on 7 October. This does
     // not change registrar, mail or verification records.
@@ -230,12 +233,15 @@ export const declareNativeAppsInfrastructure = Effect.gen(function* () {
       zoneId: zone.value.zoneId,
       zoneMode: "standard",
     }).pipe(retain());
-    yield* Effect.forEach(productionZoneSettings, (setting) =>
-      Setting(setting.resource, {
-        settingId: setting.settingId,
-        value: setting.value,
-        zoneId: zone.value.zoneId,
-      }).pipe(retain())
+    yield* EffectFunction.pipe(
+      productionZoneSettings,
+      Effect.forEach((setting) =>
+        Setting(setting.resource, {
+          settingId: setting.settingId,
+          value: setting.value,
+          zoneId: zone.value.zoneId,
+        }).pipe(retain())
+      )
     );
     // Cloudflare Registrar publishes the DS record when signing starts.
     yield* Dnssec("TaxKitProductionDnssec", {
@@ -249,7 +255,6 @@ export const declareNativeAppsInfrastructure = Effect.gen(function* () {
   }
   return zone;
 });
-
 export const declareNativeAppsHosts = Effect.gen(function* () {
   const api = yield* TaxKitApiWorker;
   const website = yield* TaxKitWebsite;

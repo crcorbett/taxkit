@@ -1,17 +1,21 @@
-import "@tanstack/react-start/server-only";
 import {
   fromCloudflareFetcher,
   toHttpClient,
 } from "@alchemy.run/cloudflare/Bridge";
+import "@tanstack/react-start/server-only";
 import { TaxKitApi } from "@taxkit/api-http/api";
 import { ApiDeadlineExceeded, ApiUnavailable } from "@taxkit/api-http/errors";
 import { apiReadTimeout, boundedReplies } from "@taxkit/api-http/requests";
-import { Effect, Layer, Result } from "effect";
+import {
+  Function as EffectFunction,
+  Effect,
+  Layer,
+  Boolean as EffectBoolean,
+} from "effect";
 import { HttpApiClient } from "effect/http-api";
 
 import { WebsiteApiConfig } from "./config.ingress";
 import { WebsiteApi } from "./service";
-
 // Native Alchemy bindings: the selected keys only, with protected values
 // unwrapped by Alchemy's own reader. The binding object keeps its receiver.
 export const WebsiteApiLive = Layer.effect(
@@ -32,8 +36,9 @@ export const WebsiteApiLive = Layer.effect(
               redirect: "manual",
             }),
         };
-        const reads = boundedReplies(
-          toHttpClient(fromCloudflareFetcher(binding))
+        const reads = EffectFunction.pipe(
+          EffectFunction.pipe(fromCloudflareFetcher(binding), toHttpClient),
+          boundedReplies
         );
         return {
           client: HttpApiClient.makeWith(TaxKitApi, {
@@ -50,35 +55,43 @@ export const WebsiteApiLive = Layer.effect(
       Effect.result
     );
     return WebsiteApi.of({
-      client: Result.map(host, ({ generated }) => generated),
-      forward: Effect.fn("WebsiteApi.forward")((path: string) =>
-        Effect.fromResult(host).pipe(
-          Effect.flatMap(({ reads, settings }) =>
-            reads.get(new URL(path, settings.apiOrigin)).pipe(
-              Effect.flatMap((response) =>
-                response.arrayBuffer.pipe(
-                  Effect.map(
-                    (body) =>
-                      new Response(
-                        response.status === 204 ||
-                          response.status === 205 ||
-                          response.status === 304
-                          ? null
-                          : body,
-                        { headers: response.headers, status: response.status }
-                      )
+      client: Effect.fromResult(host).pipe(
+        Effect.map(({ generated }) => generated),
+        Effect.withSpan("WebsiteApi.client")
+      ),
+      forward: Effect.fn("WebsiteApi.forward")(
+        ({ path }: { readonly path: string }) =>
+          Effect.fromResult(host).pipe(
+            Effect.flatMap(({ reads, settings }) =>
+              reads.get(new URL(path, settings.apiOrigin)).pipe(
+                Effect.flatMap((response) =>
+                  response.arrayBuffer.pipe(
+                    Effect.map(
+                      (body) =>
+                        new Response(
+                          EffectBoolean.match(
+                            response.status === 204 ||
+                              response.status === 205 ||
+                              response.status === 304,
+                            {
+                              onFalse: () => body,
+                              onTrue: () => null,
+                            }
+                          ),
+                          { headers: response.headers, status: response.status }
+                        )
+                    )
                   )
-                )
-              ),
-              Effect.mapError(() => new ApiUnavailable())
-            )
-          ),
-          Effect.scoped,
-          Effect.timeoutOrElse({
-            duration: apiReadTimeout,
-            orElse: () => Effect.fail(new ApiDeadlineExceeded()),
-          })
-        )
+                ),
+                Effect.mapError(() => new ApiUnavailable())
+              )
+            ),
+            Effect.scoped,
+            Effect.timeoutOrElse({
+              duration: apiReadTimeout,
+              orElse: () => Effect.fail(new ApiDeadlineExceeded()),
+            })
+          )
       ),
     });
   })

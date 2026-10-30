@@ -214,7 +214,7 @@ The infrastructure-owned `PostHogManagement` contract has only find, read,
 create and update operations over checked TaxKit identities. Its private
 Distilled adapter contains paging, credentials, supported privacy settings,
 bounded replies and safe failure mapping. The native resource provider and
-deterministic test Layer depend on that closed contract. Alchemy beta.80 requires
+deterministic test Layer depend on that closed contract. Alchemy beta.84 requires
 provider registration without an error channel, so the composition Layer caches
 fallible live acquisition in the native stack scope and defers it to a lifecycle
 operation. Invalid settings remain typed failures before any request. The
@@ -407,7 +407,7 @@ Encoding is the inverse trust operation. Execute an owning Schema encoder only
 where a canonical value leaves the system as HTTP or route transport, provider
 input, persisted representation or command output. Do not encode between
 services, as a defensive copy, or inside ordinary React composition.
-`effect/no-schema-encoder-outside-egress` is enabled repository-wide and exact
+`taxkit-effect/no-schema-encoder-outside-egress` is enabled repository-wide and exact
 egress files are disabled only in `oxlint.config.ts`.
 
 Production code must not use throwing `Schema.*Sync` codecs. Prefer

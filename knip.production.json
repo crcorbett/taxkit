@@ -111,7 +111,7 @@
     "apps/web": {
       "entry": [
         "src/router.tsx!",
-        "src/server.ts!",
+        "src/entry.server.ts!",
         "src/routes/**/*.{ts,tsx}!",
         "vite.config.ts!"
       ],

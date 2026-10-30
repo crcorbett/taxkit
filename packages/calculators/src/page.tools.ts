@@ -1,4 +1,12 @@
-import { Duration, Effect, Option, Result, Schema, Stream } from "effect";
+import {
+  Match,
+  Duration,
+  Effect,
+  Option,
+  Result,
+  Schema,
+  Stream,
+} from "effect";
 import { Tool, Toolkit } from "effect/ai";
 import type * as Atom from "effect/reactivity/Atom";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
@@ -7,13 +15,11 @@ import { AnnualTaxForm, CalculatorForm, TakeHomeForm } from "./form.ingress.js";
 import type { CalculatorPage } from "./page.atoms.js";
 import { CalculatorToolFailure, CalculatorViewState } from "./page.schemas.js";
 import { CalculatorCatalogResponse } from "./schemas.js";
-
 // Native callbacks supply unknown input. Decode it directly into the owning
 // EmptyParams contract: an empty Struct alone accepts excess fields.
 const NoArguments = Schema.Unknown.pipe(Schema.decodeTo(Tool.EmptyParams));
 const ToolFailure = Schema.toCodecJson(CalculatorToolFailure);
 const ToolView = Schema.toCodecJson(CalculatorViewState);
-
 // These operations act on the mounted page, so their names and inputs differ
 // from remote MCP's catalogue/calculation operations. Both interfaces still
 // use the owning catalogue/report Schemas and the same calculation service.
@@ -64,7 +70,6 @@ export const CalculatorPageToolkit = Toolkit.make(
     .annotate(Tool.Readonly, true)
     .annotate(Tool.Strict, true)
 );
-
 const unavailable = () =>
   new CalculatorToolFailure({
     code: "service-unavailable",
@@ -75,7 +80,6 @@ const invalidInput = () =>
     code: "invalid-input",
     retry: "check-the-visible-form",
   });
-
 /**
  * One mounted page's tool handlers. They invoke the page's own edit and submit
  * commands through the registry; they neither acquire a client nor calculate.
@@ -169,9 +173,12 @@ export const calculatorPageToolHandlers = <E, F>({
         Effect.sync(() => {
           const current = get.registry.get(page.view);
           if (
-            !(current.calculatorId === "au.income-tax.annual"
-              ? Schema.is(AnnualTaxForm)(form)
-              : Schema.is(TakeHomeForm)(form))
+            !Match.value(current).pipe(
+              Match.when({ calculatorId: "au.income-tax.annual" }, () =>
+                Schema.is(AnnualTaxForm)(form)
+              ),
+              Match.orElse(() => Schema.is(TakeHomeForm)(form))
+            )
           ) {
             return Result.fail(invalidInput());
           }

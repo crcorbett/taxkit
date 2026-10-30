@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import {
+  Function as EffectFunction,
   Array,
   Context,
   Effect,
@@ -35,7 +36,6 @@ class FixtureFact extends Context.Service<FixtureFact, number>()(
 class FixtureParameter extends Context.Service<FixtureParameter, number>()(
   "test/domain-absence/Parameter"
 ) {}
-
 const source = SourceRef.make({
   kind: "internal-validation",
   reference: "test",
@@ -71,7 +71,6 @@ const traceInput = {
   sources: [],
   title: "Compatibility fixture",
 } as const;
-
 describe("domain absence representations", () => {
   it.effect(
     "preserves trace key identity and historical bytes in all three forms",
@@ -105,28 +104,55 @@ describe("domain absence representations", () => {
             }),
           },
         ];
-        yield* Effect.forEach(samples, (sample) =>
-          Effect.gen(function* () {
-            const encoded = yield* Schema.encodeEffect(TraceNode)(sample.value);
-            expect(
-              yield* Schema.encodeEffect(Schema.fromJsonString(TraceNode))(
+        yield* EffectFunction.pipe(
+          samples,
+          Effect.forEach((sample) =>
+            Effect.gen(function* () {
+              const encoded = yield* Schema.encodeEffect(TraceNode)(
                 sample.value
-              )
-            ).toBe(sample.bytes);
-            expect(Object.hasOwn(encoded, "formula")).toBe(sample.own);
-            expect(Object.hasOwn(encoded, "rounding")).toBe(sample.own);
-            const restored = yield* Schema.decodeEffect(TraceNode)(encoded);
-            expect(restored.formula).toEqual(sample.value.formula);
-            expect(restored.rounding).toEqual(sample.value.rounding);
-            const again = yield* Schema.encodeEffect(TraceNode)(restored);
-            expect(
-              yield* Schema.encodeEffect(Schema.fromJsonString(TraceNode))(
-                restored
-              )
-            ).toBe(sample.bytes);
-            expect(Object.hasOwn(again, "formula")).toBe(sample.own);
-            expect(Object.hasOwn(again, "rounding")).toBe(sample.own);
-          })
+              );
+              expect(
+                yield* Schema.encodeEffect(Schema.fromJsonString(TraceNode))(
+                  sample.value
+                )
+              ).toBe(sample.bytes);
+              EffectFunction.pipe(
+                Object.hasOwn(encoded, "formula"),
+                (actual) => {
+                  expect(actual).toBe(sample.own);
+                }
+              );
+              EffectFunction.pipe(
+                Object.hasOwn(encoded, "rounding"),
+                (actual) => {
+                  expect(actual).toBe(sample.own);
+                }
+              );
+              const restored = yield* Schema.decodeEffect(TraceNode)(encoded);
+              expect({
+                restoredFormula: restored.formula,
+                restoredRounding: restored.rounding,
+              }).toStrictEqual({
+                restoredFormula: sample.value.formula,
+                restoredRounding: sample.value.rounding,
+              });
+              const again = yield* Schema.encodeEffect(TraceNode)(restored);
+              expect(
+                yield* Schema.encodeEffect(Schema.fromJsonString(TraceNode))(
+                  restored
+                )
+              ).toBe(sample.bytes);
+              EffectFunction.pipe(Object.hasOwn(again, "formula"), (actual) => {
+                expect(actual).toBe(sample.own);
+              });
+              EffectFunction.pipe(
+                Object.hasOwn(again, "rounding"),
+                (actual) => {
+                  expect(actual).toBe(sample.own);
+                }
+              );
+            })
+          )
         );
       })
   );
@@ -160,38 +186,61 @@ describe("domain absence representations", () => {
             }),
           },
         ];
-        yield* Effect.forEach(samples, (sample) =>
-          Effect.gen(function* () {
-            const encoded = yield* Schema.encodeEffect(FactQuestion)(
-              sample.value
-            );
-            expect(
-              yield* Schema.encodeEffect(Schema.fromJsonString(FactQuestion))(
+        yield* EffectFunction.pipe(
+          samples,
+          Effect.forEach((sample) =>
+            Effect.gen(function* () {
+              const encoded = yield* Schema.encodeEffect(FactQuestion)(
                 sample.value
-              )
-            ).toBe(sample.bytes);
-            expect(Object.hasOwn(encoded, "helpText")).toBe(sample.own);
-            const restored = yield* Schema.decodeEffect(FactQuestion)(encoded);
-            expect(restored.helpText).toEqual(sample.value.helpText);
-            const again = yield* Schema.encodeEffect(FactQuestion)(restored);
-            expect(
-              yield* Schema.encodeEffect(Schema.fromJsonString(FactQuestion))(
-                restored
-              )
-            ).toBe(sample.bytes);
-            expect(Object.hasOwn(again, "helpText")).toBe(sample.own);
-          })
+              );
+              expect(
+                yield* Schema.encodeEffect(Schema.fromJsonString(FactQuestion))(
+                  sample.value
+                )
+              ).toBe(sample.bytes);
+              EffectFunction.pipe(
+                Object.hasOwn(encoded, "helpText"),
+                (actual) => {
+                  expect(actual).toBe(sample.own);
+                }
+              );
+              const restored =
+                yield* Schema.decodeEffect(FactQuestion)(encoded);
+              expect(restored.helpText).toStrictEqual(sample.value.helpText);
+              const again = yield* Schema.encodeEffect(FactQuestion)(restored);
+              expect(
+                yield* Schema.encodeEffect(Schema.fromJsonString(FactQuestion))(
+                  restored
+                )
+              ).toBe(sample.bytes);
+              EffectFunction.pipe(
+                Object.hasOwn(again, "helpText"),
+                (actual) => {
+                  expect(actual).toBe(sample.own);
+                }
+              );
+            })
+          )
         );
       })
   );
+
   it("keeps checked question identity and collapses only historically absent descriptor inputs", () => {
-    expect(fact.question).toEqual(Option.none());
-    expect(
-      makeFactDescriptor({ ...factInput, question: undefined }).question
-    ).toEqual(Option.none());
-    expect(makeFactDescriptor({ ...factInput, question }).question).toEqual(
-      Option.some(question)
-    );
+    expect({
+      factQuestion: fact.question,
+      optionalQuestion: makeFactDescriptor({
+        ...factInput,
+        question: undefined,
+      }).question,
+      makeFactDescriptorFactInputQuestionQuestion: makeFactDescriptor({
+        ...factInput,
+        question,
+      }).question,
+    }).toStrictEqual({
+      factQuestion: Option.none(),
+      optionalQuestion: Option.none(),
+      makeFactDescriptorFactInputQuestionQuestion: Option.some(question),
+    });
     expect(makeFactDescriptor({ ...factInput, question }).schema).toBe(
       Schema.Number
     );
@@ -217,22 +266,32 @@ describe("domain absence representations", () => {
         tag: FixtureParameter,
         title: "Fixture parameter",
       };
-      expect(makeParameterDescriptor(input).sourceArtifact).toEqual(
-        Option.none()
-      );
-      expect(
-        makeParameterDescriptor({ ...input, sourceArtifact: undefined })
-          .sourceArtifact
-      ).toEqual(Option.none());
+      expect({
+        makeParameterDescriptorInputSourceArtifact:
+          makeParameterDescriptor(input).sourceArtifact,
+        optionalSourceArtifact: makeParameterDescriptor({
+          ...input,
+          sourceArtifact: undefined,
+        }).sourceArtifact,
+      }).toStrictEqual({
+        makeParameterDescriptorInputSourceArtifact: Option.none(),
+        optionalSourceArtifact: Option.none(),
+      });
       const provided = makeParameterDescriptor({
         ...input,
         sourceArtifact: artifact,
       });
-      expect(provided.sourceArtifact).toEqual(Option.some(artifact));
-      expect(provided.effectivePeriod).toEqual(period);
+      expect({
+        providedSourceArtifact: provided.sourceArtifact,
+        providedEffectivePeriod: provided.effectivePeriod,
+      }).toStrictEqual({
+        providedSourceArtifact: Option.some(artifact),
+        providedEffectivePeriod: period,
+      });
       expect(provided.tag).toBe(FixtureParameter);
     })
   );
+
   it("keeps explicit false and total empty parameter collections", () => {
     const missing = makeRuleDescriptor(ruleInput);
     const absent = makeRuleDescriptor({
@@ -247,14 +306,24 @@ describe("domain absence representations", () => {
       ...ruleInput,
       allowDuplicateProvides: true,
     });
-    expect(missing.allowDuplicateProvides).toEqual(Option.none());
-    expect(absent.allowDuplicateProvides).toEqual(Option.none());
-    expect(denied.allowDuplicateProvides).toEqual(Option.some(false));
-    expect(allowed.allowDuplicateProvides).toEqual(Option.some(true));
-    expect(missing.parameters).toEqual([]);
-    expect(absent.parameters).toEqual([]);
+    expect({
+      missingAllowDuplicateProvides: missing.allowDuplicateProvides,
+      absentAllowDuplicateProvides: absent.allowDuplicateProvides,
+      deniedAllowDuplicateProvides: denied.allowDuplicateProvides,
+      allowedAllowDuplicateProvides: allowed.allowDuplicateProvides,
+      missingParameters: missing.parameters,
+      absentParameters: absent.parameters,
+    }).toStrictEqual({
+      missingAllowDuplicateProvides: Option.none(),
+      absentAllowDuplicateProvides: Option.none(),
+      deniedAllowDuplicateProvides: Option.some(false),
+      allowedAllowDuplicateProvides: Option.some(true),
+      missingParameters: [],
+      absentParameters: [],
+    });
     expect(missing.layer).toBe(ruleInput.layer);
   });
+
   it("reports multiple unpermitted providers and preserves the explicit permission", () => {
     const duplicate = makeRuleDescriptor({
       ...ruleInput,
@@ -274,27 +343,38 @@ describe("domain absence representations", () => {
       allowDuplicateProvides: true,
       id: RuleId.make("fixture/other"),
     });
-    expect(
-      Array.map(
+    EffectFunction.pipe(
+      EffectFunction.pipe(
         validateRuleGraph({ inputFacts: [], rules: [missing, duplicate] }),
-        (issue) => issue.kind
-      )
-    ).toContain("duplicate-provider");
-    expect(
-      Array.map(
+        Array.map((issue) => issue.kind)
+      ),
+      (actual) => {
+        expect(actual).toContain("duplicate-provider");
+      }
+    );
+    EffectFunction.pipe(
+      EffectFunction.pipe(
         validateRuleGraph({ inputFacts: [], rules: [denied, duplicate] }),
-        (issue) => issue.kind
-      )
-    ).toContain("duplicate-provider");
-    expect(
-      validateRuleGraph({ inputFacts: [], rules: [denied, otherAllowed] })
-    ).toEqual([]);
-    expect(
-      validateRuleGraph({ inputFacts: [], rules: [allowed, otherAllowed] })
-    ).toEqual([]);
+        Array.map((issue) => issue.kind)
+      ),
+      (actual) => {
+        expect(actual).toContain("duplicate-provider");
+      }
+    );
+    EffectFunction.pipe(
+      validateRuleGraph({ inputFacts: [], rules: [denied, otherAllowed] }),
+      (actual) => {
+        expect(actual).toStrictEqual([]);
+      }
+    );
+    EffectFunction.pipe(
+      validateRuleGraph({ inputFacts: [], rules: [allowed, otherAllowed] }),
+      (actual) => {
+        expect(actual).toStrictEqual([]);
+      }
+    );
   });
 });
-
 describe("calculation error diagnostic absence", () => {
   it.effect(
     "preserves original missing, undefined, null and opaque-value forms",
@@ -326,32 +406,43 @@ describe("calculation error diagnostic absence", () => {
             ownCause: true,
           },
         ];
-        yield* Effect.forEach(forms, (form) =>
-          Effect.gen(function* () {
-            const error = new CalculationError({
-              cause: form.cause,
-              message: "Fixed fixture failure",
-            });
-            const encoded = yield* Schema.encodeEffect(CalculationError)(error);
-            const decoded =
-              yield* Schema.decodeEffect(CalculationError)(encoded);
-            expect(
-              yield* Schema.encodeEffect(
-                Schema.fromJsonString(CalculationError)
-              )(error)
-            ).toBe(form.bytes);
-            expect(Record.has<string, unknown>(encoded, "cause")).toBe(
-              form.ownCause
-            );
-            expect(decoded.cause).toEqual(form.cause);
-            expect(
-              yield* Schema.encodeEffect(CalculationError)(decoded)
-            ).toEqual(encoded);
-          })
+        yield* EffectFunction.pipe(
+          forms,
+          Effect.forEach((form) =>
+            Effect.gen(function* () {
+              const error = new CalculationError({
+                cause: form.cause,
+                message: "Fixed fixture failure",
+              });
+              const encoded =
+                yield* Schema.encodeEffect(CalculationError)(error);
+              const decoded =
+                yield* Schema.decodeEffect(CalculationError)(encoded);
+              expect(
+                yield* Schema.encodeEffect(
+                  Schema.fromJsonString(CalculationError)
+                )(error)
+              ).toBe(form.bytes);
+              EffectFunction.pipe(
+                Record.has<string, unknown>(encoded, "cause"),
+                (actual) => {
+                  expect(actual).toBe(form.ownCause);
+                }
+              );
+              expect({
+                decodedCause: decoded.cause,
+                SchemaEncodeEffectCalculationErrorDecoded:
+                  yield* Schema.encodeEffect(CalculationError)(decoded),
+              }).toStrictEqual({
+                decodedCause: form.cause,
+                SchemaEncodeEffectCalculationErrorDecoded: encoded,
+              });
+            })
+          )
         );
         expect(
           new CalculationError({ message: "Fixed fixture failure" }).cause
-        ).toEqual(Option.none());
+        ).toStrictEqual(Option.none());
       })
   );
 });

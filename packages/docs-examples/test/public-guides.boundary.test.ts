@@ -3,7 +3,7 @@ import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
 import { ContentServiceLive } from "@taxkit/content/live";
 import { ContentCatalogue } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { Effect, Layer } from "effect";
+import { Predicate, Function as EffectFunction, Effect, Layer } from "effect";
 import { HttpClientRequest, HttpClientResponse } from "effect/http";
 
 import { readCalculatorError } from "../src/api-error-envelope.js";
@@ -14,13 +14,25 @@ it.effect(
   "rejects external annual facts before calling the pay calculator",
   () =>
     Effect.gen(function* () {
-      expect((yield* invalidInput.pipe(Effect.flip))._tag).toBe("SchemaError");
+      EffectFunction.pipe(
+        Predicate.isTagged(
+          yield* invalidInput.pipe(Effect.flip),
+          "SchemaError"
+        ),
+        (matches) => {
+          expect(matches).toBeTruthy();
+        }
+      );
       const report = yield* validInput;
-      expect(report._tag).toBe("TakeHomePayReport");
+      EffectFunction.pipe(
+        Predicate.isTagged(report, "TakeHomePayReport"),
+        (matches) => {
+          expect(matches).toBeTruthy();
+        }
+      );
       expect(report.netPay.cents).toBe(130_100);
     })
 );
-
 it.effect(
   "checks an actual raw error response and rejects an unrelated envelope",
   () =>
@@ -33,8 +45,14 @@ it.effect(
           { headers: { "content-type": "application/json" }, status: 400 }
         )
       );
-      expect((yield* readCalculatorError(response)).error._tag).toBe(
-        "CalculatorInputDecodeError"
+      EffectFunction.pipe(
+        Predicate.isTagged(
+          (yield* readCalculatorError(response)).error,
+          "CalculatorInputDecodeError"
+        ),
+        (matches) => {
+          expect(matches).toBeTruthy();
+        }
       );
       const unrelated = HttpClientResponse.fromWeb(
         request,
@@ -43,12 +61,17 @@ it.effect(
           status: 400,
         })
       );
-      expect(
-        (yield* readCalculatorError(unrelated).pipe(Effect.flip))._tag
-      ).toBe("SchemaError");
+      EffectFunction.pipe(
+        Predicate.isTagged(
+          yield* readCalculatorError(unrelated).pipe(Effect.flip),
+          "SchemaError"
+        ),
+        (matches) => {
+          expect(matches).toBeTruthy();
+        }
+      );
     })
 );
-
 it.effect(
   "uses the real HTTP route and checked descriptor fields for calculator help",
   () =>

@@ -1,5 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import {
+  Match,
+  Function as EffectFunction,
   Array,
   Cause,
   Crypto,
@@ -11,8 +13,10 @@ import {
   Layer,
   Option,
   Ref,
+  Predicate,
   Result,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import {
   FetchHttpClient,
@@ -32,9 +36,7 @@ import { BackendAnalytics } from "../src/service.js";
 import { makeBackendAnalyticsTest } from "../src/test.layer.js";
 
 const expectedTimestamp: unknown = expect.any(String);
-
 const expectedContentLength: unknown = expect.stringMatching(/^\d+$/u);
-
 const TestCrypto = Layer.succeed(
   Crypto.Crypto,
   Crypto.make({
@@ -42,7 +44,6 @@ const TestCrypto = Layer.succeed(
     randomBytes: (size) => new Uint8Array(size),
   })
 );
-
 it.effect(
   "encodes one minimal event with no caller identity, figures, queries or credentials",
   () =>
@@ -54,7 +55,7 @@ it.effect(
         Effect.gen(function* () {
           expect(url.href).toBe("https://us.i.posthog.com/batch/");
           expect(request.method).toBe("POST");
-          expect(request.headers).toEqual({
+          expect({ ...request.headers }).toStrictEqual({
             "cache-control": "no-store",
             "content-length": expectedContentLength,
             "content-type": "application/json",
@@ -62,15 +63,18 @@ it.effect(
           const policy = yield* Effect.serviceOption(
             FetchHttpClient.RequestInit
           );
-          expect(
+          EffectFunction.pipe(
             Option.getOrElse(policy, () =>
               expect.fail("Missing native fetch policy")
-            )
-          ).toEqual({
-            cache: "no-store",
-            credentials: "omit",
-            redirect: "manual",
-          });
+            ),
+            (actual) => {
+              expect(actual).toStrictEqual({
+                cache: "no-store",
+                credentials: "omit",
+                redirect: "manual",
+              });
+            }
+          );
           expect(yield* HttpClient.TracerDisabledWhen).toBeTypeOf("function");
           const raw = yield* HttpServerRequest.fromClientRequest(
             request
@@ -97,7 +101,7 @@ it.effect(
         )
       );
       expect(disposition).toBe("accepted");
-      expect(yield* Ref.get(seen)).toEqual([
+      expect(yield* Ref.get(seen)).toStrictEqual([
         {
           api_key: "phc_synthetic_taxkit_capture_fixture_only",
           batch: [
@@ -122,15 +126,16 @@ it.effect(
       ]);
     })
 );
-
 it.effect.each(["disabled", "denied"] as const)(
   "$0 collection generates no identity and makes no request",
   (mode) =>
     Effect.gen(function* () {
-      const config =
-        mode === "disabled"
-          ? ConfigProvider.fromUnknown({ POSTHOG_COLLECTION_MODE: "off" })
-          : productionAnalyticsConfig;
+      const config = Match.value(mode).pipe(
+        Match.when("disabled", () =>
+          ConfigProvider.fromUnknown({ POSTHOG_COLLECTION_MODE: "off" })
+        ),
+        Match.orElse(() => productionAnalyticsConfig)
+      );
       const input = yield* calculatorUseFixture;
       const crypto = yield* Crypto.Crypto;
       const noUseCrypto = Layer.succeed(Crypto.Crypto, {
@@ -146,7 +151,10 @@ it.effect.each(["disabled", "denied"] as const)(
           Effect.flatMap((analytics) =>
             analytics.recordCalculatorUse({
               ...input,
-              collectionPolicy: mode === "denied" ? "deny" : "allow",
+              collectionPolicy: Match.value(mode).pipe(
+                Match.when("denied", (): "deny" => "deny"),
+                Match.orElse((): "allow" => "allow")
+              ),
             })
           ),
           Effect.provide(
@@ -160,7 +168,6 @@ it.effect.each(["disabled", "denied"] as const)(
       ).toBe(mode);
     }).pipe(Effect.provide(TestCrypto))
 );
-
 it.effect.each([200, 204, 299, 301, 400, 429, 500])(
   "does not retry, follow or expose a provider response with status %i",
   (status) =>
@@ -172,12 +179,17 @@ it.effect.each([200, 204, 299, 301, 400, 429, 500])(
         Ref.update(count, (n) => n + 1).pipe(
           Effect.as(
             HttpServerResponse.toClientResponse(
-              status === 204
-                ? HttpServerResponse.empty({ status })
-                : HttpServerResponse.text("provider-body", {
+              Match.value(status).pipe(
+                Match.when(204, (matchedValue) =>
+                  HttpServerResponse.empty({ status: matchedValue })
+                ),
+                Match.orElse((matchedValue) =>
+                  HttpServerResponse.text("provider-body", {
                     headers: { location: "https://private.invalid/secret" },
-                    status,
-                  }),
+                    status: matchedValue,
+                  })
+                )
+              ),
               { request }
             )
           )
@@ -195,15 +207,22 @@ it.effect.each([200, 204, 299, 301, 400, 429, 500])(
         )
       );
       expect(yield* Ref.get(count)).toBe(1);
-      expect(
+      EffectFunction.pipe(
         Result.match(result, {
           onFailure: (error) => error.reason,
           onSuccess: (value) => value,
-        })
-      ).toBe(status < 300 ? "accepted" : "rejected");
+        }),
+        (actual) => {
+          expect(actual).toBe(
+            EffectBoolean.match(status < 300, {
+              onFalse: (): "rejected" => "rejected",
+              onTrue: (): "accepted" => "accepted",
+            })
+          );
+        }
+      );
     })
 );
-
 it.effect.each([200, 204, 302, 500])(
   "closes the native request lifetime, including a bodyless reply, at status %i",
   (status) =>
@@ -216,7 +235,13 @@ it.effect.each([200, 204, 302, 500])(
           Effect.as(
             HttpClientResponse.fromWeb(
               request,
-              new Response(status === 204 ? null : "provider-body", { status })
+              new Response(
+                Match.value(status).pipe(
+                  Match.when(204, () => null),
+                  Match.orElse((): "provider-body" => "provider-body")
+                ),
+                { status }
+              )
             )
           )
         )
@@ -233,18 +258,33 @@ it.effect.each([200, 204, 302, 500])(
           )
         )
       );
-      expect(
+      EffectFunction.pipe(
         Result.match(result, {
           onFailure: (error) => error.reason,
           onSuccess: (value) => value,
-        })
-      ).toBe(status < 300 ? "accepted" : "rejected");
+        }),
+        (actual) => {
+          expect(actual).toBe(
+            EffectBoolean.match(status < 300, {
+              onFalse: (): "rejected" => "rejected",
+              onTrue: (): "accepted" => "accepted",
+            })
+          );
+        }
+      );
       const signals = yield* Ref.get(seen);
       expect(signals).toHaveLength(1);
-      expect(Array.every(signals, (signal) => signal.aborted)).toBe(true);
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          signals,
+          Array.every((signal) => signal.aborted)
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
     })
 );
-
 it.effect.each([65_536, 65_537])(
   "bounds the whole reply across multiple chunks at %i bytes",
   (size) =>
@@ -272,15 +312,22 @@ it.effect.each([65_536, 65_537])(
           )
         )
       );
-      expect(
+      EffectFunction.pipe(
         Result.match(result, {
           onFailure: (error) => error.reason,
           onSuccess: (value) => value,
-        })
-      ).toBe(size === 65_536 ? "accepted" : "response-size");
+        }),
+        (actual) => {
+          expect(actual).toBe(
+            Match.value(size).pipe(
+              Match.when(65_536, (): "accepted" => "accepted"),
+              Match.orElse((): "response-size" => "response-size")
+            )
+          );
+        }
+      );
     })
 );
-
 it.effect.each(["headers", "body"] as const)(
   "one five-second deadline includes stalled %s and closes that work",
   (phase) =>
@@ -294,14 +341,17 @@ it.effect.each(["headers", "body"] as const)(
         Effect.ensuring(Deferred.succeed(released, true))
       );
       const transport = HttpClient.make((request) =>
-        phase === "headers"
-          ? pending
-          : Effect.succeed(
+        Match.value(phase).pipe(
+          Match.when("headers", () => pending),
+          Match.orElse(() =>
+            Effect.succeed(
               HttpServerResponse.toClientResponse(
                 HttpServerResponse.stream(Stream.fromEffect(pending)),
                 { request }
               )
             )
+          )
+        )
       );
       yield* Effect.gen(function* () {
         const analytics = yield* BackendAnalytics;
@@ -310,7 +360,7 @@ it.effect.each(["headers", "body"] as const)(
           .pipe(Effect.forkScoped);
         yield* Deferred.await(started);
         yield* TestClock.adjust("4 seconds");
-        expect(yield* Deferred.isDone(released)).toBe(false);
+        expect(!(yield* Deferred.isDone(released))).toBeTruthy();
         yield* TestClock.adjust("1 second");
         expect((yield* Fiber.join(call).pipe(Effect.flip)).reason).toBe(
           "deadline"
@@ -328,7 +378,6 @@ it.effect.each(["headers", "body"] as const)(
       );
     })
 );
-
 it.effect("headers and body share one budget after late headers", () =>
   Effect.gen(function* () {
     const config = productionAnalyticsConfig;
@@ -379,7 +428,6 @@ it.effect("headers and body share one budget after late headers", () =>
     );
   })
 );
-
 it.effect(
   "earlier caller interruption closes pending capture and remains interruption",
   () =>
@@ -402,10 +450,16 @@ it.effect(
         yield* Deferred.await(started);
         yield* Fiber.interrupt(call);
         const exit = yield* Fiber.await(call);
-        expect(Exit.isFailure(exit)).toBe(true);
+        EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+          expect(actual).toBeTruthy();
+        });
         if (Exit.isFailure(exit)) {
-          expect(Cause.hasInterrupts(exit.cause)).toBe(true);
-          expect(Cause.hasFails(exit.cause)).toBe(false);
+          EffectFunction.pipe(Cause.hasInterrupts(exit.cause), (actual) => {
+            expect(actual).toBeTruthy();
+          });
+          EffectFunction.pipe(Cause.hasFails(exit.cause), (actual) => {
+            expect(!actual).toBeTruthy();
+          });
         }
         yield* Deferred.await(released);
       }).pipe(
@@ -420,7 +474,6 @@ it.effect(
       );
     })
 );
-
 it.effect(
   "the deterministic test Layer substitutes the same named operation",
   () =>
@@ -433,15 +486,16 @@ it.effect(
           Effect.provide(test.layer)
         )
       ).toBe("accepted");
-      expect(yield* Ref.get(test.uses)).toEqual([input]);
+      expect(yield* Ref.get(test.uses)).toStrictEqual([input]);
     })
 );
-
 it.effect(
   "constructs a static Layer and rejects invalid enabled configuration before using transport",
   () =>
     Effect.gen(function* () {
-      expect(Layer.isLayer(BackendAnalyticsLive)).toBe(true);
+      EffectFunction.pipe(Layer.isLayer(BackendAnalyticsLive), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       const result = yield* BackendAnalytics.pipe(
         Effect.provide(
           BackendAnalyticsLive.pipe(
@@ -465,8 +519,9 @@ it.effect(
         ),
         Effect.result
       );
-      expect(Result.isFailure(result) && result.failure._tag).toBe(
-        "AnalyticsConfigurationError"
-      );
+      const failedAsExpected =
+        Result.isFailure(result) &&
+        Predicate.isTagged(result.failure, "AnalyticsConfigurationError");
+      expect(failedAsExpected).toBeTruthy();
     })
 );

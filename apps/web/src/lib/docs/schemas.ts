@@ -5,8 +5,14 @@ import type {
   DocsSearchResult,
 } from "@taxkit/content/schemas";
 import { DocsSearchTerm } from "@taxkit/content/schemas";
-import { Array, Data, Schema, SchemaGetter } from "effect";
-
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  Data,
+  Schema,
+  SchemaGetter,
+} from "effect";
 // A documentation page as its route renders it. Every field is plain public
 // data, so TanStack serialises it natively.
 export interface WebsiteDocsPageView {
@@ -30,7 +36,6 @@ export const WebsiteSearchParameters = Schema.Record(
   Schema.String,
   Schema.Array(Schema.String)
 );
-
 // Human search words are public page content, never calculation facts. The
 // owning term Schema keeps the same 100-character bound as API search.
 const WebsiteDocsSearchTerm = Schema.Trim.pipe(
@@ -47,7 +52,10 @@ export const WebsiteDocsSearchLocation = Schema.String.check(
     const query = new URLSearchParams(raw);
     return (
       query.getAll("term").length <= 1 &&
-      Array.every(Array.fromIterable(query.keys()), (key) => key === "term")
+      EffectFunction.pipe(
+        Array.fromIterable(query.keys()),
+        Array.every((key) => key === "term")
+      )
     );
   })
 ).pipe(
@@ -56,9 +64,12 @@ export const WebsiteDocsSearchLocation = Schema.String.check(
       term: new URLSearchParams(raw).get("term") ?? undefined,
     })),
     encode: SchemaGetter.transform((query) =>
-      query.term === undefined
-        ? ""
-        : new URLSearchParams({ term: query.term }).toString()
+      Match.value(query.term).pipe(
+        Match.when(undefined, (): "" => ""),
+        Match.orElse((matchedValue) =>
+          new URLSearchParams({ term: matchedValue }).toString()
+        )
+      )
     ),
   })
 );

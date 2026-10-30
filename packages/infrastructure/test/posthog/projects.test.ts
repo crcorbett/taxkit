@@ -15,6 +15,7 @@ import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { State, inMemoryState } from "alchemy/State";
 import {
+  Function as EffectFunction,
   Array,
   ConfigProvider,
   Effect,
@@ -43,6 +44,12 @@ import {
 import { PostHogManagement } from "../../src/posthog/service.js";
 import { declarePostHogProjects } from "../../src/posthog/stack.js";
 import { makePostHogManagementTest } from "../../src/posthog/test.layer.js";
+
+// Alchemy erases provider errors to any. Preserve their cause as checked failure data at this native boundary.
+class NativeProviderError extends Schema.TaggedError<
+  NativeProviderError,
+  { readonly brand: unique symbol }
+>()("NativeProviderError", { cause: Schema.Defect() }) {}
 
 const organisation = PostHogOrganisationId.make(
   "00000000-0000-4000-8000-000000000079"
@@ -118,7 +125,6 @@ const graphEnvironment = Effect.provide(
   )
 );
 const session = { ...noopSession, note: () => Effect.void };
-
 it.effect(
   "retains one shared project through the actual native destroy plan and nuke inventory",
   () =>
@@ -136,84 +142,116 @@ it.effect(
       })(declarePostHogProjects).pipe(Effect.provideService(Stage, "prod"));
       const resources = Record.values(compiled.resources);
       expect(resources).toHaveLength(1);
-      expect(Array.map(resources, (resource) => resource.LogicalId)).toEqual([
-        "TaxKitProject",
-      ]);
-      expect(
-        Array.every(
+      EffectFunction.pipe(
+        EffectFunction.pipe(
           resources,
-          (resource) => resource.RemovalPolicy === "retain"
-        )
-      ).toBe(true);
+          Array.map((resource) => resource.LogicalId)
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual(["TaxKitProject"]);
+        }
+      );
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          resources,
+          Array.every((resource) => resource.RemovalPolicy === "retain")
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
       const created = yield* Plan.make(compiled).pipe(
         Effect.provideContext(compiled.services)
       );
-      expect(
-        Array.map(Record.values(created.resources), (node) => node.action)
-      ).toEqual(["create"]);
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          Record.values(created.resources),
+          Array.map((node) => node.action)
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual(["create"]);
+        }
+      );
       const state = yield* State.pipe(Effect.provideContext(compiled.services));
       const store = yield* state;
       const management = yield* PostHogManagement.pipe(
         Effect.provide(native.layer)
       );
-      yield* Effect.forEach(resources, (resource) =>
-        Effect.gen(function* () {
-          const props = yield* Schema.decodeUnknownEffect(ProjectDefinition)(
-            resource.Props
-          );
-          const attr = yield* management.createProject(props);
-          yield* store.set({
-            fqn: resource.FQN,
-            stack: compiled.name,
-            stage: compiled.stage,
-            value: {
-              attr,
-              bindings: [],
-              downstream: [],
+      yield* EffectFunction.pipe(
+        resources,
+        Effect.forEach((resource) =>
+          Effect.gen(function* () {
+            const props = yield* Schema.decodeUnknownEffect(ProjectDefinition)(
+              resource.Props
+            );
+            const attr = yield* management.createProject(props);
+            yield* store.set({
               fqn: resource.FQN,
-              instanceId: `proof-${resource.LogicalId}`,
-              logicalId: resource.LogicalId,
-              namespace: resource.Namespace,
-              props,
-              providerVersion: 0,
-              removalPolicy: "retain",
-              resourceType: resource.Type,
-              status: "created",
-            },
-          });
-        })
+              stack: compiled.name,
+              stage: compiled.stage,
+              value: {
+                attr,
+                bindings: [],
+                downstream: [],
+                fqn: resource.FQN,
+                instanceId: `proof-${resource.LogicalId}`,
+                logicalId: resource.LogicalId,
+                namespace: resource.Namespace,
+                props,
+                providerVersion: 0,
+                removalPolicy: "retain",
+                resourceType: resource.Type,
+                status: "created",
+              },
+            });
+          })
+        )
       );
       const noop = yield* Plan.make(compiled).pipe(
         Effect.provideContext(compiled.services)
       );
-      expect(
-        Array.map(Record.values(noop.resources), (node) => node.action)
-      ).toEqual(["noop"]);
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          Record.values(noop.resources),
+          Array.map((node) => node.action)
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual(["noop"]);
+        }
+      );
       const removed = yield* Plan.destroy(compiled).pipe(
         Effect.provideContext(compiled.services)
       );
-      expect(
-        Array.flatMap(Record.values(removed.deletions), (node) =>
-          Option.fromNullishOr(node).pipe(
-            Option.match({
-              onNone: () => [],
-              onSome: (checked) => [checked.action],
-            })
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          Record.values(removed.deletions),
+          Array.flatMap((node) =>
+            Option.fromNullishOr(node).pipe(
+              Option.match({
+                onNone: () => [],
+                onSome: (checked) => [checked.action],
+              })
+            )
           )
-        )
-      ).toEqual(["orphaned"]);
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual(["orphaned"]);
+        }
+      );
       const context = yield* Layer.build(providers);
       const scanned = yield* Nuke.list({ context, mode: "live" });
-      expect(scanned).toEqual({ failures: [], resources: [] });
-      expect(
-        Array.filter(
+      expect(scanned).toStrictEqual({ failures: [], resources: [] });
+      EffectFunction.pipe(
+        EffectFunction.pipe(
           yield* Ref.get(native.operations),
-          (operation) => operation === "create-project"
-        )
-      ).toHaveLength(1);
+          Array.filter((operation) => operation === "create-project")
+        ),
+        (actual) => {
+          expect(actual).toHaveLength(1);
+        }
+      );
     }).pipe(graphEnvironment)
 );
-
 it.effect(
   "keeps native identity and capture key during an in-place rename",
   () =>
@@ -230,37 +268,57 @@ it.effect(
         Option.fromNullishOr(provider.diff?.bind(provider)),
         {
           onNone: () => Effect.die("Native diff missing"),
-          onSome: (diff) =>
-            diff({
+          onSome: (diff) => {
+            const checkedDiff: Effect.Effect<
+              Effect.Success<ReturnType<typeof diff>>,
+              NativeProviderError
+            > = diff({
               ...identity,
               newBindings: [],
               news: renamed,
               oldBindings: [],
               olds: definition,
               output: saved,
-            }),
+            }).pipe(
+              Effect.mapError((cause) => new NativeProviderError({ cause }))
+            );
+
+            return checkedDiff;
+          },
         }
       );
-      expect(difference).toEqual({
+      expect(difference).toStrictEqual({
         action: "update",
         stables: ["id", "organisation", "marker", "region", "token"],
       });
-      const changed = yield* provider.reconcile({
-        ...identity,
-        bindings: [],
-        news: renamed,
-        olds: definition,
-        output: saved,
-        session,
-      });
+      const checkedReconcile: Effect.Effect<
+        Effect.Success<ReturnType<typeof provider.reconcile>>,
+        NativeProviderError
+      > = provider
+        .reconcile({
+          ...identity,
+          bindings: [],
+          news: renamed,
+          olds: definition,
+          output: saved,
+          session,
+        })
+        .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
+      const changed = yield* checkedReconcile;
       expect(changed.id).toBe(saved.id);
       expect(changed.name).toBe(renamed.name);
-      expect(
+      EffectFunction.pipe(
         Redacted.makeEquivalence(
           (a: typeof CaptureToken.Type, b: typeof CaptureToken.Type) => a === b
-        )(changed.token, saved.token)
-      ).toBe(true);
-      const refused = yield* provider
+        )(changed.token, saved.token),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
+      const checkedRefused: Effect.Effect<
+        Effect.Success<ReturnType<typeof provider.delete>>,
+        NativeProviderError
+      > = provider
         .delete({
           ...identity,
           bindings: [],
@@ -269,11 +327,13 @@ it.effect(
           output: changed,
           session,
         })
-        .pipe(Effect.exit);
-      expect(Exit.isFailure(refused)).toBe(true);
+        .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
+      const refused = yield* checkedRefused.pipe(Effect.exit);
+      EffectFunction.pipe(Exit.isFailure(refused), (actual) => {
+        expect(actual).toBeTruthy();
+      });
     })
 );
-
 it.effect(
   "refuses replacing ownership or recreating a missing retained project",
   () =>
@@ -282,7 +342,10 @@ it.effect(
       const provider = yield* PostHogProject.Provider.pipe(
         Effect.provide(PostHogProjectProvider.pipe(Layer.provide(native.layer)))
       );
-      const missing = yield* provider
+      const checkedMissing: Effect.Effect<
+        Effect.Success<ReturnType<typeof provider.reconcile>>,
+        NativeProviderError
+      > = provider
         .reconcile({
           ...identity,
           bindings: [],
@@ -291,9 +354,15 @@ it.effect(
           output: saved,
           session,
         })
-        .pipe(Effect.exit);
-      expect(Exit.isFailure(missing)).toBe(true);
-      const lostOutput = yield* provider
+        .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
+      const missing = yield* checkedMissing.pipe(Effect.exit);
+      EffectFunction.pipe(Exit.isFailure(missing), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      const checkedLostOutput: Effect.Effect<
+        Effect.Success<ReturnType<typeof provider.reconcile>>,
+        NativeProviderError
+      > = provider
         .reconcile({
           ...identity,
           bindings: [],
@@ -302,15 +371,21 @@ it.effect(
           output: Option.getOrUndefined(Option.none<ManagedProject>()),
           session,
         })
-        .pipe(Effect.exit);
-      expect(Exit.isFailure(lostOutput)).toBe(true);
+        .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
+      const lostOutput = yield* checkedLostOutput.pipe(Effect.exit);
+      EffectFunction.pipe(Exit.isFailure(lostOutput), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       const foreign = ProjectDefinition.make({
         ...definition,
         organisation: PostHogOrganisationId.make(
           "00000000-0000-4000-8000-000000000080"
         ),
       });
-      const rejected = yield* provider
+      const checkedRejected: Effect.Effect<
+        Effect.Success<ReturnType<typeof provider.reconcile>>,
+        NativeProviderError
+      > = provider
         .reconcile({
           ...identity,
           bindings: [],
@@ -319,9 +394,12 @@ it.effect(
           output: saved,
           session,
         })
-        .pipe(Effect.exit);
-      expect(Exit.isFailure(rejected)).toBe(true);
-      expect(yield* Ref.get(native.operations)).toEqual([
+        .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
+      const rejected = yield* checkedRejected.pipe(Effect.exit);
+      EffectFunction.pipe(Exit.isFailure(rejected), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      expect(yield* Ref.get(native.operations)).toStrictEqual([
         "update-project",
         "find-project",
       ]);
@@ -329,8 +407,11 @@ it.effect(
         Option.fromNullishOr(provider.diff?.bind(provider)),
         {
           onNone: () => Effect.die("Native diff missing"),
-          onSome: (diff) =>
-            diff({
+          onSome: (diff) => {
+            const checkedDiff: Effect.Effect<
+              Effect.Success<ReturnType<typeof diff>>,
+              NativeProviderError
+            > = diff({
               ...identity,
               newBindings: [],
               news: {
@@ -340,13 +421,17 @@ it.effect(
               oldBindings: [],
               olds: definition,
               output: saved,
-            }),
+            }).pipe(
+              Effect.mapError((cause) => new NativeProviderError({ cause }))
+            );
+
+            return checkedDiff;
+          },
         }
       );
       expect(unresolved).toBeUndefined();
     })
 );
-
 it.effect(
   "registers the real live provider without credentials and reports typed acquisition failure on use",
   () =>
@@ -363,12 +448,29 @@ it.effect(
         Option.fromNullishOr(provider.read?.bind(provider)),
         {
           onNone: () => Effect.die("Native read missing"),
-          onSome: (readProject) =>
-            readProject({ ...identity, olds: definition, output: saved }),
+          onSome: (readProject) => {
+            const checkedReadProject: Effect.Effect<
+              Effect.Success<ReturnType<typeof readProject>>,
+              NativeProviderError
+            > = readProject({
+              ...identity,
+              olds: definition,
+              output: saved,
+            }).pipe(
+              Effect.mapError((cause) => new NativeProviderError({ cause }))
+            );
+
+            return checkedReadProject;
+          },
         }
       ).pipe(Effect.exit);
-      expect(Exit.isFailure(read)).toBe(true);
-      const create = yield* provider
+      EffectFunction.pipe(Exit.isFailure(read), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      const checkedCreate: Effect.Effect<
+        Effect.Success<ReturnType<typeof provider.reconcile>>,
+        NativeProviderError
+      > = provider
         .reconcile({
           ...identity,
           bindings: [],
@@ -377,16 +479,18 @@ it.effect(
           output: Option.getOrUndefined(Option.none<ManagedProject>()),
           session,
         })
-        .pipe(Effect.exit);
-      expect(Exit.isFailure(create)).toBe(true);
+        .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
+      const create = yield* checkedCreate.pipe(Effect.exit);
+      EffectFunction.pipe(Exit.isFailure(create), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       const context = yield* Layer.build(PostHogProjectProviderLive);
-      expect(yield* Nuke.list({ context, mode: "live" })).toEqual({
+      expect(yield* Nuke.list({ context, mode: "live" })).toStrictEqual({
         failures: [],
         resources: [],
       });
     })
 );
-
 it.effect.each(["pr-79", "dev_posthog_proof"])(
   "rejects ephemeral project declarations at %s",
   (stage) =>
@@ -400,7 +504,9 @@ it.effect.each(["pr-79", "dev_posthog_proof"])(
         Effect.provideService(Stage, stage),
         Effect.exit
       );
-      expect(Exit.isFailure(compiled)).toBe(true);
-      expect(yield* Ref.get(native.operations)).toEqual([]);
+      EffectFunction.pipe(Exit.isFailure(compiled), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      expect(yield* Ref.get(native.operations)).toStrictEqual([]);
     }).pipe(graphEnvironment)
 );

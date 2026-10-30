@@ -14,8 +14,15 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
-
+import {
+  Function as EffectFunction,
+  Array,
+  Option,
+  BigDecimal,
+  Context,
+  Layer,
+  Schema,
+} from "effect";
 /**
  * Marginal-rate bracket for resident individual income tax.
  *
@@ -24,7 +31,12 @@ import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class IncomeTaxBracket extends Schema.TaggedClass<IncomeTaxBracket>()(
+export class IncomeTaxBracket extends Schema.TaggedClass<
+  IncomeTaxBracket,
+  {
+    readonly brand: unique symbol;
+  }
+>()(
   "IncomeTaxBracket",
   Schema.Struct({
     baseTaxCents: Cents,
@@ -48,7 +60,6 @@ export class IncomeTaxBracket extends Schema.TaggedClass<IncomeTaxBracket>()(
     )
   )
 ) {}
-
 // Keep the same relationship check on the saved representation and decoded rows.
 // Array class transformations otherwise remove this check under Schema.toEncoded.
 const IncomeTaxTableCoverageCheck = Schema.makeFilter<
@@ -61,43 +72,44 @@ const IncomeTaxTableCoverageCheck = Schema.makeFilter<
     Array.last(brackets).pipe(
       Option.exists((row) => row.maxCents === "infinity")
     ) &&
-    Array.every(
+    EffectFunction.pipe(
       brackets,
-      (row, index) =>
-        index === 0 ||
-        Array.get(brackets, index - 1).pipe(
-          Option.exists(
-            (previous) =>
-              previous.maxCents !== "infinity" &&
-              previous.maxCents === row.thresholdCents
+      Array.every(
+        (row, index) =>
+          index === 0 ||
+          Array.get(brackets, index - 1).pipe(
+            Option.exists(
+              (previous) =>
+                previous.maxCents !== "infinity" &&
+                previous.maxCents === row.thresholdCents
+            )
           )
-        )
+      )
     ),
   {
     expected:
       "complete income tax brackets from zero without gaps or overlaps, with only the final bound open",
   }
 );
-
 const IncomeTaxTableRows = Schema.Array(Schema.toEncoded(IncomeTaxBracket))
   .check(IncomeTaxTableCoverageCheck)
   .pipe(Schema.decodeTo(Schema.Array(IncomeTaxBracket)))
   .check(IncomeTaxTableCoverageCheck);
-
 /**
  * ATO resident individual income tax table for one tax year.
  *
  * @since 0.1.0
  */
-export class IncomeTaxTable extends Schema.TaggedClass<IncomeTaxTable>()(
-  "IncomeTaxTable",
+export class IncomeTaxTable extends Schema.TaggedClass<
+  IncomeTaxTable,
   {
-    brackets: IncomeTaxTableRows,
-    source: SourceRef,
-    year: TaxYear,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("IncomeTaxTable", {
+  brackets: IncomeTaxTableRows,
+  source: SourceRef,
+  year: TaxYear,
+}) {}
 /**
  * Context tag for the active ATO resident income tax table.
  *
@@ -107,7 +119,6 @@ export class AtoIncomeTaxTable extends Context.Service<
   AtoIncomeTaxTable,
   IncomeTaxTable
 >()("taxkit/rules-au-income-tax/parameter/AtoIncomeTaxTable") {}
-
 /**
  * Source reference for ATO resident income tax rates for 2025-26.
  *
@@ -119,7 +130,6 @@ export const IncomeTaxSource2025_26 = SourceRef.make({
     "https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents",
   title: "ATO tax rates - Australian resident 2025-26",
 });
-
 /**
  * Canonical extraction metadata for resident income-tax brackets.
  *
@@ -137,7 +147,6 @@ export const IncomeTaxArtifact2025_26 = new SourceArtifact({
   retrievedOn: IsoDate.make("2026-05-12"),
   source: IncomeTaxSource2025_26,
 });
-
 /**
  * Parameter descriptor for the ATO resident income tax table.
  *
@@ -155,7 +164,6 @@ export const AtoIncomeTaxTableDescriptor = makeParameterDescriptor({
   tag: AtoIncomeTaxTable,
   title: "ATO resident income tax rates",
 });
-
 // Resident individual tax rates 2025-26.
 // Each bracket covers thresholdCents < income ≤ maxCents; the nil-rate band also includes exact zero.
 // The nil-rate band (0 – $18,200) has threshold=0 and rate=0.
@@ -195,7 +203,6 @@ const table2025_26 = new IncomeTaxTable({
   source: IncomeTaxSource2025_26,
   year: taxYear("2025-26"),
 });
-
 /**
  * Live ATO resident income tax parameter layer for 2025-26.
  *

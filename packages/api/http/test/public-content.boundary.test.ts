@@ -22,16 +22,13 @@ import {
 import { TaxKitApiInProcessLive } from "../src/in-process.layer.js";
 import { TaxKitServerLayer } from "../src/server.js";
 import { ContentTestLive } from "./content.fixture.js";
-
 // The native generated client over the in-process routes.
 const inProcessClient = HttpApiClient.make(TaxKitApi, {
   baseUrl: "http://taxkit.internal",
 });
-
 const ClientTestLive = TaxKitApiInProcessLive.pipe(
   Layer.provide(ContentTestLive)
 );
-
 describe("checked public documentation HTTP", () => {
   it.effect(
     "returns the owning page, navigation, search and processed Markdown through the generated client",
@@ -61,7 +58,6 @@ describe("checked public documentation HTTP", () => {
         assert.equal(result.title, page.frontmatter.title);
       }).pipe(Effect.provide(ClientTestLive))
   );
-
   it.effect(
     "returns typed missing-page failures for both representations without reflecting the requested path",
     () =>
@@ -83,7 +79,6 @@ describe("checked public documentation HTTP", () => {
         );
       }).pipe(Effect.provide(ClientTestLive))
   );
-
   it.effect.each([
     "/api/v1/docs/page",
     "/api/v1/docs/page?path=..%2Fprivate%2Ftaxkit-secret-sentinel",
@@ -114,7 +109,6 @@ describe("checked public documentation HTTP", () => {
       );
     }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
   );
-
   it.effect(
     "serves plain Markdown with its declared media type and a fixed JSON 404",
     () =>
@@ -167,7 +161,6 @@ describe("checked public documentation HTTP", () => {
         );
       }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
   );
-
   it.effect(
     "projects a controlled source failure to fixed search guidance",
     () =>
@@ -176,14 +169,19 @@ describe("checked public documentation HTTP", () => {
         const controlled = Layer.succeed(
           ContentService,
           ContentService.of({
-            ...live,
-            searchPages: () =>
+            getNavigation: Effect.fn("ContentService.getNavigation")(
+              live.getNavigation
+            ),
+            getPage: Effect.fn("ContentService.getPage")(live.getPage),
+            listPages: Effect.fn("ContentService.listPages")(live.listPages),
+            searchPages: Effect.fn("ContentService.searchPages")(() =>
               Effect.fail(
                 new DocsSourceError({
                   message: "/private/taxkit-secret-sentinel",
                   operation: "searchPages",
                 })
-              ),
+              )
+            ),
           })
         );
         yield* Effect.gen(function* () {
@@ -202,7 +200,6 @@ describe("checked public documentation HTTP", () => {
         );
       }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
   );
-
   it.effect(
     "interrupts the actual generated-client request and closes its service work",
     () =>
@@ -213,12 +210,19 @@ describe("checked public documentation HTTP", () => {
         const controlled = Layer.succeed(
           ContentService,
           ContentService.of({
-            ...live,
-            getPage: () =>
+            getNavigation: Effect.fn("ContentService.getNavigation")(
+              live.getNavigation
+            ),
+            searchPages: Effect.fn("ContentService.searchPages")(
+              live.searchPages
+            ),
+            listPages: Effect.fn("ContentService.listPages")(live.listPages),
+            getPage: Effect.fn("ContentService.getPage")(() =>
               Deferred.succeed(entered, true).pipe(
                 Effect.andThen(Effect.never),
                 Effect.ensuring(Ref.set(closed, true))
-              ),
+              )
+            ),
           })
         );
         yield* Effect.gen(function* () {

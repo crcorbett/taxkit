@@ -14,8 +14,15 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
-
+import {
+  Function as EffectFunction,
+  Array,
+  Option,
+  BigDecimal,
+  Context,
+  Layer,
+  Schema,
+} from "effect";
 /**
  * ATO Schedule 1 scale used for residents with or without the tax-free
  * threshold.
@@ -23,14 +30,12 @@ import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
  * @since 0.1.0
  */
 export const Schedule1Scale = Schema.Literals(["scale1", "scale2"]);
-
 /**
  * ATO Schedule 1 scale literal type.
  *
  * @since 0.1.0
  */
 export type Schedule1Scale = typeof Schedule1Scale.Type;
-
 /**
  * ATO Schedule 1 coefficient row for resident Scale 1 or Scale 2.
  *
@@ -40,7 +45,12 @@ export type Schedule1Scale = typeof Schedule1Scale.Type;
  *
  * @since 0.1.0
  */
-export class Schedule1Row extends Schema.TaggedClass<Schedule1Row>()(
+export class Schedule1Row extends Schema.TaggedClass<
+  Schedule1Row,
+  {
+    readonly brand: unique symbol;
+  }
+>()(
   "Schedule1Row",
   Schema.Struct({
     a: DecimalCoefficient,
@@ -64,7 +74,6 @@ export class Schedule1Row extends Schema.TaggedClass<Schedule1Row>()(
     )
   )
 ) {}
-
 const hasCompleteWeeklyScale = (
   rows: readonly (typeof Schedule1Row.Encoded)[]
 ): boolean =>
@@ -72,53 +81,62 @@ const hasCompleteWeeklyScale = (
   Array.last(rows).pipe(
     Option.exists((row) => row.weeklyMaxCents === "infinity")
   ) &&
-  Array.every(
+  EffectFunction.pipe(
     rows,
-    (row, index) =>
-      index === 0 ||
-      Array.get(rows, index - 1).pipe(
-        Option.exists(
-          (previous) =>
-            previous.weeklyMaxCents !== "infinity" &&
-            previous.weeklyMaxCents === row.weeklyMinCents - 1
+    Array.every(
+      (row, index) =>
+        index === 0 ||
+        Array.get(rows, index - 1).pipe(
+          Option.exists(
+            (previous) =>
+              previous.weeklyMaxCents !== "infinity" &&
+              previous.weeklyMaxCents === row.weeklyMinCents - 1
+          )
         )
-      )
+    )
   );
-
 // Keep the same relationship check on the saved representation and decoded rows.
 // Array class transformations otherwise remove this check under Schema.toEncoded.
 const Schedule1TableCoverageCheck = Schema.makeFilter<
   readonly (typeof Schedule1Row.Encoded)[]
 >(
   (rows) =>
-    Array.every(["scale1", "scale2"] as const, (scale) =>
-      hasCompleteWeeklyScale(Array.filter(rows, (row) => row.scale === scale))
+    EffectFunction.pipe(
+      ["scale1", "scale2"] as const,
+      Array.every((scale) =>
+        EffectFunction.pipe(
+          EffectFunction.pipe(
+            rows,
+            Array.filter((row) => row.scale === scale)
+          ),
+          hasCompleteWeeklyScale
+        )
+      )
     ),
   {
     expected:
       "complete Schedule 1 weekly scales from zero without gaps or overlaps, with only the final bound open",
   }
 );
-
 const Schedule1TableRows = Schema.Array(Schema.toEncoded(Schedule1Row))
   .check(Schedule1TableCoverageCheck)
   .pipe(Schema.decodeTo(Schema.Array(Schedule1Row)))
   .check(Schedule1TableCoverageCheck);
-
 /**
  * ATO Schedule 1 withholding coefficient table for one tax year.
  *
  * @since 0.1.0
  */
-export class Schedule1Table extends Schema.TaggedClass<Schedule1Table>()(
-  "Schedule1Table",
+export class Schedule1Table extends Schema.TaggedClass<
+  Schedule1Table,
   {
-    rows: Schedule1TableRows,
-    source: SourceRef,
-    year: TaxYear,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("Schedule1Table", {
+  rows: Schedule1TableRows,
+  source: SourceRef,
+  year: TaxYear,
+}) {}
 /**
  * Context tag for the active ATO Schedule 1 withholding table.
  *
@@ -128,7 +146,6 @@ export class AtoSchedule1Table extends Context.Service<
   AtoSchedule1Table,
   Schedule1Table
 >()("taxkit/rules-au-pay/parameter/AtoSchedule1Table") {}
-
 /**
  * Source reference for ATO Schedule 1 PAYG withholding formulas for 2025-26.
  *
@@ -141,9 +158,7 @@ export const Schedule1Source2025_26 = SourceRef.make({
   title:
     "ATO Schedule 1 - Statement of formulas for calculating amounts to be withheld",
 });
-
 const Schedule1Source2024_25 = Schedule1Source2025_26;
-
 /**
  * Canonical extraction metadata for the Schedule 1 table used by this package.
  *
@@ -161,7 +176,6 @@ export const Schedule1Artifact2025_26 = new SourceArtifact({
   retrievedOn: IsoDate.make("2026-05-12"),
   source: Schedule1Source2025_26,
 });
-
 /**
  * Parameter descriptor for the ATO Schedule 1 withholding coefficient table.
  *
@@ -179,7 +193,6 @@ export const AtoSchedule1TableDescriptor = makeParameterDescriptor({
   tag: AtoSchedule1Table,
   title: "ATO Schedule 1 withholding coefficients",
 });
-
 const table2025_26 = new Schedule1Table({
   rows: [
     new Schedule1Row({
@@ -298,13 +311,11 @@ const table2025_26 = new Schedule1Table({
   source: Schedule1Source2025_26,
   year: taxYear("2025-26"),
 });
-
 const table2024_25 = new Schedule1Table({
   rows: table2025_26.rows,
   source: Schedule1Source2024_25,
   year: taxYear("2024-25"),
 });
-
 /**
  * Live ATO Schedule 1 withholding parameter layer for 2025-26.
  *
@@ -312,7 +323,6 @@ const table2024_25 = new Schedule1Table({
  */
 export const AtoSchedule1_2025_26_Live =
   Layer.succeed(AtoSchedule1Table)(table2025_26);
-
 /**
  * Live ATO Schedule 1 withholding parameter layer for 2024-25.
  *

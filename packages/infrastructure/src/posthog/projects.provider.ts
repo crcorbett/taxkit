@@ -1,7 +1,7 @@
 import * as Diff from "alchemy/Diff";
 import * as Provider from "alchemy/Provider";
 import { Resource } from "alchemy/Resource";
-import { Effect, Option, Schema } from "effect";
+import { Effect, Option, Schema, Boolean as EffectBoolean } from "effect";
 
 import { PostHogManagementError } from "./errors.js";
 import {
@@ -20,13 +20,15 @@ export type PostHogProject = Resource<
 export const PostHogProject = Resource<PostHogProject>(
   "TaxKit.PostHog.Project"
 );
-
 // This is an ownership rule, shared by saved-state read and update planning.
 // Names can change in place; account, region and marker cannot.
-const requireSameOwner = Effect.fnUntraced(function* (
-  expected: ProjectDefinition,
-  observed: ProjectDefinition
-) {
+const requireSameOwner = Effect.fnUntraced(function* ({
+  expected,
+  observed,
+}: {
+  readonly expected: ProjectDefinition;
+  readonly observed: ProjectDefinition;
+}) {
   if (
     expected.organisation !== observed.organisation ||
     expected.marker !== observed.marker ||
@@ -39,7 +41,6 @@ const requireSameOwner = Effect.fnUntraced(function* (
   }
   return yield* Effect.void;
 });
-
 export const PostHogProjectProvider = Provider.effect(
   PostHogProject,
   Effect.gen(function* () {
@@ -79,7 +80,10 @@ export const PostHogProjectProvider = Provider.effect(
               })
           )
         );
-        yield* requireSameOwner(previous, desired);
+        yield* requireSameOwner({
+          expected: previous,
+          observed: desired,
+        });
         return yield* Option.match(Option.fromNullishOr(output), {
           onNone: () =>
             Effect.fail(
@@ -99,14 +103,18 @@ export const PostHogProjectProvider = Provider.effect(
                     })
                 )
               );
-              yield* requireSameOwner(previous, current);
-              return current.name === desired.name &&
-                Schema.toEquivalence(ProjectPrivacy)(
-                  current.privacy,
-                  desiredProjectPrivacy
-                )
-                ? { action: "noop" as const }
-                : {
+              yield* requireSameOwner({
+                expected: previous,
+                observed: current,
+              });
+              return EffectBoolean.match(
+                current.name === desired.name &&
+                  Schema.toEquivalence(ProjectPrivacy)(
+                    current.privacy,
+                    desiredProjectPrivacy
+                  ),
+                {
+                  onFalse: () => ({
                     action: "update" as const,
                     stables: [
                       "id",
@@ -115,7 +123,10 @@ export const PostHogProjectProvider = Provider.effect(
                       "region",
                       "token",
                     ],
-                  };
+                  }),
+                  onTrue: () => ({ action: "noop" as const }),
+                }
+              );
             }),
         });
       }),
@@ -161,7 +172,10 @@ export const PostHogProjectProvider = Provider.effect(
                     })
                 )
               );
-              yield* requireSameOwner(previous, current);
+              yield* requireSameOwner({
+                expected: previous,
+                observed: current,
+              });
               const observed = yield* management.readProject({
                 definition: previous,
                 id: current.id,
@@ -205,7 +219,12 @@ export const PostHogProjectProvider = Provider.effect(
                     reason: "invalid-response",
                   })
               ),
-              Effect.flatMap((checked) => requireSameOwner(desired, checked))
+              Effect.flatMap((checked) =>
+                requireSameOwner({
+                  expected: desired,
+                  observed: checked,
+                })
+              )
             ),
         });
         return yield* Option.match(Option.fromNullishOr(output), {
@@ -243,7 +262,10 @@ export const PostHogProjectProvider = Provider.effect(
                     })
                 )
               );
-              yield* requireSameOwner(desired, current);
+              yield* requireSameOwner({
+                expected: desired,
+                observed: current,
+              });
               return yield* management.updateProject({
                 definition: desired,
                 id: current.id,

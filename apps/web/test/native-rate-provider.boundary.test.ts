@@ -3,7 +3,15 @@ import { expect, it } from "@effect/vitest";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
-import { Array, Effect, Path, Queue, Schema } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Path,
+  Queue,
+  Schema,
+} from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
@@ -17,7 +25,9 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
+      const { files, modules, wasm } = yield* readWorkerModules({
+        modulesRoot,
+      });
       expect(files).toContain("worker.js");
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
@@ -39,18 +49,18 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
           value: "https://website.example.com",
         },
       };
-      const env =
-        mode === "missing"
-          ? origins
-          : {
-              ...origins,
-              // Deliberately wrong native capability: the live SDK still receives it
-              // through WorkerEnvironment and must check its actual reply or failure.
-              CALCULATOR_RATE_LIMIT: {
-                type: "worker" as const,
-                worker: "provider-fixture",
-              },
-            };
+      const env = Match.value(mode).pipe(
+        Match.when("missing", () => origins),
+        Match.orElse(() => ({
+          ...origins,
+          // Deliberately wrong native capability: the live SDK still receives it
+          // through WorkerEnvironment and must check its actual reply or failure.
+          CALCULATOR_RATE_LIMIT: {
+            type: "worker" as const,
+            worker: "provider-fixture",
+          },
+        }))
+      );
       const host = yield* Effect.acquireRelease(
         Effect.sync(
           () =>
@@ -72,7 +82,6 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
                     env: {
                       ...env,
                     },
-
                     manifest: {
                       mainModule: "worker.js",
                       modules: { ...modules, ...wasm },
@@ -92,7 +101,17 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
                           contents: `
               import { WorkerEntrypoint } from "cloudflare:workers";
               export default class extends WorkerEntrypoint {
-                limit() { ${mode === "throwing" ? 'throw new Error("PRIVATE9")' : 'return { success: "PRIVATE9" }'}; }
+                limit() { ${Match.value(mode).pipe(
+                  Match.when(
+                    "throwing",
+                    (): 'throw new Error("PRIVATE9")' =>
+                      'throw new Error("PRIVATE9")'
+                  ),
+                  Match.orElse(
+                    (): 'return { success: "PRIVATE9" }' =>
+                      'return { success: "PRIVATE9" }'
+                  )
+                )}; }
                 fetch() { return new Response(null, { status: 404 }); }
               }
             `,
@@ -131,8 +150,9 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
       expect(response.status).toBe(503);
       const text = yield* Effect.promise(() => response.text());
       expect(text).toContain('"_tag":"CalculatorAdmissionUnavailable"');
-      expect(text).not.toContain("PRIVATE9");
-      expect(text).not.toContain("203.0.113.75");
+      Array.forEach((marker: string) => {
+        expect(text).not.toContain(marker);
+      })(["PRIVATE9", "203.0.113.75"]);
       expect(
         (yield* Effect.promise(() =>
           api.fetch("https://api.example.com/api/v1/calculators")
@@ -140,9 +160,15 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
       ).toBe(200);
       const captured = yield* Schema.encodeEffect(
         Schema.fromJsonString(Schema.Unknown)
-      )(Array.map(yield* Queue.clear(logs), (log) => log.message));
-      expect(captured).not.toContain("PRIVATE9");
-      expect(captured).not.toContain("203.0.113.75");
-      expect(yield* Queue.clear(exceptions)).toEqual([]);
+      )(
+        EffectFunction.pipe(
+          yield* Queue.clear(logs),
+          Array.map((log) => log.message)
+        )
+      );
+      Array.forEach((marker: string) => {
+        expect(captured).not.toContain(marker);
+      })(["PRIVATE9", "203.0.113.75"]);
+      expect(yield* Queue.clear(exceptions)).toStrictEqual([]);
     }).pipe(Effect.provide(NodeServices.layer), Effect.scoped)
 );

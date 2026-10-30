@@ -1,5 +1,13 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Option, Record, Result, Schema, Struct } from "effect";
+import {
+  Function as EffectFunction,
+  Effect,
+  Option,
+  Record,
+  Result,
+  Schema,
+  Struct,
+} from "effect";
 
 import {
   AustralianTaxYear,
@@ -29,34 +37,36 @@ const sourceArtifact = new SourceArtifact({
     title: "Test source",
   }),
 });
-
 const sourceArtifactInput = (retrievedOn: string) => ({
   ...Struct.pick(sourceArtifact, Struct.keys(SourceArtifact.fields)),
   retrievedOn,
 });
-
 const CalendarResult = Schema.Result(IsoDate, InvalidCalendarValue);
-
-describe("IsoDate", () => {
+describe("ISO calendar dates", () => {
   it.effect("keeps the branded Type and string Encoded representation", () =>
     Effect.gen(function* () {
       const value = yield* isoDate("2024-02-29");
       const encoded = yield* Schema.encodeEffect(IsoDate)(value);
       expect(value).toBe("2024-02-29");
       expect(encoded).toBe("2024-02-29");
-      expect(Schema.is(Schema.toEncoded(IsoDate))(encoded)).toBe(true);
+      EffectFunction.pipe(
+        Schema.is(Schema.toEncoded(IsoDate))(encoded),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
     })
   );
-
   it.effect.each(["2024-02-29", "2000-02-29", "2026-07-19"])(
     "accepts real Gregorian date %s through Schema and the fallible constructor",
     (value) =>
       Effect.gen(function* () {
-        expect(Schema.is(IsoDate)(value)).toBe(true);
+        EffectFunction.pipe(Schema.is(IsoDate)(value), (actual) => {
+          expect(actual).toBeTruthy();
+        });
         expect(yield* isoDate(value)).toBe(value);
       })
   );
-
   it.effect.each([
     "2026-2-09",
     "2026-02-9",
@@ -68,17 +78,20 @@ describe("IsoDate", () => {
     "private-calendar-sentinel",
   ])("returns a checked safe error for invalid date %s", (value) =>
     Effect.gen(function* () {
-      expect(Schema.is(IsoDate)(value)).toBe(false);
+      EffectFunction.pipe(Schema.is(IsoDate)(value), (actual) => {
+        expect(!actual).toBeTruthy();
+      });
       const result = yield* isoDate(value).pipe(Effect.result);
-      expect(Result.isFailure(result)).toBe(true);
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       const actual = yield* Schema.encodeEffect(CalendarResult)(result);
       const expected = yield* Schema.encodeEffect(CalendarResult)(
         Result.fail(new InvalidCalendarValue())
       );
-      expect(actual).toEqual(expected);
+      expect(actual).toStrictEqual(expected);
     })
   );
-
   it.effect.each([
     { from: "2026-02-29", toExclusive: "2026-07-01" },
     { from: "2026-07-01", toExclusive: "2026-07-01" },
@@ -87,13 +100,20 @@ describe("IsoDate", () => {
     "checks real dates and start-before-end in the interval owner",
     (interval) =>
       Effect.gen(function* () {
-        expect(Schema.is(Schema.toEncoded(DateInterval))(interval)).toBe(false);
-        expect(
-          Result.isFailure(yield* dateInterval(interval).pipe(Effect.result))
-        ).toBe(true);
+        EffectFunction.pipe(
+          Schema.is(Schema.toEncoded(DateInterval))(interval),
+          (actual) => {
+            expect(!actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
+          Result.isFailure(yield* dateInterval(interval).pipe(Effect.result)),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
       })
   );
-
   it.effect(
     "preserves all historical optional-end representations and bytes",
     () =>
@@ -115,29 +135,40 @@ describe("IsoDate", () => {
             own: true,
           },
         ];
-        yield* Effect.forEach(samples, (sample) =>
-          Effect.gen(function* () {
-            const value = yield* dateInterval(sample.input);
-            const encoded = yield* Schema.encodeEffect(DateInterval)(value);
-            const bytes = yield* Schema.encodeEffect(
-              Schema.fromJsonString(DateInterval)
-            )(value);
-            expect(
-              Record.has<string, string | undefined>(encoded, "toExclusive")
-            ).toBe(sample.own);
-            expect(bytes).toBe(sample.bytes);
-            expect(Option.isSome(value.toExclusive)).toBe(sample.own);
-            const restored = yield* Schema.decodeEffect(DateInterval)(encoded);
-            expect(
-              yield* Schema.encodeEffect(Schema.fromJsonString(DateInterval))(
-                restored
-              )
-            ).toBe(sample.bytes);
-          })
+        yield* EffectFunction.pipe(
+          samples,
+          Effect.forEach((sample) =>
+            Effect.gen(function* () {
+              const value = yield* dateInterval(sample.input);
+              const encoded = yield* Schema.encodeEffect(DateInterval)(value);
+              const bytes = yield* Schema.encodeEffect(
+                Schema.fromJsonString(DateInterval)
+              )(value);
+              EffectFunction.pipe(
+                Record.has<string, string | undefined>(encoded, "toExclusive"),
+                (actual) => {
+                  expect(actual).toBe(sample.own);
+                }
+              );
+              expect(bytes).toBe(sample.bytes);
+              EffectFunction.pipe(
+                Option.isSome(value.toExclusive),
+                (actual) => {
+                  expect(actual).toBe(sample.own);
+                }
+              );
+              const restored =
+                yield* Schema.decodeEffect(DateInterval)(encoded);
+              expect(
+                yield* Schema.encodeEffect(Schema.fromJsonString(DateInterval))(
+                  restored
+                )
+              ).toBe(sample.bytes);
+            })
+          )
         );
       })
   );
-
   it.effect(
     "treats an absent end as unbounded, including the last supported day",
     () =>
@@ -148,14 +179,38 @@ describe("IsoDate", () => {
           from: "9999-12-30",
           toExclusive: "9999-12-31",
         });
-        expect(dateIntervalsOverlap(lastDay, lastDay)).toBe(true);
-        expect(dateIntervalsOverlap(lastDay, earlierOpen)).toBe(true);
-        expect(dateIntervalsOverlap(earlierOpen, lastDay)).toBe(true);
-        expect(dateIntervalsOverlap(lastDay, earlierFinite)).toBe(false);
-        expect(dateIntervalsOverlap(earlierFinite, lastDay)).toBe(false);
+        EffectFunction.pipe(
+          dateIntervalsOverlap(lastDay, lastDay),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
+          dateIntervalsOverlap(lastDay, earlierOpen),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
+          dateIntervalsOverlap(earlierOpen, lastDay),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
+          dateIntervalsOverlap(lastDay, earlierFinite),
+          (actual) => {
+            expect(!actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
+          dateIntervalsOverlap(earlierFinite, lastDay),
+          (actual) => {
+            expect(!actual).toBeTruthy();
+          }
+        );
       })
   );
-
   it.effect(
     "retains the ordering check when constructing already decoded Option fields",
     () =>
@@ -165,10 +220,11 @@ describe("IsoDate", () => {
           from: date,
           toExclusive: Option.some(Option.some(date)),
         }).pipe(Effect.result);
-        expect(Result.isFailure(result)).toBe(true);
+        EffectFunction.pipe(Result.isFailure(result), (actual) => {
+          expect(actual).toBeTruthy();
+        });
       })
   );
-
   it.effect.each([
     { end: "2026-07-01", from: "2025-07-01", label: "2025-26" },
     { end: "2000-07-01", from: "1999-07-01", label: "1999-00" },
@@ -178,10 +234,11 @@ describe("IsoDate", () => {
     Effect.gen(function* () {
       const value = yield* australianTaxYearInterval(label);
       expect(value.from).toBe(from);
-      expect(Option.flatten(value.toExclusive)).toEqual(Option.some(end));
+      EffectFunction.pipe(Option.flatten(value.toExclusive), (actual) => {
+        expect(actual).toStrictEqual(Option.some(end));
+      });
     })
   );
-
   it.effect.each([
     "2025",
     "2025-27",
@@ -190,25 +247,36 @@ describe("IsoDate", () => {
     "9999-00",
   ])("rejects a wrong or unrepresentable Australian year %s", (value) =>
     Effect.gen(function* () {
-      expect(Schema.is(AustralianTaxYear)(value)).toBe(false);
-      expect(
+      EffectFunction.pipe(Schema.is(AustralianTaxYear)(value), (actual) => {
+        expect(!actual).toBeTruthy();
+      });
+      EffectFunction.pipe(
         Result.isFailure(
           yield* australianTaxYearInterval(value).pipe(Effect.result)
-        )
-      ).toBe(true);
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
     })
   );
 
   it("enforces the same calendar invariant inside SourceArtifact", () => {
-    expect(
+    EffectFunction.pipe(
       Schema.is(Schema.toEncoded(SourceArtifact))(
         sourceArtifactInput("2026-02-29")
-      )
-    ).toBe(false);
-    expect(
+      ),
+      (actual) => {
+        expect(!actual).toBeTruthy();
+      }
+    );
+    EffectFunction.pipe(
       Schema.is(Schema.toEncoded(SourceArtifact))(
         sourceArtifactInput("2024-02-29")
-      )
-    ).toBe(true);
+      ),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
+    );
   });
 });

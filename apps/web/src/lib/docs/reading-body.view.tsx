@@ -5,18 +5,27 @@ import type {
   DocsInline,
   DocsReadingBody,
 } from "@taxkit/content/schemas";
-import { Array, Match, Option, Record } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Match,
+  Option,
+  Record,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import { requestDocsNavigationFocus } from "./components";
 
 const pageLinkPattern = /^(?<path>\/[^#]*)(?:#(?<hash>.+))?$/u;
-
 // Content resolved every link: a public page path, a same-page fragment or an
 // HTTPS address. Only page paths go through the router.
 const InlineLink = ({
   children,
   href,
-}: Readonly<{ children: React.ReactNode; href: string }>) =>
+}: Readonly<{
+  children: React.ReactNode;
+  href: string;
+}>) =>
   Option.fromNullishOr(pageLinkPattern.exec(href)?.groups).pipe(
     Option.match({
       onNone: () => <a href={href}>{children}</a>,
@@ -44,40 +53,54 @@ const InlineLink = ({
       ),
     })
   );
-
-const Inlines = ({ content }: Readonly<{ content: readonly DocsInline[] }>) =>
-  Array.map(content, (inline, index) =>
-    Match.value(inline).pipe(
-      Match.discriminatorsExhaustive("kind")({
-        emphasis: ({ content: leaves }) => (
-          <em key={index}>
-            <Inlines content={leaves} />
-          </em>
-        ),
-        "inline-code": ({ text }) => <code key={index}>{text}</code>,
-        link: ({ content: formatted, href }) => (
-          <InlineLink href={href} key={index}>
-            <Inlines content={formatted} />
-          </InlineLink>
-        ),
-        strong: ({ content: leaves }) => (
-          <strong key={index}>
-            <Inlines content={leaves} />
-          </strong>
-        ),
-        text: ({ text }) => text,
-      })
+const Inlines = ({
+  content,
+}: Readonly<{
+  content: readonly DocsInline[];
+}>) =>
+  EffectFunction.pipe(
+    content,
+    Array.map((inline, index) =>
+      Match.value(inline).pipe(
+        Match.discriminatorsExhaustive("kind")({
+          emphasis: ({ content: leaves }) => (
+            <em key={index}>
+              <Inlines content={leaves} />
+            </em>
+          ),
+          "inline-code": ({ text }) => <code key={index}>{text}</code>,
+          link: ({ content: formatted, href }) => (
+            <InlineLink href={href} key={index}>
+              <Inlines content={formatted} />
+            </InlineLink>
+          ),
+          strong: ({ content: leaves }) => (
+            <strong key={index}>
+              <Inlines content={leaves} />
+            </strong>
+          ),
+          text: ({ text }) => text,
+        })
+      )
     )
   );
-
 const tokenStyle = (token: DocsCodeToken) => ({
   color: Option.getOrUndefined(token.color),
-  fontStyle: token.style.endsWith("italic") ? "italic" : undefined,
-  fontWeight: token.style.startsWith("bold") ? 600 : undefined,
+  fontStyle: EffectBoolean.match(token.style.endsWith("italic"), {
+    onFalse: EffectFunction.constUndefined,
+    onTrue: (): "italic" => "italic",
+  }),
+  fontWeight: EffectBoolean.match(token.style.startsWith("bold"), {
+    onFalse: EffectFunction.constUndefined,
+    onTrue: (): 600 => 600,
+  }),
 });
-
 /* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- A labelled horizontal scroll region needs explicit keyboard focus across supported browsers. */
-const Block = ({ block }: Readonly<{ block: DocsBlock }>) =>
+const Block = ({
+  block,
+}: Readonly<{
+  block: DocsBlock;
+}>) =>
   Match.value(block).pipe(
     Match.discriminatorsExhaustive("kind")({
       code: ({ language, lines }) => (
@@ -85,16 +108,25 @@ const Block = ({ block }: Readonly<{ block: DocsBlock }>) =>
           <figcaption>{language}</figcaption>
           <pre data-language={language}>
             <code>
-              {Array.map(lines, (line, lineIndex) => (
-                <span className="line" key={lineIndex}>
-                  {Array.map(line, (token, tokenIndex) => (
-                    <span key={tokenIndex} style={tokenStyle(token)}>
-                      {token.text}
-                    </span>
-                  ))}
-                  {lineIndex < lines.length - 1 ? "\n" : null}
-                </span>
-              ))}
+              {EffectFunction.pipe(
+                lines,
+                Array.map((line, lineIndex) => (
+                  <span className="line" key={lineIndex}>
+                    {EffectFunction.pipe(
+                      line,
+                      Array.map((token, tokenIndex) => (
+                        <span key={tokenIndex} style={tokenStyle(token)}>
+                          {token.text}
+                        </span>
+                      ))
+                    )}
+                    {EffectBoolean.match(lineIndex < lines.length - 1, {
+                      onFalse: () => null,
+                      onTrue: (): "\n" => "\n",
+                    })}
+                  </span>
+                ))
+              )}
             </code>
           </pre>
         </figure>
@@ -128,16 +160,18 @@ const Block = ({ block }: Readonly<{ block: DocsBlock }>) =>
           Match.exhaustive
         ),
       list: ({ items, ordered, start }) => {
-        const children = Array.map(items, (item, index) => (
-          <li key={index}>
-            <Inlines content={item} />
-          </li>
-        ));
-        return ordered ? (
-          <ol start={start}>{children}</ol>
-        ) : (
-          <ul>{children}</ul>
+        const children = EffectFunction.pipe(
+          items,
+          Array.map((item, index) => (
+            <li key={index}>
+              <Inlines content={item} />
+            </li>
+          ))
         );
+        return EffectBoolean.match(ordered, {
+          onFalse: () => <ul>{children}</ul>,
+          onTrue: () => <ol start={start}>{children}</ol>,
+        });
       },
       paragraph: ({ content }) => (
         <p>
@@ -159,23 +193,35 @@ const Block = ({ block }: Readonly<{ block: DocsBlock }>) =>
             <table>
               <thead>
                 <tr>
-                  {Array.map(header, (cell, column) => (
-                    <th key={column} style={{ textAlign: textAlign(column) }}>
-                      <Inlines content={cell} />
-                    </th>
-                  ))}
+                  {EffectFunction.pipe(
+                    header,
+                    Array.map((cell, column) => (
+                      <th key={column} style={{ textAlign: textAlign(column) }}>
+                        <Inlines content={cell} />
+                      </th>
+                    ))
+                  )}
                 </tr>
               </thead>
               <tbody>
-                {Array.map(rows, (row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {Array.map(row, (cell, column) => (
-                      <td key={column} style={{ textAlign: textAlign(column) }}>
-                        <Inlines content={cell} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
+                {EffectFunction.pipe(
+                  rows,
+                  Array.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {EffectFunction.pipe(
+                        row,
+                        Array.map((cell, column) => (
+                          <td
+                            key={column}
+                            style={{ textAlign: textAlign(column) }}
+                          >
+                            <Inlines content={cell} />
+                          </td>
+                        ))
+                      )}
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </section>
@@ -184,9 +230,13 @@ const Block = ({ block }: Readonly<{ block: DocsBlock }>) =>
     })
   );
 /* oxlint-enable jsx-a11y/no-noninteractive-tabindex */
-
 // The checked page body from Content. Blocks keep their authored order.
 export const DocsReadingBodyView = ({
   body,
-}: Readonly<{ body: DocsReadingBody }>) =>
-  Array.map(body, (block, index) => <Block block={block} key={index} />);
+}: Readonly<{
+  body: DocsReadingBody;
+}>) =>
+  EffectFunction.pipe(
+    body,
+    Array.map((block, index) => <Block block={block} key={index} />)
+  );

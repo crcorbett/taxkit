@@ -1,7 +1,13 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import { Config, ConfigProvider, Effect, Schema } from "effect";
+import {
+  Config,
+  ConfigProvider,
+  Effect,
+  Schema,
+  Boolean as EffectBoolean,
+} from "effect";
 import { defineConfig } from "vite";
 
 export default defineConfig(() => {
@@ -18,11 +24,12 @@ export default defineConfig(() => {
   return {
     envPrefix: [],
     plugins: [
-      ...(alchemyOwnsCloudflareVite
-        ? []
-        : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
+      ...EffectBoolean.match(alchemyOwnsCloudflareVite, {
+        onFalse: () => [cloudflare({ viteEnvironment: { name: "ssr" } })],
+        onTrue: () => [],
+      }),
       tanstackStart({
-        server: { entry: "server" },
+        server: { entry: "entry.server" },
       }),
       viteReact(),
     ],

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { DocsSearchResult, DocsSearchTerm } from "@taxkit/content/schemas";
-import { Array } from "effect";
+import { Match, Function as EffectFunction, Array } from "effect";
 
 import { requestDocsNavigationFocus } from "./components";
 
@@ -28,7 +28,6 @@ export const DocsSearchForm = ({
     </form>
   </search>
 );
-
 export const DocsSearchResults = ({
   results,
   term,
@@ -52,23 +51,30 @@ export const DocsSearchResults = ({
   return (
     <section aria-label="Documentation search results">
       <h2>
-        {results.length} matching {results.length === 1 ? "page" : "pages"}
+        {results.length} matching{" "}
+        {Match.value(results.length).pipe(
+          Match.when(1, (): "page" => "page"),
+          Match.orElse((): "pages" => "pages")
+        )}
       </h2>
       <ol className="docs-search-results">
-        {Array.map(results, (result) => (
-          <li key={result.path}>
-            <h3>
-              <Link
-                onClick={requestDocsNavigationFocus}
-                params={{ _splat: result.path.slice(1) }}
-                to="/$"
-              >
-                {result.title}
-              </Link>
-            </h3>
-            <p>{result.description}</p>
-          </li>
-        ))}
+        {EffectFunction.pipe(
+          results,
+          Array.map((result) => (
+            <li key={result.path}>
+              <h3>
+                <Link
+                  onClick={requestDocsNavigationFocus}
+                  params={{ _splat: result.path.slice(1) }}
+                  to="/$"
+                >
+                  {result.title}
+                </Link>
+              </h3>
+              <p>{result.description}</p>
+            </li>
+          ))
+        )}
       </ol>
     </section>
   );

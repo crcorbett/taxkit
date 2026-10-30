@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-sdk-owner
-last_reviewed: 2026-10-23
+last_reviewed: 2026-10-30
 review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
@@ -12,6 +12,17 @@ review_trigger: SDK contracts, lifetime, exports, examples or consumer validatio
 Public TaxKit TypeScript SDK package.
 
 Install `taxkit` from npm and use the `taxkit` and `taxkit/*` imports.
+
+## Schema construction and compatibility
+
+Public Schema classes have nominal brands. Construct domain values with their
+owning Schema constructor or decode external data through that Schema; plain
+object literals no longer substitute for checked class instances. This is a
+TypeScript breaking change and does not change the encoded JSON contracts.
+
+The `PayRules`, `IncomeTaxRules`, `StslRules`, and `CalculatorSchemas` namespaces
+remain available, including their type members. The public entry points list
+exports explicitly; internal compatibility modules preserve these namespaces.
 
 ## Scope
 

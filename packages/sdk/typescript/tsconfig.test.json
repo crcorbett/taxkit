@@ -4,6 +4,11 @@
   "exclude": ["test/scripts/**"],
   "compilerOptions": {
     "rootDir": ".",
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "taxkit": ["./src/index.ts"],
+      "taxkit/effect": ["./src/effect.ts"],
+      "taxkit/au/effect": ["./src/au-effect.ts"]
+    }
   }
 }

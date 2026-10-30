@@ -2,7 +2,15 @@ import { expect, it } from "@effect/vitest";
 import { requestDocsPage } from "@taxkit/api-http/requests";
 import { DocsPublicNavigation, DocsPublicPage } from "@taxkit/content/schemas";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { Array, Effect, Layer, Match, Result, Schema } from "effect";
+import {
+  Array,
+  Effect,
+  Layer,
+  Match,
+  Result,
+  Schema,
+  Boolean as EffectBoolean,
+} from "effect";
 import { vi } from "vitest";
 
 import { WebsiteApiLive } from "../../src/lib/host/binding.adapter.layer";
@@ -28,18 +36,21 @@ it.effect.each([
       const binding = {
         connect: vi.fn<(...args: readonly unknown[]) => void>(),
         // Native Fetcher fixture: the generated client still decodes the bytes.
-        fetch: vi.fn((request: Request) =>
-          Promise.resolve(
-            new Response(
-              request.url.includes("navigation")
-                ? navigation
-                : Match.value(reply).pipe(
-                    Match.when("malformed", () => "{}"),
-                    Match.orElse(() => encodedPage)
-                  ),
-              { headers: { "content-type": "application/json" } }
+        fetch: vi.fn<(request: Request) => ReturnType<typeof globalThis.fetch>>(
+          (request) =>
+            Promise.resolve(
+              new Response(
+                EffectBoolean.match(request.url.includes("navigation"), {
+                  onFalse: () =>
+                    Match.value(reply).pipe(
+                      Match.when("malformed", (): "{}" => "{}"),
+                      Match.orElse(() => encodedPage)
+                    ),
+                  onTrue: () => navigation,
+                }),
+                { headers: { "content-type": "application/json" } }
+              )
             )
-          )
         ),
       };
       const api = yield* WebsiteApi.pipe(
@@ -54,14 +65,34 @@ it.effect.each([
           )
         )
       );
-      const client = yield* Effect.fromResult(api.client);
-      const result = yield* requestDocsPage(
+      const client = yield* api.client;
+      const result = yield* requestDocsPage({
         client,
-        reply === "mismatched" ? "/start/quickstart" : page.path
-      ).pipe(Effect.result);
-      expect(Result.isSuccess(result) ? "Success" : result.failure._tag).toBe(
-        expected
+        address: Match.value(reply).pipe(
+          Match.when(
+            "mismatched",
+            (): "/start/quickstart" => "/start/quickstart"
+          ),
+          Match.orElse(() => page.path)
+        ),
+      }).pipe(Effect.result);
+      const outcome = Match.value(result).pipe(
+        Match.when(Result.isSuccess, (): "Success" => "Success"),
+        Match.orElse(({ failure }) =>
+          Match.value(failure).pipe(
+            Match.tag("ApiReplyMismatch", () => "ApiReplyMismatch"),
+            Match.tag("ApiUnavailable", () => "ApiUnavailable"),
+            Match.tag("ApiDeadlineExceeded", () => "ApiDeadlineExceeded"),
+            Match.tag("ApiReplyTooLarge", () => "ApiReplyTooLarge"),
+            Match.tag("DocsPageUnavailable", () => "DocsPageUnavailable"),
+            Match.tag("HttpClientError", () => "HttpClientError"),
+            Match.tag("SchemaError", () => "SchemaError"),
+            Match.tag("TimeoutError", () => "TimeoutError"),
+            Match.exhaustive
+          )
+        )
       );
+      expect(outcome).toBe(expected);
       if (Result.isSuccess(result)) {
         expect(result.success.page.path).toBe(page.path);
       }

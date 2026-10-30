@@ -38,6 +38,9 @@ import {
 import { ContentService } from "@taxkit/content/service";
 import { HostRequestRecord } from "@taxkit/observability/host-telemetry";
 import {
+  Predicate,
+  Match,
+  Function as EffectFunction,
   Array,
   ConfigProvider,
   Deferred,
@@ -50,6 +53,7 @@ import {
   Redacted,
   Ref,
   Schema,
+  Boolean as EffectBoolean,
 } from "effect";
 import type { Scope } from "effect";
 import { McpSchema } from "effect/ai";
@@ -62,38 +66,42 @@ import { ApiContentLive } from "../src/content.boundary.js";
 import { ApiWorkerApplication } from "../src/worker.application.js";
 import { ApiWorkerInit } from "../src/worker.js";
 
-class McpClientProbeFailed extends Schema.TaggedError<McpClientProbeFailed>()(
-  "McpClientProbeFailed",
+class McpClientProbeFailed extends Schema.TaggedError<
+  McpClientProbeFailed,
   {
-    operation: Schema.Literals([
-      "connect",
-      "list",
-      "catalogue",
-      "schema",
-      "navigation",
-      "search",
-      "calculate",
-      "read",
-      "limit",
-    ]),
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("McpClientProbeFailed", {
+  operation: Schema.Literals([
+    "connect",
+    "list",
+    "catalogue",
+    "schema",
+    "navigation",
+    "search",
+    "calculate",
+    "read",
+    "limit",
+  ]),
+}) {}
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
   TAXKIT_PUBLICATION_ORIGIN: "https://publication.example.com",
   WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
-
 // Each request writes one checked fixed-field record; anything else is a
 // runtime log line.
 const runtimeLines = (lines: readonly unknown[]) =>
-  Array.filter(lines, (line) =>
-    Option.isNone(
-      Schema.decodeUnknownOption(Schema.fromJsonString(HostRequestRecord))(line)
+  EffectFunction.pipe(
+    lines,
+    Array.filter((line) =>
+      Option.isNone(
+        Schema.decodeUnknownOption(Schema.fromJsonString(HostRequestRecord))(
+          line
+        )
+      )
     )
   );
-
 describe("real MCP client against the native API application", () => {
   it.effect.each([
     { headers: { origin: "https://foreign.example.com" }, status: 403 },
@@ -163,9 +171,21 @@ describe("real MCP client against the native API application", () => {
           ),
           Effect.result
         );
-        expect(refused._tag).toBe("Failure");
-        expect(yield* Ref.get(observed)).toEqual(Option.some(status));
-        expect(runtimeLines(yield* TestConsole.logLines)).toEqual([]);
+        expect({
+          refusedRequest: {
+            refused_tag: Predicate.isTagged(refused, "Failure"),
+            RefGetObserved: yield* Ref.get(observed),
+          },
+          runtimeLinesYieldTestConsoleLogLines: runtimeLines(
+            yield* TestConsole.logLines
+          ),
+        }).toStrictEqual({
+          refusedRequest: {
+            refused_tag: true,
+            RefGetObserved: Option.some(status),
+          },
+          runtimeLinesYieldTestConsoleLogLines: [],
+        });
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.provide(CalculatorLive),
@@ -173,7 +193,6 @@ describe("real MCP client against the native API application", () => {
         Effect.scoped
       )
   );
-
   it.effect.each([
     { admitted: true, origin: "https://website.example.com" },
     { admitted: false, origin: "https://publication.example.com" },
@@ -205,17 +224,28 @@ describe("real MCP client against the native API application", () => {
             })
           )
         );
-        expect(response.headers.get("access-control-allow-origin")).toBe(
-          admitted ? origin : null
+        EffectFunction.pipe(
+          response.headers.get("access-control-allow-origin"),
+          (actual) => {
+            expect(actual).toBe(
+              EffectBoolean.match(admitted, {
+                onFalse: () => null,
+                onTrue: () => origin,
+              })
+            );
+          }
         );
-        expect(
-          response.headers.get("access-control-allow-credentials")
-        ).toBeNull();
+        EffectFunction.pipe(
+          response.headers.get("access-control-allow-credentials"),
+          (actual) => {
+            expect(actual).toBeNull();
+          }
+        );
         if (admitted) {
           const headers = response.headers.get("access-control-allow-headers");
-          expect(headers).toContain("mcp-method");
-          expect(headers).toContain("mcp-name");
-          expect(headers).toContain("mcp-protocol-version");
+          Array.forEach((marker: string) => {
+            expect(headers).toContain(marker);
+          })(["mcp-method", "mcp-name", "mcp-protocol-version"]);
           expect(headers).not.toContain("mcp-session-id");
         }
       }).pipe(
@@ -225,7 +255,6 @@ describe("real MCP client against the native API application", () => {
         Effect.scoped
       )
   );
-
   it.effect.each([
     { message: "invalid-calculation", mode: "expected" },
     { message: "capacity-exceeded", mode: "capacity" },
@@ -280,20 +309,29 @@ describe("real MCP client against the native API application", () => {
         const checked = yield* Schema.decodeUnknownEffect(
           McpSchema.CallToolResult
         )(response);
-        expect(checked.isError).toBe(true);
+        expect(checked.isError === true).toBeTruthy();
         const text = yield* Schema.encodeEffect(
           Schema.fromJsonString(McpSchema.CallToolResult)
         )(checked);
         expect(text).toContain(message);
-        expect(text).not.toContain(sensitiveSentinel);
-        expect(text).not.toContain("165400");
+        Array.forEach((marker: string) => {
+          expect(text).not.toContain(marker);
+        })([sensitiveSentinel, "165400"]);
         const lines = yield* TestConsole.logLines;
-        expect(runtimeLines(lines).length).toBe(mode === "defect" ? 2 : 0);
+        EffectFunction.pipe(runtimeLines(lines), (actual) => {
+          expect(actual).toHaveLength(
+            Match.value(mode).pipe(
+              Match.when("defect", (): 2 => 2),
+              Match.orElse((): 0 => 0)
+            )
+          );
+        });
         const logged = yield* Schema.encodeEffect(
           Schema.fromJsonString(Schema.Unknown)
         )(lines);
-        expect(logged).not.toContain(sensitiveSentinel);
-        expect(logged).not.toContain("165400");
+        Array.forEach((marker: string) => {
+          expect(logged).not.toContain(marker);
+        })([sensitiveSentinel, "165400"]);
         if (mode === "defect") {
           expect(logged).toContain("api.runtime.event");
         }
@@ -304,7 +342,6 @@ describe("real MCP client against the native API application", () => {
         Effect.scoped
       )
   );
-
   it.effect(
     "cancels actual client work and releases its calculation place",
     () =>
@@ -323,34 +360,62 @@ describe("real MCP client against the native API application", () => {
                 Layer.succeed(
                   PublicCalculatorService,
                   PublicCalculatorService.of({
-                    ...calculator,
-                    calculate: (request) =>
-                      Effect.gen(function* () {
-                        const count = yield* Ref.updateAndGet(
-                          started,
-                          (value) => value + 1
-                        );
-                        if (count > CalculatorConcurrencyLimit) {
-                          return yield* calculator.calculate(request);
-                        }
-                        const signal = yield* McpRequestAbortSignal;
-                        if (Option.isSome(signal)) {
-                          yield* Ref.update(toolSignals, (values) => [
-                            ...values,
-                            signal.value,
-                          ]);
-                        }
-                        if (count === CalculatorConcurrencyLimit) {
-                          yield* Deferred.succeed(entered, true);
-                        }
-                        return yield* Effect.never;
-                      }).pipe(
-                        Effect.ensuring(
-                          Ref.updateAndGet(stopped, (value) => value + 1).pipe(
-                            Effect.andThen(Deferred.succeed(released, true))
+                    getCalculator: Effect.fn(
+                      "PublicCalculatorService.getCalculator"
+                    )(calculator.getCalculator),
+                    getCalculatorGraph: Effect.fn(
+                      "PublicCalculatorService.getCalculatorGraph"
+                    )(calculator.getCalculatorGraph),
+                    getCalculatorSchema: Effect.fn(
+                      "PublicCalculatorService.getCalculatorSchema"
+                    )(calculator.getCalculatorSchema),
+                    listCalculators: Effect.fn(
+                      "PublicCalculatorService.listCalculators"
+                    )(calculator.listCalculators),
+                    listFacts: Effect.fn("PublicCalculatorService.listFacts")(
+                      calculator.listFacts
+                    ),
+                    listJurisdictions: Effect.fn(
+                      "PublicCalculatorService.listJurisdictions"
+                    )(calculator.listJurisdictions),
+                    listRules: Effect.fn("PublicCalculatorService.listRules")(
+                      calculator.listRules
+                    ),
+                    listTaxYears: Effect.fn(
+                      "PublicCalculatorService.listTaxYears"
+                    )(calculator.listTaxYears),
+                    calculate: Effect.fn("PublicCalculatorService.calculate")(
+                      (request) =>
+                        Effect.gen(function* () {
+                          const count = yield* Ref.updateAndGet(
+                            started,
+                            (value) => value + 1
+                          );
+                          if (count > CalculatorConcurrencyLimit) {
+                            return yield* calculator.calculate(request);
+                          }
+                          const signal = yield* McpRequestAbortSignal;
+                          if (Option.isSome(signal)) {
+                            yield* Ref.update(toolSignals, (values) => [
+                              ...values,
+                              signal.value,
+                            ]);
+                          }
+                          if (count === CalculatorConcurrencyLimit) {
+                            yield* Deferred.succeed(entered, true);
+                          }
+                          return yield* Effect.never;
+                        }).pipe(
+                          Effect.ensuring(
+                            Ref.updateAndGet(
+                              stopped,
+                              (value) => value + 1
+                            ).pipe(
+                              Effect.andThen(Deferred.succeed(released, true))
+                            )
                           )
                         )
-                      ),
+                    ),
                   })
                 )
               )
@@ -389,15 +454,18 @@ describe("real MCP client against the native API application", () => {
         const aborts = yield* Effect.sync(() =>
           Array.makeBy(CalculatorConcurrencyLimit, () => new AbortController())
         );
-        const calls = yield* Effect.forEach(aborts, (abort) =>
-          Effect.tryPromise({
-            catch: () => new McpClientProbeFailed({ operation: "calculate" }),
-            try: () =>
-              client.callTool(
-                { arguments: input, name: "taxkit_calculate" },
-                { signal: abort.signal }
-              ),
-          }).pipe(Effect.result, Effect.forkScoped)
+        const calls = yield* EffectFunction.pipe(
+          aborts,
+          Effect.forEach((abort) =>
+            Effect.tryPromise({
+              catch: () => new McpClientProbeFailed({ operation: "calculate" }),
+              try: () =>
+                client.callTool(
+                  { arguments: input, name: "taxkit_calculate" },
+                  { signal: abort.signal }
+                ),
+            }).pipe(Effect.result, Effect.forkScoped)
+          )
         );
         yield* Deferred.await(entered).pipe(
           Effect.raceFirst(
@@ -417,10 +485,16 @@ describe("real MCP client against the native API application", () => {
         yield* Effect.sync(() => {
           firstAbort.abort();
         });
-        expect((yield* Fiber.join(firstCall))._tag).toBe("Failure");
-        expect(
-          Array.some(yield* Ref.get(toolSignals), (signal) => signal.aborted)
-        ).toBe(true);
+        expect({
+          length: Predicate.isTagged(yield* Fiber.join(firstCall), "Failure"),
+          length2: EffectFunction.pipe(
+            yield* Ref.get(toolSignals),
+            Array.some((signal) => signal.aborted)
+          ),
+        }).toStrictEqual({
+          length: true,
+          length2: true,
+        });
         yield* Deferred.await(released);
         expect(yield* Ref.get(stopped)).toBe(1);
         const replacement = yield* Effect.tryPromise({
@@ -431,17 +505,25 @@ describe("real MCP client against the native API application", () => {
         const checked = yield* Schema.decodeUnknownEffect(
           McpSchema.CallToolResult
         )(replacement);
-        expect(checked.isError).toBe(false);
-        expect(
-          yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
+        expect({
+          length: checked.isError === false,
+          calculation: yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
             checked.structuredContent
-          )
-        ).toEqual(yield* calculator.calculate(CalculationRequest));
+          ).pipe(Effect.flatMap(Schema.encodeEffect(CalculatorRunResponse))),
+        }).toStrictEqual({
+          length: true,
+          calculation: yield* calculator
+            .calculate(CalculationRequest)
+            .pipe(Effect.flatMap(Schema.encodeEffect(CalculatorRunResponse))),
+        });
         // Close the remaining client calls and wait for every owned calculation.
-        yield* Effect.forEach(aborts, (abort) =>
-          Effect.sync(() => {
-            abort.abort();
-          })
+        yield* EffectFunction.pipe(
+          aborts,
+          Effect.forEach((abort) =>
+            Effect.sync(() => {
+              abort.abort();
+            })
+          )
         );
         yield* Effect.forEach(calls, Fiber.join, { concurrency: "unbounded" });
         expect(yield* Ref.get(stopped)).toBe(CalculatorConcurrencyLimit + 1);
@@ -460,7 +542,9 @@ describe("real MCP client against the native API application", () => {
           Effect.provideService(
             CalculatorAdmission,
             CalculatorAdmission.of({
-              admitCalculation: (key) =>
+              admitCalculation: Effect.fn(
+                "CalculatorAdmission.admitCalculation"
+              )((key) =>
                 Ref.modify(counters, (counts) => {
                   const identity = NetAddress.formatIp(Redacted.value(key));
                   const count =
@@ -470,11 +554,13 @@ describe("real MCP client against the native API application", () => {
                   return [count, HashMap.set(counts, identity, count)] as const;
                 }).pipe(
                   Effect.flatMap((count) =>
-                    count <= 1
-                      ? Effect.void
-                      : Effect.fail(new CalculatorRateLimited())
+                    EffectBoolean.match(count <= 1, {
+                      onFalse: () => Effect.fail(new CalculatorRateLimited()),
+                      onTrue: () => Effect.void,
+                    })
                   )
-                ),
+                )
+              ),
             })
           )
         );
@@ -508,7 +594,6 @@ describe("real MCP client against the native API application", () => {
         const expectedNavigation = yield* content.getNavigation();
         const term = yield* Schema.decodeEffect(DocsSearchTerm)("quickstart");
         const expectedSearch = yield* content.searchPages(term);
-
         yield* Effect.forEach(["203.0.113.77", "203.0.113.78"], (address) =>
           Effect.gen(function* () {
             const client = yield* Effect.acquireRelease(
@@ -539,169 +624,226 @@ describe("real MCP client against the native API application", () => {
               catch: () => new McpClientProbeFailed({ operation: "connect" }),
               try: () => client.connect(transport),
             });
-            expect(client.getServerCapabilities()).toEqual({
-              completions: {},
-              logging: {},
-              tools: { listChanged: false },
-            });
-            const listed = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "list" }),
-              try: () => client.listTools(),
-            });
-            expect(
-              Array.sort(
-                Array.map(listed.tools, (tool) => tool.name),
-                Order.String
-              )
-            ).toEqual([
-              "taxkit_calculate",
-              "taxkit_docs_navigation",
-              "taxkit_find_docs",
-              "taxkit_get_calculator_schema",
-              "taxkit_list_calculators",
-              "taxkit_read_doc",
-            ]);
-            const catalogue = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "catalogue" }),
-              try: () =>
-                client.callTool({
-                  arguments: {},
-                  name: "taxkit_list_calculators",
-                }),
-            });
-            const checkedCatalogue = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(catalogue);
-            const decodedCatalogue = yield* Schema.decodeUnknownEffect(
-              CalculatorCatalogResponse
-            )(checkedCatalogue.structuredContent);
-            expect(decodedCatalogue.calculators.length).toBe(3);
-            const details = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "schema" }),
-              try: () =>
-                client.callTool({
-                  arguments: schemaInput,
-                  name: "taxkit_get_calculator_schema",
-                }),
-            });
-            const checkedDetails = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(details);
-            expect(
-              yield* Schema.decodeUnknownEffect(CalculatorSchemaResponse)(
-                checkedDetails.structuredContent
-              )
-            ).toEqual(expectedSchema);
-            const navigation = yield* Effect.tryPromise({
-              catch: () =>
-                new McpClientProbeFailed({ operation: "navigation" }),
-              try: () =>
-                client.callTool({
-                  arguments: {},
-                  name: "taxkit_docs_navigation",
-                }),
-            });
-            const checkedNavigation = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(navigation);
-            expect(
-              yield* Schema.decodeUnknownEffect(DocsPublicNavigation)(
-                checkedNavigation.structuredContent
-              )
-            ).toEqual(expectedNavigation);
-            const searched = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "search" }),
-              try: () =>
-                client.callTool({
-                  arguments: { term },
-                  name: "taxkit_find_docs",
-                }),
-            });
-            const checkedSearch = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(searched);
-            expect(
-              (yield* Schema.decodeUnknownEffect(McpDocsSearchResponse)(
-                checkedSearch.structuredContent
-              )).results
-            ).toEqual(expectedSearch);
-
-            const invalid = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "calculate" }),
-              try: () =>
-                client.callTool({
-                  arguments: { calculatorId: "PRIVATE-INPUT-77" },
-                  name: "taxkit_calculate",
-                }),
-            });
-            const checkedInvalid = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(invalid);
-            expect(checkedInvalid.isError).toBe(true);
-            expect(
-              yield* Schema.encodeEffect(
-                Schema.fromJsonString(McpSchema.CallToolResult)
-              )(checkedInvalid)
-            ).not.toContain("PRIVATE-INPUT-77");
-            expect(HashMap.has(yield* Ref.get(counters), address)).toBe(false);
-            const calculated = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "calculate" }),
-              try: () =>
-                client.callTool({ arguments: input, name: "taxkit_calculate" }),
-            });
-            const checked = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(calculated);
-            expect(checked.isError).toBe(false);
-            expect(
-              yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
-                checked.structuredContent
-              )
-            ).toEqual(expected);
-            const read = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "read" }),
-              try: () =>
-                client.callTool({
-                  arguments: { path: pagePath },
-                  name: "taxkit_read_doc",
-                }),
-            });
-            const checkedPage = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(read);
-            expect(
-              yield* Schema.decodeUnknownEffect(DocsPublicPage)(
-                checkedPage.structuredContent
-              )
-            ).toEqual(expectedPage);
-            const limited = yield* Effect.tryPromise({
-              catch: () => new McpClientProbeFailed({ operation: "limit" }),
-              try: () =>
-                client.callTool({ arguments: input, name: "taxkit_calculate" }),
-            });
-            const checkedLimit = yield* Schema.decodeUnknownEffect(
-              McpSchema.CallToolResult
-            )(limited);
-            expect(checkedLimit.isError).toBe(true);
-            const text = Array.findFirst(
-              checkedLimit.content,
-              (block) => block.type === "text"
-            );
-            expect(Option.isSome(text)).toBe(true);
-            if (Option.isSome(text) && text.value.type === "text") {
-              const refusal = yield* Schema.decodeEffect(
-                Schema.fromJsonString(McpToolUnavailable)
-              )(text.value.text);
-              expect(refusal.code).toBe("rate-limited");
-              expect(refusal.retry).toBe("wait-then-try-manually");
-              expect(text.value.text).not.toContain(address);
-              expect(text.value.text).not.toContain("165400");
-            }
-            expect(transport.sessionId).toBeUndefined();
+            yield* Effect.gen(function* verifyToolDiscovery() {
+              EffectFunction.pipe(client.getServerCapabilities(), (actual) => {
+                expect(actual).toStrictEqual({
+                  completions: {},
+                  logging: {},
+                  tools: { listChanged: false },
+                });
+              });
+              const listed = yield* Effect.tryPromise({
+                catch: () => new McpClientProbeFailed({ operation: "list" }),
+                try: () => client.listTools(),
+              });
+              EffectFunction.pipe(
+                EffectFunction.pipe(
+                  EffectFunction.pipe(
+                    listed.tools,
+                    Array.map((tool) => tool.name)
+                  ),
+                  Array.sort(Order.String)
+                ),
+                (actual) => {
+                  expect(actual).toStrictEqual([
+                    "taxkit_calculate",
+                    "taxkit_docs_navigation",
+                    "taxkit_find_docs",
+                    "taxkit_get_calculator_schema",
+                    "taxkit_list_calculators",
+                    "taxkit_read_doc",
+                  ]);
+                }
+              );
+              const catalogue = yield* Effect.tryPromise({
+                catch: () =>
+                  new McpClientProbeFailed({ operation: "catalogue" }),
+                try: () =>
+                  client.callTool({
+                    arguments: {},
+                    name: "taxkit_list_calculators",
+                  }),
+              });
+              const checkedCatalogue = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(catalogue);
+              const decodedCatalogue = yield* Schema.decodeUnknownEffect(
+                CalculatorCatalogResponse
+              )(checkedCatalogue.structuredContent);
+              expect(decodedCatalogue.calculators).toHaveLength(3);
+              const details = yield* Effect.tryPromise({
+                catch: () => new McpClientProbeFailed({ operation: "schema" }),
+                try: () =>
+                  client.callTool({
+                    arguments: schemaInput,
+                    name: "taxkit_get_calculator_schema",
+                  }),
+              });
+              const checkedDetails = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(details);
+              expect(
+                yield* Schema.decodeUnknownEffect(CalculatorSchemaResponse)(
+                  checkedDetails.structuredContent
+                ).pipe(
+                  Effect.flatMap(Schema.encodeEffect(CalculatorSchemaResponse))
+                )
+              ).toStrictEqual(
+                yield* Schema.encodeEffect(CalculatorSchemaResponse)(
+                  expectedSchema
+                )
+              );
+              const navigation = yield* Effect.tryPromise({
+                catch: () =>
+                  new McpClientProbeFailed({ operation: "navigation" }),
+                try: () =>
+                  client.callTool({
+                    arguments: {},
+                    name: "taxkit_docs_navigation",
+                  }),
+              });
+              const checkedNavigation = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(navigation);
+              expect(
+                yield* Schema.decodeUnknownEffect(DocsPublicNavigation)(
+                  checkedNavigation.structuredContent
+                )
+              ).toStrictEqual(expectedNavigation);
+              const searched = yield* Effect.tryPromise({
+                catch: () => new McpClientProbeFailed({ operation: "search" }),
+                try: () =>
+                  client.callTool({
+                    arguments: { term },
+                    name: "taxkit_find_docs",
+                  }),
+              });
+              const checkedSearch = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(searched);
+              expect(
+                (yield* Schema.decodeUnknownEffect(McpDocsSearchResponse)(
+                  checkedSearch.structuredContent
+                )).results
+              ).toStrictEqual(expectedSearch);
+            }).pipe(Effect.withSpan("verifyToolDiscovery"));
+            yield* Effect.gen(function* verifyCalculationAdmission() {
+              const invalid = yield* Effect.tryPromise({
+                catch: () =>
+                  new McpClientProbeFailed({ operation: "calculate" }),
+                try: () =>
+                  client.callTool({
+                    arguments: { calculatorId: "PRIVATE-INPUT-77" },
+                    name: "taxkit_calculate",
+                  }),
+              });
+              const checkedInvalid = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(invalid);
+              expect(checkedInvalid.isError === true).toBeTruthy();
+              expect(
+                yield* Schema.encodeEffect(
+                  Schema.fromJsonString(McpSchema.CallToolResult)
+                )(checkedInvalid)
+              ).not.toContain("PRIVATE-INPUT-77");
+              EffectFunction.pipe(
+                HashMap.has(yield* Ref.get(counters), address),
+                (actual) => {
+                  expect(!actual).toBeTruthy();
+                }
+              );
+              const calculated = yield* Effect.tryPromise({
+                catch: () =>
+                  new McpClientProbeFailed({ operation: "calculate" }),
+                try: () =>
+                  client.callTool({
+                    arguments: input,
+                    name: "taxkit_calculate",
+                  }),
+              });
+              const checked = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(calculated);
+              expect({
+                length: checked.isError === false,
+                calculation: yield* Schema.decodeUnknownEffect(
+                  CalculatorRunResponse
+                )(checked.structuredContent).pipe(
+                  Effect.flatMap(Schema.encodeEffect(CalculatorRunResponse))
+                ),
+              }).toStrictEqual({
+                length: true,
+                calculation: yield* Schema.encodeEffect(CalculatorRunResponse)(
+                  expected
+                ),
+              });
+            }).pipe(Effect.withSpan("verifyCalculationAdmission"));
+            yield* Effect.gen(function* verifyDocumentationAndLimit() {
+              const read = yield* Effect.tryPromise({
+                catch: () => new McpClientProbeFailed({ operation: "read" }),
+                try: () =>
+                  client.callTool({
+                    arguments: { path: pagePath },
+                    name: "taxkit_read_doc",
+                  }),
+              });
+              const checkedPage = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(read);
+              expect(
+                yield* Schema.decodeUnknownEffect(DocsPublicPage)(
+                  checkedPage.structuredContent
+                )
+              ).toStrictEqual(expectedPage);
+              const limited = yield* Effect.tryPromise({
+                catch: () => new McpClientProbeFailed({ operation: "limit" }),
+                try: () =>
+                  client.callTool({
+                    arguments: input,
+                    name: "taxkit_calculate",
+                  }),
+              });
+              const checkedLimit = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(limited);
+              expect(checkedLimit.isError === true).toBeTruthy();
+              const text = EffectFunction.pipe(
+                checkedLimit.content,
+                Array.findFirst((block) => block.type === "text")
+              );
+              EffectFunction.pipe(Option.isSome(text), (actual) => {
+                expect(actual).toBeTruthy();
+              });
+              if (Option.isSome(text) && text.value.type === "text") {
+                const refusal = yield* Schema.decodeEffect(
+                  Schema.fromJsonString(McpToolUnavailable)
+                )(text.value.text);
+                expect({
+                  refusalCode: refusal.code,
+                  refusalRetry: refusal.retry,
+                }).toStrictEqual({
+                  refusalCode: "rate-limited",
+                  refusalRetry: "wait-then-try-manually",
+                });
+                Array.forEach((marker: string) => {
+                  expect(text.value.text).not.toContain(marker);
+                })([address, "165400"]);
+              }
+              expect(transport.sessionId).toBeUndefined();
+            }).pipe(Effect.withSpan("verifyDocumentationAndLimit"));
           }).pipe(Effect.scoped)
         );
-        expect(HashMap.size(yield* Ref.get(counters))).toBe(2);
-        expect(runtimeLines(yield* TestConsole.logLines)).toEqual([]);
+        expect({
+          HashMapSizeYieldRefGetCounters: HashMap.size(
+            yield* Ref.get(counters)
+          ),
+          runtimeLinesYieldTestConsoleLogLines: runtimeLines(
+            yield* TestConsole.logLines
+          ),
+        }).toStrictEqual({
+          HashMapSizeYieldRefGetCounters: 2,
+          runtimeLinesYieldTestConsoleLogLines: [],
+        });
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.provide(ApiContentLive),

@@ -1,6 +1,12 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { expect, it } from "@effect/vitest";
-import { Array, Effect, FileSystem, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  FileSystem,
+  Schema,
+} from "effect";
 
 import { lintFiles, writeLintFixture } from "./cli-fixture.js";
 
@@ -11,7 +17,11 @@ const Report = Schema.fromJsonString(
   })
 );
 const lint = (file: string) =>
-  lintFiles([file], [], "json").pipe(
+  lintFiles({
+    paths: [file],
+    extraArgs: [],
+    format: "json",
+  }).pipe(
     Effect.flatMap((result) =>
       Schema.decodeEffect(Report)(result.stdout).pipe(
         Effect.map((report) => ({ ...result, report }))
@@ -21,16 +31,24 @@ const lint = (file: string) =>
 const rejected = (file: string, source: string, code: string) =>
   Effect.scoped(
     Effect.gen(function* () {
-      yield* writeLintFixture(file, source);
+      yield* writeLintFixture({
+        path: file,
+        source,
+      });
       const result = yield* lint(file);
       expect(result.exitCode, `${file}: ${source}\n${result.output}`).toBe(1);
       expect(result.report.number_of_files).toBe(1);
-      expect(
-        Array.map(result.report.diagnostics, (entry) => entry.code)
-      ).toContain(code);
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          result.report.diagnostics,
+          Array.map((entry) => entry.code)
+        ),
+        (actual) => {
+          expect(actual).toContain(code);
+        }
+      );
     })
   );
-
 it.effect(
   "rejects unavailable exports, undeclared edges and backend roles through native Oxlint",
   () =>
@@ -119,23 +137,25 @@ it.effect(
         ([file, source, code]) => rejected(file, source, code),
         { concurrency: 1, discard: true }
       );
-      yield* writeLintFixture(
-        browser,
-        `import "@taxkit/content/schemas";
+      yield* writeLintFixture({
+        path: browser,
+        source: `import "@taxkit/content/schemas";
 import "@taxkit/api-http/api";
 import "@taxkit/calculators/summaries";
-`
-      );
+`,
+      });
       const accepted = yield* lint(browser);
       expect(accepted.exitCode, accepted.output).toBe(0);
-      expect(accepted.report.diagnostics).toEqual([]);
+      expect(accepted.report.diagnostics).toStrictEqual([]);
       // Real approved host paths continue to use Alchemy runtime helpers and
       // exact infrastructure type exports. A neighbouring file gains no grant.
-      const host = yield* lintFiles([
-        "apps/web/src/lib/host/config.ingress.ts",
-        "apps/web/src/lib/host/binding.adapter.layer.ts",
-        "apps/api/src/worker.ts",
-      ]);
+      const host = yield* lintFiles({
+        paths: [
+          "apps/web/src/lib/host/config.ingress.ts",
+          "apps/web/src/lib/host/binding.adapter.layer.ts",
+          "apps/api/src/worker.ts",
+        ],
+      });
       expect(host.exitCode, host.output).toBe(0);
       yield* rejected(
         "apps/web/src/lib/.generated-host-neighbour.server.ts",
@@ -151,16 +171,17 @@ import "@taxkit/calculators/summaries";
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
   120_000
 );
-
 it.effect(
   "admits exact native isomorphic and server host imports while browser neighbours stay strict",
   () =>
     Effect.gen(function* () {
-      const host = yield* lintFiles([
-        "apps/web/src/lib/pages/loaders.ts",
-        "apps/web/src/lib/host/settings.layer.ts",
-        "apps/web/src/lib/http/negotiation.ingress.ts",
-      ]);
+      const host = yield* lintFiles({
+        paths: [
+          "apps/web/src/lib/pages/loaders.ts",
+          "apps/web/src/lib/host/settings.layer.ts",
+          "apps/web/src/lib/http/negotiation.ingress.ts",
+        ],
+      });
       expect(host.exitCode, host.output).toBe(0);
       yield* Effect.forEach(
         [
@@ -181,7 +202,6 @@ it.effect(
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
   60_000
 );
-
 it.effect(
   "reads fresh nested manifest exports, wildcard fences and every dependency class",
   () =>
@@ -207,17 +227,17 @@ it.effect(
   }
 }`
       );
-      yield* writeLintFixture(
-        file,
-        `import "@taxkit/workspace-boundary-fixture/conditional";
+      yield* writeLintFixture({
+        path: file,
+        source: `import "@taxkit/workspace-boundary-fixture/conditional";
 import "@taxkit/workspace-boundary-fixture/array";
 import "@taxkit/workspace-boundary-fixture/features/public";
 import "@taxkit/content/schemas";
-`
-      );
+`,
+      });
       const accepted = yield* lint(file);
       expect(accepted.exitCode, accepted.output).toBe(0);
-      expect(accepted.report.diagnostics).toEqual([]);
+      expect(accepted.report.diagnostics).toStrictEqual([]);
       yield* Effect.forEach(
         ["blocked", "features/private/secret", "missing"],
         (subpath) =>
@@ -257,7 +277,10 @@ import "@taxkit/content/schemas";
               manifest,
               `{"name":"@taxkit/workspace-boundary-fixture","${field}":{"@taxkit/content":"workspace:*"}}`
             );
-            yield* writeLintFixture(file, 'import "@taxkit/content/schemas";');
+            yield* writeLintFixture({
+              path: file,
+              source: 'import "@taxkit/content/schemas";',
+            });
             const result = yield* lint(file);
             expect(result.exitCode, result.output).toBe(0);
           }),
@@ -273,7 +296,9 @@ import "@taxkit/content/schemas";
         "package(workspace-import-boundaries)"
       );
       yield* fs.writeFileString(manifest, '{"name":42}');
-      const invalid = yield* lintFiles([file]);
+      const invalid = yield* lintFiles({
+        paths: [file],
+      });
       expect(invalid.exitCode).not.toBe(0);
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
   120_000

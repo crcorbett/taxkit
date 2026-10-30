@@ -1,4 +1,7 @@
 import {
+  Predicate,
+  Match,
+  Function as EffectFunction,
   Array as EffectArray,
   HashMap,
   HashSet,
@@ -21,113 +24,90 @@ import type {
   SyntaxNode,
 } from "./host.types.js";
 
-const effectImportSemantic: ImportSemantic = (
-  source,
-  specifierType,
-  imported
-) => {
+const effectImportSemantic: ImportSemantic = (source, kind, imported) => {
   if (source === "effect") {
-    if (specifierType === "ImportNamespaceSpecifier") {
-      return "effect";
+    if (kind === "ImportNamespaceSpecifier") {
+      return Option.some("effect");
     }
-
-    if (specifierType === "ImportSpecifier") {
-      return HashSet.has(
-        HashSet.fromIterable(["Data", "Effect", "ManagedRuntime", "Schema"]),
-        imported ?? ""
-      )
-        ? imported
-        : null;
+    if (kind === "ImportSpecifier") {
+      return imported.pipe(
+        Option.filter((name) =>
+          HashSet.has(
+            HashSet.fromIterable([
+              "Data",
+              "Effect",
+              "ManagedRuntime",
+              "Schema",
+            ]),
+            name
+          )
+        )
+      );
     }
   }
-
-  const moduleSemantics = HashMap.fromIterable([
-    ["effect/Data", "Data"],
-    ["effect/Effect", "Effect"],
-    ["effect/ManagedRuntime", "ManagedRuntime"],
-    ["effect/Schema", "Schema"],
-  ]);
-  const moduleSemantic = Option.getOrNull(HashMap.get(moduleSemantics, source));
-  if (moduleSemantic === null) {
-    return null;
-  }
-
-  return specifierType === "ImportSpecifier" && imported !== null
-    ? `${moduleSemantic}.${imported}`
-    : moduleSemantic;
+  return HashMap.get(
+    HashMap.make(
+      ["effect/Data", "Data"],
+      ["effect/Effect", "Effect"],
+      ["effect/ManagedRuntime", "ManagedRuntime"],
+      ["effect/Schema", "Schema"]
+    ),
+    source
+  ).pipe(
+    Option.map((module) => {
+      if (kind === "ImportSpecifier" && Option.isSome(imported)) {
+        return `${module}.${imported.value}`;
+      }
+      return module;
+    })
+  );
 };
-
-const platformBunImportSemantic: ImportSemantic = (
-  source,
-  specifierType,
-  imported
-) => {
-  if (
-    source === "@effect/platform-bun" &&
-    specifierType === "ImportSpecifier" &&
-    imported === "BunRuntime"
-  ) {
-    return "BunRuntime";
+const platformBunImportSemantic: ImportSemantic = (source, kind, imported) => {
+  if (source === "@effect/platform-bun") {
+    if (kind === "ImportNamespaceSpecifier") {
+      return Option.some("platform-bun");
+    }
+    if (kind === "ImportSpecifier") {
+      return imported.pipe(Option.filter((name) => name === "BunRuntime"));
+    }
   }
-
-  if (
-    source === "@effect/platform-bun" &&
-    specifierType === "ImportNamespaceSpecifier"
-  ) {
-    return "platform-bun";
-  }
-
   if (source === "@effect/platform-bun/BunRuntime") {
-    return specifierType === "ImportSpecifier" && imported !== null
-      ? `BunRuntime.${imported}`
-      : "BunRuntime";
+    if (kind === "ImportSpecifier" && Option.isSome(imported)) {
+      return Option.some(`BunRuntime.${imported.value}`);
+    }
+    return Option.some("BunRuntime");
   }
-
-  return null;
+  return Option.none();
 };
-
-const platformNodeImportSemantic: ImportSemantic = (
-  source,
-  specifierType,
-  imported
-) => {
-  if (
-    source === "@effect/platform-node" &&
-    specifierType === "ImportSpecifier" &&
-    imported === "NodeRuntime"
-  ) {
-    return "NodeRuntime";
-  }
-  if (
-    source === "@effect/platform-node" &&
-    specifierType === "ImportNamespaceSpecifier"
-  ) {
-    return "platform-node";
+const platformNodeImportSemantic: ImportSemantic = (source, kind, imported) => {
+  if (source === "@effect/platform-node") {
+    if (kind === "ImportNamespaceSpecifier") {
+      return Option.some("platform-node");
+    }
+    if (kind === "ImportSpecifier") {
+      return imported.pipe(Option.filter((name) => name === "NodeRuntime"));
+    }
   }
   if (source === "@effect/platform-node/NodeRuntime") {
-    return specifierType === "ImportSpecifier" && imported !== null
-      ? `NodeRuntime.${imported}`
-      : "NodeRuntime";
+    if (kind === "ImportSpecifier" && Option.isSome(imported)) {
+      return Option.some(`NodeRuntime.${imported.value}`);
+    }
+    return Option.some("NodeRuntime");
   }
-  return null;
+  return Option.none();
 };
-
-const portableImportSemantic: ImportSemantic = (
-  source,
-  specifierType,
-  imported
-) =>
-  effectImportSemantic(source, specifierType, imported) ??
-  platformBunImportSemantic(source, specifierType, imported) ??
-  platformNodeImportSemantic(source, specifierType, imported);
-
+const portableImportSemantic: ImportSemantic = (source, kind, imported) =>
+  effectImportSemantic(source, kind, imported).pipe(
+    Option.orElse(() => platformBunImportSemantic(source, kind, imported)),
+    Option.orElse(() => platformNodeImportSemantic(source, kind, imported))
+  );
 const noManualTag: OxlintRule = {
   create(context) {
     return {
       Property(node) {
         if (
           node.parent?.type === "ObjectExpression" &&
-          propertyName(node.key) === "_tag"
+          Option.contains(propertyName(node.key), "_tag")
         ) {
           context.report({ messageId: "noManualTag", node: node.key });
         }
@@ -143,7 +123,6 @@ const noManualTag: OxlintRule = {
     type: "problem",
   },
 };
-
 const noSwitch: OxlintRule = {
   create(context) {
     return {
@@ -161,9 +140,7 @@ const noSwitch: OxlintRule = {
     type: "problem",
   },
 };
-
 const layerExportNamePattern = /(?:Live|Mock|Test|TestLive)$/u;
-
 const noLayerExportsInServiceFiles: OxlintRule = {
   create(context) {
     const reportName = (node: SyntaxNode | null | undefined) => {
@@ -174,33 +151,65 @@ const noLayerExportsInServiceFiles: OxlintRule = {
         context.report({ messageId: "noLayerExportsInServiceFiles", node });
       }
     };
-
     return {
       ExportDefaultDeclaration(node) {
         reportName(node.declaration);
-        reportName("id" in node.declaration ? node.declaration.id : undefined);
+        Match.value(node.declaration).pipe(
+          Match.when(
+            {
+              type: Match.is(
+                "ClassDeclaration",
+                "FunctionDeclaration",
+                "TSEnumDeclaration",
+                "TSInterfaceDeclaration",
+                "TSTypeAliasDeclaration",
+                "TSModuleDeclaration"
+              ),
+            },
+            (declaration) => declaration.id
+          ),
+          Match.orElse(EffectFunction.constUndefined),
+          reportName
+        );
       },
       ExportNamedDeclaration(node) {
         if (node.declaration?.type === "VariableDeclaration") {
-          forEach(node.declaration.declarations, (declarator) => {
-            reportName(declarator.id);
-          });
+          EffectFunction.pipe(
+            node.declaration.declarations,
+            forEach((declarator) => {
+              reportName(declarator.id);
+            })
+          );
         } else {
-          reportName(
-            node.declaration !== null && "id" in node.declaration
-              ? node.declaration.id
-              : undefined
+          Match.value(node.declaration).pipe(
+            Match.when(
+              {
+                type: Match.is(
+                  "ClassDeclaration",
+                  "FunctionDeclaration",
+                  "TSEnumDeclaration",
+                  "TSInterfaceDeclaration",
+                  "TSTypeAliasDeclaration",
+                  "TSModuleDeclaration"
+                ),
+              },
+              (declaration) => declaration.id
+            ),
+            Match.orElse(EffectFunction.constUndefined),
+            reportName
           );
         }
-
-        forEach(node.specifiers ?? [], (specifier) => {
-          reportName(specifier.local);
-          if (
-            propertyName(specifier.exported) !== propertyName(specifier.local)
-          ) {
-            reportName(specifier.exported);
-          }
-        });
+        EffectFunction.pipe(
+          node.specifiers ?? [],
+          forEach((specifier) => {
+            reportName(specifier.local);
+            if (
+              propertyName(specifier.exported) !== propertyName(specifier.local)
+            ) {
+              reportName(specifier.exported);
+            }
+          })
+        );
       },
     };
   },
@@ -216,7 +225,6 @@ const noLayerExportsInServiceFiles: OxlintRule = {
     type: "problem",
   },
 };
-
 const runtimeMethods = HashSet.fromIterable([
   "runCallback",
   "runCallbackWith",
@@ -231,12 +239,14 @@ const runtimeMethods = HashSet.fromIterable([
   "runSyncExitWith",
   "runSyncWith",
 ]);
-
 const runtimeExecutionSemantics = HashSet.fromIterable([
-  ...EffectArray.map([...runtimeMethods], (method) => `Effect.${method}`),
-  ...EffectArray.map(
+  ...EffectFunction.pipe(
     [...runtimeMethods],
-    (method) => `effect.Effect.${method}`
+    EffectArray.map((method) => `Effect.${method}`)
+  ),
+  ...EffectFunction.pipe(
+    [...runtimeMethods],
+    EffectArray.map((method) => `effect.Effect.${method}`)
   ),
   "BunRuntime.runMain",
   "NodeRuntime.runMain",
@@ -245,16 +255,20 @@ const runtimeExecutionSemantics = HashSet.fromIterable([
   "platform-bun.BunRuntime.runMain",
   "platform-node.NodeRuntime.runMain",
 ]);
-
 const noRuntimeExecutionOutsideBoundaries: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
         if (
-          HashSet.has(runtimeExecutionSemantics, tracker.calledSemantic(node))
+          tracker
+            .calledSemantic(node)
+            .pipe(
+              Option.exists((name) =>
+                HashSet.has(runtimeExecutionSemantics, name)
+              )
+            )
         ) {
           context.report({
             messageId: "noRuntimeExecutionOutsideBoundaries",
@@ -280,7 +294,6 @@ const noRuntimeExecutionOutsideBoundaries: OxlintRule = {
     type: "problem",
   },
 };
-
 // Calls have their existing rule. This owner rejects exporting or handing a
 // runner to another callback before that callback can execute it elsewhere.
 const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
@@ -297,10 +310,13 @@ const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
         return;
       }
       if (
-        HashSet.has(
-          runtimeExecutionSemantics,
-          tracker.semanticOfExpression(node) ?? ""
-        )
+        tracker
+          .semanticOfExpression(node)
+          .pipe(
+            Option.exists((name) =>
+              HashSet.has(runtimeExecutionSemantics, name)
+            )
+          )
       ) {
         context.report({
           messageId: "noRuntimeReferencesOutsideBoundaries",
@@ -310,13 +326,13 @@ const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
     };
     const reportDestructuredRunner = (
       pattern: SyntaxNode | null | undefined,
-      source: string | null
+      source: Option.Option<string>
     ): void => {
-      if (source === null) {
+      if (Option.isNone(source)) {
         return;
       }
       if (pattern?.type === "Identifier") {
-        if (HashSet.has(runtimeExecutionSemantics, source)) {
+        if (HashSet.has(runtimeExecutionSemantics, source.value)) {
           context.report({
             messageId: "noRuntimeReferencesOutsideBoundaries",
             node: pattern,
@@ -325,16 +341,21 @@ const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
         return;
       }
       if (pattern?.type === "ObjectPattern") {
-        forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+        EffectFunction.pipe(
           pattern.properties ?? [],
-          (property) => {
-            if (property.type === "Property") {
-              const member = propertyName(property.key);
-              if (member !== null) {
-                reportDestructuredRunner(property.value, `${source}.${member}`);
+          forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+            (property) => {
+              if (property.type === "Property") {
+                const member = propertyName(property.key);
+                if (Option.isSome(member)) {
+                  const memberSemantic = Option.some(
+                    `${source.value}.${member.value}`
+                  );
+                  reportDestructuredRunner(property.value, memberSemantic);
+                }
               }
             }
-          }
+          )
         );
       }
     };
@@ -372,21 +393,21 @@ const noRuntimeReferencesOutsideBoundaries: OxlintRule = {
     type: "problem",
   },
 };
-
 const noConsoleOutsideRuntime: OxlintRule = {
   create(context) {
-    const tracker = createBindingTracker(
-      context.sourceCode,
-      HashMap.fromIterable([["console", "Global.console"]])
+    const tracker = EffectFunction.pipe(context.sourceCode, (argument1) =>
+      EffectFunction.pipe(
+        HashMap.fromIterable([["console", "Global.console"]]),
+        (argument2) => createBindingTracker(argument1, argument2)
+      )
     );
-
     return {
       AssignmentExpression(node) {
         const source = tracker.semanticOfExpression(node.right);
         tracker.trackAssignment(node);
         if (
           node.left?.type === "ObjectPattern" &&
-          source === "Global.console"
+          Option.contains(source, "Global.console")
         ) {
           context.report({ messageId: "noConsoleOutsideRuntime", node });
         }
@@ -394,15 +415,18 @@ const noConsoleOutsideRuntime: OxlintRule = {
       CallExpression(node) {
         if (
           node.callee?.type === "Identifier" &&
-          tracker.calledSemantic(node)?.startsWith("Global.console.") === true
+          tracker
+            .calledSemantic(node)
+            .pipe(Option.exists((name) => name.startsWith("Global.console.")))
         ) {
           context.report({ messageId: "noConsoleOutsideRuntime", node });
         }
       },
       MemberExpression(node) {
         if (
-          tracker.semanticOfExpression(node)?.startsWith("Global.console.") ===
-          true
+          tracker
+            .semanticOfExpression(node)
+            .pipe(Option.exists((name) => name.startsWith("Global.console.")))
         ) {
           context.report({ messageId: "noConsoleOutsideRuntime", node });
         }
@@ -410,7 +434,10 @@ const noConsoleOutsideRuntime: OxlintRule = {
       VariableDeclarator(node) {
         const source = tracker.semanticOfExpression(node.init);
         tracker.trackVariable(node);
-        if (node.id?.type === "ObjectPattern" && source === "Global.console") {
+        if (
+          node.id?.type === "ObjectPattern" &&
+          Option.contains(source, "Global.console")
+        ) {
           context.report({ messageId: "noConsoleOutsideRuntime", node });
         }
       },
@@ -427,45 +454,49 @@ const noConsoleOutsideRuntime: OxlintRule = {
     type: "problem",
   },
 };
-
 const processBoundaryMembers = HashSet.fromIterable([
   "argv",
   "env",
   "exit",
   "exitCode",
 ]);
-
 const noProcessOutsideBoundaries: OxlintRule = {
   create(context) {
-    const tracker = createBindingTracker(
-      context.sourceCode,
-      HashMap.fromIterable([["process", "Global.process"]])
+    const tracker = EffectFunction.pipe(context.sourceCode, (argument3) =>
+      EffectFunction.pipe(
+        HashMap.fromIterable([["process", "Global.process"]]),
+        (argument4) => createBindingTracker(argument3, argument4)
+      )
     );
     const reportDestructuredMembers = (
       pattern: SyntaxNode | null | undefined,
-      source: string | null,
+      source: Option.Option<string>,
       node: SyntaxNode
     ) => {
-      if (pattern?.type !== "ObjectPattern" || source !== "Global.process") {
+      if (
+        pattern?.type !== "ObjectPattern" ||
+        !Option.contains(source, "Global.process")
+      ) {
         return;
       }
-
-      forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+      EffectFunction.pipe(
         pattern.properties ?? [],
-        (property) => {
-          if (
-            property.type === "Property" &&
-            HashSet.has(
-              processBoundaryMembers,
-              propertyName(property.key) ?? ""
-            )
-          ) {
-            context.report({ messageId: "noProcessOutsideBoundaries", node });
+        forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+          (property) => {
+            if (
+              property.type === "Property" &&
+              propertyName(property.key).pipe(
+                Option.exists((name) =>
+                  HashSet.has(processBoundaryMembers, name)
+                )
+              )
+            ) {
+              context.report({ messageId: "noProcessOutsideBoundaries", node });
+            }
           }
-        }
+        )
       );
     };
-
     return {
       AssignmentExpression(node) {
         const source = tracker.semanticOfExpression(node.right);
@@ -476,10 +507,11 @@ const noProcessOutsideBoundaries: OxlintRule = {
         const semantic = tracker.calledSemantic(node);
         if (
           node.callee?.type === "Identifier" &&
-          semantic?.startsWith("Global.process.") === true &&
+          Option.isSome(semantic) &&
+          semantic.value.startsWith("Global.process.") &&
           HashSet.has(
             processBoundaryMembers,
-            semantic.slice("Global.process.".length)
+            semantic.value.slice("Global.process.".length)
           )
         ) {
           context.report({ messageId: "noProcessOutsideBoundaries", node });
@@ -488,10 +520,11 @@ const noProcessOutsideBoundaries: OxlintRule = {
       MemberExpression(node) {
         const semantic = tracker.semanticOfExpression(node);
         if (
-          semantic?.startsWith("Global.process.") === true &&
+          Option.isSome(semantic) &&
+          semantic.value.startsWith("Global.process.") &&
           HashSet.has(
             processBoundaryMembers,
-            semantic.slice("Global.process.".length)
+            semantic.value.slice("Global.process.".length)
           )
         ) {
           context.report({ messageId: "noProcessOutsideBoundaries", node });
@@ -499,11 +532,16 @@ const noProcessOutsideBoundaries: OxlintRule = {
       },
       VariableDeclarator(node) {
         tracker.trackVariable(node);
-        reportDestructuredMembers(
-          node.id,
-          tracker.semanticOfExpression(node.init),
-          node.id
-        );
+        EffectFunction.pipe(node.id, (argument5) => {
+          EffectFunction.pipe(
+            tracker.semanticOfExpression(node.init),
+            (argument6) => {
+              EffectFunction.pipe(node.id, (argument7) => {
+                reportDestructuredMembers(argument5, argument6, argument7);
+              });
+            }
+          );
+        });
       },
     };
   },
@@ -518,19 +556,17 @@ const noProcessOutsideBoundaries: OxlintRule = {
     type: "problem",
   },
 };
-
 const isHostImport = (source: string) =>
   source.startsWith("node:") ||
   source === "bun" ||
   source.startsWith("bun:") ||
   source.startsWith("@effect/platform-bun") ||
   source.startsWith("@effect/platform-node");
-
 const noHostImportsInContracts: OxlintRule = {
   create(context) {
     return {
       ImportDeclaration(node) {
-        if (isHostImport(importSourceValue(node))) {
+        if (EffectFunction.pipe(importSourceValue(node), isHostImport)) {
           context.report({ messageId: "noHostImportsInContracts", node });
         }
       },
@@ -548,11 +584,9 @@ const noHostImportsInContracts: OxlintRule = {
     type: "problem",
   },
 };
-
 const schemaEncoderMethodPattern = /^encode(?!To)[A-Za-z]*$/u;
 const throwingSchemaSyncCodecPattern =
   /^(?:decode|encode)(?!To)[A-Za-z]*Sync$/u;
-
 const schemaCodecRule = ({
   description,
   message,
@@ -566,18 +600,20 @@ const schemaCodecRule = ({
 }): OxlintRule => ({
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
         const semantic = tracker.calledSemantic(node);
-        const method = Option.getOrNull(
-          EffectArray.findFirst(
-            ["Schema.", "effect.Schema."],
-            (prefix) => semantic?.startsWith(prefix) ?? false
-          ).pipe(Option.map((prefix) => semantic?.slice(prefix.length)))
+        const method = semantic.pipe(
+          Option.flatMap((name) =>
+            EffectFunction.pipe(
+              ["Schema.", "effect.Schema."],
+              EffectArray.findFirst((prefix) => name.startsWith(prefix)),
+              Option.map((prefix) => name.slice(prefix.length))
+            )
+          )
         );
-        if (method !== null && method !== undefined && matches(method)) {
+        if (Option.exists(method, matches)) {
           context.report({ messageId, node: node.callee });
         }
       },
@@ -593,7 +629,6 @@ const schemaCodecRule = ({
     type: "problem",
   },
 });
-
 const noSchemaEncoderOutsideEgress = schemaCodecRule({
   description:
     "Restrict Effect Schema encoder execution to configured egress boundaries.",
@@ -602,7 +637,6 @@ const noSchemaEncoderOutsideEgress = schemaCodecRule({
     "Schema encoder execution belongs at an exact serialization egress: an HTTP response, route transport, persisted representation, provider request, or command output. Pass schema-derived values inward and encode once with the owning Schema where the value leaves the system.",
   messageId: "noSchemaEncoderOutsideEgress",
 });
-
 const noThrowingSchemaSyncCodec = schemaCodecRule({
   description: "Disallow throwing synchronous Effect Schema codecs.",
   matches: (method) => throwingSchemaSyncCodecPattern.test(method),
@@ -610,59 +644,73 @@ const noThrowingSchemaSyncCodec = schemaCodecRule({
     "Do not call throwing Schema *Sync codecs. Use Schema.decodeUnknownEffect/encodeUnknownEffect in an Effect boundary, or a non-throwing Result, Exit, or Option codec in a synchronous consumer, then handle the typed failure explicitly.",
   messageId: "noThrowingSchemaSyncCodec",
 });
-
 const tryPromiseSemantics = HashSet.fromIterable([
   "Effect.tryPromise",
   "effect.Effect.tryPromise",
 ]);
-
 const noBareEffectTryPromise: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
-        if (!HashSet.has(tryPromiseSemantics, tracker.calledSemantic(node))) {
+        if (
+          !tracker
+            .calledSemantic(node)
+            .pipe(
+              Option.exists((name) => HashSet.has(tryPromiseSemantics, name))
+            )
+        ) {
           return;
         }
-
         const options = Option.getOrUndefined(
           EffectArray.head(node.arguments ?? [])
         );
-        const optionProperties =
-          options?.type === "ObjectExpression"
-            ? EffectArray.filter(
-                options.properties,
+        const optionProperties: readonly SyntaxKind<"ObjectExpression">["properties"][number][] =
+          Match.value(options).pipe(
+            Match.when({ type: "ObjectExpression" }, (matchedValue) =>
+              EffectFunction.pipe(
+                matchedValue.properties,
+                EffectArray.filter(
+                  (property) =>
+                    property.type === "Property" &&
+                    (Option.contains(propertyName(property.key), "try") ||
+                      Option.contains(propertyName(property.key), "catch"))
+                )
+              )
+            ),
+            Match.orElse(() => [])
+          );
+        const inlineFunctionKeys = HashSet.fromIterable(
+          EffectFunction.pipe(
+            EffectFunction.pipe(
+              optionProperties,
+              EffectArray.filter(
                 (property) =>
                   property.type === "Property" &&
-                  (propertyName(property.key) === "try" ||
-                    propertyName(property.key) === "catch")
+                  property.kind === "init" &&
+                  (property.value?.type === "ArrowFunctionExpression" ||
+                    property.value?.type === "FunctionExpression")
               )
-            : [];
-        const inlineFunctionKeys = HashSet.fromIterable(
-          EffectArray.map(
-            EffectArray.filter(
-              optionProperties,
-              (property) =>
-                property.type === "Property" &&
-                property.kind === "init" &&
-                (property.value?.type === "ArrowFunctionExpression" ||
-                  property.value?.type === "FunctionExpression")
             ),
-            (property) =>
-              propertyName(
-                property.type === "Property" ? property.key : undefined
+            EffectArray.map((property) =>
+              Match.value(property).pipe(
+                Match.when(
+                  { type: "Property" },
+                  (matchedValue) => matchedValue.key
+                ),
+                Match.orElse(EffectFunction.constUndefined),
+                propertyName
               )
+            )
           )
         );
         const hasDynamicSpread =
           options?.type === "ObjectExpression" &&
-          EffectArray.some(
+          EffectFunction.pipe(
             options.properties,
-            (property) => property.type === "SpreadElement"
+            EffectArray.some((property) => property.type === "SpreadElement")
           );
-
         if (
           optionProperties.length !== 2 ||
           HashSet.size(inlineFunctionKeys) !== 2 ||
@@ -692,51 +740,56 @@ const noBareEffectTryPromise: OxlintRule = {
     type: "problem",
   },
 };
-
 const taggedErrorConstructorSemantics = HashSet.fromIterable([
   "Data.TaggedError",
   "Schema.TaggedError",
   "effect.Data.TaggedError",
   "effect.Schema.TaggedError",
 ]);
-
 const hasTaggedErrorCallAncestor = (
   node: SyntaxNode,
   tracker: ReturnType<typeof createBindingTracker>
 ) =>
-  EffectArray.some(syntaxParents(node), (current) => {
-    if (current.type === "CallExpression") {
-      const semantic =
-        current.callee?.type === "CallExpression"
-          ? tracker.calledSemantic(current.callee)
-          : tracker.calledSemantic(current);
-      if (HashSet.has(taggedErrorConstructorSemantics, semantic ?? "")) {
-        return true;
+  EffectFunction.pipe(
+    syntaxParents(node),
+    EffectArray.some((current) => {
+      if (current.type === "CallExpression") {
+        const semantic = Match.value(current.callee).pipe(
+          Match.when({ type: "CallExpression" }, (matchedValue) =>
+            tracker.calledSemantic(matchedValue)
+          ),
+          Match.orElse(() => tracker.calledSemantic(current))
+        );
+        if (
+          semantic.pipe(
+            Option.exists((name) =>
+              HashSet.has(taggedErrorConstructorSemantics, name)
+            )
+          )
+        ) {
+          return true;
+        }
       }
-    }
-    return false;
-  });
-
+      return false;
+    })
+  );
 const isUnknownCauseProperty = (node: SyntaxNode) =>
   Option.exists(
-    EffectArray.findFirst(
+    EffectFunction.pipe(
       syntaxParents(node),
-      (current) => current.type === "TSPropertySignature"
+      EffectArray.findFirst((current) => current.type === "TSPropertySignature")
     ),
     (current) =>
       current.type === "TSPropertySignature" &&
-      propertyName(current.key) === "cause"
+      Option.contains(propertyName(current.key), "cause")
   );
-
 const unknownSchemaSemantics = HashSet.fromIterable([
   "Schema.Unknown",
   "effect.Schema.Unknown",
 ]);
-
 const noUnknownTaggedErrorCause: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-
     return {
       AssignmentExpression: tracker.trackAssignment,
       ImportDeclaration(node) {
@@ -744,11 +797,12 @@ const noUnknownTaggedErrorCause: OxlintRule = {
       },
       Property(node) {
         if (
-          propertyName(node.key) === "cause" &&
-          HashSet.has(
-            unknownSchemaSemantics,
-            tracker.semanticOfExpression(node.value)
-          ) &&
+          Option.contains(propertyName(node.key), "cause") &&
+          tracker
+            .semanticOfExpression(node.value)
+            .pipe(
+              Option.exists((name) => HashSet.has(unknownSchemaSemantics, name))
+            ) &&
           hasTaggedErrorCallAncestor(node, tracker)
         ) {
           context.report({
@@ -777,7 +831,6 @@ const noUnknownTaggedErrorCause: OxlintRule = {
     type: "problem",
   },
 };
-
 const functionNodeTypes = HashSet.fromIterable([
   "ArrowFunctionExpression",
   "FunctionDeclaration",
@@ -786,22 +839,19 @@ const functionNodeTypes = HashSet.fromIterable([
   "TSFunctionType",
   "TSMethodSignature",
 ]);
-
 const isUnknownFunctionParameter = (node: SyntaxNode) => {
   const annotation = node.parent;
   const parameter = annotation?.parent;
   return (
     annotation?.type === "TSTypeAnnotation" &&
-    parameter !== undefined &&
+    !Predicate.isUndefined(parameter) &&
     HashSet.has(functionNodeTypes, parameter?.parent?.type ?? "")
   );
 };
-
 const effectTypeSemantics = HashSet.fromIterable([
   "Effect.Effect",
   "effect.Effect.Effect",
 ]);
-
 const isUnknownEffectError = (
   node: SyntaxNode,
   tracker: ReturnType<typeof createBindingTracker>
@@ -811,18 +861,15 @@ const isUnknownEffectError = (
   return (
     parameters?.type === "TSTypeParameterInstantiation" &&
     reference?.type === "TSTypeReference" &&
-    HashSet.has(
-      effectTypeSemantics,
-      tracker.semanticOfTypeName(reference.typeName)
-    ) &&
+    tracker
+      .semanticOfTypeName(reference.typeName)
+      .pipe(Option.exists((name) => HashSet.has(effectTypeSemantics, name))) &&
     Option.contains(EffectArray.get(parameters.params ?? [], 1), node)
   );
 };
-
 const noUnknownServiceContract: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-
     return {
       AssignmentExpression: tracker.trackAssignment,
       ImportDeclaration(node) {
@@ -851,46 +898,54 @@ const noUnknownServiceContract: OxlintRule = {
     type: "problem",
   },
 };
-
 const importedName = (
   specifier: SyntaxKind<"ImportDeclaration">["specifiers"][number]
 ) =>
-  specifier?.type === "ImportSpecifier"
-    ? propertyName(specifier.imported)
-    : null;
-
+  Match.value(specifier).pipe(
+    Match.when({ type: "ImportSpecifier" }, (matchedValue) =>
+      propertyName(matchedValue.imported)
+    ),
+    Match.orElse(() => Option.none<string>())
+  );
 const localName = (
   specifier: SyntaxKind<"ImportDeclaration">["specifiers"][number]
-) => (specifier?.local?.type === "Identifier" ? specifier.local.name : null);
-
+) =>
+  Match.value(specifier?.local).pipe(
+    Match.when({ type: "Identifier" }, () => specifier.local.name),
+    Match.orElse(() => null)
+  );
 const hasUnaliasedImport = (
   node: SyntaxKind<"ImportDeclaration">,
   names: HashSet.HashSet<string>
 ) =>
-  EffectArray.some(node.specifiers ?? [], (specifier) => {
-    const name = importedName(specifier);
-    return (
-      name !== null && HashSet.has(names, name) && localName(specifier) === name
-    );
-  });
-
+  EffectFunction.pipe(
+    node.specifiers ?? [],
+    EffectArray.some((specifier) => {
+      const name = importedName(specifier);
+      return (
+        Option.isSome(name) &&
+        HashSet.has(names, name.value) &&
+        localName(specifier) === name.value
+      );
+    })
+  );
 const effectVitestSharedGlobals = HashSet.fromIterable([
   "describe",
   "expect",
   "it",
   "test",
 ]);
-
 const noEffectTestGlobalMix: OxlintRule = {
   create(context) {
     const imports = Ref.makeUnsafe<{
-      readonly effectTestImport: SyntaxKind<"ImportDeclaration"> | null;
-      readonly vitestGlobalImport: SyntaxKind<"ImportDeclaration"> | null;
+      readonly effectTestImport: Option.Option<SyntaxKind<"ImportDeclaration">>;
+      readonly vitestGlobalImport: Option.Option<
+        SyntaxKind<"ImportDeclaration">
+      >;
     }>({
-      effectTestImport: null,
-      vitestGlobalImport: null,
+      effectTestImport: Option.none(),
+      vitestGlobalImport: Option.none(),
     });
-
     return {
       ImportDeclaration(node) {
         const source = importSourceValue(node);
@@ -900,7 +955,7 @@ const noEffectTestGlobalMix: OxlintRule = {
         ) {
           MutableRef.update(imports.ref, (current) => ({
             ...current,
-            effectTestImport: node,
+            effectTestImport: Option.some(node),
           }));
         }
         if (
@@ -909,16 +964,19 @@ const noEffectTestGlobalMix: OxlintRule = {
         ) {
           MutableRef.update(imports.ref, (current) => ({
             ...current,
-            vitestGlobalImport: node,
+            vitestGlobalImport: Option.some(node),
           }));
         }
       },
       "Program:exit"() {
         const { effectTestImport, vitestGlobalImport } = Ref.getUnsafe(imports);
-        if (effectTestImport && vitestGlobalImport) {
+        if (
+          Option.isSome(effectTestImport) &&
+          Option.isSome(vitestGlobalImport)
+        ) {
           context.report({
             messageId: "noEffectTestGlobalMix",
-            node: vitestGlobalImport,
+            node: vitestGlobalImport.value,
           });
         }
       },
@@ -936,29 +994,31 @@ const noEffectTestGlobalMix: OxlintRule = {
     type: "problem",
   },
 };
-
 const runtimeFunctionNodeTypes = HashSet.fromIterable([
   "ArrowFunctionExpression",
   "FunctionDeclaration",
   "FunctionExpression",
 ]);
-
 const isModuleLevel = (node: SyntaxNode) => {
   const ancestors = syntaxParents(node);
   return (
-    EffectArray.some(ancestors, (current) => current.type === "Program") &&
-    !EffectArray.some(
+    EffectFunction.pipe(
+      ancestors,
+      EffectArray.some((current) => current.type === "Program")
+    ) &&
+    !EffectFunction.pipe(
       EffectArray.takeWhile(ancestors, (current) => current.type !== "Program"),
-      (current) =>
-        HashSet.has(runtimeFunctionNodeTypes, current.type) ||
-        (current.type === "TSModuleDeclaration" &&
-          (current.declare ||
-            current.global ||
-            propertyName(current.id) === "global"))
+      EffectArray.some(
+        (current) =>
+          HashSet.has(runtimeFunctionNodeTypes, current.type) ||
+          (current.type === "TSModuleDeclaration" &&
+            (current.declare ||
+              current.global ||
+              Option.contains(propertyName(current.id), "global")))
+      )
     )
   );
 };
-
 const noModuleLevelMutableTestState: OxlintRule = {
   create(context) {
     return {
@@ -984,7 +1044,6 @@ const noModuleLevelMutableTestState: OxlintRule = {
     type: "problem",
   },
 };
-
 export default {
   meta: { name: "effect" },
   rules: {

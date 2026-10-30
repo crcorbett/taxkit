@@ -14,12 +14,24 @@ import {
   PayWithholdingsLedger,
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
-import { Effect, Layer, Option, Ref, Result, Schema } from "effect";
+import {
+  Schedule,
+  Predicate,
+  Match,
+  Function as EffectFunction,
+  Effect,
+  Layer,
+  Option,
+  Ref,
+  Result,
+  Schema,
+} from "effect";
 import { HttpClient, HttpClientError, HttpClientResponse } from "effect/http";
 import type { HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
+import { TestClock } from "effect/testing";
 import { createRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { vi } from "vitest";
@@ -33,13 +45,14 @@ import { calculatorPageAtoms } from "../../src/lib/calculators/page.atoms";
 import { TakeHomeResultView } from "../../src/lib/calculators/take-home-result.view";
 import { TakeHomeCalculator } from "../../src/lib/calculators/take-home.container";
 import { WebsitePublicSettings } from "../../src/lib/host/schemas";
-
 // The home page's calculator state and commands.
-const home = calculatorPageAtoms(AuPayCalculatorId.make("au.pay.take-home"));
+const home = EffectFunction.pipe(
+  AuPayCalculatorId.make("au.pay.take-home"),
+  calculatorPageAtoms
+);
 const calculateAtom = home.calculation;
 const editTakeHomeAtom = home.edit;
 const submitTakeHomeAtom = home.submit;
-
 // A real generated client over the test's controlled transport, supplied
 // through the native client runtime's Layer.
 const generatedClient = Layer.effect(
@@ -52,7 +65,6 @@ const unreachable = (request: HttpClientRequest.HttpClientRequest) =>
       reason: new HttpClientError.TransportError({ request }),
     })
   );
-
 describe("browser calculator lifetime", () => {
   it.live(
     "retains checked settings while the form is idle, then attempts its request",
@@ -94,26 +106,44 @@ describe("browser calculator lifetime", () => {
         const unmount = registry.mount(calculateAtom);
         yield* Effect.addFinalizer(() => Effect.sync(unmount));
         registry.set(calculateAtom, request);
-        yield* Effect.promise(() =>
-          expect
-            .poll(() => AsyncResult.isFailure(registry.get(calculateAtom)))
-            .toBe(true)
+        yield* Effect.sync(() =>
+          AsyncResult.isFailure(registry.get(calculateAtom))
+        ).pipe(
+          Effect.repeat({
+            until: (observed) => observed,
+            schedule: Schedule.spaced("50 millis"),
+          }),
+          Effect.timeout(1000),
+          TestClock.withLive,
+          Effect.tap((observed) =>
+            Effect.sync(() => {
+              expect(observed).toBeTruthy();
+            })
+          )
         );
         const result = registry.get(calculateAtom);
-        expect(AsyncResult.isFailure(result)).toBe(true);
+        EffectFunction.pipe(AsyncResult.isFailure(result), (actual) => {
+          expect(actual).toBeTruthy();
+        });
         if (AsyncResult.isFailure(result)) {
           const failure = yield* result.cause.pipe(
             Effect.failCause,
             Effect.result
           );
-          expect(Result.isFailure(failure)).toBe(true);
+          EffectFunction.pipe(Result.isFailure(failure), (actual) => {
+            expect(actual).toBeTruthy();
+          });
           if (Result.isFailure(failure)) {
-            expect(failure.failure._tag).toBe("ApiUnavailable");
+            EffectFunction.pipe(
+              Predicate.isTagged(failure.failure, "ApiUnavailable"),
+              (matches) => {
+                expect(matches).toBeTruthy();
+              }
+            );
           }
         }
       }).pipe(Effect.scoped)
   );
-
   it.effect("an edit interrupts work and removes the waiting result", () =>
     Effect.gen(function* () {
       const started = vi.fn<(...args: readonly unknown[]) => void>();
@@ -150,20 +180,39 @@ describe("browser calculator lifetime", () => {
       const unmount = registry.mount(calculateAtom);
       yield* Effect.addFinalizer(() => Effect.sync(unmount));
       registry.set(submitTakeHomeAtom, "calculate");
-      yield* Effect.promise(() =>
-        expect.poll(() => started.mock.calls.length).toBe(1)
+      yield* Effect.sync(() => started.mock.calls.length).pipe(
+        Effect.repeat({
+          until: (observed) => observed === 1,
+          schedule: Schedule.spaced("50 millis"),
+        }),
+        Effect.timeout(1000),
+        TestClock.withLive,
+        Effect.tap((observed) =>
+          Effect.sync(() => {
+            expect(observed).toBe(1);
+          })
+        )
       );
       registry.set(editTakeHomeAtom, {
         ...initialTakeHomeForm,
         grossDollars: "2000",
       });
-      yield* Effect.promise(() =>
-        expect.poll(() => cancelled.mock.calls.length).toBe(1)
+      yield* Effect.sync(() => cancelled.mock.calls.length).pipe(
+        Effect.repeat({
+          until: (observed) => observed === 1,
+          schedule: Schedule.spaced("50 millis"),
+        }),
+        Effect.timeout(1000),
+        TestClock.withLive,
+        Effect.tap((observed) =>
+          Effect.sync(() => {
+            expect(observed).toBe(1);
+          })
+        )
       );
-      expect(registry.get(calculateAtom).waiting).toBe(false);
+      expect(!registry.get(calculateAtom).waiting).toBeTruthy();
     }).pipe(Effect.scoped)
   );
-
   it.effect(
     "leaving the rendered form interrupts work before the registry is disposed",
     () =>
@@ -202,7 +251,7 @@ describe("browser calculator lifetime", () => {
         const host = yield* Effect.acquireRelease(
           Effect.sync(() => {
             const element = document.createElement("div");
-            document.body.appendChild(element);
+            document.body.insertBefore(element, null);
             return element;
           }),
           (element) => Effect.sync(() => element.remove())
@@ -219,25 +268,54 @@ describe("browser calculator lifetime", () => {
             <TakeHomeCalculator />
           </RegistryContext.Provider>
         );
-        yield* Effect.promise(() =>
-          expect.poll(() => host.querySelector("form")).not.toBeNull()
+        yield* Effect.sync(() => host.querySelector("form")).pipe(
+          Effect.repeat({
+            until: (observed) => Option.isSome(Option.fromNullishOr(observed)),
+            schedule: Schedule.spaced("50 millis"),
+          }),
+          Effect.timeout(1000),
+          TestClock.withLive,
+          Effect.tap((observed) =>
+            Effect.sync(() => {
+              expect(observed).not.toBeNull();
+            })
+          )
         );
         registry.set(submitTakeHomeAtom, "calculate");
-        yield* Effect.promise(() =>
-          expect.poll(() => started.mock.calls.length).toBe(1)
+        yield* Effect.sync(() => started.mock.calls.length).pipe(
+          Effect.repeat({
+            until: (observed) => observed === 1,
+            schedule: Schedule.spaced("50 millis"),
+          }),
+          Effect.timeout(1000),
+          TestClock.withLive,
+          Effect.tap((observed) =>
+            Effect.sync(() => {
+              expect(observed).toBe(1);
+            })
+          )
         );
         root.render(
           <RegistryContext.Provider value={registry}>
             <p>Another page</p>
           </RegistryContext.Provider>
         );
-        yield* Effect.promise(() =>
-          expect.poll(() => cancelled.mock.calls.length).toBe(1)
+        yield* Effect.sync(() => cancelled.mock.calls.length).pipe(
+          Effect.repeat({
+            until: (observed) => observed === 1,
+            schedule: Schedule.spaced("50 millis"),
+          }),
+          Effect.timeout(1000),
+          TestClock.withLive,
+          Effect.tap((observed) =>
+            Effect.sync(() => {
+              expect(observed).toBe(1);
+            })
+          )
         );
         expect(host.textContent).toBe("Another page");
       }).pipe(Effect.scoped)
   );
-
   it.effect("keeps old request errors hidden while a retry is running", () =>
     Effect.gen(function* () {
       const attempt = yield* Ref.make(0);
@@ -248,7 +326,10 @@ describe("browser calculator lifetime", () => {
               Ref.getAndUpdate(attempt, (value) => value + 1)
                 .pipe(
                   Effect.flatMap((value) =>
-                    value === 0 ? unreachable(request) : Effect.never
+                    Match.value(value).pipe(
+                      Match.when(0, () => unreachable(request)),
+                      Match.orElse(() => Effect.never)
+                    )
                   )
                 )
                 .pipe(
@@ -274,7 +355,7 @@ describe("browser calculator lifetime", () => {
       const host = yield* Effect.acquireRelease(
         Effect.sync(() => {
           const element = document.createElement("div");
-          document.body.appendChild(element);
+          document.body.insertBefore(element, null);
           return element;
         }),
         (element) => Effect.sync(() => element.remove())
@@ -291,25 +372,62 @@ describe("browser calculator lifetime", () => {
           <TakeHomeCalculator />
         </RegistryContext.Provider>
       );
-      yield* Effect.promise(() =>
-        expect.poll(() => host.querySelector("form")).not.toBeNull()
+      yield* Effect.sync(() => host.querySelector("form")).pipe(
+        Effect.repeat({
+          until: (observed) => Option.isSome(Option.fromNullishOr(observed)),
+          schedule: Schedule.spaced("50 millis"),
+        }),
+        Effect.timeout(1000),
+        TestClock.withLive,
+        Effect.tap((observed) =>
+          Effect.sync(() => {
+            expect(observed).not.toBeNull();
+          })
+        )
       );
       registry.set(submitTakeHomeAtom, "calculate");
-      yield* Effect.promise(() =>
-        expect
-          .poll(() => host.querySelector('[role="alert"]')?.textContent)
-          .toContain("Please try again.")
+      yield* Effect.sync(
+        () => host.querySelector('[role="alert"]')?.textContent
+      ).pipe(
+        Effect.repeat({
+          until: (observed) =>
+            Option.fromNullishOr(observed).pipe(
+              Option.exists((text) => text.includes("Please try again."))
+            ),
+          schedule: Schedule.spaced("50 millis"),
+        }),
+        Effect.timeout(1000),
+        TestClock.withLive,
+        Effect.tap((observed) =>
+          Effect.sync(() => {
+            expect(observed).toContain("Please try again.");
+          })
+        )
       );
-      expect(registry.get(calculateAtom).waiting).toBe(false);
+      expect(!registry.get(calculateAtom).waiting).toBeTruthy();
       registry.set(submitTakeHomeAtom, "calculate");
-      yield* Effect.promise(() =>
-        expect.poll(() => host.textContent).toContain("Calculating…")
+      yield* Effect.sync(() => host.textContent).pipe(
+        Effect.repeat({
+          until: (observed) =>
+            Option.fromNullishOr(observed).pipe(
+              Option.exists((text) => text.includes("Calculating…"))
+            ),
+          schedule: Schedule.spaced("50 millis"),
+        }),
+        Effect.timeout(1000),
+        TestClock.withLive,
+        Effect.tap((observed) =>
+          Effect.sync(() => {
+            expect(observed).toContain("Calculating…");
+          })
+        )
       );
-      expect(registry.get(calculateAtom).waiting).toBe(true);
-      expect(host.querySelector('[role="alert"]')).toBeNull();
+      expect(registry.get(calculateAtom).waiting).toBeTruthy();
+      EffectFunction.pipe(host.querySelector('[role="alert"]'), (actual) => {
+        expect(actual).toBeNull();
+      });
     }).pipe(Effect.scoped)
   );
-
   it.effect.each([
     { linked: true, reference: "https://www.ato.gov.au/example" },
     { linked: false, reference: "data:text/html,example" },
@@ -334,7 +452,7 @@ describe("browser calculator lifetime", () => {
           title: "Source link fixture",
         });
         const component = LedgerComponent.make({
-          amount: aud(Cents.make(100)),
+          amount: EffectFunction.pipe(Cents.make(100), aud),
           effect: "additive",
           id: ComponentId.make("test/payg"),
           label: "PAYG withholding",
@@ -342,24 +460,26 @@ describe("browser calculator lifetime", () => {
           trace,
         });
         const report = new TakeHomePayReport({
-          grossPay: aud(Cents.make(200)),
-          netPay: aud(Cents.make(100)),
+          grossPay: EffectFunction.pipe(Cents.make(200), aud),
+          netPay: EffectFunction.pipe(Cents.make(100), aud),
           period: "weekly",
           rulePackVersion: "rules-au-pay/1.0.2",
-          taxablePay: aud(Cents.make(200)),
+          taxablePay: EffectFunction.pipe(Cents.make(200), aud),
           trace,
           withholdings: new PayWithholdingsLedger({
             components: [component],
             period: "weekly",
-            total: aud(Cents.make(100)),
+            total: EffectFunction.pipe(Cents.make(100), aud),
             trace,
           }),
-          withholdingsTotal: aud(Cents.make(100)),
+          withholdingsTotal: EffectFunction.pipe(Cents.make(100), aud),
         });
         const html = renderToString(
           <TakeHomeResultView report={Option.some(report)} stale={false} />
         );
-        expect(html.includes("href=")).toBe(linked);
+        EffectFunction.pipe(html.includes("href="), (actual) => {
+          expect(actual).toBe(linked);
+        });
         expect(html).toContain("Rule source");
         // No absent or unrecognised trace field can imply a threshold choice.
         expect(html).not.toContain("Tax-free threshold claimed.");

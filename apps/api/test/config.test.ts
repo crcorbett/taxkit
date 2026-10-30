@@ -1,5 +1,11 @@
 import { expect, it } from "@effect/vitest";
-import { ConfigProvider, Effect, Result, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  ConfigProvider,
+  Effect,
+  Result,
+  Schema,
+} from "effect";
 
 import { ApiServerConfig, ApiServerConfigLive } from "../src/config.js";
 import {
@@ -10,7 +16,6 @@ import {
 const loadApiServerConfig = ApiServerConfig.pipe(
   Effect.provide(ApiServerConfigLive)
 );
-
 it.effect.each([
   { host: "127.0.0.1", port: 4000, settings: {} },
   { host: "localhost", port: 4000, settings: { API_HOST: "  localhost  " } },
@@ -32,12 +37,11 @@ it.effect.each([
         ConfigProvider.fromUnknown(settings)
       )
     );
-    expect(config.address).toEqual(
+    expect(config.address).toStrictEqual(
       ApiServerTcpAddressSchema.make({ hostname: host, port })
     );
   })
 );
-
 it.effect.each(["0", "65536", "-1", "1.5", "TAXKIT_SECRET_SENTINEL"])(
   "rejects invalid primary port %s without using its fallback or exposing it",
   (port) =>
@@ -49,7 +53,9 @@ it.effect.each(["0", "65536", "-1", "1.5", "TAXKIT_SECRET_SENTINEL"])(
         ),
         Effect.result
       );
-      expect(Result.isFailure(result)).toBe(true);
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       if (Result.isFailure(result)) {
         expect(
           yield* Schema.encodeEffect(
@@ -59,7 +65,6 @@ it.effect.each(["0", "65536", "-1", "1.5", "TAXKIT_SECRET_SENTINEL"])(
       }
     })
 );
-
 it.effect("isolates each caller's settings", () =>
   Effect.gen(function* () {
     const configs = yield* Effect.all(
@@ -79,7 +84,7 @@ it.effect("isolates each caller's settings", () =>
       ],
       { concurrency: "unbounded" }
     );
-    expect(configs).toEqual([
+    expect(configs).toStrictEqual([
       {
         address: ApiServerTcpAddressSchema.make({
           hostname: "127.0.0.1",

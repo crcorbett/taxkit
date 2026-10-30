@@ -2,7 +2,14 @@ import nodePath from "node:path";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { expect, it } from "@effect/vitest";
-import { Effect, Exit, FileSystem } from "effect";
+import {
+  Data,
+  Match,
+  Function as EffectFunction,
+  Effect,
+  Exit,
+  FileSystem,
+} from "effect";
 
 import {
   lintFiles,
@@ -10,12 +17,14 @@ import {
   writeLintFixture,
 } from "./cli-fixture.js";
 
+class FixtureConsumerFailed extends Data.TaggedError("FixtureConsumerFailed") {}
+
 it.effect.each([
   { failed: false, name: "success", outcome: Effect.void },
   {
     failed: true,
     name: "failure",
-    outcome: Effect.fail("fixture consumer failed"),
+    outcome: Effect.fail(new FixtureConsumerFailed()),
   },
   { failed: true, name: "interruption", outcome: Effect.interrupt },
 ])("removes admitted lint fixtures after $name", ({ outcome, failed }) =>
@@ -25,16 +34,20 @@ it.effect.each([
     const path = nodePath.join(directory, "fixture.ts");
     const exit = yield* Effect.scoped(
       Effect.gen(function* () {
-        yield* writeLintFixture(path, "export const value = 1;");
-        expect(yield* fs.exists(path)).toBe(true);
+        yield* writeLintFixture({
+          path,
+          source: "export const value = 1;",
+        });
+        expect(yield* fs.exists(path)).toBeTruthy();
         yield* outcome;
       })
     ).pipe(Effect.exit);
-    expect(Exit.isFailure(exit)).toBe(failed);
-    expect(yield* fs.exists(path)).toBe(false);
+    EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+      expect(actual).toBe(failed);
+    });
+    expect(!(yield* fs.exists(path))).toBeTruthy();
   }).pipe(Effect.provide(BunServices.layer))
 );
-
 it.effect(
   "retains native workspace and role fences in an isolated manifest-backed lint root",
   () =>
@@ -74,15 +87,18 @@ it.effect(
                   recursive: true,
                 });
                 yield* fs.writeFileString(target, source);
-                const result = yield* lintFiles(
-                  [target],
-                  [],
-                  "unix",
+                const result = yield* lintFiles({
+                  paths: [target],
+                  extraArgs: [],
+                  format: "unix",
                   configuration,
-                  workingDirectory
-                );
+                  workingDirectory,
+                });
                 expect(result.exitCode, result.output).toBe(
-                  code === "" ? 0 : 1
+                  Match.value(code).pipe(
+                    Match.when("", (): 0 => 0),
+                    Match.orElse((): 1 => 1)
+                  )
                 );
                 expect(result.output).not.toContain(
                   "boundary configuration is missing or inconsistent"
@@ -96,7 +112,7 @@ it.effect(
           return workingDirectory;
         })
       );
-      expect(yield* fs.exists(directory)).toBe(false);
+      expect(!(yield* fs.exists(directory))).toBeTruthy();
     }).pipe(Effect.provide(BunServices.layer)),
   60_000
 );

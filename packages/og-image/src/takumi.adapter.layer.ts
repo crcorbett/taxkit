@@ -3,13 +3,12 @@ import { DocsImageRenderError } from "@taxkit/content/errors";
 import { DocsPngBytes, docsOgImageSize } from "@taxkit/content/schemas";
 import type { DocsOgImage } from "@taxkit/content/schemas";
 import { DocsPageRenderer } from "@taxkit/content/service";
-import { Effect, Layer, Schema } from "effect";
+import { Function as EffectFunction, Effect, Layer, Schema } from "effect";
 import * as Base64 from "effect/encoding/Base64";
 import { render } from "takumi-js";
 
 import fontBase64 from "./geist-latin.base64.txt?raw";
 import { pageImage } from "./image.js";
-
 // The bundled Geist font is decoded once when the Layer is built; a corrupt
 // asset stops startup. All Takumi calls stay in this one operation.
 export const DocsPageRendererLive = Layer.effect(
@@ -27,15 +26,17 @@ export const DocsPageRendererLive = Layer.effect(
         const bytes = yield* Effect.tryPromise({
           catch: () => new DocsImageRenderError({ reason: "render" }),
           try: (signal) =>
-            render(pageImage(image), {
-              emoji: "from-font",
-              fonts: [{ data: font, name: "Geist" }],
-              format: "png",
-              height: docsOgImageSize.height,
-              module: takumiModule,
-              signal,
-              width: docsOgImageSize.width,
-            }),
+            EffectFunction.pipe(pageImage(image), (node) =>
+              render(node, {
+                emoji: "from-font",
+                fonts: [{ data: font, name: "Geist" }],
+                format: "png",
+                height: docsOgImageSize.height,
+                module: takumiModule,
+                signal,
+                width: docsOgImageSize.width,
+              })
+            ),
         });
         return yield* Schema.decodeUnknownEffect(DocsPngBytes)(bytes).pipe(
           Effect.mapError(() => new DocsImageRenderError({ reason: "output" }))

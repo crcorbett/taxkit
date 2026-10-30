@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Layer, Option, Ref, Result } from "effect";
+import { Function as EffectFunction, Effect, Layer, Option, Ref } from "effect";
 import { Headers, HttpServerRequest } from "effect/http";
 
 import { WebsiteApiConfigError } from "../../src/lib/host/errors";
@@ -14,57 +14,73 @@ const png = () => {
   data.setUint32(20, 630);
   return bytes;
 };
-
-const answer = (address: string, reply: Response, init: RequestInit = {}) =>
-  Effect.gen(function* () {
-    const forwarded = yield* Ref.make<readonly string[]>([]);
-    const response = yield* docsImageRepresentation.pipe(
-      Effect.provideService(
-        HttpServerRequest.HttpServerRequest,
-        HttpServerRequest.fromWeb(
-          new Request(`http://127.0.0.1:4196${address}`, init)
-        )
-      ),
-      Effect.provide(
-        Layer.mock(WebsiteApi, {
-          client: Result.fail(new WebsiteApiConfigError()),
-          forward: (path) =>
+const answer = Effect.fnUntraced(function* ({
+  address,
+  reply,
+  init = {},
+}: {
+  readonly address: string;
+  readonly reply: Response;
+  readonly init?: RequestInit;
+}) {
+  const forwarded = yield* Ref.make<readonly string[]>([]);
+  const response = yield* docsImageRepresentation.pipe(
+    Effect.provideService(
+      HttpServerRequest.HttpServerRequest,
+      HttpServerRequest.fromWeb(
+        new Request(`http://127.0.0.1:4196${address}`, init)
+      )
+    ),
+    Effect.provide(
+      Layer.mock(WebsiteApi, {
+        client: Effect.fail(new WebsiteApiConfigError()).pipe(
+          Effect.withSpan("WebsiteApi.client")
+        ),
+        forward: Effect.fn("WebsiteApi.forward")(
+          ({ path }: Parameters<WebsiteApi["Service"]["forward"]>[0]) =>
             Ref.update(forwarded, (paths) => [...paths, path]).pipe(
               Effect.as(reply)
-            ),
-        })
-      )
-    );
-    return { forwarded: yield* Ref.get(forwarded), response };
-  });
-
+            )
+        ),
+      })
+    )
+  );
+  return { forwarded: yield* Ref.get(forwarded), response };
+});
 describe("documentation share images", () => {
-  it.effect("forwards a page image to the API and checks its bytes", () =>
-    Effect.gen(function* () {
-      const { forwarded, response } = yield* answer(
-        "/og/start/quickstart.png",
-        new Response(png(), { headers: { "content-type": "image/png" } })
-      );
-      expect(forwarded).toEqual(["/api/v1/docs/og/start/quickstart.png"]);
+  it.effect(
+    "forwards a page image to the API and checks its bytes",
+    Effect.fnUntraced(function* () {
+      const { forwarded, response } = yield* answer({
+        address: "/og/start/quickstart.png",
+        reply: new Response(png(), {
+          headers: { "content-type": "image/png" },
+        }),
+      });
+      expect(forwarded).toStrictEqual(["/api/v1/docs/og/start/quickstart.png"]);
       const reply = yield* Effect.fromOption(response);
       expect(reply.status).toBe(200);
-      expect(Headers.get(reply.headers, "content-type")).toEqual(
-        Option.some("image/png")
+      EffectFunction.pipe(
+        Headers.get(reply.headers, "content-type"),
+        (actual) => {
+          expect(actual).toStrictEqual(Option.some("image/png"));
+        }
       );
     })
   );
-
-  it.effect("ignores every other address", () =>
-    Effect.gen(function* () {
-      const { forwarded, response } = yield* answer(
-        "/start/quickstart",
-        new Response(null, { status: 500 })
-      );
-      expect(forwarded).toEqual([]);
-      expect(Option.isNone(response)).toBe(true);
+  it.effect(
+    "ignores every other address",
+    Effect.fnUntraced(function* () {
+      const { forwarded, response } = yield* answer({
+        address: "/start/quickstart",
+        reply: new Response(null, { status: 500 }),
+      });
+      expect(forwarded).toStrictEqual([]);
+      EffectFunction.pipe(Option.isNone(response), (actual) => {
+        expect(actual).toBeTruthy();
+      });
     })
   );
-
   it.effect.each([
     {
       expected: 404,
@@ -84,35 +100,60 @@ describe("documentation share images", () => {
       expected: 503,
       reply: () => new Response(null, { status: 500 }),
     },
-  ])("answers $expected for an unusable API reply", ({ expected, reply }) =>
-    Effect.gen(function* () {
-      const { response } = yield* answer("/og/start/quickstart.png", reply());
+  ])(
+    "answers $expected for an unusable API reply",
+    Effect.fnUntraced(function* ({ expected, reply }) {
+      const { response } = yield* EffectFunction.pipe(
+        "/og/start/quickstart.png",
+        (argument1) =>
+          EffectFunction.pipe(reply(), (argument2) =>
+            answer({
+              address: argument1,
+              reply: argument2,
+            })
+          )
+      );
       const answered = yield* Effect.fromOption(response);
       expect(answered.status).toBe(expected);
-      expect(Headers.get(answered.headers, "cache-control")).toEqual(
-        Option.some("no-store")
+      EffectFunction.pipe(
+        Headers.get(answered.headers, "cache-control"),
+        (actual) => {
+          expect(actual).toStrictEqual(Option.some("no-store"));
+        }
       );
     })
   );
-
-  it.effect("refuses other methods and invalid page addresses", () =>
-    Effect.gen(function* () {
-      const posted = yield* answer(
-        "/og/start/quickstart.png",
-        new Response(png()),
-        { method: "POST" }
+  it.effect(
+    "refuses other methods and invalid page addresses",
+    Effect.fnUntraced(function* () {
+      const posted = yield* answer({
+        address: "/og/start/quickstart.png",
+        reply: new Response(png()),
+        init: { method: "POST" },
+      });
+      expect(posted.forwarded).toStrictEqual([]);
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          posted.response,
+          Option.map((reply) => reply.status)
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual(Option.some(405));
+        }
       );
-      expect(posted.forwarded).toEqual([]);
-      expect(Option.map(posted.response, (reply) => reply.status)).toEqual(
-        Option.some(405)
-      );
-      const invalid = yield* answer(
-        "/og/invalid.path.png",
-        new Response(png())
-      );
-      expect(invalid.forwarded).toEqual([]);
-      expect(Option.map(invalid.response, (reply) => reply.status)).toEqual(
-        Option.some(404)
+      const invalid = yield* answer({
+        address: "/og/invalid.path.png",
+        reply: new Response(png()),
+      });
+      expect(invalid.forwarded).toStrictEqual([]);
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          invalid.response,
+          Option.map((reply) => reply.status)
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual(Option.some(404));
+        }
       );
     })
   );

@@ -19,7 +19,14 @@ import {
 } from "@taxkit/rules-au-pay";
 import type { TakeHomeScenarioInput } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
-import { Array as EffectArray, Effect, Exit, Layer, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array as EffectArray,
+  Effect,
+  Exit,
+  Layer,
+  Schema,
+} from "effect";
 
 const runScenario = (
   pack: typeof AuTakeHomePay2025_26_Live,
@@ -34,15 +41,12 @@ const runScenario = (
         Layer.provide(Layer.succeed(TakeHomeScenario)(input))
       ),
     });
-
     return result.report;
   }).pipe(Effect.provide(CalculationEngineLive));
-
 const weekly1500 = new GrossPay({
   amount: new Money({ cents: Cents.make(150_000), currency: "AUD" }),
   period: "weekly",
 });
-
 describe("AU take-home pay calculator (2025-26 rule pack)", () => {
   // Schedule 1: monthly earnings ending in 33 cents are increased by one
   // cent before conversion to weekly earnings. Neighbours do not change.
@@ -63,7 +67,6 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
       expect(report.netPay.cents + tax).toBe(gross);
     })
   );
-
   // Independent exact-decimal Schedule 1 oracles around half-dollar boundaries.
   it.effect.each([
     { claimed: true, gross: 101_400, tax: 14_700 },
@@ -89,34 +92,35 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         expect(report.netPay.cents + tax).toBe(gross);
       })
   );
-
   it.effect("golden case: $1500 weekly, TFN claimed", () =>
     Effect.gen(function* () {
       const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
         grossPay: weekly1500,
         taxFreeThresholdClaimed: true,
       });
-
-      // x = 1_500.99
-      // bracket: a=0.32, b=176.5769 -> round(0.32*1500.99 - 176.5769) = 304
-      // net = 1_500 - 304 = 1_196
-      expect(
-        moneyEquals(
+      expect({
+        length: moneyEquals(
           report.withholdingsTotal,
           new Money({ cents: Cents.make(30_400), currency: "AUD" })
-        )
-      ).toBe(true);
-      expect(
-        moneyEquals(
+        ),
+        length2: moneyEquals(
           report.netPay,
           new Money({ cents: Cents.make(119_600), currency: "AUD" })
-        )
-      ).toBe(true);
-      expect(report.period).toBe("weekly");
-      expect(report.rulePackVersion).toBe("rules-au-pay/1.0.2");
+        ),
+        reportIdentity: {
+          reportPeriod: report.period,
+          reportRulePackVersion: report.rulePackVersion,
+        },
+      }).toStrictEqual({
+        length: true,
+        length2: true,
+        reportIdentity: {
+          reportPeriod: "weekly",
+          reportRulePackVersion: "rules-au-pay/1.0.2",
+        },
+      });
     })
   );
-
   it.effect(
     "trace tree shape: NetPay -> Ledger -> PAYG component -> TaxablePay",
     () =>
@@ -125,38 +129,51 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
           grossPay: weekly1500,
           taxFreeThresholdClaimed: true,
         });
-
-        expect(report.trace.ruleId).toBe(NetPayRuleId);
-        expect(report.trace.children.length).toBe(1);
-
         const ledgerTrace = expectAt(report.trace.children, 0);
-        expect(ledgerTrace.ruleId).toBe(PayWithholdingsLedgerRuleId);
-        expect(ledgerTrace.children.length).toBe(1);
-
         const paygTrace = expectAt(ledgerTrace.children, 0);
-        expect(paygTrace.ruleId).toBe(PaygWithholdingRuleId);
-        const encodedPayg = yield* Schema.encodeEffect(TraceNode)(paygTrace);
-        expect(encodedPayg.rounding).toBe("ato-withholding-rounding");
-        expect(paygTrace.sources.length).toBe(1);
-        expect(expectAt(paygTrace.sources, 0).kind).toBe("ato-publication");
-
         const taxableTrace = expectAt(paygTrace.children, 0);
-        expect(taxableTrace.ruleId).toBe(TaxablePayRuleId);
-
-        // ledger surfaces the active PAYG component
-        expect(report.withholdings.components.length).toBe(1);
-        expect(expectAt(report.withholdings.components, 0).id).toBe(
-          PaygWithholdingComponentId
+        const encodedPayg = yield* Schema.encodeEffect(TraceNode)(paygTrace);
+        const components = EffectFunction.pipe(
+          report.withholdings.components,
+          EffectArray.map(({ id, status, effect }) => ({ id, status, effect }))
         );
-        expect(expectAt(report.withholdings.components, 0).status).toBe(
-          "active"
-        );
-        expect(expectAt(report.withholdings.components, 0).effect).toBe(
-          "additive"
-        );
+        expect({
+          rules: [
+            report.trace.ruleId,
+            ledgerTrace.ruleId,
+            paygTrace.ruleId,
+            taxableTrace.ruleId,
+          ],
+          childCounts: [
+            report.trace.children.length,
+            ledgerTrace.children.length,
+          ],
+          rounding: encodedPayg.rounding,
+          sources: EffectFunction.pipe(
+            paygTrace.sources,
+            EffectArray.map((source) => source.kind)
+          ),
+          components,
+        }).toStrictEqual({
+          rules: [
+            NetPayRuleId,
+            PayWithholdingsLedgerRuleId,
+            PaygWithholdingRuleId,
+            TaxablePayRuleId,
+          ],
+          childCounts: [1, 1],
+          rounding: "ato-withholding-rounding",
+          sources: ["ato-publication"],
+          components: [
+            {
+              id: PaygWithholdingComponentId,
+              status: "active",
+              effect: "additive",
+            },
+          ],
+        });
       })
   );
-
   it.effect(
     "trace and ledger snapshot: PAYG-only explanation order and sources",
     () =>
@@ -168,34 +185,39 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         const encodedTrace = yield* Schema.encodeEffect(TraceNode)(
           report.trace
         );
-
         expect({
-          explanationOrder: EffectArray.map(encodedTrace.children, (child) => ({
-            children: EffectArray.map(child.children, (grandchild) => ({
-              children: EffectArray.map(
-                grandchild.children,
-                (leaf) => leaf.ruleId
+          explanationOrder: EffectFunction.pipe(
+            encodedTrace.children,
+            EffectArray.map((child) => ({
+              children: EffectFunction.pipe(
+                child.children,
+                EffectArray.map((grandchild) => ({
+                  children: EffectFunction.pipe(
+                    grandchild.children,
+                    EffectArray.map((leaf) => leaf.ruleId)
+                  ),
+                  rounding: grandchild.rounding,
+                  ruleId: grandchild.ruleId,
+                  sourceKinds: EffectFunction.pipe(
+                    grandchild.sources,
+                    EffectArray.map((source) => source.kind)
+                  ),
+                }))
               ),
-              rounding: grandchild.rounding,
-              ruleId: grandchild.ruleId,
-              sourceKinds: EffectArray.map(
-                grandchild.sources,
-                (source) => source.kind
-              ),
-            })),
-            ruleId: child.ruleId,
-          })),
-          ledger: EffectArray.map(
+              ruleId: child.ruleId,
+            }))
+          ),
+          ledger: EffectFunction.pipe(
             report.withholdings.components,
-            (component) => ({
+            EffectArray.map((component) => ({
               cents: component.amount.cents,
               effect: component.effect,
               id: component.id,
               status: component.status,
-            })
+            }))
           ),
           root: report.trace.ruleId,
-        }).toEqual({
+        }).toStrictEqual({
           explanationOrder: [
             {
               children: [
@@ -221,7 +243,6 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         });
       })
   );
-
   it.effect("determinism: two runs produce identical traces", () =>
     Effect.gen(function* () {
       const a = yield* runScenario(AuTakeHomePay2025_26_Live, {
@@ -232,7 +253,6 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         grossPay: weekly1500,
         taxFreeThresholdClaimed: true,
       });
-
       const first = yield* Schema.encodeEffect(
         Schema.fromJsonString(TakeHomePayReport)
       )(a);
@@ -242,7 +262,6 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
       expect(first).toBe(second);
     })
   );
-
   it.effect("zero withholding under tax-free threshold", () =>
     Effect.gen(function* () {
       const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
@@ -252,49 +271,45 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         }),
         taxFreeThresholdClaimed: true,
       });
-
-      expect(
-        moneyEquals(
+      expect({
+        length: moneyEquals(
           report.withholdingsTotal,
           new Money({ cents: Cents.make(0), currency: "AUD" })
-        )
-      ).toBe(true);
-      expect(
-        moneyEquals(
+        ),
+        length2: moneyEquals(
           report.netPay,
           new Money({ cents: Cents.make(30_000), currency: "AUD" })
-        )
-      ).toBe(true);
+        ),
+      }).toStrictEqual({
+        length: true,
+        length2: true,
+      });
     })
   );
-
   it.effect("Scale 1 applies when the tax-free threshold is not claimed", () =>
     Effect.gen(function* () {
       const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
         grossPay: weekly1500,
         taxFreeThresholdClaimed: false,
       });
-
-      // Schedule 1 Scale 1: round(0.32*1500.99 - 65.7202) = 415
-      expect(
-        moneyEquals(
+      expect({
+        length: moneyEquals(
           report.withholdingsTotal,
           new Money({ cents: Cents.make(41_500), currency: "AUD" })
-        )
-      ).toBe(true);
-      expect(
-        moneyEquals(
+        ),
+        length2: moneyEquals(
           report.netPay,
           new Money({ cents: Cents.make(108_500), currency: "AUD" })
-        )
-      ).toBe(true);
-
+        ),
+      }).toStrictEqual({
+        length: true,
+        length2: true,
+      });
       const ledgerTrace = expectAt(report.trace.children, 0);
       const paygTrace = expectAt(ledgerTrace.children, 0);
       expect(paygTrace.inputs).toMatchObject({ scale: "scale1" });
     })
   );
-
   it.effect("scenario input Schema rejects malformed input", () =>
     Effect.gen(function* () {
       const exit = yield* Schema.decodeUnknownEffect(
@@ -303,11 +318,11 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         grossPay: weekly1500,
         taxFreeThresholdClaimed: "yes",
       }).pipe(Effect.exit);
-
-      expect(Exit.isFailure(exit)).toBe(true);
+      EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
     })
   );
-
   it.effect("fortnightly period: weekly-equivalent formula", () =>
     Effect.gen(function* () {
       const report = yield* runScenario(AuTakeHomePay2025_26_Live, {
@@ -317,23 +332,21 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
         }),
         taxFreeThresholdClaimed: true,
       });
-
-      // 3_000 fortnightly = 1_500 weekly equivalent -> $304 weekly withholding -> $608 fortnightly
-      expect(
-        moneyEquals(
+      expect({
+        length: moneyEquals(
           report.withholdingsTotal,
           new Money({ cents: Cents.make(60_800), currency: "AUD" })
-        )
-      ).toBe(true);
-      expect(
-        moneyEquals(
+        ),
+        length2: moneyEquals(
           report.netPay,
           new Money({ cents: Cents.make(239_200), currency: "AUD" })
-        )
-      ).toBe(true);
+        ),
+      }).toStrictEqual({
+        length: true,
+        length2: true,
+      });
     })
   );
-
   it.effect(
     "monthly period: rounds the converted monthly withholding to dollars",
     () =>
@@ -345,24 +358,22 @@ describe("AU take-home pay calculator (2025-26 rule pack)", () => {
           }),
           taxFreeThresholdClaimed: true,
         });
-
-        // 6_500 monthly = 1_500 weekly equivalent -> $304 weekly -> round(304*13/3) = $1317 monthly
-        expect(
-          moneyEquals(
+        expect({
+          length: moneyEquals(
             report.withholdingsTotal,
             new Money({ cents: Cents.make(131_700), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
-          moneyEquals(
+          ),
+          length2: moneyEquals(
             report.netPay,
             new Money({ cents: Cents.make(518_300), currency: "AUD" })
-          )
-        ).toBe(true);
+          ),
+        }).toStrictEqual({
+          length: true,
+          length2: true,
+        });
       })
   );
 });
-
 describe("AU take-home pay calculator (2024-25 rule pack)", () => {
   it.effect(
     "uses the official Schedule 1 coefficients for the 2024-25 pack",
@@ -372,21 +383,19 @@ describe("AU take-home pay calculator (2024-25 rule pack)", () => {
           grossPay: weekly1500,
           taxFreeThresholdClaimed: true,
         });
-
-        // Schedule 1 was last updated for 1 July 2024, so the 2024-25 and
-        // 2025-26 packs currently share the same official coefficients.
-        expect(
-          moneyEquals(
+        expect({
+          length: moneyEquals(
             report.withholdingsTotal,
             new Money({ cents: Cents.make(30_400), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
-          moneyEquals(
+          ),
+          length2: moneyEquals(
             report.netPay,
             new Money({ cents: Cents.make(119_600), currency: "AUD" })
-          )
-        ).toBe(true);
+          ),
+        }).toStrictEqual({
+          length: true,
+          length2: true,
+        });
       })
   );
 });

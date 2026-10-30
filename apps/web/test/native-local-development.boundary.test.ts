@@ -1,6 +1,7 @@
 import { NodeServices } from "@effect/platform-node";
 import { describe, expect, it } from "@effect/vitest";
 import {
+  Function as EffectFunction,
   Array,
   Config,
   Effect,
@@ -43,7 +44,6 @@ const LocalResource = Schema.fromJsonString(
     providerMode: Schema.Literal("local"),
   })
 );
-
 describe("native local development", () => {
   it.live(
     "starts the real pair, reloads both sources and stops its processes",
@@ -150,7 +150,9 @@ describe("native local development", () => {
           const health = yield* Effect.promise(() =>
             page.request.get(`${apiOrigin}/api/health`)
           );
-          expect(health.status()).toBe(200);
+          EffectFunction.pipe(health.status(), (actual) => {
+            expect(actual).toBe(200);
+          });
           // A printed local address proves listening, not a served page. Give
           // only gateway-unavailable startup responses a bounded readiness
           // window; application errors and the real navigation still fail.
@@ -166,7 +168,9 @@ describe("native local development", () => {
           );
           expect(websiteReady).toBe(200);
           const initial = yield* Effect.promise(() => page.goto(websiteOrigin));
-          expect(initial?.status()).toBe(200);
+          EffectFunction.pipe(initial?.status(), (actual) => {
+            expect(actual).toBe(200);
+          });
           yield* Effect.promise(() =>
             page
               .getByRole("heading", {
@@ -202,100 +206,123 @@ describe("native local development", () => {
           yield* Effect.promise(() =>
             page.getByRole("alert").waitFor({ state: "hidden", timeout: 5000 })
           );
-          const viewPath = path.join(
-            root,
-            "apps/web/src/lib/calculators/take-home.view.tsx"
-          );
-          const originalView = yield* fs.readFileString(viewPath);
-          expect(originalView).toContain("<h2>Australian take-home pay</h2>");
-          // The client-only validation above proves hydration before a source
-          // change; changing source during hydration can create false errors.
-          yield* Effect.gen(function* () {
-            yield* Effect.addFinalizer(() =>
-              fs.writeFileString(viewPath, originalView).pipe(Effect.orDie)
+          yield* Effect.gen(function* verifyWebsiteHotReload() {
+            const viewPath = path.join(
+              root,
+              "apps/web/src/lib/calculators/take-home.view.tsx"
             );
-            yield* fs.writeFileString(
-              viewPath,
-              originalView.replace(
-                "<h2>Australian take-home pay</h2>",
-                "<h2>Local development proof</h2>"
-              )
-            );
+            const originalView = yield* fs.readFileString(viewPath);
+            expect(originalView).toContain("<h2>Australian take-home pay</h2>");
+            // The client-only validation above proves hydration before a source
+            // change; changing source during hydration can create false errors.
+            yield* Effect.gen(function* () {
+              yield* Effect.addFinalizer(() =>
+                fs.writeFileString(viewPath, originalView).pipe(Effect.orDie)
+              );
+              yield* fs.writeFileString(
+                viewPath,
+                originalView.replace(
+                  "<h2>Australian take-home pay</h2>",
+                  "<h2>Local development proof</h2>"
+                )
+              );
+              yield* Effect.promise(() =>
+                page
+                  .getByRole("heading", {
+                    exact: true,
+                    name: "Local development proof",
+                  })
+                  .waitFor({ timeout: 15_000 })
+              );
+              // Vite's pinned watcher drops repeat change events within 50 ms.
+              // Keep the two observed saves separate before exact restoration.
+              yield* Effect.sleep("100 millis");
+            }).pipe(Effect.scoped);
+            expect(yield* fs.readFileString(viewPath)).toBe(originalView);
             yield* Effect.promise(() =>
               page
                 .getByRole("heading", {
                   exact: true,
-                  name: "Local development proof",
+                  name: "Australian take-home pay",
                 })
                 .waitFor({ timeout: 15_000 })
             );
-            // Vite's pinned watcher drops repeat change events within 50 ms.
-            // Keep the two observed saves separate before exact restoration.
-            yield* Effect.sleep("100 millis");
-          }).pipe(Effect.scoped);
-          expect(yield* fs.readFileString(viewPath)).toBe(originalView);
-          yield* Effect.promise(() =>
-            page
-              .getByRole("heading", {
-                exact: true,
-                name: "Australian take-home pay",
-              })
-              .waitFor({ timeout: 15_000 })
-          );
-          expect(yield* Queue.clear(calls)).toEqual([]);
-          yield* Effect.promise(() =>
-            page.getByRole("button", { exact: true, name: "Calculate" }).click()
-          );
-          yield* Effect.promise(() =>
-            page
-              .getByText("$1,301.00", { exact: true })
-              .waitFor({ timeout: 10_000 })
-          );
-          expect(yield* Queue.clear(calls)).toEqual([
-            `POST ${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
-          ]);
-          const plainContext = yield* Effect.acquireRelease(
-            Effect.promise(() =>
-              browser.newContext({ javaScriptEnabled: false })
-            ),
-            (value) => Effect.promise(() => value.close())
-          );
-          const plainPage = yield* Effect.promise(() => plainContext.newPage());
-          yield* Effect.promise(() => plainPage.goto(websiteOrigin));
-          // Without JavaScript the page explains that calculators need it.
-          yield* Effect.promise(() =>
-            plainPage
-              .getByText("Turn on JavaScript to use this calculator.", {
-                exact: true,
-              })
-              .waitFor({ timeout: 10_000 })
-          );
-          const workerPath = path.join(root, "apps/api/src/worker.ts");
-          const originalWorker = yield* fs.readFileString(workerPath);
-          // Local development runs the native entry point. Alter that actual
-          // composition so a passing reload proves the served Worker changed.
-          const init = "  return yield* ApiWorkerApplication;";
-          expect(originalWorker).toContain(init);
-          yield* Effect.gen(function* () {
-            yield* Effect.addFinalizer(() =>
-              fs.writeFileString(workerPath, originalWorker).pipe(Effect.orDie)
+            expect(yield* Queue.clear(calls)).toStrictEqual([]);
+            yield* Effect.promise(() =>
+              page
+                .getByRole("button", { exact: true, name: "Calculate" })
+                .click()
             );
-            yield* fs.writeFileString(
-              workerPath,
-              `import { HttpServerResponse as LocalReloadHttpResponse } from "effect/http";\n${originalWorker.replace(
-                init,
-                '  return yield* ApiWorkerApplication.pipe(Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => LocalReloadHttpResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })));'
-              )}`
+            yield* Effect.promise(() =>
+              page
+                .getByText("$1,301.00", { exact: true })
+                .waitFor({ timeout: 10_000 })
             );
+            expect(yield* Queue.clear(calls)).toStrictEqual([
+              `POST ${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+            ]);
+            const plainContext = yield* Effect.acquireRelease(
+              Effect.promise(() =>
+                browser.newContext({ javaScriptEnabled: false })
+              ),
+              (value) => Effect.promise(() => value.close())
+            );
+            const plainPage = yield* Effect.promise(() =>
+              plainContext.newPage()
+            );
+            yield* Effect.promise(() => plainPage.goto(websiteOrigin));
+            // Without JavaScript the page explains that calculators need it.
+            yield* Effect.promise(() =>
+              plainPage
+                .getByText("Turn on JavaScript to use this calculator.", {
+                  exact: true,
+                })
+                .waitFor({ timeout: 10_000 })
+            );
+          }).pipe(Effect.withSpan("verifyWebsiteHotReload"));
+          yield* Effect.gen(function* verifyWorkerHotReload() {
+            const workerPath = path.join(root, "apps/api/src/worker.ts");
+            const originalWorker = yield* fs.readFileString(workerPath);
+            // Local development runs the native entry point. Alter that actual
+            // composition so a passing reload proves the served Worker changed.
+            const init = "  return yield* ApiWorkerApplication;";
+            expect(originalWorker).toContain(init);
+            yield* Effect.gen(function* () {
+              yield* Effect.addFinalizer(() =>
+                fs
+                  .writeFileString(workerPath, originalWorker)
+                  .pipe(Effect.orDie)
+              );
+              yield* fs.writeFileString(
+                workerPath,
+                `import { HttpServerResponse as LocalReloadHttpResponse } from "effect/http";\n${originalWorker.replace(init, '  return yield* ApiWorkerApplication.pipe(Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => LocalReloadHttpResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })));')}`
+              );
+              yield* Effect.promise(() =>
+                page.request.get(`${apiOrigin}/api/health`)
+              ).pipe(
+                Effect.map(
+                  (response) =>
+                    response.status() === 200 &&
+                    Option.getOrUndefined(
+                      Record.get(response.headers(), "x-local-proof")
+                    ) === "PRIVATE9"
+                ),
+                Effect.catchDefect(() => Effect.succeed(false)),
+                Effect.repeat({
+                  schedule: Schedule.spaced("100 millis"),
+                  while: (observed) => !observed,
+                }),
+                Effect.timeout("15 seconds")
+              );
+            }).pipe(Effect.scoped);
+            expect(yield* fs.readFileString(workerPath)).toBe(originalWorker);
             yield* Effect.promise(() =>
               page.request.get(`${apiOrigin}/api/health`)
             ).pipe(
               Effect.map(
                 (response) =>
                   response.status() === 200 &&
-                  Option.getOrUndefined(
-                    Record.get(response.headers(), "x-local-proof")
-                  ) === "PRIVATE9"
+                  Option.isNone(Record.get(response.headers(), "x-local-proof"))
               ),
               Effect.catchDefect(() => Effect.succeed(false)),
               Effect.repeat({
@@ -304,52 +331,43 @@ describe("native local development", () => {
               }),
               Effect.timeout("15 seconds")
             );
-          }).pipe(Effect.scoped);
-          expect(yield* fs.readFileString(workerPath)).toBe(originalWorker);
-          yield* Effect.promise(() =>
-            page.request.get(`${apiOrigin}/api/health`)
-          ).pipe(
-            Effect.map(
-              (response) =>
-                response.status() === 200 &&
-                Option.isNone(Record.get(response.headers(), "x-local-proof"))
-            ),
-            Effect.catchDefect(() => Effect.succeed(false)),
-            Effect.repeat({
-              schedule: Schedule.spaced("100 millis"),
-              while: (observed) => !observed,
-            }),
-            Effect.timeout("15 seconds")
-          );
-          yield* Effect.forEach(["TaxKitApi", "TaxKitWebsite"], (resource) =>
-            fs
+          }).pipe(Effect.withSpan("verifyWorkerHotReload"));
+          yield* Effect.gen(function* verifyLocalState() {
+            yield* Effect.forEach(["TaxKitApi", "TaxKitWebsite"], (resource) =>
+              fs
+                .readFileString(
+                  path.join(
+                    root,
+                    ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof",
+                    `${resource}.json`
+                  )
+                )
+                .pipe(Effect.flatMap(Schema.decodeUnknownEffect(LocalResource)))
+            );
+            const apiState = yield* fs
               .readFileString(
                 path.join(
                   root,
-                  ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof",
-                  `${resource}.json`
+                  ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof/TaxKitApi.json"
                 )
               )
-              .pipe(Effect.flatMap(Schema.decodeUnknownEffect(LocalResource)))
-          );
-          const apiState = yield* fs
-            .readFileString(
-              path.join(
-                root,
-                ".alchemy/state/TaxKitAppsCloudflare/dev_native_apps_proof/TaxKitApi.json"
-              )
-            )
-            .pipe(Effect.flatMap(Schema.decodeEffect(LocalResource)));
-          // Native state stores a portable entry relative to the stack root.
-          expect(apiState.props.main).toEqual(
-            Option.some("apps/api/src/worker.ts")
-          );
-          expect(yield* fs.readDirectory(auth)).toEqual(["logs", "profiles"]);
-          expect(
-            yield* fs.glob("**/*", { root: path.join(auth, "profiles") })
-          ).toEqual(["default"]);
-          expect(yield* Queue.clear(exceptions)).toEqual([]);
-          expect(yield* Queue.clear(calls)).toEqual([]);
+              .pipe(Effect.flatMap(Schema.decodeEffect(LocalResource)));
+            expect({
+              apiStatePropsMain: apiState.props.main,
+              fsReadDirectoryAuth: yield* fs.readDirectory(auth),
+              fsGlobRootPathJoinAuthProfiles: yield* fs.glob("**/*", {
+                root: path.join(auth, "profiles"),
+              }),
+              QueueClearExceptions: yield* Queue.clear(exceptions),
+              QueueClearCalls: yield* Queue.clear(calls),
+            }).toStrictEqual({
+              apiStatePropsMain: Option.some("apps/api/src/worker.ts"),
+              fsReadDirectoryAuth: ["logs", "profiles"],
+              fsGlobRootPathJoinAuthProfiles: ["default"],
+              QueueClearExceptions: [],
+              QueueClearCalls: [],
+            });
+          }).pipe(Effect.withSpan("verifyLocalState"));
           return { apiOrigin, websiteOrigin };
         }).pipe(Effect.scoped);
         yield* Effect.forEach(
@@ -445,27 +463,28 @@ describe("native local development", () => {
                     ),
                 })
               );
-              expect(text).not.toContain("[TaxKitApi]");
-              expect(text).not.toContain("[TaxKitWebsite]");
+              Array.forEach((marker: string) => {
+                expect(text).not.toContain(marker);
+              })(["[TaxKitApi]", "[TaxKitWebsite]"]);
               if (attempt.command === "plan") {
                 expect(yield* child.exitCode).not.toBe(0);
               } else {
                 // Native dev keeps its file watcher alive after a failed import.
                 // The root rejects declaration; this scope still owns shutdown.
                 expect(
-                  yield* fs.exists(
+                  !(yield* fs.exists(
                     path.join(
                       root,
                       ".alchemy/state/TaxKitAppsCloudflare",
                       attempt.stage,
                       "__stack_output__.json"
                     )
-                  )
-                ).toBe(false);
+                  ))
+                ).toBeTruthy();
               }
             }).pipe(Effect.timeout("15 seconds"), Effect.scoped)
         );
-        expect(yield* fs.glob("**/*.json", { root: auth })).toEqual([]);
+        expect(yield* fs.glob("**/*.json", { root: auth })).toStrictEqual([]);
       }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
     40_000
   );

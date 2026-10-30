@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax/schemas";
 import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
-import { Result } from "effect";
+import { Function as EffectFunction, Result } from "effect";
 
 import {
   AnnualTaxForm,
@@ -13,56 +13,89 @@ import {
 
 describe("calculator form admission", () => {
   it("keeps the chosen pay calculator and checked annual facts", () => {
-    const pay = takeHomeRequestFromForm(
-      initialTakeHomeForm,
-      AuPayCalculatorId.make("au.pay.withholdings")
+    const pay = EffectFunction.pipe(initialTakeHomeForm, (argument1) =>
+      EffectFunction.pipe(
+        AuPayCalculatorId.make("au.pay.withholdings"),
+        (argument2) => takeHomeRequestFromForm(argument1, argument2)
+      )
     );
     expect(Result.isSuccess(pay) && pay.success.calculatorId).toBe(
       "au.pay.withholdings"
     );
-    const annual = annualTaxRequestFromForm(
-      AnnualTaxForm.make({ taxableDollars: "67000" })
+    const annual = EffectFunction.pipe(
+      AnnualTaxForm.make({ taxableDollars: "67000" }),
+      annualTaxRequestFromForm
     );
-    expect(Result.isSuccess(annual)).toBe(true);
-    if (Result.isSuccess(annual)) {
-      expect(annual.success.calculatorId).toBe("au.income-tax.annual");
-      expect(annual.success.payload.facts).toMatchObject({
-        taxableIncome: { cents: 6_700_000, currency: "AUD" },
-      });
-    }
+    EffectFunction.pipe(Result.isSuccess(annual), (actual) => {
+      expect(actual).toBeTruthy();
+    });
+    const request = annual.pipe(
+      Result.match({
+        onFailure: () =>
+          expect.fail("Expected a checked annual calculation request"),
+        onSuccess: (value) => value,
+      })
+    );
+    expect(request.calculatorId).toBe("au.income-tax.annual");
+    expect(request.payload.facts).toMatchObject({
+      taxableIncome: { cents: 6_700_000, currency: "AUD" },
+    });
   });
+
   it("rejects invalid annual numbers before making a work request", () => {
-    expect(
+    EffectFunction.pipe(
       Result.isFailure(
-        annualTaxRequestFromForm(
-          AnnualTaxForm.make({ taxableDollars: "invalid" })
+        EffectFunction.pipe(
+          AnnualTaxForm.make({ taxableDollars: "invalid" }),
+          annualTaxRequestFromForm
         )
-      )
-    ).toBe(true);
-    expect(
+      ),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
+    );
+    EffectFunction.pipe(
       Result.isFailure(
-        annualTaxRequestFromForm(
-          AnnualTaxForm.make({ taxableDollars: "Infinity" })
+        EffectFunction.pipe(
+          AnnualTaxForm.make({ taxableDollars: "Infinity" }),
+          annualTaxRequestFromForm
         )
-      )
-    ).toBe(true);
+      ),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
+    );
   });
+
   it("refuses a form of the other calculator's kind", () => {
-    expect(
+    EffectFunction.pipe(
       Result.isFailure(
-        requestFromForm(
+        EffectFunction.pipe(
           AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
-          initialTakeHomeForm
+          (argument3) =>
+            EffectFunction.pipe(initialTakeHomeForm, (argument4) =>
+              requestFromForm(argument3, argument4)
+            )
         )
-      )
-    ).toBe(true);
-    expect(
+      ),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
+    );
+    EffectFunction.pipe(
       Result.isFailure(
-        requestFromForm(
+        EffectFunction.pipe(
           AuPayCalculatorId.make("au.pay.take-home"),
-          AnnualTaxForm.make({ taxableDollars: "67000" })
+          (argument5) =>
+            EffectFunction.pipe(
+              AnnualTaxForm.make({ taxableDollars: "67000" }),
+              (argument6) => requestFromForm(argument5, argument6)
+            )
         )
-      )
-    ).toBe(true);
+      ),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
+    );
   });
 });

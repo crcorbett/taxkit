@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
-import { Effect } from "effect";
+import { Predicate, Function as EffectFunction, Effect } from "effect";
 
 import { au } from "../src/au.js";
 
@@ -12,7 +12,6 @@ const takeHomeFacts = {
   }),
   taxFreeThresholdClaimed: true,
 };
-
 describe("AU SDK subpath", () => {
   it.effect("keeps the monthly 33-cent correction through the public SDK", () =>
     Effect.gen(function* () {
@@ -34,13 +33,16 @@ describe("AU SDK subpath", () => {
       const report = yield* Effect.promise(() =>
         au.pay.takeHomePay(takeHomeFacts)
       );
-
-      expect(report._tag).toBe("TakeHomePayReport");
+      EffectFunction.pipe(
+        Predicate.isTagged(report, "TakeHomePayReport"),
+        (matches) => {
+          expect(matches).toBeTruthy();
+        }
+      );
       expect(report.netPay.cents).toBe(130_100);
       expect(report.rulePackVersion).toBe("rules-au-pay/1.0.2");
     })
   );
-
   it.effect("keeps AU helpers thin over the generic descriptor client", () =>
     Effect.gen(function* () {
       const client = au.createClient();
@@ -65,13 +67,11 @@ describe("AU SDK subpath", () => {
         ],
         { concurrency: "unbounded" }
       );
-
-      expect(helperReport).toEqual(descriptorReport);
+      expect(helperReport).toStrictEqual(descriptorReport);
       expect(helperReport.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
       yield* Effect.promise(() => client.dispose());
     })
   );
-
   it.effect("returns safe AU failures through SDK-owned result values", () =>
     Effect.gen(function* () {
       const result = yield* Effect.promise(() =>
@@ -83,8 +83,12 @@ describe("AU SDK subpath", () => {
           }),
         })
       );
-
-      expect(result._tag).toBe("TaxKitFailure");
+      EffectFunction.pipe(
+        Predicate.isTagged(result, "TaxKitFailure"),
+        (matches) => {
+          expect(matches).toBeTruthy();
+        }
+      );
     })
   );
 });

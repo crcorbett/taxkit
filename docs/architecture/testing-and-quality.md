@@ -48,8 +48,11 @@ apply or destroy follows a matching-stage native plan without `--yes`.
 Effect diagnostics run inside every workspace's `check-types`, because the
 `prepare` script (`effect-tsgo patch --oxlint`) patches TypeScript and Oxlint with the
 Effect language service; `check-types` ends with `check:effect`, a smoke check
-that the patch and plugin are active. `bun run lint` runs type-aware checks and the published Commonplace
-`strict-effect` policy from the latest `@commonplaces/oxlint-plugin`, including the
+that the patch and plugin are active. `bun run lint` inherits the complete
+`style` and `strict` presets from `@commonplaces/oxlint-plugin`, with no local
+rule disabling. Version compatibility, native test callback registrations and
+explicit unstable API opt-ins are recorded in [tooling](../standards/tooling.md).
+Repository-owned options additionally configure the
 native request rules `static-layers`, `no-loader-request-state`,
 `no-native-client-replica`, `native-cloudflare-cache`, `website-data-proxy`,
 `website-rpc-boundary` (`apps/web/src` only) and `module-ownership`. Their

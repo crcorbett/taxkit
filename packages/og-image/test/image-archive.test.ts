@@ -6,7 +6,14 @@ import {
 } from "@taxkit/content/service";
 import { DocsOgImagesTest } from "@taxkit/content/test";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { Array, Effect, Layer, Record, Ref } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Layer,
+  Record,
+  Ref,
+} from "effect";
 
 import { renderDocsImageArchive } from "../src/image-archive.js";
 
@@ -34,11 +41,17 @@ it.effect("renders one image per published page, one page at a time", () =>
     );
     assert.deepStrictEqual(
       Record.keys(archive),
-      Array.map(catalogue.pages, (page) => page.path)
+      EffectFunction.pipe(
+        catalogue.pages,
+        Array.map((page) => page.path)
+      )
     );
     assert.deepStrictEqual(
       yield* Ref.get(titles),
-      Array.map(catalogue.pages, (page) => page.frontmatter.title)
+      EffectFunction.pipe(
+        catalogue.pages,
+        Array.map((page) => page.frontmatter.title)
+      )
     );
   })
 );

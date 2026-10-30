@@ -12,7 +12,19 @@ import {
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
-import { Clock, Effect, Layer, Path, Queue, Ref, Schema, Stream } from "effect";
+import {
+  Array,
+  Match,
+  Function as EffectFunction,
+  Clock,
+  Effect,
+  Layer,
+  Path,
+  Queue,
+  Ref,
+  Schema,
+  Stream,
+} from "effect";
 import { McpSchema } from "effect/ai";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -23,12 +35,14 @@ import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
 const origin = "http://127.0.0.1:4219";
-
-class NativeAnalyticsClientFailed extends Schema.TaggedError<NativeAnalyticsClientFailed>()(
-  "NativeAnalyticsClientFailed",
-  { operation: Schema.Literals(["connect", "calculate"]) }
-) {}
-
+class NativeAnalyticsClientFailed extends Schema.TaggedError<
+  NativeAnalyticsClientFailed,
+  {
+    readonly brand: unique symbol;
+  }
+>()("NativeAnalyticsClientFailed", {
+  operation: Schema.Literals(["connect", "calculate"]),
+}) {}
 it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
   "the built native API returns tax results independently of %s analytics",
   (mode) =>
@@ -37,7 +51,9 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
+      const { files, modules, wasm } = yield* readWorkerModules({
+        modulesRoot,
+      });
       expect(files).toContain("worker.js");
       const outgoing = yield* Queue.make<Request>();
       const replies =
@@ -90,7 +106,6 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
                       },
                       WORKER_URL: { type: "json", value: origin },
                     },
-
                     manifest: {
                       mainModule: "worker.js",
                       modules: { ...modules, ...wasm },
@@ -105,21 +120,32 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
                     outboundService: {
                       handler: (request) => {
                         Queue.offerUnsafe(outgoing, request);
-                        return mode === "stalled-reply"
-                          ? new Response(
-                              new ReadableStream<Uint8Array>({
-                                start: (controller) => {
-                                  Queue.offerUnsafe(replies, controller);
+                        return Match.value(mode).pipe(
+                          Match.when(
+                            "stalled-reply",
+                            () =>
+                              new Response(
+                                new ReadableStream<Uint8Array>({
+                                  start: (controller) => {
+                                    Queue.offerUnsafe(replies, controller);
+                                  },
+                                }),
+                                { status: 200 }
+                              )
+                          ),
+                          Match.orElse(
+                            (matchedValue) =>
+                              new Response("private-provider-response", {
+                                headers: {
+                                  location: "https://private.invalid/redirect",
                                 },
-                              }),
-                              { status: 200 }
-                            )
-                          : new Response("private-provider-response", {
-                              headers: {
-                                location: "https://private.invalid/redirect",
-                              },
-                              status: mode === "redirect" ? 302 : 500,
-                            });
+                                status: Match.value(matchedValue).pipe(
+                                  Match.when("redirect", (): 302 => 302),
+                                  Match.orElse((): 500 => 500)
+                                ),
+                              })
+                          )
+                        );
                       },
                       type: "fetcher",
                     },
@@ -151,47 +177,74 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
             }
           )
         );
-      expect(
-        (yield* calculate("deny").pipe(Effect.timeout("2 seconds"))).status
-      ).toBe(200);
-      expect(yield* Queue.clear(outgoing)).toEqual([]);
+      expect({
+        deniedStatus: (yield* calculate("deny").pipe(
+          Effect.timeout("2 seconds")
+        )).status,
+        QueueClearOutgoing: yield* Queue.clear(outgoing),
+      }).toStrictEqual({
+        deniedStatus: 200,
+        QueueClearOutgoing: [],
+      });
       const started = yield* Clock.currentTimeMillis;
       const reply = yield* calculate("allow").pipe(Effect.timeout("2 seconds"));
       expect(reply.status).toBe(200);
       expect(yield* Clock.currentTimeMillis).toBeLessThan(started + 2000);
-      const request = yield* Queue.take(outgoing).pipe(
-        Effect.timeout("2 seconds")
-      );
-      expect(request.url).toBe("https://us.i.posthog.com/batch/");
-      expect(request.method).toBe("POST");
-      expect(request.headers.get("cache-control")).toBe("no-store");
-      yield* Effect.forEach(
-        [
-          "authorization",
-          "cookie",
-          "cf-connecting-ip",
-          "x-forwarded-for",
-          "traceparent",
-          "tracestate",
-          "baggage",
-          "location",
-        ],
-        (name) =>
-          Effect.sync(() => {
-            expect(request.headers.has(name), name).toBe(false);
-          })
-      );
-      const bytes = yield* Effect.promise(() => request.text());
-      const batch = yield* Schema.decodeEffect(
-        Schema.fromJsonString(CalculatorCaptureBatch),
-        { onExcessProperty: "error" }
-      )(bytes);
-      const [event] = batch.batch;
-      expect(event.properties.stage).toBe("pr-179");
-      expect(event.properties.calculator_id).toBe("au.pay.take-home");
-      expect(event.distinct_id).toBe(event.uuid);
-      expect(bytes).not.toContain("PRIVATE9");
-      expect(bytes).not.toContain("165400");
+      yield* Effect.gen(function* verifyAnalyticsPayload() {
+        const request = yield* Queue.take(outgoing).pipe(
+          Effect.timeout("2 seconds")
+        );
+        expect({
+          request: {
+            requestUrl: request.url,
+            requestMethod: request.method,
+          },
+          requestHeadersGetCacheControl: request.headers.get("cache-control"),
+        }).toStrictEqual({
+          request: {
+            requestUrl: "https://us.i.posthog.com/batch/",
+            requestMethod: "POST",
+          },
+          requestHeadersGetCacheControl: "no-store",
+        });
+        yield* Effect.forEach(
+          [
+            "authorization",
+            "cookie",
+            "cf-connecting-ip",
+            "x-forwarded-for",
+            "traceparent",
+            "tracestate",
+            "baggage",
+            "location",
+          ],
+          (name) =>
+            Effect.sync(() => {
+              EffectFunction.pipe(request.headers.has(name), (argument1) => {
+                EffectFunction.pipe(name, (argument2) => {
+                  expect(argument1, argument2).toBeFalsy();
+                });
+              });
+            })
+        );
+        const bytes = yield* Effect.promise(() => request.text());
+        const batch = yield* Schema.decodeEffect(
+          Schema.fromJsonString(CalculatorCaptureBatch),
+          { onExcessProperty: "error" }
+        )(bytes);
+        const [event] = batch.batch;
+        expect({
+          eventPropertiesStage: event.properties.stage,
+          eventPropertiesCalculator_id: event.properties.calculator_id,
+        }).toStrictEqual({
+          eventPropertiesStage: "pr-179",
+          eventPropertiesCalculator_id: "au.pay.take-home",
+        });
+        expect(event.distinct_id).toBe(event.uuid);
+        Array.forEach((marker: string) => {
+          expect(bytes).not.toContain(marker);
+        })(["PRIVATE9", "165400"]);
+      }).pipe(Effect.withSpan("verifyAnalyticsPayload"));
       if (mode === "rejected") {
         const address = yield* Effect.promise(() => host.ready);
         const transport = Layer.effect(
@@ -231,8 +284,13 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
           Effect.tap((captured) =>
             Effect.sync(() => {
               const [item] = captured.batch;
-              expect(item.properties.calculator_id).toBe("au.pay.take-home");
-              expect(item.properties.stage).toBe("pr-179");
+              expect({
+                itemPropertiesCalculator_id: item.properties.calculator_id,
+                itemPropertiesStage: item.properties.stage,
+              }).toStrictEqual({
+                itemPropertiesCalculator_id: "au.pay.take-home",
+                itemPropertiesStage: "pr-179",
+              });
               expect(item.distinct_id).toBe(item.uuid);
             })
           )
@@ -292,12 +350,12 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
               expect(
                 (yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(
                   result
-                )).isError
-              ).toBe(false);
+                )).isError === false
+              ).toBeTruthy();
               if (choice === "allow") {
                 yield* nextCapture;
               } else {
-                expect(yield* Queue.clear(outgoing)).toEqual([]);
+                expect(yield* Queue.clear(outgoing)).toStrictEqual([]);
               }
             })
           );
@@ -324,13 +382,19 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
           controller.close();
         });
       }
-      expect(yield* Queue.clear(outgoing)).toEqual([]);
-      expect(yield* Queue.clear(exceptions)).toEqual([]);
+      expect({
+        QueueClearOutgoing: yield* Queue.clear(outgoing),
+        QueueClearExceptions: yield* Queue.clear(exceptions),
+      }).toStrictEqual({
+        QueueClearOutgoing: [],
+        QueueClearExceptions: [],
+      });
       const recorded = yield* Schema.encodeEffect(
         Schema.fromJsonString(Schema.Unknown)
       )(yield* Queue.clear(logs));
-      expect(recorded).not.toContain("PRIVATE9");
-      expect(recorded).not.toContain("165400");
+      Array.forEach((marker: string) => {
+        expect(recorded).not.toContain(marker);
+      })(["PRIVATE9", "165400"]);
     }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
   { timeout: 30_000 }
 );

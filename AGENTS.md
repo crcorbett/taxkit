@@ -3,7 +3,7 @@ document_type: agent-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-20
+last_reviewed: 2026-10-30
 ---
 
 # TaxKit repository guide
@@ -59,6 +59,9 @@ Linear.
 
 ## Engineering guardrails
 
+- Inherit the complete Commonplaces `style` and `strict` lint presets. Do not
+  filter, duplicate or disable shared rules; keep only repository ownership
+  settings and additional domain checks in local configuration.
 - Use Effect-native Schema, branded identities, Config, services, Layers,
   tagged errors, collections, Command, and runtime primitives when they own the
   semantics. Decode unknown/representation ingress once and encode egress at

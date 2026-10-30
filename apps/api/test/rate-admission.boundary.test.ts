@@ -15,6 +15,9 @@ import {
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { edgeCallerKey } from "@taxkit/observability/edge-identity";
 import {
+  Predicate,
+  Match,
+  Function as EffectFunction,
   Array,
   ConfigProvider,
   Effect,
@@ -25,6 +28,7 @@ import {
   Ref,
   Result,
   Schema,
+  Boolean as EffectBoolean,
 } from "effect";
 import {
   Headers,
@@ -43,7 +47,6 @@ const settings = ConfigProvider.fromUnknown({
   TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
   WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
-
 describe("shared native host calculation admission", () => {
   it.effect.each([
     { allowed: false, mode: "edge", origin: "http://127.0.0.1:4214" },
@@ -63,7 +66,9 @@ describe("shared native host calculation admission", () => {
           Effect.provideService(
             CalculatorAdmission,
             CalculatorAdmission.of({
-              admitCalculation: () => Ref.update(calls, (count) => count + 1),
+              admitCalculation: Effect.fn(
+                "CalculatorAdmission.admitCalculation"
+              )(() => Ref.update(calls, (count) => count + 1)),
             })
           )
         );
@@ -85,8 +90,18 @@ describe("shared native host calculation admission", () => {
             )
           )
         );
-        expect(response.status).toBe(allowed ? 200 : 503);
-        expect(yield* Ref.get(calls)).toBe(allowed ? 1 : 0);
+        expect(response.status).toBe(
+          EffectBoolean.match(allowed, {
+            onFalse: (): 503 => 503,
+            onTrue: (): 200 => 200,
+          })
+        );
+        expect(yield* Ref.get(calls)).toBe(
+          EffectBoolean.match(allowed, {
+            onFalse: (): 0 => 0,
+            onTrue: (): 1 => 1,
+          })
+        );
       }).pipe(
         Effect.provideService(
           ConfigProvider.ConfigProvider,
@@ -100,7 +115,6 @@ describe("shared native host calculation admission", () => {
         Effect.scoped
       )
   );
-
   it.effect.each([
     {},
     { "cf-connecting-ip": "private-canary" },
@@ -109,15 +123,21 @@ describe("shared native host calculation admission", () => {
     { "cf-connecting-ip": "203.0.113.75", "cf-worker": "private-canary" },
   ])("rejects absent, invalid and forwarded public identity", (headers) =>
     Effect.gen(function* () {
-      expect(
-        Option.isNone(
-          edgeCallerKey(Headers.fromInput(headers), CalculatorClientRateKey)
-        )
-      ).toBe(true);
-      expect(yield* CalculatorRequestRateKey).toEqual(Option.none());
+      expect({
+        length: Option.isNone(
+          EffectFunction.pipe(Headers.fromInput(headers), (argument1) =>
+            EffectFunction.pipe(CalculatorClientRateKey, (argument2) =>
+              edgeCallerKey(argument1, argument2)
+            )
+          )
+        ),
+        CalculatorRequestRateKey: yield* CalculatorRequestRateKey,
+      }).toStrictEqual({
+        length: true,
+        CalculatorRequestRateKey: Option.none(),
+      });
     })
   );
-
   it.effect.each(["", "0", "-1", "01", "1.2", "private-canary"])(
     "rejects an invalid namespace without inventing an account value",
     (value) =>
@@ -141,9 +161,16 @@ describe("shared native host calculation admission", () => {
         Effect.result,
         Effect.tap((result) =>
           Effect.sync(() => {
-            expect(Result.isFailure(result)).toBe(true);
+            EffectFunction.pipe(Result.isFailure(result), (actual) => {
+              expect(actual).toBeTruthy();
+            });
             if (Result.isFailure(result)) {
-              expect(result.failure._tag).toBe("ConfigError");
+              EffectFunction.pipe(
+                Predicate.isTagged(result.failure, "ConfigError"),
+                (matches) => {
+                  expect(matches).toBeTruthy();
+                }
+              );
             }
           })
         ),
@@ -151,7 +178,6 @@ describe("shared native host calculation admission", () => {
         Effect.scoped
       )
   );
-
   it.effect(
     "direct HTTP calculations from one caller share one checked allowance",
     () => {
@@ -160,17 +186,25 @@ describe("shared native host calculation admission", () => {
           HashMap.empty<CalculatorClientRateKey, number>()
         );
         const admission = CalculatorAdmission.of({
-          admitCalculation: (key) =>
-            Ref.modify(used, (counts) => {
-              const count = HashMap.get(counts, key).pipe(
-                Option.getOrElse(() => 0)
-              );
-              return [count < 60, HashMap.set(counts, key, count + 1)] as const;
-            }).pipe(
-              Effect.flatMap((allowed) =>
-                allowed ? Effect.void : Effect.fail(new CalculatorRateLimited())
+          admitCalculation: Effect.fn("CalculatorAdmission.admitCalculation")(
+            (key) =>
+              Ref.modify(used, (counts) => {
+                const count = HashMap.get(counts, key).pipe(
+                  Option.getOrElse(() => 0)
+                );
+                return [
+                  count < 60,
+                  HashMap.set(counts, key, count + 1),
+                ] as const;
+              }).pipe(
+                Effect.flatMap((allowed) =>
+                  EffectBoolean.match(allowed, {
+                    onFalse: () => Effect.fail(new CalculatorRateLimited()),
+                    onTrue: () => Effect.void,
+                  })
+                )
               )
-            ),
+          ),
         });
         const app = yield* ApiWorkerInit.pipe(
           Effect.provideService(CalculatorAdmission, admission)
@@ -213,9 +247,11 @@ describe("shared native host calculation admission", () => {
         const last = yield* calculate;
         expect(last.report).toBeDefined();
         const rejected = yield* calculate.pipe(Effect.result);
-        expect(Result.isFailure(rejected)).toBe(true);
+        EffectFunction.pipe(Result.isFailure(rejected), (actual) => {
+          expect(actual).toBeTruthy();
+        });
         if (Result.isFailure(rejected)) {
-          expect(rejected.failure).toEqual({
+          expect(rejected.failure).toStrictEqual({
             error: new CalculatorRateLimited(),
           });
         }
@@ -224,15 +260,20 @@ describe("shared native host calculation admission", () => {
             "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate"
           ).pipe(HttpClientRequest.bodyText(publicBody, "application/json"))
         );
-        expect(raw.status).toBe(429);
-        expect(Headers.get(raw.headers, "retry-after")).toEqual(
-          Option.some("60")
-        );
-        expect(
-          (yield* client.calculatorApi.listCalculators({
+        expect({
+          rawStatus: raw.status,
+          HeadersGetRawHeadersRetryAfter: Headers.get(
+            raw.headers,
+            "retry-after"
+          ),
+          length: (yield* client.calculatorApi.listCalculators({
             query: MetadataQuery.make({}),
-          })).calculators.length
-        ).toBe(3);
+          })).calculators.length,
+        }).toStrictEqual({
+          rawStatus: 429,
+          HeadersGetRawHeadersRetryAfter: Option.some("60"),
+          length: 3,
+        });
         expect(first.report).toBeDefined();
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
@@ -241,7 +282,6 @@ describe("shared native host calculation admission", () => {
       return proof;
     }
   );
-
   it.effect(
     "admits the direct edge key on the canonical HTTP calculation only",
     () =>
@@ -251,11 +291,14 @@ describe("shared native host calculation admission", () => {
           Effect.provideService(
             CalculatorAdmission,
             CalculatorAdmission.of({
-              admitCalculation: (key) =>
+              admitCalculation: Effect.fn(
+                "CalculatorAdmission.admitCalculation"
+              )((key) =>
                 Ref.update(keys, (seen) => [
                   ...seen,
-                  String(Redacted.value(key)),
-                ]),
+                  EffectFunction.pipe(Redacted.value(key), String),
+                ])
+              ),
             })
           )
         );
@@ -277,10 +320,17 @@ describe("shared native host calculation admission", () => {
               HttpServerRequest.HttpServerRequest,
               HttpServerRequest.fromWeb(
                 new Request(`https://api.example.com${path}`, {
-                  body: method === "POST" ? payload : null,
-                  headers: relayed
-                    ? { ...direct, "cf-worker": "website.example.com" }
-                    : direct,
+                  body: Match.value(method).pipe(
+                    Match.when("POST", () => payload),
+                    Match.orElse(() => null)
+                  ),
+                  headers: EffectBoolean.match(relayed, {
+                    onFalse: () => direct,
+                    onTrue: () => ({
+                      ...direct,
+                      "cf-worker": "website.example.com",
+                    }),
+                  }),
                   method,
                 })
               )
@@ -292,8 +342,13 @@ describe("shared native host calculation admission", () => {
           "POST",
           body
         );
-        expect(accepted.status).toBe(200);
-        expect(yield* Ref.get(keys)).toEqual(["203.0.113.75"]);
+        expect({
+          acceptedStatus: accepted.status,
+          RefGetKeys: yield* Ref.get(keys),
+        }).toStrictEqual({
+          acceptedStatus: 200,
+          RefGetKeys: ["203.0.113.75"],
+        });
         // An error reply keeps its real status instead of a rebuilt 200.
         const rejected = yield* call(
           "/api/v1/calculators/au.pay.take-home/calculate",
@@ -303,14 +358,14 @@ describe("shared native host calculation admission", () => {
         expect(rejected.status).toBe(400);
         const text = yield* Effect.promise(() => rejected.text());
         expect(text).not.toContain("203.0.113.75");
-        yield* Effect.forEach(
+        yield* EffectFunction.pipe(
           [
             ["/api/v1/calculators/au.pay.take-home/calculate", "GET", 404],
             ["/api/v1/calculators/not-a-calculator/calculate", "POST", 400],
             ["/api/v1/calculators/au.pay.take-home/calculate/x", "POST", 404],
             ["/api/v1/calculators", "POST", 404],
           ] as const,
-          ([path, method, status]) =>
+          Effect.forEach(([path, method, status]) =>
             call(path, method, body).pipe(
               Effect.tap((response) =>
                 Effect.sync(() => {
@@ -318,6 +373,7 @@ describe("shared native host calculation admission", () => {
                 })
               )
             )
+          )
         );
         expect(yield* Ref.get(keys)).toHaveLength(1);
         // A Worker subrequest cannot borrow the edge address it carries.
@@ -327,41 +383,55 @@ describe("shared native host calculation admission", () => {
           body,
           true
         );
-        expect(relayed.status).toBe(503);
-        expect(yield* Ref.get(keys)).toHaveLength(1);
-        // A declared 4xx keeps its status, headers and checked body.
-        const limited = yield* ApiWorkerInit.pipe(
-          Effect.provideService(
-            CalculatorAdmission,
-            CalculatorAdmission.of({
-              admitCalculation: () => Effect.fail(new CalculatorRateLimited()),
-            })
-          )
-        );
-        const reply = yield* limited.fetch.pipe(
-          Effect.provideService(
-            HttpServerRequest.HttpServerRequest,
-            HttpServerRequest.fromWeb(
-              new Request(
-                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
-                {
-                  body,
-                  headers: {
-                    "cf-connecting-ip": "203.0.113.75",
-                    "content-type": "application/json",
-                  },
-                  method: "POST",
-                }
-              )
+        expect({
+          relayedStatus: relayed.status,
+          length: (yield* Ref.get(keys)).length,
+        }).toStrictEqual({
+          relayedStatus: 503,
+          length: 1,
+        });
+        yield* Effect.gen(function* verifyRateLimitedResponse() {
+          // A declared 4xx keeps its status, headers and checked body.
+          const limited = yield* ApiWorkerInit.pipe(
+            Effect.provideService(
+              CalculatorAdmission,
+              CalculatorAdmission.of({
+                admitCalculation: Effect.fn(
+                  "CalculatorAdmission.admitCalculation"
+                )(() => Effect.fail(new CalculatorRateLimited())),
+              })
             )
-          ),
-          Effect.map(HttpServerResponse.toWeb)
-        );
-        expect(reply.status).toBe(429);
-        expect(reply.headers.get("retry-after")).toBe("60");
-        expect(yield* Effect.promise(() => reply.text())).toContain(
-          "CalculatorRateLimited"
-        );
+          );
+          const reply = yield* limited.fetch.pipe(
+            Effect.provideService(
+              HttpServerRequest.HttpServerRequest,
+              HttpServerRequest.fromWeb(
+                new Request(
+                  "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+                  {
+                    body,
+                    headers: {
+                      "cf-connecting-ip": "203.0.113.75",
+                      "content-type": "application/json",
+                    },
+                    method: "POST",
+                  }
+                )
+              )
+            ),
+            Effect.map(HttpServerResponse.toWeb)
+          );
+          expect({
+            replyStatus: reply.status,
+            replyHeadersGetRetryAfter: reply.headers.get("retry-after"),
+          }).toStrictEqual({
+            replyStatus: 429,
+            replyHeadersGetRetryAfter: "60",
+          });
+          expect(yield* Effect.promise(() => reply.text())).toContain(
+            "CalculatorRateLimited"
+          );
+        }).pipe(Effect.withSpan("verifyRateLimitedResponse"));
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.scoped

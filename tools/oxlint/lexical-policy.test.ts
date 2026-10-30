@@ -2,17 +2,16 @@ import nodePath from "node:path";
 import { fileURLToPath } from "node:url";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { expect, it as test } from "@effect/vitest";
-import { Array, Effect, Schema } from "effect";
+import { expect, it } from "@effect/vitest";
+import { Function as EffectFunction, Array, Effect, Schema } from "effect";
 
 import { lintFiles, writeLintFixture } from "./cli-fixture.js";
 
 const { join } = nodePath;
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
-
 // Counts belong to the named policy. Unrelated style diagnostics do not prove
 // a gap or a fix; only the complete persistent-state fixture requires exit 0.
-test.effect.each([
+it.effect.each([
   {
     count: 4,
     name: "rejects all four direct native collection constructors",
@@ -127,7 +126,7 @@ export const values = Array.map([{}], Object.assign);`,
   {
     count: 5,
     name: "rejects escaping root, managed, Bun and Node runner references",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { Effect, ManagedRuntime } from "effect";
 import * as Fx from "effect";
 import { BunRuntime } from "@effect/platform-bun";
@@ -137,14 +136,14 @@ export const runners = [Effect.runSync, Fx.Effect.runPromise, ManagedRuntime.mak
   {
     count: 1,
     name: "rejects a named imported runner used as a callback",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { runSync as execute, void as unit } from "effect/Effect";
 export const result = unit.pipe(execute);`,
   },
   {
     count: 2,
     name: "rejects destructured capture and callback use separately",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { Effect as Fx } from "effect";
 const { runSync: execute } = Fx;
 export const result = Fx.void.pipe(execute);`,
@@ -152,14 +151,14 @@ export const result = Fx.void.pipe(execute);`,
   {
     count: 1,
     name: "rejects an exported unused destructured runner",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { Effect } from "effect";
 export const { runSync: execute } = Effect;`,
   },
   {
     count: 2,
     name: "rejects an assigned runner and its later callback use",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { Effect } from "effect";
 let execute;
 execute = Effect.runSync;
@@ -168,7 +167,7 @@ export const result = Effect.void.pipe(execute);`,
   {
     count: 1,
     name: "retains the capture failure after a runner alias is cleared",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { Effect } from "effect";
 let execute = Effect.runSync;
 execute = (value) => value;
@@ -177,27 +176,27 @@ export const result = execute("local");`,
   {
     count: 0,
     name: "keeps a same-named local Effect separate",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `export const local = (Effect) => Effect.runSync;`,
   },
   {
     count: 1,
     name: "rejects forwarding through the function call method",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { Effect } from "effect";
 export const result = Effect.runSync.call(null, Effect.void);`,
   },
   {
     count: 0,
     name: "leaves a direct call to the existing execution rule",
-    rule: "effect(no-runtime-references-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
     source: `import { Effect } from "effect";
 export const result = Effect.runSync(Effect.void);`,
   },
   {
     count: 12,
     name: "rejects the installed Effect runner call family",
-    rule: "effect(no-runtime-execution-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
     source: `import { Effect, Context } from "effect";
 Effect.runCallback(Effect.void);
 Effect.runCallbackWith(Context.empty())(Effect.void);
@@ -215,7 +214,7 @@ Effect.runSyncWith(Context.empty())(Effect.void);`,
   {
     count: 2,
     name: "rejects named and namespace Node host runner calls",
-    rule: "effect(no-runtime-execution-outside-boundaries)",
+    rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
     source: `import { runMain } from "@effect/platform-node/NodeRuntime";
 import * as Node from "@effect/platform-node";
 import { Effect } from "effect";
@@ -237,8 +236,19 @@ export const program = Effect.gen(function* () {
 ])("$name", ({ source, rule, count, name }) =>
   Effect.gen(function* () {
     const path = "tools/oxlint/.generated-lexical-policy.ts";
-    yield* writeLintFixture(join(repositoryRoot, path), source);
-    const result = yield* lintFiles([path], [], "json");
+    yield* EffectFunction.pipe(join(repositoryRoot, path), (argument1) =>
+      EffectFunction.pipe(source, (argument2) =>
+        writeLintFixture({
+          path: argument1,
+          source: argument2,
+        })
+      )
+    );
+    const result = yield* lintFiles({
+      paths: [path],
+      extraArgs: [],
+      format: "json",
+    });
     const report = yield* Schema.decodeEffect(
       Schema.fromJsonString(
         Schema.Struct({
@@ -248,14 +258,24 @@ export const program = Effect.gen(function* () {
       )
     )(result.stdout);
     expect(report.number_of_files).toBe(1);
-    expect(
-      Array.filter(report.diagnostics, (finding) => finding.code === rule)
-    ).toHaveLength(count);
-    expect(
-      Array.some(report.diagnostics, (finding) =>
-        finding.code.includes("plugin")
-      )
-    ).toBe(false);
+    EffectFunction.pipe(
+      EffectFunction.pipe(
+        report.diagnostics,
+        Array.filter((finding) => finding.code === rule)
+      ),
+      (actual) => {
+        expect(actual).toHaveLength(count);
+      }
+    );
+    EffectFunction.pipe(
+      EffectFunction.pipe(
+        report.diagnostics,
+        Array.some((finding) => finding.code.includes("plugin"))
+      ),
+      (actual) => {
+        expect(!actual).toBeTruthy();
+      }
+    );
     if (
       name ===
       "accepts persistent collections and Effect-managed immutable state"

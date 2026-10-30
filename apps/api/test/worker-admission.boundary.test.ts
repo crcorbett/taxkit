@@ -9,6 +9,7 @@ import {
 } from "@taxkit/calculators/schemas";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
+  Function as EffectFunction,
   ConfigProvider,
   Effect,
   Layer,
@@ -30,7 +31,6 @@ const runtime = RuntimeContext.of({
 const settings = ConfigProvider.fromUnknown({
   CALCULATOR_RATE_NAMESPACE: "10080",
 });
-
 it.effect.each([
   "allow",
   "reject",
@@ -77,19 +77,30 @@ it.effect.each([
       "2001:0db8:0000:0000:0000:0000:0000:0075"
     );
     const result = yield* admission.admitCalculation(key).pipe(Effect.result);
-    expect(Result.isSuccess(result)).toBe(mode === "allow");
+    EffectFunction.pipe(Result.isSuccess(result), (actual) => {
+      expect(actual).toBe(mode === "allow");
+    });
     if (Result.isSuccess(result)) {
       expect(result.success).toBeUndefined();
     } else {
-      expect(result.failure).toEqual(
-        mode === "reject"
-          ? new CalculatorRateLimited()
-          : new CalculatorAdmissionUnavailable()
+      expect(result.failure).toStrictEqual(
+        Match.value(mode).pipe(
+          Match.when("reject", () => new CalculatorRateLimited()),
+          Match.orElse(() => new CalculatorAdmissionUnavailable())
+        )
       );
     }
-    expect(yield* Ref.get(calls)).toBe(mode === "missing-runtime" ? 0 : 1);
-    expect(yield* Ref.get(keys)).toEqual(
-      mode === "missing-runtime" ? [] : ["2001:db8::75"]
+    expect(yield* Ref.get(calls)).toBe(
+      Match.value(mode).pipe(
+        Match.when("missing-runtime", (): 0 => 0),
+        Match.orElse((): 1 => 1)
+      )
+    );
+    expect(yield* Ref.get(keys)).toStrictEqual(
+      Match.value(mode).pipe(
+        Match.when("missing-runtime", () => []),
+        Match.orElse(() => ["2001:db8::75"])
+      )
     );
     if (Result.isFailure(result)) {
       const encoded = yield* Schema.encodeEffect(
@@ -103,9 +114,12 @@ it.effect.each([
   }).pipe(
     Effect.provideService(ConfigProvider.ConfigProvider, settings),
     (effect) =>
-      mode === "missing-runtime"
-        ? effect
-        : effect.pipe(Effect.provideService(RuntimeContext, runtime)),
+      Match.value(mode).pipe(
+        Match.when("missing-runtime", () => effect),
+        Match.orElse(() =>
+          effect.pipe(Effect.provideService(RuntimeContext, runtime))
+        )
+      ),
     Effect.scoped
   )
 );

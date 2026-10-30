@@ -1,6 +1,12 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { assert, describe, it } from "@effect/vitest";
-import { Array, Effect, FileSystem, pipe, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  FileSystem,
+  Schema,
+} from "effect";
 
 import { isForbiddenPackageDependency } from "../oxlint/package-roles.js";
 import {
@@ -13,27 +19,28 @@ const RootManifest = Schema.Struct({
     packages: Schema.Array(Schema.String.check(Schema.isPattern(/\/\*$/u))),
   }),
 });
-
 const appEdges = (
   manifests: readonly {
     readonly path: string;
     readonly manifest: typeof Manifest.Type;
   }[]
 ) => {
-  const apps = pipe(
+  const apps = EffectFunction.pipe(
     manifests,
     Array.filter(({ path }) => path.startsWith("apps/")),
     Array.map(({ manifest }) => manifest.name)
   );
-  return Array.flatMap(manifests, ({ manifest }) =>
-    pipe(
-      dependencyNames(manifest),
-      Array.filter((name) => Array.contains(apps, name)),
-      Array.map((name) => `${manifest.name} -> ${name}`)
+  return EffectFunction.pipe(
+    manifests,
+    Array.flatMap(({ manifest }) =>
+      EffectFunction.pipe(
+        dependencyNames(manifest),
+        Array.filter((name) => Array.contains(apps, name)),
+        Array.map((name) => `${manifest.name} -> ${name}`)
+      )
     )
   );
 };
-
 const manifestFixture = (
   name: string,
   dependencies: Readonly<Record<string, string>>
@@ -41,7 +48,6 @@ const manifestFixture = (
   dependencies,
   name,
 });
-
 describe("workspace dependency direction", () => {
   it.effect(
     "keeps every nondeployment package provider-free and app composition at the root",
@@ -55,9 +61,9 @@ describe("workspace dependency direction", () => {
               Schema.decodeUnknownEffect(Schema.fromJsonString(RootManifest))
             )
           );
-        const paths = yield* Effect.forEach(
+        const paths = yield* EffectFunction.pipe(
           root.workspaces.packages,
-          (pattern) => {
+          Effect.forEach((pattern) => {
             const parent = pattern.slice(0, -2);
             return fs
               .readDirectory(parent)
@@ -67,7 +73,7 @@ describe("workspace dependency direction", () => {
                   Effect.filter((path) => fs.exists(`${path}/package.json`))
                 )
               );
-          }
+          })
         );
         const manifests = yield* Effect.forEach(Array.flatten(paths), (path) =>
           fs.readFileString(`${path}/package.json`).pipe(
@@ -79,12 +85,18 @@ describe("workspace dependency direction", () => {
         );
         assert.deepEqual(appEdges(manifests), []);
         assert.deepEqual(
-          Array.flatMap(manifests, ({ manifest, path }) =>
-            Array.map(
-              Array.filter(dependencyNames(manifest), (dependency) =>
-                isForbiddenPackageDependency(path, dependency)
-              ),
-              (dependency) => `${manifest.name} -> ${dependency}`
+          EffectFunction.pipe(
+            manifests,
+            Array.flatMap(({ manifest, path }) =>
+              EffectFunction.pipe(
+                EffectFunction.pipe(
+                  dependencyNames(manifest),
+                  Array.filter((dependency) =>
+                    isForbiddenPackageDependency(path, dependency)
+                  )
+                ),
+                Array.map((dependency) => `${manifest.name} -> ${dependency}`)
+              )
             )
           ),
           []
@@ -110,6 +122,7 @@ describe("workspace dependency direction", () => {
       ["web -> api", "@taxkit/infrastructure -> api"]
     );
   });
+
   it("rejects app peers, provider dependencies and domain edges into runtime support", () => {
     assert.deepEqual(
       appEdges([
@@ -125,7 +138,7 @@ describe("workspace dependency direction", () => {
       ["@taxkit/content -> api"]
     );
     assert.deepEqual(
-      Array.map(
+      EffectFunction.pipe(
         [
           ["packages/api/mcp", "@distilled.cloud/cloudflare"],
           ["packages/aeo", "@taxkit/infrastructure"],
@@ -138,7 +151,9 @@ describe("workspace dependency direction", () => {
           ["packages/observability", "effect"],
           ["packages/analytics", "@taxkit/observability"],
         ] as const,
-        ([owner, dependency]) => isForbiddenPackageDependency(owner, dependency)
+        Array.map(([owner, dependency]) =>
+          isForbiddenPackageDependency(owner, dependency)
+        )
       ),
       [true, true, true, false, false, false, true, true, false, false]
     );

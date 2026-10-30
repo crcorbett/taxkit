@@ -1,5 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Array as EffectArray } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array as EffectArray,
+} from "effect";
 import { Cookies, Headers, HttpServerResponse } from "effect/http";
 
 import {
@@ -20,7 +24,6 @@ const unshared = {
   "cdn-cache-control": privateCacheControl,
   "cloudflare-cdn-cache-control": privateCacheControl,
 };
-
 describe("public response cache policy", () => {
   it.each([
     "/api/v1/docs/page",
@@ -34,7 +37,9 @@ describe("public response cache policy", () => {
     "/api/v1/facts",
     "/api/docs/openapi.json",
   ])("shares the public read %s", (path) => {
-    expect(isPublicReadPath(path)).toBe(true);
+    EffectFunction.pipe(isPublicReadPath(path), (actual) => {
+      expect(actual).toBeTruthy();
+    });
   });
 
   it.each([
@@ -43,7 +48,9 @@ describe("public response cache policy", () => {
     "/mcp",
     "/api/v1/docs/discovery/other.txt",
   ])("never shares %s", (path) => {
-    expect(isPublicReadPath(path)).toBe(false);
+    EffectFunction.pipe(isPublicReadPath(path), (actual) => {
+      expect(!actual).toBeTruthy();
+    });
   });
 
   it("shares only successful public reads", () => {
@@ -53,19 +60,39 @@ describe("public response cache policy", () => {
       publicRead: true,
       status: 200,
     };
-    expect(cacheHeaders(base)).toEqual(shared);
-    expect(cacheHeaders({ ...base, method: "HEAD" })).toEqual(shared);
-    expect(cacheHeaders({ ...base, method: "POST" })).toEqual(unshared);
-    expect(cacheHeaders({ ...base, status: 404 })).toEqual(unshared);
-    expect(cacheHeaders({ ...base, status: 503 })).toEqual(unshared);
-    expect(cacheHeaders({ ...base, status: 400 })).toEqual(unshared);
-    expect(cacheHeaders({ ...base, publicRead: false })).toEqual(unshared);
-    expect(
+    EffectFunction.pipe(cacheHeaders(base), (actual) => {
+      expect(actual).toStrictEqual(shared);
+    });
+    EffectFunction.pipe(cacheHeaders({ ...base, method: "HEAD" }), (actual) => {
+      expect(actual).toStrictEqual(shared);
+    });
+    EffectFunction.pipe(cacheHeaders({ ...base, method: "POST" }), (actual) => {
+      expect(actual).toStrictEqual(unshared);
+    });
+    EffectFunction.pipe(cacheHeaders({ ...base, status: 404 }), (actual) => {
+      expect(actual).toStrictEqual(unshared);
+    });
+    EffectFunction.pipe(cacheHeaders({ ...base, status: 503 }), (actual) => {
+      expect(actual).toStrictEqual(unshared);
+    });
+    EffectFunction.pipe(cacheHeaders({ ...base, status: 400 }), (actual) => {
+      expect(actual).toStrictEqual(unshared);
+    });
+    EffectFunction.pipe(
+      cacheHeaders({ ...base, publicRead: false }),
+      (actual) => {
+        expect(actual).toStrictEqual(unshared);
+      }
+    );
+    EffectFunction.pipe(
       cacheHeaders({
         ...base,
         headers: Headers.fromInput({ "set-cookie": "a=b" }),
-      })
-    ).toEqual(unshared);
+      }),
+      (actual) => {
+        expect(actual).toStrictEqual(unshared);
+      }
+    );
   });
 
   it("stores Accept negotiation answers as their own public variant", () => {
@@ -74,55 +101,86 @@ describe("public response cache policy", () => {
       method: "GET",
       publicRead: true,
     };
-    expect(cacheHeaders({ ...negotiated, status: 400 })).toEqual(shared);
-    expect(cacheHeaders({ ...negotiated, status: 406 })).toEqual(shared);
-    expect(cacheHeaders({ ...negotiated, status: 307 })).toEqual(shared);
+    EffectFunction.pipe(
+      cacheHeaders({ ...negotiated, status: 400 }),
+      (actual) => {
+        expect(actual).toStrictEqual(shared);
+      }
+    );
+    EffectFunction.pipe(
+      cacheHeaders({ ...negotiated, status: 406 }),
+      (actual) => {
+        expect(actual).toStrictEqual(shared);
+      }
+    );
+    EffectFunction.pipe(
+      cacheHeaders({ ...negotiated, status: 307 }),
+      (actual) => {
+        expect(actual).toStrictEqual(shared);
+      }
+    );
     // Missing and unavailable pages are never stored, whatever they vary on.
-    expect(cacheHeaders({ ...negotiated, status: 404 })).toEqual(unshared);
-    expect(cacheHeaders({ ...negotiated, status: 503 })).toEqual(unshared);
-    expect(
+    EffectFunction.pipe(
+      cacheHeaders({ ...negotiated, status: 404 }),
+      (actual) => {
+        // Missing and unavailable pages are never stored, whatever they vary on.
+        expect(actual).toStrictEqual(unshared);
+      }
+    );
+    EffectFunction.pipe(
+      cacheHeaders({ ...negotiated, status: 503 }),
+      (actual) => {
+        expect(actual).toStrictEqual(unshared);
+      }
+    );
+    EffectFunction.pipe(
       cacheHeaders({
         ...negotiated,
         headers: Headers.fromInput({ vary: "Accept-Encoding" }),
         status: 400,
-      })
-    ).toEqual(unshared);
+      }),
+      (actual) => {
+        expect(actual).toStrictEqual(unshared);
+      }
+    );
   });
 
   it("keeps a stricter owner instruction and never overrides it publicly", () => {
-    expect(
+    EffectFunction.pipe(
       cacheHeaders({
         headers: Headers.fromInput({ "cache-control": "private, max-age=60" }),
         method: "GET",
         publicRead: true,
         status: 200,
-      })
-    ).toEqual(unshared);
-    expect(
+      }),
+      (actual) => {
+        expect(actual).toStrictEqual(unshared);
+      }
+    );
+    EffectFunction.pipe(
       cacheHeaders({
         headers: Headers.fromInput({ "cdn-cache-control": "no-store" }),
         method: "GET",
         publicRead: true,
         status: 200,
-      })
-    ).toEqual(unshared);
+      }),
+      (actual) => {
+        expect(actual).toStrictEqual(unshared);
+      }
+    );
   });
 });
-
 const cacheHeaderNames = [
   "cache-control",
   "cdn-cache-control",
   "cloudflare-cdn-cache-control",
 ] as const;
-
 const declaredPublicHeaders = {
   "cache-control": publicBrowserCacheControl,
   "cdn-cache-control": publicCdnCacheControl,
   "cloudflare-cdn-cache-control": publicCdnCacheControl,
 };
-
 const publicReadRequest = { method: "GET", publicRead: true } as const;
-
 describe("native cache policy response boundary", () => {
   it.each([
     {
@@ -185,10 +243,20 @@ describe("native cache policy response boundary", () => {
       });
       const checked = applyCachePolicy(native, publicReadRequest);
       const outgoing = HttpServerResponse.toWeb(checked);
-      expect(outgoing.headers.get("cache-control")).toBe(expectedBrowser);
-      expect(outgoing.headers.get("cdn-cache-control")).toBe(expectedCdn);
-      expect(outgoing.headers.get("cloudflare-cdn-cache-control")).toBe(
-        expectedCloudflare
+      EffectFunction.pipe(outgoing.headers.get("cache-control"), (actual) => {
+        expect(actual).toBe(expectedBrowser);
+      });
+      EffectFunction.pipe(
+        outgoing.headers.get("cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe(expectedCdn);
+        }
+      );
+      EffectFunction.pipe(
+        outgoing.headers.get("cloudflare-cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe(expectedCloudflare);
+        }
       );
       expect(checked.body).toBe(native.body);
       expect(outgoing.status).toBe(200);
@@ -196,15 +264,18 @@ describe("native cache policy response boundary", () => {
   );
 
   it.each(
-    EffectArray.flatMap(cacheHeaderNames, (headerName) =>
-      EffectArray.map(
-        [
-          "private",
-          'private="Set-Cookie"',
-          "NO-STORE",
-          "public, no-store, max-age=60",
-        ],
-        (directive) => ({ directive, headerName })
+    EffectFunction.pipe(
+      cacheHeaderNames,
+      EffectArray.flatMap((headerName) =>
+        EffectFunction.pipe(
+          [
+            "private",
+            'private="Set-Cookie"',
+            "NO-STORE",
+            "public, no-store, max-age=60",
+          ],
+          EffectArray.map((directive) => ({ directive, headerName }))
+        )
       )
     )
   )(
@@ -215,28 +286,37 @@ describe("native cache policy response boundary", () => {
       });
       const checked = applyCachePolicy(native, publicReadRequest);
       const outgoing = HttpServerResponse.toWeb(checked);
-      expect(
-        EffectArray.map(cacheHeaderNames, (name) => outgoing.headers.get(name))
-      ).toEqual([
-        privateCacheControl,
-        privateCacheControl,
-        privateCacheControl,
-      ]);
+      EffectFunction.pipe(
+        EffectFunction.pipe(
+          cacheHeaderNames,
+          EffectArray.map((name) => outgoing.headers.get(name))
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual([
+            privateCacheControl,
+            privateCacheControl,
+            privateCacheControl,
+          ]);
+        }
+      );
       expect(checked.body).toBe(native.body);
       expect(outgoing.status).toBe(native.status);
     }
   );
 
   it.each(
-    EffectArray.flatMap(cacheHeaderNames, (headerName) =>
-      EffectArray.map(
-        [
-          "public, no-cache",
-          'no-cache="Set-Cookie"',
-          "public, max-age=60, must-revalidate",
-          "PROXY-REVALIDATE",
-        ],
-        (directive) => ({ directive, headerName })
+    EffectFunction.pipe(
+      cacheHeaderNames,
+      EffectArray.flatMap((headerName) =>
+        EffectFunction.pipe(
+          [
+            "public, no-cache",
+            'no-cache="Set-Cookie"',
+            "public, max-age=60, must-revalidate",
+            "PROXY-REVALIDATE",
+          ],
+          EffectArray.map((directive) => ({ directive, headerName }))
+        )
       )
     )
   )(
@@ -249,25 +329,47 @@ describe("native cache policy response boundary", () => {
       const outgoing = HttpServerResponse.toWeb(
         applyCachePolicy(native, publicReadRequest)
       );
-      expect(outgoing.headers.get("cache-control")).toBe(
-        headerName === "cache-control" ? directive : publicBrowserCacheControl
+      EffectFunction.pipe(outgoing.headers.get("cache-control"), (actual) => {
+        expect(actual).toBe(
+          Match.value(headerName).pipe(
+            Match.when("cache-control", () => directive),
+            Match.orElse(() => publicBrowserCacheControl)
+          )
+        );
+      });
+      EffectFunction.pipe(
+        outgoing.headers.get("cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe("no-cache");
+        }
       );
-      expect(outgoing.headers.get("cdn-cache-control")).toBe("no-cache");
-      expect(outgoing.headers.get("cloudflare-cdn-cache-control")).toBe(
-        "no-cache"
+      EffectFunction.pipe(
+        outgoing.headers.get("cloudflare-cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe("no-cache");
+        }
       );
     }
   );
 
   it.each(
-    EffectArray.flatMap(["GET", "HEAD"], (method) =>
-      EffectArray.map([200, 307, 400, 406], (status) => ({ method, status }))
+    EffectFunction.pipe(
+      ["GET", "HEAD"],
+      EffectArray.flatMap((method) =>
+        EffectFunction.pipe(
+          [200, 307, 400, 406],
+          EffectArray.map((status) => ({ method, status }))
+        )
+      )
     )
   )(
     "keeps existing defaults and Accept variants for $method $status",
     ({ method, status }) => {
       const native = HttpServerResponse.text("public representation", {
-        headers: status === 200 ? {} : { vary: "Origin, Accept" },
+        headers: Match.value(status).pipe(
+          Match.when(200, () => ({})),
+          Match.orElse(() => ({ vary: "Origin, Accept" }))
+        ),
         status,
       });
       const outgoing = HttpServerResponse.toWeb(
@@ -275,13 +377,18 @@ describe("native cache policy response boundary", () => {
         { withoutBody: method === "HEAD" }
       );
       expect(outgoing.status).toBe(status);
-      expect(outgoing.headers.get("cache-control")).toBe(
-        publicBrowserCacheControl
+      EffectFunction.pipe(outgoing.headers.get("cache-control"), (actual) => {
+        expect(actual).toBe(publicBrowserCacheControl);
+      });
+      EffectFunction.pipe(
+        outgoing.headers.get("cloudflare-cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe(publicCdnCacheControl);
+        }
       );
-      expect(outgoing.headers.get("cloudflare-cdn-cache-control")).toBe(
-        publicCdnCacheControl
-      );
-      expect(outgoing.headers.get("set-cookie")).toBeNull();
+      EffectFunction.pipe(outgoing.headers.get("set-cookie"), (actual) => {
+        expect(actual).toBeNull();
+      });
     }
   );
 
@@ -321,14 +428,30 @@ describe("native cache policy response boundary", () => {
     },
   ])("refuses shared caching for $name", ({ make, separatedCookies }) => {
     const native = make();
-    expect(Headers.has(native.headers, "set-cookie")).toBe(!separatedCookies);
-    expect(Cookies.isEmpty(native.cookies)).toBe(!separatedCookies);
+    EffectFunction.pipe(Headers.has(native.headers, "set-cookie"), (actual) => {
+      expect(actual).toBe(!separatedCookies);
+    });
+    EffectFunction.pipe(Cookies.isEmpty(native.cookies), (actual) => {
+      expect(actual).toBe(!separatedCookies);
+    });
     const checked = applyCachePolicy(native, publicReadRequest);
     const outgoing = HttpServerResponse.toWeb(checked);
-    expect(
-      EffectArray.map(cacheHeaderNames, (name) => outgoing.headers.get(name))
-    ).toEqual([privateCacheControl, privateCacheControl, privateCacheControl]);
-    expect(outgoing.headers.getSetCookie()).toEqual(["session=checked"]);
+    EffectFunction.pipe(
+      EffectFunction.pipe(
+        cacheHeaderNames,
+        EffectArray.map((name) => outgoing.headers.get(name))
+      ),
+      (actual) => {
+        expect(actual).toStrictEqual([
+          privateCacheControl,
+          privateCacheControl,
+          privateCacheControl,
+        ]);
+      }
+    );
+    EffectFunction.pipe(outgoing.headers.getSetCookie(), (actual) => {
+      expect(actual).toStrictEqual(["session=checked"]);
+    });
     expect(checked.cookies).toBe(native.cookies);
     expect(checked.body).toBe(native.body);
     expect(outgoing.status).toBe(native.status);

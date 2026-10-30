@@ -2,7 +2,7 @@ import nodePath from "node:path";
 
 import { BunServices } from "@effect/platform-bun";
 import { expect, it } from "@effect/vitest";
-import { Effect, FileSystem } from "effect";
+import { Effect, FileSystem, Boolean as EffectBoolean } from "effect";
 
 import { lintFiles, makeIsolatedLintWorkspace } from "./cli-fixture.js";
 
@@ -11,7 +11,6 @@ const encoder =
   'import { Schema } from "effect";\n\nexport const result = Schema.encodeEffect(Schema.String)("fixture");';
 const decoder =
   'import { Schema } from "effect";\n\nexport const result = Schema.decodeUnknownEffect(Schema.String)("fixture");';
-
 // An isolated config root keeps the exact production relative paths. Never
 // replace or delete the real owner to exercise its file-specific permission.
 it.effect.each([
@@ -235,7 +234,7 @@ it.effect.each([
     path: "apps/web/test/native-analytics.boundary.test.ts",
     rule: "",
     source:
-      'import { Schema } from "effect";\n\nexport class NativeAnalyticsClientFailed extends Schema.TaggedError<NativeAnalyticsClientFailed>()("NativeAnalyticsClientFailed", { operation: Schema.Literal("connect") }) {}',
+      'import { Schema } from "effect";\n\nexport class NativeAnalyticsClientFailed extends Schema.TaggedError<NativeAnalyticsClientFailed, { readonly brand: unique symbol }>()("NativeAnalyticsClientFailed", { operation: Schema.Literal("connect") }) {}',
   },
   {
     allowed: false,
@@ -253,14 +252,19 @@ it.effect.each([
       const target = join(workingDirectory, path);
       yield* fs.makeDirectory(dirname(target), { recursive: true });
       yield* fs.writeFileString(target, source);
-      const result = yield* lintFiles(
-        [target],
-        [],
-        "unix",
+      const result = yield* lintFiles({
+        paths: [target],
+        extraArgs: [],
+        format: "unix",
         configuration,
-        workingDirectory
+        workingDirectory,
+      });
+      expect(result.exitCode, result.output).toBe(
+        EffectBoolean.match(allowed, {
+          onFalse: (): 1 => 1,
+          onTrue: (): 0 => 0,
+        })
       );
-      expect(result.exitCode, result.output).toBe(allowed ? 0 : 1);
       if (!allowed) {
         expect(result.output).toContain(rule);
       }

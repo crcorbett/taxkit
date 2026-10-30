@@ -1,6 +1,14 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
-import { Array, Effect, Path, Queue, Record, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Path,
+  Queue,
+  Record,
+  Schema,
+} from "effect";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
@@ -8,7 +16,6 @@ import { readWorkerModules } from "./native-modules.fixture";
 
 const origin = "http://127.0.0.1:4198";
 const Json = Schema.fromJsonString(Schema.Unknown);
-
 it.live(
   "contains a real internal settings defect before native framework error egress",
   () =>
@@ -19,21 +26,25 @@ it.live(
         root,
         ".alchemy/native-pair/settings-defect/server"
       );
-      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
-      expect(files).toContain("server.js");
-      // The actual source-built application must contain the injected operation.
-      // An ordinary artifact or an empty fake cannot satisfy this fault oracle.
-      expect(
-        Array.some(Record.values(modules), (module) =>
-          module.contents.includes('die("PRIVATE9")')
-        )
-      ).toBe(true);
-      // The Website has no generated server-function surface to fall back on.
-      expect(
-        Array.some(Record.values(modules), (module) =>
-          module.contents.includes("_createServerFn_handler")
-        )
-      ).toBe(false);
+      const { files, modules, wasm } = yield* readWorkerModules({
+        modulesRoot,
+      });
+      expect(files).toContain("index.js");
+      expect({
+        length: EffectFunction.pipe(
+          Record.values(modules),
+          Array.some((module) => module.contents.includes('die("PRIVATE9")'))
+        ),
+        length2: !EffectFunction.pipe(
+          Record.values(modules),
+          Array.some((module) =>
+            module.contents.includes("_createServerFn_handler")
+          )
+        ),
+      }).toStrictEqual({
+        length: true,
+        length2: true,
+      });
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
       const host = yield* Effect.acquireRelease(
@@ -73,7 +84,7 @@ it.live(
                       },
                     },
                     manifest: {
-                      mainModule: "server.js",
+                      mainModule: "index.js",
                       modules: { ...modules, ...wasm },
                       modulesRoot,
                     },
@@ -98,33 +109,45 @@ it.live(
               host.dispatchFetch(`${origin}/`, request)
             );
             const body = yield* Effect.promise(() => response.text());
-            expect(body.includes("PRIVATE9"), request.method).toBe(false);
+            expect(body).not.toContain("PRIVATE9");
             // TanStack's native root error egress for an internal defect.
             expect(response.status, request.method).toBe(500);
-            expect(response.headers.get("content-type")).toContain("text/html");
-            expect(response.headers.get("cache-control")).toBe("no-store");
-            expect(response.headers.get("cloudflare-cdn-cache-control")).toBe(
-              "no-store"
+            EffectFunction.pipe(
+              response.headers.get("content-type"),
+              (actual) => {
+                expect(actual).toContain("text/html");
+              }
             );
+            expect({
+              responseHeadersGetCacheControl:
+                response.headers.get("cache-control"),
+              responseHeadersGetCloudflareCdnCacheControl: response.headers.get(
+                "cloudflare-cdn-cache-control"
+              ),
+            }).toStrictEqual({
+              responseHeadersGetCacheControl: "no-store",
+              responseHeadersGetCloudflareCdnCacheControl: "no-store",
+            });
             // The root error component is the only page content.
             expect(body).toContain(
               "TaxKit cannot load its settings. Please try again later."
             );
-            expect(body).not.toContain("Pay before tax");
-            expect(body).not.toContain("1654");
-            expect(body).not.toContain("Server Fn Error");
+            Array.forEach((marker: string) => {
+              expect(body).not.toContain(marker);
+            })(["Pay before tax", "1654", "Server Fn Error"]);
             // The dehydrated route error carries no message or stack.
             expect(body).toMatch(/s:"error",e:\$R\[\d+\]=new Error\(""\)/u);
           })
       );
-      expect(yield* Queue.clear(exceptions)).toEqual([]);
+      expect(yield* Queue.clear(exceptions)).toStrictEqual([]);
       const logText = yield* Schema.encodeEffect(Json)(
         yield* Queue.clear(logs)
       );
       // Require positive safe reporting as well as absence of the injected Cause.
       expect(logText).toContain("website.runtime.event");
-      expect(logText).not.toContain("PRIVATE9");
-      expect(logText).not.toContain("Server Fn Error");
+      Array.forEach((marker: string) => {
+        expect(logText).not.toContain(marker);
+      })(["PRIVATE9", "Server Fn Error"]);
     }).pipe(
       Effect.timeout("20 seconds"),
       Effect.scoped,

@@ -1,6 +1,8 @@
 import navigationRepresentation from "@content/docs/navigation.json" with { type: "json" };
 import repositoryRepresentation from "@content/docs/repository.json" with { type: "json" };
 import {
+  Match,
+  Function as EffectFunction,
   Array,
   Effect,
   HashMap,
@@ -8,7 +10,6 @@ import {
   Layer,
   Result,
   Schema,
-  pipe,
 } from "effect";
 
 import { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
@@ -34,7 +35,6 @@ import {
 
 const catalogueFailure = (message: string) =>
   new DocsSourceError({ message, operation: "buildCatalogue" });
-
 // The one public catalogue, built once from the bundled MDX files. The
 // navigation decides each page's address and order; frontmatter decides
 // whether it is published. Any unreadable page fails the Layer.
@@ -55,73 +55,99 @@ export const ContentCatalogueLive = Layer.effect(
         catalogueFailure("The docs repository profile is invalid.")
       )
     );
-    const leaves = Array.flatMap(navigation.primaryNavigation, (item) => [
-      item,
-      ...(item.pages ?? []),
-    ]);
+    const leaves = EffectFunction.pipe(
+      navigation.primaryNavigation,
+      Array.flatMap((item) => [item, ...(item.pages ?? [])])
+    );
     const addresses = HashMap.fromIterable(
-      Array.map(leaves, (leaf) => [leaf.source, leaf.path] as const)
+      EffectFunction.pipe(
+        leaves,
+        Array.map((leaf) => [leaf.source, leaf.path] as const)
+      )
     );
     if (
       sources.length !== leaves.length ||
-      !Array.every(sources, (source) => HashMap.has(addresses, source.path))
+      !EffectFunction.pipe(
+        sources,
+        Array.every((source) => HashMap.has(addresses, source.path))
+      )
     ) {
       return yield* catalogueFailure(
         "The bundled MDX files must match the navigation."
       );
     }
-    const pages = yield* Effect.forEach(leaves, (leaf) =>
-      Effect.gen(function* () {
-        const source = yield* Array.findFirst(
-          sources,
-          (candidate) => candidate.path === leaf.source
-        ).pipe(
-          Effect.fromOption,
-          Effect.mapError(() =>
-            catalogueFailure("The bundled MDX files must match the navigation.")
-          )
-        );
-        const page = yield* reader.read(source, {
-          pages: addresses,
-          repository,
-          source: leaf.source,
-        });
-        const slugs = yield* Effect.forEach(
-          Array.filter(leaf.path.split("/"), (segment) => segment !== ""),
-          (segment) => DocsPageSlug.makeEffect(segment)
-        ).pipe(
-          Effect.mapError(() =>
-            catalogueFailure("A navigation address is invalid.")
-          )
-        );
-        return {
-          ...page,
-          markdown: readingMarkdown({
-            body: page.body,
-            title: page.frontmatter.title,
-          }),
-          path: leaf.path,
-          slugs,
-          source: leaf.source,
-        };
-      })
+    const pages = yield* EffectFunction.pipe(
+      leaves,
+      Effect.forEach((leaf) =>
+        Effect.gen(function* () {
+          const source = yield* EffectFunction.pipe(
+            sources,
+            Array.findFirst((candidate) => candidate.path === leaf.source)
+          ).pipe(
+            Effect.fromOption,
+            Effect.mapError(() =>
+              catalogueFailure(
+                "The bundled MDX files must match the navigation."
+              )
+            )
+          );
+          const page = yield* reader.read({
+            source,
+            links: {
+              pages: addresses,
+              repository,
+              source: leaf.source,
+            },
+          });
+          const slugs = yield* Effect.forEach(
+            EffectFunction.pipe(
+              leaf.path.split("/"),
+              Array.filter((segment) => segment !== "")
+            ),
+            (segment) => DocsPageSlug.makeEffect(segment)
+          ).pipe(
+            Effect.mapError(() =>
+              catalogueFailure("A navigation address is invalid.")
+            )
+          );
+          return {
+            ...page,
+            markdown: readingMarkdown({
+              body: page.body,
+              title: page.frontmatter.title,
+            }),
+            path: leaf.path,
+            slugs,
+            source: leaf.source,
+          };
+        })
+      )
     );
     const published = HashSet.fromIterable(
-      Array.flatMap(pages, (page) =>
-        page.frontmatter.status === "published" ? [page.path] : []
+      EffectFunction.pipe(
+        pages,
+        Array.flatMap((page) =>
+          Match.value(page.frontmatter).pipe(
+            Match.when({ status: "published" }, () => [page.path]),
+            Match.orElse(() => [])
+          )
+        )
       )
     );
     // A published child needs its published section page; it is never
     // silently dropped because its parent is still a draft.
     if (
       navigation.status !== "published" ||
-      Array.some(
+      EffectFunction.pipe(
         navigation.primaryNavigation,
-        (item) =>
-          !HashSet.has(published, item.path) &&
-          Array.some(item.pages ?? [], (child) =>
-            HashSet.has(published, child.path)
-          )
+        Array.some(
+          (item) =>
+            !HashSet.has(published, item.path) &&
+            EffectFunction.pipe(
+              item.pages ?? [],
+              Array.some((child) => HashSet.has(published, child.path))
+            )
+        )
       )
     ) {
       return yield* catalogueFailure(
@@ -130,28 +156,33 @@ export const ContentCatalogueLive = Layer.effect(
     }
     return yield* DocsPublicCatalogue.makeEffect({
       navigation: {
-        primaryNavigation: Array.map(
-          Array.filter(navigation.primaryNavigation, (item) =>
-            HashSet.has(published, item.path)
+        primaryNavigation: EffectFunction.pipe(
+          EffectFunction.pipe(
+            navigation.primaryNavigation,
+            Array.filter((item) => HashSet.has(published, item.path))
           ),
-          (item) => ({
+          Array.map((item) => ({
             ...item,
-            pages: Array.filter(item.pages ?? [], (child) =>
-              HashSet.has(published, child.path)
+            pages: EffectFunction.pipe(
+              item.pages ?? [],
+              Array.filter((child) => HashSet.has(published, child.path))
             ),
-          })
+          }))
         ),
       },
       pages: Array.filterMap(pages, (page) =>
-        page.frontmatter.status === "published"
-          ? Result.succeed({
+        Match.value(page.frontmatter).pipe(
+          Match.when({ status: "published" }, (matchedValue) =>
+            Result.succeed({
               ...page,
               frontmatter: {
-                ...page.frontmatter,
+                ...matchedValue,
                 status: "published" as const,
               },
             })
-          : Result.failVoid
+          ),
+          Match.orElse(() => Result.failVoid)
+        )
       ),
       schemaVersion: 1,
     }).pipe(
@@ -161,7 +192,6 @@ export const ContentCatalogueLive = Layer.effect(
     );
   })
 );
-
 export const ContentServiceLive = Layer.effect(
   ContentService,
   Effect.gen(function* () {
@@ -171,7 +201,10 @@ export const ContentServiceLive = Layer.effect(
         Effect.succeed(catalogue.navigation)
       ),
       getPage: Effect.fn("ContentService.getPage")((path: DocsPagePath) =>
-        Array.findFirst(catalogue.pages, (page) => page.path === path).pipe(
+        EffectFunction.pipe(
+          catalogue.pages,
+          Array.findFirst((page) => page.path === path)
+        ).pipe(
           Effect.fromOption,
           Effect.mapError(() => new DocsPageNotFoundError({ path }))
         )
@@ -182,7 +215,7 @@ export const ContentServiceLive = Layer.effect(
       searchPages: Effect.fn("ContentService.searchPages")(
         (term: DocsSearchTerm) =>
           Effect.forEach(
-            pipe(
+            EffectFunction.pipe(
               catalogue.pages,
               Array.filter((page) =>
                 `${page.frontmatter.title}\n${page.frontmatter.description}\n${page.markdown}`

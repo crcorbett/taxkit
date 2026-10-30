@@ -14,7 +14,6 @@ import {
   sourceChecksum,
 } from "@taxkit/core/trace";
 import { Option, BigDecimal, Context, Layer, Schema } from "effect";
-
 /**
  * Medicare Levy low-income threshold and rate table.
  *
@@ -23,7 +22,12 @@ import { Option, BigDecimal, Context, Layer, Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class MedicareLevyTable extends Schema.TaggedClass<MedicareLevyTable>()(
+export class MedicareLevyTable extends Schema.TaggedClass<
+  MedicareLevyTable,
+  {
+    readonly brand: unique symbol;
+  }
+>()(
   "MedicareLevyTable",
   Schema.Struct({
     levyRate: TaxRate,
@@ -47,7 +51,6 @@ export class MedicareLevyTable extends Schema.TaggedClass<MedicareLevyTable>()(
     )
   )
 ) {}
-
 /**
  * Context tag for the active ATO Medicare Levy table.
  *
@@ -57,7 +60,6 @@ export class AtoMedicareLevyTable extends Context.Service<
   AtoMedicareLevyTable,
   MedicareLevyTable
 >()("taxkit/rules-au-income-tax/parameter/AtoMedicareLevyTable") {}
-
 /**
  * Source reference for ATO Medicare Levy low-income reduction thresholds.
  *
@@ -70,7 +72,6 @@ export const MedicareLevySource2025_26 = SourceRef.make({
   title:
     "Act No. 58 of 2026, Schedule 5 items 3, 5 and 14 — Medicare thresholds for 2025–26",
 });
-
 /**
  * Canonical extraction metadata for the Medicare Levy threshold table.
  *
@@ -88,7 +89,6 @@ export const MedicareLevyArtifact2025_26 = new SourceArtifact({
   retrievedOn: IsoDate.make("2026-10-08"),
   source: MedicareLevySource2025_26,
 });
-
 /**
  * Parameter descriptor for the ATO Medicare Levy table.
  *
@@ -106,7 +106,6 @@ export const AtoMedicareLevyTableDescriptor = makeParameterDescriptor({
   tag: AtoMedicareLevyTable,
   title: "ATO Medicare levy threshold and rate parameters",
 });
-
 // Single non-SAPTO 2025-26: nil at/below $28,011, shade-in through $35,013, then 2% flat.
 const table2025_26 = new MedicareLevyTable({
   levyRate: TaxRate.make(BigDecimal.make(2n, 2)),
@@ -116,7 +115,6 @@ const table2025_26 = new MedicareLevyTable({
   thresholdCents: Cents.make(2_801_100),
   year: taxYear("2025-26"),
 });
-
 /**
  * Live ATO Medicare Levy parameter layer for 2025-26.
  *

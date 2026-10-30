@@ -1,4 +1,11 @@
-import { Array, Effect, Option, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Option,
+  Schema,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import { InvalidCalendarValue } from "./errors.js";
 
@@ -6,28 +13,23 @@ const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/u;
 const standardDaysInMonth = [
   31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
 ] as const;
-
 const isRealIsoDate = (value: string): boolean => {
   if (!isoDatePattern.test(value)) {
     return false;
   }
-
-  const year = Number(value.slice(0, 4));
-  const month = Number(value.slice(5, 7));
-  const day = Number(value.slice(8, 10));
+  const year = EffectFunction.pipe(value.slice(0, 4), Number);
+  const month = EffectFunction.pipe(value.slice(5, 7), Number);
+  const day = EffectFunction.pipe(value.slice(8, 10), Number);
   const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-  const monthLength =
-    month === 2 && leapYear
-      ? 29
-      : Array.get(standardDaysInMonth, month - 1).pipe(
-          Option.getOrElse(() => 0)
-        );
-
+  const monthLength = EffectBoolean.match(month === 2 && leapYear, {
+    onFalse: () =>
+      Array.get(standardDaysInMonth, month - 1).pipe(Option.getOrElse(() => 0)),
+    onTrue: (): 29 => 29,
+  });
   return (
     year > 0 && month >= 1 && month <= 12 && day >= 1 && day <= monthLength
   );
 };
-
 /**
  * ISO calendar date used for effective-period boundaries.
  *
@@ -43,26 +45,22 @@ export const IsoDate = Schema.String.check(
     expected: "a real Gregorian calendar date in YYYY-MM-DD form",
   })
 ).pipe(Schema.brand("taxkit/IsoDate"));
-
 /**
  * ISO calendar date used for effective-period boundaries.
  *
  * @since 0.1.0
  */
 export type IsoDate = typeof IsoDate.Type;
-
 const DateIntervalFields = Schema.Struct({
   from: IsoDate,
   toExclusive: Schema.OptionFromOptionalKey(
     Schema.OptionFromUndefinedOr(IsoDate)
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
 });
-
 const isIntervalOrdered = (from: string, end: Option.Option<string>): boolean =>
   end.pipe(
     Option.match({ onNone: () => true, onSome: (value) => from < value })
   );
-
 // Check each representation at its owning boundary. A check on the decoded
 // Option fields alone is lost when Schema.toEncoded removes transformations.
 /**
@@ -77,7 +75,12 @@ export const DateInterval = Schema.toEncoded(DateIntervalFields)
   .check(
     Schema.makeFilter(
       ({ from, toExclusive }) =>
-        isIntervalOrdered(from, Option.fromUndefinedOr(toExclusive)),
+        EffectFunction.pipe(from, (argument1) =>
+          EffectFunction.pipe(
+            Option.fromUndefinedOr(toExclusive),
+            (argument2) => isIntervalOrdered(argument1, argument2)
+          )
+        ),
       { expected: "interval start before end" }
     )
   )
@@ -85,18 +88,20 @@ export const DateInterval = Schema.toEncoded(DateIntervalFields)
   .check(
     Schema.makeFilter(
       ({ from, toExclusive }) =>
-        isIntervalOrdered(from, Option.flatten(toExclusive)),
+        EffectFunction.pipe(from, (argument3) =>
+          EffectFunction.pipe(Option.flatten(toExclusive), (argument4) =>
+            isIntervalOrdered(argument3, argument4)
+          )
+        ),
       { expected: "interval start before end" }
     )
   );
-
 /**
  * Half-open date interval `[from, toExclusive)`.
  *
  * @since 0.1.0
  */
 export type DateInterval = typeof DateInterval.Type;
-
 /**
  * Brands a validated ISO calendar date.
  *
@@ -108,7 +113,6 @@ export const isoDate = (
   IsoDate.makeEffect(value).pipe(
     Effect.mapError(() => new InvalidCalendarValue())
   );
-
 /**
  * Builds a validated half-open date interval.
  *
@@ -120,7 +124,6 @@ export const dateInterval = (
   Schema.decodeEffect(DateInterval)(args).pipe(
     Effect.mapError(() => new InvalidCalendarValue())
   );
-
 /**
  * Returns whether two half-open date intervals overlap.
  *
@@ -136,7 +139,6 @@ export const dateIntervalsOverlap = (
   Option.flatten(left.toExclusive).pipe(
     Option.match({ onNone: () => true, onSome: (end) => right.from < end })
   );
-
 /**
  * Complete Australian year label with a matching next-year suffix.
  *
@@ -151,7 +153,7 @@ export const AustralianTaxYear = Schema.String.check(
       if (!/^\d{4}-\d{2}$/u.test(value)) {
         return false;
       }
-      const start = Number(value.slice(0, 4));
+      const start = EffectFunction.pipe(value.slice(0, 4), Number);
       return (
         start > 0 &&
         start < 9999 &&
@@ -161,14 +163,12 @@ export const AustralianTaxYear = Schema.String.check(
     { expected: "a complete Australian tax year with representable dates" }
   )
 ).pipe(Schema.brand("taxkit/AustralianTaxYear"));
-
 /**
  * Complete Australian year label used by the calendar interval helper.
  *
  * @since 0.1.0
  */
 export type AustralianTaxYear = typeof AustralianTaxYear.Type;
-
 /**
  * Converts an Australian tax year label such as `2025-26` to its date
  * interval: `2025-07-01` through, but not including, `2026-07-01`.
@@ -183,7 +183,7 @@ export const australianTaxYearInterval = (
     Effect.flatMap((value) =>
       dateInterval({
         from: `${value.slice(0, 4)}-07-01`,
-        toExclusive: `${String(Number(value.slice(0, 4)) + 1).padStart(4, "0")}-07-01`,
+        toExclusive: `${String(EffectFunction.pipe(value.slice(0, 4), Number) + 1).padStart(4, "0")}-07-01`,
       })
     )
   );

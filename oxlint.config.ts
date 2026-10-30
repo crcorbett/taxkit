@@ -1,23 +1,11 @@
+import { strict, style } from "@commonplaces/oxlint-plugin";
 import { defineConfig } from "oxlint";
-import core from "ultracite/oxlint/core";
-import react from "ultracite/oxlint/react";
-import remix from "ultracite/oxlint/remix";
 
 import { workspaceBoundaryOptions } from "./tools/oxlint/workspaces.boundary.ts";
 
-const taxkitReact = defineConfig({
-  ...react,
-  rules: {
-    ...react.rules,
-    // Effect Match and Result callbacks return JSX inline but do not define
-    // stateful React components. Keep the rule for actual nested components.
-    "react/no-unstable-nested-components": ["error", { allowAsProps: true }],
-  },
-});
-
 const decodingBoundaryFiles = [
   // Build-time ingress of the bundled authored docs source list.
-  "apps/api/scripts/docs-catalogue.layer.ts",
+  "apps/api/src/build/docs-catalogue.layer.ts",
   // Native heterogeneous resource-map props in the in-memory provider lifecycle test.
   "packages/infrastructure/test/posthog/projects.test.ts",
   "packages/observability/test/edge-identity.test.ts",
@@ -118,8 +106,8 @@ const decodingBoundaryFiles = [
   "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
   "packages/calculators/src/form.ingress.ts",
   "apps/web/src/routes/__root.tsx",
-  "apps/web/src/server.ts",
-  "apps/api/scripts/routes.ts",
+  "apps/web/src/entry.server.ts",
+  "apps/api/src/verification/routes.ts",
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
   // Exact synthetic register fixture ingress; no command execution admission.
@@ -209,6 +197,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // The synchronous native logger encodes its fixed record at console egress.
+  "packages/observability/src/host-telemetry.ts",
   // Persisted docs catalogue written by the API build.
   "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/observability/test/edge-identity.test.ts",
@@ -265,7 +255,7 @@ const schemaEncoderEgressFiles = [
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/runtime.server.ts",
   "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
-  "apps/web/src/server.ts",
+  "apps/web/src/entry.server.ts",
   "apps/web/test/host/config.boundary.test.ts",
   // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
 
@@ -300,6 +290,8 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  // Official MCP transport callback bridges the native HttpClient to its Promise host.
+  "apps/web/test/native-mcp.boundary.test.ts",
   "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   // Synthetic fetch Promise entrypoint for deterministic discovery cancellation.
@@ -315,7 +307,7 @@ const runtimeBoundaryFiles = [
   "apps/web/src/lib/runtime.server.ts",
   "apps/web/src/lib/runtime.client.ts",
   "apps/web/src/lib/pages/loaders.ts",
-  "apps/web/src/server.ts",
+  "apps/web/src/entry.server.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "tools/oxlint/fixtures/bun-accepted.ts",
@@ -361,7 +353,7 @@ const bunRuntimeEntrypointFiles = [
 ];
 
 export default defineConfig({
-  extends: [core, taxkitReact, remix],
+  extends: [style, strict],
   ignorePatterns: [
     ".agents/**",
     ".claude/**",
@@ -374,25 +366,39 @@ export default defineConfig({
     ".vercel/**",
   ],
   jsPlugins: [
-    "@commonplaces/oxlint-plugin/strict-effect",
-    "./tools/oxlint/bun-rules.ts",
-    "./tools/oxlint/effect-rules.ts",
-    "@commonplaces/oxlint-plugin/package",
+    { name: "taxkit-bun", specifier: "./tools/oxlint/bun-rules.ts" },
+    { name: "taxkit-effect", specifier: "./tools/oxlint/effect-rules.ts" },
     "./tools/oxlint/package-rules.ts",
     "./tools/oxlint/taxkit-rules.ts",
-    "@commonplaces/oxlint-plugin/anti-slop",
-    "@commonplaces/oxlint-plugin/anti-slop-effect",
   ],
   overrides: [
     {
-      // Public package entry points aggregate the intended API. The actual
-      // browser bundle and one-archive consumer prove their runtime boundaries.
-      files: [
-        "packages/sdk/typescript/src/core.ts",
-        "packages/sdk/typescript/src/http.ts",
-        "packages/sdk/typescript/src/au.ts",
-      ],
-      rules: { "oxc/no-barrel-file": "off" },
+      files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+      rules: {
+        // Register native Effect test callbacks; assertions still require a test body.
+        // Vitest accepts an optional assertion failure message.
+        "vitest/valid-expect": ["error", { maxArgs: 2 }],
+        "vitest/no-standalone-expect": [
+          "error",
+          {
+            additionalTestBlockFunctions: [
+              "Effect.fnUntraced",
+              "it.effect",
+              "it.effect.each",
+              "it.scoped",
+              "it.scoped.each",
+              "it.live",
+              "it.live.each",
+              "test.effect",
+              "test.effect.each",
+              "test.scoped",
+              "test.scoped.each",
+              "test.live",
+              "test.live.each",
+            ],
+          },
+        ],
+      },
     },
     // Runtime addresses come from the hostname and transport-route owners.
     {
@@ -433,12 +439,6 @@ export default defineConfig({
       },
     },
     {
-      // strict-effect forbids async functions; Promise-returning SDK facades
-      // and native host callbacks cannot satisfy both rules.
-      files: ["**/*.{ts,tsx}"],
-      rules: { "typescript/promise-function-async": "off" },
-    },
-    {
       // The analytics owners use native HttpClient. A decoder/encoder permission
       // does not admit bare browser or server fetch in these new files.
       files: [
@@ -456,30 +456,6 @@ export default defineConfig({
           },
         ],
       },
-    },
-    {
-      files: [
-        "apps/api/src/config.ts",
-        // Schema.TaggedError is a class factory, not an Error constructor.
-        "apps/api/test/mcp-client.boundary.test.ts",
-        "apps/web/test/native-mcp.boundary.test.ts",
-        "apps/web/test/native-analytics.boundary.test.ts",
-        "apps/web/src/lib/host/errors.ts",
-        "apps/web/src/lib/docs/errors.ts",
-        "packages/calculators/src/form.ingress.ts",
-        "apps/api/scripts/routes.ts",
-        "apps/api/scripts/smoke-public-routes.runtime.ts",
-      ],
-      rules: { "unicorn/throw-new-error": "off" },
-    },
-    {
-      files: [
-        "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
-        "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
-        "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
-        "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
-      ],
-      rules: { "unicorn/throw-new-error": "off" },
     },
     {
       // All owned source extensions are strict, including future app/tool/config paths.
@@ -519,18 +495,10 @@ export default defineConfig({
         "packages/api/http/**",
       ],
       rules: {
-        "effect/no-runtime-references-outside-boundaries": "error",
-        "strict-effect/error-constructor-new": "error",
-        "strict-effect/no-imperative-collections": "error",
-        "strict-effect/no-native-at": "error",
-        "strict-effect/no-native-work": "error",
-        "strict-effect/no-promise-workflow": "error",
         "strict-effect/no-runtime-outside-boundary": "error",
-        "strict-effect/no-unchecked-index": "error",
-        "strict-effect/no-unchecked-json": "error",
-        "strict-effect/no-unsafe-option-unwrap": "error",
+
         "strict-effect/runtime-file-convention": "error",
-        "strict-effect/tagged-error-name": "error",
+
         "taxkit/no-native-collections": "error",
         "taxkit/no-object-writes": "error",
       },
@@ -546,17 +514,6 @@ export default defineConfig({
           { allowedFiles: ["apps/web/test/host/forward.boundary.test.ts"] },
         ],
       },
-    },
-    {
-      files: ["apps/web/src/lib/host/config.ingress.ts"],
-      rules: { "anti-slop/no-unknown-parameters": "off" },
-    },
-    {
-      files: [
-        "apps/web/test/atom-lifecycle.browser.test.tsx",
-        "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
-      ],
-      rules: { "unicorn/prefer-dom-node-append": "off" },
     },
     {
       files: ["apps/web/test/native-local-development.boundary.test.ts"],
@@ -648,11 +605,20 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/src/server.ts"],
+      files: ["apps/web/test/native-mcp.boundary.test.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
-          { allowedFiles: ["apps/web/src/server.ts"] },
+          { allowedFiles: ["apps/web/test/native-mcp.boundary.test.ts"] },
+        ],
+      },
+    },
+    {
+      files: ["apps/web/src/entry.server.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["apps/web/src/entry.server.ts"] },
         ],
       },
     },
@@ -818,31 +784,9 @@ export default defineConfig({
       },
     },
     {
-      files: ["**/*.{ts,tsx,mts,cts}"],
-      rules: {
-        "no-redeclare": "off",
-      },
-    },
-    {
-      // Effect v4's Schema.TaggedError factory is a class base. Oxlint
-      // mistakes its class declaration for an Error thrown without `new`.
-      files: [
-        "**/errors.ts",
-        "packages/sdk/typescript/test/index.test.ts",
-        "packages/sdk/typescript/test/client-lifetime.test.ts",
-        "packages/docs-examples/src/node-server.ts",
-        "**/errors/*.ts",
-        "**/schemas.ts",
-        "**/*.schemas.ts",
-      ],
-      rules: {
-        "unicorn/throw-new-error": "off",
-      },
-    },
-    {
       files: portableEffectSourceFiles,
       rules: {
-        "effect/no-bare-effect-try-promise": "error",
+        "taxkit-effect/no-bare-effect-try-promise": "error",
       },
     },
     {
@@ -867,20 +811,20 @@ export default defineConfig({
     {
       files: effectContractFiles,
       rules: {
-        "effect/no-host-imports-in-contracts": "error",
+        "taxkit-effect/no-host-imports-in-contracts": "error",
       },
     },
     {
       files: effectServiceContractFiles,
       rules: {
-        "effect/no-layer-exports-in-service-files": "error",
-        "effect/no-unknown-service-contract": "error",
+        "taxkit-effect/no-layer-exports-in-service-files": "error",
+        "taxkit-effect/no-unknown-service-contract": "error",
       },
     },
     {
       files: effectErrorContractFiles,
       rules: {
-        "effect/no-unknown-tagged-error-cause": "error",
+        "taxkit-effect/no-unknown-tagged-error-cause": "error",
       },
     },
     {
@@ -891,57 +835,65 @@ export default defineConfig({
         "tools/oxlint/fixtures/.generated-effect-rejected.ts",
       ],
       rules: {
-        "effect/no-effect-test-global-mix": "error",
-        "effect/no-module-level-mutable-test-state": "error",
+        "taxkit-effect/no-effect-test-global-mix": "error",
+        "taxkit-effect/no-module-level-mutable-test-state": "error",
       },
     },
     {
-      files: decodingBoundaryFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: decodingBoundaryFiles,
       rules: {
-        "taxkit/no-decoding-outside-boundaries": "off",
+        "taxkit/no-decoding-outside-boundaries": "error",
       },
     },
     {
-      files: schemaEncoderEgressFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: schemaEncoderEgressFiles,
       rules: {
-        "effect/no-schema-encoder-outside-egress": "off",
+        "taxkit-effect/no-schema-encoder-outside-egress": "error",
       },
     },
     {
-      files: throwingCodecTestFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: throwingCodecTestFiles,
       rules: {
-        "effect/no-throwing-schema-sync-codec": "off",
+        "taxkit-effect/no-throwing-schema-sync-codec": "error",
       },
     },
     {
-      files: runtimeBoundaryFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: runtimeBoundaryFiles,
       rules: {
-        "effect/no-runtime-execution-outside-boundaries": "off",
-        "effect/no-runtime-references-outside-boundaries": "off",
+        "taxkit-effect/no-runtime-execution-outside-boundaries": "error",
+        "taxkit-effect/no-runtime-references-outside-boundaries": "error",
       },
     },
     {
-      files: processBoundaryFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: processBoundaryFiles,
       rules: {
-        "effect/no-process-outside-boundaries": "off",
+        "taxkit-effect/no-process-outside-boundaries": "error",
       },
     },
     {
-      files: consoleBoundaryFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: consoleBoundaryFiles,
       rules: {
-        "effect/no-console-outside-runtime": "off",
+        "taxkit-effect/no-console-outside-runtime": "error",
       },
     },
     {
-      files: bunAdapterFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: bunAdapterFiles,
       rules: {
-        "bun/no-host-api-outside-adapters": "off",
+        "taxkit-bun/no-host-api-outside-adapters": "error",
       },
     },
     {
-      files: bunRuntimeEntrypointFiles,
+      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+      excludeFiles: bunRuntimeEntrypointFiles,
       rules: {
-        "bun/no-runtime-outside-entrypoints": "off",
+        "taxkit-bun/no-runtime-outside-entrypoints": "error",
       },
     },
     {
@@ -1004,7 +956,7 @@ export default defineConfig({
         "packages/webmcp/test/registration.test.ts",
         "packages/webmcp/src/model-context.adapter.layer.ts",
         "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
-        "apps/web/src/server.ts",
+        "apps/web/src/entry.server.ts",
         "apps/web/test/native-analytics.boundary.test.ts",
         "apps/web/test/native-browser-tools.boundary.test.ts",
         "apps/web/test/native-cancellation.boundary.test.ts",
@@ -1037,7 +989,7 @@ export default defineConfig({
               "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
               "packages/webmcp/test/registration.test.ts",
               "packages/webmcp/src/model-context.adapter.layer.ts",
-              "apps/web/src/server.ts",
+              "apps/web/src/entry.server.ts",
               "apps/web/test/native-analytics.boundary.test.ts",
               "apps/web/test/native-mcp.boundary.test.ts",
               "packages/sdk/typescript/test/client-lifetime.test.ts",
@@ -1085,34 +1037,20 @@ export default defineConfig({
     },
   ],
   rules: {
-    "anti-slop-effect/no-service-constructor-imports": "error",
-    "anti-slop/no-chained-type-assertions": "error",
-    "anti-slop/no-conditional-empty-object-spread": "error",
-    "anti-slop/no-known-value-widening": "error",
-    "anti-slop/no-module-mocking": "error",
-    "anti-slop/no-object-parameters": "error",
-    "anti-slop/no-reflect-apply": "error",
-    "anti-slop/no-reflect-get": "error",
-    "anti-slop/no-runtime-typeof": "error",
-    "anti-slop/no-shape-in-symbol-names": "error",
-    "anti-slop/no-unknown-parameters": "error",
-    "anti-slop/no-unknown-returns": "error",
-    "anti-slop/no-unknown-type-aliases": "error",
-    "anti-slop/no-unsafe-dictionary-type": "error",
-    "anti-slop/no-widen-then-assert": "error",
-    "anti-slop/require-safety-comment-for-type-assertion": "error",
-    "bun/no-host-api-outside-adapters": "error",
-    "bun/no-runtime-outside-entrypoints": "error",
-    "effect/no-console-outside-runtime": "error",
-    "effect/no-manual-tag": "error",
-    "effect/no-process-outside-boundaries": "error",
-    "effect/no-runtime-execution-outside-boundaries": "error",
-    "effect/no-schema-encoder-outside-egress": "error",
-    "effect/no-switch": "error",
-    "effect/no-throwing-schema-sync-codec": "error",
-    "func-name-matching": "off",
-    "func-names": "off",
-    "max-classes-per-file": "off",
+    "effect-conventions/scoped-managed-runtime": [
+      "error",
+      {
+        hostLifetimes: [
+          {
+            file: "apps/web/src/lib/runtime.server.ts",
+            declaration: "runtime",
+          },
+        ],
+      },
+    ],
+    "taxkit-effect/no-manual-tag": "error",
+    "taxkit-effect/no-switch": "error",
+
     "no-restricted-properties": [
       "error",
       {
@@ -1140,12 +1078,11 @@ export default defineConfig({
         property: "values",
       },
     ],
-    "package/no-cross-package-source-imports": "error",
+
     "package/workspace-import-boundaries": ["error", workspaceBoundaryOptions],
     // Effect pipelines intentionally use callback combinators like
     // Effect.mapError/Effect.flatMap instead of async/await.
-    "promise/prefer-await-to-callbacks": "off",
-    "strict-effect/error-constructor-new": "error",
+
     "strict-effect/module-ownership": [
       "error",
       {
@@ -1180,7 +1117,7 @@ export default defineConfig({
       },
     ],
     // The Cloudflare cache belongs to native Alchemy Worker/Website caching.
-    "strict-effect/native-cloudflare-cache": "error",
+
     "strict-effect/no-loader-request-state": [
       "error",
       {
@@ -1192,12 +1129,9 @@ export default defineConfig({
         ],
       },
     ],
-    "strict-effect/no-native-at": "error",
-    "strict-effect/no-native-client-replica": "error",
-    "strict-effect/no-unsafe-option-unwrap": "error",
+
     "strict-effect/runtime-file-convention": "error",
-    "strict-effect/static-layers": "error",
-    "strict-effect/tagged-error-name": "error",
+
     // Browser reads call the API directly; the Website has no proxy at the
     // API's public paths.
     "strict-effect/website-data-proxy": [
@@ -1208,18 +1142,14 @@ export default defineConfig({
       },
     ],
     "taxkit-package/workspace-roles": "error",
-    "taxkit/no-decoding-outside-boundaries": "error",
     "typescript/consistent-type-assertions": [
       "error",
       {
         assertionStyle: "never",
       },
     ],
-    "typescript/no-non-null-assertion": "error",
-    "typescript/no-unnecessary-type-assertion": "error",
-    "typescript/no-unsafe-type-assertion": "error",
+
     // Effect Array supports data-first calls like Array.filter(items, predicate);
     // this Unicorn rule misreads that second argument as a native Array thisArg.
-    "unicorn/no-array-method-this-argument": "off",
   },
 });

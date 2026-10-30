@@ -25,6 +25,7 @@ import {
   GrossPay,
 } from "@taxkit/rules-au-pay";
 import {
+  Function as EffectFunction,
   Cause,
   ConfigProvider,
   Deferred,
@@ -42,6 +43,7 @@ import {
   Schema,
   Sink,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import * as HttpClient from "effect/http/HttpClient";
 import * as HttpClientError from "effect/http/HttpClientError";
@@ -50,23 +52,23 @@ import { ChildProcessSpawner } from "effect/process";
 import { TestClock } from "effect/testing";
 
 import {
+  checkApiPublicRoutes,
+  loadApiSmokeSettings,
+} from "../scripts/smoke-public-routes.runtime.js";
+import { ApiContentLive } from "../src/content.boundary.js";
+import {
   checkApiCalculation,
   checkApiCatalog,
   checkApiOpenApi,
   checkApiPublicContent,
   waitForApiHealth,
-} from "../scripts/routes.js";
+} from "../src/verification/routes.js";
 import {
   ApiSmokeConsumerEvidence,
   ApiSmokeOpenApiProjection,
   ApiSmokeSettings,
   ApiSmokeValidationError,
-} from "../scripts/schemas.js";
-import {
-  checkApiPublicRoutes,
-  loadApiSmokeSettings,
-} from "../scripts/smoke-public-routes.runtime.js";
-import { ApiContentLive } from "../src/content.boundary.js";
+} from "../src/verification/schemas.js";
 
 const origin = "http://127.0.0.1:4173";
 const fault = PlatformError.badArgument({
@@ -85,7 +87,6 @@ const settings = ApiSmokeSettings.make({
   port: 4173,
   simulateDownstreamFailure: false,
 });
-
 const successfulHttpClient = Effect.gen(function* () {
   const content = yield* ContentService.pipe(Effect.provide(ApiContentLive));
   const page = yield* content.getPage(
@@ -157,7 +158,6 @@ const successfulHttpClient = Effect.gen(function* () {
     PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
   )
 );
-
 it.effect.each([
   { args: [], env: {}, expected: settings },
   {
@@ -176,7 +176,7 @@ it.effect.each([
         ConfigProvider.fromUnknown(env)
       )
     );
-    expect(value).toEqual(expected);
+    expect(value).toStrictEqual(expected);
   })
 );
 it.effect.each([
@@ -192,7 +192,7 @@ it.effect.each([
       ),
       Effect.result
     );
-    expect(result).toEqual(
+    expect(result).toStrictEqual(
       Result.fail(
         new ApiSmokeValidationError({
           message: "Invalid API smoke settings or arguments.",
@@ -201,7 +201,6 @@ it.effect.each([
     );
   })
 );
-
 it.effect("rejects an OpenAPI document with its calculate path removed", () =>
   Effect.gen(function* () {
     const client = HttpClient.make((request) =>
@@ -216,7 +215,9 @@ it.effect("rejects an OpenAPI document with its calculate path removed", () =>
       Effect.provideService(HttpClient.HttpClient, client),
       Effect.result
     );
-    expect(Result.isFailure(result)).toBe(true);
+    EffectFunction.pipe(Result.isFailure(result), (actual) => {
+      expect(actual).toBeTruthy();
+    });
     if (Result.isFailure(result)) {
       expect(result.failure.message).toBe(
         "OpenAPI document did not include the calculate route."
@@ -224,7 +225,6 @@ it.effect("rejects an OpenAPI document with its calculate path removed", () =>
     }
   })
 );
-
 it.effect.each([
   { duration: Duration.seconds(15), route: "health" },
   { duration: Duration.seconds(5), route: "catalog" },
@@ -247,7 +247,11 @@ it.effect.each([
         Match.when("health", () => waitForApiHealth(origin)),
         Match.when("catalog", () => checkApiCatalog(origin)),
         Match.when("calculate", () => checkApiCalculation(origin)),
-        Match.when("public-content", () => checkApiPublicContent(origin)),
+        Match.when("public-content", () =>
+          checkApiPublicContent({
+            origin,
+          })
+        ),
         Match.orElse(() => checkApiOpenApi(origin))
       );
       const fiber = yield* operation.pipe(
@@ -258,14 +262,15 @@ it.effect.each([
       yield* Deferred.await(started);
       yield* TestClock.adjust(duration);
       const result = yield* Fiber.join(fiber);
-      expect(Result.isFailure(result)).toBe(true);
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       if (Result.isFailure(result)) {
         expect(result.failure).toMatchObject({ reason: "timeout", route });
       }
-      expect(yield* Ref.get(closed)).toBe(true);
+      expect(yield* Ref.get(closed)).toBeTruthy();
     })
 );
-
 it.effect.each(["health", "catalog", "calculate", "openapi", "public-content"])(
   "bounds a stalled response body for %s",
   (route) =>
@@ -290,7 +295,11 @@ it.effect.each(["health", "catalog", "calculate", "openapi", "public-content"])(
         Match.when("health", () => waitForApiHealth(origin)),
         Match.when("catalog", () => checkApiCatalog(origin)),
         Match.when("calculate", () => checkApiCalculation(origin)),
-        Match.when("public-content", () => checkApiPublicContent(origin)),
+        Match.when("public-content", () =>
+          checkApiPublicContent({
+            origin,
+          })
+        ),
         Match.orElse(() => checkApiOpenApi(origin))
       );
       const fiber = yield* operation.pipe(
@@ -299,16 +308,22 @@ it.effect.each(["health", "catalog", "calculate", "openapi", "public-content"])(
         Effect.forkChild
       );
       yield* Deferred.await(started);
-      yield* TestClock.adjust(route === "health" ? "15 seconds" : "5 seconds");
+      yield* TestClock.adjust(
+        Match.value(route).pipe(
+          Match.when("health", (): "15 seconds" => "15 seconds"),
+          Match.orElse((): "5 seconds" => "5 seconds")
+        )
+      );
       const result = yield* Fiber.join(fiber);
-      expect(Result.isFailure(result)).toBe(true);
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       if (Result.isFailure(result)) {
         expect(result.failure).toMatchObject({ reason: "timeout", route });
       }
-      expect(yield* Ref.get(closed)).toBe(true);
+      expect(yield* Ref.get(closed)).toBeTruthy();
     })
 );
-
 it.effect.each([
   "start",
   "stdout",
@@ -340,39 +355,48 @@ it.effect.each([
           }
           const handle = ChildProcessSpawner.makeHandle({
             all: Stream.empty,
-            exitCode:
-              call === 1 && mode === "exit-read"
-                ? Effect.fail(fault)
-                : Effect.succeed(
-                    ChildProcessSpawner.ExitCode(
+            exitCode: EffectBoolean.match(call === 1 && mode === "exit-read", {
+              onFalse: () =>
+                Effect.succeed(
+                  ChildProcessSpawner.ExitCode(
+                    EffectBoolean.match(
                       call === 1 &&
-                        (mode === "nonzero" || mode === "nonzero-and-cleanup")
-                        ? 1
-                        : 0
+                        (mode === "nonzero" || mode === "nonzero-and-cleanup"),
+                      {
+                        onFalse: (): 0 => 0,
+                        onTrue: (): 1 => 1,
+                      }
                     )
-                  ),
+                  )
+                ),
+              onTrue: () => Effect.fail(fault),
+            }),
             getInputFd: () => Sink.drain,
             getOutputFd: () => Stream.empty,
             isRunning: Effect.succeed(false),
             kill: () => Effect.void,
             pid: ChildProcessSpawner.ProcessId(1),
-            stderr:
-              call === 1 && mode === "stderr"
-                ? Stream.fail(fault)
-                : Stream.empty,
+            stderr: EffectBoolean.match(call === 1 && mode === "stderr", {
+              onFalse: () => Stream.empty,
+              onTrue: () => Stream.fail(fault),
+            }),
             stdin: Sink.drain,
-            stdout:
-              call === 1 && mode === "stdout"
-                ? Stream.fail(fault)
-                : Stream.make(
-                    new TextEncoder().encode(
-                      Match.value(mode).pipe(
-                        Match.when("output-limit", () => "x".repeat(1_048_577)),
-                        Match.when("evidence", () => "TAXKIT_SECRET_SENTINEL"),
-                        Match.orElse(() => evidence)
-                      )
+            stdout: EffectBoolean.match(call === 1 && mode === "stdout", {
+              onFalse: () =>
+                Stream.make(
+                  new TextEncoder().encode(
+                    Match.value(mode).pipe(
+                      Match.when("output-limit", () => "x".repeat(1_048_577)),
+                      Match.when(
+                        "evidence",
+                        (): "TAXKIT_SECRET_SENTINEL" => "TAXKIT_SECRET_SENTINEL"
+                      ),
+                      Match.orElse(() => evidence)
                     )
-                  ),
+                  )
+                ),
+              onTrue: () => Stream.fail(fault),
+            }),
             unref: Effect.succeed(Effect.void),
           });
           return yield* Effect.acquireRelease(Effect.succeed(handle), () =>
@@ -385,13 +409,20 @@ it.effect.each([
         remove: () =>
           Ref.update(removed, (n) => n + 1).pipe(
             Effect.andThen(
-              mode === "cleanup" || mode === "nonzero-and-cleanup"
-                ? Effect.fail(fault)
-                : Effect.void
+              EffectBoolean.match(
+                mode === "cleanup" || mode === "nonzero-and-cleanup",
+                {
+                  onFalse: () => Effect.void,
+                  onTrue: () => Effect.fail(fault),
+                }
+              )
             )
           ),
         writeFileString: () =>
-          mode === "write" ? Effect.fail(fault) : Effect.void,
+          Match.value(mode).pipe(
+            Match.when("write", () => Effect.fail(fault)),
+            Match.orElse(() => Effect.void)
+          ),
       });
       const exit = yield* checkApiPublicRoutes(settings).pipe(
         Effect.provideService(HttpClient.HttpClient, http),
@@ -399,9 +430,14 @@ it.effect.each([
         Effect.provide(Layer.merge(BunServices.layer, fs)),
         Effect.exit
       );
-      expect(Exit.isSuccess(exit)).toBe(mode === "success");
+      EffectFunction.pipe(Exit.isSuccess(exit), (actual) => {
+        expect(actual).toBe(mode === "success");
+      });
       expect(yield* Ref.get(closed)).toBe(
-        mode === "start" || mode === "write" ? 1 : 2
+        EffectBoolean.match(mode === "start" || mode === "write", {
+          onFalse: (): 2 => 2,
+          onTrue: (): 1 => 1,
+        })
       );
       expect(yield* Ref.get(removed)).toBe(1);
       if (Exit.isFailure(exit)) {
@@ -418,7 +454,6 @@ it.effect.each([
       }
     })
 );
-
 it.effect.each(["catalog", "calculate", "openapi"])(
   "bounds failed HTTP transport and rejects invalid responses: %s",
   (route) =>
@@ -431,8 +466,9 @@ it.effect.each(["catalog", "calculate", "openapi"])(
       yield* Effect.forEach(["transport", "status", "json", "schema"], (mode) =>
         Effect.gen(function* () {
           const client = HttpClient.make((request) =>
-            mode === "transport"
-              ? Effect.fail(
+            Match.value(mode).pipe(
+              Match.when("transport", () =>
+                Effect.fail(
                   new HttpClientError.HttpClientError({
                     reason: new HttpClientError.TransportError({
                       cause: fault,
@@ -440,21 +476,39 @@ it.effect.each(["catalog", "calculate", "openapi"])(
                     }),
                   })
                 )
-              : Effect.succeed(
+              ),
+              Match.orElse((matchedValue) =>
+                Effect.succeed(
                   HttpClientResponse.fromWeb(
                     request,
                     new Response(
-                      mode === "json" ? "TAXKIT_SECRET_SENTINEL" : "{}",
-                      { status: mode === "status" ? 503 : 200 }
+                      Match.value(matchedValue).pipe(
+                        Match.when(
+                          "json",
+                          (): "TAXKIT_SECRET_SENTINEL" =>
+                            "TAXKIT_SECRET_SENTINEL"
+                        ),
+                        Match.orElse((): "{}" => "{}")
+                      ),
+                      {
+                        status: Match.value(matchedValue).pipe(
+                          Match.when("status", (): 503 => 503),
+                          Match.orElse((): 200 => 200)
+                        ),
+                      }
                     )
                   )
                 )
+              )
+            )
           );
           const result = yield* operation.pipe(
             Effect.provideService(HttpClient.HttpClient, client),
             Effect.result
           );
-          expect(Result.isFailure(result)).toBe(true);
+          EffectFunction.pipe(Result.isFailure(result), (actual) => {
+            expect(actual).toBeTruthy();
+          });
           if (Result.isFailure(result)) {
             expect(result.failure).toMatchObject({
               reason: "request-or-response",
@@ -465,7 +519,6 @@ it.effect.each(["catalog", "calculate", "openapi"])(
       );
     })
 );
-
 it.effect(
   "safely reports an API process start failure before creating a workspace",
   () =>
@@ -488,16 +541,17 @@ it.effect(
         ),
         Effect.exit
       );
-      expect(Exit.isFailure(exit)).toBe(true);
+      EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       expect(yield* Ref.get(removed)).toBe(0);
       if (Exit.isFailure(exit)) {
-        expect(Cause.pretty(exit.cause)).toContain(
-          "Failed to start the API smoke process."
-        );
+        EffectFunction.pipe(Cause.pretty(exit.cause), (actual) => {
+          expect(actual).toContain("Failed to start the API smoke process.");
+        });
       }
     })
 );
-
 it.effect.each(["interrupt", "timeout"])(
   "stops a stalled consumer and API and removes its workspace: %s",
   (mode) =>
@@ -513,12 +567,16 @@ it.effect.each(["interrupt", "timeout"])(
             Effect.succeed(
               ChildProcessSpawner.makeHandle({
                 all: Stream.empty,
-                exitCode:
-                  call === 1
-                    ? Deferred.succeed(started, true).pipe(
-                        Effect.andThen(Effect.never)
-                      )
-                    : Effect.succeed(ChildProcessSpawner.ExitCode(0)),
+                exitCode: Match.value(call).pipe(
+                  Match.when(1, () =>
+                    Deferred.succeed(started, true).pipe(
+                      Effect.andThen(Effect.never)
+                    )
+                  ),
+                  Match.orElse(() =>
+                    Effect.succeed(ChildProcessSpawner.ExitCode(0))
+                  )
+                ),
                 getInputFd: () => Sink.drain,
                 getOutputFd: () => Stream.empty,
                 isRunning: Effect.succeed(true),
@@ -553,14 +611,19 @@ it.effect.each(["interrupt", "timeout"])(
         Effect.forkChild
       );
       yield* Deferred.await(started);
-      yield* mode === "interrupt"
-        ? Fiber.interrupt(fiber)
-        : TestClock.adjust("30 seconds");
+      yield* Match.value(mode).pipe(
+        Match.when("interrupt", () => Fiber.interrupt(fiber)),
+        Match.orElse(() => TestClock.adjust("30 seconds"))
+      );
       const exit = yield* Fiber.await(fiber);
-      expect(Exit.isFailure(exit)).toBe(true);
+      EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       if (Exit.isFailure(exit) && mode === "timeout") {
-        expect(Cause.findErrorOption(exit.cause)).toMatchObject({
-          value: { reason: "timeout" },
+        EffectFunction.pipe(Cause.findErrorOption(exit.cause), (actual) => {
+          expect(actual).toMatchObject({
+            value: { reason: "timeout" },
+          });
         });
       }
       expect(yield* Ref.get(closed)).toBe(2);

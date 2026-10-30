@@ -3,6 +3,8 @@ import { CalculationEngineLive } from "@taxkit/core";
 import { Cents, Money } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
 import {
+  Predicate,
+  Function as EffectFunction,
   Deferred,
   Effect,
   Fiber,
@@ -42,12 +44,10 @@ const request = CalculatorRunServiceRequest.make({
     },
   },
 });
-
 const calculators = PublicCalculatorServiceRateLimited.pipe(
   Layer.provide(PublicCalculatorServiceLive),
   Layer.provide(CalculationEngineLive)
 );
-
 describe("anonymous calculation admission", () => {
   it.effect("canonicalises IPv6 and prevents ordinary key serialisation", () =>
     Effect.gen(function* () {
@@ -57,16 +57,21 @@ describe("anonymous calculation admission", () => {
       const second = yield* Schema.decodeEffect(CalculatorClientRateKey)(
         "2001:0db8:0000:0000:0000:0000:0000:0075"
       );
-      expect(first).toEqual(second);
+      expect(first).toStrictEqual(second);
       // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
-      expect(String(first)).not.toContain("2001:");
-      expect(
+      EffectFunction.pipe(String(first), (actual) => {
+        expect(actual).not.toContain("2001:");
+      });
+      EffectFunction.pipe(
         Result.isFailure(
           yield* Schema.encodeEffect(CalculatorClientRateKey)(first).pipe(
             Effect.result
           )
-        )
-      ).toBe(true);
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
       yield* Effect.forEach(
         ["", "999.0.0.1", "203.0.113.1, 203.0.113.2", "private-canary"],
         (invalid) =>
@@ -74,14 +79,15 @@ describe("anonymous calculation admission", () => {
             Effect.result,
             Effect.tap((result) =>
               Effect.sync(() => {
-                expect(Result.isFailure(result)).toBe(true);
+                EffectFunction.pipe(Result.isFailure(result), (actual) => {
+                  expect(actual).toBeTruthy();
+                });
               })
             )
           )
       );
     })
   );
-
   it.effect(
     "missing identity rejects calculation while metadata consumes no unit",
     () =>
@@ -94,8 +100,9 @@ describe("anonymous calculation admission", () => {
                 Layer.succeed(
                   CalculatorAdmission,
                   CalculatorAdmission.of({
-                    admitCalculation: () =>
-                      Ref.update(calls, (count) => count + 1),
+                    admitCalculation: Effect.fn(
+                      "CalculatorAdmission.admitCalculation"
+                    )(() => Ref.update(calls, (count) => count + 1)),
                   })
                 )
               )
@@ -103,17 +110,15 @@ describe("anonymous calculation admission", () => {
           )
         );
         const result = yield* service.calculate(request).pipe(Effect.result);
-        expect(result).toEqual(
+        expect(result).toStrictEqual(
           Result.fail(new CalculatorAdmissionUnavailable())
         );
         expect(
           (yield* service.listCalculators(MetadataQuery.make({}))).calculators
-            .length
-        ).toBe(3);
+        ).toHaveLength(3);
         expect(yield* Ref.get(calls)).toBe(0);
       })
   );
-
   it.effect(
     "rejected admission does no calculation work and carries fixed safe guidance",
     () =>
@@ -130,11 +135,36 @@ describe("anonymous calculation admission", () => {
                 Layer.succeed(
                   PublicCalculatorService,
                   PublicCalculatorService.of({
-                    ...live,
-                    calculate: () =>
-                      Ref.update(worked, (count) => count + 1).pipe(
-                        Effect.andThen(Effect.never)
-                      ),
+                    getCalculator: Effect.fn(
+                      "PublicCalculatorService.getCalculator"
+                    )(live.getCalculator),
+                    getCalculatorGraph: Effect.fn(
+                      "PublicCalculatorService.getCalculatorGraph"
+                    )(live.getCalculatorGraph),
+                    getCalculatorSchema: Effect.fn(
+                      "PublicCalculatorService.getCalculatorSchema"
+                    )(live.getCalculatorSchema),
+                    listCalculators: Effect.fn(
+                      "PublicCalculatorService.listCalculators"
+                    )(live.listCalculators),
+                    listFacts: Effect.fn("PublicCalculatorService.listFacts")(
+                      live.listFacts
+                    ),
+                    listJurisdictions: Effect.fn(
+                      "PublicCalculatorService.listJurisdictions"
+                    )(live.listJurisdictions),
+                    listRules: Effect.fn("PublicCalculatorService.listRules")(
+                      live.listRules
+                    ),
+                    listTaxYears: Effect.fn(
+                      "PublicCalculatorService.listTaxYears"
+                    )(live.listTaxYears),
+                    calculate: Effect.fn("PublicCalculatorService.calculate")(
+                      () =>
+                        Ref.update(worked, (count) => count + 1).pipe(
+                          Effect.andThen(Effect.never)
+                        )
+                    ),
                   })
                 )
               ),
@@ -142,8 +172,9 @@ describe("anonymous calculation admission", () => {
                 Layer.succeed(
                   CalculatorAdmission,
                   CalculatorAdmission.of({
-                    admitCalculation: () =>
-                      Effect.fail(new CalculatorRateLimited()),
+                    admitCalculation: Effect.fn(
+                      "CalculatorAdmission.admitCalculation"
+                    )(() => Effect.fail(new CalculatorRateLimited())),
                   })
                 )
               )
@@ -156,7 +187,7 @@ describe("anonymous calculation admission", () => {
             Effect.provideService(CalculatorRequestRateKey, Option.some(key)),
             Effect.result
           );
-        expect(result).toEqual(Result.fail(new CalculatorRateLimited()));
+        expect(result).toStrictEqual(Result.fail(new CalculatorRateLimited()));
         expect(yield* Ref.get(worked)).toBe(0);
         const encoded = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRateLimited)
@@ -169,7 +200,6 @@ describe("anonymous calculation admission", () => {
         )
       )
   );
-
   it.effect(
     "the five-second work budget includes stalled admission and its cleanup",
     () =>
@@ -187,11 +217,14 @@ describe("anonymous calculation admission", () => {
                 Layer.succeed(
                   CalculatorAdmission,
                   CalculatorAdmission.of({
-                    admitCalculation: () =>
+                    admitCalculation: Effect.fn(
+                      "CalculatorAdmission.admitCalculation"
+                    )(() =>
                       Deferred.succeed(started, true).pipe(
                         Effect.andThen(Effect.never),
                         Effect.ensuring(Ref.set(released, true))
-                      ),
+                      )
+                    ),
                   })
                 )
               )
@@ -208,11 +241,18 @@ describe("anonymous calculation admission", () => {
         yield* Deferred.await(started);
         yield* TestClock.adjust("5 seconds");
         const result = yield* Fiber.join(pending);
-        expect(Result.isFailure(result)).toBe(true);
+        EffectFunction.pipe(Result.isFailure(result), (actual) => {
+          expect(actual).toBeTruthy();
+        });
         if (Result.isFailure(result)) {
-          expect(result.failure._tag).toBe("CalculatorOperationTimedOut");
+          EffectFunction.pipe(
+            Predicate.isTagged(result.failure, "CalculatorOperationTimedOut"),
+            (matches) => {
+              expect(matches).toBeTruthy();
+            }
+          );
         }
-        expect(yield* Ref.get(released)).toBe(true);
+        expect(yield* Ref.get(released)).toBeTruthy();
       })
   );
 });

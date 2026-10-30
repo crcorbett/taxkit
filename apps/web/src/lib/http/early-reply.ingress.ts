@@ -1,10 +1,9 @@
+import { Match, Effect, Option } from "effect";
 import "@tanstack/react-start/server-only";
-import { Effect, Option } from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { discoveryRepresentation } from "./discovery.ingress";
 import { docsImageRepresentation } from "./image.ingress";
-
 // The framework still mounts its server-function base. The Website declares
 // no server functions, so every such address is absent.
 const serverFunctionBase = HttpServerRequest.HttpServerRequest.pipe(
@@ -18,19 +17,22 @@ const serverFunctionBase = HttpServerRequest.HttpServerRequest.pipe(
     )
   )
 );
-
 /**
  * The reply the Website gives before TanStack renders HTML, if any: forwarded
  * discovery documents and share images, then the empty server-function base.
  */
 export const earlyReply = discoveryRepresentation.pipe(
   Effect.flatMap((discovery) =>
-    Option.isSome(discovery)
-      ? Effect.succeed(discovery)
-      : docsImageRepresentation
+    Match.value(discovery).pipe(
+      Match.when(Option.isSome, (matchedValue) => Effect.succeed(matchedValue)),
+      Match.orElse(() => docsImageRepresentation)
+    )
   ),
   Effect.flatMap((image) =>
-    Option.isSome(image) ? Effect.succeed(image) : serverFunctionBase
+    Match.value(image).pipe(
+      Match.when(Option.isSome, (matchedValue) => Effect.succeed(matchedValue)),
+      Match.orElse(() => serverFunctionBase)
+    )
   ),
   Effect.withSpan("Website.earlyReply")
 );

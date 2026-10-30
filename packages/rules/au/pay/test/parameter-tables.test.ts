@@ -1,7 +1,17 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Cents, DecimalCoefficient } from "@taxkit/core/primitives";
 import { expectAt } from "@taxkit/testing";
-import { Array, BigDecimal, Effect, Result, Schema, Struct } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  BigDecimal,
+  Effect,
+  Result,
+  Schema,
+  Struct,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import {
   Schedule1Table,
@@ -58,34 +68,53 @@ describe("Schedule1Table owned relationships", () => {
             name: "enormous multiplier",
           },
         ];
-        yield* Effect.forEach(cases, (scenario) =>
-          Effect.gen(function* () {
-            const result = yield* Schedule1Row.makeEffect(scenario.input).pipe(
-              Effect.result
-            );
-            expect(Result.isFailure(result), scenario.name).toBe(true);
-            expect(
-              Schema.is(Schema.toEncoded(Schedule1Row))(scenario.input),
-              scenario.name
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          cases,
+          Effect.forEach((scenario) =>
+            Effect.gen(function* () {
+              const result = yield* Schedule1Row.makeEffect(
+                scenario.input
+              ).pipe(Effect.result);
+              EffectFunction.pipe(Result.isFailure(result), (argument1) => {
+                EffectFunction.pipe(scenario.name, (argument2) => {
+                  expect(argument1, argument2).toBeTruthy();
+                });
+              });
+              EffectFunction.pipe(
+                Schema.is(Schema.toEncoded(Schedule1Row))(scenario.input),
+                (argument3) => {
+                  EffectFunction.pipe(scenario.name, (argument4) => {
+                    expect(argument3, argument4).toBeFalsy();
+                  });
+                }
+              );
+            })
+          )
         );
         const point = yield* Schedule1Row.makeEffect({
           ...Struct.pick(row, Struct.keys(Schedule1Row.fields)),
           weeklyMaxCents: row.weeklyMinCents,
         });
-        expect(Schema.is(Schedule1Row)(point)).toBe(true);
-        expect(Schema.is(Schema.toEncoded(Schedule1Row))(point)).toBe(true);
+        EffectFunction.pipe(Schema.is(Schedule1Row)(point), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(
+          Schema.is(Schema.toEncoded(Schedule1Row))(point),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
         const tiny = yield* Schedule1Row.makeEffect({
           ...Struct.pick(row, Struct.keys(Schedule1Row.fields)),
           a: DecimalCoefficient.make(
             BigDecimal.make(1n, Number.MAX_SAFE_INTEGER)
           ),
         });
-        expect(Schema.is(Schedule1Row)(tiny)).toBe(true);
+        EffectFunction.pipe(Schema.is(Schedule1Row)(tiny), (actual) => {
+          expect(actual).toBeTruthy();
+        });
       }).pipe(Effect.provide(AtoSchedule1_2025_26_Live))
   );
-
   it.effect(
     "rejects gaps, overlaps and open middle bounds in the saved table representation",
     () =>
@@ -121,65 +150,118 @@ describe("Schedule1Table owned relationships", () => {
           { name: "empty table", rows: [] },
           {
             name: "gap",
-            rows: Array.map(table.rows, (row, index) =>
-              index === 1 ? gap : row
+            rows: EffectFunction.pipe(
+              table.rows,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(1, () => gap),
+                  Match.orElse(() => row)
+                )
+              )
             ),
           },
           {
             name: "overlap",
-            rows: Array.map(table.rows, (row, index) =>
-              index === 1 ? overlap : row
+            rows: EffectFunction.pipe(
+              table.rows,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(1, () => overlap),
+                  Match.orElse(() => row)
+                )
+              )
             ),
           },
           { name: "reversed", rows: Array.reverse(table.rows) },
           {
             name: "open middle",
-            rows: Array.map(table.rows, (row, index) =>
-              index === 0 ? openMiddle : row
+            rows: EffectFunction.pipe(
+              table.rows,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(0, () => openMiddle),
+                  Match.orElse(() => row)
+                )
+              )
             ),
           },
           {
             name: "closed tail",
-            rows: Array.map(table.rows, (row, index) =>
-              index === table.rows.length - 1 ? closedTail : row
+            rows: EffectFunction.pipe(
+              table.rows,
+              Array.map((row, index) =>
+                EffectBoolean.match(index === table.rows.length - 1, {
+                  onFalse: () => row,
+                  onTrue: () => closedTail,
+                })
+              )
             ),
           },
           {
             name: "missing zero start",
-            rows: Array.map(table.rows, (row, index) =>
-              index === 0 ? missingStart : row
+            rows: EffectFunction.pipe(
+              table.rows,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(0, () => missingStart),
+                  Match.orElse(() => row)
+                )
+              )
             ),
           },
           {
             name: "missing scale1",
-            rows: Array.filter(table.rows, (row) => row.scale !== "scale1"),
+            rows: EffectFunction.pipe(
+              table.rows,
+              Array.filter((row) => row.scale !== "scale1")
+            ),
           },
           {
             name: "missing scale2",
-            rows: Array.filter(table.rows, (row) => row.scale !== "scale2"),
+            rows: EffectFunction.pipe(
+              table.rows,
+              Array.filter((row) => row.scale !== "scale2")
+            ),
           },
         ];
-        yield* Effect.forEach(cases, (scenario) =>
-          Effect.gen(function* () {
-            const input = {
-              ...Struct.pick(table, Struct.keys(Schedule1Table.fields)),
-              rows: scenario.rows,
-            };
-            const result = yield* Schedule1Table.makeEffect(input).pipe(
-              Effect.result
-            );
-            expect(Result.isFailure(result), scenario.name).toBe(true);
-            expect(
-              Schema.is(Schema.toEncoded(Schedule1Table))(input),
-              scenario.name
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          cases,
+          Effect.forEach((scenario) =>
+            Effect.gen(function* () {
+              const input = {
+                ...Struct.pick(table, Struct.keys(Schedule1Table.fields)),
+                rows: scenario.rows,
+              };
+              const result = yield* Schedule1Table.makeEffect(input).pipe(
+                Effect.result
+              );
+              EffectFunction.pipe(Result.isFailure(result), (argument5) => {
+                EffectFunction.pipe(scenario.name, (argument6) => {
+                  expect(argument5, argument6).toBeTruthy();
+                });
+              });
+              EffectFunction.pipe(
+                Schema.is(Schema.toEncoded(Schedule1Table))(input),
+                (argument7) => {
+                  EffectFunction.pipe(scenario.name, (argument8) => {
+                    expect(argument7, argument8).toBeFalsy();
+                  });
+                }
+              );
+            })
+          )
         );
-        expect(Schema.is(Schedule1Table)(table)).toBe(true);
-        expect(Schema.is(Schema.toEncoded(Schedule1Table))(table)).toBe(true);
+        EffectFunction.pipe(Schema.is(Schedule1Table)(table), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(
+          Schema.is(Schema.toEncoded(Schedule1Table))(table),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
       }).pipe(Effect.provide(AtoSchedule1_2025_26_Live))
   );
-
   it.effect(
     "retains both authored years and legitimate negative dollar coefficients",
     () =>
@@ -190,14 +272,21 @@ describe("Schedule1Table owned relationships", () => {
         const previous = yield* AtoSchedule1Table.pipe(
           Effect.provide(AtoSchedule1_2024_25_Live)
         );
-        expect(Schema.is(Schedule1Table)(current)).toBe(true);
-        expect(Schema.is(Schedule1Table)(previous)).toBe(true);
-        expect(
+        EffectFunction.pipe(Schema.is(Schedule1Table)(current), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(Schema.is(Schedule1Table)(previous), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(
           BigDecimal.Order(
             expectAt(current.rows, 2).bDollars,
             BigDecimal.make(0n, 0)
-          )
-        ).toBeLessThan(0);
+          ),
+          (actual) => {
+            expect(actual).toBeLessThan(0);
+          }
+        );
         const point = yield* Schedule1Row.makeEffect({
           ...Struct.pick(
             expectAt(current.rows, 0),
@@ -225,8 +314,11 @@ describe("Schedule1Table owned relationships", () => {
           ...Struct.pick(current, Struct.keys(Schedule1Table.fields)),
           rows: [point, scale2, next],
         });
-        expect(Schema.is(Schema.toEncoded(Schedule1Table))(interleaved)).toBe(
-          true
+        EffectFunction.pipe(
+          Schema.is(Schema.toEncoded(Schedule1Table))(interleaved),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
         );
       })
   );

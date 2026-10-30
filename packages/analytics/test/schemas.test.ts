@@ -1,5 +1,7 @@
 import { expect, it } from "@effect/vitest";
 import {
+  Predicate,
+  Function as EffectFunction,
   ConfigProvider,
   Effect,
   Match,
@@ -19,7 +21,6 @@ const enabled = {
   POSTHOG_REGION: "us",
   POSTHOG_STAGE: "prod",
 } as const;
-
 it.effect.each([
   {},
   { POSTHOG_COLLECTION_MODE: "off" },
@@ -38,10 +39,9 @@ it.effect.each([
             ConfigProvider.fromUnknown(input)
           )
         )
-      ).toEqual(AnalyticsDisabled.make({}));
+      ).toStrictEqual(AnalyticsDisabled.make({}));
     })
 );
-
 it.effect.each([
   enabled,
   {
@@ -59,7 +59,12 @@ it.effect.each([
           ConfigProvider.fromUnknown(input)
         )
       );
-      expect(settings._tag).toBe("AnalyticsEnabled");
+      EffectFunction.pipe(
+        Predicate.isTagged(settings, "AnalyticsEnabled"),
+        (matches) => {
+          expect(matches).toBeTruthy();
+        }
+      );
       Match.value(settings).pipe(
         Match.tag("AnalyticsDisabled", () =>
           expect.fail("Enabled settings were disabled")
@@ -67,19 +72,19 @@ it.effect.each([
         Match.tag("AnalyticsEnabled", (value) => {
           expect(value.projectId).toBe(123);
           expect(value.stage).toBe(input.POSTHOG_STAGE);
-          expect(Redacted.isRedacted(value.token)).toBe(true);
+          EffectFunction.pipe(Redacted.isRedacted(value.token), (actual) => {
+            expect(actual).toBeTruthy();
+          });
           // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
-          expect(String(value.token)).not.toContain(
-            input.POSTHOG_CAPTURE_TOKEN
-          );
+          EffectFunction.pipe(String(value.token), (actual) => {
+            expect(actual).not.toContain(input.POSTHOG_CAPTURE_TOKEN);
+          });
         }),
-
         // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
         Match.exhaustive
       );
     })
 );
-
 it.effect.each([
   { POSTHOG_COLLECTION_MODE: "production" },
   { ...enabled, POSTHOG_COLLECTION_MODE: "automatic" },
@@ -104,9 +109,16 @@ it.effect.each([
       ),
       Effect.result
     );
-    expect(Result.isFailure(result)).toBe(true);
+    EffectFunction.pipe(Result.isFailure(result), (actual) => {
+      expect(actual).toBeTruthy();
+    });
     if (Result.isFailure(result)) {
-      expect(Schema.is(AnalyticsConfigurationError)(result.failure)).toBe(true);
+      EffectFunction.pipe(
+        Schema.is(AnalyticsConfigurationError)(result.failure),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
       expect(
         yield* Schema.encodeEffect(
           Schema.fromJsonString(AnalyticsConfigurationError)

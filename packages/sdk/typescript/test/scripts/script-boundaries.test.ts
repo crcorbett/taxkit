@@ -1,6 +1,8 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it } from "@effect/vitest";
 import {
+  Predicate,
+  Function as EffectFunction,
   Array,
   Cause,
   Deferred,
@@ -18,16 +20,17 @@ import {
   Schema,
   Sink,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import { ChildProcessSpawner } from "effect/process";
 
 import { checkSdkImportBoundaries } from "../../scripts/check-import-boundaries.runtime.js";
 import { checkPackedArtifact } from "../../scripts/check-packed-artifact.runtime.js";
+import { checkDownstreamConsumer } from "../../scripts/validate-downstream-consumer.runtime.js";
 import {
   DependencySectionsManifest,
   PackedPackageManifest,
-} from "../../scripts/schemas.js";
-import { checkDownstreamConsumer } from "../../scripts/validate-downstream-consumer.runtime.js";
+} from "../../src/internal/artifact-schemas.js";
 
 const nativeFault = PlatformError.badArgument({
   description: "TAXKIT_SECRET_SENTINEL",
@@ -37,7 +40,6 @@ const nativeFault = PlatformError.badArgument({
 const packedManifest = `{"dependencies":{"effect":"4.0.0"},"exports":{".":{"default":"./dist/index.js","types":"./dist/index.d.ts"}}}`;
 const rootManifest = `{"workspaces":{"catalog":{"effect":"4.0.0","typescript":"7.0.2","@types/bun":"1.4.0"}}}`;
 const packedListing = "package/dist/index.js\npackage/dist/index.d.ts\n";
-
 const handleFixture = (
   stdout: Stream.Stream<Uint8Array, PlatformError.PlatformError>,
   mode: string,
@@ -45,24 +47,25 @@ const handleFixture = (
 ) =>
   ChildProcessSpawner.makeHandle({
     all: Stream.empty,
-    exitCode:
-      mode === "exit-read"
-        ? Effect.fail(nativeFault)
-        : Effect.succeed(ChildProcessSpawner.ExitCode(code)),
+    exitCode: Match.value(mode).pipe(
+      Match.when("exit-read", () => Effect.fail(nativeFault)),
+      Match.orElse(() => Effect.succeed(ChildProcessSpawner.ExitCode(code)))
+    ),
     getInputFd: () => Sink.drain,
     getOutputFd: () => Stream.empty,
     isRunning: Effect.succeed(false),
     kill: () => Effect.void,
     pid: ChildProcessSpawner.ProcessId(1),
-    stderr:
-      mode === "stderr"
-        ? Stream.fail(nativeFault)
-        : Stream.make(new TextEncoder().encode("TAXKIT_SECRET_SENTINEL")),
+    stderr: Match.value(mode).pipe(
+      Match.when("stderr", () => Stream.fail(nativeFault)),
+      Match.orElse(() =>
+        Stream.make(new TextEncoder().encode("TAXKIT_SECRET_SENTINEL"))
+      )
+    ),
     stdin: Sink.drain,
     stdout,
     unref: Effect.succeed(Effect.void),
   });
-
 it.effect(
   "round-trips missing dependency keys and uninterpreted metadata once",
   () =>
@@ -70,8 +73,12 @@ it.effect(
       const codec = Schema.fromJsonString(PackedPackageManifest);
       const wire = `{"name":"@taxkit/fixture","version":"1.0.0","files":["dist"],"exports":{".":{"default":"./dist/index.js","types":"./dist/index.d.ts"}},"publishConfig":{"access":"public","exports":{".":{"default":"./dist/index.js","types":"./dist/index.d.ts"}}},"sideEffects":false,"custom":{"retained":true}}`;
       const value = yield* Schema.decodeEffect(codec)(wire);
-      expect(Option.isNone(value.dependencies)).toBe(true);
-      expect(Record.get(value, "sideEffects")).toEqual(Option.some(false));
+      EffectFunction.pipe(Option.isNone(value.dependencies), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      EffectFunction.pipe(Record.get(value, "sideEffects"), (actual) => {
+        expect(actual).toStrictEqual(Option.some(false));
+      });
       const encoded = yield* Schema.encodeEffect(codec)(value);
       expect(encoded).toContain('"sideEffects":false');
       expect(encoded).toContain('"custom":{"retained":true}');
@@ -87,10 +94,11 @@ it.effect(
       const result = yield* Schema.decodeEffect(
         Schema.fromJsonString(DependencySectionsManifest)
       )('{"dependencies":null}').pipe(Effect.result);
-      expect(Result.isFailure(result)).toBe(true);
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
     })
 );
-
 describe("SDK direct import command", () => {
   it.effect("accepts the checked direction and closes both searches", () =>
     Effect.gen(function* () {
@@ -101,7 +109,9 @@ describe("SDK direct import command", () => {
           Ref.update(closed, (n) => n + 1)
         )
       );
-      yield* checkSdkImportBoundaries("/fixture/sdk").pipe(
+      yield* checkSdkImportBoundaries({
+        sdkRoot: "/fixture/sdk",
+      }).pipe(
         Effect.scoped,
         Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
         Effect.provide(
@@ -113,13 +123,13 @@ describe("SDK direct import command", () => {
                   Match.value(path).pipe(
                     Match.when(
                       (value) => value.endsWith("/api/http/package.json"),
-                      () => "{}"
+                      (): "{}" => "{}"
                     ),
                     Match.when(
                       (value) => value.endsWith("package.json"),
-                      () => "{}"
+                      (): "{}" => "{}"
                     ),
-                    Match.orElse(() => "export {};")
+                    Match.orElse((): "export {};" => "export {};")
                   )
                 ),
             })
@@ -196,7 +206,9 @@ describe("SDK direct import command", () => {
     },
   ])("fails closed: $name", (fixture) =>
     Effect.gen(function* () {
-      const result = yield* checkSdkImportBoundaries("/fixture/sdk").pipe(
+      const result = yield* checkSdkImportBoundaries({
+        sdkRoot: "/fixture/sdk",
+      }).pipe(
         Effect.scoped,
         Effect.provideService(
           ChildProcessSpawner.ChildProcessSpawner,
@@ -229,34 +241,43 @@ describe("SDK direct import command", () => {
       );
       Result.match(result, {
         onFailure: (error) => {
-          expect(error._tag).toBe(fixture.tag);
-          expect(String(error)).not.toContain("TAXKIT_SECRET_SENTINEL");
+          EffectFunction.pipe(
+            Predicate.isTagged(error, fixture.tag),
+            (matches) => {
+              expect(matches).toBeTruthy();
+            }
+          );
+          EffectFunction.pipe(String(error), (actual) => {
+            expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
+          });
         },
         onSuccess: () => expect.unreachable(),
       });
     })
   );
 });
-
 it.effect.each(["start", "stdout", "stderr", "exit-read", "nonzero"] as const)(
   "packed command retains safe failure and cleanup: %s",
   (mode) =>
     Effect.gen(function* () {
       const removed = yield* Ref.make(0);
       const closed = yield* Ref.make(0);
-      const handle = handleFixture(
-        mode === "stdout"
-          ? Stream.fail(nativeFault)
-          : Stream.make(new TextEncoder().encode("TAXKIT_SECRET_SENTINEL")),
-        mode,
-        23
+      const stdout = Match.value(mode).pipe(
+        Match.when("stdout", () => Stream.fail(nativeFault)),
+        Match.orElse(() =>
+          Stream.make(new TextEncoder().encode("TAXKIT_SECRET_SENTINEL"))
+        )
       );
+      const handle = handleFixture(stdout, mode, 23);
       const spawner = ChildProcessSpawner.make(() =>
-        mode === "start"
-          ? Effect.fail(nativeFault)
-          : Effect.acquireRelease(Effect.succeed(handle), () =>
+        Match.value(mode).pipe(
+          Match.when("start", () => Effect.fail(nativeFault)),
+          Match.orElse(() =>
+            Effect.acquireRelease(Effect.succeed(handle), () =>
               Ref.update(closed, (n) => n + 1)
             )
+          )
+        )
       );
       const result = yield* checkPackedArtifact.pipe(
         Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
@@ -277,12 +298,16 @@ it.effect.each(["start", "stdout", "stderr", "exit-read", "nonzero"] as const)(
           Match.value(error).pipe(
             Match.tag("PackedArtifactCommandError", (failure) => {
               expect(failure.stage).toBe("pack SDK artifact");
-              expect(failure.exitCode).toEqual(
-                mode === "nonzero" ? Option.some(23) : Option.none()
+              expect(failure.exitCode).toStrictEqual(
+                Match.value(mode).pipe(
+                  Match.when("nonzero", () => Option.some(23)),
+                  Match.orElse(() => Option.none())
+                )
               );
-              expect(String(failure)).not.toContain("TAXKIT_SECRET_SENTINEL");
+              EffectFunction.pipe(String(failure), (actual) => {
+                expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
+              });
             }),
-
             // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
             Match.orElse(() => expect.unreachable())
           );
@@ -290,10 +315,14 @@ it.effect.each(["start", "stdout", "stderr", "exit-read", "nonzero"] as const)(
         onSuccess: () => expect.unreachable(),
       });
       expect(yield* Ref.get(removed)).toBe(1);
-      expect(yield* Ref.get(closed)).toBe(mode === "start" ? 0 : 1);
+      expect(yield* Ref.get(closed)).toBe(
+        Match.value(mode).pipe(
+          Match.when("start", (): 0 => 0),
+          Match.orElse((): 1 => 1)
+        )
+      );
     })
 );
-
 it.effect.each([
   "success",
   "manifest",
@@ -310,18 +339,27 @@ it.effect.each([
         expect(yield* Ref.get(closed)).toBe(call);
         return yield* Effect.acquireRelease(
           Effect.succeed(
-            handleFixture(
+            EffectFunction.pipe(
               Stream.make(
                 new TextEncoder().encode(
                   Match.value(call).pipe(
-                    Match.when(0, () => "/tmp/fixture.tgz"),
+                    Match.when(0, (): "/tmp/fixture.tgz" => "/tmp/fixture.tgz"),
                     Match.when(1, () => packedListing),
-                    Match.orElse(() => "")
+                    Match.orElse((): "" => "")
                   )
                 )
               ),
-              "success",
-              mode === "failed-command-and-cleanup" ? 23 : 0
+              (argument1) =>
+                EffectFunction.pipe("success", (argument2) =>
+                  EffectFunction.pipe(
+                    Match.value(mode).pipe(
+                      Match.when("failed-command-and-cleanup", (): 23 => 23),
+                      Match.orElse((): 0 => 0)
+                    ),
+                    (argument3) =>
+                      handleFixture(argument1, argument2, argument3)
+                  )
+                )
             )
           ),
           () => Ref.update(closed, (n) => n + 1)
@@ -338,14 +376,24 @@ it.effect.each([
             makeTempDirectory: () => Effect.succeed("/fixture/smoke"),
             readFileString: () =>
               Effect.succeed(
-                mode === "manifest" ? "TAXKIT_SECRET_SENTINEL" : packedManifest
+                Match.value(mode).pipe(
+                  Match.when(
+                    "manifest",
+                    (): "TAXKIT_SECRET_SENTINEL" => "TAXKIT_SECRET_SENTINEL"
+                  ),
+                  Match.orElse(() => packedManifest)
+                )
               ),
             remove: () =>
               Ref.update(removed, (n) => n + 1).pipe(
                 Effect.andThen(
-                  mode === "cleanup" || mode === "failed-command-and-cleanup"
-                    ? Effect.fail(nativeFault)
-                    : Effect.void
+                  EffectBoolean.match(
+                    mode === "cleanup" || mode === "failed-command-and-cleanup",
+                    {
+                      onFalse: () => Effect.void,
+                      onTrue: () => Effect.fail(nativeFault),
+                    }
+                  )
                 )
               ),
             writeFileString: () => Effect.void,
@@ -354,23 +402,28 @@ it.effect.each([
       ),
       Effect.exit
     );
-    expect(Exit.isSuccess(exit)).toBe(mode === "success");
+    EffectFunction.pipe(Exit.isSuccess(exit), (actual) => {
+      expect(actual).toBe(mode === "success");
+    });
     expect(yield* Ref.get(removed)).toBe(1);
     expect(yield* Ref.get(closed)).toBe(yield* Ref.get(calls));
     if (Exit.isFailure(exit)) {
-      expect(Cause.pretty(exit.cause)).not.toContain("TAXKIT_SECRET_SENTINEL");
+      EffectFunction.pipe(Cause.pretty(exit.cause), (actual) => {
+        expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
+      });
       if (mode === "failed-command-and-cleanup") {
-        expect(Cause.pretty(exit.cause)).toContain(
-          "PackedArtifactCommandError"
-        );
-        expect(Cause.pretty(exit.cause)).toContain(
-          "Failed to remove the temporary SDK check folder."
-        );
+        EffectFunction.pipe(Cause.pretty(exit.cause), (actual) => {
+          expect(actual).toContain("PackedArtifactCommandError");
+        });
+        EffectFunction.pipe(Cause.pretty(exit.cause), (actual) => {
+          expect(actual).toContain(
+            "Failed to remove the temporary SDK check folder."
+          );
+        });
       }
     }
   })
 );
-
 it.effect.each([
   "root-manifest",
   "build",
@@ -390,14 +443,28 @@ it.effect.each([
           Match.tag("PipedCommand", () => expect.unreachable()),
           Match.exhaustive
         );
-        const code =
-          mode === "build" || (mode === "packed-command" && packing) ? 23 : 0;
-        return handleFixture(
+        const code = EffectBoolean.match(
+          mode === "build" || (mode === "packed-command" && packing),
+          {
+            onFalse: (): 0 => 0,
+            onTrue: (): 23 => 23,
+          }
+        );
+        return EffectFunction.pipe(
           Stream.make(
-            new TextEncoder().encode(packing ? "/tmp/fixture.tgz" : "")
+            new TextEncoder().encode(
+              EffectBoolean.match(packing, {
+                onFalse: (): "" => "",
+                onTrue: (): "/tmp/fixture.tgz" => "/tmp/fixture.tgz",
+              })
+            )
           ),
-          "success",
-          code
+          (argument4) =>
+            EffectFunction.pipe("success", (argument5) =>
+              EffectFunction.pipe(code, (argument6) =>
+                handleFixture(argument4, argument5, argument6)
+              )
+            )
         );
       })
     );
@@ -412,9 +479,14 @@ it.effect.each([
               Effect.succeed("/tmp/sdk-downstream-fixture"),
             readFileString: (path) =>
               Effect.succeed(
-                path.includes("pack-staging") || mode === "root-manifest"
-                  ? "TAXKIT_SECRET_SENTINEL"
-                  : rootManifest
+                EffectBoolean.match(
+                  path.includes("pack-staging") || mode === "root-manifest",
+                  {
+                    onFalse: () => rootManifest,
+                    onTrue: (): "TAXKIT_SECRET_SENTINEL" =>
+                      "TAXKIT_SECRET_SENTINEL",
+                  }
+                )
               ),
             remove: () => Ref.update(removed, (n) => n + 1),
             writeFileString: () => Effect.void,
@@ -425,36 +497,51 @@ it.effect.each([
     );
     Result.match(result, {
       onFailure: (error) => {
-        expect(error._tag).toBe(
-          mode === "build" || mode === "packed-command"
-            ? "DownstreamCommandError"
-            : "DownstreamValidationError"
+        EffectFunction.pipe(
+          Predicate.isTagged(
+            error,
+            EffectBoolean.match(mode === "build" || mode === "packed-command", {
+              onFalse: (): "DownstreamValidationError" =>
+                "DownstreamValidationError",
+              onTrue: (): "DownstreamCommandError" => "DownstreamCommandError",
+            })
+          ),
+          (matches) => {
+            expect(matches).toBeTruthy();
+          }
         );
         Match.value(error).pipe(
           Match.tag("DownstreamCommandError", (failure) => {
             expect(failure.stage).toBe(
-              mode === "build"
-                ? "build taxkit"
-                : "pack workspace manifest for taxkit"
+              Match.value(mode).pipe(
+                Match.when("build", (): "build taxkit" => "build taxkit"),
+                Match.orElse(
+                  (): "pack workspace manifest for taxkit" =>
+                    "pack workspace manifest for taxkit"
+                )
+              )
             );
-            expect(failure.exitCode).toEqual(Option.some(23));
+            expect(failure.exitCode).toStrictEqual(Option.some(23));
           }),
-
           // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
           Match.orElse(() => {
             expect(["root-manifest", "staged-manifest"]).toContain(mode);
           })
         );
-        expect(String(error)).not.toContain("TAXKIT_SECRET_SENTINEL");
+        EffectFunction.pipe(String(error), (actual) => {
+          expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
+        });
       },
       onSuccess: () => expect.unreachable(),
     });
     expect(yield* Ref.get(removed)).toBe(
-      mode === "root-manifest" || mode === "build" ? 0 : 1
+      EffectBoolean.match(mode === "root-manifest" || mode === "build", {
+        onFalse: (): 1 => 1,
+        onTrue: (): 0 => 0,
+      })
     );
   })
 );
-
 it.effect(
   "interrupting the packed checker closes its process and temporary folder",
   () =>
@@ -462,12 +549,16 @@ it.effect(
       const started = yield* Deferred.make<true>();
       const closed = yield* Ref.make(0);
       const removed = yield* Ref.make(0);
-      const handle = handleFixture(
+      const handle = EffectFunction.pipe(
         Stream.fromEffect(
           Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
         ),
-        "success",
-        0
+        (argument7) =>
+          EffectFunction.pipe("success", (argument8) =>
+            EffectFunction.pipe(0, (argument9) =>
+              handleFixture(argument7, argument8, argument9)
+            )
+          )
       );
       const spawner = ChildProcessSpawner.make(() =>
         Effect.acquireRelease(Effect.succeed(handle), () =>
@@ -490,17 +581,23 @@ it.effect(
       );
       yield* Deferred.await(started);
       yield* Fiber.interrupt(fiber);
-      expect(Exit.isFailure(yield* Fiber.await(fiber))).toBe(true);
+      EffectFunction.pipe(
+        Exit.isFailure(yield* Fiber.await(fiber)),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
       expect(yield* Ref.get(closed)).toBe(1);
       expect(yield* Ref.get(removed)).toBe(1);
     })
 );
-
 it.effect.each(["read", "search-start"] as const)(
   "direct import operational failure is bounded: %s",
   (mode) =>
     Effect.gen(function* () {
-      const result = yield* checkSdkImportBoundaries("/fixture/sdk").pipe(
+      const result = yield* checkSdkImportBoundaries({
+        sdkRoot: "/fixture/sdk",
+      }).pipe(
         Effect.scoped,
         Effect.provideService(
           ChildProcessSpawner.ChildProcessSpawner,
@@ -511,11 +608,20 @@ it.effect.each(["read", "search-start"] as const)(
             BunServices.layer,
             FileSystem.layerNoop({
               readFileString: (path) =>
-                mode === "read"
-                  ? Effect.fail(nativeFault)
-                  : Effect.succeed(
-                      path.endsWith("/api/http/package.json") ? "{}" : "{}"
-                    ),
+                Match.value(mode).pipe(
+                  Match.when("read", () => Effect.fail(nativeFault)),
+                  Match.orElse(() =>
+                    Effect.succeed(
+                      EffectBoolean.match(
+                        path.endsWith("/api/http/package.json"),
+                        {
+                          onFalse: (): "{}" => "{}",
+                          onTrue: (): "{}" => "{}",
+                        }
+                      )
+                    )
+                  )
+                ),
             })
           )
         ),
@@ -523,30 +629,39 @@ it.effect.each(["read", "search-start"] as const)(
       );
       Result.match(result, {
         onFailure: (error) => {
-          expect(error._tag).toBe("SdkImportReadError");
-          expect(String(error)).not.toContain("TAXKIT_SECRET_SENTINEL");
+          EffectFunction.pipe(
+            Predicate.isTagged(error, "SdkImportReadError"),
+            (matches) => {
+              expect(matches).toBeTruthy();
+            }
+          );
+          EffectFunction.pipe(String(error), (actual) => {
+            expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
+          });
         },
         onSuccess: () => expect.unreachable(),
       });
     })
 );
-
 it.effect.each(["start", "stdout", "stderr", "exit-read"] as const)(
   "downstream command operational failure is bounded: %s",
   (mode) =>
     Effect.gen(function* () {
       const closed = yield* Ref.make(0);
-      const handle = handleFixture(
-        mode === "stdout" ? Stream.fail(nativeFault) : Stream.empty,
-        mode,
-        0
+      const stdout = Match.value(mode).pipe(
+        Match.when("stdout", () => Stream.fail(nativeFault)),
+        Match.orElse(() => Stream.empty)
       );
+      const handle = handleFixture(stdout, mode, 0);
       const spawner = ChildProcessSpawner.make(() =>
-        mode === "start"
-          ? Effect.fail(nativeFault)
-          : Effect.acquireRelease(Effect.succeed(handle), () =>
+        Match.value(mode).pipe(
+          Match.when("start", () => Effect.fail(nativeFault)),
+          Match.orElse(() =>
+            Effect.acquireRelease(Effect.succeed(handle), () =>
               Ref.update(closed, (n) => n + 1)
             )
+          )
+        )
       );
       const result = yield* checkDownstreamConsumer.pipe(
         Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
@@ -565,30 +680,39 @@ it.effect.each(["start", "stdout", "stderr", "exit-read"] as const)(
           Match.value(error).pipe(
             Match.tag("DownstreamCommandError", (failure) => {
               expect(failure.stage).toBe("build taxkit");
-              expect(failure.exitCode).toEqual(Option.none());
-              expect(String(failure)).not.toContain("TAXKIT_SECRET_SENTINEL");
+              expect(failure.exitCode).toStrictEqual(Option.none());
+              EffectFunction.pipe(String(failure), (actual) => {
+                expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
+              });
             }),
-
             // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
             Match.orElse(() => expect.unreachable())
           );
         },
         onSuccess: () => expect.unreachable(),
       });
-      expect(yield* Ref.get(closed)).toBe(mode === "start" ? 0 : 1);
+      expect(yield* Ref.get(closed)).toBe(
+        Match.value(mode).pipe(
+          Match.when("start", (): 0 => 0),
+          Match.orElse((): 1 => 1)
+        )
+      );
     })
 );
-
 it.effect.each(["packed", "downstream"] as const)(
   "bounds stdout and closes a rejected process: %s",
   (owner) =>
     Effect.gen(function* () {
       const closed = yield* Ref.make(0);
       const removed = yield* Ref.make(0);
-      const handle = handleFixture(
+      const handle = EffectFunction.pipe(
         Stream.make(new TextEncoder().encode("x".repeat(1_048_577))),
-        "success",
-        0
+        (argument10) =>
+          EffectFunction.pipe("success", (argument11) =>
+            EffectFunction.pipe(0, (argument12) =>
+              handleFixture(argument10, argument11, argument12)
+            )
+          )
       );
       const spawner = ChildProcessSpawner.make(() =>
         Effect.acquireRelease(Effect.succeed(handle), () =>
@@ -596,9 +720,10 @@ it.effect.each(["packed", "downstream"] as const)(
         )
       );
       const error = yield* Effect.gen(function* runBoundedFixture() {
-        return yield* owner === "packed"
-          ? checkPackedArtifact
-          : checkDownstreamConsumer;
+        return yield* Match.value(owner).pipe(
+          Match.when("packed", () => checkPackedArtifact),
+          Match.orElse(() => checkDownstreamConsumer)
+        );
       }).pipe(
         Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
         Effect.provide(
@@ -623,11 +748,15 @@ it.effect.each(["packed", "downstream"] as const)(
             expect(failure.reason).toBe("output-limit");
           },
         }),
-
         // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
         Match.orElse(() => expect.unreachable())
       );
       expect(yield* Ref.get(closed)).toBe(1);
-      expect(yield* Ref.get(removed)).toBe(owner === "packed" ? 1 : 0);
+      expect(yield* Ref.get(removed)).toBe(
+        Match.value(owner).pipe(
+          Match.when("packed", (): 1 => 1),
+          Match.orElse((): 0 => 0)
+        )
+      );
     })
 );

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Deferred, Effect, Fiber, Ref, Stream } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Deferred,
+  Effect,
+  Fiber,
+  Ref,
+  Stream,
+} from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 import { TestClock } from "effect/testing";
 
@@ -14,15 +22,21 @@ describe("complete native MCP response budget", () => {
         const stream = Stream.succeed(new Uint8Array(length)).pipe(
           Stream.ensuring(Ref.set(released, true))
         );
-        const response = yield* withBoundedMcpReply(
+        const response = yield* EffectFunction.pipe(
           Effect.succeed(
             HttpServerResponse.stream(stream, {
               contentType: "text/event-stream",
             })
+          ),
+          withBoundedMcpReply
+        );
+        expect(response.status).toBe(
+          Match.value(length).pipe(
+            Match.when(2_097_152, (): 200 => 200),
+            Match.orElse((): 503 => 503)
           )
         );
-        expect(response.status).toBe(length === 2_097_152 ? 200 : 503);
-        expect(yield* Ref.get(released)).toBe(true);
+        expect(yield* Ref.get(released)).toBeTruthy();
       }).pipe(
         Effect.provideService(
           HttpServerRequest.HttpServerRequest,
@@ -33,7 +47,6 @@ describe("complete native MCP response budget", () => {
         Effect.scoped
       )
   );
-
   it.effect(
     "applies one deadline to a stalled response and closes its resources",
     () =>
@@ -43,19 +56,20 @@ describe("complete native MCP response budget", () => {
         const body = Stream.fromEffect(
           Deferred.succeed(entered, true).pipe(Effect.andThen(Effect.never))
         ).pipe(Stream.ensuring(Ref.set(released, true)));
-        const call = yield* withBoundedMcpReply(
+        const call = yield* EffectFunction.pipe(
           Effect.succeed(
             HttpServerResponse.stream(body, {
               contentType: "text/event-stream",
             })
-          )
+          ),
+          withBoundedMcpReply
         ).pipe(Effect.forkScoped);
         yield* Deferred.await(entered);
         yield* TestClock.adjust("9 seconds");
-        expect(yield* Ref.get(released)).toBe(false);
+        expect(!(yield* Ref.get(released))).toBeTruthy();
         yield* TestClock.adjust("1 second");
         expect((yield* Fiber.join(call)).status).toBe(503);
-        expect(yield* Ref.get(released)).toBe(true);
+        expect(yield* Ref.get(released)).toBeTruthy();
       }).pipe(
         Effect.provideService(
           HttpServerRequest.HttpServerRequest,

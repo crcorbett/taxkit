@@ -1,5 +1,11 @@
 import { expect, it } from "@effect/vitest";
-import { Effect, Layer, Result, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Effect,
+  Layer,
+  Result,
+  Schema,
+} from "effect";
 import { vi } from "vitest";
 
 import { WebsiteApiLive } from "../../src/lib/host/binding.adapter.layer";
@@ -11,7 +17,9 @@ import { loadRootView } from "../../src/lib/pages/root.load";
 
 const binding = {
   connect: vi.fn<(...args: readonly unknown[]) => void>(),
-  fetch: vi.fn(() => Promise.resolve(new Response("User-agent: *"))),
+  fetch: vi.fn<() => ReturnType<typeof globalThis.fetch>>(() =>
+    Promise.resolve(new Response("User-agent: *"))
+  ),
 };
 const valid = {
   API_PUBLIC_ORIGIN: "https://api.taxkit.example",
@@ -19,7 +27,6 @@ const valid = {
   TAXKIT_PUBLICATION_ORIGIN: "https://taxkit.example",
   WEBSITE_PUBLIC_ORIGIN: "https://preview.taxkit.example",
 };
-
 it.effect.each([
   { apiValid: true, changed: {}, settingsValid: true },
   { apiValid: false, changed: { TAXKIT_API: {} }, settingsValid: true },
@@ -45,11 +52,25 @@ it.effect.each([
       const settings = yield* WebsiteSettings;
       const api = yield* WebsiteApi;
       const forward = yield* api
-        .forward("/api/v1/docs/discovery/robots.txt")
+        .forward({
+          path: "/api/v1/docs/discovery/robots.txt",
+        })
         .pipe(Effect.result);
-      expect(Result.isSuccess(settings.settings)).toBe(settingsValid);
-      expect(Result.isSuccess(api.client)).toBe(apiValid);
-      expect(Result.isSuccess(forward)).toBe(apiValid);
+      EffectFunction.pipe(
+        Result.isSuccess(yield* Effect.result(settings.settings)),
+        (actual) => {
+          expect(actual).toBe(settingsValid);
+        }
+      );
+      EffectFunction.pipe(
+        Result.isSuccess(yield* Effect.result(api.client)),
+        (actual) => {
+          expect(actual).toBe(apiValid);
+        }
+      );
+      EffectFunction.pipe(Result.isSuccess(forward), (actual) => {
+        expect(actual).toBe(apiValid);
+      });
       if (Result.isSuccess(forward)) {
         expect(yield* Effect.promise(() => forward.success.text())).toBe(
           "User-agent: *"

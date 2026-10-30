@@ -69,8 +69,7 @@ export type AnyParameterDescriptor = ParameterDescriptor<unknown, unknown>;
  * @since 0.1.0
  */
 export const makeParameterDescriptor = <Self, Value>(
-  args: Omit<typeof ParameterDescriptorFields.Encoded, "id"> & {
-    readonly id: string;
+  args: typeof ParameterDescriptorFields.Encoded & {
     readonly schema: Schema.Schema<Value>;
     readonly tag: Context.Key<Self, Value>;
   }

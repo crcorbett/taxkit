@@ -6,6 +6,8 @@ import { boundedReplies, requestCalculation } from "@taxkit/api-http/requests";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
+  Match,
+  Function as EffectFunction,
   Array,
   Clock,
   Effect,
@@ -14,6 +16,7 @@ import {
   Queue,
   Record,
   Schema,
+  Boolean as EffectBoolean,
 } from "effect";
 import { FetchHttpClient, HttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -34,9 +37,11 @@ const Json = Schema.fromJsonString(Schema.Unknown);
 // The browser's only calculation request: the public HTTP calculate route.
 const calculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`;
 const isCalculation = (
-  request: Readonly<{ method: () => string; url: () => string }>
+  request: Readonly<{
+    method: () => string;
+    url: () => string;
+  }>
 ) => request.method() === "POST" && request.url() === calculation;
-
 it.live(
   "keeps native headers/body deadlines and cancels browser reads on editing and departure",
   () =>
@@ -45,7 +50,7 @@ it.live(
       const root = path.resolve("../..");
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
-      const workers = yield* Effect.forEach(
+      const workers = yield* EffectFunction.pipe(
         [
           {
             entry: "worker.js",
@@ -63,35 +68,43 @@ it.live(
             output: ".alchemy/native-pair/bundles/TaxKitApi",
           },
           {
-            entry: "server.js",
+            entry: "index.js",
             name: "website",
             output: "apps/web/dist/server",
           },
         ] as const,
-        (artifact) =>
+        Effect.forEach((artifact) =>
           Effect.gen(function* () {
             const modulesRoot = path.join(root, artifact.output);
-            const { files, modules, wasm } =
-              yield* readWorkerModules(modulesRoot);
+            const { files, modules, wasm } = yield* readWorkerModules({
+              modulesRoot,
+            });
             expect(files).toContain(artifact.entry);
             if (
               artifact.name === "api-body" ||
               artifact.name === "api-headers"
             ) {
-              expect(
-                Array.some(
+              EffectFunction.pipe(
+                EffectFunction.pipe(
                   Record.toEntries(modules),
-                  ([file, module]) =>
-                    file === "worker.js" && module.contents.includes("PRIVATE9")
-                )
-              ).toBe(true);
+                  Array.some(
+                    ([file, module]) =>
+                      file === "worker.js" &&
+                      module.contents.includes("PRIVATE9")
+                  )
+                ),
+                (actual) => {
+                  expect(actual).toBeTruthy();
+                }
+              );
             }
             const origins = {
-              ...(artifact.entry === "worker.js"
-                ? {
-                    ...nativeRateFixture("10078"),
-                  }
-                : nativeLocalModeFixture),
+              ...Match.value(artifact).pipe(
+                Match.when({ entry: "worker.js" }, () => ({
+                  ...nativeRateFixture("10078"),
+                })),
+                Match.orElse(() => nativeLocalModeFixture)
+              ),
               API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
               TAXKIT_PUBLICATION_ORIGIN: {
                 type: "json" as const,
@@ -105,27 +118,26 @@ it.live(
             };
             return {
               config: {
-                assets:
-                  artifact.entry === "server.js"
-                    ? {
-                        directory: path.join(root, "apps/web/dist/client"),
-                        hasUserWorker: true,
-                        runWorkerFirst: false,
-                      }
-                    : undefined,
+                assets: Match.value(artifact).pipe(
+                  Match.when({ entry: "index.js" }, () => ({
+                    directory: path.join(root, "apps/web/dist/client"),
+                    hasUserWorker: true,
+                    runWorkerFirst: false,
+                  })),
+                  Match.orElse((): undefined => {})
+                ),
                 compatibilityDate: "2026-10-04",
                 compatibilityFlags: ["nodejs_compat"],
-                env:
-                  artifact.entry === "server.js"
-                    ? {
-                        ...origins,
-                        TAXKIT_API: {
-                          type: "worker" as const,
-                          worker: "api-body",
-                        },
-                      }
-                    : origins,
-
+                env: Match.value(artifact).pipe(
+                  Match.when({ entry: "index.js" }, () => ({
+                    ...origins,
+                    TAXKIT_API: {
+                      type: "worker" as const,
+                      worker: "api-body",
+                    },
+                  })),
+                  Match.orElse(() => origins)
+                ),
                 manifest: {
                   mainModule: artifact.entry,
                   modules: { ...modules, ...wasm },
@@ -135,6 +147,7 @@ it.live(
               },
             };
           })
+        )
       );
       const host = yield* Effect.acquireRelease(
         Effect.sync(
@@ -171,10 +184,12 @@ it.live(
         })
       );
       expect(yield* Effect.promise(() => control.text())).toContain("130100");
-
-      const headerWorker = Array.map(
-        Array.filter(workers, (worker) => worker.config.name === "api-headers"),
-        (worker) => ({
+      const headerWorker = EffectFunction.pipe(
+        EffectFunction.pipe(
+          workers,
+          Array.filter((worker) => worker.config.name === "api-headers")
+        ),
+        Array.map((worker) => ({
           config: {
             ...worker.config,
             env: {
@@ -187,7 +202,7 @@ it.live(
               WORKER_URL: { type: "json" as const, value: headersOrigin },
             },
           },
-        })
+        }))
       );
       const headerHost = yield* Effect.acquireRelease(
         Effect.sync(
@@ -223,7 +238,10 @@ it.live(
               })
             ),
             Effect.flatMap((client) =>
-              requestCalculation(client, CalculationRequest)
+              requestCalculation({
+                client,
+                request: CalculationRequest,
+              })
             ),
             Effect.flip,
             Effect.provide(FetchHttpClient.layer)
@@ -232,15 +250,19 @@ it.live(
           // The native client exposes a closed safe error union. Report only
           // its tag and the fixed fixture phase; never inspect raw causes or
           // request/response bytes to diagnose a transport regression.
+          const isDeadline = Schema.is(ApiDeadlineExceeded)(error);
+          const phase = EffectBoolean.match(address === apiOrigin, {
+            onFalse: () => "headers",
+            onTrue: () => "body",
+          });
           expect(
-            Schema.is(ApiDeadlineExceeded)(error),
-            `Native ${address === apiOrigin ? "body" : "headers"} fixture returned ${error._tag} after ${elapsed}ms`
-          ).toBe(true);
+            isDeadline,
+            `Native ${phase} fixture completed after ${elapsed}ms`
+          ).toBeTruthy();
           expect(elapsed).toBeGreaterThanOrEqual(9500);
           expect(elapsed).toBeLessThan(12_000);
         })
       );
-
       const websiteHost = yield* Effect.acquireRelease(
         Effect.sync(
           () =>
@@ -255,13 +277,13 @@ it.live(
               host: "127.0.0.1",
               port: 4202,
               workers: [
-                ...Array.filter(
+                ...EffectFunction.pipe(
                   workers,
-                  (worker) => worker.config.name === "website"
+                  Array.filter((worker) => worker.config.name === "website")
                 ),
-                ...Array.filter(
+                ...EffectFunction.pipe(
                   workers,
-                  (worker) => worker.config.name !== "website"
+                  Array.filter((worker) => worker.config.name !== "website")
                 ),
               ],
             })
@@ -314,90 +336,130 @@ it.live(
       );
       const payInput = page.getByLabel("Pay before tax ($)");
       yield* Effect.promise(() => payInput.fill("1654"));
-      expect(yield* Queue.clear(calls)).toEqual([]);
-      const deadlineStarted = yield* Clock.currentTimeMillis;
-      yield* Effect.promise(() =>
-        page.getByRole("button", { exact: true, name: "Calculate" }).click()
-      );
-      yield* Effect.promise(() =>
-        page
-          .getByRole("button", { exact: true, name: "Calculating…" })
-          .waitFor({ timeout: 5000 })
-      );
-      yield* Effect.promise(() =>
-        page.getByRole("alert").waitFor({ timeout: 12_000 })
-      );
-      const deadlineElapsed =
-        (yield* Clock.currentTimeMillis) - deadlineStarted;
-      expect(deadlineElapsed).toBeGreaterThanOrEqual(9500);
-      expect(deadlineElapsed).toBeLessThan(12_000);
-      expect(
-        yield* Effect.promise(() => page.getByRole("alert").textContent())
-      ).toBe(new ApiDeadlineExceeded().message);
-      expect(yield* Queue.clear(calls)).toEqual([`POST ${calculation}`]);
-      expect(yield* Queue.take(failed)).toContain("ERR_ABORTED");
-      yield* Effect.promise(() => payInput.fill("1700"));
-      yield* Effect.promise(() =>
-        page.getByRole("alert").waitFor({ state: "hidden", timeout: 5000 })
-      );
-
-      yield* Effect.logInfo("native-cancellation: editing");
-      const editResponse = yield* Effect.promise(() =>
-        page.waitForResponse((response) => isCalculation(response.request()), {
-          timeout: 5000,
-        })
-      ).pipe(Effect.forkScoped);
-      yield* Effect.promise(() =>
-        page.getByRole("button", { exact: true, name: "Calculate" }).click()
-      );
-      expect((yield* Fiber.join(editResponse)).status()).toBe(200);
-      yield* Effect.promise(() => payInput.fill("1800"));
-      expect(
-        yield* Queue.take(failed).pipe(Effect.timeout("3 seconds"))
-      ).toContain("ERR_ABORTED");
-      expect(yield* Queue.clear(calls)).toEqual([`POST ${calculation}`]);
-      expect(yield* Effect.promise(() => page.getByRole("alert").count())).toBe(
-        0
-      );
-      expect(
+      expect(yield* Queue.clear(calls)).toStrictEqual([]);
+      yield* Effect.gen(function* verifyBrowserDeadline() {
+        const deadlineStarted = yield* Clock.currentTimeMillis;
         yield* Effect.promise(() =>
-          page.getByText("$1,301.00", { exact: true }).count()
-        )
-      ).toBe(0);
-
-      yield* Effect.logInfo("native-cancellation: departure");
-      const departureResponse = yield* Effect.promise(() =>
-        page.waitForResponse((response) => isCalculation(response.request()), {
-          timeout: 5000,
-        })
-      ).pipe(Effect.forkScoped);
-      yield* Effect.promise(() =>
-        page.getByRole("button", { exact: true, name: "Calculate" }).click()
+          page.getByRole("button", { exact: true, name: "Calculate" }).click()
+        );
+        yield* Effect.promise(() =>
+          page
+            .getByRole("button", { exact: true, name: "Calculating…" })
+            .waitFor({ timeout: 5000 })
+        );
+        yield* Effect.promise(() =>
+          page.getByRole("alert").waitFor({ timeout: 12_000 })
+        );
+        const deadlineElapsed =
+          (yield* Clock.currentTimeMillis) - deadlineStarted;
+        expect(deadlineElapsed).toBeGreaterThanOrEqual(9500);
+        expect(deadlineElapsed).toBeLessThan(12_000);
+        expect(
+          yield* Effect.promise(() => page.getByRole("alert").textContent())
+        ).toBe(new ApiDeadlineExceeded().message);
+        expect(yield* Queue.clear(calls)).toStrictEqual([
+          `POST ${calculation}`,
+        ]);
+        expect(yield* Queue.take(failed)).toContain("ERR_ABORTED");
+        yield* Effect.promise(() => payInput.fill("1700"));
+        yield* Effect.promise(() =>
+          page.getByRole("alert").waitFor({ state: "hidden", timeout: 5000 })
+        );
+      }).pipe(Effect.withSpan("NativeCancellation.verifyBrowserDeadline"));
+      yield* Effect.gen(function* verifyEditingCancellation() {
+        yield* Effect.logInfo("native-cancellation: editing");
+        const editResponse = yield* Effect.promise(() =>
+          page.waitForResponse(
+            (response) =>
+              EffectFunction.pipe(response.request(), isCalculation),
+            {
+              timeout: 5000,
+            }
+          )
+        ).pipe(Effect.forkScoped);
+        yield* Effect.promise(() =>
+          page.getByRole("button", { exact: true, name: "Calculate" }).click()
+        );
+        EffectFunction.pipe(
+          (yield* Fiber.join(editResponse)).status(),
+          (actual) => {
+            expect(actual).toBe(200);
+          }
+        );
+        yield* Effect.promise(() => payInput.fill("1800"));
+        expect(
+          yield* Queue.take(failed).pipe(Effect.timeout("3 seconds"))
+        ).toContain("ERR_ABORTED");
+        expect({
+          QueueClearCalls: yield* Queue.clear(calls),
+          EffectPromisePageGetByRoleAlertCount: yield* Effect.promise(() =>
+            page.getByRole("alert").count()
+          ),
+          retainedNetPayCount: yield* Effect.promise(() =>
+            page.getByText("$1,301.00", { exact: true }).count()
+          ),
+        }).toStrictEqual({
+          QueueClearCalls: [`POST ${calculation}`],
+          EffectPromisePageGetByRoleAlertCount: 0,
+          retainedNetPayCount: 0,
+        });
+      }).pipe(Effect.withSpan("NativeCancellation.verifyEditingCancellation"));
+      yield* Effect.gen(function* verifyDepartureCancellation() {
+        yield* Effect.logInfo("native-cancellation: departure");
+        const departureResponse = yield* Effect.promise(() =>
+          page.waitForResponse(
+            (response) =>
+              EffectFunction.pipe(response.request(), isCalculation),
+            {
+              timeout: 5000,
+            }
+          )
+        ).pipe(Effect.forkScoped);
+        yield* Effect.promise(() =>
+          page.getByRole("button", { exact: true, name: "Calculate" }).click()
+        );
+        EffectFunction.pipe(
+          (yield* Fiber.join(departureResponse)).status(),
+          (actual) => {
+            expect(actual).toBe(200);
+          }
+        );
+        yield* Effect.promise(() => page.goBack());
+        yield* Effect.promise(() =>
+          page
+            .getByRole("heading", { name: "Australian take-home pay" })
+            .waitFor({ state: "hidden", timeout: 5000 })
+        );
+        expect(
+          yield* Queue.take(failed).pipe(Effect.timeout("3 seconds"))
+        ).toContain("ERR_ABORTED");
+        expect({
+          QueueClearCalls: yield* Queue.clear(calls),
+          QueueClearExceptions: yield* Queue.clear(exceptions),
+        }).toStrictEqual({
+          QueueClearCalls: [`POST ${calculation}`],
+          QueueClearExceptions: [],
+        });
+      }).pipe(
+        Effect.withSpan("NativeCancellation.verifyDepartureCancellation")
       );
-      expect((yield* Fiber.join(departureResponse)).status()).toBe(200);
-      yield* Effect.promise(() => page.goBack());
-      yield* Effect.promise(() =>
-        page
-          .getByRole("heading", { name: "Australian take-home pay" })
-          .waitFor({ state: "hidden", timeout: 5000 })
+      yield* Effect.gen(function* verifyCancellationTelemetry() {
+        const capturedLogs = yield* Queue.clear(logs);
+        const logText = yield* Schema.encodeEffect(Json)(capturedLogs);
+        const messageText = yield* Schema.encodeEffect(Json)(
+          EffectFunction.pipe(
+            capturedLogs,
+            Array.map((log) => log.message)
+          )
+        );
+        expect(logText).toContain("api.runtime.event");
+        expect(logText).not.toContain("PRIVATE9");
+        Array.forEach((marker: string) => {
+          expect(messageText).not.toContain(marker);
+        })(["1654", "130100"]);
+      }).pipe(
+        Effect.withSpan("NativeCancellation.verifyCancellationTelemetry")
       );
-      expect(
-        yield* Queue.take(failed).pipe(Effect.timeout("3 seconds"))
-      ).toContain("ERR_ABORTED");
-      expect(yield* Queue.clear(calls)).toEqual([`POST ${calculation}`]);
-      expect(yield* Queue.clear(exceptions)).toEqual([]);
-      const capturedLogs = yield* Queue.clear(logs);
-      const logText = yield* Schema.encodeEffect(Json)(capturedLogs);
-      const messageText = yield* Schema.encodeEffect(Json)(
-        Array.map(capturedLogs, (log) => log.message)
-      );
-      expect(logText).toContain("api.runtime.event");
-      expect(logText).not.toContain("PRIVATE9");
-      expect(messageText).not.toContain("1654");
-      expect(messageText).not.toContain("130100");
-      // Browser abort and caller cleanup are observed. The local Worker runtime
-      // does not establish upstream cancellation of its artificial twelve-second
-      // stream; never report this as provider or remote-operation cancellation.
     }).pipe(
       // Three ten-second deadline checks run sequentially, alongside Worker
       // and browser startup. Keep each operation's own bound above; allow

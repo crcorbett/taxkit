@@ -6,9 +6,16 @@ import {
 } from "@effect/atom-react";
 import { scheduleTask } from "@effect/atom-react/RegistryContext";
 import { describe, expect, it } from "@effect/vitest";
-import { Array as EffectArray, Effect, Option } from "effect";
+import {
+  Schedule,
+  Function as EffectFunction,
+  Array as EffectArray,
+  Effect,
+  Option,
+} from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
+import { TestClock } from "effect/testing";
 import { StrictMode, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
 import { hydrateRoot } from "react-dom/client";
@@ -20,7 +27,6 @@ const AtomHarness = ({ children }: { readonly children: ReactNode }) => (
     <RegistryProvider>{children}</RegistryProvider>
   </StrictMode>
 );
-
 describe("qualified Atom / React / Scheduler lifecycle", () => {
   it.effect("runs scheduled work and cancels queued work", () =>
     Effect.gen(function* () {
@@ -29,13 +35,22 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
       const cancel = scheduleTask(cancelled);
       cancel();
       scheduleTask(executed);
-      yield* Effect.promise(() =>
-        expect.poll(() => executed.mock.calls.length).toBe(1)
+      yield* Effect.sync(() => executed.mock.calls.length).pipe(
+        Effect.repeat({
+          until: (observed) => observed === 1,
+          schedule: Schedule.spaced("50 millis"),
+        }),
+        Effect.timeout(1000),
+        TestClock.withLive,
+        Effect.tap((observed) =>
+          Effect.sync(() => {
+            expect(observed).toBe(1);
+          })
+        )
       );
       expect(cancelled).not.toHaveBeenCalled();
     })
   );
-
   it.effect(
     "hydrates, survives StrictMode remount, applies rapid updates and disposes",
     () =>
@@ -73,7 +88,6 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
           }, [registry]);
           return <span>{value}</span>;
         };
-
         yield* Effect.scoped(
           Effect.gen(function* () {
             // Browser test host: React owns DOM writes and registry scheduling. The
@@ -89,7 +103,7 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
                     </AtomHarness>
                   )
                 );
-                document.body.appendChild(element);
+                document.body.insertBefore(element, null);
                 return element;
               }),
               (element) => Effect.sync(() => element.remove())
@@ -113,8 +127,18 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
                   reactRoot.unmount();
                 })
             );
-            yield* Effect.promise(() =>
-              expect.poll(() => hydrated.mock.calls.length).toBeGreaterThan(0)
+            yield* Effect.sync(() => hydrated.mock.calls.length).pipe(
+              Effect.repeat({
+                until: (observed) => observed > 0,
+                schedule: Schedule.spaced("50 millis"),
+              }),
+              Effect.timeout(1000),
+              TestClock.withLive,
+              Effect.tap((observed) =>
+                Effect.sync(() => {
+                  expect(observed).toBeGreaterThan(0);
+                })
+              )
             );
             root.render(
               <AtomHarness>
@@ -122,14 +146,30 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
                 <Resource />
               </AtomHarness>
             );
-            yield* Effect.promise(() =>
-              expect.poll(() => captured.mock.calls.length).toBe(2)
-            );
-            expect(
-              EffectArray.dedupe(
-                EffectArray.map(captured.mock.calls, ([registry]) => registry)
+            yield* Effect.sync(() => captured.mock.calls.length).pipe(
+              Effect.repeat({
+                until: (observed) => observed === 2,
+                schedule: Schedule.spaced("50 millis"),
+              }),
+              Effect.timeout(1000),
+              TestClock.withLive,
+              Effect.tap((observed) =>
+                Effect.sync(() => {
+                  expect(observed).toBe(2);
+                })
               )
-            ).toHaveLength(1);
+            );
+            EffectFunction.pipe(
+              EffectArray.dedupe(
+                EffectFunction.pipe(
+                  captured.mock.calls,
+                  EffectArray.map(([registry]) => registry)
+                )
+              ),
+              (actual) => {
+                expect(actual).toHaveLength(1);
+              }
+            );
             const button = yield* Option.fromNullishOr(
               host.querySelector("button")
             ).pipe(
@@ -149,17 +189,35 @@ describe("qualified Atom / React / Scheduler lifecycle", () => {
                 }),
               { discard: true }
             );
-            yield* Effect.promise(() =>
-              expect.poll(() => button.textContent).toBe("92")
+            yield* Effect.sync(() => button.textContent).pipe(
+              Effect.repeat({
+                until: (observed) => observed === "92",
+                schedule: Schedule.spaced("50 millis"),
+              }),
+              Effect.timeout(1000),
+              TestClock.withLive,
+              Effect.tap((observed) =>
+                Effect.sync(() => {
+                  expect(observed).toBe("92");
+                })
+              )
             );
             expect(errors).not.toHaveBeenCalled();
             expect(disposed).not.toHaveBeenCalled();
           })
         );
-        yield* Effect.promise(() =>
-          expect
-            .poll(() => disposed.mock.calls.length, { timeout: 2000 })
-            .toBe(1)
+        yield* Effect.sync(() => disposed.mock.calls.length).pipe(
+          Effect.repeat({
+            until: (observed) => observed === 1,
+            schedule: Schedule.spaced("50 millis"),
+          }),
+          Effect.timeout(2000),
+          TestClock.withLive,
+          Effect.tap((observed) =>
+            Effect.sync(() => {
+              expect(observed).toBe(1);
+            })
+          )
         );
       })
   );

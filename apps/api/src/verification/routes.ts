@@ -21,7 +21,17 @@ import {
   AuPayTaxYear,
   GrossPay,
 } from "@taxkit/rules-au-pay";
-import { Array, Effect, Option, Record, Schedule, Schema } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Option,
+  Record,
+  Schedule,
+  Schema,
+  Boolean as EffectBoolean,
+} from "effect";
 import * as HttpBody from "effect/http/HttpBody";
 import * as HttpClient from "effect/http/HttpClient";
 import * as HttpClientResponse from "effect/http/HttpClientResponse";
@@ -34,7 +44,7 @@ import {
 } from "./schemas.js";
 
 export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
-  (origin: string) =>
+  ({ origin }: { readonly origin: string }) =>
     Effect.gen(function* () {
       const page = yield* HttpClient.get(
         new URL(`${docsPaths.page}?path=%2Fstart%2Fquickstart`, origin),
@@ -68,18 +78,23 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
       if (
         page.path !== "/start/quickstart" ||
         markdown !== page.markdown ||
-        !Array.some(
+        !EffectFunction.pipe(
           search,
-          (result) =>
-            result.path === page.path && result.title === page.frontmatter.title
+          Array.some(
+            (result) =>
+              result.path === page.path &&
+              result.title === page.frontmatter.title
+          )
         ) ||
-        !Array.some(
-          Array.flatMap(navigation.primaryNavigation, (item) => [
-            item,
-            ...item.pages,
-          ]),
-          (item) =>
-            item.path === page.path && item.title === page.frontmatter.title
+        !EffectFunction.pipe(
+          EffectFunction.pipe(
+            navigation.primaryNavigation,
+            Array.flatMap((item) => [item, ...item.pages])
+          ),
+          Array.some(
+            (item) =>
+              item.path === page.path && item.title === page.frontmatter.title
+          )
         )
       ) {
         return yield* new ApiSmokeValidationError({
@@ -108,7 +123,6 @@ export const checkApiPublicContent = Effect.fn("ApiSmoke.publicContent")(
       })
     )
 );
-
 export const waitForApiHealth = (origin: string) =>
   HttpClient.get(new URL(healthPath, origin), { acceptJson: true }).pipe(
     Effect.flatMap(HttpClientResponse.filterStatusOk),
@@ -131,7 +145,6 @@ export const waitForApiHealth = (origin: string) =>
         ),
     })
   );
-
 export const checkApiCatalog = (origin: string) =>
   HttpClient.get(new URL(calculatorPaths.calculators, origin), {
     acceptJson: true,
@@ -155,9 +168,11 @@ export const checkApiCatalog = (origin: string) =>
         ),
     }),
     Effect.flatMap((catalog) =>
-      Array.findFirst(
+      EffectFunction.pipe(
         catalog.calculators,
-        (calculator) => calculator.calculatorId === "au.pay.take-home"
+        Array.findFirst(
+          (calculator) => calculator.calculatorId === "au.pay.take-home"
+        )
       ).pipe(
         Option.match({
           onNone: () =>
@@ -171,7 +186,6 @@ export const checkApiCatalog = (origin: string) =>
       )
     )
   );
-
 export const checkApiCalculation = (origin: string) =>
   HttpBody.jsonSchema(CalculatorRunRequest)({
     facts: {
@@ -210,16 +224,18 @@ export const checkApiCalculation = (origin: string) =>
         ),
     }),
     Effect.flatMap((calculation) =>
-      calculation.calculator.calculatorId === "au.pay.take-home"
-        ? Effect.void
-        : Effect.fail(
+      Match.value(calculation.calculator).pipe(
+        Match.when({ calculatorId: "au.pay.take-home" }, () => Effect.void),
+        Match.orElse(() =>
+          Effect.fail(
             new ApiSmokeValidationError({
               message: "Calculate route returned the wrong calculator id.",
             })
           )
+        )
+      )
     )
   );
-
 export const checkApiOpenApi = (origin: string) =>
   HttpClient.get(new URL(openApiPath, origin), {
     acceptJson: true,
@@ -243,12 +259,21 @@ export const checkApiOpenApi = (origin: string) =>
         ),
     }),
     Effect.flatMap((document) =>
-      Record.has(document.paths, "/api/v1/calculators/{calculatorId}/calculate")
-        ? Effect.void
-        : Effect.fail(
-            new ApiSmokeValidationError({
-              message: "OpenAPI document did not include the calculate route.",
-            })
-          )
+      EffectBoolean.match(
+        Record.has(
+          document.paths,
+          calculatorPaths.calculate.replace(":calculatorId", "{calculatorId}")
+        ),
+        {
+          onFalse: () =>
+            Effect.fail(
+              new ApiSmokeValidationError({
+                message:
+                  "OpenAPI document did not include the calculate route.",
+              })
+            ),
+          onTrue: () => Effect.void,
+        }
+      )
     )
   );

@@ -1,6 +1,7 @@
 import { CalculatorToolFailure } from "@taxkit/calculators/page-schemas";
 import type { CalculatorPageToolkit } from "@taxkit/calculators/page-tools";
 import {
+  Function as EffectFunction,
   Array,
   Cause,
   Context,
@@ -10,18 +11,17 @@ import {
   Record,
   Schema,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import { AiError, Tool } from "effect/ai";
 import type { Toolkit } from "effect/ai";
 
 import { ModelContextHost } from "./service.js";
-
 // Tools reject unknown input keys, as remote MCP does.
 const strict = { onExcessProperty: "error" } as const;
 const encodeFailure = Schema.encodeEffect(
   Schema.toCodecJson(CalculatorToolFailure)
 );
-
 /**
  * Register the mounted calculator page's tools with the browser's WebMCP host
  * for the enclosing Scope. Each tool advertises its checked parameter Schema;
@@ -71,21 +71,27 @@ export const registerCalculatorPageTools = Effect.fnUntraced(function* (
                     )
                   )
                 );
-                return encodeFailure(
+                return EffectFunction.pipe(
                   error.pipe(
                     Option.filter(Schema.is(CalculatorToolFailure)),
                     Option.getOrElse(
                       () =>
                         new CalculatorToolFailure({
-                          code: invalid
-                            ? "invalid-input"
-                            : "service-unavailable",
-                          retry: invalid
-                            ? "check-the-visible-form"
-                            : "try-again-manually",
+                          code: EffectBoolean.match(invalid, {
+                            onFalse: (): "service-unavailable" =>
+                              "service-unavailable",
+                            onTrue: (): "invalid-input" => "invalid-input",
+                          }),
+                          retry: EffectBoolean.match(invalid, {
+                            onFalse: (): "try-again-manually" =>
+                              "try-again-manually",
+                            onTrue: (): "check-the-visible-form" =>
+                              "check-the-visible-form",
+                          }),
                         })
                     )
-                  )
+                  ),
+                  encodeFailure
                 );
               }),
               Effect.scoped,

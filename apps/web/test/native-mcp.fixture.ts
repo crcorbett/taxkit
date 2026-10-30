@@ -1,11 +1,10 @@
-import { Record, Schema } from "effect";
+import { Function as EffectFunction, Record, Schema } from "effect";
 
 export const NativeMcpResumeProgress = Schema.Struct({
   attempts: Schema.Number,
   completed: Schema.Number,
   errors: Schema.Array(Schema.String),
 });
-
 // Test-only native observation boundary. Preserve the exact native callback,
 // this/arguments, return value and thrown error; never catch-and-suppress or
 // change ALS selection. The host requires a synchronous callback, so the
@@ -15,17 +14,23 @@ export const NativeMcpResumeProgress = Schema.Struct({
 export const nativeMcpResumeFixture = (
   modules: Record.ReadonlyRecord<
     string,
-    { readonly contents: string; readonly type: "esm" }
+    {
+      readonly contents: string;
+      readonly type: "esm";
+    }
   >
 ) => ({
-  ...Record.map(modules, (module) => ({
-    ...module,
-    contents: module.contents.replaceAll(
-      /(?<receiver>[\w$]+)\.runInAsyncScope\(this\.evaluate,this,/gu,
-      (_, receiver: string) =>
-        `globalThis.__taxkitNativeResume(${receiver},this.evaluate,this,`
-    ),
-  })),
+  ...EffectFunction.pipe(
+    modules,
+    Record.map((module) => ({
+      ...module,
+      contents: module.contents.replaceAll(
+        /(?<receiver>[\w$]+)\.runInAsyncScope\(this\.evaluate,this,/gu,
+        (_, receiver: string) =>
+          `globalThis.__taxkitNativeResume(${receiver},this.evaluate,this,`
+      ),
+    }))
+  ),
   "mcp-resume-probe.js": {
     contents: `import Original from './worker.js';
 const progress = { attempts: 0, completed: 0, errors: [] };

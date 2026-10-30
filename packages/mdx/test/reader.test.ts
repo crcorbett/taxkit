@@ -9,14 +9,22 @@ import {
   DocsCodeHighlighterTest,
   DocsDiagramRendererTest,
 } from "@taxkit/content/test";
-import { Array, Effect, HashMap, Layer, Schema } from "effect";
+import {
+  Predicate,
+  Match,
+  Function as EffectFunction,
+  Array,
+  Effect,
+  HashMap,
+  Layer,
+  Schema,
+} from "effect";
 
 import { DocsPageReaderLive } from "../src/live.layer.js";
 
 const ReaderTest = DocsPageReaderLive.pipe(
   Layer.provide(Layer.merge(DocsCodeHighlighterTest, DocsDiagramRendererTest))
 );
-
 const links = Effect.gen(function* () {
   const source = yield* DocsSourcePath.makeEffect("guides/first.mdx");
   return {
@@ -35,22 +43,22 @@ const links = Effect.gen(function* () {
     source,
   };
 }).pipe(Effect.orDie);
-
 const page = (body: string) =>
   `---\ntitle: "First guide"\ndescription: "Read the first guide."\nstatus: "published"\n---\n\n# First guide\n\n${body}`;
-
 const read = (text: string) =>
   Effect.gen(function* () {
     const context = yield* links;
     const reader = yield* DocsPageReader;
-    return yield* reader.read({ path: context.source, text }, context);
+    return yield* reader.read({
+      source: { path: context.source, text },
+      links: context,
+    });
   }).pipe(Effect.provide(ReaderTest));
-
 describe("MDX page reader", () => {
   it.effect("reads supported Markdown into checked reading blocks", () =>
     Effect.gen(function* () {
-      const result = yield* read(
-        page(
+      const result = yield* EffectFunction.pipe(
+        EffectFunction.pipe(
           [
             "Use **the SDK** and `calculate`; see [Start](../start/index.mdx#install).",
             "",
@@ -71,12 +79,17 @@ describe("MDX page reader", () => {
             "flowchart LR",
             "  A --> B",
             "```",
-          ].join("\n")
-        )
+          ].join("\n"),
+          page
+        ),
+        read
       );
       assert.strictEqual(result.frontmatter.title, "First guide");
       assert.deepEqual(
-        Array.map(result.body, (block) => block.kind),
+        EffectFunction.pipe(
+          result.body,
+          Array.map((block) => block.kind)
+        ),
         ["paragraph", "heading", "list", "table", "code", "diagram"]
       );
       const [paragraph, heading, list, table, , diagram] = result.body;
@@ -102,24 +115,32 @@ describe("MDX page reader", () => {
         id: "run-it",
         kind: "heading",
       });
-      const [, secondItem] = list?.kind === "list" ? list.items : [];
+      const [, secondItem] = Match.value(list).pipe(
+        Match.when({ kind: "list" }, (matchedValue) => matchedValue.items),
+        Match.orElse(() => [])
+      );
       const [, exampleLink] = secondItem ?? [];
       assert.deepEqual<unknown>(exampleLink, {
         content: [{ kind: "text", text: "the example" }],
         href: `https://github.com/crcorbett/taxkit/blob/${"1".repeat(40)}/packages/docs-examples/src/a.ts`,
         kind: "link",
       });
-      assert.deepEqual(table?.kind === "table" ? table.align : undefined, [
-        "left",
-        "right",
-      ]);
+      assert.deepEqual(
+        Match.value(table).pipe(
+          Match.when({ kind: "table" }, (matchedValue) => matchedValue.align),
+          Match.orElse((): undefined => {})
+        ),
+        ["left", "right"]
+      );
       assert.strictEqual(
-        diagram?.kind === "diagram" ? diagram.title : undefined,
+        Match.value(diagram).pipe(
+          Match.when({ kind: "diagram" }, (matchedValue) => matchedValue.title),
+          Match.orElse((): undefined => {})
+        ),
         "Two steps"
       );
     })
   );
-
   it.effect(
     "fails each unsupported page with a parse error naming the file",
     () =>
@@ -144,7 +165,7 @@ describe("MDX page reader", () => {
             Effect.flip,
             Effect.flatMap((error) =>
               Effect.sync(() => {
-                assert.strictEqual(error._tag, "DocsSourceError");
+                assert.isTrue(Predicate.isTagged(error, "DocsSourceError"));
                 assert.strictEqual(error.operation, "parse");
                 assert.strictEqual(error.source, "guides/first.mdx");
               })
