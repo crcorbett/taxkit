@@ -28,6 +28,7 @@ import type {
   SyntaxPhrasing,
   SyntaxTableRow,
 } from "./syntax.schemas.js";
+
 const diagramMetaPattern = /^title="(?<title>[^"]+)"$/u;
 const DiagramMeta = Schema.Struct({ title: DiagramTitle });
 const compileLeaf = (node: SyntaxLeaf) =>

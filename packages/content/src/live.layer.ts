@@ -8,6 +8,7 @@ import type {
   DocsSearchTerm,
 } from "./schemas.js";
 import { ContentCatalogue, ContentService } from "./service.js";
+
 export const ContentServiceLive = Layer.effect(
   ContentService,
   Effect.gen(function* () {

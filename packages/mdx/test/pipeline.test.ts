@@ -37,6 +37,7 @@ import {
   Ref,
   Schema,
 } from "effect";
+
 const LinksTest = Layer.succeed(
   LinkResolver,
   LinkResolver.of({
@@ -76,8 +77,8 @@ describe("portable MDX pipeline", () => {
       assert.strictEqual(yield* InlineText.makeEffect(" "), " ");
       assert.strictEqual(yield* LinkTarget.makeEffect(""), "");
       assert.strictEqual(yield* ListStart.makeEffect(1), 1);
-      yield* SourceText.makeEffect("s".repeat(1000001)).pipe(Effect.flip);
-      yield* CodeText.makeEffect("c".repeat(20001)).pipe(Effect.flip);
+      yield* SourceText.makeEffect("s".repeat(1_000_001)).pipe(Effect.flip);
+      yield* CodeText.makeEffect("c".repeat(20_001)).pipe(Effect.flip);
       yield* InlineText.makeEffect("").pipe(Effect.flip);
       yield* LinkTarget.makeEffect("t".repeat(8193)).pipe(Effect.flip);
       yield* EffectFunction.pipe(

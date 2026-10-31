@@ -18,6 +18,7 @@ import {
   DocsPublicCatalogue,
 } from "./schemas.js";
 import { ContentCatalogue, DocsPageReader, DocsSources } from "./service.js";
+
 const catalogueFailure = (message: string) =>
   new DocsSourceError({ message, operation: "buildCatalogue" });
 // The one public catalogue, built once from the bundled MDX files. The
