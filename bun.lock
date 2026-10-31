@@ -34,7 +34,7 @@
     },
     "apps/api": {
       "name": "api",
-      "version": "2.0.2",
+      "version": "2.0.3",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@effect/platform-bun": "catalog:",
@@ -69,7 +69,7 @@
     },
     "apps/web": {
       "name": "web",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@effect/atom-react": "catalog:",
@@ -120,7 +120,7 @@
     },
     "packages/aeo": {
       "name": "@taxkit/aeo",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -150,7 +150,7 @@
     },
     "packages/api/http": {
       "name": "@taxkit/api-http",
-      "version": "3.1.1",
+      "version": "3.1.2",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -169,7 +169,7 @@
     },
     "packages/api/mcp": {
       "name": "@taxkit/api-mcp",
-      "version": "0.2.3",
+      "version": "0.2.4",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
@@ -240,7 +240,7 @@
     },
     "packages/docs-examples": {
       "name": "@taxkit/docs-examples",
-      "version": "0.0.6",
+      "version": "0.0.7",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -261,7 +261,7 @@
     },
     "packages/infrastructure": {
       "name": "@taxkit/infrastructure",
-      "version": "1.1.2",
+      "version": "1.1.3",
       "dependencies": {
         "@alchemy.run/axiom": "catalog:",
         "@alchemy.run/cloudflare": "catalog:",
@@ -283,7 +283,7 @@
     },
     "packages/mdx": {
       "name": "@taxkit/mdx",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "dependencies": {
         "@pierre/highlights": "0.3.0",
         "@taxkit/content": "workspace:*",
@@ -316,7 +316,7 @@
     },
     "packages/og-image": {
       "name": "@taxkit/og-image",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "dependencies": {
         "@takumi-rs/wasm": "2.18.2",
         "@taxkit/content": "workspace:*",
@@ -382,7 +382,7 @@
     },
     "packages/sdk/typescript": {
       "name": "taxkit",
-      "version": "2.2.0",
+      "version": "3.0.0",
       "dependencies": {
         "effect": "catalog:",
       },

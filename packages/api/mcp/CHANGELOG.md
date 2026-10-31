@@ -1,5 +1,12 @@
 # @taxkit/api-mcp
 
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [990965c]
+  - @taxkit/api-http@3.1.2
+
 ## 0.2.3
 
 ### Patch Changes
