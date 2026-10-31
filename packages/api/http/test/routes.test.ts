@@ -11,9 +11,9 @@ import {
 import { OpenApi } from "effect/http-api";
 
 import { TaxKitApi } from "../src/api.js";
-import { isPublicReadPath } from "../src/response-policy.js";
 import {
   ApiDataPath,
+  isPublicReadApiPath,
   ApiReferencePath,
   CalculatorApiPath,
   CalculationPath,
@@ -48,7 +48,7 @@ describe("transport route catalogue", () => {
               path
             );
             assert.equal(
-              isPublicReadPath(path),
+              isPublicReadApiPath(path),
               Option.isSome(Option.fromNullishOr(methods.get)) &&
                 path !== healthPath,
               path
@@ -65,7 +65,7 @@ describe("transport route catalogue", () => {
           Effect.sync(() => {
             const apiPath = discoveryApiPath(path);
             assert.isTrue(Schema.is(DocsDiscoveryApiPath)(apiPath));
-            assert.isTrue(isPublicReadPath(apiPath));
+            assert.isTrue(isPublicReadApiPath(apiPath));
             assert.isFalse(Schema.is(ApiDataPath)(apiPath));
             assert.isFalse(Schema.is(ApiReferencePath)(apiPath));
           })
@@ -87,7 +87,7 @@ describe("transport route catalogue", () => {
         ],
         (path) =>
           Effect.sync(() => {
-            assert.isFalse(isPublicReadPath(path), path);
+            assert.isFalse(isPublicReadApiPath(path), path);
           })
       )
   );

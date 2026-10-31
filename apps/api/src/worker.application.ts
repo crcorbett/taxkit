@@ -7,7 +7,6 @@ import { withCalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundar
 import {
   applyCachePolicy,
   isBrowserOrigin,
-  isPublicReadPath,
   publicCors,
 } from "@taxkit/api-http/response-policy";
 import {
@@ -19,6 +18,7 @@ import {
   DocsImageApiPath,
   HealthPath,
   McpRoutePath,
+  isPublicReadApiPath,
   mcpPath,
 } from "@taxkit/api-http/routes";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
@@ -280,7 +280,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         Effect.map((request) =>
           applyCachePolicy(response, {
             method: request.method,
-            publicRead: isPublicReadPath(
+            publicRead: isPublicReadApiPath(
               new URL(request.url, "https://api.invalid").pathname
             ),
           })

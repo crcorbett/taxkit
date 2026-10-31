@@ -9,11 +9,11 @@ import { Cookies, Headers, HttpServerResponse } from "effect/http";
 import {
   applyCachePolicy,
   cacheHeaders,
-  isPublicReadPath,
   privateCacheControl,
   publicBrowserCacheControl,
   publicCdnCacheControl,
 } from "../src/response-policy.js";
+import { isPublicReadApiPath } from "../src/routes.js";
 
 const shared = {
   "cache-control": publicBrowserCacheControl,
@@ -37,7 +37,7 @@ describe("public response cache policy", () => {
     "/api/v1/facts",
     "/api/docs/openapi.json",
   ])("shares the public read %s", (path) => {
-    EffectFunction.pipe(isPublicReadPath(path), (actual) => {
+    EffectFunction.pipe(isPublicReadApiPath(path), (actual) => {
       expect(actual).toBeTruthy();
     });
   });
@@ -48,7 +48,7 @@ describe("public response cache policy", () => {
     "/mcp",
     "/api/v1/docs/discovery/other.txt",
   ])("never shares %s", (path) => {
-    EffectFunction.pipe(isPublicReadPath(path), (actual) => {
+    EffectFunction.pipe(isPublicReadApiPath(path), (actual) => {
       expect(!actual).toBeTruthy();
     });
   });

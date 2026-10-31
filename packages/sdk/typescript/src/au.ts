@@ -9,9 +9,6 @@ import {
 import type { CalculationInput } from "./types.js";
 
 export { GrossPay } from "@taxkit/rules-au-pay";
-export { default as PayRules } from "./internal/compatibility/pay-rules.js";
-export { default as IncomeTaxRules } from "./internal/compatibility/income-tax-rules.js";
-export { default as StslRules } from "./internal/compatibility/stsl-rules.js";
 export {
   AtoSchedule1Table,
   AtoSchedule1TableDescriptor,

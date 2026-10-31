@@ -2,12 +2,12 @@ import { Function as EffectFunction, Array, Effect, Option } from "effect";
 import { HttpApiClient } from "effect/http-api";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
-import { CalculatorSchemas } from "taxkit/core";
 import { TaxKitApi } from "taxkit/http";
+import { HelpQuery } from "taxkit/schemas";
 
 export const loadCalculatorHelp = Effect.fnUntraced(function* (baseUrl: URL) {
   const client = yield* HttpApiClient.make(TaxKitApi, { baseUrl });
-  const query = yield* CalculatorSchemas.HelpQuery.makeEffect({
+  const query = yield* HelpQuery.makeEffect({
     help: Option.some(Option.some("schema")),
   });
   const schema = yield* client.calculatorApi.getCalculatorSchema({

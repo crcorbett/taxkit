@@ -97,4 +97,3 @@ export {
   CalculatorConcurrencyLimit,
   PublicCalculatorServiceBounded,
 } from "@taxkit/calculators/work";
-export { default as CalculatorSchemas } from "./internal/compatibility/calculator-schemas.js";

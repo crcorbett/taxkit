@@ -447,7 +447,7 @@ const writeConsumerFiles = Effect.fnUntraced(function* ({
       ),
       fs.writeFileString(
         path.join(workspacePath, "src/typecheck.ts"),
-        `import { CalculatorSchemas as MetadataSchemas } from "taxkit/core";
+        `import { CalculationQuery, CalculatorJurisdiction, HelpMode, MetadataQuery, RuleDescriptorMetadata } from "taxkit/schemas";
 import { CalculationError } from "taxkit/core";
 import { listCalculatorCatalogEntries } from "taxkit/core";
 import type { CalculatorCatalogEntry } from "taxkit/core";
@@ -479,19 +479,7 @@ import {
 } from "taxkit/schemas";
 import { AuPayTakeHomeCalculation } from "taxkit/testing";
 import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "taxkit/core";
-import { GrossPay, PayRules, IncomeTaxRules, StslRules } from "taxkit/au";
-
-// Legacy namespace imports retain class types as well as runtime members.
-const namespaceGrossPay: PayRules.GrossPay = new GrossPay({ amount: aud(Cents.make(165_400)), period: "weekly" });
-const namespacePaySchema: typeof PayRules.GrossPay = GrossPay;
-const namespaceIncomeTaxRules: typeof IncomeTaxRules = IncomeTaxRules;
-const namespaceStslRules: typeof StslRules = StslRules;
-const namespaceQuery: MetadataSchemas.CalculationQuery = MetadataSchemas.CalculationQuery.make({});
-void namespaceGrossPay;
-void namespacePaySchema;
-void namespaceIncomeTaxRules;
-void namespaceStslRules;
-void namespaceQuery;
+import { GrossPay } from "taxkit/au";
 
 const takeHomeFacts: CalculationInput<typeof au.calculations.takeHomePay> = {
   grossPay: new GrossPay({
@@ -548,20 +536,20 @@ catalogueEntry.program;
 void listCalculatorCatalogEntries;
 
 const traceMakeInput = {children: [], inputs: {}, result: 1, ruleId: RuleId.make("fixture/type"), sources: [], title: "Fixture"};
-const requestDefaults = MetadataSchemas.CalculationQuery.make({});
-const checkedHelp: Option.Option<Option.Option<typeof MetadataSchemas.HelpMode.Type>> = requestDefaults.help;
+const requestDefaults = CalculationQuery.make({});
+const checkedHelp: Option.Option<Option.Option<typeof HelpMode.Type>> = requestDefaults.help;
 void checkedHelp;
-const checkedContext = MetadataSchemas.MetadataQuery.make({});
-const jurisdiction: Option.Option<Option.Option<typeof MetadataSchemas.CalculatorJurisdiction.Type>> = checkedContext.jurisdiction;
+const checkedContext = MetadataQuery.make({});
+const jurisdiction: Option.Option<Option.Option<typeof CalculatorJurisdiction.Type>> = checkedContext.jurisdiction;
 void jurisdiction;
 // @ts-expect-error constructor inputs use canonical Options, not wire strings.
-MetadataSchemas.MetadataQuery.make({jurisdiction: "AU"});
+MetadataQuery.make({jurisdiction: "AU"});
 // @ts-expect-error constructor help uses canonical Options, not a wire string.
-MetadataSchemas.CalculationQuery.make({help: "full"});
+CalculationQuery.make({help: "full"});
 // @ts-expect-error nullable context is not an admitted request representation.
-MetadataSchemas.MetadataQuery.make({taxYear: null});
+MetadataQuery.make({taxYear: null});
 // @ts-expect-error false permission must still be wrapped in its owning Option.
-MetadataSchemas.RuleDescriptorMetadata.make({id: RuleId.make("fixture/rule"), parameters: [], provides: [], requires: [], sourcePolicy: "not-required", sources: [], title: "Fixture", allowDuplicateProvides: false});
+RuleDescriptorMetadata.make({id: RuleId.make("fixture/rule"), parameters: [], provides: [], requires: [], sourcePolicy: "not-required", sources: [], title: "Fixture", allowDuplicateProvides: false});
 const checkedTrace = TraceNode.make(traceMakeInput);
 const traceFormula: Option.Option<Option.Option<string>> = checkedTrace.formula;
 void traceFormula;
@@ -648,7 +636,7 @@ au.pay.takeHomePay({
 import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "taxkit/core";
 import { PublicCalculatorServiceLive } from "taxkit/core";
 import { PublicCalculatorService } from "taxkit/core";
-import { CalculatorSchemas as MetadataSchemas } from "taxkit/core";
+import { CalculationQuery, CalculatorCatalogItem, CalculatorCatalogResponse, CalculatorGraphResponse, CalculatorInputDecodeError, CalculatorInputHelp, CalculatorRunRequest, CalculatorRunResponse, CalculatorRunServiceRequest, CalculatorSchemaResponse, CalculatorServiceError, DescriptorFilterQuery, FactDescriptorMetadata, FactsResponse, GetCalculatorGraphRequest, GetCalculatorRequest, HelpQuery, JurisdictionsResponse, MetadataQuery, RuleDescriptorMetadata, RulesResponse, TaxYearsResponse, UnsupportedCalculatorContextError } from "taxkit/schemas";
 import { CalculationError } from "taxkit/core";
 import { listCalculatorCatalogEntries } from "taxkit/core";
 import { CalculationEngineLive } from "taxkit/core";
@@ -877,460 +865,460 @@ await Effect.runPromise(Effect.gen(function* () {
 // Saved before the public request migration; expectations come from the original owners.
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(MetadataQuery)({});
+  const encoded = yield* Schema.encodeEffect(MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed MetadataQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({jurisdiction: undefined, taxYear: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(MetadataQuery)({jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed MetadataQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({jurisdiction: "AU", taxYear: "2025-26"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(MetadataQuery)({jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "f45bea6dfdddf63af51736fca999756a1780f4b31d33495026c5c7fa88fbd5a0" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed MetadataQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(HelpQuery)({});
+  const encoded = yield* Schema.encodeEffect(HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(HelpQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed HelpQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({jurisdiction: undefined, taxYear: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(HelpQuery)({jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(HelpQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed HelpQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({jurisdiction: "AU", taxYear: "2025-26", help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(HelpQuery)({jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(HelpQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "0be5bb97e742b21e1526e138ac2b85eb2cf971e1355aa0862e6941a8331adc67" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed HelpQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculationQuery)({});
+  const encoded = yield* Schema.encodeEffect(CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(CalculationQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed CalculationQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculationQuery)({help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(CalculationQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculationQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculationQuery)({help: "full"});
+  const encoded = yield* Schema.encodeEffect(CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(CalculationQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "da39084a2e387010419681fabd9733b9183dc0130300ab37e2ea99b897dec05d" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculationQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)({calculatorId: "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed GetCalculatorRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed GetCalculatorRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "37671de06f163469dc22e3558fe7057a8e8f205ff728a287108fe999a7ebab9f" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed GetCalculatorRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed GetCalculatorGraphRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed GetCalculatorGraphRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "65fe06057e41885252e7a2b092290de8b7c5cec8b075f9e6247d528c4d7551d0" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed GetCalculatorGraphRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)({});
+  const encoded = yield* Schema.encodeEffect(DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(DescriptorFilterQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== false || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed DescriptorFilterQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({calculator: undefined, jurisdiction: undefined, taxYear: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)({calculator: undefined, jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(DescriptorFilterQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== true || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed DescriptorFilterQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({calculator: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)({calculator: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(DescriptorFilterQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "adccd61014613c74da5bd5fa3b0dd8ac7452ae2cf0e1273cba6b34b6c364feda" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== true || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed DescriptorFilterQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "b0c6614005ab660bdb736bf10fefd1643b57bf5c784e2e3c4f0318ab2d579617" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed CalculatorRunRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: undefined, taxYear: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "b0c6614005ab660bdb736bf10fefd1643b57bf5c784e2e3c4f0318ab2d579617" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed CalculatorRunRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: "AU", taxYear: "2025-26"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "bec0ecf461d79d2524f0c4d3590c8f49095883d58fb64e6cba3bd18ac83df44f" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed CalculatorRunRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7d4cebb87770da5f461a30a47178e63eeb23b1e7bfece6c31631e412849114cb" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed CalculatorRunServiceRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7d4cebb87770da5f461a30a47178e63eeb23b1e7bfece6c31631e412849114cb" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculatorRunServiceRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: "full"});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "58c6a32c45ba03810fb7f864c7d0882d3072625130480b49d8021bcd038d71f1" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculatorRunServiceRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputHelp)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "934afe89da88e80a9eabe058b7899d7698407a6c6842cf76ef010ec5393652bf" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "title"])) {
     throw new Error("Packed CalculatorInputHelp/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(FactDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "91d29898239c61f2b3c9198263a2c39540d137430009da982b97e648d6b0824a" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "schemaTag", "title"])) {
     throw new Error("Packed FactDescriptorMetadata/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "913960bc8e0e08c568c9150db526d4ef8c03bc10720a56fa9f82a5cdc7d417d0" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
     throw new Error("Packed UnsupportedCalculatorContextError/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture", question: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture", question: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputHelp)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "934afe89da88e80a9eabe058b7899d7698407a6c6842cf76ef010ec5393652bf" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "question", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "question", "title"])) {
     throw new Error("Packed CalculatorInputHelp/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture", question: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture", question: undefined});
+  const encoded = yield* Schema.encodeEffect(FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(FactDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "91d29898239c61f2b3c9198263a2c39540d137430009da982b97e648d6b0824a" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"])) {
     throw new Error("Packed FactDescriptorMetadata/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": undefined, "taxYear": undefined}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": undefined, "taxYear": undefined}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "913960bc8e0e08c568c9150db526d4ef8c03bc10720a56fa9f82a5cdc7d417d0" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
     throw new Error("Packed UnsupportedCalculatorContextError/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)({"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputHelp)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7efaeb721955f48f3c3986cfbc0243bc2919146997e172b0c4681bbf108432b7" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "question", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "question", "title"])) {
     throw new Error("Packed CalculatorInputHelp/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "schemaTag": "Money", "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "schemaTag": "Money", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(FactDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a4aea7f78123263173a29ba84f804b8b0b02f00192aee676e80627c18622bcb7" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"])) {
     throw new Error("Packed FactDescriptorMetadata/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": "AU", "taxYear": "2025-26"}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": "AU", "taxYear": "2025-26"}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "0363af54d90b1906faa9b64a27f256113bbf1fda2f067496eef8f16b4894f46b" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
     throw new Error("Packed UnsupportedCalculatorContextError/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "1ec96367697bf2207c370ea47470dbb3db075dd7c3f82d771b5ecccfc1292705" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture", allowDuplicateProvides: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture", allowDuplicateProvides: undefined});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "1ec96367697bf2207c370ea47470dbb3db075dd7c3f82d771b5ecccfc1292705" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"allowDuplicateProvides": false, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"allowDuplicateProvides": false, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "65a273a5cb1041e950715e738da2e774ee675e458b7ac558c3e62216a362d288" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/false changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"allowDuplicateProvides": true, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"allowDuplicateProvides": true, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3edbef562b82856cbf24da6e552d116e641143b1ee8f7d21f88749bcab4352e5" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/true changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/missing/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/missing/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3053782fc254bd270aa71aa13c2fda25f13570163998614a76e9f3e820d36281" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/missing/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/undefined/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/undefined/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3053782fc254bd270aa71aa13c2fda25f13570163998614a76e9f3e820d36281" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/undefined/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "c02eb42d05fe7e4c5fdb4821fa6079388c6a0ff890f40f9f038eb7350dafe587" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/present/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input", help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input", help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "c02eb42d05fe7e4c5fdb4821fa6079388c6a0ff890f40f9f038eb7350dafe587" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/present/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7426d620c184e3969b2becabc3d87b7157c61631988d8301d9a8e3725a4d64aa" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/present/present changed historical bytes or key identity.");
   }
@@ -2112,12 +2100,12 @@ await Effect.runPromise(Effect.gen(function* () {
     const context = contextForm === "missing" ? {} : contextForm === "undefined" ? {jurisdiction: undefined, taxYear: undefined} : {jurisdiction: "AU", taxYear: "2025-26"};
     const help = helpForm === "missing" ? {} : {help: helpForm === "undefined" ? undefined : helpForm};
     const facts = calculatorId === "au.income-tax.annual" ? {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}} : {grossPay: {_tag: "GrossPay", amount: {_tag: "Money", cents: 346200, currency: "AUD"}, period: "fortnightly"}, taxFreeThresholdClaimed: true};
-    const request = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId, ...help, payload: {facts, ...context}});
+    const request = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId, ...help, payload: {facts, ...context}});
     const report = yield* service.calculate(request);
-    const encodedReport = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunResponse)(report);
+    const encodedReport = yield* Schema.encodeEffect(CalculatorRunResponse)(report);
     // @ts-expect-error invalid external facts deliberately bypass the Type to qualify safe selected-calculator errors.
     const error = yield* service.calculate({...request, payload: {...request.payload, facts: {privateSource: "private-fixed-sentinel"}}}).pipe(Effect.flip);
-    const encodedError = yield* Schema.encodeEffect(MetadataSchemas.CalculatorServiceError)(error);
+    const encodedError = yield* Schema.encodeEffect(CalculatorServiceError)(error);
     const suffix = calculatorId + "/" + contextForm + "/" + helpForm;
     for (const sample of [{name: "report/" + suffix, value: encodedReport}, {name: "error/" + suffix, value: encodedError}]) {
       const prior = historicalRuns.find((row) => row.name === sample.name);
@@ -2230,28 +2218,28 @@ await Effect.runPromise(Effect.gen(function* () {
   const service = yield* PublicCalculatorService;
   for (const form of ["missing", "undefined", "present"] as const) {
     const context = form === "missing" ? {} : form === "undefined" ? {jurisdiction: undefined, taxYear: undefined} : {jurisdiction: "AU", taxYear: "2025-26"} as const;
-    const query = yield* Schema.decodeEffect(MetadataSchemas.MetadataQuery)(context);
-    const filter = yield* Schema.decodeEffect(MetadataSchemas.DescriptorFilterQuery)(context);
+    const query = yield* Schema.decodeEffect(MetadataQuery)(context);
+    const filter = yield* Schema.decodeEffect(DescriptorFilterQuery)(context);
     const calculators = yield* service.listCalculators(query);
     const years = yield* service.listTaxYears(query);
     const facts = yield* service.listFacts(filter);
     const rules = yield* service.listRules(filter);
-    assertHistoricalMetadataResponse("listCalculators/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorCatalogResponse)(calculators)));
-    assertHistoricalMetadataResponse("listTaxYears/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.TaxYearsResponse)(years)));
-    assertHistoricalMetadataResponse("listFacts/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.FactsResponse)(facts)));
-    assertHistoricalMetadataResponse("listRules/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.RulesResponse)(rules)));
+    assertHistoricalMetadataResponse("listCalculators/" + form, JSON.stringify(yield* Schema.encodeEffect(CalculatorCatalogResponse)(calculators)));
+    assertHistoricalMetadataResponse("listTaxYears/" + form, JSON.stringify(yield* Schema.encodeEffect(TaxYearsResponse)(years)));
+    assertHistoricalMetadataResponse("listFacts/" + form, JSON.stringify(yield* Schema.encodeEffect(FactsResponse)(facts)));
+    assertHistoricalMetadataResponse("listRules/" + form, JSON.stringify(yield* Schema.encodeEffect(RulesResponse)(rules)));
   }
-  assertHistoricalMetadataResponse("listJurisdictions", JSON.stringify(yield* service.listJurisdictions().pipe(Effect.flatMap((value) => Schema.encodeEffect(MetadataSchemas.JurisdictionsResponse)(value)))));
+  assertHistoricalMetadataResponse("listJurisdictions", JSON.stringify(yield* service.listJurisdictions().pipe(Effect.flatMap((value) => Schema.encodeEffect(JurisdictionsResponse)(value)))));
   for (const calculatorId of ["au.income-tax.annual", "au.pay.take-home", "au.pay.withholdings"] as const) {
     const input = {calculatorId, jurisdiction: "AU", taxYear: "2025-26"} as const;
-    const request = yield* Schema.decodeEffect(MetadataSchemas.GetCalculatorRequest)(input);
-    const graphRequest = yield* Schema.decodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(input);
+    const request = yield* Schema.decodeEffect(GetCalculatorRequest)(input);
+    const graphRequest = yield* Schema.decodeEffect(GetCalculatorGraphRequest)(input);
     const calculator = yield* service.getCalculator(request);
     const schema = yield* service.getCalculatorSchema(request);
     const graph = yield* service.getCalculatorGraph(graphRequest);
-    assertHistoricalMetadataResponse("getCalculator/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorCatalogItem)(calculator)));
-    assertHistoricalMetadataResponse("getCalculatorSchema/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorSchemaResponse)(schema)));
-    assertHistoricalMetadataResponse("getCalculatorGraph/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorGraphResponse)(graph)));
+    assertHistoricalMetadataResponse("getCalculator/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(CalculatorCatalogItem)(calculator)));
+    assertHistoricalMetadataResponse("getCalculatorSchema/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(CalculatorSchemaResponse)(schema)));
+    assertHistoricalMetadataResponse("getCalculatorGraph/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(CalculatorGraphResponse)(graph)));
   }
 }).pipe(Effect.provide(ServiceLive)));
 

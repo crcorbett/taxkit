@@ -322,15 +322,21 @@ import * as schemas from "taxkit/schemas";
 import * as testing from "taxkit/testing";
 import * as core from "taxkit/core";
 import * as http from "taxkit/http";
-import { GrossPay, PayRules } from "taxkit/au";
+import { GrossPay } from "taxkit/au";
+import * as australian from "taxkit/au";
 
 assert.equal(import.meta.resolve("taxkit"), new URL("./node_modules/taxkit/dist/index.js", import.meta.url).href, "imports select the extracted archive");
 assert.equal(typeof TaxKit.calculate, "function", "root SDK import");
 assert.ok(core.Money, "Core entrypoint");
 assert.ok(http.TaxKitApi, "HTTP contract entrypoint");
 assert.equal(http.CalculatorRunResponse, schemas.CalculatorRunResponse, "one HTTP/SDK Schema identity");
-assert.equal(core.CalculatorSchemas.CalculatorRunResponse, schemas.CalculatorRunResponse, "one Core/SDK Schema identity");
-assert.equal(GrossPay, PayRules.GrossPay, "one AU rule identity");
+assert.ok(GrossPay, "AU fact Schema import");
+assert.equal(Object.hasOwn(core, "CalculatorSchemas"), false, "removed calculator namespace");
+for (const name of ["PayRules", "IncomeTaxRules", "StslRules"]) {
+  assert.equal(Object.hasOwn(australian, name), false, "removed AU namespace " + name);
+}
+assert.ok(schemas.MetadataQuery, "named metadata query import");
+assert.ok(schemas.HelpQuery, "named help query import");
 assert.equal(typeof effect.calculateRunRequest, "function", "Effect run import");
 assert.equal(typeof effect.calculateReportRequest, "function", "Effect report request import");
 assert.equal(typeof effect.calculateReport, "function", "Effect report import");

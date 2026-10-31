@@ -31,8 +31,6 @@ export const publicCors = {
 export const publicBrowserCacheControl = "public, max-age=0";
 export const publicCdnCacheControl = "public, max-age=604800, stale-if-error=0";
 export const privateCacheControl = "no-store";
-// Compatibility export; the route catalogue owns cache eligibility.
-export { isPublicReadApiPath as isPublicReadPath } from "./routes.js";
 const restrictive = /(?:^|,)\s*(?:private|no-store)\s*(?:=|,|$)/iu;
 const revalidation =
   /(?:^|,)\s*(?:no-cache|must-revalidate|proxy-revalidate)\s*(?:=|,|$)/iu;
