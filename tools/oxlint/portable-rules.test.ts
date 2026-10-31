@@ -2,8 +2,9 @@ import nodePath from "node:path";
 import { fileURLToPath } from "node:url";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { describe, expect, it as test } from "@effect/vitest";
+import { describe, expect, it } from "@effect/vitest";
 import {
+  Function as EffectFunction,
   Array,
   Effect,
   FileSystem,
@@ -11,86 +12,391 @@ import {
   Order,
   Record,
   Schema,
+  Boolean as EffectBoolean,
 } from "effect";
 import type { OxlintConfig } from "oxlint";
 
 import oxlintConfig from "../../oxlint.config.js";
-import { lintFiles, writeLintFixture } from "./cli-fixture.js";
+import {
+  lintFiles,
+  makeIsolatedLintWorkspace,
+  writeLintFixture,
+} from "./cli-fixture.js";
 
-const { join } = nodePath;
-const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
-
-const antiSlopRules = [
-  "no-chained-type-assertions",
-  "no-conditional-empty-object-spread",
-  "no-known-value-widening",
-  "no-module-mocking",
-  "no-object-parameters",
-  "no-reflect-apply",
-  "no-reflect-get",
-  "no-runtime-typeof",
-  "no-shape-in-symbol-names",
-  "no-unknown-parameters",
-  "no-unknown-returns",
-  "no-unknown-type-aliases",
-  "no-unsafe-dictionary-type",
-  "no-widen-then-assert",
-  "require-safety-comment-for-type-assertion",
-] as const;
-
-const fixtureCases = [
-  {
-    accepted: [
-      "packages/api/mcp/src/cancellation.boundary.ts",
-      "packages/api/mcp/src/handlers.layer.ts",
-      "packages/api/mcp/src/request.service.ts",
-      "packages/api/mcp/src/response-budget.boundary.ts",
-      "packages/api/mcp/src/schemas.ts",
-      "packages/api/mcp/src/server.ts",
-      "packages/api/mcp/src/tools.ts",
-      "packages/api/mcp/test/cancellation.boundary.test.ts",
-      "packages/api/mcp/test/response-budget.boundary.test.ts",
-      "packages/api/mcp/vitest.config.ts",
-    ],
-    generated: "packages/api/mcp/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["tools/oxlint/fixtures/strict-commonjs-accepted.cjs"],
-    generated: ".generated-owned-source-rejected.cjs",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-commonjs-rejected.cjs.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "error-constructor-new",
-    ],
-  },
-  ...Array.map(
-    [
-      "bun-accepted",
-      "bun-global-non-host-accepted",
-      "bun-unrelated-accepted",
-      "effect-accepted",
-      "effect-unrelated-accepted",
-    ] as const,
-    (name) => ({
+describe("portable rules", () => {
+  const { join } = nodePath;
+  const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
+  const fixtureCases = [
+    {
+      accepted: [
+        "packages/api/mcp/src/cancellation.boundary.ts",
+        "packages/api/mcp/src/handlers.layer.ts",
+        "packages/api/mcp/src/request.service.ts",
+        "packages/api/mcp/src/response-budget.boundary.ts",
+        "packages/api/mcp/src/schemas.ts",
+        "packages/api/mcp/src/server.ts",
+        "packages/api/mcp/src/tools.ts",
+        "packages/api/mcp/test/cancellation.boundary.test.ts",
+        "packages/api/mcp/test/response-budget.boundary.test.ts",
+        "packages/api/mcp/vitest.config.ts",
+      ],
+      generated: "packages/api/mcp/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["tools/oxlint/fixtures/strict-commonjs-accepted.cjs"],
+      generated: ".generated-owned-source-rejected.cjs",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-commonjs-rejected.cjs.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "error-constructor-new",
+      ],
+    },
+    ...EffectFunction.pipe(
+      [
+        "bun-accepted",
+        "bun-global-non-host-accepted",
+        "bun-unrelated-accepted",
+        "effect-accepted",
+        "effect-unrelated-accepted",
+      ] as const,
+      Array.map((name) => ({
+        accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
+        generated: `tools/oxlint/fixtures/.generated-${name}-neighbour.ts`,
+        namespace: "strict-effect",
+        rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
+        rules: [
+          "no-native-at",
+          "tagged-error-name",
+          "error-constructor-new",
+          "no-unsafe-option-unwrap",
+        ],
+      }))
+    ),
+    ...EffectFunction.pipe(
+      ["ts", "tsx", "js", "jsx", "mjs"] as const,
+      Array.map((extension) => ({
+        accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
+        generated: `.generated-owned-source-rejected.${extension}`,
+        namespace: "strict-effect",
+        rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
+        rules: [
+          "no-native-at",
+          "tagged-error-name",
+          "error-constructor-new",
+          "no-unsafe-option-unwrap",
+        ],
+      }))
+    ),
+    {
+      accepted: [],
+      generated: "apps/api/scripts/.generated-retired-built-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [],
+      generated:
+        "apps/api/scripts/.generated-retired-hosted-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [
+        "apps/web/src/lib/host/errors.ts",
+        "apps/web/src/lib/host/config.ingress.ts",
+        "apps/web/test/host/config.boundary.test.ts",
+        "apps/web/src/lib/runtime.server.ts",
+        "apps/web/src/lib/runtime.client.ts",
+        "apps/web/src/lib/host/binding.adapter.layer.ts",
+        "apps/web/src/lib/api-client.atoms.ts",
+        "packages/api/http/src/requests.ts",
+        "apps/web/src/lib/calculators/page.atoms.ts",
+        "apps/web/src/lib/pages/loaders.ts",
+        "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
+        "tools/apps-local/native-pair-build.runtime.ts",
+        // native-pair takes over a minute to lint alone; `bun run lint` covers it.
+        "apps/web/test/native-settings-failure.boundary.test.ts",
+        "apps/web/test/native-cancellation.boundary.test.ts",
+        "apps/web/test/native-local-development.boundary.test.ts",
+        "apps/web/vitest.native.config.ts",
+        "packages/calculators/src/form.ingress.ts",
+        "apps/web/src/entry.server.ts",
+        "apps/web/src/routes/index.tsx",
+        "apps/web/test/atom-lifecycle.browser.test.tsx",
+        "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
+        "apps/web/vite.config.ts",
+        "apps/web/vitest.config.ts",
+        "apps/web/vitest.browser.config.ts",
+      ],
+      generated: "apps/web/src/.generated-app-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [
+        "packages/infrastructure/src/stage.ts",
+        "packages/infrastructure/src/secrets.ts",
+        "packages/infrastructure/src/apps-stack.ts",
+      ],
+      generated: "packages/infrastructure/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [],
+      generated: "apps/web/src/.generated-retired-app-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [],
+      generated:
+        "apps/web/src/lib/docs/.generated-retired-native-tests-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [],
+      generated:
+        "apps/api/scripts/.generated-retired-imports-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [
+        "apps/api/src/config.ts",
+        "apps/api/src/schemas.ts",
+        "apps/api/src/server.ts",
+        "apps/api/src/index.ts",
+        "apps/api/src/verification/routes.ts",
+        "apps/api/src/verification/schemas.ts",
+        "apps/api/scripts/smoke-public-routes.runtime.ts",
+        "apps/api/test/smoke-boundaries.test.ts",
+        "apps/api/test/config.test.ts",
+        "apps/api/vitest.config.ts",
+      ],
+      generated: "apps/api/scripts/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [
+        "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+        "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+        "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+        "packages/sdk/typescript/src/internal/artifact-schemas.ts",
+        "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
+      ],
+      generated:
+        "packages/sdk/typescript/scripts/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [
+        "packages/sdk/typescript/test/au.test.ts",
+        "packages/sdk/typescript/src/au.ts",
+        "packages/sdk/typescript/src/au-effect.ts",
+        "packages/sdk/typescript/test/client-lifetime.test.ts",
+        "packages/sdk/typescript/src/client.runtime.ts",
+        "packages/sdk/typescript/test/effect.test.ts",
+        "packages/sdk/typescript/src/effect.ts",
+        "packages/sdk/typescript/src/errors.ts",
+        "packages/sdk/typescript/test/index.test.ts",
+        "packages/sdk/typescript/src/index.ts",
+        "packages/sdk/typescript/src/internal/au-descriptors.ts",
+        "packages/sdk/typescript/src/live.layer.ts",
+        "packages/sdk/typescript/src/schemas/index.ts",
+        "packages/sdk/typescript/src/testing/index.ts",
+        "packages/sdk/typescript/src/types.ts",
+        "packages/sdk/typescript/type-tests/plain-client.test.ts",
+        "packages/sdk/typescript/type-tests/effect-client.test.ts",
+        "packages/sdk/typescript/vitest.config.ts",
+        "packages/sdk/typescript/vitest.browser.config.ts",
+      ],
+      generated: "packages/sdk/typescript/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [
+        "tools/oxlint/binding-tracker.ts",
+        "tools/oxlint/binding-tracker.test.ts",
+        "tools/oxlint/host.types.ts",
+        "tools/oxlint/bun-rules.ts",
+        "tools/oxlint/effect-rules.ts",
+        "tools/oxlint/package-rules.ts",
+        "tools/oxlint/taxkit-rules.ts",
+      ],
+      generated: "tools/oxlint/.generated-strict-bindings.js",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-bindings-rejected.js.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["apps/web/src/lib/runtime.server.ts"],
+      generated: "apps/web/src/lib/.generated-strict-runtime.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-native-at",
+        "runtime-file-convention",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-unsafe-option-unwrap",
+      ],
+    },
+    {
       accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
-      generated: `tools/oxlint/fixtures/.generated-${name}-neighbour.ts`,
+      generated: "tools/oxlint/fixtures/.generated-strict-global-rejected.js",
       namespace: "strict-effect",
       rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
       rules: [
@@ -99,569 +405,267 @@ const fixtureCases = [
         "error-constructor-new",
         "no-unsafe-option-unwrap",
       ],
-    })
-  ),
-  ...Array.map(["ts", "tsx", "js", "jsx", "mjs"] as const, (extension) => ({
-    accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
-    generated: `.generated-owned-source-rejected.${extension}`,
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
-    rules: [
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-unsafe-option-unwrap",
-    ],
-  })),
-  {
-    accepted: [],
-    generated: "apps/api/scripts/.generated-retired-built-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-
-  {
-    accepted: [],
-    generated: "apps/api/scripts/.generated-retired-hosted-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "apps/web/src/lib/host/errors.ts",
-      "apps/web/src/lib/host/config.ingress.ts",
-      "apps/web/test/host/config.boundary.test.ts",
-      "apps/web/src/lib/runtime.server.ts",
-      "apps/web/src/lib/runtime.client.ts",
-      "apps/web/src/lib/host/binding.adapter.layer.ts",
-      "apps/web/src/lib/api-client.atoms.ts",
-      "packages/api/http/src/requests.ts",
-      "apps/web/src/lib/calculators/page.atoms.ts",
-      "apps/web/src/lib/pages/loaders.ts",
-      "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
-      "tools/apps-local/native-pair-build.runtime.ts",
-      // native-pair takes over a minute to lint alone; `bun run lint` covers it.
-      "apps/web/test/native-settings-failure.boundary.test.ts",
-      "apps/web/test/native-cancellation.boundary.test.ts",
-      "apps/web/test/native-local-development.boundary.test.ts",
-      "apps/web/vitest.native.config.ts",
-      "packages/calculators/src/form.ingress.ts",
-      "apps/web/src/server.ts",
-      "apps/web/src/routes/index.tsx",
-      "apps/web/test/atom-lifecycle.browser.test.tsx",
-      "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
-      "apps/web/vite.config.ts",
-      "apps/web/vitest.config.ts",
-      "apps/web/vitest.browser.config.ts",
-    ],
-    generated: "apps/web/src/.generated-app-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "packages/infrastructure/src/stage.ts",
-      "packages/infrastructure/src/secrets.ts",
-      "packages/infrastructure/src/apps-stack.ts",
-    ],
-    generated: "packages/infrastructure/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [],
-    generated: "apps/web/src/.generated-retired-app-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [],
-    generated:
-      "apps/web/src/lib/docs/.generated-retired-native-tests-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [],
-    generated: "apps/api/scripts/.generated-retired-imports-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "apps/api/src/config.ts",
-      "apps/api/src/schemas.ts",
-      "apps/api/src/server.ts",
-      "apps/api/src/index.ts",
-      "apps/api/scripts/routes.ts",
-      "apps/api/scripts/schemas.ts",
-      "apps/api/scripts/smoke-public-routes.runtime.ts",
-      "apps/api/test/smoke-boundaries.test.ts",
-      "apps/api/test/config.test.ts",
-      "apps/api/vitest.config.ts",
-    ],
-    generated: "apps/api/scripts/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
-      "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
-      "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
-      "packages/sdk/typescript/scripts/schemas.ts",
-      "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
-    ],
-    generated: "packages/sdk/typescript/scripts/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-
-  {
-    accepted: [
-      "packages/sdk/typescript/test/au.test.ts",
-      "packages/sdk/typescript/src/au.ts",
-      "packages/sdk/typescript/src/au-effect.ts",
-      "packages/sdk/typescript/test/client-lifetime.test.ts",
-      "packages/sdk/typescript/src/client.runtime.ts",
-      "packages/sdk/typescript/test/effect.test.ts",
-      "packages/sdk/typescript/src/effect.ts",
-      "packages/sdk/typescript/src/errors.ts",
-      "packages/sdk/typescript/test/index.test.ts",
-      "packages/sdk/typescript/src/index.ts",
-      "packages/sdk/typescript/src/internal/au-descriptors.ts",
-      "packages/sdk/typescript/src/live.layer.ts",
-      "packages/sdk/typescript/src/schemas/index.ts",
-      "packages/sdk/typescript/src/testing/index.ts",
-      "packages/sdk/typescript/src/types.ts",
-      "packages/sdk/typescript/type-tests/plain-client.test.ts",
-      "packages/sdk/typescript/type-tests/effect-client.test.ts",
-      "packages/sdk/typescript/vitest.config.ts",
-      "packages/sdk/typescript/vitest.browser.config.ts",
-    ],
-    generated: "packages/sdk/typescript/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-
-  {
-    accepted: [
-      "tools/oxlint/binding-tracker.ts",
-      "tools/oxlint/binding-tracker.test.ts",
-      "tools/oxlint/host.types.ts",
-      "tools/oxlint/bun-rules.ts",
-      "tools/oxlint/effect-rules.ts",
-      "tools/oxlint/package-rules.ts",
-      "tools/oxlint/taxkit-rules.ts",
-    ],
-    generated: "tools/oxlint/.generated-strict-bindings.js",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-bindings-rejected.js.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["apps/web/src/lib/runtime.server.ts"],
-    generated: "apps/web/src/lib/.generated-strict-runtime.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-native-at",
-      "runtime-file-convention",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-unsafe-option-unwrap",
-    ],
-  },
-  {
-    accepted: ["tools/oxlint/fixtures/strict-global-accepted.js"],
-    generated: "tools/oxlint/fixtures/.generated-strict-global-rejected.js",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-global-rejected.js.txt",
-    rules: [
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-unsafe-option-unwrap",
-    ],
-  },
-  {
-    accepted: ["oxlint.config.ts"],
-    generated: ".generated-strict.config.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-unsafe-option-unwrap",
-    ],
-  },
-  {
-    accepted: ["tools/oxlint/cli-fixture.ts"],
-    generated: "tools/oxlint/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["packages/mdx/src/live.layer.ts"],
-    generated: "packages/mdx/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["packages/diagrams/src/mermaid.adapter.layer.ts"],
-    generated: "packages/diagrams/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["tools/documentation/check.runtime.ts"],
-    generated: "tools/documentation/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["packages/testing/src/index.ts"],
-    generated: "packages/testing/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["packages/api/http/src/in-process.layer.ts"],
-    generated: "packages/api/http/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["tools/repository-paths/check.runtime.ts"],
-    generated: "tools/repository-paths/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["packages/core/src/graph/rule-graph.ts"],
-    generated: "packages/core/src/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["packages/rules/au/pay/test/rule-graph.test.ts"],
-    generated: "packages/rules/au/pay/test/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: ["packages/calculators/test/public-calculator-service.test.ts"],
-    generated: "packages/calculators/test/.generated-strict-rejected.ts",
-    namespace: "strict-effect",
-    rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-    rules: [
-      "no-imperative-collections",
-      "no-unchecked-index",
-      "no-native-at",
-      "tagged-error-name",
-      "error-constructor-new",
-      "no-promise-workflow",
-      "no-unsafe-option-unwrap",
-      "no-unchecked-json",
-      "no-runtime-outside-boundary",
-      "no-native-work",
-    ],
-  },
-  {
-    accepted: [
-      "tools/oxlint/fixtures/effect-accepted.ts",
-      "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
-    ],
-    generated: "tools/oxlint/fixtures/.generated-effect-rejected.ts",
-    namespace: "effect",
-    rejected: "tools/oxlint/fixtures/effect-rejected.ts.txt",
-    rules: [
-      "no-bare-effect-try-promise",
-      "no-console-outside-runtime",
-      "no-effect-test-global-mix",
-      "no-host-imports-in-contracts",
-      "no-layer-exports-in-service-files",
-      "no-manual-tag",
-      "no-module-level-mutable-test-state",
-      "no-process-outside-boundaries",
-      "no-runtime-execution-outside-boundaries",
-      "no-schema-encoder-outside-egress",
-      "no-switch",
-      "no-throwing-schema-sync-codec",
-      "no-unknown-service-contract",
-      "no-unknown-tagged-error-cause",
-    ],
-  },
-  {
-    accepted: [
-      "tools/oxlint/fixtures/bun-accepted.ts",
-      "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
-      "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
-    ],
-    generated: "tools/oxlint/fixtures/.generated-bun-rejected.ts",
-    namespace: "bun",
-    rejected: "tools/oxlint/fixtures/bun-rejected.ts.txt",
-    rules: ["no-host-api-outside-adapters", "no-runtime-outside-entrypoints"],
-  },
-  {
-    accepted: ["tools/oxlint/fixtures/anti-slop-effect-accepted.test.ts"],
-    generated: "tools/oxlint/fixtures/.generated-anti-slop-effect-rejected.ts",
-    namespace: "anti-slop-effect",
-    rejected: "tools/oxlint/fixtures/anti-slop-effect-rejected.ts.txt",
-    rules: ["no-service-constructor-imports"],
-  },
-  {
-    accepted: ["tools/oxlint/fixtures/package-accepted.ts"],
-    generated: "apps/web/src/.generated-package-rejected.ts",
-    namespace: "package",
-    rejected: "tools/oxlint/fixtures/package-rejected.ts.txt",
-    rules: ["no-cross-package-source-imports"],
-  },
-] as const;
-
-const runOxlint = (path: string) =>
-  Effect.gen(function* () {
-    const result = yield* lintFiles([path], [], "json");
+    },
+    {
+      accepted: ["oxlint.config.ts"],
+      generated: ".generated-strict.config.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-unsafe-option-unwrap",
+      ],
+    },
+    {
+      accepted: ["tools/oxlint/cli-fixture.ts"],
+      generated: "tools/oxlint/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["packages/mdx/src/live.layer.ts"],
+      generated: "packages/mdx/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["packages/diagrams/src/mermaid.adapter.layer.ts"],
+      generated: "packages/diagrams/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["tools/documentation/check.runtime.ts"],
+      generated: "tools/documentation/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["packages/testing/src/index.ts"],
+      generated: "packages/testing/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["packages/api/http/src/in-process.layer.ts"],
+      generated: "packages/api/http/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["tools/repository-paths/check.runtime.ts"],
+      generated: "tools/repository-paths/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["packages/core/src/graph/rule-graph.ts"],
+      generated: "packages/core/src/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["packages/rules/au/pay/test/rule-graph.test.ts"],
+      generated: "packages/rules/au/pay/test/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: ["packages/calculators/test/public-calculator-service.test.ts"],
+      generated: "packages/calculators/test/.generated-strict-rejected.ts",
+      namespace: "strict-effect",
+      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
+      rules: [
+        "no-imperative-collections",
+        "no-unchecked-index",
+        "no-native-at",
+        "tagged-error-name",
+        "error-constructor-new",
+        "no-promise-workflow",
+        "no-unsafe-option-unwrap",
+        "no-unchecked-json",
+        "no-runtime-outside-boundary",
+        "no-native-work",
+      ],
+    },
+    {
+      accepted: [
+        "tools/oxlint/fixtures/effect-accepted.ts",
+        "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
+      ],
+      generated: "tools/oxlint/fixtures/.generated-effect-rejected.ts",
+      namespace: "taxkit-effect",
+      rejected: "tools/oxlint/fixtures/effect-rejected.ts.txt",
+      rules: [
+        "no-bare-effect-try-promise",
+        "no-console-outside-runtime",
+        "no-effect-test-global-mix",
+        "no-host-imports-in-contracts",
+        "no-layer-exports-in-service-files",
+        "no-manual-tag",
+        "no-module-level-mutable-test-state",
+        "no-process-outside-boundaries",
+        "no-runtime-execution-outside-boundaries",
+        "no-schema-encoder-outside-egress",
+        "no-switch",
+        "no-throwing-schema-sync-codec",
+        "no-unknown-service-contract",
+        "no-unknown-tagged-error-cause",
+      ],
+    },
+    {
+      accepted: [
+        "tools/oxlint/fixtures/bun-accepted.ts",
+        "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
+        "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
+      ],
+      generated: "tools/oxlint/fixtures/.generated-bun-rejected.ts",
+      namespace: "taxkit-bun",
+      rejected: "tools/oxlint/fixtures/bun-rejected.ts.txt",
+      rules: ["no-host-api-outside-adapters", "no-runtime-outside-entrypoints"],
+    },
+    {
+      accepted: ["tools/oxlint/fixtures/anti-slop-effect-accepted.test.ts"],
+      generated:
+        "tools/oxlint/fixtures/.generated-anti-slop-effect-rejected.ts",
+      namespace: "anti-slop-effect",
+      rejected: "tools/oxlint/fixtures/anti-slop-effect-rejected.ts.txt",
+      rules: ["no-service-constructor-imports"],
+    },
+    {
+      accepted: ["tools/oxlint/fixtures/package-accepted.ts"],
+      generated: "apps/web/src/.generated-package-rejected.ts",
+      namespace: "package",
+      rejected: "tools/oxlint/fixtures/package-rejected.ts.txt",
+      rules: ["no-cross-package-source-imports"],
+    },
+  ] as const;
+  const runOxlint = Effect.fnUntraced(function* ({
+    path,
+    configuration = "oxlint.config.ts",
+    workingDirectory = repositoryRoot,
+  }: {
+    readonly path: string;
+    readonly configuration?: string;
+    readonly workingDirectory?: string;
+  }) {
+    const result = yield* lintFiles({
+      configuration,
+      workingDirectory,
+      paths: [path],
+      extraArgs: [],
+      format: "json",
+    });
     const report = yield* Schema.decodeEffect(
       Schema.fromJsonString(
         Schema.Struct({
@@ -671,1381 +675,1462 @@ const runOxlint = (path: string) =>
       )
     )(result.stdout);
     return {
-      codes: Array.map(report.diagnostics, (diagnostic) => diagnostic.code),
+      codes: EffectFunction.pipe(
+        report.diagnostics,
+        Array.map((diagnostic) => diagnostic.code)
+      ),
       exitCode: result.exitCode,
       files: report.number_of_files,
     };
   });
 
-test("keeps full source coverage and its five unexecuted fixture exclusions exact", () => {
-  const strict = Array.filter(oxlintConfig.overrides ?? [], (entry) =>
-    Array.contains(entry.files ?? [], "packages/core/**")
-  );
-  expect(strict).toHaveLength(1);
-  const scope = Array.head(strict).pipe(
-    Option.getOrElse(() => ({ excludeFiles: [], files: [] }))
-  );
-  expect(scope.files, "Owned source extension coverage").toContain(
-    "**/*.{ts,tsx,js,jsx,mjs,cjs}"
-  );
-  const configuration: OxlintConfig = oxlintConfig;
-  const promiseScope = Array.filter(configuration.overrides ?? [], (entry) =>
-    Record.get<string>("effect/no-bare-effect-try-promise")(
-      entry.rules ?? {}
-    ).pipe(Option.exists((severity) => severity === "error"))
-  );
-  expect(promiseScope).toHaveLength(1);
-  expect(
-    Array.head(promiseScope).pipe(
+  it("keeps full source coverage and its five unexecuted fixture exclusions exact", () => {
+    const strict = EffectFunction.pipe(
+      oxlintConfig.overrides ?? [],
+      Array.filter((entry) =>
+        Array.contains(entry.files ?? [], "packages/core/**")
+      )
+    );
+    expect(strict).toHaveLength(1);
+    const scope = Array.head(strict).pipe(
+      Option.getOrElse(() => ({ excludeFiles: [], files: [] }))
+    );
+    expect(scope.files, "Owned source extension coverage").toContain(
+      "**/*.{ts,tsx,js,jsx,mjs,cjs}"
+    );
+    const configuration: OxlintConfig = oxlintConfig;
+    const promiseScope = EffectFunction.pipe(
+      configuration.overrides ?? [],
+      Array.filter((entry) =>
+        Record.get<string>("taxkit-effect/no-bare-effect-try-promise")(
+          entry.rules ?? {}
+        ).pipe(Option.exists((severity) => severity === "error"))
+      )
+    );
+    expect(promiseScope).toHaveLength(1);
+    const actual = Array.head(promiseScope).pipe(
       Option.map((entry) => entry.files),
       Option.getOrUndefined
-    ),
-    "Owned Promise mapping coverage"
-  ).toEqual(["**/*.{cjs,mjs,jsx,js,tsx,ts}"]);
-  expect(scope.excludeFiles, "Owned-source fixture exclusions").toEqual([
-    "tools/oxlint/fixtures/bun-accepted.ts",
-    "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
-    "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
-    "tools/oxlint/fixtures/effect-accepted.ts",
-    "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
-  ]);
-});
-
-describe("portable Oxlint plugins", () => {
-  test.effect.each([
-    "apps/web/src/.generated-promise-mapping.ts",
-    "apps/web/src/.generated-retired-promise-mapping.tsx",
-    "packages/infrastructure/src/.generated-promise-mapping.ts",
-    ".generated-promise-mapping.js",
-    ".generated-promise-mapping.jsx",
-    ".generated-promise-mapping.mjs",
-  ])("enforces inline Promise error mapping at $name", (path) =>
-    Effect.gen(function* () {
-      yield* writeLintFixture(
-        join(repositoryRoot, path),
-        `import { Effect } from "effect";
+    );
+    expect(actual, "Owned Promise mapping coverage").toStrictEqual([
+      "**/*.{cjs,mjs,jsx,js,tsx,ts}",
+    ]);
+    expect(scope.excludeFiles, "Owned-source fixture exclusions").toStrictEqual(
+      [
+        "tools/oxlint/fixtures/bun-accepted.ts",
+        "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
+        "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
+        "tools/oxlint/fixtures/effect-accepted.ts",
+        "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
+      ]
+    );
+  });
+  describe("portable Oxlint plugins", () => {
+    it.effect.each([
+      "apps/web/src/.generated-promise-mapping.ts",
+      "apps/web/src/.generated-retired-promise-mapping.tsx",
+      "packages/infrastructure/src/.generated-promise-mapping.ts",
+      ".generated-promise-mapping.js",
+      ".generated-promise-mapping.jsx",
+      ".generated-promise-mapping.mjs",
+    ])("enforces inline Promise error mapping at $name", (path) =>
+      Effect.gen(function* () {
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source: `import { Effect } from "effect";
 export const rejected = Effect.tryPromise(() => Promise.resolve("bad"));
-export const accepted = Effect.tryPromise({ try: () => Promise.resolve("good"), catch: () => "fixed" });`
-      );
-      const result = yield* runOxlint(path);
-      expect(result.files).toBe(1);
-      expect(result.exitCode).toBe(1);
-      expect(
-        Array.filter(
+export const accepted = Effect.tryPromise({ try: () => Promise.resolve("good"), catch: () => "fixed" });`,
+        });
+        const result = yield* runOxlint({
+          path,
+        });
+        expect(result.files).toBe(1);
+        expect(result.exitCode).toBe(1);
+        EffectFunction.pipe(
           result.codes,
-          (code) => code === "effect(no-bare-effect-try-promise)"
-        )
-      ).toHaveLength(1);
-    }).pipe(Effect.provide(BunServices.layer))
-  );
-
-  test.effect.each([
-    {
-      count: 1,
-      name: "keeps an imported runner separate from a same-named local runner",
-      rule: "effect(no-runtime-execution-outside-boundaries)",
-      source: `import { Effect } from "effect";
+          Array.filter(
+            (code) => code === "taxkit-effect(no-bare-effect-try-promise)"
+          ),
+          (actual) => {
+            expect(actual).toHaveLength(1);
+          }
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+    );
+    it.effect.each([
+      {
+        count: 1,
+        name: "keeps an imported runner separate from a same-named local runner",
+        rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
+        source: `import { Effect } from "effect";
 export const imported = Effect.runSync(Effect.void);
 export const local = (Effect) => Effect.runSync("local");`,
-    },
-    {
-      count: 1,
-      name: "follows a runner through import and destructuring aliases",
-      rule: "effect(no-runtime-execution-outside-boundaries)",
-      source: `import { Effect as Fx } from "effect";
+      },
+      {
+        count: 1,
+        name: "follows a runner through import and destructuring aliases",
+        rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
+        source: `import { Effect as Fx } from "effect";
 const { runSync: execute } = Fx;
 export const value = execute(Fx.void);`,
-    },
-    {
-      count: 0,
-      name: "clears an assigned runner when its source becomes unrelated",
-      rule: "effect(no-runtime-execution-outside-boundaries)",
-      source: `import { Effect } from "effect";
+      },
+      {
+        count: 0,
+        name: "clears an assigned runner when its source becomes unrelated",
+        rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
+        source: `import { Effect } from "effect";
 let execute = Effect.runSync;
 execute = (value) => value;
 export const value = execute("local");`,
-    },
-    {
-      count: 2,
-      name: "resolves a Bun host alias without confusing a local parameter",
-      rule: "bun(no-host-api-outside-adapters)",
-      source: `const { file: open } = Bun;
+      },
+      {
+        count: 2,
+        name: "resolves a Bun host alias without confusing a local parameter",
+        rule: "taxkit-bun(no-host-api-outside-adapters)",
+        source: `const { file: open } = Bun;
 export const host = open("package.json");
 export const local = (Bun) => Bun.file("local");`,
-    },
-    {
-      count: 0,
-      name: "accepts direct inline try and catch callbacks after aliasing",
-      rule: "effect(no-bare-effect-try-promise)",
-      source: `import { Effect as Fx } from "effect";
+      },
+      {
+        count: 0,
+        name: "accepts direct inline try and catch callbacks after aliasing",
+        rule: "taxkit-effect(no-bare-effect-try-promise)",
+        source: `import { Effect as Fx } from "effect";
 const { tryPromise: attempt } = Fx;
 export const value = attempt({ try: () => Promise.resolve(1), catch: () => "failed" });`,
-    },
-    {
-      count: 1,
-      name: "rejects a missing catch callback after aliasing",
-      rule: "effect(no-bare-effect-try-promise)",
-      source: `import { Effect as Fx } from "effect";
+      },
+      {
+        count: 1,
+        name: "rejects a missing catch callback after aliasing",
+        rule: "taxkit-effect(no-bare-effect-try-promise)",
+        source: `import { Effect as Fx } from "effect";
 const { tryPromise: attempt } = Fx;
 export const value = attempt({ try: () => Promise.resolve(1) });`,
+      },
+    ])("$name", ({ source, rule, count }) =>
+      Effect.gen(function* () {
+        const path = "tools/oxlint/.generated-binding-policy.ts";
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source,
+        });
+        const result = yield* runOxlint({
+          path,
+        });
+        expect(result.files).toBe(1);
+        EffectFunction.pipe(
+          result.codes,
+          Array.filter((code) => code === rule),
+          (actual) => {
+            expect(actual).toHaveLength(count);
+          }
+        );
+        EffectFunction.pipe(
+          result.codes,
+          Array.some((code) => code.includes("plugin")),
+          (actual) => {
+            expect(!actual).toBeTruthy();
+          }
+        );
+      }).pipe(Effect.provide(BunServices.layer))
+    );
+    // Each path starts a real process. Give each file its own ordinary test
+    // deadline rather than sharing one deadline across a growing file group.
+    it.effect.each(
+      EffectFunction.pipe(
+        fixtureCases,
+        Array.flatMap((fixture) =>
+          EffectFunction.pipe(
+            fixture.accepted,
+            Array.map((path) => ({
+              namespace: fixture.namespace,
+              path,
+            }))
+          )
+        )
+      )
+    )(
+      "$namespace accepts its boundary fixture ($path)",
+      ({ namespace, path }) =>
+        Effect.gen(function* () {
+          const result = yield* runOxlint({
+            path,
+          });
+          expect(result.files).toBe(1);
+          const violations = EffectFunction.pipe(
+            result.codes,
+            Array.filter((code) => code.startsWith(`${namespace}(`))
+          );
+          expect(violations).toStrictEqual([]);
+        }).pipe(Effect.provide(BunServices.layer)),
+      // The largest native suites take more than five seconds to lint.
+      30_000
+    );
+    it.effect.each(fixtureCases)(
+      "$namespace rejects invalid code through the real binary ($generated)",
+      (fixture) =>
+        Effect.gen(function* () {
+          const fs = yield* FileSystem.FileSystem;
+          const source = yield* fs.readFileString(
+            join(repositoryRoot, fixture.rejected)
+          );
+          const fixturePath = join(repositoryRoot, fixture.generated);
+          yield* writeLintFixture({
+            path: fixturePath,
+            source,
+          });
+          const result = yield* runOxlint({
+            path: fixture.generated,
+          });
+          expect(result.files).toBe(1);
+          expect(result.exitCode).toBe(1);
+          yield* EffectFunction.pipe(
+            fixture.rules,
+            Effect.forEach((rule: string) =>
+              Effect.sync(() => {
+                expect(
+                  result.codes,
+                  `Required lint rule: ${fixture.namespace}/${rule}`
+                ).toContain(`${fixture.namespace}(${rule})`);
+              })
+            )
+          );
+        }).pipe(Effect.provide(BunServices.layer))
+    );
+  });
+  // Oxlint has no stdin mode; use one exact admitted fixture and a neighbouring canary.
+  it.effect.each([
+    {
+      name: "admits the Fetch result type only at its exact host",
+      path: "tools/oxlint/.generated-fetch-host.ts",
+      rejected: false,
+      source:
+        "export type Handler = (request: Request) => ReturnType<typeof fetch>;",
     },
-  ])("$name", ({ source, rule, count }) =>
+    {
+      name: "rejects an adjacent Promise signature",
+      path: "tools/oxlint/.generated-ordinary.ts",
+      rejected: true,
+      source: "export type Handler = (request: Request) => Promise<Response>;",
+    },
+    {
+      name: "rejects async orchestration even at the Fetch host",
+      path: "tools/oxlint/.generated-fetch-host.ts",
+      rejected: true,
+      source: "export const handler = async () => await Promise.resolve(1);",
+    },
+  ])("$name", ({ path, source, rejected }) =>
     Effect.gen(function* () {
-      const path = "tools/oxlint/.generated-binding-policy.ts";
-      yield* writeLintFixture(join(repositoryRoot, path), source);
-      const result = yield* runOxlint(path);
-      expect(result.files).toBe(1);
-      expect(Array.filter(result.codes, (code) => code === rule)).toHaveLength(
-        count
+      const fixturePath = join(repositoryRoot, path);
+      yield* writeLintFixture({
+        path: fixturePath,
+        source,
+      });
+      const result = yield* lintFiles({
+        paths: [path],
+      });
+      EffectFunction.pipe(
+        result.output.includes("strict-effect(no-promise-workflow)"),
+        (actual) => {
+          expect(actual).toBe(rejected);
+        }
       );
-      expect(Array.some(result.codes, (code) => code.includes("plugin"))).toBe(
-        false
+      expect(result.exitCode).toBe(
+        EffectBoolean.match(rejected, {
+          onFalse: (): 0 => 0,
+          onTrue: (): 1 => 1,
+        })
+      );
+    }).pipe(Effect.provide(BunServices.layer))
+  );
+  // Policy changes must review both the filename selector and the canonical admission.
+  it.effect.each([
+    {
+      name: "admits an assignment only at the exact synthetic host target",
+      path: "tools/oxlint/.generated-collection-host.ts",
+      rejected: false,
+      source:
+        "const host = { value: 0 }; export const onHostEvent = () => { host.value = 1; };",
+    },
+    {
+      name: "rejects that assignment in the neighbouring file",
+      path: "tools/oxlint/.generated-collection-neighbour.ts",
+      rejected: true,
+      source:
+        "const host = { value: 0 }; export const onHostEvent = () => { host.value = 1; };",
+    },
+    {
+      name: "rejects an unrelated assignment target at the synthetic host",
+      path: "tools/oxlint/.generated-collection-host.ts",
+      rejected: true,
+      source:
+        "const host = { other: 0, value: 0 }; export const onHostEvent = () => { host.other = 1; };",
+    },
+    {
+      name: "admits one method only at the exact synthetic host receiver",
+      path: "tools/oxlint/.generated-collection-host.ts",
+      rejected: false,
+      source:
+        "const host: number[] = []; export const onHostEvent = () => { host.push(1); };",
+    },
+    {
+      name: "rejects that method in the neighbouring file",
+      path: "tools/oxlint/.generated-collection-neighbour.ts",
+      rejected: true,
+      source:
+        "const host: number[] = []; export const onHostEvent = () => { host.push(1); };",
+    },
+    {
+      name: "rejects an unrelated method at the synthetic host",
+      path: "tools/oxlint/.generated-collection-host.ts",
+      rejected: true,
+      source:
+        "const host = [1]; export const onHostEvent = () => host.map((value) => value + 1);",
+    },
+    {
+      name: "rejects a different receiver at the synthetic host",
+      path: "tools/oxlint/.generated-collection-host.ts",
+      rejected: true,
+      source:
+        "const other: number[] = []; export const onHostEvent = () => { other.push(1); };",
+    },
+    {
+      name: "rejects loops even at the admitted synthetic host",
+      path: "tools/oxlint/.generated-collection-host.ts",
+      rejected: true,
+      source: "for (const value of [1]) { void value; }",
+    },
+  ])("$name", ({ path, rejected, source }) =>
+    Effect.gen(function* () {
+      const fixturePath = join(repositoryRoot, path);
+      yield* writeLintFixture({
+        path: fixturePath,
+        source,
+      });
+      const result = yield* runOxlint({
+        path,
+      });
+      expect(result.files).toBe(1);
+      const actual = Array.contains(
+        result.codes,
+        "strict-effect(no-imperative-collections)"
+      );
+      expect(actual, "Strict collection admission canary").toBe(rejected);
+      expect(result.exitCode).toBe(
+        EffectBoolean.match(rejected, {
+          onFalse: (): 0 => 0,
+          onTrue: (): 1 => 1,
+        })
       );
     }).pipe(Effect.provide(BunServices.layer))
   );
 
-  test.effect("enables every anti-slop rule at error severity", () =>
-    Effect.gen(function* () {
-      yield* Effect.forEach(antiSlopRules, (rule) =>
-        Effect.sync(() => {
-          expect(
-            Record.get(`anti-slop/${rule}`)(oxlintConfig.rules ?? {}).pipe(
-              Option.getOrUndefined
-            )
-          ).toBe("error");
-        })
-      );
-      expect(
-        Record.get("anti-slop-effect/no-service-constructor-imports")(
-          oxlintConfig.rules ?? {}
-        ).pipe(Option.getOrUndefined)
-      ).toBe("error");
-    })
-  );
-
-  // Each path starts a real process. Give each file its own ordinary test
-  // deadline rather than sharing one deadline across a growing file group.
-  test.effect.each(
-    Array.flatMap(fixtureCases, (fixture) =>
-      Array.map(fixture.accepted, (path) => ({
-        namespace: fixture.namespace,
-        path,
-      }))
-    )
-  )(
-    "$namespace accepts its boundary fixture ($path)",
-    ({ namespace, path }) =>
-      Effect.gen(function* () {
-        const result = yield* runOxlint(path);
-        expect(result.files).toBe(1);
-        expect(result.exitCode).toBe(0);
-        expect(
-          Array.some(result.codes, (code) => code.startsWith(`${namespace}(`))
-        ).toBe(false);
-      }).pipe(Effect.provide(BunServices.layer)),
-    // The largest native suites take more than five seconds to lint.
-    30_000
-  );
-
-  test.effect.each(fixtureCases)(
-    "$namespace rejects invalid code through the real binary ($generated)",
-    (fixture) =>
-      Effect.gen(function* () {
-        const fs = yield* FileSystem.FileSystem;
-        const source = yield* fs.readFileString(
-          join(repositoryRoot, fixture.rejected)
-        );
-        yield* writeLintFixture(
-          join(repositoryRoot, fixture.generated),
-          source
-        );
-        const result = yield* runOxlint(fixture.generated);
-        expect(result.files).toBe(1);
-        expect(result.exitCode).toBe(1);
-        yield* Effect.forEach(fixture.rules, (rule) =>
-          Effect.sync(() => {
-            expect(
-              result.codes,
-              `Required lint rule: ${fixture.namespace}/${rule}`
-            ).toContain(`${fixture.namespace}(${rule})`);
-          })
-        );
-      }).pipe(Effect.provide(BunServices.layer))
-  );
-});
-
-// Oxlint has no stdin mode; use one exact admitted fixture and a neighbouring canary.
-test.effect.each([
-  {
-    name: "admits the Fetch result type only at its exact host",
-    path: "tools/oxlint/.generated-fetch-host.ts",
-    rejected: false,
-    source: "export type Handler = (request: Request) => Promise<Response>;",
-  },
-  {
-    name: "rejects an adjacent Promise signature",
-    path: "tools/oxlint/.generated-ordinary.ts",
-    rejected: true,
-    source: "export type Handler = (request: Request) => Promise<Response>;",
-  },
-  {
-    name: "rejects async orchestration even at the Fetch host",
-    path: "tools/oxlint/.generated-fetch-host.ts",
-    rejected: true,
-    source: "export const handler = async () => await Promise.resolve(1);",
-  },
-])("$name", ({ path, source, rejected }) =>
-  Effect.gen(function* () {
-    yield* writeLintFixture(join(repositoryRoot, path), source);
-    const result = yield* lintFiles([path]);
-    expect(result.output.includes("strict-effect(no-promise-workflow)")).toBe(
-      rejected
-    );
-    expect(result.exitCode).toBe(rejected ? 1 : 0);
-  }).pipe(Effect.provide(BunServices.layer))
-);
-
-// Policy changes must review both the filename selector and the canonical admission.
-test.effect.each([
-  {
-    name: "admits an assignment only at the exact synthetic host target",
-    path: "tools/oxlint/.generated-collection-host.ts",
-    rejected: false,
-    source:
-      "const host = { value: 0 }; export const onHostEvent = () => { host.value = 1; };",
-  },
-  {
-    name: "rejects that assignment in the neighbouring file",
-    path: "tools/oxlint/.generated-collection-neighbour.ts",
-    rejected: true,
-    source:
-      "const host = { value: 0 }; export const onHostEvent = () => { host.value = 1; };",
-  },
-  {
-    name: "rejects an unrelated assignment target at the synthetic host",
-    path: "tools/oxlint/.generated-collection-host.ts",
-    rejected: true,
-    source:
-      "const host = { other: 0, value: 0 }; export const onHostEvent = () => { host.other = 1; };",
-  },
-  {
-    name: "admits one method only at the exact synthetic host receiver",
-    path: "tools/oxlint/.generated-collection-host.ts",
-    rejected: false,
-    source:
-      "const host: number[] = []; export const onHostEvent = () => { host.push(1); };",
-  },
-  {
-    name: "rejects that method in the neighbouring file",
-    path: "tools/oxlint/.generated-collection-neighbour.ts",
-    rejected: true,
-    source:
-      "const host: number[] = []; export const onHostEvent = () => { host.push(1); };",
-  },
-  {
-    name: "rejects an unrelated method at the synthetic host",
-    path: "tools/oxlint/.generated-collection-host.ts",
-    rejected: true,
-    source:
-      "const host = [1]; export const onHostEvent = () => host.map((value) => value + 1);",
-  },
-  {
-    name: "rejects a different receiver at the synthetic host",
-    path: "tools/oxlint/.generated-collection-host.ts",
-    rejected: true,
-    source:
-      "const other: number[] = []; export const onHostEvent = () => { other.push(1); };",
-  },
-  {
-    name: "rejects loops even at the admitted synthetic host",
-    path: "tools/oxlint/.generated-collection-host.ts",
-    rejected: true,
-    source: "for (const value of [1]) { void value; }",
-  },
-])("$name", ({ path, rejected, source }) =>
-  Effect.gen(function* () {
-    yield* writeLintFixture(join(repositoryRoot, path), source);
-    const result = yield* runOxlint(path);
-    expect(result.files).toBe(1);
-    expect(
-      Array.contains(result.codes, "strict-effect(no-imperative-collections)"),
-      "Strict collection admission canary"
-    ).toBe(rejected);
-    expect(result.exitCode).toBe(rejected ? 1 : 0);
-  }).pipe(Effect.provide(BunServices.layer))
-);
-
-test.each([
-  "apps/web/vite.config.ts",
-  "apps/web/src/lib/runtime.server.ts",
-  "apps/web/src/lib/runtime.client.ts",
-  "tools/apps-local/native-pair-build.runtime.ts",
-  "apps/web/src/server.ts",
-  "apps/api/src/index.ts",
-  "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
-  "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
-  "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
-  "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
-  "packages/sdk/typescript/src/client.runtime.ts",
-  "tools/repository-paths/check.runtime.ts",
-  "tools/documentation/check.runtime.ts",
-])("keeps the execution runtime admission exact: %s", (path) => {
-  expect(
-    Array.filter(
+  it.each([
+    "apps/web/vite.config.ts",
+    "apps/web/src/lib/runtime.server.ts",
+    "apps/web/src/lib/runtime.client.ts",
+    "tools/apps-local/native-pair-build.runtime.ts",
+    "apps/web/src/entry.server.ts",
+    "apps/api/src/index.ts",
+    "apps/api/scripts/smoke-public-routes.runtime.ts",
+    "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
+    "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
+    "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
+    "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
+    "packages/sdk/typescript/src/client.runtime.ts",
+    "tools/repository-paths/check.runtime.ts",
+    "tools/documentation/check.runtime.ts",
+  ])("keeps the execution runtime admission exact: %s", (path) => {
+    EffectFunction.pipe(
       oxlintConfig.overrides ?? [],
-      (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
-        Array.contains(entry.files ?? [], path) &&
-        Record.get<string>("strict-effect/no-runtime-outside-boundary")(
+      Array.filter(
+        (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
+          Array.contains(entry.files ?? [], path) &&
+          Record.get<string>("strict-effect/no-runtime-outside-boundary")(
+            entry.rules ?? {}
+          ).pipe(Option.exists(Array.isArray))
+      ),
+      (actual) => {
+        expect(actual).toStrictEqual([
+          {
+            files: [path],
+            rules: {
+              "strict-effect/no-runtime-outside-boundary": [
+                "error",
+                { allowedFiles: [path] },
+              ],
+            },
+          },
+        ]);
+      }
+    );
+  });
+  const PromiseAdmission = Schema.Tuple([
+    Schema.Literal("error"),
+    Schema.Struct({
+      allowedFiles: Schema.Array(Schema.String),
+      promiseOnlyFiles: Schema.optionalKey(Schema.Array(Schema.String)),
+    }),
+  ]);
+
+  it("keeps every Promise admission exact and listed once", () => {
+    const admissions = EffectFunction.pipe(
+      oxlintConfig.overrides ?? [],
+      Array.filter((entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
+        Record.get<string>("strict-effect/no-promise-workflow")(
           entry.rules ?? {}
         ).pipe(Option.exists(Array.isArray))
-    )
-  ).toEqual([
-    {
-      files: [path],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          { allowedFiles: [path] },
-        ],
-      },
-    },
-  ]);
-});
-
-const PromiseAdmission = Schema.Tuple([
-  Schema.Literal("error"),
-  Schema.Struct({
-    allowedFiles: Schema.Array(Schema.String),
-    promiseOnlyFiles: Schema.optionalKey(Schema.Array(Schema.String)),
-  }),
-]);
-
-test("keeps every Promise admission exact and listed once", () => {
-  const admissions = Array.filter(
-    oxlintConfig.overrides ?? [],
-    (entry: NonNullable<OxlintConfig["overrides"]>[number]) =>
-      Record.get<string>("strict-effect/no-promise-workflow")(
-        entry.rules ?? {}
-      ).pipe(Option.exists(Array.isArray))
-  );
-  // One override owns production adapters, host-contract tests and the CLI
-  // fixture; each admitted path is named exactly, never by glob.
-  expect(Array.map(admissions, (entry) => entry.files)).toEqual([
-    ["tools/oxlint/.generated-fetch-host.ts"],
-    expect.arrayContaining([
-      "apps/web/src/lib/host/binding.adapter.layer.ts",
-      "apps/web/src/server.ts",
-      "packages/sdk/typescript/src/client.runtime.ts",
-    ]),
-  ]);
-  const listed = Array.map(
-    admissions,
-    (entry: NonNullable<OxlintConfig["overrides"]>[number]) => ({
-      files: Array.sort(entry.files ?? [], Order.String),
-      named: Record.get<string>("strict-effect/no-promise-workflow")(
-        entry.rules ?? {}
-      ).pipe(
-        Option.filter(Schema.is(PromiseAdmission)),
-        Option.map(([, options]) =>
-          Array.sort(
-            Array.appendAll(
-              options.allowedFiles,
-              options.promiseOnlyFiles ?? []
-            ),
-            Order.String
-          )
-        )
-      ),
-    })
-  );
-  expect(Array.map(listed, ({ named }) => named)).toEqual(
-    Array.map(listed, ({ files }) => Option.some(files))
-  );
-  expect(
-    Array.some(
-      Array.flatMap(listed, ({ files }) => files),
-      (path) => path.includes("*")
-    )
-  ).toBe(false);
-});
-
-describe("exact native RPC lint boundaries", () => {
-  test.effect("rejects decoding beside the native app stage ingress", () =>
-    Effect.gen(function* () {
-      const path =
-        "packages/infrastructure/src/.generated-app-decoder-neighbour.ts";
-      yield* writeLintFixture(
-        join(repositoryRoot, path),
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);'
-      );
-      const result = yield* runOxlint(path);
-      expect(result.files).toBe(1);
-      expect(result.exitCode).not.toBe(0);
-      expect(result.codes).toContain("taxkit(no-decoding-outside-boundaries)");
-    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
-  );
-  test.effect("rejects decoding in a neighbouring transport source file", () =>
-    Effect.gen(function* () {
-      const path = "packages/api/mcp/src/.generated-decoder-neighbour.ts";
-      yield* writeLintFixture(
-        join(repositoryRoot, path),
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);'
-      );
-      const result = yield* runOxlint(path);
-      expect(result.files).toBe(1);
-      expect(result.exitCode).not.toBe(0);
-      expect(result.codes).toContain("taxkit(no-decoding-outside-boundaries)");
-    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
-  );
-  test.effect.each([
-    ...Array.flatMap(
-      [
-        "apps/web/src/lib/docs/search-location.ingress.ts",
-        "apps/web/test/http/negotiation.boundary.test.ts",
-        "apps/web/src/lib/http/negotiation.ingress.ts",
-        "apps/web/src/lib/http/image.ingress.ts",
-        "apps/web/test/http/image.boundary.test.ts",
-      ],
-      (path) => [
-        {
-          path,
-          rejected: false,
-          rule: "taxkit(no-decoding-outside-boundaries)",
-          source:
-            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-        },
-        {
-          path,
-          rejected: true,
-          rule: "effect(no-schema-encoder-outside-egress)",
-          source:
-            'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-        },
-        {
-          path,
-          rejected: true,
-          rule: "strict-effect(no-runtime-outside-boundary)",
-          source:
-            'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-        },
-      ]
-    ),
-    ...Array.map(
-      [
-        {
-          rejected: false,
-          rule: "effect(no-schema-encoder-outside-egress)",
-          source:
-            'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-        },
-        {
-          rejected: true,
-          rule: "taxkit(no-decoding-outside-boundaries)",
-          source:
-            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-        },
-        {
-          rejected: true,
-          rule: "strict-effect(no-runtime-outside-boundary)",
-          source:
-            'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-        },
-      ],
-      (fixture) => ({
-        ...fixture,
-        path: "packages/content/src/publication.egress.ts",
-      })
-    ),
-    ...Array.flatMap(
-      [
-        "apps/web/src/lib/docs/components.tsx",
-        "apps/web/src/lib/docs/page.view.tsx",
-        "apps/web/src/lib/docs/search.view.tsx",
-        "apps/web/src/lib/seo/head.ts",
-        "apps/web/src/routes/search.tsx",
-        "apps/web/src/routes/$.tsx",
-      ],
-      (path) => [
-        {
-          path,
-          rejected: true,
-          rule: "taxkit(no-decoding-outside-boundaries)",
-          source:
-            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-        },
-        {
-          path,
-          rejected: true,
-          rule: "effect(no-schema-encoder-outside-egress)",
-          source:
-            'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-        },
-        {
-          path,
-          rejected: true,
-          rule: "strict-effect(no-runtime-outside-boundary)",
-          source:
-            'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-        },
-      ]
-    ),
-    {
-      path: "apps/web/src/lib/host/binding.adapter.layer.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/pages/loader-context.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/pages/loader-context.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/pages/loader-context.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/test/native-pair.boundary.test.ts",
-      rejected: false,
-      rule: "strict-effect(no-imperative-collections)",
-      source:
-        'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const filled = calculatorInput.fill("67000");',
-    },
-    {
-      path: "apps/web/test/native-pair.boundary.test.ts",
-      rejected: false,
-      rule: "strict-effect(no-imperative-collections)",
-      source:
-        'declare const plainCalculatorInput: { readonly fill: (value: string) => void };\nexport const filled = plainCalculatorInput.fill("67000");',
-    },
-    {
-      path: "apps/web/src/lib/calculators/calculator-page.view.tsx",
-      rejected: true,
-      rule: "strict-effect(no-imperative-collections)",
-      source:
-        'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const filled = calculatorInput.fill("67000");',
-    },
-    {
-      path: "apps/web/test/native-pair.boundary.test.ts",
-      rejected: false,
-      rule: "strict-effect(no-imperative-collections)",
-      source:
-        'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const filled = savedPayInput.fill("2000");',
-    },
-    {
-      path: "apps/web/test/native-pair.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-imperative-collections)",
-      source:
-        'declare const unrelatedInput: { readonly fill: (value: string) => void };\nexport const filled = unrelatedInput.fill("2000");',
-    },
-    {
-      path: "apps/web/src/lib/calculators/take-home.view.tsx",
-      rejected: true,
-      rule: "strict-effect(no-imperative-collections)",
-      source:
-        'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const filled = savedPayInput.fill("2000");',
-    },
-    {
-      path: "apps/web/test/native-local-development.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-local-development.boundary.test.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-local-development.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/test/native-cancellation.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-cancellation.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-cancellation.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/test/native-settings-failure.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-settings-failure.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/src/lib/host/config.ingress.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/host/config.ingress.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/src/lib/calculators/page.atoms.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/src/lib/calculators/page.atoms.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/pages/loaders.ts",
-      rejected: false,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/src/lib/pages/loaders.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/pages/loaders.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/router.tsx",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/server.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/server.ts",
-      rejected: true,
-      rule: "strict-effect(no-imperative-collections)",
-      source:
-        "export const run = () => { const values = [1]; values.push(2); return values; };",
-    },
-    {
-      path: "apps/api/test/worker.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/worker.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-pair.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/http/test/request-body.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/src/worker.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-settings-failure.boundary.test.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/http/src/handlers/calculators.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/worker.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/core/src/primitives/date.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/test/date.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/test/date.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/test/money.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/src/primitives/date.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/src/primitives/money.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/src/primitives/tax.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/test/money.test.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/src/primitives/date.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/core/test/date.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/core/test/money.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/rules/au/pay/test/rule-graph.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/pay/test/rule-graph.test.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/pay/test/rule-graph.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/rules/au/stsl/test/rule-graph.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/stsl/test/rule-graph.test.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/stsl/test/rule-graph.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/sdk/typescript/test/effect.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/sdk/typescript/test/effect.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/sdk/typescript/test/effect.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/core/test/domain-absence.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/test/domain-absence.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/core/test/domain-absence.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/infrastructure/src/secrets.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "tools/infrastructure/apps-stack.test.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
-    },
-    {
-      path: "tools/infrastructure/apps-stack.test.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/infrastructure/src/secrets.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/infrastructure/src/secrets.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/observability/src/edge-identity.boundary.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/observability/src/edge-identity.boundary.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/observability/src/edge-identity.boundary.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/src/worker.application.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/src/worker.application.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/api/src/worker.application.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/src/worker-admission.layer.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/src/worker-admission.layer.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/api/src/worker-admission.layer.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/mcp-client.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/mcp-client.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/mcp-client.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/test/native-mcp.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-mcp.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-mcp.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/api/mcp/src/handlers.layer.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/mcp/src/request.service.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownOption(Schema.String);',
-    },
-    {
-      path: "packages/webmcp/test/registration.test.ts",
-      rejected: false,
-      rule: "strict-effect(no-promise-workflow)",
-      source:
-        'import { Predicate, Schema } from "effect";\n\nexport const Callback = Schema.declare<Promise<unknown>>(Predicate.isPromise);',
-    },
-    {
-      path: "packages/webmcp/test/registration.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-promise-workflow)",
-      source: "export const run = async () => 1;",
-    },
-    {
-      path: "packages/webmcp/test/registration.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-promise-workflow)",
-      source: "export const run = new Promise<void>((resolve) => resolve());",
-    },
-    {
-      path: "packages/webmcp/test/registration.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-promise-workflow)",
-      source:
-        "export const run = (source: Promise<number>) => source.then((value) => value);",
-    },
-    {
-      path: "apps/web/src/lib/calculators/tools.atoms.ts",
-      rejected: true,
-      rule: "strict-effect(no-promise-workflow)",
-      source: "export const run = (source: Promise<number>) => source;",
-    },
-    {
-      path: "packages/webmcp/src/model-context.adapter.layer.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/webmcp/src/model-context.adapter.layer.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/webmcp/src/model-context.adapter.layer.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/web/src/lib/calculators/tools.atoms.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/calculators/tools.atoms.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/src/lib/calculators/tools.atoms.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/webmcp/test/registration.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-browser-tools.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-browser-tools.boundary.test.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/web/test/native-browser-tools.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/api/mcp/src/handlers.layer.ts",
-      rejected: true,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/api/mcp/src/handlers.layer.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/api/test/rate-admission.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/rate-admission.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/api/test/rate-admission.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/worker-admission.boundary.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "apps/api/test/worker-admission.boundary.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "apps/api/test/worker-admission.boundary.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/calculators/test/calculation-admission.test.ts",
-      rejected: false,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-    {
-      path: "packages/calculators/test/calculation-admission.test.ts",
-      rejected: true,
-      rule: "strict-effect(no-runtime-outside-boundary)",
-      source:
-        'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
-    },
-    {
-      path: "packages/calculators/test/calculation-admission.test.ts",
-      rejected: false,
-      rule: "effect(no-schema-encoder-outside-egress)",
-      source:
-        'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
-    },
-    {
-      path: "packages/calculators/src/admission.layer.ts",
-      rejected: true,
-      rule: "taxkit(no-decoding-outside-boundaries)",
-      source:
-        'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
-    },
-  ])("keeps $rule exact at $path", ({ path, source, rejected, rule }) =>
-    Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const target = join(repositoryRoot, path);
-      // The test scope restores the real owner even if the actual CLI assertion
-      // fails; removing an existing source file would corrupt the checkout.
-      yield* Effect.acquireRelease(fs.readFileString(target), (original) =>
-        fs.writeFileString(target, original).pipe(Effect.orDie)
-      );
-      yield* fs.writeFileString(target, source);
-      const result = yield* runOxlint(path);
-      expect(result.files).toBe(1);
-      if (rejected) {
-        expect(result.exitCode).not.toBe(0);
-        expect(result.codes).toContain(rule);
-      } else {
-        expect(result.exitCode, result.codes.join(", ")).toBe(0);
-        expect(result.codes).not.toContain(rule);
+      )
+    );
+    // One override owns production adapters, host-contract tests and the CLI
+    // fixture; each admitted path is named exactly, never by glob.
+    EffectFunction.pipe(
+      admissions,
+      Array.map((entry) => entry.files),
+      (actual) => {
+        // One override owns production adapters, host-contract tests and the CLI
+        // fixture; each admitted path is named exactly, never by glob.
+        expect(actual).toStrictEqual([
+          ["tools/oxlint/.generated-fetch-host.ts"],
+          expect.arrayContaining([
+            "apps/web/src/lib/host/binding.adapter.layer.ts",
+            "apps/web/src/entry.server.ts",
+            "packages/sdk/typescript/src/client.runtime.ts",
+          ]),
+        ]);
       }
-    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
-  );
+    );
+    const listed = EffectFunction.pipe(
+      admissions,
+      Array.map((entry: NonNullable<OxlintConfig["overrides"]>[number]) => ({
+        files: EffectFunction.pipe(entry.files ?? [], Array.sort(Order.String)),
+        named: Record.get<string>("strict-effect/no-promise-workflow")(
+          entry.rules ?? {}
+        ).pipe(
+          Option.filter(Schema.is(PromiseAdmission)),
+          Option.map(([, options]) =>
+            EffectFunction.pipe(
+              Array.appendAll(
+                options.allowedFiles,
+                options.promiseOnlyFiles ?? []
+              ),
+              Array.sort(Order.String)
+            )
+          )
+        ),
+      }))
+    );
+    EffectFunction.pipe(
+      listed,
+      Array.map(({ named }) => named),
+      (actual) => {
+        expect(actual).toStrictEqual(
+          EffectFunction.pipe(
+            listed,
+            Array.map(({ files }) => Option.some(files))
+          )
+        );
+      }
+    );
+    EffectFunction.pipe(
+      listed,
+      Array.flatMap(({ files }) => files),
+      Array.some((path) => path.includes("*")),
+      (actual) => {
+        expect(!actual).toBeTruthy();
+      }
+    );
+  });
+  describe("exact native RPC lint boundaries", () => {
+    it.effect("rejects decoding beside the native app stage ingress", () =>
+      Effect.gen(function* () {
+        const path =
+          "packages/infrastructure/src/.generated-app-decoder-neighbour.ts";
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source:
+            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+        });
+        const result = yield* runOxlint({
+          path,
+        });
+        expect(result.files).toBe(1);
+        expect(result.exitCode).not.toBe(0);
+        expect(result.codes).toContain(
+          "taxkit(no-decoding-outside-boundaries)"
+        );
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+    );
+    it.effect("rejects decoding in a neighbouring transport source file", () =>
+      Effect.gen(function* () {
+        const path = "packages/api/mcp/src/.generated-decoder-neighbour.ts";
+        const fixturePath = join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source:
+            'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+        });
+        const result = yield* runOxlint({
+          path,
+        });
+        expect(result.files).toBe(1);
+        expect(result.exitCode).not.toBe(0);
+        expect(result.codes).toContain(
+          "taxkit(no-decoding-outside-boundaries)"
+        );
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+    );
+    it.effect.each([
+      ...EffectFunction.pipe(
+        [
+          "apps/web/src/lib/docs/search-location.ingress.ts",
+          "apps/web/test/http/negotiation.boundary.test.ts",
+          "apps/web/src/lib/http/negotiation.ingress.ts",
+          "apps/web/src/lib/http/image.ingress.ts",
+          "apps/web/test/http/image.boundary.test.ts",
+        ],
+        Array.flatMap((path) => [
+          {
+            path,
+            rejected: false,
+            rule: "taxkit(no-decoding-outside-boundaries)",
+            source:
+              'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+          },
+          {
+            path,
+            rejected: true,
+            rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+            source:
+              'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+          },
+          {
+            path,
+            rejected: true,
+            rule: "strict-effect(no-runtime-outside-boundary)",
+            source:
+              'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+          },
+        ])
+      ),
+      ...EffectFunction.pipe(
+        [
+          {
+            rejected: false,
+            rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+            source:
+              'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+          },
+          {
+            rejected: true,
+            rule: "taxkit(no-decoding-outside-boundaries)",
+            source:
+              'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+          },
+          {
+            rejected: true,
+            rule: "strict-effect(no-runtime-outside-boundary)",
+            source:
+              'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+          },
+        ],
+        Array.map((fixture) => ({
+          ...fixture,
+          path: "packages/content/src/publication.egress.ts",
+        }))
+      ),
+      ...EffectFunction.pipe(
+        [
+          "apps/web/src/lib/docs/components.tsx",
+          "apps/web/src/lib/docs/page.view.tsx",
+          "apps/web/src/lib/docs/search.view.tsx",
+          "apps/web/src/lib/seo/head.ts",
+          "apps/web/src/routes/search.tsx",
+          "apps/web/src/routes/$.tsx",
+        ],
+        Array.flatMap((path) => [
+          {
+            path,
+            rejected: true,
+            rule: "taxkit(no-decoding-outside-boundaries)",
+            source:
+              'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+          },
+          {
+            path,
+            rejected: true,
+            rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+            source:
+              'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+          },
+          {
+            path,
+            rejected: true,
+            rule: "strict-effect(no-runtime-outside-boundary)",
+            source:
+              'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+          },
+        ])
+      ),
+      {
+        path: "apps/web/src/lib/host/binding.adapter.layer.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/pages/loader-context.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/pages/loader-context.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/pages/loader-context.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/test/native-pair.boundary.test.ts",
+        rejected: false,
+        rule: "strict-effect(no-imperative-collections)",
+        source:
+          'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const fill = () => { calculatorInput.fill("67000"); };',
+      },
+      {
+        path: "apps/web/test/native-pair.boundary.test.ts",
+        rejected: false,
+        rule: "strict-effect(no-imperative-collections)",
+        source:
+          'declare const plainCalculatorInput: { readonly fill: (value: string) => void };\nexport const fill = () => { plainCalculatorInput.fill("67000"); };',
+      },
+      {
+        path: "apps/web/src/lib/calculators/calculator-page.view.tsx",
+        rejected: true,
+        rule: "strict-effect(no-imperative-collections)",
+        source:
+          'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const fill = () => { calculatorInput.fill("67000"); };',
+      },
+      {
+        path: "apps/web/test/native-pair.boundary.test.ts",
+        rejected: false,
+        rule: "strict-effect(no-imperative-collections)",
+        source:
+          'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const fill = () => { savedPayInput.fill("2000"); };',
+      },
+      {
+        path: "apps/web/test/native-pair.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-imperative-collections)",
+        source:
+          'declare const unrelatedInput: { readonly fill: (value: string) => void };\nexport const filled = unrelatedInput.fill("2000");',
+      },
+      {
+        path: "apps/web/src/lib/calculators/take-home.view.tsx",
+        rejected: true,
+        rule: "strict-effect(no-imperative-collections)",
+        source:
+          'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const fill = () => { savedPayInput.fill("2000"); };',
+      },
+      {
+        path: "apps/web/test/native-local-development.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-local-development.boundary.test.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-local-development.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/test/native-cancellation.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-cancellation.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-cancellation.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/test/native-settings-failure.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-settings-failure.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/src/lib/host/config.ingress.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/host/config.ingress.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/src/lib/calculators/page.atoms.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/src/lib/calculators/page.atoms.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/pages/loaders.ts",
+        rejected: false,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/src/lib/pages/loaders.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/pages/loaders.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/router.tsx",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/entry.server.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/entry.server.ts",
+        rejected: true,
+        rule: "strict-effect(no-imperative-collections)",
+        source:
+          "export const run = () => { const values = [1]; values.push(2); return values; };",
+      },
+      {
+        path: "apps/api/test/worker.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/worker.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-pair.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/api/http/test/request-body.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/src/worker.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-settings-failure.boundary.test.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/api/http/src/handlers/calculators.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/worker.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/core/src/primitives/date.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/test/date.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/test/date.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/test/money.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/primitives/date.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/primitives/money.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/primitives/tax.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/test/money.test.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/primitives/date.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/core/test/date.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/core/test/money.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/rules/au/pay/test/rule-graph.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/pay/test/rule-graph.test.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/pay/test/rule-graph.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/rules/au/stsl/test/rule-graph.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/stsl/test/rule-graph.test.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/stsl/test/rule-graph.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/sdk/typescript/test/effect.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/sdk/typescript/test/effect.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/sdk/typescript/test/effect.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/core/test/domain-absence.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/test/domain-absence.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/test/domain-absence.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/infrastructure/src/secrets.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "tools/infrastructure/apps-stack.test.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
+      },
+      {
+        path: "tools/infrastructure/apps-stack.test.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/infrastructure/src/secrets.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/infrastructure/src/secrets.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/observability/src/edge-identity.boundary.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/observability/src/edge-identity.boundary.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/observability/src/edge-identity.boundary.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/src/worker.application.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/src/worker.application.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/api/src/worker.application.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/src/worker-admission.layer.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/src/worker-admission.layer.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/api/src/worker-admission.layer.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/mcp-client.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/mcp-client.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/mcp-client.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/test/native-mcp.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-mcp.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-mcp.boundary.test.ts",
+        rejected: false,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/api/mcp/src/handlers.layer.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/api/mcp/src/request.service.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownOption(Schema.String);',
+      },
+      {
+        path: "packages/webmcp/test/registration.test.ts",
+        rejected: false,
+        rule: "strict-effect(no-promise-workflow)",
+        source:
+          'import { Predicate, Schema } from "effect";\n\nexport const Callback = Schema.declare<ReturnType<typeof globalThis.fetch>>(Predicate.isPromise);',
+      },
+      {
+        path: "packages/webmcp/test/registration.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-promise-workflow)",
+        source: "export const run = async () => 1;",
+      },
+      {
+        path: "packages/webmcp/test/registration.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-promise-workflow)",
+        source: "export const run = new Promise<void>((resolve) => resolve());",
+      },
+      {
+        path: "packages/webmcp/test/registration.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-promise-workflow)",
+        source:
+          "export const run = (source: Promise<number>) => source.then((value) => value);",
+      },
+      {
+        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        rejected: true,
+        rule: "strict-effect(no-promise-workflow)",
+        source: "export const run = (source: Promise<number>) => source;",
+      },
+      {
+        path: "packages/webmcp/src/model-context.adapter.layer.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/webmcp/src/model-context.adapter.layer.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/webmcp/src/model-context.adapter.layer.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/webmcp/test/registration.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-browser-tools.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-browser-tools.boundary.test.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/web/test/native-browser-tools.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/api/mcp/src/handlers.layer.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/api/mcp/src/handlers.layer.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/api/test/rate-admission.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/rate-admission.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/api/test/rate-admission.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/worker-admission.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "apps/api/test/worker-admission.boundary.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "apps/api/test/worker-admission.boundary.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/calculators/test/calculation-admission.test.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/calculators/test/calculation-admission.test.ts",
+        rejected: true,
+        rule: "strict-effect(no-runtime-outside-boundary)",
+        source:
+          'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
+      },
+      {
+        path: "packages/calculators/test/calculation-admission.test.ts",
+        rejected: false,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
+      },
+      {
+        path: "packages/calculators/src/admission.layer.ts",
+        rejected: true,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+    ])("keeps $rule exact at $path", ({ path, source, rejected, rule }) =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const workspace = yield* makeIsolatedLintWorkspace();
+        const target = join(workspace.workingDirectory, path);
+        yield* fs.makeDirectory(nodePath.dirname(target), { recursive: true });
+        yield* fs.writeFileString(target, source);
+        const result = yield* runOxlint({ path, ...workspace });
+        expect(result.files).toBe(1);
+        if (rejected) {
+          expect(result.exitCode).not.toBe(0);
+          expect(result.codes).toContain(rule);
+        } else {
+          const actual = result.exitCode;
+          const message = result.codes.join(", ");
+          expect(actual, message).toBe(0);
+          expect(result.codes).not.toContain(rule);
+        }
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+    );
+  });
 });

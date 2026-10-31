@@ -8,42 +8,40 @@ import {
 
 // A generated-client call's own transport outcomes. Declared API failures keep
 // their owning error types; these cover the rest, with safe fixed messages.
-export class ApiUnavailable extends Schema.TaggedError<ApiUnavailable>()(
-  "ApiUnavailable",
-  {
-    message: Schema.tag(
-      "The TaxKit service could not be reached. Please try again."
-    ),
-  }
-) {}
+export class ApiUnavailable extends Schema.TaggedError<
+  ApiUnavailable,
+  { readonly brand: unique symbol }
+>()("ApiUnavailable", {
+  message: Schema.tag(
+    "The TaxKit service could not be reached. Please try again."
+  ),
+}) {}
 
-export class ApiDeadlineExceeded extends Schema.TaggedError<ApiDeadlineExceeded>()(
-  "ApiDeadlineExceeded",
-  {
-    message: Schema.tag(
-      "The request could not finish within ten seconds. Try again when you are ready."
-    ),
-  }
-) {}
+export class ApiDeadlineExceeded extends Schema.TaggedError<
+  ApiDeadlineExceeded,
+  { readonly brand: unique symbol }
+>()("ApiDeadlineExceeded", {
+  message: Schema.tag(
+    "The request could not finish within ten seconds. Try again when you are ready."
+  ),
+}) {}
 
-export class ApiReplyTooLarge extends Schema.TaggedError<ApiReplyTooLarge>()(
-  "ApiReplyTooLarge",
-  {
-    message: Schema.tag(
-      "The reply is too large. Reduce the request before trying again."
-    ),
-  }
-) {}
+export class ApiReplyTooLarge extends Schema.TaggedError<
+  ApiReplyTooLarge,
+  { readonly brand: unique symbol }
+>()("ApiReplyTooLarge", {
+  message: Schema.tag(
+    "The reply is too large. Reduce the request before trying again."
+  ),
+}) {}
 
 // A reply that does not answer the request it was sent for.
-export class ApiReplyMismatch extends Schema.TaggedError<ApiReplyMismatch>()(
-  "ApiReplyMismatch",
-  {
-    message: Schema.tag(
-      "The reply did not match the request. Please try again."
-    ),
-  }
-) {}
+export class ApiReplyMismatch extends Schema.TaggedError<
+  ApiReplyMismatch,
+  { readonly brand: unique symbol }
+>()("ApiReplyMismatch", {
+  message: Schema.tag("The reply did not match the request. Please try again."),
+}) {}
 
 export const ApiCallFailure = Schema.Union([
   ApiUnavailable,

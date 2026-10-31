@@ -113,7 +113,7 @@ acquire a compiler.
 Decoding an artifact is representation ingress; rendering an already-checked
 Document must not decode the same domain value again.
 
-MDX explicitly enables the shared strict preset's `no-ternary` lint rule. Use
+MDX inherits the complete shared style and strict presets, including `no-ternary`. Use
 native `Array.filter`/`Array.map` for selection, `Option` for absence, `Boolean`
 for boolean branches and exhaustive `Match` for domain alternatives. The owning
 heading-uniqueness check is shared by both artifact formats.

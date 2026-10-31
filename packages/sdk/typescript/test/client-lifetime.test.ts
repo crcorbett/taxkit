@@ -5,6 +5,8 @@ import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import { GrossPay } from "@taxkit/rules-au-pay";
 import {
+  Predicate,
+  Function as EffectFunction,
   Context,
   Deferred,
   Effect,
@@ -26,13 +28,14 @@ import {
   AuPayTakeHomeCalculation,
 } from "../src/testing/index.js";
 
-class SdkPromiseRejectionError extends Schema.TaggedError<SdkPromiseRejectionError>()(
-  "SdkPromiseRejectionError",
+class SdkPromiseRejectionError extends Schema.TaggedError<
+  SdkPromiseRejectionError,
   {
-    rejection: Schema.Unknown,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("SdkPromiseRejectionError", {
+  rejection: Schema.Defect(),
+}) {}
 const ServiceLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
@@ -44,7 +47,6 @@ const facts = {
   taxFreeThresholdClaimed: true,
 };
 const sentinel = "taxkit-private-secret:/private/sdk-lifetime/input.json";
-
 class LifetimeFixture extends Context.Service<
   LifetimeFixture,
   {
@@ -61,7 +63,6 @@ class LifetimeFixture extends Context.Service<
     readonly started: Deferred.Deferred<boolean>;
   }
 >()("@taxkit/sdk/test/LifetimeFixture") {}
-
 // A calculator-service fixture owns real scoped acquisition and release. Each
 // failure is placed at its actual lifecycle step, with deterministic signals.
 const FixtureLayer = Layer.effect(
@@ -107,25 +108,22 @@ const FixtureLayer = Layer.effect(
     };
   })
 ).pipe(Layer.provide(ServiceLive));
-
 it.effect("closes an unused client without starting its Layer", () =>
   Effect.gen(function* () {
     const resources = yield* Ref.make(0);
     const started = yield* Deferred.make<boolean>();
     const release = yield* Deferred.make<boolean>();
-    const client = createPlainClient(
-      FixtureLayer.pipe(
-        Layer.provide(
-          Layer.succeed(LifetimeFixture)({
-            mode: "normal",
-            release,
-            resources,
-            started,
-          })
-        )
-      ),
-      AuPay2025_26Module
+    const layer = FixtureLayer.pipe(
+      Layer.provide(
+        Layer.succeed(LifetimeFixture)({
+          mode: "normal",
+          release,
+          resources,
+          started,
+        })
+      )
     );
+    const client = createPlainClient(layer, AuPay2025_26Module);
     yield* Effect.promise(() => client.dispose());
     yield* Effect.promise(() => client.dispose());
     expect(yield* Ref.get(resources)).toBe(0);
@@ -135,8 +133,16 @@ it.effect("closes an unused client without starting its Layer", () =>
     yield* Match.value(result).pipe(
       Match.tag("TaxKitFailure", ({ error }) =>
         Effect.sync(() => {
-          expect(error.error._tag).toBe("TaxKitClientDisposedError");
-          expect(error.error.message).toBe("TaxKit client is closed");
+          expect({
+            isDisposed: Predicate.isTagged(
+              error.error,
+              "TaxKitClientDisposedError"
+            ),
+            errorErrorMessage: error.error.message,
+          }).toStrictEqual({
+            isDisposed: true,
+            errorErrorMessage: "TaxKit client is closed",
+          });
         })
       ),
       Match.tag("TaxKitSuccess", () =>
@@ -147,7 +153,6 @@ it.effect("closes an unused client without starting its Layer", () =>
     expect(yield* Ref.get(resources)).toBe(0);
   })
 );
-
 it.effect("keeps separate client lifetimes even with the same Layer", () =>
   Effect.gen(function* () {
     const resources = yield* Ref.make(0);
@@ -176,8 +181,13 @@ it.effect("keeps separate client lifetimes even with the same Layer", () =>
       ],
       { concurrency: "unbounded" }
     );
-    expect(reports).toHaveLength(2);
-    expect(yield* Ref.get(resources)).toBe(2);
+    expect({
+      reportCount: reports.length,
+      RefGetResources: yield* Ref.get(resources),
+    }).toStrictEqual({
+      reportCount: 2,
+      RefGetResources: 2,
+    });
     yield* Effect.promise(() => first.dispose());
     expect(yield* Ref.get(resources)).toBe(1);
     const report = yield* Effect.promise(() =>
@@ -190,7 +200,6 @@ it.effect("keeps separate client lifetimes even with the same Layer", () =>
     expect(yield* Ref.get(resources)).toBe(0);
   })
 );
-
 it.effect.each(["operationBlocked", "startupBlocked"] as const)(
   "closes safe work during %s",
   (mode) =>
@@ -198,19 +207,17 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = createPlainClient(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode,
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        AuPay2025_26Module
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode,
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       const pending = yield* Effect.promise(() =>
         client.calculations.safe.calculate(AuPayTakeHomeCalculation, facts)
       ).pipe(Effect.forkChild);
@@ -220,7 +227,12 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       yield* Match.value(result).pipe(
         Match.tag("TaxKitFailure", ({ error }) =>
           Effect.gen(function* () {
-            expect(error.error._tag).toBe("TaxKitClientDisposedError");
+            EffectFunction.pipe(
+              Predicate.isTagged(error.error, "TaxKitClientDisposedError"),
+              (matches) => {
+                expect(matches).toBeTruthy();
+              }
+            );
             const text = yield* Schema.encodeEffect(
               Schema.toCodecJson(TaxKitCalculationError)
             )(error);
@@ -236,7 +248,6 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       expect(yield* Ref.get(resources)).toBe(0);
     })
 );
-
 it.effect.each(["operationBlocked", "startupBlocked"] as const)(
   "rejects normal work safely during %s",
   (mode) =>
@@ -244,19 +255,17 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = createPlainClient(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode,
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        AuPay2025_26Module
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode,
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       const pending = yield* Effect.tryPromise({
         catch: (rejection) => new SdkPromiseRejectionError({ rejection }),
         try: () =>
@@ -271,11 +280,18 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       yield* Deferred.await(started);
       yield* Effect.promise(() => client.dispose());
       const error = yield* Fiber.join(pending);
-      expect(error.error._tag).toBe("TaxKitClientDisposedError");
-      expect(yield* Ref.get(resources)).toBe(0);
+      expect({
+        isDisposed: Predicate.isTagged(
+          error.error,
+          "TaxKitClientDisposedError"
+        ),
+        RefGetResources: yield* Ref.get(resources),
+      }).toStrictEqual({
+        isDisposed: true,
+        RefGetResources: 0,
+      });
     })
 );
-
 it.effect.each(["startupDefect", "operationDefect"] as const)(
   "contains private defects during %s",
   (mode) =>
@@ -283,26 +299,29 @@ it.effect.each(["startupDefect", "operationDefect"] as const)(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = createPlainClient(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode,
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        AuPay2025_26Module
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode,
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       const result = yield* Effect.promise(() =>
         client.calculations.safe.calculate(AuPayTakeHomeCalculation, facts)
       );
       yield* Match.value(result).pipe(
         Match.tag("TaxKitFailure", ({ error }) =>
           Effect.gen(function* () {
-            expect(error.error._tag).toBe("TaxKitUnexpectedError");
+            EffectFunction.pipe(
+              Predicate.isTagged(error.error, "TaxKitUnexpectedError"),
+              (matches) => {
+                expect(matches).toBeTruthy();
+              }
+            );
             const text = yield* Schema.encodeEffect(
               Schema.toCodecJson(TaxKitCalculationError)
             )(error);
@@ -318,25 +337,22 @@ it.effect.each(["startupDefect", "operationDefect"] as const)(
       expect(yield* Ref.get(resources)).toBe(0);
     })
 );
-
 it.effect("all overlapping dispose calls await the same finalisers", () =>
   Effect.gen(function* () {
     const resources = yield* Ref.make(0);
     const started = yield* Deferred.make<boolean>();
     const release = yield* Deferred.make<boolean>();
-    const client = createPlainClient(
-      FixtureLayer.pipe(
-        Layer.provide(
-          Layer.succeed(LifetimeFixture)({
-            mode: "finalizerBlocked",
-            release,
-            resources,
-            started,
-          })
-        )
-      ),
-      AuPay2025_26Module
+    const layer = FixtureLayer.pipe(
+      Layer.provide(
+        Layer.succeed(LifetimeFixture)({
+          mode: "finalizerBlocked",
+          release,
+          resources,
+          started,
+        })
+      )
     );
+    const client = createPlainClient(layer, AuPay2025_26Module);
     yield* Effect.promise(() =>
       client.calculations.calculate(AuPayTakeHomeCalculation, facts)
     );
@@ -348,11 +364,17 @@ it.effect("all overlapping dispose calls await the same finalisers", () =>
       Effect.forkChild
     );
     yield* Effect.yieldNow;
-    expect(Option.isNone(Option.fromUndefinedOr(first.pollUnsafe()))).toBe(
-      true
+    EffectFunction.pipe(
+      Option.isNone(Option.fromUndefinedOr(first.pollUnsafe())),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
     );
-    expect(Option.isNone(Option.fromUndefinedOr(second.pollUnsafe()))).toBe(
-      true
+    EffectFunction.pipe(
+      Option.isNone(Option.fromUndefinedOr(second.pollUnsafe())),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
     );
     expect(yield* Ref.get(resources)).toBe(1);
     yield* Deferred.succeed(release, true);
@@ -361,7 +383,6 @@ it.effect("all overlapping dispose calls await the same finalisers", () =>
     expect(yield* Ref.get(resources)).toBe(0);
   })
 );
-
 it.effect(
   "replays a safe disposal failure without private finaliser details",
   () =>
@@ -369,19 +390,17 @@ it.effect(
       const resources = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const release = yield* Deferred.make<boolean>();
-      const client = createPlainClient(
-        FixtureLayer.pipe(
-          Layer.provide(
-            Layer.succeed(LifetimeFixture)({
-              mode: "finalizerDefect",
-              release,
-              resources,
-              started,
-            })
-          )
-        ),
-        AuPay2025_26Module
+      const layer = FixtureLayer.pipe(
+        Layer.provide(
+          Layer.succeed(LifetimeFixture)({
+            mode: "finalizerDefect",
+            release,
+            resources,
+            started,
+          })
+        )
       );
+      const client = createPlainClient(layer, AuPay2025_26Module);
       yield* Effect.promise(() =>
         client.calculations.calculate(AuPayTakeHomeCalculation, facts)
       );
@@ -407,8 +426,13 @@ it.effect(
           )
         )
       );
-      expect(second).toEqual(first);
-      expect(first.message).toBe("TaxKit client could not be closed");
+      expect({
+        second,
+        firstMessage: first.message,
+      }).toStrictEqual({
+        second: first,
+        firstMessage: "TaxKit client could not be closed",
+      });
       expect(
         yield* Schema.encodeEffect(
           Schema.toCodecJson(TaxKitClientDisposeError)

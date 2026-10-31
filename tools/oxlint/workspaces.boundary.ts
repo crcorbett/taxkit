@@ -3,13 +3,24 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { Array, Option, Predicate, Record, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Option,
+  Predicate,
+  Record,
+  Result,
+  Schema,
+  Boolean as EffectBoolean,
+} from "effect";
 
 type ExportTarget =
   | string
   | null
   | readonly ExportTarget[]
-  | { readonly [condition: string]: ExportTarget };
+  | {
+      readonly [condition: string]: ExportTarget;
+    };
 const ExportTarget: Schema.Codec<ExportTarget> = Schema.suspend(() =>
   Schema.Union([
     Schema.String,
@@ -42,11 +53,11 @@ const selectedTarget = (target: ExportTarget): boolean | undefined => {
   if (Predicate.isString(target)) {
     return true;
   }
-  if (target === null) {
+  if (Predicate.isNull(target)) {
     return false;
   }
   if (isExportArray(target)) {
-    const selected = Array.map(target, selectedTarget);
+    const selected = EffectFunction.pipe(target, Array.map(selectedTarget));
     if (Array.contains(selected, true)) {
       return true;
     }
@@ -55,34 +66,43 @@ const selectedTarget = (target: ExportTarget): boolean | undefined => {
     }
     return undefined;
   }
-  return Array.findFirst(
-    Array.map(
-      Array.filter(Record.toEntries(target), ([condition]) =>
-        Array.contains(conditions, condition)
-      ),
-      ([, value]) => selectedTarget(value)
-    ),
-    (value): value is boolean => value !== undefined
+  return EffectFunction.pipe(
+    Record.toEntries(target),
+    Array.filter(([condition]) => Array.contains(conditions, condition)),
+    Array.map(([, value]) => selectedTarget(value)),
+    Array.findFirst((value): value is boolean => !Predicate.isUndefined(value))
   ).pipe(Option.getOrUndefined);
 };
 const publicExports = (
   target: ExportTarget | undefined
 ): Readonly<Record<string, boolean>> => {
-  if (target === undefined) {
+  if (Predicate.isUndefined(target)) {
     return {};
   }
-  if (target === null || Predicate.isString(target) || isExportArray(target)) {
+  if (
+    Predicate.isNull(target) ||
+    Predicate.isString(target) ||
+    isExportArray(target)
+  ) {
     return { ".": selectedTarget(target) === true };
   }
   const entries = Record.toEntries(target);
-  return Array.some(entries, ([key]) => key.startsWith("."))
-    ? Record.fromEntries(
-        Array.map(entries, ([key, value]) => [
-          key,
-          selectedTarget(value) === true,
-        ])
-      )
-    : { ".": selectedTarget(target) === true };
+  return EffectBoolean.match(
+    EffectFunction.pipe(
+      entries,
+      Array.some(([key]) => key.startsWith("."))
+    ),
+    {
+      onFalse: () => ({ ".": selectedTarget(target) === true }),
+      onTrue: () =>
+        Record.fromEntries(
+          EffectFunction.pipe(
+            entries,
+            Array.map(([key, value]) => [key, selectedTarget(value) === true])
+          )
+        ),
+    }
+  );
 };
 export const dependencyNames = (manifest: typeof WorkspaceManifest.Type) =>
   Array.dedupe([
@@ -91,57 +111,71 @@ export const dependencyNames = (manifest: typeof WorkspaceManifest.Type) =>
     ...Record.keys(manifest.optionalDependencies ?? {}),
     ...Record.keys(manifest.peerDependencies ?? {}),
   ]);
-const rootManifest = Schema.decodeSync(Schema.fromJsonString(RootManifest))(
-  readFileSync(`${root}/package.json`, "utf-8")
-);
-export const workspaceContracts = Array.flatMap(
+const rootManifest = Schema.decodeUnknownResult(
+  Schema.fromJsonString(RootManifest)
+)(readFileSync(`${root}/package.json`, "utf-8")).pipe(Result.getOrThrow);
+export const workspaceContracts = EffectFunction.pipe(
   rootManifest.workspaces.packages,
-  (pattern) => {
+  Array.flatMap((pattern) => {
     const parent = pattern.slice(0, -2);
-    return Array.flatMap(
+    return EffectFunction.pipe(
       readdirSync(`${root}/${parent}`, { withFileTypes: true }),
-      (entry) => {
+      Array.flatMap((entry) => {
         const owner = `${parent}/${entry.name}`;
         const file = `${root}/${owner}/package.json`;
         if (!entry.isDirectory() || !existsSync(file)) {
           return [];
         }
-        const manifest = Schema.decodeSync(
+        const manifest = Schema.decodeUnknownResult(
           Schema.fromJsonString(WorkspaceManifest)
-        )(readFileSync(file, "utf-8"));
+        )(readFileSync(file, "utf-8")).pipe(Result.getOrThrow);
         return [{ manifest, owner }];
-      }
+      })
     );
-  }
+  })
 );
 export const workspaceBoundaryOptions = {
   aliases: [{ prefix: "#/", root: "apps/web/src" }],
   exceptions: [],
-  forbiddenEdges: Array.flatMap(
+  forbiddenEdges: EffectFunction.pipe(
     [{ manifest: rootManifest, owner: "root" }, ...workspaceContracts],
-    (source) =>
-      Array.flatMap(workspaceContracts, (target) =>
-        source.owner !== target.owner &&
-        (!Array.contains(
-          dependencyNames(source.manifest),
-          target.manifest.name
-        ) ||
-          (source.owner !== "root" && target.owner.startsWith("apps/")))
-          ? [{ from: source.owner, to: target.owner }]
-          : []
+    Array.flatMap((source) =>
+      EffectFunction.pipe(
+        workspaceContracts,
+        Array.flatMap((target) =>
+          EffectBoolean.match(
+            source.owner !== target.owner &&
+              (!Array.contains(
+                dependencyNames(source.manifest),
+                target.manifest.name
+              ) ||
+                (source.owner !== "root" && target.owner.startsWith("apps/"))),
+            {
+              onFalse: () => [],
+              onTrue: () => [{ from: source.owner, to: target.owner }],
+            }
+          )
+        )
       )
+    )
   ),
   owners: [
     { id: "root", root: "." },
-    ...Array.map(workspaceContracts, ({ owner }) => ({
-      id: owner,
-      root: owner,
-    })),
+    ...EffectFunction.pipe(
+      workspaceContracts,
+      Array.map(({ owner }) => ({
+        id: owner,
+        root: owner,
+      }))
+    ),
   ],
   workspacePrefixes: ["@taxkit/", "api", "web"],
-  workspaces: Array.map(workspaceContracts, ({ manifest, owner }) => ({
-    exports: publicExports(manifest.exports),
-    name: manifest.name,
-    owner,
-  })),
+  workspaces: EffectFunction.pipe(
+    workspaceContracts,
+    Array.map(({ manifest, owner }) => ({
+      exports: publicExports(manifest.exports),
+      name: manifest.name,
+      owner,
+    }))
+  ),
 };

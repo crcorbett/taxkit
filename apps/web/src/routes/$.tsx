@@ -13,26 +13,7 @@ import { loadDocsPage } from "#/lib/pages/loaders";
 import { docsHead } from "#/lib/seo/head";
 
 export const Route = createFileRoute("/$")({
-  component: function DocumentationRoute() {
-    const { metadata, navigation, page } = Route.useLoaderData();
-    return (
-      <div className="docs-layout">
-        <aside className="docs-sidebar">
-          <DocsNavigation
-            currentPath={Option.some(page.path)}
-            navigation={navigation}
-          />
-        </aside>
-        <article className="docs-article">
-          <DocsHeading>{page.frontmatter.title}</DocsHeading>
-          <DocsReadingBodyView body={page.body} />
-          <p className="docs-markdown-link">
-            <a href={metadata.markdown}>Read this page as Markdown</a>
-          </p>
-        </article>
-      </div>
-    );
-  },
+  component: DocumentationRoute,
   errorComponent: DocsPageUnavailable,
   // An explicit parameter type keeps loader inference independent of head.
   head: ({
@@ -59,3 +40,24 @@ export const Route = createFileRoute("/$")({
   ),
   pendingMs: 150,
 });
+
+function DocumentationRoute() {
+  const { metadata, navigation, page } = Route.useLoaderData();
+  return (
+    <div className="docs-layout">
+      <aside className="docs-sidebar">
+        <DocsNavigation
+          currentPath={Option.some(page.path)}
+          navigation={navigation}
+        />
+      </aside>
+      <article className="docs-article">
+        <DocsHeading>{page.frontmatter.title}</DocsHeading>
+        <DocsReadingBodyView body={page.body} />
+        <p className="docs-markdown-link">
+          <a href={metadata.markdown}>Read this page as Markdown</a>
+        </p>
+      </article>
+    </div>
+  );
+}

@@ -4,7 +4,7 @@ import {
 } from "@taxkit/calculators/schemas";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import { DeploymentStage } from "@taxkit/observability/stage";
-import { Schema } from "effect";
+import { Match, Schema } from "effect";
 
 export const PostHogProjectId = Schema.Int.check(Schema.isGreaterThan(0)).pipe(
   Schema.brand("taxkit/PostHogProjectId")
@@ -23,9 +23,13 @@ export const AnalyticsEnabled = Schema.TaggedStruct("AnalyticsEnabled", {
 }).check(
   Schema.makeFilter(
     (settings) =>
-      settings.environment === "production"
-        ? settings.stage === "prod"
-        : settings.stage !== "prod",
+      Match.value(settings).pipe(
+        Match.when(
+          { environment: "production" },
+          (matchedValue) => matchedValue.stage === "prod"
+        ),
+        Match.orElse((matchedValue) => matchedValue.stage !== "prod")
+      ),
     {
       message:
         "The analytics environment must match its checked deployment stage.",
@@ -74,7 +78,6 @@ export const PageView = Schema.Struct({
   ]),
 });
 export type PageView = typeof PageView.Type;
-
 // Capture, browser enrichment and provider management keep distinct boundaries.
 // This backend wire owner includes no tax inputs, result, visitor or request data.
 export const CalculatorCaptureBatch = Schema.Struct({

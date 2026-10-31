@@ -3,15 +3,22 @@ import { DocsImageRenderError, DocsSourceError } from "@taxkit/content/errors";
 import { DocsPngBytes } from "@taxkit/content/schemas";
 import { ContentCatalogue, DocsOgImages } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { Effect, Layer, Option, Ref, Schema } from "effect";
 import {
-  Headers,
+  Effect,
+  Layer,
+  Option,
+  Ref,
+  Schema,
+  Function as EffectFunction,
+} from "effect";
+import {
   HttpClientRequest,
   HttpRouter,
   HttpServerError,
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
+import * as HttpHeaders from "effect/http/Headers";
 
 import { exampleOrigins } from "../src/__testing__/fixtures.js";
 import { aeoRoutes } from "../src/routes.layer.js";
@@ -25,7 +32,6 @@ const png = Effect.gen(function* () {
   view.setUint32(20, 630);
   return yield* Schema.decodeEffect(DocsPngBytes)(bytes);
 });
-
 const serve = (
   address: string,
   layer: Layer.Layer<
@@ -49,7 +55,6 @@ const serve = (
     );
     return HttpServerResponse.toClientResponse(response, { request });
   }).pipe(Effect.provide(layer), Effect.scoped);
-
 const layers = Effect.gen(function* () {
   const bytes = yield* png;
   const reads = yield* Ref.make(0);
@@ -65,7 +70,6 @@ const layers = Effect.gen(function* () {
   );
   return { bytes, layer, reads };
 });
-
 describe("answer-engine routes", () => {
   it.effect("serve the four documents with their media types", () =>
     Effect.gen(function* () {
@@ -76,23 +80,25 @@ describe("answer-engine routes", () => {
         ["/api/v1/docs/discovery/llms.txt", "text/plain"],
         ["/api/v1/docs/discovery/llms-full.txt", "text/plain"],
       ] as const;
-      yield* Effect.forEach(cases, ([address, type]) =>
-        Effect.gen(function* () {
-          const response = yield* serve(address, layer);
-          assert.equal(response.status, 200, address);
-          assert.deepEqual(
-            Headers.get(response.headers, "content-type"),
-            Option.some(`${type}; charset=utf-8`)
-          );
-          assert.deepEqual(
-            Headers.get(response.headers, "x-content-type-options"),
-            Option.some("nosniff")
-          );
-        })
+      yield* EffectFunction.pipe(
+        cases,
+        Effect.forEach(([address, type]) =>
+          Effect.gen(function* () {
+            const response = yield* serve(address, layer);
+            assert.equal(response.status, 200, address);
+            assert.deepEqual(
+              HttpHeaders.get(response.headers, "content-type"),
+              Option.some(`${type}; charset=utf-8`)
+            );
+            assert.deepEqual(
+              HttpHeaders.get(response.headers, "x-content-type-options"),
+              Option.some("nosniff")
+            );
+          })
+        )
       );
     })
   );
-
   it.effect("serve each published page's share image as PNG", () =>
     Effect.gen(function* () {
       const { bytes, layer } = yield* layers;
@@ -102,7 +108,7 @@ describe("answer-engine routes", () => {
       );
       assert.equal(response.status, 200);
       assert.deepEqual(
-        Headers.get(response.headers, "content-type"),
+        HttpHeaders.get(response.headers, "content-type"),
         Option.some("image/png")
       );
       assert.deepEqual(
@@ -113,7 +119,6 @@ describe("answer-engine routes", () => {
       assert.equal(missing.status, 404);
     })
   );
-
   it.effect("read stage origins lazily and once", () =>
     Effect.gen(function* () {
       const { layer, reads } = yield* layers;
@@ -139,7 +144,6 @@ describe("answer-engine routes", () => {
       }).pipe(Effect.provide(handlerLayer), Effect.scoped);
     })
   );
-
   it.effect("answer 503 when origins or the image are unavailable", () =>
     Effect.gen(function* () {
       const layer = Layer.mergeAll(

@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-10-30
 review_trigger: Effect, schema boundary, service, Layer, collection, error, or abstraction rule change
 ---
 
@@ -97,16 +97,20 @@ Use `Array.reduce`, `Array.map`, `Array.filter`, and `Array.findFirst` when
 folding descriptors or constructing validation issues.
 
 ```ts
-const missingProviderIssues = Array.reduce(
+const missingProviderIssues = pipe(
   rules,
-  Array.empty<GraphValidationIssue>(),
-  (issues, rule) =>
-    Array.reduce(rule.requires, issues, (updatedIssues, required) => {
-      const key = factKey(required);
-      return hasProvider(key)
-        ? updatedIssues
-        : Array.append(updatedIssues, missingProvider(rule, key));
-    })
+  Array.reduce(Chunk.empty<GraphValidationIssue>(), (issues, rule) =>
+    pipe(
+      rule.requires,
+      Array.reduce(issues, (current, required) => {
+        const key = factKey(required);
+        if (hasProvider(key)) {
+          return current;
+        }
+        return Chunk.append(current, missingProvider(rule, key));
+      })
+    )
+  )
 );
 ```
 
@@ -115,18 +119,22 @@ const missingProviderIssues = Array.reduce(
 Use `HashMap` for descriptor indexes where the key is a branded ID.
 
 ```ts
-const providers = Array.reduce(
+const providers = pipe(
   rules,
-  HashMap.empty<FactId, readonly AnyRuleDescriptor[]>(),
-  (byFact, rule) =>
-    Array.reduce(rule.provides, byFact, (updatedByFact, provided) => {
-      const existing = HashMap.get(updatedByFact, provided.id);
-      const next = Option.isSome(existing)
-        ? Array.append(existing.value, rule)
-        : Array.of(rule);
-
-      return HashMap.set(updatedByFact, provided.id, next);
-    })
+  Array.reduce(HashMap.empty<FactId, readonly AnyRuleDescriptor[]>(), (byFact, rule) =>
+    pipe(
+      rule.provides,
+      Array.reduce(byFact, (current, provided) => {
+        const next = HashMap.get(current, provided.id).pipe(
+          Option.match({
+            onNone: () => Array.of(rule),
+            onSome: (existing) => Array.append(existing, rule),
+          })
+        );
+        return HashMap.set(current, provided.id, next);
+      })
+    )
+  )
 );
 ```
 
@@ -136,11 +144,10 @@ Use `HashSet` for stable membership checks, especially input facts and official
 source references.
 
 ```ts
-const inputFacts = HashSet.fromIterable(
-  Array.map(
-    args.inputFacts ?? Array.empty<AnyFactDescriptor>(),
-    (fact) => fact.id
-  )
+const inputFacts = pipe(
+  args.inputFacts ?? Array.empty<AnyFactDescriptor>(),
+  Array.map((fact) => fact.id),
+  HashSet.fromIterable
 );
 
 const isInputFact = HashSet.has(inputFacts, required.id);
@@ -151,11 +158,13 @@ const isInputFact = HashSet.has(inputFacts, required.id);
 Use `Option.match`, `Option.isSome`, or `Option.isNone` for lookups. Do not
 encode missing values with `undefined` or `null` branches in validation
 algorithms.
+Use `Result.match` and `Exit.match` for their own success/failure alternatives;
+reserve `Match` for domain unions rather than inspecting native containers.
 
 ```ts
-const row = Array.findFirst(
+const row = pipe(
   table.rows,
-  (candidate) => weeklyCents >= candidate.weeklyMinCents
+  Array.findFirst((candidate) => weeklyCents >= candidate.weeklyMinCents)
 );
 
 return Option.match(row, {
@@ -180,10 +189,12 @@ return payload.jurisdiction.pipe(
   Option.flatten,
   Option.match({
     onNone: () => Effect.void,
-    onSome: (jurisdiction) =>
-      jurisdiction === entry.context.jurisdiction
-        ? Effect.void
-        : Effect.fail(new UnsupportedCalculatorContextError(...)),
+    onSome: (jurisdiction) => {
+      if (jurisdiction === entry.context.jurisdiction) {
+        return Effect.void;
+      }
+      return Effect.fail(new UnsupportedCalculatorContextError(...));
+    },
   })
 );
 ```
@@ -196,11 +207,14 @@ as `toFactsResponse(filterCalculatorEntries(query))` when the same logic reads
 left-to-right:
 
 ```ts
-query.pipe(filterCalculatorEntries, toFactsResponse);
+pipe(query, filterCalculatorEntries, toFactsResponse);
 ```
 
 Use named reusable operations only when they own a real policy or are reused.
 Do not extract tiny one-off wrappers just to hide a single function call.
+Keep one call with several inputs direct: bind any substantial input expression
+to a meaningful local value rather than introducing a nested pipe callback for
+each argument. Flatten consecutive transformations into one pipe.
 
 Service contract files MUST NOT export `Live`, `Mock` or `Test` layers. Keep
 `service.ts` focused on the `Context.Service` contract and canonical

@@ -5,14 +5,18 @@ import { Effect } from "effect";
 
 import { ApiClient, apiClientRuntime } from "../api-client.atoms";
 import { calculationFailureMessage } from "./failure";
-
 // Each calculator page calculates through the native browser client. Replacing
 // the request or interrupting it cancels the browser call.
 export const calculatorPageAtoms = makeCalculatorPages({
   calculation: () =>
     apiClientRuntime.fn<CalculatorRunServiceRequest>()((request) =>
       ApiClient.pipe(
-        Effect.flatMap((client) => requestCalculation(client, request))
+        Effect.flatMap((client) =>
+          requestCalculation({
+            client,
+            request,
+          })
+        )
       )
     ),
   failureMessage: calculationFailureMessage,

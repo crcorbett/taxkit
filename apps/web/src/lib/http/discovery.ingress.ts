@@ -4,7 +4,6 @@ import { Effect, Option, Schema } from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { WebsiteApi } from "../host/service";
-
 // The Website's /sitemap.xml, /robots.txt and /llms*.txt. The API owns each
 // finished document; forward it once, before TanStack renders any HTML.
 export const discoveryRepresentation = Effect.gen(function* () {
@@ -29,11 +28,15 @@ export const discoveryRepresentation = Effect.gen(function* () {
     return Option.some(HttpServerResponse.empty({ status: 400 }));
   }
   const api = yield* WebsiteApi;
-  return yield* api.forward(discoveryApiPath(path.value)).pipe(
-    Effect.map(HttpServerResponse.fromWeb),
-    Effect.catch(() =>
-      Effect.succeed(HttpServerResponse.empty({ status: 503 }))
-    ),
-    Effect.asSome
-  );
+  return yield* api
+    .forward({
+      path: discoveryApiPath(path.value),
+    })
+    .pipe(
+      Effect.map(HttpServerResponse.fromWeb),
+      Effect.catch(() =>
+        Effect.succeed(HttpServerResponse.empty({ status: 503 }))
+      ),
+      Effect.asSome
+    );
 }).pipe(Effect.withSpan("Website.discoveryRepresentation"));

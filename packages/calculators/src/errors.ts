@@ -1,4 +1,10 @@
-import { Array, Option, Schema, SchemaIssue } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Option,
+  Schema,
+  SchemaIssue,
+} from "effect";
 
 import type { CalculatorCatalogEntry } from "./catalog.js";
 import {
@@ -7,16 +13,13 @@ import {
   CalculatorInputHelp,
 } from "./schemas.js";
 import type { CalculatorId, HelpMode } from "./schemas.js";
-
 // Effect Schema's Standard Schema formatter can emit path segments as objects
 // with a `key` field. Decode that shape with Schema instead of probing with
 // `typeof` or `in`, then stringify the canonical path for public API consumers.
 const StandardPathSegment = Schema.Struct({
   key: Schema.PropertyKey,
 });
-
 const schemaIssueFormatter = SchemaIssue.makeFormatterStandardSchemaV1();
-
 /**
  * Converts an Effect Schema decode issue into the public calculator API error.
  *
@@ -30,30 +33,33 @@ export const toCalculatorInputDecodeError = (args: {
   readonly help: Option.Option<HelpMode>;
   readonly issue: SchemaIssue.Issue;
 }): CalculatorInputDecodeError => {
-  const issues = Array.map(
+  const issues = EffectFunction.pipe(
     schemaIssueFormatter(args.issue).issues,
-    (issue) =>
-      new CalculatorInputIssue({
-        message: "Invalid calculator input value",
-        path: Option.fromNullishOr(issue.path).pipe(
-          Option.match({
-            onNone: Array.empty,
-            onSome: (path) =>
-              Array.map(path, (segment) => {
-                const pathSegment =
-                  Schema.decodeUnknownOption(StandardPathSegment)(segment);
-
-                return pathSegment.pipe(
-                  Option.map((decodedSegment) => decodedSegment.key),
-                  Option.getOrElse(() => segment),
-                  String
-                );
-              }),
-          })
-        ),
-      })
+    Array.map(
+      (issue) =>
+        new CalculatorInputIssue({
+          message: "Invalid calculator input value",
+          path: Option.fromNullishOr(issue.path).pipe(
+            Option.match({
+              onNone: Array.empty,
+              onSome: (path) =>
+                EffectFunction.pipe(
+                  path,
+                  Array.map((segment) => {
+                    const pathSegment =
+                      Schema.decodeUnknownOption(StandardPathSegment)(segment);
+                    return pathSegment.pipe(
+                      Option.map((decodedSegment) => decodedSegment.key),
+                      Option.getOrElse(() => segment),
+                      String
+                    );
+                  })
+                ),
+            })
+          ),
+        })
+    )
   );
-
   return args.help.pipe(
     Option.filter((help) => help === "errors" || help === "full"),
     Option.match({
@@ -67,12 +73,18 @@ export const toCalculatorInputDecodeError = (args: {
           calculatorId: Option.some(Option.some(args.calculatorId)),
           help: Option.some(
             Option.some(
-              Array.map(args.entry.inputFacts, (fact) =>
-                CalculatorInputHelp.make({
-                  factId: fact.id,
-                  question: Option.map(fact.question, Option.some),
-                  title: fact.title,
-                })
+              EffectFunction.pipe(
+                args.entry.inputFacts,
+                Array.map((fact) =>
+                  CalculatorInputHelp.make({
+                    factId: fact.id,
+                    question: EffectFunction.pipe(
+                      fact.question,
+                      Option.map(Option.some)
+                    ),
+                    title: fact.title,
+                  })
+                )
               )
             )
           ),

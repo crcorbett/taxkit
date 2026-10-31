@@ -28,6 +28,8 @@ import {
 } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
 import {
+  Predicate,
+  Function as EffectFunction,
   Array,
   Cause,
   Effect,
@@ -53,26 +55,21 @@ import { calculateRunRequest as calculateSdkRunRequest } from "taxkit/effect";
 const ContentTestLive = ContentServiceLive.pipe(
   Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
 );
-
 // The native generated client over the in-process routes.
 const inProcessClient = HttpApiClient.make(TaxKitApi, {
   baseUrl: "http://taxkit.internal",
 });
-
 const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
-
 const TestLive = Layer.mergeAll(
   TaxKitApiInProcessLive.pipe(Layer.provide(ContentTestLive)),
   PublicCalculatorServiceTestLive
 );
-
 const takeHomeCalculatorId = AuPayCalculatorId.make("au.pay.take-home");
 const annualTaxCalculatorId = AuAnnualIncomeTaxCalculation.calculatorId;
 const secretSentinel = "taxkit-secret-sentinel";
 const privatePathSentinel = "/private/taxkit-sentinel/http-input.json";
-
 const grossPayFacts = (
   amount: Money,
   period: GrossPay["period"],
@@ -81,7 +78,6 @@ const grossPayFacts = (
   grossPay: new GrossPay({ amount, period }),
   taxFreeThresholdClaimed,
 });
-
 describe("TaxKit public calculation HTTP API", () => {
   it.effect.each([
     "/api/v1/jurisdictions",
@@ -98,18 +94,33 @@ describe("TaxKit public calculation HTTP API", () => {
       const service = Layer.succeed(
         PublicCalculatorService,
         PublicCalculatorService.of({
-          ...live,
-          getCalculator: () => Effect.fail(new CalculatorOperationTimedOut()),
-          getCalculatorGraph: () =>
-            Effect.fail(new CalculatorOperationTimedOut()),
-          getCalculatorSchema: () =>
-            Effect.fail(new CalculatorOperationTimedOut()),
-          listCalculators: () => Effect.fail(new CalculatorOperationTimedOut()),
-          listFacts: () => Effect.fail(new CalculatorOperationTimedOut()),
-          listJurisdictions: () =>
-            Effect.fail(new CalculatorOperationTimedOut()),
-          listRules: () => Effect.fail(new CalculatorOperationTimedOut()),
-          listTaxYears: () => Effect.fail(new CalculatorOperationTimedOut()),
+          calculate: Effect.fn("PublicCalculatorService.calculate")(
+            live.calculate
+          ),
+          getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
+            () => Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          getCalculatorGraph: Effect.fn(
+            "PublicCalculatorService.getCalculatorGraph"
+          )(() => Effect.fail(new CalculatorOperationTimedOut())),
+          getCalculatorSchema: Effect.fn(
+            "PublicCalculatorService.getCalculatorSchema"
+          )(() => Effect.fail(new CalculatorOperationTimedOut())),
+          listCalculators: Effect.fn("PublicCalculatorService.listCalculators")(
+            () => Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          listFacts: Effect.fn("PublicCalculatorService.listFacts")(() =>
+            Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          listJurisdictions: Effect.fn(
+            "PublicCalculatorService.listJurisdictions"
+          )(() => Effect.fail(new CalculatorOperationTimedOut())),
+          listRules: Effect.fn("PublicCalculatorService.listRules")(() =>
+            Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")(() =>
+            Effect.fail(new CalculatorOperationTimedOut())
+          ),
         })
       );
       // HttpApiBuilder captures services while constructing handlers. Supply
@@ -127,27 +138,29 @@ describe("TaxKit public calculation HTTP API", () => {
           HttpServerRequest.fromClientRequest(request)
         )
       );
-      expect(response.status).toBe(504);
-      expect(
-        yield* Schema.decodeUnknownEffect(CalculatorApiErrorEnvelope)(
+      expect({
+        responseStatus: response.status,
+        errorEnvelope: yield* Schema.decodeUnknownEffect(
+          CalculatorApiErrorEnvelope
+        )(
           yield* HttpServerResponse.toClientResponse(response, { request }).json
-        )
-      ).toEqual({ error: new CalculatorOperationTimedOut() });
+        ),
+      }).toStrictEqual({
+        responseStatus: 504,
+        errorEnvelope: { error: new CalculatorOperationTimedOut() },
+      });
     }).pipe(Effect.provide(PublicCalculatorServiceTestLive), Effect.scoped)
   );
-
   it.effect("pins the health route fixture", () =>
     Effect.gen(function* () {
       const client = yield* inProcessClient;
       const response = yield* client.health.getHealth();
-
-      expect(response).toEqual({
+      expect(response).toStrictEqual({
         service: "taxkit",
         status: "ok",
       });
     }).pipe(Effect.provide(TestLive))
   );
-
   it.effect(
     "pins calculator metadata against the calculator service contract",
     () =>
@@ -169,25 +182,36 @@ describe("TaxKit public calculation HTTP API", () => {
         const decoded = yield* Schema.decodeUnknownEffect(
           Schema.toType(CalculatorCatalogResponse)
         )(response);
-        const takeHomeCalculator = expectAt(
+        const items = EffectFunction.pipe(
+          response.calculators,
           Array.filter(
-            response.calculators,
             (calculator) => calculator.calculatorId === takeHomeCalculatorId
-          ),
-          0
+          )
         );
-
-        expect(decoded).toEqual(serviceResponse);
+        const takeHomeCalculator = expectAt(items, 0);
+        const receivedRepresentation = yield* Schema.encodeEffect(
+          CalculatorCatalogResponse
+        )(decoded);
+        const serviceRepresentation = yield* Schema.encodeEffect(
+          CalculatorCatalogResponse
+        )(serviceResponse);
+        expect(receivedRepresentation).toStrictEqual(serviceRepresentation);
         expect(takeHomeCalculator.calculatorId).toBe(takeHomeCalculatorId);
-        expect(takeHomeCalculator.context).toEqual(context);
-        expect(takeHomeCalculator.inputFactIds).toEqual([
-          GrossPayDescriptor.id,
-          TaxFreeThresholdClaimedDescriptor.id,
-        ]);
-        expect(takeHomeCalculator.reportSchemaName).toBe("TakeHomePayReport");
+        expect({
+          takeHomeCalculatorContext: takeHomeCalculator.context,
+          takeHomeCalculatorInputFactIds: takeHomeCalculator.inputFactIds,
+          takeHomeCalculatorReportSchemaName:
+            takeHomeCalculator.reportSchemaName,
+        }).toStrictEqual({
+          takeHomeCalculatorContext: context,
+          takeHomeCalculatorInputFactIds: [
+            GrossPayDescriptor.id,
+            TaxFreeThresholdClaimedDescriptor.id,
+          ],
+          takeHomeCalculatorReportSchemaName: "TakeHomePayReport",
+        });
       }).pipe(Effect.provide(TestLive))
   );
-
   it.effect("pins calculate success through SDK full-run parity", () =>
     Effect.gen(function* () {
       const client = yield* inProcessClient;
@@ -226,20 +250,35 @@ describe("TaxKit public calculation HTTP API", () => {
       const decoded = yield* Schema.decodeUnknownEffect(
         Schema.toType(CalculatorRunResponse)
       )(response);
-
       const takeHomeReport = Match.value(response.report).pipe(
         Match.tag("TakeHomePayReport", (report) => report),
         Match.orElse(() => expect.fail("Expected take-home report"))
       );
-      expect(response.calculator.calculatorId).toBe("au.pay.take-home");
-      expect(response.report._tag).toBe("TakeHomePayReport");
-      expect(takeHomeReport.rulePackVersion).toBe("rules-au-pay/1.0.2");
-      expect(decoded).toEqual(sdkResponse);
-      expect(response).toEqual(sdkResponse);
-      expect(takeHomeReport.withholdingsTotal.cents).toBe(75_600);
-      expect(takeHomeReport.netPay.cents).toBe(270_600);
-      expect(response.diagnostics.graphIssues.length).toBe(0);
-
+      expect({
+        responseCalculatorCalculatorId: response.calculator.calculatorId,
+        responseReport_tag: Predicate.isTagged(
+          response.report,
+          "TakeHomePayReport"
+        ),
+        takeHomeReportRulePackVersion: takeHomeReport.rulePackVersion,
+        decoded: yield* Schema.encodeEffect(CalculatorRunResponse)(decoded),
+        response: yield* Schema.encodeEffect(CalculatorRunResponse)(response),
+        takeHomeReportWithholdingsTotalCents:
+          takeHomeReport.withholdingsTotal.cents,
+        takeHomeReportNetPayCents: takeHomeReport.netPay.cents,
+        graphIssueCount: response.diagnostics.graphIssues.length,
+      }).toStrictEqual({
+        responseCalculatorCalculatorId: "au.pay.take-home",
+        responseReport_tag: true,
+        takeHomeReportRulePackVersion: "rules-au-pay/1.0.2",
+        decoded: yield* Schema.encodeEffect(CalculatorRunResponse)(sdkResponse),
+        response: yield* Schema.encodeEffect(CalculatorRunResponse)(
+          sdkResponse
+        ),
+        takeHomeReportWithholdingsTotalCents: 75_600,
+        takeHomeReportNetPayCents: 270_600,
+        graphIssueCount: 0,
+      });
       const annualTaxResponse = yield* client.calculatorApi.calculate({
         params: {
           calculatorId: annualTaxCalculatorId,
@@ -258,16 +297,22 @@ describe("TaxKit public calculation HTTP API", () => {
         },
         query: CalculationQuery.make({}),
       });
-
       const annualReport = Match.value(annualTaxResponse.report).pipe(
         Match.tag("AnnualTaxReport", (report) => report),
         Match.orElse(() => expect.fail("Expected annual tax report"))
       );
-      expect(annualTaxResponse.report._tag).toBe("AnnualTaxReport");
-      expect(annualReport.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
+      expect({
+        annualTaxResponseReport_tag: Predicate.isTagged(
+          annualTaxResponse.report,
+          "AnnualTaxReport"
+        ),
+        annualReportRulePackVersion: annualReport.rulePackVersion,
+      }).toStrictEqual({
+        annualTaxResponseReport_tag: true,
+        annualReportRulePackVersion: "rules-au-income-tax/1.0.1",
+      });
     }).pipe(Effect.provide(TestLive))
   );
-
   it.effect(
     "returns typed calculator input errors through the HTTP client",
     () =>
@@ -331,7 +376,6 @@ describe("TaxKit public calculation HTTP API", () => {
             },
           })
           .pipe(Effect.exit);
-
         const httpCause = yield* Exit.match(exit, {
           onFailure: Effect.succeed,
           onSuccess: () =>
@@ -351,18 +395,21 @@ describe("TaxKit public calculation HTTP API", () => {
               new Error("Expected the calculator service fixture to fail")
             ),
         });
-        const failure = expectAt(
-          Array.filter(httpCause.reasons, Cause.isFailReason),
-          0
+        const httpFailures = EffectFunction.pipe(
+          httpCause.reasons,
+          Array.filter(Cause.isFailReason)
         );
-        const sdkFailure = expectAt(
-          Array.filter(sdkCause.reasons, Cause.isFailReason),
-          0
+        const failure = expectAt(httpFailures, 0);
+        const sdkFailures = EffectFunction.pipe(
+          sdkCause.reasons,
+          Array.filter(Cause.isFailReason)
         );
-        const serviceFailure = expectAt(
-          Array.filter(serviceCause.reasons, Cause.isFailReason),
-          0
+        const sdkFailure = expectAt(sdkFailures, 0);
+        const serviceFailures = EffectFunction.pipe(
+          serviceCause.reasons,
+          Array.filter(Cause.isFailReason)
         );
+        const serviceFailure = expectAt(serviceFailures, 0);
         const envelope = yield* Schema.decodeUnknownEffect(
           Schema.toType(CalculatorApiErrorEnvelope)
         )(failure.error);
@@ -380,17 +427,38 @@ describe("TaxKit public calculation HTTP API", () => {
             onSome: (help) => help,
           })
         );
-
-        expect(Exit.isFailure(exit)).toBe(true);
-        expect(Exit.isFailure(sdkExit)).toBe(true);
-        expect(Exit.isFailure(serviceExit)).toBe(true);
-        expect(calculatorError).toEqual(sdkFailure.error);
-        expect(calculatorError).toEqual(serviceFailure.error);
-        expect(calculatorError._tag).toBe("CalculatorInputDecodeError");
-        expect(expectAt(calculatorError.issues, 0).path).toEqual(["grossPay"]);
-        expect(expectAt(calculatorError.issues, 0).message).toBe(
-          "Invalid calculator input value"
-        );
+        EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(Exit.isFailure(sdkExit), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(Exit.isFailure(serviceExit), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        expect({
+          calculatorError,
+          calculatorError2: calculatorError,
+          calculatorError_tag: Predicate.isTagged(
+            calculatorError,
+            "CalculatorInputDecodeError"
+          ),
+          expectAtCalculatorErrorIssues0Path: expectAt(
+            calculatorError.issues,
+            0
+          ).path,
+          expectAtCalculatorErrorIssues0Message: expectAt(
+            calculatorError.issues,
+            0
+          ).message,
+        }).toStrictEqual({
+          calculatorError: sdkFailure.error,
+          calculatorError2: serviceFailure.error,
+          calculatorError_tag: true,
+          expectAtCalculatorErrorIssues0Path: ["grossPay"],
+          expectAtCalculatorErrorIssues0Message:
+            "Invalid calculator input value",
+        });
         expect(expectAt(inputHelp, 0).factId).toBe(GrossPayDescriptor.id);
         const serializedEnvelope = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorApiErrorEnvelope)

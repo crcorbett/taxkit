@@ -25,7 +25,13 @@ import {
   PayWithholdingsLedgerWithStslRuleId,
 } from "@taxkit/rules-au-stsl";
 import { expectAt } from "@taxkit/testing";
-import { Array as EffectArray, Effect, Layer, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array as EffectArray,
+  Effect,
+  Layer,
+  Schema,
+} from "effect";
 
 const weekly1500 = new GrossPay({
   amount: new Money({ cents: Cents.make(150_000), currency: "AUD" }),
@@ -45,7 +51,6 @@ const sacrifice300 = new SalarySacrifice({
 });
 const stslEnabled = new StslDebt({ enabled: true });
 const stslDisabled = new StslDebt({ enabled: false });
-
 const stslScenario = (
   grossPay: GrossPay,
   stslDebt: StslDebt,
@@ -66,7 +71,6 @@ const stslScenario = (
       )
     )
   );
-
 const stslWithSacrificeScenario = (
   grossPay: GrossPay,
   stslDebt: StslDebt,
@@ -88,7 +92,6 @@ const stslWithSacrificeScenario = (
       )
     )
   );
-
 const sacrificeOnlyScenario = (
   grossPay: GrossPay,
   sacrifice: SalarySacrifice
@@ -108,7 +111,6 @@ const sacrificeOnlyScenario = (
       )
     )
   );
-
 describe("AU take-home pay with STSL", () => {
   it.effect.each([
     { gross: 559_432, tax: 0 },
@@ -145,7 +147,6 @@ describe("AU take-home pay with STSL", () => {
       );
     })
   );
-
   it.effect.each([
     { gross: 93_700, tax: 0 },
     { gross: 93_800, tax: 0 },
@@ -170,101 +171,115 @@ describe("AU take-home pay with STSL", () => {
       );
     })
   );
-
   it.effect("STSL active: PAYG + STSL both contribute", () =>
     Effect.gen(function* () {
       // $1500/week: PAYG = 304, STSL = round(0.15*1500.99 - 193.2692) = 32
       const report = yield* stslScenario(weekly1500, stslEnabled);
-
-      expect(
+      EffectFunction.pipe(
         moneyEquals(
           report.withholdingsTotal,
           new Money({ cents: Cents.make(33_600), currency: "AUD" })
-        )
-      ).toBe(true);
-      expect(
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
+      EffectFunction.pipe(
         moneyEquals(
           report.netPay,
           new Money({ cents: Cents.make(116_400), currency: "AUD" })
-        )
-      ).toBe(true);
-      expect(report.withholdings.components.length).toBe(2);
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
+      expect(report.withholdings.components).toHaveLength(2);
       const payg = expectAt(report.withholdings.components, 0);
       const stsl = expectAt(report.withholdings.components, 1);
       expect(payg.id).toBe(PaygWithholdingComponentId);
       expect(payg.status).toBe("active");
       expect(stsl.id).toBe(StslComponentId);
       expect(stsl.status).toBe("active");
-      expect(
+      EffectFunction.pipe(
         moneyEquals(
           stsl.amount,
           new Money({ cents: Cents.make(3200), currency: "AUD" })
-        )
-      ).toBe(true);
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
     })
   );
-
   it.effect(
     "STSL zeroed: below repayment threshold appears in ledger with $0",
     () =>
       Effect.gen(function* () {
         // $1000/week: PAYG = 143, STSL = 0 (zeroed)
         const report = yield* stslScenario(weekly1000, stslEnabled);
-
-        expect(
+        EffectFunction.pipe(
           moneyEquals(
             report.withholdingsTotal,
             new Money({ cents: Cents.make(14_300), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             report.netPay,
             new Money({ cents: Cents.make(85_700), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(report.withholdings.components.length).toBe(2);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        expect(report.withholdings.components).toHaveLength(2);
         const stsl = expectAt(report.withholdings.components, 1);
         expect(stsl.id).toBe(StslComponentId);
         expect(stsl.status).toBe("zeroed");
       })
   );
-
   it.effect(
     "STSL disabled: component in ledger with status disabled, no net impact",
     () =>
       Effect.gen(function* () {
         // enabled=false: STSL component is disabled, $0, same net as PAYG-only
         const report = yield* stslScenario(weekly1500, stslDisabled);
-
         // PAYG only: 304, STSL: 0 (disabled, not contributing)
-        expect(
+        EffectFunction.pipe(
           moneyEquals(
             report.withholdingsTotal,
             new Money({ cents: Cents.make(30_400), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            // PAYG only: 304, STSL: 0 (disabled, not contributing)
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             report.netPay,
             new Money({ cents: Cents.make(119_600), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(report.withholdings.components.length).toBe(2);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        expect(report.withholdings.components).toHaveLength(2);
         const stsl = expectAt(report.withholdings.components, 1);
         expect(stsl.id).toBe(StslComponentId);
         expect(stsl.status).toBe("disabled");
       })
   );
-
   it.effect("trace tree: NetPay -> Ledger -> [PAYG, STSL] -> TaxablePay", () =>
     Effect.gen(function* () {
       const report = yield* stslScenario(weekly1500, stslEnabled);
-
       expect(report.trace.ruleId).toBe(NetPayRuleId);
       const ledgerTrace = expectAt(report.trace.children, 0);
       expect(ledgerTrace.ruleId).toBe(PayWithholdingsLedgerWithStslRuleId);
-      expect(ledgerTrace.children.length).toBe(2);
+      expect(ledgerTrace.children).toHaveLength(2);
       expect(expectAt(ledgerTrace.children, 0).ruleId).toBe(
         PaygWithholdingRuleId
       );
@@ -273,34 +288,32 @@ describe("AU take-home pay with STSL", () => {
       );
     })
   );
-
   it.effect("trace and ledger snapshot: PAYG plus STSL explanation order", () =>
     Effect.gen(function* () {
       const report = yield* stslScenario(weekly1500, stslEnabled);
       const encodedTrace = yield* Schema.encodeEffect(TraceNode)(report.trace);
-
       expect({
-        ledger: EffectArray.map(
+        ledger: EffectFunction.pipe(
           report.withholdings.components,
-          (component) => ({
+          EffectArray.map((component) => ({
             cents: component.amount.cents,
             id: component.id,
             status: component.status,
-          })
+          }))
         ),
-        ledgerChildren: EffectArray.map(
+        ledgerChildren: EffectFunction.pipe(
           expectAt(encodedTrace.children, 0).children,
-          (child) => ({
+          EffectArray.map((child) => ({
             rounding: child.rounding,
             ruleId: child.ruleId,
-            sourceKinds: EffectArray.map(
+            sourceKinds: EffectFunction.pipe(
               child.sources,
-              (source) => source.kind
+              EffectArray.map((source) => source.kind)
             ),
-          })
+          }))
         ),
         root: report.trace.ruleId,
-      }).toEqual({
+      }).toStrictEqual({
         ledger: [
           {
             cents: 30_400,
@@ -329,7 +342,6 @@ describe("AU take-home pay with STSL", () => {
       });
     })
   );
-
   it.effect.each([0, 30_000, 150_000])(
     "balances cash, sacrifice and tax for %i cents sacrificed",
     (cents) =>
@@ -344,46 +356,51 @@ describe("AU take-home pay with STSL", () => {
         ).toBe(weekly1500.amount.cents);
       })
   );
-
   it.effect(
     "+sacrifice only (no STSL): sacrifice reduces taxable pay and PAYG",
     () =>
       Effect.gen(function* () {
         // taxable = 1_500 - 300 = 1_200; PAYG = round(0.3227*1200.99 - 180.0385) = 208
         const report = yield* sacrificeOnlyScenario(weekly1500, sacrifice300);
-
-        expect(
+        EffectFunction.pipe(
           moneyEquals(
             report.taxablePay,
             new Money({ cents: Cents.make(120_000), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             report.withholdingsTotal,
             new Money({ cents: Cents.make(20_800), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             report.netPay,
             new Money({ cents: Cents.make(99_200), currency: "AUD" })
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
         expect(
           report.netPay.cents +
             sacrifice300.amount.cents +
             report.withholdingsTotal.cents
         ).toBe(weekly1500.amount.cents);
-        expect(report.withholdings.components.length).toBe(1);
-
+        expect(report.withholdings.components).toHaveLength(1);
         const ledgerTrace = expectAt(report.trace.children, 0);
         const paygTrace = expectAt(ledgerTrace.children, 0);
         const taxableTrace = expectAt(paygTrace.children, 0);
         expect(taxableTrace.ruleId).toBe(TaxablePayWithSacrificeRuleId);
       })
   );
-
   it.effect(
     "+both: STSL + sacrifice, STSL applies to post-sacrifice taxable",
     () =>
@@ -394,38 +411,48 @@ describe("AU take-home pay with STSL", () => {
           stslEnabled,
           sacrifice300
         );
-
-        expect(
+        EffectFunction.pipe(
           moneyEquals(
             report.taxablePay,
             new Money({ cents: Cents.make(150_000), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             report.withholdingsTotal,
             new Money({ cents: Cents.make(33_600), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             report.netPay,
             new Money({ cents: Cents.make(116_400), currency: "AUD" })
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
         const payg = expectAt(report.withholdings.components, 0);
         const stsl = expectAt(report.withholdings.components, 1);
         expect(payg.id).toBe(PaygWithholdingComponentId);
         expect(stsl.id).toBe(StslComponentId);
-        expect(
+        EffectFunction.pipe(
           moneyEquals(
             stsl.amount,
             new Money({ cents: Cents.make(3200), currency: "AUD" })
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
       })
   );
-
   it.effect(
     "monthly period: PAYG and STSL both use nearest-dollar monthly conversion",
     () =>
@@ -437,36 +464,48 @@ describe("AU take-home pay with STSL", () => {
           }),
           stslEnabled
         );
-
         // 6_500 monthly = 1_500 weekly equivalent. PAYG: round(304*13/3)=1317.
         // STSL: weekly component 32, monthly round(32*13/3)=139.
-        expect(
+        EffectFunction.pipe(
           moneyEquals(
             report.withholdingsTotal,
             new Money({ cents: Cents.make(145_600), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            // 6_500 monthly = 1_500 weekly equivalent. PAYG: round(304*13/3)=1317.
+            // STSL: weekly component 32, monthly round(32*13/3)=139.
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             report.netPay,
             new Money({ cents: Cents.make(504_400), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             expectAt(report.withholdings.components, 0).amount,
             new Money({ cents: Cents.make(131_700), currency: "AUD" })
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           moneyEquals(
             expectAt(report.withholdings.components, 1).amount,
             new Money({ cents: Cents.make(13_900), currency: "AUD" })
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
       })
   );
-
   it.effect(
     "STSL highest official row remains active at high weekly income",
     () =>
@@ -478,14 +517,17 @@ describe("AU take-home pay with STSL", () => {
           }),
           stslEnabled
         );
-
         // Schedule 8 final row: round(0.10*3500.99) = 350.
-        expect(
+        EffectFunction.pipe(
           moneyEquals(
             expectAt(report.withholdings.components, 1).amount,
             new Money({ cents: Cents.make(35_000), currency: "AUD" })
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            // Schedule 8 final row: round(0.10*3500.99) = 350.
+            expect(actual).toBeTruthy();
+          }
+        );
         expect(expectAt(report.withholdings.components, 1).status).toBe(
           "active"
         );

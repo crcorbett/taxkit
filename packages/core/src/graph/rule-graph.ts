@@ -1,4 +1,14 @@
-import { Array, Graph, HashMap, HashSet, Option, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Chunk,
+  Graph,
+  HashMap,
+  HashSet,
+  Option,
+  Schema,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import type { FactId } from "../facts/descriptor.js";
 import type {
@@ -10,7 +20,6 @@ import type {
   AnyFactDescriptor,
   AnyRuleDescriptor,
 } from "../rules/descriptor.js";
-
 /**
  * Kind of structural problem found in a selected rule graph.
  *
@@ -24,27 +33,26 @@ export const GraphValidationIssueKind = Schema.Literals([
   "parameter-source-mismatch",
   "cycle",
 ]);
-
 /**
  * Kind of structural problem found in a selected rule graph.
  *
  * @since 0.1.0
  */
 export type GraphValidationIssueKind = typeof GraphValidationIssueKind.Type;
-
 /**
  * A structural validation issue found before composing rule layers.
  *
  * @since 0.1.0
  */
-export class GraphValidationIssue extends Schema.TaggedClass<GraphValidationIssue>()(
-  "GraphValidationIssue",
+export class GraphValidationIssue extends Schema.TaggedClass<
+  GraphValidationIssue,
   {
-    kind: GraphValidationIssueKind,
-    message: Schema.String,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("GraphValidationIssue", {
+  kind: GraphValidationIssueKind,
+  message: Schema.String,
+}) {}
 const factKey = (fact: AnyFactDescriptor): FactId => fact.id;
 const sourceKey = (source: {
   readonly kind: string;
@@ -56,88 +64,105 @@ const parametersOverlap = (
   left: AnyParameterDescriptor,
   right: AnyParameterDescriptor
 ): boolean => dateIntervalsOverlap(left.effectivePeriod, right.effectivePeriod);
-
 const makeIssue = (
   kind: GraphValidationIssueKind,
   message: string
 ): GraphValidationIssue => new GraphValidationIssue({ kind, message });
-
 const collectProviders = (
   rules: readonly AnyRuleDescriptor[]
 ): HashMap.HashMap<FactId, readonly AnyRuleDescriptor[]> =>
-  Array.reduce(
+  EffectFunction.pipe(
     rules,
-    HashMap.empty<FactId, readonly AnyRuleDescriptor[]>(),
-    (providers, rule) =>
-      Array.reduce(rule.provides, providers, (updatedProviders, provided) => {
-        const key = factKey(provided);
-        const existing = HashMap.get(updatedProviders, key);
-        const nextProviders = Option.isSome(existing)
-          ? Array.append(existing.value, rule)
-          : Array.of(rule);
-
-        return HashMap.set(updatedProviders, key, nextProviders);
-      })
+    Array.reduce(
+      HashMap.empty<FactId, readonly AnyRuleDescriptor[]>(),
+      (providers, rule) =>
+        EffectFunction.pipe(
+          rule.provides,
+          Array.reduce(providers, (updatedProviders, provided) => {
+            const key = factKey(provided);
+            const existing = HashMap.get(updatedProviders, key);
+            const nextProviders = existing.pipe(
+              Option.match({
+                onNone: () => Array.of(rule),
+                onSome: (existingProviders) =>
+                  Array.append(existingProviders, rule),
+              })
+            );
+            return HashMap.set(updatedProviders, key, nextProviders);
+          })
+        )
+    )
   );
-
 const collectParameters = (
   rules: readonly AnyRuleDescriptor[]
 ): HashMap.HashMap<ParameterId, readonly AnyParameterDescriptor[]> =>
-  Array.reduce(
+  EffectFunction.pipe(
     rules,
-    HashMap.empty<ParameterId, readonly AnyParameterDescriptor[]>(),
-    (parameters, rule) =>
-      Array.reduce(
-        rule.parameters,
-        parameters,
-        (updatedParameters, parameter) => {
-          const existing = HashMap.get(updatedParameters, parameter.id);
-          const nextParameters = Option.isSome(existing)
-            ? Array.append(existing.value, parameter)
-            : Array.of(parameter);
-
-          return HashMap.set(updatedParameters, parameter.id, nextParameters);
-        }
-      )
+    Array.reduce(
+      HashMap.empty<ParameterId, readonly AnyParameterDescriptor[]>(),
+      (parameters, rule) =>
+        EffectFunction.pipe(
+          rule.parameters,
+          Array.reduce(parameters, (updatedParameters, parameter) => {
+            const existing = HashMap.get(updatedParameters, parameter.id);
+            const nextParameters = existing.pipe(
+              Option.match({
+                onNone: () => Array.of(parameter),
+                onSome: (existingParameters) =>
+                  Array.append(existingParameters, parameter),
+              })
+            );
+            return HashMap.set(updatedParameters, parameter.id, nextParameters);
+          })
+        )
+    )
   );
-
 const buildDependencyGraph = (
   rules: readonly AnyRuleDescriptor[],
   providers: HashMap.HashMap<FactId, readonly AnyRuleDescriptor[]>
 ): Graph.DirectedGraph<FactId, string> => {
-  const nodes = Array.map(
+  const nodes = EffectFunction.pipe(
     Array.fromIterable(HashMap.keys(providers)),
-    (data, index) => ({ data, index })
+    Array.map((data, index) => ({ data, index }))
   );
   const nodeIndices = HashMap.fromIterable(
-    Array.map(nodes, ({ data, index }) => [data, index] as const)
+    EffectFunction.pipe(
+      nodes,
+      Array.map(({ data, index }) => [data, index] as const)
+    )
   );
   return Graph.fromSnapshot({
-    edges: Array.map(
-      Array.flatMap(rules, (rule) =>
-        Array.flatMap(rule.requires, (required) =>
-          Array.flatMap(rule.provides, (provided) =>
-            Option.all([
-              HashMap.get(nodeIndices, factKey(required)),
-              HashMap.get(nodeIndices, factKey(provided)),
-            ]).pipe(
-              Option.map(([source, target]) => ({
-                data: `${factKey(required)} -> ${factKey(provided)}`,
-                source,
-                target,
-              })),
-              Option.toArray
+    edges: EffectFunction.pipe(
+      rules,
+      Array.flatMap((rule) =>
+        EffectFunction.pipe(
+          rule.requires,
+          Array.flatMap((required) =>
+            EffectFunction.pipe(
+              rule.provides,
+              Array.flatMap((provided) =>
+                Option.all([
+                  HashMap.get(nodeIndices, factKey(required)),
+                  HashMap.get(nodeIndices, factKey(provided)),
+                ]).pipe(
+                  Option.map(([source, target]) => ({
+                    data: `${factKey(required)} -> ${factKey(provided)}`,
+                    source,
+                    target,
+                  })),
+                  Option.toArray
+                )
+              )
             )
           )
         )
       ),
-      (edge, index) => ({ ...edge, index })
+      Array.map((edge, index) => ({ ...edge, index }))
     ),
     nodes,
     type: "directed",
   });
 };
-
 /**
  * Validates that selected rule descriptors can be composed for input facts.
  *
@@ -150,120 +175,155 @@ export const validateRuleGraph = (args: {
   readonly inputFacts?: readonly AnyFactDescriptor[];
 }): readonly GraphValidationIssue[] => {
   const inputFacts = HashSet.fromIterable(
-    Array.map(args.inputFacts ?? Array.empty<AnyFactDescriptor>(), factKey)
+    EffectFunction.pipe(
+      args.inputFacts ?? Array.empty<AnyFactDescriptor>(),
+      Array.map(factKey)
+    )
   );
   const providers = collectProviders(args.rules);
   const parameters = collectParameters(args.rules);
-
-  const sourceIssues = Array.reduce(
+  const sourceIssues = EffectFunction.pipe(
     args.rules,
-    Array.empty<GraphValidationIssue>(),
-    (issues, rule) =>
-      rule.sourcePolicy === "required" && rule.sources.length === 0
-        ? Array.append(
-            issues,
-            makeIssue(
-              "missing-source",
-              `${rule.id} requires at least one source reference`
-            )
-          )
-        : issues
+    Array.reduce(Chunk.empty<GraphValidationIssue>(), (issues, rule) =>
+      EffectBoolean.match(
+        rule.sourcePolicy === "required" && rule.sources.length === 0,
+        {
+          onFalse: () => issues,
+          onTrue: () =>
+            Chunk.append(
+              issues,
+              makeIssue(
+                "missing-source",
+                `${rule.id} requires at least one source reference`
+              )
+            ),
+        }
+      )
+    )
   );
-
-  const duplicateIssues = HashMap.reduce(
+  const duplicateIssues = EffectFunction.pipe(
     providers,
-    Array.empty<GraphValidationIssue>(),
-    (issues, factProviders, factId) => {
-      const duplicateProviders = Array.filter(
-        factProviders,
-        (provider) =>
-          !Option.getOrElse(provider.allowDuplicateProvides, () => false)
-      );
-
-      return duplicateProviders.length > 1
-        ? Array.append(
-            issues,
-            makeIssue(
-              "duplicate-provider",
-              `${factId} is provided by ${Array.join(
-                Array.map(duplicateProviders, (provider) => provider.id),
-                ", "
-              )}`
-            )
+    HashMap.reduce(
+      Chunk.empty<GraphValidationIssue>(),
+      (issues, factProviders, factId) => {
+        const duplicateProviders = EffectFunction.pipe(
+          factProviders,
+          Array.filter(
+            (provider) =>
+              !Option.getOrElse(provider.allowDuplicateProvides, () => false)
           )
-        : issues;
-    }
-  );
-
-  const parameterSourceIssues = Array.reduce(
-    args.rules,
-    Array.empty<GraphValidationIssue>(),
-    (issues, rule) => {
-      const sources = HashSet.fromIterable(Array.map(rule.sources, sourceKey));
-
-      return Array.reduce(rule.parameters, issues, (updatedIssues, parameter) =>
-        HashSet.has(sources, sourceKey(parameter.source))
-          ? updatedIssues
-          : Array.append(
-              updatedIssues,
-              makeIssue(
-                "parameter-source-mismatch",
-                `${rule.id} parameter ${parameter.id} source must be listed on rule sources`
-              )
-            )
-      );
-    }
-  );
-
-  const parameterOverlapIssues = HashMap.reduce(
-    parameters,
-    Array.empty<GraphValidationIssue>(),
-    (issues, parameterDescriptors, parameterId) =>
-      Array.reduce(parameterDescriptors, issues, (updatedIssues, parameter) => {
-        const overlapping = Array.findFirst(
-          parameterDescriptors,
-          (candidate) =>
-            parameterInstanceKey(candidate) !==
-              parameterInstanceKey(parameter) &&
-            parametersOverlap(candidate, parameter)
         );
-
-        return Option.isSome(overlapping)
-          ? Array.append(
-              updatedIssues,
+        return EffectBoolean.match(duplicateProviders.length > 1, {
+          onFalse: () => issues,
+          onTrue: () =>
+            Chunk.append(
+              issues,
               makeIssue(
-                "parameter-overlap",
-                `${parameterId} has overlapping effective periods`
+                "duplicate-provider",
+                `${factId} is provided by ${Array.join(
+                  EffectFunction.pipe(
+                    duplicateProviders,
+                    Array.map((provider) => provider.id)
+                  ),
+                  ", "
+                )}`
               )
-            )
-          : updatedIssues;
-      })
+            ),
+        });
+      }
+    )
   );
-
-  const missingProviderIssues = Array.reduce(
+  const parameterSourceIssues = EffectFunction.pipe(
     args.rules,
-    Array.empty<GraphValidationIssue>(),
-    (issues, rule) =>
-      Array.reduce(rule.requires, issues, (updatedIssues, required) => {
-        const key = factKey(required);
-
-        return !HashSet.has(inputFacts, key) && !HashMap.has(providers, key)
-          ? Array.append(
-              updatedIssues,
-              makeIssue(
-                "missing-provider",
-                `${rule.id} requires ${key}, but no input fact or rule provides it`
-              )
-            )
-          : updatedIssues;
-      })
+    Array.reduce(Chunk.empty<GraphValidationIssue>(), (issues, rule) => {
+      const sources = HashSet.fromIterable(
+        EffectFunction.pipe(rule.sources, Array.map(sourceKey))
+      );
+      return EffectFunction.pipe(
+        rule.parameters,
+        Array.reduce(issues, (updatedIssues, parameter) =>
+          EffectBoolean.match(
+            HashSet.has(sources, sourceKey(parameter.source)),
+            {
+              onFalse: () =>
+                Chunk.append(
+                  updatedIssues,
+                  makeIssue(
+                    "parameter-source-mismatch",
+                    `${rule.id} parameter ${parameter.id} source must be listed on rule sources`
+                  )
+                ),
+              onTrue: () => updatedIssues,
+            }
+          )
+        )
+      );
+    })
   );
-
+  const parameterOverlapIssues = EffectFunction.pipe(
+    parameters,
+    HashMap.reduce(
+      Chunk.empty<GraphValidationIssue>(),
+      (issues, parameterDescriptors, parameterId) =>
+        EffectFunction.pipe(
+          parameterDescriptors,
+          Array.reduce(issues, (updatedIssues, parameter) => {
+            const overlapping = EffectFunction.pipe(
+              parameterDescriptors,
+              Array.findFirst(
+                (candidate) =>
+                  parameterInstanceKey(candidate) !==
+                    parameterInstanceKey(parameter) &&
+                  parametersOverlap(candidate, parameter)
+              )
+            );
+            return overlapping.pipe(
+              Option.match({
+                onNone: () => updatedIssues,
+                onSome: () =>
+                  Chunk.append(
+                    updatedIssues,
+                    makeIssue(
+                      "parameter-overlap",
+                      `${parameterId} has overlapping effective periods`
+                    )
+                  ),
+              })
+            );
+          })
+        )
+    )
+  );
+  const missingProviderIssues = EffectFunction.pipe(
+    args.rules,
+    Array.reduce(Chunk.empty<GraphValidationIssue>(), (issues, rule) =>
+      EffectFunction.pipe(
+        rule.requires,
+        Array.reduce(issues, (updatedIssues, required) => {
+          const key = factKey(required);
+          return EffectBoolean.match(
+            !HashSet.has(inputFacts, key) && !HashMap.has(providers, key),
+            {
+              onFalse: () => updatedIssues,
+              onTrue: () =>
+                Chunk.append(
+                  updatedIssues,
+                  makeIssue(
+                    "missing-provider",
+                    `${rule.id} requires ${key}, but no input fact or rule provides it`
+                  )
+                ),
+            }
+          );
+        })
+      )
+    )
+  );
   const dependencyGraph = buildDependencyGraph(args.rules, providers);
-  const cycleIssues = Graph.isAcyclic(dependencyGraph)
-    ? Array.empty<GraphValidationIssue>()
-    : Array.of(makeIssue("cycle", "rule graph contains cycle"));
-
+  const cycleIssues = EffectBoolean.match(Graph.isAcyclic(dependencyGraph), {
+    onFalse: () => Array.of(makeIssue("cycle", "rule graph contains cycle")),
+    onTrue: () => Chunk.empty<GraphValidationIssue>(),
+  });
   return [
     ...sourceIssues,
     ...duplicateIssues,

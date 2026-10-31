@@ -19,34 +19,7 @@ const SearchUnavailable = () => (
 );
 
 export const Route = createFileRoute("/search")({
-  component: function DocumentationSearchRoute() {
-    return Match.value(Route.useLoaderData()).pipe(
-      Match.tag("InvalidSearch", () => (
-        <section className="docs-state" role="alert">
-          <DocsHeading>Search documentation</DocsHeading>
-          <p>Enter up to 100 characters to search the documentation.</p>
-          <DocsSearchForm term="" />
-          <a href="/start/quickstart">Open the Quickstart</a>
-        </section>
-      )),
-      Match.tag("Found", ({ navigation, results, term }) => (
-        <div className="docs-layout">
-          <aside className="docs-sidebar">
-            <DocsNavigation
-              currentPath={Option.none()}
-              navigation={navigation}
-            />
-          </aside>
-          <article className="docs-article">
-            <DocsHeading>Search documentation</DocsHeading>
-            <DocsSearchForm term={term} />
-            <DocsSearchResults results={results} term={term} />
-          </article>
-        </div>
-      )),
-      Match.exhaustive
-    );
-  },
+  component: DocumentationSearchRoute,
   errorComponent: SearchUnavailable,
   head: () => ({
     meta: [
@@ -75,3 +48,29 @@ export const Route = createFileRoute("/search")({
   // from a previous query or let the framework's JSON query parser change it.
   shouldReload: true,
 });
+
+function DocumentationSearchRoute() {
+  return Match.value(Route.useLoaderData()).pipe(
+    Match.tag("InvalidSearch", () => (
+      <section className="docs-state" role="alert">
+        <DocsHeading>Search documentation</DocsHeading>
+        <p>Enter up to 100 characters to search the documentation.</p>
+        <DocsSearchForm term="" />
+        <a href="/start/quickstart">Open the Quickstart</a>
+      </section>
+    )),
+    Match.tag("Found", ({ navigation, results, term }) => (
+      <div className="docs-layout">
+        <aside className="docs-sidebar">
+          <DocsNavigation currentPath={Option.none()} navigation={navigation} />
+        </aside>
+        <article className="docs-article">
+          <DocsHeading>Search documentation</DocsHeading>
+          <DocsSearchForm term={term} />
+          <DocsSearchResults results={results} term={term} />
+        </article>
+      </div>
+    )),
+    Match.exhaustive
+  );
+}

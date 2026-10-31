@@ -5,13 +5,13 @@ import { Effect, Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class CalculationError extends Schema.TaggedError<CalculationError>()(
-  "CalculationError",
-  {
-    // Legacy diagnostic data remains opaque; its codec preserves key identity.
-    cause: Schema.OptionFromOptionalKey(
-      Schema.OptionFromUndefinedOr(Schema.Unknown)
-    ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-    message: Schema.String,
-  }
-) {}
+export class CalculationError extends Schema.TaggedError<
+  CalculationError,
+  { readonly brand: unique symbol }
+>()("CalculationError", {
+  // Legacy diagnostic data remains opaque; its codec preserves key identity.
+  cause: Schema.OptionFromOptionalKey(
+    Schema.OptionFromUndefinedOr(Schema.Unknown)
+  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  message: Schema.String,
+}) {}

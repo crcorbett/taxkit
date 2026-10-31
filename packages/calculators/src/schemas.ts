@@ -21,7 +21,6 @@ import {
   TakeHomeScenarioInputSchema,
 } from "@taxkit/rules-au-pay/schemas";
 import { Data, Effect, Schema } from "effect";
-
 /**
  * Public calculator ids supported by this package.
  *
@@ -33,9 +32,7 @@ export const CalculatorId = Schema.Union([
   AuPayCalculatorId,
   AuAnnualTaxCalculatorId,
 ]);
-
 export type CalculatorId = typeof CalculatorId.Type;
-
 /**
  * Public jurisdictions supported by the composed calculator catalog.
  *
@@ -46,21 +43,16 @@ export const CalculatorJurisdiction = Schema.Union([
   AuPayJurisdiction,
   AuAnnualTaxJurisdiction,
 ]);
-
 export type CalculatorJurisdiction = typeof CalculatorJurisdiction.Type;
-
 /**
  * Public tax years supported by the composed calculator catalog.
  */
 export const CalculatorTaxYear = Schema.Union([AuPayTaxYear, AuAnnualTaxYear]);
-
 export type CalculatorTaxYear = typeof CalculatorTaxYear.Type;
-
 const CalculatorContextFields = {
   jurisdiction: CalculatorJurisdiction,
   taxYear: CalculatorTaxYear,
 };
-
 const OptionalCalculatorContextFields = {
   jurisdiction: Schema.OptionFromOptionalKey(
     Schema.OptionFromUndefinedOr(CalculatorJurisdiction)
@@ -69,13 +61,10 @@ const OptionalCalculatorContextFields = {
     Schema.OptionFromUndefinedOr(CalculatorTaxYear)
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
 };
-
 export const CalculatorContext = Schema.Struct({
   ...CalculatorContextFields,
 });
-
 export type CalculatorContext = typeof CalculatorContext.Type;
-
 /**
  * Optional calculator context supplied by list/detail/calculate requests.
  *
@@ -87,9 +76,7 @@ export type CalculatorContext = typeof CalculatorContext.Type;
 export const CalculatorContextQuery = Schema.Struct({
   ...OptionalCalculatorContextFields,
 });
-
 export type CalculatorContextQuery = typeof CalculatorContextQuery.Type;
-
 export const HelpMode = Schema.Literals([
   "none",
   "errors",
@@ -98,20 +85,19 @@ export const HelpMode = Schema.Literals([
   "sources",
   "full",
 ]);
-
 export type HelpMode = typeof HelpMode.Type;
-
 /**
  * Transport-safe representation of one schema decode issue.
  */
-export class CalculatorInputIssue extends Schema.TaggedClass<CalculatorInputIssue>()(
-  "CalculatorInputIssue",
+export class CalculatorInputIssue extends Schema.TaggedClass<
+  CalculatorInputIssue,
   {
-    message: Schema.String,
-    path: Schema.Array(Schema.String),
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("CalculatorInputIssue", {
+  message: Schema.String,
+  path: Schema.Array(Schema.String),
+}) {}
 /**
  * Field-level guidance returned when the caller asks for error help.
  */
@@ -122,110 +108,111 @@ export const CalculatorInputHelp = Schema.Struct({
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   title: Schema.String,
 });
-
 export type CalculatorInputHelp = typeof CalculatorInputHelp.Type;
-
 /**
  * Public error returned when request facts do not match the calculator's input
  * fact schema.
  */
-export class CalculatorInputDecodeError extends Schema.TaggedClass<CalculatorInputDecodeError>()(
-  "CalculatorInputDecodeError",
+export class CalculatorInputDecodeError extends Schema.TaggedClass<
+  CalculatorInputDecodeError,
   {
-    calculatorId: Schema.OptionFromOptionalKey(
-      Schema.OptionFromUndefinedOr(CalculatorId)
-    ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-    help: Schema.OptionFromOptionalKey(
-      Schema.OptionFromUndefinedOr(Schema.Array(CalculatorInputHelp))
-    ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-    issues: Schema.Array(CalculatorInputIssue),
-    message: Schema.String,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("CalculatorInputDecodeError", {
+  calculatorId: Schema.OptionFromOptionalKey(
+    Schema.OptionFromUndefinedOr(CalculatorId)
+  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptionalKey(
+    Schema.OptionFromUndefinedOr(Schema.Array(CalculatorInputHelp))
+  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  issues: Schema.Array(CalculatorInputIssue),
+  message: Schema.String,
+}) {}
 /**
  * Public error for a supported request shape that names no catalog entry.
  */
-export class UnsupportedCalculatorError extends Schema.TaggedClass<UnsupportedCalculatorError>()(
-  "UnsupportedCalculatorError",
+export class UnsupportedCalculatorError extends Schema.TaggedClass<
+  UnsupportedCalculatorError,
   {
-    message: Schema.String,
-    requestedCalculator: Schema.String,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("UnsupportedCalculatorError", {
+  message: Schema.String,
+  requestedCalculator: Schema.String,
+}) {}
 /**
  * Public error for calculator/context combinations that are not in the catalog.
  */
-export class UnsupportedCalculatorContextError extends Schema.TaggedClass<UnsupportedCalculatorContextError>()(
-  "UnsupportedCalculatorContextError",
+export class UnsupportedCalculatorContextError extends Schema.TaggedClass<
+  UnsupportedCalculatorContextError,
   {
-    context: CalculatorContextQuery,
-    message: Schema.String,
-    requestedCalculator: CalculatorId,
+    readonly brand: unique symbol;
   }
-) {}
-
-export class CalculatorCapacityExceeded extends Schema.TaggedError<CalculatorCapacityExceeded>()(
-  "CalculatorCapacityExceeded",
+>()("UnsupportedCalculatorContextError", {
+  context: CalculatorContextQuery,
+  message: Schema.String,
+  requestedCalculator: CalculatorId,
+}) {}
+export class CalculatorCapacityExceeded extends Schema.TaggedError<
+  CalculatorCapacityExceeded,
   {
-    code: Schema.tag("calculation-capacity"),
-    message: Schema.tag(
-      "The calculators are busy. Try again when you are ready."
-    ),
-    retry: Schema.tag("try-again-manually"),
+    readonly brand: unique symbol;
   }
-) {}
-
-export class CalculatorOperationTimedOut extends Schema.TaggedError<CalculatorOperationTimedOut>()(
-  "CalculatorOperationTimedOut",
+>()("CalculatorCapacityExceeded", {
+  code: Schema.tag("calculation-capacity"),
+  message: Schema.tag(
+    "The calculators are busy. Try again when you are ready."
+  ),
+  retry: Schema.tag("try-again-manually"),
+}) {}
+export class CalculatorOperationTimedOut extends Schema.TaggedError<
+  CalculatorOperationTimedOut,
   {
-    code: Schema.tag("calculation-timeout"),
-    message: Schema.tag(
-      "The calculation could not finish within five seconds. Try again when you are ready."
-    ),
-    retry: Schema.tag("try-again-manually"),
+    readonly brand: unique symbol;
   }
-) {}
-
-export class CalculatorRateLimited extends Schema.TaggedError<CalculatorRateLimited>()(
-  "CalculatorRateLimited",
+>()("CalculatorOperationTimedOut", {
+  code: Schema.tag("calculation-timeout"),
+  message: Schema.tag(
+    "The calculation could not finish within five seconds. Try again when you are ready."
+  ),
+  retry: Schema.tag("try-again-manually"),
+}) {}
+export class CalculatorRateLimited extends Schema.TaggedError<
+  CalculatorRateLimited,
   {
-    code: Schema.tag("rate-limited"),
-    message: Schema.tag(
-      "Too many calculations were sent. Wait a minute before trying again."
-    ),
-    retry: Schema.tag("wait-then-try-manually"),
+    readonly brand: unique symbol;
   }
-) {}
-
-export class CalculatorAdmissionUnavailable extends Schema.TaggedError<CalculatorAdmissionUnavailable>()(
-  "CalculatorAdmissionUnavailable",
+>()("CalculatorRateLimited", {
+  code: Schema.tag("rate-limited"),
+  message: Schema.tag(
+    "Too many calculations were sent. Wait a minute before trying again."
+  ),
+  retry: Schema.tag("wait-then-try-manually"),
+}) {}
+export class CalculatorAdmissionUnavailable extends Schema.TaggedError<
+  CalculatorAdmissionUnavailable,
   {
-    code: Schema.tag("calculation-admission-unavailable"),
-    message: Schema.tag(
-      "The calculation could not be started. Try again when you are ready."
-    ),
-    retry: Schema.tag("try-again-manually"),
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("CalculatorAdmissionUnavailable", {
+  code: Schema.tag("calculation-admission-unavailable"),
+  message: Schema.tag(
+    "The calculation could not be started. Try again when you are ready."
+  ),
+  retry: Schema.tag("try-again-manually"),
+}) {}
 export const CalculatorRequestError = Schema.Union([
   CalculationError,
   CalculatorInputDecodeError,
   UnsupportedCalculatorError,
   UnsupportedCalculatorContextError,
 ]);
-
 export type CalculatorRequestError = typeof CalculatorRequestError.Type;
-
 export const CalculatorMetadataError = Schema.Union([
   CalculatorRequestError,
   CalculatorOperationTimedOut,
 ]);
-
 export type CalculatorMetadataError = typeof CalculatorMetadataError.Type;
-
 export const CalculatorServiceError = Schema.Union([
   CalculatorRequestError,
   CalculatorRateLimited,
@@ -233,26 +220,7 @@ export const CalculatorServiceError = Schema.Union([
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
 ]);
-
 export type CalculatorServiceError = typeof CalculatorServiceError.Type;
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorServiceError`.
- */
-export const PublicApiError = CalculatorServiceError.annotate({
-  title: "PublicApiError",
-});
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorServiceError`.
- */
-export type PublicApiError = CalculatorServiceError;
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorServiceError`.
- */
-export type PublicCalculatorError = CalculatorServiceError;
-
 /**
  * Catalog entry shape returned by discovery endpoints.
  */
@@ -267,9 +235,7 @@ export const CalculatorCatalogItem = Schema.Struct({
   supportedHelpModes: Schema.Array(HelpMode),
   title: Schema.String,
 });
-
 export type CalculatorCatalogItem = typeof CalculatorCatalogItem.Type;
-
 /** Publication metadata shared by the API catalogue and browser navigation. */
 export const CalculatorSummary = Schema.Struct({
   calculatorId: CalculatorCatalogItem.fields.calculatorId,
@@ -277,61 +243,44 @@ export const CalculatorSummary = Schema.Struct({
   title: CalculatorCatalogItem.fields.title,
 });
 export type CalculatorSummary = typeof CalculatorSummary.Type;
-
 export const CalculatorCatalogResponse = Schema.Struct({
   calculators: Schema.Array(CalculatorCatalogItem),
 });
-
 export type CalculatorCatalogResponse = typeof CalculatorCatalogResponse.Type;
-
 export const Jurisdiction = Schema.Struct({
   code: CalculatorJurisdiction,
   title: Schema.String,
 });
-
 export type Jurisdiction = typeof Jurisdiction.Type;
-
 export const JurisdictionsResponse = Schema.Struct({
   jurisdictions: Schema.Array(Jurisdiction),
 });
-
 export type JurisdictionsResponse = typeof JurisdictionsResponse.Type;
-
 export const TaxYear = Schema.Struct({
   ...CalculatorContextFields,
 });
-
 export type TaxYear = typeof TaxYear.Type;
-
 export const TaxYearsResponse = Schema.Struct({
   taxYears: Schema.Array(TaxYear),
 });
-
 export type TaxYearsResponse = typeof TaxYearsResponse.Type;
-
 export const MetadataQuery = Schema.Struct({
   ...OptionalCalculatorContextFields,
 });
-
 export type MetadataQuery = typeof MetadataQuery.Type;
-
 export const HelpQuery = Schema.Struct({
   help: Schema.OptionFromOptionalKey(
     Schema.OptionFromUndefinedOr(HelpMode)
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   ...OptionalCalculatorContextFields,
 });
-
 export type HelpQuery = typeof HelpQuery.Type;
-
 export const CalculationQuery = Schema.Struct({
   help: Schema.OptionFromOptionalKey(
     Schema.OptionFromUndefinedOr(HelpMode)
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
 });
-
 export type CalculationQuery = typeof CalculationQuery.Type;
-
 export const GetCalculatorRequest = Schema.Struct({
   calculatorId: CalculatorId,
   help: Schema.OptionFromOptionalKey(
@@ -339,25 +288,19 @@ export const GetCalculatorRequest = Schema.Struct({
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   ...OptionalCalculatorContextFields,
 });
-
 export type GetCalculatorRequest = typeof GetCalculatorRequest.Type;
-
 export const GetCalculatorGraphRequest = Schema.Struct({
   calculatorId: CalculatorId,
   ...OptionalCalculatorContextFields,
 });
-
 export type GetCalculatorGraphRequest = typeof GetCalculatorGraphRequest.Type;
-
 export const DescriptorFilterQuery = Schema.Struct({
   calculator: Schema.OptionFromOptionalKey(
     Schema.OptionFromUndefinedOr(CalculatorId)
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   ...OptionalCalculatorContextFields,
 });
-
 export type DescriptorFilterQuery = typeof DescriptorFilterQuery.Type;
-
 /**
  * Public metadata for one parameter descriptor.
  */
@@ -367,10 +310,8 @@ export const ParameterDescriptorMetadata = Schema.Struct({
   source: SourceRef,
   title: Schema.String,
 });
-
 export type ParameterDescriptorMetadata =
   typeof ParameterDescriptorMetadata.Type;
-
 /**
  * Public metadata for one input or output fact descriptor.
  */
@@ -383,9 +324,7 @@ export const FactDescriptorMetadata = Schema.Struct({
   schemaTag: Schema.String,
   title: Schema.String,
 });
-
 export type FactDescriptorMetadata = typeof FactDescriptorMetadata.Type;
-
 /**
  * Public metadata for one rule descriptor and its dependency edges.
  */
@@ -401,21 +340,15 @@ export const RuleDescriptorMetadata = Schema.Struct({
   sources: Schema.Array(SourceRef),
   title: Schema.String,
 });
-
 export type RuleDescriptorMetadata = typeof RuleDescriptorMetadata.Type;
-
 export const FactsResponse = Schema.Struct({
   facts: Schema.Array(FactDescriptorMetadata),
 });
-
 export type FactsResponse = typeof FactsResponse.Type;
-
 export const RulesResponse = Schema.Struct({
   rules: Schema.Array(RuleDescriptorMetadata),
 });
-
 export type RulesResponse = typeof RulesResponse.Type;
-
 export const CalculatorSchemaResponse = Schema.Struct({
   calculator: CalculatorCatalogItem,
   inputFacts: Schema.Array(FactDescriptorMetadata),
@@ -423,17 +356,13 @@ export const CalculatorSchemaResponse = Schema.Struct({
   reportSchemaName: Schema.String,
   rules: Schema.Array(RuleDescriptorMetadata),
 });
-
 export type CalculatorSchemaResponse = typeof CalculatorSchemaResponse.Type;
-
 export const RuleGraphEdge = Schema.Struct({
   from: FactId,
   ruleId: RuleId,
   to: FactId,
 });
-
 export type RuleGraphEdge = typeof RuleGraphEdge.Type;
-
 export const CalculatorGraphResponse = Schema.Struct({
   calculator: CalculatorCatalogItem,
   edges: Schema.Array(RuleGraphEdge),
@@ -441,9 +370,7 @@ export const CalculatorGraphResponse = Schema.Struct({
   rules: Schema.Array(RuleDescriptorMetadata),
   validationIssues: Schema.Array(GraphValidationIssue),
 });
-
 export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
-
 /**
  * Calculator run facts accepted by the generic calculate route.
  *
@@ -457,16 +384,12 @@ export const CalculatorRunFacts = Schema.Union([
   TakeHomeScenarioInputSchema,
   AnnualTaxScenarioInputSchema,
 ]);
-
 export type CalculatorRunFacts = typeof CalculatorRunFacts.Type;
-
 export const CalculatorRunRequest = Schema.Struct({
   facts: CalculatorRunFacts,
   ...OptionalCalculatorContextFields,
 });
-
 export type CalculatorRunRequest = typeof CalculatorRunRequest.Type;
-
 /**
  * Service-level calculation request after route params, query params and JSON
  * body have been decoded by the HTTP API package.
@@ -478,18 +401,14 @@ export const CalculatorRunServiceRequest = Schema.Struct({
   ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   payload: CalculatorRunRequest,
 });
-
 export type CalculatorRunServiceRequest =
   typeof CalculatorRunServiceRequest.Type;
-
 export const CalculatorRunReport = Schema.Union([
   TakeHomePayReport,
   PayWithholdingsLedger,
   AnnualTaxReport,
 ]);
-
 export type CalculatorRunReport = typeof CalculatorRunReport.Type;
-
 /**
  * Calculator run response with catalog metadata, diagnostics and the typed
  * calculator-specific report.
@@ -499,75 +418,6 @@ export const CalculatorRunResponse = Schema.Struct({
   diagnostics: CalculationDiagnostics,
   report: CalculatorRunReport,
 });
-
 export type CalculatorRunResponse = typeof CalculatorRunResponse.Type;
-
 export class CalculatorCatalogResponseData extends Data.Class<CalculatorCatalogResponse> {}
-
 export class CalculatorRunResponseData extends Data.Class<CalculatorRunResponse> {}
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunFacts`.
- */
-export const PublicCalculationFacts = CalculatorRunFacts.annotate({
-  title: "PublicCalculationFacts",
-});
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunFacts`.
- */
-export type PublicCalculationFacts = CalculatorRunFacts;
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunRequest`.
- */
-export const PublicCalculationRequest = CalculatorRunRequest.annotate({
-  title: "PublicCalculationRequest",
-});
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunRequest`.
- */
-export type PublicCalculationRequest = CalculatorRunRequest;
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunServiceRequest`.
- */
-export const PublicCalculationServiceRequest =
-  CalculatorRunServiceRequest.annotate({
-    title: "PublicCalculationServiceRequest",
-  });
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunServiceRequest`.
- */
-export type PublicCalculationServiceRequest = CalculatorRunServiceRequest;
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunReport`.
- */
-export const PublicCalculationReport = CalculatorRunReport.annotate({
-  title: "PublicCalculationReport",
-});
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunReport`.
- */
-export type PublicCalculationReport = CalculatorRunReport;
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunResponse`.
- */
-export const PublicCalculationResponse = CalculatorRunResponse.annotate({
-  title: "PublicCalculationResponse",
-});
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunResponse`.
- */
-export type PublicCalculationResponse = CalculatorRunResponse;
-
-/**
- * @deprecated Transitional API-era alias. Use `CalculatorRunResponseData`.
- */
-export class PublicCalculationResponseData extends CalculatorRunResponseData {}

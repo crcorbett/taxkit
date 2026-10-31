@@ -1,5 +1,25 @@
 # taxkit
 
+## 3.0.0
+
+### Major Changes
+
+- ce2be85: Make Schema class identities nominal across the SDK and align its Effect dependencies with the latest release verified against Alchemy. Code that supplied structural stand-ins for Schema classes must use the owning constructors or decoders instead.
+
+  Remove the `CalculatorSchemas`, `PayRules`, `IncomeTaxRules` and `StslRules` compatibility namespaces. Import calculator execution and metadata Schemas by name from `taxkit/schemas`, and Australian fact Schemas and parameter contracts from `taxkit/au`. The calculator package also removes its deprecated `PublicCalculation*`, `PublicApiError` and `PublicCalculatorError` aliases in favour of `CalculatorRun*` and `CalculatorServiceError`.
+
+  Encoded JSON representations and Promise-returning plain SDK calls retain their existing behaviour. Plain clients now own an explicit Effect scope that is closed by `dispose()`. Public entry points use explicit named exports.
+
+### Patch Changes
+
+- 990965c: Update Effect to 4.0.7 and Alchemy to beta.84, migrate the Cloudflare, Axiom and Doppler providers to their separate packages, and preserve the existing deployment identities. Keep telemetry authorization redacted through native planning and state migration.
+
+  Keep the Website build hash focused on real workspace inputs, adopt the native redirect provider's refusal to write after a failed ruleset read, and regenerate OpenAPI with flattened unions and optional query parameters represented by omission rather than null.
+
+  Use Alchemy's supported Node loader for local development and persist standalone native test bundles explicitly. Preserve HTTP 500 for internal Website faults and mismatched pages, while unavailable page reads retain their intended HTTP 503 through the updated TanStack error renderer.
+
+  Refresh the remaining application, rendering, browser-test and development dependencies, including the native TypeScript compiler diagnostics and the SDK assembler's JavaScript compiler API.
+
 ## 2.2.0
 
 ### Minor Changes

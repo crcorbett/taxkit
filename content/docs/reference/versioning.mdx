@@ -1,6 +1,6 @@
 ---
 title: "Versioning"
-description: "Understand TaxKit release-train versioning and Changeset expectations."
+description: "Understand TaxKit SDK versioning and Changeset expectations."
 status: "published"
 ---
 
@@ -9,19 +9,21 @@ status: "published"
 Use this page when you need to decide whether a docs, SDK, API or rule change
 needs release metadata.
 
-## Release train
+## Public version owner
 
-TaxKit uses a fixed release-train workflow for implemented packages. Package
-versions should move together when `bun run version-repo` applies pending
-Changesets.
+The `taxkit` SDK owns the single public npm version. Its archive includes the
+engine, calculators, Australian rules and HTTP contracts. Other workspace
+packages remain private implementation owners; their versions do not form a
+fixed public release group. `bun run version-packages` applies pending
+Changesets to the affected packages and their dependants.
 
 ```ts
 Production: release metadata
 
 package-facing change
   -> Changeset
-    -> bun run changeset status --verbose
-    -> bun run version-repo during release prep
+    -> bun run changeset:status
+    -> bun run version-packages during release prep
     -> package changelogs and versions
 ```
 
@@ -35,17 +37,20 @@ Add a Changeset when you change package-facing behaviour:
 - HTTP API request, response or status shape
 - calculator schemas, errors, rule behaviour or package metadata
 
-Record a no-Changeset rationale when the change is docs-only, app-internal or
-execution-plan-only.
+Name `taxkit` when an included module changes its public contract or distributed
+files. Private app changes can carry their own changelog entries without
+forcing an SDK release. Docs-only corrections and internal tools do not need
+a Changeset when they leave public behaviour unchanged; state that rationale
+in the pull request.
 
 ## Commands
 
 ```sh
 bun run changeset
-bun run changeset status --verbose
+bun run changeset:status
 ```
 
-Run `bun run version-repo` only when you intend to apply pending release-train
+Run `bun run version-packages` only when you intend to apply pending package
 versions and changelogs.
 
 ## Related pages

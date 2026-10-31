@@ -1,7 +1,6 @@
 import { discoveryPaths } from "@taxkit/api-http/routes";
 import type { DocsPublicationOrigin } from "@taxkit/content/schemas";
-import { Array, Schema, Struct, pipe } from "effect";
-
+import { Function as EffectFunction, Array, Schema, Struct } from "effect";
 // Named answer-engine and AI crawlers, as documented by their operators. Each
 // gets its own group because a crawler reads only the group that names it.
 const AiCrawlerToken = Schema.Literals([
@@ -38,7 +37,6 @@ const RobotsGroup = Schema.Struct({
   contentSignal: ContentSignal,
   userAgent: RobotsUserAgent,
 });
-
 // The documentation is open: every crawler may index it, use it as AI input
 // and train on it.
 const permitEverything = ContentSignal.make({
@@ -46,21 +44,24 @@ const permitEverything = ContentSignal.make({
   "ai-train": "yes",
   search: "yes",
 });
-const groups = pipe(
+const groups = EffectFunction.pipe(
   AiCrawlerToken.literals,
   Array.prepend<typeof RobotsUserAgent.Type>("*"),
   Array.map((userAgent) =>
-    RobotsGroup.make({ allow: "/", contentSignal: permitEverything, userAgent })
+    RobotsGroup.make({
+      allow: "/",
+      contentSignal: permitEverything,
+      userAgent,
+    })
   )
 );
-
 // Robots files need an absolute sitemap address on this stage's Website.
 export const robotsTxt = (origin: DocsPublicationOrigin): string =>
-  pipe(
+  EffectFunction.pipe(
     groups,
     Array.map(
       ({ allow, contentSignal, userAgent }) =>
-        `User-agent: ${userAgent}\nContent-Signal: ${pipe(
+        `User-agent: ${userAgent}\nContent-Signal: ${EffectFunction.pipe(
           contentSignals,
           Array.map(
             (signal) => `${signal}=${Struct.get(contentSignal, signal)}`

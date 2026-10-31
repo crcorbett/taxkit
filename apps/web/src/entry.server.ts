@@ -1,4 +1,4 @@
-import { createServerOnlyFn } from "@tanstack/react-start";
+import "@tanstack/react-start/server-only";
 import {
   createStartHandler,
   defaultStreamHandler,
@@ -42,7 +42,7 @@ const websiteRoute = (pathname: string): HostRoute =>
   );
 
 // The Worker entry is server-only; the runtime never reaches a browser bundle.
-const handleRequest = createServerOnlyFn((request: Request) =>
+const handleRequest = (request: Request) =>
   runtime.runPromise(
     Effect.gen(function* websiteRequest() {
       const early = yield* earlyReply;
@@ -90,7 +90,6 @@ const handleRequest = createServerOnlyFn((request: Request) =>
       Effect.map(HttpServerResponse.toWeb)
     ),
     { signal: request.signal }
-  )
-);
+  );
 
 export default { fetch: handleRequest };

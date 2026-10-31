@@ -1,5 +1,5 @@
 import { Cents, Money } from "@taxkit/core/primitives";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, Layer, Boolean as EffectBoolean } from "effect";
 
 import {
   AnnualTaxableIncome,
@@ -14,7 +14,6 @@ export {
   AnnualTaxScenarioInputSchema,
   type AnnualTaxScenarioInput,
 } from "./schemas.js";
-
 /**
  * Calculates annual income tax from the supplied taxable income and derived
  * annual tax ledger.
@@ -24,13 +23,11 @@ export {
 export const CalculateAnnualTax = Effect.gen(function* () {
   const income = yield* AnnualTaxableIncomeFact;
   const ledger = yield* AnnualTaxLedgerFact;
-
   const { rawLiability } = ledger;
-  const liability =
-    rawLiability.cents < 0
-      ? new Money({ cents: Cents.make(0), currency: "AUD" })
-      : rawLiability;
-
+  const liability = EffectBoolean.match(rawLiability.cents < 0, {
+    onFalse: () => rawLiability,
+    onTrue: () => new Money({ cents: Cents.make(0), currency: "AUD" }),
+  });
   return new AnnualTaxReport({
     ledger,
     liability,
@@ -40,7 +37,6 @@ export const CalculateAnnualTax = Effect.gen(function* () {
     trace: ledger.trace,
   });
 });
-
 /**
  * The caller's decoded annual tax scenario. Supply it with
  * `Layer.succeed(AnnualTaxScenario)(input)` after decoding
@@ -52,7 +48,6 @@ export class AnnualTaxScenario extends Context.Service<
   AnnualTaxScenario,
   AnnualTaxScenarioInput
 >()("taxkit/rules-au-income-tax/AnnualTaxScenario") {}
-
 /**
  * Provides annual taxable income from `AnnualTaxScenario`.
  *

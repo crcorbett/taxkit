@@ -7,7 +7,14 @@ import {
   PublicHttpOrigin,
 } from "@taxkit/content/schemas";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { Array, Effect, Option, Record, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Option,
+  Record,
+  Schema,
+} from "effect";
 import { OpenApi } from "effect/http-api";
 
 import { exampleOrigins } from "../src/__testing__/fixtures.js";
@@ -43,14 +50,16 @@ describe("answer-engine documents", () => {
         full,
         "Canonical page: https://website.example.com/start/overview"
       );
-      yield* Effect.forEach(pages, (page) =>
-        Effect.sync(() => {
-          assert.include(full, page.markdown);
-        })
+      yield* EffectFunction.pipe(
+        pages,
+        Effect.forEach((page) =>
+          Effect.sync(() => {
+            assert.include(full, page.markdown);
+          })
+        )
       );
     })
   );
-
   it.effect("link every page to a declared native GET Markdown route", () =>
     Effect.gen(function* () {
       const { pages } = yield* exampleContentCatalogue;
@@ -79,26 +88,28 @@ describe("answer-engine documents", () => {
       );
     })
   );
-
   it.effect("escape Markdown labels under another stage's origins", () =>
     Effect.gen(function* () {
       const original = yield* exampleContentCatalogue;
       const catalogue = yield* DocsPublicCatalogue.makeEffect({
         ...original,
         navigation: {
-          primaryNavigation: Array.map(
+          primaryNavigation: EffectFunction.pipe(
             original.navigation.primaryNavigation,
-            (page) => ({ ...page, title: "[Start] \\ guide" })
+            Array.map((page) => ({ ...page, title: "[Start] \\ guide" }))
           ),
         },
-        pages: Array.map(original.pages, (page) => ({
-          ...page,
-          frontmatter: {
-            ...page.frontmatter,
-            description: "First line.\nSecond line.",
-            title: "[Start] \\ guide",
-          },
-        })),
+        pages: EffectFunction.pipe(
+          original.pages,
+          Array.map((page) => ({
+            ...page,
+            frontmatter: {
+              ...page.frontmatter,
+              description: "First line.\nSecond line.",
+              title: "[Start] \\ guide",
+            },
+          }))
+        ),
       });
       const index = llmsTxt({
         apiOrigin: yield* Schema.decodeEffect(PublicHttpOrigin)(

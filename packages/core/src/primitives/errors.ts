@@ -5,39 +5,39 @@ import { Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class InvalidCalendarValue extends Schema.TaggedError<InvalidCalendarValue>()(
-  "InvalidCalendarValue",
-  {
-    code: Schema.tag("invalid-calendar-value"),
-    message: Schema.tag("The calendar date, interval or tax year is invalid."),
-  }
-) {}
+export class InvalidCalendarValue extends Schema.TaggedError<
+  InvalidCalendarValue,
+  { readonly brand: unique symbol }
+>()("InvalidCalendarValue", {
+  code: Schema.tag("invalid-calendar-value"),
+  message: Schema.tag("The calendar date, interval or tax year is invalid."),
+}) {}
 
 /**
  * Safe failure for an amount that cannot be represented in whole AUD cents.
  *
  * @since 0.1.0
  */
-export class InvalidMoneyValue extends Schema.TaggedError<InvalidMoneyValue>()(
-  "InvalidMoneyValue",
-  {
-    code: Schema.tag("invalid-money-value"),
-    message: Schema.tag("The amount must fit in safe whole AUD cents."),
-  }
-) {}
+export class InvalidMoneyValue extends Schema.TaggedError<
+  InvalidMoneyValue,
+  { readonly brand: unique symbol }
+>()("InvalidMoneyValue", {
+  code: Schema.tag("invalid-money-value"),
+  message: Schema.tag("The amount must fit in safe whole AUD cents."),
+}) {}
 
 /**
  * Safe failure for a decimal string that cannot be parsed.
  *
  * @since 0.1.0
  */
-export class InvalidDecimalValue extends Schema.TaggedError<InvalidDecimalValue>()(
-  "InvalidDecimalValue",
-  {
-    code: Schema.tag("invalid-decimal-value"),
-    message: Schema.tag("The decimal value is invalid."),
-  }
-) {}
+export class InvalidDecimalValue extends Schema.TaggedError<
+  InvalidDecimalValue,
+  { readonly brand: unique symbol }
+>()("InvalidDecimalValue", {
+  code: Schema.tag("invalid-decimal-value"),
+  message: Schema.tag("The decimal value is invalid."),
+}) {}
 
 /**
  * Why dollar text could not become Money: it was blank, was not plain decimal
@@ -60,11 +60,11 @@ export type DollarsTextIssue = typeof DollarsTextIssue.Type;
  *
  * @since 2.2.0
  */
-export class InvalidDollarsText extends Schema.TaggedError<InvalidDollarsText>()(
-  "InvalidDollarsText",
-  {
-    code: Schema.tag("invalid-dollars-text"),
-    message: Schema.tag("The dollar amount is invalid."),
-    reason: DollarsTextIssue,
-  }
-) {}
+export class InvalidDollarsText extends Schema.TaggedError<
+  InvalidDollarsText,
+  { readonly brand: unique symbol }
+>()("InvalidDollarsText", {
+  code: Schema.tag("invalid-dollars-text"),
+  message: Schema.tag("The dollar amount is invalid."),
+  reason: DollarsTextIssue,
+}) {}

@@ -63,6 +63,6 @@ Stored-document consumers yield `MdxArtifacts` and call
 `MdxArtifactsLive` and `MdxRendererLive` without acquiring a compiler. The public
 API exports no standalone encoding or decoding functions.
 
-The MDX package enables the shared strict preset's `no-ternary` rule explicitly.
+MDX inherits the complete shared style and strict presets, including `no-ternary`.
 Use native `Match`, `Option`, `Boolean` and `Array` operations for branching and
 selection; closed domain alternatives use exhaustive matching.

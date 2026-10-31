@@ -1,7 +1,17 @@
 import { describe, expect, it } from "@effect/vitest";
 import { Cents, TaxRate } from "@taxkit/core/primitives";
 import { expectAt } from "@taxkit/testing";
-import { Array, BigDecimal, Effect, Result, Schema, Struct } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  BigDecimal,
+  Effect,
+  Result,
+  Schema,
+  Struct,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import {
   AtoIncomeTaxTable,
@@ -73,26 +83,31 @@ describe("IncomeTaxTable owned relationships", () => {
             name: "enormous rate",
           },
         ];
-        yield* Effect.forEach(cases, (scenario) =>
-          Effect.gen(function* () {
-            const result = yield* IncomeTaxBracket.makeEffect(
-              scenario.input
-            ).pipe(Effect.result);
-            expect(Result.isFailure(result), scenario.name).toBe(true);
-            expect(
-              Schema.is(Schema.toEncoded(IncomeTaxBracket))(scenario.input),
-              scenario.name
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          cases,
+          Effect.forEach((scenario) =>
+            Effect.gen(function* () {
+              const result = yield* IncomeTaxBracket.makeEffect(
+                scenario.input
+              ).pipe(Effect.result);
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(
+                Schema.toEncoded(IncomeTaxBracket)
+              )(scenario.input);
+              expect(encodedAccepted, scenario.name).toBeFalsy();
+            })
+          )
         );
         const tiny = yield* IncomeTaxBracket.makeEffect({
           ...Struct.pick(row, Struct.keys(IncomeTaxBracket.fields)),
           rate: TaxRate.make(BigDecimal.make(1n, Number.MAX_SAFE_INTEGER)),
         });
-        expect(Schema.is(IncomeTaxBracket)(tiny)).toBe(true);
+        EffectFunction.pipe(Schema.is(IncomeTaxBracket)(tiny), (actual) => {
+          expect(actual).toBeTruthy();
+        });
       }).pipe(Effect.provide(AtoIncomeTax_2025_26_Live))
   );
-
   it.effect(
     "rejects gaps, overlaps and open middle bounds in the saved table representation",
     () =>
@@ -127,59 +142,99 @@ describe("IncomeTaxTable owned relationships", () => {
         const cases = [
           { brackets: [], name: "empty table" },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 1 ? gap : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(1, () => gap),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "gap",
           },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 1 ? overlap : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(1, () => overlap),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "overlap",
           },
           { brackets: Array.reverse(table.brackets), name: "reversed" },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 0 ? openMiddle : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(0, () => openMiddle),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "open middle",
           },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === table.brackets.length - 1 ? closedTail : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                EffectBoolean.match(index === table.brackets.length - 1, {
+                  onFalse: () => row,
+                  onTrue: () => closedTail,
+                })
+              )
             ),
             name: "closed tail",
           },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 0 ? missingStart : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(0, () => missingStart),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "missing zero threshold",
           },
         ];
-        yield* Effect.forEach(cases, (scenario) =>
-          Effect.gen(function* () {
-            const input = {
-              ...Struct.pick(table, Struct.keys(IncomeTaxTable.fields)),
-              brackets: scenario.brackets,
-            };
-            const result = yield* IncomeTaxTable.makeEffect(input).pipe(
-              Effect.result
-            );
-            expect(Result.isFailure(result), scenario.name).toBe(true);
-            expect(
-              Schema.is(Schema.toEncoded(IncomeTaxTable))(input),
-              scenario.name
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          cases,
+          Effect.forEach((scenario) =>
+            Effect.gen(function* () {
+              const input = {
+                ...Struct.pick(table, Struct.keys(IncomeTaxTable.fields)),
+                brackets: scenario.brackets,
+              };
+              const result = yield* IncomeTaxTable.makeEffect(input).pipe(
+                Effect.result
+              );
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(
+                Schema.toEncoded(IncomeTaxTable)
+              )(input);
+              expect(encodedAccepted, scenario.name).toBeFalsy();
+            })
+          )
         );
-        expect(Schema.is(IncomeTaxTable)(table)).toBe(true);
-        expect(Schema.is(Schema.toEncoded(IncomeTaxTable))(table)).toBe(true);
+        EffectFunction.pipe(Schema.is(IncomeTaxTable)(table), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(
+          Schema.is(Schema.toEncoded(IncomeTaxTable))(table),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
       }).pipe(Effect.provide(AtoIncomeTax_2025_26_Live))
   );
 });
-
 describe("LitoTable owned relationships", () => {
   it.effect(
     "rejects malformed brackets in construction and saved representation",
@@ -233,17 +288,21 @@ describe("LitoTable owned relationships", () => {
             name: "enormous rate",
           },
         ];
-        yield* Effect.forEach(cases, (scenario) =>
-          Effect.gen(function* () {
-            const result = yield* LitoBracket.makeEffect(scenario.input).pipe(
-              Effect.result
-            );
-            expect(Result.isFailure(result), scenario.name).toBe(true);
-            expect(
-              Schema.is(Schema.toEncoded(LitoBracket))(scenario.input),
-              scenario.name
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          cases,
+          Effect.forEach((scenario) =>
+            Effect.gen(function* () {
+              const result = yield* LitoBracket.makeEffect(scenario.input).pipe(
+                Effect.result
+              );
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(Schema.toEncoded(LitoBracket))(
+                scenario.input
+              );
+              expect(encodedAccepted, scenario.name).toBeFalsy();
+            })
+          )
         );
         const tiny = yield* LitoBracket.makeEffect({
           ...Struct.pick(row, Struct.keys(LitoBracket.fields)),
@@ -251,10 +310,11 @@ describe("LitoTable owned relationships", () => {
             BigDecimal.make(1n, Number.MAX_SAFE_INTEGER)
           ),
         });
-        expect(Schema.is(LitoBracket)(tiny)).toBe(true);
+        EffectFunction.pipe(Schema.is(LitoBracket)(tiny), (actual) => {
+          expect(actual).toBeTruthy();
+        });
       }).pipe(Effect.provide(AtoLito_2025_26_Live))
   );
-
   it.effect(
     "rejects gaps, overlaps and open middle bounds in the saved table representation",
     () =>
@@ -289,59 +349,99 @@ describe("LitoTable owned relationships", () => {
         const cases = [
           { brackets: [], name: "empty table" },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 1 ? gap : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(1, () => gap),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "gap",
           },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 1 ? overlap : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(1, () => overlap),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "overlap",
           },
           { brackets: Array.reverse(table.brackets), name: "reversed" },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 0 ? openMiddle : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(0, () => openMiddle),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "open middle",
           },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === table.brackets.length - 1 ? closedTail : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                EffectBoolean.match(index === table.brackets.length - 1, {
+                  onFalse: () => row,
+                  onTrue: () => closedTail,
+                })
+              )
             ),
             name: "closed tail",
           },
           {
-            brackets: Array.map(table.brackets, (row, index) =>
-              index === 0 ? missingStart : row
+            brackets: EffectFunction.pipe(
+              table.brackets,
+              Array.map((row, index) =>
+                Match.value(index).pipe(
+                  Match.when(0, () => missingStart),
+                  Match.orElse(() => row)
+                )
+              )
             ),
             name: "missing zero threshold",
           },
         ];
-        yield* Effect.forEach(cases, (scenario) =>
-          Effect.gen(function* () {
-            const input = {
-              ...Struct.pick(table, Struct.keys(LitoTable.fields)),
-              brackets: scenario.brackets,
-            };
-            const result = yield* LitoTable.makeEffect(input).pipe(
-              Effect.result
-            );
-            expect(Result.isFailure(result), scenario.name).toBe(true);
-            expect(
-              Schema.is(Schema.toEncoded(LitoTable))(input),
-              scenario.name
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          cases,
+          Effect.forEach((scenario) =>
+            Effect.gen(function* () {
+              const input = {
+                ...Struct.pick(table, Struct.keys(LitoTable.fields)),
+                brackets: scenario.brackets,
+              };
+              const result = yield* LitoTable.makeEffect(input).pipe(
+                Effect.result
+              );
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(Schema.toEncoded(LitoTable))(
+                input
+              );
+              expect(encodedAccepted, scenario.name).toBeFalsy();
+            })
+          )
         );
-        expect(Schema.is(LitoTable)(table)).toBe(true);
-        expect(Schema.is(Schema.toEncoded(LitoTable))(table)).toBe(true);
+        EffectFunction.pipe(Schema.is(LitoTable)(table), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(
+          Schema.is(Schema.toEncoded(LitoTable))(table),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
       }).pipe(Effect.provide(AtoLito_2025_26_Live))
   );
 });
-
 describe("MedicareLevyTable owned relationships", () => {
   it.effect(
     "rejects invalid threshold and rate relationships without correcting retained values",
@@ -409,32 +509,52 @@ describe("MedicareLevyTable owned relationships", () => {
             name: "enormous shade-in rate",
           },
         ];
-        yield* Effect.forEach(cases, (scenario) =>
-          Effect.gen(function* () {
-            const result = yield* MedicareLevyTable.makeEffect(
-              scenario.input
-            ).pipe(Effect.result);
-            expect(Result.isFailure(result), scenario.name).toBe(true);
-            expect(
-              Schema.is(Schema.toEncoded(MedicareLevyTable))(scenario.input),
-              scenario.name
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          cases,
+          Effect.forEach((scenario) =>
+            Effect.gen(function* () {
+              const result = yield* MedicareLevyTable.makeEffect(
+                scenario.input
+              ).pipe(Effect.result);
+              const rejected = Result.isFailure(result);
+              expect(rejected, scenario.name).toBeTruthy();
+              const encodedAccepted = Schema.is(
+                Schema.toEncoded(MedicareLevyTable)
+              )(scenario.input);
+              expect(encodedAccepted, scenario.name).toBeFalsy();
+            })
+          )
         );
         expect(table.year).toBe("2025-26");
-        expect(BigDecimal.format(table.levyRate)).toBe("0.02");
-        expect(BigDecimal.format(table.shadeInRate)).toBe("0.1");
-        expect(MedicareLevyArtifact2025_26.documentVersion).toBe(
-          "C2026A00058/asmade; Schedule 5"
-        );
-        expect(MedicareLevyArtifact2025_26.checksum).toBe(
-          "sha256:8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67"
-        );
-        expect(MedicareLevyArtifact2025_26.retrievedOn).toBe("2026-10-08");
-        expect(table.thresholdCents).toBe(2_801_100);
-        expect(table.shadeInMaxCents).toBe(3_501_300);
-        expect(Schema.is(Schema.toEncoded(MedicareLevyTable))(table)).toBe(
-          true
+        EffectFunction.pipe(BigDecimal.format(table.levyRate), (actual) => {
+          expect(actual).toBe("0.02");
+        });
+        EffectFunction.pipe(BigDecimal.format(table.shadeInRate), (actual) => {
+          expect(actual).toBe("0.1");
+        });
+        expect({
+          MedicareLevyArtifact2025_26DocumentVersion:
+            MedicareLevyArtifact2025_26.documentVersion,
+          MedicareLevyArtifact2025_26Checksum:
+            MedicareLevyArtifact2025_26.checksum,
+          MedicareLevyArtifact2025_26RetrievedOn:
+            MedicareLevyArtifact2025_26.retrievedOn,
+          tableThresholdCents: table.thresholdCents,
+          tableShadeInMaxCents: table.shadeInMaxCents,
+        }).toStrictEqual({
+          MedicareLevyArtifact2025_26DocumentVersion:
+            "C2026A00058/asmade; Schedule 5",
+          MedicareLevyArtifact2025_26Checksum:
+            "sha256:8298b458c6a579ffad9305acf5b4604255c928313654eea58e495164e4478b67",
+          MedicareLevyArtifact2025_26RetrievedOn: "2026-10-08",
+          tableThresholdCents: 2_801_100,
+          tableShadeInMaxCents: 3_501_300,
+        });
+        EffectFunction.pipe(
+          Schema.is(Schema.toEncoded(MedicareLevyTable))(table),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
         );
       }).pipe(Effect.provide(AtoMedicareLevy_2025_26_Live))
   );

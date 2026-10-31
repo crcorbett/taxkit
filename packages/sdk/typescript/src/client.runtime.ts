@@ -13,6 +13,8 @@ import {
   ManagedRuntime,
   Match,
   Ref,
+  Scope,
+  Boolean as EffectBoolean,
 } from "effect";
 import type { Layer, Schema } from "effect";
 
@@ -39,19 +41,27 @@ export interface TaxKitClient<Modules extends readonly AnyTaxKitModule[]> {
     readonly calculate: <const Calculation extends ModuleCalculation<Modules>>(
       calculation: Calculation,
       input: Calculation["inputSchema"]["Type"]
-    ) => Promise<Calculation["outputSchema"]["Type"]>;
+    ) => ReturnType<
+      typeof Effect.runPromise<Calculation["outputSchema"]["Type"], never>
+    >;
     readonly safe: {
       readonly calculate: <
         const Calculation extends ModuleCalculation<Modules>,
       >(
         calculation: Calculation,
         input: Calculation["inputSchema"]["Type"]
-      ) => Promise<TaxKitSafeResult<Calculation["outputSchema"]["Type"]>>;
+      ) => ReturnType<
+        typeof Effect.runPromise<
+          TaxKitSafeResult<Calculation["outputSchema"]["Type"]>,
+          never
+        >
+      >;
     };
   };
-  readonly dispose: () => Promise<void>;
+  readonly dispose: () => ReturnType<
+    typeof Effect.runPromise<Effect.Success<typeof Effect.void>, never>
+  >;
 }
-
 const disposedFailure = () =>
   new TaxKitFailure({
     error: new TaxKitCalculationError({
@@ -61,7 +71,6 @@ const disposedFailure = () =>
       message: "TaxKit calculation failed",
     }),
   });
-
 // The accepted plain API requires Promises. This exact private host owns the
 // bridge; callers own each client and must await dispose(). No runtime is shared
 // between clients or exposed in their public signatures.
@@ -71,10 +80,13 @@ export const createPlainClient = <
   layer: Layer.Layer<TaxKitEffectRequirements>,
   ..._modules: Modules
 ): TaxKitClient<Modules> => {
-  const runtime = ManagedRuntime.make(layer);
+  const lifetime = Scope.makeUnsafe();
+  const runtime = Effect.acquireRelease(
+    Effect.sync(() => ManagedRuntime.make(layer)),
+    (ownedRuntime) => ownedRuntime.disposeEffect
+  ).pipe(Effect.provideService(Scope.Scope, lifetime), Effect.runSync);
   const disposed = Ref.makeUnsafe(false);
   const closed = Deferred.makeUnsafe<true, TaxKitClientDisposeError>();
-
   const safeCalculation = <
     const Id extends CalculatorId,
     const Jurisdiction extends CalculatorJurisdiction,
@@ -104,19 +116,20 @@ export const createPlainClient = <
       Effect.map(
         Exit.match({
           onFailure: (cause) =>
-            Ref.getUnsafe(disposed)
-              ? disposedFailure()
-              : new TaxKitFailure({ error: toTaxKitCalculationError(cause) }),
+            EffectBoolean.match(Ref.getUnsafe(disposed), {
+              onFalse: () =>
+                new TaxKitFailure({ error: toTaxKitCalculationError(cause) }),
+              onTrue: () => disposedFailure(),
+            }),
           onSuccess: (value) => new TaxKitSuccess({ value }),
         })
       )
     );
-
   const dispose = Ref.getAndSet(disposed, true).pipe(
     Effect.flatMap((alreadyClosed) =>
-      alreadyClosed
-        ? Deferred.await(closed)
-        : runtime.disposeEffect.pipe(
+      EffectBoolean.match(alreadyClosed, {
+        onFalse: () =>
+          Scope.close(lifetime, Exit.void).pipe(
             Effect.catchCause(() =>
               Effect.fail(
                 new TaxKitClientDisposeError({
@@ -128,20 +141,21 @@ export const createPlainClient = <
             Effect.exit,
             Effect.flatMap((exit) => Deferred.done(closed, exit)),
             Effect.andThen(Deferred.await(closed))
-          )
+          ),
+        onTrue: () => Deferred.await(closed),
+      })
     ),
     Effect.asVoid
   );
-
   return {
     calculations: {
       // A synchronous Ref read prevents registering new work on a closed Scope.
       // Actual work remains interruptible; only encoding its public outcome is
       // protected, so closing never exposes a raw interruption exception.
       calculate: (calculation, input) =>
-        Ref.getUnsafe(disposed)
-          ? Effect.runPromise(Effect.fail(disposedFailure().error))
-          : Effect.runPromise(
+        EffectBoolean.match(Ref.getUnsafe(disposed), {
+          onFalse: () =>
+            Effect.runPromise(
               safeCalculation(calculation, input).pipe(
                 Effect.flatMap((result) =>
                   Match.value(result).pipe(
@@ -162,22 +176,25 @@ export const createPlainClient = <
                 uninterruptible: true,
               }
             ),
+          onTrue: () => Effect.runPromise(Effect.fail(disposedFailure().error)),
+        }),
       safe: {
         calculate: (calculation, input) =>
-          Ref.getUnsafe(disposed)
-            ? Effect.runPromise(Effect.succeed(disposedFailure()))
-            : Effect.runPromise(safeCalculation(calculation, input), {
+          EffectBoolean.match(Ref.getUnsafe(disposed), {
+            onFalse: () =>
+              Effect.runPromise(safeCalculation(calculation, input), {
                 onFiberStart: (fiber) => {
                   Fiber.runIn(runtime.scope)(fiber);
                 },
                 uninterruptible: true,
               }),
+            onTrue: () => Effect.runPromise(Effect.succeed(disposedFailure())),
+          }),
       },
     },
     dispose: () => Effect.runPromise(dispose, { uninterruptible: true }),
   };
 };
-
 // One-shot helpers own a bounded Scope instead of leaving a hidden runtime alive.
 export const calculateSafe = <
   const Id extends CalculatorId,
@@ -194,7 +211,9 @@ export const calculateSafe = <
     OutputSchema
   >,
   input: InputSchema["Type"]
-): Promise<TaxKitSafeResult<OutputSchema["Type"]>> =>
+): ReturnType<
+  typeof Effect.runPromise<TaxKitSafeResult<OutputSchema["Type"]>, never>
+> =>
   Effect.runPromise(
     calculateReport(calculation, input).pipe(
       Effect.provide(SdkCalculatorServiceLive),
@@ -208,7 +227,6 @@ export const calculateSafe = <
       )
     )
   );
-
 export const calculate = <
   const Id extends CalculatorId,
   const Jurisdiction extends CalculatorJurisdiction,
@@ -224,7 +242,7 @@ export const calculate = <
     OutputSchema
   >,
   input: InputSchema["Type"]
-): Promise<OutputSchema["Type"]> =>
+): ReturnType<typeof Effect.runPromise<OutputSchema["Type"], never>> =>
   Effect.runPromise(
     calculateReport(calculation, input).pipe(
       Effect.provide(SdkCalculatorServiceLive),

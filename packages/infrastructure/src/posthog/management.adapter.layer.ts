@@ -8,6 +8,7 @@ import {
 import * as Retry from "@distilled.cloud/posthog/Retry";
 import { CaptureToken } from "@taxkit/analytics/schemas";
 import {
+  Function as EffectFunction,
   Array,
   Config,
   Effect,
@@ -19,6 +20,7 @@ import {
   Schema,
   Semaphore,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import {
   FetchHttpClient,
@@ -38,7 +40,6 @@ import {
 } from "./schemas.js";
 import type { ProjectDefinition, ProjectLookup } from "./schemas.js";
 import { PostHogManagement } from "./service.js";
-
 // The generated SDK's list omits product_description. Read each project after
 // paging; unrelated nullable names and absent privacy fields are valid inventory.
 const ProviderProject = Schema.Struct({
@@ -86,7 +87,6 @@ const NextQuery = Schema.Struct({
     Schema.isGreaterThan(0)
   ),
 });
-
 export const PostHogManagementLive = Layer.effect(
   PostHogManagement,
   Effect.gen(function* () {
@@ -141,7 +141,12 @@ export const PostHogManagementLive = Layer.effect(
                   HttpClientResponse.fromWeb(
                     response.request,
                     new Response(
-                      new Uint8Array(Array.flatMap(chunks, Array.fromIterable)),
+                      new Uint8Array(
+                        EffectFunction.pipe(
+                          chunks,
+                          Array.flatMap(Array.fromIterable)
+                        )
+                      ),
                       {
                         headers: { "content-type": "application/json" },
                         status: response.status,
@@ -157,12 +162,14 @@ export const PostHogManagementLive = Layer.effect(
       )
     );
     const writePermit = yield* Semaphore.make(1);
-
     const readProviderProject = Effect.fnUntraced(
-      function* (
-        lookup: ProjectLookup,
-        operation: typeof PostHogManagementOperation.Type
-      ) {
+      function* ({
+        lookup,
+        operation,
+      }: {
+        readonly lookup: ProjectLookup;
+        readonly operation: typeof PostHogManagementOperation.Type;
+      }) {
         const result = yield* getOrganizationsProject({
           id: lookup.id,
           organization_id: lookup.definition.organisation,
@@ -211,15 +218,20 @@ export const PostHogManagementLive = Layer.effect(
                   })
               ),
               Effect.flatMap((project) =>
-                project.id === lookup.id &&
-                project.organization === lookup.definition.organisation
-                  ? Effect.succeed(Option.some(project))
-                  : Effect.fail(
-                      new PostHogManagementError({
-                        operation,
-                        reason: "foreign-resource",
-                      })
-                    )
+                EffectBoolean.match(
+                  project.id === lookup.id &&
+                    project.organization === lookup.definition.organisation,
+                  {
+                    onFalse: () =>
+                      Effect.fail(
+                        new PostHogManagementError({
+                          operation,
+                          reason: "foreign-resource",
+                        })
+                      ),
+                    onTrue: () => Effect.succeed(Option.some(project)),
+                  }
+                )
               )
             ),
         });
@@ -246,12 +258,15 @@ export const PostHogManagementLive = Layer.effect(
           })
         )
     );
-
-    const restoreOwned = Effect.fnUntraced(function* (
-      definition: ProjectDefinition,
-      project: typeof ProviderProject.Type,
-      operation: typeof PostHogManagementOperation.Type
-    ) {
+    const restoreOwned = Effect.fnUntraced(function* ({
+      definition,
+      project,
+      operation,
+    }: {
+      readonly definition: ProjectDefinition;
+      readonly project: typeof ProviderProject.Type;
+      readonly operation: typeof PostHogManagementOperation.Type;
+    }) {
       if (
         project.organization !== definition.organisation ||
         !Option.contains(project.product_description, definition.marker)
@@ -300,28 +315,36 @@ export const PostHogManagementLive = Layer.effect(
         )
       );
     });
-
     const readProject = Effect.fn("PostHogManagement.readProject")(function* (
       lookup: ProjectLookup
     ) {
-      const current = yield* readProviderProject(lookup, "read-project");
+      const current = yield* readProviderProject({
+        lookup,
+        operation: "read-project",
+      });
       return yield* Option.match(current, {
         onNone: () => Effect.succeed(Option.none()),
         onSome: (project) =>
-          restoreOwned(lookup.definition, project, "read-project").pipe(
-            Effect.map(Option.some)
-          ),
+          restoreOwned({
+            definition: lookup.definition,
+            project,
+            operation: "read-project",
+          }).pipe(Effect.map(Option.some)),
       });
     });
-
     const findProject = Effect.fn("PostHogManagement.findProject")(
       function* (definition: ProjectDefinition) {
-        const readPage = Effect.fnUntraced(function* (
-          offset: number,
-          seen: HashSet.HashSet<number>,
-          expectedCount: Option.Option<number>,
-          ids: readonly (typeof ManagedProject.fields.id.Type)[]
-        ): Effect.fn.Return<
+        const readPage = Effect.fnUntraced(function* ({
+          offset,
+          seen,
+          expectedCount,
+          ids,
+        }: {
+          readonly offset: number;
+          readonly seen: HashSet.HashSet<number>;
+          readonly expectedCount: Option.Option<number>;
+          readonly ids: readonly (typeof ManagedProject.fields.id.Type)[];
+        }): Effect.fn.Return<
           readonly (typeof ManagedProject.fields.id.Type)[],
           PostHogManagementError,
           Credentials | HttpClient.HttpClient
@@ -372,7 +395,10 @@ export const PostHogManagementLive = Layer.effect(
           );
           const collected = Array.appendAll(
             ids,
-            Array.map(page.results, (project) => project.id)
+            EffectFunction.pipe(
+              page.results,
+              Array.map((project) => project.id)
+            )
           );
           if (
             Option.exists(expectedCount, (count) => count !== page.count) ||
@@ -386,14 +412,16 @@ export const PostHogManagementLive = Layer.effect(
           }
           return yield* Option.match(page.next, {
             onNone: () =>
-              collected.length === page.count
-                ? Effect.succeed(collected)
-                : Effect.fail(
+              EffectBoolean.match(collected.length === page.count, {
+                onFalse: () =>
+                  Effect.fail(
                     new PostHogManagementError({
                       operation: "find-project",
                       reason: "incomplete-inventory",
                     })
                   ),
+                onTrue: () => Effect.succeed(collected),
+              }),
             onSome: (next) =>
               Effect.gen(function* () {
                 const url = yield* Effect.try(() => new URL(next)).pipe(
@@ -413,9 +441,9 @@ export const PostHogManagementLive = Layer.effect(
                   url.password !== "" ||
                   url.hash !== "" ||
                   Array.fromIterable(url.searchParams).length !== 2 ||
-                  !Array.every(
+                  !EffectFunction.pipe(
                     Array.fromIterable(url.searchParams.keys()),
-                    (name) => name === "limit" || name === "offset"
+                    Array.every((name) => name === "limit" || name === "offset")
                   )
                 ) {
                   return yield* new PostHogManagementError({
@@ -445,40 +473,53 @@ export const PostHogManagementLive = Layer.effect(
                     reason: "incomplete-inventory",
                   });
                 }
-                return yield* readPage(
-                  query.offset,
-                  HashSet.add(seen, offset),
-                  Option.some(page.count),
-                  collected
-                );
+                return yield* readPage({
+                  offset: query.offset,
+                  seen: HashSet.add(seen, offset),
+                  expectedCount: Option.some(page.count),
+                  ids: collected,
+                });
               }),
           });
         });
-        const ids = yield* readPage(0, HashSet.empty(), Option.none(), []);
-        const projects = yield* Effect.forEach(ids, (id) =>
-          readProviderProject({ definition, id }, "find-project").pipe(
-            Effect.flatMap((current) =>
-              Option.match(current, {
-                onNone: () =>
-                  Effect.fail(
-                    new PostHogManagementError({
-                      operation: "find-project",
-                      reason: "incomplete-inventory",
-                    })
-                  ),
-                onSome: Effect.succeed,
-              })
+        const ids = yield* readPage({
+          offset: 0,
+          seen: HashSet.empty(),
+          expectedCount: Option.none(),
+          ids: [],
+        });
+        const projects = yield* EffectFunction.pipe(
+          ids,
+          Effect.forEach((id) =>
+            readProviderProject({
+              lookup: { definition, id },
+              operation: "find-project",
+            }).pipe(
+              Effect.flatMap((current) =>
+                Option.match(current, {
+                  onNone: () =>
+                    Effect.fail(
+                      new PostHogManagementError({
+                        operation: "find-project",
+                        reason: "incomplete-inventory",
+                      })
+                    ),
+                  onSome: Effect.succeed,
+                })
+              )
             )
           )
         );
-        const candidates = Array.filter(
+        const candidates = EffectFunction.pipe(
           projects,
-          (project) =>
-            Option.contains(project.product_description, definition.marker) ||
-            Option.exists(
-              project.name,
-              (name) => name.toLowerCase() === definition.name.toLowerCase()
-            )
+          Array.filter(
+            (project) =>
+              Option.contains(project.product_description, definition.marker) ||
+              Option.exists(
+                project.name,
+                (name) => name.toLowerCase() === definition.name.toLowerCase()
+              )
+          )
         );
         if (candidates.length > 1) {
           return yield* new PostHogManagementError({
@@ -489,9 +530,11 @@ export const PostHogManagementLive = Layer.effect(
         return yield* Option.match(Array.head(candidates), {
           onNone: () => Effect.succeed(Option.none()),
           onSome: (project) =>
-            restoreOwned(definition, project, "find-project").pipe(
-              Effect.map(Option.some)
-            ),
+            restoreOwned({
+              definition,
+              project,
+              operation: "find-project",
+            }).pipe(Effect.map(Option.some)),
         });
       },
       (effect) =>
@@ -516,7 +559,6 @@ export const PostHogManagementLive = Layer.effect(
           })
         )
     );
-
     const createProject = Effect.fn("PostHogManagement.createProject")(
       function* (definition: ProjectDefinition) {
         const existing = yield* findProject(definition);
@@ -532,7 +574,11 @@ export const PostHogManagementLive = Layer.effect(
                 Retry.none,
                 Effect.flatMap(Schema.decodeUnknownEffect(ProviderProject)),
                 Effect.flatMap((project) =>
-                  restoreOwned(definition, project, "create-project")
+                  restoreOwned({
+                    definition,
+                    project,
+                    operation: "create-project",
+                  })
                 ),
                 Effect.timeoutOrElse({
                   duration: "5 seconds",
@@ -574,24 +620,29 @@ export const PostHogManagementLive = Layer.effect(
                   )
                 ),
                 Effect.catchTag("PostHogManagementError", (owned) =>
-                  owned.reason === "permission-refused" ||
-                  owned.reason === "request-refused" ||
-                  owned.reason === "foreign-resource"
-                    ? Effect.fail(owned)
-                    : findProject(definition).pipe(
-                        Effect.flatMap((observed) =>
-                          Option.match(observed, {
-                            onNone: () =>
-                              Effect.fail(
-                                new PostHogManagementError({
-                                  operation: "create-project",
-                                  reason: "uncertain-create",
-                                })
-                              ),
-                            onSome: Effect.succeed,
-                          })
-                        )
-                      )
+                  EffectBoolean.match(
+                    owned.reason === "permission-refused" ||
+                      owned.reason === "request-refused" ||
+                      owned.reason === "foreign-resource",
+                    {
+                      onFalse: () =>
+                        findProject(definition).pipe(
+                          Effect.flatMap((observed) =>
+                            Option.match(observed, {
+                              onNone: () =>
+                                Effect.fail(
+                                  new PostHogManagementError({
+                                    operation: "create-project",
+                                    reason: "uncertain-create",
+                                  })
+                                ),
+                              onSome: Effect.succeed,
+                            })
+                          )
+                        ),
+                      onTrue: () => Effect.fail(owned),
+                    }
+                  )
                 )
               );
               const observed = yield* readProject({
@@ -607,18 +658,23 @@ export const PostHogManagementLive = Layer.effect(
                     })
                   ),
                 onSome: (project) =>
-                  project.name === definition.name &&
-                  Schema.toEquivalence(ProjectPrivacy)(
-                    project.privacy,
-                    desiredProjectPrivacy
-                  )
-                    ? Effect.succeed(project)
-                    : Effect.fail(
-                        new PostHogManagementError({
-                          operation: "create-project",
-                          reason: "write-not-converged",
-                        })
+                  EffectBoolean.match(
+                    project.name === definition.name &&
+                      Schema.toEquivalence(ProjectPrivacy)(
+                        project.privacy,
+                        desiredProjectPrivacy
                       ),
+                    {
+                      onFalse: () =>
+                        Effect.fail(
+                          new PostHogManagementError({
+                            operation: "create-project",
+                            reason: "write-not-converged",
+                          })
+                        ),
+                      onTrue: () => Effect.succeed(project),
+                    }
+                  ),
               });
             }),
           onSome: Effect.succeed,
@@ -647,7 +703,6 @@ export const PostHogManagementLive = Layer.effect(
           })
         )
     );
-
     const updateProject = Effect.fn("PostHogManagement.updateProject")(
       function* (lookup: ProjectLookup) {
         const existing = yield* readProject(lookup);
@@ -679,7 +734,11 @@ export const PostHogManagementLive = Layer.effect(
                 Retry.none,
                 Effect.flatMap(Schema.decodeUnknownEffect(ProviderProject)),
                 Effect.flatMap((project) =>
-                  restoreOwned(lookup.definition, project, "update-project")
+                  restoreOwned({
+                    definition: lookup.definition,
+                    project,
+                    operation: "update-project",
+                  })
                 ),
                 Effect.mapError((error) =>
                   Match.value(error).pipe(
@@ -722,22 +781,26 @@ export const PostHogManagementLive = Layer.effect(
                     })
                   ),
                 onSome: (project) =>
-                  project.name === lookup.definition.name &&
-                  Schema.toEquivalence(ProjectPrivacy)(
-                    project.privacy,
-                    desiredProjectPrivacy
-                  ) &&
-                  Redacted.makeEquivalence(Schema.toEquivalence(CaptureToken))(
-                    project.token,
-                    current.token
-                  )
-                    ? Effect.succeed(project)
-                    : Effect.fail(
-                        new PostHogManagementError({
-                          operation: "update-project",
-                          reason: "write-not-converged",
-                        })
-                      ),
+                  EffectBoolean.match(
+                    project.name === lookup.definition.name &&
+                      Schema.toEquivalence(ProjectPrivacy)(
+                        project.privacy,
+                        desiredProjectPrivacy
+                      ) &&
+                      Redacted.makeEquivalence(
+                        Schema.toEquivalence(CaptureToken)
+                      )(project.token, current.token),
+                    {
+                      onFalse: () =>
+                        Effect.fail(
+                          new PostHogManagementError({
+                            operation: "update-project",
+                            reason: "write-not-converged",
+                          })
+                        ),
+                      onTrue: () => Effect.succeed(project),
+                    }
+                  ),
               });
             }),
         });

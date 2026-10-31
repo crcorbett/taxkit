@@ -202,7 +202,7 @@ reply 503, both `no-store`. No renderer is in the Website or browser bundles.
 
 ## Caching
 
-`src/server.ts` makes one cache decision for every reply with
+`src/entry.server.ts` makes one cache decision for every reply with
 `applyCachePolicy` from `@taxkit/api-http/response-policy`, with
 `publicRead: true`. A successful GET or HEAD without `Set-Cookie` or a stricter
 instruction gets

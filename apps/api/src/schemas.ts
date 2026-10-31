@@ -32,10 +32,10 @@ export type ApiServerConfigService = Schema.Schema.Type<
   typeof ApiServerConfigSchema
 >;
 
-export class ApiServerConfigError extends Schema.TaggedError<ApiServerConfigError>()(
-  "ApiServerConfigError",
-  { operation: Schema.Literal("settings") }
-) {}
+export class ApiServerConfigError extends Schema.TaggedError<
+  ApiServerConfigError,
+  { readonly brand: unique symbol }
+>()("ApiServerConfigError", { operation: Schema.Literal("settings") }) {}
 
 export const ApiWorkerSettings = Schema.Struct({
   apiOrigin: TaxKitApiOrigin,

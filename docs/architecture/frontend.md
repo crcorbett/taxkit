@@ -91,7 +91,7 @@ remote refresh. The browser's catalogue tool still reads the API for full
 discovery metadata. Root-loader completion and SSR response timing are separate
 claims; the absence of catalogue I/O does not establish first-byte timing.
 
-`src/server.ts` is the Worker entry. Before TanStack it handles discovery
+`src/entry.server.ts` is the Worker entry. Before TanStack it handles discovery
 files (forwarded once to the API) and an empty 404 for `/_serverFn`.
 Calculators need JavaScript: the server never calculates, calculator pages show
 a `<noscript>` notice and a POST to any Website page gets an empty 404. Every
@@ -208,7 +208,7 @@ coloured spans, diagrams as `<img>` with an SVG data address, tables in a
 labelled scroll region and page links through the TanStack router. `/search`
 reads the raw address once and calls the API's search route. Markdown
 representations (`.md` files, and a 307 to them for a Markdown `Accept`
-preference) are a named HTTP policy over the HTML Effect in `src/server.ts`
+preference) are a named HTTP policy over the HTML Effect in `src/entry.server.ts`
 (`http/negotiation.ingress.ts`). Discovery documents and share images belong to
 the API and are forwarded once (`http/early-reply.ingress.ts`). Each docs loader
 returns Content's `docsPageMetadata`, rendered by `seo/head.ts`. No Website

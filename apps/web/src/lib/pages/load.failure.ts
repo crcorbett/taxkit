@@ -2,7 +2,7 @@ import { notFound } from "@tanstack/react-router";
 import type { NotFoundError } from "@tanstack/react-router";
 import { ApiReplyMismatch } from "@taxkit/api-http/errors";
 import { DocsPageUnavailable } from "@taxkit/content/errors";
-import { Cause, Effect, Schema } from "effect";
+import { Match, Cause, Effect, Schema } from "effect";
 
 import { WebsiteLoadError } from "../host/errors";
 
@@ -15,9 +15,11 @@ export const loadFailureStatus = <E>(
   ) {
     return 500;
   }
-  return Schema.is(DocsPageUnavailable)(Cause.squash(cause)) ? 404 : 503;
+  return Match.value(Cause.squash(cause)).pipe(
+    Match.when(Schema.is(DocsPageUnavailable), (): 404 => 404),
+    Match.orElse((): 503 => 503)
+  );
 };
-
 // Typed failures are translated once, to TanStack's native not-found or error
 // handling. Cancellation stays interruption, and no Cause or URL is logged.
 export const rejectRouteLoad = <E>(
@@ -27,9 +29,14 @@ export const rejectRouteLoad = <E>(
     return Effect.failCause(cause);
   }
   const status = loadFailureStatus(cause);
-  return status === 404
-    ? Effect.fail(notFound())
-    : Effect.logWarning("Website page load failed").pipe(
-        Effect.andThen(Effect.fail(new WebsiteLoadError({ status })))
-      );
+  return Match.value(status).pipe(
+    Match.when(404, () => Effect.fail(notFound())),
+    Match.orElse((matchedValue) =>
+      Effect.logWarning("Website page load failed").pipe(
+        Effect.andThen(
+          Effect.fail(new WebsiteLoadError({ status: matchedValue }))
+        )
+      )
+    )
+  );
 };

@@ -21,6 +21,9 @@ import {
 } from "@taxkit/content/schemas";
 import { HostRequestRecord } from "@taxkit/observability/host-telemetry";
 import {
+  Function as EffectFunction,
+  Predicate,
+  Boolean as EffectBoolean,
   Array,
   Clock,
   Duration,
@@ -35,7 +38,13 @@ import {
   Schema,
 } from "effect";
 import { McpSchema } from "effect/ai";
-import { Headers } from "effect/http";
+import {
+  Headers,
+  FetchHttpClient,
+  HttpClient,
+  HttpClientRequest,
+  HttpClientResponse,
+} from "effect/http";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
@@ -48,24 +57,25 @@ import {
 import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
 
-class NativeMcpClientFailed extends Schema.TaggedError<NativeMcpClientFailed>()(
-  "NativeMcpClientFailed",
+class NativeMcpClientFailed extends Schema.TaggedError<
+  NativeMcpClientFailed,
   {
-    operation: Schema.Literals([
-      "connect",
-      "list",
-      "catalogue",
-      "schema",
-      "search",
-      "calculate",
-      "read",
-      "limit",
-      "cancel",
-      "browser-bundle",
-    ]),
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("NativeMcpClientFailed", {
+  operation: Schema.Literals([
+    "connect",
+    "list",
+    "catalogue",
+    "schema",
+    "search",
+    "calculate",
+    "read",
+    "limit",
+    "cancel",
+    "browser-bundle",
+  ]),
+}) {}
 const NativeMcpWorkLog = Schema.fromJsonString(
   Schema.Struct({
     event: Schema.Literal("api.runtime.event"),
@@ -74,7 +84,6 @@ const NativeMcpWorkLog = Schema.fromJsonString(
     timestamp: Schema.String,
   })
 );
-
 it.live(
   "serves real MCP client calls through the built native API and shares its HTTP allowance",
   () =>
@@ -83,13 +92,19 @@ it.live(
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
+      const { files, modules, wasm } = yield* readWorkerModules({
+        modulesRoot,
+      });
       expect(files).toContain("worker.js");
-      expect(
-        Array.some(Record.values(modules), (module) =>
+      EffectFunction.pipe(
+        Record.values(modules),
+        Array.some((module) =>
           /[\w$]+\.runInAsyncScope\(this\.evaluate,this,/u.test(module.contents)
-        )
-      ).toBe(true);
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
       const host = yield* Effect.acquireRelease(
@@ -161,9 +176,9 @@ it.live(
       );
       // Concurrent first use must share registration while keeping protocol
       // work and cancellation local to each native request.
-      yield* Effect.forEach(
+      yield* EffectFunction.pipe(
         Array.range(1, 3),
-        (number) =>
+        Array.map((number) =>
           Effect.gen(function* () {
             const cold = yield* Effect.acquireRelease(
               Effect.sync(
@@ -187,8 +202,9 @@ it.live(
               try: () => cold.listTools(),
             });
             expect(tools.tools).toHaveLength(6);
-          }).pipe(Effect.scoped),
-        { concurrency: "unbounded" }
+          }).pipe(Effect.scoped)
+        ),
+        (requests) => Effect.all(requests, { concurrency: "unbounded" })
       ).pipe(
         // Inspect the native observer even if cold clients fail before the
         // later snapshots; an ordinary transport error hides escaped resumes.
@@ -196,7 +212,7 @@ it.live(
           resumeProgress.pipe(
             Effect.tap((progress) =>
               Effect.sync(() => {
-                expect(progress.errors).toEqual([]);
+                expect(progress.errors).toStrictEqual([]);
               })
             ),
             Effect.orDie
@@ -227,263 +243,297 @@ it.live(
         try: () => client.connect(transport),
       });
       yield* Effect.logInfo("native-mcp: client connected");
-      const listed = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "list" }),
-        try: () => client.listTools(),
-      });
-      yield* Effect.logInfo("native-mcp: tools listed");
-      expect(listed.tools).toHaveLength(6);
-      expect(transport.sessionId).toBeUndefined();
-      const httpNavigation = yield* Effect.promise(() =>
-        api.fetch("http://127.0.0.1:4218/api/v1/docs/navigation")
-      );
-      expect(httpNavigation.status).toBe(200);
-      const expectedNavigation = yield* Schema.decodeEffect(
-        Schema.fromJsonString(DocsPublicNavigation)
-      )(yield* Effect.promise(() => httpNavigation.text()));
-      const before = yield* resumeProgress;
-      // Request A has completed. Each later request must resume native Effect
-      // callbacks successfully; HTTP 200 and ordinary log hooks alone were
-      // falsely green for the former retained notification consumer.
-      yield* Effect.forEach(Array.range(1, 3), () =>
-        Effect.gen(function* () {
-          const laterTools = yield* Effect.tryPromise({
-            catch: () => new NativeMcpClientFailed({ operation: "list" }),
-            try: () => client.listTools(),
-          });
-          expect(laterTools.tools).toHaveLength(6);
-          const navigation = yield* Effect.tryPromise({
-            catch: () => new NativeMcpClientFailed({ operation: "read" }),
-            try: () =>
-              client.callTool({
-                arguments: {},
-                name: "taxkit_docs_navigation",
-              }),
-          });
-          const checkedNavigation = yield* Schema.decodeUnknownEffect(
-            McpSchema.CallToolResult
-          )(navigation);
-          expect(checkedNavigation.isError).toBe(false);
-          expect(
-            yield* Schema.decodeUnknownEffect(DocsPublicNavigation)(
-              checkedNavigation.structuredContent
-            )
-          ).toEqual(expectedNavigation);
-        })
-      );
-      // Complete native replies for every metadata tool must agree with the
-      // owning HTTP codecs and actual native API, without spending tax quota.
-      const catalogue = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "catalogue" }),
-        try: () =>
-          client.callTool({ arguments: {}, name: "taxkit_list_calculators" }),
-      });
-      const checkedCatalogue = yield* Schema.decodeUnknownEffect(
-        McpSchema.CallToolResult
-      )(catalogue);
-      expect(checkedCatalogue.isError).toBe(false);
-      const catalogueReply = yield* Schema.decodeUnknownEffect(
-        CalculatorCatalogResponse
-      )(checkedCatalogue.structuredContent);
-      expect(catalogueReply.calculators).toHaveLength(3);
-      expect(
-        Array.map(
+      const { before } = yield* Effect.gen(function* verifyNavigation() {
+        const listed = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "list" }),
+          try: () => client.listTools(),
+        });
+        yield* Effect.logInfo("native-mcp: tools listed");
+        expect(listed.tools).toHaveLength(6);
+        expect(transport.sessionId).toBeUndefined();
+        const httpNavigation = yield* Effect.promise(() =>
+          api.fetch("http://127.0.0.1:4218/api/v1/docs/navigation")
+        );
+        expect(httpNavigation.status).toBe(200);
+        const expectedNavigation = yield* Schema.decodeEffect(
+          Schema.fromJsonString(DocsPublicNavigation)
+        )(yield* Effect.promise(() => httpNavigation.text()));
+        const initialProgress = yield* resumeProgress;
+        // Request A has completed. Each later request must resume native Effect
+        // callbacks successfully; HTTP 200 and ordinary log hooks alone were
+        // falsely green for the former retained notification consumer.
+        yield* EffectFunction.pipe(
+          Array.range(1, 3),
+          Effect.forEach(() =>
+            Effect.gen(function* () {
+              const laterTools = yield* Effect.tryPromise({
+                catch: () => new NativeMcpClientFailed({ operation: "list" }),
+                try: () => client.listTools(),
+              });
+              expect(laterTools.tools).toHaveLength(6);
+              const navigation = yield* Effect.tryPromise({
+                catch: () => new NativeMcpClientFailed({ operation: "read" }),
+                try: () =>
+                  client.callTool({
+                    arguments: {},
+                    name: "taxkit_docs_navigation",
+                  }),
+              });
+              const checkedNavigation = yield* Schema.decodeUnknownEffect(
+                McpSchema.CallToolResult
+              )(navigation);
+              expect(checkedNavigation.isError).toBeFalsy();
+              expect(
+                yield* Schema.decodeUnknownEffect(DocsPublicNavigation)(
+                  checkedNavigation.structuredContent
+                )
+              ).toStrictEqual(expectedNavigation);
+            })
+          )
+        );
+        return { before: initialProgress };
+      }).pipe(Effect.withSpan("verifyNavigation"));
+      yield* Effect.gen(function* verifyCatalogue() {
+        // Complete native replies for every metadata tool must agree with the
+        // owning HTTP codecs and actual native API, without spending tax quota.
+        const catalogue = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "catalogue" }),
+          try: () =>
+            client.callTool({ arguments: {}, name: "taxkit_list_calculators" }),
+        });
+        const checkedCatalogue = yield* Schema.decodeUnknownEffect(
+          McpSchema.CallToolResult
+        )(catalogue);
+        expect(checkedCatalogue.isError).toBeFalsy();
+        const catalogueReply = yield* Schema.decodeUnknownEffect(
+          CalculatorCatalogResponse
+        )(checkedCatalogue.structuredContent);
+        expect(catalogueReply.calculators).toHaveLength(3);
+        EffectFunction.pipe(
           catalogueReply.calculators,
-          (calculator) => calculator.calculatorId
-        )
-      ).toEqual(
-        expect.arrayContaining([
-          "au.pay.take-home",
-          "au.pay.withholdings",
-          "au.income-tax.annual",
-        ])
-      );
-      const httpCatalogue = yield* Effect.promise(() =>
-        api.fetch("http://127.0.0.1:4218/api/v1/calculators")
-      );
-      expect(httpCatalogue.status).toBe(200);
-      expect(
-        yield* Schema.decodeEffect(
-          Schema.fromJsonString(CalculatorCatalogResponse)
-        )(yield* Effect.promise(() => httpCatalogue.text()))
-      ).toEqual(catalogueReply);
-      const schemaRequest = yield* Schema.decodeEffect(GetCalculatorRequest)({
-        calculatorId: CalculationRequest.calculatorId,
-      });
-      const schemaInput =
-        yield* Schema.encodeEffect(GetCalculatorRequest)(schemaRequest);
-      const details = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "schema" }),
-        try: () =>
-          client.callTool({
-            arguments: schemaInput,
-            name: "taxkit_get_calculator_schema",
-          }),
-      });
-      const checkedDetails = yield* Schema.decodeUnknownEffect(
-        McpSchema.CallToolResult
-      )(details);
-      expect(checkedDetails.isError).toBe(false);
-      const schemaReply = yield* Schema.decodeUnknownEffect(
-        CalculatorSchemaResponse
-      )(checkedDetails.structuredContent);
-      expect(schemaReply.calculator.calculatorId).toBe(
-        CalculationRequest.calculatorId
-      );
-      expect(schemaReply.inputFacts.length).toBeGreaterThan(0);
-      const httpSchema = yield* Effect.promise(() =>
-        api.fetch(
-          `http://127.0.0.1:4218/api/v1/calculators/${CalculationRequest.calculatorId}/schema`
-        )
-      );
-      expect(httpSchema.status).toBe(200);
-      expect(
-        yield* Schema.decodeEffect(
-          Schema.fromJsonString(CalculatorSchemaResponse)
-        )(yield* Effect.promise(() => httpSchema.text()))
-      ).toEqual(schemaReply);
-      const term = yield* Schema.decodeEffect(DocsSearchTerm)("quickstart");
-      const searched = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "search" }),
-        try: () =>
-          client.callTool({ arguments: { term }, name: "taxkit_find_docs" }),
-      });
-      const checkedSearch = yield* Schema.decodeUnknownEffect(
-        McpSchema.CallToolResult
-      )(searched);
-      expect(checkedSearch.isError).toBe(false);
-      const searchReply = yield* Schema.decodeUnknownEffect(
-        McpDocsSearchResponse
-      )(checkedSearch.structuredContent);
-      expect(
-        Array.some(
-          searchReply.results,
-          (result) => result.path === "/start/quickstart"
-        )
-      ).toBe(true);
-      const httpSearch = yield* Effect.promise(() =>
-        api.fetch(
-          `http://127.0.0.1:4218/api/v1/docs/search?${new URLSearchParams({ term })}`
-        )
-      );
-      expect(httpSearch.status).toBe(200);
-      expect(
-        yield* Schema.decodeEffect(
-          Schema.fromJsonString(Schema.Array(DocsSearchResult))
-        )(yield* Effect.promise(() => httpSearch.text()))
-      ).toEqual(searchReply.results);
-      const after = yield* resumeProgress;
-      expect(after.attempts).toBeGreaterThan(before.attempts);
-      expect(after.completed).toBeGreaterThan(before.completed);
-      expect(after.errors).toEqual([]);
-      expect(after.completed).toBe(after.attempts);
-      expect(client.getServerCapabilities()?.tools?.listChanged).toBe(false);
-      const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-        CalculationRequest
-      );
-      // Keep the complete three-call burst in one workerd minute window.
-      const elapsed = (yield* Clock.currentTimeMillis) % 60_000;
-      if (elapsed > 55_000) {
-        yield* Effect.sleep(Duration.millis(60_050 - elapsed));
-      }
-      const calculated = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
-        try: () =>
-          client.callTool({ arguments: input, name: "taxkit_calculate" }),
-      });
-      yield* Effect.logInfo("native-mcp: calculation returned");
-      const checked = yield* Schema.decodeUnknownEffect(
-        McpSchema.CallToolResult
-      )(calculated);
-      expect(checked.isError).toBe(false);
-      const report = yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
-        checked.structuredContent
-      );
-      const body = yield* Schema.encodeEffect(
-        Schema.fromJsonString(CalculatorRunServiceRequest.fields.payload)
-      )(CalculationRequest.payload);
-      const http = yield* Effect.promise(() =>
-        api.fetch(
-          "http://127.0.0.1:4218/api/v1/calculators/au.pay.take-home/calculate",
-          {
-            body,
-            headers: {
-              "cf-connecting-ip": "127.0.0.1",
-              "content-type": "application/json",
-            },
-            method: "POST",
+          Array.map((calculator) => calculator.calculatorId),
+          (actual) => {
+            expect(actual).toStrictEqual(
+              expect.arrayContaining([
+                "au.pay.take-home",
+                "au.pay.withholdings",
+                "au.income-tax.annual",
+              ])
+            );
           }
-        )
-      );
-      expect(http.status).toBe(200);
-      expect(
-        yield* Schema.decodeEffect(
-          Schema.fromJsonString(CalculatorRunResponse)
-        )(yield* Effect.promise(() => http.text()))
-      ).toEqual(report);
-      const last = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
-        try: () =>
-          client.callTool({ arguments: input, name: "taxkit_calculate" }),
-      });
-      expect(
-        (yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(last))
-          .isError
-      ).toBe(false);
-      const limited = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "limit" }),
-        try: () =>
-          client.callTool({ arguments: input, name: "taxkit_calculate" }),
-      });
-      const checkedLimit = yield* Schema.decodeUnknownEffect(
-        McpSchema.CallToolResult
-      )(limited);
-      expect(checkedLimit.isError).toBe(true);
-      const limitText = yield* Schema.encodeEffect(
-        Schema.fromJsonString(McpSchema.CallToolResult)
-      )(checkedLimit);
-      expect(limitText).toContain("rate-limited");
-      expect(limitText).toContain("wait-then-try-manually");
-      expect(limitText).not.toContain("165400");
-      const read = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "read" }),
-        try: () =>
-          client.callTool({
-            arguments: { path: "/start/quickstart" },
-            name: "taxkit_read_doc",
-          }),
-      });
-      const pageResult = yield* Schema.decodeUnknownEffect(
-        McpSchema.CallToolResult
-      )(read);
-      expect(pageResult.isError).toBe(false);
-      const page = yield* Schema.decodeUnknownEffect(DocsPublicPage)(
-        pageResult.structuredContent
-      );
-      const httpPage = yield* Effect.promise(() =>
-        api.fetch(
-          "http://127.0.0.1:4218/api/v1/docs/page?path=/start/quickstart"
-        )
-      );
-      expect(httpPage.status).toBe(200);
-      expect(
-        yield* Schema.decodeEffect(Schema.fromJsonString(DocsPublicPage))(
-          yield* Effect.promise(() => httpPage.text())
-        )
-      ).toEqual(page);
-      expect(page.markdown.length).toBeGreaterThan(0);
-      // Inspect after every tool's complete reply, including calculate/read_doc.
-      // Ordinary logging callbacks cannot observe escaped native ALS failures.
-      const finalProgress = yield* resumeProgress;
-      expect(finalProgress.attempts).toBeGreaterThan(after.attempts);
-      expect(finalProgress.completed).toBeGreaterThan(after.completed);
-      expect(finalProgress.errors).toEqual([]);
-      expect(finalProgress.completed).toBe(finalProgress.attempts);
-      expect(yield* Queue.clear(exceptions)).toEqual([]);
-      const logText = yield* Schema.encodeEffect(
-        Schema.fromJsonString(Schema.Unknown)
-      )(yield* Queue.clear(logs));
-      expect(logText).not.toContain("165400");
+        );
+        const httpCatalogue = yield* Effect.promise(() =>
+          api.fetch("http://127.0.0.1:4218/api/v1/calculators")
+        );
+        expect(httpCatalogue.status).toBe(200);
+        expect(
+          yield* Schema.decodeEffect(
+            Schema.fromJsonString(CalculatorCatalogResponse)
+          )(yield* Effect.promise(() => httpCatalogue.text()))
+        ).toStrictEqual(catalogueReply);
+      }).pipe(Effect.withSpan("verifyCatalogue"));
+      yield* Effect.gen(function* verifyCalculatorSchema() {
+        const schemaRequest = yield* Schema.decodeEffect(GetCalculatorRequest)({
+          calculatorId: CalculationRequest.calculatorId,
+        });
+        const schemaInput =
+          yield* Schema.encodeEffect(GetCalculatorRequest)(schemaRequest);
+        const details = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "schema" }),
+          try: () =>
+            client.callTool({
+              arguments: schemaInput,
+              name: "taxkit_get_calculator_schema",
+            }),
+        });
+        const checkedDetails = yield* Schema.decodeUnknownEffect(
+          McpSchema.CallToolResult
+        )(details);
+        expect(checkedDetails.isError).toBeFalsy();
+        const schemaReply = yield* Schema.decodeUnknownEffect(
+          CalculatorSchemaResponse
+        )(checkedDetails.structuredContent);
+        expect(schemaReply.calculator.calculatorId).toBe(
+          CalculationRequest.calculatorId
+        );
+        expect(schemaReply.inputFacts.length).toBeGreaterThan(0);
+        const httpSchema = yield* Effect.promise(() =>
+          api.fetch(
+            `http://127.0.0.1:4218/api/v1/calculators/${CalculationRequest.calculatorId}/schema`
+          )
+        );
+        expect(httpSchema.status).toBe(200);
+        expect(
+          yield* Schema.decodeEffect(
+            Schema.fromJsonString(CalculatorSchemaResponse)
+          )(yield* Effect.promise(() => httpSchema.text()))
+        ).toStrictEqual(schemaReply);
+      }).pipe(Effect.withSpan("verifyCalculatorSchema"));
+      yield* Effect.gen(function* verifySearch() {
+        const term = yield* Schema.decodeEffect(DocsSearchTerm)("quickstart");
+        const searched = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "search" }),
+          try: () =>
+            client.callTool({ arguments: { term }, name: "taxkit_find_docs" }),
+        });
+        const checkedSearch = yield* Schema.decodeUnknownEffect(
+          McpSchema.CallToolResult
+        )(searched);
+        expect(checkedSearch.isError).toBeFalsy();
+        const searchReply = yield* Schema.decodeUnknownEffect(
+          McpDocsSearchResponse
+        )(checkedSearch.structuredContent);
+        EffectFunction.pipe(
+          searchReply.results,
+          Array.some((result) => result.path === "/start/quickstart"),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        const httpSearch = yield* Effect.promise(() =>
+          api.fetch(
+            `http://127.0.0.1:4218/api/v1/docs/search?${new URLSearchParams({ term })}`
+          )
+        );
+        expect(httpSearch.status).toBe(200);
+        expect(
+          yield* Schema.decodeEffect(
+            Schema.fromJsonString(Schema.Array(DocsSearchResult))
+          )(yield* Effect.promise(() => httpSearch.text()))
+        ).toStrictEqual(searchReply.results);
+      }).pipe(Effect.withSpan("verifySearch"));
+      const { after } = yield* Effect.gen(function* verifyResumptions() {
+        const metadataProgress = yield* resumeProgress;
+        expect(metadataProgress.attempts).toBeGreaterThan(before.attempts);
+        expect(metadataProgress.completed).toBeGreaterThan(before.completed);
+        expect(metadataProgress.errors).toStrictEqual([]);
+        expect(metadataProgress.completed).toBe(metadataProgress.attempts);
+        expect(client.getServerCapabilities()?.tools?.listChanged).toBeFalsy();
+        return { after: metadataProgress };
+      }).pipe(Effect.withSpan("verifyResumptions"));
+      const { input } = yield* Effect.gen(function* verifyCalculationParity() {
+        const calculationInput = yield* Schema.encodeEffect(
+          CalculatorRunServiceRequest
+        )(CalculationRequest);
+        // Keep the complete three-call burst in one workerd minute window.
+        const elapsed = (yield* Clock.currentTimeMillis) % 60_000;
+        if (elapsed > 55_000) {
+          yield* Effect.sleep(Duration.millis(60_050 - elapsed));
+        }
+        const calculated = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
+          try: () =>
+            client.callTool({
+              arguments: calculationInput,
+              name: "taxkit_calculate",
+            }),
+        });
+        yield* Effect.logInfo("native-mcp: calculation returned");
+        const checked = yield* Schema.decodeUnknownEffect(
+          McpSchema.CallToolResult
+        )(calculated);
+        expect(checked.isError).toBeFalsy();
+        const report = yield* Schema.decodeUnknownEffect(CalculatorRunResponse)(
+          checked.structuredContent
+        );
+        const body = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CalculatorRunServiceRequest.fields.payload)
+        )(CalculationRequest.payload);
+        const http = yield* Effect.promise(() =>
+          api.fetch(
+            "http://127.0.0.1:4218/api/v1/calculators/au.pay.take-home/calculate",
+            {
+              body,
+              headers: {
+                "cf-connecting-ip": "127.0.0.1",
+                "content-type": "application/json",
+              },
+              method: "POST",
+            }
+          )
+        );
+        expect(http.status).toBe(200);
+        expect(
+          yield* Schema.decodeEffect(
+            Schema.fromJsonString(CalculatorRunResponse)
+          )(yield* Effect.promise(() => http.text()))
+        ).toStrictEqual(report);
+        const last = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
+          try: () =>
+            client.callTool({
+              arguments: calculationInput,
+              name: "taxkit_calculate",
+            }),
+        });
+        expect(
+          (yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(last))
+            .isError
+        ).toBeFalsy();
+        return { input: calculationInput };
+      }).pipe(Effect.withSpan("verifyCalculationParity"));
+      yield* Effect.gen(function* verifyRateLimit() {
+        const limited = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "limit" }),
+          try: () =>
+            client.callTool({ arguments: input, name: "taxkit_calculate" }),
+        });
+        const checkedLimit = yield* Schema.decodeUnknownEffect(
+          McpSchema.CallToolResult
+        )(limited);
+        expect(checkedLimit.isError).toBeTruthy();
+        const limitText = yield* Schema.encodeEffect(
+          Schema.fromJsonString(McpSchema.CallToolResult)
+        )(checkedLimit);
+        expect(limitText).toContain("rate-limited");
+        expect(limitText).toContain("wait-then-try-manually");
+        expect(limitText).not.toContain("165400");
+      }).pipe(Effect.withSpan("verifyRateLimit"));
+      yield* Effect.gen(function* verifyDocumentParity() {
+        const read = yield* Effect.tryPromise({
+          catch: () => new NativeMcpClientFailed({ operation: "read" }),
+          try: () =>
+            client.callTool({
+              arguments: { path: "/start/quickstart" },
+              name: "taxkit_read_doc",
+            }),
+        });
+        const pageResult = yield* Schema.decodeUnknownEffect(
+          McpSchema.CallToolResult
+        )(read);
+        expect(pageResult.isError).toBeFalsy();
+        const page = yield* Schema.decodeUnknownEffect(DocsPublicPage)(
+          pageResult.structuredContent
+        );
+        const httpPage = yield* Effect.promise(() =>
+          api.fetch(
+            "http://127.0.0.1:4218/api/v1/docs/page?path=/start/quickstart"
+          )
+        );
+        expect(httpPage.status).toBe(200);
+        expect(
+          yield* Schema.decodeEffect(Schema.fromJsonString(DocsPublicPage))(
+            yield* Effect.promise(() => httpPage.text())
+          )
+        ).toStrictEqual(page);
+        expect(page.markdown.length).toBeGreaterThan(0);
+      }).pipe(Effect.withSpan("verifyDocumentParity"));
+      yield* Effect.gen(function* verifyMcpTelemetry() {
+        // Inspect after every tool's complete reply, including calculate/read_doc.
+        // Ordinary logging callbacks cannot observe escaped native ALS failures.
+        const finalProgress = yield* resumeProgress;
+        expect(finalProgress.attempts).toBeGreaterThan(after.attempts);
+        expect(finalProgress.completed).toBeGreaterThan(after.completed);
+        expect({
+          errors: finalProgress.errors,
+          completed: finalProgress.completed,
+        }).toStrictEqual({ errors: [], completed: finalProgress.attempts });
+        expect(yield* Queue.clear(exceptions)).toStrictEqual([]);
+        const logText = yield* Schema.encodeEffect(
+          Schema.fromJsonString(Schema.Unknown)
+        )(yield* Queue.clear(logs));
+        expect(logText).not.toContain("165400");
+      }).pipe(Effect.withSpan("verifyMcpTelemetry"));
     }).pipe(
       Effect.timeout("20 seconds"),
       Effect.provide(NodeServices.layer),
@@ -491,7 +541,6 @@ it.live(
     ),
   30_000
 );
-
 it.live(
   "bounds modern remote disconnect work and recovers every calculation place",
   () =>
@@ -508,7 +557,7 @@ it.live(
         )
       );
       const exceptions = yield* Queue.make<string>();
-      const workers = yield* Effect.forEach(
+      const workers = yield* EffectFunction.pipe(
         [
           {
             artifact: "TaxKitApiStalledWork",
@@ -517,24 +566,28 @@ it.live(
             namespace: "10094",
           },
         ] as const,
-        (fixture) =>
+        Effect.forEach((fixture) =>
           Effect.gen(function* () {
             const modulesRoot = path.join(
               root,
               ".alchemy/native-pair/bundles",
               fixture.artifact
             );
-            const { files, modules, wasm } =
-              yield* readWorkerModules(modulesRoot);
+            const { files, modules, wasm } = yield* readWorkerModules({
+              modulesRoot,
+            });
             expect(files).toContain("worker.js");
             {
-              expect(
+              EffectFunction.pipe(
                 Record.get(modules, "worker.js").pipe(
                   Option.map((module) =>
                     module.contents.includes("PRIVATE9 metadata started")
                   )
-                )
-              ).toEqual(Option.some(true));
+                ),
+                (actual) => {
+                  expect(actual).toStrictEqual(Option.some(true));
+                }
+              );
             }
             return {
               config: {
@@ -574,6 +627,7 @@ it.live(
               dev: { unsafeDirectSockets: [{ host: "127.0.0.1", port: 0 }] },
             };
           })
+        )
       );
       const host = yield* Effect.acquireRelease(
         Effect.sync(
@@ -615,6 +669,7 @@ it.live(
       // The modern adapter has no conversation binding for its cancellation
       // notification. A real outgoing TCP abort stops this caller, but on the
       // pinned Worker it does not release pre-response work before its budget.
+      const httpClient = yield* HttpClient.HttpClient;
       const networkControllers = yield* Queue.make<AbortController>();
       const networkStops = yield* Queue.make<true>();
       const modernWork = yield* Effect.acquireRelease(
@@ -636,129 +691,191 @@ it.live(
             new StreamableHTTPClientTransport(new URL("/mcp", workAddress), {
               fetch: (address, init) => {
                 const request = new Request(address, init);
-                if (request.headers.get("mcp-method") === "tools/call") {
-                  const controller = new AbortController();
-                  Queue.offerUnsafe(networkControllers, controller);
-                  const signal = AbortSignal.any([
-                    request.signal,
-                    controller.signal,
-                  ]);
-                  signal.addEventListener(
-                    "abort",
-                    () => {
-                      Queue.offerUnsafe(networkStops, true);
+                const signal = EffectBoolean.match(
+                  request.headers.get("mcp-method") === "tools/call",
+                  {
+                    onFalse: () => request.signal,
+                    onTrue: () => {
+                      const controller = new AbortController();
+                      Queue.offerUnsafe(networkControllers, controller);
+                      const combined = AbortSignal.any([
+                        request.signal,
+                        controller.signal,
+                      ]);
+                      combined.addEventListener(
+                        "abort",
+                        () => {
+                          Queue.offerUnsafe(networkStops, true);
+                        },
+                        { once: true }
+                      );
+                      return combined;
                     },
-                    { once: true }
-                  );
-                  return fetch(address, { ...init, signal });
-                }
-                return fetch(address, init);
+                  }
+                );
+                // The official transport requires a Promise<Response>. This
+                // callback owns its sole bridge and the caller's abort signal.
+                return Effect.runPromise(
+                  httpClient
+                    .execute(HttpClientRequest.fromWeb(request))
+                    .pipe(
+                      Effect.flatMap((response) =>
+                        Effect.fromOption(HttpClientResponse.toWeb(response))
+                      )
+                    ),
+                  { signal }
+                );
               },
               requestInit: { headers: { "cf-connecting-ip": "127.0.0.1" } },
             })
           ),
       });
-      yield* Queue.clear(logs);
-      const modernStarted = yield* Clock.monotonicTimeNanos;
-      const modernCalls = yield* Effect.forEach(Array.range(1, 8), () =>
-        Effect.tryPromise({
+      const { modernCalls, modernStarted } = yield* Effect.gen(
+        function* verifyDisconnect() {
+          yield* Queue.clear(logs);
+          const startedAt = yield* Clock.monotonicTimeNanos;
+          const pendingCalls = yield* EffectFunction.pipe(
+            Array.range(1, 8),
+            Effect.forEach(() =>
+              Effect.tryPromise({
+                catch: () =>
+                  new NativeMcpClientFailed({ operation: "calculate" }),
+                try: () =>
+                  modernWork.callTool({
+                    arguments: input,
+                    name: "taxkit_calculate",
+                  }),
+              }).pipe(Effect.result, Effect.forkScoped)
+            )
+          );
+          yield* EffectFunction.pipe(
+            Array.range(1, 8),
+            Effect.forEach(() =>
+              workLog.pipe(
+                Effect.tap((log) =>
+                  Effect.sync(() => {
+                    expect(log.level).toBe("Warn");
+                    expect(log.message).not.toContain("165400");
+                  })
+                )
+              )
+            )
+          ).pipe(Effect.timeout("1 second"));
+          const outgoingController = yield* Queue.take(networkControllers);
+          yield* Effect.sync(() => {
+            outgoingController.abort();
+          });
+          expect(yield* Queue.take(networkStops)).toBeTruthy();
+          EffectFunction.pipe(
+            Result.isFailure(
+              yield* Fiber.join(Array.headNonEmpty(pendingCalls))
+            ),
+            (actual) => {
+              expect(actual).toBeTruthy();
+            }
+          );
+          expect(
+            yield* workLog.pipe(Effect.timeoutOption("150 millis"))
+          ).toStrictEqual(Option.none());
+          return { modernCalls: pendingCalls, modernStarted: startedAt };
+        }
+      ).pipe(Effect.withSpan("verifyDisconnect"));
+      yield* Effect.gen(function* verifyOccupiedCapacity() {
+        const stillBusy = yield* Effect.tryPromise({
           catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
           try: () =>
             modernWork.callTool({ arguments: input, name: "taxkit_calculate" }),
-        }).pipe(Effect.result, Effect.forkScoped)
-      );
-      yield* Effect.forEach(Array.range(1, 8), () =>
-        workLog.pipe(
-          Effect.tap((log) =>
-            Effect.sync(() => {
-              expect(log.level).toBe("Warn");
-              expect(log.message).not.toContain("165400");
-            })
+        });
+        const busyText = yield* Schema.encodeEffect(
+          Schema.fromJsonString(McpSchema.CallToolResult)
+        )(
+          yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(stillBusy)
+        );
+        expect(stillBusy.isError).toBeTruthy();
+        expect(busyText).toContain("capacity-exceeded");
+      }).pipe(Effect.withSpan("verifyOccupiedCapacity"));
+      yield* Effect.gen(function* verifyBudgetCleanup() {
+        // Without the native keep-alive Workerd discarded the disconnected
+        // invocation, including its cleanup log and occupied place. All eight
+        // requests must now finalize at the existing five-second budget.
+        yield* EffectFunction.pipe(
+          Array.range(1, 8),
+          Effect.forEach(() =>
+            workLog.pipe(
+              Effect.tap((log) =>
+                Effect.sync(() => {
+                  expect(log.level).toBe("Info");
+                  expect(log.message).not.toContain("165400");
+                })
+              )
+            )
           )
-        )
-      ).pipe(Effect.timeout("1 second"));
-      const outgoingController = yield* Queue.take(networkControllers);
-      yield* Effect.sync(() => {
-        outgoingController.abort();
-      });
-      expect(yield* Queue.take(networkStops)).toBe(true);
-      expect(
-        Result.isFailure(yield* Fiber.join(Array.headNonEmpty(modernCalls)))
-      ).toBe(true);
-      expect(yield* workLog.pipe(Effect.timeoutOption("150 millis"))).toEqual(
-        Option.none()
-      );
-      const stillBusy = yield* Effect.tryPromise({
-        catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
-        try: () =>
-          modernWork.callTool({ arguments: input, name: "taxkit_calculate" }),
-      });
-      const busyText = yield* Schema.encodeEffect(
-        Schema.fromJsonString(McpSchema.CallToolResult)
-      )(yield* Schema.decodeUnknownEffect(McpSchema.CallToolResult)(stillBusy));
-      expect(stillBusy.isError).toBe(true);
-      expect(busyText).toContain("capacity-exceeded");
-      // Without the native keep-alive Workerd discarded the disconnected
-      // invocation, including its cleanup log and occupied place. All eight
-      // requests must now finalize at the existing five-second budget.
-      yield* Effect.forEach(Array.range(1, 8), () =>
-        workLog.pipe(
-          Effect.tap((log) =>
-            Effect.sync(() => {
-              expect(log.level).toBe("Info");
-              expect(log.message).not.toContain("165400");
-            })
+        ).pipe(Effect.timeout("6 seconds"));
+        const cleanupMillis =
+          Number((yield* Clock.monotonicTimeNanos) - modernStarted) / 1_000_000;
+        expect(cleanupMillis).toBeGreaterThanOrEqual(4500);
+        expect(cleanupMillis).toBeLessThan(6500);
+        yield* EffectFunction.pipe(modernCalls, Effect.forEach(Fiber.join));
+      }).pipe(Effect.withSpan("verifyBudgetCleanup"));
+      yield* Effect.gen(function* verifyRecoveredCapacity() {
+        const recoveredCalls = yield* EffectFunction.pipe(
+          Array.range(1, 8),
+          Effect.forEach(() =>
+            Effect.tryPromise({
+              catch: () =>
+                new NativeMcpClientFailed({ operation: "calculate" }),
+              try: () =>
+                modernWork.callTool({
+                  arguments: input,
+                  name: "taxkit_calculate",
+                }),
+            }).pipe(Effect.result, Effect.forkScoped)
           )
-        )
-      ).pipe(Effect.timeout("6 seconds"));
-      const cleanupMillis =
-        Number((yield* Clock.monotonicTimeNanos) - modernStarted) / 1_000_000;
-      expect(cleanupMillis).toBeGreaterThanOrEqual(4500);
-      expect(cleanupMillis).toBeLessThan(6500);
-      yield* Effect.forEach(modernCalls, Fiber.join);
-      const recoveredCalls = yield* Effect.forEach(Array.range(1, 8), () =>
-        Effect.tryPromise({
-          catch: () => new NativeMcpClientFailed({ operation: "calculate" }),
-          try: () =>
-            modernWork.callTool({ arguments: input, name: "taxkit_calculate" }),
-        }).pipe(Effect.result, Effect.forkScoped)
-      );
-      // Every recovered place must enter held work before any five-second
-      // expiry; accepting a transport request alone cannot satisfy this oracle.
-      yield* Effect.forEach(Array.range(1, 8), () =>
-        workLog.pipe(
-          Effect.tap((log) =>
-            Effect.sync(() => {
-              expect(log.level).toBe("Warn");
-            })
+        );
+        // Every recovered place must enter held work before any five-second
+        // expiry; accepting a transport request alone cannot satisfy this oracle.
+        yield* EffectFunction.pipe(
+          Array.range(1, 8),
+          Effect.forEach(() =>
+            workLog.pipe(
+              Effect.tap((log) =>
+                Effect.sync(() => {
+                  expect(log.level).toBe("Warn");
+                })
+              )
+            )
           )
-        )
-      ).pipe(Effect.timeout("1 second"));
-      yield* Effect.forEach(Array.range(1, 8), () =>
-        workLog.pipe(
-          Effect.tap((log) =>
-            Effect.sync(() => {
-              expect(log.level).toBe("Info");
-            })
+        ).pipe(Effect.timeout("1 second"));
+        yield* EffectFunction.pipe(
+          Array.range(1, 8),
+          Effect.forEach(() =>
+            workLog.pipe(
+              Effect.tap((log) =>
+                Effect.sync(() => {
+                  expect(log.level).toBe("Info");
+                })
+              )
+            )
           )
-        )
-      ).pipe(Effect.timeout("6 seconds"));
-      yield* Effect.forEach(recoveredCalls, Fiber.join);
-
-      expect(yield* Queue.clear(exceptions)).toEqual([]);
-      const logText = yield* Schema.encodeEffect(
-        Schema.fromJsonString(Schema.Unknown)
-      )(yield* Queue.clear(allLogs));
-      expect(logText).not.toContain("PRIVATE9");
-      expect(logText).not.toContain("165400");
+        ).pipe(Effect.timeout("6 seconds"));
+        yield* EffectFunction.pipe(recoveredCalls, Effect.forEach(Fiber.join));
+      }).pipe(Effect.withSpan("verifyRecoveredCapacity"));
+      yield* Effect.gen(function* verifyDisconnectTelemetry() {
+        expect(yield* Queue.clear(exceptions)).toStrictEqual([]);
+        const logText = yield* Schema.encodeEffect(
+          Schema.fromJsonString(Schema.Unknown)
+        )(yield* Queue.clear(allLogs));
+        expect(logText).not.toContain("PRIVATE9");
+        expect(logText).not.toContain("165400");
+      }).pipe(Effect.withSpan("verifyDisconnectTelemetry"));
     }).pipe(
       Effect.timeout("20 seconds"),
+      Effect.provide(FetchHttpClient.layer),
       Effect.provide(NodeServices.layer),
       Effect.scoped
     ),
   30_000
 );
-
 it.live(
   "uses the official modern MCP client from Chromium with native origin and CORS admission",
   () =>
@@ -767,7 +884,9 @@ it.live(
       const modulesRoot = path.resolve(
         "../../.alchemy/native-pair/bundles/TaxKitApi"
       );
-      const { files, modules, wasm } = yield* readWorkerModules(modulesRoot);
+      const { files, modules, wasm } = yield* readWorkerModules({
+        modulesRoot,
+      });
       expect(files).toContain("worker.js");
       const websiteOrigin = "http://127.0.0.1:4354";
       const foreignOrigin = "http://127.0.0.1:4355";
@@ -823,12 +942,12 @@ it.live(
         .href;
       // Serve both origin documents over real loopback connections. Synthetic
       // document fulfillment can misclassify Chromium's network address space.
-      const documents = yield* Effect.forEach(
+      const documents = yield* EffectFunction.pipe(
         [
           { name: "mcp-publication-document", port: 4354 },
           { name: "mcp-foreign-document", port: 4355 },
         ],
-        (fixture) =>
+        Effect.forEach((fixture) =>
           Effect.acquireRelease(
             Effect.sync(
               () =>
@@ -859,9 +978,11 @@ it.live(
             ),
             (value) => Effect.promise(() => value.dispose())
           )
+        )
       );
-      yield* Effect.forEach(documents, (document) =>
-        Effect.promise(() => document.ready)
+      yield* EffectFunction.pipe(
+        documents,
+        Effect.forEach((document) => Effect.promise(() => document.ready))
       );
       // Compile only the installed official SDK into an in-memory browser
       // script. This test never rebuilds an app/package or writes an artifact.
@@ -886,14 +1007,17 @@ it.live(
             plugins: [
               {
                 load: (id) =>
-                  id === "\0native-mcp-browser-client"
-                    ? 'import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client"; globalThis.TaxKitNativeMcpClient = { Client, StreamableHTTPClientTransport };'
-                    : null,
+                  EffectBoolean.match(id === "\0native-mcp-browser-client", {
+                    onTrue: () =>
+                      'import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client"; globalThis.TaxKitNativeMcpClient = { Client, StreamableHTTPClientTransport };',
+                    onFalse: () => null,
+                  }),
                 name: "native-mcp-browser-client",
                 resolveId: (id) =>
-                  id === "native-mcp-browser-client"
-                    ? "\0native-mcp-browser-client"
-                    : null,
+                  EffectBoolean.match(id === "native-mcp-browser-client", {
+                    onTrue: () => "\0native-mcp-browser-client",
+                    onFalse: () => null,
+                  }),
               },
             ],
             resolve: { conditions: ["browser", "import", "default"] },
@@ -1006,250 +1130,313 @@ it.live(
       });
       const modernInvocation = `(${invoke})(${modernArguments})`;
       const legacyInvocation = `(${invoke})(${legacyArguments})`;
-      const allowed = yield* Effect.promise(() =>
-        page.evaluate(modernInvocation)
-      ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(BrowserReply)));
-      yield* Match.value(allowed).pipe(
-        Match.tag("Complete", (value) =>
-          Effect.gen(function* () {
-            expect(value.capabilities.tools?.listChanged).toBe(false);
-            expect(value.reply.isError).toBe(false);
-            const catalogue = yield* Schema.decodeUnknownEffect(
-              CalculatorCatalogResponse
-            )(value.reply.structuredContent);
-            expect(catalogue.calculators).toHaveLength(3);
-          })
-        ),
-        Match.tag("Refused", () =>
-          Effect.sync(() =>
-            expect.fail("Permitted Chromium MCP client was refused")
-          )
-        ),
-        Match.exhaustive
-      );
-      const allowedRequests = Array.filter(
-        yield* Queue.clear(requests),
-        (event) => event.request.url === endpoint
-      );
-      const allowedExtraRequests = yield* Queue.clear(extraRequests);
-      const preflights = Array.filter(
-        allowedRequests,
-        (event) => event.request.method === "OPTIONS"
-      );
-      expect(preflights.length).toBeGreaterThan(0);
-      expect(
-        Array.some(preflights, (event) => {
-          const headers = Headers.fromInput(event.request.headers);
-          return (
-            Headers.get(headers, "origin").pipe(
-              Option.contains(websiteOrigin)
-            ) &&
-            Headers.get(headers, "access-control-request-headers").pipe(
-              Option.exists((value) =>
-                Array.every(
-                  [
-                    "b3",
-                    "content-type",
-                    "mcp-method",
-                    "mcp-protocol-version",
-                    "traceparent",
-                  ],
-                  (header) => value.toLowerCase().includes(header)
+      yield* Effect.gen(function* verifyBrowserAdmission() {
+        const allowed = yield* Effect.promise(() =>
+          page.evaluate(modernInvocation)
+        ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(BrowserReply)));
+        yield* Match.value(allowed).pipe(
+          Match.tag("Complete", (value) =>
+            Effect.gen(function* () {
+              expect(value.capabilities.tools?.listChanged).toBeFalsy();
+              expect(value.reply.isError).toBeFalsy();
+              const catalogue = yield* Schema.decodeUnknownEffect(
+                CalculatorCatalogResponse
+              )(value.reply.structuredContent);
+              expect(catalogue.calculators).toHaveLength(3);
+            })
+          ),
+          Match.tag("Refused", () =>
+            Effect.sync(() =>
+              expect.fail("Permitted Chromium MCP client was refused")
+            )
+          ),
+          Match.exhaustive
+        );
+        const allowedRequests = EffectFunction.pipe(
+          yield* Queue.clear(requests),
+          Array.filter((event) => event.request.url === endpoint)
+        );
+        const allowedExtraRequests = yield* Queue.clear(extraRequests);
+        const preflights = EffectFunction.pipe(
+          allowedRequests,
+          Array.filter((event) => event.request.method === "OPTIONS")
+        );
+        expect(preflights.length).toBeGreaterThan(0);
+        EffectFunction.pipe(
+          preflights,
+          Array.some((event) => {
+            const headers = Headers.fromInput(event.request.headers);
+            return (
+              Headers.get(headers, "origin").pipe(
+                Option.contains(websiteOrigin)
+              ) &&
+              Headers.get(headers, "access-control-request-headers").pipe(
+                Option.exists((value) =>
+                  EffectFunction.pipe(
+                    [
+                      "b3",
+                      "content-type",
+                      "mcp-method",
+                      "mcp-protocol-version",
+                      "traceparent",
+                    ],
+                    Array.every((header) =>
+                      value.toLowerCase().includes(header)
+                    )
+                  )
                 )
               )
-            )
-          );
-        })
-      ).toBe(true);
-      expect(
-        Array.some(allowedRequests, (event) => {
-          const headers = Headers.merge(
-            Headers.fromInput(event.request.headers),
-            Array.findFirst(
-              allowedExtraRequests,
-              (extra) => extra.requestId === event.requestId
-            ).pipe(
-              Option.map((extra) => Headers.fromInput(extra.headers)),
-              Option.getOrElse(() => Headers.empty)
-            )
-          );
-          return (
-            event.request.method === "POST" &&
-            Headers.get(headers, "origin").pipe(
-              Option.contains(websiteOrigin)
-            ) &&
-            Headers.get(headers, "mcp-protocol-version").pipe(
-              Option.contains("2026-07-28")
-            ) &&
-            Headers.get(headers, "mcp-name").pipe(
-              Option.contains("taxkit_list_calculators")
-            )
-          );
-        })
-      ).toBe(true);
-      const allowedResponses = Array.filter(
-        yield* Queue.clear(responses),
-        (event) => event.response.url === endpoint
-      );
-      expect(
-        Array.some(
-          allowedResponses,
-          (event) =>
-            event.response.status === 200 &&
-            Headers.get(
-              Headers.fromInput(event.response.headers),
-              "access-control-allow-origin"
-            ).pipe(Option.contains(websiteOrigin))
-        )
-      ).toBe(true);
-      // Chromium can cache every header granted by the first preflight, so
-      // tools/call need not issue a second OPTIONS for its added mcp-name.
-      expect(
-        Array.some(
-          allowedResponses,
-          (event) =>
-            event.response.status === 204 &&
-            Headers.get(
-              Headers.fromInput(event.response.headers),
-              "access-control-allow-headers"
-            ).pipe(
-              Option.exists((value) =>
-                Array.every(
-                  [
-                    "b3",
-                    "content-type",
-                    "mcp-method",
-                    "mcp-name",
-                    "mcp-protocol-version",
-                    "traceparent",
-                  ],
-                  (header) => value.toLowerCase().includes(header)
-                )
+            );
+          }),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
+          allowedRequests,
+          Array.some((event) => {
+            const headers = Headers.merge(
+              Headers.fromInput(event.request.headers),
+              EffectFunction.pipe(
+                allowedExtraRequests,
+                Array.findFirst((extra) => extra.requestId === event.requestId)
+              ).pipe(
+                Option.map((extra) => Headers.fromInput(extra.headers)),
+                Option.getOrElse(() => Headers.empty)
               )
-            )
-        )
-      ).toBe(true);
-      expect(
-        Array.every(allowedResponses, (event) =>
-          Option.isNone(
-            Headers.get(
-              Headers.fromInput(event.response.headers),
-              "access-control-allow-credentials"
-            )
-          )
-        )
-      ).toBe(true);
-      const legacy = yield* Effect.promise(() =>
-        page.evaluate(legacyInvocation)
-      ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(BrowserReply)));
-      expect(legacy._tag).toBe("Refused");
-      expect(
-        Array.some(
+            );
+            return (
+              event.request.method === "POST" &&
+              Headers.get(headers, "origin").pipe(
+                Option.contains(websiteOrigin)
+              ) &&
+              Headers.get(headers, "mcp-protocol-version").pipe(
+                Option.contains("2026-07-28")
+              ) &&
+              Headers.get(headers, "mcp-name").pipe(
+                Option.contains("taxkit_list_calculators")
+              )
+            );
+          }),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+      }).pipe(Effect.withSpan("verifyBrowserAdmission"));
+      yield* Effect.gen(function* verifyCorsResponse() {
+        const allowedResponses = EffectFunction.pipe(
           yield* Queue.clear(responses),
-          (event) =>
-            event.response.url === endpoint && event.response.status === 400
-        )
-      ).toBe(true);
-      yield* Queue.clear(requests);
-      yield* Queue.clear(extraRequests);
-      yield* Effect.promise(() => page.goto(foreignOrigin));
-      yield* Effect.promise(() => page.addScriptTag({ content: script.code }));
-      const foreign = yield* Effect.promise(() =>
-        page.evaluate(modernInvocation)
-      ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(BrowserReply)));
-      expect(foreign._tag).toBe("Refused");
-      const foreignRequests = Array.filter(
-        yield* Queue.clear(requests),
-        (event) => event.request.url === endpoint
-      );
-      expect(
-        Array.some(
-          foreignRequests,
-          (event) => event.request.method === "OPTIONS"
-        )
-      ).toBe(true);
-      // requestWillBeSent also describes a planned POST before Chromium
-      // resolves its preflight. ExtraInfo identifies actual network headers.
-      const foreignPostIds = Array.map(
-        Array.filter(
-          foreignRequests,
-          (event) => event.request.method === "POST"
-        ),
-        (event) => event.requestId
-      );
-      expect(
-        Array.some(yield* Queue.clear(extraRequests), (event) =>
-          Array.contains(foreignPostIds, event.requestId)
-        )
-      ).toBe(false);
-      const foreignResponses = Array.filter(
-        yield* Queue.clear(responses),
-        (event) => event.response.url === endpoint
-      );
-      expect(
-        Array.every(foreignResponses, (event) =>
-          Option.isNone(
-            Headers.get(
-              Headers.fromInput(event.response.headers),
-              "access-control-allow-origin"
+          Array.filter((event) => event.response.url === endpoint)
+        );
+        EffectFunction.pipe(
+          allowedResponses,
+          Array.some(
+            (event) =>
+              event.response.status === 200 &&
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-origin"
+              ).pipe(Option.contains(websiteOrigin))
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        // Chromium can cache every header granted by the first preflight, so
+        // tools/call need not issue a second OPTIONS for its added mcp-name.
+        EffectFunction.pipe(
+          allowedResponses,
+          Array.some(
+            (event) =>
+              event.response.status === 204 &&
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-headers"
+              ).pipe(
+                Option.exists((value) =>
+                  EffectFunction.pipe(
+                    [
+                      "b3",
+                      "content-type",
+                      "mcp-method",
+                      "mcp-name",
+                      "mcp-protocol-version",
+                      "traceparent",
+                    ],
+                    Array.every((header) =>
+                      value.toLowerCase().includes(header)
+                    )
+                  )
+                )
+              )
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
+          allowedResponses,
+          Array.every((event) =>
+            Option.isNone(
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-credentials"
+              )
             )
-          )
-        )
-      ).toBe(true);
-      const foreignPreflightIds = Array.map(
-        Array.filter(
-          foreignRequests,
-          (event) => event.request.method === "OPTIONS"
-        ),
-        (event) => event.requestId
-      );
-      const foreignPreflightReplies = Array.filter(
-        yield* Queue.clear(extras),
-        (event) => Array.contains(foreignPreflightIds, event.requestId)
-      );
-      expect(foreignPreflightReplies.length).toBeGreaterThan(0);
-      expect(
-        Array.every(foreignPreflightReplies, (event) =>
-          Option.isNone(
-            Headers.get(
-              Headers.fromInput(event.headers),
-              "access-control-allow-origin"
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+      }).pipe(Effect.withSpan("verifyCorsResponse"));
+      yield* Effect.gen(function* verifyLegacyRefusal() {
+        const legacy = yield* Effect.promise(() =>
+          page.evaluate(legacyInvocation)
+        ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(BrowserReply)));
+        EffectFunction.pipe(Predicate.isTagged(legacy, "Refused"), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(
+          yield* Queue.clear(responses),
+          Array.some(
+            (event) =>
+              event.response.url === endpoint && event.response.status === 400
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+      }).pipe(Effect.withSpan("verifyLegacyRefusal"));
+      const { foreignRequests } = yield* Effect.gen(
+        function* verifyForeignRefusal() {
+          yield* Queue.clear(requests);
+          yield* Queue.clear(extraRequests);
+          yield* Effect.promise(() => page.goto(foreignOrigin));
+          yield* Effect.promise(() =>
+            page.addScriptTag({ content: script.code })
+          );
+          const foreign = yield* Effect.promise(() =>
+            page.evaluate(modernInvocation)
+          ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(BrowserReply)));
+          EffectFunction.pipe(
+            Predicate.isTagged(foreign, "Refused"),
+            (actual) => {
+              expect(actual).toBeTruthy();
+            }
+          );
+          const foreignNetworkRequests = EffectFunction.pipe(
+            yield* Queue.clear(requests),
+            Array.filter((event) => event.request.url === endpoint)
+          );
+          EffectFunction.pipe(
+            foreignNetworkRequests,
+            Array.some((event) => event.request.method === "OPTIONS"),
+            (actual) => {
+              expect(actual).toBeTruthy();
+            }
+          );
+          // requestWillBeSent also describes a planned POST before Chromium
+          // resolves its preflight. ExtraInfo identifies actual network headers.
+          const foreignPostIds = EffectFunction.pipe(
+            foreignNetworkRequests,
+            Array.filter((event) => event.request.method === "POST"),
+            Array.map((event) => event.requestId)
+          );
+          EffectFunction.pipe(
+            yield* Queue.clear(extraRequests),
+            Array.some((event) =>
+              Array.contains(foreignPostIds, event.requestId)
+            ),
+            (actual) => {
+              expect(actual).toBeFalsy();
+            }
+          );
+          return { foreignRequests: foreignNetworkRequests };
+        }
+      ).pipe(Effect.withSpan("verifyForeignRefusal"));
+      yield* Effect.gen(function* verifyForeignCors() {
+        const foreignResponses = EffectFunction.pipe(
+          yield* Queue.clear(responses),
+          Array.filter((event) => event.response.url === endpoint)
+        );
+        EffectFunction.pipe(
+          foreignResponses,
+          Array.every((event) =>
+            Option.isNone(
+              Headers.get(
+                Headers.fromInput(event.response.headers),
+                "access-control-allow-origin"
+              )
             )
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        const foreignPreflightIds = EffectFunction.pipe(
+          foreignRequests,
+          Array.filter((event) => event.request.method === "OPTIONS"),
+          Array.map((event) => event.requestId)
+        );
+        const foreignPreflightReplies = EffectFunction.pipe(
+          yield* Queue.clear(extras),
+          Array.filter((event) =>
+            Array.contains(foreignPreflightIds, event.requestId)
           )
-        )
-      ).toBe(true);
-      // A safelisted request reaches the native Origin check as well, proving
-      // the refusal is not only Chromium withholding a preflighted POST.
-      const blocked = yield* Effect.promise(() =>
-        page.evaluate(
-          `(async ({ endpoint }) => {
+        );
+        expect(foreignPreflightReplies.length).toBeGreaterThan(0);
+        EffectFunction.pipe(
+          foreignPreflightReplies,
+          Array.every((event) =>
+            Option.isNone(
+              Headers.get(
+                Headers.fromInput(event.headers),
+                "access-control-allow-origin"
+              )
+            )
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+      }).pipe(Effect.withSpan("verifyForeignCors"));
+      yield* Effect.gen(function* verifySafelistedRefusal() {
+        // A safelisted request reaches the native Origin check as well, proving
+        // the refusal is not only Chromium withholding a preflighted POST.
+        const blocked = yield* Effect.promise(() =>
+          page.evaluate(`(async ({ endpoint }) => {
         try { await fetch(endpoint, { method: "POST", headers: { "content-type": "text/plain" }, body: "{}", credentials: "omit" }); return false; }
         catch { return true; }
-      })(${modernArguments})`
-        )
-      ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Schema.Boolean)));
-      expect(blocked).toBe(true);
-      const forbiddenRequests = Array.filter(
-        yield* Queue.clear(requests),
-        (event) =>
-          event.request.url === endpoint && event.request.method === "POST"
-      );
-      expect(forbiddenRequests).toHaveLength(1);
-      // ExtraInfo retains the HTTP status even when CORS prevents exposing a
-      // response to JavaScript and responseReceived is absent.
-      const forbiddenIds = Array.map(
-        forbiddenRequests,
-        (event) => event.requestId
-      );
-      expect(
-        Array.some(
+      })(${modernArguments})`)
+        ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Schema.Boolean)));
+        expect(blocked).toBeTruthy();
+        const forbiddenRequests = EffectFunction.pipe(
+          yield* Queue.clear(requests),
+          Array.filter(
+            (event) =>
+              event.request.url === endpoint && event.request.method === "POST"
+          )
+        );
+        expect(forbiddenRequests).toHaveLength(1);
+        // ExtraInfo retains the HTTP status even when CORS prevents exposing a
+        // response to JavaScript and responseReceived is absent.
+        const forbiddenIds = EffectFunction.pipe(
+          forbiddenRequests,
+          Array.map((event) => event.requestId)
+        );
+        EffectFunction.pipe(
           yield* Queue.clear(extras),
-          (event) =>
-            event.statusCode === 403 &&
-            Array.contains(forbiddenIds, event.requestId)
-        )
-      ).toBe(true);
-      expect(yield* Queue.clear(exceptions)).toEqual([]);
+          Array.some(
+            (event) =>
+              event.statusCode === 403 &&
+              Array.contains(forbiddenIds, event.requestId)
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        expect(yield* Queue.clear(exceptions)).toStrictEqual([]);
+      }).pipe(Effect.withSpan("verifySafelistedRefusal"));
     }).pipe(
       Effect.timeout("30 seconds"),
       Effect.provide(NodeServices.layer),

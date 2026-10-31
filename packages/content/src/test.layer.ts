@@ -1,4 +1,9 @@
-import { Array, Effect, Layer, Ref } from "effect";
+import {
+  Array,
+  Effect,
+  Layer,
+  Ref,
+} from "effect";
 
 import type { ContentObservations } from "./__testing__/observations.js";
 import { DocsImageRenderError } from "./errors.js";
@@ -9,7 +14,11 @@ import type {
   DocsPublicCatalogue,
   DocsSearchTerm,
 } from "./schemas.js";
-import { ContentCatalogue, ContentService, DocsOgImages } from "./service.js";
+import {
+  ContentCatalogue,
+  ContentService,
+  DocsOgImages,
+} from "./service.js";
 
 export const makeContentTest = Effect.fnUntraced(function* (
   catalogue: DocsPublicCatalogue
@@ -29,14 +38,16 @@ export const makeContentTest = Effect.fnUntraced(function* (
     layer: Layer.succeed(
       ContentService,
       ContentService.of({
-        getNavigation: service.getNavigation,
+        getNavigation: Effect.fn("ContentService.getNavigation")(
+          service.getNavigation
+        ),
         getPage: Effect.fn("ContentService.getPage")(function* (
           path: DocsPagePath
         ) {
           yield* Ref.update(observations.requestedPages, Array.append(path));
           return yield* service.getPage(path);
         }),
-        listPages: service.listPages,
+        listPages: Effect.fn("ContentService.listPages")(service.listPages),
         searchPages: Effect.fn("ContentService.searchPages")(function* (
           term: DocsSearchTerm
         ) {
@@ -48,12 +59,11 @@ export const makeContentTest = Effect.fnUntraced(function* (
     observations,
   };
 });
-
 // Deterministic share images: one fixed PNG header of the owned size for
 // every page.
 export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(
   DocsOgImages.of({
-    getImage: () =>
+    getImage: Effect.fn("DocsOgImages.getImage")(() =>
       Effect.sync(() => {
         const bytes = new Uint8Array(24);
         const data = new DataView(bytes.buffer);
@@ -64,6 +74,7 @@ export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(
       }).pipe(
         Effect.flatMap((bytes) => DocsPngBytes.makeEffect(bytes)),
         Effect.mapError(() => new DocsImageRenderError({ reason: "output" }))
-      ),
+      )
+    ),
   })
 );

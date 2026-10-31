@@ -13,17 +13,24 @@ import {
   CalculatorFixtureMode,
   CalculatorLive,
 } from "@taxkit/calculators/testing/fixtures";
-import { Array, Cause, Effect, Exit, Layer, Option, Ref } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Cause,
+  Effect,
+  Exit,
+  Layer,
+  Option,
+  Ref,
+} from "effect";
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
 
 const expectedCalculatorName: unknown = expect.any(String);
-
 const AnalyticsCalculatorLive = ApiCalculatorAnalyticsLive.pipe(
   Layer.provide(CalculatorLive)
 );
-
 it.effect.each([
   { count: 1, headers: {} },
   { count: 1, headers: { [CollectionPolicyHeader]: "allow" } },
@@ -75,9 +82,9 @@ it.effect.each([
         )).status
       ).toBe(200);
       const events = yield* Ref.get(observed);
-      expect(events.length).toBe(count);
+      expect(events).toHaveLength(count);
       if (count === 1) {
-        expect(events).toEqual([
+        expect(events).toStrictEqual([
           {
             calculatorId: CalculationRequest.calculatorId,
             calculatorName: expectedCalculatorName,
@@ -87,7 +94,6 @@ it.effect.each([
       }
     })
 );
-
 it.effect.each(["expected", "defect", "mixed", "capacity", "timeout"] as const)(
   "failed %s calculation adds no successful-use event",
   (mode) =>
@@ -112,14 +118,17 @@ it.effect.each(["expected", "defect", "mixed", "capacity", "timeout"] as const)(
           )
         )
       );
-      expect(Exit.isFailure(exit)).toBe(true);
+      EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       if (mode === "mixed" && Exit.isFailure(exit)) {
-        expect(Cause.hasInterrupts(exit.cause)).toBe(true);
+        EffectFunction.pipe(Cause.hasInterrupts(exit.cause), (actual) => {
+          expect(actual).toBeTruthy();
+        });
       }
-      expect(yield* Ref.get(events)).toEqual([]);
+      expect(yield* Ref.get(events)).toStrictEqual([]);
     })
 );
-
 it.effect("metadata and direct local calculator work generate no event", () =>
   Effect.gen(function* () {
     const events = yield* Ref.make<readonly CalculatorUse[]>([]);
@@ -144,10 +153,9 @@ it.effect("metadata and direct local calculator work generate no event", () =>
       Effect.flatMap((calculator) => calculator.calculate(CalculationRequest)),
       Effect.provide(AnalyticsCalculatorLive)
     );
-    expect(yield* Ref.get(events)).toEqual([]);
+    expect(yield* Ref.get(events)).toStrictEqual([]);
   })
 );
-
 it.effect(
   "concurrent allowed and denied calls use different request collectors",
   () =>
@@ -178,11 +186,10 @@ it.effect(
         ],
         { concurrency: "unbounded" }
       );
-      expect((yield* Ref.get(allowed)).length).toBe(1);
-      expect(yield* Ref.get(denied)).toEqual([]);
+      expect(yield* Ref.get(allowed)).toHaveLength(1);
+      expect(yield* Ref.get(denied)).toStrictEqual([]);
     }).pipe(Effect.provide(AnalyticsCalculatorLive))
 );
-
 it.effect(
   "one request has a bounded collector even when it makes many successful calls",
   () =>
@@ -201,6 +208,6 @@ it.effect(
           Option.some({ collectionPolicy: "allow", events })
         )
       );
-      expect((yield* Ref.get(events)).length).toBe(64);
+      expect(yield* Ref.get(events)).toHaveLength(64);
     }).pipe(Effect.provide(AnalyticsCalculatorLive))
 );

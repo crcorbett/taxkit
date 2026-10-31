@@ -1,4 +1,12 @@
-import { Array as EffectArray, HashMap, HashSet, Option } from "effect";
+import {
+  Predicate,
+  Match,
+  Function as EffectFunction,
+  Array as EffectArray,
+  HashMap,
+  HashSet,
+  Option,
+} from "effect";
 import { forEach } from "effect/Array";
 
 import { createBindingTracker } from "./binding-tracker.ts";
@@ -33,7 +41,6 @@ const noTypeof: OxlintRule = {
     type: "problem",
   },
 };
-
 const noInstanceof: OxlintRule = {
   create(context) {
     return {
@@ -58,7 +65,6 @@ const noInstanceof: OxlintRule = {
     type: "problem",
   },
 };
-
 const noInOperator: OxlintRule = {
   create(context) {
     return {
@@ -84,13 +90,10 @@ const noInOperator: OxlintRule = {
     type: "problem",
   },
 };
-
 const isUndefinedIdentifier = (node: SyntaxNode | null | undefined) =>
   node?.type === "Identifier" && node.name === "undefined";
-
 const isNullLiteral = (node: SyntaxNode | null | undefined) =>
-  node?.type === "Literal" && node.value === null;
-
+  node?.type === "Literal" && Predicate.isNull(node.value);
 const noUndefinedComparison: OxlintRule = {
   create(context) {
     return {
@@ -120,7 +123,6 @@ const noUndefinedComparison: OxlintRule = {
     type: "problem",
   },
 };
-
 const noNullishComparison: OxlintRule = {
   create(context) {
     return {
@@ -149,10 +151,8 @@ const noNullishComparison: OxlintRule = {
     type: "problem",
   },
 };
-
 const isConditionalObjectSpread = (node: SyntaxNode | null | undefined) =>
   node?.type === "ConditionalExpression" || node?.type === "LogicalExpression";
-
 const noConditionalObjectSpread: OxlintRule = {
   create(context) {
     return {
@@ -181,25 +181,19 @@ const noConditionalObjectSpread: OxlintRule = {
     type: "problem",
   },
 };
-
 const contextFieldNames = HashSet.fromIterable(["jurisdiction", "taxYear"]);
-
 const contextFieldName = (node: SyntaxNode | null | undefined) => {
   if (node?.type !== "MemberExpression") {
     return null;
   }
-
   if (node.property?.type === "Identifier") {
     return node.property.name;
   }
-
   if (node.property?.type === "Literal") {
     return String(node.property.value);
   }
-
   return null;
 };
-
 const noContextNullishDefault: OxlintRule = {
   create(context) {
     return {
@@ -228,7 +222,6 @@ const noContextNullishDefault: OxlintRule = {
     type: "problem",
   },
 };
-
 const nativeArrayMethods = HashSet.fromIterable([
   "concat",
   "every",
@@ -245,7 +238,6 @@ const nativeArrayMethods = HashSet.fromIterable([
   "some",
   "sort",
 ]);
-
 const effectCollectionNamespaces = HashSet.fromIterable([
   "Array",
   "Chunk",
@@ -255,26 +247,21 @@ const effectCollectionNamespaces = HashSet.fromIterable([
   "Option",
   "Record",
 ]);
-
 const propertyName = (node: SyntaxNode | null | undefined) => {
   if (node?.type === "Identifier") {
     return node.name;
   }
-
   if (node?.type === "Literal") {
     return String(node.value);
   }
-
   return null;
 };
-
 const isEffectCollectionNamespaceCall = (
   callee: SyntaxNode | null | undefined
 ) =>
   callee?.type === "MemberExpression" &&
   callee.object?.type === "Identifier" &&
   HashSet.has(effectCollectionNamespaces, callee.object.name);
-
 const isMemberCall = (
   node: SyntaxNode | null | undefined,
   objectName: string,
@@ -285,7 +272,6 @@ const isMemberCall = (
   node.callee.object?.type === "Identifier" &&
   node.callee.object.name === objectName &&
   propertyName(node.callee.property) === methodName;
-
 const noNativeArrayMethods: OxlintRule = {
   create(context) {
     return {
@@ -315,16 +301,15 @@ const noNativeArrayMethods: OxlintRule = {
     type: "problem",
   },
 };
-
 const noNestedWrapperCalls: OxlintRule = {
   create(context) {
     return {
       CallExpression(node) {
         if (
           node.callee?.type === "Identifier" &&
-          EffectArray.some(
+          EffectFunction.pipe(
             node.arguments,
-            (argument) => argument?.type === "CallExpression"
+            EffectArray.some((argument) => argument?.type === "CallExpression")
           )
         ) {
           context.report({
@@ -347,7 +332,6 @@ const noNestedWrapperCalls: OxlintRule = {
     type: "problem",
   },
 };
-
 const nativeCollectionConstructors = HashSet.fromIterable([
   "Map",
   "Set",
@@ -355,33 +339,33 @@ const nativeCollectionConstructors = HashSet.fromIterable([
   "WeakSet",
 ]);
 const nativeCollectionSemantics = HashSet.fromIterable(
-  EffectArray.flatMap([...nativeCollectionConstructors], (name) => [
-    `Native.${name}`,
-    `Global.${name}`,
-  ])
+  EffectFunction.pipe(
+    [...nativeCollectionConstructors],
+    EffectArray.flatMap((name) => [`Native.${name}`, `Global.${name}`])
+  )
 );
-
 const noNativeCollections: OxlintRule = {
   create(context) {
-    const tracker = createBindingTracker(
-      context.sourceCode,
-      HashMap.fromIterable([
-        ...EffectArray.map(
-          [...nativeCollectionConstructors],
-          (name) => [name, `Native.${name}`] as const
-        ),
-        ["globalThis", "Global"],
-        ["window", "Global"],
-      ])
-    );
+    const bindings = HashMap.fromIterable([
+      ...EffectFunction.pipe(
+        [...nativeCollectionConstructors],
+        EffectArray.map((name) => [name, `Native.${name}`] as const)
+      ),
+      ["globalThis", "Global"],
+      ["window", "Global"],
+    ]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     return {
       AssignmentExpression: tracker.trackAssignment,
       NewExpression(node) {
         if (
-          HashSet.has(
-            nativeCollectionSemantics,
-            tracker.semanticOfExpression(node.callee)
-          )
+          tracker
+            .semanticOfExpression(node.callee)
+            .pipe(
+              Option.exists((name) =>
+                HashSet.has(nativeCollectionSemantics, name)
+              )
+            )
         ) {
           context.report({
             messageId: "noNativeCollections",
@@ -404,7 +388,6 @@ const noNativeCollections: OxlintRule = {
     type: "problem",
   },
 };
-
 const objectWriteSemantics = HashSet.fromIterable([
   "Global.Object.assign",
   "Global.Object.defineProperty",
@@ -415,18 +398,15 @@ const objectWriteSemantics = HashSet.fromIterable([
   "Global.Reflect.defineProperty",
   "Global.Reflect.setPrototypeOf",
 ]);
-
 const noObjectWrites: OxlintRule = {
   create(context) {
-    const tracker = createBindingTracker(
-      context.sourceCode,
-      HashMap.fromIterable([
-        ["Object", "Global.Object"],
-        ["Reflect", "Global.Reflect"],
-        ["globalThis", "Global"],
-        ["window", "Global"],
-      ])
-    );
+    const bindings = HashMap.fromIterable([
+      ["Object", "Global.Object"],
+      ["Reflect", "Global.Reflect"],
+      ["globalThis", "Global"],
+      ["window", "Global"],
+    ]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     const reportReference = (node: SyntaxNode) => {
       if (node.type === "Identifier" && !tracker.isReadReference(node)) {
         return;
@@ -438,35 +418,44 @@ const noObjectWrites: OxlintRule = {
         return;
       }
       if (
-        HashSet.has(objectWriteSemantics, tracker.semanticOfExpression(node))
+        tracker
+          .semanticOfExpression(node)
+          .pipe(
+            Option.exists((name) => HashSet.has(objectWriteSemantics, name))
+          )
       ) {
         context.report({ messageId: "noObjectWrites", node });
       }
     };
     const reportDestructuredWrite = (
       pattern: SyntaxNode | null | undefined,
-      source: string | null
+      source: Option.Option<string>
     ): void => {
-      if (source === null) {
+      if (Option.isNone(source)) {
         return;
       }
       if (pattern?.type === "Identifier") {
-        if (HashSet.has(objectWriteSemantics, source)) {
+        if (HashSet.has(objectWriteSemantics, source.value)) {
           context.report({ messageId: "noObjectWrites", node: pattern });
         }
         return;
       }
       if (pattern?.type === "ObjectPattern") {
-        forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+        EffectFunction.pipe(
           pattern.properties ?? [],
-          (property) => {
-            if (property.type === "Property") {
-              const member = propertyName(property.key);
-              if (member !== null) {
-                reportDestructuredWrite(property.value, `${source}.${member}`);
+          forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+            (property) => {
+              if (property.type === "Property") {
+                const member = propertyName(property.key);
+                if (!Predicate.isNull(member)) {
+                  const memberSemantic = Option.some(
+                    `${source.value}.${member}`
+                  );
+                  reportDestructuredWrite(property.value, memberSemantic);
+                }
               }
             }
-          }
+          )
         );
       }
     };
@@ -479,7 +468,13 @@ const noObjectWrites: OxlintRule = {
         }
       },
       CallExpression(node) {
-        if (HashSet.has(objectWriteSemantics, tracker.calledSemantic(node))) {
+        if (
+          tracker
+            .calledSemantic(node)
+            .pipe(
+              Option.exists((name) => HashSet.has(objectWriteSemantics, name))
+            )
+        ) {
           context.report({ messageId: "noObjectWrites", node: node.callee });
         }
       },
@@ -506,7 +501,6 @@ const noObjectWrites: OxlintRule = {
     type: "problem",
   },
 };
-
 const noThrow: OxlintRule = {
   create(context) {
     return {
@@ -529,7 +523,6 @@ const noThrow: OxlintRule = {
     type: "problem",
   },
 };
-
 const noAsyncAwaitPromise: OxlintRule = {
   create(context) {
     return {
@@ -584,7 +577,6 @@ const noAsyncAwaitPromise: OxlintRule = {
     type: "problem",
   },
 };
-
 const noJsonParseStringify: OxlintRule = {
   create(context) {
     return {
@@ -595,7 +587,6 @@ const noJsonParseStringify: OxlintRule = {
             node: node.callee,
           });
         }
-
         if (isMemberCall(node, "JSON", "stringify")) {
           context.report({
             messageId: "noJsonStringify",
@@ -619,7 +610,6 @@ const noJsonParseStringify: OxlintRule = {
     type: "problem",
   },
 };
-
 const noAmbientTimeOrRandom: OxlintRule = {
   create(context) {
     return {
@@ -630,7 +620,6 @@ const noAmbientTimeOrRandom: OxlintRule = {
             node: node.callee,
           });
         }
-
         if (isMemberCall(node, "Math", "random")) {
           context.report({
             messageId: "noMathRandom",
@@ -664,7 +653,6 @@ const noAmbientTimeOrRandom: OxlintRule = {
     type: "problem",
   },
 };
-
 const effectSchemaRuntimeDecoderNames = HashSet.fromIterable([
   "decodeEffect",
   "decodeExit",
@@ -679,43 +667,46 @@ const effectSchemaRuntimeDecoderNames = HashSet.fromIterable([
   "decodeUnknownResult",
   "decodeUnknownSync",
 ]);
-
 const isDecoderCallName = (name: string) =>
   name === "decode" || /^decode[A-Z]/u.test(name ?? "");
-
 const localBindingName = (node: SyntaxNode | null | undefined) =>
-  node?.type === "Identifier" ? node.name : null;
-
+  Match.value(node).pipe(
+    Match.when({ type: "Identifier" }, (matchedValue) => matchedValue.name),
+    Match.orElse(() => null)
+  );
 const schemaImportSemantic: ImportSemantic = (source, kind, imported) => {
   if (source === "effect") {
-    if (kind === "ImportSpecifier" && imported === "Schema") {
-      return "Schema";
+    if (kind === "ImportSpecifier") {
+      return imported.pipe(Option.filter((name) => name === "Schema"));
     }
     if (kind === "ImportNamespaceSpecifier") {
-      return "effect";
+      return Option.some("effect");
     }
   }
   if (source === "effect/Schema") {
-    return kind === "ImportSpecifier" && imported !== null
-      ? `Schema.${imported}`
-      : "Schema";
+    if (kind === "ImportSpecifier" && Option.isSome(imported)) {
+      return Option.some(`Schema.${imported.value}`);
+    }
+    return Option.some("Schema");
   }
-  return null;
+  return Option.none();
 };
-
-const isSchemaDecoderSemantic = (semantic: string | null) =>
-  Option.exists(
-    EffectArray.findFirst(
-      ["Schema.", "effect.Schema."],
-      (prefix) => semantic?.startsWith(prefix) ?? false
-    ),
-    (prefix) =>
-      HashSet.has(
-        effectSchemaRuntimeDecoderNames,
-        semantic?.slice(prefix.length) ?? ""
+const isSchemaDecoderSemantic = (semantic: Option.Option<string>) =>
+  semantic.pipe(
+    Option.exists((name) =>
+      EffectFunction.pipe(
+        ["Schema.", "effect.Schema."],
+        EffectArray.some(
+          (prefix) =>
+            name.startsWith(prefix) &&
+            HashSet.has(
+              effectSchemaRuntimeDecoderNames,
+              name.slice(prefix.length)
+            )
+        )
       )
+    )
   );
-
 const noDecodingOutsideBoundaries: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
@@ -727,7 +718,10 @@ const noDecodingOutsideBoundaries: OxlintRule = {
       CallExpression(node) {
         if (node.callee?.type === "Identifier") {
           if (
-            isSchemaDecoderSemantic(tracker.calledSemantic(node)) ||
+            EffectFunction.pipe(
+              tracker.calledSemantic(node),
+              isSchemaDecoderSemantic
+            ) ||
             isDecoderCallName(node.callee.name)
           ) {
             report(node.callee);
@@ -741,12 +735,16 @@ const noDecodingOutsideBoundaries: OxlintRule = {
         const objectSemantic = tracker.semanticOfExpression(node.callee.object);
         if (
           memberName === "decodeTo" &&
-          (objectSemantic === "Schema" || objectSemantic === "effect.Schema")
+          (Option.contains(objectSemantic, "Schema") ||
+            Option.contains(objectSemantic, "effect.Schema"))
         ) {
           return;
         }
         if (
-          isSchemaDecoderSemantic(tracker.calledSemantic(node)) ||
+          EffectFunction.pipe(
+            tracker.calledSemantic(node),
+            isSchemaDecoderSemantic
+          ) ||
           isDecoderCallName(memberName ?? "")
         ) {
           report(node.callee.property);
@@ -766,20 +764,24 @@ const noDecodingOutsideBoundaries: OxlintRule = {
         }
         if (
           node.id?.type === "ObjectPattern" &&
-          (semantic === "Schema" || semantic === "effect.Schema")
+          (Option.contains(semantic, "Schema") ||
+            Option.contains(semantic, "effect.Schema"))
         ) {
-          forEach(node.id.properties ?? [], (property) => {
-            if (
-              property.type === "Property" &&
-              localBindingName(property.value) !== null &&
-              HashSet.has(
-                effectSchemaRuntimeDecoderNames,
-                propertyName(property.key)
-              )
-            ) {
-              report(property);
-            }
-          });
+          EffectFunction.pipe(
+            node.id.properties ?? [],
+            forEach((property) => {
+              if (
+                property.type === "Property" &&
+                !Predicate.isNull(localBindingName(property.value)) &&
+                HashSet.has(
+                  effectSchemaRuntimeDecoderNames,
+                  propertyName(property.key)
+                )
+              ) {
+                report(property);
+              }
+            })
+          );
         }
       },
     };
@@ -796,7 +798,6 @@ const noDecodingOutsideBoundaries: OxlintRule = {
     type: "problem",
   },
 };
-
 export default {
   meta: {
     name: "taxkit",

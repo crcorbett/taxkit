@@ -49,8 +49,8 @@ export class DocsSources extends Context.Service<
   readonly DocsSource[]
 >()("@taxkit/content/DocsSources") {}
 
-// Contracts Content consumes. `@taxkit/mdx` reads MDX and highlights code;
-// `@taxkit/diagrams` draws Mermaid. Content never imports either package.
+// Content projects the neutral MDX model into its published page contract.
+// The app supplies the concrete MDX and presentation-provider Layers.
 export class DocsPageReader extends Context.Service<
   DocsPageReader,
   {

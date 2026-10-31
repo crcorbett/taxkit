@@ -1,7 +1,9 @@
+import { AnnualTaxForm } from "@taxkit/calculators/form";
 import type { CalculatorForm } from "@taxkit/calculators/form";
 import type { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
 import type { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import type { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
+import { Predicate, Boolean as EffectBoolean, Match, Schema } from "effect";
 import type { Option } from "effect";
 
 import { CalculatorPageResultView } from "./calculator-page-result.view";
@@ -49,66 +51,83 @@ export const CalculatorPageView = ({
         onCalculate();
       }}
     >
-      {"taxableDollars" in form ? (
-        <label>
-          Annual taxable income ($)
-          <input
-            name="taxableDollars"
-            inputMode="decimal"
-            value={form.taxableDollars}
-            onChange={(event) => {
-              onEdit({ ...form, taxableDollars: event.currentTarget.value });
-            }}
-          />
-        </label>
-      ) : (
-        <>
+      {Match.value(form).pipe(
+        Match.when(Schema.is(AnnualTaxForm), (annualForm) => (
           <label>
-            Pay before tax ($)
+            Annual taxable income ($)
             <input
-              name="grossDollars"
+              name="taxableDollars"
               inputMode="decimal"
-              value={form.grossDollars}
+              value={annualForm.taxableDollars}
               onChange={(event) => {
-                onEdit({ ...form, grossDollars: event.currentTarget.value });
+                onEdit({
+                  ...annualForm,
+                  taxableDollars: event.currentTarget.value,
+                });
               }}
             />
           </label>
-          <label>
-            Pay period
-            <select
-              name="period"
-              value={form.period}
-              onChange={(event) => {
-                onEdit({ ...form, period: event.currentTarget.value });
-              }}
-            >
-              <option value="weekly">Weekly</option>
-              <option value="fortnightly">Fortnightly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </label>
-          <label>
-            <input
-              name="taxFreeThresholdClaimed"
-              type="checkbox"
-              checked={form.taxFreeThresholdClaimed}
-              onChange={(event) => {
-                onEdit({
-                  ...form,
-                  taxFreeThresholdClaimed: event.currentTarget.checked,
-                });
-              }}
-            />{" "}
-            Claim the tax-free threshold
-          </label>
-        </>
+        )),
+        Match.orElse((withholdingForm) => (
+          <>
+            <label>
+              Pay before tax ($)
+              <input
+                name="grossDollars"
+                inputMode="decimal"
+                value={withholdingForm.grossDollars}
+                onChange={(event) => {
+                  onEdit({
+                    ...withholdingForm,
+                    grossDollars: event.currentTarget.value,
+                  });
+                }}
+              />
+            </label>
+            <label>
+              Pay period
+              <select
+                name="period"
+                value={withholdingForm.period}
+                onChange={(event) => {
+                  onEdit({
+                    ...withholdingForm,
+                    period: event.currentTarget.value,
+                  });
+                }}
+              >
+                <option value="weekly">Weekly</option>
+                <option value="fortnightly">Fortnightly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </label>
+            <label>
+              <input
+                name="taxFreeThresholdClaimed"
+                type="checkbox"
+                checked={withholdingForm.taxFreeThresholdClaimed}
+                onChange={(event) => {
+                  onEdit({
+                    ...withholdingForm,
+                    taxFreeThresholdClaimed: event.currentTarget.checked,
+                  });
+                }}
+              />{" "}
+              Claim the tax-free threshold
+            </label>
+          </>
+        ))
       )}
       <button type="submit" disabled={busy}>
-        {busy ? "Calculating…" : "Calculate"}
+        {EffectBoolean.match(busy, {
+          onFalse: (): "Calculate" => "Calculate",
+          onTrue: (): "Calculating…" => "Calculating…",
+        })}
       </button>
     </form>
-    {message !== undefined && message !== "" && <p role="alert">{message}</p>}
+    {!Predicate.isUndefined(message) && message !== "" && (
+      <p role="alert">{message}</p>
+    )}
     <CalculatorPageResultView report={report} stale={stale} />
   </section>
 );

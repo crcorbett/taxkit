@@ -1,5 +1,11 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Result, Schema } from "effect";
+import {
+  Predicate,
+  Function as EffectFunction,
+  Effect,
+  Result,
+  Schema,
+} from "effect";
 import { vi } from "vitest";
 
 import {
@@ -24,7 +30,6 @@ const settings = {
   UNRELATED_SECRET: "secret-canary",
   WEBSITE_PUBLIC_ORIGIN: "https://preview.taxkit.example",
 };
-
 describe("native website settings boundary", () => {
   it.effect(
     "retains the binding receiver and restores checked origins from JSON",
@@ -37,11 +42,15 @@ describe("native website settings boundary", () => {
           Effect.provideService(WebsiteBindings, settings)
         );
         expect(api.binding).toBe(binding);
-        expect(checked.apiOrigin.href).toBe("https://api.taxkit.example/");
-        expect(checked.publicationOrigin.href).toBe("https://taxkit.example/");
-        expect(checked.websiteOrigin.href).toBe(
-          "https://preview.taxkit.example/"
-        );
+        expect({
+          checkedApiOriginHref: checked.apiOrigin.href,
+          checkedPublicationOriginHref: checked.publicationOrigin.href,
+          checkedWebsiteOriginHref: checked.websiteOrigin.href,
+        }).toStrictEqual({
+          checkedApiOriginHref: "https://api.taxkit.example/",
+          checkedPublicationOriginHref: "https://taxkit.example/",
+          checkedWebsiteOriginHref: "https://preview.taxkit.example/",
+        });
         const encoded = yield* Schema.encodeEffect(
           Schema.fromJsonString(WebsiteRootView)
         )({ settings: checked });
@@ -55,7 +64,6 @@ describe("native website settings boundary", () => {
         );
       })
   );
-
   it.effect.each([
     { ...settings, API_PUBLIC_ORIGIN: undefined },
     {
@@ -86,7 +94,6 @@ describe("native website settings boundary", () => {
       })
   );
 });
-
 it.effect.each([
   { apiValid: true, changed: {}, settingsValid: true },
   { apiValid: false, changed: { TAXKIT_API: {} }, settingsValid: true },
@@ -123,14 +130,25 @@ it.effect.each([
         Effect.provideService(WebsiteBindings, input),
         Effect.result
       );
-      expect(Result.isSuccess(publicSettings)).toBe(settingsValid);
-      expect(Result.isSuccess(api)).toBe(apiValid);
+      EffectFunction.pipe(Result.isSuccess(publicSettings), (actual) => {
+        expect(actual).toBe(settingsValid);
+      });
+      EffectFunction.pipe(Result.isSuccess(api), (actual) => {
+        expect(actual).toBe(apiValid);
+      });
       if (Result.isFailure(api)) {
-        expect(api.failure._tag).toBe("WebsiteApiConfigError");
-        expect(api.failure.message).toBe(
-          "TaxKit API settings are missing or invalid."
-        );
-        expect(api.failure).toEqual(new WebsiteApiConfigError());
+        expect({
+          apiFailure_tag: Predicate.isTagged(
+            api.failure,
+            "WebsiteApiConfigError"
+          ),
+          apiFailureMessage: api.failure.message,
+          apiFailure: api.failure,
+        }).toStrictEqual({
+          apiFailure_tag: true,
+          apiFailureMessage: "TaxKit API settings are missing or invalid.",
+          apiFailure: new WebsiteApiConfigError(),
+        });
       }
     })
 );

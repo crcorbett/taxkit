@@ -22,6 +22,8 @@ import {
   observeHostRequest,
 } from "@taxkit/observability/host-telemetry";
 import {
+  Match,
+  Function as EffectFunction,
   Array,
   ConfigProvider,
   Deferred,
@@ -50,18 +52,18 @@ import { ApiContentLive } from "../src/content.boundary.js";
 import { ApiWorkerApplication } from "../src/worker.application.js";
 import { ApiWorkerSettingsConfig } from "../src/worker.config.js";
 import { ApiWorkerInit as ApiWorkerApplicationInit } from "../src/worker.js";
-
 // These retained tests isolate body, protocol and lifetime behaviour. Actual
 // admission and native provider counters are qualified in their owning tests.
 const ApiWorkerInit = ApiWorkerApplicationInit.pipe(
   Effect.provideService(
     CalculatorAdmission,
     CalculatorAdmission.of({
-      admitCalculation: () => Effect.void,
+      admitCalculation: Effect.fn("CalculatorAdmission.admitCalculation")(
+        () => Effect.void
+      ),
     })
   )
 );
-
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
   TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
@@ -69,26 +71,27 @@ const settings = ConfigProvider.fromUnknown({
 });
 const Json = Schema.fromJsonString(Schema.Unknown);
 const calculatePath = "/api/v1/calculators/au.pay.take-home/calculate";
-
 // Each request writes one checked fixed-field record; anything else is a
 // runtime log line.
 const runtimeLines = (lines: readonly unknown[]) =>
-  Array.filter(lines, (line) =>
-    Option.isNone(
-      Schema.decodeUnknownOption(Schema.fromJsonString(HostRequestRecord))(line)
+  EffectFunction.pipe(
+    lines,
+    Array.filter((line) =>
+      Option.isNone(
+        Schema.decodeUnknownOption(Schema.fromJsonString(HostRequestRecord))(
+          line
+        )
+      )
     )
   );
-
 const header = (
   response: HttpServerResponse.HttpServerResponse,
   name: string
 ) => Headers.get(response.headers, name).pipe(Option.getOrUndefined);
-
 const allowOrigin = (response: HttpServerResponse.HttpServerResponse) =>
   Headers.get(response.headers, "access-control-allow-origin").pipe(
     Option.getOrUndefined
   );
-
 describe("native API application", () => {
   it.effect("serves discovery and shares only public reads", () =>
     Effect.gen(function* () {
@@ -113,10 +116,17 @@ describe("native API application", () => {
         );
       const llms = yield* send("/api/v1/docs/discovery/llms.txt", "GET", null);
       expect(llms.status).toBe(200);
-      expect(header(llms, "content-type")).toBe("text/plain; charset=utf-8");
-      expect(header(llms, "cache-control")).toBe("public, max-age=0");
-      expect(header(llms, "cloudflare-cdn-cache-control")).toBe(
-        "public, max-age=604800, stale-if-error=0"
+      EffectFunction.pipe(header(llms, "content-type"), (actual) => {
+        expect(actual).toBe("text/plain; charset=utf-8");
+      });
+      EffectFunction.pipe(header(llms, "cache-control"), (actual) => {
+        expect(actual).toBe("public, max-age=0");
+      });
+      EffectFunction.pipe(
+        header(llms, "cloudflare-cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe("public, max-age=604800, stale-if-error=0");
+        }
       );
       const text = yield* Effect.promise(() =>
         HttpServerResponse.toWeb(llms).text()
@@ -128,18 +138,29 @@ describe("native API application", () => {
         null
       );
       expect(head.status).toBe(200);
-      expect(header(head, "cache-control")).toBe("public, max-age=0");
+      EffectFunction.pipe(header(head, "cache-control"), (actual) => {
+        expect(actual).toBe("public, max-age=0");
+      });
       const metadata = yield* send("/api/v1/calculators", "GET", null);
-      expect(header(metadata, "cache-control")).toBe("public, max-age=0");
+      EffectFunction.pipe(header(metadata, "cache-control"), (actual) => {
+        expect(actual).toBe("public, max-age=0");
+      });
       const health = yield* send("/api/health", "GET", null);
-      expect(header(health, "cache-control")).toBe("no-store");
+      EffectFunction.pipe(header(health, "cache-control"), (actual) => {
+        expect(actual).toBe("no-store");
+      });
       const missing = yield* send(
         "/api/v1/docs/discovery/other.txt",
         "GET",
         null
       );
       expect(missing.status).toBe(404);
-      expect(header(missing, "cloudflare-cdn-cache-control")).toBe("no-store");
+      EffectFunction.pipe(
+        header(missing, "cloudflare-cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe("no-store");
+        }
+      );
       const calculated = yield* send(
         "/api/v1/calculators/au.pay.take-home/calculate",
         "POST",
@@ -148,13 +169,17 @@ describe("native API application", () => {
         )
       );
       expect(calculated.status).toBe(200);
-      expect(header(calculated, "cache-control")).toBe("no-store");
-      expect(header(calculated, "cloudflare-cdn-cache-control")).toBe(
-        "no-store"
+      EffectFunction.pipe(header(calculated, "cache-control"), (actual) => {
+        expect(actual).toBe("no-store");
+      });
+      EffectFunction.pipe(
+        header(calculated, "cloudflare-cdn-cache-control"),
+        (actual) => {
+          expect(actual).toBe("no-store");
+        }
       );
     }).pipe(Effect.provideService(ConfigProvider.ConfigProvider, settings))
   );
-
   it.effect("shares eight calculation places across HTTP calls", () =>
     Effect.gen(function* () {
       const live = yield* PublicCalculatorService;
@@ -169,19 +194,47 @@ describe("native API application", () => {
               Layer.succeed(
                 PublicCalculatorService,
                 PublicCalculatorService.of({
-                  ...live,
-                  calculate: () =>
-                    Ref.updateAndGet(active, (count) => count + 1).pipe(
-                      Effect.flatMap((count) =>
-                        count === 8
-                          ? Deferred.succeed(started, true)
-                          : Effect.void
-                      ),
-                      Effect.andThen(Effect.never),
-                      Effect.ensuring(
-                        Ref.update(released, (count) => count + 1)
+                  getCalculator: Effect.fn(
+                    "PublicCalculatorService.getCalculator"
+                  )(live.getCalculator),
+                  getCalculatorGraph: Effect.fn(
+                    "PublicCalculatorService.getCalculatorGraph"
+                  )(live.getCalculatorGraph),
+                  getCalculatorSchema: Effect.fn(
+                    "PublicCalculatorService.getCalculatorSchema"
+                  )(live.getCalculatorSchema),
+                  listCalculators: Effect.fn(
+                    "PublicCalculatorService.listCalculators"
+                  )(live.listCalculators),
+                  listFacts: Effect.fn("PublicCalculatorService.listFacts")(
+                    live.listFacts
+                  ),
+                  listJurisdictions: Effect.fn(
+                    "PublicCalculatorService.listJurisdictions"
+                  )(live.listJurisdictions),
+                  listRules: Effect.fn("PublicCalculatorService.listRules")(
+                    live.listRules
+                  ),
+                  listTaxYears: Effect.fn(
+                    "PublicCalculatorService.listTaxYears"
+                  )(live.listTaxYears),
+                  calculate: Effect.fn("PublicCalculatorService.calculate")(
+                    () =>
+                      Ref.updateAndGet(active, (count) => count + 1).pipe(
+                        Effect.flatMap((count) =>
+                          Match.value(count).pipe(
+                            Match.when(8, () =>
+                              Deferred.succeed(started, true)
+                            ),
+                            Match.orElse(() => Effect.void)
+                          )
+                        ),
+                        Effect.andThen(Effect.never),
+                        Effect.ensuring(
+                          Ref.update(released, (count) => count + 1)
+                        )
                       )
-                    ),
+                  ),
                 })
               )
             )
@@ -227,24 +280,36 @@ describe("native API application", () => {
       yield* TestClock.adjust("4 seconds");
       expect(yield* Ref.get(released)).toBe(0);
       yield* TestClock.adjust("1 second");
-      const timed = yield* Effect.forEach(running, (fibre) =>
-        Fiber.join(fibre).pipe(
-          Effect.flatMap((response) =>
-            Effect.promise(() =>
-              HttpServerResponse.toWeb(response).text()
-            ).pipe(Effect.map((text) => ({ status: response.status, text })))
+      const timed = yield* EffectFunction.pipe(
+        running,
+        Effect.forEach((fibre) =>
+          Fiber.join(fibre).pipe(
+            Effect.flatMap((response) =>
+              Effect.promise(() =>
+                HttpServerResponse.toWeb(response).text()
+              ).pipe(Effect.map((text) => ({ status: response.status, text })))
+            )
           )
         )
       );
-      yield* Effect.forEach(timed, ({ status, text }) =>
-        Effect.sync(() => {
-          expect(status).toBe(504);
-          expect(text).toContain("CalculatorOperationTimedOut");
-        })
+      yield* EffectFunction.pipe(
+        timed,
+        Effect.forEach(({ status, text }) =>
+          Effect.sync(() => {
+            expect(status).toBe(504);
+            expect(text).toContain("CalculatorOperationTimedOut");
+          })
+        )
       );
       expect(yield* Ref.get(released)).toBe(8);
       yield* Effect.forEach(
-        [busyText, ...Array.map(timed, ({ text }) => text)],
+        [
+          busyText,
+          ...EffectFunction.pipe(
+            timed,
+            Array.map(({ text }) => text)
+          ),
+        ],
         (text) =>
           Effect.sync(() => {
             expect(text).not.toContain(sensitiveSentinel);
@@ -258,7 +323,6 @@ describe("native API application", () => {
       Effect.scoped
     )
   );
-
   it.effect("defers address reads during construction and decodes once", () =>
     Effect.gen(function* () {
       const reads = yield* Ref.make(0);
@@ -291,7 +355,6 @@ describe("native API application", () => {
       expect(yield* Ref.get(reads)).toBe(afterFirst);
     }).pipe(Effect.scoped)
   );
-
   it.effect(
     "serves a checked unavailable response when bound origins are absent",
     () =>
@@ -306,10 +369,15 @@ describe("native API application", () => {
           ),
           Effect.scoped
         );
-        expect(response.status).toBe(503);
-        expect(
-          yield* Effect.promise(() => HttpServerResponse.toWeb(response).text())
-        ).toBe("");
+        expect({
+          responseStatus: response.status,
+          responseBody: yield* Effect.promise(() =>
+            HttpServerResponse.toWeb(response).text()
+          ),
+        }).toStrictEqual({
+          responseStatus: 503,
+          responseBody: "",
+        });
       }).pipe(
         Effect.provideService(
           ConfigProvider.ConfigProvider,
@@ -318,7 +386,6 @@ describe("native API application", () => {
         Effect.scoped
       )
   );
-
   it.effect("closes a stalled body at its total read deadline", () =>
     Effect.gen(function* () {
       const started = yield* Deferred.make<boolean>();
@@ -352,8 +419,8 @@ describe("native API application", () => {
         yield* Schema.decodeUnknownEffect(CalculatorRequestBodyErrorEnvelope)(
           json
         )
-      ).toEqual({ error: new CalculatorRequestBodyTimedOut() });
-      expect(yield* Ref.get(released)).toBe(true);
+      ).toStrictEqual({ error: new CalculatorRequestBodyTimedOut() });
+      expect(yield* Ref.get(released)).toBeTruthy();
       const next = yield* app.fetch.pipe(
         Effect.provideService(
           HttpServerRequest.HttpServerRequest,
@@ -369,7 +436,6 @@ describe("native API application", () => {
       Effect.scoped
     )
   );
-
   it.effect("preserves earlier body cancellation and closes the source", () =>
     Effect.gen(function* () {
       const started = yield* Deferred.make<boolean>();
@@ -397,15 +463,18 @@ describe("native API application", () => {
       yield* Deferred.await(started);
       yield* Fiber.interrupt(fibre);
       const exit = yield* Fiber.await(fibre);
-      expect(Exit.isFailure(exit)).toBe(true);
-      expect(Exit.hasInterrupts(exit)).toBe(true);
-      expect(yield* Ref.get(released)).toBe(true);
+      EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      EffectFunction.pipe(Exit.hasInterrupts(exit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      expect(yield* Ref.get(released)).toBeTruthy();
     }).pipe(
       Effect.provideService(ConfigProvider.ConfigProvider, settings),
       Effect.scoped
     )
   );
-
   it.effect("admits public browser origins without credentials", () =>
     Effect.gen(function* () {
       const app = yield* ApiWorkerInit;
@@ -431,41 +500,60 @@ describe("native API application", () => {
         "https://other.example.com"
       );
       expect(other.status).toBe(204);
-      expect(allowOrigin(other)).toBe("https://other.example.com");
-      expect(
+      EffectFunction.pipe(allowOrigin(other), (actual) => {
+        expect(actual).toBe("https://other.example.com");
+      });
+      EffectFunction.pipe(
         Headers.get(other.headers, "access-control-allow-headers").pipe(
           Option.getOrUndefined
-        )
-      ).toBe("x-taxkit-collection-policy,b3,content-type,traceparent");
-      expect(
+        ),
+        (actual) => {
+          expect(actual).toBe(
+            "x-taxkit-collection-policy,b3,content-type,traceparent"
+          );
+        }
+      );
+      EffectFunction.pipe(
         Headers.get(other.headers, "access-control-allow-credentials").pipe(
           Option.getOrUndefined
-        )
-      ).toBeUndefined();
+        ),
+        (actual) => {
+          expect(actual).toBeUndefined();
+        }
+      );
       const http = yield* preflight(
         "/api/v1/calculators/au.pay.take-home/calculate",
         "http://127.0.0.1:3000"
       );
-      expect(allowOrigin(http)).toBe("http://127.0.0.1:3000");
+      EffectFunction.pipe(allowOrigin(http), (actual) => {
+        expect(actual).toBe("http://127.0.0.1:3000");
+      });
       // A malformed or non-HTTP origin is never echoed.
       const malformed = yield* preflight(
         calculatePath,
         "https://other.example.com/"
       );
-      expect(allowOrigin(malformed)).toBeUndefined();
+      EffectFunction.pipe(allowOrigin(malformed), (actual) => {
+        expect(actual).toBeUndefined();
+      });
       const opaque = yield* preflight(calculatePath, "null");
-      expect(allowOrigin(opaque)).toBeUndefined();
+      EffectFunction.pipe(allowOrigin(opaque), (actual) => {
+        expect(actual).toBeUndefined();
+      });
       // Remote MCP keeps its exact browser list.
       const mcpListed = yield* preflight("/mcp", "https://website.example.com");
-      expect(allowOrigin(mcpListed)).toBe("https://website.example.com");
+      EffectFunction.pipe(allowOrigin(mcpListed), (actual) => {
+        expect(actual).toBe("https://website.example.com");
+      });
       const mcpOther = yield* preflight("/mcp", "https://other.example.com");
-      expect(allowOrigin(mcpOther)).toBeUndefined();
+      EffectFunction.pipe(allowOrigin(mcpOther), (actual) => {
+        expect(actual).toBeUndefined();
+      });
     }).pipe(
       Effect.provideService(ConfigProvider.ConfigProvider, settings),
       Effect.scoped
     )
   );
-
   it.effect.each([
     {
       pathname: "/api/v1/calculators/au.pay.take-home/calculate",
@@ -482,13 +570,17 @@ describe("native API application", () => {
         const released = yield* Ref.make(false);
         const tailRead = yield* Ref.make(false);
         const app = yield* ApiWorkerInit;
-        const chunks =
-          representation === "chunks"
-            ? Stream.make(
-                new Uint8Array(32 * 1024),
-                new Uint8Array(32 * 1024 + 1)
-              )
-            : Stream.succeed(new TextEncoder().encode("é".repeat(32_769)));
+        const chunks = Match.value(representation).pipe(
+          Match.when("chunks", () =>
+            Stream.make(
+              new Uint8Array(32 * 1024),
+              new Uint8Array(32 * 1024 + 1)
+            )
+          ),
+          Match.orElse(() =>
+            Stream.succeed(new TextEncoder().encode("é".repeat(32_769)))
+          )
+        );
         const body = chunks.pipe(
           Stream.concat(
             Stream.fromEffect(
@@ -518,15 +610,14 @@ describe("native API application", () => {
           yield* Schema.decodeUnknownEffect(CalculatorRequestBodyErrorEnvelope)(
             json
           )
-        ).toEqual({ error: new CalculatorRequestBodyTooLarge() });
-        expect(yield* Ref.get(tailRead)).toBe(false);
-        expect(yield* Ref.get(released)).toBe(true);
+        ).toStrictEqual({ error: new CalculatorRequestBodyTooLarge() });
+        expect(!(yield* Ref.get(tailRead))).toBeTruthy();
+        expect(yield* Ref.get(released)).toBeTruthy();
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.scoped
       )
   );
-
   it.effect(
     "accepts exactly 64 KiB and shares one calculator operation across requests",
     () =>
@@ -541,34 +632,59 @@ describe("native API application", () => {
             yield* Ref.update(constructions, (count) => count + 1);
             const live = yield* PublicCalculatorService;
             return PublicCalculatorService.of({
-              ...live,
-              calculate: (request) =>
-                Effect.gen(function* () {
-                  yield* Ref.update(calls, (count) => count + 1);
-                  const incoming = yield* Effect.serviceOption(
-                    HttpServerRequest.HttpServerRequest
-                  );
-                  yield* incoming.pipe(
-                    Option.match({
-                      onNone: () => Effect.die("Incoming request is missing"),
-                      onSome: ({ url }) =>
-                        Ref.update(incomingPaths, Array.append(url)),
-                    })
-                  );
-                  const scope = yield* Effect.serviceOption(Scope.Scope);
-                  yield* scope.pipe(
-                    Option.match({
-                      onNone: () =>
-                        Effect.die("Incoming request scope is missing"),
-                      onSome: (requestScope) =>
-                        Scope.addFinalizer(
-                          requestScope,
-                          Ref.update(releases, (count) => count + 1)
-                        ),
-                    })
-                  );
-                  return yield* live.calculate(request);
-                }),
+              getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
+                live.getCalculator
+              ),
+              getCalculatorGraph: Effect.fn(
+                "PublicCalculatorService.getCalculatorGraph"
+              )(live.getCalculatorGraph),
+              getCalculatorSchema: Effect.fn(
+                "PublicCalculatorService.getCalculatorSchema"
+              )(live.getCalculatorSchema),
+              listCalculators: Effect.fn(
+                "PublicCalculatorService.listCalculators"
+              )(live.listCalculators),
+              listFacts: Effect.fn("PublicCalculatorService.listFacts")(
+                live.listFacts
+              ),
+              listJurisdictions: Effect.fn(
+                "PublicCalculatorService.listJurisdictions"
+              )(live.listJurisdictions),
+              listRules: Effect.fn("PublicCalculatorService.listRules")(
+                live.listRules
+              ),
+              listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")(
+                live.listTaxYears
+              ),
+              calculate: Effect.fn("PublicCalculatorService.calculate")(
+                (request) =>
+                  Effect.gen(function* () {
+                    yield* Ref.update(calls, (count) => count + 1);
+                    const incoming = yield* Effect.serviceOption(
+                      HttpServerRequest.HttpServerRequest
+                    );
+                    yield* incoming.pipe(
+                      Option.match({
+                        onNone: () => Effect.die("Incoming request is missing"),
+                        onSome: ({ url }) =>
+                          Ref.update(incomingPaths, Array.append(url)),
+                      })
+                    );
+                    const scope = yield* Effect.serviceOption(Scope.Scope);
+                    yield* scope.pipe(
+                      Option.match({
+                        onNone: () =>
+                          Effect.die("Incoming request scope is missing"),
+                        onSome: (requestScope) =>
+                          Scope.addFinalizer(
+                            requestScope,
+                            Ref.update(releases, (count) => count + 1)
+                          ),
+                      })
+                    );
+                    return yield* live.calculate(request);
+                  })
+              ),
             });
           })
         ).pipe(Layer.provide(CalculatorLive));
@@ -609,23 +725,34 @@ describe("native API application", () => {
             `https://api.example.com${calculatePath}`
           ).pipe(HttpClientRequest.bodyText(httpBody, "application/json"))
         );
-        expect(http.status).toBe(200);
-        expect(second.status).toBe(200);
+        expect({
+          httpStatus: http.status,
+          secondStatus: second.status,
+        }).toStrictEqual({
+          httpStatus: 200,
+          secondStatus: 200,
+        });
         expect(yield* http.text).toContain('"netPay"');
         expect(yield* second.text).toContain('"netPay"');
-        expect(yield* Ref.get(calls)).toBe(2);
-        expect(yield* Ref.get(constructions)).toBe(1);
-        expect(yield* Ref.get(releases)).toBe(2);
-        expect(yield* Ref.get(incomingPaths)).toEqual([
-          "/api/v1/calculators/au.pay.take-home/calculate",
-          "/api/v1/calculators/au.pay.take-home/calculate",
-        ]);
+        expect({
+          RefGetCalls: yield* Ref.get(calls),
+          RefGetConstructions: yield* Ref.get(constructions),
+          RefGetReleases: yield* Ref.get(releases),
+          RefGetIncomingPaths: yield* Ref.get(incomingPaths),
+        }).toStrictEqual({
+          RefGetCalls: 2,
+          RefGetConstructions: 1,
+          RefGetReleases: 2,
+          RefGetIncomingPaths: [
+            "/api/v1/calculators/au.pay.take-home/calculate",
+            "/api/v1/calculators/au.pay.take-home/calculate",
+          ],
+        });
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.scoped
       )
   );
-
   it.effect("serves after native instance initialisation returns", () =>
     Effect.gen(function* () {
       const app = yield* ApiWorkerInit;
@@ -644,7 +771,6 @@ describe("native API application", () => {
       Effect.scoped
     )
   );
-
   it.effect("keeps rejected settings out of the native startup error", () =>
     Effect.gen(function* () {
       const exit = yield* ApiWorkerSettingsConfig.pipe(
@@ -658,14 +784,17 @@ describe("native API application", () => {
         ),
         Effect.exit
       );
-      expect(Exit.isFailure(exit)).toBe(true);
-      expect(String(exit)).not.toContain(sensitiveSentinel);
-      expect(String(exit)).toContain(
-        "API Worker origins are missing or invalid"
-      );
+      EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      EffectFunction.pipe(String(exit), (actual) => {
+        expect(actual).not.toContain(sensitiveSentinel);
+      });
+      EffectFunction.pipe(String(exit), (actual) => {
+        expect(actual).toContain("API Worker origins are missing or invalid");
+      });
     })
   );
-
   it.effect.each(["api", "website"] as const)(
     "replaces %s native log and reporter fields before console egress",
     (host) =>
@@ -674,18 +803,24 @@ describe("native API application", () => {
           Effect.annotateLogs({ [sensitiveSentinel]: sensitiveSentinel }),
           Effect.withLogSpan(sensitiveSentinel),
           Effect.provide(
-            host === "api" ? ApiHostTelemetryLive : WebsiteHostTelemetryLive
+            Match.value(host).pipe(
+              Match.when("api", () => ApiHostTelemetryLive),
+              Match.orElse(() => WebsiteHostTelemetryLive)
+            )
           )
         );
         yield* Effect.die(sensitiveSentinel).pipe(
           Effect.withErrorReporting,
           Effect.exit,
           Effect.provide(
-            host === "api" ? ApiHostTelemetryLive : WebsiteHostTelemetryLive
+            Match.value(host).pipe(
+              Match.when("api", () => ApiHostTelemetryLive),
+              Match.orElse(() => WebsiteHostTelemetryLive)
+            )
           )
         );
         const lines = yield* TestConsole.logLines;
-        expect(lines.length).toBe(2);
+        expect(lines).toHaveLength(2);
         const output = yield* Schema.encodeEffect(Json)(lines);
         expect(output).not.toContain(sensitiveSentinel);
         expect(output).toContain(`${host}.runtime.event`);
@@ -693,7 +828,6 @@ describe("native API application", () => {
         expect(output).not.toContain("cause");
       }).pipe(Effect.provide(TestConsole.layer))
   );
-
   it.effect(
     "writes one fixed request record without URL, headers or body",
     () =>
@@ -727,62 +861,80 @@ describe("native API application", () => {
         yield* send(`/api/health${query}`, "GET", null);
         yield* send(`/api/v1/calculators${query}`, "GET", null);
         const lines = yield* TestConsole.logLines;
-        expect(runtimeLines(lines)).toEqual([]);
-        const records = yield* Effect.forEach(lines, (line) =>
-          Schema.decodeUnknownEffect(
-            Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown))
-          )(line)
-        );
-        expect(
-          Array.map(records, (record) =>
-            Array.sort(Record.keys(record), Order.String)
-          )
-        ).toEqual(
-          Array.makeBy(3, () => [
-            "durationMs",
-            "event",
-            "level",
-            "method",
-            "outcome",
-            "route",
-            "service",
-            "status",
-            "statusClass",
-            "timestamp",
-          ])
-        );
-        const decoded = yield* Effect.forEach(lines, (line) =>
-          Schema.decodeUnknownEffect(Schema.fromJsonString(HostRequestRecord))(
-            line
+        EffectFunction.pipe(runtimeLines(lines), (actual) => {
+          expect(actual).toStrictEqual([]);
+        });
+        const records = yield* EffectFunction.pipe(
+          lines,
+          Effect.forEach((line) =>
+            Schema.decodeUnknownEffect(
+              Schema.fromJsonString(
+                Schema.Record(Schema.String, Schema.Unknown)
+              )
+            )(line)
           )
         );
-        expect(
-          Array.map(decoded, ({ method, outcome, route, service }) => ({
+        EffectFunction.pipe(
+          records,
+          Array.map((record) =>
+            EffectFunction.pipe(Record.keys(record), Array.sort(Order.String))
+          ),
+          (actual) => {
+            expect(actual).toStrictEqual(
+              Array.makeBy(3, () => [
+                "durationMs",
+                "event",
+                "level",
+                "method",
+                "outcome",
+                "route",
+                "service",
+                "status",
+                "statusClass",
+                "timestamp",
+              ])
+            );
+          }
+        );
+        const decoded = yield* EffectFunction.pipe(
+          lines,
+          Effect.forEach((line) =>
+            Schema.decodeUnknownEffect(
+              Schema.fromJsonString(HostRequestRecord)
+            )(line)
+          )
+        );
+        EffectFunction.pipe(
+          decoded,
+          Array.map(({ method, outcome, route, service }) => ({
             method,
             outcome,
             route,
             service,
-          }))
-        ).toEqual([
-          {
-            method: "POST",
-            outcome: "completed",
-            route: "calculate",
-            service: "taxkit-api",
-          },
-          {
-            method: "GET",
-            outcome: "completed",
-            route: "health",
-            service: "taxkit-api",
-          },
-          {
-            method: "GET",
-            outcome: "completed",
-            route: "catalogue",
-            service: "taxkit-api",
-          },
-        ]);
+          })),
+          (actual) => {
+            expect(actual).toStrictEqual([
+              {
+                method: "POST",
+                outcome: "completed",
+                route: "calculate",
+                service: "taxkit-api",
+              },
+              {
+                method: "GET",
+                outcome: "completed",
+                route: "health",
+                service: "taxkit-api",
+              },
+              {
+                method: "GET",
+                outcome: "completed",
+                route: "catalogue",
+                service: "taxkit-api",
+              },
+            ]);
+          }
+        );
         const output = yield* Schema.encodeEffect(Json)(lines);
         expect(output).not.toContain(sensitiveSentinel);
         expect(output).not.toContain("165400");
@@ -794,7 +946,6 @@ describe("native API application", () => {
         Effect.scoped
       )
   );
-
   it.effect("records failures and cancellation without their causes", () =>
     Effect.gen(function* () {
       const observe = observeHostRequest("taxkit-web", {
@@ -813,7 +964,7 @@ describe("native API application", () => {
           outcome: "completed",
           route: "docs",
           service: "taxkit-api",
-          status: 200,
+          status: Option.some(200),
           statusClass: "2xx",
         })
       );
@@ -823,34 +974,40 @@ describe("native API application", () => {
           line
         )
       );
-      expect(
-        Array.map(decoded, ({ method, outcome, status, statusClass }) => ({
+      EffectFunction.pipe(
+        decoded,
+        Array.map(({ method, outcome, status, statusClass }) => ({
           method,
           outcome,
           status,
           statusClass,
-        }))
-      ).toEqual([
-        {
-          method: "other",
-          outcome: "failed",
-          status: null,
-          statusClass: "none",
-        },
-        {
-          method: "other",
-          outcome: "interrupted",
-          status: null,
-          statusClass: "none",
-        },
-        {
-          method: "other",
-          outcome: "completed",
-          status: 503,
-          statusClass: "5xx",
-        },
-      ]);
-      expect(runtimeLines(lines).length).toBe(1);
+        })),
+        (actual) => {
+          expect(actual).toStrictEqual([
+            {
+              method: "other",
+              outcome: "failed",
+              status: Option.none(),
+              statusClass: "none",
+            },
+            {
+              method: "other",
+              outcome: "interrupted",
+              status: Option.none(),
+              statusClass: "none",
+            },
+            {
+              method: "other",
+              outcome: "completed",
+              status: Option.some(503),
+              statusClass: "5xx",
+            },
+          ]);
+        }
+      );
+      EffectFunction.pipe(runtimeLines(lines), (actual) => {
+        expect(actual).toHaveLength(1);
+      });
       const output = yield* Schema.encodeEffect(Json)(lines);
       expect(output).not.toContain(sensitiveSentinel);
       expect(output).toContain("website.runtime.event");
@@ -859,7 +1016,6 @@ describe("native API application", () => {
       Effect.provide(TestConsole.layer)
     )
   );
-
   it.effect(
     "captures a calculation defect in the installed safe reporter",
     () =>
@@ -895,8 +1051,13 @@ describe("native API application", () => {
           HttpServerResponse.toWeb(response).text()
         );
         const lines = yield* TestConsole.logLines;
-        expect(response.status).toBe(500);
-        expect(text).toBe("");
+        expect({
+          responseStatus: response.status,
+          text,
+        }).toStrictEqual({
+          responseStatus: 500,
+          text: "",
+        });
         expect(lines.length).toBeGreaterThan(0);
         expect(yield* Schema.encodeEffect(Json)(lines)).not.toContain(
           sensitiveSentinel

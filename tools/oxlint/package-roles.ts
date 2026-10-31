@@ -1,5 +1,4 @@
-import { Array, Number, Option } from "effect";
-
+import { Function as EffectFunction, Array, Number, Option } from "effect";
 // Roles are independent of package exports and dependency declarations. Adding
 // an export or dependency cannot grant a browser or deployment permission.
 const frontendModules = [
@@ -41,7 +40,7 @@ const frontendModules = [
 ];
 const hostModuleExceptions = [
   {
-    file: "apps/web/src/server.ts",
+    file: "apps/web/src/entry.server.ts",
     module: "@taxkit/observability/host-telemetry",
   },
   {
@@ -67,9 +66,11 @@ const hostSourceImports = [
   { file: "apps/web/src/lib/pages/loaders.ts", module: "../runtime.server" },
 ];
 export const isHostSourceImport = (file: string, address: string) =>
-  Array.some(
+  EffectFunction.pipe(
     hostSourceImports,
-    (exception) => exception.file === file && exception.module === address
+    Array.some(
+      (exception) => exception.file === file && exception.module === address
+    )
   );
 const isDeploymentDependency = (dependency: string) =>
   dependency === "@taxkit/infrastructure" ||
@@ -97,9 +98,11 @@ export const isFrontendModule = (file: string, address: string) =>
   Array.contains(frontendModules, address) ||
   (/\.(?:test|spec)\.[cm]?[jt]sx?$/u.test(file) &&
     /\/testing\/(?:fixtures|observations)$/u.test(address)) ||
-  Array.some(
+  EffectFunction.pipe(
     hostModuleExceptions,
-    (exception) => exception.file === file && exception.module === address
+    Array.some(
+      (exception) => exception.file === file && exception.module === address
+    )
   );
 // File ownership uses the longest root because transport/rule/SDK packages nest.
 interface WorkspaceOwner {
@@ -109,9 +112,10 @@ export const workspaceOwner = (
   owners: readonly WorkspaceOwner[],
   file: string
 ) =>
-  Array.findFirst(
-    Array.sort(owners, (left: WorkspaceOwner, right: WorkspaceOwner) =>
+  EffectFunction.pipe(
+    owners,
+    Array.sort((left: WorkspaceOwner, right: WorkspaceOwner) =>
       Number.Order(right.owner.length, left.owner.length)
     ),
-    ({ owner }) => file.startsWith(`${owner}/`)
+    Array.findFirst(({ owner }) => file.startsWith(`${owner}/`))
   ).pipe(Option.map(({ owner }) => owner));

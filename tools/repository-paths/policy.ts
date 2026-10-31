@@ -1,5 +1,12 @@
-import { Array, Match, Option, Order, Result } from "effect";
-import { pipe } from "effect/Function";
+import {
+  Function as EffectFunction,
+  Array,
+  Match,
+  Option,
+  Order,
+  Result,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import {
   RepositoryPathCategory,
@@ -31,12 +38,10 @@ const checkoutDirectoryPath = new RegExp(
   `(?:^|[^A-Za-z0-9_.~-])${checkoutDirectoryName}/[A-Za-z0-9._-]+`,
   "u"
 );
-
 const categoryForLine = (
   line: string
 ): Option.Option<RepositoryPathCategory> => {
   const candidate = line.replaceAll(httpsReference, "");
-
   return Match.value(candidate).pipe(
     Match.when(
       (value) => homeFileUrl.test(value),
@@ -61,51 +66,51 @@ const categoryForLine = (
     Match.option
   );
 };
-
 export const inspectRepositoryText = (
   file: RepositoryRelativeFile,
   text: string
 ): readonly RepositoryPathFinding[] =>
-  pipe(
+  EffectFunction.pipe(
     text.split(/\r?\n/u),
     Array.map((line, index) =>
-      Option.map(
+      EffectFunction.pipe(
         categoryForLine(line),
-        (category) =>
-          new RepositoryPathFinding({
-            category,
-            file,
-            line: index + 1,
-          })
+        Option.map(
+          (category) =>
+            new RepositoryPathFinding({
+              category,
+              file,
+              line: index + 1,
+            })
+        )
       )
     ),
     Array.getSomes
   );
-
 export const decodeReadableRepositoryText = (
   bytes: Uint8Array
 ): Option.Option<string> =>
-  bytes.includes(0)
-    ? Option.none()
-    : Result.try(() =>
+  EffectBoolean.match(bytes.includes(0), {
+    onFalse: () =>
+      Result.try(() =>
         new TextDecoder("utf-8", { fatal: true }).decode(bytes)
       ).pipe(
         Result.match({
           onFailure: Option.none,
           onSuccess: Option.some,
         })
-      );
-
+      ),
+    onTrue: () => Option.none(),
+  });
 const findingOrder = Order.combineAll<RepositoryPathFinding>([
   Order.mapInput(Order.String, (finding) => finding.file),
   Order.mapInput(Order.Number, (finding) => finding.line),
   Order.mapInput(Order.String, (finding) => finding.category),
 ]);
-
 const sortRepositoryPathFindings = (
   findings: Iterable<RepositoryPathFinding>
-): readonly RepositoryPathFinding[] => Array.sort(findings, findingOrder);
-
+): readonly RepositoryPathFinding[] =>
+  EffectFunction.pipe(findings, Array.sort(findingOrder));
 export const renderRepositoryPathReport = (
   report: RepositoryPathReport
 ): string =>
@@ -118,14 +123,15 @@ export const renderRepositoryPathReport = (
     Match.orElse(() =>
       [
         `Repository path check failed with ${report.findings.length} finding(s):`,
-        ...Array.map(
+        ...EffectFunction.pipe(
           report.findings,
-          (finding) => `${finding.file}:${finding.line} [${finding.category}]`
+          Array.map(
+            (finding) => `${finding.file}:${finding.line} [${finding.category}]`
+          )
         ),
       ].join("\n")
     )
   );
-
 export const createRepositoryPathReport = (options: {
   readonly binaryFiles: number;
   readonly findings: Iterable<RepositoryPathFinding>;

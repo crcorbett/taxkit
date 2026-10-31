@@ -8,7 +8,9 @@ import { checkDocumentation } from "./check.boundary.js";
 const program = Effect.gen(function* () {
   const path = yield* Path.Path;
   const root = yield* path.fromFileUrl(new URL("../..", import.meta.url));
-  const checked = yield* checkDocumentation(root);
+  const checked = yield* checkDocumentation({
+    repositoryRoot: root,
+  });
   yield* Console.log(`Documentation check passed for ${checked} documents.`);
 }).pipe(
   Effect.tapErrorTag("DocumentationError", (error) =>
@@ -16,5 +18,4 @@ const program = Effect.gen(function* () {
   ),
   Effect.provide(BunServices.layer)
 );
-
 BunRuntime.runMain(program);

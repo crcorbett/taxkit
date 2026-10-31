@@ -8,6 +8,12 @@ export const WebsiteSettingsLive = Layer.effect(
   WebsiteSettings,
   WebsiteSettingsConfig.pipe(
     Effect.result,
-    Effect.map((settings) => WebsiteSettings.of({ settings }))
+    Effect.map((settings) =>
+      WebsiteSettings.of({
+        settings: Effect.fromResult(settings).pipe(
+          Effect.withSpan("WebsiteSettings.settings")
+        ),
+      })
+    )
   )
 );

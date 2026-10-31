@@ -18,7 +18,9 @@ it.effect("loads settings without an API capability", () =>
     });
     const loaded = yield* loadRootView.pipe(
       Effect.provideService(WebsiteSettings, {
-        settings: Result.succeed(settings),
+        settings: Effect.succeed(settings).pipe(
+          Effect.withSpan("WebsiteSettings.settings")
+        ),
       })
     );
     const view = yield* Schema.decodeUnknownEffect(WebsiteRootView)(
@@ -29,7 +31,6 @@ it.effect("loads settings without an API capability", () =>
     );
   })
 );
-
 it.effect("keeps invalid required settings as a root failure", () =>
   Effect.gen(function* () {
     const failure = new TaxKitWebConfigError({
@@ -39,10 +40,12 @@ it.effect("keeps invalid required settings as a root failure", () =>
     });
     const loaded = yield* loadRootView.pipe(
       Effect.provideService(WebsiteSettings, {
-        settings: Result.fail(failure),
+        settings: Effect.fail(failure).pipe(
+          Effect.withSpan("WebsiteSettings.settings")
+        ),
       }),
       Effect.result
     );
-    expect(loaded).toEqual(Result.fail(failure));
+    expect(loaded).toStrictEqual(Result.fail(failure));
   })
 );

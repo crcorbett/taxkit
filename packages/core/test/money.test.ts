@@ -1,5 +1,11 @@
 import { describe, expect, it } from "@effect/vitest";
-import { BigDecimal, Effect, Result, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  BigDecimal,
+  Effect,
+  Result,
+  Schema,
+} from "effect";
 
 import {
   ComponentId,
@@ -32,12 +38,11 @@ import { RuleId, TraceNode } from "../src/trace/node.js";
 
 const MoneyResult = Schema.Result(Money, InvalidMoneyValue);
 const CentsResult = Schema.Result(Cents, InvalidMoneyValue);
-const maximum = aud(Cents.make(Number.MAX_SAFE_INTEGER));
-const minimum = aud(Cents.make(Number.MIN_SAFE_INTEGER));
-const oneCent = aud(Cents.make(1));
-const zero = aud(Cents.make(0));
+const maximum = EffectFunction.pipe(Cents.make(Number.MAX_SAFE_INTEGER), aud);
+const minimum = EffectFunction.pipe(Cents.make(Number.MIN_SAFE_INTEGER), aud);
+const oneCent = EffectFunction.pipe(Cents.make(1), aud);
+const zero = EffectFunction.pipe(Cents.make(0), aud);
 const two = DecimalCoefficient.make(BigDecimal.make(2n, 0));
-
 const trace = TraceNode.make({
   children: [],
   inputs: {},
@@ -46,20 +51,20 @@ const trace = TraceNode.make({
   sources: [],
   title: "Checked money test",
 });
-
 describe("checked money construction", () => {
   it.effect.each([0, 1, -1, Number.MAX_SAFE_INTEGER, Number.MIN_SAFE_INTEGER])(
     "retains safe whole cents %s and the historical Money encoding",
     (cents) =>
       Effect.gen(function* () {
         const value = yield* audFromCents(cents);
-        expect(value).toEqual(aud(Cents.make(cents)));
+        expect(value).toStrictEqual(
+          EffectFunction.pipe(Cents.make(cents), aud)
+        );
         expect(
           yield* Schema.encodeEffect(Schema.fromJsonString(Money))(value)
         ).toBe(`{"_tag":"Money","cents":${cents},"currency":"AUD"}`);
       })
   );
-
   it.effect.each([
     0.5,
     Number.NaN,
@@ -70,15 +75,16 @@ describe("checked money construction", () => {
   ])("returns a checked safe error for unsupported cents %s", (cents) =>
     Effect.gen(function* () {
       const result = yield* audFromCents(cents).pipe(Effect.result);
-      expect(Result.isFailure(result)).toBe(true);
-      expect(yield* Schema.encodeEffect(MoneyResult)(result)).toEqual(
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      expect(yield* Schema.encodeEffect(MoneyResult)(result)).toStrictEqual(
         yield* Schema.encodeEffect(MoneyResult)(
           Result.fail(new InvalidMoneyValue())
         )
       );
     })
   );
-
   it.effect.each([
     { cents: 4250, dollars: 42.5 },
     { cents: 124, dollars: 1.235 },
@@ -90,20 +96,21 @@ describe("checked money construction", () => {
         expect((yield* audDollars(dollars)).cents).toBe(cents);
       })
   );
-
   it.effect.each([
     Number.NaN,
     Number.POSITIVE_INFINITY,
     Number.MAX_SAFE_INTEGER,
   ])("rejects unsupported dollar conversion %s without a defect", (dollars) =>
     Effect.gen(function* () {
-      expect(
-        Result.isFailure(yield* audDollars(dollars).pipe(Effect.result))
-      ).toBe(true);
+      EffectFunction.pipe(
+        Result.isFailure(yield* audDollars(dollars).pipe(Effect.result)),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
     })
   );
 });
-
 describe("derived money", () => {
   it.effect("keeps valid addition, subtraction and rounding", () =>
     Effect.gen(function* () {
@@ -113,14 +120,14 @@ describe("derived money", () => {
       expect((yield* moneySub(minimum, zero)).cents).toBe(
         Number.MIN_SAFE_INTEGER
       );
-      expect((yield* moneySub(oneCent, aud(Cents.make(2)))).cents).toBe(-1);
+      const twoCents = EffectFunction.pipe(Cents.make(2), aud);
+      expect((yield* moneySub(oneCent, twoCents)).cents).toBe(-1);
+      const unrounded = EffectFunction.pipe(Cents.make(12_345), aud);
       expect(
-        (yield* roundMoney(aud(Cents.make(12_345)), "ato-withholding-rounding"))
-          .cents
+        (yield* roundMoney(unrounded, "ato-withholding-rounding")).cents
       ).toBe(12_300);
     })
   );
-
   it.effect.each([
     { name: "addition", operation: moneyAdd(maximum, oneCent) },
     { name: "subtraction", operation: moneySub(minimum, oneCent) },
@@ -128,8 +135,10 @@ describe("derived money", () => {
   ])("returns the owned failure for overflow during $name", ({ operation }) =>
     Effect.gen(function* () {
       const result = yield* operation.pipe(Effect.result);
-      expect(Result.isFailure(result)).toBe(true);
-      expect(yield* Schema.encodeEffect(MoneyResult)(result)).toEqual(
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      expect(yield* Schema.encodeEffect(MoneyResult)(result)).toStrictEqual(
         yield* Schema.encodeEffect(MoneyResult)(
           Result.fail(new InvalidMoneyValue())
         )
@@ -137,7 +146,6 @@ describe("derived money", () => {
     })
   );
 });
-
 describe("exact decimal operations", () => {
   it.effect(
     "handles admitted extreme exponents without constructing enormous powers",
@@ -145,18 +153,24 @@ describe("exact decimal operations", () => {
       Effect.gen(function* () {
         const enormous = yield* decimalCoefficient("1e9007199254740991");
         const tiny = yield* decimalCoefficient("1e-9007199254740991");
-        expect(
+        EffectFunction.pipe(
           Result.isFailure(
             yield* multiplyCentsByDecimal(oneCent.cents, enormous).pipe(
               Effect.result
             )
-          )
-        ).toBe(true);
-        expect(
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        EffectFunction.pipe(
           Result.isFailure(
             yield* decimalDollarsToCents(enormous).pipe(Effect.result)
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
         expect(yield* multiplyCentsByDecimal(oneCent.cents, tiny)).toBe(0);
         expect(yield* decimalDollarsToCents(tiny)).toBe(0);
         expect(yield* multiplyCentsByDecimal(zero.cents, enormous)).toBe(0);
@@ -165,25 +179,34 @@ describe("exact decimal operations", () => {
   it.effect("retains exact rates and half-away-from-zero cent rounding", () =>
     Effect.gen(function* () {
       const rate = yield* taxRate("0.325");
-      expect(BigDecimal.format(yield* Schema.encodeEffect(TaxRate)(rate))).toBe(
-        "0.325"
+      EffectFunction.pipe(
+        BigDecimal.format(yield* Schema.encodeEffect(TaxRate)(rate)),
+        (actual) => {
+          expect(actual).toBe("0.325");
+        }
       );
       const coefficient = yield* decimalCoefficient("0.5");
-      expect(yield* multiplyCentsByDecimal(Cents.make(3), coefficient)).toBe(2);
-      expect(yield* multiplyCentsByDecimal(Cents.make(-3), coefficient)).toBe(
-        -2
-      );
+      const positive = Cents.make(3);
+      const negative = Cents.make(-3);
+      expect(yield* multiplyCentsByDecimal(positive, coefficient)).toBe(2);
+      expect(yield* multiplyCentsByDecimal(negative, coefficient)).toBe(-2);
       expect(
         yield* decimalDollarsToCents(yield* decimalCoefficient("1.235"))
       ).toBe(124);
       expect(
         yield* decimalDollarsToCents(yield* decimalCoefficient("-1.235"))
       ).toBe(-124);
-      expect(BigDecimal.format(yield* taxRate(""))).toBe("0");
-      expect(BigDecimal.format(yield* decimalCoefficient(""))).toBe("0");
+      EffectFunction.pipe(BigDecimal.format(yield* taxRate("")), (actual) => {
+        expect(actual).toBe("0");
+      });
+      EffectFunction.pipe(
+        BigDecimal.format(yield* decimalCoefficient("")),
+        (actual) => {
+          expect(actual).toBe("0");
+        }
+      );
     })
   );
-
   it.effect.each(["private-decimal-sentinel", "NaN", "Infinity", "1.2.3"])(
     "returns safe checked failures for invalid rate and coefficient %s",
     (value) =>
@@ -192,14 +215,18 @@ describe("exact decimal operations", () => {
         const coefficient = yield* decimalCoefficient(value).pipe(
           Effect.result
         );
-        expect(Result.isFailure(rate)).toBe(true);
-        expect(Result.isFailure(coefficient)).toBe(true);
+        EffectFunction.pipe(Result.isFailure(rate), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        EffectFunction.pipe(Result.isFailure(coefficient), (actual) => {
+          expect(actual).toBeTruthy();
+        });
         const expected = new InvalidDecimalValue();
         expect(
           yield* Schema.encodeEffect(
             Schema.Result(TaxRate, InvalidDecimalValue)
           )(rate)
-        ).toEqual(
+        ).toStrictEqual(
           yield* Schema.encodeEffect(
             Schema.Result(TaxRate, InvalidDecimalValue)
           )(Result.fail(expected))
@@ -208,14 +235,13 @@ describe("exact decimal operations", () => {
           yield* Schema.encodeEffect(
             Schema.Result(DecimalCoefficient, InvalidDecimalValue)
           )(coefficient)
-        ).toEqual(
+        ).toStrictEqual(
           yield* Schema.encodeEffect(
             Schema.Result(DecimalCoefficient, InvalidDecimalValue)
           )(Result.fail(expected))
         );
       })
   );
-
   it.effect.each([
     {
       name: "multiplication",
@@ -223,17 +249,20 @@ describe("exact decimal operations", () => {
     },
     {
       name: "dollars to cents",
-      operation: decimalDollarsToCents(
+      operation: EffectFunction.pipe(
         DecimalCoefficient.make(
           BigDecimal.make(BigInt(Number.MAX_SAFE_INTEGER), 0)
-        )
+        ),
+        decimalDollarsToCents
       ),
     },
   ])("rejects a result too large after $name", ({ operation }) =>
     Effect.gen(function* () {
       const result = yield* operation.pipe(Effect.result);
-      expect(Result.isFailure(result)).toBe(true);
-      expect(yield* Schema.encodeEffect(CentsResult)(result)).toEqual(
+      EffectFunction.pipe(Result.isFailure(result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      expect(yield* Schema.encodeEffect(CentsResult)(result)).toStrictEqual(
         yield* Schema.encodeEffect(CentsResult)(
           Result.fail(new InvalidMoneyValue())
         )
@@ -241,7 +270,6 @@ describe("exact decimal operations", () => {
     })
   );
 });
-
 describe("ledger totals", () => {
   it.effect(
     "sums active amounts while retaining ignored items in the ledger",
@@ -249,7 +277,7 @@ describe("ledger totals", () => {
       Effect.gen(function* () {
         const components = [
           LedgerComponent.make({
-            amount: aud(Cents.make(100)),
+            amount: EffectFunction.pipe(Cents.make(100), aud),
             effect: "additive",
             id: ComponentId.make("add"),
             label: "Add",
@@ -257,7 +285,7 @@ describe("ledger totals", () => {
             trace,
           }),
           LedgerComponent.make({
-            amount: aud(Cents.make(25)),
+            amount: EffectFunction.pipe(Cents.make(25), aud),
             effect: "subtractive",
             id: ComponentId.make("subtract"),
             label: "Subtract",
@@ -294,7 +322,6 @@ describe("ledger totals", () => {
         expect((yield* sumLedgerComponents([])).cents).toBe(0);
       })
   );
-
   it.effect(
     "fails at an overflowing intermediate total even if a later item would cancel it",
     () =>
@@ -328,8 +355,10 @@ describe("ledger totals", () => {
         const result = yield* sumLedgerComponents(components).pipe(
           Effect.result
         );
-        expect(Result.isFailure(result)).toBe(true);
-        expect(yield* Schema.encodeEffect(MoneyResult)(result)).toEqual(
+        EffectFunction.pipe(Result.isFailure(result), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        expect(yield* Schema.encodeEffect(MoneyResult)(result)).toStrictEqual(
           yield* Schema.encodeEffect(MoneyResult)(
             Result.fail(new InvalidMoneyValue())
           )

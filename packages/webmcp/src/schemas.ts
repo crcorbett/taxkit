@@ -19,19 +19,19 @@ export interface WebMcpTool {
 
 // Why the host refused: the DOMException name it reported, a missed deadline
 // or any other refusal. The name is bounded, so a refusal is visible in logs.
-export class WebMcpRegistrationError extends Schema.TaggedError<WebMcpRegistrationError>()(
-  "WebMcpRegistrationError",
-  {
-    reason: Schema.Literals([
-      "AbortError",
-      "DataCloneError",
-      "InvalidStateError",
-      "NotAllowedError",
-      "NotSupportedError",
-      "SecurityError",
-      "registration-timeout",
-      "unexpected-host-refusal",
-    ]),
-    tool: Schema.String.check(Schema.isMaxLength(128)),
-  }
-) {}
+export class WebMcpRegistrationError extends Schema.TaggedError<
+  WebMcpRegistrationError,
+  { readonly brand: unique symbol }
+>()("WebMcpRegistrationError", {
+  reason: Schema.Literals([
+    "AbortError",
+    "DataCloneError",
+    "InvalidStateError",
+    "NotAllowedError",
+    "NotSupportedError",
+    "SecurityError",
+    "registration-timeout",
+    "unexpected-host-refusal",
+  ]),
+  tool: Schema.String.check(Schema.isMaxLength(128)),
+}) {}

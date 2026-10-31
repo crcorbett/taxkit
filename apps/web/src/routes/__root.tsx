@@ -13,7 +13,15 @@ import {
 } from "@tanstack/react-router";
 import { referencePath } from "@taxkit/api-http/routes";
 import { CalculatorSummaries } from "@taxkit/calculators/summaries";
-import { Array, Function, Option, Result, Schema } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  Function,
+  Option,
+  Result,
+  Schema,
+} from "effect";
 import type * as AtomRegistry from "effect/reactivity/AtomRegistry";
 import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
@@ -32,7 +40,6 @@ const SettingsUnavailable = () => (
     <p role="alert">TaxKit cannot load its settings. Please try again later.</p>
   </main>
 );
-
 const RootShell = ({ children }: { readonly children: ReactNode }) => (
   <html lang="en-AU">
     <head>
@@ -44,14 +51,16 @@ const RootShell = ({ children }: { readonly children: ReactNode }) => (
     </body>
   </html>
 );
-
 // The browser registry was created before loaders ran; React uses that same
 // registry. React can replay mount and cleanup in development, so disposal is
 // scheduled and cancelled by the next mount rather than run immediately.
 const BrowserRegistry = ({
   children,
   registry,
-}: Readonly<{ children: ReactNode; registry: AtomRegistry.AtomRegistry }>) => {
+}: Readonly<{
+  children: ReactNode;
+  registry: AtomRegistry.AtomRegistry;
+}>) => {
   const pendingDisposal = useRef(Function.constVoid);
   useEffect(() => {
     pendingDisposal.current();
@@ -67,11 +76,13 @@ const BrowserRegistry = ({
     </RegistryContext.Provider>
   );
 };
-
 const RootRegistry = ({
   children,
   registry,
-}: Readonly<{ children: ReactNode; registry: LoaderContext["registry"] }>) =>
+}: Readonly<{
+  children: ReactNode;
+  registry: LoaderContext["registry"];
+}>) =>
   Option.match(registry, {
     // Server rendering keeps an isolated registry per request.
     onNone: () => <RegistryProvider>{children}</RegistryProvider>,
@@ -79,72 +90,18 @@ const RootRegistry = ({
       <BrowserRegistry registry={value}>{children}</BrowserRegistry>
     ),
   });
-
 const InitialSettings = ({
   children,
   settings,
-}: Readonly<{ children: ReactNode; settings: WebsitePublicSettings }>) => {
+}: Readonly<{
+  children: ReactNode;
+  settings: WebsitePublicSettings;
+}>) => {
   useAtomInitialValues([[publicSettingsAtom, Option.some(settings)]]);
   return children;
 };
-
 export const Route = createRootRouteWithContext<LoaderContext>()({
-  component: function RootComponent() {
-    const data = Route.useLoaderData();
-    const { registry } = Route.useRouteContext();
-    const view = useMemo(
-      () => Schema.decodeUnknownResult(WebsiteRootView)(data.view),
-      [data.view]
-    );
-    if (Result.isFailure(view)) {
-      return <SettingsUnavailable />;
-    }
-    const { settings } = view.success;
-    return (
-      <RootRegistry registry={registry}>
-        <InitialSettings settings={settings}>
-          <div className="app-shell">
-            <a className="skip-link" href="#main-content">
-              Skip to content
-            </a>
-            <nav aria-label="Calculators">
-              <ul>
-                {Array.map(CalculatorSummaries, (calculator) => (
-                  <li key={calculator.calculatorId}>
-                    {calculator.calculatorId === "au.pay.take-home" ? (
-                      <Link activeProps={{ "aria-current": "page" }} to="/">
-                        {calculator.title}
-                      </Link>
-                    ) : (
-                      <Link
-                        activeProps={{ "aria-current": "page" }}
-                        to="/calculators/$calculatorId"
-                        params={{ calculatorId: calculator.calculatorId }}
-                      >
-                        {calculator.title}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              <a href={new URL(referencePath, settings.apiOrigin).href}>
-                For developers: API documentation
-              </a>
-              <Link activeProps={{ "aria-current": "page" }} to="/agents">
-                For agents: API access
-              </Link>
-              <Link params={{ _splat: "start/quickstart" }} to="/$">
-                Documentation
-              </Link>
-            </nav>
-            <main id="main-content" tabIndex={-1}>
-              <Outlet />
-            </main>
-          </div>
-        </InitialSettings>
-      </RootRegistry>
-    );
-  },
+  component: RootComponent,
   errorComponent: SettingsUnavailable,
   head: () => ({
     meta: [
@@ -165,3 +122,69 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
   // default applies to documentation routes.
   staleTime: 0,
 });
+
+function RootComponent() {
+  const data = Route.useLoaderData();
+  const { registry } = Route.useRouteContext();
+  const view = useMemo(
+    () => Schema.decodeUnknownResult(WebsiteRootView)(data.view),
+    [data.view]
+  );
+  if (Result.isFailure(view)) {
+    return <SettingsUnavailable />;
+  }
+  const { settings } = view.success;
+  return (
+    <RootRegistry registry={registry}>
+      <InitialSettings settings={settings}>
+        <div className="app-shell">
+          <a className="skip-link" href="#main-content">
+            Skip to content
+          </a>
+          <nav aria-label="Calculators">
+            <ul>
+              {EffectFunction.pipe(
+                CalculatorSummaries,
+                Array.map((calculator) => (
+                  <li key={calculator.calculatorId}>
+                    {Match.value(calculator.calculatorId).pipe(
+                      Match.when(
+                        (id) => id === "au.pay.take-home",
+                        () => (
+                          <Link activeProps={{ "aria-current": "page" }} to="/">
+                            {calculator.title}
+                          </Link>
+                        )
+                      ),
+                      Match.orElse(() => (
+                        <Link
+                          activeProps={{ "aria-current": "page" }}
+                          to="/calculators/$calculatorId"
+                          params={{ calculatorId: calculator.calculatorId }}
+                        >
+                          {calculator.title}
+                        </Link>
+                      ))
+                    )}
+                  </li>
+                ))
+              )}
+            </ul>
+            <a href={new URL(referencePath, settings.apiOrigin).href}>
+              For developers: API documentation
+            </a>
+            <Link activeProps={{ "aria-current": "page" }} to="/agents">
+              For agents: API access
+            </Link>
+            <Link params={{ _splat: "start/quickstart" }} to="/$">
+              Documentation
+            </Link>
+          </nav>
+          <main id="main-content" tabIndex={-1}>
+            <Outlet />
+          </main>
+        </div>
+      </InitialSettings>
+    </RootRegistry>
+  );
+}

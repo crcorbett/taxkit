@@ -1,5 +1,13 @@
 import { expect, it } from "@effect/vitest";
-import { Effect, Fiber, Layer, Result } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Effect,
+  Fiber,
+  Layer,
+  Predicate,
+  Result,
+} from "effect";
 import { TestClock } from "effect/testing";
 import { vi } from "vitest";
 
@@ -15,15 +23,25 @@ it.effect.each(["headers", "body"] as const)(
       // Promise and stream callbacks are the native fetch host fixture.
       const binding = {
         connect: vi.fn<(...args: readonly unknown[]) => void>(),
-        fetch: vi.fn((_url: string, init?: RequestInit) => {
+        fetch: vi.fn<
+          (
+            url: string,
+            init?: RequestInit
+          ) => ReturnType<typeof globalThis.fetch>
+        >((_url, init) => {
           init?.signal?.addEventListener("abort", aborted);
-          return stall === "headers"
-            ? Effect.runPromise(Effect.never, {
+          return Match.value(stall).pipe(
+            Match.when("headers", () =>
+              Effect.runPromise(Effect.never, {
                 signal: init?.signal ?? undefined,
               })
-            : Promise.resolve(
+            ),
+            Match.orElse(() =>
+              Promise.resolve(
                 new Response(new ReadableStream({ cancel: aborted }))
-              );
+              )
+            )
+          );
         }),
       };
       const host = yield* WebsiteApi.pipe(
@@ -41,17 +59,19 @@ it.effect.each(["headers", "body"] as const)(
         )
       );
       const fiber = yield* host
-        .forward("/api/v1/docs/discovery/robots.txt")
+        .forward({
+          path: "/api/v1/docs/discovery/robots.txt",
+        })
         .pipe(Effect.result, Effect.forkScoped);
       yield* TestClock.adjust("10 seconds");
       const result = yield* Fiber.join(fiber);
-      expect(Result.isFailure(result) && result.failure._tag).toBe(
-        "ApiDeadlineExceeded"
-      );
-      expect(aborted).toHaveBeenCalled();
+      const failedAsExpected =
+        Result.isFailure(result) &&
+        Predicate.isTagged(result.failure, "ApiDeadlineExceeded");
+      expect(failedAsExpected).toBeTruthy();
+      expect(aborted).toHaveBeenCalledOnce();
     }).pipe(Effect.scoped)
 );
-
 it.effect.each([
   { body: "User-agent: *", status: 200, succeeds: true },
   { body: "missing", status: 404, succeeds: true },
@@ -63,7 +83,7 @@ it.effect.each([
     Effect.gen(function* () {
       const binding = {
         connect: vi.fn<(...args: readonly unknown[]) => void>(),
-        fetch: vi.fn(() =>
+        fetch: vi.fn<() => ReturnType<typeof globalThis.fetch>>(() =>
           Promise.resolve(
             new Response(body, {
               headers: {
@@ -90,13 +110,20 @@ it.effect.each([
         )
       );
       const result = yield* host
-        .forward("/api/v1/docs/discovery/robots.txt")
+        .forward({
+          path: "/api/v1/docs/discovery/robots.txt",
+        })
         .pipe(Effect.result);
-      expect(Result.isSuccess(result)).toBe(succeeds);
+      EffectFunction.pipe(Result.isSuccess(result), (actual) => {
+        expect(actual).toBe(succeeds);
+      });
       if (Result.isSuccess(result)) {
         expect(result.success.status).toBe(status);
-        expect(result.success.headers.get("cache-control")).toBe(
-          "public, max-age=60"
+        EffectFunction.pipe(
+          result.success.headers.get("cache-control"),
+          (actual) => {
+            expect(actual).toBe("public, max-age=60");
+          }
         );
         expect(yield* Effect.promise(() => result.success.text())).toBe(
           body ?? ""

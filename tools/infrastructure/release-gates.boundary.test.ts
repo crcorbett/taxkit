@@ -1,6 +1,7 @@
 import { BunServices } from "@effect/platform-bun";
 import { describe, expect, it } from "@effect/vitest";
 import {
+  Function as EffectFunction,
   Array,
   Effect,
   FileSystem,
@@ -9,6 +10,7 @@ import {
   Record,
   Schema,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
 import { parse } from "yaml";
@@ -50,7 +52,6 @@ const Workflow = Schema.Struct({
 const checksWorkflow = ".github/workflows/checks.yml";
 const providerCommand = /^bun run (?:pr|production):(?:plan|deploy)\b/u;
 const statusOverride = /\b(?:always|failure|cancelled)\s*\(/u;
-
 // These executable fixture leaves cannot build, access a provider or use a
 // credential. The orchestration scripts themselves are read from the repository.
 const bunFixture = `#!/bin/sh
@@ -68,7 +69,6 @@ printf 'alchemy %s\\n' "$*" >> "$GATE_FIXTURE/calls"
 const turboFixture = `#!/bin/sh
 printf 'turbo %s\\n' "$*" >> "$GATE_FIXTURE/calls"
 `;
-
 const commandFixture = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const directory = yield* fs.makeTempDirectoryScoped({
@@ -101,14 +101,19 @@ const commandFixture = Effect.gen(function* () {
   yield* fs.chmod(`${directory}/gh`, 0o700);
   return { directory, scripts: manifest.scripts };
 });
-
-const runCommand = Effect.fnUntraced(function* (
-  fixture: Effect.Success<typeof commandFixture>,
-  command: string,
-  fail?: string,
-  args: readonly string[] = [],
-  pullRequestState: "open" | "closed" = "closed"
-) {
+const runCommand = Effect.fnUntraced(function* ({
+  fixture,
+  command,
+  fail,
+  args = [],
+  pullRequestState = "closed",
+}: {
+  readonly fixture: Effect.Success<typeof commandFixture>;
+  readonly command: string;
+  readonly fail?: string;
+  readonly args?: readonly string[];
+  readonly pullRequestState?: "open" | "closed";
+}) {
   const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
   const child = yield* spawner.spawn(
     ChildProcess.make(
@@ -145,12 +150,14 @@ const runCommand = Effect.fnUntraced(function* (
   const calls = yield* fs.readFileString(`${fixture.directory}/calls`);
   const outputs = yield* fs.readFileString(`${fixture.directory}/outputs`);
   return {
-    calls: Array.filter(calls.trim().split("\n"), (line) => line.length > 0),
+    calls: EffectFunction.pipe(
+      calls.trim().split("\n"),
+      Array.filter((line) => line.length > 0)
+    ),
     code: Number(code),
     outputs,
   };
 });
-
 const workflow = (path: string) =>
   FileSystem.FileSystem.pipe(
     Effect.flatMap((fs) => fs.readFileString(path)),
@@ -160,35 +167,43 @@ const workflow = (path: string) =>
       ).pipe(Effect.flatMap(Effect.fromResult))
     )
   );
-
 describe("required native release gate", () => {
   it.effect(
     "runs native build and tests after all earlier verification work",
     () =>
       Effect.gen(function* () {
         const fixture = yield* commandFixture;
-        const result = yield* runCommand(fixture, "bun run verification");
+        const result = yield* runCommand({
+          fixture,
+          command: "bun run verification",
+        });
         expect(result.code).toBe(0);
-        expect(result.calls.slice(-2)).toEqual([
-          "run --filter=web build:native-pair",
-          "run --filter=web test:native-pair",
-        ]);
-        expect(result.calls.indexOf("run test:tools")).toBeLessThan(
-          result.calls.indexOf("run --filter=web build:native-pair")
+        EffectFunction.pipe(result.calls.slice(-2), (actual) => {
+          expect(actual).toStrictEqual([
+            "run --filter=web build:native-pair",
+            "run --filter=web test:native-pair",
+          ]);
+        });
+        EffectFunction.pipe(
+          result.calls.indexOf("run test:tools"),
+          (actual) => {
+            expect(actual).toBeLessThan(
+              result.calls.indexOf("run --filter=web build:native-pair")
+            );
+          }
         );
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   it.effect.each(["build:native-pair", "test:native-pair"])(
     "blocks later release checks when native %s fails",
     (failure) =>
       Effect.gen(function* () {
         const fixture = yield* commandFixture;
-        const result = yield* runCommand(
+        const result = yield* runCommand({
           fixture,
-          "bun run release:check",
-          `run --filter=web ${failure}`
-        );
+          command: "bun run release:check",
+          fail: `run --filter=web ${failure}`,
+        });
         expect(result.code).not.toBe(0);
         expect(result.calls).not.toContain("run sdk:check-packed-artifact");
         expect(result.calls).not.toContain("run changeset:status");
@@ -199,7 +214,6 @@ describe("required native release gate", () => {
         }
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   it.effect(
     "runs every Checks verification gate once and fails the job when native fails",
     () =>
@@ -209,45 +223,69 @@ describe("required native release gate", () => {
           Option.getOrElse(() => expect.fail("Missing checks job"))
         );
         const { "continue-on-error": checksMayFail } = checks;
-        expect(Option.getOrElse(checksMayFail, () => false)).toBe(false);
-        expect(checks.if).toEqual(
+        EffectFunction.pipe(
+          Option.getOrElse(checksMayFail, () => false),
+          (actual) => {
+            expect(!actual).toBeTruthy();
+          }
+        );
+        expect(checks.if).toStrictEqual(
           Option.some("github.event.action != 'closed'")
         );
-        const gates = Array.filter(checks.steps, (step) =>
-          Option.contains(step.run, "bun run verification")
+        const gates = EffectFunction.pipe(
+          checks.steps,
+          Array.filter((step) =>
+            Option.contains(step.run, "bun run verification")
+          )
         );
         // One trusted gate with the remote cache, one credential-free fork gate.
         expect(gates).toHaveLength(2);
-        expect(
+        EffectFunction.pipe(
+          gates,
           Array.every(
-            gates,
             ({ "continue-on-error": stepMayFail }) =>
               !Option.getOrElse(stepMayFail, () => false)
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
         // No other job repeats verification for the same revision.
-        expect(
-          Array.flatMap(Record.toEntries(configuration.jobs), ([name, job]) =>
-            Array.some(job.steps, (step) =>
-              Option.contains(step.run, "bun run verification")
+        EffectFunction.pipe(
+          Record.toEntries(configuration.jobs),
+          Array.flatMap(([name, job]) =>
+            EffectBoolean.match(
+              EffectFunction.pipe(
+                job.steps,
+                Array.some((step) =>
+                  Option.contains(step.run, "bun run verification")
+                )
+              ),
+              {
+                onFalse: () => [],
+                onTrue: () => [name],
+              }
             )
-              ? [name]
-              : []
-          )
-        ).toEqual(["checks"]);
+          ),
+          (actual) => {
+            // No other job repeats verification for the same revision.
+            expect(actual).toStrictEqual(["checks"]);
+          }
+        );
         const fixture = yield* commandFixture;
-        const result = yield* runCommand(
+        const result = yield* runCommand({
           fixture,
-          "bun run verification",
-          "run --filter=web test:native-pair"
-        );
+          command: "bun run verification",
+          fail: "run --filter=web test:native-pair",
+        });
         expect(result.code).not.toBe(0);
-        expect(Array.last(result.calls)).toEqual(
-          Option.some("run --filter=web test:native-pair")
-        );
+        EffectFunction.pipe(Array.last(result.calls), (actual) => {
+          expect(actual).toStrictEqual(
+            Option.some("run --filter=web test:native-pair")
+          );
+        });
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   it.effect(
     "admits Preview and Production only after Checks passed for the same commit",
     () =>
@@ -255,31 +293,49 @@ describe("required native release gate", () => {
         const fs = yield* FileSystem.FileSystem;
         const files = yield* fs.readDirectory(".github/workflows");
         const providerJobs = yield* Effect.forEach(
-          Array.sort(files, Order.String),
+          EffectFunction.pipe(files, Array.sort(Order.String)),
           (file) =>
             workflow(`.github/workflows/${file}`).pipe(
               Effect.map((configuration) =>
-                Array.flatMap(
+                EffectFunction.pipe(
                   Record.toEntries(configuration.jobs),
-                  ([name, job]) =>
-                    Array.some(job.steps, (step) =>
-                      Option.exists(step.run, (run) =>
-                        providerCommand.test(run)
-                      )
+                  Array.flatMap(([name, job]) =>
+                    EffectBoolean.match(
+                      EffectFunction.pipe(
+                        job.steps,
+                        Array.some((step) =>
+                          Option.exists(step.run, (run) =>
+                            providerCommand.test(run)
+                          )
+                        )
+                      ),
+                      {
+                        onFalse: () => [],
+                        onTrue: () => [{ file, job, name }],
+                      }
                     )
-                      ? [{ file, job, name }]
-                      : []
+                  )
                 )
               )
             )
         ).pipe(Effect.map(Array.flatten));
-        expect(
-          Array.map(providerJobs, ({ file, name }) => `${file}#${name}`)
-        ).toEqual(["checks.yml#deploy", "checks.yml#production"]);
+        EffectFunction.pipe(
+          providerJobs,
+          Array.map(({ file, name }) => `${file}#${name}`),
+          (actual) => {
+            expect(actual).toStrictEqual([
+              "checks.yml#deploy",
+              "checks.yml#production",
+            ]);
+          }
+        );
         const checkoutRef = (job: (typeof providerJobs)[number]["job"]) =>
-          Array.findFirst(job.steps, (step) =>
-            Option.exists(step.uses, (uses) =>
-              uses.startsWith("actions/checkout@")
+          EffectFunction.pipe(
+            job.steps,
+            Array.findFirst((step) =>
+              Option.exists(step.uses, (uses) =>
+                uses.startsWith("actions/checkout@")
+              )
             )
           ).pipe(
             Option.flatMap((step) => step.with),
@@ -293,100 +349,140 @@ describe("required native release gate", () => {
         );
         // Checks verifies the pull request head, or the pushed commit; each
         // deploy job checks out exactly that revision.
-        expect(checkoutRef(checks)).toEqual(
-          Option.some("github.event.pull_request.head.sha || github.sha")
-        );
+        EffectFunction.pipe(checkoutRef(checks), (actual) => {
+          // Checks verifies the pull request head, or the pushed commit; each
+          // deploy job checks out exactly that revision.
+          expect(actual).toStrictEqual(
+            Option.some("github.event.pull_request.head.sha || github.sha")
+          );
+        });
         const expectedRef: Record.ReadonlyRecord<string, string> = {
           deploy: "github.event.pull_request.head.sha",
           production: "github.sha",
         };
-        yield* Effect.forEach(providerJobs, ({ job, name }) =>
-          Effect.sync(() => {
-            const { "continue-on-error": jobMayFail } = job;
-            expect(Option.getOrElse(jobMayFail, () => false)).toBe(false);
-            expect(job.needs).toEqual(Option.some("checks"));
-            expect(
-              Option.exists(job.if, (condition) =>
-                statusOverride.test(condition)
-              )
-            ).toBe(false);
-            expect(
-              Array.some(job.steps, (step) =>
-                Option.exists(step.if, (condition) =>
+        yield* EffectFunction.pipe(
+          providerJobs,
+          Effect.forEach(({ job, name }) =>
+            Effect.sync(() => {
+              const { "continue-on-error": jobMayFail } = job;
+              EffectFunction.pipe(
+                Option.getOrElse(jobMayFail, () => false),
+                (actual) => {
+                  expect(!actual).toBeTruthy();
+                }
+              );
+              expect(job.needs).toStrictEqual(Option.some("checks"));
+              EffectFunction.pipe(
+                Option.exists(job.if, (condition) =>
                   statusOverride.test(condition)
-                )
-              )
-            ).toBe(false);
-            expect(
-              Array.filter(job.steps, (step) =>
-                Option.exists(step.run, (run) => providerCommand.test(run))
-              )
-            ).toHaveLength(2);
-            expect(checkoutRef(job)).toEqual(Record.get(expectedRef, name));
-          })
+                ),
+                (actual) => {
+                  expect(!actual).toBeTruthy();
+                }
+              );
+              EffectFunction.pipe(
+                job.steps,
+                Array.some((step) =>
+                  Option.exists(step.if, (condition) =>
+                    statusOverride.test(condition)
+                  )
+                ),
+                (actual) => {
+                  expect(!actual).toBeTruthy();
+                }
+              );
+              EffectFunction.pipe(
+                job.steps,
+                Array.filter((step) =>
+                  Option.exists(step.run, (run) => providerCommand.test(run))
+                ),
+                (actual) => {
+                  expect(actual).toHaveLength(2);
+                }
+              );
+              EffectFunction.pipe(checkoutRef(job), (actual) => {
+                expect(actual).toStrictEqual(Record.get(expectedRef, name));
+              });
+            })
+          )
         );
       }).pipe(Effect.provide(BunServices.layer))
   );
-
   it.effect.each(["checks"])(
     "checks the %s Doppler secret first and gives the token only to native commands",
     (name) =>
       Effect.gen(function* () {
         const configuration = yield* workflow(`.github/workflows/${name}.yml`);
-        const credentialJobs = Array.filter(
+        const credentialJobs = EffectFunction.pipe(
           Record.values(configuration.jobs),
-          (job) =>
-            Array.some(job.steps, (step) =>
-              Option.exists(step.env, (env) => Record.has(env, "DOPPLER_TOKEN"))
+          Array.filter((job) =>
+            EffectFunction.pipe(
+              job.steps,
+              Array.some((step) =>
+                Option.exists(step.env, (env) =>
+                  Record.has(env, "DOPPLER_TOKEN")
+                )
+              )
             )
+          )
         );
         expect(credentialJobs.length).toBeGreaterThan(0);
-        yield* Effect.forEach(credentialJobs, (job) =>
-          Effect.gen(function* () {
-            const check = Array.head(job.steps).pipe(
-              Option.getOrElse(() => expect.fail("Missing job steps"))
-            );
-            const { "continue-on-error": checkMayFail } = check;
-            expect(check.env).toEqual(
-              Option.some({
-                DOPPLER_TOKEN_SET: `\${{ secrets.DOPPLER_TOKEN != '' }}`,
-              })
-            );
-            expect(check.if).toEqual(Option.none());
-            expect(Option.getOrElse(checkMayFail, () => false)).toBe(false);
-            expect(
-              Array.every(
+        yield* EffectFunction.pipe(
+          credentialJobs,
+          Effect.forEach((job) =>
+            Effect.gen(function* () {
+              const check = Array.head(job.steps).pipe(
+                Option.getOrElse(() => expect.fail("Missing job steps"))
+              );
+              const { "continue-on-error": checkMayFail } = check;
+              expect(check.env).toStrictEqual(
+                Option.some({
+                  DOPPLER_TOKEN_SET: `\${{ secrets.DOPPLER_TOKEN != '' }}`,
+                })
+              );
+              expect(check.if).toStrictEqual(Option.none());
+              EffectFunction.pipe(
+                Option.getOrElse(checkMayFail, () => false),
+                (actual) => {
+                  expect(!actual).toBeTruthy();
+                }
+              );
+              EffectFunction.pipe(
                 job.steps,
-                (step) =>
-                  !Option.exists(step.env, (env) =>
-                    Record.has(env, "DOPPLER_TOKEN")
-                  ) ||
-                  Option.exists(step.run, (run) =>
-                    /^bun run (?:pr|production):(?:plan|deploy|destroy|drift)\b/u.test(
-                      run
+                Array.every(
+                  (step) =>
+                    !Option.exists(step.env, (env) =>
+                      Record.has(env, "DOPPLER_TOKEN")
+                    ) ||
+                    Option.exists(step.run, (run) =>
+                      /^bun run (?:pr|production):(?:plan|deploy|destroy|drift)\b/u.test(
+                        run
+                      )
                     )
-                  )
-              )
-            ).toBe(true);
-            const command = Option.getOrElse(check.run, () =>
-              expect.fail("Missing token check")
-            );
-            const fixture = yield* commandFixture;
-            const missing = yield* runCommand(
-              fixture,
-              `DOPPLER_TOKEN_SET=false; ${command};`
-            );
-            const present = yield* runCommand(
-              fixture,
-              `DOPPLER_TOKEN_SET=true; ${command};`
-            );
-            expect(missing.code).not.toBe(0);
-            expect(present.code).toBe(0);
-          })
+                ),
+                (actual) => {
+                  expect(actual).toBeTruthy();
+                }
+              );
+              const command = Option.getOrElse(check.run, () =>
+                expect.fail("Missing token check")
+              );
+              const fixture = yield* commandFixture;
+              const missing = yield* runCommand({
+                fixture,
+                command: `DOPPLER_TOKEN_SET=false; ${command};`,
+              });
+              const present = yield* runCommand({
+                fixture,
+                command: `DOPPLER_TOKEN_SET=true; ${command};`,
+              });
+              expect(missing.code).not.toBe(0);
+              expect(present.code).toBe(0);
+            })
+          )
         );
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   // `--yes` also lets native Alchemy set up or upgrade the shared state store.
   // A matching run without it fails closed first when the store is not ready.
   it.effect.each(["checks"])(
@@ -394,49 +490,65 @@ describe("required native release gate", () => {
     (name) =>
       Effect.gen(function* () {
         const configuration = yield* workflow(`.github/workflows/${name}.yml`);
-        const applies = Array.flatMap(
+        const applies = EffectFunction.pipe(
           Record.values(configuration.jobs),
-          (job) =>
-            Array.map(
-              Array.filter(job.steps, (step) =>
+          Array.flatMap((job) =>
+            EffectFunction.pipe(
+              job.steps,
+              Array.filter((step) =>
                 Option.exists(step.run, (run) => run.includes("--yes"))
               ),
-              (step) => ({ job, step })
+              Array.map((step) => ({ job, step }))
             )
+          )
         );
         expect(applies.length).toBeGreaterThan(0);
-        yield* Effect.forEach(applies, ({ job, step }) =>
-          Effect.sync(() => {
-            const run = Option.getOrElse(step.run, () =>
-              expect.fail("Missing apply command")
-            );
-            const base = run.replace(/ --yes --no-input(?: .*)?$/u, "");
-            expect(base).toMatch(
-              /^bun run (?:pr|production):(?:deploy|destroy)(?: "\$STAGE")?$/u
-            );
-            const guard = base.includes(":destroy")
-              ? `${base} --dry-run --no-input`
-              : `${base.replace(":deploy", ":plan")} --no-input`;
-            const plan = Array.findFirst(job.steps, (candidate) =>
-              Option.contains(candidate.run, guard)
-            ).pipe(Option.getOrElse(() => expect.fail(`Missing ${guard}`)));
-            const { "continue-on-error": planMayFail } = plan;
-            expect(job.steps.indexOf(plan)).toBeLessThan(
-              job.steps.indexOf(step)
-            );
-            expect(plan.if).toEqual(step.if);
-            expect(plan.env).toEqual(step.env);
-            expect(Option.getOrElse(planMayFail, () => false)).toBe(false);
-            expect(
-              Option.exists(step.if, (condition) =>
-                /\b(?:always|failure|cancelled)\s*\(/u.test(condition)
-              )
-            ).toBe(false);
-          })
+        yield* EffectFunction.pipe(
+          applies,
+          Effect.forEach(({ job, step }) =>
+            Effect.sync(() => {
+              const run = Option.getOrElse(step.run, () =>
+                expect.fail("Missing apply command")
+              );
+              const base = run.replace(/ --yes --no-input(?: .*)?$/u, "");
+              expect(base).toMatch(
+                /^bun run (?:pr|production):(?:deploy|destroy)(?: "\$STAGE")?$/u
+              );
+              const guard = EffectBoolean.match(base.includes(":destroy"), {
+                onFalse: () => `${base.replace(":deploy", ":plan")} --no-input`,
+                onTrue: () => `${base} --dry-run --no-input`,
+              });
+              const plan = EffectFunction.pipe(
+                job.steps,
+                Array.findFirst((candidate) =>
+                  Option.contains(candidate.run, guard)
+                )
+              ).pipe(Option.getOrElse(() => expect.fail(`Missing ${guard}`)));
+              const { "continue-on-error": planMayFail } = plan;
+              EffectFunction.pipe(job.steps.indexOf(plan), (actual) => {
+                expect(actual).toBeLessThan(job.steps.indexOf(step));
+              });
+              expect(plan.if).toStrictEqual(step.if);
+              expect(plan.env).toStrictEqual(step.env);
+              EffectFunction.pipe(
+                Option.getOrElse(planMayFail, () => false),
+                (actual) => {
+                  expect(!actual).toBeTruthy();
+                }
+              );
+              EffectFunction.pipe(
+                Option.exists(step.if, (condition) =>
+                  /\b(?:always|failure|cancelled)\s*\(/u.test(condition)
+                ),
+                (actual) => {
+                  expect(!actual).toBeTruthy();
+                }
+              );
+            })
+          )
         );
       }).pipe(Effect.provide(BunServices.layer))
   );
-
   it.effect.each([
     { args: ["prod"] },
     { args: ["pr-0"] },
@@ -447,50 +559,50 @@ describe("required native release gate", () => {
     ({ args }) =>
       Effect.gen(function* () {
         const fixture = yield* commandFixture;
-        const result = yield* runCommand(
+        const destroyCommand = script(fixture.scripts, "pr:destroy");
+        const result = yield* runCommand({
           fixture,
-          script(fixture.scripts, "pr:destroy"),
-          "",
-          args
-        );
+          command: destroyCommand,
+          fail: "",
+          args,
+        });
         expect(result.code).toBe(64);
-        expect(result.calls).toEqual([]);
+        expect(result.calls).toStrictEqual([]);
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   it.effect(
     "builds the API docs catalogue before native preview destroy and forwards flags",
     () =>
       Effect.gen(function* () {
         const fixture = yield* commandFixture;
-        const result = yield* runCommand(
+        const destroyCommand = script(fixture.scripts, "pr:destroy");
+        const result = yield* runCommand({
           fixture,
-          script(fixture.scripts, "pr:destroy"),
-          "",
-          ["pr-123", "--yes"]
-        );
+          command: destroyCommand,
+          fail: "",
+          args: ["pr-123", "--yes"],
+        });
         expect(result.code).toBe(0);
-        expect(result.calls).toEqual([
+        expect(result.calls).toStrictEqual([
           "run build --filter=api",
           "alchemy destroy --stage pr-123 --yes",
         ]);
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   it.effect("does not import the destroy stack if the API build fails", () =>
     Effect.gen(function* () {
       const fixture = yield* commandFixture;
-      const result = yield* runCommand(
+      const destroyCommand = script(fixture.scripts, "pr:destroy");
+      const result = yield* runCommand({
         fixture,
-        script(fixture.scripts, "pr:destroy"),
-        "run build --filter=api",
-        ["pr-123", "--yes"]
-      );
+        command: destroyCommand,
+        fail: "run build --filter=api",
+        args: ["pr-123", "--yes"],
+      });
       expect(result.code).not.toBe(0);
-      expect(result.calls).toEqual(["run build --filter=api"]);
+      expect(result.calls).toStrictEqual(["run build --filter=api"]);
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   it.effect("runs the cleanup guards before destroy", () =>
     Effect.gen(function* () {
       const configuration = yield* workflow(checksWorkflow);
@@ -498,50 +610,74 @@ describe("required native release gate", () => {
         Option.getOrElse(() => expect.fail("Missing cleanup job"))
       );
       const { "continue-on-error": cleanupMayFail } = cleanup;
-      const required = Array.map(["pull-request", "stage-safety"], (id) =>
-        Array.findFirst(cleanup.steps, (step) =>
-          Option.contains(step.id, id)
-        ).pipe(
-          Option.getOrElse(() =>
-            expect.fail(`Missing cleanup prerequisite: ${id}`)
+      const required = EffectFunction.pipe(
+        ["pull-request", "stage-safety"],
+        Array.map((id) =>
+          EffectFunction.pipe(
+            cleanup.steps,
+            Array.findFirst((step) => Option.contains(step.id, id))
+          ).pipe(
+            Option.getOrElse(() =>
+              expect.fail(`Missing cleanup prerequisite: ${id}`)
+            )
           )
         )
       );
-      const destroy = Array.findFirst(cleanup.steps, (step) =>
-        Option.exists(step.run, (run) => run.startsWith("bun run pr:destroy"))
+      const destroy = EffectFunction.pipe(
+        cleanup.steps,
+        Array.findFirst((step) =>
+          Option.exists(step.run, (run) => run.startsWith("bun run pr:destroy"))
+        )
       ).pipe(Option.getOrElse(() => expect.fail("Missing cleanup command")));
       const { "continue-on-error": destroyMayFail } = destroy;
-      expect(Option.getOrElse(cleanupMayFail, () => false)).toBe(false);
-      yield* Effect.forEach(required, (step, index) => {
-        const { "continue-on-error": stepMayFail } = step;
-        expect(Option.getOrElse(stepMayFail, () => false)).toBe(false);
-        if (index > 0) {
-          expect(step.if).toEqual(
-            Option.some("steps.pull-request.outputs.closed == 'true'")
-          );
+      EffectFunction.pipe(
+        Option.getOrElse(cleanupMayFail, () => false),
+        (actual) => {
+          expect(!actual).toBeTruthy();
         }
-        expect(cleanup.steps.indexOf(step)).toBeLessThan(
-          cleanup.steps.indexOf(destroy)
-        );
-        return Array.get(required, index + 1).pipe(
-          Option.match({
-            onNone: () => Effect.void,
-            onSome: (next) =>
-              Effect.sync(() => {
-                expect(cleanup.steps.indexOf(step)).toBeLessThan(
-                  cleanup.steps.indexOf(next)
-                );
-              }),
-          })
-        );
-      });
-      expect(destroy.if).toEqual(
+      );
+      yield* EffectFunction.pipe(
+        required,
+        Effect.forEach((step, index) => {
+          const { "continue-on-error": stepMayFail } = step;
+          EffectFunction.pipe(
+            Option.getOrElse(stepMayFail, () => false),
+            (actual) => {
+              expect(!actual).toBeTruthy();
+            }
+          );
+          if (index > 0) {
+            expect(step.if).toStrictEqual(
+              Option.some("steps.pull-request.outputs.closed == 'true'")
+            );
+          }
+          EffectFunction.pipe(cleanup.steps.indexOf(step), (actual) => {
+            expect(actual).toBeLessThan(cleanup.steps.indexOf(destroy));
+          });
+          return Array.get(required, index + 1).pipe(
+            Option.match({
+              onNone: () => Effect.void,
+              onSome: (next) =>
+                Effect.sync(() => {
+                  EffectFunction.pipe(cleanup.steps.indexOf(step), (actual) => {
+                    expect(actual).toBeLessThan(cleanup.steps.indexOf(next));
+                  });
+                }),
+            })
+          );
+        })
+      );
+      expect(destroy.if).toStrictEqual(
         Option.some("steps.pull-request.outputs.closed == 'true'")
       );
-      expect(Option.getOrElse(destroyMayFail, () => false)).toBe(false);
+      EffectFunction.pipe(
+        Option.getOrElse(destroyMayFail, () => false),
+        (actual) => {
+          expect(!actual).toBeTruthy();
+        }
+      );
     }).pipe(Effect.provide(BunServices.layer))
   );
-
   it.effect.each(["open", "closed"] as const)(
     "rechecks the actual cleanup PR state before admitting destroy: %s",
     (state) =>
@@ -550,26 +686,38 @@ describe("required native release gate", () => {
         const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
           Option.getOrElse(() => expect.fail("Missing cleanup job"))
         );
-        const guard = Array.findFirst(cleanup.steps, (step) =>
-          Option.contains(step.id, "pull-request")
+        const guard = EffectFunction.pipe(
+          cleanup.steps,
+          Array.findFirst((step) => Option.contains(step.id, "pull-request"))
         ).pipe(Option.getOrElse(() => expect.fail("Missing closed-PR guard")));
         const command = Option.getOrElse(guard.run, () =>
           expect.fail("Missing state check")
         );
         const fixture = yield* commandFixture;
-        const result = yield* runCommand(fixture, command, "", [], state);
+        const result = yield* runCommand({
+          fixture,
+          command,
+          fail: "",
+          args: [],
+          pullRequestState: state,
+        });
         expect(result.code).toBe(0);
         expect(result.outputs).toBe(`closed=${state === "closed"}\n`);
-        const destroy = Array.findFirst(cleanup.steps, (step) =>
-          Option.exists(step.run, (run) => run.startsWith("bun run pr:destroy"))
+        const destroy = EffectFunction.pipe(
+          cleanup.steps,
+          Array.findFirst((step) =>
+            Option.exists(step.run, (run) =>
+              run.startsWith("bun run pr:destroy")
+            )
+          )
         ).pipe(Option.getOrElse(() => expect.fail("Missing cleanup command")));
-        expect(destroy.if).toEqual(
+        expect(destroy.if).toStrictEqual(
           Option.some("steps.pull-request.outputs.closed == 'true'")
         );
-        expect(cleanup.steps.indexOf(guard)).toBeLessThan(
-          cleanup.steps.indexOf(destroy)
-        );
-        expect(result.calls).toEqual([]);
+        EffectFunction.pipe(cleanup.steps.indexOf(guard), (actual) => {
+          expect(actual).toBeLessThan(cleanup.steps.indexOf(destroy));
+        });
+        expect(result.calls).toStrictEqual([]);
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
 });

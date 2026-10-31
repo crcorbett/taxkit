@@ -1,5 +1,11 @@
 import type { TakeHomePayReport } from "@taxkit/rules-au-pay/schemas";
-import { Array, Match, Option, Record } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Match,
+  Option,
+  Record,
+} from "effect";
 
 export const TakeHomeResultView = ({
   report,
@@ -47,15 +53,19 @@ export const TakeHomeResultView = ({
               <dt>Pay used to calculate withholding</dt>
               <dd>{currency.format(report.value.taxablePay.cents / 100)}</dd>
             </div>
-            {Array.map(report.value.withholdings.components, (component) => (
-              <div key={component.id}>
-                <dt>{component.label}</dt>
-                <dd>
-                  {currency.format(component.amount.cents / 100)}
-                  {component.status !== "active" && " (not included in total)"}
-                </dd>
-              </div>
-            ))}
+            {EffectFunction.pipe(
+              report.value.withholdings.components,
+              Array.map((component) => (
+                <div key={component.id}>
+                  <dt>{component.label}</dt>
+                  <dd>
+                    {currency.format(component.amount.cents / 100)}
+                    {component.status !== "active" &&
+                      " (not included in total)"}
+                  </dd>
+                </div>
+              ))
+            )}
             <div>
               <dt>Total withheld</dt>
               <dd>
@@ -74,41 +84,57 @@ export const TakeHomeResultView = ({
               Other deductions, study-loan repayments and salary sacrifice are
               not included.
             </li>
-            {Array.map(report.value.withholdings.components, (component) =>
-              Record.get(component.trace.inputs, "scale").pipe(
-                Option.match({
-                  onNone: () => null,
-                  onSome: (scale) =>
-                    Match.value(scale).pipe(
-                      Match.when("scale1", () => (
-                        <li key={component.id}>
-                          Tax-free threshold not claimed.
-                        </li>
-                      )),
-                      Match.when("scale2", () => (
-                        <li key={component.id}>Tax-free threshold claimed.</li>
-                      )),
-                      Match.orElse(() => null)
-                    ),
-                })
+            {EffectFunction.pipe(
+              report.value.withholdings.components,
+              Array.map((component) =>
+                Record.get(component.trace.inputs, "scale").pipe(
+                  Option.match({
+                    onNone: () => null,
+                    onSome: (scale) =>
+                      Match.value(scale).pipe(
+                        Match.when("scale1", () => (
+                          <li key={component.id}>
+                            Tax-free threshold not claimed.
+                          </li>
+                        )),
+                        Match.when("scale2", () => (
+                          <li key={component.id}>
+                            Tax-free threshold claimed.
+                          </li>
+                        )),
+                        Match.orElse(() => null)
+                      ),
+                  })
+                )
               )
             )}
           </ul>
           <h3>Rule sources</h3>
           <ul>
-            {Array.flatMap(report.value.withholdings.components, (component) =>
-              Array.map(component.trace.sources, (source) => (
-                <li key={`${component.id}:${source.reference}`}>
-                  {URL.canParse(source.reference) &&
-                  source.reference.startsWith("https://") ? (
-                    <a href={source.reference}>{source.title}</a>
-                  ) : (
-                    <span>
-                      {source.title}: {source.reference}
-                    </span>
-                  )}
-                </li>
-              ))
+            {EffectFunction.pipe(
+              report.value.withholdings.components,
+              Array.flatMap((component) =>
+                EffectFunction.pipe(
+                  component.trace.sources,
+                  Array.map((source) => (
+                    <li key={`${component.id}:${source.reference}`}>
+                      {Match.value(
+                        URL.canParse(source.reference) &&
+                          source.reference.startsWith("https://")
+                      ).pipe(
+                        Match.when(true, () => (
+                          <a href={source.reference}>{source.title}</a>
+                        )),
+                        Match.orElse(() => (
+                          <span>
+                            {source.title}: {source.reference}
+                          </span>
+                        ))
+                      )}
+                    </li>
+                  ))
+                )
+              )
             )}
           </ul>
         </details>

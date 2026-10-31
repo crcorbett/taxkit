@@ -4,7 +4,7 @@ import {
   AuPayCalculatorId,
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
-import { Option, Schema } from "effect";
+import { Match, Option, Schema } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
@@ -13,7 +13,6 @@ import { TakeHomeFormView } from "./take-home.view";
 import { calculatorToolsAtom } from "./tools.atoms";
 
 const calculatorId = AuPayCalculatorId.make("au.pay.take-home");
-
 // Home is the take-home calculator page with its own form view.
 export const TakeHomeCalculator = () => {
   const atoms = useMemo(() => calculatorPageAtoms(calculatorId), []);
@@ -37,9 +36,10 @@ export const TakeHomeCalculator = () => {
   );
   return (
     <TakeHomeFormView
-      form={
-        Schema.is(TakeHomeForm)(view.form) ? view.form : initialTakeHomeForm
-      }
+      form={Match.value(view.form).pipe(
+        Match.when(Schema.is(TakeHomeForm), (matchedValue) => matchedValue),
+        Match.orElse(() => initialTakeHomeForm)
+      )}
       busy={view.busy}
       message={Option.getOrUndefined(view.message)}
       report={view.report.pipe(Option.filter(Schema.is(TakeHomePayReport)))}

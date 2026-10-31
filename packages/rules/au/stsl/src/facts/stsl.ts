@@ -1,7 +1,6 @@
 import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@taxkit/core";
 import { LedgerComponent } from "@taxkit/core/ledger";
 import { Context, Schema } from "effect";
-
 /**
  * Whether the employee has an STSL debt and wants STSL withholding included.
  *
@@ -17,10 +16,14 @@ import { Context, Schema } from "effect";
  * const stsl = new StslDebt({ enabled: true })
  * ```
  */
-export class StslDebt extends Schema.TaggedClass<StslDebt>()("StslDebt", {
+export class StslDebt extends Schema.TaggedClass<
+  StslDebt,
+  {
+    readonly brand: unique symbol;
+  }
+>()("StslDebt", {
   enabled: Schema.Boolean,
 }) {}
-
 /**
  * Context tag for caller-provided STSL debt status.
  *
@@ -29,7 +32,6 @@ export class StslDebt extends Schema.TaggedClass<StslDebt>()("StslDebt", {
 export class StslDebtFact extends Context.Service<StslDebtFact, StslDebt>()(
   "taxkit/rules-au-stsl/fact/StslDebt"
 ) {}
-
 /**
  * Fact descriptor for STSL debt status.
  *
@@ -47,7 +49,6 @@ export const StslDebtDescriptor = makeFactDescriptor({
   tag: StslDebtFact,
   title: "Whether the employee has STSL debt and is opting into withholding",
 });
-
 /**
  * Context tag for the STSL withholding ledger component.
  *
@@ -57,7 +58,6 @@ export class StslComponentFact extends Context.Service<
   StslComponentFact,
   LedgerComponent
 >()("taxkit/rules-au-stsl/fact/StslComponent") {}
-
 /**
  * Fact descriptor for the STSL withholding component.
  *

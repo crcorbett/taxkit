@@ -41,9 +41,16 @@ longer needs.
 
 ## Kept
 
-The repository-wide `source` export condition stays, because published
-packages still build to `dist`. Server-only Website modules keep the `.server`
-name that TaxKit's lint rules use. The public HTTP contract, SDK and calculator
-results did not change.
+Server-only Website modules keep the `.server` name that TaxKit's lint rules
+use. At adoption, the public HTTP contract, SDK and calculator results did not
+change.
+
+## Package export policy amendment
+
+The subsequent package migration removed the repository-wide `source` export
+condition. Private packages export TypeScript source directly, without a build
+or `dist` directory. Only the public `taxkit` SDK compiles and exports `dist`;
+its archive includes the private modules it needs. The current ownership rules
+are in [package ownership](../architecture/package-ownership.md).
 
 [Architecture](../../ARCHITECTURE.md) describes the current system.

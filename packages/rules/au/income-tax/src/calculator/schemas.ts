@@ -10,7 +10,6 @@ export {
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
 } from "./metadata.js";
-
 /**
  * Independent version of the Australian annual-income-tax ruleset represented
  * by this report.
@@ -20,7 +19,6 @@ export {
 export const AnnualTaxRulePackVersion = Schema.Literal(
   "rules-au-income-tax/1.0.1"
 );
-
 /**
  * Annual Australian income tax report for one taxable-income scenario.
  *
@@ -29,18 +27,19 @@ export const AnnualTaxRulePackVersion = Schema.Literal(
  *
  * @since 0.1.0
  */
-export class AnnualTaxReport extends Schema.TaggedClass<AnnualTaxReport>()(
-  "AnnualTaxReport",
+export class AnnualTaxReport extends Schema.TaggedClass<
+  AnnualTaxReport,
   {
-    ledger: AnnualTaxLedger,
-    liability: Money,
-    rawLiability: Money,
-    rulePackVersion: AnnualTaxRulePackVersion,
-    taxableIncome: Money,
-    trace: TraceNode,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("AnnualTaxReport", {
+  ledger: AnnualTaxLedger,
+  liability: Money,
+  rawLiability: Money,
+  rulePackVersion: AnnualTaxRulePackVersion,
+  taxableIncome: Money,
+  trace: TraceNode,
+}) {}
 /**
  * Input schema for the annual-tax scenario helper.
  *
@@ -49,7 +48,6 @@ export class AnnualTaxReport extends Schema.TaggedClass<AnnualTaxReport>()(
 export const AnnualTaxScenarioInputSchema = Schema.Struct({
   taxableIncome: Money,
 });
-
 /**
  * Input type for the annual-tax scenario helper.
  *

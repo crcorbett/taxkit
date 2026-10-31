@@ -1,6 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
-import { CalculatorServiceError } from "@taxkit/calculators/schemas";
+import {
+  CalculatorRunResponse,
+  CalculatorServiceError,
+} from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
@@ -11,6 +14,8 @@ import {
 } from "@taxkit/rules-au-pay";
 import { expectAt } from "@taxkit/testing";
 import {
+  Predicate,
+  Function as EffectFunction,
   Array as EffectArray,
   Cause,
   Effect,
@@ -31,7 +36,6 @@ import {
 const ServiceLive = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
-
 const takeHomeFacts = {
   grossPay: new GrossPay({
     amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
@@ -39,10 +43,8 @@ const takeHomeFacts = {
   }),
   taxFreeThresholdClaimed: true,
 };
-
 const secretSentinel = "taxkit-secret-sentinel";
 const privatePathSentinel = "/private/taxkit-sentinel/effect-sdk-input.json";
-
 describe("Effect SDK facade", () => {
   it.effect(
     "keeps selected-calculator help when omitted options use defaults",
@@ -61,15 +63,22 @@ describe("Effect SDK facade", () => {
         yield* Match.value(error).pipe(
           Match.tag("CalculatorInputDecodeError", (failure) =>
             Effect.gen(function* () {
-              expect(
-                EffectArray.map(failure.issues, (issue) => issue.path)
-              ).toContainEqual(["grossPay"]);
-              expect(
+              EffectFunction.pipe(
+                failure.issues,
+                EffectArray.map((issue) => issue.path),
+                (actual) => {
+                  expect(actual).toContainEqual(["grossPay"]);
+                }
+              );
+              EffectFunction.pipe(
                 failure.help.pipe(
                   Option.flatten,
                   Option.map((help) => help.length)
-                )
-              ).toEqual(Option.some(2));
+                ),
+                (actual) => {
+                  expect(actual).toStrictEqual(Option.some(2));
+                }
+              );
               const wire = yield* Schema.encodeEffect(
                 Schema.toCodecJson(CalculatorServiceError)
               )(failure);
@@ -83,7 +92,6 @@ describe("Effect SDK facade", () => {
         );
       }).pipe(Effect.provide(ServiceLive))
   );
-
   it.effect(
     "returns the full canonical calculator run response with decoded report",
     () =>
@@ -109,13 +117,22 @@ describe("Effect SDK facade", () => {
             taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
-
-        expect(sdkResult).toEqual(serviceResult);
-        expect(sdkResult.report._tag).toBe("TakeHomePayReport");
+        const sdkRepresentation = yield* Schema.encodeEffect(
+          CalculatorRunResponse
+        )(sdkResult);
+        const serviceRepresentation = yield* Schema.encodeEffect(
+          CalculatorRunResponse
+        )(serviceResult);
+        expect(sdkRepresentation).toStrictEqual(serviceRepresentation);
+        EffectFunction.pipe(
+          Predicate.isTagged(sdkResult.report, "TakeHomePayReport"),
+          (matches) => {
+            expect(matches).toBeTruthy();
+          }
+        );
         expect(sdkResult.report.rulePackVersion).toBe("rules-au-pay/1.0.2");
       }).pipe(Effect.provide(ServiceLive))
   );
-
   it.effect(
     "matches PublicCalculatorService for a successful calculation",
     () =>
@@ -136,11 +153,9 @@ describe("Effect SDK facade", () => {
             taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
           },
         });
-
-        expect(sdkResult).toEqual(serviceResult.report);
+        expect(sdkResult).toStrictEqual(serviceResult.report);
       }).pipe(Effect.provide(ServiceLive))
   );
-
   it.effect("preserves guided calculator input errors from the service", () =>
     Effect.gen(function* () {
       const service = yield* PublicCalculatorService;
@@ -169,22 +184,30 @@ describe("Effect SDK facade", () => {
           },
         })
         .pipe(Effect.exit);
-
-      expect(Exit.isFailure(sdkExit)).toBe(true);
-      expect(Exit.isFailure(serviceExit)).toBe(true);
-
+      EffectFunction.pipe(Exit.isFailure(sdkExit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
+      EffectFunction.pipe(Exit.isFailure(serviceExit), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       if (Exit.isFailure(sdkExit) && Exit.isFailure(serviceExit)) {
-        const sdkFailure = expectAt(
-          EffectArray.filter(sdkExit.cause.reasons, Cause.isFailReason),
-          0
+        const sdkFailures = EffectFunction.pipe(
+          sdkExit.cause.reasons,
+          EffectArray.filter(Cause.isFailReason)
         );
-        const serviceFailure = expectAt(
-          EffectArray.filter(serviceExit.cause.reasons, Cause.isFailReason),
-          0
+        const sdkFailure = expectAt(sdkFailures, 0);
+        const serviceFailures = EffectFunction.pipe(
+          serviceExit.cause.reasons,
+          EffectArray.filter(Cause.isFailReason)
         );
-
-        expect(sdkFailure.error).toEqual(serviceFailure.error);
-        expect(sdkFailure.error._tag).toBe("CalculatorInputDecodeError");
+        const serviceFailure = expectAt(serviceFailures, 0);
+        expect(sdkFailure.error).toStrictEqual(serviceFailure.error);
+        EffectFunction.pipe(
+          Predicate.isTagged(sdkFailure.error, "CalculatorInputDecodeError"),
+          (matches) => {
+            expect(matches).toBeTruthy();
+          }
+        );
         const encodedError = yield* Match.value(sdkFailure.error).pipe(
           Match.tag("SchemaError", () =>
             Effect.sync(() => expect.fail("Expected calculator input error"))
@@ -200,7 +223,6 @@ describe("Effect SDK facade", () => {
       }
     }).pipe(Effect.provide(ServiceLive))
   );
-
   it.effect(
     "narrows canonical reports without decoding their wire form again",
     () =>
@@ -220,22 +242,25 @@ describe("Effect SDK facade", () => {
         const report = yield* AuPayTakeHomeCalculation.decodeOutput(
           response.report
         );
-        expect(report).toEqual(response.report);
+        expect(report).toStrictEqual(response.report);
         const encoded = yield* Schema.encodeEffect(
           AuPayTakeHomeCalculation.outputSchema
         )(report);
         const wireAsDomain = yield* AuPayTakeHomeCalculation.decodeOutput(
           encoded
         ).pipe(Effect.exit);
-        expect(Exit.isFailure(wireAsDomain)).toBe(true);
+        EffectFunction.pipe(Exit.isFailure(wireAsDomain), (actual) => {
+          expect(actual).toBeTruthy();
+        });
         const malformed = yield* AuPayTakeHomeCalculation.decodeOutput({
           ...Struct.pick(report, Struct.keys(TakeHomePayReport.fields)),
           trace: { ...report.trace, formula: secretSentinel },
         }).pipe(Effect.exit);
-        expect(Exit.isFailure(malformed)).toBe(true);
+        EffectFunction.pipe(Exit.isFailure(malformed), (actual) => {
+          expect(actual).toBeTruthy();
+        });
       }).pipe(Effect.provide(ServiceLive))
   );
-
   it.effect(
     "keeps annual-tax descriptors executable through the same facade",
     () =>
@@ -246,8 +271,12 @@ describe("Effect SDK facade", () => {
             currency: "AUD",
           }),
         });
-
-        expect(report._tag).toBe("AnnualTaxReport");
+        EffectFunction.pipe(
+          Predicate.isTagged(report, "AnnualTaxReport"),
+          (matches) => {
+            expect(matches).toBeTruthy();
+          }
+        );
         expect(report.rulePackVersion).toBe("rules-au-income-tax/1.0.1");
         expect(report.liability.cents).toBe(1_958_800);
       }).pipe(Effect.provide(ServiceLive))

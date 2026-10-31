@@ -1,4 +1,4 @@
-import { Console, Effect, Match } from "effect";
+import { Effect, Match } from "effect";
 import { TaxKit } from "taxkit";
 import { GrossPay, au } from "taxkit/au";
 import { audFromCents } from "taxkit/core";
@@ -18,9 +18,11 @@ export const program = audFromCents(346_200).pipe(
   Effect.flatMap((result) =>
     Match.value(result).pipe(
       Match.tag("TaxKitFailure", (failure) =>
-        Console.log(failure.error.error._tag)
+        Effect.logError(failure.error.message)
       ),
-      Match.tag("TaxKitSuccess", (success) => Console.log(success.value._tag)),
+      Match.tag("TaxKitSuccess", (_success) =>
+        Effect.logInfo("Calculated take-home pay")
+      ),
       Match.exhaustive
     )
   )

@@ -1,6 +1,7 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
+  Function as EffectFunction,
   Array as EffectArray,
   Console,
   Effect,
@@ -10,32 +11,38 @@ import {
   Record as EffectRecord,
   Schema,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import { ChildProcess } from "effect/process";
 
-import { ConditionalPackageExportTarget, DependencyRecord } from "./schemas.js";
+import {
+  ConditionalPackageExportTarget,
+  DependencyRecord,
+} from "../src/internal/artifact-schemas.js";
 
-class PackedArtifactCommandError extends Schema.TaggedError<PackedArtifactCommandError>()(
-  "PackedArtifactCommandError",
+class PackedArtifactCommandError extends Schema.TaggedError<
+  PackedArtifactCommandError,
   {
-    exitCode: Schema.Option(Schema.Finite),
-    reason: Schema.Literals(["start-or-read", "exit", "output-limit"]),
-    stage: Schema.String,
+    readonly brand: unique symbol;
   }
-) {}
-class PackedArtifactValidationError extends Schema.TaggedError<PackedArtifactValidationError>()(
-  "PackedArtifactValidationError",
-  { message: Schema.String }
-) {}
+>()("PackedArtifactCommandError", {
+  exitCode: Schema.Option(Schema.Finite),
+  reason: Schema.Literals(["start-or-read", "exit", "output-limit"]),
+  stage: Schema.String,
+}) {}
+class PackedArtifactValidationError extends Schema.TaggedError<
+  PackedArtifactValidationError,
+  {
+    readonly brand: unique symbol;
+  }
+>()("PackedArtifactValidationError", { message: Schema.String }) {}
 const PackageManifest = Schema.Struct({
   dependencies: DependencyRecord,
   exports: Schema.Record(Schema.String, ConditionalPackageExportTarget),
 });
-
 const sdkRootUrl = new URL("..", import.meta.url);
-
 const runCommand = (
   label: string,
   command: string,
@@ -45,7 +52,6 @@ const runCommand = (
   Effect.gen(function* runPackedArtifactCommand() {
     const commandLine = EffectArray.prepend(args, command).join(" ");
     yield* Console.info(`$ ${commandLine}`);
-
     const result = yield* Effect.gen(function* runChildProcess() {
       const handle = yield* ChildProcess.make(command, args, {
         cwd,
@@ -66,15 +72,17 @@ const runCommand = (
               }
             ),
             Stream.mapEffect(({ bytes, chunk }) =>
-              bytes > 1_048_576
-                ? Effect.fail(
+              EffectBoolean.match(bytes > 1_048_576, {
+                onFalse: () => Effect.succeed(chunk),
+                onTrue: () =>
+                  Effect.fail(
                     new PackedArtifactCommandError({
                       exitCode: Option.none(),
                       reason: "output-limit",
                       stage: label,
                     })
-                  )
-                : Effect.succeed(chunk)
+                  ),
+              })
             ),
             Stream.decodeText,
             Stream.mkString
@@ -84,7 +92,6 @@ const runCommand = (
         ],
         { concurrency: "unbounded" }
       );
-
       return {
         commandLine,
         cwd,
@@ -106,7 +113,6 @@ const runCommand = (
         )
       )
     );
-
     return yield* Match.value(result.exitCode).pipe(
       Match.when(0, () => Effect.succeed(result)),
       Match.orElse(() =>
@@ -120,7 +126,6 @@ const runCommand = (
       )
     );
   }).pipe(Effect.scoped);
-
 export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
@@ -149,10 +154,8 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
     "taxkit"
   );
   const smokeEntrypointPath = path.join(smokeRootPath, "smoke.mjs");
-
   yield* fs.makeDirectory(artifactRootPath, { recursive: true });
   yield* fs.makeDirectory(smokePackageRootPath, { recursive: true });
-
   const packOutput = yield* runCommand(
     "pack SDK artifact",
     "bun",
@@ -175,20 +178,17 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
     ["-tzf", tarballPath],
     sdkRootPath
   );
-  const packedFiles = EffectArray.map(
-    EffectArray.filter(tarListing.stdout.split("\n"), (packedFile) =>
-      packedFile.startsWith("package/")
-    ),
-    (packedFile) => packedFile.replace(/^package\//u, "")
+  const packedFiles = EffectFunction.pipe(
+    tarListing.stdout.split("\n"),
+    EffectArray.filter((packedFile) => packedFile.startsWith("package/")),
+    EffectArray.map((packedFile) => packedFile.replace(/^package\//u, ""))
   );
-
   yield* runCommand(
     "extract SDK artifact",
     "tar",
     ["-xzf", tarballPath, "--strip-components=1", "-C", smokePackageRootPath],
     sdkRootPath
   );
-
   const packageManifest = yield* fs
     .readFileString(path.join(smokePackageRootPath, "package.json"))
     .pipe(
@@ -212,9 +212,9 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
       )
     );
   const packedFileSet = HashSet.fromIterable(packedFiles);
-  const exportFailures = EffectArray.flatMap(
+  const exportFailures = EffectFunction.pipe(
     EffectRecord.toEntries(packageManifest.exports),
-    ([exportPath, exportTarget]) => {
+    EffectArray.flatMap(([exportPath, exportTarget]) => {
       const sourceFailures = exportTarget.source.pipe(
         Option.match({
           onNone: () => [],
@@ -223,9 +223,9 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
           ],
         })
       );
-      const targetFailures = EffectArray.flatMap(
+      const targetFailures = EffectFunction.pipe(
         ["types", "default"] as const,
-        (condition) =>
+        EffectArray.flatMap((condition) =>
           EffectRecord.get(exportTarget, condition)
             .pipe(Option.flatten)
             .pipe(
@@ -234,48 +234,69 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
                   `${exportPath} is missing a ${condition} export target.`,
                 ],
                 onSome: (target) =>
-                  HashSet.has(packedFileSet, target.replace(/^\.\//u, ""))
-                    ? []
-                    : [
+                  EffectBoolean.match(
+                    HashSet.has(packedFileSet, target.replace(/^\.\//u, "")),
+                    {
+                      onFalse: () => [
                         `${exportPath} ${condition} export points to ${target}, which is absent from the packed artifact.`,
                       ],
+                      onTrue: () => [],
+                    }
+                  ),
               })
             )
+        )
       );
-
       return EffectArray.appendAll(sourceFailures, targetFailures);
-    }
+    })
   );
-  const dependencyFailures = EffectArray.flatMap(
+  const dependencyFailures = EffectFunction.pipe(
     EffectRecord.toEntries(packageManifest.dependencies),
-    ([dependencyName, range]) =>
-      dependencyName.startsWith("@taxkit/") ||
-      range.startsWith("workspace:") ||
-      range.startsWith("catalog:")
-        ? [
+    EffectArray.flatMap(([dependencyName, range]) =>
+      EffectBoolean.match(
+        dependencyName.startsWith("@taxkit/") ||
+          range.startsWith("workspace:") ||
+          range.startsWith("catalog:"),
+        {
+          onFalse: () => [],
+          onTrue: () => [
             `Packed runtime dependency ${dependencyName} must be external and use a concrete range, received ${range}.`,
-          ]
-        : []
+          ],
+        }
+      )
+    )
   );
-  const packedFileFailures = EffectArray.flatMap(packedFiles, (packedPath) => {
-    const sourceFailures = packedPath.startsWith("src/")
-      ? [`Packed artifact must not include source file: ${packedPath}`]
-      : [];
-    const testFailures =
-      packedPath.endsWith(".test.js") ||
-      packedPath.endsWith(".test.d.ts") ||
-      packedPath.includes("/test/") ||
-      packedPath.includes("/type-tests/")
-        ? [`Packed artifact must not include test file: ${packedPath}`]
-        : [];
-
-    return EffectArray.appendAll(sourceFailures, testFailures);
-  });
+  const packedFileFailures = EffectFunction.pipe(
+    packedFiles,
+    EffectArray.flatMap((packedPath) => {
+      const sourceFailures = EffectBoolean.match(
+        packedPath.startsWith("src/"),
+        {
+          onFalse: () => [],
+          onTrue: () => [
+            `Packed artifact must not include source file: ${packedPath}`,
+          ],
+        }
+      );
+      const testFailures = EffectBoolean.match(
+        packedPath.endsWith(".test.js") ||
+          packedPath.endsWith(".test.d.ts") ||
+          packedPath.includes("/test/") ||
+          packedPath.includes("/type-tests/"),
+        {
+          onFalse: () => [],
+          onTrue: () => [
+            `Packed artifact must not include test file: ${packedPath}`,
+          ],
+        }
+      );
+      return EffectArray.appendAll(sourceFailures, testFailures);
+    })
+  );
   const failures = EffectArray.appendAll(
     EffectArray.appendAll(exportFailures, dependencyFailures),
     packedFileFailures
   );
-
   yield* Match.value(failures.length).pipe(
     Match.when(0, () => Effect.void),
     Match.orElse(() =>
@@ -286,7 +307,6 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
       )
     )
   );
-
   yield* fs.writeFileString(
     path.join(smokeRootPath, "package.json"),
     '{"name":"taxkit-packed-artifact-smoke","private":true,"type":"module"}\n'
@@ -302,15 +322,21 @@ import * as schemas from "taxkit/schemas";
 import * as testing from "taxkit/testing";
 import * as core from "taxkit/core";
 import * as http from "taxkit/http";
-import { GrossPay, PayRules } from "taxkit/au";
+import { GrossPay } from "taxkit/au";
+import * as australian from "taxkit/au";
 
 assert.equal(import.meta.resolve("taxkit"), new URL("./node_modules/taxkit/dist/index.js", import.meta.url).href, "imports select the extracted archive");
 assert.equal(typeof TaxKit.calculate, "function", "root SDK import");
 assert.ok(core.Money, "Core entrypoint");
 assert.ok(http.TaxKitApi, "HTTP contract entrypoint");
 assert.equal(http.CalculatorRunResponse, schemas.CalculatorRunResponse, "one HTTP/SDK Schema identity");
-assert.equal(core.CalculatorSchemas.CalculatorRunResponse, schemas.CalculatorRunResponse, "one Core/SDK Schema identity");
-assert.equal(GrossPay, PayRules.GrossPay, "one AU rule identity");
+assert.ok(GrossPay, "AU fact Schema import");
+assert.equal(Object.hasOwn(core, "CalculatorSchemas"), false, "removed calculator namespace");
+for (const name of ["PayRules", "IncomeTaxRules", "StslRules"]) {
+  assert.equal(Object.hasOwn(australian, name), false, "removed AU namespace " + name);
+}
+assert.ok(schemas.MetadataQuery, "named metadata query import");
+assert.ok(schemas.HelpQuery, "named help query import");
 assert.equal(typeof effect.calculateRunRequest, "function", "Effect run import");
 assert.equal(typeof effect.calculateReportRequest, "function", "Effect report request import");
 assert.equal(typeof effect.calculateReport, "function", "Effect report import");
@@ -343,7 +369,6 @@ assert.equal(closed.error.error._tag, "TaxKitClientDisposedError", "closed clien
     [smokeEntrypointPath],
     smokeRootPath
   );
-
   yield* Console.info("Packed SDK import smoke passed.");
   yield* Console.info(
     `Packed SDK artifact check passed: ${path.basename(tarballPath)} (${packedFiles.length} files)`
@@ -371,7 +396,6 @@ assert.equal(closed.error.error._tag, "TaxKitClientDisposedError", "closed clien
   ),
   Effect.scoped
 );
-
 if (import.meta.main) {
   BunRuntime.runMain(
     checkPackedArtifact.pipe(Effect.provide(BunServices.layer))

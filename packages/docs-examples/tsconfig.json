@@ -23,12 +23,17 @@
       "taxkit/schemas": ["../sdk/typescript/src/schemas/index.ts"],
       "@taxkit/api-http/in-process": ["../api/http/src/in-process.layer.ts"],
       "@taxkit/api-http": ["../api/http/src/index.ts"],
-      "@taxkit/api-http/api": ["../api/http/src/api.ts"]
+      "@taxkit/api-http/api": ["../api/http/src/api.ts"],
+      "taxkit/core": ["../sdk/typescript/src/core.ts"],
+      "taxkit/http": ["../sdk/typescript/src/http.ts"]
     },
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2024",
-    "types": ["node"]
+    "types": ["node"],
+    "declaration": false,
+    "declarationMap": false
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "extends": "../../tsconfig.base.json"
 }

@@ -7,6 +7,7 @@ import {
   Option,
   Predicate,
   Schema,
+  Boolean as EffectBoolean,
 } from "effect";
 import type { WebMCP } from "webmcp-types";
 
@@ -15,7 +16,6 @@ import type { WebMcpTool } from "./schemas.js";
 import { ModelContextHost, WebMcpSite } from "./service.js";
 
 type NativeModelContext = Pick<WebMCP.ModelContext, "registerTool">;
-
 // A declaration checks the native capability without copying its receiver:
 // browser methods can require the original modelContext object as `this`.
 const NativeModelContext = Schema.declare<NativeModelContext>(
@@ -23,7 +23,6 @@ const NativeModelContext = Schema.declare<NativeModelContext>(
     Predicate.hasProperty(input, "registerTool") &&
     Predicate.isFunction(input.registerTool)
 );
-
 // Server rendering has no document. Detection is lazy at this host boundary,
 // so importing the module performs no browser work.
 const findModelContext = (site: DocsWebsiteOrigin) =>
@@ -35,13 +34,17 @@ const findModelContext = (site: DocsWebsiteOrigin) =>
     const origin = Schema.decodeUnknownOption(DocsWebsiteOrigin)(
       globalThis.location.origin
     );
-    return Option.isSome(origin) && origin.value.origin === site.origin
-      ? Schema.decodeUnknownOption(NativeModelContext)(
-          documentHost.value.modelContext
-        )
-      : Option.none<NativeModelContext>();
+    return EffectBoolean.match(
+      Option.isSome(origin) && origin.value.origin === site.origin,
+      {
+        onFalse: () => Option.none<NativeModelContext>(),
+        onTrue: () =>
+          Schema.decodeUnknownOption(NativeModelContext)(
+            documentHost.value.modelContext
+          ),
+      }
+    );
   });
-
 // The one browser Promise bridge for WebMCP. The host's `registerTool`
 // returns a Promise and calls `execute` outside Effect; the registration
 // Scope owns both the tool's removal and its running callbacks.
@@ -90,8 +93,10 @@ export const ModelContextHostLive = Layer.effect(
                   untrustedContentHint: true,
                 },
                 description: tool.description,
-                execute: (input, options) =>
-                  run(tool.execute(input), { signal: options.signal }),
+                execute: (input, options) => {
+                  const program = tool.execute(input);
+                  return run(program, { signal: options.signal });
+                },
                 inputSchema: tool.inputSchema,
                 name: tool.name,
               },

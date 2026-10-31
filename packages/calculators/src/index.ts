@@ -1,4 +1,3 @@
-/* oxlint-disable typescript/no-deprecated -- Re-export existing compatibility aliases without breaking consumers. */
 export {
   CalculatorCatalog,
   getCalculatorCatalogEntry,
@@ -62,14 +61,6 @@ export {
   JurisdictionsResponse,
   MetadataQuery,
   ParameterDescriptorMetadata,
-  PublicApiError,
-  type PublicCalculatorError,
-  PublicCalculationFacts,
-  PublicCalculationReport,
-  PublicCalculationRequest,
-  PublicCalculationResponse,
-  PublicCalculationResponseData,
-  PublicCalculationServiceRequest,
   RuleDescriptorMetadata,
   RuleGraphEdge,
   RulesResponse,

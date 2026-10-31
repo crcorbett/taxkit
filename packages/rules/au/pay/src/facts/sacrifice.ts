@@ -7,7 +7,6 @@ import { Money } from "@taxkit/core/primitives";
 import { Context, Schema } from "effect";
 
 import { PayPeriod } from "./pay.js";
-
 /**
  * Pre-tax salary sacrifice for one pay period.
  *
@@ -24,14 +23,15 @@ import { PayPeriod } from "./pay.js";
  * const sacrifice = new SalarySacrifice({ amount: aud(Cents.make(25_000)), period: "weekly" })
  * ```
  */
-export class SalarySacrifice extends Schema.TaggedClass<SalarySacrifice>()(
-  "SalarySacrifice",
+export class SalarySacrifice extends Schema.TaggedClass<
+  SalarySacrifice,
   {
-    amount: Money,
-    period: PayPeriod,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("SalarySacrifice", {
+  amount: Money,
+  period: PayPeriod,
+}) {}
 /**
  * Context tag for caller-provided pre-tax salary sacrifice.
  *
@@ -41,7 +41,6 @@ export class SalarySacrificeFact extends Context.Service<
   SalarySacrificeFact,
   SalarySacrifice
 >()("taxkit/rules-au-pay/fact/SalarySacrifice") {}
-
 /**
  * Fact descriptor for pre-tax salary sacrifice.
  *

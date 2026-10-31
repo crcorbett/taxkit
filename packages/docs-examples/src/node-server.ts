@@ -10,10 +10,10 @@ import {
 } from "taxkit/core";
 import { calculateReport } from "taxkit/effect";
 
-class PayPreviewRequestError extends Schema.TaggedError<PayPreviewRequestError>()(
-  "PayPreviewRequestError",
-  { message: Schema.String }
-) {}
+class PayPreviewRequestError extends Schema.TaggedError<
+  PayPreviewRequestError,
+  { readonly brand: unique symbol }
+>()("PayPreviewRequestError", { message: Schema.String }) {}
 
 const PayPreviewRequest = Schema.Struct({
   grossPayCents: Cents,

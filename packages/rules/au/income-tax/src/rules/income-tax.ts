@@ -6,13 +6,19 @@ import {
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Array, BigDecimal, Effect, Layer, Option } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  BigDecimal,
+  Effect,
+  Layer,
+  Option,
+} from "effect";
 
 import { IncomeTaxComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
 import { AtoIncomeTaxTable } from "../parameters/income-tax-table.js";
 import type { IncomeTaxBracket } from "../parameters/income-tax-table.js";
-
 /**
  * Rule id for marginal-rate Australian resident income tax.
  *
@@ -21,7 +27,6 @@ import type { IncomeTaxBracket } from "../parameters/income-tax-table.js";
 export const IncomeTaxRuleId = RuleId.make(
   "taxkit/rules-au-income-tax/rule/IncomeTax"
 );
-
 /**
  * Ledger component id for marginal-rate income tax.
  *
@@ -30,18 +35,18 @@ export const IncomeTaxRuleId = RuleId.make(
 export const IncomeTaxComponentId = ComponentId.make(
   "taxkit/rules-au-income-tax/component/IncomeTax"
 );
-
 const findBracket = (
   brackets: readonly IncomeTaxBracket[],
   incomeCents: number
 ): Effect.Effect<IncomeTaxBracket, CalculationError> => {
-  const bracket = Array.findFirst(
+  const bracket = EffectFunction.pipe(
     Array.reverse(brackets),
-    (b) =>
-      incomeCents > b.thresholdCents ||
-      (incomeCents === 0 && b.thresholdCents === 0)
+    Array.findFirst(
+      (b) =>
+        incomeCents > b.thresholdCents ||
+        (incomeCents === 0 && b.thresholdCents === 0)
+    )
   );
-
   return Option.match(bracket, {
     onNone: () =>
       Effect.fail(
@@ -52,7 +57,6 @@ const findBracket = (
     onSome: Effect.succeed,
   });
 };
-
 /**
  * Current marginal-rate income tax rule.
  *
@@ -66,7 +70,6 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
   Effect.gen(function* () {
     const income = yield* AnnualTaxableIncomeFact;
     const table = yield* AtoIncomeTaxTable;
-
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
     const taxableExcess = yield* Cents.makeEffect(
@@ -77,7 +80,6 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
       bracket.rate
     );
     const taxAmount = yield* audFromCents(bracket.baseTaxCents + marginalTax);
-
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(
@@ -96,7 +98,6 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
       sources: [table.source],
       title: "Income tax at marginal rates",
     });
-
     const component = LedgerComponent.make({
       amount: taxAmount,
       effect: "additive",

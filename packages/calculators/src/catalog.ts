@@ -38,8 +38,16 @@ import {
   TakeHomeScenario,
   TakeHomeScenarioLive,
 } from "@taxkit/rules-au-pay";
+import {
+  Function as EffectFunction,
+  Array,
+  Data,
+  Effect,
+  HashMap,
+  Layer,
+  Schema,
+} from "effect";
 import type { Option } from "effect";
-import { Array, Data, Effect, HashMap, Layer, Schema } from "effect";
 
 import type {
   CalculatorContext,
@@ -54,7 +62,6 @@ import {
 } from "./summaries.js";
 
 type UntrustedCalculatorFacts = typeof Schema.Unknown.Type;
-
 type CalculatorExecution = (
   facts: UntrustedCalculatorFacts,
   validationIssues: readonly GraphValidationIssue[]
@@ -63,11 +70,9 @@ type CalculatorExecution = (
   CalculationError | Schema.SchemaError,
   CalculationEngine
 >;
-
 type CalculatorInputSchema =
   | typeof AnnualTaxScenarioInputSchema
   | typeof TakeHomeScenarioInputSchema;
-
 type TypedCalculatorExecution<InputSchema extends CalculatorInputSchema> = (
   facts: InputSchema["Type"],
   validationIssues: readonly GraphValidationIssue[]
@@ -76,7 +81,6 @@ type TypedCalculatorExecution<InputSchema extends CalculatorInputSchema> = (
   CalculationError,
   CalculationEngine
 >;
-
 export interface CalculatorCatalogEntry {
   readonly calculate: CalculatorExecution;
   readonly calculatorId: CalculatorId;
@@ -92,16 +96,13 @@ export interface CalculatorCatalogEntry {
   readonly supportedHelpModes: readonly HelpMode[];
   readonly title: string;
 }
-
 class CalculatorCatalogEntryData extends Data.Class<CalculatorCatalogEntry> {}
-
 export interface CalculatorCatalogEntryDefinition<
   InputSchema extends CalculatorInputSchema,
 > extends Omit<CalculatorCatalogEntry, "calculate" | "inputSchema"> {
   readonly calculate: TypedCalculatorExecution<InputSchema>;
   readonly inputSchema: InputSchema;
 }
-
 /**
  * Couples a selected input schema with its typed calculator continuation
  * before heterogeneous catalogue storage erases the concrete input type.
@@ -118,7 +119,6 @@ export const defineCalculatorCatalogEntry = <
         Effect.flatMap((facts) => definition.calculate(facts, validationIssues))
       ),
   });
-
 const SupportedHelpModes: readonly HelpMode[] = [
   "none",
   "errors",
@@ -127,7 +127,6 @@ const SupportedHelpModes: readonly HelpMode[] = [
   "sources",
   "full",
 ];
-
 const CatalogEntries: readonly CalculatorCatalogEntry[] = [
   defineCalculatorCatalogEntry({
     calculate: (facts, validationIssues) =>
@@ -216,21 +215,18 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     supportedHelpModes: SupportedHelpModes,
   }),
 ];
-
 export const CalculatorCatalog = HashMap.fromIterable(
-  Array.map(
+  EffectFunction.pipe(
     CatalogEntries,
-    (entry): readonly [CalculatorId, CalculatorCatalogEntry] => [
+    Array.map((entry): readonly [CalculatorId, CalculatorCatalogEntry] => [
       entry.calculatorId,
       entry,
-    ]
+    ])
   )
 );
-
 export const listCalculatorCatalogEntries =
   (): readonly CalculatorCatalogEntry[] =>
     Array.fromIterable(HashMap.values(CalculatorCatalog));
-
 export const getCalculatorCatalogEntry = (
   calculatorId: CalculatorId
 ): Option.Option<CalculatorCatalogEntry> =>

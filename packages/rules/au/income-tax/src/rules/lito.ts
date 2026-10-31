@@ -6,20 +6,26 @@ import {
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Array, BigDecimal, Effect, Layer, Option } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  BigDecimal,
+  Effect,
+  Layer,
+  Option,
+} from "effect";
 
 import { LitoComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
 import { AtoLitoTable } from "../parameters/lito-table.js";
 import type { LitoBracket } from "../parameters/lito-table.js";
-
 /**
  * Rule id for the Low Income Tax Offset.
  *
  * @since 0.1.0
  */
 export const LitoRuleId = RuleId.make("taxkit/rules-au-income-tax/rule/Lito");
-
 /**
  * Ledger component id for the Low Income Tax Offset.
  *
@@ -28,19 +34,17 @@ export const LitoRuleId = RuleId.make("taxkit/rules-au-income-tax/rule/Lito");
 export const LitoComponentId = ComponentId.make(
   "taxkit/rules-au-income-tax/component/Lito"
 );
-
 const findBracket = (
   brackets: readonly LitoBracket[],
   incomeCents: number
 ): Effect.Effect<LitoBracket, CalculationError> => {
   const bracket = Option.orElse(
-    Array.findFirst(
+    EffectFunction.pipe(
       Array.reverse(brackets),
-      (b) => incomeCents > b.thresholdCents
+      Array.findFirst((b) => incomeCents > b.thresholdCents)
     ),
     () => Array.head(brackets)
   );
-
   return Option.match(bracket, {
     onNone: () =>
       Effect.fail(
@@ -51,7 +55,6 @@ const findBracket = (
     onSome: Effect.succeed,
   });
 };
-
 /**
  * Current Low Income Tax Offset rule.
  *
@@ -69,10 +72,8 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
   Effect.gen(function* () {
     const income = yield* AnnualTaxableIncomeFact;
     const table = yield* AtoLitoTable;
-
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
-
     const taxableExcess = yield* Cents.makeEffect(
       incomeCents - bracket.thresholdCents
     );
@@ -83,8 +84,10 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const rawOffsetCents = bracket.fullOffsetCents - phasedOut;
     const offsetCents = Math.max(0, rawOffsetCents);
     const offsetAmount = yield* audFromCents(offsetCents);
-    const status = offsetCents === 0 ? "zeroed" : "active";
-
+    const status = Match.value(offsetCents).pipe(
+      Match.when(0, (): "zeroed" => "zeroed"),
+      Match.orElse((): "active" => "active")
+    );
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(
@@ -105,7 +108,6 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
       sources: [table.source],
       title: "Low Income Tax Offset (LITO)",
     });
-
     const component = LedgerComponent.make({
       amount: offsetAmount,
       effect: "subtractive",

@@ -17,6 +17,8 @@
     "../../rules/au/pay/src/**/*.ts",
     "../../rules/au/stsl/src/**/*.ts"
   ],
+  // Build and verification codecs are checked by scripts/tsconfig.json.
+  "exclude": ["src/internal/artifact-schemas.ts"],
   "compilerOptions": {
     "rootDir": "../../..",
     "outDir": ".compiled",

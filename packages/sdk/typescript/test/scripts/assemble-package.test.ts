@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { Effect, Option } from "effect";
+import { Predicate, Function as EffectFunction, Effect, Option } from "effect";
 
 import { relocateModuleImports } from "../../scripts/assemble-package.runtime.js";
 
@@ -15,11 +15,15 @@ const serviceId = "@taxkit/core";`;
       const output = yield* relocateModuleImports(source, "entry.d.ts", () =>
         Option.some("./internal/core/index.js")
       );
-      expect(output.match(/\.\/internal\/core\/index\.js/gu)).toHaveLength(4);
+      EffectFunction.pipe(
+        output.match(/\.\/internal\/core\/index\.js/gu),
+        (actual) => {
+          expect(actual).toHaveLength(4);
+        }
+      );
       expect(output).toContain('const serviceId = "@taxkit/core"');
     })
 );
-
 it.effect("refuses an unassembled private dependency", () =>
   Effect.gen(function* () {
     const result = yield* relocateModuleImports(
@@ -27,6 +31,8 @@ it.effect("refuses an unassembled private dependency", () =>
       "entry.d.ts",
       () => Option.none()
     ).pipe(Effect.result);
-    expect(result._tag).toBe("Failure");
+    EffectFunction.pipe(Predicate.isTagged(result, "Failure"), (matches) => {
+      expect(matches).toBeTruthy();
+    });
   })
 );

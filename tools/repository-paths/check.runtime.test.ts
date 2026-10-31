@@ -1,5 +1,5 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { describe, expect, it as test } from "@effect/vitest";
+import { describe, expect, it } from "@effect/vitest";
 import { Effect, Match, Result } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import { ChildProcess, ChildProcessSpawner } from "effect/process";
@@ -8,33 +8,32 @@ import { checkRepositoryPaths } from "./check.runtime.js";
 import { RepositoryRelativeFile } from "./schemas.js";
 
 describe("repository path runtime", () => {
-  test.effect(
-    "maps a failed tracked-file inventory to a safe typed error",
-    () =>
-      Effect.gen(function* () {
-        const result = yield* Effect.gen(function* inventoryFailure() {
-          const fileSystem = yield* FileSystem.FileSystem;
-          const directory = yield* fileSystem.makeTempDirectoryScoped({
-            prefix: "taxkit-path-check-",
-          });
-          return yield* checkRepositoryPaths(directory).pipe(Effect.result);
-        }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
-        Result.match(result, {
-          onFailure: (error) => {
-            Match.value(error).pipe(
-              Match.tag("RepositoryInventoryError", (failure) => {
-                expect(failure.operation).toBe("list-tracked-files");
-              }),
-
-              // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
-              Match.orElse(() => expect.unreachable())
-            );
-          },
-          onSuccess: () => expect.unreachable(),
+  it.effect("maps a failed tracked-file inventory to a safe typed error", () =>
+    Effect.gen(function* () {
+      const result = yield* Effect.gen(function* inventoryFailure() {
+        const fileSystem = yield* FileSystem.FileSystem;
+        const directory = yield* fileSystem.makeTempDirectoryScoped({
+          prefix: "taxkit-path-check-",
         });
-      })
+        return yield* checkRepositoryPaths({
+          repositoryRoot: directory,
+        }).pipe(Effect.result);
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
+      Result.match(result, {
+        onFailure: (error) => {
+          Match.value(error).pipe(
+            Match.tag("RepositoryInventoryError", (failure) => {
+              expect(failure.operation).toBe("list-tracked-files");
+            }),
+            // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
+            Match.orElse(() => expect.unreachable())
+          );
+        },
+        onSuccess: () => expect.unreachable(),
+      });
+    })
   );
-  test.effect(
+  it.effect(
     "maps an unreadable tracked file to its safe repository-relative location",
     () =>
       Effect.gen(function* () {
@@ -84,7 +83,9 @@ describe("repository path runtime", () => {
               )
             );
           yield* fileSystem.remove(`${directory}/${trackedFile}`);
-          return yield* checkRepositoryPaths(directory).pipe(Effect.result);
+          return yield* checkRepositoryPaths({
+            repositoryRoot: directory,
+          }).pipe(Effect.result);
         }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
         Result.match(result, {
           onFailure: (error) => {
@@ -94,7 +95,6 @@ describe("repository path runtime", () => {
                   RepositoryRelativeFile.make("removed-after-index.md")
                 );
               }),
-
               // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
               Match.orElse(() => expect.unreachable())
             );

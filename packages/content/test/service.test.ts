@@ -1,5 +1,13 @@
 import { assert, describe, it } from "@effect/vitest";
-import { Array, Effect, Layer, Ref, Schema } from "effect";
+import {
+  Predicate,
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Layer,
+  Ref,
+  Schema,
+} from "effect";
 
 import { exampleContentCatalogue } from "../src/__testing__/fixtures.js";
 import { ContentServiceLive } from "../src/live.layer.js";
@@ -32,7 +40,7 @@ describe("public content service", () => {
             "Start here"
           );
           const missing = yield* content.getPage(missingPath).pipe(Effect.flip);
-          assert.strictEqual(missing._tag, "DocsPageNotFoundError");
+          assert.isTrue(Predicate.isTagged(missing, "DocsPageNotFoundError"));
           assert.strictEqual(missing.path, missingPath);
         }).pipe(Effect.provide(setup.layer));
         assert.deepEqual(yield* Ref.get(setup.observations.requestedPages), [
@@ -41,7 +49,6 @@ describe("public content service", () => {
         ]);
       })
   );
-
   it.effect(
     "matches title, description and processed text without case sensitivity",
     () =>
@@ -65,7 +72,10 @@ describe("public content service", () => {
                   Effect.sync(() => {
                     assert.strictEqual(results.length, 1);
                     assert.deepEqual(
-                      Array.map(results, (result) => result.excerpt),
+                      EffectFunction.pipe(
+                        results,
+                        Array.map((result) => result.excerpt)
+                      ),
                       [
                         "# Start here The supported calculator returns checked results.",
                       ]
@@ -84,37 +94,45 @@ describe("public content service", () => {
         ]);
       })
   );
-
   it.effect(
     "bounds search to the first twenty catalogue pages and 240 characters",
     () =>
       Effect.gen(function* () {
-        const pages = Array.map(Array.range(1, 25), (number) => ({
-          body: [
-            { content: [{ kind: "text", text: "Match." }], kind: "paragraph" },
-          ],
-          frontmatter: {
-            description: "Accepted guide.",
-            status: "published",
-            title: `Page ${number}`,
-          },
-          markdown: "match ".repeat(100),
-          path: `/page-${number}`,
-          slugs: [`page-${number}`],
-          source: `page-${number}.mdx`,
-        }));
+        const pages = EffectFunction.pipe(
+          Array.range(1, 25),
+          Array.map((number) => ({
+            body: [
+              {
+                content: [{ kind: "text", text: "Match." }],
+                kind: "paragraph",
+              },
+            ],
+            frontmatter: {
+              description: "Accepted guide.",
+              status: "published",
+              title: `Page ${number}`,
+            },
+            markdown: "match ".repeat(100),
+            path: `/page-${number}`,
+            slugs: [`page-${number}`],
+            source: `page-${number}.mdx`,
+          }))
+        );
         const catalogue = yield* Schema.decodeUnknownEffect(
           DocsPublicCatalogue
         )({
           navigation: {
-            primaryNavigation: Array.map(pages, (page) => ({
-              pageType: "guide",
-              pages: [],
-              path: page.path,
-              primaryReader: "New contributor",
-              source: page.source,
-              title: page.frontmatter.title,
-            })),
+            primaryNavigation: EffectFunction.pipe(
+              pages,
+              Array.map((page) => ({
+                pageType: "guide",
+                pages: [],
+                path: page.path,
+                primaryReader: "New contributor",
+                source: page.source,
+                title: page.frontmatter.title,
+              }))
+            ),
           },
           pages,
           schemaVersion: 1,
@@ -132,11 +150,20 @@ describe("public content service", () => {
         );
         assert.strictEqual(results.length, 20);
         assert.deepEqual(
-          Array.map(results, (result) => result.path),
-          Array.map(Array.take(pages, 20), (page) => page.path)
+          EffectFunction.pipe(
+            results,
+            Array.map((result) => result.path)
+          ),
+          EffectFunction.pipe(
+            Array.take(pages, 20),
+            Array.map((page) => page.path)
+          )
         );
         assert.isTrue(
-          Array.every(results, (result) => result.excerpt.length === 240)
+          EffectFunction.pipe(
+            results,
+            Array.every((result) => result.excerpt.length === 240)
+          )
         );
       })
   );

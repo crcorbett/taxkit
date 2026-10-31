@@ -1,7 +1,6 @@
 import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@taxkit/core";
 import { Money } from "@taxkit/core/primitives";
 import { Context, Schema } from "effect";
-
 /**
  * Annual taxable income used by the Australian annual tax rules.
  *
@@ -18,13 +17,14 @@ import { Context, Schema } from "effect";
  * const income = new AnnualTaxableIncome({ income: aud(Cents.make(9_500_000)) })
  * ```
  */
-export class AnnualTaxableIncome extends Schema.TaggedClass<AnnualTaxableIncome>()(
-  "AnnualTaxableIncome",
+export class AnnualTaxableIncome extends Schema.TaggedClass<
+  AnnualTaxableIncome,
   {
-    income: Money,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("AnnualTaxableIncome", {
+  income: Money,
+}) {}
 /**
  * Context tag for caller-provided annual taxable income.
  *
@@ -34,7 +34,6 @@ export class AnnualTaxableIncomeFact extends Context.Service<
   AnnualTaxableIncomeFact,
   AnnualTaxableIncome
 >()("taxkit/rules-au-income-tax/fact/AnnualTaxableIncome") {}
-
 /**
  * Fact descriptor for annual taxable income and its money-input question.
  *

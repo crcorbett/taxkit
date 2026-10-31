@@ -1,5 +1,5 @@
 import type * as Axiom from "@alchemy.run/axiom";
-import { Array, pipe } from "effect";
+import { Function as EffectFunction, Array } from "effect";
 
 type DashboardDocument = Omit<
   Axiom.DashboardProps["dashboard"],
@@ -8,13 +8,11 @@ type DashboardDocument = Omit<
   readonly charts: Axiom.Chart[];
   readonly layout: Axiom.LayoutCell[];
 };
-
 export interface TaxKitDashboardDefinition {
   readonly logicalId: string;
   readonly uid: string;
   readonly dashboard: DashboardDocument;
 }
-
 interface TaxKitDashboardIdentity {
   readonly logicalId: string;
   readonly name: string;
@@ -22,7 +20,6 @@ interface TaxKitDashboardIdentity {
   /** Starts the ids of the dashboard's note and service filter. */
   readonly chartIdPrefix: string;
 }
-
 /** One panel and its place on the dashboard's twelve-column grid. */
 interface TaxKitPanel {
   readonly chart: Axiom.Chart;
@@ -33,7 +30,6 @@ interface TaxKitPanel {
     readonly h: number;
   };
 }
-
 /**
  * A dashboard is its service filter, a note and its panels, in that order.
  * Every dashboard opens with the same two full-width rows, so panels start at
@@ -73,7 +69,7 @@ export const defineTaxKitDashboard = ({
           type: "SmartFilter",
         },
         { id: noteId, text: note, type: "Note" },
-        ...pipe(
+        ...EffectFunction.pipe(
           panels,
           Array.map(({ chart }) => chart)
         ),
@@ -82,7 +78,7 @@ export const defineTaxKitDashboard = ({
       layout: [
         { h: 1, i: filterId, w: 12, x: 0, y: 0 },
         { h: 3, i: noteId, w: 12, x: 0, y: 1 },
-        ...pipe(
+        ...EffectFunction.pipe(
           panels,
           Array.map(({ at, chart }) => ({ i: chart.id, ...at }))
         ),

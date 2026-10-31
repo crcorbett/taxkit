@@ -4,7 +4,7 @@ import {
   docsImageApiPath,
 } from "@taxkit/api-http/routes";
 import { ContentCatalogue, DocsOgImages } from "@taxkit/content/service";
-import { Array, Effect, Layer } from "effect";
+import { Function as EffectFunction, Array, Effect, Layer } from "effect";
 import { HttpRouter, HttpServerResponse } from "effect/http";
 
 import { llmsFullTxt, llmsTxt, sitemapXml } from "./documents.egress.js";
@@ -14,7 +14,6 @@ import { PublicationOrigins } from "./service.js";
 const headers = { "x-content-type-options": "nosniff" };
 const unavailable = () =>
   Effect.succeed(HttpServerResponse.empty({ status: 503 }));
-
 // Every answer-engine route the API serves: the four discovery documents and
 // each published page's share image. The inventory comes from the checked
 // catalogue, never a second list of pages. The Website forwards its own
@@ -60,18 +59,21 @@ export const aeoRoutes = Layer.unwrap(
       document(discoveryPaths.llmsFull, "text/plain", ({ publicationOrigin }) =>
         llmsFullTxt({ pages, publicationOrigin })
       ),
-      ...Array.map(pages, (page) =>
-        HttpRouter.route(
-          "GET",
-          docsImageApiPath(page.path),
-          images.getImage(page.path).pipe(
-            Effect.map((bytes) =>
-              HttpServerResponse.uint8Array(bytes, {
-                contentType: "image/png",
-                headers,
-              })
-            ),
-            Effect.catchTag("DocsImageRenderError", unavailable)
+      ...EffectFunction.pipe(
+        pages,
+        Array.map((page) =>
+          HttpRouter.route(
+            "GET",
+            docsImageApiPath(page.path),
+            images.getImage(page.path).pipe(
+              Effect.map((bytes) =>
+                HttpServerResponse.uint8Array(bytes, {
+                  contentType: "image/png",
+                  headers,
+                })
+              ),
+              Effect.catchTag("DocsImageRenderError", unavailable)
+            )
           )
         )
       ),

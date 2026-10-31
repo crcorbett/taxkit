@@ -3,7 +3,6 @@ import { LedgerComponent } from "@taxkit/core/ledger";
 import { Money } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Context, Schema } from "effect";
-
 /**
  * Aggregated annual tax ledger before calculator-level liability flooring.
  *
@@ -12,15 +11,16 @@ import { Context, Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class AnnualTaxLedger extends Schema.TaggedClass<AnnualTaxLedger>()(
-  "AnnualTaxLedger",
+export class AnnualTaxLedger extends Schema.TaggedClass<
+  AnnualTaxLedger,
   {
-    components: Schema.Array(LedgerComponent),
-    rawLiability: Money,
-    trace: TraceNode,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("AnnualTaxLedger", {
+  components: Schema.Array(LedgerComponent),
+  rawLiability: Money,
+  trace: TraceNode,
+}) {}
 /**
  * Context tag for the derived annual tax ledger.
  *
@@ -30,7 +30,6 @@ export class AnnualTaxLedgerFact extends Context.Service<
   AnnualTaxLedgerFact,
   AnnualTaxLedger
 >()("taxkit/rules-au-income-tax/fact/AnnualTaxLedger") {}
-
 /**
  * Fact descriptor for the aggregated annual tax ledger.
  *

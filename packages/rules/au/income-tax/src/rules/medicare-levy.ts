@@ -11,7 +11,6 @@ import { BigDecimal, Effect, Layer, Match, Option } from "effect";
 import { MedicareLevyComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
 import { AtoMedicareLevyTable } from "../parameters/medicare-levy-table.js";
-
 /**
  * Rule id for the Medicare Levy component.
  *
@@ -20,7 +19,6 @@ import { AtoMedicareLevyTable } from "../parameters/medicare-levy-table.js";
 export const MedicareLevyRuleId = RuleId.make(
   "taxkit/rules-au-income-tax/rule/MedicareLevy"
 );
-
 /**
  * Ledger component id for Medicare Levy.
  *
@@ -29,7 +27,6 @@ export const MedicareLevyRuleId = RuleId.make(
 export const MedicareLevyComponentId = ComponentId.make(
   "taxkit/rules-au-income-tax/component/MedicareLevy"
 );
-
 /**
  * Current Medicare Levy rule.
  *
@@ -44,9 +41,7 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
   Effect.gen(function* () {
     const income = yield* AnnualTaxableIncomeFact;
     const table = yield* AtoMedicareLevyTable;
-
     const incomeCents = income.income.cents;
-
     const { levyCents, formula } = yield* Match.value(incomeCents).pipe(
       Match.when(
         (cents) => cents <= table.thresholdCents,
@@ -78,10 +73,11 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
         )
       )
     );
-
     const levyAmount = yield* audFromCents(levyCents);
-    const status = levyCents === 0 ? "zeroed" : "active";
-
+    const status = Match.value(levyCents).pipe(
+      Match.when(0, (): "zeroed" => "zeroed"),
+      Match.orElse((): "active" => "active")
+    );
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(Option.some(formula)),
@@ -99,7 +95,6 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
       sources: [table.source],
       title: "Medicare Levy",
     });
-
     const component = LedgerComponent.make({
       amount: levyAmount,
       effect: "additive",

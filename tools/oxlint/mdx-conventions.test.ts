@@ -15,6 +15,13 @@ it.effect.each([
     source: 'export const choose = (value: boolean) => value ? "yes" : "no";',
   },
   {
+    exitCode: 1,
+    name: "ternary outside MDX",
+    rule: "no-ternary",
+    path: "packages/content/src/branching.ts",
+    source: 'export const choose = (value: boolean) => value ? "yes" : "no";',
+  },
+  {
     exitCode: 0,
     name: "native Boolean matching",
     rule: "",
@@ -23,7 +30,7 @@ it.effect.each([
       'import { Boolean } from "effect";\n\nexport const choose = (value: boolean) => Boolean.match(value, { onFalse: () => "no", onTrue: () => "yes" });',
   },
 ])(
-  "enforces MDX branching conventions for $name",
+  "enforces shared branching conventions for $name",
   ({ source, exitCode, rule, path }) =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
@@ -32,13 +39,13 @@ it.effect.each([
       const target = nodePath.join(workingDirectory, path);
       yield* fs.makeDirectory(nodePath.dirname(target), { recursive: true });
       yield* fs.writeFileString(target, source);
-      const result = yield* lintFiles(
-        [target],
-        [],
-        "unix",
+      const result = yield* lintFiles({
+        paths: [target],
+        extraArgs: [],
+        format: "unix",
         configuration,
-        workingDirectory
-      );
+        workingDirectory,
+      });
       expect(result.exitCode, result.output).toBe(exitCode);
       expect(result.output).toContain(rule);
     }).pipe(Effect.provide(BunServices.layer), Effect.scoped)

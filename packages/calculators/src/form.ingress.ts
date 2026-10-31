@@ -33,16 +33,17 @@ export const initialTakeHomeForm = TakeHomeForm.make({
   period: "weekly",
   taxFreeThresholdClaimed: true,
 });
-export class CalculatorInputError extends Schema.TaggedError<CalculatorInputError>()(
-  "CalculatorInputError",
+export class CalculatorInputError extends Schema.TaggedError<
+  CalculatorInputError,
   {
-    message: Schema.Literals([
-      "Enter a valid pay amount and pay period.",
-      "Enter a valid annual taxable income.",
-    ]),
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("CalculatorInputError", {
+  message: Schema.Literals([
+    "Enter a valid pay amount and pay period.",
+    "Enter a valid annual taxable income.",
+  ]),
+}) {}
 // Form text is representation ingress. The rule-owned scenario checks money,
 // period and threshold once; no browser rule implementation calculates tax.
 export const takeHomeRequestFromForm = (
@@ -82,7 +83,6 @@ export const takeHomeRequestFromForm = (
         })
     )
   );
-
 export const annualTaxRequestFromForm = (
   form: AnnualTaxForm
 ): Result.Result<CalculatorRunServiceRequest, CalculatorInputError> =>
@@ -114,7 +114,6 @@ export const annualTaxRequestFromForm = (
         })
     )
   );
-
 // Each calculator page starts with a worked example the visitor can change.
 export const initialCalculatorForm = (
   calculatorId: CalculatorRunServiceRequest["calculatorId"]
@@ -132,7 +131,6 @@ export const initialCalculatorForm = (
       })
     )
   );
-
 // The one checked request for a calculator's visible form. A form of the other
 // kind is the visitor's input error, never a calculation.
 export const requestFromForm = (
@@ -140,20 +138,30 @@ export const requestFromForm = (
   form: CalculatorForm
 ): Result.Result<CalculatorRunServiceRequest, CalculatorInputError> => {
   if (calculatorId === "au.income-tax.annual") {
-    return Schema.is(AnnualTaxForm)(form)
-      ? annualTaxRequestFromForm(form)
-      : Result.fail(
+    return Match.value(form).pipe(
+      Match.when(Schema.is(AnnualTaxForm), (matchedValue) =>
+        annualTaxRequestFromForm(matchedValue)
+      ),
+      Match.orElse(() =>
+        Result.fail(
           new CalculatorInputError({
             message: "Enter a valid annual taxable income.",
           })
-        );
+        )
+      )
+    );
   }
   const payCalculatorId = AuPayCalculatorId.make(calculatorId);
-  return Schema.is(TakeHomeForm)(form)
-    ? takeHomeRequestFromForm(form, payCalculatorId)
-    : Result.fail(
+  return Match.value(form).pipe(
+    Match.when(Schema.is(TakeHomeForm), (matchedValue) =>
+      takeHomeRequestFromForm(matchedValue, payCalculatorId)
+    ),
+    Match.orElse(() =>
+      Result.fail(
         new CalculatorInputError({
           message: "Enter a valid pay amount and pay period.",
         })
-      );
+      )
+    )
+  );
 };

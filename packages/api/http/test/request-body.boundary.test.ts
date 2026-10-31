@@ -1,5 +1,14 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Clock, Deferred, Effect, Fiber, Ref, Schema, Stream } from "effect";
+import {
+  Function as EffectFunction,
+  Clock,
+  Deferred,
+  Effect,
+  Fiber,
+  Ref,
+  Schema,
+  Stream,
+} from "effect";
 import {
   HttpClientRequest,
   HttpRouter,
@@ -20,7 +29,6 @@ import { ContentTestLive } from "./content.fixture.js";
 
 const path =
   "http://taxkit.internal/api/v1/calculators/au.pay.take-home/calculate";
-
 describe("shared HTTP request-body policy", () => {
   it.effect(
     "refuses a late synchronous body before entering the request handler",
@@ -35,8 +43,9 @@ describe("shared HTTP request-body policy", () => {
             "application/json"
           )
         );
-        const response = yield* withCalculatorRequestBodyLimit(
-          Ref.set(entered, true).pipe(Effect.as(HttpServerResponse.empty()))
+        const response = yield* EffectFunction.pipe(
+          Ref.set(entered, true).pipe(Effect.as(HttpServerResponse.empty())),
+          (handler) => withCalculatorRequestBodyLimit({ handler })
         ).pipe(
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
@@ -55,11 +64,15 @@ describe("shared HTTP request-body policy", () => {
             sleep: (duration) => clock.sleep(duration),
           })
         );
-        expect(response.status).toBe(408);
-        expect(yield* Ref.get(entered)).toBe(false);
+        expect({
+          responseStatus: response.status,
+          handlerNotEntered: !(yield* Ref.get(entered)),
+        }).toStrictEqual({
+          responseStatus: 408,
+          handlerNotEntered: true,
+        });
       }).pipe(Effect.scoped)
   );
-
   it.effect(
     "guards the retained standalone HTTP routes before parsing oversized bytes",
     () =>
@@ -87,10 +100,9 @@ describe("shared HTTP request-body policy", () => {
           yield* Schema.decodeUnknownEffect(CalculatorRequestBodyErrorEnvelope)(
             yield* clientResponse.json
           )
-        ).toEqual({ error: new CalculatorRequestBodyTooLarge() });
+        ).toStrictEqual({ error: new CalculatorRequestBodyTooLarge() });
       }).pipe(Effect.scoped)
   );
-
   it.effect.each(["json", "html"] as const)(
     "closes a stalled source at five seconds and returns safe $0 guidance",
     (responseFormat) =>
@@ -106,12 +118,14 @@ describe("shared HTTP request-body policy", () => {
             { contentType: "application/json" }
           )
         );
-        const call = yield* withCalculatorRequestBodyLimit(
-          Ref.set(entered, true).pipe(
-            Effect.as(HttpServerResponse.empty({ status: 200 }))
-          ),
-          CalculatorRequestBodyPolicy.make({ responseFormat })
-        ).pipe(
+        const requestHandler = Ref.set(entered, true).pipe(
+          Effect.as(HttpServerResponse.empty({ status: 200 }))
+        );
+        const bodyPolicy = CalculatorRequestBodyPolicy.make({ responseFormat });
+        const call = yield* withCalculatorRequestBodyLimit({
+          handler: requestHandler,
+          policy: bodyPolicy,
+        }).pipe(
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromClientRequest(request)
@@ -120,12 +134,17 @@ describe("shared HTTP request-body policy", () => {
         );
         yield* Deferred.await(started);
         yield* TestClock.adjust("4 seconds");
-        expect(yield* Ref.get(released)).toBe(false);
+        expect(!(yield* Ref.get(released))).toBeTruthy();
         yield* TestClock.adjust("1 second");
-        expect(yield* Ref.get(released)).toBe(true);
+        expect(yield* Ref.get(released)).toBeTruthy();
         const response = yield* Fiber.join(call);
-        expect(response.status).toBe(408);
-        expect(yield* Ref.get(entered)).toBe(false);
+        expect({
+          responseStatus: response.status,
+          handlerNotEntered: !(yield* Ref.get(entered)),
+        }).toStrictEqual({
+          responseStatus: 408,
+          handlerNotEntered: true,
+        });
         const body = yield* HttpServerResponse.toClientResponse(response, {
           request,
         }).text;
@@ -134,7 +153,7 @@ describe("shared HTTP request-body policy", () => {
             yield* Schema.decodeUnknownEffect(
               Schema.fromJsonString(CalculatorRequestBodyErrorEnvelope)
             )(body)
-          ).toEqual({ error: new CalculatorRequestBodyTimedOut() });
+          ).toStrictEqual({ error: new CalculatorRequestBodyTimedOut() });
         } else {
           expect(body).toContain(new CalculatorRequestBodyTimedOut().message);
           expect(body).toContain('href="/"');

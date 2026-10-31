@@ -11,7 +11,12 @@ it.effect.each([301, 302, 303, 307, 308])(
   "returns native redirect %s without following it or losing its receiver/signal",
   (status) =>
     Effect.gen(function* () {
-      const fetch = vi.fn((_request: Request, _init?: RequestInit) =>
+      const fetch = vi.fn<
+        (
+          request: Request,
+          init?: RequestInit
+        ) => ReturnType<typeof globalThis.fetch>
+      >((_request, _init) =>
         Promise.resolve(
           new Response(null, {
             headers: { location: "https://different-host.invalid/collect" },
@@ -25,14 +30,13 @@ it.effect.each([301, 302, 303, 307, 308])(
       };
       yield* Effect.gen(function* () {
         const api = yield* WebsiteApi;
-        const client = yield* Effect.fromResult(api.client);
+        const client = yield* api.client;
         expect(
           yield* client.calculatorApi
             .listCalculators({ query: MetadataQuery.make({}) })
             .pipe(Effect.isFailure)
-        ).toBe(true);
-        expect(fetch).toHaveBeenCalledTimes(1);
-        expect(fetch.mock.contexts).toEqual([binding]);
+        ).toBeTruthy();
+        expect(fetch.mock.contexts).toStrictEqual([binding]);
         const [request, init] = yield* Array.head(fetch.mock.calls).pipe(
           Effect.fromOption
         );

@@ -1,12 +1,19 @@
 import { assert, describe, it } from "@effect/vitest";
 import { AuPayCalculatorId } from "@taxkit/rules-au-pay/schemas";
-import { Array, Effect, Option, Record, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Option,
+  Record,
+  Schema,
+} from "effect";
 import { OpenApi } from "effect/http-api";
 
 import { TaxKitApi } from "../src/api.js";
-import { isPublicReadPath } from "../src/response-policy.js";
 import {
   ApiDataPath,
+  isPublicReadApiPath,
   ApiReferencePath,
   CalculatorApiPath,
   CalculationPath,
@@ -20,7 +27,6 @@ import {
 } from "../src/routes.js";
 
 const calculator = AuPayCalculatorId.make("au.pay.take-home");
-
 describe("transport route catalogue", () => {
   it.effect(
     "covers every native OpenAPI endpoint and derives cache eligibility",
@@ -34,15 +40,15 @@ describe("transport route catalogue", () => {
             assert.notInclude(path, "{");
             assert.isTrue(Schema.is(ApiDataPath)(path), path);
             assert.equal(
-              Array.filter(
+              EffectFunction.pipe(
                 [HealthPath, CalculatorApiPath, DocsApiPath],
-                (family) => Schema.is(family)(path)
+                Array.filter((family) => Schema.is(family)(path))
               ).length,
               1,
               path
             );
             assert.equal(
-              isPublicReadPath(path),
+              isPublicReadApiPath(path),
               Option.isSome(Option.fromNullishOr(methods.get)) &&
                 path !== healthPath,
               path
@@ -50,21 +56,22 @@ describe("transport route catalogue", () => {
           })
       )
   );
-
   it.effect(
     "keeps discovery and reference reads in their own public families",
     () =>
-      Effect.forEach(DiscoveryPath.literals, (path) =>
-        Effect.sync(() => {
-          const apiPath = discoveryApiPath(path);
-          assert.isTrue(Schema.is(DocsDiscoveryApiPath)(apiPath));
-          assert.isTrue(isPublicReadPath(apiPath));
-          assert.isFalse(Schema.is(ApiDataPath)(apiPath));
-          assert.isFalse(Schema.is(ApiReferencePath)(apiPath));
-        })
+      EffectFunction.pipe(
+        DiscoveryPath.literals,
+        Effect.forEach((path) =>
+          Effect.sync(() => {
+            const apiPath = discoveryApiPath(path);
+            assert.isTrue(Schema.is(DocsDiscoveryApiPath)(apiPath));
+            assert.isTrue(isPublicReadApiPath(apiPath));
+            assert.isFalse(Schema.is(ApiDataPath)(apiPath));
+            assert.isFalse(Schema.is(ApiReferencePath)(apiPath));
+          })
+        )
       )
   );
-
   it.effect(
     "refuses unknown calculator identifiers and suffixes for public cache",
     () =>
@@ -80,7 +87,7 @@ describe("transport route catalogue", () => {
         ],
         (path) =>
           Effect.sync(() => {
-            assert.isFalse(isPublicReadPath(path), path);
+            assert.isFalse(isPublicReadApiPath(path), path);
           })
       )
   );

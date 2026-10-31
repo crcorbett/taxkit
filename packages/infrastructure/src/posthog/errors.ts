@@ -24,10 +24,10 @@ const PostHogManagementReason = Schema.Literals([
   "uncertain-create",
   "write-not-converged",
 ]);
-export class PostHogManagementError extends Schema.TaggedError<PostHogManagementError>()(
-  "PostHogManagementError",
-  {
-    operation: PostHogManagementOperation,
-    reason: PostHogManagementReason,
-  }
-) {}
+export class PostHogManagementError extends Schema.TaggedError<
+  PostHogManagementError,
+  { readonly brand: unique symbol }
+>()("PostHogManagementError", {
+  operation: PostHogManagementOperation,
+  reason: PostHogManagementReason,
+}) {}
