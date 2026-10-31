@@ -1,12 +1,20 @@
 {
   "name": "@taxkit/mdx",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": true,
   "license": "MIT",
   "type": "module",
   "exports": {
     "./live": "./src/live.layer.ts",
-    "./highlights": "./src/highlights.adapter.layer.ts"
+    "./highlights": "./src/highlights.adapter.layer.ts",
+    "./service": "./src/service.ts",
+    "./schemas": "./src/schemas.ts",
+    "./errors": "./src/errors.ts",
+    "./compiler": "./src/compiler.layer.ts",
+    "./renderer": "./src/renderer.layer.ts",
+    "./config": "./src/config.ts",
+    "./test": "./src/test.layer.ts",
+    "./artifacts": "./src/artifacts.layer.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
@@ -14,7 +22,6 @@
   },
   "dependencies": {
     "@pierre/highlights": "0.3.0",
-    "@taxkit/content": "workspace:*",
     "effect": "catalog:",
     "mdast-util-from-markdown": "2.1.0",
     "mdast-util-gfm-table": "2.0.0",

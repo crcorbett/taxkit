@@ -1,5 +1,12 @@
 # @taxkit/api-http
 
+## 3.1.3
+
+### Patch Changes
+
+- Updated dependencies [786e719]
+  - @taxkit/content@3.2.1
+
 ## 3.1.2
 
 ### Patch Changes

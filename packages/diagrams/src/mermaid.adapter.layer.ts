@@ -1,7 +1,7 @@
-import { DocsDiagramRenderError } from "@taxkit/content/errors";
-import { DocsDiagramSvg } from "@taxkit/content/schemas";
-import type { DocsDiagramSource } from "@taxkit/content/schemas";
-import { DocsDiagramRenderer } from "@taxkit/content/service";
+import { DiagramRenderError } from "@taxkit/mdx/errors";
+import { DiagramSvg } from "@taxkit/mdx/schemas";
+import type { DiagramSource } from "@taxkit/mdx/schemas";
+import { DiagramRenderer } from "@taxkit/mdx/service";
 import { renderMermaidSVG } from "beautiful-mermaid";
 import { Effect, Layer, Schema } from "effect";
 
@@ -17,17 +17,17 @@ const diagramColours = {
 
 // beautiful-mermaid is the only diagram renderer. It lays out and draws the
 // diagram synchronously, without a DOM; every call stays in this operation.
-export const DocsDiagramRendererLive = Layer.succeed(DocsDiagramRenderer)(
-  DocsDiagramRenderer.of({
-    render: Effect.fn("DocsDiagramRenderer.render")(function* (
-      source: DocsDiagramSource
+export const MermaidDiagramRendererLive = Layer.succeed(DiagramRenderer)(
+  DiagramRenderer.of({
+    render: Effect.fn("DiagramRenderer.render")(function* (
+      source: DiagramSource
     ) {
       const svg: unknown = yield* Effect.try({
-        catch: () => new DocsDiagramRenderError({ reason: "render" }),
+        catch: () => new DiagramRenderError({ reason: "render" }),
         try: () => renderMermaidSVG(source, diagramColours),
       });
-      return yield* Schema.decodeUnknownEffect(DocsDiagramSvg)(svg).pipe(
-        Effect.mapError(() => new DocsDiagramRenderError({ reason: "svg" }))
+      return yield* Schema.decodeUnknownEffect(DiagramSvg)(svg).pipe(
+        Effect.mapError(() => new DiagramRenderError({ reason: "svg" }))
       );
     }),
   })

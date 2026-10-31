@@ -1,40 +1,37 @@
-import { DocsSourceError } from "@taxkit/content/errors";
-import { resolveDocsHref } from "@taxkit/content/links";
-import type { DocsLinkContext } from "@taxkit/content/links";
-import {
-  DocsCodeLanguage,
-  DocsDiagramSource,
-  DocsDiagramTitle,
-  DocsHeadingId,
-  DocsReadingBody,
-} from "@taxkit/content/schemas";
-import type { DocsBlock, DocsInline } from "@taxkit/content/schemas";
-import {
-  DocsCodeHighlighter,
-  DocsDiagramRenderer,
-} from "@taxkit/content/service";
 import {
   Function as EffectFunction,
+  Boolean,
   Array,
   Effect,
   Match,
   Option,
   Schema,
-  Boolean as EffectBoolean,
 } from "effect";
 
-import { plainText } from "./schemas.js";
+import { CompileError } from "./errors.js";
+import {
+  CodeLanguage,
+  CodeText,
+  ListStart,
+  DiagramSource,
+  DiagramTitle,
+  HeadingId,
+  Blocks,
+} from "./schemas.js";
+import type { Block, Inline, SourceId } from "./schemas.js";
+import { plainText } from "./syntax.schemas.js";
 import type {
+  BlockCompilation,
   SyntaxBlock,
   SyntaxFormatted,
   SyntaxLeaf,
   SyntaxPhrasing,
   SyntaxTableRow,
-} from "./schemas.js";
+} from "./syntax.schemas.js";
 
 const diagramMetaPattern = /^title="(?<title>[^"]+)"$/u;
-const DiagramMeta = Schema.Struct({ title: DocsDiagramTitle });
-const readLeaf = (node: SyntaxLeaf) =>
+const DiagramMeta = Schema.Struct({ title: DiagramTitle });
+const compileLeaf = (node: SyntaxLeaf) =>
   Match.value(node).pipe(
     Match.discriminatorsExhaustive("type")({
       inlineCode: ({ value }) => ({
@@ -44,158 +41,144 @@ const readLeaf = (node: SyntaxLeaf) =>
       text: ({ value }) => ({ kind: "text" as const, text: value }),
     })
   );
-const readFormatted = (node: SyntaxFormatted) =>
+const compileFormatted = (node: SyntaxFormatted) =>
   Match.value(node).pipe(
     Match.discriminatorsExhaustive("type")({
       emphasis: ({ children }) => ({
-        content: EffectFunction.pipe(children, Array.map(readLeaf)),
+        content: EffectFunction.pipe(children, Array.map(compileLeaf)),
         kind: "emphasis" as const,
       }),
-      inlineCode: readLeaf,
+      inlineCode: compileLeaf,
       strong: ({ children }) => ({
-        content: EffectFunction.pipe(children, Array.map(readLeaf)),
+        content: EffectFunction.pipe(children, Array.map(compileLeaf)),
         kind: "strong" as const,
       }),
-      text: readLeaf,
+      text: compileLeaf,
     })
   );
-const readInline = (
-  node: SyntaxPhrasing,
-  links: DocsLinkContext
-): Effect.Effect<DocsInline, DocsSourceError> =>
+const compileInline = (node: SyntaxPhrasing): Effect.Effect<Inline> =>
   Match.value(node).pipe(
-    Match.when({ type: "link" }, (matchedValue) =>
-      resolveDocsHref(matchedValue.url, links).pipe(
-        Effect.map((href) => ({
-          content: EffectFunction.pipe(
-            matchedValue.children,
-            Array.map(readFormatted)
-          ),
-          href,
-          kind: "link" as const,
-        }))
-      )
-    ),
-    Match.orElse((matchedValue) => Effect.succeed(readFormatted(matchedValue)))
+    Match.when({ type: "link" }, (link) => ({
+      content: EffectFunction.pipe(link.children, Array.map(compileFormatted)),
+      kind: "link" as const,
+      target: link.url,
+    })),
+    Match.orElse(compileFormatted),
+    Effect.succeed
   );
-const readInlines = (
-  nodes: readonly SyntaxPhrasing[],
-  links: DocsLinkContext
-) =>
+const compileInlines = (nodes: readonly SyntaxPhrasing[]) =>
   EffectFunction.pipe(
     nodes,
-    Effect.forEach((node) => readInline(node, links))
+    Effect.forEach((node) => compileInline(node))
   );
-const readRow = (row: SyntaxTableRow, links: DocsLinkContext) =>
+const compileRow = (row: SyntaxTableRow) =>
   EffectFunction.pipe(
     row.children,
-    Effect.forEach((cell) => readInlines(cell.children, links))
+    Effect.forEach((cell) => compileInlines(cell.children))
   );
-const readBlock = (
+const compileBlock = (
   node: SyntaxBlock,
-  links: DocsLinkContext
-): Effect.Effect<
-  DocsBlock,
-  DocsSourceError,
-  DocsCodeHighlighter | DocsDiagramRenderer
-> => {
-  const fail = (message: string) =>
-    new DocsSourceError({ message, operation: "parse", source: links.source });
-  const unsupported = fail("The page uses unsupported Markdown.");
+  sourceId: SourceId
+): Effect.Effect<Block, CompileError> => {
+  const fail = (reason: CompileError["reason"], message: string) =>
+    new CompileError({ message, reason, source: sourceId });
   return Match.value(node).pipe(
     Match.discriminatorsExhaustive("type")({
       code: ({ lang, meta, value }) =>
-        EffectBoolean.match(Option.contains(lang, "mermaid"), {
+        Boolean.match(Option.contains(lang, "mermaid"), {
           onFalse: () =>
             Effect.gen(function* () {
               if (Option.isSome(meta)) {
-                return yield* unsupported;
-              }
-              const language = yield* Schema.decodeUnknownEffect(
-                DocsCodeLanguage
-              )(Option.getOrElse(lang, () => "txt")).pipe(
-                Effect.mapError(() => unsupported)
-              );
-              const highlighter = yield* DocsCodeHighlighter;
-              const lines = yield* highlighter
-                .highlight({ language, text: value })
-                .pipe(
-                  Effect.mapError(() =>
-                    fail("A code block could not be highlighted.")
-                  )
+                return yield* fail(
+                  "code-metadata",
+                  "Code block metadata is not supported."
                 );
-              return { kind: "code" as const, language, lines };
+              }
+              const language = yield* Schema.decodeUnknownEffect(CodeLanguage)(
+                EffectFunction.pipe(
+                  lang,
+                  Option.getOrElse(() => "txt")
+                )
+              ).pipe(
+                Effect.mapError(() =>
+                  fail(
+                    "code-language",
+                    "The code block language is not supported."
+                  )
+                )
+              );
+              const text = yield* CodeText.makeEffect(value).pipe(
+                Effect.mapError(() =>
+                  fail("body", "The code text exceeds the supported size.")
+                )
+              );
+              return { kind: "code" as const, language, text };
             }),
           onTrue: () =>
             Effect.gen(function* () {
-              const { title } = yield* Option.fromNullishOr(
-                Match.value(meta).pipe(
-                  Match.when(
-                    Option.isSome,
-                    (matchedValue) =>
-                      diagramMetaPattern.exec(matchedValue.value)?.groups
-                  ),
-                  Match.orElse(EffectFunction.constUndefined)
-                )
-              ).pipe(
+              const { title } = yield* meta.pipe(
+                Option.flatMap((text) =>
+                  Option.fromNullishOr(diagramMetaPattern.exec(text)?.groups)
+                ),
                 Effect.fromOption,
                 Effect.flatMap(Schema.decodeUnknownEffect(DiagramMeta)),
                 Effect.mapError(() =>
                   fail(
+                    "diagram-title",
                     'A diagram needs a title, written as ```mermaid title="…"'
                   )
                 )
               );
-              const source = yield* DocsDiagramSource.makeEffect(value).pipe(
-                Effect.mapError(() => unsupported)
+              const source = yield* DiagramSource.makeEffect(value).pipe(
+                Effect.mapError(() =>
+                  fail("diagram-source", "The diagram source is invalid.")
+                )
               );
-              const renderer = yield* DocsDiagramRenderer;
-              const svg = yield* renderer
-                .render(source)
-                .pipe(
-                  Effect.mapError(() => fail("A diagram could not be drawn."))
-                );
-              return { kind: "diagram" as const, source, svg, title };
+              return { kind: "diagram" as const, source, title };
             }),
         }),
       heading: ({ children, depth }) =>
-        Match.value(depth).pipe(
-          Match.when(1, () =>
-            Effect.fail(fail("A page has only one # heading."))
-          ),
-          Match.orElse((matchedValue) =>
-            Effect.gen(function* () {
-              const id = yield* DocsHeadingId.makeEffect(
-                plainText(children)
-                  .toLowerCase()
-                  .replaceAll(/[^a-z0-9]+/gu, "-")
-                  .replaceAll(/^-|-$/gu, "")
-              ).pipe(Effect.mapError(() => unsupported));
-              return {
-                content: yield* readInlines(children, links),
-                depth: matchedValue,
-                id,
-                kind: "heading" as const,
-              };
-            })
-          )
-        ),
+        Effect.gen(function* () {
+          const id = yield* HeadingId.makeEffect(
+            plainText(children)
+              .toLowerCase()
+              .replaceAll(/[^a-z0-9]+/gu, "-")
+              .replaceAll(/^-|-$/gu, "")
+          ).pipe(
+            Effect.mapError(() =>
+              fail("heading", "The heading cannot form a page anchor.")
+            )
+          );
+          return {
+            content: yield* compileInlines(children),
+            depth,
+            id,
+            kind: "heading" as const,
+          };
+        }),
       list: ({ children, ordered, start }) =>
         EffectFunction.pipe(
           children,
           Effect.forEach(({ children: [paragraph] }) =>
-            readInlines(paragraph.children, links)
+            compileInlines(paragraph.children)
+          ),
+          Effect.flatMap((items) =>
+            Option.match(start, {
+              onNone: () => ListStart.makeEffect(1),
+              onSome: Effect.succeed,
+            }).pipe(
+              Effect.map((position) => ({
+                items,
+                kind: "list" as const,
+                ordered,
+                start: position,
+              })),
+              Effect.mapError(() => fail("body", "The list start is invalid."))
+            )
           )
-        ).pipe(
-          Effect.map((items) => ({
-            items,
-            kind: "list" as const,
-            ordered,
-            start: Option.getOrElse(start, () => 1),
-          }))
         ),
       paragraph: ({ children }) =>
-        readInlines(children, links).pipe(
+        compileInlines(children).pipe(
           Effect.map((content) => ({ content, kind: "paragraph" as const }))
         ),
       table: ({ align, children: [header, ...rows] }) =>
@@ -205,38 +188,33 @@ const readBlock = (
               align,
               Array.map(Option.getOrElse(() => "none" as const))
             ),
-            header: yield* readRow(header, links),
+            header: yield* compileRow(header),
             kind: "table" as const,
             rows: yield* EffectFunction.pipe(
               rows,
-              Effect.forEach((row) => readRow(row, links))
+              Effect.forEach((row) => compileRow(row))
             ),
           };
         }),
     })
   );
 };
-// The page body after its `#` title, as Content's checked reading blocks.
-// Links resolve against the catalogue; code and diagrams use Content's
-// highlighter and renderer contracts.
-export const readBody = Effect.fnUntraced(function* ({
+// Compile checked syntax without resolving links or acquiring providers.
+export const compileBlocks = Effect.fnUntraced(function* ({
   blocks,
-  links,
-}: {
-  readonly blocks: readonly SyntaxBlock[];
-  readonly links: DocsLinkContext;
-}) {
+  sourceId,
+}: BlockCompilation) {
   const body = yield* EffectFunction.pipe(
     blocks,
-    Effect.forEach((block) => readBlock(block, links))
+    Effect.forEach((block) => compileBlock(block, sourceId))
   );
-  return yield* DocsReadingBody.makeEffect(body).pipe(
+  return yield* Blocks.makeEffect(body).pipe(
     Effect.mapError(
       () =>
-        new DocsSourceError({
+        new CompileError({
           message: "The page body is invalid, for example a repeated heading.",
-          operation: "parse",
-          source: links.source,
+          reason: "body",
+          source: sourceId,
         })
     )
   );

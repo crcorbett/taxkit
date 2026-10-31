@@ -1,17 +1,13 @@
+import type { RenderedBlock, RenderedInline } from "@taxkit/mdx/schemas";
 import {
   Function as EffectFunction,
   Array,
+  Boolean as EffectBoolean,
   Match,
   Order,
-  Boolean as EffectBoolean,
 } from "effect";
 
-import type {
-  DocsBlock,
-  DocsInline,
-  DocsNonEmptyText,
-  DocsReadingBody,
-} from "./schemas.js";
+import type { DocsNonEmptyText } from "./schemas.js";
 // Text must stay literal when read as Markdown: protect inline delimiters,
 // table pipes, entities and block markers at line starts. Real formatting,
 // list markers, code and link addresses have their own serialisers.
@@ -28,15 +24,14 @@ const escapeText = (text: string) =>
     );
 // A code fence one backtick longer than any run inside the text.
 const fence = (text: string, minimum: number) =>
-  "`".repeat(
-    EffectFunction.pipe(
-      text.split(/[^`]+/u),
-      Array.map((run) => run.length + 1),
-      Array.prepend(minimum),
-      Array.max(Order.Number)
-    )
+  EffectFunction.pipe(
+    text.split(/[^`]+/u),
+    Array.map((run) => run.length + 1),
+    Array.prepend(minimum),
+    Array.max(Order.Number),
+    (length) => "`".repeat(length)
   );
-const inlineMarkdown = (inline: DocsInline): string =>
+const inlineMarkdown = (inline: RenderedInline): string =>
   Match.value(inline).pipe(
     Match.discriminatorsExhaustive("kind")({
       emphasis: ({ content }) =>
@@ -50,25 +45,15 @@ const inlineMarkdown = (inline: DocsInline): string =>
       text: ({ text }) => escapeText(text),
     })
   );
-const inlines = (content: readonly DocsInline[]): string =>
+const inlines = (content: readonly RenderedInline[]): string =>
   EffectFunction.pipe(content, Array.map(inlineMarkdown)).join("");
-const tableRow = (cells: readonly (readonly DocsInline[])[]) =>
+const tableRow = (cells: readonly (readonly RenderedInline[])[]) =>
   `| ${EffectFunction.pipe(cells, Array.map(inlines)).join(" | ")} |`;
-const blockMarkdown = (block: DocsBlock): string =>
+const blockMarkdown = (block: RenderedBlock): string =>
   Match.value(block).pipe(
     Match.discriminatorsExhaustive("kind")({
-      code: ({ language, lines }) => {
-        const text = EffectFunction.pipe(
-          lines,
-          Array.map((line) =>
-            EffectFunction.pipe(
-              line,
-              Array.map((token) => token.text)
-            ).join("")
-          )
-        ).join("\n");
-        return `${fence(text, 3)}${language}\n${text}\n${fence(text, 3)}`;
-      },
+      code: ({ language, text }) =>
+        `${fence(text, 3)}${language}\n${text}\n${fence(text, 3)}`,
       diagram: ({ source }) =>
         `${fence(source, 3)}mermaid\n${source}\n${fence(source, 3)}`,
       heading: ({ content, depth }) =>
@@ -78,8 +63,8 @@ const blockMarkdown = (block: DocsBlock): string =>
           items,
           Array.map((item, index) =>
             EffectBoolean.match(ordered, {
-              onFalse: () => `- ${inlines(item)}`,
               onTrue: () => `${start + index}. ${inlines(item)}`,
+              onFalse: () => `- ${inlines(item)}`,
             })
           )
         ).join("\n"),
@@ -91,10 +76,10 @@ const blockMarkdown = (block: DocsBlock): string =>
             align,
             Array.map((side) =>
               Match.value(side).pipe(
-                Match.when("left", (): ":---" => ":---"),
-                Match.when("center", (): ":---:" => ":---:"),
-                Match.when("right", (): "---:" => "---:"),
-                Match.when("none", (): "---" => "---"),
+                Match.when("left", () => ":---"),
+                Match.when("center", () => ":---:"),
+                Match.when("right", () => "---:"),
+                Match.when("none", () => "---"),
                 Match.exhaustive
               )
             )
@@ -109,7 +94,7 @@ export const readingMarkdown = ({
   body,
   title,
 }: Readonly<{
-  body: DocsReadingBody;
+  body: readonly RenderedBlock[];
   title: DocsNonEmptyText;
 }>): string =>
   `# ${escapeText(title)}\n\n${EffectFunction.pipe(body, Array.map(blockMarkdown)).join("\n\n")}\n`;

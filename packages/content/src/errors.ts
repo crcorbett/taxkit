@@ -1,7 +1,6 @@
 import { Schema } from "effect";
 
 import {
-  DocsCodeLanguage,
   DocsNonEmptyText,
   DocsPagePath,
   DocsPageSlug,
@@ -61,21 +60,31 @@ export class DocsSourceError extends Schema.TaggedError<
   source: Schema.optional(DocsSourcePath),
 }) {}
 
-// The highlighter refused the code or returned tokens Content could not read.
-// No source text or provider cause is kept.
-export class DocsCodeHighlightError extends Schema.TaggedError<
-  DocsCodeHighlightError,
+// Authoring failures always name the file and a matchable reason. Provider
+// reasons survive translation, but source text and raw exceptions never do.
+export class DocsPageReadError extends Schema.TaggedError<
+  DocsPageReadError,
   { readonly brand: unique symbol }
->()("DocsCodeHighlightError", {
-  language: DocsCodeLanguage,
-  reason: Schema.Literals(["highlight", "tokens"]),
+>()("DocsPageReadError", {
+  message: DocsNonEmptyText,
+  reason: Schema.Literals([
+    "frontmatter",
+    "syntax",
+    "title",
+    "link",
+    "code-language",
+    "code-metadata",
+    "code-highlight",
+    "code-tokens",
+    "diagram-title",
+    "diagram-source",
+    "diagram-render",
+    "diagram-svg",
+    "heading",
+    "body",
+  ]),
+  source: DocsSourcePath,
 }) {}
-
-// The diagram renderer refused the Mermaid source or returned an unusable SVG.
-export class DocsDiagramRenderError extends Schema.TaggedError<
-  DocsDiagramRenderError,
-  { readonly brand: unique symbol }
->()("DocsDiagramRenderError", { reason: Schema.Literals(["render", "svg"]) }) {}
 
 // A share image could not be produced. No page text or provider cause is kept.
 export class DocsImageRenderError extends Schema.TaggedError<

@@ -1,5 +1,12 @@
 # @taxkit/analytics
 
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [786e719]
+  - @taxkit/content@3.2.1
+
 ## 1.0.2
 
 ### Patch Changes

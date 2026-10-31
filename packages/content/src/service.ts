@@ -2,18 +2,12 @@ import { Context } from "effect";
 import type { Effect } from "effect";
 
 import type {
-  DocsCodeHighlightError,
-  DocsDiagramRenderError,
   DocsImageRenderError,
+  DocsPageReadError,
   DocsPageNotFoundError,
   DocsSourceError,
 } from "./errors.js";
-import type { DocsLinkContext } from "./links.js";
 import type {
-  DocsCodeLines,
-  DocsCodeSnippet,
-  DocsDiagramSource,
-  DocsDiagramSvg,
   DocsOgImage,
   DocsPagePath,
   DocsPngBytes,
@@ -55,35 +49,16 @@ export class DocsSources extends Context.Service<
   readonly DocsSource[]
 >()("@taxkit/content/DocsSources") {}
 
-// Contracts Content consumes. `@taxkit/mdx` reads MDX and highlights code;
-// `@taxkit/diagrams` draws Mermaid. Content never imports either package.
+// Content projects the neutral MDX model into its published page contract.
+// The app supplies the concrete MDX and presentation-provider Layers.
 export class DocsPageReader extends Context.Service<
   DocsPageReader,
   {
-    readonly read: (request: {
-      readonly source: DocsSource;
-      readonly links: DocsLinkContext;
-    }) => Effect.Effect<DocsReadPage, DocsSourceError>;
+    readonly read: (
+      source: DocsSource
+    ) => Effect.Effect<DocsReadPage, DocsPageReadError>;
   }
 >()("@taxkit/content/DocsPageReader") {}
-
-export class DocsCodeHighlighter extends Context.Service<
-  DocsCodeHighlighter,
-  {
-    readonly highlight: (
-      snippet: DocsCodeSnippet
-    ) => Effect.Effect<DocsCodeLines, DocsCodeHighlightError>;
-  }
->()("@taxkit/content/DocsCodeHighlighter") {}
-
-export class DocsDiagramRenderer extends Context.Service<
-  DocsDiagramRenderer,
-  {
-    readonly render: (
-      source: DocsDiagramSource
-    ) => Effect.Effect<DocsDiagramSvg, DocsDiagramRenderError>;
-  }
->()("@taxkit/content/DocsDiagramRenderer") {}
 
 // Share images. `@taxkit/og-image` implements the renderer, which draws one
 // image at build time; routes read finished images through `DocsOgImages`.

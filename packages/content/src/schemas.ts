@@ -1,3 +1,4 @@
+import * as Mdx from "@taxkit/mdx/schemas";
 import {
   Match,
   Function as EffectFunction,
@@ -169,29 +170,15 @@ export const DocsInlines = Schema.Array(DocsInline).check(
   Schema.isMinLength(1)
 );
 export type DocsInlines = typeof DocsInlines.Type;
-export const DocsCodeLanguage = Schema.Literals([
-  "json",
-  "md",
-  "sh",
-  "ts",
-  "txt",
-]);
+// Preserve the public Content identities while reusing MDX's wire refinements.
+// Neutral semantic brands stay inside MDX; the Content adapter projects them.
+export const DocsCodeLanguage = Mdx.CodeLanguage;
 export type DocsCodeLanguage = typeof DocsCodeLanguage.Type;
-export const DocsCodeSnippet = Schema.Struct({
-  language: DocsCodeLanguage,
-  text: Schema.String.check(Schema.isMaxLength(20_000)),
-});
-export type DocsCodeSnippet = typeof DocsCodeSnippet.Type;
-export const DocsTokenColor = Schema.String.check(
-  Schema.isPattern(/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/iu)
-).pipe(Schema.brand("taxkit/DocsTokenColor"));
+export const DocsTokenColor = Schema.toEncoded(Mdx.TokenColor).pipe(
+  Schema.brand("taxkit/DocsTokenColor")
+);
 export type DocsTokenColor = typeof DocsTokenColor.Type;
-export const DocsTokenStyle = Schema.Literals([
-  "normal",
-  "italic",
-  "bold",
-  "bold-italic",
-]);
+export const DocsTokenStyle = Mdx.TokenStyle;
 export type DocsTokenStyle = typeof DocsTokenStyle.Type;
 export const DocsCodeToken = Schema.Struct({
   color: Schema.OptionFromNullOr(DocsTokenColor),
@@ -199,24 +186,21 @@ export const DocsCodeToken = Schema.Struct({
   text: DocsInlineText,
 });
 export type DocsCodeToken = typeof DocsCodeToken.Type;
-// Each line keeps its tokens; an empty line has none.
 export const DocsCodeLines = Schema.Array(Schema.Array(DocsCodeToken)).check(
   Schema.isMinLength(1)
 );
 export type DocsCodeLines = typeof DocsCodeLines.Type;
-export const DocsDiagramTitle = DocsNonEmptyText.check(
-  Schema.isMaxLength(200)
-).pipe(Schema.brand("taxkit/DocsDiagramTitle"));
+export const DocsDiagramTitle = Schema.toEncoded(Mdx.DiagramTitle).pipe(
+  Schema.brand("taxkit/DocsDiagramTitle")
+);
 export type DocsDiagramTitle = typeof DocsDiagramTitle.Type;
-export const DocsDiagramSource = DocsNonEmptyText.check(
-  Schema.isMaxLength(10_000)
-).pipe(Schema.brand("taxkit/DocsDiagramSource"));
+export const DocsDiagramSource = Schema.toEncoded(Mdx.DiagramSource).pipe(
+  Schema.brand("taxkit/DocsDiagramSource")
+);
 export type DocsDiagramSource = typeof DocsDiagramSource.Type;
-// A finished standalone SVG document from the diagram renderer.
-export const DocsDiagramSvg = Schema.String.check(
-  Schema.isMaxLength(500_000),
-  Schema.isPattern(/^<svg[\s>][\s\S]*<\/svg>\s*$/u)
-).pipe(Schema.brand("taxkit/DocsDiagramSvg"));
+export const DocsDiagramSvg = Schema.toEncoded(Mdx.DiagramSvg).pipe(
+  Schema.brand("taxkit/DocsDiagramSvg")
+);
 export type DocsDiagramSvg = typeof DocsDiagramSvg.Type;
 export const DocsHeadingBlock = Schema.Struct({
   content: DocsInlines,
@@ -305,6 +289,7 @@ export type DocsReadingBody = typeof DocsReadingBody.Type;
 export const DocsReadPage = Schema.Struct({
   body: DocsReadingBody,
   frontmatter: DocsPageFrontmatter,
+  markdown: Schema.String,
 });
 export type DocsReadPage = typeof DocsReadPage.Type;
 export const DocsContentPage = Schema.Struct({

@@ -1,5 +1,17 @@
 # TaxKit
 
+## 3.0.1
+
+- Separate MDX compilation, rendering and artifact persistence into static Effect
+  services. Hosts can compile source once and render stored documents later;
+  TaxKit continues to build its documentation ahead of time.
+- Keep TaxKit publication and link policy in Content while preserving public
+  documentation responses and Schema brand identities.
+- Check versioned document artifacts with strict JSON codecs and branded values.
+  See the [MDX changelog](./packages/mdx/CHANGELOG.md),
+  [SDK changelog](./packages/sdk/typescript/CHANGELOG.md) and
+  [API changelog](./apps/api/CHANGELOG.md).
+
 ## 3.0.0
 
 - Give public Schema classes nominal identities: construct values with their

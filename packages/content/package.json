@@ -1,6 +1,6 @@
 {
   "name": "@taxkit/content",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -15,7 +15,10 @@
     "./testing/fixtures": "./src/__testing__/fixtures.ts",
     "./testing/observations": "./src/__testing__/observations.ts",
     "./response-check": "./src/response-check.ts",
-    "./config": "./src/config.ts"
+    "./config": "./src/config.ts",
+    "./catalogue": "./src/catalogue.layer.ts",
+    "./mdx": "./src/mdx.layer.ts",
+    "./link-resolver": "./src/link-resolver.layer.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
@@ -23,6 +26,7 @@
   },
   "dependencies": {
     "@content/docs": "workspace:*",
+    "@taxkit/mdx": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

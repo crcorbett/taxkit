@@ -1,6 +1,7 @@
 import {
   Function as EffectFunction,
   Array,
+  Context,
   Effect,
   HashMap,
   Match,
@@ -9,16 +10,20 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 
-import { DocsSourceError } from "./errors.js";
+import { DocsPageReadError } from "./errors.js";
 import { DocsLinkHref, DocsSourcePath } from "./schemas.js";
 import type { DocsPagePath, DocsRepositoryProfile } from "./schemas.js";
 // What one page's links can point to: every authored page by its source file,
 // the repository revisions for file links, and the page being read.
-export type DocsLinkContext = Readonly<{
+export type DocsLinkTargets = Readonly<{
   pages: HashMap.HashMap<DocsSourcePath, DocsPagePath>;
   repository: DocsRepositoryProfile;
-  source: DocsSourcePath;
 }>;
+export const DocsLinkTargets = Context.Service<DocsLinkTargets>(
+  "@taxkit/content/DocsLinkTargets"
+);
+export type DocsLinkContext = DocsLinkTargets &
+  Readonly<{ source: DocsSourcePath }>;
 const docsRoot = "content/docs";
 const examplesRoot = "packages/docs-examples/";
 const hrefPattern = /^(?<path>[^#]*)(?<fragment>#.*)?$/u;
@@ -54,10 +59,10 @@ const joinSegments = (
 export const resolveDocsHref = (
   href: string,
   context: DocsLinkContext
-): Effect.Effect<DocsLinkHref, DocsSourceError> => {
-  const fail = new DocsSourceError({
+): Effect.Effect<DocsLinkHref, DocsPageReadError> => {
+  const fail = new DocsPageReadError({
     message: "The page links to an unknown page or an unsupported address.",
-    operation: "parse",
+    reason: "link",
     source: context.source,
   });
   const checkedHref = (value: string) =>

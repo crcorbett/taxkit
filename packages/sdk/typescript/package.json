@@ -1,6 +1,6 @@
 {
   "name": "taxkit",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": false,
   "description": "TypeScript SDK for in-process TaxKit calculations.",
   "homepage": "https://taxkit.dev",

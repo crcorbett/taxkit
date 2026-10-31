@@ -55,13 +55,17 @@ const decodingBoundaryFiles = [
   "packages/docs-examples/test/integration.example.test.ts",
   // Authored docs ingress: Content's navigation and link profile JSON, the
   // MDX parser and its syntax tree, and the highlighter and diagram replies.
-  "packages/content/src/live.layer.ts",
+  "packages/content/src/catalogue.layer.ts",
   "packages/mdx/src/mdx.ingress.ts",
   "packages/mdx/src/body.ingress.ts",
+  "packages/mdx/src/artifacts.layer.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
   "packages/diagrams/src/mermaid.adapter.layer.ts",
   "packages/content/test/reading.test.ts",
-  "packages/mdx/test/reader.test.ts",
+  "packages/content/test/mdx.test.ts",
+  "packages/mdx/test/pipeline.test.ts",
+  "packages/content/src/mdx.layer.ts",
+  "packages/content/src/link-resolver.layer.ts",
   // Exact public catalogue wire and adversarial ingress fixtures only.
   "packages/content/src/__testing__/fixtures.ts",
   "packages/content/test/schemas.test.ts",
@@ -197,6 +201,8 @@ const effectErrorContractFiles = [
 const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 
 const schemaEncoderEgressFiles = [
+  // Strict, private MDX persistence codecs.
+  "packages/mdx/src/artifacts.layer.ts",
   // The synchronous native logger encodes its fixed record at console egress.
   "packages/observability/src/host-telemetry.ts",
   // Persisted docs catalogue written by the API build.

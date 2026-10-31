@@ -1,13 +1,9 @@
-import { codeToTokens } from "@pierre/highlights";
-import { pierreLight } from "@pierre/highlights/themes";
-import { DocsCodeHighlightError } from "@taxkit/content/errors";
-import { DocsTokenColor } from "@taxkit/content/schemas";
-import type {
-  DocsCodeSnippet,
-  DocsCodeToken,
-  DocsTokenStyle,
-} from "@taxkit/content/schemas";
-import { DocsCodeHighlighter } from "@taxkit/content/service";
+import { createHighlighter } from "@pierre/highlights";
+import { pierreDark, pierreLight } from "@pierre/highlights/themes";
+import { CodeHighlightError } from "@taxkit/mdx/errors";
+import { InlineText, TokenColor } from "@taxkit/mdx/schemas";
+import type { CodeSnippet, CodeToken, TokenStyle } from "@taxkit/mdx/schemas";
+import { CodeHighlighter } from "@taxkit/mdx/service";
 import {
   Function as EffectFunction,
   Array,
@@ -18,20 +14,22 @@ import {
   Result,
   Schema,
 } from "effect";
-// The part of the provider's Shiki-compatible reply Content reads. Font-style
+
+import { PresentationThemeConfig } from "./config.js";
+// The checked part of the provider's Shiki-compatible reply. Font-style
 // bits: 1 italic, 2 bold. Other provider fields are ignored.
 const HighlightsTokens = Schema.Struct({
   tokens: Schema.Array(
     Schema.Array(
       Schema.Struct({
-        color: Schema.optional(DocsTokenColor),
-        content: Schema.String,
-        fontStyle: Schema.optional(Schema.Int),
+        color: Schema.OptionFromOptional(TokenColor),
+        content: Schema.Union([Schema.Literal(""), InlineText]),
+        fontStyle: Schema.OptionFromOptional(Schema.Int),
       })
     )
   ).check(Schema.isMinLength(1)),
 });
-const tokenStyle = (fontStyle: number): DocsTokenStyle =>
+const resolveTokenStyle = (fontStyle: number): TokenStyle =>
   Match.value({
     bold: Math.floor(fontStyle / 2) % 2 === 1,
     italic: fontStyle % 2 === 1,
@@ -41,56 +39,75 @@ const tokenStyle = (fontStyle: number): DocsTokenStyle =>
     Match.when({ italic: true }, () => "italic" as const),
     Match.orElse(() => "normal" as const)
   );
-// @pierre/highlights is the only syntax highlighter. Its module initialises
-// its WebAssembly on import (the Worker build loads it as a compiled module);
-// every call stays inside this one named operation.
-export const DocsCodeHighlighterLive = Layer.succeed(DocsCodeHighlighter)(
-  DocsCodeHighlighter.of({
-    highlight: Effect.fn("DocsCodeHighlighter.highlight")(function* (
-      snippet: DocsCodeSnippet
-    ) {
-      const reply: unknown = yield* Effect.try({
-        catch: () =>
-          new DocsCodeHighlightError({
-            language: snippet.language,
-            reason: "highlight",
-          }),
-        try: () =>
-          codeToTokens(snippet.text, {
-            lang: snippet.language,
-            theme: pierreLight,
-          }),
-      });
-      const { tokens } = yield* Schema.decodeUnknownEffect(HighlightsTokens)(
-        reply
-      ).pipe(
-        Effect.mapError(
-          () =>
-            new DocsCodeHighlightError({
+// @pierre/highlights initialises its WebAssembly on import. Only the API
+// build loads this adapter; every provider call stays in this operation.
+export const PierreCodeHighlighterLive = Layer.effect(
+  CodeHighlighter,
+  Effect.gen(function* () {
+    const theme = yield* PresentationThemeConfig;
+    const highlighter = yield* Effect.try({
+      catch: () =>
+        new CodeHighlightError({ language: "txt", reason: "highlight" }),
+      try: () => createHighlighter(),
+    });
+    return CodeHighlighter.of({
+      highlight: Effect.fn("CodeHighlighter.highlight")(function* (
+        snippet: CodeSnippet
+      ) {
+        const reply: unknown = yield* Effect.try({
+          catch: () =>
+            new CodeHighlightError({
               language: snippet.language,
-              reason: "tokens",
-            })
-        )
-      );
-      // Already-checked provider tokens become Content tokens; empty runs
-      // carry no text and are dropped.
-      return EffectFunction.pipe(
-        tokens,
-        Array.map((line) =>
-          Array.filterMap(line, (token) =>
-            Match.value(token).pipe(
-              Match.when({ content: "" }, () => Result.failVoid),
-              Match.orElse((matchedValue) =>
-                Result.succeed<DocsCodeToken>({
-                  color: Option.fromUndefinedOr(matchedValue.color),
-                  style: tokenStyle(matchedValue.fontStyle ?? 0),
-                  text: matchedValue.content,
-                })
+              reason: "highlight",
+            }),
+          try: () =>
+            highlighter.codeToTokens(snippet.text, {
+              lang: snippet.language,
+              theme: Match.value(theme).pipe(
+                Match.when("dark", () => pierreDark),
+                Match.when("light", () => pierreLight),
+                Match.exhaustive
+              ),
+            }),
+        });
+        const { tokens } = yield* Schema.decodeUnknownEffect(HighlightsTokens)(
+          reply
+        ).pipe(
+          Effect.mapError(
+            () =>
+              new CodeHighlightError({
+                language: snippet.language,
+                reason: "tokens",
+              })
+          )
+        );
+        // Already-checked provider tokens become Content tokens; empty runs
+        // carry no text and are dropped.
+        return EffectFunction.pipe(
+          tokens,
+          Array.map((line) =>
+            EffectFunction.pipe(
+              line,
+              Array.filterMap((token) =>
+                Match.value(token.content).pipe(
+                  Match.when("", () => Result.failVoid),
+                  Match.orElse((text) =>
+                    Result.succeed<CodeToken>({
+                      color: token.color,
+                      style: EffectFunction.pipe(
+                        token.fontStyle,
+                        Option.getOrElse(() => 0),
+                        resolveTokenStyle
+                      ),
+                      text,
+                    })
+                  )
+                )
               )
             )
           )
-        )
-      );
-    }),
+        );
+      }),
+    });
   })
 );

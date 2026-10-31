@@ -1,5 +1,22 @@
 # TaxKit API
 
+## 2.0.4
+
+### Patch Changes
+
+- 786e719: Build documentation through independent MDX compilation and rendering
+  services, with strict artifact persistence and TaxKit publication policy owned
+  by Content. Public page, navigation, search and Markdown responses retain their
+  existing representation and Schema brand identities.
+
+- Updated dependencies [786e719]
+  - @taxkit/content@3.2.1
+  - @taxkit/aeo@0.1.4
+  - @taxkit/analytics@1.0.3
+  - @taxkit/api-http@3.1.3
+  - @taxkit/api-mcp@0.2.5
+  - @taxkit/infrastructure@1.1.4
+
 ## 2.0.3
 
 ### Patch Changes

@@ -1,30 +1,15 @@
-import {
-  Match,
-  Function as EffectFunction,
-  Array,
-  Effect,
-  Layer,
-  Option,
-  Ref,
-} from "effect";
+import { Array, Effect, Layer, Ref } from "effect";
 
 import type { ContentObservations } from "./__testing__/observations.js";
-import { DocsDiagramRenderError, DocsImageRenderError } from "./errors.js";
+import { DocsImageRenderError } from "./errors.js";
 import { ContentServiceLive } from "./live.layer.js";
-import { DocsDiagramSvg, DocsPngBytes, docsOgImageSize } from "./schemas.js";
+import { DocsPngBytes, docsOgImageSize } from "./schemas.js";
 import type {
-  DocsCodeSnippet,
   DocsPagePath,
   DocsPublicCatalogue,
   DocsSearchTerm,
 } from "./schemas.js";
-import {
-  ContentCatalogue,
-  ContentService,
-  DocsCodeHighlighter,
-  DocsDiagramRenderer,
-  DocsOgImages,
-} from "./service.js";
+import { ContentCatalogue, ContentService, DocsOgImages } from "./service.js";
 
 export const makeContentTest = Effect.fnUntraced(function* (
   catalogue: DocsPublicCatalogue
@@ -65,43 +50,6 @@ export const makeContentTest = Effect.fnUntraced(function* (
     observations,
   };
 });
-// Deterministic highlighter: each source line becomes one uncoloured token.
-export const DocsCodeHighlighterTest = Layer.succeed(DocsCodeHighlighter)(
-  DocsCodeHighlighter.of({
-    highlight: Effect.fn("DocsCodeHighlighter.highlight")(
-      (snippet: DocsCodeSnippet) =>
-        Effect.succeed(
-          EffectFunction.pipe(
-            snippet.text.split("\n"),
-            Array.map((line) =>
-              Match.value(line).pipe(
-                Match.when("", () => []),
-                Match.orElse((matchedValue) => [
-                  {
-                    color: Option.none(),
-                    style: "normal" as const,
-                    text: matchedValue,
-                  },
-                ])
-              )
-            )
-          )
-        )
-    ),
-  })
-);
-// Deterministic renderer: one fixed, valid SVG document for every diagram.
-export const DocsDiagramRendererTest = Layer.succeed(DocsDiagramRenderer)(
-  DocsDiagramRenderer.of({
-    render: Effect.fn("DocsDiagramRenderer.render")(() =>
-      DocsDiagramSvg.makeEffect(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"></svg>'
-      ).pipe(
-        Effect.mapError(() => new DocsDiagramRenderError({ reason: "svg" }))
-      )
-    ),
-  })
-);
 // Deterministic share images: one fixed PNG header of the owned size for
 // every page.
 export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(

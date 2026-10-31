@@ -181,12 +181,13 @@ identity. Neither an app nor a package depends on another app.
 : Private source owner of canonical docs page/navigation contracts, source
   errors, the accepted public catalogue Schema and `ContentService`. Application
   composition supplies `DocsSources`; `ContentCatalogueLive` builds the checked
-  catalogue once through `DocsPageReader`, and the service reads accepted
+  catalogue once through `DocsPageReader` from the build-only `./catalogue`
+  export; the separate runtime `./live` service reads accepted
   pages, navigation and bounded search from it. It owns the checked reading
   `body`, link resolution (`src/links.ts`) and the processed Markdown writer
-  (`src/reading-markdown.egress.ts`). It declares the consumed
-  `DocsPageReader`, `DocsCodeHighlighter` and `DocsDiagramRenderer` contracts and
-  never imports their implementations. The HTTP content group consumes this
+  (`src/reading-markdown.egress.ts`). Its `ContentMdxReaderLive` implements `DocsPageReader` over MDX contracts;
+  `ContentLinkResolverLive` applies publication policy from checked targets.
+  The app selects concrete compiler, renderer and provider Layers. The HTTP content group consumes this
   compiled contract. The public path refinement and fixed page/search errors
   have one owner here. `./response-check` correlates an already-decoded page with
   its requested path. Shared public-origin policy lives in its Schema owner.
@@ -208,15 +209,17 @@ identity. Neither an app nor a package depends on another app.
   It has no Schemas, services or runtime.
 
 `packages/mdx`
-: Private source `@taxkit/mdx`. `./live` implements Content's
-  `DocsPageReader` with micromark MDX and GFM tables and a Schema-checked syntax
-  tree; JSX, images, raw HTML and quotes fail the page. `./highlights`
-  implements `DocsCodeHighlighter` and is the only `@pierre/highlights` caller.
+: Private source `@taxkit/mdx`: content-neutral `MdxCompiler.compile` and
+  `MdxRenderer.render`, static individual Layers and combined `MdxLive`.
+  MDX owns portable versioned documents and provider contracts; the compiler
+  requires no providers. `./highlights` owns every Pierre call. Content imports
+  only these contracts and Schemas, while the app selects implementations.
+  See [the package](../../packages/mdx/README.md).
 
 `packages/diagrams`
-: Private source `@taxkit/diagrams`. `./mermaid` implements Content's
-  `DocsDiagramRenderer` and is the only `beautiful-mermaid` caller. It renders
-  SVG on the server, with no browser or Chromium.
+: Private source `@taxkit/diagrams`. Static `MermaidDiagramRendererLive`
+  implements MDX's `DiagramRenderer`; it is the only `beautiful-mermaid` caller
+  and draws SVG without a browser. It does not import Content.
 
 `packages/docs-examples`
 : Private owner of the four retained integration templates, additional checked
