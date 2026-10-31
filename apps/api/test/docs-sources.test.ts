@@ -4,14 +4,22 @@ import { NodeServices } from "@effect/platform-node";
 import { assert, describe, it } from "@effect/vitest";
 import type { DocsBlock, DocsInline } from "@taxkit/content/schemas";
 import { ContentCatalogue, DocsOgImages } from "@taxkit/content/service";
-import { Array, Effect, FileSystem, Layer, Match, Order } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  FileSystem,
+  Layer,
+  Match,
+  Order,
+  Boolean as EffectBoolean,
+} from "effect";
 
-import { DocsCatalogueBuildLive } from "../scripts/docs-catalogue.layer.js";
+import { DocsCatalogueBuildLive } from "../src/build/docs-catalogue.layer.js";
 import { ApiContentLive } from "../src/content.boundary.js";
 
 const contentRoot = "../../content/docs";
 const blobPrefix = `${repository.repositoryUrl}/blob/`;
-
 // Wording the public docs never use: marketing claims, retired API names and
 // private product details.
 const textPolicy = [
@@ -19,7 +27,6 @@ const textPolicy = [
   /\b(?:calculateRequest|createEffectClient|PublicCalculationMetadata|PublicErrorEnvelope|PublicCalculationMetadataGroup|PublicCalculationMetadataHandlerLive)\b/u,
   /\b(?:adad|SaaS|paid|simulation|private downstream product|private product strategy)\b/iu,
 ] as const;
-
 const requiredText = [
   {
     path: "api/openapi-reference.mdx",
@@ -42,69 +49,90 @@ const requiredText = [
     ],
   },
 ] as const;
-
 const linkHrefs = (inlines: readonly DocsInline[]): readonly string[] =>
-  Array.flatMap(inlines, (inline) =>
-    inline.kind === "link" ? [inline.href] : []
+  EffectFunction.pipe(
+    inlines,
+    Array.flatMap((inline) =>
+      Match.value(inline).pipe(
+        Match.when({ kind: "link" }, (matchedValue) => [matchedValue.href]),
+        Match.orElse(() => [])
+      )
+    )
   );
-
 const blockHrefs = (block: DocsBlock): readonly string[] =>
   Match.value(block).pipe(
     Match.discriminatorsExhaustive("kind")({
       code: () => [],
       diagram: () => [],
       heading: ({ content }) => linkHrefs(content),
-      list: ({ items }) => Array.flatMap(items, linkHrefs),
+      list: ({ items }) => EffectFunction.pipe(items, Array.flatMap(linkHrefs)),
       paragraph: ({ content }) => linkHrefs(content),
       table: ({ header, rows }) =>
-        Array.flatMap([header, ...rows], (row) =>
-          Array.flatMap(row, linkHrefs)
+        EffectFunction.pipe(
+          [header, ...rows],
+          Array.flatMap((row) =>
+            EffectFunction.pipe(row, Array.flatMap(linkHrefs))
+          )
         ),
     })
   );
-
 describe("bundled docs sources", () => {
   it.effect("lists every authored MDX file exactly once", () =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const files = yield* fs.readDirectory(contentRoot, { recursive: true });
       assert.deepEqual(
-        Array.sort(
-          Array.map(docsSources, (source) => source.path),
-          Order.String
+        EffectFunction.pipe(
+          docsSources,
+          Array.map((source) => source.path),
+          Array.sort(Order.String)
         ),
-        Array.sort(
-          Array.filter(files, (file) => file.endsWith(".mdx")),
-          Order.String
+        EffectFunction.pipe(
+          files,
+          Array.filter((file) => file.endsWith(".mdx")),
+          Array.sort(Order.String)
         )
       );
     }).pipe(Effect.provide(NodeServices.layer))
   );
-
   it.effect("keeps the public wording and reference pages complete", () =>
     Effect.gen(function* () {
-      yield* Effect.forEach(docsSources, ({ path, text }) =>
-        Effect.forEach(textPolicy, (pattern) =>
-          Effect.sync(() => {
-            assert.notMatch(text, pattern, path);
-          })
+      yield* EffectFunction.pipe(
+        docsSources,
+        Effect.forEach(({ path, text }) =>
+          EffectFunction.pipe(
+            textPolicy,
+            Effect.forEach((pattern) =>
+              Effect.sync(() => {
+                assert.notMatch(text, pattern, path);
+              })
+            )
+          )
         )
       );
-      yield* Effect.forEach(requiredText, ({ path, texts }) =>
-        Array.findFirst(docsSources, (source) => source.path === path).pipe(
-          Effect.fromOption,
-          Effect.flatMap((page) =>
-            Effect.forEach(texts, (text) =>
-              Effect.sync(() => {
-                assert.include(page.text, text, path);
-              })
+      yield* EffectFunction.pipe(
+        requiredText,
+        Effect.forEach(({ path, texts }) =>
+          EffectFunction.pipe(
+            docsSources,
+            Array.findFirst((source) => source.path === path)
+          ).pipe(
+            Effect.fromOption,
+            Effect.flatMap((page) =>
+              EffectFunction.pipe(
+                texts,
+                Effect.forEach((text: string) =>
+                  Effect.sync(() => {
+                    assert.include(page.text, text, path);
+                  })
+                )
+              )
             )
           )
         )
       );
     })
   );
-
   it.effect(
     "builds every page with real highlighting and diagrams, and every repository link names a file",
     () =>
@@ -112,17 +140,27 @@ describe("bundled docs sources", () => {
         const fs = yield* FileSystem.FileSystem;
         const catalogue = yield* ContentCatalogue;
         assert.strictEqual(catalogue.pages.length, docsSources.length);
-        const repositoryFiles = Array.flatMap(catalogue.pages, (page) =>
-          Array.flatMap(page.body, (block) =>
-            Array.flatMap(blockHrefs(block), (href) =>
-              href.startsWith(blobPrefix)
-                ? [
-                    href
-                      .slice(blobPrefix.length)
-                      .replace(/^[a-f0-9]{40}\//u, "")
-                      .replace(/#.*$/u, ""),
-                  ]
-                : []
+        const repositoryFiles = EffectFunction.pipe(
+          catalogue.pages,
+          Array.flatMap((page) =>
+            EffectFunction.pipe(
+              page.body,
+              Array.flatMap((block) =>
+                EffectFunction.pipe(
+                  blockHrefs(block),
+                  Array.flatMap((href) =>
+                    EffectBoolean.match(href.startsWith(blobPrefix), {
+                      onFalse: () => [],
+                      onTrue: () => [
+                        href
+                          .slice(blobPrefix.length)
+                          .replace(/^[a-f0-9]{40}\//u, "")
+                          .replace(/#.*$/u, ""),
+                      ],
+                    })
+                  )
+                )
+              )
             )
           )
         );
@@ -140,7 +178,6 @@ describe("bundled docs sources", () => {
         Effect.provide(Layer.merge(DocsCatalogueBuildLive, NodeServices.layer))
       )
   );
-
   it.effect(
     "bundles the catalogue the authored files build to (run the API build after editing docs)",
     () =>
@@ -154,15 +191,22 @@ describe("bundled docs sources", () => {
         assert.deepEqual(bundled, built);
       })
   );
-
   it.effect("bundles one checked share image for every published page", () =>
     Effect.gen(function* () {
       const { pages } = yield* ContentCatalogue;
       const images = yield* DocsOgImages;
-      const sizes = yield* Effect.forEach(pages, (page) =>
-        images.getImage(page.path).pipe(Effect.map((png) => png.byteLength))
+      const sizes = yield* EffectFunction.pipe(
+        pages,
+        Effect.forEach((page) =>
+          images.getImage(page.path).pipe(Effect.map((png) => png.byteLength))
+        )
       );
-      assert.isTrue(Array.every(sizes, (size) => size > 1000));
+      assert.isTrue(
+        EffectFunction.pipe(
+          sizes,
+          Array.every((size) => size > 1000)
+        )
+      );
     }).pipe(Effect.provide(ApiContentLive))
   );
 });

@@ -48,7 +48,11 @@ export const ApiRoutesLive = ApiRoutesLayer.pipe(
       Layer.provide(CalculationEngineLive)
     )
   ),
-  Layer.provide(HttpRouter.middleware(withCalculatorRequestBodyLimit).layer),
+  Layer.provide(
+    HttpRouter.middleware((handler) =>
+      withCalculatorRequestBodyLimit({ handler })
+    ).layer
+  ),
   Layer.provide(
     HttpRouter.middleware(HttpMiddleware.cors(publicCors), { global: true })
   )

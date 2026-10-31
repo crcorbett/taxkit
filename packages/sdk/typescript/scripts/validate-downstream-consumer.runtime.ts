@@ -1,6 +1,7 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
+  Function as EffectFunction,
   Array as EffectArray,
   Console,
   Effect,
@@ -10,6 +11,7 @@ import {
   Record as EffectRecord,
   Schema,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
@@ -20,7 +22,7 @@ import {
   DependencySectionName,
   PackedPackageManifest,
   RootPackageManifest,
-} from "./schemas.js";
+} from "../src/internal/artifact-schemas.js";
 
 const PackageClosureItem = Schema.Struct({
   build: Schema.Boolean,
@@ -28,7 +30,6 @@ const PackageClosureItem = Schema.Struct({
   relativeRoot: Schema.String,
 });
 type PackageClosureItem = typeof PackageClosureItem.Type;
-
 const PackedPackageEvidence = Schema.Struct({
   manifest: Schema.toType(PackedPackageManifest),
   packageName: Schema.String,
@@ -61,24 +62,30 @@ const DownstreamValidationEvidence = Schema.Struct({
   typecheckResult: Schema.String,
 });
 type DownstreamValidationEvidence = typeof DownstreamValidationEvidence.Type;
-
-class DownstreamCommandError extends Schema.TaggedError<DownstreamCommandError>()(
-  "DownstreamCommandError",
+class DownstreamCommandError extends Schema.TaggedError<
+  DownstreamCommandError,
   {
-    exitCode: Schema.Option(Schema.Finite),
-    reason: Schema.Literals(["start-or-read", "exit", "output-limit"]),
-    stage: Schema.String,
+    readonly brand: unique symbol;
   }
-) {}
-class DownstreamReleaseBlockerError extends Schema.TaggedError<DownstreamReleaseBlockerError>()(
-  "DownstreamReleaseBlockerError",
-  { evidence: DownstreamValidationEvidence }
-) {}
-class DownstreamValidationError extends Schema.TaggedError<DownstreamValidationError>()(
-  "DownstreamValidationError",
-  { message: Schema.String }
-) {}
-
+>()("DownstreamCommandError", {
+  exitCode: Schema.Option(Schema.Finite),
+  reason: Schema.Literals(["start-or-read", "exit", "output-limit"]),
+  stage: Schema.String,
+}) {}
+class DownstreamReleaseBlockerError extends Schema.TaggedError<
+  DownstreamReleaseBlockerError,
+  {
+    readonly brand: unique symbol;
+  }
+>()("DownstreamReleaseBlockerError", {
+  evidence: DownstreamValidationEvidence,
+}) {}
+class DownstreamValidationError extends Schema.TaggedError<
+  DownstreamValidationError,
+  {
+    readonly brand: unique symbol;
+  }
+>()("DownstreamValidationError", { message: Schema.String }) {}
 const ConsumerTsConfig = Schema.Struct({
   compilerOptions: Schema.Struct({
     lib: Schema.Array(Schema.String),
@@ -100,7 +107,6 @@ const ConsumerPackageManifest = Schema.Struct({
   scripts: DependencyRecord,
   type: Schema.Literal("module"),
 });
-
 const packageClosure = [
   {
     build: true,
@@ -108,23 +114,18 @@ const packageClosure = [
     relativeRoot: "packages/sdk/typescript",
   },
 ] satisfies readonly PackageClosureItem[];
-
 const runtimeDependencySections = [
   "dependencies",
   "optionalDependencies",
   "peerDependencies",
 ] satisfies readonly DependencySectionName[];
-
 const devDependencySections = [
   "devDependencies",
 ] satisfies readonly DependencySectionName[];
-
 const sdkRootUrl = new URL("..", import.meta.url);
 const repoRootUrl = new URL("../../..", sdkRootUrl);
-
 const commandLine = (command: string, args: readonly string[]) =>
   EffectArray.prepend(args, command).join(" ");
-
 const runCommand = (
   label: string,
   command: string,
@@ -133,7 +134,6 @@ const runCommand = (
 ) =>
   Effect.gen(function* runEffectCommand() {
     yield* Console.info(`$ ${commandLine(command, args)}`);
-
     const result = yield* Effect.gen(function* runChildProcess() {
       const handle = yield* ChildProcess.make(command, args, {
         cwd,
@@ -154,15 +154,17 @@ const runCommand = (
               }
             ),
             Stream.mapEffect(({ bytes, chunk }) =>
-              bytes > 1_048_576
-                ? Effect.fail(
+              EffectBoolean.match(bytes > 1_048_576, {
+                onFalse: () => Effect.succeed(chunk),
+                onTrue: () =>
+                  Effect.fail(
                     new DownstreamCommandError({
                       exitCode: Option.none(),
                       reason: "output-limit",
                       stage: label,
                     })
-                  )
-                : Effect.succeed(chunk)
+                  ),
+              })
             ),
             Stream.decodeText,
             Stream.mkString
@@ -172,7 +174,6 @@ const runCommand = (
         ],
         { concurrency: "unbounded" }
       );
-
       return {
         commandLine: commandLine(command, args),
         cwd,
@@ -194,7 +195,6 @@ const runCommand = (
         )
       )
     );
-
     return yield* Match.value(result.exitCode).pipe(
       Match.when(0, () => Effect.succeed(result)),
       Match.orElse(() =>
@@ -208,7 +208,6 @@ const runCommand = (
       )
     );
   }).pipe(Effect.scoped);
-
 const tarballPathFromPackOutput = (packageName: string, output: string) =>
   Schema.decodeEffect(Schema.NonEmptyString)(output.trim()).pipe(
     Effect.mapError(
@@ -218,99 +217,123 @@ const tarballPathFromPackOutput = (packageName: string, output: string) =>
         })
     )
   );
-
 const publicEntrypointsFromManifest = (manifest: PackedPackageManifest) =>
-  EffectArray.flatMap(
+  EffectFunction.pipe(
     EffectRecord.toEntries(manifest.exports),
-    ([subpath, target]) =>
-      Schema.is(Schema.String)(target)
-        ? []
-        : target.default.pipe(
+    EffectArray.flatMap(([subpath, target]) =>
+      Match.value(target).pipe(
+        Match.when(Schema.is(Schema.String), () => []),
+        Match.orElse((matchedValue) =>
+          matchedValue.default.pipe(
             Option.filter((defaultTarget) => defaultTarget.endsWith(".js")),
             Option.match({
               onNone: () => [],
               onSome: () => [
-                subpath === "."
-                  ? manifest.name
-                  : `${manifest.name}${subpath.slice(1)}`,
+                Match.value(subpath).pipe(
+                  Match.when(".", () => manifest.name),
+                  Match.orElse(
+                    (entrypoint) => `${manifest.name}${entrypoint.slice(1)}`
+                  )
+                ),
               ],
             })
           )
+        )
+      )
+    )
   );
-
 const packedSurfaceFailures = (
   manifest: PackedPackageManifest,
   packedFiles: readonly string[]
 ) => {
   const packedFileSet = HashSet.fromIterable(packedFiles);
-  const exportFailures = EffectArray.flatMap(
+  const exportFailures = EffectFunction.pipe(
     EffectRecord.toEntries(manifest.exports),
-    ([subpath, target]) => {
+    EffectArray.flatMap(([subpath, target]) => {
       const targetFailures = Match.value(target).pipe(
         Match.when(Schema.is(Schema.String), (targetValue) =>
-          HashSet.has(
-            packedFileSet,
-            `package/${targetValue.replace(/^\.\//u, "")}`
-          )
-            ? []
-            : [
+          EffectBoolean.match(
+            HashSet.has(
+              packedFileSet,
+              `package/${targetValue.replace(/^\.\//u, "")}`
+            ),
+            {
+              onFalse: () => [
                 `${manifest.name} ${subpath} default target ${targetValue} is absent from the tarball.`,
-              ]
+              ],
+              onTrue: () => [],
+            }
+          )
         ),
         Match.orElse((targetValue) =>
-          EffectArray.flatMap(["types", "default"] as const, (condition) =>
-            EffectRecord.get(targetValue, condition)
-              .pipe(Option.flatten)
-              .pipe(
-                Option.match({
-                  onNone: () => [
-                    `${manifest.name} ${subpath} is missing its ${condition} publication target.`,
-                  ],
-                  onSome: (value) =>
-                    HashSet.has(
-                      packedFileSet,
-                      `package/${value.replace(/^\.\//u, "")}`
-                    )
-                      ? []
-                      : [
-                          `${manifest.name} ${subpath} ${condition} target ${value} is absent from the tarball.`,
-                        ],
-                })
-              )
+          EffectFunction.pipe(
+            ["types", "default"] as const,
+            EffectArray.flatMap((condition) =>
+              EffectRecord.get(targetValue, condition)
+                .pipe(Option.flatten)
+                .pipe(
+                  Option.match({
+                    onNone: () => [
+                      `${manifest.name} ${subpath} is missing its ${condition} publication target.`,
+                    ],
+                    onSome: (value) =>
+                      EffectBoolean.match(
+                        HashSet.has(
+                          packedFileSet,
+                          `package/${value.replace(/^\.\//u, "")}`
+                        ),
+                        {
+                          onFalse: () => [
+                            `${manifest.name} ${subpath} ${condition} target ${value} is absent from the tarball.`,
+                          ],
+                          onTrue: () => [],
+                        }
+                      ),
+                  })
+                )
+            )
           )
         )
       );
-      const sourceFailures = Schema.is(Schema.String)(target)
-        ? []
-        : target.source.pipe(
+      const sourceFailures = Match.value(target).pipe(
+        Match.when(Schema.is(Schema.String), () => []),
+        Match.orElse((matchedValue) =>
+          matchedValue.source.pipe(
             Option.match({
               onNone: () => [],
               onSome: (source) => [
                 `${manifest.name} ${subpath} exposes source condition ${source} in the packed manifest.`,
               ],
             })
-          );
-
+          )
+        )
+      );
       return EffectArray.appendAll(sourceFailures, targetFailures);
-    }
+    })
   );
-  const sourceFileFailures = EffectArray.flatMap(packedFiles, (packedFile) =>
-    packedFile.startsWith("package/src/")
-      ? [`${manifest.name} packed source file ${packedFile}.`]
-      : []
+  const sourceFileFailures = EffectFunction.pipe(
+    packedFiles,
+    EffectArray.flatMap((packedFile) =>
+      EffectBoolean.match(packedFile.startsWith("package/src/"), {
+        onFalse: () => [],
+        onTrue: () => [`${manifest.name} packed source file ${packedFile}.`],
+      })
+    )
   );
-  const declaredFileFailures = EffectArray.flatMap(manifest.files, (file) =>
-    file === "src" || file.startsWith("src/")
-      ? [`${manifest.name} files includes source path ${file}.`]
-      : []
+  const declaredFileFailures = EffectFunction.pipe(
+    manifest.files,
+    EffectArray.flatMap((file) =>
+      EffectBoolean.match(file === "src" || file.startsWith("src/"), {
+        onFalse: () => [],
+        onTrue: () => [`${manifest.name} files includes source path ${file}.`],
+      })
+    )
   );
-
   return EffectArray.appendAll(
     EffectArray.appendAll(exportFailures, sourceFileFailures),
     declaredFileFailures
   );
 };
-
 const unsupportedProtocol = (range: string) =>
   Match.value(range).pipe(
     Match.when(
@@ -323,49 +346,51 @@ const unsupportedProtocol = (range: string) =>
     ),
     Match.orElse(() => Option.none<"catalog:" | "workspace:">())
   );
-
 const dependencyFindingsForSections = (
   packageName: string,
   manifest: PackedPackageManifest,
   sections: readonly DependencySectionName[]
 ): readonly ManifestProtocolFinding[] =>
-  EffectArray.flatMap(sections, (section) =>
-    EffectRecord.get(
-      {
-        dependencies: manifest.dependencies,
-        devDependencies: manifest.devDependencies,
-        optionalDependencies: manifest.optionalDependencies,
-        peerDependencies: manifest.peerDependencies,
-      },
-      section
-    )
-      .pipe(Option.flatten)
-      .pipe(
-        Option.match({
-          onNone: () => [],
-          onSome: (dependencies) =>
-            EffectArray.flatMap(
-              EffectRecord.toEntries(dependencies),
-              ([dependencyName, range]) =>
-                unsupportedProtocol(range).pipe(
-                  Option.match({
-                    onNone: () => [],
-                    onSome: (protocol) => [
-                      {
-                        dependencyName,
-                        packageName,
-                        protocol,
-                        range,
-                        section,
-                      } satisfies ManifestProtocolFinding,
-                    ],
-                  })
-                )
-            ),
-        })
+  EffectFunction.pipe(
+    sections,
+    EffectArray.flatMap((section) =>
+      EffectRecord.get(
+        {
+          dependencies: manifest.dependencies,
+          devDependencies: manifest.devDependencies,
+          optionalDependencies: manifest.optionalDependencies,
+          peerDependencies: manifest.peerDependencies,
+        },
+        section
       )
+        .pipe(Option.flatten)
+        .pipe(
+          Option.match({
+            onNone: () => [],
+            onSome: (dependencies) =>
+              EffectFunction.pipe(
+                EffectRecord.toEntries(dependencies),
+                EffectArray.flatMap(([dependencyName, range]) =>
+                  unsupportedProtocol(range).pipe(
+                    Option.match({
+                      onNone: () => [],
+                      onSome: (protocol) => [
+                        {
+                          dependencyName,
+                          packageName,
+                          protocol,
+                          range,
+                          section,
+                        } satisfies ManifestProtocolFinding,
+                      ],
+                    })
+                  )
+                )
+              ),
+          })
+        )
+    )
   );
-
 const catalogVersion = (
   catalog: typeof DependencyRecord.Type,
   packageName: string
@@ -381,46 +406,48 @@ const catalogVersion = (
       onSome: Effect.succeed,
     })
   );
-
-const writeConsumerFiles = (
-  fs: FileSystem.FileSystem,
-  path: Path.Path,
-  workspacePath: string
-) =>
-  Effect.gen(function* () {
-    yield* fs.makeDirectory(path.join(workspacePath, "src"), {
-      recursive: true,
-    });
-    const tsconfigJson = yield* Schema.encodeEffect(
-      Schema.fromJsonString(ConsumerTsConfig, { space: 2 })
-    )({
-      compilerOptions: {
-        lib: ["DOM", "ES2022", "ESNext.Disposable"],
-        module: "NodeNext",
-        moduleResolution: "NodeNext",
-        noEmit: true,
-        strict: true,
-        target: "ES2022",
-        types: [],
-      },
-      include: ["src/**/*.ts"],
-    }).pipe(
-      Effect.mapError(
-        () =>
-          new DownstreamValidationError({
-            message: "Failed to encode downstream tsconfig.json.",
-          })
-      )
-    );
-    yield* Effect.all(
-      [
-        fs.writeFileString(
-          path.join(workspacePath, "tsconfig.json"),
-          `${tsconfigJson}\n`
-        ),
-        fs.writeFileString(
-          path.join(workspacePath, "src/typecheck.ts"),
-          `import { CalculatorSchemas as MetadataSchemas } from "taxkit/core";
+const writeConsumerFiles = Effect.fnUntraced(function* ({
+  fs,
+  path,
+  workspacePath,
+}: {
+  readonly fs: FileSystem.FileSystem;
+  readonly path: Path.Path;
+  readonly workspacePath: string;
+}) {
+  yield* fs.makeDirectory(path.join(workspacePath, "src"), {
+    recursive: true,
+  });
+  const tsconfigJson = yield* Schema.encodeEffect(
+    Schema.fromJsonString(ConsumerTsConfig, { space: 2 })
+  )({
+    compilerOptions: {
+      lib: ["DOM", "ES2022", "ESNext.Disposable"],
+      module: "NodeNext",
+      moduleResolution: "NodeNext",
+      noEmit: true,
+      strict: true,
+      target: "ES2022",
+      types: [],
+    },
+    include: ["src/**/*.ts"],
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new DownstreamValidationError({
+          message: "Failed to encode downstream tsconfig.json.",
+        })
+    )
+  );
+  yield* Effect.all(
+    [
+      fs.writeFileString(
+        path.join(workspacePath, "tsconfig.json"),
+        `${tsconfigJson}\n`
+      ),
+      fs.writeFileString(
+        path.join(workspacePath, "src/typecheck.ts"),
+        `import { CalculationQuery, CalculatorJurisdiction, HelpMode, MetadataQuery, RuleDescriptorMetadata } from "taxkit/schemas";
 import { CalculationError } from "taxkit/core";
 import { listCalculatorCatalogEntries } from "taxkit/core";
 import type { CalculatorCatalogEntry } from "taxkit/core";
@@ -509,20 +536,20 @@ catalogueEntry.program;
 void listCalculatorCatalogEntries;
 
 const traceMakeInput = {children: [], inputs: {}, result: 1, ruleId: RuleId.make("fixture/type"), sources: [], title: "Fixture"};
-const requestDefaults = MetadataSchemas.CalculationQuery.make({});
-const checkedHelp: Option.Option<Option.Option<typeof MetadataSchemas.HelpMode.Type>> = requestDefaults.help;
+const requestDefaults = CalculationQuery.make({});
+const checkedHelp: Option.Option<Option.Option<typeof HelpMode.Type>> = requestDefaults.help;
 void checkedHelp;
-const checkedContext = MetadataSchemas.MetadataQuery.make({});
-const jurisdiction: Option.Option<Option.Option<typeof MetadataSchemas.CalculatorJurisdiction.Type>> = checkedContext.jurisdiction;
+const checkedContext = MetadataQuery.make({});
+const jurisdiction: Option.Option<Option.Option<typeof CalculatorJurisdiction.Type>> = checkedContext.jurisdiction;
 void jurisdiction;
 // @ts-expect-error constructor inputs use canonical Options, not wire strings.
-MetadataSchemas.MetadataQuery.make({jurisdiction: "AU"});
+MetadataQuery.make({jurisdiction: "AU"});
 // @ts-expect-error constructor help uses canonical Options, not a wire string.
-MetadataSchemas.CalculationQuery.make({help: "full"});
+CalculationQuery.make({help: "full"});
 // @ts-expect-error nullable context is not an admitted request representation.
-MetadataSchemas.MetadataQuery.make({taxYear: null});
+MetadataQuery.make({taxYear: null});
 // @ts-expect-error false permission must still be wrapped in its owning Option.
-MetadataSchemas.RuleDescriptorMetadata.make({id: RuleId.make("fixture/rule"), parameters: [], provides: [], requires: [], sourcePolicy: "not-required", sources: [], title: "Fixture", allowDuplicateProvides: false});
+RuleDescriptorMetadata.make({id: RuleId.make("fixture/rule"), parameters: [], provides: [], requires: [], sourcePolicy: "not-required", sources: [], title: "Fixture", allowDuplicateProvides: false});
 const checkedTrace = TraceNode.make(traceMakeInput);
 const traceFormula: Option.Option<Option.Option<string>> = checkedTrace.formula;
 void traceFormula;
@@ -602,14 +629,14 @@ au.pay.takeHomePay({
   taxableIncome: aud(Cents.make(9_000_000)),
 });
 `
-        ),
-        fs.writeFileString(
-          path.join(workspacePath, "src/runtime.ts"),
-          `import { CalculatorRequestBodyErrorEnvelope, CalculatorRequestBodyTooLarge, CalculatorRequestBodyLimit } from "taxkit/http";
+      ),
+      fs.writeFileString(
+        path.join(workspacePath, "src/runtime.ts"),
+        `import { CalculatorRequestBodyErrorEnvelope, CalculatorRequestBodyTooLarge, CalculatorRequestBodyLimit } from "taxkit/http";
 import { PublicCalculatorServiceBounded, CalculatorConcurrencyLimit } from "taxkit/core";
 import { PublicCalculatorServiceLive } from "taxkit/core";
 import { PublicCalculatorService } from "taxkit/core";
-import { CalculatorSchemas as MetadataSchemas } from "taxkit/core";
+import { CalculationQuery, CalculatorCatalogItem, CalculatorCatalogResponse, CalculatorGraphResponse, CalculatorInputDecodeError, CalculatorInputHelp, CalculatorRunRequest, CalculatorRunResponse, CalculatorRunServiceRequest, CalculatorSchemaResponse, CalculatorServiceError, DescriptorFilterQuery, FactDescriptorMetadata, FactsResponse, GetCalculatorGraphRequest, GetCalculatorRequest, HelpQuery, JurisdictionsResponse, MetadataQuery, RuleDescriptorMetadata, RulesResponse, TaxYearsResponse, UnsupportedCalculatorContextError } from "taxkit/schemas";
 import { CalculationError } from "taxkit/core";
 import { listCalculatorCatalogEntries } from "taxkit/core";
 import { CalculationEngineLive } from "taxkit/core";
@@ -838,460 +865,460 @@ await Effect.runPromise(Effect.gen(function* () {
 // Saved before the public request migration; expectations come from the original owners.
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(MetadataQuery)({});
+  const encoded = yield* Schema.encodeEffect(MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed MetadataQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({jurisdiction: undefined, taxYear: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(MetadataQuery)({jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed MetadataQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)({jurisdiction: "AU", taxYear: "2025-26"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.MetadataQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.MetadataQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(MetadataQuery)({jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(MetadataQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(MetadataQuery)(encoded);
+  const again = yield* Schema.encodeEffect(MetadataQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "f45bea6dfdddf63af51736fca999756a1780f4b31d33495026c5c7fa88fbd5a0" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed MetadataQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(HelpQuery)({});
+  const encoded = yield* Schema.encodeEffect(HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(HelpQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed HelpQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({jurisdiction: undefined, taxYear: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(HelpQuery)({jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(HelpQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed HelpQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)({jurisdiction: "AU", taxYear: "2025-26", help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.HelpQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.HelpQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(HelpQuery)({jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(HelpQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(HelpQuery)(encoded);
+  const again = yield* Schema.encodeEffect(HelpQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "0be5bb97e742b21e1526e138ac2b85eb2cf971e1355aa0862e6941a8331adc67" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed HelpQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculationQuery)({});
+  const encoded = yield* Schema.encodeEffect(CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(CalculationQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed CalculationQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculationQuery)({help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(CalculationQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculationQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)({help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculationQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculationQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculationQuery)({help: "full"});
+  const encoded = yield* Schema.encodeEffect(CalculationQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculationQuery)(encoded);
+  const again = yield* Schema.encodeEffect(CalculationQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "da39084a2e387010419681fabd9733b9183dc0130300ab37e2ea99b897dec05d" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculationQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)({calculatorId: "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed GetCalculatorRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed GetCalculatorRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "37671de06f163469dc22e3558fe7057a8e8f205ff728a287108fe999a7ebab9f" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed GetCalculatorRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed GetCalculatorGraphRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: undefined, taxYear: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "fe30bae8d21838d1abfdfef6ede97337602421dca17a2f875f9f8d74f2993d23" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed GetCalculatorGraphRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.GetCalculatorGraphRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)({calculatorId: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26", help: "full"});
+  const encoded = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(GetCalculatorGraphRequest)(encoded);
+  const again = yield* Schema.encodeEffect(GetCalculatorGraphRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "65fe06057e41885252e7a2b092290de8b7c5cec8b075f9e6247d528c4d7551d0" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed GetCalculatorGraphRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)({});
+  const encoded = yield* Schema.encodeEffect(DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(DescriptorFilterQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== false || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed DescriptorFilterQuery/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({calculator: undefined, jurisdiction: undefined, taxYear: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)({calculator: undefined, jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(DescriptorFilterQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== true || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed DescriptorFilterQuery/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)({calculator: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.DescriptorFilterQuery)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.DescriptorFilterQuery)(restored);
+  const value = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)({calculator: "au.income-tax.annual", jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(DescriptorFilterQuery)(value);
+  const restored = yield* Schema.decodeUnknownEffect(DescriptorFilterQuery)(encoded);
+  const again = yield* Schema.encodeEffect(DescriptorFilterQuery)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "adccd61014613c74da5bd5fa3b0dd8ac7452ae2cf0e1273cba6b34b6c364feda" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "calculator") !== true || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed DescriptorFilterQuery/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "b0c6614005ab660bdb736bf10fefd1643b57bf5c784e2e3c4f0318ab2d579617" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== false || Object.hasOwn(encoded, "taxYear") !== false) {
     throw new Error("Packed CalculatorRunRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: undefined, taxYear: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: undefined, taxYear: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "b0c6614005ab660bdb736bf10fefd1643b57bf5c784e2e3c4f0318ab2d579617" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed CalculatorRunRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: "AU", taxYear: "2025-26"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)({facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}, jurisdiction: "AU", taxYear: "2025-26"});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "bec0ecf461d79d2524f0c4d3590c8f49095883d58fb64e6cba3bd18ac83df44f" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "jurisdiction") !== true || Object.hasOwn(encoded, "taxYear") !== true) {
     throw new Error("Packed CalculatorRunRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7d4cebb87770da5f461a30a47178e63eeb23b1e7bfece6c31631e412849114cb" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== false) {
     throw new Error("Packed CalculatorRunServiceRequest/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7d4cebb87770da5f461a30a47178e63eeb23b1e7bfece6c31631e412849114cb" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculatorRunServiceRequest/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: "full"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunServiceRequest)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId: "au.income-tax.annual", payload: {facts: {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}}}, help: "full"});
+  const encoded = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "58c6a32c45ba03810fb7f864c7d0882d3072625130480b49d8021bcd038d71f1" || JSON.stringify(encoded) !== JSON.stringify(again) || Object.hasOwn(encoded, "help") !== true) {
     throw new Error("Packed CalculatorRunServiceRequest/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputHelp)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "934afe89da88e80a9eabe058b7899d7698407a6c6842cf76ef010ec5393652bf" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "title"])) {
     throw new Error("Packed CalculatorInputHelp/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(FactDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "91d29898239c61f2b3c9198263a2c39540d137430009da982b97e648d6b0824a" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "schemaTag", "title"])) {
     throw new Error("Packed FactDescriptorMetadata/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "913960bc8e0e08c568c9150db526d4ef8c03bc10720a56fa9f82a5cdc7d417d0" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
     throw new Error("Packed UnsupportedCalculatorContextError/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture", question: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)({"factId": "fixture/fact", "title": "Fixture", question: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputHelp)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "934afe89da88e80a9eabe058b7899d7698407a6c6842cf76ef010ec5393652bf" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "question", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "question", "title"])) {
     throw new Error("Packed CalculatorInputHelp/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture", question: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "schemaTag": "Money", "title": "Fixture", question: undefined});
+  const encoded = yield* Schema.encodeEffect(FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(FactDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "91d29898239c61f2b3c9198263a2c39540d137430009da982b97e648d6b0824a" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"])) {
     throw new Error("Packed FactDescriptorMetadata/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": undefined, "taxYear": undefined}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": undefined, "taxYear": undefined}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "913960bc8e0e08c568c9150db526d4ef8c03bc10720a56fa9f82a5cdc7d417d0" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
     throw new Error("Packed UnsupportedCalculatorContextError/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)({"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputHelp)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputHelp)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)({"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputHelp)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputHelp)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputHelp)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7efaeb721955f48f3c3986cfbc0243bc2919146997e172b0c4681bbf108432b7" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["factId", "question", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["factId", "question", "title"])) {
     throw new Error("Packed CalculatorInputHelp/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "schemaTag": "Money", "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.FactDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.FactDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)({"authority": "input", "id": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "schemaTag": "Money", "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(FactDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(FactDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(FactDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a4aea7f78123263173a29ba84f804b8b0b02f00192aee676e80627c18622bcb7" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["authority", "id", "question", "schemaTag", "title"])) {
     throw new Error("Packed FactDescriptorMetadata/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": "AU", "taxYear": "2025-26"}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.UnsupportedCalculatorContextError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.UnsupportedCalculatorContextError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)({"_tag": "UnsupportedCalculatorContextError", "context": {"jurisdiction": "AU", "taxYear": "2025-26"}, "message": "Unsupported test context", "requestedCalculator": "au.income-tax.annual"});
+  const encoded = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(UnsupportedCalculatorContextError)(encoded);
+  const again = yield* Schema.encodeEffect(UnsupportedCalculatorContextError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "0363af54d90b1906faa9b64a27f256113bbf1fda2f067496eef8f16b4894f46b" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "context", "message", "requestedCalculator"])) {
     throw new Error("Packed UnsupportedCalculatorContextError/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "1ec96367697bf2207c370ea47470dbb3db075dd7c3f82d771b5ecccfc1292705" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture", allowDuplicateProvides: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture", allowDuplicateProvides: undefined});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "1ec96367697bf2207c370ea47470dbb3db075dd7c3f82d771b5ecccfc1292705" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"allowDuplicateProvides": false, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"allowDuplicateProvides": false, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "65a273a5cb1041e950715e738da2e774ee675e458b7ac558c3e62216a362d288" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/false changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)({"allowDuplicateProvides": true, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.RuleDescriptorMetadata)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.RuleDescriptorMetadata)(restored);
+  const value = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)({"allowDuplicateProvides": true, "id": "fixture/rule", "parameters": [], "provides": [], "requires": [], "sourcePolicy": "not-required", "sources": [], "title": "Fixture"});
+  const encoded = yield* Schema.encodeEffect(RuleDescriptorMetadata)(value);
+  const restored = yield* Schema.decodeUnknownEffect(RuleDescriptorMetadata)(encoded);
+  const again = yield* Schema.encodeEffect(RuleDescriptorMetadata)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3edbef562b82856cbf24da6e552d116e641143b1ee8f7d21f88749bcab4352e5" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["allowDuplicateProvides", "id", "parameters", "provides", "requires", "sourcePolicy", "sources", "title"])) {
     throw new Error("Packed RuleDescriptorMetadata/true changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/missing/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/missing/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3053782fc254bd270aa71aa13c2fda25f13570163998614a76e9f3e820d36281" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/missing/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/undefined/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined, help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "issues": [], "message": "Invalid fixture input", calculatorId: undefined, help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "a407a6d8d3d76bbeb4fca1bd016d7aeaa93e6a688715077583380d60b95a1ec3" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/undefined/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input", calculatorId: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "3053782fc254bd270aa71aa13c2fda25f13570163998614a76e9f3e820d36281" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/undefined/present changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "c02eb42d05fe7e4c5fdb4821fa6079388c6a0ff890f40f9f038eb7350dafe587" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/present/missing changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input", help: undefined});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "issues": [], "message": "Invalid fixture input", help: undefined});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "c02eb42d05fe7e4c5fdb4821fa6079388c6a0ff890f40f9f038eb7350dafe587" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/present/undefined changed historical bytes or key identity.");
   }
 }));
 
 await Effect.runPromise(Effect.gen(function* () {
-  const value = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
-  const encoded = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(value);
-  const restored = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorInputDecodeError)(encoded);
-  const again = yield* Schema.encodeEffect(MetadataSchemas.CalculatorInputDecodeError)(restored);
+  const value = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)({"_tag": "CalculatorInputDecodeError", "calculatorId": "au.income-tax.annual", "help": [{"factId": "fixture/fact", "question": {"_tag": "FactQuestion", "id": "fixture/question", "inputKind": "money", "prompt": "Enter an amount"}, "title": "Fixture"}], "issues": [], "message": "Invalid fixture input"});
+  const encoded = yield* Schema.encodeEffect(CalculatorInputDecodeError)(value);
+  const restored = yield* Schema.decodeUnknownEffect(CalculatorInputDecodeError)(encoded);
+  const again = yield* Schema.encodeEffect(CalculatorInputDecodeError)(restored);
   if (new CryptoHasher("sha256").update(JSON.stringify(encoded)).digest("hex") !== "7426d620c184e3969b2becabc3d87b7157c61631988d8301d9a8e3725a4d64aa" || JSON.stringify(encoded) !== JSON.stringify(again) || JSON.stringify(Object.keys(encoded)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"]) || JSON.stringify(Object.keys(again)) !== JSON.stringify(["_tag", "calculatorId", "help", "issues", "message"])) {
     throw new Error("Packed CalculatorInputDecodeError/present/present changed historical bytes or key identity.");
   }
@@ -2073,12 +2100,12 @@ await Effect.runPromise(Effect.gen(function* () {
     const context = contextForm === "missing" ? {} : contextForm === "undefined" ? {jurisdiction: undefined, taxYear: undefined} : {jurisdiction: "AU", taxYear: "2025-26"};
     const help = helpForm === "missing" ? {} : {help: helpForm === "undefined" ? undefined : helpForm};
     const facts = calculatorId === "au.income-tax.annual" ? {taxableIncome: {_tag: "Money", cents: 9000000, currency: "AUD"}} : {grossPay: {_tag: "GrossPay", amount: {_tag: "Money", cents: 346200, currency: "AUD"}, period: "fortnightly"}, taxFreeThresholdClaimed: true};
-    const request = yield* Schema.decodeUnknownEffect(MetadataSchemas.CalculatorRunServiceRequest)({calculatorId, ...help, payload: {facts, ...context}});
+    const request = yield* Schema.decodeUnknownEffect(CalculatorRunServiceRequest)({calculatorId, ...help, payload: {facts, ...context}});
     const report = yield* service.calculate(request);
-    const encodedReport = yield* Schema.encodeEffect(MetadataSchemas.CalculatorRunResponse)(report);
+    const encodedReport = yield* Schema.encodeEffect(CalculatorRunResponse)(report);
     // @ts-expect-error invalid external facts deliberately bypass the Type to qualify safe selected-calculator errors.
     const error = yield* service.calculate({...request, payload: {...request.payload, facts: {privateSource: "private-fixed-sentinel"}}}).pipe(Effect.flip);
-    const encodedError = yield* Schema.encodeEffect(MetadataSchemas.CalculatorServiceError)(error);
+    const encodedError = yield* Schema.encodeEffect(CalculatorServiceError)(error);
     const suffix = calculatorId + "/" + contextForm + "/" + helpForm;
     for (const sample of [{name: "report/" + suffix, value: encodedReport}, {name: "error/" + suffix, value: encodedError}]) {
       const prior = historicalRuns.find((row) => row.name === sample.name);
@@ -2191,28 +2218,28 @@ await Effect.runPromise(Effect.gen(function* () {
   const service = yield* PublicCalculatorService;
   for (const form of ["missing", "undefined", "present"] as const) {
     const context = form === "missing" ? {} : form === "undefined" ? {jurisdiction: undefined, taxYear: undefined} : {jurisdiction: "AU", taxYear: "2025-26"} as const;
-    const query = yield* Schema.decodeEffect(MetadataSchemas.MetadataQuery)(context);
-    const filter = yield* Schema.decodeEffect(MetadataSchemas.DescriptorFilterQuery)(context);
+    const query = yield* Schema.decodeEffect(MetadataQuery)(context);
+    const filter = yield* Schema.decodeEffect(DescriptorFilterQuery)(context);
     const calculators = yield* service.listCalculators(query);
     const years = yield* service.listTaxYears(query);
     const facts = yield* service.listFacts(filter);
     const rules = yield* service.listRules(filter);
-    assertHistoricalMetadataResponse("listCalculators/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorCatalogResponse)(calculators)));
-    assertHistoricalMetadataResponse("listTaxYears/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.TaxYearsResponse)(years)));
-    assertHistoricalMetadataResponse("listFacts/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.FactsResponse)(facts)));
-    assertHistoricalMetadataResponse("listRules/" + form, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.RulesResponse)(rules)));
+    assertHistoricalMetadataResponse("listCalculators/" + form, JSON.stringify(yield* Schema.encodeEffect(CalculatorCatalogResponse)(calculators)));
+    assertHistoricalMetadataResponse("listTaxYears/" + form, JSON.stringify(yield* Schema.encodeEffect(TaxYearsResponse)(years)));
+    assertHistoricalMetadataResponse("listFacts/" + form, JSON.stringify(yield* Schema.encodeEffect(FactsResponse)(facts)));
+    assertHistoricalMetadataResponse("listRules/" + form, JSON.stringify(yield* Schema.encodeEffect(RulesResponse)(rules)));
   }
-  assertHistoricalMetadataResponse("listJurisdictions", JSON.stringify(yield* service.listJurisdictions().pipe(Effect.flatMap((value) => Schema.encodeEffect(MetadataSchemas.JurisdictionsResponse)(value)))));
+  assertHistoricalMetadataResponse("listJurisdictions", JSON.stringify(yield* service.listJurisdictions().pipe(Effect.flatMap((value) => Schema.encodeEffect(JurisdictionsResponse)(value)))));
   for (const calculatorId of ["au.income-tax.annual", "au.pay.take-home", "au.pay.withholdings"] as const) {
     const input = {calculatorId, jurisdiction: "AU", taxYear: "2025-26"} as const;
-    const request = yield* Schema.decodeEffect(MetadataSchemas.GetCalculatorRequest)(input);
-    const graphRequest = yield* Schema.decodeEffect(MetadataSchemas.GetCalculatorGraphRequest)(input);
+    const request = yield* Schema.decodeEffect(GetCalculatorRequest)(input);
+    const graphRequest = yield* Schema.decodeEffect(GetCalculatorGraphRequest)(input);
     const calculator = yield* service.getCalculator(request);
     const schema = yield* service.getCalculatorSchema(request);
     const graph = yield* service.getCalculatorGraph(graphRequest);
-    assertHistoricalMetadataResponse("getCalculator/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorCatalogItem)(calculator)));
-    assertHistoricalMetadataResponse("getCalculatorSchema/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorSchemaResponse)(schema)));
-    assertHistoricalMetadataResponse("getCalculatorGraph/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(MetadataSchemas.CalculatorGraphResponse)(graph)));
+    assertHistoricalMetadataResponse("getCalculator/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(CalculatorCatalogItem)(calculator)));
+    assertHistoricalMetadataResponse("getCalculatorSchema/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(CalculatorSchemaResponse)(schema)));
+    assertHistoricalMetadataResponse("getCalculatorGraph/" + calculatorId, JSON.stringify(yield* Schema.encodeEffect(CalculatorGraphResponse)(graph)));
   }
 }).pipe(Effect.provide(ServiceLive)));
 
@@ -2289,10 +2316,10 @@ try {
 }
 console.log("Downstream SDK runtime examples passed, including three caller-owned calculations and disposal.");
 `
-        ),
-        fs.writeFileString(
-          path.join(workspacePath, "src/browser-entry.ts"),
-          `import { TaxKit } from "taxkit";
+      ),
+      fs.writeFileString(
+        path.join(workspacePath, "src/browser-entry.ts"),
+        `import { TaxKit } from "taxkit";
 import { au } from "taxkit/au";
 import { CalculatorRunRequest } from "taxkit/schemas";
 import { Money } from "taxkit/core";
@@ -2308,37 +2335,40 @@ export const browserSafeEntrypoints = {
   effect: typeof calculateReport === "function",
 } as const;
 `
-        ),
-      ],
-      { concurrency: 1 }
-    );
-  });
-
-const writePublicEntrypointSmoke = (
-  fs: FileSystem.FileSystem,
-  path: Path.Path,
-  workspacePath: string,
-  packedPackages: readonly PackedPackageEvidence[]
-) =>
-  Effect.gen(function* writePublicImports() {
-    const entrypointsJson = yield* Schema.encodeEffect(
-      Schema.fromJsonString(Schema.Array(Schema.String), { space: 2 })
-    )(
-      EffectArray.flatMap(
-        packedPackages,
-        (packedPackage) => packedPackage.publicEntrypoints
-      )
-    ).pipe(
-      Effect.mapError(
-        () =>
-          new DownstreamValidationError({
-            message: "Failed to encode public entrypoint fixture.",
-          })
-      )
-    );
-    yield* fs.writeFileString(
-      path.join(workspacePath, "src/public-entrypoints.ts"),
-      `const publicEntrypoints = ${entrypointsJson} as const;
+      ),
+    ],
+    { concurrency: 1 }
+  );
+});
+const writePublicEntrypointSmoke = Effect.fnUntraced(function* ({
+  fs,
+  path,
+  workspacePath,
+  packedPackages,
+}: {
+  readonly fs: FileSystem.FileSystem;
+  readonly path: Path.Path;
+  readonly workspacePath: string;
+  readonly packedPackages: readonly PackedPackageEvidence[];
+}) {
+  const entrypointsJson = yield* Schema.encodeEffect(
+    Schema.fromJsonString(Schema.Array(Schema.String), { space: 2 })
+  )(
+    EffectFunction.pipe(
+      packedPackages,
+      EffectArray.flatMap((packedPackage) => packedPackage.publicEntrypoints)
+    )
+  ).pipe(
+    Effect.mapError(
+      () =>
+        new DownstreamValidationError({
+          message: "Failed to encode public entrypoint fixture.",
+        })
+    )
+  );
+  yield* fs.writeFileString(
+    path.join(workspacePath, "src/public-entrypoints.ts"),
+    `const publicEntrypoints = ${entrypointsJson} as const;
 
 for (const publicEntrypoint of publicEntrypoints) {
   await import(publicEntrypoint);
@@ -2346,192 +2376,198 @@ for (const publicEntrypoint of publicEntrypoints) {
 
 console.log(\`Imported \${publicEntrypoints.length} packed public entrypoints.\`);
 `
-    );
-  });
-
-const writeConsumerPackageManifest = (
-  fs: FileSystem.FileSystem,
-  path: Path.Path,
-  workspacePath: string,
-  catalog: typeof DependencyRecord.Type,
-  packedPackages: readonly PackedPackageEvidence[]
-) =>
-  Effect.gen(function* writePackageManifest() {
-    const effectVersion = yield* catalogVersion(catalog, "effect");
-    const typescriptVersion = yield* catalogVersion(catalog, "typescript");
-    const bunTypesVersion = yield* catalogVersion(catalog, "@types/bun");
-    const taxkitDependencies = EffectRecord.fromEntries(
-      EffectArray.map(packedPackages, (packedPackage) => [
+  );
+});
+const writeConsumerPackageManifest = Effect.fnUntraced(function* ({
+  fs,
+  path,
+  workspacePath,
+  catalog,
+  packedPackages,
+}: {
+  readonly fs: FileSystem.FileSystem;
+  readonly path: Path.Path;
+  readonly workspacePath: string;
+  readonly catalog: typeof DependencyRecord.Type;
+  readonly packedPackages: readonly PackedPackageEvidence[];
+}) {
+  const effectVersion = yield* catalogVersion(catalog, "effect");
+  const typescriptVersion = yield* catalogVersion(catalog, "typescript");
+  const bunTypesVersion = yield* catalogVersion(catalog, "@types/bun");
+  const taxkitDependencies = EffectRecord.fromEntries(
+    EffectFunction.pipe(
+      packedPackages,
+      EffectArray.map((packedPackage) => [
         packedPackage.packageName,
         `file:./${path.relative(workspacePath, packedPackage.tarballPath)}`,
       ])
-    );
-
-    const manifestJson = yield* Schema.encodeEffect(
-      Schema.fromJsonString(ConsumerPackageManifest, { space: 2 })
-    )({
-      dependencies: {
-        ...taxkitDependencies,
-        effect: effectVersion,
-      },
-      devDependencies: {
-        "@types/bun": bunTypesVersion,
-        typescript: typescriptVersion,
-      },
-      name: "taxkit-sdk-downstream-consumer",
-      overrides: taxkitDependencies,
-      private: true,
-      scripts: {
-        "bundle:browser":
-          "bun build src/browser-entry.ts --target=browser --format=esm --outdir=dist-browser",
-        runtime: "bun src/runtime.ts",
-        "runtime:exports": "bun src/public-entrypoints.ts",
-        typecheck: "tsc -p tsconfig.json --noEmit",
-      },
-      type: "module",
-    }).pipe(
-      Effect.mapError(
-        () =>
-          new DownstreamValidationError({
-            message: "Failed to encode downstream package.json.",
-          })
-      )
-    );
-    yield* fs.writeFileString(
-      path.join(workspacePath, "package.json"),
-      `${manifestJson}\n`
-    );
-  });
-
-const packPackage = (
-  path: Path.Path,
-  artifactPath: string,
-  repoRootPath: string,
-  stagingRootPath: string,
-  packageItem: PackageClosureItem
-) =>
-  Effect.gen(function* packPackageManifest() {
-    const fs = yield* FileSystem.FileSystem;
-    const rootPath = path.join(repoRootPath, packageItem.relativeRoot);
-    const packageStagingPath = path.join(
-      stagingRootPath,
-      packageItem.packageName.replaceAll("@", "").replaceAll("/", "-")
-    );
-    const rawArtifactPath = path.join(packageStagingPath, "raw-artifact");
-    const unpackedPath = path.join(packageStagingPath, "unpacked");
-    yield* fs.makeDirectory(rawArtifactPath, { recursive: true });
-    yield* fs.makeDirectory(unpackedPath, { recursive: true });
-
-    const rawPackOutput = yield* runCommand(
-      `pack workspace manifest for ${packageItem.packageName}`,
-      "bun",
-      ["pm", "pack", "--destination", rawArtifactPath, "--quiet"],
-      rootPath
-    );
-    const rawTarballPath = yield* tarballPathFromPackOutput(
-      packageItem.packageName,
-      rawPackOutput.stdout
-    );
-    yield* runCommand(
-      `extract workspace tarball for ${packageItem.packageName}`,
-      "tar",
-      ["-xzf", rawTarballPath, "-C", unpackedPath],
-      packageStagingPath
-    );
-    const stagedRootPath = path.join(unpackedPath, "package");
-    const stagedManifestPath = path.join(stagedRootPath, "package.json");
-    const stagedManifestJson = yield* fs.readFileString(stagedManifestPath);
-    const workspacePackedManifest = yield* Schema.decodeEffect(
-      Schema.fromJsonString(PackedPackageManifest)
-    )(stagedManifestJson).pipe(
-      Effect.mapError(
-        () =>
-          new DownstreamValidationError({
-            message: "Failed to decode workspace packed package.json.",
-          })
-      )
-    );
-    const stagedPublicationJson = yield* Schema.encodeEffect(
-      Schema.fromJsonString(PackedPackageManifest, { space: 2 })
-    )({
-      ...workspacePackedManifest,
-      exports: workspacePackedManifest.publishConfig.exports,
-    }).pipe(
-      Effect.mapError(
-        () =>
-          new DownstreamValidationError({
-            message: "Failed to encode staged publication package.json.",
-          })
-      )
-    );
-    yield* fs.writeFileString(stagedManifestPath, `${stagedPublicationJson}\n`);
-
-    const releasePackOutput = yield* runCommand(
-      `pack publication manifest for ${packageItem.packageName}`,
-      "bun",
-      ["pm", "pack", "--destination", artifactPath, "--quiet"],
-      stagedRootPath
-    );
-    const tarballPath = yield* tarballPathFromPackOutput(
-      packageItem.packageName,
-      releasePackOutput.stdout
-    );
-    const tarballFile = path.basename(tarballPath);
-    const manifest = yield* runCommand(
-      `extract packed manifest for ${packageItem.packageName}`,
-      "tar",
-      ["-xOf", tarballPath, "package/package.json"],
-      artifactPath
-    ).pipe(
-      Effect.flatMap((result) =>
-        Schema.decodeEffect(Schema.fromJsonString(PackedPackageManifest))(
-          result.stdout
-        ).pipe(
-          Effect.mapError(
-            () =>
-              new DownstreamValidationError({
-                message: "Failed to decode publication packed package.json.",
-              })
-          )
+    )
+  );
+  const manifestJson = yield* Schema.encodeEffect(
+    Schema.fromJsonString(ConsumerPackageManifest, { space: 2 })
+  )({
+    dependencies: {
+      ...taxkitDependencies,
+      effect: effectVersion,
+    },
+    devDependencies: {
+      "@types/bun": bunTypesVersion,
+      typescript: typescriptVersion,
+    },
+    name: "taxkit-sdk-downstream-consumer",
+    overrides: taxkitDependencies,
+    private: true,
+    scripts: {
+      "bundle:browser":
+        "bun build src/browser-entry.ts --target=browser --format=esm --outdir=dist-browser",
+      runtime: "bun src/runtime.ts",
+      "runtime:exports": "bun src/public-entrypoints.ts",
+      typecheck: "tsc -p tsconfig.json --noEmit",
+    },
+    type: "module",
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new DownstreamValidationError({
+          message: "Failed to encode downstream package.json.",
+        })
+    )
+  );
+  yield* fs.writeFileString(
+    path.join(workspacePath, "package.json"),
+    `${manifestJson}\n`
+  );
+});
+const packPackage = Effect.fnUntraced(function* ({
+  path,
+  artifactPath,
+  repoRootPath,
+  stagingRootPath,
+  packageItem,
+}: {
+  readonly path: Path.Path;
+  readonly artifactPath: string;
+  readonly repoRootPath: string;
+  readonly stagingRootPath: string;
+  readonly packageItem: PackageClosureItem;
+}) {
+  const fs = yield* FileSystem.FileSystem;
+  const rootPath = path.join(repoRootPath, packageItem.relativeRoot);
+  const packageStagingPath = path.join(
+    stagingRootPath,
+    packageItem.packageName.replaceAll("@", "").replaceAll("/", "-")
+  );
+  const rawArtifactPath = path.join(packageStagingPath, "raw-artifact");
+  const unpackedPath = path.join(packageStagingPath, "unpacked");
+  yield* fs.makeDirectory(rawArtifactPath, { recursive: true });
+  yield* fs.makeDirectory(unpackedPath, { recursive: true });
+  const rawPackOutput = yield* runCommand(
+    `pack workspace manifest for ${packageItem.packageName}`,
+    "bun",
+    ["pm", "pack", "--destination", rawArtifactPath, "--quiet"],
+    rootPath
+  );
+  const rawTarballPath = yield* tarballPathFromPackOutput(
+    packageItem.packageName,
+    rawPackOutput.stdout
+  );
+  yield* runCommand(
+    `extract workspace tarball for ${packageItem.packageName}`,
+    "tar",
+    ["-xzf", rawTarballPath, "-C", unpackedPath],
+    packageStagingPath
+  );
+  const stagedRootPath = path.join(unpackedPath, "package");
+  const stagedManifestPath = path.join(stagedRootPath, "package.json");
+  const stagedManifestJson = yield* fs.readFileString(stagedManifestPath);
+  const workspacePackedManifest = yield* Schema.decodeEffect(
+    Schema.fromJsonString(PackedPackageManifest)
+  )(stagedManifestJson).pipe(
+    Effect.mapError(
+      () =>
+        new DownstreamValidationError({
+          message: "Failed to decode workspace packed package.json.",
+        })
+    )
+  );
+  const stagedPublicationJson = yield* Schema.encodeEffect(
+    Schema.fromJsonString(PackedPackageManifest, { space: 2 })
+  )({
+    ...workspacePackedManifest,
+    exports: workspacePackedManifest.publishConfig.exports,
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new DownstreamValidationError({
+          message: "Failed to encode staged publication package.json.",
+        })
+    )
+  );
+  yield* fs.writeFileString(stagedManifestPath, `${stagedPublicationJson}\n`);
+  const releasePackOutput = yield* runCommand(
+    `pack publication manifest for ${packageItem.packageName}`,
+    "bun",
+    ["pm", "pack", "--destination", artifactPath, "--quiet"],
+    stagedRootPath
+  );
+  const tarballPath = yield* tarballPathFromPackOutput(
+    packageItem.packageName,
+    releasePackOutput.stdout
+  );
+  const tarballFile = path.basename(tarballPath);
+  const manifest = yield* runCommand(
+    `extract packed manifest for ${packageItem.packageName}`,
+    "tar",
+    ["-xOf", tarballPath, "package/package.json"],
+    artifactPath
+  ).pipe(
+    Effect.flatMap((result) =>
+      Schema.decodeEffect(Schema.fromJsonString(PackedPackageManifest))(
+        result.stdout
+      ).pipe(
+        Effect.mapError(
+          () =>
+            new DownstreamValidationError({
+              message: "Failed to decode publication packed package.json.",
+            })
         )
       )
-    );
-    const packedFiles = yield* runCommand(
-      `list packed files for ${packageItem.packageName}`,
-      "tar",
-      ["-tzf", tarballPath],
-      artifactPath
-    ).pipe(
-      Effect.map((result) =>
-        EffectArray.filter(
-          result.stdout.split("\n"),
-          (packedFile) => packedFile.length > 0
-        )
+    )
+  );
+  const packedFiles = yield* runCommand(
+    `list packed files for ${packageItem.packageName}`,
+    "tar",
+    ["-tzf", tarballPath],
+    artifactPath
+  ).pipe(
+    Effect.map((result) =>
+      EffectFunction.pipe(
+        result.stdout.split("\n"),
+        EffectArray.filter((packedFile) => packedFile.length > 0)
       )
-    );
-    const surfaceFailures = packedSurfaceFailures(manifest, packedFiles);
-    yield* Match.value(surfaceFailures.length).pipe(
-      Match.when(0, () => Effect.void),
-      Match.orElse(() =>
-        Effect.fail(
-          new DownstreamValidationError({
-            message: surfaceFailures.join("\n"),
-          })
-        )
+    )
+  );
+  const surfaceFailures = packedSurfaceFailures(manifest, packedFiles);
+  yield* Match.value(surfaceFailures.length).pipe(
+    Match.when(0, () => Effect.void),
+    Match.orElse(() =>
+      Effect.fail(
+        new DownstreamValidationError({
+          message: surfaceFailures.join("\n"),
+        })
       )
-    );
-
-    return {
-      manifest,
-      packageName: packageItem.packageName,
-      packedFileCount: packedFiles.length,
-      publicEntrypoints: publicEntrypointsFromManifest(manifest),
-      rootPath,
-      tarballFile,
-      tarballPath,
-    } satisfies PackedPackageEvidence;
-  });
-
+    )
+  );
+  return {
+    manifest,
+    packageName: packageItem.packageName,
+    packedFileCount: packedFiles.length,
+    publicEntrypoints: publicEntrypointsFromManifest(manifest),
+    rootPath,
+    tarballFile,
+    tarballPath,
+  } satisfies PackedPackageEvidence;
+});
 const printFindings = (
   title: string,
   findings: readonly ManifestProtocolFinding[]
@@ -2540,15 +2576,16 @@ const printFindings = (
     Match.when(0, () => Console.info(`${title}: none`)),
     Match.orElse(() =>
       Console.info(
-        `${title}:\n${EffectArray.map(
+        `${title}:\n${EffectFunction.pipe(
           findings,
-          (finding) =>
-            `- ${finding.packageName} ${finding.section}.${finding.dependencyName} = ${finding.range}`
+          EffectArray.map(
+            (finding) =>
+              `- ${finding.packageName} ${finding.section}.${finding.dependencyName} = ${finding.range}`
+          )
         ).join("\n")}`
       )
     )
   );
-
 const printEvidence = (evidence: DownstreamValidationEvidence) =>
   Effect.all(
     [
@@ -2556,9 +2593,9 @@ const printEvidence = (evidence: DownstreamValidationEvidence) =>
       Console.info(`Temp workspace: ${evidence.tempWorkspacePath}`),
       Console.info(`Artifacts: ${evidence.artifactsPath}`),
       Console.info(
-        `Packed artifacts:\n${EffectArray.map(
+        `Packed artifacts:\n${EffectFunction.pipe(
           evidence.packedArtifacts,
-          (artifact) => `- ${artifact}`
+          EffectArray.map((artifact) => `- ${artifact}`)
         ).join("\n")}`
       ),
       Console.info(`Install strategy: ${evidence.installStrategy}`),
@@ -2572,14 +2609,12 @@ const printEvidence = (evidence: DownstreamValidationEvidence) =>
     ],
     { concurrency: 1 }
   );
-
 const validateWorkspaceLocation = (
   path: Path.Path,
   repoRootPath: string,
   workspacePath: string
 ) => {
   const relativeToRepo = path.relative(repoRootPath, workspacePath);
-
   return Match.value(
     !relativeToRepo.startsWith("..") && !path.isAbsolute(relativeToRepo)
   ).pipe(
@@ -2593,7 +2628,6 @@ const validateWorkspaceLocation = (
     Match.orElse(() => Effect.succeed(workspacePath))
   );
 };
-
 export const checkDownstreamConsumer = Effect.gen(
   function* validateDownstreamConsumer() {
     const fs = yield* FileSystem.FileSystem;
@@ -2616,10 +2650,12 @@ export const checkDownstreamConsumer = Effect.gen(
           )
         )
       );
-
     yield* Console.info("Building SDK downstream runtime package closure.");
     yield* Effect.forEach(
-      EffectArray.filter(packageClosure, (packageItem) => packageItem.build),
+      EffectFunction.pipe(
+        packageClosure,
+        EffectArray.filter((packageItem) => packageItem.build)
+      ),
       (packageItem) =>
         runCommand(
           `build ${packageItem.packageName}`,
@@ -2629,7 +2665,6 @@ export const checkDownstreamConsumer = Effect.gen(
         ),
       { concurrency: 1 }
     );
-
     const workspacePath = yield* Effect.acquireRelease(
       fs.makeTempDirectory({
         prefix: "taxkit-sdk-downstream-",
@@ -2649,52 +2684,60 @@ export const checkDownstreamConsumer = Effect.gen(
     yield* validateWorkspaceLocation(path, repoRootPath, workspacePath);
     const artifactPath = path.join(workspacePath, "artifacts");
     const stagingRootPath = path.join(workspacePath, "pack-staging");
-
     yield* Console.info(
       `Created temp downstream workspace at ${workspacePath}`
     );
     yield* fs.makeDirectory(artifactPath, { recursive: true });
     yield* fs.makeDirectory(stagingRootPath, { recursive: true });
-    yield* writeConsumerFiles(fs, path, workspacePath);
-
+    yield* writeConsumerFiles({
+      fs,
+      path,
+      workspacePath,
+    });
     const packedPackages = yield* Effect.forEach(
       packageClosure,
       (packageItem) =>
-        packPackage(
+        packPackage({
           path,
           artifactPath,
           repoRootPath,
           stagingRootPath,
-          packageItem
-        ),
+          packageItem,
+        }),
       { concurrency: 1 }
     );
-    yield* writePublicEntrypointSmoke(fs, path, workspacePath, packedPackages);
-    yield* writeConsumerPackageManifest(
+    yield* writePublicEntrypointSmoke({
       fs,
       path,
       workspacePath,
-      rootPackageManifest.workspaces.catalog,
-      packedPackages
-    );
-
-    const releaseBlockers = EffectArray.flatMap(
       packedPackages,
-      (packedPackage) =>
+    });
+    yield* writeConsumerPackageManifest({
+      fs,
+      path,
+      workspacePath,
+      catalog: rootPackageManifest.workspaces.catalog,
+      packedPackages,
+    });
+    const releaseBlockers = EffectFunction.pipe(
+      packedPackages,
+      EffectArray.flatMap((packedPackage) =>
         dependencyFindingsForSections(
           packedPackage.packageName,
           packedPackage.manifest,
           runtimeDependencySections
         )
+      )
     );
-    const devDiagnostics = EffectArray.flatMap(
+    const devDiagnostics = EffectFunction.pipe(
       packedPackages,
-      (packedPackage) =>
+      EffectArray.flatMap((packedPackage) =>
         dependencyFindingsForSections(
           packedPackage.packageName,
           packedPackage.manifest,
           devDependencySections
         )
+      )
     );
     const blockerEvidence = {
       artifactsPath: artifactPath,
@@ -2704,17 +2747,18 @@ export const checkDownstreamConsumer = Effect.gen(
       installResult: "skipped: packed manifests contain unresolved protocols",
       installStrategy:
         "strict manifest-diagnostic mode; packed dependency closure uses local file: references only after manifests are clean",
-      packedArtifacts: EffectArray.map(
+      packedArtifacts: EffectFunction.pipe(
         packedPackages,
-        (packedPackage) =>
-          `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
+        EffectArray.map(
+          (packedPackage) =>
+            `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
+        )
       ),
       releaseBlockers,
       runtimeSdkResult: "skipped: release blockers found before install",
       tempWorkspacePath: workspacePath,
       typecheckResult: "skipped: release blockers found before install",
     } satisfies DownstreamValidationEvidence;
-
     yield* Match.value(releaseBlockers.length).pipe(
       Match.when(0, () => Effect.void),
       Match.orElse(() =>
@@ -2729,7 +2773,6 @@ export const checkDownstreamConsumer = Effect.gen(
         )
       )
     );
-
     yield* runCommand(
       "install downstream package closure",
       "bun",
@@ -2768,17 +2811,18 @@ export const checkDownstreamConsumer = Effect.gen(
       installResult: "passed: bun install",
       installStrategy:
         "single SDK archive installed through a local file: reference",
-      packedArtifacts: EffectArray.map(
+      packedArtifacts: EffectFunction.pipe(
         packedPackages,
-        (packedPackage) =>
-          `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
+        EffectArray.map(
+          (packedPackage) =>
+            `${packedPackage.packageName} ${packedPackage.tarballFile} (${packedPackage.packedFileCount} files)`
+        )
       ),
       releaseBlockers,
       runtimeSdkResult: `passed: ${runtime.commandLine}; ${publicExports.commandLine}`,
       tempWorkspacePath: workspacePath,
       typecheckResult: `passed: ${typecheck.commandLine}`,
     } satisfies DownstreamValidationEvidence;
-
     yield* printEvidence(successEvidence);
     yield* Console.info(`SDK root validated from ${sdkRootPath}`);
   }
@@ -2813,7 +2857,6 @@ export const checkDownstreamConsumer = Effect.gen(
   ),
   Effect.scoped
 );
-
 if (import.meta.main) {
   BunRuntime.runMain(
     checkDownstreamConsumer.pipe(Effect.provide(BunServices.layer))

@@ -1,7 +1,7 @@
 import { assert, describe, it } from "@effect/vitest";
 import { DocsDiagramSource } from "@taxkit/content/schemas";
 import { DocsDiagramRenderer } from "@taxkit/content/service";
-import { Effect } from "effect";
+import { Predicate, Effect } from "effect";
 
 import { DocsDiagramRendererLive } from "../src/mermaid.adapter.layer.js";
 
@@ -17,13 +17,12 @@ describe("Mermaid diagram renderer", () => {
       assert.include(svg, "HTTP API");
     }).pipe(Effect.provide(DocsDiagramRendererLive))
   );
-
   it.effect("returns a typed render failure for unreadable Mermaid", () =>
     Effect.gen(function* () {
       const renderer = yield* DocsDiagramRenderer;
       const source = yield* DocsDiagramSource.makeEffect("not a diagram");
       const error = yield* renderer.render(source).pipe(Effect.flip);
-      assert.strictEqual(error._tag, "DocsDiagramRenderError");
+      assert.isTrue(Predicate.isTagged(error, "DocsDiagramRenderError"));
       assert.strictEqual(error.reason, "render");
     }).pipe(Effect.provide(DocsDiagramRendererLive))
   );

@@ -8,7 +8,6 @@ export const RepositoryPathCategory = Schema.Literals([
   "windows-home-path",
 ]);
 export type RepositoryPathCategory = typeof RepositoryPathCategory.Type;
-
 export const RepositoryRelativeFile = Schema.NonEmptyString.pipe(
   Schema.check(
     Schema.isPattern(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/u),
@@ -17,52 +16,55 @@ export const RepositoryRelativeFile = Schema.NonEmptyString.pipe(
   Schema.brand("taxkit/RepositoryRelativeFile")
 );
 export type RepositoryRelativeFile = typeof RepositoryRelativeFile.Type;
-
 const RepositoryPathLine = Schema.Int.check(Schema.isGreaterThan(0));
-
-export class RepositoryPathFinding extends Schema.TaggedClass<RepositoryPathFinding>()(
-  "RepositoryPathFinding",
+export class RepositoryPathFinding extends Schema.TaggedClass<
+  RepositoryPathFinding,
   {
-    category: RepositoryPathCategory,
-    file: RepositoryRelativeFile,
-    line: RepositoryPathLine,
+    readonly brand: unique symbol;
   }
-) {}
-
-export class RepositoryPathReport extends Schema.TaggedClass<RepositoryPathReport>()(
-  "RepositoryPathReport",
+>()("RepositoryPathFinding", {
+  category: RepositoryPathCategory,
+  file: RepositoryRelativeFile,
+  line: RepositoryPathLine,
+}) {}
+export class RepositoryPathReport extends Schema.TaggedClass<
+  RepositoryPathReport,
   {
-    binaryFiles: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
-    findings: Schema.Array(RepositoryPathFinding),
-    textFiles: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
-    trackedFiles: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+    readonly brand: unique symbol;
   }
-) {}
-
-export class RepositoryPolicyViolationError extends Schema.TaggedError<RepositoryPolicyViolationError>()(
-  "RepositoryPolicyViolationError",
+>()("RepositoryPathReport", {
+  binaryFiles: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+  findings: Schema.Array(RepositoryPathFinding),
+  textFiles: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+  trackedFiles: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+}) {}
+export class RepositoryPolicyViolationError extends Schema.TaggedError<
+  RepositoryPolicyViolationError,
   {
-    report: RepositoryPathReport,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("RepositoryPolicyViolationError", {
+  report: RepositoryPathReport,
+}) {}
 const RepositoryInventoryOperation = Schema.Literals([
   "decode-tracked-files",
   "list-tracked-files",
   "resolve-repository-root",
 ]);
-
-export class RepositoryInventoryError extends Schema.TaggedError<RepositoryInventoryError>()(
-  "RepositoryInventoryError",
+export class RepositoryInventoryError extends Schema.TaggedError<
+  RepositoryInventoryError,
   {
-    exitCode: Schema.optional(Schema.Int),
-    operation: RepositoryInventoryOperation,
+    readonly brand: unique symbol;
   }
-) {}
-
-export class RepositoryFileReadError extends Schema.TaggedError<RepositoryFileReadError>()(
-  "RepositoryFileReadError",
+>()("RepositoryInventoryError", {
+  exitCode: Schema.optional(Schema.Int),
+  operation: RepositoryInventoryOperation,
+}) {}
+export class RepositoryFileReadError extends Schema.TaggedError<
+  RepositoryFileReadError,
   {
-    file: RepositoryRelativeFile,
+    readonly brand: unique symbol;
   }
-) {}
+>()("RepositoryFileReadError", {
+  file: RepositoryRelativeFile,
+}) {}

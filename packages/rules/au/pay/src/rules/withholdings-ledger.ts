@@ -5,7 +5,13 @@ import {
 } from "@taxkit/core/ledger";
 import type { LedgerComponent } from "@taxkit/core/ledger";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Array as EffectArray, Effect, Layer, Option } from "effect";
+import {
+  Function as EffectFunction,
+  Array as EffectArray,
+  Effect,
+  Layer,
+  Option,
+} from "effect";
 
 import { GrossPayFact } from "../facts/pay.js";
 import type { PayPeriod } from "../facts/pay.js";
@@ -14,7 +20,6 @@ import {
   PayWithholdingsLedgerFact,
   PaygWithholdingComponentFact,
 } from "../facts/withholdings.js";
-
 /**
  * Rule id for aggregating withholding components into a pay-period ledger.
  *
@@ -23,7 +28,6 @@ import {
 export const PayWithholdingsLedgerRuleId = RuleId.make(
   "taxkit/rules-au-pay/rule/PayWithholdingsLedger"
 );
-
 /**
  * Builds a PayWithholdingsLedger from a list of components for a given
  * pay period. Rule packs that define their own aggregator (e.g. STSL-aware)
@@ -44,18 +48,25 @@ export const buildPayWithholdingsLedger = (
   Effect.gen(function* () {
     const total = yield* sumLedgerComponents(components);
     const trace = TraceNode.make({
-      children: EffectArray.map(components, (c) => c.trace),
+      children: EffectFunction.pipe(
+        components,
+        EffectArray.map((c) => c.trace)
+      ),
       formula: Option.some(
         Option.some(
           "total = sum(active additive components) - sum(active subtractive components)"
         )
       ),
       inputs: {
-        activeComponentIds: EffectArray.map(
-          EffectArray.filter(components, isComponentContributing),
-          (c) => c.id
+        activeComponentIds: EffectFunction.pipe(
+          components,
+          EffectArray.filter(isComponentContributing),
+          EffectArray.map((c) => c.id)
         ),
-        componentIds: EffectArray.map(components, (c) => c.id),
+        componentIds: EffectFunction.pipe(
+          components,
+          EffectArray.map((c) => c.id)
+        ),
       },
       result: total.cents,
       ruleId,
@@ -71,7 +82,6 @@ export const buildPayWithholdingsLedger = (
         })
     )
   );
-
 /**
  * Base aggregator: PAYG only.
  *

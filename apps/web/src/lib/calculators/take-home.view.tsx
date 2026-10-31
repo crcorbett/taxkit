@@ -1,5 +1,6 @@
 import type { TakeHomeForm } from "@taxkit/calculators/form";
 import type { TakeHomePayReport } from "@taxkit/rules-au-pay/schemas";
+import { Predicate, Boolean as EffectBoolean } from "effect";
 import type { Option } from "effect";
 
 import { TakeHomeResultView } from "./take-home-result.view";
@@ -74,10 +75,15 @@ export const TakeHomeFormView = ({
         Claim the tax-free threshold
       </label>
       <button type="submit" disabled={busy}>
-        {busy ? "Calculating…" : "Calculate"}
+        {EffectBoolean.match(busy, {
+          onFalse: (): "Calculate" => "Calculate",
+          onTrue: (): "Calculating…" => "Calculating…",
+        })}
       </button>
     </form>
-    {message !== undefined && message !== "" && <p role="alert">{message}</p>}
+    {!Predicate.isUndefined(message) && message !== "" && (
+      <p role="alert">{message}</p>
+    )}
     <TakeHomeResultView report={report} stale={stale} />
   </section>
 );

@@ -5,7 +5,31 @@
       {
         "name": "@effect/language-service",
         "ignoreEffectSuggestionsInTscExitCode": true,
-        "ignoreEffectWarningsInTscExitCode": true
+        "ignoreEffectWarningsInTscExitCode": true,
+        "allowedUnstableApis": [
+          "@effect/atom-react",
+          "@effect/platform-bun",
+          "@effect/platform-node",
+          "@effect/vitest",
+          "effect/ByteSize",
+          "effect/Crypto",
+          "effect/Effect#withErrorReporting",
+          "effect/ErrorReporter",
+          "effect/FileSystem",
+          "effect/Graph",
+          "effect/Path",
+          "effect/PlatformError",
+          "effect/Schema#IpAddressFromString",
+          "effect/Stream#limitBytes",
+          "effect/Stdio",
+          "effect/ai",
+          "effect/http",
+          "effect/http-api",
+          "effect/net/NetAddress",
+          "effect/process",
+          "effect/reactivity",
+          "effect/testing/TestConsole"
+        ]
       }
     ],
     "target": "ES2024",

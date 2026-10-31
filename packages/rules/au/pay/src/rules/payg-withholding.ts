@@ -2,7 +2,15 @@ import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { Cents, audFromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { Array, BigDecimal, Effect, Layer, Option } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  BigDecimal,
+  Effect,
+  Layer,
+  Option,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import {
   payPeriodToWeeklyCents,
@@ -17,7 +25,6 @@ import type {
   Schedule1Scale,
   Schedule1Table,
 } from "../parameters/schedule1.js";
-
 /**
  * Rule id for PAYG withholding using ATO Schedule 1 coefficients.
  *
@@ -26,7 +33,6 @@ import type {
 export const PaygWithholdingRuleId = RuleId.make(
   "taxkit/rules-au-pay/rule/PaygWithholding"
 );
-
 /**
  * Ledger component id for PAYG withholding.
  *
@@ -35,21 +41,21 @@ export const PaygWithholdingRuleId = RuleId.make(
 export const PaygWithholdingComponentId = ComponentId.make(
   "taxkit/rules-au-pay/component/Payg"
 );
-
 const findRow = (
   table: Schedule1Table,
   scale: Schedule1Scale,
   weeklyFormulaCents: number
 ): Effect.Effect<Schedule1Row, CalculationError> => {
-  const row = Array.findFirst(
+  const row = EffectFunction.pipe(
     table.rows,
-    (r) =>
-      r.scale === scale &&
-      weeklyFormulaCents >= r.weeklyMinCents &&
-      (r.weeklyMaxCents === "infinity" ||
-        weeklyFormulaCents <= r.weeklyMaxCents)
+    Array.findFirst(
+      (r) =>
+        r.scale === scale &&
+        weeklyFormulaCents >= r.weeklyMinCents &&
+        (r.weeklyMaxCents === "infinity" ||
+          weeklyFormulaCents <= r.weeklyMaxCents)
+    )
   );
-
   return Option.match(row, {
     onNone: () =>
       Effect.fail(
@@ -60,7 +66,6 @@ const findRow = (
     onSome: Effect.succeed,
   });
 };
-
 /**
  * Produces a LedgerComponent rather than a bare Money, so a downstream
  * aggregator can combine it with other withholding components (e.g. STSL)
@@ -74,15 +79,16 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     const taxable = yield* TaxablePayFact;
     const tftClaimed = yield* TaxFreeThresholdClaimedFact;
     const table = yield* AtoSchedule1Table;
-
     const weeklyCents = payPeriodToWeeklyCents(
       taxable.amount.cents,
       taxable.period
     );
     const weeklyFormulaCents = Math.floor(weeklyCents / 100) * 100 + 99;
-    const scale = tftClaimed.value ? "scale2" : "scale1";
+    const scale = EffectBoolean.match(tftClaimed.value, {
+      onFalse: (): "scale1" => "scale1",
+      onTrue: (): "scale2" => "scale2",
+    });
     const row = yield* findRow(table, scale, weeklyFormulaCents);
-
     const checkedWeeklyFormulaCents =
       yield* Cents.makeEffect(weeklyFormulaCents);
     // Keep a*x-b exact until Schedule 1's whole-dollar rounding boundary.
@@ -108,7 +114,6 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         taxable.period
       ) * 100
     );
-
     const trace = TraceNode.make({
       children: [taxable.trace],
       formula: Option.some(
@@ -133,7 +138,6 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
       sources: [table.source],
       title: `PAYG withholding (Schedule 1, ${scale})`,
     });
-
     const component = LedgerComponent.make({
       amount: periodWithholding,
       effect: "additive",
@@ -142,7 +146,6 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
       status: "active",
       trace,
     });
-
     return component;
   }).pipe(
     Effect.mapError(

@@ -28,7 +28,9 @@ export const makeBrowserAnalyticsTest = Effect.gen(function* () {
     layer: Layer.succeed(
       BrowserAnalytics,
       BrowserAnalytics.of({
-        getCollectionPolicy: Effect.succeed("allow" as const),
+        getCollectionPolicy: Effect.succeed("allow" as const).pipe(
+          Effect.withSpan("BrowserAnalytics.getCollectionPolicy")
+        ),
         recordPageView: Effect.fn("BrowserAnalytics.recordPageView")(
           function* (input) {
             yield* Ref.update(pages, (observed) =>

@@ -8,7 +8,7 @@ import { Effect, Layer, Schema } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 
-import { DocsCatalogueBuildLive } from "./docs-catalogue.layer.js";
+import { DocsCatalogueBuildLive } from "../src/build/docs-catalogue.layer.js";
 
 // Writes the checked public catalogue and every page's share image before the
 // API compiles. The Worker decodes finished pages and images instead of

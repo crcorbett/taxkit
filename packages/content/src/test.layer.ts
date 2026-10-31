@@ -1,4 +1,12 @@
-import { Array, Effect, Layer, Option, Ref } from "effect";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Layer,
+  Option,
+  Ref,
+} from "effect";
 
 import type { ContentObservations } from "./__testing__/observations.js";
 import { DocsDiagramRenderError, DocsImageRenderError } from "./errors.js";
@@ -36,14 +44,16 @@ export const makeContentTest = Effect.fnUntraced(function* (
     layer: Layer.succeed(
       ContentService,
       ContentService.of({
-        getNavigation: service.getNavigation,
+        getNavigation: Effect.fn("ContentService.getNavigation")(
+          service.getNavigation
+        ),
         getPage: Effect.fn("ContentService.getPage")(function* (
           path: DocsPagePath
         ) {
           yield* Ref.update(observations.requestedPages, Array.append(path));
           return yield* service.getPage(path);
         }),
-        listPages: service.listPages,
+        listPages: Effect.fn("ContentService.listPages")(service.listPages),
         searchPages: Effect.fn("ContentService.searchPages")(function* (
           term: DocsSearchTerm
         ) {
@@ -55,38 +65,48 @@ export const makeContentTest = Effect.fnUntraced(function* (
     observations,
   };
 });
-
 // Deterministic highlighter: each source line becomes one uncoloured token.
 export const DocsCodeHighlighterTest = Layer.succeed(DocsCodeHighlighter)(
   DocsCodeHighlighter.of({
-    highlight: (snippet: DocsCodeSnippet) =>
-      Effect.succeed(
-        Array.map(snippet.text.split("\n"), (line) =>
-          line === ""
-            ? []
-            : [{ color: Option.none(), style: "normal" as const, text: line }]
+    highlight: Effect.fn("DocsCodeHighlighter.highlight")(
+      (snippet: DocsCodeSnippet) =>
+        Effect.succeed(
+          EffectFunction.pipe(
+            snippet.text.split("\n"),
+            Array.map((line) =>
+              Match.value(line).pipe(
+                Match.when("", () => []),
+                Match.orElse((matchedValue) => [
+                  {
+                    color: Option.none(),
+                    style: "normal" as const,
+                    text: matchedValue,
+                  },
+                ])
+              )
+            )
+          )
         )
-      ),
+    ),
   })
 );
-
 // Deterministic renderer: one fixed, valid SVG document for every diagram.
 export const DocsDiagramRendererTest = Layer.succeed(DocsDiagramRenderer)(
   DocsDiagramRenderer.of({
-    render: () =>
+    render: Effect.fn("DocsDiagramRenderer.render")(() =>
       DocsDiagramSvg.makeEffect(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"></svg>'
       ).pipe(
         Effect.mapError(() => new DocsDiagramRenderError({ reason: "svg" }))
-      ),
+      )
+    ),
   })
 );
-
 // Deterministic share images: one fixed PNG header of the owned size for
 // every page.
 export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(
   DocsOgImages.of({
-    getImage: () =>
+    getImage: Effect.fn("DocsOgImages.getImage")(() =>
       Effect.sync(() => {
         const bytes = new Uint8Array(24);
         const data = new DataView(bytes.buffer);
@@ -97,6 +117,7 @@ export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(
       }).pipe(
         Effect.flatMap((bytes) => DocsPngBytes.makeEffect(bytes)),
         Effect.mapError(() => new DocsImageRenderError({ reason: "output" }))
-      ),
+      )
+    ),
   })
 );

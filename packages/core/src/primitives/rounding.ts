@@ -1,10 +1,9 @@
-import { Match, Schema } from "effect";
+import { Function as EffectFunction, Match, Schema } from "effect";
 import type { Effect } from "effect";
 
 import type { InvalidMoneyValue } from "./errors.js";
 import { audFromCents } from "./money.js";
 import type { Cents, Money } from "./money.js";
-
 /**
  * Rounding policies used by formula evaluation and trace output.
  *
@@ -19,14 +18,12 @@ export const RoundingMode = Schema.Literals([
   "ceil-dollar",
   "ato-withholding-rounding",
 ]);
-
 /**
  * Rounding policies used by formula evaluation and trace output.
  *
  * @since 0.1.0
  */
 export type RoundingMode = typeof RoundingMode.Type;
-
 /**
  * Rounds a cent amount according to a named calculation policy.
  *
@@ -50,7 +47,6 @@ export const roundCentsToDollar = (cents: Cents, mode: RoundingMode): number =>
     Match.when("ato-withholding-rounding", () => Math.round(cents / 100) * 100),
     Match.exhaustive
   );
-
 /**
  * Rounds a money value according to a named calculation policy.
  *
@@ -60,4 +56,4 @@ export const roundMoney = (
   m: Money,
   mode: RoundingMode
 ): Effect.Effect<Money, InvalidMoneyValue> =>
-  audFromCents(roundCentsToDollar(m.cents, mode));
+  EffectFunction.pipe(roundCentsToDollar(m.cents, mode), audFromCents);

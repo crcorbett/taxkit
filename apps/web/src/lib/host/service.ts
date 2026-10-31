@@ -4,7 +4,7 @@ import type {
 } from "@taxkit/api-http/errors";
 import type { TaxKitClient } from "@taxkit/api-http/requests";
 import { Context } from "effect";
-import type { Effect, Result } from "effect";
+import type { Effect } from "effect";
 
 import type { TaxKitWebConfigError, WebsiteApiConfigError } from "./errors";
 import type { WebsitePublicSettings } from "./schemas";
@@ -14,7 +14,7 @@ import type { WebsitePublicSettings } from "./schemas";
 export class WebsiteSettings extends Context.Service<
   WebsiteSettings,
   {
-    readonly settings: Result.Result<
+    readonly settings: Effect.Effect<
       WebsitePublicSettings,
       TaxKitWebConfigError
     >;
@@ -24,10 +24,10 @@ export class WebsiteSettings extends Context.Service<
 export class WebsiteApi extends Context.Service<
   WebsiteApi,
   {
-    readonly client: Result.Result<TaxKitClient, WebsiteApiConfigError>;
-    readonly forward: (
-      path: string
-    ) => Effect.Effect<
+    readonly client: Effect.Effect<TaxKitClient, WebsiteApiConfigError>;
+    readonly forward: (request: {
+      readonly path: string;
+    }) => Effect.Effect<
       Response,
       ApiUnavailable | ApiDeadlineExceeded | WebsiteApiConfigError
     >;

@@ -14,14 +14,26 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
-
+import {
+  Function as EffectFunction,
+  Array,
+  Option,
+  BigDecimal,
+  Context,
+  Layer,
+  Schema,
+} from "effect";
 /**
  * Low Income Tax Offset phase-out bracket.
  *
  * @since 0.1.0
  */
-export class LitoBracket extends Schema.TaggedClass<LitoBracket>()(
+export class LitoBracket extends Schema.TaggedClass<
+  LitoBracket,
+  {
+    readonly brand: unique symbol;
+  }
+>()(
   "LitoBracket",
   Schema.Struct({
     fullOffsetCents: Cents,
@@ -45,7 +57,6 @@ export class LitoBracket extends Schema.TaggedClass<LitoBracket>()(
     )
   )
 ) {}
-
 // Keep the same relationship check on the saved representation and decoded rows.
 // Array class transformations otherwise remove this check under Schema.toEncoded.
 const LitoTableCoverageCheck = Schema.makeFilter<
@@ -58,40 +69,44 @@ const LitoTableCoverageCheck = Schema.makeFilter<
     Array.last(brackets).pipe(
       Option.exists((row) => row.maxCents === "infinity")
     ) &&
-    Array.every(
+    EffectFunction.pipe(
       brackets,
-      (row, index) =>
-        index === 0 ||
-        Array.get(brackets, index - 1).pipe(
-          Option.exists(
-            (previous) =>
-              previous.maxCents !== "infinity" &&
-              previous.maxCents === row.thresholdCents
+      Array.every(
+        (row, index) =>
+          index === 0 ||
+          Array.get(brackets, index - 1).pipe(
+            Option.exists(
+              (previous) =>
+                previous.maxCents !== "infinity" &&
+                previous.maxCents === row.thresholdCents
+            )
           )
-        )
+      )
     ),
   {
     expected:
       "complete LITO brackets from zero without gaps or overlaps, with only the final bound open",
   }
 );
-
 const LitoTableRows = Schema.Array(Schema.toEncoded(LitoBracket))
   .check(LitoTableCoverageCheck)
   .pipe(Schema.decodeTo(Schema.Array(LitoBracket)))
   .check(LitoTableCoverageCheck);
-
 /**
  * ATO Low Income Tax Offset table for one tax year.
  *
  * @since 0.1.0
  */
-export class LitoTable extends Schema.TaggedClass<LitoTable>()("LitoTable", {
+export class LitoTable extends Schema.TaggedClass<
+  LitoTable,
+  {
+    readonly brand: unique symbol;
+  }
+>()("LitoTable", {
   brackets: LitoTableRows,
   source: SourceRef,
   year: TaxYear,
 }) {}
-
 /**
  * Context tag for the active ATO Low Income Tax Offset table.
  *
@@ -100,7 +115,6 @@ export class LitoTable extends Schema.TaggedClass<LitoTable>()("LitoTable", {
 export class AtoLitoTable extends Context.Service<AtoLitoTable, LitoTable>()(
   "taxkit/rules-au-income-tax/parameter/AtoLitoTable"
 ) {}
-
 /**
  * Source reference for ATO Low Income Tax Offset parameters.
  *
@@ -112,7 +126,6 @@ export const LitoSource2025_26 = SourceRef.make({
     "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/low-income-tax-offset",
   title: "ATO low income tax offset",
 });
-
 /**
  * Canonical extraction metadata for the LITO table.
  *
@@ -130,7 +143,6 @@ export const LitoArtifact2025_26 = new SourceArtifact({
   retrievedOn: IsoDate.make("2026-05-12"),
   source: LitoSource2025_26,
 });
-
 /**
  * Parameter descriptor for the ATO Low Income Tax Offset table.
  *
@@ -148,7 +160,6 @@ export const AtoLitoTableDescriptor = makeParameterDescriptor({
   tag: AtoLitoTable,
   title: "ATO low income tax offset parameters",
 });
-
 // LITO 2025-26: max $700, phases out in two stages.
 // Bracket 1: income ≤ $37,500 — full $700 offset (flat)
 // Bracket 2: $37,501–$45,000 — phases out at 5c per $1 ($700 → $325)
@@ -184,7 +195,6 @@ const table2025_26 = new LitoTable({
   source: LitoSource2025_26,
   year: taxYear("2025-26"),
 });
-
 /**
  * Live ATO Low Income Tax Offset parameter layer for 2025-26.
  *

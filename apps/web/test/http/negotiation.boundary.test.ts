@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Effect, Layer, Option, Result } from "effect";
+import { Function as EffectFunction, Effect, Layer, Option } from "effect";
 import { Headers, HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import {
@@ -14,7 +14,6 @@ const unconfigured = new TaxKitWebConfigError({
   operation: "settings",
   runtime: "server",
 });
-
 describe("documentation HTML response headers", () => {
   it.effect.each([
     { existing: "", expected: "Accept" },
@@ -25,13 +24,14 @@ describe("documentation HTML response headers", () => {
     },
     { existing: "*", expected: "*" },
   ])("preserves $existing while varying on Accept", ({ existing, expected }) =>
-    withDocsRepresentation(
+    EffectFunction.pipe(
       Effect.succeed(
         HttpServerResponse.text("accepted HTML", {
           contentType: "text/html",
           headers: { vary: existing },
         })
-      )
+      ),
+      withDocsRepresentation
     ).pipe(
       Effect.provideService(
         HttpServerRequest.HttpServerRequest,
@@ -42,16 +42,25 @@ describe("documentation HTML response headers", () => {
       Effect.provide(
         Layer.mergeAll(
           Layer.mock(WebsiteApi, {
-            client: Result.fail(new WebsiteApiConfigError()),
+            client: Effect.fail(new WebsiteApiConfigError()).pipe(
+              Effect.withSpan("WebsiteApi.client")
+            ),
           }),
-          Layer.mock(WebsiteSettings, { settings: Result.fail(unconfigured) })
+          Layer.mock(WebsiteSettings, {
+            settings: Effect.fail(unconfigured).pipe(
+              Effect.withSpan("WebsiteSettings.settings")
+            ),
+          })
         )
       ),
       Effect.scoped,
       Effect.tap((response) =>
         Effect.sync(() => {
-          expect(Headers.get(response.headers, "vary")).toEqual(
-            Option.some(expected)
+          EffectFunction.pipe(
+            Headers.get(response.headers, "vary"),
+            (actual) => {
+              expect(actual).toStrictEqual(Option.some(expected));
+            }
           );
           expect(response.status).toBe(200);
         })
@@ -59,11 +68,11 @@ describe("documentation HTML response headers", () => {
     )
   );
 });
-
 describe("documentation Markdown negotiation", () => {
   it.effect("moves a Markdown preference at a page to its Markdown file", () =>
-    withDocsRepresentation(
-      Effect.succeed(HttpServerResponse.text("accepted HTML"))
+    EffectFunction.pipe(
+      Effect.succeed(HttpServerResponse.text("accepted HTML")),
+      withDocsRepresentation
     ).pipe(
       Effect.provideService(
         HttpServerRequest.HttpServerRequest,
@@ -77,20 +86,32 @@ describe("documentation Markdown negotiation", () => {
       Effect.provide(
         Layer.mergeAll(
           Layer.mock(WebsiteApi, {
-            client: Result.fail(new WebsiteApiConfigError()),
+            client: Effect.fail(new WebsiteApiConfigError()).pipe(
+              Effect.withSpan("WebsiteApi.client")
+            ),
           }),
-          Layer.mock(WebsiteSettings, { settings: Result.fail(unconfigured) })
+          Layer.mock(WebsiteSettings, {
+            settings: Effect.fail(unconfigured).pipe(
+              Effect.withSpan("WebsiteSettings.settings")
+            ),
+          })
         )
       ),
       Effect.scoped,
       Effect.tap((response) =>
         Effect.sync(() => {
           expect(response.status).toBe(307);
-          expect(Headers.get(response.headers, "location")).toEqual(
-            Option.some("/start/quickstart.md")
+          EffectFunction.pipe(
+            Headers.get(response.headers, "location"),
+            (actual) => {
+              expect(actual).toStrictEqual(Option.some("/start/quickstart.md"));
+            }
           );
-          expect(Headers.get(response.headers, "vary")).toEqual(
-            Option.some("Accept")
+          EffectFunction.pipe(
+            Headers.get(response.headers, "vary"),
+            (actual) => {
+              expect(actual).toStrictEqual(Option.some("Accept"));
+            }
           );
         })
       )

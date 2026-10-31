@@ -24,6 +24,11 @@ the [versioning standard](../standards/versioning.md) for semver rules.
    manifest and changelog diff, then run `bun run release:check`.
 4. Commit the version change through an ordinary pull request.
 
+Changesets consumes the pending files when applying versions. If its status
+check then reports changed packages with no Changesets on the release branch,
+add an empty one with `bun run changeset --empty`. Review the applied versions
+and changelogs first; the empty Changeset queues no additional version bump.
+
 Publishing to npm is a separate operation and needs the maintainer's explicit
 request. Roll back an unpublished version change by reverting its commit.
 

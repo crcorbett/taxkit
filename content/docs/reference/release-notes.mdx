@@ -13,7 +13,7 @@ repository changelog and applied package changelogs.
 
 Use sources in this order:
 
-1. Applied package changelogs after `bun run version-repo`.
+1. Applied package changelogs after `bun run version-packages`.
 2. The repository [`CHANGELOG.md`](../../../CHANGELOG.md).
 3. Pending `.changeset/*.md` files only before a release is applied.
 4. Public docs pages when the release changes SDK, API or contribution
@@ -26,17 +26,17 @@ checks establish implementation; they do not establish public availability.
 ## Release note shape
 
 ```md
-# Version 1.0.0 (unpublished)
+# Version <version> (unpublished)
 
 ## Changed
 
-- Changed package names to `@taxkit/*`.
-- Changed runtime configuration names to the `TAXKIT_` prefix.
+- Describe the public SDK or API behaviour that changed.
+- Link to the generated changelog for the affected package.
 
 ## Migration notes
 
-Update package imports and runtime configuration names. Packages remain
-private and unpublished.
+Show the old and new imports or calls when consumers need to migrate.
+Name the exact published version only after registry readback.
 ```
 
 ## Review checklist
@@ -45,7 +45,7 @@ private and unpublished.
 - Explain required migration steps, if any.
 - Link to the owning guide or reference page.
 - Avoid downstream application details.
-- Confirm `bun run changeset status --verbose` before handoff.
+- Confirm `bun run changeset:status` before handoff.
 
 ## Related pages
 

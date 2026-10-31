@@ -1,11 +1,18 @@
-import "@tanstack/react-start/server-only";
 import type { NotFoundError } from "@tanstack/react-router";
+import "@tanstack/react-start/server-only";
 import { setResponseStatus } from "@tanstack/react-start/server";
 import { requestDocsPage, requestDocsSearch } from "@taxkit/api-http/requests";
 import { docsPageMetadata } from "@taxkit/content/publication";
 import { WebsiteHostTelemetryLive } from "@taxkit/observability/host-telemetry";
 import { env } from "cloudflare:workers";
-import { Cause, Effect, Layer, ManagedRuntime } from "effect";
+import {
+  Function as EffectFunction,
+  Cause,
+  Effect,
+  Layer,
+  ManagedRuntime,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import { WebsiteDocsSearchView } from "./docs/schemas";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
@@ -16,10 +23,8 @@ import { WebsiteApi, WebsiteSettings } from "./host/service";
 import { WebsiteSettingsLive } from "./host/settings.layer";
 import { loadFailureStatus, rejectRouteLoad } from "./pages/load.failure";
 import { loadRootView } from "./pages/root.load";
-
 // The Worker's bindings object, read at this host edge only.
 const bindings = Layer.sync(WebsiteBindings, () => ({ ...env }));
-
 // One server runner per loaded Worker module. It supplies native API clients,
 // never a backend implementation; each request supplies its own signal.
 export const runtime = ManagedRuntime.make(
@@ -29,49 +34,60 @@ export const runtime = ManagedRuntime.make(
     WebsiteHostTelemetryLive
   ).pipe(Layer.provide(bindings))
 );
-
 // Server loads report their HTTP status before TanStack renders the native
 // not-found or error component. Cancellation stays interruption.
 const rejectServerLoad = <E>(
   cause: Cause.Cause<E>
 ): Effect.Effect<never, E | NotFoundError | WebsiteLoadError> =>
-  Cause.hasInterruptsOnly(cause)
-    ? Effect.failCause(cause)
-    : Effect.sync(() => {
-        setResponseStatus(loadFailureStatus(cause));
-      }).pipe(Effect.andThen(rejectRouteLoad(cause)));
-
-const client = WebsiteApi.pipe(
-  Effect.flatMap((host) => Effect.fromResult(host.client))
-);
-
-export const loadRoot = ({ signal }: Readonly<{ signal: AbortSignal }>) =>
+  EffectBoolean.match(Cause.hasInterruptsOnly(cause), {
+    onFalse: () =>
+      Effect.sync(() => {
+        EffectFunction.pipe(loadFailureStatus(cause), setResponseStatus);
+      }).pipe(Effect.andThen(rejectRouteLoad(cause))),
+    onTrue: () => Effect.failCause(cause),
+  });
+const client = WebsiteApi.pipe(Effect.flatMap((host) => host.client));
+export const loadRoot = ({
+  signal,
+}: Readonly<{
+  signal: AbortSignal;
+}>) =>
   runtime.runPromise(loadRootView.pipe(Effect.catchCause(rejectServerLoad)), {
     signal,
   });
-
 export const loadDocsPage = ({
   path,
   signal,
-}: Readonly<{ path: string; signal: AbortSignal }>) =>
+}: Readonly<{
+  path: string;
+  signal: AbortSignal;
+}>) =>
   runtime.runPromise(
     Effect.gen(function* () {
       const host = yield* WebsiteSettings;
-      const settings = yield* Effect.fromResult(host.settings);
-      const { navigation, page } = yield* requestDocsPage(yield* client, path);
+      const settings = yield* host.settings;
+      const { navigation, page } = yield* requestDocsPage({
+        client: yield* client,
+        address: path,
+      });
       return {
-        metadata: yield* docsPageMetadata(page, settings.publicationOrigin),
+        metadata: yield* docsPageMetadata({
+          page,
+          origin: settings.publicationOrigin,
+        }),
         navigation,
         page,
       };
     }).pipe(Effect.catchCause(rejectServerLoad)),
     { signal }
   );
-
 export const loadDocsSearch = ({
   query,
   signal,
-}: Readonly<{ query: WebsiteDocsSearchQuery; signal: AbortSignal }>) =>
+}: Readonly<{
+  query: WebsiteDocsSearchQuery;
+  signal: AbortSignal;
+}>) =>
   runtime.runPromise(
     Effect.fromResult(query).pipe(
       Effect.matchEffect({
@@ -79,7 +95,12 @@ export const loadDocsSearch = ({
         onFailure: () => Effect.succeed(WebsiteDocsSearchView.InvalidSearch()),
         onSuccess: (term) =>
           client.pipe(
-            Effect.flatMap((generated) => requestDocsSearch(generated, term)),
+            Effect.flatMap((generated) =>
+              requestDocsSearch({
+                client: generated,
+                term,
+              })
+            ),
             Effect.map((found) =>
               WebsiteDocsSearchView.Found({ ...found, term })
             )

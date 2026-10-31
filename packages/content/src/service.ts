@@ -60,10 +60,10 @@ export class DocsSources extends Context.Service<
 export class DocsPageReader extends Context.Service<
   DocsPageReader,
   {
-    readonly read: (
-      source: DocsSource,
-      links: DocsLinkContext
-    ) => Effect.Effect<DocsReadPage, DocsSourceError>;
+    readonly read: (request: {
+      readonly source: DocsSource;
+      readonly links: DocsLinkContext;
+    }) => Effect.Effect<DocsReadPage, DocsSourceError>;
   }
 >()("@taxkit/content/DocsPageReader") {}
 

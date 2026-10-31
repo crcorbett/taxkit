@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Result, Schema } from "effect";
+import { Function as EffectFunction, Result, Schema } from "effect";
 
 import { DocsAccept } from "../src/negotiation.ingress.js";
 
@@ -52,18 +52,26 @@ describe("documentation representation preferences", () => {
         "text/html;q=0, text/markdown;charset=utf-8;q=0, text/markdown;q=1",
     },
   ])("selects $expected from $header", ({ header, expected }) => {
-    expect(Schema.decodeResult(DocsAccept)(header)).toEqual(
-      Result.succeed(expected)
+    EffectFunction.pipe(Schema.decodeResult(DocsAccept)(header), (actual) => {
+      expect(actual).toStrictEqual(Result.succeed(expected));
+    });
+  });
+
+  it("rejects excess header characters before parsing", () => {
+    EffectFunction.pipe(
+      Result.isFailure(Schema.decodeResult(DocsAccept)("x".repeat(4097))),
+      (actual) => {
+        expect(actual).toBeTruthy();
+      }
     );
   });
-  it("rejects excess header characters before parsing", () => {
-    expect(
-      Result.isFailure(Schema.decodeResult(DocsAccept)("x".repeat(4097)))
-    ).toBe(true);
-  });
+
   it("bounds media ranges", () => {
-    expect(Schema.decodeResult(DocsAccept)("text/html,".repeat(65))).toEqual(
-      Result.succeed("invalid")
+    EffectFunction.pipe(
+      Schema.decodeResult(DocsAccept)("text/html,".repeat(65)),
+      (actual) => {
+        expect(actual).toStrictEqual(Result.succeed("invalid"));
+      }
     );
   });
 });

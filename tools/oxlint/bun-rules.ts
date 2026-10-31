@@ -1,4 +1,10 @@
-import { Array as EffectArray, HashMap, HashSet } from "effect";
+import {
+  Function as EffectFunction,
+  Array as EffectArray,
+  HashMap,
+  HashSet,
+  Option,
+} from "effect";
 
 import { createBindingTracker, propertyName } from "./binding-tracker.ts";
 import type {
@@ -8,31 +14,23 @@ import type {
   SyntaxNode,
 } from "./host.types.js";
 
-const bunImportSemantic: ImportSemantic = (source, specifierType, imported) => {
-  if (
-    source === "@effect/platform-bun" &&
-    specifierType === "ImportSpecifier" &&
-    imported === "BunRuntime"
-  ) {
-    return "BunRuntime";
+const bunImportSemantic: ImportSemantic = (source, kind, imported) => {
+  if (source === "@effect/platform-bun") {
+    if (kind === "ImportNamespaceSpecifier") {
+      return Option.some("platform-bun");
+    }
+    if (kind === "ImportSpecifier") {
+      return imported.pipe(Option.filter((name) => name === "BunRuntime"));
+    }
   }
-
-  if (
-    source === "@effect/platform-bun" &&
-    specifierType === "ImportNamespaceSpecifier"
-  ) {
-    return "platform-bun";
-  }
-
   if (source === "@effect/platform-bun/BunRuntime") {
-    return specifierType === "ImportSpecifier" && imported !== null
-      ? `BunRuntime.${imported}`
-      : "BunRuntime";
+    if (kind === "ImportSpecifier" && Option.isSome(imported)) {
+      return Option.some(`BunRuntime.${imported.value}`);
+    }
+    return Option.some("BunRuntime");
   }
-
-  return null;
+  return Option.none();
 };
-
 const bunHostMethods = HashSet.fromIterable([
   "file",
   "serve",
@@ -40,38 +38,43 @@ const bunHostMethods = HashSet.fromIterable([
   "spawnSync",
   "write",
 ]);
-
 const bunRuntimeSemantics = HashSet.fromIterable([
   "BunRuntime.runMain",
   "platform-bun.BunRuntime.runMain",
 ]);
-
 const destructuresBunHostMethod = (pattern: SyntaxNode | null | undefined) =>
   pattern?.type === "ObjectPattern" &&
-  EffectArray.some<SyntaxKind<"ObjectPattern">["properties"][number]>(
+  EffectFunction.pipe(
     pattern.properties,
-    (property) =>
-      property.type === "Property" &&
-      (!property.computed || property.key?.type === "Literal") &&
-      HashSet.has(bunHostMethods, propertyName(property.key) ?? "")
+    EffectArray.some<SyntaxKind<"ObjectPattern">["properties"][number]>(
+      (property) =>
+        property.type === "Property" &&
+        (!property.computed || property.key?.type === "Literal") &&
+        propertyName(property.key).pipe(
+          Option.exists((name) => HashSet.has(bunHostMethods, name))
+        )
+    )
   );
-
-const isHostMethod = (semantic: string | null) =>
-  semantic?.startsWith("Global.Bun.") === true &&
-  HashSet.has(bunHostMethods, semantic.slice("Global.Bun.".length));
-
+const isHostMethod = (semantic: Option.Option<string>) =>
+  semantic.pipe(
+    Option.exists(
+      (name) =>
+        name.startsWith("Global.Bun.") &&
+        HashSet.has(bunHostMethods, name.slice("Global.Bun.".length))
+    )
+  );
 const noHostApiOutsideAdapters: OxlintRule = {
   create(context) {
-    const tracker = createBindingTracker(
-      context.sourceCode,
-      HashMap.make(["Bun", "Global.Bun"])
-    );
-
+    const bindings = HashMap.make(["Bun", "Global.Bun"]);
+    const tracker = createBindingTracker(context.sourceCode, bindings);
     return {
       AssignmentExpression(node) {
         const source = tracker.semanticOfExpression(node.right);
         tracker.trackAssignment(node);
-        if (source === "Global.Bun" && destructuresBunHostMethod(node.left)) {
+        if (
+          Option.contains(source, "Global.Bun") &&
+          destructuresBunHostMethod(node.left)
+        ) {
           context.report({ messageId: "noHostApiOutsideAdapters", node });
         }
       },
@@ -88,7 +91,9 @@ const noHostApiOutsideAdapters: OxlintRule = {
         tracker.trackImport(node, bunImportSemantic);
       },
       MemberExpression(node) {
-        if (isHostMethod(tracker.semanticOfExpression(node))) {
+        if (
+          EffectFunction.pipe(tracker.semanticOfExpression(node), isHostMethod)
+        ) {
           context.report({
             messageId: "noHostApiOutsideAdapters",
             node,
@@ -98,7 +103,10 @@ const noHostApiOutsideAdapters: OxlintRule = {
       VariableDeclarator(node) {
         const source = tracker.semanticOfExpression(node.init);
         tracker.trackVariable(node);
-        if (source === "Global.Bun" && destructuresBunHostMethod(node.id)) {
+        if (
+          Option.contains(source, "Global.Bun") &&
+          destructuresBunHostMethod(node.id)
+        ) {
           context.report({ messageId: "noHostApiOutsideAdapters", node });
         }
       },
@@ -115,15 +123,19 @@ const noHostApiOutsideAdapters: OxlintRule = {
     type: "problem",
   },
 };
-
 const noRuntimeOutsideEntrypoints: OxlintRule = {
   create(context) {
     const tracker = createBindingTracker(context.sourceCode);
-
     return {
       AssignmentExpression: tracker.trackAssignment,
       CallExpression(node) {
-        if (HashSet.has(bunRuntimeSemantics, tracker.calledSemantic(node))) {
+        if (
+          tracker
+            .calledSemantic(node)
+            .pipe(
+              Option.exists((name) => HashSet.has(bunRuntimeSemantics, name))
+            )
+        ) {
           context.report({
             messageId: "noRuntimeOutsideEntrypoints",
             node: node.callee,
@@ -147,7 +159,6 @@ const noRuntimeOutsideEntrypoints: OxlintRule = {
     type: "problem",
   },
 };
-
 export default {
   meta: { name: "bun" },
   rules: {

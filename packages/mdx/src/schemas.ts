@@ -1,5 +1,4 @@
-import { Array, Match, Schema } from "effect";
-
+import { Function as EffectFunction, Array, Match, Schema } from "effect";
 // The supported MDX, as the installed parser reports it. Anything else,
 // including JSX, images, raw HTML, quotes and nested lists, fails the page.
 const SyntaxText = Schema.Struct({
@@ -33,7 +32,7 @@ export type SyntaxFormatted = typeof SyntaxFormatted.Type;
 const SyntaxLink = Schema.Struct({
   children: Schema.Array(SyntaxFormatted).check(Schema.isMinLength(1)),
   type: Schema.Literal("link"),
-  url: Schema.String,
+  url: Schema.String.pipe(Schema.brand("taxkit/mdx/MarkdownLinkDestination")),
 });
 export const SyntaxPhrasing = Schema.Union([
   SyntaxText,
@@ -43,21 +42,22 @@ export const SyntaxPhrasing = Schema.Union([
   SyntaxLink,
 ]).pipe(Schema.toTaggedUnion("type"));
 export type SyntaxPhrasing = typeof SyntaxPhrasing.Type;
-
 // The words a reader sees in a run of inline syntax, without formatting.
 export const plainText = (nodes: readonly SyntaxPhrasing[]): string =>
-  Array.map(nodes, (node) =>
-    Match.value(node).pipe(
-      Match.discriminatorsExhaustive("type")({
-        emphasis: ({ children }) => plainText(children),
-        inlineCode: ({ value }) => value,
-        link: ({ children }) => plainText(children),
-        strong: ({ children }) => plainText(children),
-        text: ({ value }) => value,
-      })
+  EffectFunction.pipe(
+    nodes,
+    Array.map((node) =>
+      Match.value(node).pipe(
+        Match.discriminatorsExhaustive("type")({
+          emphasis: ({ children }) => plainText(children),
+          inlineCode: ({ value }) => value,
+          link: ({ children }) => plainText(children),
+          strong: ({ children }) => plainText(children),
+          text: ({ value }) => value,
+        })
+      )
     )
   ).join("");
-
 const SyntaxPhrasings = Schema.Array(SyntaxPhrasing).check(
   Schema.isMinLength(1)
 );
@@ -114,7 +114,6 @@ export const SyntaxBlock = Schema.Union([
   SyntaxCode,
 ]).pipe(Schema.toTaggedUnion("type"));
 export type SyntaxBlock = typeof SyntaxBlock.Type;
-
 // A page is its `#` title followed by at least one body block.
 export const SyntaxRoot = Schema.Struct({
   children: Schema.TupleWithRest(

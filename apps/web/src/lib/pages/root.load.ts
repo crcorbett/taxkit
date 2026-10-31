@@ -8,7 +8,7 @@ import { WebsiteSettings } from "../host/service";
 // calculator summaries, with no remote read.
 export const loadRootView = Effect.gen(function* () {
   const host = yield* WebsiteSettings;
-  const settings = yield* Effect.fromResult(host.settings);
+  const settings = yield* host.settings;
   return {
     view: yield* Schema.encodeEffect(WebsiteRootView)({ settings }),
   };

@@ -14,8 +14,15 @@ import {
   SourceRef,
   sourceChecksum,
 } from "@taxkit/core/trace";
-import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
-
+import {
+  Function as EffectFunction,
+  Array,
+  Option,
+  BigDecimal,
+  Context,
+  Layer,
+  Schema,
+} from "effect";
 /**
  * ATO Schedule 8 STSL coefficient row.
  *
@@ -24,7 +31,12 @@ import { Array, Option, BigDecimal, Context, Layer, Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class StslRow extends Schema.TaggedClass<StslRow>()(
+export class StslRow extends Schema.TaggedClass<
+  StslRow,
+  {
+    readonly brand: unique symbol;
+  }
+>()(
   "StslRow",
   Schema.Struct({
     a: DecimalCoefficient,
@@ -47,7 +59,6 @@ export class StslRow extends Schema.TaggedClass<StslRow>()(
     )
   )
 ) {}
-
 // Keep the same relationship check on the saved representation and decoded rows.
 // Array class transformations otherwise remove this check under Schema.toEncoded.
 const StslTableCoverageCheck = Schema.makeFilter<
@@ -58,40 +69,44 @@ const StslTableCoverageCheck = Schema.makeFilter<
     Array.last(rows).pipe(
       Option.exists((row) => row.weeklyMaxCents === "infinity")
     ) &&
-    Array.every(
+    EffectFunction.pipe(
       rows,
-      (row, index) =>
-        index === 0 ||
-        Array.get(rows, index - 1).pipe(
-          Option.exists(
-            (previous) =>
-              previous.weeklyMaxCents !== "infinity" &&
-              previous.weeklyMaxCents === row.weeklyMinCents - 1
+      Array.every(
+        (row, index) =>
+          index === 0 ||
+          Array.get(rows, index - 1).pipe(
+            Option.exists(
+              (previous) =>
+                previous.weeklyMaxCents !== "infinity" &&
+                previous.weeklyMaxCents === row.weeklyMinCents - 1
+            )
           )
-        )
+      )
     ),
   {
     expected:
       "complete STSL weekly rows from zero without gaps or overlaps, with only the final bound open",
   }
 );
-
 const StslTableRows = Schema.Array(Schema.toEncoded(StslRow))
   .check(StslTableCoverageCheck)
   .pipe(Schema.decodeTo(Schema.Array(StslRow)))
   .check(StslTableCoverageCheck);
-
 /**
  * ATO Schedule 8 STSL withholding coefficient table for one tax year.
  *
  * @since 0.1.0
  */
-export class StslTable extends Schema.TaggedClass<StslTable>()("StslTable", {
+export class StslTable extends Schema.TaggedClass<
+  StslTable,
+  {
+    readonly brand: unique symbol;
+  }
+>()("StslTable", {
   rows: StslTableRows,
   source: SourceRef,
   year: TaxYear,
 }) {}
-
 /**
  * Context tag for the active ATO Schedule 8 STSL table.
  *
@@ -100,13 +115,11 @@ export class StslTable extends Schema.TaggedClass<StslTable>()("StslTable", {
 export class AtoStslTable extends Context.Service<AtoStslTable, StslTable>()(
   "taxkit/rules-au-stsl/parameter/AtoStslTable"
 ) {}
-
 /** Schedule 8 coefficients when the tax-free threshold is not claimed. @since 2.1.2 */
 export class AtoStslNoThresholdTable extends Context.Service<
   AtoStslNoThresholdTable,
   StslTable
 >()("taxkit/rules-au-stsl/parameter/AtoStslNoThresholdTable") {}
-
 /**
  * Source reference for ATO Schedule 8 STSL withholding formulas for 2025-26.
  *
@@ -119,7 +132,6 @@ export const StslSource2025_26 = SourceRef.make({
   title:
     "ATO Schedule 8 - Statement of formulas for calculating study and training support loans components",
 });
-
 /**
  * Canonical extraction metadata for the Schedule 8 STSL table.
  *
@@ -137,7 +149,6 @@ export const StslArtifact2025_26 = new SourceArtifact({
   retrievedOn: IsoDate.make("2026-05-12"),
   source: StslSource2025_26,
 });
-
 /**
  * Parameter descriptor for the ATO Schedule 8 STSL coefficient table.
  *
@@ -155,7 +166,6 @@ export const AtoStslTableDescriptor = makeParameterDescriptor({
   tag: AtoStslTable,
   title: "ATO Schedule 8 STSL withholding coefficients",
 });
-
 const table2025_26 = new StslTable({
   rows: [
     new StslRow({
@@ -186,7 +196,6 @@ const table2025_26 = new StslTable({
   source: StslSource2025_26,
   year: taxYear("2025-26"),
 });
-
 const noThresholdTable2025_26 = new StslTable({
   rows: [
     new StslRow({
@@ -217,7 +226,6 @@ const noThresholdTable2025_26 = new StslTable({
   source: StslSource2025_26,
   year: taxYear("2025-26"),
 });
-
 /** The no-threshold table has a separate identity; existing saved tables stay valid. @since 2.1.2 */
 export const AtoStslNoThresholdTableDescriptor = makeParameterDescriptor({
   effectivePeriod: AtoStslTableDescriptor.effectivePeriod,
@@ -237,7 +245,6 @@ export const AtoStslNoThresholdTableDescriptor = makeParameterDescriptor({
   tag: AtoStslNoThresholdTable,
   title: "ATO Schedule 8 STSL coefficients without the tax-free threshold",
 });
-
 /**
  * Live ATO Schedule 8 STSL parameter layer for 2025-26.
  *

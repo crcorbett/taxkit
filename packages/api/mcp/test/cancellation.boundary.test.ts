@@ -1,5 +1,14 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Deferred, Effect, Exit, Fiber, Option, Ref, Result } from "effect";
+import {
+  Function as EffectFunction,
+  Deferred,
+  Effect,
+  Exit,
+  Fiber,
+  Option,
+  Ref,
+  Result,
+} from "effect";
 
 import { withMcpRequestCancellation } from "../src/cancellation.boundary.js";
 import { McpRequestAbortSignal } from "../src/request.service.js";
@@ -12,13 +21,15 @@ describe("MCP request cancellation", () => {
         withMcpRequestCancellation,
         Effect.result
       );
-      expect(
-        Result.getFailure(result).pipe(Option.map((error) => error.code))
-      ).toEqual(Option.some("service-unavailable"));
-      expect(yield* Ref.get(entered)).toBe(false);
+      EffectFunction.pipe(
+        Result.getFailure(result).pipe(Option.map((error) => error.code)),
+        (actual) => {
+          expect(actual).toStrictEqual(Option.some("service-unavailable"));
+        }
+      );
+      expect(!(yield* Ref.get(entered))).toBeTruthy();
     })
   );
-
   it.effect(
     "interrupts before starting a request that already disconnected",
     () =>
@@ -36,11 +47,12 @@ describe("MCP request cancellation", () => {
           ),
           Effect.exit
         );
-        expect(Exit.hasInterrupts(exit)).toBe(true);
-        expect(yield* Ref.get(entered)).toBe(false);
+        EffectFunction.pipe(Exit.hasInterrupts(exit), (actual) => {
+          expect(actual).toBeTruthy();
+        });
+        expect(!(yield* Ref.get(entered))).toBeTruthy();
       })
   );
-
   it.effect("closes only the disconnected request's running work", () =>
     Effect.gen(function* () {
       const disconnected = yield* Effect.sync(() => new AbortController());
@@ -71,9 +83,14 @@ describe("MCP request cancellation", () => {
       yield* Effect.sync(() => {
         disconnected.abort();
       });
-      expect(Exit.hasInterrupts(yield* Fiber.await(first))).toBe(true);
-      expect(yield* Ref.get(released)).toBe(true);
-      expect(yield* Ref.get(otherReleased)).toBe(false);
+      EffectFunction.pipe(
+        Exit.hasInterrupts(yield* Fiber.await(first)),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
+      expect(yield* Ref.get(released)).toBeTruthy();
+      expect(!(yield* Ref.get(otherReleased))).toBeTruthy();
       yield* Fiber.interrupt(other);
     }).pipe(Effect.scoped)
   );

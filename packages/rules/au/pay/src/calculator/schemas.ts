@@ -12,7 +12,6 @@ export {
   AuPayJurisdiction,
   AuPayTaxYear,
 } from "./metadata.js";
-
 /**
  * Independent version of the Australian pay ruleset represented by this
  * report.
@@ -20,7 +19,6 @@ export {
  * @since 1.0.0
  */
 export const PayRulePackVersion = Schema.Literal("rules-au-pay/1.0.2");
-
 /**
  * Take-home pay report for one Australian pay-period scenario.
  *
@@ -29,20 +27,21 @@ export const PayRulePackVersion = Schema.Literal("rules-au-pay/1.0.2");
  *
  * @since 0.1.0
  */
-export class TakeHomePayReport extends Schema.TaggedClass<TakeHomePayReport>()(
-  "TakeHomePayReport",
+export class TakeHomePayReport extends Schema.TaggedClass<
+  TakeHomePayReport,
   {
-    grossPay: Money,
-    netPay: Money,
-    period: PayPeriod,
-    rulePackVersion: PayRulePackVersion,
-    taxablePay: Money,
-    trace: TraceNode,
-    withholdings: PayWithholdingsLedger,
-    withholdingsTotal: Money,
+    readonly brand: unique symbol;
   }
-) {}
-
+>()("TakeHomePayReport", {
+  grossPay: Money,
+  netPay: Money,
+  period: PayPeriod,
+  rulePackVersion: PayRulePackVersion,
+  taxablePay: Money,
+  trace: TraceNode,
+  withholdings: PayWithholdingsLedger,
+  withholdingsTotal: Money,
+}) {}
 /**
  * Input schema for the standard take-home-pay scenario helper.
  *
@@ -52,7 +51,6 @@ export const TakeHomeScenarioInputSchema = Schema.Struct({
   grossPay: GrossPay,
   taxFreeThresholdClaimed: Schema.Boolean,
 });
-
 /**
  * Input type for the standard take-home-pay scenario helper.
  *

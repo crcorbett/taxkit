@@ -1,4 +1,4 @@
-import { expect, it } from "@effect/vitest";
+import { describe, expect, it } from "@effect/vitest";
 import { Option, Schema } from "effect";
 import { Headers } from "effect/http";
 
@@ -12,38 +12,47 @@ const FixtureCallerKey = Schema.String.check(
   Schema.isPattern(/^\d{1,3}(?:\.\d{1,3}){3}$/u)
 ).pipe(Schema.brand("FixtureCallerKey"));
 
-it("admits only checked direct edge identity and rejects Worker subrequests", () => {
-  expect(
-    edgeCallerKey(
-      Headers.fromInput({ "cf-connecting-ip": "203.0.113.4" }),
-      FixtureCallerKey
-    )
-  ).toEqual(Option.some("203.0.113.4"));
-  expect(
-    edgeCallerKey(
-      Headers.fromInput({
+describe("edge identity", () => {
+  it.each([
+    {
+      name: "a checked direct address",
+      headers: Headers.fromInput({ "cf-connecting-ip": "203.0.113.4" }),
+      expected: Option.some(FixtureCallerKey.make("203.0.113.4")),
+    },
+    {
+      name: "a Worker subrequest",
+      headers: Headers.fromInput({
         "cf-connecting-ip": "203.0.113.4",
         "cf-worker": "same-zone.example",
       }),
-      FixtureCallerKey
-    )
-  ).toEqual(Option.none());
-  expect(edgeCallerKey(Headers.fromInput({}), FixtureCallerKey)).toEqual(
-    Option.none()
-  );
-  expect(
-    edgeCallerKey(
-      Headers.fromInput({ "cf-connecting-ip": "" }),
-      FixtureCallerKey
-    )
-  ).toEqual(Option.none());
-  expect(
-    edgeCallerKey(
-      Headers.fromInput({ "cf-connecting-ip": "not-an-address" }),
-      FixtureCallerKey
-    )
-  ).toEqual(Option.none());
-  expect(Schema.is(CalculatorHostMode)("edge")).toBe(true);
-  expect(Schema.is(CalculatorHostMode)("local-emulator")).toBe(true);
-  expect(Schema.is(CalculatorHostMode)("untrusted")).toBe(false);
+      expected: Option.none(),
+    },
+    {
+      name: "missing identity",
+      headers: Headers.fromInput({}),
+      expected: Option.none(),
+    },
+    {
+      name: "empty identity",
+      headers: Headers.fromInput({ "cf-connecting-ip": "" }),
+      expected: Option.none(),
+    },
+    {
+      name: "malformed identity",
+      headers: Headers.fromInput({ "cf-connecting-ip": "not-an-address" }),
+      expected: Option.none(),
+    },
+  ])("checks $name", ({ headers, expected }) => {
+    const identity = edgeCallerKey(headers, FixtureCallerKey);
+    expect(identity).toStrictEqual(expected);
+  });
+
+  it.each([
+    { mode: "edge", accepted: true },
+    { mode: "local-emulator", accepted: true },
+    { mode: "untrusted", accepted: false },
+  ])("checks the $mode host mode", ({ mode, accepted }) => {
+    const checked = Schema.is(CalculatorHostMode)(mode);
+    expect(checked === accepted).toBeTruthy();
+  });
 });

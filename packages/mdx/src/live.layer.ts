@@ -11,7 +11,6 @@ import { Effect, Layer } from "effect";
 import { readBody } from "./body.ingress.js";
 import { readMdx } from "./mdx.ingress.js";
 import { plainText } from "./schemas.js";
-
 // Reads Content's authored MDX. The Layer requires Content's highlighter and
 // diagram renderer, so the API chooses their implementations.
 export const DocsPageReaderLive = Layer.effect(
@@ -21,10 +20,13 @@ export const DocsPageReaderLive = Layer.effect(
       DocsCodeHighlighter | DocsDiagramRenderer
     >();
     return DocsPageReader.of({
-      read: Effect.fn("DocsPageReader.read")(function* (
-        source: DocsSource,
-        links: DocsLinkContext
-      ) {
+      read: Effect.fn("DocsPageReader.read")(function* ({
+        source,
+        links,
+      }: {
+        readonly source: DocsSource;
+        readonly links: DocsLinkContext;
+      }) {
         const { frontmatter, root } = yield* readMdx(source);
         const [title, ...blocks] = root.children;
         if (plainText(title.children) !== frontmatter.title) {
@@ -34,7 +36,13 @@ export const DocsPageReaderLive = Layer.effect(
             source: source.path,
           });
         }
-        return { body: yield* readBody(blocks, links), frontmatter };
+        return {
+          body: yield* readBody({
+            blocks,
+            links,
+          }),
+          frontmatter,
+        };
       }, Effect.provideContext(services)),
     });
   })

@@ -16,7 +16,6 @@ const settingsUnavailable = new TaxKitWebConfigError({
   operation: "settings",
   runtime: "client",
 });
-
 // TanStack's one browser Promise bridge. It runs a request Effect with the
 // shared registry and the loader's own AbortSignal. Route results belong to
 // the router; there is no request Atom or second cache.
@@ -39,13 +38,11 @@ const runForLoader = <A, E>({
     ),
     { signal }
   );
-
 const settings = AtomRegistry.AtomRegistry.pipe(
   Effect.map((registry) => registry.get(publicSettingsAtom)),
   Effect.flatMap(Effect.fromOption),
   Effect.mapError(() => settingsUnavailable)
 );
-
 export const loadRoot = (
   request: Readonly<{
     context: LoaderContext;
@@ -63,7 +60,6 @@ export const loadRoot = (
       };
     }),
   });
-
 export const loadDocsPage = (
   request: Readonly<{
     context: LoaderContext;
@@ -76,15 +72,20 @@ export const loadDocsPage = (
     effect: Effect.gen(function* () {
       const current = yield* settings;
       const client = yield* browserApiClient;
-      const { navigation, page } = yield* requestDocsPage(client, request.path);
+      const { navigation, page } = yield* requestDocsPage({
+        client,
+        address: request.path,
+      });
       return {
-        metadata: yield* docsPageMetadata(page, current.publicationOrigin),
+        metadata: yield* docsPageMetadata({
+          page,
+          origin: current.publicationOrigin,
+        }),
         navigation,
         page,
       };
     }),
   });
-
 export const loadDocsSearch = (
   request: Readonly<{
     context: LoaderContext;
@@ -99,7 +100,12 @@ export const loadDocsSearch = (
         onFailure: () => Effect.succeed(WebsiteDocsSearchView.InvalidSearch()),
         onSuccess: (term) =>
           browserApiClient.pipe(
-            Effect.flatMap((client) => requestDocsSearch(client, term)),
+            Effect.flatMap((client) =>
+              requestDocsSearch({
+                client,
+                term,
+              })
+            ),
             Effect.map((found) =>
               WebsiteDocsSearchView.Found({ ...found, term })
             )

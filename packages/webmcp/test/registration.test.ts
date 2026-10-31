@@ -3,6 +3,9 @@ import { CalculatorToolFailure } from "@taxkit/calculators/page-schemas";
 import { CalculatorPageToolkit } from "@taxkit/calculators/page-tools";
 import { DocsWebsiteOrigin } from "@taxkit/content/schemas";
 import {
+  Schedule,
+  Match,
+  Function as EffectFunction,
   Array,
   Deferred,
   Effect,
@@ -22,8 +25,6 @@ import { ModelContextHostLive } from "../src/model-context.adapter.layer.js";
 import { registerCalculatorPageTools } from "../src/registration.egress.js";
 import { WebMcpSite } from "../src/service.js";
 
-const CallbackPromise = Schema.declare<Promise<unknown>>(Predicate.isPromise);
-
 const websiteOrigin = DocsWebsiteOrigin.make(
   new URL("https://website.example.com")
 );
@@ -33,7 +34,6 @@ const HostLive = ModelContextHostLive.pipe(
 );
 const registerTools = (toolkit: Effect.Success<typeof CalculatorPageToolkit>) =>
   registerCalculatorPageTools(toolkit).pipe(Effect.provide(HostLive));
-
 const unavailable = new CalculatorToolFailure({
   code: "service-unavailable",
   retry: "try-again-manually",
@@ -45,7 +45,6 @@ const ControlledHandlers = CalculatorPageToolkit.toLayer({
   taxkit_read_calculator: () => Effect.fail(unavailable),
   taxkit_read_result: () => Effect.fail(unavailable),
 });
-
 it.effect.each(["absent", "unsupported", "other-origin"] as const)(
   "does not register in an $0 host",
   (mode) =>
@@ -57,19 +56,26 @@ it.effect.each(["absent", "unsupported", "other-origin"] as const)(
         Effect.sync(() => {
           vi.stubGlobal(
             "document",
-            mode === "absent"
-              ? undefined
-              : {
-                  modelContext:
-                    mode === "unsupported" ? {} : { registerTool: register },
-                }
+            Match.value(mode).pipe(
+              Match.when("absent", EffectFunction.constUndefined),
+              Match.orElse((matchedValue) => ({
+                modelContext: Match.value(matchedValue).pipe(
+                  Match.when("unsupported", () => ({})),
+                  Match.orElse(() => ({ registerTool: register }))
+                ),
+              }))
+            )
           );
           vi.stubGlobal(
             "location",
             new URL(
-              mode === "other-origin"
-                ? "https://other.example.com"
-                : websiteOrigin.href
+              Match.value(mode).pipe(
+                Match.when(
+                  "other-origin",
+                  (): "https://other.example.com" => "https://other.example.com"
+                ),
+                Match.orElse(() => websiteOrigin.href)
+              )
             )
           );
         }),
@@ -82,7 +88,6 @@ it.effect.each(["absent", "unsupported", "other-origin"] as const)(
       expect(register).not.toHaveBeenCalled();
     }).pipe(Effect.scoped)
 );
-
 it.effect(
   "bounds a stalled registration without holding up independent tools",
   () =>
@@ -91,11 +96,10 @@ it.effect(
       // This test scope owns the controlled host's pending callback, including
       // a host that finishes late after our registration deadline.
       const hostRun = yield* FiberSet.makeRuntimePromise();
+      const registration = Deferred.await(ready).pipe(Effect.asVoid, hostRun);
       const register = vi
         .fn<WebMCP.ModelContext["registerTool"]>()
-        .mockImplementationOnce(() =>
-          hostRun(Deferred.await(ready).pipe(Effect.asVoid))
-        )
+        .mockReturnValueOnce(registration)
         .mockResolvedValue();
       yield* Effect.acquireRelease(
         Effect.sync(() => {
@@ -112,8 +116,18 @@ it.effect(
       const registrations = yield* registerTools(toolkit).pipe(
         Effect.forkChild
       );
-      yield* Effect.promise(() =>
-        expect.poll(() => register.mock.calls.length).toBe(5)
+      yield* Effect.sync(() => register.mock.calls.length).pipe(
+        Effect.repeat({
+          until: (observed) => observed === 5,
+          schedule: Schedule.spaced("50 millis"),
+        }),
+        Effect.timeout(1000),
+        TestClock.withLive,
+        Effect.tap((observed) =>
+          Effect.sync(() => {
+            expect(observed).toBe(5);
+          })
+        )
       );
       yield* TestClock.adjust("2 seconds");
       yield* Fiber.join(registrations);
@@ -122,13 +136,12 @@ it.effect(
         Effect.map(([, options]) => Option.fromNullishOr(options?.signal)),
         Effect.flatMap(Effect.fromOption)
       );
-      expect(stalled.aborted).toBe(true);
+      expect(stalled.aborted).toBeTruthy();
       yield* Deferred.succeed(ready, true);
       expect(register).toHaveBeenCalledTimes(5);
-      expect(stalled.aborted).toBe(true);
+      expect(stalled.aborted).toBeTruthy();
     }).pipe(Effect.scoped)
 );
-
 it.effect(
   "preserves the host receiver, attempts independent tools and returns only safe failures",
   () =>
@@ -167,35 +180,46 @@ it.effect(
           );
           yield* registerTools(toolkit);
           expect(register).toHaveBeenCalledTimes(5);
-          expect(
-            Array.every(register.mock.contexts, (receiver) => receiver === host)
-          ).toBe(true);
-          const read = yield* Array.findFirst(
+          EffectFunction.pipe(
+            register.mock.contexts,
+            Array.every((receiver) => receiver === host),
+            (actual) => {
+              expect(actual).toBeTruthy();
+            }
+          );
+          const read = yield* EffectFunction.pipe(
             register.mock.calls,
-            ([tool]) => tool.name === "taxkit_read_calculator"
+            Array.findFirst(([tool]) => tool.name === "taxkit_read_calculator")
           ).pipe(
             Effect.fromOption,
             Effect.map(([tool]) => tool)
           );
-          const result = yield* Array.findFirst(
+          const result = yield* EffectFunction.pipe(
             register.mock.calls,
-            ([tool]) => tool.name === "taxkit_read_result"
+            Array.findFirst(([tool]) => tool.name === "taxkit_read_result")
           ).pipe(
             Effect.fromOption,
             Effect.map(([tool]) => tool)
           );
-          const calculate = yield* Array.findFirst(
+          const calculate = yield* EffectFunction.pipe(
             register.mock.calls,
-            ([tool]) => tool.name === "taxkit_calculate_visible_form"
+            Array.findFirst(
+              ([tool]) => tool.name === "taxkit_calculate_visible_form"
+            )
           ).pipe(
             Effect.fromOption,
             Effect.map(([tool]) => tool)
           );
           const { signal } = new AbortController();
-          const invalidPromise = yield* Schema.decodeUnknownEffect(
-            CallbackPromise
-          )(read.execute({ extra: "PRIVATE9" }, { signal }));
-          const invalid = yield* Effect.promise(() => invalidPromise).pipe(
+          const invalid = yield* Effect.promise(() => {
+            const response = read.execute({ extra: "PRIVATE9" }, { signal });
+            if (!Predicate.isPromise(response)) {
+              return expect.fail(
+                "The native tool callback must return a Promise"
+              );
+            }
+            return response;
+          }).pipe(
             Effect.flatMap(
               Schema.decodeUnknownEffect(
                 Schema.toCodecJson(CalculatorToolFailure)
@@ -203,59 +227,97 @@ it.effect(
             )
           );
           expect(invalid.code).toBe("invalid-input");
-          const declaredPromise = yield* Schema.decodeUnknownEffect(
-            CallbackPromise
-          )(read.execute({}, { signal }));
-          const declared = yield* Effect.promise(() => declaredPromise).pipe(
+          const declared = yield* Effect.promise(() => {
+            const response = read.execute({}, { signal });
+            if (!Predicate.isPromise(response)) {
+              return expect.fail(
+                "The native tool callback must return a Promise"
+              );
+            }
+            return response;
+          }).pipe(
             Effect.flatMap(
               Schema.decodeUnknownEffect(
                 Schema.toCodecJson(CalculatorToolFailure)
               )
             )
           );
-          expect(declared).toEqual(unavailable);
-          const unexpectedPromise = yield* Schema.decodeUnknownEffect(
-            CallbackPromise
-          )(result.execute({}, { signal }));
-          const unexpected = yield* Effect.promise(
-            () => unexpectedPromise
-          ).pipe(
+          expect(declared).toStrictEqual(unavailable);
+          const unexpected = yield* Effect.promise(() => {
+            const response = result.execute({}, { signal });
+            if (!Predicate.isPromise(response)) {
+              return expect.fail(
+                "The native tool callback must return a Promise"
+              );
+            }
+            return response;
+          }).pipe(
             Effect.flatMap(
               Schema.decodeUnknownEffect(
                 Schema.toCodecJson(CalculatorToolFailure)
               )
             )
           );
-          expect(unexpected).toEqual(unavailable);
+          expect(unexpected).toStrictEqual(unavailable);
           const controller = new AbortController();
-          const pending = yield* Schema.decodeUnknownEffect(CallbackPromise)(
-            calculate.execute({}, { signal: controller.signal })
-          );
-          yield* Effect.promise(() =>
-            expect.poll(() => started.mock.calls.length).toBe(1)
+          const pending = yield* Effect.tryPromise({
+            catch: () => unavailable,
+            try: () => {
+              const response = calculate.execute(
+                {},
+                { signal: controller.signal }
+              );
+              if (!Predicate.isPromise(response)) {
+                return expect.fail(
+                  "The native tool callback must return a Promise"
+                );
+              }
+              return response;
+            },
+          }).pipe(Effect.result, Effect.forkScoped);
+          yield* Effect.sync(() => started.mock.calls.length).pipe(
+            Effect.repeat({
+              until: (observed) => observed === 1,
+              schedule: Schedule.spaced("50 millis"),
+            }),
+            Effect.timeout(1000),
+            TestClock.withLive,
+            Effect.tap((observed) =>
+              Effect.sync(() => {
+                expect(observed).toBe(1);
+              })
+            )
           );
           controller.abort();
-          const outcome = yield* Effect.tryPromise({
-            catch: () => unavailable,
-            try: () => pending,
-          }).pipe(Effect.result);
-          expect(Result.isFailure(outcome)).toBe(true);
-          expect(cancelled).toHaveBeenCalledTimes(1);
-          const current = Array.map(register.mock.calls, ([, options]) =>
-            Option.fromNullishOr(options?.signal)
+          const outcome = yield* Fiber.join(pending);
+          EffectFunction.pipe(Result.isFailure(outcome), (actual) => {
+            expect(actual).toBeTruthy();
+          });
+          expect(cancelled).toHaveBeenCalledOnce();
+          const current = EffectFunction.pipe(
+            register.mock.calls,
+            Array.map(([, options]) => Option.fromNullishOr(options?.signal))
           );
-          expect(
-            Array.every(current, (value) =>
+          EffectFunction.pipe(
+            current,
+            Array.every((value) =>
               value.pipe(Option.exists((entry) => !entry.aborted))
-            )
-          ).toBe(true);
+            ),
+            (actual) => {
+              expect(actual).toBeTruthy();
+            }
+          );
           return current;
         })
       );
-      expect(
-        Array.every(signals, (value) =>
+      EffectFunction.pipe(
+        signals,
+        Array.every((value) =>
           value.pipe(Option.exists((entry) => entry.aborted))
-        )
-      ).toBe(true);
+        ),
+        (actual) => {
+          expect(actual).toBeTruthy();
+        }
+      );
     }).pipe(Effect.scoped)
 );

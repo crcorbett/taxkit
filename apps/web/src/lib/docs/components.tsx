@@ -1,3 +1,4 @@
+import { Predicate } from "effect";
 import type { ComponentPropsWithoutRef, MouseEvent } from "react";
 
 const focusIntentAttribute = "data-docs-focus-heading";
@@ -27,7 +28,7 @@ export const DocsHeading = ({
     {...props}
     ref={(heading) => {
       if (
-        heading !== null &&
+        !Predicate.isNull(heading) &&
         document.documentElement.getAttribute(focusIntentAttribute) === "true"
       ) {
         document.documentElement.removeAttribute(focusIntentAttribute);

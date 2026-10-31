@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-tooling-owner
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-30
 review_trigger: formatter, lint, dependency, typecheck, Changeset or root command change
 ---
 
@@ -17,12 +17,19 @@ stable boundaries.
 
 - `bun` is the package manager and workspace runner. Root `package.json` owns
   the workspace globs and catalogue dependency versions.
-- `oxlint.config.ts` extends `ultracite/oxlint/core` with the React and Remix
-  profiles, the published strict Effect and anti-slop plugins and
-  TaxKit's own rules under `tools/oxlint`. Native workspace import enforcement
-  comes from `@commonplaces/oxlint-plugin/package`. All shared rules use
-  the latest `@commonplaces/oxlint-plugin`, recorded in the lockfile. The shared package owns its `@oxlint/plugins` dependency and declares
-  compatibility with the pinned Oxlint version.
+- `oxlint.config.ts` extends the complete, unmodified `style` and `strict`
+  presets from `@commonplaces/oxlint-plugin`. The shared package owns rule
+  selection and default severity. Do not copy a subset, filter the presets,
+  add local `off` settings, or weaken shared checks for a package.
+  Local settings name semantic owners and exact host boundaries; they do not
+  suppress shared preset checks. Repository plugins use `taxkit-effect`,
+  `taxkit-bun`, `taxkit` and `taxkit-package`, so they cannot replace shared
+  `effect`, `bun` or `package` rules.
+- The published Commonplaces plugin is pinned to 0.8.0 with Oxlint 1.89.0,
+  inside its supported range. Required Effect platform and test APIs use
+  explicit `allowedUnstableApis` entries for the pinned release; the unstable
+  API diagnostic remains enabled. Native Effect test callbacks are registered
+  with Vitest's assertion rule rather than disabling it.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
   wrapping.
 - TypeScript 7 is the root compiler. `@effect/tsgo` patches it at install and
@@ -30,8 +37,10 @@ stable boundaries.
   The SDK assembler separately uses `typescript-ast`, an alias for TypeScript
   6.0.3, for its JavaScript compiler API; TypeScript 7 supplies the native
   compiler rather than that API.
-- Effect and its versioned platform, Atom, SQL and test packages use 4.0.6.
-  Alchemy and its provider/framework packages use beta.84. Miniflare follows
+- Effect and its versioned platform, Atom, SQL and test packages use 4.0.7.
+  Alchemy and its provider/framework packages use beta.84. Effect 4.1 removes
+  `effect/Crypto`, which Alchemy’s OAuth module still imports; 4.0.7 is the
+  latest tested compatible release, despite the wider declared peer range. Miniflare follows
   the v5 beta line used by Wrangler; its `latest` tag still points to v4.
 - `knip.json` checks development reachability and `knip.production.json`
   checks the published package and runtime graph, including the standalone
@@ -57,51 +66,19 @@ stable boundaries.
 | `bun run test:tools` / `bun run test:native` | Only the root tool tests, or only the slower native Website/API pair tests. |
 | `bun run release:check` | `verification` plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. |
 
-## Ultracite Rules
+## Shared rules and repository ownership
 
-Do not disable a rule just because it is inconvenient. Treat Ultracite as the
-default best-practice reference and change the code first.
+The full shared presets are the source of truth. Native TypeScript/Effect,
+Alchemy, React, accessibility, tests and convention checks apply repo-wide.
+Ternaries are rejected through the shared preset, including outside MDX.
+The shared `style` preset owns its compatibility settings; TaxKit does not
+restate or change those settings.
 
-Important enabled rules:
-
-- `sort-keys`: public values, traces, fixtures, descriptors, and config objects
-  use deterministic key ordering.
-- `oxc/no-barrel-file`: package entrypoints use explicit named exports instead
-  of `export *`, improving API review, bundling, and code splitting.
-- `jsdoc/check-tag-names`: docstrings use only linter-recognized tags.
-
-The published `@commonplaces/oxlint-plugin/anti-slop` export owns the generic rules. All run at
-error severity and reject chained or unexplained assertions, widening followed
-by assertion, unknown parameters, returns and aliases, unsafe dictionary and
-object parameter types, runtime `typeof`, `Reflect.get`/`Reflect.apply`, module
-mocking, conditional empty-object spreads, widened known values and vague
-`Shape` symbol names. The separate opt-in Effect plugin rejects imported
-service or Layer constructors named `make*`; exported compatibility aliases may
-remain at their owner, but repository consumers import the clearer `create*`
-name.
-
-The generic plugin is deliberately separate from TaxKit policy. It does not
-own TaxKit content, SEO, TanStack route naming, package naming or reference-site
-rules. Those concerns are excluded unless a TaxKit semantic owner and focused
-proof are added. The installed package supplies its rule implementation; actual-CLI fixtures
-prove its behaviour against TaxKit configuration. Owned source still receives
-every configured rule. TypeScript files
-disable the JavaScript-only `no-redeclare` rule so a value and its derived type
-may share one name. JavaScript files keep that rule.
-
-Current TaxKit-specific overrides are narrow:
-
-- `func-names`: `Effect.gen(function* () { ... })` is idiomatic and should not
-  need artificial local names.
-- `func-style`: named declarations are acceptable for small local helpers and
-  generated framework entrypoints.
-- `max-classes-per-file`: schema-backed rows, tables, and services often belong
-  together in one parameter module.
-- `unicorn/no-array-method-this-argument`: Effect `Array` helpers are not native
-  JavaScript array method `thisArg` usage.
-
-Portable custom rules live under `effect/*` and `bun/*`; tax,
-calculator and decoder policy remains under `taxkit/*`.
+Local ownership rules apply outside explicitly declared ingress, egress and
+runtime boundaries. Their `excludeFiles` lists express those rules' ownership
+scope and never exclude files from the shared presets. Domain package rules and
+workspace dependency fences remain additive. Configured rule options stay at
+error severity.
 
 The native `package/workspace-import-boundaries` rule consumes checked current
 manifests from `tools/oxlint/workspaces.boundary.ts`, including public export
@@ -122,44 +99,44 @@ non-infrastructure package and rejects app dependencies in every dependency
 field. Approved Alchemy Worker helpers remain available to app hosts.
 Important portable rules include:
 
-- `effect/no-manual-tag`: bans manual `_tag` object literals. Use
+- `taxkit-effect/no-manual-tag`: bans manual `_tag` object literals. Use
   `Data.TaggedClass`, `Data.TaggedError`, `Schema.TaggedClass`, or an owning
   package constructor.
-- `effect/no-layer-exports-in-service-files`: bans `Live`, `Mock` and `Test`
+- `taxkit-effect/no-layer-exports-in-service-files`: bans `Live`, `Mock` and `Test`
   layer exports from `service.ts`/`services.ts` files, including named export
   specifiers and named re-exports. Service files own `Context.Service`
   contracts and canonical schemas; production wiring belongs in
   `live.layer.ts`, test wiring belongs in `test.layer.ts` or test helpers.
-- `effect/no-runtime-execution-outside-boundaries`,
-  `effect/no-console-outside-runtime` and
-  `effect/no-process-outside-boundaries`: keep execution and host lifecycle in
+- `taxkit-effect/no-runtime-execution-outside-boundaries`,
+  `taxkit-effect/no-console-outside-runtime` and
+  `taxkit-effect/no-process-outside-boundaries`: keep execution and host lifecycle in
   exact files owned by `oxlint.config.ts`. Package and service logic returns
   `Effect` values and tagged failures. The rules resolve canonical imports,
   renamed bindings, aliases and statically known destructuring; lexically
   shadowed same-named locals are not host or runtime APIs.
-- `effect/no-schema-encoder-outside-egress` and
-  `effect/no-throwing-schema-sync-codec`: encode once at exact egress and use
+- `taxkit-effect/no-schema-encoder-outside-egress` and
+  `taxkit-effect/no-throwing-schema-sync-codec`: encode once at exact egress and use
   Effect or non-throwing Result/Exit/Option codecs. Canonical `Schema`
   imports, namespace imports, renamed bindings and statically known method
   aliases are all enforced.
-- `effect/no-unknown-service-contract` and
-  `effect/no-unknown-tagged-error-cause`: keep service inputs schema-derived and
+- `taxkit-effect/no-unknown-service-contract` and
+  `taxkit-effect/no-unknown-tagged-error-cause`: keep service inputs schema-derived and
   expected errors closed and tagged. Scope-resolved aliases of `Effect.Effect`,
   `Schema.Unknown`, `Schema.TaggedErrorClass` and `Data.TaggedError` remain
   subject to the same contract.
-- `effect/no-effect-test-global-mix`: rejects a file that splits unaliased
+- `taxkit-effect/no-effect-test-global-mix`: rejects a file that splits unaliased
   `describe`, `expect`, `it` or `test` imports between `@effect/vitest` and
   `vitest`. Shared globals must have one owner. Vitest-only utilities such as
   `vi` and hooks may still come from `vitest`; an explicitly aliased secondary
   shared API is also valid.
-- `effect/no-module-level-mutable-test-state`: rejects module-level `let` and
+- `taxkit-effect/no-module-level-mutable-test-state`: rejects module-level `let` and
   `var` in test files so one test cannot leak changed state into another.
   Immutable declarations, function-local variables and ambient declarations
   remain valid.
-- `effect/no-switch`: bans `switch`. Use Effect `Match` with
+- `taxkit-effect/no-switch`: bans `switch`. Use Effect `Match` with
   exhaustive handling.
-- `bun/no-host-api-outside-adapters` and
-  `bun/no-runtime-outside-entrypoints`: keep Bun file/process/server APIs and
+- `taxkit-bun/no-host-api-outside-adapters` and
+  `taxkit-bun/no-runtime-outside-entrypoints`: keep Bun file/process/server APIs and
   `BunRuntime.runMain` in exact live/runtime/script boundaries. Global Bun
   methods and canonical platform runtime imports remain enforced through
   aliases and statically known destructuring without treating local objects

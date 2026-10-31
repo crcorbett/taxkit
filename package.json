@@ -12,9 +12,9 @@
       "packages/rules/au/*"
     ],
     "catalog": {
-      "@effect/platform-bun": "4.0.6",
-      "@effect/platform-node": "4.0.6",
-      "@effect/vitest": "4.0.6",
+      "@effect/platform-bun": "4.0.7",
+      "@effect/platform-node": "4.0.7",
+      "@effect/vitest": "4.0.7",
       "@cloudflare/vite-plugin": "1.65.0",
       "@tanstack/react-router": "1.170.46",
       "@tanstack/react-start": "1.169.4",
@@ -24,7 +24,7 @@
       "@types/react-dom": "19.3.0",
       "@vitejs/plugin-react": "6.1.2",
       "alchemy": "2.0.0-beta.84",
-      "effect": "4.0.6",
+      "effect": "4.0.7",
       "react": "19.3.1",
       "react-dom": "19.3.1",
       "typescript": "7.0.2",
@@ -34,7 +34,8 @@
       "@alchemy.run/cloudflare": "2.0.0-beta.84",
       "@alchemy.run/axiom": "2.0.0-beta.84",
       "@alchemy.run/doppler": "2.0.0-beta.84",
-      "@alchemy.run/frontend-frameworks": "2.0.0-beta.84"
+      "@alchemy.run/frontend-frameworks": "2.0.0-beta.84",
+      "@effect/atom-react": "4.0.7"
     }
   },
   "type": "module",
@@ -87,17 +88,17 @@
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",
-    "@commonplaces/oxlint-plugin": "latest",
+    "@commonplaces/oxlint-plugin": "0.8.0",
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
-    "@effect/tsgo": "0.62.0",
+    "@effect/tsgo": "0.63.0",
     "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
     "effect": "catalog:",
     "knip": "6.43.0",
     "oxfmt": "0.75.0",
-    "oxlint": "1.90.0",
-    "oxlint-tsgolint": "7.0.2005",
+    "oxlint": "1.89.0",
+    "oxlint-tsgolint": "7.0.2004",
     "portless": "0.15.12",
     "turbo": "2.11.10",
     "typescript": "7.0.2",
@@ -107,9 +108,11 @@
     "yaml": "2.9.1"
   },
   "overrides": {
-    "@effect/platform-node-shared": "4.0.6",
-    "@effect/sql-d1": "4.0.6",
-    "@effect/sql-sqlite-do": "4.0.6",
+    "@effect/platform-node-shared": "4.0.7",
+    "@effect/sql-d1": "4.0.7",
+    "@effect/sql-sqlite-do": "4.0.7",
+    "@effect/tsgo": "0.63.0",
+    "effect": "4.0.7",
     "workerd": "1.20261027.1"
   },
   "engines": {

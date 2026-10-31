@@ -1,14 +1,16 @@
 import {
-  Array as EffectArray,
+  Array,
   Equal,
+  Function,
   Hash,
   HashMap,
+  Match,
   MutableRef,
   Option,
   Predicate,
   Ref,
+  Tuple,
 } from "effect";
-import { forEach } from "effect/Array";
 
 import type {
   ImportSemantic,
@@ -19,266 +21,241 @@ import type {
 } from "./host.types.js";
 
 // Host nodes and lexical variables have identity even when their fields match.
-// Wrap keys without changing or structurally hashing the host object.
 export const referenceIdentity = <Value extends object>(value: Value) => ({
   [Equal.symbol]: (other: Parameters<Equal.Equal[typeof Equal.symbol]>[0]) =>
     Predicate.hasProperty(other, "value") && other.value === value,
   [Hash.symbol]: () => Hash.random(value),
   value,
 });
-
 export const syntaxParents = (node: SyntaxNode | null | undefined) =>
-  EffectArray.unfold(node?.parent, (current) =>
-    current ? Option.some([current, current.parent]) : Option.none()
-  );
-
-export const propertyName = (node: SyntaxNode | null | undefined) => {
-  if (node?.type === "Identifier" || node?.type === "JSXIdentifier") {
-    return node.name;
-  }
-
-  if (node?.type === "Literal") {
-    return String(node.value);
-  }
-
-  return null;
-};
-
-export const importSourceValue = (node: SyntaxKind<"ImportDeclaration">) => {
-  const value = node?.source?.value;
-  return value;
-};
-
-const declaredVariable = (
-  sourceCode: OxlintSourceCode,
-  node: SyntaxNode,
-  name: string
-) =>
-  Option.getOrNull(
-    EffectArray.findFirst(
-      sourceCode.getDeclaredVariables(node),
-      (variable) => variable.name === name
+  Array.unfold(node?.parent, (current) =>
+    Option.fromNullishOr(current).pipe(
+      Option.map((parent) => Tuple.make(parent, parent.parent))
     )
   );
+export const propertyName = (
+  node: SyntaxNode | null | undefined
+): Option.Option<string> =>
+  Match.value(node).pipe(
+    Match.when({ type: Match.is("Identifier", "JSXIdentifier") }, (value) =>
+      Option.some(value.name)
+    ),
+    Match.when({ type: "Literal" }, (value) =>
+      Option.some(String(value.value))
+    ),
+    Match.orElse(() => Option.none<string>())
+  );
+export const importSourceValue = (node: SyntaxKind<"ImportDeclaration">) =>
+  node.source.value;
 
 export const createBindingTracker = (
   sourceCode: OxlintSourceCode,
   globalSemantics: HashMap.HashMap<string, string> = HashMap.empty()
 ) => {
   // Oxlint owns one synchronous listener lifetime per rule and source file.
-  // Ref owns its changing bindings; each update replaces a persistent map.
-  const bindingSemantics = Ref.makeUnsafe(
+  const bindings = Ref.makeUnsafe(
     HashMap.empty<
       ReturnType<typeof referenceIdentity<SyntaxVariable>>,
       string
     >()
   );
-  const lexicalReferences = HashMap.fromIterable(
-    EffectArray.flatMap(sourceCode.scopeManager.scopes, (scope) =>
-      EffectArray.map(scope.references, (reference) => [
-        referenceIdentity<SyntaxNode>(reference.identifier),
-        reference,
-      ])
-    )
+  const references = Function.pipe(
+    sourceCode.scopeManager.scopes,
+    Array.flatMap((scope) =>
+      Function.pipe(
+        scope.references,
+        Array.map((reference) =>
+          Tuple.make(
+            referenceIdentity<SyntaxNode>(reference.identifier),
+            reference
+          )
+        )
+      )
+    ),
+    HashMap.fromIterable
   );
-
-  const semanticOfIdentifier = (
-    node: SyntaxNode | null | undefined
-  ): string | null => {
-    if (node?.type !== "Identifier") {
-      return null;
+  const semanticOfIdentifier = (node: SyntaxNode): Option.Option<string> => {
+    if (node.type !== "Identifier") {
+      return Option.none();
     }
-
-    const variable = Option.getOrUndefined(
-      HashMap.get(lexicalReferences, referenceIdentity(node)).pipe(
-        Option.map((reference) => reference.resolved ?? null)
+    return HashMap.get(references, referenceIdentity(node)).pipe(
+      Option.flatMap((reference) =>
+        Option.fromNullishOr(reference.resolved).pipe(
+          Option.match({
+            // An unresolved lexical reference is a genuine global; an absent
+            // reference (for example a declaration name) is not.
+            onNone: () => HashMap.get(globalSemantics, node.name),
+            onSome: (variable) => {
+              if (
+                variable.scope?.type === "global" &&
+                variable.defs.length === 0
+              ) {
+                return HashMap.get(globalSemantics, node.name);
+              }
+              return HashMap.get(
+                Ref.getUnsafe(bindings),
+                referenceIdentity(variable)
+              );
+            },
+          })
+        )
       )
     );
-    if (variable) {
-      if (variable.scope?.type === "global" && variable.defs.length === 0) {
-        return Option.getOrNull(HashMap.get(globalSemantics, node.name));
-      }
-      return Option.getOrNull(
-        HashMap.get(
-          Ref.getUnsafe(bindingSemantics),
-          referenceIdentity(variable)
-        )
-      );
-    }
-
-    return variable === null
-      ? Option.getOrNull(HashMap.get(globalSemantics, node.name))
-      : null;
   };
-
   const semanticOfExpression = (
     node: SyntaxNode | null | undefined
-  ): string | null => {
-    if (node?.type === "Identifier") {
-      return semanticOfIdentifier(node);
-    }
-
-    if (node?.type === "MemberExpression") {
-      const object = semanticOfExpression(node.object);
-      const member =
-        !node.computed || node.property?.type === "Literal"
-          ? propertyName(node.property)
-          : null;
-      return object !== null && member !== null ? `${object}.${member}` : null;
-    }
-
-    if (
-      node?.type === "ChainExpression" ||
-      node?.type === "TSAsExpression" ||
-      node?.type === "TSInstantiationExpression" ||
-      node?.type === "TSNonNullExpression" ||
-      node?.type === "TSTypeAssertion"
-    ) {
-      return semanticOfExpression(node.expression);
-    }
-
-    return null;
-  };
-
+  ): Option.Option<string> =>
+    Match.value(node).pipe(
+      Match.when({ type: "Identifier" }, semanticOfIdentifier),
+      Match.when({ type: "MemberExpression" }, (member) => {
+        if (member.computed && member.property.type !== "Literal") {
+          return Option.none();
+        }
+        return Option.all({
+          object: semanticOfExpression(member.object),
+          member: propertyName(member.property),
+        }).pipe(Option.map(({ object, member: name }) => `${object}.${name}`));
+      }),
+      Match.when(
+        {
+          type: Match.is(
+            "ChainExpression",
+            "TSAsExpression",
+            "TSInstantiationExpression",
+            "TSNonNullExpression",
+            "TSTypeAssertion"
+          ),
+        },
+        (value) => semanticOfExpression(value.expression)
+      ),
+      Match.orElse(() => Option.none<string>())
+    );
   const semanticOfTypeName = (
     node: SyntaxNode | null | undefined
-  ): string | null => {
-    if (node?.type === "Identifier") {
-      return semanticOfIdentifier(node);
-    }
-
-    if (node?.type === "TSQualifiedName") {
-      const left = semanticOfTypeName(node.left);
-      const right = propertyName(node.right);
-      return left !== null && right !== null ? `${left}.${right}` : null;
-    }
-
-    return null;
-  };
-
-  const setDeclaredSemantic = (
-    node: SyntaxNode,
-    name: string,
-    semantic: string | null
-  ) => {
-    const variable = declaredVariable(sourceCode, node, name);
-    if (variable && semantic !== null) {
-      MutableRef.update(
-        bindingSemantics.ref,
-        HashMap.set(referenceIdentity(variable), semantic)
-      );
-    }
-  };
-
-  const setReferencedSemantic = (node: SyntaxNode, semantic: string | null) => {
-    const variable = Option.getOrUndefined(
-      HashMap.get(lexicalReferences, referenceIdentity(node)).pipe(
-        Option.map((reference) => reference.resolved ?? null)
-      )
+  ): Option.Option<string> =>
+    Match.value(node).pipe(
+      Match.when({ type: "Identifier" }, semanticOfIdentifier),
+      Match.when({ type: "TSQualifiedName" }, (value) =>
+        Option.all({
+          left: semanticOfTypeName(value.left),
+          right: propertyName(value.right),
+        }).pipe(Option.map(({ left, right }) => `${left}.${right}`))
+      ),
+      Match.orElse(() => Option.none<string>())
     );
-    if (variable && semantic !== null) {
-      MutableRef.update(
-        bindingSemantics.ref,
-        HashMap.set(referenceIdentity(variable), semantic)
-      );
-    }
-  };
-
   const trackPattern = (
     pattern: SyntaxNode | null | undefined,
-    sourceSemantic: string | null,
-    declarationNode: SyntaxNode | null = null
+    semantic: Option.Option<string>,
+    declaration: Option.Option<SyntaxNode> = Option.none()
   ): void => {
-    if (sourceSemantic === null) {
+    if (Option.isNone(semantic)) {
       return;
     }
-
     if (pattern?.type === "Identifier") {
-      if (declarationNode) {
-        setDeclaredSemantic(declarationNode, pattern.name, sourceSemantic);
-      } else {
-        setReferencedSemantic(pattern, sourceSemantic);
-      }
-      return;
-    }
-
-    if (pattern?.type !== "ObjectPattern") {
-      return;
-    }
-
-    forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
-      pattern.properties ?? [],
-      (property) => {
-        if (property.type !== "Property") {
-          return;
-        }
-
-        const member = propertyName(property.key);
-        if (member === null) {
-          return;
-        }
-
-        const target =
-          property.value?.type === "AssignmentPattern"
-            ? property.value.left
-            : property.value;
-        trackPattern(target, `${sourceSemantic}.${member}`, declarationNode);
-      }
-    );
-  };
-
-  const clearPattern = (pattern: SyntaxNode | null | undefined): void => {
-    if (pattern?.type === "Identifier") {
-      const variable = Option.getOrUndefined(
-        HashMap.get(lexicalReferences, referenceIdentity(pattern)).pipe(
-          Option.map((reference) => reference.resolved ?? null)
-        )
+      const variable = declaration.pipe(
+        Option.match({
+          onNone: () =>
+            HashMap.get(references, referenceIdentity(pattern)).pipe(
+              Option.flatMap((reference) =>
+                Option.fromNullishOr(reference.resolved)
+              )
+            ),
+          onSome: (node) =>
+            Function.pipe(
+              sourceCode.getDeclaredVariables(node),
+              Array.findFirst((value) => value.name === pattern.name)
+            ),
+        })
       );
-      if (variable) {
+      if (Option.isSome(variable)) {
         MutableRef.update(
-          bindingSemantics.ref,
-          HashMap.remove(referenceIdentity(variable))
+          bindings.ref,
+          HashMap.set(referenceIdentity(variable.value), semantic.value)
         );
       }
       return;
     }
-
-    if (pattern?.type === "ObjectPattern") {
-      forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
-        pattern.properties ?? [],
-        (property) => {
-          if (property.type === "Property") {
-            clearPattern(
-              property.value?.type === "AssignmentPattern"
-                ? property.value.left
-                : property.value
-            );
-          }
-        }
-      );
+    if (pattern?.type !== "ObjectPattern") {
+      return;
     }
+    Function.pipe(
+      pattern.properties,
+      Array.forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+        (property) => {
+          if (property.type !== "Property") {
+            return;
+          }
+          const member = propertyName(property.key);
+          if (Option.isNone(member)) {
+            return;
+          }
+          const target = Match.value(property.value).pipe(
+            Match.when({ type: "AssignmentPattern" }, ({ left }) => left),
+            Match.orElse((value) => value)
+          );
+          const memberSemantic = Option.some(
+            `${semantic.value}.${member.value}`
+          );
+          trackPattern(target, memberSemantic, declaration);
+        }
+      )
+    );
   };
-
+  const clearPattern = (pattern: SyntaxNode | null | undefined): void => {
+    if (pattern?.type === "Identifier") {
+      const variable = HashMap.get(references, referenceIdentity(pattern)).pipe(
+        Option.flatMap((reference) => Option.fromNullishOr(reference.resolved))
+      );
+      if (Option.isSome(variable)) {
+        MutableRef.update(
+          bindings.ref,
+          HashMap.remove(referenceIdentity(variable.value))
+        );
+      }
+      return;
+    }
+    if (pattern?.type !== "ObjectPattern") {
+      return;
+    }
+    Function.pipe(
+      pattern.properties,
+      Array.forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
+        (property) => {
+          if (property.type !== "Property") {
+            return;
+          }
+          Match.value(property.value).pipe(
+            Match.when({ type: "AssignmentPattern" }, ({ left }) => left),
+            Match.orElse((value) => value),
+            clearPattern
+          );
+        }
+      )
+    );
+  };
   return {
     calledSemantic: (node: SyntaxNode | null | undefined) =>
-      node?.type === "CallExpression"
-        ? semanticOfExpression(node.callee)
-        : null,
+      Match.value(node).pipe(
+        Match.when({ type: "CallExpression" }, ({ callee }) =>
+          semanticOfExpression(callee)
+        ),
+        Match.orElse(() => Option.none<string>())
+      ),
     isReadReference: (node: SyntaxNode) =>
-      Option.exists(
-        HashMap.get(lexicalReferences, referenceIdentity(node)),
-        (reference) => reference.isRead()
+      HashMap.get(references, referenceIdentity(node)).pipe(
+        Option.exists((reference) => reference.isRead())
       ),
     semanticOfExpression,
     semanticOfTypeName,
     trackAssignment: (node: SyntaxKind<"AssignmentExpression">) => {
-      if (node.operator === "=") {
-        const semantic = semanticOfExpression(node.right);
-        if (semantic === null) {
-          clearPattern(node.left);
-        } else {
-          trackPattern(node.left, semantic);
-        }
+      if (node.operator !== "=") {
+        return;
+      }
+      const semantic = semanticOfExpression(node.right);
+      if (Option.isNone(semantic)) {
+        clearPattern(node.left);
+      } else {
+        trackPattern(node.left, semantic);
       }
     },
     trackImport(
@@ -286,19 +263,25 @@ export const createBindingTracker = (
       importSemantic: ImportSemantic
     ) {
       const source = importSourceValue(node);
-      forEach(node.specifiers ?? [], (specifier) => {
-        const imported =
-          specifier.type === "ImportSpecifier"
-            ? propertyName(specifier.imported)
-            : null;
-        const semantic = importSemantic(source, specifier.type, imported);
-        if (semantic !== null && specifier.local?.type === "Identifier") {
-          setDeclaredSemantic(specifier, specifier.local.name, semantic);
-        }
-      });
+      Function.pipe(
+        node.specifiers,
+        Array.forEach((specifier) => {
+          const imported = Match.value(specifier).pipe(
+            Match.when({ type: "ImportSpecifier" }, (value) =>
+              propertyName(value.imported)
+            ),
+            Match.orElse(() => Option.none<string>())
+          );
+          const semantic = importSemantic(source, specifier.type, imported);
+          const declaration = Option.some(specifier);
+          trackPattern(specifier.local, semantic, declaration);
+        })
+      );
     },
     trackVariable: (node: SyntaxKind<"VariableDeclarator">) => {
-      trackPattern(node.id, semanticOfExpression(node.init), node);
+      const semantic = semanticOfExpression(node.init);
+      const declaration = Option.some(node);
+      trackPattern(node.id, semantic, declaration);
     },
   };
 };

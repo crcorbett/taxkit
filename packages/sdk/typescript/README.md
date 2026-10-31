@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-sdk-owner
-last_reviewed: 2026-10-23
+last_reviewed: 2026-10-31
 review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
 ---
 
@@ -12,6 +12,24 @@ review_trigger: SDK contracts, lifetime, exports, examples or consumer validatio
 Public TaxKit TypeScript SDK package.
 
 Install `taxkit` from npm and use the `taxkit` and `taxkit/*` imports.
+
+## Migrating to SDK 3
+
+Public Schema classes have nominal brands. Construct domain values with their
+owning Schema constructor or decode external data through that Schema; plain
+object literals no longer substitute for checked class instances. This is a
+TypeScript breaking change and does not change the encoded JSON contracts.
+
+Import calculator and metadata Schemas by name from `taxkit/schemas`. For
+example, replace `CalculatorSchemas.HelpQuery` from `taxkit/core` with
+`HelpQuery` from `taxkit/schemas`. The `CalculatorSchemas`, `PayRules`,
+`IncomeTaxRules` and `StslRules` namespace adapters have been removed. Australian
+fact Schemas and parameter contracts are named exports from `taxkit/au`.
+
+The calculator package also removes its transitional `PublicCalculation*`,
+`PublicApiError` and `PublicCalculatorError` aliases. Use `CalculatorRun*` and
+`CalculatorServiceError`. Promise-returning plain SDK calls and encoded JSON
+contracts retain their existing behaviour.
 
 ## Scope
 
@@ -228,11 +246,12 @@ identity across entry points. Runtime service identifiers and data strings are
 unchanged. Effect stays external. No deployment, provider SDK, repository test
 runner or compiler becomes a runtime dependency.
 
-`/core` exposes engine primitives and calculator composition; `/au` also exposes
-Pay, IncomeTax and STSL rule namespaces and parameter contracts. `/http` exposes
+`/core` exposes engine primitives and calculator composition; `/au` exposes
+Australian fact Schemas and parameter contracts. `/schemas` exposes the named
+calculator execution and metadata Schemas. `/http` exposes
 `TaxKitApi` and checked request-body contracts for native Effect HTTP clients.
-The existing `/au/effect`, `/schemas` and `/testing` descriptor entries remain
-compatible. These are module paths inside one package, not extra npm packages.
+`/au/effect` and `/testing` expose descriptor composition and test support.
+These are module paths inside one package, not extra npm packages.
 
 ## Guardrails
 

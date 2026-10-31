@@ -6,22 +6,19 @@ import {
 import { Money } from "@taxkit/core/primitives";
 import type { Cents } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
-import { Context, Match, Schema } from "effect";
-
+import { Context, Match, Schema, Boolean as EffectBoolean } from "effect";
 /**
  * Pay periods supported by the Australian withholding rule packages.
  *
  * @since 0.1.0
  */
 export const PayPeriod = Schema.Literals(["weekly", "fortnightly", "monthly"]);
-
 /**
  * Pay-period literal type.
  *
  * @since 0.1.0
  */
 export type PayPeriod = typeof PayPeriod.Type;
-
 /**
  * Converts a pay-period amount to its weekly equivalent for ATO formula
  * lookup.
@@ -39,12 +36,11 @@ export type PayPeriod = typeof PayPeriod.Type;
  */
 export const payPeriodToWeeklyFactor = (period: PayPeriod): number =>
   Match.value(period).pipe(
-    Match.when("weekly", () => 1),
-    Match.when("fortnightly", () => 0.5),
+    Match.when("weekly", (): 1 => 1),
+    Match.when("fortnightly", (): 0.5 => 0.5),
     Match.when("monthly", () => 3 / 13),
     Match.exhaustive
   );
-
 /**
  * Weekly earnings for Schedule 1 and Schedule 8 formula lookup. Monthly
  * earnings ending in 33 cents gain one cent before the weekly conversion.
@@ -55,9 +51,10 @@ export const payPeriodToWeeklyCents = (
   cents: Cents,
   period: PayPeriod
 ): number =>
-  (period === "monthly" && cents % 100 === 33 ? cents + 1 : cents) *
-  payPeriodToWeeklyFactor(period);
-
+  EffectBoolean.match(period === "monthly" && cents % 100 === 33, {
+    onFalse: () => cents,
+    onTrue: () => cents + 1,
+  }) * payPeriodToWeeklyFactor(period);
 /**
  * Scales a rounded weekly withholding amount back to the original pay period.
  *
@@ -78,7 +75,6 @@ export const scaleWeeklyWithholdingToPayPeriodDollars = (
     ),
     Match.exhaustive
   );
-
 /**
  * Gross pay received for one pay period before withholdings or pre-tax
  * deductions.
@@ -93,11 +89,15 @@ export const scaleWeeklyWithholdingToPayPeriodDollars = (
  * const gross = new GrossPay({ amount: aud(Cents.make(200_000)), period: "fortnightly" })
  * ```
  */
-export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
+export class GrossPay extends Schema.TaggedClass<
+  GrossPay,
+  {
+    readonly brand: unique symbol;
+  }
+>()("GrossPay", {
   amount: Money,
   period: PayPeriod,
 }) {}
-
 /**
  * Context tag for caller-provided gross pay.
  *
@@ -106,7 +106,6 @@ export class GrossPay extends Schema.TaggedClass<GrossPay>()("GrossPay", {
 export class GrossPayFact extends Context.Service<GrossPayFact, GrossPay>()(
   "taxkit/rules-au-pay/fact/GrossPay"
 ) {}
-
 /**
  * Fact descriptor for gross pay, including its money-input question metadata.
  *
@@ -124,7 +123,6 @@ export const GrossPayDescriptor = makeFactDescriptor({
   tag: GrossPayFact,
   title: "Gross pay for a single pay period",
 });
-
 /**
  * Whether the employee has claimed the tax-free threshold.
  *
@@ -133,11 +131,12 @@ export const GrossPayDescriptor = makeFactDescriptor({
  *
  * @since 0.1.0
  */
-export class TaxFreeThresholdClaimed extends Schema.TaggedClass<TaxFreeThresholdClaimed>()(
-  "TaxFreeThresholdClaimed",
-  { value: Schema.Boolean }
-) {}
-
+export class TaxFreeThresholdClaimed extends Schema.TaggedClass<
+  TaxFreeThresholdClaimed,
+  {
+    readonly brand: unique symbol;
+  }
+>()("TaxFreeThresholdClaimed", { value: Schema.Boolean }) {}
 /**
  * Context tag for tax-free-threshold claim status.
  *
@@ -147,7 +146,6 @@ export class TaxFreeThresholdClaimedFact extends Context.Service<
   TaxFreeThresholdClaimedFact,
   TaxFreeThresholdClaimed
 >()("taxkit/rules-au-pay/fact/TaxFreeThresholdClaimed") {}
-
 /**
  * Fact descriptor for tax-free-threshold claim status.
  *
@@ -167,18 +165,21 @@ export const TaxFreeThresholdClaimedDescriptor = makeFactDescriptor({
   tag: TaxFreeThresholdClaimedFact,
   title: "Whether the employee has claimed the tax-free threshold",
 });
-
 /**
  * Pay amount used by withholding rules after pre-tax adjustments.
  *
  * @since 0.1.0
  */
-export class TaxablePay extends Schema.TaggedClass<TaxablePay>()("TaxablePay", {
+export class TaxablePay extends Schema.TaggedClass<
+  TaxablePay,
+  {
+    readonly brand: unique symbol;
+  }
+>()("TaxablePay", {
   amount: Money,
   period: PayPeriod,
   trace: TraceNode,
 }) {}
-
 /**
  * Context tag for derived taxable pay.
  *
@@ -188,7 +189,6 @@ export class TaxablePayFact extends Context.Service<
   TaxablePayFact,
   TaxablePay
 >()("taxkit/rules-au-pay/fact/TaxablePay") {}
-
 /**
  * Fact descriptor for taxable pay.
  *
@@ -201,18 +201,21 @@ export const TaxablePayDescriptor = makeFactDescriptor({
   tag: TaxablePayFact,
   title: "Taxable pay for a single pay period",
 });
-
 /**
  * Final take-home pay for one pay period after active withholding components.
  *
  * @since 0.1.0
  */
-export class NetPay extends Schema.TaggedClass<NetPay>()("NetPay", {
+export class NetPay extends Schema.TaggedClass<
+  NetPay,
+  {
+    readonly brand: unique symbol;
+  }
+>()("NetPay", {
   amount: Money,
   period: PayPeriod,
   trace: TraceNode,
 }) {}
-
 /**
  * Context tag for derived net pay.
  *
@@ -221,7 +224,6 @@ export class NetPay extends Schema.TaggedClass<NetPay>()("NetPay", {
 export class NetPayFact extends Context.Service<NetPayFact, NetPay>()(
   "taxkit/rules-au-pay/fact/NetPay"
 ) {}
-
 /**
  * Fact descriptor for net pay.
  *

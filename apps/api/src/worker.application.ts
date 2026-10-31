@@ -7,7 +7,6 @@ import { withCalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundar
 import {
   applyCachePolicy,
   isBrowserOrigin,
-  isPublicReadPath,
   publicCors,
 } from "@taxkit/api-http/response-policy";
 import {
@@ -19,6 +18,7 @@ import {
   DocsImageApiPath,
   HealthPath,
   McpRoutePath,
+  isPublicReadApiPath,
   mcpPath,
 } from "@taxkit/api-http/routes";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
@@ -43,6 +43,7 @@ import type { HostRoute } from "@taxkit/observability/host-telemetry";
 import { safeHttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
+  Function as EffectFunction,
   Config,
   Context,
   Deferred,
@@ -52,6 +53,7 @@ import {
   Option,
   Schema,
   Scope,
+  Boolean as EffectBoolean,
 } from "effect";
 import {
   HttpMiddleware,
@@ -66,7 +68,6 @@ import {
 } from "./analytics-request.boundary.js";
 import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
-
 // The closed route family for the one request record; the raw path, query and
 // calculator ID never leave this function.
 const apiRoute = (pathname: string): HostRoute =>
@@ -81,7 +82,6 @@ const apiRoute = (pathname: string): HostRoute =>
     Match.when(Schema.is(ApiReferencePath), () => "reference" as const),
     Match.orElse(() => "other" as const)
   );
-
 // Construct once in the native instance scope. HTTP and MCP receive this
 // same application service; native requests keep their own scope and fibre.
 export const ApiWorkerApplication = Effect.gen(function* () {
@@ -93,19 +93,27 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Config.schema(CalculatorHostMode, "CALCULATOR_HOST_MODE").pipe(
       Config.withDefault("edge"),
       Effect.flatMap((mode) =>
-        mode === "local-emulator"
-          ? settings.pipe(
+        Match.value(mode).pipe(
+          Match.when("local-emulator", () =>
+            settings.pipe(
               Effect.flatMap((config) =>
-                config.apiOrigin.protocol === "http:" &&
-                (config.apiOrigin.hostname === "127.0.0.1" ||
-                  config.apiOrigin.hostname === "localhost")
-                  ? Schema.decodeEffect(CalculatorClientRateKey)(
-                      "127.0.0.1"
-                    ).pipe(Effect.map(Option.some))
-                  : Effect.succeed(Option.none())
+                EffectBoolean.match(
+                  config.apiOrigin.protocol === "http:" &&
+                    (config.apiOrigin.hostname === "127.0.0.1" ||
+                      config.apiOrigin.hostname === "localhost"),
+                  {
+                    onFalse: () => Effect.succeed(Option.none()),
+                    onTrue: () =>
+                      Schema.decodeEffect(CalculatorClientRateKey)(
+                        "127.0.0.1"
+                      ).pipe(Effect.map(Option.some)),
+                  }
+                )
               )
             )
-          : Effect.succeed(Option.none())
+          ),
+          Match.orElse(() => Effect.succeed(Option.none()))
+        )
       ),
       Effect.catchTags({
         ConfigError: () => Effect.succeedNone,
@@ -179,16 +187,22 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       })
     )
   );
-
-  const fetch = safeHttpEffect(
+  const fetch = EffectFunction.pipe(
     Effect.gen(function* () {
       const config = yield* settings;
       const request = yield* HttpServerRequest.HttpServerRequest;
       const callerKey = edgeCallerKey(request.headers, CalculatorClientRateKey);
-      const key = Option.isSome(callerKey) ? callerKey : yield* localKey;
+      const key = yield* callerKey.pipe(
+        Option.match({
+          onNone: () => localKey,
+          onSome: (value) => Effect.succeed(Option.some(value)),
+        })
+      );
       const isMcp = new URL(request.url, config.apiOrigin).pathname === mcpPath;
-      const selected = isMcp
-        ? mcp.pipe(
+      const selected = EffectBoolean.match(isMcp, {
+        onFalse: () => handler,
+        onTrue: () =>
+          mcp.pipe(
             Effect.flatMap(withBoundedMcpReply),
             Effect.provideService(
               McpRequestAbortSignal,
@@ -196,8 +210,8 @@ export const ApiWorkerApplication = Effect.gen(function* () {
                 request.source
               ).pipe(Option.map((original) => original.signal))
             )
-          )
-        : handler;
+          ),
+      });
       return yield* Effect.acquireUseRelease(
         Effect.gen(function* () {
           const completed = yield* Deferred.make<boolean>();
@@ -216,30 +230,38 @@ export const ApiWorkerApplication = Effect.gen(function* () {
           return completed;
         }),
         () =>
-          withCalculatorAnalytics(
-            withCalculatorRequestBodyLimit(selected)
+          EffectFunction.pipe(
+            withCalculatorRequestBodyLimit({
+              handler: selected,
+            }),
+            withCalculatorAnalytics
           ).pipe(
             Effect.provideService(ApiCalculatorDelivery, analytics),
             // The shared public browser policy for HTTP, plus the
             // Website's collection header. Remote MCP keeps its own exact
             // browser origin list.
             HttpMiddleware.cors({
-              allowedHeaders: isMcp
-                ? [
-                    CollectionPolicyHeader,
-                    "b3",
-                    "content-type",
-                    "mcp-method",
-                    "mcp-name",
-                    "mcp-protocol-version",
-                    "traceparent",
-                  ]
-                : [CollectionPolicyHeader, ...publicCors.allowedHeaders],
+              allowedHeaders: EffectBoolean.match(isMcp, {
+                onFalse: () => [
+                  CollectionPolicyHeader,
+                  ...publicCors.allowedHeaders,
+                ],
+                onTrue: () => [
+                  CollectionPolicyHeader,
+                  "b3",
+                  "content-type",
+                  "mcp-method",
+                  "mcp-name",
+                  "mcp-protocol-version",
+                  "traceparent",
+                ],
+              }),
               allowedMethods: publicCors.allowedMethods,
               allowedOrigins: (origin) =>
-                isMcp
-                  ? origin === config.websiteOrigin.origin
-                  : isBrowserOrigin(origin),
+                EffectBoolean.match(isMcp, {
+                  onFalse: () => isBrowserOrigin(origin),
+                  onTrue: () => origin === config.websiteOrigin.origin,
+                }),
               credentials: false,
             })
           ),
@@ -249,7 +271,8 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       Effect.catchTag("ConfigError", () =>
         Effect.succeed(HttpServerResponse.empty({ status: 503 }))
       )
-    )
+    ),
+    safeHttpEffect
   ).pipe(
     // Every reply, including native error responses, gets one cache decision.
     Effect.flatMap((response) =>
@@ -257,7 +280,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         Effect.map((request) =>
           applyCachePolicy(response, {
             method: request.method,
-            publicRead: isPublicReadPath(
+            publicRead: isPublicReadApiPath(
               new URL(request.url, "https://api.invalid").pathname
             ),
           })
@@ -280,6 +303,5 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       ),
     Effect.provideContext(telemetry)
   );
-
   return { fetch };
 });

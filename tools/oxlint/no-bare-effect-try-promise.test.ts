@@ -1,22 +1,27 @@
 import { fileURLToPath } from "node:url";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { describe, expect, it as test } from "@effect/vitest";
-import { Effect } from "effect";
+import { describe, expect, it } from "@effect/vitest";
+import { Function as EffectFunction, Effect } from "effect";
 
 import { lintFiles, writeTemporaryLintFixture } from "./cli-fixture.js";
 
-const writeFixture = (source: string) =>
-  writeTemporaryLintFixture(
+const writeFixture = (source: string) => {
+  const fixtureDirectory = fileURLToPath(new URL("fixtures", import.meta.url));
+  return writeTemporaryLintFixture({
     source,
-    "ts",
-    fileURLToPath(new URL("fixtures", import.meta.url))
-  );
+    extension: "ts",
+    directory: fixtureDirectory,
+  });
+};
 const diagnostics = (output: string) =>
   output.match(/effect\(no-bare-effect-try-promise\)/gu) ?? [];
-const runOxlint = (path: string) => lintFiles([path]);
-describe("effect/no-bare-effect-try-promise", () => {
-  test.effect(
+const runOxlint = (path: string) =>
+  lintFiles({
+    paths: [path],
+  });
+describe("taxkit-effect/no-bare-effect-try-promise", () => {
+  it.effect(
     "rejects canonical root, namespace, subpath, alias, destructured and reassigned calls",
     () =>
       Effect.gen(function* () {
@@ -39,17 +44,19 @@ describe("effect/no-bare-effect-try-promise", () => {
     `);
         const result = yield* runOxlint(fixture);
         expect(result.exitCode).toBe(1);
-        expect(diagnostics(result.output)).toHaveLength(6);
+        EffectFunction.pipe(diagnostics(result.output), (actual) => {
+          expect(actual).toHaveLength(6);
+        });
       }).pipe(Effect.provide(BunServices.layer))
   );
-  test.effect(
+  it.effect(
     "accepts direct arrow, function and method mappings plus unrelated shadowed locals",
     () =>
       Effect.gen(function* () {
         const fixture = yield* writeFixture(`
       import { Effect as Fx, Schema } from "effect";
 
-      class BoundaryError extends Schema.TaggedError<BoundaryError>()(
+      class BoundaryError extends Schema.TaggedError<BoundaryError, { readonly brand: unique symbol }>()(
         "BoundaryError",
         { message: Schema.String }
       ) {}
@@ -85,11 +92,11 @@ describe("effect/no-bare-effect-try-promise", () => {
     `);
         const result = yield* runOxlint(fixture);
         expect(result.output).not.toContain(
-          "effect(no-bare-effect-try-promise)"
+          "taxkit-effect(no-bare-effect-try-promise)"
         );
       }).pipe(Effect.provide(BunServices.layer))
   );
-  test.effect(
+  it.effect(
     "rejects options whose rejection mapping is not statically inline",
     () =>
       Effect.gen(function* () {
@@ -124,7 +131,9 @@ describe("effect/no-bare-effect-try-promise", () => {
     `);
         const result = yield* runOxlint(fixture);
         expect(result.exitCode).toBe(1);
-        expect(diagnostics(result.output)).toHaveLength(7);
+        EffectFunction.pipe(diagnostics(result.output), (actual) => {
+          expect(actual).toHaveLength(7);
+        });
       }).pipe(Effect.provide(BunServices.layer))
   );
 });

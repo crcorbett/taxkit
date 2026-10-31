@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import { describe, expect, it } from "@effect/vitest";
 import {
+  Function as EffectFunction,
   Array as EffectArray,
   Config,
   ConfigProvider,
@@ -14,20 +15,16 @@ import {
   Record as EffectRecord,
   Schema,
 } from "effect";
-import { pipe } from "effect/Function";
 import type { OpenApi } from "effect/http-api";
 
 import { taxKitOpenApiSpec } from "../src/openapi.js";
 
 const snapshotUrl = new URL("../__snapshots__/openapi.json", import.meta.url);
-
 const updateOpenApiSnapshot = Config.Boolean(
   "UPDATE_TAXKIT_OPENAPI_SNAPSHOT"
 ).pipe(Config.withDefault(false));
-
 const JsonArray = Schema.Array(Schema.Json);
 const JsonObject = Schema.Record(Schema.String, Schema.Json);
-
 const normalizeJsonValue = (value: Schema.Json): Schema.Json =>
   Schema.decodeUnknownOption(JsonArray)(value).pipe(
     Option.match({
@@ -36,7 +33,7 @@ const normalizeJsonValue = (value: Schema.Json): Schema.Json =>
           Option.match({
             onNone: () => value,
             onSome: (object) =>
-              pipe(
+              EffectFunction.pipe(
                 EffectRecord.toEntries(object),
                 EffectArray.sortWith(([key]) => key, Order.String),
                 EffectArray.map(
@@ -49,17 +46,15 @@ const normalizeJsonValue = (value: Schema.Json): Schema.Json =>
               ),
           })
         ),
-      onSome: (array) => EffectArray.map(array, normalizeJsonValue),
+      onSome: (array) =>
+        EffectFunction.pipe(array, EffectArray.map(normalizeJsonValue)),
     })
   );
-
 const normalizeOpenApiSpec = (spec: OpenApi.OpenAPISpec) =>
   Schema.decodeUnknownEffect(Schema.Json)(spec).pipe(
-    Effect.map(normalizeJsonValue)
+    Effect.map((value) => normalizeJsonValue(value))
   );
-
 const normalizedTaxKitOpenApiSpec = normalizeOpenApiSpec(taxKitOpenApiSpec);
-
 const formatOpenApiSnapshot = (spec: OpenApi.OpenAPISpec) =>
   normalizeOpenApiSpec(spec).pipe(
     Effect.flatMap(
@@ -67,26 +62,22 @@ const formatOpenApiSnapshot = (spec: OpenApi.OpenAPISpec) =>
     ),
     Effect.map((encoded) => `${encoded}\n`)
   );
-
 const readOpenApiSnapshot = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const source = yield* fs.readFileString(fileURLToPath(snapshotUrl));
   return yield* Schema.decodeEffect(Schema.fromJsonString(Schema.Json))(source);
 });
-
 const writeOpenApiSnapshot = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const snapshot = yield* formatOpenApiSnapshot(taxKitOpenApiSpec);
   yield* fs.writeFileString(fileURLToPath(snapshotUrl), snapshot);
 });
-
 describe("TaxKit OpenAPI snapshot", () => {
   it.effect("matches the committed normalized OpenAPI contract snapshot", () =>
     Effect.gen(function* () {
       const shouldUpdate = yield* updateOpenApiSnapshot.parse(
         ConfigProvider.fromEnv()
       );
-
       yield* Match.value(shouldUpdate).pipe(
         Match.when(true, () => writeOpenApiSnapshot),
         Match.orElse(() =>
@@ -96,7 +87,7 @@ describe("TaxKit OpenAPI snapshot", () => {
           }).pipe(
             Effect.tap(({ normalized, snapshot }) =>
               Effect.sync(() => {
-                expect(normalized).toEqual(snapshot);
+                expect(normalized).toStrictEqual(snapshot);
               })
             )
           )

@@ -1,5 +1,14 @@
 import { PostHogProjectId, CaptureToken } from "@taxkit/analytics/schemas";
-import { Effect, Layer, Option, Redacted, Ref, Array } from "effect";
+import {
+  Function as EffectFunction,
+  Effect,
+  Layer,
+  Option,
+  Redacted,
+  Ref,
+  Array,
+  Boolean as EffectBoolean,
+} from "effect";
 
 import { PostHogManagementError } from "./errors.js";
 import type { PostHogManagementOperation } from "./errors.js";
@@ -39,11 +48,13 @@ export const makePostHogManagementTest = Effect.fnUntraced(function* (
           yield* Ref.update(operations, (current) =>
             Array.append(current, "find-project")
           );
-          return Array.findFirst(
+          return EffectFunction.pipe(
             yield* Ref.get(projects),
-            (current) =>
-              current.organisation === definition.organisation &&
-              current.marker === definition.marker
+            Array.findFirst(
+              (current) =>
+                current.organisation === definition.organisation &&
+                current.marker === definition.marker
+            )
           );
         }
       ),
@@ -54,22 +65,27 @@ export const makePostHogManagementTest = Effect.fnUntraced(function* (
         yield* Ref.update(operations, (current) =>
           Array.append(current, "read-project")
         );
-        const found = Array.findFirst(
+        const found = EffectFunction.pipe(
           yield* Ref.get(projects),
-          (current) => current.id === id
+          Array.findFirst((current) => current.id === id)
         );
         return yield* Option.match(found, {
           onNone: () => Effect.succeed(Option.none()),
           onSome: (current) =>
-            current.organisation === definition.organisation &&
-            current.marker === definition.marker
-              ? Effect.succeed(Option.some(current))
-              : Effect.fail(
-                  new PostHogManagementError({
-                    operation: "read-project",
-                    reason: "foreign-resource",
-                  })
-                ),
+            EffectBoolean.match(
+              current.organisation === definition.organisation &&
+                current.marker === definition.marker,
+              {
+                onFalse: () =>
+                  Effect.fail(
+                    new PostHogManagementError({
+                      operation: "read-project",
+                      reason: "foreign-resource",
+                    })
+                  ),
+                onTrue: () => Effect.succeed(Option.some(current)),
+              }
+            ),
         });
       }),
       updateProject: Effect.fn("PostHogManagement.updateProject")(function* ({
@@ -79,9 +95,9 @@ export const makePostHogManagementTest = Effect.fnUntraced(function* (
         yield* Ref.update(operations, (current) =>
           Array.append(current, "update-project")
         );
-        const found = Array.findFirst(
+        const found = EffectFunction.pipe(
           yield* Ref.get(projects),
-          (current) => current.id === id
+          Array.findFirst((current) => current.id === id)
         );
         return yield* Option.match(found, {
           onNone: () =>
@@ -108,7 +124,15 @@ export const makePostHogManagementTest = Effect.fnUntraced(function* (
                 privacy: desiredProjectPrivacy,
               });
               yield* Ref.update(projects, (values) =>
-                Array.map(values, (value) => (value.id === id ? saved : value))
+                EffectFunction.pipe(
+                  values,
+                  Array.map((value) =>
+                    EffectBoolean.match(value.id === id, {
+                      onFalse: () => value,
+                      onTrue: () => saved,
+                    })
+                  )
+                )
               );
               return saved;
             }),

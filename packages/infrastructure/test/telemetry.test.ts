@@ -17,6 +17,7 @@ import { Stage } from "alchemy/Stage";
 import { inMemoryState } from "alchemy/State";
 import type { ResourceState } from "alchemy/State";
 import {
+  Function as EffectFunction,
   Array,
   Cause,
   Effect,
@@ -33,10 +34,8 @@ import { HttpClient } from "effect/http";
 
 import { declareTaxKitObservability } from "../src/axiom/resources.js";
 import { declareTaxKitTraceExport } from "../src/trace-export.js";
-
 // A synthetic stand-in for the retained ingest token. It is not a credential.
 const ingestSentinel = "synthetic-ingest-token-fixture";
-
 const environment = Effect.provide(
   Layer.mergeAll(
     BunServices.layer,
@@ -82,7 +81,6 @@ const localContext = {
   dev: false,
   dotAlchemy: "tmp/telemetry-graph-proof",
 };
-
 // Persisted records of the foreign resources the telemetry stacks reference:
 // Site's two signal datasets and TaxKit's retained ingest token.
 const persisted = (
@@ -130,7 +128,6 @@ const foreignState = () =>
       },
     },
   });
-
 // Every provider refuses writes and enumeration; planning reads state only.
 const forbiddenWrites = Effect.fnUntraced(function* () {
   const writes = yield* Ref.make(0);
@@ -139,8 +136,11 @@ const forbiddenWrites = Effect.fnUntraced(function* () {
   );
   return { forbidden, writes };
 });
-
-const observabilityStack = Effect.fnUntraced(function* (stage: string) {
+const observabilityStack = Effect.fnUntraced(function* ({
+  stage,
+}: {
+  readonly stage: string;
+}) {
   const { forbidden, writes } = yield* forbiddenWrites();
   const compiled = yield* Stack.make({
     name: "TaxKitObservability",
@@ -173,8 +173,11 @@ const observabilityStack = Effect.fnUntraced(function* (stage: string) {
   );
   return { compiled, writes };
 });
-
-const traceExportStack = Effect.fnUntraced(function* (stage: string) {
+const traceExportStack = Effect.fnUntraced(function* ({
+  stage,
+}: {
+  readonly stage: string;
+}) {
   const { forbidden, writes } = yield* forbiddenWrites();
   const compiled = yield* Stack.make({
     name: "TaxKitTraceExport",
@@ -198,13 +201,11 @@ const traceExportStack = Effect.fnUntraced(function* (stage: string) {
   );
   return { compiled, writes };
 });
-
 const plan = <A>(compiled: Stack.CompiledStack<A>) =>
   Plan.make(compiled).pipe(
     Effect.provideContext(compiled.services),
     Effect.timeout("1 second")
   );
-
 // Evaluate a planned member's props and removal policy against state.
 const member = (compiled: Stack.CompiledStack, id: string) =>
   Record.get(compiled.resources, id).pipe(
@@ -215,7 +216,6 @@ const member = (compiled: Stack.CompiledStack, id: string) =>
     }),
     Effect.provideContext(compiled.services)
   );
-
 const Query = Schema.Struct({ query: Schema.Struct({ apl: Schema.String }) });
 const Dashboard = Schema.Struct({
   props: Schema.Struct({
@@ -233,66 +233,77 @@ const Destination = Schema.Struct({
     }),
     logpushDataset: Schema.String,
     name: Schema.String,
-    url: Schema.String,
+    url: Schema.String.check(Schema.isPattern(/^https:\/\//u)).pipe(
+      Schema.brand("taxkit/testing/AxiomIngestUrl")
+    ),
   }),
   removal: Schema.Literal("retain"),
 });
-
 const proof = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   effect.pipe(
     Effect.provideService(AlchemyContext, localContext),
     environment,
     Effect.scoped
   );
-
 describe("production-only telemetry stacks", () => {
   it.live.each(["pr-214", "dev_ci_user"])(
     "refuses stage %s before any resource",
     (stage) =>
-      proof(
+      EffectFunction.pipe(
         Effect.gen(function* () {
-          const observability = yield* observabilityStack(stage);
-          const traceExport = yield* traceExportStack(stage);
+          const observability = yield* observabilityStack({
+            stage,
+          });
+          const traceExport = yield* traceExportStack({
+            stage,
+          });
           const refusal = "TaxKit telemetry stacks require the prod stage";
           expect([
             Exit.isFailure(observability.compiled) &&
               Cause.pretty(observability.compiled.cause).includes(refusal),
             Exit.isFailure(traceExport.compiled) &&
               Cause.pretty(traceExport.compiled.cause).includes(refusal),
-          ]).toEqual([true, true]);
+          ]).toStrictEqual([true, true]);
           expect([
             yield* Ref.get(observability.writes),
             yield* Ref.get(traceExport.writes),
-          ]).toEqual([0, 0]);
-        })
+          ]).toStrictEqual([0, 0]);
+        }),
+        proof
       )
   );
-
   it.live("plans a retained ingest-only token and four dashboards", () =>
-    proof(
+    EffectFunction.pipe(
       Effect.gen(function* () {
-        const stack = yield* observabilityStack("prod");
+        const stack = yield* observabilityStack({
+          stage: "prod",
+        });
         const compiled = yield* stack.compiled;
         const planned = yield* plan(compiled);
         expect(yield* Ref.get(stack.writes)).toBe(0);
-        expect(
-          Array.sort(Record.keys(planned.resources), Order.String)
-        ).toEqual([
-          "TaxKitRequestFailures",
-          "TaxKitRequestLatency",
-          "TaxKitRequestOverview",
-          "TaxKitTelemetryHealth",
-          "TaxKitTelemetryIngest",
-        ]);
-        expect(
-          Array.every(
-            Record.values(planned.resources),
-            ({ action }) => action === "create"
-          )
-        ).toBe(true);
-        expect(compiled.output).toEqual({ dashboardCount: 4 });
+        EffectFunction.pipe(
+          Record.keys(planned.resources),
+          Array.sort(Order.String),
+          (actual) => {
+            expect(actual).toStrictEqual([
+              "TaxKitRequestFailures",
+              "TaxKitRequestLatency",
+              "TaxKitRequestOverview",
+              "TaxKitTelemetryHealth",
+              "TaxKitTelemetryIngest",
+            ]);
+          }
+        );
+        EffectFunction.pipe(
+          Record.values(planned.resources),
+          Array.every(({ action }) => action === "create"),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        expect(compiled.output).toStrictEqual({ dashboardCount: 4 });
         // Ingest only, on exactly Site's three shared datasets, and retained.
-        expect(yield* member(compiled, "TaxKitTelemetryIngest")).toEqual({
+        expect(yield* member(compiled, "TaxKitTelemetryIngest")).toStrictEqual({
           props: {
             datasetCapabilities: {
               "site-prod-logs": { ingest: ["create"] },
@@ -316,45 +327,66 @@ describe("production-only telemetry stacks", () => {
               Effect.flatMap(Schema.decodeUnknownEffect(Dashboard))
             )
         );
-        expect(Array.map(dashboards, ({ props }) => props.uid)).toEqual([
-          "taxkit-request-overview",
-          "taxkit-request-failures",
-          "taxkit-request-latency",
-          "taxkit-telemetry-health",
-        ]);
+        EffectFunction.pipe(
+          dashboards,
+          Array.map(({ props }) => props.uid),
+          (actual) => {
+            expect(actual).toStrictEqual([
+              "taxkit-request-overview",
+              "taxkit-request-failures",
+              "taxkit-request-latency",
+              "taxkit-telemetry-health",
+            ]);
+          }
+        );
         // Every chart reads only TaxKit's records in the shared logs dataset,
         // never another signal, a URL, a header or a calculation field.
-        const queries = Array.flatMap(dashboards, ({ props }) =>
-          Array.filterMap(props.dashboard.charts, (chart) =>
-            Schema.decodeUnknownResult(Query)(chart)
+        const queries = EffectFunction.pipe(
+          dashboards,
+          Array.flatMap(({ props }) =>
+            Array.filterMap(props.dashboard.charts, (chart) =>
+              Schema.decodeUnknownResult(Query)(chart)
+            )
           )
         );
         expect(queries.length).toBeGreaterThan(15);
-        expect(
+        EffectFunction.pipe(
+          queries,
           Array.filter(
-            queries,
             ({ query }) =>
               !query.apl.includes("['site-prod-logs']") ||
               !query.apl.includes("Service in ('taxkit-api', 'taxkit-web')") ||
               /site-prod-traces|site-prod-metrics|url|header|salary|income|gross/iu.test(
                 query.apl
               )
-          )
-        ).toEqual([]);
-      })
+          ),
+          (actual) => {
+            expect(actual).toStrictEqual([]);
+          }
+        );
+      }),
+      proof
     )
   );
-
   it.live("plans retained log and trace destinations from the token", () =>
-    proof(
+    EffectFunction.pipe(
       Effect.gen(function* () {
-        const stack = yield* traceExportStack("prod");
+        const stack = yield* traceExportStack({
+          stage: "prod",
+        });
         const compiled = yield* stack.compiled;
         const planned = yield* plan(compiled);
         expect(yield* Ref.get(stack.writes)).toBe(0);
-        expect(
-          Array.sort(Record.keys(planned.resources), Order.String)
-        ).toEqual(["TaxKitAxiomLogs", "TaxKitAxiomTraces"]);
+        EffectFunction.pipe(
+          Record.keys(planned.resources),
+          Array.sort(Order.String),
+          (actual) => {
+            expect(actual).toStrictEqual([
+              "TaxKitAxiomLogs",
+              "TaxKitAxiomTraces",
+            ]);
+          }
+        );
         const destinations = yield* Effect.forEach(
           ["TaxKitAxiomLogs", "TaxKitAxiomTraces"],
           (id) =>
@@ -362,43 +394,60 @@ describe("production-only telemetry stacks", () => {
               Effect.flatMap(Schema.decodeUnknownEffect(Destination))
             )
         );
-        expect(
-          Array.map(destinations, ({ props }) => [
+        EffectFunction.pipe(
+          destinations,
+          Array.map(({ props }) => [
             props.name,
             props.logpushDataset,
             props.url,
             Record.get(props.headers, "X-Axiom-Dataset"),
-          ])
-        ).toEqual([
-          [
-            "taxkit-axiom-logs",
-            "opentelemetry-logs",
-            "https://axiom.example.test/v1/logs",
-            Option.some("site-prod-logs"),
-          ],
-          [
-            "taxkit-axiom-traces",
-            "opentelemetry-traces",
-            "https://axiom.example.test/v1/traces",
-            Option.some("site-prod-traces"),
-          ],
-        ]);
+          ]),
+          (actual) => {
+            expect(actual).toStrictEqual([
+              [
+                "taxkit-axiom-logs",
+                "opentelemetry-logs",
+                "https://axiom.example.test/v1/logs",
+                Option.some("site-prod-logs"),
+              ],
+              [
+                "taxkit-axiom-traces",
+                "opentelemetry-traces",
+                "https://axiom.example.test/v1/traces",
+                Option.some("site-prod-traces"),
+              ],
+            ]);
+          }
+        );
         // The bearer header comes from the retained token. Compare without
         // printing it.
-        expect(
+        EffectFunction.pipe(
+          destinations,
           Array.every(
-            destinations,
             ({ props }) =>
               Redacted.value(props.headers.Authorization) ===
               `Bearer ${ingestSentinel}`
-          )
-        ).toBe(true);
+          ),
+          (actual) => {
+            // The bearer header comes from the retained token. Compare without
+            // printing it.
+            expect(actual).toBeTruthy();
+          }
+        );
         // Workers read only the two names; headers never become outputs.
-        expect(Array.sort(Record.keys(compiled.output), Order.String)).toEqual([
-          "logsDestinationName",
-          "tracesDestinationName",
-        ]);
-      })
+        EffectFunction.pipe(
+          Record.keys(compiled.output),
+          Array.sort(Order.String),
+          (actual) => {
+            // Workers read only the two names; headers never become outputs.
+            expect(actual).toStrictEqual([
+              "logsDestinationName",
+              "tracesDestinationName",
+            ]);
+          }
+        );
+      }),
+      proof
     )
   );
 });

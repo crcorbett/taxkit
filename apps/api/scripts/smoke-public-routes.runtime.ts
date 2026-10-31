@@ -16,6 +16,8 @@ import {
   Option,
   Schema,
   Stream,
+  Stdio,
+  Boolean as EffectBoolean,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
@@ -27,7 +29,7 @@ import {
   checkApiOpenApi,
   checkApiPublicContent,
   waitForApiHealth,
-} from "./routes.js";
+} from "../src/verification/routes.js";
 import {
   ApiSmokeArguments,
   ApiSmokeConsumerError,
@@ -36,8 +38,7 @@ import {
   ApiSmokeConsumerParameters,
   ApiSmokeSettings,
   ApiSmokeValidationError,
-} from "./schemas.js";
-
+} from "../src/verification/schemas.js";
 // This string is the deliberately plain JavaScript consumer outside the repo.
 // Its fetch/Promise/JSON behaviour proves consumption without TaxKit internals.
 // Route addresses are written into it from the HTTP route catalogue.
@@ -167,7 +168,6 @@ if (simulateFailure) {
   process.exitCode = 1;
 }
 `;
-
 export const loadApiSmokeSettings = (args: readonly string[]) =>
   Effect.gen(function* () {
     const options = yield* Schema.decodeUnknownEffect(ApiSmokeArguments)(args);
@@ -187,7 +187,6 @@ export const loadApiSmokeSettings = (args: readonly string[]) =>
         })
     )
   );
-
 const runExternalConsumer = (workspacePath: string, origin: string) =>
   Effect.gen(function* () {
     yield* Console.info("$ bun run smoke");
@@ -211,14 +210,16 @@ const runExternalConsumer = (workspacePath: string, origin: string) =>
               }
             ),
             Stream.mapEffect(({ bytes, chunk }) =>
-              bytes > 1_048_576
-                ? Effect.fail(
+              EffectBoolean.match(bytes > 1_048_576, {
+                onFalse: () => Effect.succeed(chunk),
+                onTrue: () =>
+                  Effect.fail(
                     new ApiSmokeConsumerError({
                       exitCode: Option.none(),
                       reason: "output-limit",
                     })
-                  )
-                : Effect.succeed(chunk)
+                  ),
+              })
             ),
             Stream.decodeText,
             Stream.mkString
@@ -253,7 +254,6 @@ const runExternalConsumer = (workspacePath: string, origin: string) =>
           ),
       })
     );
-
     if (result.exitCode !== 0) {
       return yield* Effect.fail(
         new ApiSmokeConsumerError({
@@ -297,7 +297,6 @@ const runExternalConsumer = (workspacePath: string, origin: string) =>
     yield* Console.info("External temp-workspace HTTP consumer passed");
     return yield* Effect.void;
   }).pipe(Effect.scoped);
-
 export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem;
@@ -335,11 +334,12 @@ export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
     );
     yield* checkApiOpenApi(origin);
     yield* Console.info("GET /api/docs/openapi.json passed");
-    yield* checkApiPublicContent(origin);
+    yield* checkApiPublicContent({
+      origin,
+    });
     yield* Console.info(
       "Public documentation page, navigation, search and Markdown passed"
     );
-
     const workspacePath = yield* Effect.acquireRelease(
       fs.makeTempDirectory({ prefix: "taxkit-api-downstream-" }),
       (tempPath) =>
@@ -424,10 +424,11 @@ export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
     Effect.scoped,
     Effect.ensuring(Console.info("apps/api smoke process stopped"))
   );
-
 if (import.meta.main) {
   BunRuntime.runMain(
-    loadApiSmokeSettings(Array.drop(process.argv, 2)).pipe(
+    Stdio.Stdio.use(({ args }) =>
+      args.pipe(Effect.flatMap(loadApiSmokeSettings))
+    ).pipe(
       Effect.flatMap(checkApiPublicRoutes),
       Effect.provide(Layer.mergeAll(BunServices.layer, BunHttpClient.layer))
     )

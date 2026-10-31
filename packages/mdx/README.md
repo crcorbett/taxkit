@@ -21,6 +21,6 @@ source file, or the highlighter's `DocsCodeHighlightError`. A page fails as a
 whole; nothing is skipped.
 
 The API build composes both Layers in
-`apps/api/scripts/docs-catalogue.layer.ts`; the Worker bundle never includes this
+`apps/api/src/build/docs-catalogue.layer.ts`; the Worker bundle never includes this
 package. The Website's share-image build composes them to read page titles. Tests use
 Content's deterministic highlighter and diagram renderer.

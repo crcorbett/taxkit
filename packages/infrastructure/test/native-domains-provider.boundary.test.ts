@@ -22,6 +22,7 @@ import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { inMemoryState } from "alchemy/State";
 import {
+  Function as EffectFunction,
   Array,
   Cause,
   Effect,
@@ -36,6 +37,12 @@ import {
   Schema,
 } from "effect";
 import { HttpClient, HttpClientResponse } from "effect/http";
+
+// Alchemy erases provider errors to any. Preserve their cause as checked failure data at this native boundary.
+class NativeProviderError extends Schema.TaggedError<
+  NativeProviderError,
+  { readonly brand: unique symbol }
+>()("NativeProviderError", { cause: Schema.Defect() }) {}
 
 const account = "00000000000000000000000000000078";
 const zone = "00000000000000000000000000007800";
@@ -85,7 +92,11 @@ const providerFixture = Effect.fnUntraced(function* (
     'export default { fetch() { return new Response("fixture") } };\n'
   );
   const calls = yield* Ref.make<
-    readonly { method: string; path: string; body: string }[]
+    readonly {
+      method: string;
+      path: string;
+      body: string;
+    }[]
   >([]);
   const client = HttpClient.make((request) =>
     Effect.gen(function* () {
@@ -94,7 +105,11 @@ const providerFixture = Effect.fnUntraced(function* (
         Match.tag("Uint8Array", ({ body: bytes }) =>
           new TextDecoder().decode(bytes)
         ),
-        Match.orElse(({ _tag }) => _tag)
+        Match.tag("Empty", () => "Empty"),
+        Match.tag("Raw", () => "Raw"),
+        Match.tag("FormData", () => "FormData"),
+        Match.tag("Stream", () => "Stream"),
+        Match.exhaustive
       );
       yield* Ref.update(calls, (x) =>
         Array.append(x, { body, method: request.method, path })
@@ -344,20 +359,26 @@ const providerFixture = Effect.fnUntraced(function* (
   const resource = compiled.output;
   const result = yield* Effect.gen(function* () {
     const provider = yield* Worker.Provider;
-    return yield* provider.reconcile({
-      bindings: [],
-      fqn: resource.FQN,
-      id: resource.LogicalId,
-      instanceId: "fixture-instance",
-      news: resource.Props,
-      olds: undefined,
-      output: undefined,
-      session: {
-        done: () => Effect.void,
-        emit: () => Effect.void,
-        note: () => Effect.void,
-      },
-    });
+    const checkedReconcile: Effect.Effect<
+      Effect.Success<ReturnType<typeof provider.reconcile>>,
+      NativeProviderError
+    > = provider
+      .reconcile({
+        bindings: [],
+        fqn: resource.FQN,
+        id: resource.LogicalId,
+        instanceId: "fixture-instance",
+        news: resource.Props,
+        olds: undefined,
+        output: undefined,
+        session: {
+          done: () => Effect.void,
+          emit: () => Effect.void,
+          note: () => Effect.void,
+        },
+      })
+      .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
+    return yield* checkedReconcile;
   }).pipe(
     Effect.provide(
       Layer.mergeAll(LiveWorkerProvider(), scopedArtifacts(resource.FQN))
@@ -392,33 +413,41 @@ const providerFixture = Effect.fnUntraced(function* (
   const captured = yield* Ref.get(calls);
   return { calls: captured, result };
 });
-
 describe("actual installed native redirect provider", () => {
   it.live("refuses redirect writes after a forbidden shared-rule read", () =>
     Effect.gen(function* () {
       const fixture = yield* providerFixture("forbidden");
-      const reads = Array.filter(
+      const reads = EffectFunction.pipe(
         fixture.calls,
-        (x) => x.method === "GET" && x.path.includes("/rulesets/")
+        Array.filter((x) => x.method === "GET" && x.path.includes("/rulesets/"))
       );
       expect(reads).toHaveLength(1);
-      expect(Exit.isFailure(fixture.result)).toBe(true);
+      EffectFunction.pipe(Exit.isFailure(fixture.result), (actual) => {
+        expect(actual).toBeTruthy();
+      });
       if (Exit.isFailure(fixture.result)) {
-        expect(
+        EffectFunction.pipe(
+          fixture.result.cause.reasons,
           Array.some(
-            fixture.result.cause.reasons,
             (reason) =>
               Cause.isFailReason(reason) &&
-              Predicate.isTagged(reason.error, "Forbidden")
-          )
-        ).toBe(true);
+              Schema.is(NativeProviderError)(reason.error) &&
+              Predicate.isTagged(reason.error.cause, "Forbidden")
+          ),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
       }
-      expect(
+      EffectFunction.pipe(
+        fixture.calls,
         Array.filter(
-          fixture.calls,
           (x) => x.method === "PUT" && x.path.includes("/rulesets/")
-        )
-      ).toHaveLength(0);
+        ),
+        (actual) => {
+          expect(actual).toHaveLength(0);
+        }
+      );
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
   it.live.each(["absent", "existing"] as const)(
@@ -426,16 +455,17 @@ describe("actual installed native redirect provider", () => {
     (mode) =>
       Effect.gen(function* () {
         const fixture = yield* providerFixture(mode);
-        expect(
-          Exit.isSuccess(fixture.result),
-          Exit.match(fixture.result, {
-            onFailure: Cause.pretty,
-            onSuccess: () => "",
-          })
-        ).toBe(true);
-        const calls = Array.filter(
+        const succeeded = Exit.isSuccess(fixture.result);
+        const message = Exit.match(fixture.result, {
+          onFailure: Cause.pretty,
+          onSuccess: () => "",
+        });
+        expect(succeeded, message).toBeTruthy();
+        const calls = EffectFunction.pipe(
           fixture.calls,
-          (x) => x.method === "PUT" && x.path.includes("/rulesets/")
+          Array.filter(
+            (x) => x.method === "PUT" && x.path.includes("/rulesets/")
+          )
         );
         expect(calls).toHaveLength(1);
         const call = Array.head(calls).pipe(
@@ -448,33 +478,41 @@ describe("actual installed native redirect provider", () => {
             })
           )
         )(call.body);
-        expect(rules.rules).toHaveLength(mode === "existing" ? 2 : 1);
+        expect(rules.rules).toHaveLength(
+          Match.value(mode).pipe(
+            Match.when("existing", (): 2 => 2),
+            Match.orElse((): 1 => 1)
+          )
+        );
         if (mode === "existing") {
-          expect(
+          EffectFunction.pipe(
             Array.head(rules.rules).pipe(
               Option.getOrElse(() =>
                 expect.fail("Expected retained foreign rule")
               )
-            )
-          ).toEqual({
-            action: "redirect",
-            action_parameters: {
-              from_value: {
-                preserve_query_string: true,
-                status_code: 301,
-                target_url: { value: "https://other-target.example.com" },
-              },
-            },
-            description: "foreign-preserved-rule",
-            enabled: true,
-            expression: 'http.host eq "other.example.com"',
-            id: "foreign-rule-id",
-          });
+            ),
+            (actual) => {
+              expect(actual).toStrictEqual({
+                action: "redirect",
+                action_parameters: {
+                  from_value: {
+                    preserve_query_string: true,
+                    status_code: 301,
+                    target_url: { value: "https://other-target.example.com" },
+                  },
+                },
+                description: "foreign-preserved-rule",
+                enabled: true,
+                expression: 'http.host eq "other.example.com"',
+                id: "foreign-rule-id",
+              });
+            }
+          );
         }
         const ours = Array.last(rules.rules).pipe(
           Option.getOrElse(() => expect.fail("Expected native redirect rule"))
         );
-        expect(ours).toEqual({
+        expect(ours).toStrictEqual({
           action: "redirect",
           action_parameters: {
             from_value: {

@@ -1,6 +1,7 @@
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
+  Function as EffectFunction,
   Array,
   Console,
   Effect,
@@ -11,14 +12,19 @@ import {
   Path,
   Record,
   Schema,
+  Boolean as EffectBoolean,
 } from "effect";
 import * as TypeScript from "typescript-ast";
 
-class PackageAssemblyError extends Schema.TaggedError<PackageAssemblyError>()(
-  "PackageAssemblyError",
-  { operation: Schema.String }
-) {}
-
+class PackageAssemblyError extends Schema.TaggedError<
+  PackageAssemblyError,
+  {
+    readonly brand: unique symbol;
+  }
+>()("PackageAssemblyError", {
+  operation: Schema.Literals(["resolve-import", "assemble-package"]),
+  specifier: Schema.optionalKey(Schema.String),
+}) {}
 const LibraryManifest = Schema.Struct({
   exports: Schema.Record(
     Schema.String,
@@ -26,7 +32,6 @@ const LibraryManifest = Schema.Struct({
   ),
   name: Schema.String,
 });
-
 // These are the private source owners compiled into the SDK, not separately
 // installed packages. Their manifests remain the owner of each module's path.
 const libraries = [
@@ -38,14 +43,12 @@ const libraries = [
   { directory: "pay", root: "packages/rules/au/pay" },
   { directory: "stsl", root: "packages/rules/au/stsl" },
 ] as const;
-
 const ModuleReference = Schema.Struct({
   end: Schema.Finite,
   specifier: Schema.String,
   start: Schema.Finite,
 });
 type ModuleReference = typeof ModuleReference.Type;
-
 // This compiler adapter visits module syntax only. Service identifiers,
 // documentation strings and other literals must never be rewritten.
 const moduleReferences = (
@@ -60,39 +63,43 @@ const moduleReferences = (
       (value) => value.moduleSpecifier
     ),
     Match.when(TypeScript.isImportTypeNode, (value) =>
-      TypeScript.isLiteralTypeNode(value.argument)
-        ? value.argument.literal
-        : undefined
+      Match.value(value.argument).pipe(
+        Match.when(
+          TypeScript.isLiteralTypeNode,
+          (argument) => argument.literal
+        ),
+        Match.orElse(EffectFunction.constUndefined)
+      )
     ),
     Match.when(TypeScript.isCallExpression, (value) =>
-      value.expression.kind === TypeScript.SyntaxKind.ImportKeyword
-        ? Array.head(value.arguments).pipe(Option.getOrUndefined)
-        : undefined
+      EffectBoolean.match(
+        value.expression.kind === TypeScript.SyntaxKind.ImportKeyword,
+        {
+          onFalse: EffectFunction.constUndefined,
+          onTrue: () => Array.head(value.arguments).pipe(Option.getOrUndefined),
+        }
+      )
     ),
-    Match.orElse(() => {
-      // Other compiler nodes do not own a module reference.
-    })
+    Match.orElse(EffectFunction.constUndefined)
   );
-  const own =
-    literal !== undefined &&
-    TypeScript.isStringLiteral(literal) &&
-    literal.text.startsWith("@taxkit/")
-      ? [
-          {
-            end: literal.getEnd() - 1,
-            specifier: literal.text,
-            start: literal.getStart(source) + 1,
-          },
-        ]
-      : [];
+  const own = Option.fromNullishOr(literal).pipe(
+    Option.filter(TypeScript.isStringLiteral),
+    Option.filter((reference) => reference.text.startsWith("@taxkit/")),
+    Option.map((reference) => ({
+      end: reference.getEnd() - 1,
+      specifier: reference.text,
+      start: reference.getStart(source) + 1,
+    })),
+    Option.toArray
+  );
   return Array.appendAll(
     own,
-    Array.flatMap(node.getChildren(source), (child) =>
-      moduleReferences(source, child)
+    EffectFunction.pipe(
+      node.getChildren(source),
+      Array.flatMap((child) => moduleReferences(source, child))
     )
   );
 };
-
 export const relocateModuleImports = (
   source: string,
   file: string,
@@ -110,27 +117,28 @@ export const relocateModuleImports = (
       Effect.mapError(
         () =>
           new PackageAssemblyError({
-            operation: `unresolved module ${reference.specifier}`,
+            operation: "resolve-import",
+            specifier: reference.specifier,
           })
       ),
       Effect.map((replacement) => ({ ...reference, replacement }))
     )
   ).pipe(
     Effect.map((references) =>
-      Array.reduce(
-        Array.sort(
-          references,
-          (left: ModuleReference, right: ModuleReference) =>
-            Number.Order(right.start, left.start)
+      EffectFunction.pipe(
+        references,
+        Array.sort((left: ModuleReference, right: ModuleReference) =>
+          Number.Order(right.start, left.start)
         ),
-        source.replace(/\n\/\/# sourceMappingURL=.*$/u, ""),
-        (text, reference) =>
-          `${text.slice(0, reference.start)}${reference.replacement}${text.slice(reference.end)}`
+        Array.reduce(
+          source.replace(/\n\/\/# sourceMappingURL=.*$/u, ""),
+          (text, reference) =>
+            `${text.slice(0, reference.start)}${reference.replacement}${text.slice(reference.end)}`
+        )
       )
     )
   );
 };
-
 export const assemblePackage = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
@@ -145,36 +153,50 @@ export const assemblePackage = Effect.gen(function* () {
   const compiled = yield* path.fromFileUrl(
     new URL("../.compiled/", import.meta.url)
   );
-  const owners = yield* Effect.forEach(libraries, (library) =>
-    fs.readFileString(path.join(root, library.root, "package.json")).pipe(
-      Effect.flatMap(
-        Schema.decodeEffect(Schema.fromJsonString(LibraryManifest))
-      ),
-      Effect.map((manifest) => ({ ...library, manifest }))
+  const owners = yield* EffectFunction.pipe(
+    libraries,
+    Effect.forEach((library) =>
+      fs.readFileString(path.join(root, library.root, "package.json")).pipe(
+        Effect.flatMap(
+          Schema.decodeEffect(Schema.fromJsonString(LibraryManifest))
+        ),
+        Effect.map((manifest) => ({ ...library, manifest }))
+      )
     )
   );
   const modules = Record.fromEntries(
-    Array.flatMap(owners, (owner) =>
-      Array.map(
-        Record.toEntries(owner.manifest.exports),
-        ([key, target]) =>
-          [
-            `${owner.manifest.name}${key === "." ? "" : key.slice(1)}`,
-            path.join(
-              destination,
-              "internal",
-              owner.directory,
-              path.relative("src", target).replace(/\.ts$/u, ".js")
-            ),
-          ] as const
+    EffectFunction.pipe(
+      owners,
+      Array.flatMap((owner) =>
+        EffectFunction.pipe(
+          Record.toEntries(owner.manifest.exports),
+          Array.map(
+            ([key, target]) =>
+              [
+                `${owner.manifest.name}${Match.value(key).pipe(
+                  Match.when(".", (): "" => ""),
+                  Match.orElse((matchedValue) => matchedValue.slice(1))
+                )}`,
+                path.join(
+                  destination,
+                  "internal",
+                  owner.directory,
+                  path.relative("src", target).replace(/\.ts$/u, ".js")
+                ),
+              ] as const
+          )
+        )
       )
     )
   );
   const inputs = Array.prepend(
-    Array.map(owners, (owner) => ({
-      from: path.join(compiled, owner.root, "src"),
-      to: path.join(destination, "internal", owner.directory),
-    })),
+    EffectFunction.pipe(
+      owners,
+      Array.map((owner) => ({
+        from: path.join(compiled, owner.root, "src"),
+        to: path.join(destination, "internal", owner.directory),
+      }))
+    ),
     {
       from: path.join(compiled, "packages/sdk/typescript/src"),
       to: destination,
@@ -186,9 +208,11 @@ export const assemblePackage = Effect.gen(function* () {
       Effect.gen(function* () {
         const files = yield* fs.readDirectory(input.from, { recursive: true });
         yield* Effect.forEach(
-          Array.filter(
+          EffectFunction.pipe(
             files,
-            (file) => file.endsWith(".js") || file.endsWith(".d.ts")
+            Array.filter(
+              (file) => file.endsWith(".js") || file.endsWith(".d.ts")
+            )
           ),
           (file) =>
             Effect.gen(function* () {
@@ -206,9 +230,10 @@ export const assemblePackage = Effect.gen(function* () {
                         .relative(path.dirname(target), module)
                         .split(path.sep)
                         .join("/");
-                      return relative.startsWith(".")
-                        ? relative
-                        : `./${relative}`;
+                      return EffectBoolean.match(relative.startsWith("."), {
+                        onFalse: () => `./${relative}`,
+                        onTrue: () => relative,
+                      });
                     })
                   )
               );
@@ -233,13 +258,12 @@ export const assemblePackage = Effect.gen(function* () {
       Match.orElse(
         () =>
           new PackageAssemblyError({
-            operation: "read or write compiled package",
+            operation: "assemble-package",
           })
       )
     )
   )
 );
-
 if (import.meta.main) {
   BunRuntime.runMain(assemblePackage.pipe(Effect.provide(BunServices.layer)));
 }

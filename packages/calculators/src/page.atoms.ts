@@ -3,7 +3,14 @@ import {
   PayWithholdingsLedger,
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
-import { Cause, Match, Option, Result, Schema } from "effect";
+import {
+  Cause,
+  Match,
+  Option,
+  Result,
+  Schema,
+  Boolean as EffectBoolean,
+} from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import * as Atom from "effect/reactivity/Atom";
 
@@ -16,7 +23,6 @@ import type {
 } from "./schemas.js";
 
 type CalculatorId = CalculatorRunServiceRequest["calculatorId"];
-
 /** One calculator page's state and commands, held in the shared registry. */
 export interface CalculatorPage<E> {
   // Checked request identity belongs to one visible attempt. An edit or a
@@ -33,7 +39,6 @@ export interface CalculatorPage<E> {
   readonly submit: Atom.Writable<Option.Option<void>, "calculate">;
   readonly view: Atom.Atom<CalculatorViewState>;
 }
-
 // The report kind each calculator answers with.
 const answersWithItsReport = (
   calculatorId: CalculatorId,
@@ -46,7 +51,6 @@ const answersWithItsReport = (
     Match.when("au.pay.take-home", () => Schema.is(TakeHomePayReport)(report)),
     Match.orElse(() => Schema.is(PayWithholdingsLedger)(report))
   );
-
 /**
  * Calculator pages over the host's calculation command. The registry owns
  * separate temporary state for each checked calculator ID; the family
@@ -126,14 +130,23 @@ export const makeCalculatorPages = <E>({
           !current.waiting &&
           (AsyncResult.isFailure(current) ||
             (AsyncResult.isSuccess(current) && Option.isNone(report)));
-        const calculationMessage = AsyncResult.isFailure(current)
-          ? current.cause.pipe(
+        const calculationMessage = Match.value(current).pipe(
+          Match.when(AsyncResult.isFailure, (matchedValue) =>
+            matchedValue.cause.pipe(
               Cause.findErrorOption,
               Option.map(failureMessage)
             )
-          : Option.some("The calculation could not finish. Please try again.");
+          ),
+          Match.orElse(() =>
+            Option.some("The calculation could not finish. Please try again.")
+          )
+        );
         const message = Option.match(inputError, {
-          onNone: () => (failed ? calculationMessage : Option.none<string>()),
+          onNone: () =>
+            EffectBoolean.match(failed, {
+              onFalse: () => Option.none<string>(),
+              onTrue: () => calculationMessage,
+            }),
           onSome: Option.some,
         });
         return {

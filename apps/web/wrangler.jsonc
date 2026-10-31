@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "taxkit-website-local-candidate",
-  "main": "src/server.ts",
+  "main": "src/entry.server.ts",
   "compatibility_date": "2026-10-04",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {

@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@alchemy.run/cloudflare": "catalog:",
-    "@effect/atom-react": "4.0.6",
+    "@effect/atom-react": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@taxkit/api-http": "workspace:*",

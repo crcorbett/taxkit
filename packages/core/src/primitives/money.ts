@@ -1,35 +1,30 @@
-import { Effect, Schema } from "effect";
+import { Function as EffectFunction, Effect, Schema } from "effect";
 
 import { InvalidMoneyValue } from "./errors.js";
-
 /**
  * Whole cents used by all money values in the core package.
  *
  * @since 0.1.0
  */
 export const Cents = Schema.Int.pipe(Schema.brand("taxkit/Cents"));
-
 /**
  * Whole cents used by all money values in the core package.
  *
  * @since 0.1.0
  */
 export type Cents = typeof Cents.Type;
-
 /**
  * The currency supported by core tax calculations.
  *
  * @since 0.1.0
  */
 export const Currency = Schema.Literal("AUD");
-
 /**
  * The currency supported by core tax calculations.
  *
  * @since 0.1.0
  */
 export type Currency = typeof Currency.Type;
-
 /**
  * An AUD amount represented as integer cents.
  *
@@ -42,11 +37,15 @@ export type Currency = typeof Currency.Type;
  *
  * @since 0.1.0
  */
-export class Money extends Schema.TaggedClass<Money>()("Money", {
+export class Money extends Schema.TaggedClass<
+  Money,
+  {
+    readonly brand: unique symbol;
+  }
+>()("Money", {
   cents: Cents,
   currency: Currency,
 }) {}
-
 /**
  * Creates an AUD amount from already checked whole cents.
  *
@@ -54,7 +53,6 @@ export class Money extends Schema.TaggedClass<Money>()("Money", {
  */
 export const aud = (cents: Cents): Money =>
   new Money({ cents, currency: "AUD" });
-
 /**
  * Checks an arbitrary number of cents before constructing an AUD amount.
  *
@@ -67,7 +65,6 @@ export const audFromCents = (
     Effect.map(aud),
     Effect.mapError(() => new InvalidMoneyValue())
   );
-
 /**
  * Creates an AUD money value from dollars, rounded to the nearest cent.
  *
@@ -84,8 +81,7 @@ export const audFromCents = (
 export const audDollars = (
   dollars: number
 ): Effect.Effect<Money, InvalidMoneyValue> =>
-  audFromCents(Math.round(dollars * 100));
-
+  EffectFunction.pipe(Math.round(dollars * 100), audFromCents);
 /**
  * Adds two checked AUD money values.
  *
@@ -95,7 +91,6 @@ export const moneyAdd = (
   a: Money,
   b: Money
 ): Effect.Effect<Money, InvalidMoneyValue> => audFromCents(a.cents + b.cents);
-
 /**
  * Subtracts one checked AUD money value from another.
  *
@@ -105,7 +100,6 @@ export const moneySub = (
   a: Money,
   b: Money
 ): Effect.Effect<Money, InvalidMoneyValue> => audFromCents(a.cents - b.cents);
-
 /**
  * Tests money values for exact cent and currency equality.
  *

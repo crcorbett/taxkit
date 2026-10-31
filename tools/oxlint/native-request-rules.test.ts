@@ -3,16 +3,19 @@ import { fileURLToPath } from "node:url";
 
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { describe, expect, it } from "@effect/vitest";
-import { Array, Effect, Schema } from "effect";
+import { Function as EffectFunction, Array, Effect, Schema } from "effect";
 
 import { lintFiles, writeLintFixture } from "./cli-fixture.js";
 
 const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
-
 // The published native request, cache and Layer rules, proved through the
 // repository's actual Oxlint command and configuration at TaxKit paths.
 const runOxlint = (path: string, extraArgs: readonly string[] = []) =>
-  lintFiles([path], extraArgs, "json").pipe(
+  lintFiles({
+    paths: [path],
+    extraArgs,
+    format: "json",
+  }).pipe(
     Effect.flatMap((result) =>
       Schema.decodeEffect(
         Schema.fromJsonString(
@@ -23,10 +26,12 @@ const runOxlint = (path: string, extraArgs: readonly string[] = []) =>
       )(result.stdout)
     ),
     Effect.map((report) =>
-      Array.map(report.diagnostics, (diagnostic) => diagnostic.code)
+      EffectFunction.pipe(
+        report.diagnostics,
+        Array.map((diagnostic) => diagnostic.code)
+      )
     )
   );
-
 describe("native request ownership rules", () => {
   it.effect(
     "traverses a large cyclic host AST without structural hashing",
@@ -34,7 +39,7 @@ describe("native request ownership rules", () => {
       runOxlint("apps/web/test/native-pair.boundary.test.ts").pipe(
         Effect.tap((codes) =>
           Effect.sync(() => {
-            expect(codes).toEqual([]);
+            expect(codes).toStrictEqual([]);
           })
         ),
         Effect.provide(BunServices.layer)
@@ -190,35 +195,47 @@ export type Values = Env;`,
     },
   ])("$name", ({ count, path, rule, source }) =>
     Effect.gen(function* () {
-      yield* writeLintFixture(nodePath.join(repositoryRoot, path), source);
+      const fixturePath = nodePath.join(repositoryRoot, path);
+      yield* writeLintFixture({
+        path: fixturePath,
+        source,
+      });
       const codes = yield* runOxlint(path);
-      expect(Array.filter(codes, (code) => code === rule)).toHaveLength(count);
+      EffectFunction.pipe(
+        codes,
+        Array.filter((code) => code === rule),
+        (actual) => {
+          expect(actual).toHaveLength(count);
+        }
+      );
     }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
-
   it.effect.each([
     "apps/web/src/lib/api-client.atoms.ts",
     "apps/web/src/lib/host/binding.adapter.layer.ts",
     "apps/web/src/lib/pages/loaders.ts",
     "apps/web/src/lib/runtime.client.ts",
     "apps/web/src/lib/runtime.server.ts",
-    "apps/web/src/server.ts",
+    "apps/web/src/entry.server.ts",
     "apps/web/src/routes/$.tsx",
     "apps/web/src/routes/search.tsx",
   ])("accepts the Website's native owner %s", (path) =>
     Effect.gen(function* () {
       const codes = yield* runOxlint(path);
-      expect(
+      EffectFunction.pipe(
+        codes,
         Array.filter(
-          codes,
           (code) =>
             code.startsWith("strict-effect(website-") ||
             code === "strict-effect(no-loader-request-state)" ||
             code === "strict-effect(static-layers)" ||
             code === "strict-effect(native-cloudflare-cache)" ||
             code === "strict-effect(no-native-client-replica)"
-        )
-      ).toEqual([]);
+        ),
+        (actual) => {
+          expect(actual).toStrictEqual([]);
+        }
+      );
     }).pipe(Effect.provide(BunServices.layer))
   );
   it.effect(
@@ -226,10 +243,11 @@ export type Values = Env;`,
     () =>
       Effect.gen(function* () {
         const path = "packages/sdk/typescript/src/.generated-type-aware.ts";
-        yield* writeLintFixture(
-          nodePath.join(repositoryRoot, path),
-          "export const native = () => Promise.resolve(1); native();"
-        );
+        const fixturePath = nodePath.join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source: "export const native = () => Promise.resolve(1); native();",
+        });
         const codes = yield* runOxlint(path, ["--type-aware"]);
         expect(codes).toContain("typescript(no-floating-promises)");
         expect(codes).not.toContain("typescript(promise-function-async)");

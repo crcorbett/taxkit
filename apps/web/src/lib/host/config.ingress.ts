@@ -1,5 +1,5 @@
-import "@tanstack/react-start/server-only";
 import { TaxKitApiOriginConfig } from "@taxkit/api-http/origin";
+import "@tanstack/react-start/server-only";
 import {
   DocsPublicationOriginConfig,
   DocsWebsiteOriginConfig,
@@ -7,6 +7,7 @@ import {
 import type { TaxKitApiBinding } from "@taxkit/infrastructure/api-worker";
 import { reifyBoundConfigProvider } from "alchemy/Runtime";
 import {
+  Function as EffectFunction,
   Array,
   ConfigProvider,
   Context,
@@ -18,13 +19,11 @@ import {
 } from "effect";
 
 import { TaxKitWebConfigError, WebsiteApiConfigError } from "./errors";
-
 /** The raw Cloudflare bindings object, supplied once by the server host. */
 export class WebsiteBindings extends Context.Service<
   WebsiteBindings,
   Readonly<Record<string, unknown>>
 >()("taxkit/web/WebsiteBindings") {}
-
 // This is the native SDK capability boundary. Preserve the original Fetcher
 // object (and method receiver); a Struct would copy its methods off the binding.
 const PrivateApiBinding: Schema.Codec<TaxKitApiBinding> =
@@ -36,7 +35,6 @@ const PrivateApiBinding: Schema.Codec<TaxKitApiBinding> =
       Predicate.hasProperty(value, "connect") &&
       Predicate.isFunction(value.connect)
   );
-
 // Only Website-owned settings reach Config. Alchemy's reader unwraps its
 // protected binding format; nothing here inspects those markers itself.
 const websiteKeys = [
@@ -44,19 +42,16 @@ const websiteKeys = [
   "TAXKIT_PUBLICATION_ORIGIN",
   "WEBSITE_PUBLIC_ORIGIN",
 ] as const;
-
 const websiteConfigProvider = WebsiteBindings.pipe(
   Effect.map((bindings) => {
-    const selected = Record.filter(bindings, (_, key) =>
-      Array.contains(websiteKeys, key)
+    const selected = EffectFunction.pipe(
+      bindings,
+      Record.filter((_, key) => Array.contains(websiteKeys, key))
     );
-    return reifyBoundConfigProvider(
-      ConfigProvider.fromUnknown(selected),
-      selected
-    );
+    const provider = ConfigProvider.fromUnknown(selected);
+    return reifyBoundConfigProvider(provider, selected);
   })
 );
-
 export const WebsiteSettingsConfig = Effect.gen(function* () {
   const provider = yield* websiteConfigProvider;
   return yield* Effect.all({
@@ -74,7 +69,6 @@ export const WebsiteSettingsConfig = Effect.gen(function* () {
       })
   )
 );
-
 export const WebsiteApiConfig = Effect.gen(function* () {
   const bindings = yield* WebsiteBindings;
   const provider = yield* websiteConfigProvider;

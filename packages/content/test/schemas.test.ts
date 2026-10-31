@@ -1,5 +1,11 @@
 import { assert, describe, it } from "@effect/vitest";
-import { Array, Effect, Result, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Result,
+  Schema,
+} from "effect";
 
 import { exampleContentCatalogue } from "../src/__testing__/fixtures.js";
 import {
@@ -19,38 +25,39 @@ describe("public catalogue ingress", () => {
       );
     })
   );
-
   it.effect(
     "rejects drafts, mismatched addresses and unrelated source files",
     () =>
       Effect.gen(function* () {
         const catalogue = yield* exampleContentCatalogue;
-        yield* Effect.forEach(catalogue.pages, (page) =>
-          Effect.forEach(
-            [
-              {
-                ...page,
-                frontmatter: { ...page.frontmatter, status: "draft" },
-              },
-              { ...page, path: "/other/page" },
-              { ...page, path: "/start/../overview" },
-              { ...page, source: "private/person.mdx" },
-              { ...page, slugs: [] },
-            ],
-            (raw) =>
-              Schema.decodeUnknownEffect(DocsPublicPage)(raw).pipe(
-                Effect.result,
-                Effect.tap((result) =>
-                  Effect.sync(() => {
-                    assert.isTrue(Result.isFailure(result));
-                  })
+        yield* EffectFunction.pipe(
+          catalogue.pages,
+          Effect.forEach((page) =>
+            Effect.forEach(
+              [
+                {
+                  ...page,
+                  frontmatter: { ...page.frontmatter, status: "draft" },
+                },
+                { ...page, path: "/other/page" },
+                { ...page, path: "/start/../overview" },
+                { ...page, source: "private/person.mdx" },
+                { ...page, slugs: [] },
+              ],
+              (raw) =>
+                Schema.decodeUnknownEffect(DocsPublicPage)(raw).pipe(
+                  Effect.result,
+                  Effect.tap((result) =>
+                    Effect.sync(() => {
+                      assert.isTrue(Result.isFailure(result));
+                    })
+                  )
                 )
-              )
+            )
           )
         );
       })
   );
-
   it.effect(
     "rejects duplicate pages, stray navigation, wrong titles and unknown versions",
     () =>
@@ -73,9 +80,9 @@ describe("public catalogue ingress", () => {
             {
               ...catalogue,
               navigation: {
-                primaryNavigation: Array.map(
+                primaryNavigation: EffectFunction.pipe(
                   catalogue.navigation.primaryNavigation,
-                  (item) => ({ ...item, title: "Wrong title" })
+                  Array.map((item) => ({ ...item, title: "Wrong title" }))
                 ),
               },
             },
@@ -93,7 +100,6 @@ describe("public catalogue ingress", () => {
         );
       })
   );
-
   it.effect(
     "requires a nonempty, trimmed search term of at most 100 characters",
     () =>
