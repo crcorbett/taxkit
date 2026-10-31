@@ -216,7 +216,7 @@ closed `read(source)` operation derives identity from the actual source; safe
 `DocsPageReadError` reasons preserve authoring and provider failures.
 
 `ContentCatalogueLive` (`@taxkit/content/catalogue`) builds the checked catalogue
-once from `DocsSources`. `apps/api/scripts/docs-catalogue.layer.ts` composes the
+once from `DocsSources`. `apps/api/src/build/docs-catalogue.layer.ts` composes the
 build-time Layers. `@taxkit/content/live` contains only `ContentServiceLive`, so
 `apps/api/src/content.boundary.ts` can serve the stored catalogue without importing
 authored metadata or the builder. Tests use deterministic rendering Layers, and
