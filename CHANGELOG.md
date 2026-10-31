@@ -1,5 +1,22 @@
 # TaxKit
 
+## 3.0.0
+
+- Give public Schema classes nominal identities: construct values with their
+  owning constructors or decoders instead of structural object stand-ins.
+- Remove the `CalculatorSchemas`, `PayRules`, `IncomeTaxRules` and `StslRules`
+  namespace adapters and deprecated calculator aliases. Use named Schemas from
+  `taxkit/schemas` and Australian fact and parameter exports from `taxkit/au`.
+  See the [SDK migration guide](./packages/sdk/typescript/README.md) and
+  [generated SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
+- Enforce the complete Commonplaces style and strict Effect presets, with
+  static Layers, explicit SDK scope disposal and native Effect boundaries.
+  Encoded JSON contracts and Promise-returning plain SDK calls keep their
+  existing behaviour.
+- Pin Effect to 4.0.7 with Alchemy beta.84 and refresh the Website/API toolchain.
+  See the [API changelog](./apps/api/CHANGELOG.md) and
+  [Website changelog](./apps/web/CHANGELOG.md).
+
 ## 2.2.0
 
 - Read typed dollar text as `Money` with `moneyFromDollarsText` in

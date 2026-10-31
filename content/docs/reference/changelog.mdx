@@ -10,32 +10,32 @@ Use this page when you need release history after a version has been applied.
 
 ## Current changelog sources
 
-| Source                                                    | Owns                                                                |
-| --------------------------------------------------------- | ------------------------------------------------------------------- |
-| [`CHANGELOG.md`](../../../CHANGELOG.md)                   | Repository-level release summary and package changelog index.       |
-| [`apps/api/CHANGELOG.md`](../../../apps/api/CHANGELOG.md) | API app release notes.                                              |
-| Package `CHANGELOG.md` files                              | Package-local release history after the release train is versioned. |
-| `.changeset/*.md`                                         | Pending release intent before `bun run version-repo` is applied.    |
+| Source                                                           | Owns                                                                 |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [`CHANGELOG.md`](../../../CHANGELOG.md)                          | Repository-level release summary and package changelog index.        |
+| [`apps/api/CHANGELOG.md`](../../../apps/api/CHANGELOG.md)        | API app release notes.                                               |
+| [`SDK changelog`](../../../packages/sdk/typescript/CHANGELOG.md) | Applied changes to the single public `taxkit` npm package.           |
+| Package `CHANGELOG.md` files                                     | Private package release history after versioning.                    |
+| `.changeset/*.md`                                                | Pending release intent before `bun run version-packages` is applied. |
 
 ## Current release
 
-The current repository changelog records version `1.0.0` for the TaxKit
-identity change. Packages remain private and unpublished pending a separate
-publication approach. A changelog entry or package version does not establish
-that an npm package or deployed API is available.
-
-Use the older `0.0.1` entry for the initial calculator API and engine history.
+The `taxkit` SDK is the public npm package; all other workspace packages remain
+private. The SDK changelog records its applied package changes, and the root
+changelog provides the repository summary. A changelog entry or package
+version does not establish public availability: check the npm registry version
+and tags for the SDK, and deployment readback for the Website and API.
 
 ## Pending changes
 
 Before a release is cut, inspect pending Changesets:
 
 ```sh
-bun run changeset status --verbose
+bun run changeset:status
 ```
 
 Do not copy pending Changeset text into a public changelog by hand. Apply the
-release train with `bun run version-repo` only during deliberate release prep.
+pending changes with `bun run version-packages` only during release preparation.
 
 ## Related pages
 
