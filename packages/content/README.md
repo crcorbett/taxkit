@@ -3,7 +3,7 @@ document_type: package-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-content-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-31
 review_trigger: content contracts, search policy or package exports change
 ---
 
@@ -16,15 +16,17 @@ duplicate addresses and navigation that does not match the pages.
 `ContentCatalogueLive` (`./catalogue`) builds that catalogue once from the authored MDX in
 [`@content/docs`](../../content/docs/README.md). It reads the navigation and
 repository link profile from that package, takes the page texts from
-`DocsSources`, reads each page through `DocsPageReader`, writes each page's
-processed Markdown from its checked body, and keeps only published pages. Any
+`DocsSources`, reads each page and its processed Markdown through `DocsPageReader`,
+and keeps only published pages. Any
 unreadable page fails the Layer. `ContentServiceLive` (`./live`) serves pages, navigation
 and search from `ContentCatalogue`. The runtime export does not import authored
 navigation, repository metadata or the catalogue builder.
 
 Content owns `DocsPageReader`, implemented by `ContentMdxReaderLive` (`./mdx`)
 using the neutral MDX contracts. It validates TaxKit metadata and page titles and
-projects finished data into the existing public body. `ContentLinkResolverLive`
+projects finished data into the existing public body. Public Content brand
+identities stay unchanged; shared wire refinements come from MDX. The adapter
+writes Markdown from the semantic code text before projecting the public body. `ContentLinkResolverLive`
 (`./link-resolver`) consumes a checked `DocsLinkTargets` snapshot; the static
 `DocsLinkTargetsLive` loads the authored navigation/repository policy. The API build
 supplies the concrete MDX, highlighter and diagram Layers. The API Worker reads

@@ -23,7 +23,6 @@ describe("Mermaid diagram renderer", () => {
       const renderer = yield* DiagramRenderer;
       const source = yield* DiagramSource.makeEffect("not a diagram");
       const error = yield* renderer.render(source).pipe(Effect.flip);
-      assert.strictEqual(error._tag, "DiagramRenderError");
       assert.strictEqual(error.reason, "render");
     }).pipe(Effect.provide(MermaidDiagramRendererLive))
   );

@@ -1,4 +1,12 @@
-import { Boolean, Array, Effect, Match, Option, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Boolean,
+  Array,
+  Effect,
+  Match,
+  Option,
+  Schema,
+} from "effect";
 
 import { CompileError } from "./errors.js";
 import {
@@ -13,16 +21,15 @@ import {
 import type { Block, Inline, SourceId } from "./schemas.js";
 import { plainText } from "./syntax.schemas.js";
 import type {
+  BlockCompilation,
   SyntaxBlock,
   SyntaxFormatted,
   SyntaxLeaf,
   SyntaxPhrasing,
   SyntaxTableRow,
 } from "./syntax.schemas.js";
-
 const diagramMetaPattern = /^title="(?<title>[^"]+)"$/u;
 const DiagramMeta = Schema.Struct({ title: DiagramTitle });
-
 const compileLeaf = (node: SyntaxLeaf) =>
   Match.value(node).pipe(
     Match.discriminatorsExhaustive("type")({
@@ -33,40 +40,41 @@ const compileLeaf = (node: SyntaxLeaf) =>
       text: ({ value }) => ({ kind: "text" as const, text: value }),
     })
   );
-
 const compileFormatted = (node: SyntaxFormatted) =>
   Match.value(node).pipe(
     Match.discriminatorsExhaustive("type")({
       emphasis: ({ children }) => ({
-        content: Array.map(children, compileLeaf),
+        content: EffectFunction.pipe(children, Array.map(compileLeaf)),
         kind: "emphasis" as const,
       }),
       inlineCode: compileLeaf,
       strong: ({ children }) => ({
-        content: Array.map(children, compileLeaf),
+        content: EffectFunction.pipe(children, Array.map(compileLeaf)),
         kind: "strong" as const,
       }),
       text: compileLeaf,
     })
   );
-
 const compileInline = (node: SyntaxPhrasing): Effect.Effect<Inline> =>
   Match.value(node).pipe(
     Match.when({ type: "link" }, (link) => ({
-      content: Array.map(link.children, compileFormatted),
+      content: EffectFunction.pipe(link.children, Array.map(compileFormatted)),
       kind: "link" as const,
       target: link.url,
     })),
     Match.orElse(compileFormatted),
     Effect.succeed
   );
-
 const compileInlines = (nodes: readonly SyntaxPhrasing[]) =>
-  Effect.forEach(nodes, (node) => compileInline(node));
-
+  EffectFunction.pipe(
+    nodes,
+    Effect.forEach((node) => compileInline(node))
+  );
 const compileRow = (row: SyntaxTableRow) =>
-  Effect.forEach(row.children, (cell) => compileInlines(cell.children));
-
+  EffectFunction.pipe(
+    row.children,
+    Effect.forEach((cell) => compileInlines(cell.children))
+  );
 const compileBlock = (
   node: SyntaxBlock,
   sourceId: SourceId
@@ -86,7 +94,10 @@ const compileBlock = (
                 );
               }
               const language = yield* Schema.decodeUnknownEffect(CodeLanguage)(
-                Option.getOrElse(lang, () => "txt")
+                EffectFunction.pipe(
+                  lang,
+                  Option.getOrElse(() => "txt")
+                )
               ).pipe(
                 Effect.mapError(() =>
                   fail(
@@ -145,9 +156,11 @@ const compileBlock = (
           };
         }),
       list: ({ children, ordered, start }) =>
-        Effect.forEach(children, ({ children: [paragraph] }) =>
-          compileInlines(paragraph.children)
-        ).pipe(
+        EffectFunction.pipe(
+          children,
+          Effect.forEach(({ children: [paragraph] }) =>
+            compileInlines(paragraph.children)
+          ),
           Effect.flatMap((items) =>
             Option.match(start, {
               onNone: () => ListStart.makeEffect(1),
@@ -170,26 +183,29 @@ const compileBlock = (
       table: ({ align, children: [header, ...rows] }) =>
         Effect.gen(function* () {
           return {
-            align: Array.map(
+            align: EffectFunction.pipe(
               align,
-              Option.getOrElse(() => "none" as const)
+              Array.map(Option.getOrElse(() => "none" as const))
             ),
             header: yield* compileRow(header),
             kind: "table" as const,
-            rows: yield* Effect.forEach(rows, (row) => compileRow(row)),
+            rows: yield* EffectFunction.pipe(
+              rows,
+              Effect.forEach((row) => compileRow(row))
+            ),
           };
         }),
     })
   );
 };
-
 // Compile checked syntax without resolving links or acquiring providers.
-export const compileBlocks = Effect.fnUntraced(function* (
-  blocks: readonly SyntaxBlock[],
-  sourceId: SourceId
-) {
-  const body = yield* Effect.forEach(blocks, (block) =>
-    compileBlock(block, sourceId)
+export const compileBlocks = Effect.fnUntraced(function* ({
+  blocks,
+  sourceId,
+}: BlockCompilation) {
+  const body = yield* EffectFunction.pipe(
+    blocks,
+    Effect.forEach((block) => compileBlock(block, sourceId))
   );
   return yield* Blocks.makeEffect(body).pipe(
     Effect.mapError(

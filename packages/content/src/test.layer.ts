@@ -1,9 +1,4 @@
-import {
-  Array,
-  Effect,
-  Layer,
-  Ref,
-} from "effect";
+import { Array, Effect, Layer, Ref } from "effect";
 
 import type { ContentObservations } from "./__testing__/observations.js";
 import { DocsImageRenderError } from "./errors.js";
@@ -14,11 +9,7 @@ import type {
   DocsPublicCatalogue,
   DocsSearchTerm,
 } from "./schemas.js";
-import {
-  ContentCatalogue,
-  ContentService,
-  DocsOgImages,
-} from "./service.js";
+import { ContentCatalogue, ContentService, DocsOgImages } from "./service.js";
 
 export const makeContentTest = Effect.fnUntraced(function* (
   catalogue: DocsPublicCatalogue

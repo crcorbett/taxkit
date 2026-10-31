@@ -3,7 +3,14 @@ import repositoryRepresentation from "@content/docs/repository.json" with { type
 import { LinkResolveError } from "@taxkit/mdx/errors";
 import { LinkDestination } from "@taxkit/mdx/schemas";
 import { LinkResolver } from "@taxkit/mdx/service";
-import { Array, Effect, HashMap, Layer, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  HashMap,
+  Layer,
+  Schema,
+} from "effect";
 
 import { DocsSourceError } from "./errors.js";
 import { DocsLinkTargets, resolveDocsHref } from "./links.js";
@@ -28,12 +35,10 @@ export const DocsLinkTargetsLive = Layer.effect(
     ).pipe(Effect.mapError(() => fail));
     return {
       pages: HashMap.fromIterable(
-        Array.map(
-          Array.flatMap(navigation.primaryNavigation, (item) => [
-            item,
-            ...(item.pages ?? []),
-          ]),
-          (leaf) => [leaf.source, leaf.path] as const
+        EffectFunction.pipe(
+          navigation.primaryNavigation,
+          Array.flatMap((item) => [item, ...(item.pages ?? [])]),
+          Array.map((leaf) => [leaf.source, leaf.path] as const)
         )
       ),
       repository,

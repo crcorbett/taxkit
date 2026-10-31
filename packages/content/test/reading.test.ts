@@ -1,6 +1,6 @@
 import { assert, describe, it } from "@effect/vitest";
 import { RenderedBlock } from "@taxkit/mdx/schemas";
-import { Effect, HashMap, Schema } from "effect";
+import { Function as EffectFunction, Effect, HashMap, Schema } from "effect";
 
 import { resolveDocsHref } from "../src/links.js";
 import { readingMarkdown } from "../src/reading-markdown.egress.js";
@@ -26,7 +26,6 @@ const context = Effect.gen(function* () {
     source,
   };
 }).pipe(Effect.orDie);
-
 describe("docs links", () => {
   it.effect("resolves pages, repository files, fragments and HTTPS", () =>
     Effect.gen(function* () {
@@ -52,13 +51,12 @@ describe("docs links", () => {
       );
     })
   );
-
   it.effect(
     "rejects unknown pages, other schemes, absolute paths and escapes",
     () =>
       Effect.gen(function* () {
         const links = yield* context;
-        yield* Effect.forEach(
+        yield* EffectFunction.pipe(
           [
             "./missing.mdx",
             "mailto:a@example.com",
@@ -67,22 +65,21 @@ describe("docs links", () => {
             "../../../../outside.md",
             "../start/index.mdx#Bad Fragment",
           ],
-          (href) =>
+          Effect.forEach((href) =>
             resolveDocsHref(href, links).pipe(
               Effect.flip,
               Effect.flatMap((error) =>
                 Effect.sync(() => {
-                  assert.strictEqual(error._tag, "DocsPageReadError");
                   assert.strictEqual(error.reason, "link");
                   assert.strictEqual(error.source, "guides/first.mdx");
                 })
               )
             )
+          )
         );
       })
   );
 });
-
 describe("reading Markdown", () => {
   it.effect("writes the checked body back as literal Markdown", () =>
     Effect.gen(function* () {

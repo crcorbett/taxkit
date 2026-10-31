@@ -162,6 +162,7 @@
         "src/live.layer.ts",
         "src/highlights.adapter.layer.ts",
         "test/**/*.test.ts",
+        "test/**/*.typecheck.ts",
         "vitest.config.ts",
         "src/service.ts",
         "src/schemas.ts",

@@ -1,4 +1,4 @@
-import { Effect, Layer, Match } from "effect";
+import { Function as EffectFunction, Effect, Layer, Match } from "effect";
 
 import { RenderError } from "./errors.js";
 import { RenderedBlock, RenderedLink } from "./schemas.js";
@@ -9,7 +9,6 @@ import {
   LinkResolver,
   MdxRenderer,
 } from "./service.js";
-
 export const MdxRendererLive = Layer.effect(
   MdxRenderer,
   Effect.gen(function* () {
@@ -47,8 +46,11 @@ export const MdxRendererLive = Layer.effect(
       document: Document,
       node: readonly number[]
     ) =>
-      Effect.forEach(inlines, (inline, index) =>
-        renderInline(inline, document, [...node, index])
+      EffectFunction.pipe(
+        inlines,
+        Effect.forEach((inline, index) =>
+          renderInline(inline, document, [...node, index])
+        )
       );
     const renderBlock = (
       input: Block,
@@ -101,23 +103,34 @@ export const MdxRendererLive = Layer.effect(
               Effect.map((content) => ({ ...block, content }))
             ),
           list: (block) =>
-            Effect.forEach(block.items, (item, index) =>
-              renderInlines(item, document, [...node, index])
-            ).pipe(Effect.map((items) => ({ ...block, items }))),
+            EffectFunction.pipe(
+              block.items,
+              Effect.forEach((item, index) =>
+                renderInlines(item, document, [...node, index])
+              ),
+              Effect.map((items) => ({ ...block, items }))
+            ),
           paragraph: (block) =>
             renderInlines(block.content, document, node).pipe(
               Effect.map((content) => ({ ...block, content }))
             ),
           table: (block) =>
             Effect.gen(function* () {
-              const header = yield* Effect.forEach(
+              const header = yield* EffectFunction.pipe(
                 block.header,
-                (cell, index) =>
+                Effect.forEach((cell, index) =>
                   renderInlines(cell, document, [...node, 0, index])
+                )
               );
-              const rows = yield* Effect.forEach(block.rows, (row, index) =>
-                Effect.forEach(row, (cell, col) =>
-                  renderInlines(cell, document, [...node, index + 1, col])
+              const rows = yield* EffectFunction.pipe(
+                block.rows,
+                Effect.forEach((row, index) =>
+                  EffectFunction.pipe(
+                    row,
+                    Effect.forEach((cell, col) =>
+                      renderInlines(cell, document, [...node, index + 1, col])
+                    )
+                  )
                 )
               );
               return { ...block, header, rows };
@@ -127,8 +140,11 @@ export const MdxRendererLive = Layer.effect(
     };
     return MdxRenderer.of({
       render: Effect.fn("MdxRenderer.render")(function* (document) {
-        const blocks = yield* Effect.forEach(document.blocks, (block, index) =>
-          renderBlock(block, document, [index])
+        const blocks = yield* EffectFunction.pipe(
+          document.blocks,
+          Effect.forEach((block, index) =>
+            renderBlock(block, document, [index])
+          )
         );
         return {
           ...document,

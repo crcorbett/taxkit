@@ -9,7 +9,10 @@ export const MdxCompilerLive = Layer.succeed(
   MdxCompiler.of({
     compile: Effect.fn("MdxCompiler.compile")(function* (source) {
       const { metadata, root } = yield* parseSource(source);
-      const blocks = yield* compileBlocks(root.children, source.id);
+      const blocks = yield* compileBlocks({
+        blocks: root.children,
+        sourceId: source.id,
+      });
       return {
         blocks,
         format: "mdx-document" as const,

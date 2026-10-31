@@ -1,4 +1,4 @@
-import { Array, Effect, Layer, pipe } from "effect";
+import { Function as EffectFunction, Array, Effect, Layer } from "effect";
 
 import { DocsPageNotFoundError, DocsSourceError } from "./errors.js";
 import { DocsSearchExcerpt } from "./schemas.js";
@@ -8,7 +8,6 @@ import type {
   DocsSearchTerm,
 } from "./schemas.js";
 import { ContentCatalogue, ContentService } from "./service.js";
-
 export const ContentServiceLive = Layer.effect(
   ContentService,
   Effect.gen(function* () {
@@ -18,7 +17,9 @@ export const ContentServiceLive = Layer.effect(
         Effect.succeed(catalogue.navigation)
       ),
       getPage: Effect.fn("ContentService.getPage")((path: DocsPagePath) =>
-        Array.findFirst(catalogue.pages, (page) => page.path === path).pipe(
+        EffectFunction.pipe(
+          catalogue.pages,
+          Array.findFirst((page) => page.path === path),
           Effect.fromOption,
           Effect.mapError(() => new DocsPageNotFoundError({ path }))
         )
@@ -28,17 +29,15 @@ export const ContentServiceLive = Layer.effect(
       ),
       searchPages: Effect.fn("ContentService.searchPages")(
         (term: DocsSearchTerm) =>
-          Effect.forEach(
-            pipe(
-              catalogue.pages,
-              Array.filter((page) =>
-                `${page.frontmatter.title}\n${page.frontmatter.description}\n${page.markdown}`
-                  .toLowerCase()
-                  .includes(term.toLowerCase())
-              ),
-              Array.take(20)
+          EffectFunction.pipe(
+            catalogue.pages,
+            Array.filter((page) =>
+              `${page.frontmatter.title}\n${page.frontmatter.description}\n${page.markdown}`
+                .toLowerCase()
+                .includes(term.toLowerCase())
             ),
-            (page) =>
+            Array.take(20),
+            Effect.forEach((page) =>
               DocsSearchExcerpt.makeEffect(
                 page.markdown.replaceAll(/\s+/gu, " ").trim().slice(0, 240)
               ).pipe(
@@ -52,7 +51,7 @@ export const ContentServiceLive = Layer.effect(
                     }) satisfies DocsSearchResult
                 )
               )
-          ).pipe(
+            ),
             Effect.mapError(
               () =>
                 new DocsSourceError({

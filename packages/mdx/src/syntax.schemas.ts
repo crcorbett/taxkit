@@ -1,7 +1,6 @@
-import { Array, Match, Schema } from "effect";
+import { Function as EffectFunction, Array, Match, Schema } from "effect";
 
-import { InlineText, LinkTarget, ListStart } from "./schemas.js";
-
+import { InlineText, LinkTarget, ListStart, SourceId } from "./schemas.js";
 // The supported MDX, as the installed parser reports it. Anything else,
 // including JSX, images, raw HTML, quotes and nested lists, fails the page.
 const SyntaxText = Schema.Struct({
@@ -45,21 +44,22 @@ export const SyntaxPhrasing = Schema.Union([
   SyntaxLink,
 ]).pipe(Schema.toTaggedUnion("type"));
 export type SyntaxPhrasing = typeof SyntaxPhrasing.Type;
-
 // The words a reader sees in a run of inline syntax, without formatting.
 export const plainText = (nodes: readonly SyntaxPhrasing[]): string =>
-  Array.map(nodes, (node) =>
-    Match.value(node).pipe(
-      Match.discriminatorsExhaustive("type")({
-        emphasis: ({ children }) => plainText(children),
-        inlineCode: ({ value }) => value,
-        link: ({ children }) => plainText(children),
-        strong: ({ children }) => plainText(children),
-        text: ({ value }) => value,
-      })
+  EffectFunction.pipe(
+    nodes,
+    Array.map((node) =>
+      Match.value(node).pipe(
+        Match.discriminatorsExhaustive("type")({
+          emphasis: ({ children }) => plainText(children),
+          inlineCode: ({ value }) => value,
+          link: ({ children }) => plainText(children),
+          strong: ({ children }) => plainText(children),
+          text: ({ value }) => value,
+        })
+      )
     )
   ).join("");
-
 const SyntaxPhrasings = Schema.Array(SyntaxPhrasing).check(
   Schema.isMinLength(1)
 );
@@ -116,8 +116,13 @@ export const SyntaxBlock = Schema.Union([
   SyntaxCode,
 ]).pipe(Schema.toTaggedUnion("type"));
 export type SyntaxBlock = typeof SyntaxBlock.Type;
-
 export const SyntaxRoot = Schema.Struct({
   children: Schema.Array(SyntaxBlock),
   type: Schema.Literal("root"),
 });
+
+export const BlockCompilation = Schema.Struct({
+  blocks: Schema.Array(SyntaxBlock),
+  sourceId: SourceId,
+});
+export type BlockCompilation = typeof BlockCompilation.Type;

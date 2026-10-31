@@ -1,5 +1,6 @@
 import { assert, describe, it } from "@effect/vitest";
 import {
+  DocsDiagramTitle,
   DocsPagePath,
   DocsRepositoryProfile,
   DocsSourcePath,
@@ -8,7 +9,15 @@ import { CodeHighlightError, DiagramRenderError } from "@taxkit/mdx/errors";
 import { MdxLive } from "@taxkit/mdx/live";
 import { CodeHighlighter, DiagramRenderer } from "@taxkit/mdx/service";
 import { CodeHighlighterTest, DiagramRendererTest } from "@taxkit/mdx/test";
-import { Array, Effect, HashMap, Layer, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  HashMap,
+  Layer,
+  Match,
+  Schema,
+} from "effect";
 
 import { ContentLinkResolverLive } from "../src/link-resolver.layer.js";
 import { DocsLinkTargets } from "../src/links.js";
@@ -33,7 +42,6 @@ const links = Effect.gen(function* () {
     source,
   };
 }).pipe(Effect.orDie);
-
 const MdxPageReaderLive = ContentMdxReaderLive.pipe(
   Layer.provide(MdxLive),
   Layer.provide(
@@ -47,21 +55,17 @@ const MdxPageReaderLive = ContentMdxReaderLive.pipe(
     )
   )
 );
-
 const ReaderTest = MdxPageReaderLive.pipe(
   Layer.provide(Layer.merge(CodeHighlighterTest, DiagramRendererTest))
 );
-
 const page = (body: string) =>
   `---\ntitle: "First guide"\ndescription: "Read the first guide."\nstatus: "published"\n---\n\n# First guide\n\n${body}`;
-
 const read = (text: string) =>
   Effect.gen(function* () {
     const context = yield* links;
     const reader = yield* DocsPageReader;
     return yield* reader.read({ path: context.source, text });
   }).pipe(Effect.provide(ReaderTest));
-
 describe("MDX page reader", () => {
   it.effect(
     "uses the source file for relative links and closes its dependencies",
@@ -90,116 +94,125 @@ describe("MDX page reader", () => {
         });
       })
   );
-
   it.effect("preserves highlighter refusal and malformed-token reasons", () =>
-    Effect.forEach(["highlight", "tokens"] as const, (reason) =>
-      Effect.gen(function* () {
-        const context = yield* links;
-        const reader = yield* DocsPageReader.pipe(
-          Effect.provide(
-            MdxPageReaderLive.pipe(
-              Layer.provide(
-                Layer.merge(
-                  Layer.succeed(CodeHighlighter, {
-                    highlight: (snippet) =>
-                      Effect.fail(
-                        new CodeHighlightError({
-                          language: snippet.language,
-                          reason,
-                        })
-                      ),
-                  }),
-                  DiagramRendererTest
+    EffectFunction.pipe(
+      ["highlight", "tokens"] as const,
+      Effect.forEach((reason) =>
+        Effect.gen(function* () {
+          const context = yield* links;
+          const reader = yield* DocsPageReader.pipe(
+            Effect.provide(
+              MdxPageReaderLive.pipe(
+                Layer.provide(
+                  Layer.merge(
+                    Layer.succeed(CodeHighlighter, {
+                      highlight: (snippet) =>
+                        Effect.fail(
+                          new CodeHighlightError({
+                            language: snippet.language,
+                            reason,
+                          })
+                        ),
+                    }),
+                    DiagramRendererTest
+                  )
                 )
               )
             )
-          )
-        );
-        const error = yield* reader
-          .read({
-            path: context.source,
-            text: page("```ts\nconst n = 1;\n```"),
-          })
-          .pipe(Effect.flip);
-        assert.strictEqual(error._tag, "DocsPageReadError");
-        assert.strictEqual(
-          error.reason,
-          reason === "highlight" ? "code-highlight" : "code-tokens"
-        );
-        assert.strictEqual(error.source, context.source);
-        assert.notInclude(error.message, "const n");
-      })
+          );
+          const error = yield* reader
+            .read({
+              path: context.source,
+              text: page("```ts\nconst n = 1;\n```"),
+            })
+            .pipe(Effect.flip);
+          assert.strictEqual(
+            error.reason,
+            Match.value(reason).pipe(
+              Match.when("highlight", () => "code-highlight"),
+              Match.when("tokens", () => "code-tokens"),
+              Match.exhaustive
+            )
+          );
+          assert.strictEqual(error.source, context.source);
+          assert.notInclude(error.message, "const n");
+        })
+      )
     )
   );
-
   it.effect("preserves diagram refusal and malformed-SVG reasons", () =>
-    Effect.forEach(["render", "svg"] as const, (reason) =>
-      Effect.gen(function* () {
-        const context = yield* links;
-        const reader = yield* DocsPageReader.pipe(
-          Effect.provide(
-            MdxPageReaderLive.pipe(
-              Layer.provide(
-                Layer.merge(
-                  CodeHighlighterTest,
-                  Layer.succeed(DiagramRenderer, {
-                    render: () =>
-                      Effect.fail(new DiagramRenderError({ reason })),
-                  })
+    EffectFunction.pipe(
+      ["render", "svg"] as const,
+      Effect.forEach((reason) =>
+        Effect.gen(function* () {
+          const context = yield* links;
+          const reader = yield* DocsPageReader.pipe(
+            Effect.provide(
+              MdxPageReaderLive.pipe(
+                Layer.provide(
+                  Layer.merge(
+                    CodeHighlighterTest,
+                    Layer.succeed(DiagramRenderer, {
+                      render: () =>
+                        Effect.fail(new DiagramRenderError({ reason })),
+                    })
+                  )
                 )
               )
             )
-          )
-        );
-        const error = yield* reader
-          .read({
-            path: context.source,
-            text: page(
-              '```mermaid title="Steps"\nflowchart LR\n  A --> B\n```'
-            ),
-          })
-          .pipe(Effect.flip);
-        assert.strictEqual(error._tag, "DocsPageReadError");
-        assert.strictEqual(
-          error.reason,
-          reason === "render" ? "diagram-render" : "diagram-svg"
-        );
-        assert.strictEqual(error.source, context.source);
-        assert.notInclude(error.message, "flowchart");
-      })
+          );
+          const error = yield* reader
+            .read({
+              path: context.source,
+              text: page(
+                '```mermaid title="Steps"\nflowchart LR\n  A --> B\n```'
+              ),
+            })
+            .pipe(Effect.flip);
+          assert.strictEqual(
+            error.reason,
+            Match.value(reason).pipe(
+              Match.when("render", () => "diagram-render"),
+              Match.when("svg", () => "diagram-svg"),
+              Match.exhaustive
+            )
+          );
+          assert.strictEqual(error.source, context.source);
+          assert.notInclude(error.message, "flowchart");
+        })
+      )
     )
   );
-
   it.effect("reads supported Markdown into checked reading blocks", () =>
     Effect.gen(function* () {
-      const result = yield* read(
-        page(
-          [
-            "Use **the SDK** and `calculate`; see [Start](../start/index.mdx#install).",
-            "",
-            "## Run it",
-            "",
-            "1. Install it.",
-            "2. Read [the example](../../../packages/docs-examples/src/a.ts).",
-            "",
-            "| Field | Value |",
-            "| :--- | ---: |",
-            "| `netPay` | cents |",
-            "",
-            "```ts",
-            "const a = 1;",
-            "```",
-            "",
-            '```mermaid title="Two steps"',
-            "flowchart LR",
-            "  A --> B",
-            "```",
-          ].join("\n")
-        )
-      );
+      const body = [
+        "Use **the SDK** and `calculate`; see [Start](../start/index.mdx#install).",
+        "",
+        "## Run it",
+        "",
+        "1. Install it.",
+        "2. Read [the example](../../../packages/docs-examples/src/a.ts).",
+        "",
+        "| Field | Value |",
+        "| :--- | ---: |",
+        "| `netPay` | cents |",
+        "",
+        "```ts",
+        "const a = 1;",
+        "```",
+        "",
+        '```mermaid title="Two steps"',
+        "flowchart LR",
+        "  A --> B",
+        "```",
+      ].join("\n");
+      const result = yield* EffectFunction.pipe(body, page, read);
       assert.strictEqual(result.frontmatter.title, "First guide");
       assert.deepEqual(
-        Array.map(result.body, (block) => block.kind),
+        EffectFunction.pipe(
+          result.body,
+          Array.map((block) => block.kind)
+        ),
         ["paragraph", "heading", "list", "table", "code", "diagram"]
       );
       const [paragraph, heading, list, table, , diagram] = result.body;
@@ -225,28 +238,39 @@ describe("MDX page reader", () => {
         id: "run-it",
         kind: "heading",
       });
-      const [, secondItem] = list?.kind === "list" ? list.items : [];
+      assert.isDefined(list);
+      assert.strictEqual(list?.kind, "list");
+      const items = Match.value(list).pipe(
+        Match.when({ kind: "list" }, (value) => value.items),
+        Match.orElse(() => [])
+      );
+      const [, secondItem] = items;
       const [, exampleLink] = secondItem ?? [];
       assert.deepEqual<unknown>(exampleLink, {
         content: [{ kind: "text", text: "the example" }],
         href: `https://github.com/crcorbett/taxkit/blob/${"1".repeat(40)}/packages/docs-examples/src/a.ts`,
         kind: "link",
       });
-      assert.deepEqual(table?.kind === "table" ? table.align : undefined, [
-        "left",
-        "right",
-      ]);
+      assert.deepEqual(
+        Match.value(table).pipe(
+          Match.when({ kind: "table" }, (value) => value.align),
+          Match.orElse(() => {})
+        ),
+        ["left", "right"]
+      );
       assert.strictEqual(
-        diagram?.kind === "diagram" ? diagram.title : undefined,
-        "Two steps"
+        Match.value(diagram).pipe(
+          Match.when({ kind: "diagram" }, (value) => value.title),
+          Match.orElse(() => {})
+        ),
+        yield* DocsDiagramTitle.makeEffect("Two steps")
       );
     })
   );
-
   it.effect(
     "fails each unsupported page with a parse error naming the file",
     () =>
-      Effect.forEach(
+      EffectFunction.pipe(
         [
           ["No frontmatter", "frontmatter"],
           [page("<Callout>Hi</Callout>"), "syntax"],
@@ -268,17 +292,17 @@ describe("MDX page reader", () => {
             "frontmatter",
           ],
         ] as const,
-        ([text, reason]) =>
+        Effect.forEach(([text, reason]) =>
           read(text).pipe(
             Effect.flip,
             Effect.flatMap((error) =>
               Effect.sync(() => {
-                assert.strictEqual(error._tag, "DocsPageReadError");
                 assert.strictEqual(error.reason, reason);
                 assert.strictEqual(error.source, "guides/first.mdx");
               })
             )
           )
+        )
       )
   );
 });

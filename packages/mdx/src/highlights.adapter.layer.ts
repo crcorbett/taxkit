@@ -4,10 +4,18 @@ import { CodeHighlightError } from "@taxkit/mdx/errors";
 import { InlineText, TokenColor } from "@taxkit/mdx/schemas";
 import type { CodeSnippet, CodeToken, TokenStyle } from "@taxkit/mdx/schemas";
 import { CodeHighlighter } from "@taxkit/mdx/service";
-import { Array, Effect, Layer, Match, Option, Result, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Layer,
+  Match,
+  Option,
+  Result,
+  Schema,
+} from "effect";
 
 import { PresentationThemeConfig } from "./config.js";
-
 // The checked part of the provider's Shiki-compatible reply. Font-style
 // bits: 1 italic, 2 bold. Other provider fields are ignored.
 const HighlightsTokens = Schema.Struct({
@@ -21,8 +29,7 @@ const HighlightsTokens = Schema.Struct({
     )
   ).check(Schema.isMinLength(1)),
 });
-
-const tokenStyle = (fontStyle: number): TokenStyle =>
+const resolveTokenStyle = (fontStyle: number): TokenStyle =>
   Match.value({
     bold: Math.floor(fontStyle / 2) % 2 === 1,
     italic: fontStyle % 2 === 1,
@@ -32,7 +39,6 @@ const tokenStyle = (fontStyle: number): TokenStyle =>
     Match.when({ italic: true }, () => "italic" as const),
     Match.orElse(() => "normal" as const)
   );
-
 // @pierre/highlights initialises its WebAssembly on import. Only the API
 // build loads this adapter; every provider call stays in this operation.
 export const PierreCodeHighlighterLive = Layer.effect(
@@ -77,16 +83,26 @@ export const PierreCodeHighlighterLive = Layer.effect(
         );
         // Already-checked provider tokens become Content tokens; empty runs
         // carry no text and are dropped.
-        return Array.map(tokens, (line) =>
-          Array.filterMap(line, (token) =>
-            Match.value(token.content).pipe(
-              Match.when("", () => Result.failVoid),
-              Match.orElse((text) =>
-                Result.succeed<CodeToken>({
-                  color: token.color,
-                  style: tokenStyle(Option.getOrElse(token.fontStyle, () => 0)),
-                  text,
-                })
+        return EffectFunction.pipe(
+          tokens,
+          Array.map((line) =>
+            EffectFunction.pipe(
+              line,
+              Array.filterMap((token) =>
+                Match.value(token.content).pipe(
+                  Match.when("", () => Result.failVoid),
+                  Match.orElse((text) =>
+                    Result.succeed<CodeToken>({
+                      color: token.color,
+                      style: EffectFunction.pipe(
+                        token.fontStyle,
+                        Option.getOrElse(() => 0),
+                        resolveTokenStyle
+                      ),
+                      text,
+                    })
+                  )
+                )
               )
             )
           )

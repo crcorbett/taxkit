@@ -60,13 +60,13 @@ Content subsequently validates its own page fields at its domain boundary. It mu
 explicitly project public fields rather than publish arbitrary metadata.
 
 Source identity comes from `Source.id` and cannot be supplied again to override
-link resolution or diagnostics. Compilation accepts LF and CRLF documents;
-frontmatter extraction must not lose the original position when reporting an
-error. Errors use source id and, where available, an original-source span for
-compilation or a node path for rendering. Parser offsets are translated once at
-ingress: spans use zero-based UTF-16 offsets with an exclusive end in the original
-text. Do not expose the parser's node types as the location contract or fabricate
-a span when none is available.
+link resolution or diagnostics. Compilation accepts LF and CRLF documents.
+Current compilation errors carry the source id and a closed reason; rendering
+errors also carry an integer node path. Exact source spans are not part of the
+implemented compiler contract. Adding them requires a checked location Schema
+and mapping parser offsets once at ingress to zero-based UTF-16 offsets with an
+exclusive end in the original text, including frontmatter and CRLF. Do not expose
+parser node types or fabricate locations.
 
 Keep the current supported Markdown subset and language set explicit. Neutrality
 does not mean full CommonMark or every language a provider happens to recognise.

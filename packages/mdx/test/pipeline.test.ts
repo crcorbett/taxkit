@@ -1,6 +1,7 @@
 import { assert, describe, it } from "@effect/vitest";
 import { MdxArtifactsLive } from "@taxkit/mdx/artifacts";
 import { MdxCompilerLive } from "@taxkit/mdx/compiler";
+import { CompileError } from "@taxkit/mdx/errors";
 import { PierreCodeHighlighterLive } from "@taxkit/mdx/highlights";
 import { MdxLive } from "@taxkit/mdx/live";
 import { MdxRendererLive } from "@taxkit/mdx/renderer";
@@ -24,6 +25,7 @@ import {
 } from "@taxkit/mdx/service";
 import { DiagramRendererTest } from "@taxkit/mdx/test";
 import {
+  Function as EffectFunction,
   Array,
   ConfigProvider,
   Deferred,
@@ -33,9 +35,8 @@ import {
   Match,
   Option,
   Ref,
+  Schema,
 } from "effect";
-import { expectTypeOf } from "vitest";
-
 const LinksTest = Layer.succeed(
   LinkResolver,
   LinkResolver.of({
@@ -64,17 +65,7 @@ const source = Effect.gen(function* () {
     ),
   });
 });
-
 describe("portable MDX pipeline", () => {
-  it("keeps raw primitives and distinct semantic brands out of typed operations", () => {
-    expectTypeOf<string>().not.toExtend<SourceText>();
-    expectTypeOf<SourceText>().not.toExtend<CodeText>();
-    expectTypeOf<CodeText>().not.toExtend<InlineText>();
-    expectTypeOf<SourceId>().not.toExtend<LinkTarget>();
-    expectTypeOf<LinkTarget>().not.toExtend<LinkDestination>();
-    expectTypeOf<number>().not.toExtend<ListStart>();
-  });
-
   it.effect("checks brand refinements without changing literal text", () =>
     Effect.gen(function* () {
       assert.strictEqual(
@@ -85,26 +76,26 @@ describe("portable MDX pipeline", () => {
       assert.strictEqual(yield* InlineText.makeEffect(" "), " ");
       assert.strictEqual(yield* LinkTarget.makeEffect(""), "");
       assert.strictEqual(yield* ListStart.makeEffect(1), 1);
-      yield* SourceText.makeEffect("s".repeat(1_000_001)).pipe(Effect.flip);
-      yield* CodeText.makeEffect("c".repeat(20_001)).pipe(Effect.flip);
+      yield* SourceText.makeEffect("s".repeat(1000001)).pipe(Effect.flip);
+      yield* CodeText.makeEffect("c".repeat(20001)).pipe(Effect.flip);
       yield* InlineText.makeEffect("").pipe(Effect.flip);
       yield* LinkTarget.makeEffect("t".repeat(8193)).pipe(Effect.flip);
-      yield* Effect.forEach([0, -1, 1.5], (value) =>
-        ListStart.makeEffect(value).pipe(Effect.flip)
+      yield* EffectFunction.pipe(
+        [0, -1, 1.5],
+        Effect.forEach((value) => ListStart.makeEffect(value).pipe(Effect.flip))
       );
     })
   );
-
   it.effect("rejects invalid table shapes in both artifact formats", () =>
     Effect.gen(function* () {
       const artifacts = yield* MdxArtifacts;
-      yield* Effect.forEach(
+      yield* EffectFunction.pipe(
         [
           '{"kind":"table","align":[],"header":[],"rows":[]}',
           '{"kind":"table","align":["left"],"header":[[]],"rows":[[]]}',
           '{"kind":"table","align":[],"header":[[]],"rows":[]}',
         ],
-        (block) =>
+        Effect.forEach((block) =>
           Effect.gen(function* () {
             const fields = `"blocks":[${block}],"metadata":null,"sourceId":"table","version":1`;
             yield* artifacts
@@ -116,6 +107,7 @@ describe("portable MDX pipeline", () => {
               )
               .pipe(Effect.flip);
           })
+        )
       );
       const fields =
         '"blocks":[{"kind":"table","align":["left"],"header":[[]],"rows":[[[]]]}],"metadata":null,"sourceId":"table","version":1';
@@ -125,7 +117,6 @@ describe("portable MDX pipeline", () => {
       );
     }).pipe(Effect.provide(MdxArtifactsLive))
   );
-
   it.effect(
     "rejects rendered artifact drift and excess fields on egress without caller options",
     () =>
@@ -136,7 +127,7 @@ describe("portable MDX pipeline", () => {
         const document = yield* compiler.compile(yield* source);
         const rendered = yield* renderer.render(document);
         const bytes = yield* artifacts.encodeRenderedDocument(rendered);
-        yield* Effect.forEach(
+        yield* EffectFunction.pipe(
           [
             bytes.replace('"version":1', '"future":true,"version":1'),
             bytes.replace('"kind":"link"', '"future":true,"kind":"link"'),
@@ -147,14 +138,14 @@ describe("portable MDX pipeline", () => {
             bytes.replace('"version":1', '"version":2'),
             bytes.replace(',"href":"/resolved/another"', ""),
           ],
-          (input) => {
+          Effect.forEach((input) => {
             assert.notStrictEqual(
               input,
               bytes,
               "The rejection fixture must change the artifact."
             );
             return artifacts.decodeRenderedDocument(input).pipe(Effect.flip);
-          }
+          })
         );
         const futureDocument = { ...document, future: true };
         const futureRendered = { ...rendered, future: true };
@@ -183,7 +174,6 @@ describe("portable MDX pipeline", () => {
         ]);
       }).pipe(Effect.provide(MdxCompilerLive))
   );
-
   it.effect(
     "round-trips a checked artifact and renders without a compiler",
     () =>
@@ -231,7 +221,6 @@ describe("portable MDX pipeline", () => {
         );
       }).pipe(Effect.provide(MdxArtifactsLive))
   );
-
   it.effect("normalises LF and CRLF into the same semantic document", () =>
     Effect.gen(function* () {
       const compiler = yield* MdxCompiler;
@@ -247,12 +236,11 @@ describe("portable MDX pipeline", () => {
       );
     }).pipe(Effect.provide(MdxCompilerLive))
   );
-
   it.effect("rejects unsafe or unsupported source without evaluation", () =>
     Effect.gen(function* () {
       const compiler = yield* MdxCompiler;
       const input = yield* source;
-      yield* Effect.forEach(
+      yield* EffectFunction.pipe(
         [
           "---\nx: .inf\n---\nText",
           "---\nx: 1\nx: 2\n---\nText",
@@ -265,7 +253,7 @@ describe("portable MDX pipeline", () => {
           "export const x = 1",
           "## Twice\n\n## Twice",
         ],
-        (text) =>
+        Effect.forEach((text) =>
           SourceText.makeEffect(text).pipe(
             Effect.orDie,
             Effect.flatMap((checked) =>
@@ -274,10 +262,11 @@ describe("portable MDX pipeline", () => {
             Effect.flip,
             Effect.tap((error) =>
               Effect.sync(() => {
-                assert.strictEqual(error._tag, "CompileError");
+                assert.isTrue(Schema.is(CompileError)(error));
               })
             )
           )
+        )
       );
       const fenced = yield* compiler.compile({
         ...input,
@@ -286,14 +275,15 @@ describe("portable MDX pipeline", () => {
         ),
       });
       assert.strictEqual(
-        Option.map(Array.head(fenced.blocks), (block) => block.kind).pipe(
+        EffectFunction.pipe(
+          Array.head(fenced.blocks),
+          Option.map((block) => block.kind),
           Option.getOrUndefined
         ),
         "code"
       );
     }).pipe(Effect.provide(MdxCompilerLive))
   );
-
   it.effect(
     "rejects wrong artifact kinds, versions and unexpected fields",
     () =>
@@ -302,7 +292,7 @@ describe("portable MDX pipeline", () => {
         const compiler = yield* MdxCompiler;
         const document = yield* compiler.compile(yield* source);
         const encoded = yield* artifacts.encodeDocument(document);
-        yield* Effect.forEach(
+        yield* EffectFunction.pipe(
           [
             encoded.replace('"version":1', '"version":999'),
             encoded.replace('"mdx-document"', '"mdx-rendered-document"'),
@@ -310,11 +300,12 @@ describe("portable MDX pipeline", () => {
             encoded.replace('"kind":"code"', '"future":true,"kind":"code"'),
             encoded.replace('"kind":"text"', '"future":true,"kind":"text"'),
           ],
-          (text) => artifacts.decodeDocument(text).pipe(Effect.flip)
+          Effect.forEach((text) =>
+            artifacts.decodeDocument(text).pipe(Effect.flip)
+          )
         );
       }).pipe(Effect.provide(Layer.merge(MdxCompilerLive, MdxArtifactsLive)))
   );
-
   it.effect(
     "changes presentation with checked Config while retaining document semantics",
     () =>
@@ -337,19 +328,18 @@ describe("portable MDX pipeline", () => {
         );
         const a = yield* light.render(document);
         const b = yield* dark.render(document);
-        const codeA = Array.findFirst(
+        const codeA = EffectFunction.pipe(
           a.blocks,
-          (block) => block.kind === "code"
+          Array.findFirst((block) => block.kind === "code")
         );
-        const codeB = Array.findFirst(
+        const codeB = EffectFunction.pipe(
           b.blocks,
-          (block) => block.kind === "code"
+          Array.findFirst((block) => block.kind === "code")
         );
         assert.notDeepEqual(codeA, codeB);
         assert.deepEqual(yield* compiler.compile(yield* source), document);
       })
   );
-
   it.effect("rejects token corruption with a bounded node diagnostic", () =>
     Effect.gen(function* () {
       const compiler = yield* MdxCompiler;
@@ -379,7 +369,6 @@ describe("portable MDX pipeline", () => {
       )
     )
   );
-
   it.effect(
     "interrupts between providers without running later work or publishing success",
     () =>
@@ -439,7 +428,6 @@ describe("portable MDX pipeline", () => {
         assert.isFalse(yield* Ref.get(published));
       }).pipe(Effect.scoped)
   );
-
   it.effect(
     "shares provider acquisition within a scope and releases it before the next scope",
     () =>
@@ -492,7 +480,6 @@ describe("portable MDX pipeline", () => {
         assert.strictEqual(yield* Ref.get(releases), 2);
       })
   );
-
   it.effect("runs the complete pipeline through one static composition", () =>
     Effect.gen(function* () {
       const compiler = yield* MdxCompiler;

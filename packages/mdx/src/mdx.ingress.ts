@@ -1,4 +1,10 @@
-import { Boolean, Effect, Option, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Boolean,
+  Effect,
+  Option,
+  Schema,
+} from "effect";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { gfmTableFromMarkdown } from "mdast-util-gfm-table";
 import { mdxFromMarkdown } from "mdast-util-mdx";
@@ -64,10 +70,12 @@ export const parseSource = Effect.fnUntraced(function* (source: Source) {
   const tree: unknown = yield* Effect.try({
     catch: () => fail("syntax"),
     try: () =>
-      fromMarkdown(parts.body.replaceAll("\r\n", "\n"), {
-        extensions: [mdxjs(), gfmTable()],
-        mdastExtensions: [mdxFromMarkdown(), gfmTableFromMarkdown()],
-      }),
+      EffectFunction.pipe(parts.body.replaceAll("\r\n", "\n"), (markdown) =>
+        fromMarkdown(markdown, {
+          extensions: [mdxjs(), gfmTable()],
+          mdastExtensions: [mdxFromMarkdown(), gfmTableFromMarkdown()],
+        })
+      ),
   });
   const root = yield* Schema.decodeUnknownEffect(SyntaxRoot)(tree).pipe(
     Effect.mapError(() => fail("syntax"))

@@ -1,18 +1,33 @@
 import { Source, SourceId, SourceText } from "@taxkit/mdx/schemas";
-import type { RenderedInline, RenderedBlock } from "@taxkit/mdx/schemas";
+import type {
+  Inline,
+  RenderedInline,
+  RenderedBlock,
+} from "@taxkit/mdx/schemas";
 import { MdxCompiler, MdxRenderer } from "@taxkit/mdx/service";
-import { Array, Effect, Layer, Match, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Layer,
+  Match,
+  Schema,
+} from "effect";
 
 import { DocsPageReadError } from "./errors.js";
 import { readingMarkdown } from "./reading-markdown.egress.js";
 import { DocsPageFrontmatter, DocsReadingBody } from "./schemas.js";
 import { DocsPageReader } from "./service.js";
-
 // Content projects neutral checked semantics into the existing public wire shape.
 const projectInline = (inline: RenderedInline) =>
-  inline.kind === "link"
-    ? { content: inline.content, href: inline.href, kind: inline.kind }
-    : inline;
+  Match.value(inline).pipe(
+    Match.when({ kind: "link" }, ({ content, href, kind }) => ({
+      content,
+      href,
+      kind,
+    })),
+    Match.orElse((value) => value)
+  );
 const projectBlock = (input: RenderedBlock) =>
   Match.value(input).pipe(
     Match.discriminatorsExhaustive("kind")({
@@ -20,25 +35,67 @@ const projectBlock = (input: RenderedBlock) =>
       diagram: (block) => block,
       heading: (block) => ({
         ...block,
-        content: Array.map(block.content, projectInline),
+        content: EffectFunction.pipe(block.content, Array.map(projectInline)),
       }),
       list: (block) => ({
         ...block,
-        items: Array.map(block.items, (item) => Array.map(item, projectInline)),
+        items: EffectFunction.pipe(
+          block.items,
+          Array.map((item) =>
+            EffectFunction.pipe(item, Array.map(projectInline))
+          )
+        ),
       }),
       paragraph: (block) => ({
         ...block,
-        content: Array.map(block.content, projectInline),
+        content: EffectFunction.pipe(block.content, Array.map(projectInline)),
       }),
       table: (block) => ({
         ...block,
-        header: Array.map(block.header, (cell) =>
-          Array.map(cell, projectInline)
+        header: EffectFunction.pipe(
+          block.header,
+          Array.map((cell) =>
+            EffectFunction.pipe(cell, Array.map(projectInline))
+          )
         ),
-        rows: Array.map(block.rows, (row) =>
-          Array.map(row, (cell) => Array.map(cell, projectInline))
+        rows: EffectFunction.pipe(
+          block.rows,
+          Array.map((row) =>
+            EffectFunction.pipe(
+              row,
+              Array.map((cell) =>
+                EffectFunction.pipe(cell, Array.map(projectInline))
+              )
+            )
+          )
         ),
       }),
+    })
+  );
+// Heading comparison follows the checked inline tree, including link labels.
+const collectInlineText = (inline: Inline): string =>
+  Match.value(inline).pipe(
+    Match.discriminatorsExhaustive("kind")({
+      text: ({ text }) => text,
+      "inline-code": ({ text }) => text,
+      strong: ({ content }) =>
+        EffectFunction.pipe(
+          content,
+          Array.map(collectInlineText),
+          Array.join("")
+        ),
+      emphasis: ({ content }) =>
+        EffectFunction.pipe(
+          content,
+          Array.map(collectInlineText),
+          Array.join("")
+        ),
+      link: ({ content }) =>
+        EffectFunction.pipe(
+          content,
+          Array.map(collectInlineText),
+          Array.join("")
+        ),
     })
   );
 export const ContentMdxReaderLive = Layer.effect(
@@ -63,7 +120,6 @@ export const ContentMdxReaderLive = Layer.effect(
         const input = yield* Source.makeEffect({ id, text }).pipe(
           Effect.mapError(() => fail("syntax"))
         );
-
         const document = yield* compiler
           .compile(input)
           .pipe(Effect.mapError((error) => fail(error.reason)));
@@ -80,31 +136,18 @@ export const ContentMdxReaderLive = Layer.effect(
           title?.kind !== "heading" ||
           title.depth !== 1 ||
           body.length === 0 ||
-          Array.some(
+          EffectFunction.pipe(
             body,
-            (block) => block.kind === "heading" && block.depth === 1
+            Array.some((block) => block.kind === "heading" && block.depth === 1)
           )
         ) {
           return yield* fail("heading");
         }
-        const headingText = Array.map(title.content, (inline) =>
-          Match.value(inline).pipe(
-            Match.discriminatorsExhaustive("kind")({
-              emphasis: (node) =>
-                Array.map(node.content, (leaf) => leaf.text).join(""),
-              "inline-code": (node) => node.text,
-              link: (node) =>
-                Array.map(node.content, (leaf) =>
-                  leaf.kind === "strong" || leaf.kind === "emphasis"
-                    ? Array.map(leaf.content, (value) => value.text).join("")
-                    : leaf.text
-                ).join(""),
-              strong: (node) =>
-                Array.map(node.content, (leaf) => leaf.text).join(""),
-              text: (node) => node.text,
-            })
-          )
-        ).join("");
+        const headingText = EffectFunction.pipe(
+          title.content,
+          Array.map(collectInlineText),
+          Array.join("")
+        );
         if (headingText !== frontmatter.title) {
           return yield* fail("title");
         }
@@ -113,7 +156,7 @@ export const ContentMdxReaderLive = Layer.effect(
           .pipe(Effect.mapError((error) => fail(error.reason)));
         const checkedBody = yield* Schema.decodeUnknownEffect(
           Schema.toType(DocsReadingBody)
-        )(Array.map(rendered.blocks, projectBlock)).pipe(
+        )(EffectFunction.pipe(rendered.blocks, Array.map(projectBlock))).pipe(
           Effect.mapError(() => fail("body"))
         );
         return {

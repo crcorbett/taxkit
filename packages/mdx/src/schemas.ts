@@ -1,4 +1,4 @@
-import { Array, HashSet, Schema } from "effect";
+import { Function as EffectFunction, Array, HashSet, Schema } from "effect";
 
 export const NonEmptyText = Schema.Trimmed.check(Schema.isMinLength(1));
 export const InlineText = Schema.String.check(Schema.isMinLength(1)).pipe(
@@ -45,18 +45,15 @@ export const HeadingId = NonEmptyText.pipe(
 export type HeadingId = typeof HeadingId.Type;
 export const CodeLanguage = Schema.Literals(["json", "md", "sh", "ts", "txt"]);
 export type CodeLanguage = typeof CodeLanguage.Type;
-
 export const CodeSnippet = Schema.Struct({
   language: CodeLanguage,
   text: CodeText,
 });
 export type CodeSnippet = typeof CodeSnippet.Type;
-
 export const TokenColor = Schema.String.check(
   Schema.isPattern(/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/iu)
 ).pipe(Schema.brand("taxkit/TokenColor"));
 export type TokenColor = typeof TokenColor.Type;
-
 export const TokenStyle = Schema.Literals([
   "normal",
   "italic",
@@ -64,37 +61,31 @@ export const TokenStyle = Schema.Literals([
   "bold-italic",
 ]);
 export type TokenStyle = typeof TokenStyle.Type;
-
 export const CodeToken = Schema.Struct({
   color: Schema.OptionFromNullOr(TokenColor),
   style: TokenStyle,
   text: InlineText,
 });
 export type CodeToken = typeof CodeToken.Type;
-
 // Each line keeps its tokens; an empty line has none.
 export const CodeLines = Schema.Array(Schema.Array(CodeToken)).check(
   Schema.isMinLength(1)
 );
 export type CodeLines = typeof CodeLines.Type;
-
 export const DiagramTitle = NonEmptyText.check(Schema.isMaxLength(200)).pipe(
   Schema.brand("taxkit/DiagramTitle")
 );
 export type DiagramTitle = typeof DiagramTitle.Type;
-
 export const DiagramSource = NonEmptyText.check(
   Schema.isMaxLength(10_000)
 ).pipe(Schema.brand("taxkit/DiagramSource"));
 export type DiagramSource = typeof DiagramSource.Type;
-
 // A finished standalone SVG document from the diagram renderer.
 export const DiagramSvg = Schema.String.check(
   Schema.isMaxLength(500_000),
   Schema.isPattern(/^<svg[\s>][\s\S]*<\/svg>\s*$/u)
 ).pipe(Schema.brand("taxkit/DiagramSvg"));
 export type DiagramSvg = typeof DiagramSvg.Type;
-
 export const Text = Schema.Struct({
   kind: Schema.Literal("text"),
   text: InlineText,
@@ -129,7 +120,6 @@ export const Inline = Schema.Union([
 export type Inline = typeof Inline.Type;
 export const Inlines = Schema.Array(Inline).check(Schema.isMinLength(1));
 export type Inlines = typeof Inlines.Type;
-
 export const HeadingBlock = Schema.Struct({
   content: Inlines,
   depth: Schema.Literals([1, 2, 3, 4]),
@@ -159,7 +149,10 @@ export const TableBlock = Schema.Struct({
   Schema.makeFilter(
     (table) =>
       table.align.length === table.header.length &&
-      Array.every(table.rows, (row) => row.length === table.header.length),
+      EffectFunction.pipe(
+        table.rows,
+        Array.every((row) => row.length === table.header.length)
+      ),
     { message: "Every table row must have the header's column count." }
   )
 );
@@ -171,7 +164,6 @@ export const CodeBlock = Schema.Struct({
 export const DiagramBlock = Schema.Struct({
   kind: Schema.Literal("diagram"),
   source: DiagramSource,
-
   title: DiagramTitle,
 });
 export const Block = Schema.Union([
@@ -183,12 +175,12 @@ export const Block = Schema.Union([
   DiagramBlock,
 ]).pipe(Schema.toTaggedUnion("kind"));
 export type Block = typeof Block.Type;
-
 const UniqueHeadingIds = Schema.makeFilter(
   (blocks: readonly Block[]) => {
-    const ids = Array.map(
-      Array.filter(blocks, (block) => block.kind === "heading"),
-      (heading) => heading.id
+    const ids = EffectFunction.pipe(
+      blocks,
+      Array.filter((block) => block.kind === "heading"),
+      Array.map((heading) => heading.id)
     );
     return HashSet.size(HashSet.fromIterable(ids)) === ids.length;
   },
@@ -237,14 +229,23 @@ export const RenderedBlock = Schema.Union([
     Schema.makeFilter(
       (table) =>
         table.align.length === table.header.length &&
-        Array.every(table.rows, (row) => row.length === table.header.length)
+        EffectFunction.pipe(
+          table.rows,
+          Array.every((row) => row.length === table.header.length)
+        )
     )
   ),
   Schema.Struct({ ...CodeBlock.fields, lines: CodeLines }).check(
     Schema.makeFilter(
       (block) =>
-        Array.map(block.lines, (line) =>
-          Array.map(line, (token) => token.text).join("")
+        EffectFunction.pipe(
+          block.lines,
+          Array.map((line) =>
+            EffectFunction.pipe(
+              line,
+              Array.map((token) => token.text)
+            ).join("")
+          )
         ).join("\n") === block.text,
       { message: "Tokens must preserve source text." }
     )
