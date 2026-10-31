@@ -199,16 +199,28 @@ only at final SDK construction. A provider service must have an explicit live
 Layer and deterministic mock Layer with focused encoding, failure, malformed
 output and substitution tests.
 
-The docs reading boundary follows the same rule. `@taxkit/content` declares
-the consumed `DocsPageReader`, `DocsCodeHighlighter` and `DocsDiagramRenderer`
-contracts and never imports their implementations. `@taxkit/mdx` implements the
-reader (`./live`) and the highlighter (`./highlights`, the only
-`@pierre/highlights` caller); `@taxkit/diagrams` implements the renderer
-(`./mermaid`, the only `beautiful-mermaid` caller). Each checks its reply at
-once and fails with a safe tagged error. `ContentCatalogueLive` builds the
-checked catalogue once from `DocsSources`. `apps/api/src/content.boundary.ts`
-chooses the live Layers, tests use Content's deterministic highlighter and
-diagram renderer, and `apps/web` reads documentation from the API.
+The MDX boundary uses content-neutral `MdxCompiler.compile` and
+`MdxRenderer.render`. Static `MdxCompilerLive` has no provider requirements;
+`MdxRendererLive` acquires `CodeHighlighter`, `DiagramRenderer` and `LinkResolver`
+exactly once per host scope. `MdxArtifactsLive` supplies the `MdxArtifacts`
+service's strict JSON encode/decode methods without compiler or provider dependencies.
+`MdxLive` merges all three capabilities without forwarding operations. All public operations use named `Effect.fn` and have closed
+requirements. Fixed theme settings use checked Config, while checked publication
+policy enters Content's static resolver through `DocsLinkTargets`.
+
+Content's `ContentMdxReaderLive` validates TaxKit frontmatter/title rules and
+projects neutral documents into its public reading body. Provider implementations
+remain app-composed: `PierreCodeHighlighterLive` and
+`MermaidDiagramRendererLive` import MDX contracts, never Content. The reader's
+closed `read(source)` operation derives identity from the actual source; safe
+`DocsPageReadError` reasons preserve authoring and provider failures.
+
+`ContentCatalogueLive` (`@taxkit/content/catalogue`) builds the checked catalogue
+once from `DocsSources`. `apps/api/scripts/docs-catalogue.layer.ts` composes the
+build-time Layers. `@taxkit/content/live` contains only `ContentServiceLive`, so
+`apps/api/src/content.boundary.ts` can serve the stored catalogue without importing
+authored metadata or the builder. Tests use deterministic rendering Layers, and
+`apps/web` reads documentation from the API.
 
 The infrastructure-owned `PostHogManagement` contract has only find, read,
 create and update operations over checked TaxKit identities. Its private

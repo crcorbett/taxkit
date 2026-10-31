@@ -33,6 +33,7 @@ const libraries = [
   { directory: "core", root: "packages/core" },
   { directory: "calculators", root: "packages/calculators" },
   { directory: "content", root: "packages/content" },
+  { directory: "mdx", root: "packages/mdx" },
   { directory: "http", root: "packages/api/http" },
   { directory: "income-tax", root: "packages/rules/au/income-tax" },
   { directory: "pay", root: "packages/rules/au/pay" },

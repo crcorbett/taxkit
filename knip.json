@@ -151,7 +151,9 @@
         "src/test.layer.ts",
         "src/__testing__/*.ts",
         "test/**/*.test.ts",
-        "vitest.config.ts"
+        "vitest.config.ts",
+        "src/mdx.layer.ts",
+        "src/link-resolver.layer.ts"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     },
@@ -160,7 +162,15 @@
         "src/live.layer.ts",
         "src/highlights.adapter.layer.ts",
         "test/**/*.test.ts",
-        "vitest.config.ts"
+        "vitest.config.ts",
+        "src/service.ts",
+        "src/schemas.ts",
+        "src/errors.ts",
+        "src/compiler.layer.ts",
+        "src/renderer.layer.ts",
+        "src/artifacts.layer.ts",
+        "src/config.ts",
+        "src/test.layer.ts"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     },

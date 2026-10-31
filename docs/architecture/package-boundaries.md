@@ -218,21 +218,19 @@ Implemented source-only `@content/docs` owns:
 - `repository.json`, the GitHub revisions that repository-file links use
 - `sources.ts`, every page as a `?raw` import
 
-Implemented `@taxkit/mdx` owns:
+Implemented `@taxkit/mdx` owns content-neutral `MdxCompiler` and `MdxRenderer`,
+portable document Schemas and the highlighter, diagram and link adapter contracts.
+Its static `MdxLive` combines the individual capability Layers; the renderer
+requires providers while the compiler does not. The Pierre adapter is the only
+`@pierre/highlights` caller. MDX imports neither Content nor the app.
 
-- `DocsPageReaderLive` (`./live`): micromark MDX and GFM tables with a
-  Schema-checked syntax tree; JSX, images, raw HTML and quotes fail
-- `DocsCodeHighlighterLive` (`./highlights`), the only `@pierre/highlights`
-  caller
+`@taxkit/diagrams` implements MDX's `DiagramRenderer` with static
+`MermaidDiagramRendererLive`, the only `beautiful-mermaid` caller.
 
-Implemented `@taxkit/diagrams` owns:
-
-- `DocsDiagramRendererLive` (`./mermaid`), the only `beautiful-mermaid` caller,
-  which renders SVG on the server with no browser or Chromium
-
-`@taxkit/content` declares the `DocsPageReader`, `DocsCodeHighlighter` and
-`DocsDiagramRenderer` contracts these packages implement, and never imports
-the implementations.
+Content imports MDX contracts and Schemas for `ContentMdxReaderLive` and
+`ContentLinkResolverLive`. It owns frontmatter/title/publication rules, navigation,
+repository revisions and projection into the existing public page body. The app
+composes concrete Layers. The serving runtime reads prebuilt catalogues.
 
 Docs packages must not own rule-pack algorithms, API endpoint business logic
 or SDK calculation facades.

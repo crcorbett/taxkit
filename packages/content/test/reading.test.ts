@@ -1,4 +1,5 @@
 import { assert, describe, it } from "@effect/vitest";
+import { RenderedBlock } from "@taxkit/mdx/schemas";
 import { Effect, HashMap, Schema } from "effect";
 
 import { resolveDocsHref } from "../src/links.js";
@@ -6,7 +7,6 @@ import { readingMarkdown } from "../src/reading-markdown.egress.js";
 import {
   DocsNonEmptyText,
   DocsPagePath,
-  DocsReadingBody,
   DocsRepositoryProfile,
   DocsSourcePath,
 } from "../src/schemas.js";
@@ -72,7 +72,8 @@ describe("docs links", () => {
               Effect.flip,
               Effect.flatMap((error) =>
                 Effect.sync(() => {
-                  assert.strictEqual(error.operation, "parse");
+                  assert.strictEqual(error._tag, "DocsPageReadError");
+                  assert.strictEqual(error.reason, "link");
                   assert.strictEqual(error.source, "guides/first.mdx");
                 })
               )
@@ -85,7 +86,7 @@ describe("docs links", () => {
 describe("reading Markdown", () => {
   it.effect("writes the checked body back as literal Markdown", () =>
     Effect.gen(function* () {
-      const body = yield* Schema.decodeEffect(DocsReadingBody)([
+      const body = yield* Schema.decodeEffect(Schema.Array(RenderedBlock))([
         {
           content: [
             { kind: "text", text: "Use *stars* | pipes " },
@@ -93,6 +94,7 @@ describe("reading Markdown", () => {
               content: [{ kind: "text", text: "Start" }],
               href: "/start",
               kind: "link",
+              target: "/start",
             },
           ],
           kind: "paragraph",
@@ -124,6 +126,7 @@ describe("reading Markdown", () => {
           kind: "code",
           language: "ts",
           lines: [[{ color: null, style: "normal", text: "const a = 1;" }], []],
+          text: "const a = 1;\n",
         },
         {
           kind: "diagram",

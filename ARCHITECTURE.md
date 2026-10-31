@@ -18,8 +18,8 @@ everything from the API. There is no database or sign-in.
 | `packages/api/mcp` — `@taxkit/api-mcp`               | Remote MCP tools over the calculator and content services                                                                                                   |
 | `content/docs` — `@content/docs`                     | Authored MDX pages, navigation and repository link revisions                                                                                                |
 | `packages/content` — `@taxkit/content`               | Page Schemas, the checked reading body, catalogue, content service, page addresses and head metadata, and the share-image contracts                         |
-| `packages/mdx` — `@taxkit/mdx`                       | MDX page reader and code highlighter for Content                                                                                                            |
-| `packages/diagrams` — `@taxkit/diagrams`             | Mermaid to SVG renderer for Content                                                                                                                         |
+| `packages/mdx` — `@taxkit/mdx`                       | Content-neutral document compiler, renderer contracts and code highlighter                                                                                  |
+| `packages/diagrams` — `@taxkit/diagrams`             | Mermaid to SVG adapter for MDX                                                                                                                              |
 | `packages/aeo` — `@taxkit/aeo`                       | Robots, sitemap, `llms.txt`, `llms-full.txt` and share-image routes                                                                                         |
 | `packages/og-image` — `@taxkit/og-image`             | Build-time Takumi share-image renderer                                                                                                                      |
 | `packages/webmcp` — `@taxkit/webmcp`                 | Browser WebMCP host adapter and calculator page tool registration                                                                                           |
@@ -87,7 +87,9 @@ flowchart LR
   Public --> Routes
 ```
 
-The API build reads every page once and writes the checked catalogue; the
+The API build uses `@taxkit/content/catalogue` to read every page once and write
+the checked catalogue. The separate runtime export `@taxkit/content/live` only
+reads that catalogue; the
 Worker decodes it on first use, so no request parses MDX. The Website reads
 pages, navigation, search and Markdown through the generated client. It serves
 `.md` files, answers a Markdown `Accept` preference with a 307 to that file,

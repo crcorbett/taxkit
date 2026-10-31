@@ -67,13 +67,18 @@ const decodingBoundaryFiles = [
   "packages/docs-examples/test/integration.example.test.ts",
   // Authored docs ingress: Content's navigation and link profile JSON, the
   // MDX parser and its syntax tree, and the highlighter and diagram replies.
-  "packages/content/src/live.layer.ts",
+  "packages/content/src/catalogue.layer.ts",
   "packages/mdx/src/mdx.ingress.ts",
+  "packages/mdx/src/artifacts.layer.ts",
   "packages/mdx/src/body.ingress.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
   "packages/diagrams/src/mermaid.adapter.layer.ts",
   "packages/content/test/reading.test.ts",
-  "packages/mdx/test/reader.test.ts",
+  "packages/content/test/mdx.test.ts",
+  // Adversarial stored-artifact decoding through the public persistence API.
+  "packages/mdx/test/pipeline.test.ts",
+  "packages/content/src/mdx.layer.ts",
+  "packages/content/src/link-resolver.layer.ts",
   // Exact public catalogue wire and adversarial ingress fixtures only.
   "packages/content/src/__testing__/fixtures.ts",
   "packages/content/test/schemas.test.ts",
@@ -233,6 +238,8 @@ const schemaEncoderEgressFiles = [
   "packages/content/src/publication.egress.ts",
   // The encoded tool failure the browser's WebMCP host receives.
   "packages/webmcp/src/registration.egress.ts",
+  // Exact portable MDX artifact persistence encoding.
+  "packages/mdx/src/artifacts.layer.ts",
   // Exact public catalogue representation round-trip proof, not a service encoder.
   "packages/content/test/schemas.test.ts",
   // Exact rate wire/secret-negative fixtures; no production encoding permission.
@@ -384,6 +391,11 @@ export default defineConfig({
     "@commonplaces/oxlint-plugin/anti-slop-effect",
   ],
   overrides: [
+    {
+      // Adopt the shared strict preset's ternary prohibition for the MDX boundary.
+      files: ["packages/mdx/**/*.ts"],
+      rules: { "no-ternary": "error", "unicorn/prefer-ternary": "off" },
+    },
     {
       // Public package entry points aggregate the intended API. The actual
       // browser bundle and one-archive consumer prove their runtime boundaries.

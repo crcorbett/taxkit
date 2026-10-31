@@ -13,20 +13,23 @@ Private source package for TaxKit docs contracts and published public page
 lookup, navigation and search. `DocsPublicCatalogue` rejects draft pages,
 duplicate addresses and navigation that does not match the pages.
 
-`ContentCatalogueLive` builds that catalogue once from the authored MDX in
+`ContentCatalogueLive` (`./catalogue`) builds that catalogue once from the authored MDX in
 [`@content/docs`](../../content/docs/README.md). It reads the navigation and
 repository link profile from that package, takes the page texts from
 `DocsSources`, reads each page through `DocsPageReader`, writes each page's
 processed Markdown from its checked body, and keeps only published pages. Any
-unreadable page fails the Layer. `ContentServiceLive` serves pages, navigation
-and search from `ContentCatalogue`.
+unreadable page fails the Layer. `ContentServiceLive` (`./live`) serves pages, navigation
+and search from `ContentCatalogue`. The runtime export does not import authored
+navigation, repository metadata or the catalogue builder.
 
-Content declares the contracts it consumes and never imports their
-implementations: `DocsPageReader` and `DocsCodeHighlighter` are implemented by
-[`@taxkit/mdx`](../mdx/README.md), and `DocsDiagramRenderer` by
-[`@taxkit/diagrams`](../diagrams/README.md). The API build supplies `DocsSources`
-and those Layers and writes the catalogue to JSON; the API Worker decodes it with
-`DocsPublicCatalogue` and provides it as `ContentCatalogue`. The checked [HTTP package](../api/http/README.md)
+Content owns `DocsPageReader`, implemented by `ContentMdxReaderLive` (`./mdx`)
+using the neutral MDX contracts. It validates TaxKit metadata and page titles and
+projects finished data into the existing public body. `ContentLinkResolverLive`
+(`./link-resolver`) consumes a checked `DocsLinkTargets` snapshot; the static
+`DocsLinkTargetsLive` loads the authored navigation/repository policy. The API build
+supplies the concrete MDX, highlighter and diagram Layers. The API Worker reads
+the prebuilt catalogue, keeping parser and provider engines out of request code.
+The checked [HTTP package](../api/http/README.md)
 delegates public content routes to this service, and the answer-engine routes
 to [AEO](../aeo/README.md). The Website reads pages, navigation, search and
 Markdown through the API's HTTP routes.
@@ -65,14 +68,19 @@ shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
 
 - `./schemas`: canonical page, navigation, public catalogue, search, secure
   origin Schemas.
-- `./errors`: internal checked source/lookup failures and shared fixed public
-  page/search failures.
+- `./errors`: `DocsPageReadError` for file-specific authoring failures with
+  matchable reasons, `DocsSourceError` for catalogue/runtime failures, lookup
+  failures, provider failures and shared fixed public page/search failures.
 - `./service`: `ContentServiceContract`, `ContentService`, `ContentCatalogue`,
-  `DocsSources` and the consumed `DocsPageReader`, `DocsCodeHighlighter`,
-  `DocsDiagramRenderer`, `DocsPageRenderer` and `DocsOgImages` contracts.
+  `DocsSources`, `DocsPageReader`, `DocsPageRenderer` and `DocsOgImages` contracts.
 - `./publication`: page addresses, share-image input and head metadata.
-- `./links`: `DocsLinkContext` and `resolveDocsHref`, used by the MDX reader.
-- `./live`: `ContentCatalogueLive` and the page/search `ContentServiceLive`.
+- `./links`: shared `DocsLinkTargets`, per-file `DocsLinkContext` and
+  `resolveDocsHref`. The reader derives the context from `DocsSource.path`;
+  the resolver acquires shared targets at Layer construction.
+- `./mdx`: static `ContentMdxReaderLive`.
+- `./link-resolver`: static link resolver and publication policy Layers.
+- `./catalogue`: build-time `ContentCatalogueLive`, which reads authored metadata.
+- `./live`: runtime `ContentServiceLive`, which only reads the supplied catalogue.
 - `./config` (internal, not in the published export map):
   `DocsPublicationOriginConfig` (`TAXKIT_PUBLICATION_ORIGIN`) and
   `DocsWebsiteOriginConfig` (`WEBSITE_PUBLIC_ORIGIN`), the one declaration of
@@ -81,8 +89,7 @@ shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
 - `./response-check`: request/reply page identity predicate for checked docs
   pages, used after generated-client decoding.
 - `./test`: the same implementation with controlled request observations, plus
-  deterministic `DocsCodeHighlighterTest`, `DocsDiagramRendererTest` and
-  `DocsOgImagesTest`.
+  deterministic `DocsOgImagesTest`. MDX owns its provider test Layers.
 - `./testing/fixtures`: checked synthetic catalogue inputs for tests.
 - `./testing/observations`: typed test observations.
 

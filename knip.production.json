@@ -130,7 +130,10 @@
         "src/errors.ts!",
         "src/service.ts!",
         "src/links.ts!",
-        "src/live.layer.ts!"
+        "src/catalogue.layer.ts!",
+        "src/live.layer.ts!",
+        "src/mdx.layer.ts!",
+        "src/link-resolver.layer.ts!"
       ],
       "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
     },
@@ -156,8 +159,18 @@
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
     },
     "packages/mdx": {
-      "entry": ["src/live.layer.ts!", "src/highlights.adapter.layer.ts!"],
-      "project": ["src/**/*.ts!"]
+      "entry": [
+        "src/live.layer.ts!",
+        "src/highlights.adapter.layer.ts!",
+        "src/service.ts!",
+        "src/schemas.ts!",
+        "src/errors.ts!",
+        "src/compiler.layer.ts!",
+        "src/renderer.layer.ts!",
+        "src/artifacts.layer.ts!",
+        "src/config.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/test.layer.ts!"]
     },
     "packages/diagrams": {
       "entry": ["src/mermaid.adapter.layer.ts!"],

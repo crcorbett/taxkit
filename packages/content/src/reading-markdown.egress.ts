@@ -1,11 +1,7 @@
+import type { RenderedBlock, RenderedInline } from "@taxkit/mdx/schemas";
 import { Array, Match, Order, pipe } from "effect";
 
-import type {
-  DocsBlock,
-  DocsInline,
-  DocsNonEmptyText,
-  DocsReadingBody,
-} from "./schemas.js";
+import type { DocsNonEmptyText } from "./schemas.js";
 
 // Text must stay literal when read as Markdown: protect inline delimiters,
 // table pipes, entities and block markers at line starts. Real formatting,
@@ -33,7 +29,7 @@ const fence = (text: string, minimum: number) =>
     )
   );
 
-const inlineMarkdown = (inline: DocsInline): string =>
+const inlineMarkdown = (inline: RenderedInline): string =>
   Match.value(inline).pipe(
     Match.discriminatorsExhaustive("kind")({
       emphasis: ({ content }) =>
@@ -48,21 +44,17 @@ const inlineMarkdown = (inline: DocsInline): string =>
     })
   );
 
-const inlines = (content: readonly DocsInline[]): string =>
+const inlines = (content: readonly RenderedInline[]): string =>
   Array.map(content, inlineMarkdown).join("");
 
-const tableRow = (cells: readonly (readonly DocsInline[])[]) =>
+const tableRow = (cells: readonly (readonly RenderedInline[])[]) =>
   `| ${Array.map(cells, inlines).join(" | ")} |`;
 
-const blockMarkdown = (block: DocsBlock): string =>
+const blockMarkdown = (block: RenderedBlock): string =>
   Match.value(block).pipe(
     Match.discriminatorsExhaustive("kind")({
-      code: ({ language, lines }) => {
-        const text = Array.map(lines, (line) =>
-          Array.map(line, (token) => token.text).join("")
-        ).join("\n");
-        return `${fence(text, 3)}${language}\n${text}\n${fence(text, 3)}`;
-      },
+      code: ({ language, text }) =>
+        `${fence(text, 3)}${language}\n${text}\n${fence(text, 3)}`,
       diagram: ({ source }) =>
         `${fence(source, 3)}mermaid\n${source}\n${fence(source, 3)}`,
       heading: ({ content, depth }) =>
@@ -94,5 +86,8 @@ const blockMarkdown = (block: DocsBlock): string =>
 export const readingMarkdown = ({
   body,
   title,
-}: Readonly<{ body: DocsReadingBody; title: DocsNonEmptyText }>): string =>
+}: Readonly<{
+  body: readonly RenderedBlock[];
+  title: DocsNonEmptyText;
+}>): string =>
   `# ${escapeText(title)}\n\n${Array.map(body, blockMarkdown).join("\n\n")}\n`;
