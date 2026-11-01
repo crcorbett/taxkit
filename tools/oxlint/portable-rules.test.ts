@@ -455,7 +455,10 @@ describe("portable rules", () => {
       ],
     },
     {
-      accepted: ["packages/diagrams/src/mermaid.adapter.layer.ts"],
+      accepted: [
+        "packages/diagrams/src/pele.adapter.layer.ts",
+        "packages/pele/src/live.layer.ts",
+      ],
       generated: "packages/diagrams/src/.generated-strict-rejected.ts",
       namespace: "strict-effect",
       rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",

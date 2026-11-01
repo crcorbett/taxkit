@@ -8,9 +8,10 @@ import {
 import { ContentMdxReaderLive } from "@taxkit/content/mdx";
 import { DocsSource } from "@taxkit/content/schemas";
 import { DocsSources } from "@taxkit/content/service";
-import { MermaidDiagramRendererLive } from "@taxkit/diagrams/mermaid";
+import { PeleDiagramRendererLive } from "@taxkit/diagrams/pele";
 import { PierreCodeHighlighterLive } from "@taxkit/mdx/highlights";
 import { MdxLive } from "@taxkit/mdx/live";
+import { PeleLive } from "@taxkit/pele/live";
 import { Effect, Layer, Schema } from "effect";
 
 // The build-time catalogue. Content reads every authored page with the MDX
@@ -38,7 +39,7 @@ export const DocsCatalogueBuildLive = ContentCatalogueLive.pipe(
           Layer.provide(
             Layer.mergeAll(
               PierreCodeHighlighterLive,
-              MermaidDiagramRendererLive,
+              PeleDiagramRendererLive.pipe(Layer.provide(PeleLive)),
               ContentLinkResolverLive.pipe(Layer.provide(DocsLinkTargetsLive))
             )
           )

@@ -60,7 +60,7 @@ const decodingBoundaryFiles = [
   "packages/mdx/src/body.ingress.ts",
   "packages/mdx/src/artifacts.layer.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
-  "packages/diagrams/src/mermaid.adapter.layer.ts",
+  "packages/pele/src/live.layer.ts",
   "packages/content/test/reading.test.ts",
   "packages/content/test/mdx.test.ts",
   "packages/mdx/test/pipeline.test.ts",
@@ -296,6 +296,8 @@ const throwingCodecTestFiles = [
 ];
 
 const runtimeBoundaryFiles = [
+  // Isolated real process proving Pierre acquisition without WebAssembly.
+  "packages/mdx/test/fixtures/highlights-unavailable.runtime.ts",
   // Official MCP transport callback bridges the native HttpClient to its Promise host.
   "apps/web/test/native-mcp.boundary.test.ts",
   "apps/api/scripts/docs-catalogue.runtime.ts",
@@ -343,6 +345,7 @@ const bunAdapterFiles = [
 ];
 
 const bunRuntimeEntrypointFiles = [
+  "packages/mdx/test/fixtures/highlights-unavailable.runtime.ts",
   "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
@@ -510,6 +513,20 @@ export default defineConfig({
       },
     },
 
+    {
+      // Executable test host only; no runtime permission for MDX library code.
+      files: ["packages/mdx/test/fixtures/highlights-unavailable.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          {
+            allowedFiles: [
+              "packages/mdx/test/fixtures/highlights-unavailable.runtime.ts",
+            ],
+          },
+        ],
+      },
+    },
     {
       // The synthetic fetch host must return a Promise. Its never Effect is
       // cancelled through the native binding's AbortSignal in the deadline test.

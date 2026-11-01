@@ -28,6 +28,7 @@ frontmatter and navigation say `status: published`.
 - [0005 Public API and Production publication links](adr/0005-public-api-and-production-publication-links.md)
 - [0006 Follow Common Practice's structure](adr/0006-follow-common-practice.md)
 - [0007 Content-neutral MDX compilation and rendering](adr/0007-content-neutral-mdx.md)
+- [0008 Effect-owned rendering providers](adr/0008-effect-rendering-providers.md)
 
 ## Keeping this useful
 

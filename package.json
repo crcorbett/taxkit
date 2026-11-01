@@ -119,5 +119,8 @@
     "bun": ">=1.4.4",
     "node": ">=24.16.0"
   },
-  "packageManager": "bun@1.4.4"
+  "packageManager": "bun@1.4.4",
+  "patchedDependencies": {
+    "@pierre/highlights@0.3.0": "patches/pierre-highlights-0.3.0.patch"
+  }
 }

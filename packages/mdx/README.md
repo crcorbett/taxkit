@@ -24,7 +24,9 @@ router, filesystem or runtime dependency. TaxKit publication rules belong to
 - `./errors`: closed compiler, renderer and adapter failures. Rendering errors
   carry source identity and a node path, without source text or raw causes.
 - `./highlights`: `PierreCodeHighlighterLive`, the only Pierre caller. A private
-  instance is acquired once; provider output is checked immediately.
+  instance is acquired once; WASM compilation and instance creation return a
+  `CodeHighlighterInitializationError` on failure. Provider output is checked
+  immediately; per-snippet failures remain `CodeHighlightError`.
 - `./config`: checked `PresentationThemeConfig` (`MDX_THEME`, `light` by default,
   or `dark`), acquired through the host's ConfigProvider at Layer construction.
 - `./test`: deterministic static highlighter and diagram Layers.
@@ -44,10 +46,18 @@ owns storage, cache identity and invalidation. A stored Document can render with
 the compiler. Renderer data is not HTML: consumers project it into their view.
 
 Providers run synchronously. Effect interruption applies between operations;
-there is no hard CPU pre-emption. Pierre also initialises WASM on module import,
-so import failures remain host startup failures. Bun tests do not qualify the
-Worker-specific WASM entry for request-time compilation. TaxKit continues to serve
-prebuilt documentation; no request-time route or cache is introduced.
+there is no hard CPU pre-emption. Pierre 0.3.0's default entry eagerly compiles
+WASM. The pinned [Bun patch](../../patches/pierre-highlights-0.3.0.patch)
+exposes its existing pure core and packaged bytes as `./core` and `./wasm`, plus
+the byte declaration. Static imports stay side-effect-free; the static Layer
+owns compilation through `Effect.try`. The patch changes no provider algorithm.
+Recheck these exports when upgrading Pierre. See
+[ADR 0008](../../docs/adr/0008-effect-rendering-providers.md).
+
+The adapter's byte-compilation path is qualified in Bun and Node, including a
+real host without WebAssembly. It is not qualified for Workerd request-time
+rendering. TaxKit continues to serve prebuilt documentation; no request-time
+route or cache is introduced.
 
 Brands are constructed with the owning Schema at ingress or through `makeEffect`.
 Internal methods retain the checked types: `SourceText` cannot substitute for

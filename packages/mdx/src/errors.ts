@@ -39,6 +39,12 @@ export class LinkResolveError extends Schema.TaggedError<
   LinkResolveError,
   { readonly brand: unique symbol }
 >()("LinkResolveError", { reason: Schema.Literal("link") }) {}
+export class CodeHighlighterInitializationError extends Schema.TaggedError<
+  CodeHighlighterInitializationError,
+  { readonly brand: unique symbol }
+>()("CodeHighlighterInitializationError", {
+  reason: Schema.Literal("initialize"),
+}) {}
 // The highlighter refused the code or returned tokens that do not satisfy the MDX contract.
 // No source text or provider cause is kept.
 export class CodeHighlightError extends Schema.TaggedError<

@@ -41,6 +41,7 @@
     "@taxkit/diagrams": "workspace:*",
     "@taxkit/mdx": "workspace:*",
     "@taxkit/og-image": "workspace:*",
+    "@taxkit/pele": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/tsconfig": "workspace:*",
     "@types/bun": "catalog:",

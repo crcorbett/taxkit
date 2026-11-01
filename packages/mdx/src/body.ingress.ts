@@ -19,7 +19,7 @@ import {
   Blocks,
 } from "./schemas.js";
 import type { Block, Inline, SourceId } from "./schemas.js";
-import { plainText } from "./syntax.schemas.js";
+import { collectText } from "./syntax.schemas.js";
 import type {
   BlockCompilation,
   SyntaxBlock,
@@ -56,25 +56,21 @@ const compileFormatted = (node: SyntaxFormatted) =>
       text: compileLeaf,
     })
   );
-const compileInline = (node: SyntaxPhrasing): Effect.Effect<Inline> =>
+const compileInline = (node: SyntaxPhrasing): Inline =>
   Match.value(node).pipe(
     Match.when({ type: "link" }, (link) => ({
       content: EffectFunction.pipe(link.children, Array.map(compileFormatted)),
       kind: "link" as const,
       target: link.url,
     })),
-    Match.orElse(compileFormatted),
-    Effect.succeed
+    Match.orElse(compileFormatted)
   );
 const compileInlines = (nodes: readonly SyntaxPhrasing[]) =>
-  EffectFunction.pipe(
-    nodes,
-    Effect.forEach((node) => compileInline(node))
-  );
+  EffectFunction.pipe(nodes, Array.map(compileInline));
 const compileRow = (row: SyntaxTableRow) =>
   EffectFunction.pipe(
     row.children,
-    Effect.forEach((cell) => compileInlines(cell.children))
+    Array.map((cell) => compileInlines(cell.children))
   );
 const compileBlock = (
   node: SyntaxBlock,
@@ -140,7 +136,7 @@ const compileBlock = (
       heading: ({ children, depth }) =>
         Effect.gen(function* () {
           const id = yield* HeadingId.makeEffect(
-            plainText(children)
+            collectText(children)
               .toLowerCase()
               .replaceAll(/[^a-z0-9]+/gu, "-")
               .replaceAll(/^-|-$/gu, "")
@@ -150,51 +146,44 @@ const compileBlock = (
             )
           );
           return {
-            content: yield* compileInlines(children),
+            content: compileInlines(children),
             depth,
             id,
             kind: "heading" as const,
           };
         }),
       list: ({ children, ordered, start }) =>
-        EffectFunction.pipe(
-          children,
-          Effect.forEach(({ children: [paragraph] }) =>
-            compileInlines(paragraph.children)
-          ),
-          Effect.flatMap((items) =>
-            Option.match(start, {
-              onNone: () => ListStart.makeEffect(1),
-              onSome: Effect.succeed,
-            }).pipe(
-              Effect.map((position) => ({
-                items,
-                kind: "list" as const,
-                ordered,
-                start: position,
-              })),
-              Effect.mapError(() => fail("body", "The list start is invalid."))
-            )
-          )
+        Option.match(start, {
+          onNone: () => ListStart.makeEffect(1),
+          onSome: Effect.succeed,
+        }).pipe(
+          Effect.map((position) => ({
+            items: EffectFunction.pipe(
+              children,
+              Array.map(({ children: [paragraph] }) =>
+                compileInlines(paragraph.children)
+              )
+            ),
+            kind: "list" as const,
+            ordered,
+            start: position,
+          })),
+          Effect.mapError(() => fail("body", "The list start is invalid."))
         ),
       paragraph: ({ children }) =>
-        compileInlines(children).pipe(
-          Effect.map((content) => ({ content, kind: "paragraph" as const }))
-        ),
+        Effect.succeed({
+          content: compileInlines(children),
+          kind: "paragraph" as const,
+        }),
       table: ({ align, children: [header, ...rows] }) =>
-        Effect.gen(function* () {
-          return {
-            align: EffectFunction.pipe(
-              align,
-              Array.map(Option.getOrElse(() => "none" as const))
-            ),
-            header: yield* compileRow(header),
-            kind: "table" as const,
-            rows: yield* EffectFunction.pipe(
-              rows,
-              Effect.forEach((row) => compileRow(row))
-            ),
-          };
+        Effect.succeed({
+          align: EffectFunction.pipe(
+            align,
+            Array.map(Option.getOrElse(() => "none" as const))
+          ),
+          header: compileRow(header),
+          kind: "table" as const,
+          rows: EffectFunction.pipe(rows, Array.map(compileRow)),
         }),
     })
   );

@@ -211,7 +211,12 @@ policy enters Content's static resolver through `DocsLinkTargets`.
 Content's `ContentMdxReaderLive` validates TaxKit frontmatter/title rules and
 projects neutral documents into its public reading body. Provider implementations
 remain app-composed: `PierreCodeHighlighterLive` and
-`MermaidDiagramRendererLive` import MDX contracts, never Content. The reader's
+`PeleDiagramRendererLive` import MDX contracts, never Content. The diagram adapter
+requires the independent `Pele` service, whose `renderSvg` operation has no MDX
+or publication dependency. The host provides static `PeleLive`.
+Pierre compiles WASM during Layer acquisition through `Effect.try`; initialization
+has its own typed failure, separate from snippet highlighting. See
+[ADR 0008](../adr/0008-effect-rendering-providers.md). The reader's
 closed `read(source)` operation derives identity from the actual source; safe
 `DocsPageReadError` reasons preserve authoring and provider failures.
 

@@ -1,6 +1,10 @@
-import { createHighlighter } from "@pierre/highlights";
+import { createHighlighter } from "@pierre/highlights/core";
 import { pierreDark, pierreLight } from "@pierre/highlights/themes";
-import { CodeHighlightError } from "@taxkit/mdx/errors";
+import wasmBytes from "@pierre/highlights/wasm";
+import {
+  CodeHighlightError,
+  CodeHighlighterInitializationError,
+} from "@taxkit/mdx/errors";
 import { InlineText, TokenColor } from "@taxkit/mdx/schemas";
 import type { CodeSnippet, CodeToken, TokenStyle } from "@taxkit/mdx/schemas";
 import { CodeHighlighter } from "@taxkit/mdx/service";
@@ -39,16 +43,16 @@ const resolveTokenStyle = (fontStyle: number): TokenStyle =>
     Match.when({ italic: true }, () => "italic" as const),
     Match.orElse(() => "normal" as const)
   );
-// @pierre/highlights initialises its WebAssembly on import. Only the API
-// build loads this adapter; every provider call stays in this operation.
+// The pinned export patch exposes Pierre's pure core and packaged bytes.
+// Compilation and instance creation belong to this static Layer's acquisition.
 export const PierreCodeHighlighterLive = Layer.effect(
   CodeHighlighter,
   Effect.gen(function* () {
     const theme = yield* PresentationThemeConfig;
     const highlighter = yield* Effect.try({
       catch: () =>
-        new CodeHighlightError({ language: "txt", reason: "highlight" }),
-      try: () => createHighlighter(),
+        new CodeHighlighterInitializationError({ reason: "initialize" }),
+      try: () => createHighlighter(new WebAssembly.Module(wasmBytes)),
     });
     return CodeHighlighter.of({
       highlight: Effect.fn("CodeHighlighter.highlight")(function* (
@@ -81,7 +85,7 @@ export const PierreCodeHighlighterLive = Layer.effect(
               })
           )
         );
-        // Already-checked provider tokens become Content tokens; empty runs
+        // Already-checked provider tokens become MDX tokens; empty runs
         // carry no text and are dropped.
         return EffectFunction.pipe(
           tokens,

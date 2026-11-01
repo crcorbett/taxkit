@@ -90,7 +90,7 @@ const blockMarkdown = (block: RenderedBlock): string =>
   );
 // The processed Markdown served at a page's `.md` address and used by search:
 // the checked body with resolved links, written back as plain Markdown.
-export const readingMarkdown = ({
+export const writeReadingMarkdown = ({
   body,
   title,
 }: Readonly<{

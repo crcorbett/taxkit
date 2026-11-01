@@ -3,7 +3,7 @@ import { RenderedBlock } from "@taxkit/mdx/schemas";
 import { Function as EffectFunction, Effect, HashMap, Schema } from "effect";
 
 import { resolveDocsHref } from "../src/links.js";
-import { readingMarkdown } from "../src/reading-markdown.egress.js";
+import { writeReadingMarkdown } from "../src/reading-markdown.egress.js";
 import {
   DocsNonEmptyText,
   DocsPagePath,
@@ -134,7 +134,7 @@ describe("reading Markdown", () => {
       ]);
       const title = yield* DocsNonEmptyText.makeEffect("First guide");
       assert.strictEqual(
-        readingMarkdown({ body, title }),
+        writeReadingMarkdown({ body, title }),
         [
           "# First guide",
           "",

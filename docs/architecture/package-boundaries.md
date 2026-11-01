@@ -27,6 +27,7 @@ Implemented packages and apps:
 - `packages/diagrams`
 - `packages/docs-examples`
 - `packages/mdx`
+- `packages/pele`
 - `packages/core`
 - `packages/api/http`
 - `packages/api/mcp`
@@ -98,6 +99,7 @@ packages/
 
   content/
   mdx/
+  pele/
   diagrams/
   docs-examples/
   scripts/
@@ -225,7 +227,10 @@ requires providers while the compiler does not. The Pierre adapter is the only
 `@pierre/highlights` caller. MDX imports neither Content nor the app.
 
 `@taxkit/diagrams` implements MDX's `DiagramRenderer` with static
-`MermaidDiagramRendererLive`, the only `beautiful-mermaid` caller.
+`PeleDiagramRendererLive`. It requires `Pele` from `@taxkit/pele/service`, converts
+the owning brands and preserves MDX's narrower SVG bound. `@taxkit/pele` owns the
+only Pele SDK call through `Pele.renderSvg`, with static live/test Layers. It
+imports no MDX, Content or app. The app supplies `PeleLive` to the adapter.
 
 Content imports MDX contracts and Schemas for `ContentMdxReaderLive` and
 `ContentLinkResolverLive`. It owns frontmatter/title/publication rules, navigation,
@@ -252,6 +257,7 @@ content/docs                 -> @content/docs
 packages/content             -> @taxkit/content
 packages/mdx                 -> @taxkit/mdx
 packages/diagrams            -> @taxkit/diagrams
+packages/pele                -> @taxkit/pele
 ```
 
 Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and

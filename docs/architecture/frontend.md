@@ -238,7 +238,7 @@ event allowlist and stored-event readback are not built.
 - Keep frontend docs and component details out of rule packages.
 - Keep browser docs modules on browser-safe Content exports such as
   `@taxkit/content/schemas`; do not import `@content/docs`, `@taxkit/mdx` or
-  `@taxkit/diagrams` from browser modules.
+  `@taxkit/diagrams` or `@taxkit/pele` from browser modules.
 - Use TanStack router links for internal docs routes so client navigation runs
   the route loader. Keep ordinary anchors for external, mail, download,
   repository-source and same-document destinations.

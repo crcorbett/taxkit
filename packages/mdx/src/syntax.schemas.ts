@@ -45,16 +45,16 @@ export const SyntaxPhrasing = Schema.Union([
 ]).pipe(Schema.toTaggedUnion("type"));
 export type SyntaxPhrasing = typeof SyntaxPhrasing.Type;
 // The words a reader sees in a run of inline syntax, without formatting.
-export const plainText = (nodes: readonly SyntaxPhrasing[]): string =>
+export const collectText = (nodes: readonly SyntaxPhrasing[]): string =>
   EffectFunction.pipe(
     nodes,
     Array.map((node) =>
       Match.value(node).pipe(
         Match.discriminatorsExhaustive("type")({
-          emphasis: ({ children }) => plainText(children),
+          emphasis: ({ children }) => collectText(children),
           inlineCode: ({ value }) => value,
-          link: ({ children }) => plainText(children),
-          strong: ({ children }) => plainText(children),
+          link: ({ children }) => collectText(children),
+          strong: ({ children }) => collectText(children),
           text: ({ value }) => value,
         })
       )

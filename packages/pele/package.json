@@ -1,0 +1,27 @@
+{
+  "name": "@taxkit/pele",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./schemas": "./src/schemas.ts",
+    "./errors": "./src/errors.ts",
+    "./service": "./src/service.ts",
+    "./live": "./src/live.layer.ts",
+    "./test": "./src/test.layer.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "effect": "catalog:",
+    "pele": "1.13.0"
+  },
+  "devDependencies": {
+    "@effect/vitest": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
