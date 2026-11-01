@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-11-01
 review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
 ---
 
@@ -25,7 +25,7 @@ page state, tools and WebMCP live in their packages.
 | `host/` | checked settings and API binding: `service.ts` contracts, `config.server.ts`, `binding.server.ts`, `settings.server.layer.ts`, `schemas.ts`, `errors.ts` |
 | `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.ingress.ts` (Markdown files and `Accept`) |
 | `pages/` | `loaders.ts`, `load.failure.ts`, `loader-context.ts` and the root load |
-| `docs/` | documentation views, view types and the search address reader |
+| `docs/` | documentation chrome, reading views, appearance/copy/outline Atoms and the search address reader |
 | `calculators/` | calculator containers and views, `page.atoms.ts`, `tools.atoms.ts` and the safe failure text |
 | `seo/` | `head.ts`, the documentation page head |
 | root | `runtime.server.ts`, `runtime.client.ts` and `api-client.atoms.ts` |
@@ -159,6 +159,14 @@ never calculates, and a POST to any Website page returns an empty 404.
 
 ## Documentation pages
 
+[DESIGN.md](DESIGN.md) owns the documentation layout, typography, theme mapping,
+Base UI composition and interaction requirements. The route renders the major
+landmarks; focused components own the navigation, mobile drawer, page outline,
+code toolbar and previous/next links. CSS lives in `src/lib/docs/styles.css`.
+Local browser work shares `browserRuntime` and the existing root registry.
+Clipboard uses the native static Effect Clipboard Layer, independently of API
+client acquisition. The outline observer is scoped to the mounted page.
+
 The catch-all route loads the page and navigation from the API's documentation
 routes; the server uses the original pathname. The route shows the page title
 as `DocsHeading`, and `src/lib/docs/reading-body.view.tsx` renders the page's
@@ -167,11 +175,19 @@ data address and tables in a labelled scroll region. Missing pages use
 TanStack's not-found state and HTTP 404. Internal links are router links; client navigation moves
 focus to the new heading and initial hydration does not.
 
-`/search` has a plain GET form with one `term` field and works without
-JavaScript. `docs/search-location.ingress.ts` reads the raw address once, so words
+`/search` has a GET form with one `term` field and works without JavaScript;
+client submission uses native Router navigation to retain the appearance
+choice. `docs/search-location.ingress.ts` reads the raw address once, so words
 such as `1e3` or quoted text are not JSON-parsed; duplicate or unexpected keys
 and words over 100 characters are a normal invalid-search page state. Empty
-words load navigation only. Search pages are `noindex, follow`.
+words skip the search request. Search also loads the canonical Quickstart page
+through the existing bounded page helper to obtain its checked theme, alongside
+the navigation/search helper. An empty search therefore makes two navigation
+reads and one page read; nonempty words add one search read. TanStack owns
+loading, with the preserved search parameters as loader dependencies, so Back
+and Forward restore the right words and results. There is no extra theme
+endpoint or client cache. Search pages are
+`noindex, follow`.
 
 **Markdown.** Accepted pages also serve their processed Markdown at the `.md`
 address (`http/negotiation.ingress.ts`). A page address with a preferring
@@ -252,6 +268,10 @@ bun run --filter=web test:native-pair
 shared loader registry and client reuse, not-found and load-error translation,
 loader cancellation, invalid search words, calculator commands, editing,
 hydration and form unmount.
+Documentation copy tests also cover whitespace, independent feedback and safe
+clipboard refusal. The native suite checks the drawer's keyboard/focus behaviour,
+active page outlines, theme retention during search, narrow layouts and
+no-JavaScript code scrolling.
 
 `build:native-pair` builds the API dependency graph and then both apps with
 Alchemy's native builders, without a cloud provider, state or credentials. Its

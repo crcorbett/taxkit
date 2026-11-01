@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type {
   DocsBlock,
-  DocsCodeToken,
   DocsInline,
   DocsReadingBody,
 } from "@taxkit/content/schemas";
@@ -14,6 +13,7 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 
+import { DocsCodeBlock } from "./code-block.view";
 import { requestDocsNavigationFocus } from "./components";
 
 const pageLinkPattern = /^(?<path>\/[^#]*)(?:#(?<hash>.+))?$/u;
@@ -84,25 +84,6 @@ const Inlines = ({
       )
     )
   );
-const tokenStyle = (token: DocsCodeToken) => ({
-  color: `light-dark(${token.light.color},${token.dark.color})`,
-  "--mdx-light-font-style": EffectBoolean.match(
-    token.light.style.endsWith("italic"),
-    { onFalse: () => "normal", onTrue: () => "italic" }
-  ),
-  "--mdx-dark-font-style": EffectBoolean.match(
-    token.dark.style.endsWith("italic"),
-    { onFalse: () => "normal", onTrue: () => "italic" }
-  ),
-  "--mdx-light-font-weight": EffectBoolean.match(
-    token.light.style.startsWith("bold"),
-    { onFalse: () => 400, onTrue: () => 600 }
-  ),
-  "--mdx-dark-font-weight": EffectBoolean.match(
-    token.dark.style.startsWith("bold"),
-    { onFalse: () => 400, onTrue: () => 600 }
-  ),
-});
 /* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- A labelled horizontal scroll region needs explicit keyboard focus across supported browsers. */
 const Block = ({
   block,
@@ -112,36 +93,7 @@ const Block = ({
   Match.value(block).pipe(
     Match.discriminatorsExhaustive("kind")({
       code: ({ language, lines }) => (
-        <figure data-slot="code-block">
-          <figcaption>{language}</figcaption>
-          <pre data-language={language}>
-            <code>
-              {EffectFunction.pipe(
-                lines,
-                Array.map((line, lineIndex) => (
-                  <span className="line" key={lineIndex}>
-                    {EffectFunction.pipe(
-                      line,
-                      Array.map((token, tokenIndex) => (
-                        <span
-                          className="docs-code-token"
-                          key={tokenIndex}
-                          style={tokenStyle(token)}
-                        >
-                          {token.text}
-                        </span>
-                      ))
-                    )}
-                    {EffectBoolean.match(lineIndex < lines.length - 1, {
-                      onFalse: () => null,
-                      onTrue: (): "\n" => "\n",
-                    })}
-                  </span>
-                ))
-              )}
-            </code>
-          </pre>
-        </figure>
+        <DocsCodeBlock language={language} lines={lines} />
       ),
       diagram: ({ svg, title }) => (
         <figure data-slot="diagram">

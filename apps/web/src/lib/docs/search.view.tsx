@@ -4,30 +4,6 @@ import { Match, Function as EffectFunction, Array } from "effect";
 
 import { requestDocsNavigationFocus } from "./components";
 
-export const DocsSearchForm = ({
-  term,
-}: {
-  readonly term: DocsSearchTerm | "";
-}) => (
-  <search>
-    <form action="/search" className="docs-search-form" method="GET">
-      <label htmlFor="docs-search-term">Search words</label>
-      <div className="docs-search-controls">
-        <input
-          autoComplete="off"
-          defaultValue={term}
-          id="docs-search-term"
-          key={term}
-          maxLength={100}
-          name="term"
-          type="search"
-        />
-        <button type="submit">Search documentation</button>
-      </div>
-      <p>Search the guides, API reference and integration examples.</p>
-    </form>
-  </search>
-);
 export const DocsSearchResults = ({
   results,
   term,

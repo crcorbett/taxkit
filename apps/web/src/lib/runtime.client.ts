@@ -101,13 +101,23 @@ export const loadDocsSearch = (
         onSuccess: (term) =>
           browserApiClient.pipe(
             Effect.flatMap((client) =>
-              requestDocsSearch({
-                client,
-                term,
-              })
+              Effect.all(
+                {
+                  found: requestDocsSearch({ client, term }),
+                  home: requestDocsPage({
+                    client,
+                    address: "/start/quickstart",
+                  }),
+                },
+                { concurrency: "unbounded" }
+              )
             ),
-            Effect.map((found) =>
-              WebsiteDocsSearchView.Found({ ...found, term })
+            Effect.map(({ found, home }) =>
+              WebsiteDocsSearchView.Found({
+                ...found,
+                term,
+                theme: home.page.theme,
+              })
             )
           ),
       })

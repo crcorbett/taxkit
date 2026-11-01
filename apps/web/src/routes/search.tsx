@@ -1,21 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Match, Option } from "effect";
 
+import { DocsHeader } from "#/lib/docs/chrome.view";
 import { DocsHeading } from "#/lib/docs/components";
 import { DocsNavigation } from "#/lib/docs/page.view";
+import { DocsReader } from "#/lib/docs/reader.container";
+import { DocsSearchForm } from "#/lib/docs/search-form.container";
 import { readDocsSearchTerm } from "#/lib/docs/search-location.ingress";
-import { DocsSearchForm, DocsSearchResults } from "#/lib/docs/search.view";
+import { DocsSearchResults } from "#/lib/docs/search.view";
+import { DocsState } from "#/lib/docs/state.view";
 import { loadDocsSearch } from "#/lib/pages/loaders";
 
 const SearchUnavailable = () => (
-  <section className="docs-state" role="alert">
-    <DocsHeading>Search documentation</DocsHeading>
-    <p>
+  <DocsState title="Search documentation">
+    <p role="alert">
       Documentation search could not load. Please reload this page to try again.
     </p>
     <DocsSearchForm term="" />
-    <a href="/start/quickstart">Open the Quickstart</a>
-  </section>
+  </DocsState>
 );
 
 export const Route = createFileRoute("/search")({
@@ -31,45 +33,50 @@ export const Route = createFileRoute("/search")({
       },
     ],
   }),
+  // Router must distinguish the preserved query pairs in its match cache.
+  // Validation still reads the original address once in the loader below.
+  loaderDeps: ({ search }) => search,
   loader: ({ location, context, abortController }) =>
     loadDocsSearch({
       context,
       query: readDocsSearchTerm(location.searchStr),
       signal: abortController.signal,
     }),
-  pendingComponent: () => (
-    <section aria-busy="true" aria-live="polite" className="docs-state">
-      <h1>Searching documentation</h1>
-      <p>Matching pages are being loaded.</p>
-    </section>
-  ),
-  pendingMs: 150,
-  // Each original address supplies its own words. Do not reuse a cached result
-  // from a previous query or let the framework's JSON query parser change it.
+  // Refresh a restored query through its own match and preserve human words.
   shouldReload: true,
 });
 
 function DocumentationSearchRoute() {
   return Match.value(Route.useLoaderData()).pipe(
     Match.tag("InvalidSearch", () => (
-      <section className="docs-state" role="alert">
-        <DocsHeading>Search documentation</DocsHeading>
-        <p>Enter up to 100 characters to search the documentation.</p>
+      <DocsState title="Search documentation">
+        <p role="alert">
+          Enter up to 100 characters to search the documentation.
+        </p>
         <DocsSearchForm term="" />
-        <a href="/start/quickstart">Open the Quickstart</a>
-      </section>
+      </DocsState>
     )),
-    Match.tag("Found", ({ navigation, results, term }) => (
-      <div className="docs-layout">
-        <aside className="docs-sidebar">
-          <DocsNavigation currentPath={Option.none()} navigation={navigation} />
-        </aside>
-        <article className="docs-article">
-          <DocsHeading>Search documentation</DocsHeading>
-          <DocsSearchForm term={term} />
-          <DocsSearchResults results={results} term={term} />
-        </article>
-      </div>
+    Match.tag("Found", ({ navigation, results, term, theme }) => (
+      <DocsReader theme={theme}>
+        <DocsHeader currentPath={Option.none()} navigation={navigation} />
+        <div className="docs-layout docs-search-layout">
+          <aside className="docs-sidebar">
+            <DocsNavigation
+              currentPath={Option.none()}
+              navigation={navigation}
+            />
+          </aside>
+          <article className="docs-article">
+            <div className="docs-breadcrumbs">Documentation</div>
+            <DocsHeading>Search documentation</DocsHeading>
+            <p className="docs-search-description">
+              Find the right guide, reference or integration example.
+            </p>
+            <DocsSearchForm key={term} term={term} />
+            <DocsSearchResults results={results} term={term} />
+          </article>
+        </div>
+      </DocsReader>
     )),
     Match.exhaustive
   );

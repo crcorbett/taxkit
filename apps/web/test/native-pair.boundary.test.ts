@@ -77,7 +77,7 @@ const docsNavigationAddress = `${apiOrigin}/api/v2/docs/navigation`;
 const docsPageAddress = (path: string) =>
   `${apiOrigin}/api/v2/docs/page?${new URLSearchParams({ path })}`;
 const Json = Schema.fromJsonString(Schema.Unknown);
-const ColourChannel = Schema.NumberFromString.check(
+const ColourChannel = Schema.Int.check(
   Schema.isGreaterThanOrEqualTo(0),
   Schema.isLessThanOrEqualTo(255)
 );
@@ -93,43 +93,50 @@ const expectReadableText = Effect.fnUntraced(function* ({
   readonly page: Page;
   readonly selector: string;
 }) {
-  const foreground = yield* Effect.promise(() =>
+  const colours = yield* Effect.promise(() =>
     page
       .locator(selector)
       .first()
-      .evaluate((element) => getComputedStyle(element).color)
+      .evaluate((element) => {
+        // Let the browser resolve modern CSS and system colours into sRGB.
+        // Read the actual reader surface, including themed recovery pages.
+        const context = document.createElement("canvas").getContext("2d");
+        const channels = (colour: string) => {
+          if (context) {
+            context.fillStyle = colour;
+            context.fillRect(0, 0, 1, 1);
+            const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
+            return [red, green, blue];
+          }
+          return [];
+        };
+        const surface =
+          element.closest(".docs-reader") ?? document.documentElement;
+        return [
+          channels(getComputedStyle(element).color),
+          channels(getComputedStyle(surface).backgroundColor),
+        ];
+      })
+  ).pipe(
+    Effect.flatMap(
+      Schema.decodeUnknownEffect(Schema.Tuple([ColourChannels, ColourChannels]))
+    )
   );
-  const background = yield* Effect.promise(() =>
-    page
-      .locator(":root")
-      .evaluate((element) => getComputedStyle(element).backgroundColor)
-  );
-  const luminance = yield* Effect.forEach([foreground, background], (colour) =>
-    Option.fromNullishOr(
-      /^rgb\((?<red>\d+), (?<green>\d+), (?<blue>\d+)\)$/u.exec(colour)
-    ).pipe(
-      Effect.fromOption,
-      Effect.map((matches) => Array.drop(matches, 1)),
-      Effect.flatMap(Schema.decodeUnknownEffect(ColourChannels)),
-      Effect.map((channels) =>
-        EffectFunction.pipe(
-          Array.zipWith(
-            channels,
-            [0.2126, 0.7152, 0.0722],
-            (channel, weight) => {
-              const normalised = channel / 255;
-              return (
-                EffectBoolean.match(normalised <= 0.04045, {
-                  onFalse: () => ((normalised + 0.055) / 1.055) ** 2.4,
-                  onTrue: () => normalised / 12.92,
-                }) * weight
-              );
-            }
-          ),
-          Array.reduce(0, (sum, value) => sum + value)
-        )
-      ),
-      Effect.orDie
+  const luminance = EffectFunction.pipe(
+    colours,
+    Array.map((channels) =>
+      EffectFunction.pipe(
+        Array.zipWith(channels, [0.2126, 0.7152, 0.0722], (channel, weight) => {
+          const normalised = channel / 255;
+          return (
+            EffectBoolean.match(normalised <= 0.04045, {
+              onFalse: () => ((normalised + 0.055) / 1.055) ** 2.4,
+              onTrue: () => normalised / 12.92,
+            }) * weight
+          );
+        }),
+        Array.reduce(0, (sum, value) => sum + value)
+      )
     )
   );
   const text = Array.get(luminance, 0).pipe(
@@ -2037,8 +2044,9 @@ describe("built native API and Website", () => {
             page
               .getByRole("link", {
                 exact: true,
-                name: "Read this page as Markdown",
+                name: "Read as Markdown",
               })
+              .first()
               .getAttribute("href")
           );
           expect(guideMarkdown).toBe(`${websiteOrigin}/api/agent-tools.md`);
@@ -2278,7 +2286,7 @@ describe("built native API and Website", () => {
             });
             yield* expectReadableText({
               page: documentationPage,
-              selector: ".docs-navigation-panel summary",
+              selector: ".docs-nav-section-heading > a",
             });
             yield* Effect.promise(() =>
               documentationPage.keyboard.press("Tab")
@@ -2296,7 +2304,7 @@ describe("built native API and Website", () => {
             expect(
               yield* Effect.promise(() =>
                 documentationPage
-                  .getByRole("main")
+                  .locator(".docs-article h1")
                   .evaluate((element) => element === document.activeElement)
               )
             ).toBeTruthy();
@@ -2304,7 +2312,7 @@ describe("built native API and Website", () => {
               documentationPage.emulateMedia({ reducedMotion: "reduce" })
             );
             const motionElements = documentationPage.locator(
-              ".app-shell, .docs-layout, .docs-navigation-panel, .docs-navigation, .docs-article"
+              ".app-shell, .docs-layout, .docs-navigation, .docs-article"
             );
             const motionCount = yield* Effect.promise(() =>
               motionElements.count()
@@ -2388,10 +2396,11 @@ describe("built native API and Website", () => {
                         .querySelector('meta[property="og:image:width"]')
                         ?.getAttribute("content"),
                       markdown: article
-                        ?.querySelector(".docs-markdown-link a")
+                        ?.querySelector('.docs-page-actions a[href$=".md"]')
                         ?.getAttribute("href"),
-                      navigation:
-                        document.querySelectorAll(".docs-navigation a").length,
+                      navigation: document.querySelectorAll(
+                        ".docs-sidebar .docs-navigation a"
+                      ).length,
                       text: article?.textContent,
                       title: document.title,
                       twitterCard: document
@@ -2473,7 +2482,8 @@ describe("built native API and Website", () => {
         yield* Effect.gen(function* verifyDocumentationRepresentations() {
           yield* Effect.promise(() =>
             docsPage
-              .getByRole("link", { name: "Read this page as Markdown" })
+              .getByRole("link", { name: "Read as Markdown" })
+              .first()
               .click()
           );
           EffectFunction.pipe(docsPage.url(), (actual) => {
@@ -2655,30 +2665,101 @@ describe("built native API and Website", () => {
             })
           );
         }).pipe(Effect.withSpan("NativePair.verifyClientNavigation"));
-        yield* Effect.gen(function* verifyMobileNavigation() {
+        yield* Effect.gen(function* verifyPageOutline() {
+          const outline = docsPage.locator(".docs-page-sidebar .docs-outline");
+          const last = outline.getByRole("link").last();
+          const target = yield* Effect.promise(() => last.getAttribute("href"));
+          yield* Effect.promise(() => last.click());
           yield* Effect.promise(() =>
-            docsPage.setViewportSize({ height: 844, width: 390 })
+            outline.locator('a[aria-current="location"]').waitFor()
           );
+          yield* Effect.promise(() =>
+            outline.locator('a[aria-current="location"]').getAttribute("href")
+          ).pipe(
+            Effect.repeat({
+              until: (value) => value === target,
+              schedule: Schedule.spaced("20 millis"),
+            }),
+            Effect.timeout("2 seconds"),
+            Effect.tap((value) =>
+              Effect.sync(() => {
+                expect(value).toBe(target);
+              })
+            )
+          );
+          yield* Effect.promise(() =>
+            docsPage.evaluate(() => {
+              window.scrollTo(0, 0);
+            })
+          );
+        }).pipe(Effect.withSpan("NativePair.verifyPageOutline"));
+        yield* Effect.gen(function* verifyMobileNavigation() {
+          const fits = yield* EffectFunction.pipe(
+            [320, 390],
+            Effect.forEach((width) =>
+              Effect.gen(function* () {
+                yield* Effect.promise(() =>
+                  docsPage.setViewportSize({ height: 844, width })
+                );
+                return yield* Effect.promise(() =>
+                  docsPage.evaluate(
+                    () =>
+                      document.documentElement.scrollWidth <= window.innerWidth
+                  )
+                );
+              })
+            )
+          );
+          expect(fits).toStrictEqual([true, true]);
+          yield* Effect.promise(() =>
+            docsPage.getByRole("radio", { name: /^dark$/iu }).check()
+          );
+          const menu = docsPage.getByRole("button", {
+            name: "Open documentation menu",
+          });
+          yield* Effect.promise(() => menu.focus());
+          yield* Effect.promise(() => docsPage.keyboard.press("Enter"));
+          const dialog = docsPage.getByRole("dialog");
+          yield* Effect.promise(() => dialog.waitFor());
           expect(
             yield* Effect.promise(() =>
-              docsPage.evaluate(
-                () => document.documentElement.scrollWidth <= window.innerWidth
-              )
+              dialog.evaluate((element) => ({
+                focusInside: element.contains(document.activeElement),
+                scheme: getComputedStyle(element).colorScheme,
+              }))
+            )
+          ).toStrictEqual({ focusInside: true, scheme: "dark" });
+          yield* Effect.promise(() => docsPage.keyboard.press("Escape"));
+          yield* Effect.promise(() => dialog.waitFor({ state: "hidden" }));
+          expect(
+            yield* Effect.promise(() =>
+              menu.evaluate((element) => element === document.activeElement)
+            )
+          ).toBeTruthy();
+          yield* Effect.promise(() => menu.click());
+          yield* Effect.promise(() =>
+            dialog
+              .getByRole("link", { name: "Quickstart", exact: true })
+              .click()
+          );
+          yield* Effect.promise(() => dialog.waitFor({ state: "hidden" }));
+          expect(
+            yield* Effect.promise(() =>
+              docsPage
+                .locator(".docs-article h1")
+                .evaluate((element) => element === document.activeElement)
+            )
+          ).toBeTruthy();
+          expect(
+            yield* Effect.promise(() =>
+              docsPage
+                .getByRole("link", { name: "Read as Markdown", exact: true })
+                .isVisible()
             )
           ).toBeTruthy();
           yield* Effect.promise(() =>
-            docsPage.locator(".docs-navigation-panel summary").focus()
+            docsPage.getByRole("radio", { name: /^system$/iu }).check()
           );
-          yield* expectReadableText({
-            page: docsPage,
-            selector: ".docs-navigation-panel summary",
-          });
-          yield* Effect.promise(() => docsPage.keyboard.press("Enter"));
-          expect(
-            yield* Effect.promise(() =>
-              docsPage.locator(".docs-navigation-panel").getAttribute("open")
-            )
-          ).toBeNull();
           yield* Effect.promise(() =>
             docsPage.evaluate(() => {
               window.scrollTo(0, 0);
@@ -2702,7 +2783,8 @@ describe("built native API and Website", () => {
           ).toBe("Quickstart");
           yield* Effect.promise(() =>
             plainPage
-              .locator('.docs-navigation a[href="/sdk/typescript-sdk"]')
+              .getByRole("navigation", { name: "Documentation", exact: true })
+              .locator('a[href="/sdk/typescript-sdk"]')
               .click()
           );
           expect(
@@ -2711,7 +2793,7 @@ describe("built native API and Website", () => {
             )
           ).toBe("TypeScript SDK");
           yield* Effect.promise(() =>
-            plainPage.getByRole("radio", { name: "dark", exact: true }).check()
+            plainPage.getByRole("radio", { name: /^dark$/iu }).check()
           );
           expect(
             yield* Effect.promise(() =>
@@ -2720,6 +2802,35 @@ describe("built native API and Website", () => {
                 .evaluate((element) => getComputedStyle(element).colorScheme)
             )
           ).toBe("dark");
+          yield* Effect.promise(() =>
+            plainPage.setViewportSize({ height: 844, width: 320 })
+          );
+          const code = plainPage
+            .getByRole("region", { name: "TypeScript", exact: true })
+            .first();
+          yield* Effect.promise(() => code.focus());
+          yield* Effect.promise(() => plainPage.keyboard.press("ArrowRight"));
+          const scrolled = yield* Effect.promise(() =>
+            code.evaluate((element) => element.scrollLeft > 0)
+          ).pipe(
+            Effect.repeat({
+              until: (value) => value,
+              schedule: Schedule.spaced("20 millis"),
+            }),
+            Effect.timeout("2 seconds")
+          );
+          expect({
+            scrolled,
+            focused: yield* Effect.promise(() =>
+              code.evaluate((element) => element === document.activeElement)
+            ),
+            copyControls: yield* Effect.promise(() =>
+              plainPage.getByRole("button", { name: /^Copy/u }).count()
+            ),
+          }).toStrictEqual({ scrolled: true, focused: true, copyControls: 0 });
+          yield* Effect.promise(() =>
+            plainPage.setViewportSize({ height: 900, width: 1280 })
+          );
         }).pipe(
           Effect.withSpan("NativePair.verifyNavigationWithoutJavaScript")
         );
@@ -2728,9 +2839,6 @@ describe("built native API and Website", () => {
             docsPage.goto(`${websiteOrigin}/contributing/what-are-you-changing`)
           );
           yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
-          yield* Effect.promise(() =>
-            docsPage.locator(".docs-navigation-panel summary").click()
-          );
           expect({
             fitsViewport: yield* Effect.promise(() =>
               docsPage.evaluate(
@@ -2788,9 +2896,6 @@ describe("built native API and Website", () => {
             docsPage.setViewportSize({ height: 900, width: 1440 })
           );
           yield* Effect.promise(() =>
-            docsPage.locator(".docs-navigation-panel summary").click()
-          );
-          yield* Effect.promise(() =>
             docsPage.evaluate(() => {
               window.scrollTo(0, 0);
             })
@@ -2823,7 +2928,7 @@ describe("built native API and Website", () => {
               .evaluate((element) => getComputedStyle(element).color)
           );
           yield* Effect.promise(() =>
-            docsPage.getByRole("radio", { name: "dark", exact: true }).check()
+            docsPage.getByRole("radio", { name: /^dark$/iu }).check()
           );
           const dark = yield* Effect.promise(() =>
             docsPage
@@ -2849,7 +2954,7 @@ describe("built native API and Website", () => {
             })
           );
           yield* Effect.promise(() =>
-            docsPage.getByRole("radio", { name: "system", exact: true }).check()
+            docsPage.getByRole("radio", { name: /^system$/iu }).check()
           );
           yield* Effect.promise(() =>
             docsPage.emulateMedia({ colorScheme: "dark" })
@@ -2863,7 +2968,7 @@ describe("built native API and Website", () => {
             )
           ).toBe(dark);
           yield* Effect.promise(() =>
-            docsPage.getByRole("radio", { name: "light", exact: true }).check()
+            docsPage.getByRole("radio", { name: /^light$/iu }).check()
           );
           expect(
             yield* Effect.promise(() =>
@@ -2886,7 +2991,7 @@ describe("built native API and Website", () => {
           });
           const src = yield* Effect.promise(() => diagram.getAttribute("src"));
           yield* Effect.promise(() =>
-            docsPage.getByRole("radio", { name: "dark", exact: true }).check()
+            docsPage.getByRole("radio", { name: /^dark$/iu }).check()
           );
           expect({
             source: yield* Effect.promise(() => diagram.getAttribute("src")),
@@ -2982,9 +3087,15 @@ describe("built native API and Website", () => {
               })
               .waitFor()
           );
-          // An empty search reads only the navigation, directly from the API.
-          expect(yield* Queue.clear(docsCalls)).toStrictEqual([
+          // Search uses the canonical page's checked theme through existing
+          // bounded helpers; its navigation reads remain native public GETs.
+          const searchReads = yield* Queue.clear(docsCalls).pipe(
+            Effect.map(Array.sort(Order.String))
+          );
+          expect(searchReads).toStrictEqual([
             `GET ${docsNavigationAddress}`,
+            `GET ${docsNavigationAddress}`,
+            `GET ${docsPageAddress("/start/quickstart")}`,
           ]);
           yield* Queue.clear(docsRequests);
           expect({
@@ -3143,6 +3254,9 @@ describe("built native API and Website", () => {
         yield* Effect.gen(function* verifySearchInteraction() {
           yield* Effect.promise(() => docsPage.goto(`${websiteOrigin}/search`));
           yield* Effect.promise(() =>
+            docsPage.getByRole("radio", { name: /^dark$/iu }).check()
+          );
+          yield* Effect.promise(() =>
             docsPage
               .getByRole("searchbox", { name: "Search words" })
               .pressSequentially("Quickstart")
@@ -3155,6 +3269,80 @@ describe("built native API and Website", () => {
               })
               .click()
           );
+          yield* Effect.promise(() =>
+            docsPage
+              .locator('.docs-search-results a[href="/start/quickstart"]')
+              .waitFor()
+          );
+          expect(
+            yield* Effect.promise(() =>
+              docsPage
+                .locator(".docs-reader")
+                .evaluate((element) => getComputedStyle(element).colorScheme)
+            )
+          ).toBe("dark");
+          // Re-submitting the same words must remain one native navigation.
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("button", {
+                exact: true,
+                name: "Search documentation",
+              })
+              .click()
+          );
+          yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+          const words = docsPage.getByRole("searchbox", {
+            name: "Search words",
+          });
+          yield* Effect.promise(() => words.press("ControlOrMeta+A"));
+          yield* Effect.promise(() => words.pressSequentially("money"));
+          yield* Effect.promise(() =>
+            docsPage
+              .getByRole("button", {
+                exact: true,
+                name: "Search documentation",
+              })
+              .click()
+          );
+          yield* Effect.promise(() =>
+            docsPage.waitForURL(`${websiteOrigin}/search?term=money`)
+          );
+          yield* Effect.promise(() =>
+            docsPage.locator('main[aria-busy="false"]').waitFor()
+          );
+          yield* Effect.promise(() => docsPage.goBack());
+          yield* Effect.promise(() =>
+            docsPage.waitForURL(`${websiteOrigin}/search?term=Quickstart`)
+          );
+          yield* Effect.promise(() =>
+            docsPage.locator('main[aria-busy="false"]').waitFor()
+          );
+          const restored = yield* Effect.promise(() => words.inputValue()).pipe(
+            Effect.repeat({
+              until: (value) => value === "Quickstart",
+              schedule: Schedule.spaced("20 millis"),
+            }),
+            Effect.timeout("2 seconds")
+          );
+          yield* Effect.promise(() => docsPage.goForward());
+          yield* Effect.promise(() =>
+            docsPage.waitForURL(`${websiteOrigin}/search?term=money`)
+          );
+          yield* Effect.promise(() =>
+            docsPage.locator('main[aria-busy="false"]').waitFor()
+          );
+          const forward = yield* Effect.promise(() => words.inputValue()).pipe(
+            Effect.repeat({
+              until: (value) => value === "money",
+              schedule: Schedule.spaced("20 millis"),
+            }),
+            Effect.timeout("2 seconds")
+          );
+          expect({
+            restored,
+            forward,
+          }).toStrictEqual({ restored: "Quickstart", forward: "money" });
+          yield* Effect.promise(() => docsPage.goBack());
           yield* Effect.promise(() =>
             docsPage
               .getByRole("link", { exact: true, name: "Quickstart" })

@@ -527,6 +527,25 @@ export default defineConfig({
       },
     },
     {
+      // TanStack history emits a native navigation; this is not Array.push.
+      // Router's subscription owns asynchronous loading and cancellation.
+      files: ["apps/web/src/lib/docs/search-form.container.tsx"],
+      rules: {
+        "strict-effect/no-imperative-collections": [
+          "error",
+          {
+            allowedMethods: [
+              {
+                file: "apps/web/src/lib/docs/search-form.container.tsx",
+                method: "push",
+                receiver: "router.history",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
       files: ["apps/web/test/native-local-development.boundary.test.ts"],
       rules: {
         "strict-effect/no-imperative-collections": [
@@ -566,6 +585,13 @@ export default defineConfig({
         "strict-effect/no-imperative-collections": [
           "error",
           {
+            // Native Canvas resolves CSS colour spaces for the contrast check.
+            allowedAssignments: [
+              {
+                file: "apps/web/test/native-pair.boundary.test.ts",
+                target: "context.fillStyle",
+              },
+            ],
             allowedMethods: [
               {
                 file: "apps/web/test/native-pair.boundary.test.ts",

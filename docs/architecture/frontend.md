@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-11-01
 review_trigger: frontend runtime, API client, loader, rendering, cache, build adapter, or composition change
 ---
 
@@ -201,6 +201,12 @@ registration and interrupt it on cleanup.
 
 ## Documentation
 
+The [Website design guide](../../apps/web/DESIGN.md) owns layout, typography and
+interaction details. Documentation uses a sticky header, independently scrolling
+navigation, a bounded reading column and a page outline. Base UI provides the
+mobile Dialog, navigation Collapsibles, code ScrollArea and copy Buttons. Native
+links, radios, GET forms and disclosures preserve progressive enhancement.
+
 The catch-all route loads page and navigation from the API's documentation
 routes. The route renders the title as `DocsHeading` and the checked
 `page.body` through `src/lib/docs/reading-body.view.tsx`: code tokens as
@@ -213,6 +219,24 @@ preference) are a named HTTP policy over the HTML Effect in `src/entry.server.ts
 the API and are forwarded once (`http/early-reply.ingress.ts`). Each docs loader
 returns Content's `docsPageMetadata`, rendered by `seo/head.ts`. No Website
 request reads authored MDX, builds a content index or constructs a Layer.
+
+`DocsReader` applies the checked MDX theme to prose, code and diagram images.
+Native Light, Dark and System radios select the colour scheme through CSS
+before hydration and without JavaScript. One appearance Atom in the existing
+router/React registry retains the choice across client navigation; reloads
+return to the device default, without cookies or browser storage. Code tokens
+retain both appearances and SVGs embed both palettes. Search obtains its theme
+from the canonical Quickstart page through existing bounded reads, without a new
+endpoint or cache; an empty search reads navigation twice and the page once.
+The public docs client uses `/api/v2/docs`; calculator routes retain their
+existing version.
+
+Copy commands use the static native Clipboard Layer in `browserRuntime` and
+per-control action Atoms; they never acquire the generated API client. The
+page outline uses a scoped observer action on that same runtime. Native Router
+retains the resolved page while navigation loads, and recovery pages without a
+checked theme use platform system colours. No component creates another runtime
+or registry.
 
 ## Analytics
 
@@ -257,12 +281,3 @@ event allowlist and stored-event readback are not built.
 - [Package ownership](./package-ownership.md)
 - [Content and posts](./content-and-posts.md)
 - [Deployment](./deployment.md)
-
-
-Documentation's `DocsReader` container applies the page's checked MDX theme to
-prose, code and diagram images. Native Light, Dark and System radio controls
-select the reading area's colour scheme without provider calls or persisted
-browser state. CSS resolves System before JavaScript; explicit choices also
-work with JavaScript disabled. Code tokens retain both appearances and SVGs
-embed both palettes. The public docs client uses `/api/v2/docs`; calculator
-routes retain their existing version.

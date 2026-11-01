@@ -1,7 +1,11 @@
+import { useAtom } from "@effect/atom-react";
 import type { DocsPublicPage } from "@taxkit/content/schemas";
 import { Array, Function as EffectFunction, Match, Record } from "effect";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useId } from "react";
 import type { ReactNode } from "react";
+
+import { docsAppearanceAtom } from "./appearance.atoms";
 
 const formatFontStack = (
   stack: DocsPublicPage["theme"]["typography"]["text"]
@@ -20,7 +24,6 @@ export const DocsReader = ({
   theme: DocsPublicPage["theme"];
   children: ReactNode;
 }>) => {
-  const group = useId();
   const variables = EffectFunction.pipe(
     [
       { mode: "light", scheme: theme.light },
@@ -48,25 +51,41 @@ export const DocsReader = ({
   };
   return (
     <section className="docs-reader" style={readingStyle}>
-      <fieldset className="docs-theme-options">
-        <legend>Appearance</legend>
-        {EffectFunction.pipe(
-          ["system", "light", "dark"] as const,
-          Array.map((mode) => (
-            <label key={mode}>
-              <input
-                data-mode={mode}
-                defaultChecked={mode === "system"}
-                name={group}
-                type="radio"
-                value={mode}
-              />
-              <span>{mode}</span>
-            </label>
-          ))
-        )}
-      </fieldset>
       {children}
     </section>
+  );
+};
+
+export const DocsAppearance = () => {
+  const group = useId();
+  const [appearance, chooseAppearance] = useAtom(docsAppearanceAtom);
+  return (
+    <fieldset className="docs-theme-options">
+      <legend className="sr-only">Appearance</legend>
+      {EffectFunction.pipe(
+        [
+          { mode: "system", label: "System", icon: Monitor },
+          { mode: "light", label: "Light", icon: Sun },
+          { mode: "dark", label: "Dark", icon: Moon },
+        ] as const,
+        Array.map(({ mode, label, icon: Icon }) => (
+          <label key={mode} title={`${label} appearance`}>
+            <input
+              className="docs-theme-input"
+              data-mode={mode}
+              checked={appearance === mode}
+              onChange={() => {
+                chooseAppearance(mode);
+              }}
+              name={group}
+              type="radio"
+              value={mode}
+            />
+            <Icon aria-hidden="true" size={17} />
+            <span className="sr-only">{label}</span>
+          </label>
+        ))
+      )}
+    </fieldset>
   );
 };
