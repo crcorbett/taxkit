@@ -1,5 +1,14 @@
 # TaxKit Website
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [70e7319]
+  - @taxkit/content@3.2.2
+  - @taxkit/api-http@3.1.4
+  - @taxkit/webmcp@0.1.4
+
 ## 0.0.4
 
 ### Patch Changes
