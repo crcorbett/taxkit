@@ -1,6 +1,6 @@
 {
   "name": "@taxkit/mdx",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -31,6 +31,7 @@
     "yaml": "2.9.1"
   },
   "devDependencies": {
+    "@effect/platform-bun": "catalog:",
     "@effect/vitest": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

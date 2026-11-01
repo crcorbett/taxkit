@@ -24,7 +24,10 @@ router, filesystem or runtime dependency. TaxKit publication rules belong to
 - `./errors`: closed compiler, renderer and adapter failures. Rendering errors
   carry source identity and a node path, without source text or raw causes.
 - `./highlights`: `PierreCodeHighlighterLive`, the only Pierre caller. A private
-  instance is acquired once; provider output is checked immediately.
+  instance is acquired once through Pierre's public `createHighlighter()` API.
+  Instance creation returns a `CodeHighlighterInitializationError` on failure.
+  Provider output is checked immediately; per-snippet failures remain
+  `CodeHighlightError`.
 - `./config`: checked `PresentationThemeConfig` (`MDX_THEME`, `light` by default,
   or `dark`), acquired through the host's ConfigProvider at Layer construction.
 - `./test`: deterministic static highlighter and diagram Layers.
@@ -44,10 +47,18 @@ owns storage, cache identity and invalidation. A stored Document can render with
 the compiler. Renderer data is not HTML: consumers project it into their view.
 
 Providers run synchronously. Effect interruption applies between operations;
-there is no hard CPU pre-emption. Pierre also initialises WASM on module import,
-so import failures remain host startup failures. Bun tests do not qualify the
-Worker-specific WASM entry for request-time compilation. TaxKit continues to serve
-prebuilt documentation; no request-time route or cache is introduced.
+there is no hard CPU pre-emption. Pierre 0.3.0's public root entry initializes
+shared WASM during import. An import failure is a host startup failure, before
+the Layer exists. The Layer owns its separate highlighter instance through
+`Effect.try`; it cannot turn an earlier module-load failure into a typed service
+error. Only published exports are used; there are no dependency patches, private
+deep imports or dynamic imports. See
+[ADR 0008](../../docs/adr/0008-effect-rendering-providers.md).
+
+The public entry is qualified in Bun and Node. An isolated Node process without
+WebAssembly confirms the host startup failure boundary. Pierre's published
+Workerd entry is not qualified for request-time rendering. TaxKit continues to
+serve prebuilt documentation; no request-time route or cache is introduced.
 
 Brands are constructed with the owning Schema at ingress or through `makeEffect`.
 Internal methods retain the checked types: `SourceText` cannot substitute for

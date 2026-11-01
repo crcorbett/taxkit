@@ -1,5 +1,6 @@
-import { Source, SourceId, SourceText } from "@taxkit/mdx/schemas";
+import { SourceId, SourceText } from "@taxkit/mdx/schemas";
 import type {
+  Source,
   Inline,
   RenderedInline,
   RenderedBlock,
@@ -15,7 +16,7 @@ import {
 } from "effect";
 
 import { DocsPageReadError } from "./errors.js";
-import { readingMarkdown } from "./reading-markdown.egress.js";
+import { writeReadingMarkdown } from "./reading-markdown.egress.js";
 import { DocsPageFrontmatter, DocsReadingBody } from "./schemas.js";
 import { DocsPageReader } from "./service.js";
 // Content projects neutral checked semantics into the existing public wire shape.
@@ -117,9 +118,7 @@ export const ContentMdxReaderLive = Layer.effect(
         const text = yield* SourceText.makeEffect(source.text).pipe(
           Effect.mapError(() => fail("syntax"))
         );
-        const input = yield* Source.makeEffect({ id, text }).pipe(
-          Effect.mapError(() => fail("syntax"))
-        );
+        const input: Source = { id, text };
         const document = yield* compiler
           .compile(input)
           .pipe(Effect.mapError((error) => fail(error.reason)));
@@ -162,7 +161,7 @@ export const ContentMdxReaderLive = Layer.effect(
         return {
           body: checkedBody,
           frontmatter,
-          markdown: readingMarkdown({
+          markdown: writeReadingMarkdown({
             body: rendered.blocks,
             title: frontmatter.title,
           }),

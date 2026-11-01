@@ -59,9 +59,15 @@ on the open-source tax engine and avoid downstream private-product specifics.
   See [the package](../../packages/mdx/README.md).
 
 `packages/diagrams`
-: Private source `@taxkit/diagrams`. Static `MermaidDiagramRendererLive`
-  implements MDX's `DiagramRenderer`; it is the only `beautiful-mermaid` caller
-  and draws SVG without a browser. It does not import Content.
+: Private source `@taxkit/diagrams`. Static `PeleDiagramRendererLive` implements
+  MDX's `DiagramRenderer` using `Pele`. It converts the independently branded
+  contracts and applies MDX's SVG bound, without importing the SDK or Content.
+
+`packages/pele`
+: Private source `@taxkit/pele`. `Pele.renderSvg` renders Mermaid definitions
+  without a browser, independently of MDX and TaxKit publication rules. The static
+  live Layer owns the SDK call, immediate decoding and safe failure mapping;
+  the static test Layer uses the same contract. See [its README](../../packages/pele/README.md).
 
 `packages/docs-examples`
 : Private checked integration templates and their compiler/runtime proof. It
@@ -75,7 +81,7 @@ on the open-source tax engine and avoid downstream private-product specifics.
 `apps/api/scripts/docs-catalogue.runtime.ts` and `apps/api/src/content.boundary.ts`
 : The API build composes the public catalogue ahead of time. It supplies
 `@content/docs/sources`, the `@taxkit/mdx` reader and highlighter and the
-`@taxkit/diagrams` renderer to `ContentCatalogueLive` and writes the checked
+`@taxkit/diagrams` adapter with `@taxkit/pele` to `ContentCatalogueLive` and writes the checked
 catalogue to `apps/api/src/generated/docs-catalogue.json`. The Worker only
 decodes that file. Page frontmatter and `navigation.json`
 decide publication: Content keeps pages whose `status` is `published`, requires
@@ -132,7 +138,7 @@ docs implementation
     -> examples at the checked-example revision equal the current files
   -> bun run check:docs
     -> relative links and documented commands in docs/, AGENTS.md and READMEs
-  -> @taxkit/content, @taxkit/mdx and @taxkit/diagrams unit tests
+  -> @taxkit/content, @taxkit/mdx, @taxkit/diagrams and @taxkit/pele unit tests
   -> apps/web native build and real browser/Worker checks when rendering changes
   -> bun run verification
 ```
@@ -159,7 +165,8 @@ docs implementation
   pull request.
 - Keep authored pages in `@content/docs`; keep TaxKit content contracts in
   `@taxkit/content`; keep MDX reading and highlighting in `@taxkit/mdx` and
-  diagram rendering in `@taxkit/diagrams`; keep route composition and
+  the diagram adapter in `@taxkit/diagrams` and provider rendering in `@taxkit/pele`;
+  keep route composition and
   app-specific rendering in `apps/web`.
 
 ## Related docs

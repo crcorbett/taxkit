@@ -1,6 +1,9 @@
 import { createHighlighter } from "@pierre/highlights";
 import { pierreDark, pierreLight } from "@pierre/highlights/themes";
-import { CodeHighlightError } from "@taxkit/mdx/errors";
+import {
+  CodeHighlightError,
+  CodeHighlighterInitializationError,
+} from "@taxkit/mdx/errors";
 import { InlineText, TokenColor } from "@taxkit/mdx/schemas";
 import type { CodeSnippet, CodeToken, TokenStyle } from "@taxkit/mdx/schemas";
 import { CodeHighlighter } from "@taxkit/mdx/service";
@@ -39,15 +42,15 @@ const resolveTokenStyle = (fontStyle: number): TokenStyle =>
     Match.when({ italic: true }, () => "italic" as const),
     Match.orElse(() => "normal" as const)
   );
-// @pierre/highlights initialises its WebAssembly on import. Only the API
-// build loads this adapter; every provider call stays in this operation.
+// Pierre initializes its shared WASM module on import. The Layer owns a separate
+// highlighter instance; SDK module-load failures belong to the host's startup.
 export const PierreCodeHighlighterLive = Layer.effect(
   CodeHighlighter,
   Effect.gen(function* () {
     const theme = yield* PresentationThemeConfig;
     const highlighter = yield* Effect.try({
       catch: () =>
-        new CodeHighlightError({ language: "txt", reason: "highlight" }),
+        new CodeHighlighterInitializationError({ reason: "initialize" }),
       try: () => createHighlighter(),
     });
     return CodeHighlighter.of({
@@ -81,7 +84,7 @@ export const PierreCodeHighlighterLive = Layer.effect(
               })
           )
         );
-        // Already-checked provider tokens become Content tokens; empty runs
+        // Already-checked provider tokens become MDX tokens; empty runs
         // carry no text and are dropped.
         return EffectFunction.pipe(
           tokens,

@@ -17,9 +17,10 @@ The initial component vocabulary is empty; unsupported JSX fails closed.
 MDX owns document Schemas, compiler and renderer contracts, typed failures and
 format adapters. It does not import Content, TaxKit pages, navigation, a router,
 a filesystem or an application runtime. Content imports MDX contracts and
-Schemas; the app composes concrete Layers. Pierre and Mermaid implement MDX-owned
-contracts without importing Content. Keep the existing packages; this decision
-requires no additional package or plugin system.
+Schemas; the app composes concrete Layers. Pierre and the Pele diagram adapter
+implement MDX-owned contracts without importing Content.
+[ADR 0008](0008-effect-rendering-providers.md) adds the independent Pele provider
+package; it preserves this split without introducing a plugin system.
 
 Content owns frontmatter interpretation, publication, title matching, navigation,
 repository revisions and link policy. A fragment without frontmatter or a heading
@@ -200,7 +201,7 @@ const MdxPresentationLive = MdxRendererLive.pipe(
   Layer.provide(
     Layer.mergeAll(
       PierreCodeHighlighterLive,
-      MermaidDiagramRendererLive,
+      PeleDiagramRendererLive.pipe(Layer.provide(PeleLive)),
       ContentLinkResolverLive
     )
   )
@@ -261,9 +262,13 @@ inject as inline HTML; this change does not add inline-SVG rendering.
 Acquire private provider instances through native APIs where available, such as
 Pierre's `createHighlighter`, and keep mutable provider objects inside their Layer.
 Map acquisition failures controlled by that Layer separately from per-document
-failures. Installed Pierre entry points also initialise WebAssembly on import:
-module-load failures before a Layer exists are host startup failures, not promised
-`RenderError` values. Do not invent a loader framework to conceal that distinction.
+failures. Pierre's published root entry initializes shared WASM during static
+import; a module-load failure belongs to host startup, before a Layer exists.
+Private instance creation uses its public `createHighlighter()` inside
+`Effect.try` during Layer acquisition and returns `CodeHighlighterInitializationError`.
+Per-snippet failures remain `CodeHighlightError`. Use supported exports without
+patching dependencies or importing private paths; see
+[ADR 0008](0008-effect-rendering-providers.md).
 
 Parser, highlighter and Mermaid calls are synchronous. Effect preserves structured
 interruption between operations, but cannot pre-empt synchronous work already
@@ -319,10 +324,11 @@ MDX models; a cache must not be necessary for correctness.
 Compare decoded outputs under identical pinned inputs and policies, including
 provider-produced strings; object-key order in encoded JSON is immaterial. Changing
 a theme changes presentation without changing Document semantics. Changing link
-policy requires rerendering, not recompiling. Request-time qualification must load
-the actual host-specific provider entry: Pierre's Bun/default entry compiles bytes,
-whereas its `workerd` entry imports a compiled WASM module. Bun success is not Worker
-success, and current native tests serve prebuilt docs rather than compile on requests.
+policy requires rerendering, not recompiling. Request-time qualification must test
+the actual provider acquisition in its intended host. Pierre's public entry is
+qualified in Bun and Node, including its host startup failure without WebAssembly.
+Its published Workerd entry is not qualified for request-time rendering. Current
+native tests serve prebuilt docs rather than compile on requests.
 
 ## Evidence required for migration
 

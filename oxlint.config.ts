@@ -60,7 +60,7 @@ const decodingBoundaryFiles = [
   "packages/mdx/src/body.ingress.ts",
   "packages/mdx/src/artifacts.layer.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
-  "packages/diagrams/src/mermaid.adapter.layer.ts",
+  "packages/pele/src/live.layer.ts",
   "packages/content/test/reading.test.ts",
   "packages/content/test/mdx.test.ts",
   "packages/mdx/test/pipeline.test.ts",

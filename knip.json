@@ -177,8 +177,21 @@
     },
     "packages/diagrams": {
       "entry": [
-        "src/mermaid.adapter.layer.ts",
+        "src/pele.adapter.layer.ts",
         "test/**/*.test.ts",
+        "vitest.config.ts"
+      ],
+      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/pele": {
+      "entry": [
+        "src/schemas.ts",
+        "src/errors.ts",
+        "src/service.ts",
+        "src/live.layer.ts",
+        "src/test.layer.ts",
+        "test/**/*.test.ts",
+        "test/**/*.typecheck.ts",
         "vitest.config.ts"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]

@@ -173,8 +173,17 @@
       "project": ["src/**/*.ts!", "!src/test.layer.ts!"]
     },
     "packages/diagrams": {
-      "entry": ["src/mermaid.adapter.layer.ts!"],
+      "entry": ["src/pele.adapter.layer.ts!"],
       "project": ["src/**/*.ts!"]
+    },
+    "packages/pele": {
+      "entry": [
+        "src/schemas.ts!",
+        "src/errors.ts!",
+        "src/service.ts!",
+        "src/live.layer.ts!"
+      ],
+      "project": ["src/**/*.ts!", "!src/test.layer.ts!"]
     },
     "packages/aeo": {
       "entry": [

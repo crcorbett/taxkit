@@ -1,15 +1,16 @@
 # @taxkit/diagrams
 
-Private source package that draws Mermaid diagrams for TaxKit's docs. It
-implements MDX's `DiagramRenderer` contract; MDX never imports this
-package.
+MDX's adapter to the independent [Pele service](../pele/README.md). This private
+source package owns no SDK, runtime, file loader, Content policy or site palette.
 
-- `./mermaid` exports `MermaidDiagramRendererLive`, the only caller of
-  `beautiful-mermaid`. It renders a diagram to SVG synchronously and without a
-  DOM, using the Website's light palette, then checks the reply as a
-  `DiagramSvg`.
+`./pele` exports the static `PeleDiagramRendererLive`. It requires `Pele`,
+implements MDX's `DiagramRenderer`, constructs Pele's branded source at that
+semantic boundary, and maps provider failures to MDX's closed diagram errors.
+The returned SVG becomes MDX's `DiagramSvg` through its owning constructor,
+including the narrower 500,000-character document limit.
 
-Rejected Mermaid becomes `DiagramRenderError` with reason `render`; an
-unusable reply becomes reason `svg`. The API build composes the Layer with the
-MDX renderer, so diagrams are drawn before deployment. The Website shows the stored SVG as an image, so the diagram carries its
-own colours and needs no browser script.
+The application supplies `PeleLive` through ordinary Layer composition. Pele
+can also be imported directly without MDX or this adapter. Rendering uses Pele's
+CSS-variable defaults and native font fallback; the Website displays the finished
+SVG as an image. SVG markup and layout change from the previous renderer, while
+authored definitions, titles, links and non-diagram content remain intact.

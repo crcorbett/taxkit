@@ -1,5 +1,18 @@
 # TaxKit
 
+## 3.0.2
+
+- Render documentation diagrams with the independent Effect-wrapped Pele service;
+  diagram SVG layout and styling change while source definitions, titles, code,
+  links and processed Markdown remain intact.
+- Acquire Pierre's private highlighter through its published API in a static
+  Effect Layer, with checked tokens and distinct instance-creation failures.
+  Pierre's import-time WASM initialization remains a host startup boundary.
+- Simplify MDX compiler mappings and preserve checked values across internal
+  operations. See the [MDX changelog](./packages/mdx/CHANGELOG.md),
+  [Pele changelog](./packages/pele/CHANGELOG.md) and
+  [API changelog](./apps/api/CHANGELOG.md).
+
 ## 3.0.1
 
 - Separate MDX compilation, rendering and artifact persistence into static Effect

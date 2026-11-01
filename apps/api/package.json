@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -41,6 +41,7 @@
     "@taxkit/diagrams": "workspace:*",
     "@taxkit/mdx": "workspace:*",
     "@taxkit/og-image": "workspace:*",
+    "@taxkit/pele": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/tsconfig": "workspace:*",
     "@types/bun": "catalog:",

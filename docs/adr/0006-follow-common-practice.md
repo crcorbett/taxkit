@@ -54,3 +54,8 @@ its archive includes the private modules it needs. The current ownership rules
 are in [package ownership](../architecture/package-ownership.md).
 
 [Architecture](../../ARCHITECTURE.md) describes the current system.
+
+[ADR 0007](0007-content-neutral-mdx.md) subsequently separated content-neutral
+compilation from TaxKit publication rules. [ADR 0008](0008-effect-rendering-providers.md)
+replaces the diagram provider with an independent Pele service and keeps Pierre's
+private highlighter instance inside its Effect Layer.

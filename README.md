@@ -19,7 +19,7 @@ with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, the installable
 `taxkit` TypeScript SDK, the authored `@content/docs` pages, private
-`@taxkit/content`, `@taxkit/mdx` and `@taxkit/diagrams` packages, shared
+`@taxkit/content`, `@taxkit/mdx`, `@taxkit/diagrams` and `@taxkit/pele` packages, shared
 testing helpers and shared TypeScript config. The SDK includes the engine, Australian rules and typed HTTP contracts
 in one package, with Effect as its only external runtime dependency.
 
@@ -65,10 +65,12 @@ entry points.
   and the raw page list.
 - [packages/content](./packages/content/README.md): private docs page Schemas,
   checked reading body, link resolution, catalogue and content service.
-- [packages/mdx](./packages/mdx/README.md): private MDX page reader and code
-  highlighter that implement Content's contracts.
-- [packages/diagrams](./packages/diagrams/README.md): private server-side
-  Mermaid to SVG renderer that implements Content's diagram contract.
+- [packages/mdx](./packages/mdx/README.md): content-neutral document compiler,
+  renderer contracts and Effect-owned Pierre highlighter.
+- [packages/diagrams](./packages/diagrams/README.md): Pele adapter implementing
+  MDX's diagram contract.
+- [packages/pele](./packages/pele/README.md): independent Effect service rendering
+  Mermaid definitions to SVG without a browser.
 - [packages/core](./packages/core/README.md): deterministic engine primitives,
   schema-backed facts, rule descriptors, graph validation, trace and ledger
   contracts and calculation engine service.

@@ -1,7 +1,7 @@
 import { Function as EffectFunction, Effect, Layer, Match } from "effect";
 
 import { RenderError } from "./errors.js";
-import { RenderedBlock, RenderedLink } from "./schemas.js";
+import { RenderedBlock } from "./schemas.js";
 import type { Block, Document, Inline, RenderedInline } from "./schemas.js";
 import {
   CodeHighlighter,
@@ -26,9 +26,7 @@ export const MdxRendererLive = Layer.effect(
           links
             .resolve({ sourceId: document.sourceId, target: link.target })
             .pipe(
-              Effect.flatMap((href) =>
-                RenderedLink.makeEffect({ ...link, href })
-              ),
+              Effect.map((href) => ({ ...link, href })),
               Effect.mapError(
                 () =>
                   new RenderError({
@@ -93,11 +91,7 @@ export const MdxRendererLive = Layer.effect(
                   Match.exhaustive
                 )
               ),
-              Effect.flatMap((svg) =>
-                RenderedBlock.makeEffect({ ...block, svg }).pipe(
-                  Effect.mapError(() => fail("diagram-svg"))
-                )
-              )
+              Effect.map((svg) => ({ ...block, svg }))
             ),
           heading: (block) =>
             renderInlines(block.content, document, node).pipe(

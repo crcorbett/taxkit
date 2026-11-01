@@ -36,6 +36,7 @@ Current implemented code lives in:
 - `packages/mdx`
 - `packages/observability`
 - `packages/og-image`
+- `packages/pele`
 - `packages/webmcp`
 - `packages/rules/au/income-tax`
 - `packages/rules/au/pay`
@@ -217,9 +218,15 @@ identity. Neither an app nor a package depends on another app.
   See [the package](../../packages/mdx/README.md).
 
 `packages/diagrams`
-: Private source `@taxkit/diagrams`. Static `MermaidDiagramRendererLive`
-  implements MDX's `DiagramRenderer`; it is the only `beautiful-mermaid` caller
-  and draws SVG without a browser. It does not import Content.
+: Private source `@taxkit/diagrams`. Static `PeleDiagramRendererLive` implements
+  MDX's `DiagramRenderer` using the `Pele` service. It converts independently
+  branded contracts and applies MDX's narrower SVG bound. It imports no SDK or Content.
+
+`packages/pele`
+: Private source `@taxkit/pele`. `Pele.renderSvg` owns the only Pele SDK call,
+  immediate response decoding and bounded errors. Static `PeleLive` and `PeleTest`
+  implement the same closed contract. It imports no MDX, Content or application.
+  See [the package](../../packages/pele/README.md).
 
 `packages/docs-examples`
 : Private owner of the four retained integration templates, additional checked
