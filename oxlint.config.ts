@@ -59,6 +59,9 @@ const decodingBoundaryFiles = [
   "packages/mdx/src/mdx.ingress.ts",
   "packages/mdx/src/body.ingress.ts",
   "packages/mdx/src/artifacts.layer.ts",
+  // Controlled paired-theme JSON fixture ingress; no runtime or synchronous codec.
+  "packages/mdx/src/__testing__/fixtures.ts",
+  "packages/mdx/test/theme.test.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
   "packages/pele/src/live.layer.ts",
   "packages/content/test/reading.test.ts",
@@ -203,6 +206,8 @@ const portableEffectSourceFiles = ["**/*.{cjs,mjs,jsx,js,tsx,ts}"];
 const schemaEncoderEgressFiles = [
   // Strict, private MDX persistence codecs.
   "packages/mdx/src/artifacts.layer.ts",
+  // Adversarial theme JSON bytes sent through the real artifact decoder.
+  "packages/mdx/test/theme.test.ts",
   // The synchronous native logger encodes its fixed record at console egress.
   "packages/observability/src/host-telemetry.ts",
   // Persisted docs catalogue written by the API build.

@@ -9,6 +9,7 @@ import {
   LinkResolver,
   MdxRenderer,
 } from "./service.js";
+import type { Theme } from "./theme.schemas.js";
 
 export const MdxRendererLive = Layer.effect(
   MdxRenderer,
@@ -54,7 +55,8 @@ export const MdxRendererLive = Layer.effect(
     const renderBlock = (
       input: Block,
       document: Document,
-      node: readonly number[]
+      node: readonly number[],
+      theme: Theme
     ): Effect.Effect<RenderedBlock, RenderError> => {
       const fail = (reason: RenderError["reason"]) =>
         new RenderError({
@@ -67,7 +69,10 @@ export const MdxRendererLive = Layer.effect(
         Match.discriminatorsExhaustive("kind")({
           code: (block) =>
             highlighter
-              .highlight({ language: block.language, text: block.text })
+              .highlight({
+                snippet: { language: block.language, text: block.text },
+                theme,
+              })
               .pipe(
                 Effect.mapError((error) =>
                   Match.value(error.reason).pipe(
@@ -83,7 +88,7 @@ export const MdxRendererLive = Layer.effect(
                 )
               ),
           diagram: (block) =>
-            diagrams.render(block.source).pipe(
+            diagrams.render({ source: block.source, theme }).pipe(
               Effect.mapError((error) =>
                 Match.value(error.reason).pipe(
                   Match.when("render", () => fail("diagram-render")),
@@ -134,17 +139,19 @@ export const MdxRendererLive = Layer.effect(
       );
     };
     return MdxRenderer.of({
-      render: Effect.fn("MdxRenderer.render")(function* (document) {
+      render: Effect.fn("MdxRenderer.render")(function* ({ document, theme }) {
         const blocks = yield* EffectFunction.pipe(
           document.blocks,
           Effect.forEach((block, index) =>
-            renderBlock(block, document, [index])
+            renderBlock(block, document, [index], theme)
           )
         );
         return {
           ...document,
           blocks,
           format: "mdx-rendered-document" as const,
+          theme,
+          version: 2 as const,
         };
       }),
     });

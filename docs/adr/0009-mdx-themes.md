@@ -23,7 +23,7 @@ ownership and host-startup decisions remain applicable.
 ## Theme vocabulary and Schemas
 
 `@taxkit/mdx/theme` owns the framework-independent Schemas. All types derive
-from those Schemas. The following is the proposed core shape:
+from those Schemas. The following is the core shape:
 
 ```ts
 const ColorRole = Schema.Literals([
@@ -81,7 +81,7 @@ contract change.
 
 ## Rendering interface and lifetime
 
-The proposed service operations remain closed Effects:
+The service operations remain closed Effects:
 
 ```ts
 MdxCompiler.compile(source)
@@ -243,8 +243,9 @@ Pierre's host-startup WASM constraint are unchanged; this design does not
 qualify request-time Pierre rendering in Workerd.
 
 The paired token and page theme fields change the public docs JSON contract.
-Implementation needs a deliberate docs API migration and Changesets for its
-owners, including their generated client/OpenAPI contracts and Web consumer.
+The docs namespace moves to `/api/v2/docs`, including discovery and share-image
+paths, with matching generated client/OpenAPI and Web changes. Calculator routes
+retain their existing version. Changesets record the breaking contract changes.
 Do not silently replace the existing public contract or keep an indefinite
 single-theme compatibility model. Rebuild stored rendered artifacts; do not
 guess a missing theme while decoding version 1. Markdown and compiled document

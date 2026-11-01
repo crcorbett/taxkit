@@ -38,9 +38,10 @@ on the open-source tax engine and avoid downstream private-product specifics.
 `packages/content`
 : Private source owner of canonical docs page, frontmatter, navigation and
   source error contracts, including the checked reading `body`: headings with
-  ids, paragraphs, lists, tables, highlighted code as coloured token lines and
+  ids, paragraphs, lists, tables, highlighted code with paired light/dark token appearances and
   diagrams with Mermaid source, title and SVG. Its public catalogue Schema
-  admits published pages with matching navigation. `ContentCatalogueLive` (`./catalogue`) builds
+  admits published pages with matching navigation and their exact checked theme
+  snapshot, using catalogue version 2. `ContentCatalogueLive` (`./catalogue`) builds
   that catalogue once from `DocsSources` through `DocsPageReader`; its service
   reads the checked catalogue and limits search to twenty short results. The
   runtime `./live` export is separate from the builder and authored metadata.
@@ -53,7 +54,7 @@ on the open-source tax engine and avoid downstream private-product specifics.
 `packages/mdx`
 : Private source `@taxkit/mdx`: content-neutral `MdxCompiler.compile` and
   `MdxRenderer.render`, static individual Layers and combined `MdxLive`.
-  MDX owns portable versioned documents and provider contracts; the compiler
+  MDX owns portable versioned documents, paired theme Schemas and provider contracts; the compiler
   requires no providers. `./highlights` owns every Pierre call. Content imports
   only these contracts and Schemas, while the app selects implementations.
   See [the package](../../packages/mdx/README.md).
@@ -96,7 +97,7 @@ content routes with the generated client and renders each page's checked
 with the existing document links. No second index is added.
 `@taxkit/aeo` owns the answer-engine routes, which derive four discovery files
 from the same public catalogue, the API origin and the publication origin
-`https://taxkit.dev`. The API serves them at `/api/v1/docs/discovery/*`; the
+`https://taxkit.dev`. The API serves them at `/api/v2/docs/discovery/*`; the
 Website forwards its conventional addresses there once. Robots allows everything (`Allow: /`) and
 names the sitemap. The short agent index links to published processed Markdown;
 the full index retains those bodies, including fenced examples. No authored
@@ -182,7 +183,7 @@ Content declares the share-image contracts (`DocsOgImage`, `DocsPngBytes`,
 Takumi 2.14.0 WebAssembly renderer and the bundled Geist font. The API build
 renders every published page once (about three seconds) into
 `docs-images.json`; the Worker decodes one stored PNG per request. The AEO
-package serves one image route per published page at `/api/v1/docs/og/<page>.png`,
+package serves one image route per published page at `/api/v2/docs/og/<page>.png`,
 from the same catalogue; there is no separate page list. The Website forwards
 `/og/<page>.png` there and checks the PNG. Images read only checked page titles,
 descriptions and addresses and accept no calculation values. The CDN keeps each

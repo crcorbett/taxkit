@@ -60,7 +60,7 @@ it.effect.each(["headers", "body"] as const)(
       );
       const fiber = yield* host
         .forward({
-          path: "/api/v1/docs/discovery/robots.txt",
+          path: "/api/v2/docs/discovery/robots.txt",
         })
         .pipe(Effect.result, Effect.forkScoped);
       yield* TestClock.adjust("10 seconds");
@@ -111,7 +111,7 @@ it.effect.each([
       );
       const result = yield* host
         .forward({
-          path: "/api/v1/docs/discovery/robots.txt",
+          path: "/api/v2/docs/discovery/robots.txt",
         })
         .pipe(Effect.result);
       EffectFunction.pipe(Result.isSuccess(result), (actual) => {

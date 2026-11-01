@@ -257,3 +257,12 @@ event allowlist and stored-event readback are not built.
 - [Package ownership](./package-ownership.md)
 - [Content and posts](./content-and-posts.md)
 - [Deployment](./deployment.md)
+
+
+Documentation's `DocsReader` container applies the page's checked MDX theme to
+prose, code and diagram images. Native Light, Dark and System radio controls
+select the reading area's colour scheme without provider calls or persisted
+browser state. CSS resolves System before JavaScript; explicit choices also
+work with JavaScript disabled. Code tokens retain both appearances and SVGs
+embed both palettes. The public docs client uses `/api/v2/docs`; calculator
+routes retain their existing version.

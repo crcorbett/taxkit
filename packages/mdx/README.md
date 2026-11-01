@@ -4,7 +4,7 @@ Content-neutral MDX compilation and presentation data. The package has no Conten
 router, filesystem or runtime dependency. TaxKit publication rules belong to
 [Content](../content/README.md). See [ADR 0007](../../docs/adr/0007-content-neutral-mdx.md).
 
-- `./service`: `MdxCompiler.compile(source)`, `MdxRenderer.render(document)`,
+- `./service`: `MdxCompiler.compile(source)`, `MdxRenderer.render({ document, theme })`,
   the `MdxArtifacts` persistence service and the `CodeHighlighter.highlight`, `DiagramRenderer.render` and
   `LinkResolver.resolve` adapter contracts. Operations return closed Effects.
 - `./compiler`: static `MdxCompilerLive`; needs no rendering providers.
@@ -13,11 +13,14 @@ router, filesystem or runtime dependency. TaxKit publication rules belong to
   The host supplies providers and builds the graph once in its existing scope.
 - `./schemas`: `Source`, semantic `Document` and enriched `RenderedDocument`.
   Their owning Schemas brand identities, source/code/inline text, authored link
-  targets, resolved destinations, list starts, token colours and diagram values.
+  targets, resolved destinations, list starts and diagram values. Compiled
+  documents stay at version 1; rendered documents use version 2 and retain
+  their exact theme with paired token appearances.
 - `./artifacts`: static `MdxArtifactsLive`, with no dependencies. The service's
   `decodeDocument`, `encodeDocument`, `decodeRenderedDocument` and
   `encodeRenderedDocument` methods own JSON persistence as closed Effects and
-  always reject excess fields, including nested nodes and tokens. JSON codecs
+  always reject excess fields, including nested nodes and tokens.
+  `decodeTheme` and `encodeTheme` apply the same strict policy to theme JSON. JSON codecs
   are private; callers cannot override parse options. Failures are native
   `SchemaError` values. Use these operations for stored artifacts; decoding a
   structural Schema directly uses Effect's ordinary parser defaults.
@@ -28,8 +31,9 @@ router, filesystem or runtime dependency. TaxKit publication rules belong to
   Instance creation returns a `CodeHighlighterInitializationError` on failure.
   Provider output is checked immediately; per-snippet failures remain
   `CodeHighlightError`.
-- `./config`: checked `PresentationThemeConfig` (`MDX_THEME`, `light` by default,
-  or `dark`), acquired through the host's ConfigProvider at Layer construction.
+- `./theme`: the checked `Theme`, complete light/dark schemes, branded `Color`,
+  font names and sizes, and the closed syntax/style vocabulary. The host passes
+  one immutable theme per render. Neither provider reads an independent mode.
 - `./test`: deterministic static highlighter and diagram Layers.
 
 Compilation accepts fragments without frontmatter or a heading. Optional YAML
@@ -77,3 +81,11 @@ API exports no standalone encoding or decoding functions.
 MDX inherits the complete shared style and strict presets, including `no-ternary`.
 Use native `Match`, `Option`, `Boolean` and `Array` operations for branching and
 selection; closed domain alternatives use exhaustive matching.
+
+
+One Pierre call returns both schemes over shared token text. The renderer's
+`CodeToken` stores `text`, `light` and `dark` appearances with checked colours
+and font styles. The compiler and processed Markdown remain presentation-free.
+The Pele adapter embeds both palettes in one SVG image; the reading container's
+`color-scheme` selects its palette without rerendering geometry. See
+[ADR 0009](../../docs/adr/0009-mdx-themes.md) for ownership and lifetime.

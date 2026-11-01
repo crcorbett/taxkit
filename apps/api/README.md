@@ -43,9 +43,9 @@ Documentation calls consume no calculator allowance. See the
 [HTTP package](../../packages/api/http/README.md) for paths/response rules.
 
 The native Worker also serves the AEO package's `aeoRoutes`: the four discovery
-documents at GET (and HEAD) `/api/v1/docs/discovery/sitemap.xml`, `/robots.txt`,
+documents at GET (and HEAD) `/api/v2/docs/discovery/sitemap.xml`, `/robots.txt`,
 `/llms.txt` and `/llms-full.txt`, and each published page's 1200×630 PNG share
-image at `/api/v1/docs/og/<page>.png`. The routes come from that same catalogue.
+image at `/api/v2/docs/og/<page>.png`. The routes come from that same catalogue.
 `PublicationOrigins` is supplied from the app's cached checked API and
 publication origins, so deferred native addresses are read on first use. A
 document is plain text or XML with `nosniff`; settings failure is an empty 503.

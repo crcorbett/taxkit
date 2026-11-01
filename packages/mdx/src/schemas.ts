@@ -1,5 +1,7 @@
 import { Function as EffectFunction, Array, HashSet, Schema } from "effect";
 
+import { Theme, TokenAppearance } from "./theme.schemas.js";
+
 export const NonEmptyText = Schema.Trimmed.check(Schema.isMinLength(1));
 export const InlineText = Schema.String.check(Schema.isMinLength(1)).pipe(
   Schema.brand("taxkit/mdx/InlineText")
@@ -50,20 +52,14 @@ export const CodeSnippet = Schema.Struct({
   text: CodeText,
 });
 export type CodeSnippet = typeof CodeSnippet.Type;
-export const TokenColor = Schema.String.check(
-  Schema.isPattern(/^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/iu)
-).pipe(Schema.brand("taxkit/TokenColor"));
-export type TokenColor = typeof TokenColor.Type;
-export const TokenStyle = Schema.Literals([
-  "normal",
-  "italic",
-  "bold",
-  "bold-italic",
-]);
-export type TokenStyle = typeof TokenStyle.Type;
+export const CodeHighlightRequest = Schema.Struct({
+  snippet: CodeSnippet,
+  theme: Theme,
+});
+export type CodeHighlightRequest = typeof CodeHighlightRequest.Type;
 export const CodeToken = Schema.Struct({
-  color: Schema.OptionFromNullOr(TokenColor),
-  style: TokenStyle,
+  light: TokenAppearance,
+  dark: TokenAppearance,
   text: InlineText,
 });
 export type CodeToken = typeof CodeToken.Type;
@@ -80,6 +76,11 @@ export const DiagramSource = NonEmptyText.check(
   Schema.isMaxLength(10_000)
 ).pipe(Schema.brand("taxkit/DiagramSource"));
 export type DiagramSource = typeof DiagramSource.Type;
+export const DiagramRenderRequest = Schema.Struct({
+  source: DiagramSource,
+  theme: Theme,
+});
+export type DiagramRenderRequest = typeof DiagramRenderRequest.Type;
 // A finished standalone SVG document from the diagram renderer.
 export const DiagramSvg = Schema.String.check(
   Schema.isMaxLength(500_000),
@@ -195,6 +196,11 @@ export const Document = Schema.Struct({
   version: Schema.Literal(1),
 });
 export type Document = typeof Document.Type;
+export const RenderRequest = Schema.Struct({
+  document: Document,
+  theme: Theme,
+});
+export type RenderRequest = typeof RenderRequest.Type;
 export const RenderedLink = Schema.Struct({
   ...Link.fields,
   href: LinkDestination,
@@ -257,5 +263,7 @@ export const RenderedDocument = Schema.Struct({
   ...Document.fields,
   blocks: Schema.Array(RenderedBlock).check(UniqueHeadingIds),
   format: Schema.Literal("mdx-rendered-document"),
+  theme: Theme,
+  version: Schema.Literal(2),
 });
 export type RenderedDocument = typeof RenderedDocument.Type;

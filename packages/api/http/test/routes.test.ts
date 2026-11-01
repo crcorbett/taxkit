@@ -81,8 +81,8 @@ describe("transport route catalogue", () => {
           "/api/v1/calculators/unknown/schema",
           "/api/v1/calculators/au.pay.take-home/private",
           "/api/v1/calculators/au.pay.take-home/schema/extra",
-          "/api/v1/docs/discovery/unknown.txt",
-          "/api/v1/docs/markdown/extra",
+          "/api/v2/docs/discovery/unknown.txt",
+          "/api/v2/docs/markdown/extra",
           "/mcp",
         ],
         (path) =>

@@ -1,4 +1,5 @@
 import { assert, describe, it } from "@effect/vitest";
+import { exampleTheme } from "@taxkit/mdx/testing/fixtures";
 import {
   Predicate,
   Function as EffectFunction,
@@ -98,9 +99,11 @@ describe("public content service", () => {
     "bounds search to the first twenty catalogue pages and 240 characters",
     () =>
       Effect.gen(function* () {
+        const theme = yield* exampleTheme;
         const pages = EffectFunction.pipe(
           Array.range(1, 25),
           Array.map((number) => ({
+            theme,
             body: [
               {
                 content: [{ kind: "text", text: "Match." }],
@@ -135,7 +138,7 @@ describe("public content service", () => {
             ),
           },
           pages,
-          schemaVersion: 1,
+          schemaVersion: 2,
         });
         const term = yield* DocsSearchTerm.makeEffect("MATCH");
         const results = yield* Effect.gen(function* () {

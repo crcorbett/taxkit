@@ -14,11 +14,13 @@ import type {
   LinkDestination,
   Document,
   RenderedDocument,
-  CodeSnippet,
   CodeLines,
-  DiagramSource,
   DiagramSvg,
+  RenderRequest,
+  CodeHighlightRequest,
+  DiagramRenderRequest,
 } from "./schemas.js";
+import type { Theme } from "./theme.schemas.js";
 
 export class MdxCompiler extends Context.Service<
   MdxCompiler,
@@ -30,7 +32,7 @@ export class MdxRenderer extends Context.Service<
   MdxRenderer,
   {
     readonly render: (
-      document: Document
+      request: RenderRequest
     ) => Effect.Effect<RenderedDocument, RenderError>;
   }
 >()("@taxkit/mdx/MdxRenderer") {}
@@ -38,6 +40,12 @@ export class MdxRenderer extends Context.Service<
 export class MdxArtifacts extends Context.Service<
   MdxArtifacts,
   {
+    readonly decodeTheme: (
+      json: string
+    ) => Effect.Effect<Theme, Schema.SchemaError>;
+    readonly encodeTheme: (
+      theme: Theme
+    ) => Effect.Effect<string, Schema.SchemaError>;
     readonly decodeDocument: (
       json: string
     ) => Effect.Effect<Document, Schema.SchemaError>;
@@ -57,7 +65,7 @@ export class CodeHighlighter extends Context.Service<
   CodeHighlighter,
   {
     readonly highlight: (
-      snippet: CodeSnippet
+      request: CodeHighlightRequest
     ) => Effect.Effect<CodeLines, CodeHighlightError>;
   }
 >()("@taxkit/mdx/CodeHighlighter") {}
@@ -65,7 +73,7 @@ export class DiagramRenderer extends Context.Service<
   DiagramRenderer,
   {
     readonly render: (
-      source: DiagramSource
+      request: DiagramRenderRequest
     ) => Effect.Effect<DiagramSvg, DiagramRenderError>;
   }
 >()("@taxkit/mdx/DiagramRenderer") {}

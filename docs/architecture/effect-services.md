@@ -205,8 +205,10 @@ The MDX boundary uses content-neutral `MdxCompiler.compile` and
 exactly once per host scope. `MdxArtifactsLive` supplies the `MdxArtifacts`
 service's strict JSON encode/decode methods without compiler or provider dependencies.
 `MdxLive` merges all three capabilities without forwarding operations. All public operations use named `Effect.fn` and have closed
-requirements. Fixed theme settings use checked Config, while checked publication
-policy enters Content's static resolver through `DocsLinkTargets`.
+requirements. The renderer accepts a checked light/dark `Theme` as operation data. Content
+loads its fixed build theme through checked Config and passes the same snapshot
+to both adapters. Checked publication policy enters Content's static resolver
+through `DocsLinkTargets`. See [paired themes](../adr/0009-mdx-themes.md).
 
 Content's `ContentMdxReaderLive` validates TaxKit frontmatter/title rules and
 projects neutral documents into its public reading body. Provider implementations

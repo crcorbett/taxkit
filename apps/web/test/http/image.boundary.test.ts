@@ -57,7 +57,7 @@ describe("documentation share images", () => {
           headers: { "content-type": "image/png" },
         }),
       });
-      expect(forwarded).toStrictEqual(["/api/v1/docs/og/start/quickstart.png"]);
+      expect(forwarded).toStrictEqual(["/api/v2/docs/og/start/quickstart.png"]);
       const reply = yield* Effect.fromOption(response);
       expect(reply.status).toBe(200);
       EffectFunction.pipe(

@@ -1,5 +1,9 @@
 # Content-neutral MDX compilation and rendering
 
+[ADR 0009](0009-mdx-themes.md) supersedes the single-theme selection and
+rendered-document version described here with paired themes and version 2.
+
+
 Make `@taxkit/mdx` a content-neutral package with two Effect operations:
 `compile` produces a checked semantic document; `render` prepares its links, code
 and diagrams for presentation. Content owns TaxKit publication rules. The host

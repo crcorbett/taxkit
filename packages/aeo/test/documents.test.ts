@@ -122,7 +122,7 @@ describe("answer-engine documents", () => {
       });
       assert.include(
         index,
-        "[\\[Start\\] \\\\ guide](http://127.0.0.1:4001/api/v1/docs/markdown?path=%2Fstart%2Foverview): First line. Second line."
+        "[\\[Start\\] \\\\ guide](http://127.0.0.1:4001/api/v2/docs/markdown?path=%2Fstart%2Foverview): First line. Second line."
       );
     })
   );

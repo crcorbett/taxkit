@@ -75,10 +75,10 @@ describe("answer-engine routes", () => {
     Effect.gen(function* () {
       const { layer } = yield* layers;
       const cases = [
-        ["/api/v1/docs/discovery/sitemap.xml", "application/xml"],
-        ["/api/v1/docs/discovery/robots.txt", "text/plain"],
-        ["/api/v1/docs/discovery/llms.txt", "text/plain"],
-        ["/api/v1/docs/discovery/llms-full.txt", "text/plain"],
+        ["/api/v2/docs/discovery/sitemap.xml", "application/xml"],
+        ["/api/v2/docs/discovery/robots.txt", "text/plain"],
+        ["/api/v2/docs/discovery/llms.txt", "text/plain"],
+        ["/api/v2/docs/discovery/llms-full.txt", "text/plain"],
       ] as const;
       yield* EffectFunction.pipe(
         cases,
@@ -103,7 +103,7 @@ describe("answer-engine routes", () => {
     Effect.gen(function* () {
       const { bytes, layer } = yield* layers;
       const response = yield* serve(
-        "/api/v1/docs/og/start/overview.png",
+        "/api/v2/docs/og/start/overview.png",
         layer
       );
       assert.equal(response.status, 200);
@@ -115,7 +115,7 @@ describe("answer-engine routes", () => {
         new Uint8Array(yield* response.arrayBuffer),
         new Uint8Array(bytes)
       );
-      const missing = yield* serve("/api/v1/docs/og/private9.png", layer);
+      const missing = yield* serve("/api/v2/docs/og/private9.png", layer);
       assert.equal(missing.status, 404);
     })
   );
@@ -134,7 +134,7 @@ describe("answer-engine routes", () => {
                 HttpServerRequest.HttpServerRequest,
                 HttpServerRequest.fromClientRequest(
                   HttpClientRequest.get(
-                    `http://taxkit.internal/api/v1/docs/discovery${path}`
+                    `http://taxkit.internal/api/v2/docs/discovery${path}`
                   )
                 )
               )
@@ -161,9 +161,9 @@ describe("answer-engine routes", () => {
           )
         )
       );
-      const document = yield* serve("/api/v1/docs/discovery/llms.txt", layer);
+      const document = yield* serve("/api/v2/docs/discovery/llms.txt", layer);
       assert.equal(document.status, 503);
-      const image = yield* serve("/api/v1/docs/og/start/overview.png", layer);
+      const image = yield* serve("/api/v2/docs/og/start/overview.png", layer);
       assert.equal(image.status, 503);
     })
   );

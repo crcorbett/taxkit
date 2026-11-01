@@ -86,7 +86,7 @@ describe("public catalogue ingress", () => {
                 ),
               },
             },
-            { ...catalogue, schemaVersion: 2 },
+            { ...catalogue, schemaVersion: 1 },
           ],
           (raw) =>
             Schema.decodeUnknownEffect(DocsPublicCatalogue)(raw).pipe(

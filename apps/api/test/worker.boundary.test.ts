@@ -114,7 +114,7 @@ describe("native API application", () => {
           ),
           Effect.scoped
         );
-      const llms = yield* send("/api/v1/docs/discovery/llms.txt", "GET", null);
+      const llms = yield* send("/api/v2/docs/discovery/llms.txt", "GET", null);
       expect(llms.status).toBe(200);
       EffectFunction.pipe(header(llms, "content-type"), (actual) => {
         expect(actual).toBe("text/plain; charset=utf-8");
@@ -133,7 +133,7 @@ describe("native API application", () => {
       );
       expect(text).toContain("https://website.example.com");
       const head = yield* send(
-        "/api/v1/docs/discovery/sitemap.xml",
+        "/api/v2/docs/discovery/sitemap.xml",
         "HEAD",
         null
       );
@@ -150,7 +150,7 @@ describe("native API application", () => {
         expect(actual).toBe("no-store");
       });
       const missing = yield* send(
-        "/api/v1/docs/discovery/other.txt",
+        "/api/v2/docs/discovery/other.txt",
         "GET",
         null
       );

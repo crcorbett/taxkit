@@ -15,6 +15,7 @@ import {
   Schema,
 } from "effect";
 
+import { DocsThemeConfig } from "./config.js";
 import { DocsPageReadError } from "./errors.js";
 import { writeReadingMarkdown } from "./reading-markdown.egress.js";
 import { DocsPageFrontmatter, DocsReadingBody } from "./schemas.js";
@@ -104,6 +105,7 @@ export const ContentMdxReaderLive = Layer.effect(
   Effect.gen(function* () {
     const compiler = yield* MdxCompiler;
     const renderer = yield* MdxRenderer;
+    const theme = yield* DocsThemeConfig;
     return DocsPageReader.of({
       read: Effect.fn("DocsPageReader.read")(function* (source) {
         const fail = (reason: DocsPageReadError["reason"]) =>
@@ -151,7 +153,7 @@ export const ContentMdxReaderLive = Layer.effect(
           return yield* fail("title");
         }
         const rendered = yield* renderer
-          .render({ ...document, blocks: body })
+          .render({ document: { ...document, blocks: body }, theme })
           .pipe(Effect.mapError((error) => fail(error.reason)));
         const checkedBody = yield* Schema.decodeUnknownEffect(
           Schema.toType(DocsReadingBody)
@@ -159,6 +161,7 @@ export const ContentMdxReaderLive = Layer.effect(
           Effect.mapError(() => fail("body"))
         );
         return {
+          theme: rendered.theme,
           body: checkedBody,
           frontmatter,
           markdown: writeReadingMarkdown({

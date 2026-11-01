@@ -12,7 +12,8 @@
     "./errors": "./src/errors.ts",
     "./compiler": "./src/compiler.layer.ts",
     "./renderer": "./src/renderer.layer.ts",
-    "./config": "./src/config.ts",
+    "./theme": "./src/theme.schemas.ts",
+    "./testing/fixtures": "./src/__testing__/fixtures.ts",
     "./test": "./src/test.layer.ts",
     "./artifacts": "./src/artifacts.layer.ts"
   },

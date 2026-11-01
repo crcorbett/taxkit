@@ -1,5 +1,9 @@
 # Effect-owned rendering providers
 
+[ADR 0009](0009-mdx-themes.md) supersedes the single-theme selection and
+rendered-document version described here with paired themes and version 2.
+
+
 Use Pele for Mermaid rendering through an independent Effect service, and acquire
 Pierre's private highlighter instance inside its static Layer through the
 published API. This refines

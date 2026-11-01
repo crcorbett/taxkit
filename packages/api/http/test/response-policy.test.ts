@@ -26,11 +26,11 @@ const unshared = {
 };
 describe("public response cache policy", () => {
   it.each([
-    "/api/v1/docs/page",
-    "/api/v1/docs/search",
-    "/api/v1/docs/markdown",
-    "/api/v1/docs/navigation",
-    "/api/v1/docs/discovery/llms.txt",
+    "/api/v2/docs/page",
+    "/api/v2/docs/search",
+    "/api/v2/docs/markdown",
+    "/api/v2/docs/navigation",
+    "/api/v2/docs/discovery/llms.txt",
     "/api/v1/calculators",
     "/api/v1/calculators/au.pay.take-home",
     "/api/v1/calculators/au.pay.take-home/schema",
@@ -46,7 +46,7 @@ describe("public response cache policy", () => {
     "/api/health",
     "/api/v1/calculators/au.pay.take-home/calculate",
     "/mcp",
-    "/api/v1/docs/discovery/other.txt",
+    "/api/v2/docs/discovery/other.txt",
   ])("never shares %s", (path) => {
     EffectFunction.pipe(isPublicReadApiPath(path), (actual) => {
       expect(!actual).toBeTruthy();

@@ -1,6 +1,7 @@
 import { assert, describe, it } from "@effect/vitest";
 import { DiagramSource } from "@taxkit/mdx/schemas";
 import { DiagramRenderer } from "@taxkit/mdx/service";
+import { exampleTheme } from "@taxkit/mdx/testing/fixtures";
 import { PeleRenderError } from "@taxkit/pele/errors";
 import { PeleLive } from "@taxkit/pele/live";
 import { Svg } from "@taxkit/pele/schemas";
@@ -38,9 +39,16 @@ describe("Pele MDX diagram adapter", () => {
       const source = yield* DiagramSource.makeEffect(
         "flowchart LR\n  A[Server] --> B[SDK]\n  A --> C[HTTP API]"
       );
-      const svg = yield* renderer.render(source);
+      const svg = yield* renderer.render({
+        source,
+        theme: yield* exampleTheme,
+      });
       assert.match(svg, /^<svg[\s>]/u);
       assert.include(svg, "HTTP API");
+      const theme = yield* exampleTheme;
+      assert.include(svg, `--pele-bg:${theme.light.palette.background}`);
+      assert.include(svg, `--pele-bg:${theme.dark.palette.background}`);
+      assert.include(svg, "@media(prefers-color-scheme:dark)");
     }).pipe(Effect.provide(DiagramsLive))
   );
 
@@ -48,7 +56,9 @@ describe("Pele MDX diagram adapter", () => {
     Effect.gen(function* () {
       const renderer = yield* DiagramRenderer;
       const source = yield* DiagramSource.makeEffect("not a diagram");
-      const error = yield* renderer.render(source).pipe(Effect.flip);
+      const error = yield* renderer
+        .render({ source, theme: yield* exampleTheme })
+        .pipe(Effect.flip);
       assert.strictEqual(error.reason, "render");
     }).pipe(Effect.provide(DiagramsLive))
   );
@@ -57,7 +67,9 @@ describe("Pele MDX diagram adapter", () => {
     Effect.gen(function* () {
       const renderer = yield* DiagramRenderer;
       const source = yield* DiagramSource.makeEffect("flowchart LR\n A --> B");
-      const error = yield* renderer.render(source).pipe(Effect.flip);
+      const error = yield* renderer
+        .render({ source, theme: yield* exampleTheme })
+        .pipe(Effect.flip);
       assert.strictEqual(error.reason, "svg");
     }).pipe(
       Effect.provide(
@@ -70,7 +82,9 @@ describe("Pele MDX diagram adapter", () => {
     Effect.gen(function* () {
       const renderer = yield* DiagramRenderer;
       const source = yield* DiagramSource.makeEffect("flowchart LR\n A --> B");
-      const error = yield* renderer.render(source).pipe(Effect.flip);
+      const error = yield* renderer
+        .render({ source, theme: yield* exampleTheme })
+        .pipe(Effect.flip);
       assert.strictEqual(error.reason, "svg");
     }).pipe(
       Effect.provide(

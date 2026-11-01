@@ -21,10 +21,10 @@ export const calculatorPaths = {
 } as const;
 
 export const docsPaths = {
-  markdown: "/api/v1/docs/markdown",
-  navigation: "/api/v1/docs/navigation",
-  page: "/api/v1/docs/page",
-  search: "/api/v1/docs/search",
+  markdown: "/api/v2/docs/markdown",
+  navigation: "/api/v2/docs/navigation",
+  page: "/api/v2/docs/page",
+  search: "/api/v2/docs/search",
 } as const;
 
 export const discoveryPaths = {
@@ -40,7 +40,7 @@ export const DiscoveryPath = Schema.Literals([
   discoveryPaths.llmsFull,
 ]);
 export type DiscoveryPath = typeof DiscoveryPath.Type;
-export const docsDiscoveryPrefix = "/api/v1/docs/discovery";
+export const docsDiscoveryPrefix = "/api/v2/docs/discovery";
 export const discoveryApiPath = (path: DiscoveryPath) =>
   `${docsDiscoveryPrefix}${path}` as const;
 export const DocsDiscoveryApiPath = Schema.TemplateLiteral([
@@ -50,7 +50,7 @@ export const DocsDiscoveryApiPath = Schema.TemplateLiteral([
 
 // One share image per published page, drawn when the API is built. The Website serves
 // the same image at /og<page>.png by forwarding here.
-export const docsImagePrefix = "/api/v1/docs/og";
+export const docsImagePrefix = "/api/v2/docs/og";
 export const docsImageApiPath = (pagePath: string) =>
   `${docsImagePrefix}${pagePath}.png` as const;
 export const DocsImageApiPath = Schema.TemplateLiteral([

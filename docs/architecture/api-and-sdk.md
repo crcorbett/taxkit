@@ -62,13 +62,13 @@ POST /api/v1/calculators/:calculatorId/calculate
 GET /api/v1/calculators/:calculatorId/graph
 GET /api/v1/facts
 GET /api/v1/rules
-GET /api/v1/docs/navigation
-GET /api/v1/docs/page?path=/start/quickstart
-GET /api/v1/docs/search?term=Quickstart
-GET /api/v1/docs/markdown?path=/start/quickstart
+GET /api/v2/docs/navigation
+GET /api/v2/docs/page?path=/start/quickstart
+GET /api/v2/docs/search?term=Quickstart
+GET /api/v2/docs/markdown?path=/start/quickstart
 ```
 
-The native API Worker also serves GET/HEAD `/api/v1/docs/discovery/*`
+The native API Worker also serves GET/HEAD `/api/v2/docs/discovery/*`
 (`sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`) and `/mcp`.
 
 `apps/web` reads the separate API with Effect's generated
@@ -623,7 +623,7 @@ The [calculator rate owner](../../packages/calculators/README.md#native-calculat
 ### Documentation over HTTP
 
 The Website reads documentation through the public HTTP content routes
-(`/api/v1/docs/navigation`, `page`, `search` and `markdown`) and serves
+(`/api/v2/docs/navigation`, `page`, `search` and `markdown`) and serves
 `.md`/`Accept` Markdown from `getMarkdown`; see
 [frontend architecture](frontend.md#documentation). The API's discovery routes
 build each document from the public catalogue and the checked API and

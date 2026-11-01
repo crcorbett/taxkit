@@ -3,6 +3,7 @@ import {
   Clock,
   Effect,
   Layer,
+  Option,
   Result,
   Schema,
 } from "effect";
@@ -21,7 +22,7 @@ const ProviderFailure = Schema.Struct({
 export const PeleLive = Layer.succeed(
   Pele,
   Pele.of({
-    renderSvg: Effect.fn("Pele.renderSvg")(function* (source) {
+    renderSvg: Effect.fn("Pele.renderSvg")(function* ({ source, typography }) {
       // Gantt's "today" marker uses the host's Effect clock, including tests.
       const now = yield* Clock.currentTimeMillis;
       const reply: unknown = yield* Effect.try({
@@ -34,7 +35,8 @@ export const PeleLive = Layer.succeed(
               onSuccess: ({ code }) => new PeleRenderError({ reason: code }),
             })
           ),
-        try: () => render(source, { now }),
+        try: () =>
+          render(source, { now, ...Option.getOrElse(typography, () => ({})) }),
       });
       const result = yield* Schema.decodeUnknownEffect(ProviderReply)(
         reply

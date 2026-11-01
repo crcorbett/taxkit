@@ -1,3 +1,4 @@
+import { Theme } from "@taxkit/mdx/theme";
 import { Config } from "effect";
 
 import { DocsPublicationOrigin, DocsWebsiteOrigin } from "./schemas.js";
@@ -13,3 +14,4 @@ export const DocsWebsiteOriginConfig = Config.schema(
   DocsWebsiteOrigin,
   "WEBSITE_PUBLIC_ORIGIN"
 );
+export const DocsThemeConfig = Config.schema(Theme, "DOCS_THEME");

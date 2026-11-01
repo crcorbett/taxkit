@@ -1,9 +1,11 @@
 import { assert, it } from "@effect/vitest";
+import { exampleThemeInput } from "@taxkit/mdx/testing/fixtures";
 import { ConfigProvider, Effect } from "effect";
 
 import {
   DocsPublicationOriginConfig,
   DocsWebsiteOriginConfig,
+  DocsThemeConfig,
 } from "../src/config.js";
 
 const read = (input: Readonly<Record<string, string>>) =>
@@ -26,6 +28,39 @@ it.effect("reads each origin from its one host binding name", () =>
     assert.strictEqual(origins.publication.href, "https://taxkit.example/");
     assert.strictEqual(origins.website.href, "https://preview.taxkit.example/");
   })
+);
+
+it.effect(
+  "loads the complete paired theme and rejects missing or incomplete input",
+  () =>
+    Effect.gen(function* () {
+      const theme = yield* DocsThemeConfig.pipe(
+        Effect.provideService(
+          ConfigProvider.ConfigProvider,
+          ConfigProvider.fromUnknown({ DOCS_THEME: exampleThemeInput })
+        )
+      );
+      assert.strictEqual(
+        theme.dark.palette.background,
+        exampleThemeInput.dark.palette.background
+      );
+      yield* DocsThemeConfig.pipe(
+        Effect.provideService(
+          ConfigProvider.ConfigProvider,
+          ConfigProvider.fromUnknown({})
+        ),
+        Effect.flip
+      );
+      yield* DocsThemeConfig.pipe(
+        Effect.provideService(
+          ConfigProvider.ConfigProvider,
+          ConfigProvider.fromUnknown({
+            DOCS_THEME: { light: exampleThemeInput.light },
+          })
+        ),
+        Effect.flip
+      );
+    })
 );
 
 it.effect.each([

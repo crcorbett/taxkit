@@ -80,13 +80,13 @@ describe("checked public documentation HTTP", () => {
       }).pipe(Effect.provide(ClientTestLive))
   );
   it.effect.each([
-    "/api/v1/docs/page",
-    "/api/v1/docs/page?path=..%2Fprivate%2Ftaxkit-secret-sentinel",
-    "/api/v1/docs/page?path=%2F%2Fstart%2Foverview",
-    `/api/v1/docs/page?path=%2F${"a".repeat(257)}`,
-    "/api/v1/docs/search",
-    "/api/v1/docs/search?term=%20%20",
-    `/api/v1/docs/search?term=${"taxkit-secret-sentinel".repeat(6)}`,
+    "/api/v2/docs/page",
+    "/api/v2/docs/page?path=..%2Fprivate%2Ftaxkit-secret-sentinel",
+    "/api/v2/docs/page?path=%2F%2Fstart%2Foverview",
+    `/api/v2/docs/page?path=%2F${"a".repeat(257)}`,
+    "/api/v2/docs/search",
+    "/api/v2/docs/search?term=%20%20",
+    `/api/v2/docs/search?term=${"taxkit-secret-sentinel".repeat(6)}`,
   ])("rejects invalid ingress with an empty 400 at %s", (address) =>
     Effect.gen(function* () {
       const handler = yield* HttpRouter.toHttpEffect(TaxKitServerLayer);
@@ -115,7 +115,7 @@ describe("checked public documentation HTTP", () => {
       Effect.gen(function* () {
         const handler = yield* HttpRouter.toHttpEffect(TaxKitServerLayer);
         const request = HttpClientRequest.get(
-          "http://taxkit.internal/api/v1/docs/markdown?path=%2Fstart%2Foverview"
+          "http://taxkit.internal/api/v2/docs/markdown?path=%2Fstart%2Foverview"
         );
         const response = yield* handler.pipe(
           Effect.provideService(
@@ -140,7 +140,7 @@ describe("checked public documentation HTTP", () => {
         );
         assert.equal(body, expected.markdown);
         const missing = HttpClientRequest.get(
-          "http://taxkit.internal/api/v1/docs/markdown?path=%2Fmissing"
+          "http://taxkit.internal/api/v2/docs/markdown?path=%2Fmissing"
         );
         const absent = yield* handler.pipe(
           Effect.provideService(

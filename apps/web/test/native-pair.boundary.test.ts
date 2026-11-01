@@ -73,9 +73,9 @@ const calculationPath = /^\/api\/v1\/calculators\/[^/]+\/calculate$/u;
 const isCalculation = (url: URL) =>
   url.origin === apiOrigin && calculationPath.test(url.pathname);
 const takeHomeCalculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`;
-const docsNavigationAddress = `${apiOrigin}/api/v1/docs/navigation`;
+const docsNavigationAddress = `${apiOrigin}/api/v2/docs/navigation`;
 const docsPageAddress = (path: string) =>
-  `${apiOrigin}/api/v1/docs/page?${new URLSearchParams({ path })}`;
+  `${apiOrigin}/api/v2/docs/page?${new URLSearchParams({ path })}`;
 const Json = Schema.fromJsonString(Schema.Unknown);
 const ColourChannel = Schema.NumberFromString.check(
   Schema.isGreaterThanOrEqualTo(0),
@@ -452,7 +452,7 @@ describe("built native API and Website", () => {
                 );
                 const owned = yield* Effect.promise(() =>
                   publicApi.dispatchFetch(
-                    `${apiOrigin}/api/v1/docs/og${page.path}.png`
+                    `${apiOrigin}/api/v2/docs/og${page.path}.png`
                   )
                 );
                 expect({
@@ -553,7 +553,7 @@ describe("built native API and Website", () => {
                 Effect.gen(function* () {
                   const owned = yield* Effect.promise(() =>
                     publicApi.dispatchFetch(
-                      `${apiOrigin}/api/v1/docs/discovery${documentPath}`
+                      `${apiOrigin}/api/v2/docs/discovery${documentPath}`
                     )
                   );
                   expect(owned.status).toBe(200);
@@ -599,7 +599,7 @@ describe("built native API and Website", () => {
                   // The Website forwards the API's own discovery route unchanged.
                   const owned = yield* Effect.promise(() =>
                     publicApi.dispatchFetch(
-                      `${apiOrigin}/api/v1/docs/discovery${document.path}`
+                      `${apiOrigin}/api/v2/docs/discovery${document.path}`
                     )
                   );
                   expect({
@@ -749,7 +749,7 @@ describe("built native API and Website", () => {
                     `<loc>${websiteOrigin}${page.path}</loc>`
                   );
                   expect(discoveryIndex.body).toContain(
-                    `(${apiOrigin}/api/v1/docs/markdown?${new URLSearchParams({ path: page.path }).toString()})`
+                    `(${apiOrigin}/api/v2/docs/markdown?${new URLSearchParams({ path: page.path }).toString()})`
                   );
                   expect(discoveryFull.body).toContain(
                     `Canonical page: ${websiteOrigin}${page.path}\n\n${page.markdown}`
@@ -764,7 +764,7 @@ describe("built native API and Website", () => {
           }).pipe(Effect.withSpan("NativePair.verifyDiscoveryDocuments"));
         yield* Effect.gen(function* verifyPublicDocumentation() {
           const docsNavigation = yield* Effect.promise(() =>
-            publicApi.dispatchFetch(`${apiOrigin}/api/v1/docs/navigation`)
+            publicApi.dispatchFetch(`${apiOrigin}/api/v2/docs/navigation`)
           );
           expect({
             docsNavigationStatus: docsNavigation.status,
@@ -782,7 +782,7 @@ describe("built native API and Website", () => {
                 const query = new URLSearchParams({ path: expectedPage.path });
                 const pageResponse = yield* Effect.promise(() =>
                   publicApi.dispatchFetch(
-                    `${apiOrigin}/api/v1/docs/page?${query}`,
+                    `${apiOrigin}/api/v2/docs/page?${query}`,
                     { headers: { origin: websiteOrigin } }
                   )
                 );
@@ -801,7 +801,7 @@ describe("built native API and Website", () => {
                 expect(page).toStrictEqual(expectedPage);
                 const markdown = yield* Effect.promise(() =>
                   publicApi.dispatchFetch(
-                    `${apiOrigin}/api/v1/docs/markdown?${query}`
+                    `${apiOrigin}/api/v2/docs/markdown?${query}`
                   )
                 );
                 expect(markdown.status).toBe(200);
@@ -1154,7 +1154,7 @@ describe("built native API and Website", () => {
         yield* Effect.gen(function* verifySearchResponses() {
           const docsSearch = yield* Effect.promise(() =>
             publicApi.dispatchFetch(
-              `${apiOrigin}/api/v1/docs/search?term=Quickstart`
+              `${apiOrigin}/api/v2/docs/search?term=Quickstart`
             )
           );
           expect(docsSearch.status).toBe(200);
@@ -1178,8 +1178,8 @@ describe("built native API and Website", () => {
           );
           yield* Effect.forEach(
             [
-              "/api/v1/docs/page?path=..%2Ftaxkit-secret-sentinel",
-              "/api/v1/docs/search?term=%20%20",
+              "/api/v2/docs/page?path=..%2Ftaxkit-secret-sentinel",
+              "/api/v2/docs/search?term=%20%20",
             ],
             (address) =>
               Effect.gen(function* () {
@@ -1199,7 +1199,7 @@ describe("built native API and Website", () => {
           );
           const missingDocs = yield* Effect.promise(() =>
             publicApi.dispatchFetch(
-              `${apiOrigin}/api/v1/docs/markdown?path=%2Fprivate-taxkit-sentinel`
+              `${apiOrigin}/api/v2/docs/markdown?path=%2Fprivate-taxkit-sentinel`
             )
           );
           expect({
@@ -2206,7 +2206,7 @@ describe("built native API and Website", () => {
               const url = new URL(request.url());
               if (
                 (url.origin === apiOrigin &&
-                  url.pathname.startsWith("/api/v1/docs/")) ||
+                  url.pathname.startsWith("/api/v2/docs/")) ||
                 url.pathname.startsWith("/_serverFn")
               ) {
                 Queue.offerUnsafe(
@@ -2710,6 +2710,16 @@ describe("built native API and Website", () => {
               plainPage.locator(".docs-article h1").textContent()
             )
           ).toBe("TypeScript SDK");
+          yield* Effect.promise(() =>
+            plainPage.getByRole("radio", { name: "dark", exact: true }).check()
+          );
+          expect(
+            yield* Effect.promise(() =>
+              plainPage
+                .locator(".docs-reader")
+                .evaluate((element) => getComputedStyle(element).colorScheme)
+            )
+          ).toBe("dark");
         }).pipe(
           Effect.withSpan("NativePair.verifyNavigationWithoutJavaScript")
         );
@@ -2798,6 +2808,111 @@ describe("built native API and Website", () => {
         }).pipe(
           Effect.withSpan("NativePair.verifyResponsiveTablesAndDiagrams")
         );
+        yield* Effect.gen(function* verifyPairedThemes() {
+          yield* Queue.clear(docsCalls);
+          yield* Effect.promise(() =>
+            docsPage.emulateMedia({ colorScheme: "light" })
+          );
+          const text = yield* Effect.promise(() =>
+            docsPage.locator(".docs-article pre").first().textContent()
+          );
+          const light = yield* Effect.promise(() =>
+            docsPage
+              .locator(".docs-code-token")
+              .first()
+              .evaluate((element) => getComputedStyle(element).color)
+          );
+          yield* Effect.promise(() =>
+            docsPage.getByRole("radio", { name: "dark", exact: true }).check()
+          );
+          const dark = yield* Effect.promise(() =>
+            docsPage
+              .locator(".docs-code-token")
+              .first()
+              .evaluate((element) => getComputedStyle(element).color)
+          );
+          expect({
+            scheme: yield* Effect.promise(() =>
+              docsPage
+                .locator(".docs-reader")
+                .evaluate((element) => getComputedStyle(element).colorScheme)
+            ),
+            changedColour: dark !== light,
+            text: yield* Effect.promise(() =>
+              docsPage.locator(".docs-article pre").first().textContent()
+            ),
+          }).toStrictEqual({ scheme: "dark", changedColour: true, text });
+          yield* Effect.promise(() =>
+            docsPage.screenshot({
+              fullPage: true,
+              path: path.join(screenshotRoot, "docs-theme-code-dark.png"),
+            })
+          );
+          yield* Effect.promise(() =>
+            docsPage.getByRole("radio", { name: "system", exact: true }).check()
+          );
+          yield* Effect.promise(() =>
+            docsPage.emulateMedia({ colorScheme: "dark" })
+          );
+          expect(
+            yield* Effect.promise(() =>
+              docsPage
+                .locator(".docs-code-token")
+                .first()
+                .evaluate((element) => getComputedStyle(element).color)
+            )
+          ).toBe(dark);
+          yield* Effect.promise(() =>
+            docsPage.getByRole("radio", { name: "light", exact: true }).check()
+          );
+          expect(
+            yield* Effect.promise(() =>
+              docsPage
+                .locator(".docs-code-token")
+                .first()
+                .evaluate((element) => getComputedStyle(element).color)
+            )
+          ).toBe(light);
+          expect(yield* Queue.clear(docsCalls)).toStrictEqual([]);
+          yield* Effect.promise(() =>
+            docsPage.emulateMedia({ colorScheme: "light" })
+          );
+          yield* Effect.promise(() =>
+            docsPage.goto(`${websiteOrigin}/contributing/what-are-you-changing`)
+          );
+          yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+          const diagram = docsPage.getByRole("img", {
+            name: "Which contribution guide matches your change",
+          });
+          const src = yield* Effect.promise(() => diagram.getAttribute("src"));
+          yield* Effect.promise(() =>
+            docsPage.getByRole("radio", { name: "dark", exact: true }).check()
+          );
+          expect({
+            source: yield* Effect.promise(() => diagram.getAttribute("src")),
+            loaded: yield* Effect.promise(() =>
+              diagram.evaluate(
+                (image: HTMLImageElement) =>
+                  image.complete && image.naturalWidth > 0
+              )
+            ),
+            scheme: yield* Effect.promise(() =>
+              docsPage
+                .locator(".docs-reader")
+                .evaluate((element) => getComputedStyle(element).colorScheme)
+            ),
+          }).toStrictEqual({ source: src, loaded: true, scheme: "dark" });
+          yield* Effect.promise(() =>
+            docsPage.screenshot({
+              fullPage: true,
+              path: path.join(screenshotRoot, "docs-theme-diagram-dark.png"),
+            })
+          );
+          yield* Effect.promise(() =>
+            docsPage.goto(`${websiteOrigin}/start/quickstart`)
+          );
+          yield* Effect.promise(() => docsPage.waitForLoadState("networkidle"));
+        }).pipe(Effect.withSpan("NativePair.verifyPairedThemes"));
         yield* Effect.gen(function* verifyMalformedPageRecovery() {
           // An undecodable API reply is contained by the documentation route.
           yield* Effect.promise(() =>
@@ -2891,7 +3006,7 @@ describe("built native API and Website", () => {
               Effect.gen(function* () {
                 const response = yield* Effect.promise(() =>
                   publicApi.dispatchFetch(
-                    `${apiOrigin}/api/v1/docs/search?${new URLSearchParams({ term })}`
+                    `${apiOrigin}/api/v2/docs/search?${new URLSearchParams({ term })}`
                   )
                 );
                 expect(response.status).toBe(200);
