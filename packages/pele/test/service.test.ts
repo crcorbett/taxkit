@@ -4,7 +4,13 @@ import { PeleLive } from "@taxkit/pele/live";
 import { Source, Svg } from "@taxkit/pele/schemas";
 import { Pele } from "@taxkit/pele/service";
 import { PeleTest } from "@taxkit/pele/test";
-import { Function as EffectFunction, Array, Effect, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Option,
+  Schema,
+} from "effect";
 import * as TestClock from "effect/testing/TestClock";
 
 describe("Pele SVG service", () => {
@@ -19,8 +25,14 @@ describe("Pele SVG service", () => {
         Effect.forEach((text) =>
           Effect.gen(function* () {
             const source = yield* Source.makeEffect(text);
-            const first = yield* pele.renderSvg(source);
-            const second = yield* pele.renderSvg(source);
+            const first = yield* pele.renderSvg({
+              source,
+              typography: Option.none(),
+            });
+            const second = yield* pele.renderSvg({
+              source,
+              typography: Option.none(),
+            });
             assert.strictEqual(first, second);
             assert.isTrue(Schema.is(Svg)(first));
             assert.include(first, 'class="pele');
@@ -38,11 +50,20 @@ describe("Pele SVG service", () => {
       );
       // 2026-01-04 UTC, within the chart's explicit date range.
       yield* TestClock.setTime(1_767_484_800_000);
-      const first = yield* pele.renderSvg(source);
+      const first = yield* pele.renderSvg({
+        source,
+        typography: Option.none(),
+      });
       assert.include(first, 'class="pele-today"');
-      assert.strictEqual(yield* pele.renderSvg(source), first);
+      assert.strictEqual(
+        yield* pele.renderSvg({ source, typography: Option.none() }),
+        first
+      );
       yield* TestClock.adjust("1 day");
-      assert.notStrictEqual(yield* pele.renderSvg(source), first);
+      assert.notStrictEqual(
+        yield* pele.renderSvg({ source, typography: Option.none() }),
+        first
+      );
     }).pipe(Effect.provide(PeleLive))
   );
 
@@ -59,7 +80,9 @@ describe("Pele SVG service", () => {
       Effect.gen(function* () {
         const pele = yield* Pele;
         const source = yield* Source.makeEffect(text);
-        const error = yield* pele.renderSvg(source).pipe(Effect.flip);
+        const error = yield* pele
+          .renderSvg({ source, typography: Option.none() })
+          .pipe(Effect.flip);
         assert.isTrue(Schema.is(PeleRenderError)(error));
         assert.strictEqual(error.reason, reason);
         assert.notInclude(error.message, source);
@@ -83,7 +106,9 @@ describe("Pele SVG service", () => {
       const source = yield* Source.makeEffect(
         `flowchart LR\n ${left} --> ${right}`
       );
-      const error = yield* pele.renderSvg(source).pipe(Effect.flip);
+      const error = yield* pele
+        .renderSvg({ source, typography: Option.none() })
+        .pipe(Effect.flip);
       assert.strictEqual(error.reason, "limit");
     }).pipe(Effect.provide(PeleLive))
   );
@@ -94,7 +119,10 @@ describe("Pele SVG service", () => {
       Effect.gen(function* () {
         const pele = yield* Pele;
         const source = yield* Source.makeEffect("flowchart LR\n A --> B");
-        const svg = yield* pele.renderSvg(source);
+        const svg = yield* pele.renderSvg({
+          source,
+          typography: Option.none(),
+        });
         assert.isTrue(Schema.is(Svg)(svg));
       }).pipe(Effect.provide(PeleTest))
   );

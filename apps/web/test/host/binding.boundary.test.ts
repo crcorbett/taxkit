@@ -53,7 +53,7 @@ it.effect.each([
       const api = yield* WebsiteApi;
       const forward = yield* api
         .forward({
-          path: "/api/v1/docs/discovery/robots.txt",
+          path: "/api/v2/docs/discovery/robots.txt",
         })
         .pipe(Effect.result);
       EffectFunction.pipe(

@@ -7,6 +7,7 @@ import {
   DocsPageUnavailable,
   DocsNavigation,
 } from "#/lib/docs/page.view";
+import { DocsReader } from "#/lib/docs/reader.container";
 import { DocsReadingBodyView } from "#/lib/docs/reading-body.view";
 import type { WebsiteDocsPageView } from "#/lib/docs/schemas";
 import { loadDocsPage } from "#/lib/pages/loaders";
@@ -44,20 +45,22 @@ export const Route = createFileRoute("/$")({
 function DocumentationRoute() {
   const { metadata, navigation, page } = Route.useLoaderData();
   return (
-    <div className="docs-layout">
-      <aside className="docs-sidebar">
-        <DocsNavigation
-          currentPath={Option.some(page.path)}
-          navigation={navigation}
-        />
-      </aside>
-      <article className="docs-article">
-        <DocsHeading>{page.frontmatter.title}</DocsHeading>
-        <DocsReadingBodyView body={page.body} />
-        <p className="docs-markdown-link">
-          <a href={metadata.markdown}>Read this page as Markdown</a>
-        </p>
-      </article>
-    </div>
+    <DocsReader theme={page.theme}>
+      <div className="docs-layout">
+        <aside className="docs-sidebar">
+          <DocsNavigation
+            currentPath={Option.some(page.path)}
+            navigation={navigation}
+          />
+        </aside>
+        <article className="docs-article">
+          <DocsHeading>{page.frontmatter.title}</DocsHeading>
+          <DocsReadingBodyView body={page.body} />
+          <p className="docs-markdown-link">
+            <a href={metadata.markdown}>Read this page as Markdown</a>
+          </p>
+        </article>
+      </div>
+    </DocsReader>
   );
 }

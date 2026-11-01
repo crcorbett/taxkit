@@ -12,7 +12,9 @@ import { PeleDiagramRendererLive } from "@taxkit/diagrams/pele";
 import { PierreCodeHighlighterLive } from "@taxkit/mdx/highlights";
 import { MdxLive } from "@taxkit/mdx/live";
 import { PeleLive } from "@taxkit/pele/live";
-import { Effect, Layer, Schema } from "effect";
+import { ConfigProvider, Effect, Layer, Schema } from "effect";
+
+import docsTheme from "./docs-theme.json" with { type: "json" };
 
 // The build-time catalogue. Content reads every authored page with the MDX
 // reader, code highlighter and diagram renderer. Only the API build and its
@@ -46,5 +48,6 @@ export const DocsCatalogueBuildLive = ContentCatalogueLive.pipe(
         )
       )
     )
-  )
+  ),
+  Layer.provide(ConfigProvider.layerAdd(ConfigProvider.fromUnknown({ DOCS_THEME: docsTheme }), { asPrimary: true }))
 );

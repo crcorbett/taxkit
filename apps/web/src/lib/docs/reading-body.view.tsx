@@ -85,15 +85,23 @@ const Inlines = ({
     )
   );
 const tokenStyle = (token: DocsCodeToken) => ({
-  color: Option.getOrUndefined(token.color),
-  fontStyle: EffectBoolean.match(token.style.endsWith("italic"), {
-    onFalse: EffectFunction.constUndefined,
-    onTrue: (): "italic" => "italic",
-  }),
-  fontWeight: EffectBoolean.match(token.style.startsWith("bold"), {
-    onFalse: EffectFunction.constUndefined,
-    onTrue: (): 600 => 600,
-  }),
+  color: `light-dark(${token.light.color},${token.dark.color})`,
+  "--mdx-light-font-style": EffectBoolean.match(
+    token.light.style.endsWith("italic"),
+    { onFalse: () => "normal", onTrue: () => "italic" }
+  ),
+  "--mdx-dark-font-style": EffectBoolean.match(
+    token.dark.style.endsWith("italic"),
+    { onFalse: () => "normal", onTrue: () => "italic" }
+  ),
+  "--mdx-light-font-weight": EffectBoolean.match(
+    token.light.style.startsWith("bold"),
+    { onFalse: () => 400, onTrue: () => 600 }
+  ),
+  "--mdx-dark-font-weight": EffectBoolean.match(
+    token.dark.style.startsWith("bold"),
+    { onFalse: () => 400, onTrue: () => 600 }
+  ),
 });
 /* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- A labelled horizontal scroll region needs explicit keyboard focus across supported browsers. */
 const Block = ({
@@ -115,7 +123,11 @@ const Block = ({
                     {EffectFunction.pipe(
                       line,
                       Array.map((token, tokenIndex) => (
-                        <span key={tokenIndex} style={tokenStyle(token)}>
+                        <span
+                          className="docs-code-token"
+                          key={tokenIndex}
+                          style={tokenStyle(token)}
+                        >
                           {token.text}
                         </span>
                       ))

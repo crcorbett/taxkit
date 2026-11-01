@@ -9,9 +9,11 @@ import { CodeHighlightError, DiagramRenderError } from "@taxkit/mdx/errors";
 import { MdxLive } from "@taxkit/mdx/live";
 import { CodeHighlighter, DiagramRenderer } from "@taxkit/mdx/service";
 import { CodeHighlighterTest, DiagramRendererTest } from "@taxkit/mdx/test";
+import { exampleThemeInput } from "@taxkit/mdx/testing/fixtures";
 import {
   Function as EffectFunction,
   Array,
+  ConfigProvider,
   Effect,
   HashMap,
   Layer,
@@ -43,6 +45,11 @@ const links = Effect.gen(function* () {
   };
 }).pipe(Effect.orDie);
 const MdxPageReaderLive = ContentMdxReaderLive.pipe(
+  Layer.provide(
+    ConfigProvider.layerAdd(
+      ConfigProvider.fromUnknown({ DOCS_THEME: exampleThemeInput })
+    )
+  ),
   Layer.provide(MdxLive),
   Layer.provide(
     ContentLinkResolverLive.pipe(
@@ -53,7 +60,8 @@ const MdxPageReaderLive = ContentMdxReaderLive.pipe(
         )
       )
     )
-  )
+  ),
+  Layer.orDie
 );
 const ReaderTest = MdxPageReaderLive.pipe(
   Layer.provide(Layer.merge(CodeHighlighterTest, DiagramRendererTest))
@@ -106,7 +114,7 @@ describe("MDX page reader", () => {
                 Layer.provide(
                   Layer.merge(
                     Layer.succeed(CodeHighlighter, {
-                      highlight: (snippet) =>
+                      highlight: ({ snippet }) =>
                         Effect.fail(
                           new CodeHighlightError({
                             language: snippet.language,

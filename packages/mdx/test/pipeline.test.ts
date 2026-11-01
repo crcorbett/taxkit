@@ -24,10 +24,10 @@ import {
   MdxRenderer,
 } from "@taxkit/mdx/service";
 import { DiagramRendererTest } from "@taxkit/mdx/test";
+import { exampleTheme } from "@taxkit/mdx/testing/fixtures";
 import {
   Function as EffectFunction,
   Array,
-  ConfigProvider,
   Deferred,
   Effect,
   Fiber,
@@ -104,7 +104,7 @@ describe("portable MDX pipeline", () => {
               .pipe(Effect.flip);
             yield* artifacts
               .decodeRenderedDocument(
-                `{"format":"mdx-rendered-document",${fields}}`
+                `{"format":"mdx-rendered-document",${fields.replace('"version":1', '"version":2')},"theme":${yield* artifacts.encodeTheme(yield* exampleTheme)}}`
               )
               .pipe(Effect.flip);
           })
@@ -114,7 +114,7 @@ describe("portable MDX pipeline", () => {
         '"blocks":[{"kind":"table","align":["left"],"header":[[]],"rows":[[[]]]}],"metadata":null,"sourceId":"table","version":1';
       yield* artifacts.decodeDocument(`{"format":"mdx-document",${fields}}`);
       yield* artifacts.decodeRenderedDocument(
-        `{"format":"mdx-rendered-document",${fields}}`
+        `{"format":"mdx-rendered-document",${fields.replace('"version":1', '"version":2')},"theme":${yield* artifacts.encodeTheme(yield* exampleTheme)}}`
       );
     }).pipe(Effect.provide(MdxArtifactsLive))
   );
@@ -126,17 +126,21 @@ describe("portable MDX pipeline", () => {
         const compiler = yield* MdxCompiler;
         const renderer = yield* MdxRenderer;
         const document = yield* compiler.compile(yield* source);
-        const rendered = yield* renderer.render(document);
+        const rendered = yield* renderer.render({
+          document,
+          theme: yield* exampleTheme,
+        });
         const bytes = yield* artifacts.encodeRenderedDocument(rendered);
         yield* EffectFunction.pipe(
           [
-            bytes.replace('"version":1', '"future":true,"version":1'),
+            bytes.replace('"version":2', '"future":true,"version":2'),
             bytes.replace('"kind":"link"', '"future":true,"kind":"link"'),
             bytes.replace('"kind":"text"', '"future":true,"kind":"text"'),
             bytes.replace('"kind":"code"', '"future":true,"kind":"code"'),
             bytes.replace('"style":"normal"', '"future":true,"style":"normal"'),
             bytes.replace('"mdx-rendered-document"', '"mdx-document"'),
-            bytes.replace('"version":1', '"version":2'),
+            bytes.replace('"version":2', '"version":3'),
+            bytes.replace('"version":2', '"version":1'),
             bytes.replace(',"href":"/resolved/another"', ""),
           ],
           Effect.forEach((input) => {
@@ -189,7 +193,10 @@ describe("portable MDX pipeline", () => {
         const stored = yield* artifacts.decodeDocument(bytes);
         assert.deepEqual(stored, document);
         const renderer = yield* MdxRenderer.pipe(Effect.provide(RenderingTest));
-        const rendered = yield* renderer.render(stored);
+        const rendered = yield* renderer.render({
+          document: stored,
+          theme: yield* exampleTheme,
+        });
         const encoded = yield* artifacts.encodeRenderedDocument(rendered);
         assert.deepEqual(
           yield* artifacts.decodeRenderedDocument(encoded),
@@ -308,36 +315,22 @@ describe("portable MDX pipeline", () => {
       }).pipe(Effect.provide(Layer.merge(MdxCompilerLive, MdxArtifactsLive)))
   );
   it.effect(
-    "changes presentation with checked Config while retaining document semantics",
+    "uses explicit immutable themes while retaining document semantics",
     () =>
       Effect.gen(function* () {
         const compiler = yield* MdxCompiler.pipe(
           Effect.provide(MdxCompilerLive)
         );
+        const renderer = yield* MdxRenderer.pipe(Effect.provide(RenderingTest));
         const document = yield* compiler.compile(yield* source);
-        const light = yield* MdxRenderer.pipe(Effect.provide(RenderingTest));
-        const dark = yield* MdxRenderer.pipe(
-          Effect.provide(
-            RenderingTest.pipe(
-              Layer.provide(
-                ConfigProvider.layer(
-                  ConfigProvider.fromUnknown({ MDX_THEME: "dark" })
-                )
-              )
-            )
-          )
-        );
-        const a = yield* light.render(document);
-        const b = yield* dark.render(document);
-        const codeA = EffectFunction.pipe(
-          a.blocks,
-          Array.findFirst((block) => block.kind === "code")
-        );
-        const codeB = EffectFunction.pipe(
-          b.blocks,
-          Array.findFirst((block) => block.kind === "code")
-        );
-        assert.notDeepEqual(codeA, codeB);
+        const theme = yield* exampleTheme;
+        const a = yield* renderer.render({ document, theme });
+        const b = yield* renderer.render({
+          document,
+          theme: { ...theme, light: theme.dark, dark: theme.light },
+        });
+        assert.notDeepEqual(a.blocks, b.blocks);
+        assert.deepEqual(a.theme, theme);
         assert.deepEqual(yield* compiler.compile(yield* source), document);
       })
   );
@@ -346,7 +339,9 @@ describe("portable MDX pipeline", () => {
       const compiler = yield* MdxCompiler;
       const renderer = yield* MdxRenderer;
       const document = yield* compiler.compile(yield* source);
-      const error = yield* renderer.render(document).pipe(Effect.flip);
+      const error = yield* renderer
+        .render({ document, theme: yield* exampleTheme })
+        .pipe(Effect.flip);
       assert.strictEqual(error.reason, "code-tokens");
       assert.deepEqual(error.node, [2]);
     }).pipe(
@@ -419,10 +414,12 @@ describe("portable MDX pipeline", () => {
             )
           )
         );
-        const fiber = yield* renderer.render(document).pipe(
-          Effect.tap(() => Ref.set(published, true)),
-          Effect.forkScoped
-        );
+        const fiber = yield* renderer
+          .render({ document, theme: yield* exampleTheme })
+          .pipe(
+            Effect.tap(() => Ref.set(published, true)),
+            Effect.forkScoped
+          );
         yield* Deferred.await(started);
         yield* Fiber.interrupt(fiber);
         assert.strictEqual(yield* Ref.get(later), 0);
@@ -458,8 +455,8 @@ describe("portable MDX pipeline", () => {
             ...input,
             text: yield* SourceText.makeEffect("A fragment."),
           });
-          yield* renderer.render(document);
-          yield* renderer.render(document);
+          yield* renderer.render({ document, theme: yield* exampleTheme });
+          yield* renderer.render({ document, theme: yield* exampleTheme });
         }).pipe(
           Effect.provide(
             MdxLive.pipe(
@@ -485,9 +482,10 @@ describe("portable MDX pipeline", () => {
     Effect.gen(function* () {
       const compiler = yield* MdxCompiler;
       const renderer = yield* MdxRenderer;
-      const result = yield* renderer.render(
-        yield* compiler.compile(yield* source)
-      );
+      const result = yield* renderer.render({
+        document: yield* compiler.compile(yield* source),
+        theme: yield* exampleTheme,
+      });
       assert.strictEqual(result.format, "mdx-rendered-document");
     }).pipe(Effect.provide(PipelineTest))
   );

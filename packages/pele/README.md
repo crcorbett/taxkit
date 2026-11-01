@@ -4,7 +4,7 @@ An Effect service for [Pele](https://github.com/obsidianmd/pele), pinned to 1.13
 It renders Mermaid definitions to standalone SVG without a browser. This package
 imports no MDX, Content, app, filesystem or application runtime.
 
-- `./service`: `Pele.renderSvg(source)` returns a closed `Effect<Svg, PeleRenderError>`.
+- `./service`: `Pele.renderSvg({ source, typography })` returns a closed `Effect<Svg, PeleRenderError>`.
 - `./schemas`: branded `Source` and `Svg`. Source preserves whitespace and is
   bounded to Pele's default 50,000 characters; SVG requires its namespace and is
   bounded to the provider's default 4,000,000 characters. These checks establish
@@ -20,12 +20,12 @@ imports no MDX, Content, app, filesystem or application runtime.
 import { PeleLive } from "@taxkit/pele/live";
 import { Source } from "@taxkit/pele/schemas";
 import { Pele } from "@taxkit/pele/service";
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 const program = Effect.gen(function* () {
   const pele = yield* Pele;
   const source = yield* Source.makeEffect("flowchart LR\n A[Author] --> B[Reader]");
-  return yield* pele.renderSvg(source);
+  return yield* pele.renderSvg({ source, typography: Option.none() });
 }).pipe(Effect.provide(PeleLive));
 ```
 
@@ -34,6 +34,10 @@ factories, generic SDK callbacks, DOM mounting operations, retries or background
 workers. Pele renders synchronously, so interruption applies before and after a
 call; a timeout cannot pre-empt its CPU work. The Gantt today marker receives
 Effect's clock rather than using Pele's wall-clock default.
+
+`RenderSvgRequest` includes optional checked typography: bounded serialized
+font stacks and a finite 8–48px font size. MDX supplies its shared font choices;
+standalone callers can use `Option.none()` for native defaults.
 
 Pele owns its CSS-variable defaults and font fallback. Inline SVG consumers can
 style `--pele-*` variables; an SVG shown as an image uses its own defaults and

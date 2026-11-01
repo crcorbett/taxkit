@@ -1,21 +1,30 @@
-import { Effect, Layer, Match, Option } from "effect";
+import { Effect, Layer, Match } from "effect";
 
 import { CodeHighlightError, DiagramRenderError } from "./errors.js";
 import { InlineText, DiagramSvg } from "./schemas.js";
-import type { CodeSnippet } from "./schemas.js";
 import { CodeHighlighter, DiagramRenderer } from "./service.js";
 
-// Deterministic highlighter: each source line becomes one uncoloured token.
+// Deterministic highlighter: each source line uses the scheme's foreground.
 export const CodeHighlighterTest = Layer.succeed(CodeHighlighter)(
   CodeHighlighter.of({
-    highlight: Effect.fn("CodeHighlighter.highlight")((snippet: CodeSnippet) =>
+    highlight: Effect.fn("CodeHighlighter.highlight")(({ snippet, theme }) =>
       Effect.forEach(snippet.text.split("\n"), (line) =>
         Match.value(line).pipe(
           Match.when("", () => Effect.succeed([])),
           Match.orElse((value) =>
             InlineText.makeEffect(value).pipe(
               Effect.map((text) => [
-                { color: Option.none(), style: "normal" as const, text },
+                {
+                  light: {
+                    color: theme.light.palette.foreground,
+                    style: "normal" as const,
+                  },
+                  dark: {
+                    color: theme.dark.palette.foreground,
+                    style: "normal" as const,
+                  },
+                  text,
+                },
               ])
             )
           )

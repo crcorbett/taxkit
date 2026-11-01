@@ -252,7 +252,7 @@ it.live(
         expect(listed.tools).toHaveLength(6);
         expect(transport.sessionId).toBeUndefined();
         const httpNavigation = yield* Effect.promise(() =>
-          api.fetch("http://127.0.0.1:4218/api/v1/docs/navigation")
+          api.fetch("http://127.0.0.1:4218/api/v2/docs/navigation")
         );
         expect(httpNavigation.status).toBe(200);
         const expectedNavigation = yield* Schema.decodeEffect(
@@ -392,7 +392,7 @@ it.live(
         );
         const httpSearch = yield* Effect.promise(() =>
           api.fetch(
-            `http://127.0.0.1:4218/api/v1/docs/search?${new URLSearchParams({ term })}`
+            `http://127.0.0.1:4218/api/v2/docs/search?${new URLSearchParams({ term })}`
           )
         );
         expect(httpSearch.status).toBe(200);
@@ -507,7 +507,7 @@ it.live(
         );
         const httpPage = yield* Effect.promise(() =>
           api.fetch(
-            "http://127.0.0.1:4218/api/v1/docs/page?path=/start/quickstart"
+            "http://127.0.0.1:4218/api/v2/docs/page?path=/start/quickstart"
           )
         );
         expect(httpPage.status).toBe(200);

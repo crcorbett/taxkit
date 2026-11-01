@@ -147,7 +147,7 @@ export const ContentCatalogueLive = Layer.effect(
           )
         )
       ),
-      schemaVersion: 1,
+      schemaVersion: 2,
     }).pipe(
       Effect.mapError(() =>
         catalogueFailure("The public docs catalogue is invalid.")

@@ -122,7 +122,16 @@ describe("reading Markdown", () => {
         {
           kind: "code",
           language: "ts",
-          lines: [[{ color: null, style: "normal", text: "const a = 1;" }], []],
+          lines: [
+            [
+              {
+                light: { color: "#172033", style: "normal" },
+                dark: { color: "#e7edf5", style: "normal" },
+                text: "const a = 1;",
+              },
+            ],
+            [],
+          ],
           text: "const a = 1;\n",
         },
         {

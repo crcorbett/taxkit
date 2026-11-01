@@ -50,10 +50,10 @@ The implemented API surface is:
 - `GET /api/v1/calculators/:calculatorId/graph`
 - `GET /api/v1/facts`
 - `GET /api/v1/rules`
-- `GET /api/v1/docs/navigation`
-- `GET /api/v1/docs/page?path=/start/quickstart`
-- `GET /api/v1/docs/search?term=Quickstart`
-- `GET /api/v1/docs/markdown?path=/start/quickstart`
+- `GET /api/v2/docs/navigation`
+- `GET /api/v2/docs/page?path=/start/quickstart`
+- `GET /api/v2/docs/search?term=Quickstart`
+- `GET /api/v2/docs/markdown?path=/start/quickstart`
 
 The public calculation API routes use the reusable calculator catalogue,
 fact and rule descriptors and graph diagnostics from `@taxkit/calculators`.

@@ -186,7 +186,7 @@ address carries `Vary: Accept`; Markdown also carries `nosniff` and a canonical
 link to the publication origin.
 
 **Discovery.** `/sitemap.xml`, `/robots.txt`, `/llms.txt` and `/llms-full.txt`
-are forwarded once to the API's `/api/v1/docs/discovery/*` routes, which own the
+are forwarded once to the API's `/api/v2/docs/discovery/*` routes, which own the
 documents. GET and HEAD only (other methods 405 with `Allow: GET, HEAD`); query
 input 400; an unreachable API 503.
 
@@ -194,7 +194,7 @@ input 400; an unreachable API 503.
 canonical, Markdown alternate and image addresses on the publication origin and
 TechArticle data with script-breaking characters escaped. `seo/head.ts` renders
 it as the page title, description, Open Graph and Twitter tags. `/og/<page>.png`
-is forwarded once to the API's `/api/v1/docs/og/<page>.png` route
+is forwarded once to the API's `/api/v2/docs/og/<page>.png` route
 (`http/image.ingress.ts`), which serves the 1200 × 630 PNG drawn when the API
 was built; the Website checks
 the type and bytes. GET and HEAD only; an unknown page 404 and an unusable

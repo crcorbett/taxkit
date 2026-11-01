@@ -24,12 +24,14 @@ navigation, repository metadata or the catalogue builder.
 
 Content owns `DocsPageReader`, implemented by `ContentMdxReaderLive` (`./mdx`)
 using the neutral MDX contracts. It validates TaxKit metadata and page titles and
-projects finished data into the existing public body. Public Content brand
+projects finished data into the version 2 public body. Public Content brand
 identities stay unchanged; shared wire refinements come from MDX. The adapter
 writes Markdown from the semantic code text before projecting the public body. `ContentLinkResolverLive`
 (`./link-resolver`) consumes a checked `DocsLinkTargets` snapshot; the static
 `DocsLinkTargetsLive` loads the authored navigation/repository policy. The API build
-supplies the concrete MDX, highlighter and diagram Layers. The API Worker reads
+supplies the concrete MDX, highlighter and diagram Layers and adds its authored
+`DOCS_THEME` value to the native ConfigProvider. The reader acquires it once
+and passes it explicitly to rendering. The catalogue wire version is 2. The API Worker reads
 the prebuilt catalogue, keeping parser and provider engines out of request code.
 The checked [HTTP package](../api/http/README.md)
 delegates public content routes to this service, and the answer-engine routes
@@ -38,9 +40,9 @@ Markdown through the API's HTTP routes.
 
 ## Reading body
 
-Each page carries `body`, a checked list of reading blocks after its `#` title:
+Each page carries its exact checked MDX `theme` and `body`, a checked list of reading blocks after its `#` title:
 headings with unique ids, paragraphs, lists, tables, highlighted code (lines of
-coloured tokens) and diagrams (Mermaid source, title and SVG). Inline content is
+tokens with paired light/dark colours and styles) and diagrams (Mermaid source, title and SVG). Inline content is
 text, inline code, bold, italics and links. `links.ts` resolves every link: a
 relative `.mdx` link becomes the page's public address, any other relative link
 becomes a GitHub link at the revision in `repository.json`, and only HTTPS and

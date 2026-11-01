@@ -477,6 +477,201 @@
         "required": ["_tag", "amount", "period"],
         "type": "object"
       },
+      "MdxColor": {
+        "allOf": [
+          {
+            "pattern": "^#[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?$"
+          }
+        ],
+        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+        "type": "string"
+      },
+      "MdxFontName": {
+        "allOf": [
+          {
+            "pattern": "^[\\p{L}\\p{N}][\\p{L}\\p{N} _-]*$"
+          }
+        ],
+        "maxLength": 64,
+        "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
+        "type": "string"
+      },
+      "MdxFontSizePx": {
+        "maximum": 48,
+        "minimum": 8,
+        "type": "number"
+      },
+      "MdxFontStack": {
+        "additionalProperties": false,
+        "properties": {
+          "fallback": {
+            "enum": ["serif", "sans-serif", "monospace"],
+            "type": "string"
+          },
+          "names": {
+            "items": {
+              "$ref": "#/components/schemas/MdxFontName"
+            },
+            "maxItems": 8,
+            "type": "array"
+          }
+        },
+        "required": ["names", "fallback"],
+        "type": "object"
+      },
+      "MdxScheme": {
+        "additionalProperties": false,
+        "properties": {
+          "palette": {
+            "additionalProperties": false,
+            "properties": {
+              "accent": {
+                "$ref": "#/components/schemas/MdxColor"
+              },
+              "background": {
+                "$ref": "#/components/schemas/MdxColor"
+              },
+              "border": {
+                "$ref": "#/components/schemas/MdxColor"
+              },
+              "critical": {
+                "$ref": "#/components/schemas/MdxColor"
+              },
+              "foreground": {
+                "$ref": "#/components/schemas/MdxColor"
+              },
+              "muted": {
+                "$ref": "#/components/schemas/MdxColor"
+              },
+              "surface": {
+                "$ref": "#/components/schemas/MdxColor"
+              },
+              "surfaceAlt": {
+                "$ref": "#/components/schemas/MdxColor"
+              }
+            },
+            "required": [
+              "background",
+              "foreground",
+              "muted",
+              "surface",
+              "surfaceAlt",
+              "border",
+              "accent",
+              "critical"
+            ],
+            "type": "object"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/MdxColor"
+            },
+            "maxItems": 8,
+            "minItems": 8,
+            "type": "array"
+          },
+          "syntax": {
+            "additionalProperties": false,
+            "properties": {
+              "comment": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "constant": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "function": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "keyword": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "number": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "operator": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "property": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "punctuation": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "string": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "type": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              },
+              "variable": {
+                "$ref": "#/components/schemas/MdxTokenAppearance"
+              }
+            },
+            "required": [
+              "comment",
+              "keyword",
+              "string",
+              "number",
+              "constant",
+              "function",
+              "type",
+              "variable",
+              "property",
+              "operator",
+              "punctuation"
+            ],
+            "type": "object"
+          }
+        },
+        "required": ["palette", "syntax", "series"],
+        "type": "object"
+      },
+      "MdxTheme": {
+        "additionalProperties": false,
+        "properties": {
+          "dark": {
+            "$ref": "#/components/schemas/MdxScheme"
+          },
+          "light": {
+            "$ref": "#/components/schemas/MdxScheme"
+          },
+          "typography": {
+            "$ref": "#/components/schemas/MdxTypography"
+          }
+        },
+        "required": ["typography", "light", "dark"],
+        "type": "object"
+      },
+      "MdxTokenAppearance": {
+        "additionalProperties": false,
+        "properties": {
+          "color": {
+            "$ref": "#/components/schemas/MdxColor"
+          },
+          "style": {
+            "enum": ["normal", "italic", "bold", "bold-italic"],
+            "type": "string"
+          }
+        },
+        "required": ["color", "style"],
+        "type": "object"
+      },
+      "MdxTypography": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/MdxFontStack"
+          },
+          "diagramSize": {
+            "$ref": "#/components/schemas/MdxFontSizePx"
+          },
+          "text": {
+            "$ref": "#/components/schemas/MdxFontStack"
+          }
+        },
+        "required": ["text", "code", "diagramSize"],
+        "type": "object"
+      },
       "MoneyEncoded": {
         "additionalProperties": false,
         "properties": {
@@ -2551,7 +2746,562 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/docs/markdown": {
+    "/api/v1/facts": {
+      "get": {
+        "description": "List canonical fact descriptors, optionally filtered by calculator context.",
+        "operationId": "calculatorApi.listFacts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "calculator",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "facts": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "authority": {
+                            "enum": ["input", "derived", "parameter"],
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "question": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/FactQuestionEncoded"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "schemaTag": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["authority", "id", "schemaTag", "title"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["facts"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/jurisdictions": {
+      "get": {
+        "description": "List supported public API jurisdictions.",
+        "operationId": "calculatorApi.getJurisdictions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "jurisdictions": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "code": {
+                            "anyOf": [
+                              {
+                                "enum": ["AU"],
+                                "type": "string"
+                              },
+                              {
+                                "enum": ["AU"],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["code", "title"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["jurisdictions"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/rules": {
+      "get": {
+        "description": "List canonical rule descriptors, optionally filtered by calculator context.",
+        "operationId": "calculatorApi.listRules",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "calculator",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["au.income-tax.annual"],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "rules": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "allowDuplicateProvides": {
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "parameters": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "effectivePeriod": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "from": {
+                                      "type": "string"
+                                    },
+                                    "toExclusive": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": ["from"],
+                                  "type": "object"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "_tag": {
+                                      "enum": ["SourceRef"],
+                                      "type": "string"
+                                    },
+                                    "kind": {
+                                      "enum": [
+                                        "ato-publication",
+                                        "legislation",
+                                        "regulation",
+                                        "internal-validation"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "reference": {
+                                      "type": "string"
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "_tag",
+                                    "kind",
+                                    "reference",
+                                    "title"
+                                  ],
+                                  "type": "object"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "effectivePeriod",
+                                "id",
+                                "source",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "provides": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "requires": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "sourcePolicy": {
+                            "enum": ["not-required", "required"],
+                            "type": "string"
+                          },
+                          "sources": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "_tag": {
+                                  "enum": ["SourceRef"],
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "ato-publication",
+                                    "legislation",
+                                    "regulation",
+                                    "internal-validation"
+                                  ],
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "_tag",
+                                "kind",
+                                "reference",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "parameters",
+                          "provides",
+                          "requires",
+                          "sourcePolicy",
+                          "sources",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["rules"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v1/tax-years": {
+      "get": {
+        "description": "List supported tax years for a jurisdiction.",
+        "operationId": "calculatorApi.getTaxYears",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "jurisdiction",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["AU"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["AU"],
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "taxYear",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
+                },
+                {
+                  "enum": ["2025-26"],
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "taxYears": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "jurisdiction": {
+                            "anyOf": [
+                              {
+                                "enum": ["AU"],
+                                "type": "string"
+                              },
+                              {
+                                "enum": ["AU"],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "taxYear": {
+                            "anyOf": [
+                              {
+                                "enum": ["2025-26"],
+                                "type": "string"
+                              },
+                              {
+                                "enum": ["2025-26"],
+                                "type": "string"
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["jurisdiction", "taxYear"],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["taxYears"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "error": {
+                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
+                    }
+                  },
+                  "required": ["error"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [],
+        "tags": ["Calculator API"]
+      }
+    },
+    "/api/v2/docs/markdown": {
       "get": {
         "description": "Read processed public Markdown, with resolved links and without executable MDX. This route does not return personal calculation reports.",
         "operationId": "content.getMarkdown",
@@ -2599,7 +3349,7 @@
         "tags": ["Public documentation"]
       }
     },
-    "/api/v1/docs/navigation": {
+    "/api/v2/docs/navigation": {
       "get": {
         "description": "Read navigation for accepted public documentation.",
         "operationId": "content.getNavigation",
@@ -2741,7 +3491,7 @@
         "tags": ["Public documentation"]
       }
     },
-    "/api/v1/docs/page": {
+    "/api/v2/docs/page": {
       "get": {
         "description": "Read one accepted public documentation page.",
         "operationId": "content.getPage",
@@ -4442,31 +5192,18 @@
                                   "items": {
                                     "additionalProperties": false,
                                     "properties": {
-                                      "color": {
-                                        "anyOf": [
-                                          {
-                                            "type": "string"
-                                          },
-                                          {
-                                            "type": "null"
-                                          }
-                                        ]
+                                      "dark": {
+                                        "$ref": "#/components/schemas/MdxTokenAppearance"
                                       },
-                                      "style": {
-                                        "enum": [
-                                          "normal",
-                                          "italic",
-                                          "bold",
-                                          "bold-italic"
-                                        ],
-                                        "type": "string"
+                                      "light": {
+                                        "$ref": "#/components/schemas/MdxTokenAppearance"
                                       },
                                       "text": {
                                         "minLength": 1,
                                         "type": "string"
                                       }
                                     },
-                                    "required": ["color", "style", "text"],
+                                    "required": ["light", "dark", "text"],
                                     "type": "object"
                                   },
                                   "type": "array"
@@ -4558,9 +5295,13 @@
                       "minLength": 1,
                       "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                       "type": "string"
+                    },
+                    "theme": {
+                      "$ref": "#/components/schemas/MdxTheme"
                     }
                   },
                   "required": [
+                    "theme",
                     "body",
                     "frontmatter",
                     "markdown",
@@ -4589,7 +5330,7 @@
         "tags": ["Public documentation"]
       }
     },
-    "/api/v1/docs/search": {
+    "/api/v2/docs/search": {
       "get": {
         "description": "Search accepted public documentation; at most 20 results with 240-character excerpts.",
         "operationId": "content.searchPages",
@@ -4656,561 +5397,6 @@
         },
         "security": [],
         "tags": ["Public documentation"]
-      }
-    },
-    "/api/v1/facts": {
-      "get": {
-        "description": "List canonical fact descriptors, optionally filtered by calculator context.",
-        "operationId": "calculatorApi.listFacts",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "calculator",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["au.income-tax.annual"],
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "jurisdiction",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["AU"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["AU"],
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "taxYear",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["2025-26"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["2025-26"],
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "facts": {
-                      "items": {
-                        "additionalProperties": false,
-                        "properties": {
-                          "authority": {
-                            "enum": ["input", "derived", "parameter"],
-                            "type": "string"
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "question": {
-                            "anyOf": [
-                              {
-                                "$ref": "#/components/schemas/FactQuestionEncoded"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "schemaTag": {
-                            "type": "string"
-                          },
-                          "title": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["authority", "id", "schemaTag", "title"],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": ["facts"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          }
-        },
-        "security": [],
-        "tags": ["Calculator API"]
-      }
-    },
-    "/api/v1/jurisdictions": {
-      "get": {
-        "description": "List supported public API jurisdictions.",
-        "operationId": "calculatorApi.getJurisdictions",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "jurisdictions": {
-                      "items": {
-                        "additionalProperties": false,
-                        "properties": {
-                          "code": {
-                            "anyOf": [
-                              {
-                                "enum": ["AU"],
-                                "type": "string"
-                              },
-                              {
-                                "enum": ["AU"],
-                                "type": "string"
-                              }
-                            ]
-                          },
-                          "title": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["code", "title"],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": ["jurisdictions"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          }
-        },
-        "security": [],
-        "tags": ["Calculator API"]
-      }
-    },
-    "/api/v1/rules": {
-      "get": {
-        "description": "List canonical rule descriptors, optionally filtered by calculator context.",
-        "operationId": "calculatorApi.listRules",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "calculator",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["au.pay.take-home", "au.pay.withholdings"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["au.income-tax.annual"],
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "jurisdiction",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["AU"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["AU"],
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "taxYear",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["2025-26"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["2025-26"],
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "rules": {
-                      "items": {
-                        "additionalProperties": false,
-                        "properties": {
-                          "allowDuplicateProvides": {
-                            "anyOf": [
-                              {
-                                "type": "boolean"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "id": {
-                            "type": "string"
-                          },
-                          "parameters": {
-                            "items": {
-                              "additionalProperties": false,
-                              "properties": {
-                                "effectivePeriod": {
-                                  "additionalProperties": false,
-                                  "properties": {
-                                    "from": {
-                                      "type": "string"
-                                    },
-                                    "toExclusive": {
-                                      "anyOf": [
-                                        {
-                                          "type": "string"
-                                        },
-                                        {
-                                          "type": "null"
-                                        }
-                                      ]
-                                    }
-                                  },
-                                  "required": ["from"],
-                                  "type": "object"
-                                },
-                                "id": {
-                                  "type": "string"
-                                },
-                                "source": {
-                                  "additionalProperties": false,
-                                  "properties": {
-                                    "_tag": {
-                                      "enum": ["SourceRef"],
-                                      "type": "string"
-                                    },
-                                    "kind": {
-                                      "enum": [
-                                        "ato-publication",
-                                        "legislation",
-                                        "regulation",
-                                        "internal-validation"
-                                      ],
-                                      "type": "string"
-                                    },
-                                    "reference": {
-                                      "type": "string"
-                                    },
-                                    "title": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "required": [
-                                    "_tag",
-                                    "kind",
-                                    "reference",
-                                    "title"
-                                  ],
-                                  "type": "object"
-                                },
-                                "title": {
-                                  "type": "string"
-                                }
-                              },
-                              "required": [
-                                "effectivePeriod",
-                                "id",
-                                "source",
-                                "title"
-                              ],
-                              "type": "object"
-                            },
-                            "type": "array"
-                          },
-                          "provides": {
-                            "items": {
-                              "type": "string"
-                            },
-                            "type": "array"
-                          },
-                          "requires": {
-                            "items": {
-                              "type": "string"
-                            },
-                            "type": "array"
-                          },
-                          "sourcePolicy": {
-                            "enum": ["not-required", "required"],
-                            "type": "string"
-                          },
-                          "sources": {
-                            "items": {
-                              "additionalProperties": false,
-                              "properties": {
-                                "_tag": {
-                                  "enum": ["SourceRef"],
-                                  "type": "string"
-                                },
-                                "kind": {
-                                  "enum": [
-                                    "ato-publication",
-                                    "legislation",
-                                    "regulation",
-                                    "internal-validation"
-                                  ],
-                                  "type": "string"
-                                },
-                                "reference": {
-                                  "type": "string"
-                                },
-                                "title": {
-                                  "type": "string"
-                                }
-                              },
-                              "required": [
-                                "_tag",
-                                "kind",
-                                "reference",
-                                "title"
-                              ],
-                              "type": "object"
-                            },
-                            "type": "array"
-                          },
-                          "title": {
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "parameters",
-                          "provides",
-                          "requires",
-                          "sourcePolicy",
-                          "sources",
-                          "title"
-                        ],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": ["rules"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          }
-        },
-        "security": [],
-        "tags": ["Calculator API"]
-      }
-    },
-    "/api/v1/tax-years": {
-      "get": {
-        "description": "List supported tax years for a jurisdiction.",
-        "operationId": "calculatorApi.getTaxYears",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "jurisdiction",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["AU"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["AU"],
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "taxYear",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "enum": ["2025-26"],
-                  "type": "string"
-                },
-                {
-                  "enum": ["2025-26"],
-                  "type": "string"
-                }
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "taxYears": {
-                      "items": {
-                        "additionalProperties": false,
-                        "properties": {
-                          "jurisdiction": {
-                            "anyOf": [
-                              {
-                                "enum": ["AU"],
-                                "type": "string"
-                              },
-                              {
-                                "enum": ["AU"],
-                                "type": "string"
-                              }
-                            ]
-                          },
-                          "taxYear": {
-                            "anyOf": [
-                              {
-                                "enum": ["2025-26"],
-                                "type": "string"
-                              },
-                              {
-                                "enum": ["2025-26"],
-                                "type": "string"
-                              }
-                            ]
-                          }
-                        },
-                        "required": ["jurisdiction", "taxYear"],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": ["taxYears"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          }
-        },
-        "security": [],
-        "tags": ["Calculator API"]
       }
     }
   },

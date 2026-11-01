@@ -1,4 +1,5 @@
 import * as Mdx from "@taxkit/mdx/schemas";
+import { Theme, TokenAppearance } from "@taxkit/mdx/theme";
 import {
   Match,
   Function as EffectFunction,
@@ -174,15 +175,9 @@ export type DocsInlines = typeof DocsInlines.Type;
 // Neutral semantic brands stay inside MDX; the Content adapter projects them.
 export const DocsCodeLanguage = Mdx.CodeLanguage;
 export type DocsCodeLanguage = typeof DocsCodeLanguage.Type;
-export const DocsTokenColor = Schema.toEncoded(Mdx.TokenColor).pipe(
-  Schema.brand("taxkit/DocsTokenColor")
-);
-export type DocsTokenColor = typeof DocsTokenColor.Type;
-export const DocsTokenStyle = Mdx.TokenStyle;
-export type DocsTokenStyle = typeof DocsTokenStyle.Type;
 export const DocsCodeToken = Schema.Struct({
-  color: Schema.OptionFromNullOr(DocsTokenColor),
-  style: DocsTokenStyle,
+  light: TokenAppearance,
+  dark: TokenAppearance,
   text: DocsInlineText,
 });
 export type DocsCodeToken = typeof DocsCodeToken.Type;
@@ -287,6 +282,7 @@ export const DocsReadingBody = Schema.Array(DocsBlock).check(
 export type DocsReadingBody = typeof DocsReadingBody.Type;
 // One authored page after its MDX is read: checked frontmatter and body.
 export const DocsReadPage = Schema.Struct({
+  theme: Theme,
   body: DocsReadingBody,
   frontmatter: DocsPageFrontmatter,
   markdown: Schema.String,
@@ -332,7 +328,7 @@ export type DocsPublicNavigation = typeof DocsPublicNavigation.Type;
 export const DocsPublicCatalogue = Schema.Struct({
   navigation: DocsPublicNavigation,
   pages: Schema.Array(DocsPublicPage),
-  schemaVersion: Schema.Literal(1),
+  schemaVersion: Schema.Literal(2),
 }).check(
   Schema.makeFilter(
     (catalogue) => {

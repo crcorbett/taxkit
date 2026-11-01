@@ -26,10 +26,10 @@ response detail.
 | `GET`  | `/api/v1/calculators/:calculatorId/graph`      | Get graph edges and validation diagnostics.                    |
 | `GET`  | `/api/v1/facts`                                | List canonical fact descriptors.                               |
 | `GET`  | `/api/v1/rules`                                | List canonical rule descriptors.                               |
-| `GET`  | `/api/v1/docs/navigation`                      | Read public documentation navigation.                          |
-| `GET`  | `/api/v1/docs/page?path=/start/quickstart`     | Read one public page as JSON.                                  |
-| `GET`  | `/api/v1/docs/search?term=Quickstart`          | Search public documentation.                                   |
-| `GET`  | `/api/v1/docs/markdown?path=/start/quickstart` | Read one public page as Markdown.                              |
+| `GET`  | `/api/v2/docs/navigation`                      | Read public documentation navigation.                          |
+| `GET`  | `/api/v2/docs/page?path=/start/quickstart`     | Read one public page as JSON.                                  |
+| `GET`  | `/api/v2/docs/search?term=Quickstart`          | Search public documentation.                                   |
+| `GET`  | `/api/v2/docs/markdown?path=/start/quickstart` | Read one public page as Markdown.                              |
 
 ## Calculate
 
@@ -69,7 +69,7 @@ returns the page title, description and Markdown in a JSON object. The Markdown
 route returns the same page text with `content-type: text/markdown`.
 
 ```sh
-curl 'http://127.0.0.1:4000/api/v1/docs/markdown?path=/start/quickstart'
+curl 'http://127.0.0.1:4000/api/v2/docs/markdown?path=/start/quickstart'
 ```
 
 Search with a `term` of 1 to 100 characters. Each search returns up to 20

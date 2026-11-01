@@ -140,10 +140,10 @@ const successfulHttpClient = Effect.gen(function* () {
         new Response(
           Match.value(url.pathname).pipe(
             Match.when("/api/health", () => healthJson),
-            Match.when("/api/v1/docs/page", () => pageJson),
-            Match.when("/api/v1/docs/navigation", () => navigationJson),
-            Match.when("/api/v1/docs/search", () => searchJson),
-            Match.when("/api/v1/docs/markdown", () => page.markdown),
+            Match.when("/api/v2/docs/page", () => pageJson),
+            Match.when("/api/v2/docs/navigation", () => navigationJson),
+            Match.when("/api/v2/docs/search", () => searchJson),
+            Match.when("/api/v2/docs/markdown", () => page.markdown),
             Match.when("/api/v1/calculators", () => catalogJson),
             Match.when("/api/docs/openapi.json", () => openApiJson),
             Match.orElse(() => calculationJson)

@@ -5,15 +5,15 @@ accepted docs catalogue. The API Worker composes it; the Website forwards its
 own conventional addresses to these routes once.
 
 - `./routes` exports `aeoRoutes`, one native `HttpRouter` Layer:
-  - `/api/v1/docs/discovery/robots.txt`: every crawler, including named AI
+  - `/api/v2/docs/discovery/robots.txt`: every crawler, including named AI
     crawlers, may index, use as AI input and train (Content Signals), with the
     sitemap address;
-  - `/api/v1/docs/discovery/sitemap.xml`: every published page on the
+  - `/api/v2/docs/discovery/sitemap.xml`: every published page on the
     publication origin;
-  - `/api/v1/docs/discovery/llms.txt`: the short index, linking each page's
+  - `/api/v2/docs/discovery/llms.txt`: the short index, linking each page's
     processed Markdown on the API;
-  - `/api/v1/docs/discovery/llms-full.txt`: every page's Markdown body;
-  - `/api/v1/docs/og/<page>.png`: one share image per published page, from
+  - `/api/v2/docs/discovery/llms-full.txt`: every page's Markdown body;
+  - `/api/v2/docs/og/<page>.png`: one share image per published page, from
     Content's `DocsOgImages`.
 - `./service` exports `PublicationOrigins`, the host-supplied Effect that
   reads this stage's API and publication origins on first use.
