@@ -160,11 +160,11 @@ export const PierreCodeHighlighterLive = Layer.effect(
                 const darkItalic = Option.isSome(darkStyle);
                 const lightBold = EffectFunction.pipe(
                   lightWeight,
-                  Option.contains("600")
+                  Option.exists((weight) => weight === "600")
                 );
                 const darkBold = EffectFunction.pipe(
                   darkWeight,
-                  Option.contains("600")
+                  Option.exists((weight) => weight === "600")
                 );
                 const light = resolveAppearance(
                   lightColor,
