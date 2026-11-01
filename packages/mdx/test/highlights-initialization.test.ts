@@ -24,6 +24,8 @@ describe("Pierre acquisition", () => {
           ChildProcess.make("node", ["--jitless", "--import", loader, fixture])
         );
         assert.strictEqual(output.trim(), "initialization-error");
-      }).pipe(Effect.provide(BunServices.layer))
+      }).pipe(Effect.provide(BunServices.layer)),
+    // Real Node/TS startup under --jitless competes with CI's workspace tests.
+    30_000
   );
 });
