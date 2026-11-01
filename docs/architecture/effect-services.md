@@ -214,8 +214,10 @@ remain app-composed: `PierreCodeHighlighterLive` and
 `PeleDiagramRendererLive` import MDX contracts, never Content. The diagram adapter
 requires the independent `Pele` service, whose `renderSvg` operation has no MDX
 or publication dependency. The host provides static `PeleLive`.
-Pierre compiles WASM during Layer acquisition through `Effect.try`; initialization
-has its own typed failure, separate from snippet highlighting. See
+Pierre's public entry initializes shared WASM on import; import failure belongs
+to host startup. Its private highlighter instance is created during Layer
+acquisition through `Effect.try`, with a typed failure separate from snippet
+highlighting. See
 [ADR 0008](../adr/0008-effect-rendering-providers.md). The reader's
 closed `read(source)` operation derives identity from the actual source; safe
 `DocsPageReadError` reasons preserve authoring and provider failures.

@@ -452,9 +452,6 @@
       },
     },
   },
-  "patchedDependencies": {
-    "@pierre/highlights@0.3.0": "patches/pierre-highlights-0.3.0.patch",
-  },
   "overrides": {
     "@effect/platform-node-shared": "4.0.7",
     "@effect/sql-d1": "4.0.7",

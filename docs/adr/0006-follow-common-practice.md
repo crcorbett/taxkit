@@ -57,5 +57,5 @@ are in [package ownership](../architecture/package-ownership.md).
 
 [ADR 0007](0007-content-neutral-mdx.md) subsequently separated content-neutral
 compilation from TaxKit publication rules. [ADR 0008](0008-effect-rendering-providers.md)
-replaces the diagram provider with an independent Pele service and moves Pierre
-WASM initialization into its Effect Layer.
+replaces the diagram provider with an independent Pele service and keeps Pierre's
+private highlighter instance inside its Effect Layer.

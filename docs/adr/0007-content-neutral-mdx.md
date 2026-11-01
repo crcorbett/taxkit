@@ -262,11 +262,13 @@ inject as inline HTML; this change does not add inline-SVG rendering.
 Acquire private provider instances through native APIs where available, such as
 Pierre's `createHighlighter`, and keep mutable provider objects inside their Layer.
 Map acquisition failures controlled by that Layer separately from per-document
-failures. The pinned Pierre export patch exposes its existing pure core and WASM
-bytes for static imports. Compilation and instance creation occur within
-`Effect.try` during Layer acquisition and return `CodeHighlighterInitializationError`.
-Per-snippet failures remain `CodeHighlightError`; see
-[ADR 0008](0008-effect-rendering-providers.md) for the compatibility decision.
+failures. Pierre's published root entry initializes shared WASM during static
+import; a module-load failure belongs to host startup, before a Layer exists.
+Private instance creation uses its public `createHighlighter()` inside
+`Effect.try` during Layer acquisition and returns `CodeHighlighterInitializationError`.
+Per-snippet failures remain `CodeHighlightError`. Use supported exports without
+patching dependencies or importing private paths; see
+[ADR 0008](0008-effect-rendering-providers.md).
 
 Parser, highlighter and Mermaid calls are synchronous. Effect preserves structured
 interruption between operations, but cannot pre-empt synchronous work already
@@ -323,9 +325,9 @@ Compare decoded outputs under identical pinned inputs and policies, including
 provider-produced strings; object-key order in encoded JSON is immaterial. Changing
 a theme changes presentation without changing Document semantics. Changing link
 policy requires rerendering, not recompiling. Request-time qualification must test
-the actual provider acquisition in its intended host. The current Pierre adapter
-compiles packaged bytes inside its Layer; that path is qualified in Bun and Node,
-including the typed failure without WebAssembly, but not in Workerd. Current
+the actual provider acquisition in its intended host. Pierre's public entry is
+qualified in Bun and Node, including its host startup failure without WebAssembly.
+Its published Workerd entry is not qualified for request-time rendering. Current
 native tests serve prebuilt docs rather than compile on requests.
 
 ## Evidence required for migration

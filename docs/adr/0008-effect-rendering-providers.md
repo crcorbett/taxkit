@@ -1,7 +1,8 @@
 # Effect-owned rendering providers
 
-Use Pele for Mermaid rendering through an independent Effect service, and own
-Pierre's WASM initialization inside its static highlighter Layer. This refines
+Use Pele for Mermaid rendering through an independent Effect service, and acquire
+Pierre's private highlighter instance inside its static Layer through the
+published API. This refines
 [ADR 0007](0007-content-neutral-mdx.md) without changing the document formats,
 supported Markdown grammar or TaxKit's build-time catalogue policy.
 
@@ -46,22 +47,21 @@ values and new record-level relationships still use their owning checks.
 
 ## Pierre initialization
 
-Pierre 0.3.0's root import eagerly compiles WASM. Catching only
-`createHighlighter()` cannot handle that earlier failure; dynamic import would
-conflict with the repository's static-import policy.
+Use Pierre 0.3.0's published `@pierre/highlights` and theme exports without
+dependency patches, private deep imports or custom WASM loading. The root entry
+initializes shared WASM during static import. Module-load failures belong to host
+startup, before a Layer exists; they cannot be promised as typed Effect failures.
 
-The pinned [Bun patch](../../patches/pierre-highlights-0.3.0.patch) adds two export
-paths to the existing upstream implementation: `./core` for its pure module and
-`./wasm` for packaged bytes, plus the missing byte declaration. It changes no
-provider algorithm and adds no loader or SDK injection framework. Reassess the
-patch against upstream exports on every Pierre upgrade.
-
-`PierreCodeHighlighterLive` statically imports these paths and compiles bytes
-inside `Effect.try` during Layer acquisition, after checking theme Config. One
-private highlighter instance is reused in that scope. Initialization failures
+`PierreCodeHighlighterLive` checks theme Config and calls public
+`createHighlighter()` inside `Effect.try` during Layer acquisition. It creates a
+separate private instance and reuses it in that scope. Instance creation failures
 return `CodeHighlighterInitializationError`, without a fabricated snippet or
 language. Operations continue to return `CodeHighlightError` with checked token
 lines. The compiler and artifact services do not acquire providers.
+
+Keeping the SDK unmodified makes upgrades follow its supported contract. Accept
+its import-time startup constraint explicitly rather than adding a loader
+framework or weakening the static-import rules to hide it.
 
 ## Presentation and verification
 
@@ -74,16 +74,18 @@ establish bounded SVG format, not a separate sanitization guarantee.
 
 Verify independent Pele usage, branded input/output, safe provider failures,
 deterministic test substitution and clock-controlled Gantt rendering. Qualify
-Pierre's real initialization failure in an isolated host without WebAssembly,
-without module mocking. Compile the complete authored corpus and compare it with
+Pierre's public entry in supported hosts and its startup failure in an isolated
+host without WebAssembly, without module mocking. Compile the complete authored
+corpus and compare it with
 the pre-migration catalogue, excluding only intentional diagram SVG changes:
 page order, anchors, text, code/tokens, links, Mermaid definitions, titles and
 processed Markdown must remain equal. Native Website/API checks cover serving
 the rebuilt catalogue.
 
-Static declarations do not initialize provider resources. The host builds and
-shares Layers in its existing scope. Parser and renderer CPU work is synchronous;
+Owned Layers describe private-instance acquisition; Pierre's SDK import has the
+separate startup constraint above. The host builds and shares Layers in its
+existing scope. Parser and renderer CPU work is synchronous;
 Effect interruption applies between operations and does not pre-empt a running
-call. Bun/Node qualification does not qualify Pierre byte compilation in Workerd.
+call. Bun/Node qualification does not qualify Pierre's Workerd entry.
 TaxKit continues to serve prebuilt docs; request-time routes, caches, grammar
 expansion and token-model changes are outside this change.

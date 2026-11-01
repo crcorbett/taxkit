@@ -1,6 +1,5 @@
-import { createHighlighter } from "@pierre/highlights/core";
+import { createHighlighter } from "@pierre/highlights";
 import { pierreDark, pierreLight } from "@pierre/highlights/themes";
-import wasmBytes from "@pierre/highlights/wasm";
 import {
   CodeHighlightError,
   CodeHighlighterInitializationError,
@@ -43,8 +42,8 @@ const resolveTokenStyle = (fontStyle: number): TokenStyle =>
     Match.when({ italic: true }, () => "italic" as const),
     Match.orElse(() => "normal" as const)
   );
-// The pinned export patch exposes Pierre's pure core and packaged bytes.
-// Compilation and instance creation belong to this static Layer's acquisition.
+// Pierre initializes its shared WASM module on import. The Layer owns a separate
+// highlighter instance; SDK module-load failures belong to the host's startup.
 export const PierreCodeHighlighterLive = Layer.effect(
   CodeHighlighter,
   Effect.gen(function* () {
@@ -52,7 +51,7 @@ export const PierreCodeHighlighterLive = Layer.effect(
     const highlighter = yield* Effect.try({
       catch: () =>
         new CodeHighlighterInitializationError({ reason: "initialize" }),
-      try: () => createHighlighter(new WebAssembly.Module(wasmBytes)),
+      try: () => createHighlighter(),
     });
     return CodeHighlighter.of({
       highlight: Effect.fn("CodeHighlighter.highlight")(function* (
