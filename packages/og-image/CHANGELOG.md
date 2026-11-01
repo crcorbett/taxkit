@@ -1,5 +1,12 @@
 # @taxkit/og-image
 
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [012f346]
+  - @taxkit/content@4.0.0
+
 ## 0.2.3
 
 ### Patch Changes

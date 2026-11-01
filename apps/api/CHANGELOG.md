@@ -1,5 +1,27 @@
 # TaxKit API
 
+## 3.0.0
+
+### Major Changes
+
+- Move the documentation namespace, discovery and share-image endpoints to
+  `/api/v2/docs`; the previous v1 docs endpoints are removed. Update generated
+  clients with the matching OpenAPI contract. Calculator routes remain at v1.
+- Return each page's checked light/dark theme with shared typography, paired code
+  token appearances and one SVG supporting both palettes. The content catalogue
+  and stored rendered documents use version 2; rebuild version 1 rendered data.
+  Markdown, navigation and compiled document semantics remain unchanged.
+
+### Patch Changes
+
+- Updated dependencies [012f346]
+  - @taxkit/content@4.0.0
+  - @taxkit/api-http@4.0.0
+  - @taxkit/aeo@0.1.6
+  - @taxkit/analytics@1.0.5
+  - @taxkit/api-mcp@0.2.7
+  - @taxkit/infrastructure@1.1.6
+
 ## 2.0.5
 
 ### Patch Changes

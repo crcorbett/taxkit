@@ -1,5 +1,19 @@
 # TaxKit
 
+## 4.0.0
+
+- Render prose, Pierre code and Pele diagrams from one Schema-checked light/dark
+  MDX theme with shared typography. Native Light, Dark and System controls switch
+  the reading area without invoking providers again.
+- Move the public docs API to `/api/v2/docs`, including discovery and share-image
+  paths. Pages carry the exact theme and paired code appearances; rebuild stored
+  rendered documents for version 2. Calculator routes and compiled document
+  version 1 retain their existing contracts.
+- Keep themes as explicit render data, static provider Layers and independently
+  usable Pele services. See the [MDX changelog](./packages/mdx/CHANGELOG.md),
+  [SDK changelog](./packages/sdk/typescript/CHANGELOG.md) and
+  [API changelog](./apps/api/CHANGELOG.md).
+
 ## 3.0.2
 
 - Render documentation diagrams with the independent Effect-wrapped Pele service;
