@@ -1,5 +1,30 @@
 # TaxKit Website
 
+## 0.0.7
+
+### Patch Changes
+
+- ccfbb17: Move shared reading-node Schemas into MDX and introduce a content-neutral React presenter for blocks, code, tables, diagrams and paired themes. Keep publication rules in Content and routing, appearance state, clipboard commands and layout in the Website.
+
+  Preserve docs v2 JSON bytes while deriving Content values from MDX-owned branded types. The stronger nested TypeScript brands require callers constructing these values to use the owning Schemas. Retain compiled/rendered artifact formats and enforce neutral package dependencies.
+
+  Refresh generated OpenAPI heading-ID and link descriptions with the inherited nonempty and whitespace checks; the existing publication patterns already imply these constraints.
+
+- 7f99083: Improve the documentation reading experience with responsive navigation, a mobile menu, an active page outline, themed code blocks and copy controls. Keep keyboard access, native no-JavaScript navigation and light/dark appearance consistent across documentation and search.
+
+  Use scoped Effect Atoms for menu, search and destination focus. Isolate outline updates from article rendering and reuse the canonical page's navigation during search.
+
+  Adopt shared shadcn/Base UI components for docs actions, search, the mobile sheet, navigation collapsibles and code scroll areas. Centralise themed component variants and accessibility states while retaining native links and no-JavaScript controls.
+
+  Polish selected navigation, keyboard focus and responsive title spacing. Remove decorative side stripes, preserve selected states on hover and keep fragment headings consistent with the article typography.
+
+- Updated dependencies [ccfbb17]
+- Updated dependencies [b1ef0a5]
+  - @taxkit/mdx-react@0.1.0
+  - @taxkit/content@5.0.0
+  - @taxkit/api-http@4.0.1
+  - @taxkit/webmcp@0.1.6
+
 ## 0.0.6
 
 ### Patch Changes

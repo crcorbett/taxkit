@@ -1,5 +1,11 @@
 # taxkit
 
+## 4.0.1
+
+### Patch Changes
+
+- Update the MDX and Content schemas included behind the SDK's HTTP contracts to reuse checked, branded reading values. Preserve public docs v2 JSON and calculator behavior while aligning the distributed files with the content-neutral MDX package boundary.
+
 ## 4.0.0
 
 ### Major Changes

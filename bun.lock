@@ -34,7 +34,7 @@
     },
     "apps/api": {
       "name": "api",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@effect/platform-bun": "catalog:",
@@ -70,7 +70,7 @@
     },
     "apps/web": {
       "name": "web",
-      "version": "0.0.6",
+      "version": "0.0.7",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@base-ui/react": "1.9.0",
@@ -126,7 +126,7 @@
     },
     "packages/aeo": {
       "name": "@taxkit/aeo",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -140,7 +140,7 @@
     },
     "packages/analytics": {
       "name": "@taxkit/analytics",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -156,7 +156,7 @@
     },
     "packages/api/http": {
       "name": "@taxkit/api-http",
-      "version": "4.0.0",
+      "version": "4.0.1",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -175,7 +175,7 @@
     },
     "packages/api/mcp": {
       "name": "@taxkit/api-mcp",
-      "version": "0.2.7",
+      "version": "0.2.8",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
@@ -207,7 +207,7 @@
     },
     "packages/content": {
       "name": "@taxkit/content",
-      "version": "4.0.0",
+      "version": "5.0.0",
       "dependencies": {
         "@content/docs": "workspace:*",
         "@taxkit/mdx": "workspace:*",
@@ -233,7 +233,7 @@
     },
     "packages/diagrams": {
       "name": "@taxkit/diagrams",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "dependencies": {
         "@taxkit/mdx": "workspace:*",
         "@taxkit/pele": "workspace:*",
@@ -247,7 +247,7 @@
     },
     "packages/docs-examples": {
       "name": "@taxkit/docs-examples",
-      "version": "0.0.10",
+      "version": "0.0.11",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -268,7 +268,7 @@
     },
     "packages/infrastructure": {
       "name": "@taxkit/infrastructure",
-      "version": "1.1.6",
+      "version": "1.1.7",
       "dependencies": {
         "@alchemy.run/axiom": "catalog:",
         "@alchemy.run/cloudflare": "catalog:",
@@ -290,7 +290,7 @@
     },
     "packages/mdx": {
       "name": "@taxkit/mdx",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "dependencies": {
         "@pierre/highlights": "0.3.0",
         "effect": "catalog:",
@@ -310,7 +310,7 @@
     },
     "packages/mdx-react": {
       "name": "@taxkit/mdx-react",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@base-ui/react": "1.9.0",
         "@taxkit/mdx": "workspace:*",
@@ -348,7 +348,7 @@
     },
     "packages/og-image": {
       "name": "@taxkit/og-image",
-      "version": "0.2.4",
+      "version": "0.2.5",
       "dependencies": {
         "@takumi-rs/wasm": "2.18.2",
         "@taxkit/content": "workspace:*",
@@ -427,7 +427,7 @@
     },
     "packages/sdk/typescript": {
       "name": "taxkit",
-      "version": "4.0.0",
+      "version": "4.0.1",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -468,7 +468,7 @@
     },
     "packages/webmcp": {
       "name": "@taxkit/webmcp",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",

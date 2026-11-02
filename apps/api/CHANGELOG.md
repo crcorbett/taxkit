@@ -1,5 +1,23 @@
 # TaxKit API
 
+## 3.0.1
+
+### Patch Changes
+
+- Reuse neutral MDX reading Schemas while preserving the docs v2 JSON shape,
+  publication restrictions and calculator routes. Generated OpenAPI descriptions
+  include equivalent inherited heading and link string checks.
+- Keep documentation search bounded; the Website reuses its existing page's
+  checked navigation and theme instead of fetching navigation twice.
+- Updated dependencies [ccfbb17]
+- Updated dependencies [b1ef0a5]
+  - @taxkit/content@5.0.0
+  - @taxkit/api-http@4.0.1
+  - @taxkit/aeo@0.1.7
+  - @taxkit/analytics@1.0.6
+  - @taxkit/api-mcp@0.2.8
+  - @taxkit/infrastructure@1.1.7
+
 ## 3.0.0
 
 ### Major Changes
