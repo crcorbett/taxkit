@@ -1,4 +1,3 @@
-import { ScrollArea } from "@base-ui/react/scroll-area";
 import type { DocsCodeToken, DocsBlock } from "@taxkit/content/schemas";
 import {
   Array,
@@ -8,6 +7,12 @@ import {
 } from "effect";
 import { Code2, Terminal } from "lucide-react";
 import { useId } from "react";
+
+import {
+  ScrollArea,
+  ScrollAreaViewport,
+  ScrollBar,
+} from "#/components/ui/scroll-area";
 
 import { DocsCopyButton } from "./copy-button.container";
 
@@ -67,8 +72,8 @@ export const DocsCodeBlock = ({
         </span>
         <DocsCopyButton label={`Copy ${presentation.label} code`} text={text} />
       </figcaption>
-      <ScrollArea.Root className="docs-code-scroll">
-        <ScrollArea.Viewport
+      <ScrollArea>
+        <ScrollAreaViewport
           aria-labelledby={caption}
           className="docs-code-viewport"
           render={<section />}
@@ -101,14 +106,9 @@ export const DocsCodeBlock = ({
               )}
             </code>
           </pre>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar
-          className="docs-code-scrollbar"
-          orientation="horizontal"
-        >
-          <ScrollArea.Thumb className="docs-code-scroll-thumb" />
-        </ScrollArea.Scrollbar>
-      </ScrollArea.Root>
+        </ScrollAreaViewport>
+        <ScrollBar className="docs-code-scrollbar" orientation="horizontal" />
+      </ScrollArea>
       <noscript>
         <style>
           {

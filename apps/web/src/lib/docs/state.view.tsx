@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { SquareTerminal, Search, ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { buttonVariants } from "#/components/ui/button";
+
 import { DocsHeading } from "./components";
 import { useDocsNavigationFocus } from "./focus.container";
 import { DocsAppearance } from "./reader.container";
@@ -28,8 +30,8 @@ export const DocsState = ({
           </Link>
           <div className="docs-header-actions">
             <Link
+              {...buttonVariants({ size: "icon", variant: "ghost" })}
               aria-label="Search documentation"
-              className="docs-icon-button"
               onClick={requestDocsNavigationFocus}
               to="/search"
             >

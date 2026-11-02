@@ -1,4 +1,3 @@
-import { Collapsible } from "@base-ui/react/collapsible";
 import { Link } from "@tanstack/react-router";
 import type {
   DocsPublicNavigation,
@@ -11,6 +10,13 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 import { ChevronDown } from "lucide-react";
+
+import { Button } from "#/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "#/components/ui/collapsible";
 
 import { isDocsNavigationClick } from "./components";
 import { useDocsNavigationFocus } from "./focus.container";
@@ -30,7 +36,7 @@ export const DocsNavigation = ({
       {EffectFunction.pipe(
         navigation.primaryNavigation,
         Array.map((section) => (
-          <Collapsible.Root
+          <Collapsible
             className="docs-nav-section"
             defaultOpen
             key={section.path}
@@ -56,14 +62,20 @@ export const DocsNavigation = ({
               >
                 {section.title}
               </Link>
-              <Collapsible.Trigger
+              <CollapsibleTrigger
                 aria-label={`Toggle ${section.title} navigation`}
-                className="docs-nav-section-toggle"
+                render={
+                  <Button
+                    className="docs-nav-section-toggle"
+                    size="icon"
+                    variant="ghost"
+                  />
+                }
               >
                 <ChevronDown aria-hidden="true" size={15} />
-              </Collapsible.Trigger>
+              </CollapsibleTrigger>
             </div>
-            <Collapsible.Panel>
+            <CollapsibleContent>
               <ul>
                 {EffectFunction.pipe(
                   section.pages,
@@ -93,8 +105,8 @@ export const DocsNavigation = ({
                   ))
                 )}
               </ul>
-            </Collapsible.Panel>
-          </Collapsible.Root>
+            </CollapsibleContent>
+          </Collapsible>
         ))
       )}
     </nav>

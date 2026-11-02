@@ -15,6 +15,8 @@ import {
   SquareTerminal,
 } from "lucide-react";
 
+import { buttonVariants } from "#/components/ui/button";
+
 import { docsHeadingId } from "./focus.atoms";
 import { useDocsNavigationFocus } from "./focus.container";
 import { DocsMenu } from "./menu.container";
@@ -75,6 +77,7 @@ export const DocsHeader = ({
           </nav>
           <div className="docs-header-actions">
             <Link
+              {...buttonVariants({ variant: "outline" })}
               aria-label="Search documentation"
               className="docs-search-trigger"
               onClick={requestDocsNavigationFocus}
@@ -84,8 +87,9 @@ export const DocsHeader = ({
               <span>Search documentation</span>
             </Link>
             <a
+              {...buttonVariants({ size: "icon", variant: "ghost" })}
               aria-label="TaxKit on GitHub"
-              className="docs-icon-button docs-github-link"
+              className="docs-github-link"
               href={repositoryUrl}
             >
               <GitFork aria-hidden="true" size={18} />

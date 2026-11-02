@@ -1,4 +1,3 @@
-import { Dialog } from "@base-ui/react/dialog";
 import { useAtom } from "@effect/atom-react";
 import { Link } from "@tanstack/react-router";
 import type {
@@ -9,6 +8,19 @@ import type { Option } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useMemo, useRef } from "react";
+
+import { Button } from "#/components/ui/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
+} from "#/components/ui/sheet";
 
 import { isDocsNavigationClick } from "./components";
 import { DocsNavigation } from "./page.view";
@@ -31,7 +43,7 @@ export const DocsMenu = ({
   };
   return (
     <div className="docs-menu-host" ref={portal}>
-      <Dialog.Root
+      <Sheet
         onOpenChange={(nextOpen) => {
           if (nextOpen) {
             setMenu("open");
@@ -41,30 +53,33 @@ export const DocsMenu = ({
         }}
         open={menu === "open"}
       >
-        <Dialog.Trigger
+        <SheetTrigger
           aria-label="Open documentation menu"
-          className="docs-icon-button docs-menu-trigger"
+          render={
+            <Button className="docs-menu-trigger" size="icon" variant="ghost" />
+          }
         >
           <Menu aria-hidden="true" size={20} />
-        </Dialog.Trigger>
-        <Dialog.Portal container={portal}>
-          <Dialog.Backdrop className="docs-menu-backdrop" />
-          <Dialog.Popup
+        </SheetTrigger>
+        <SheetPortal container={portal}>
+          <SheetOverlay />
+          <SheetContent
             className="docs-menu-popup"
             finalFocus={menu !== "following-link"}
+            side="left"
           >
-            <div className="docs-menu-heading">
-              <Dialog.Title>Documentation</Dialog.Title>
-              <Dialog.Close
+            <SheetHeader className="docs-menu-heading">
+              <SheetTitle>Documentation</SheetTitle>
+              <SheetClose
                 aria-label="Close documentation menu"
-                className="docs-icon-button"
+                render={<Button size="icon" variant="ghost" />}
               >
                 <X aria-hidden="true" size={20} />
-              </Dialog.Close>
-            </div>
-            <Dialog.Description className="sr-only">
+              </SheetClose>
+            </SheetHeader>
+            <SheetDescription className="sr-only">
               Browse the TaxKit guides and references.
-            </Dialog.Description>
+            </SheetDescription>
             <div className="docs-menu-scroll">
               <nav aria-label="TaxKit" className="docs-menu-shortcuts">
                 <Link
@@ -94,9 +109,9 @@ export const DocsMenu = ({
                 onNavigate={followLink}
               />
             </div>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+          </SheetContent>
+        </SheetPortal>
+      </Sheet>
     </div>
   );
 };

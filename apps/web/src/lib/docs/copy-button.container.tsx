@@ -1,10 +1,11 @@
-import { Button } from "@base-ui/react/button";
 import { useAtom } from "@effect/atom-react";
 import * as Clipboard from "@effect/platform-browser/Clipboard";
 import { Effect } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import { Check, Copy, CircleAlert } from "lucide-react";
 import { useMemo } from "react";
+
+import { Button } from "#/components/ui/button";
 
 import { clipboardRuntime } from "./clipboard.atoms";
 
@@ -54,6 +55,7 @@ export const DocsCopyButton = ({
           copy("copy");
         }}
         title={label}
+        variant="ghost"
       >
         <Icon aria-hidden="true" size={15} />
         <span>{feedback.text}</span>

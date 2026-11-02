@@ -6,6 +6,10 @@ import * as Atom from "effect/reactivity/Atom";
 import { Search } from "lucide-react";
 import { useMemo } from "react";
 
+import { Button } from "#/components/ui/button";
+import { Field, FieldDescription, FieldLabel } from "#/components/ui/field";
+import { Input } from "#/components/ui/input";
+
 import { docsHeadingFocusAtom } from "./focus.atoms";
 
 export const DocsSearchForm = ({
@@ -30,26 +34,31 @@ export const DocsSearchForm = ({
           router.history.push(href);
         }}
       >
-        <label htmlFor="docs-search-term">Search words</label>
-        <div className="docs-search-controls">
-          <input
-            autoComplete="off"
-            id="docs-search-term"
-            maxLength={100}
-            name="term"
-            onChange={(event) => {
-              setWords(event.currentTarget.value);
-            }}
-            placeholder="Try money, annual income tax, or Effect"
-            type="search"
-            value={words}
-          />
-          <button type="submit">
-            <Search aria-hidden="true" size={16} />
-            <span>Search documentation</span>
-          </button>
-        </div>
-        <p>Search the guides, API reference and integration examples.</p>
+        <Field>
+          <FieldLabel htmlFor="docs-search-term">Search words</FieldLabel>
+          <div className="docs-search-controls">
+            <Input
+              aria-describedby="docs-search-description"
+              autoComplete="off"
+              id="docs-search-term"
+              maxLength={100}
+              name="term"
+              onChange={(event) => {
+                setWords(event.currentTarget.value);
+              }}
+              placeholder="Try money, annual income tax, or Effect"
+              type="search"
+              value={words}
+            />
+            <Button size="lg" type="submit">
+              <Search aria-hidden="true" size={16} />
+              <span>Search documentation</span>
+            </Button>
+          </div>
+          <FieldDescription id="docs-search-description">
+            Search the guides, API reference and integration examples.
+          </FieldDescription>
+        </Field>
       </form>
     </search>
   );

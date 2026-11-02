@@ -2880,6 +2880,50 @@ describe("built native API and Website", () => {
             })
           );
         }).pipe(Effect.withSpan("NativePair.verifyMobileNavigation"));
+        yield* Effect.gen(function* verifyCodeScrollbar() {
+          const code = docsPage
+            .getByRole("region", { name: "TypeScript", exact: true })
+            .first();
+          const track = code
+            .locator("..")
+            .locator('[data-slot="scroll-area-scrollbar"]');
+          const thumb = track.locator('[data-slot="scroll-area-thumb"]');
+          yield* Effect.promise(() => code.scrollIntoViewIfNeeded());
+          const trackBounds = yield* Effect.promise(() =>
+            track.boundingBox()
+          ).pipe(
+            Effect.flatMap((value) =>
+              Effect.fromOption(Option.fromNullishOr(value))
+            )
+          );
+          const thumbBounds = yield* Effect.promise(() =>
+            thumb.boundingBox()
+          ).pipe(
+            Effect.flatMap((value) =>
+              Effect.fromOption(Option.fromNullishOr(value))
+            )
+          );
+          yield* Effect.promise(() =>
+            thumb.dragTo(track, {
+              targetPosition: {
+                x: trackBounds.width - 4,
+                y: trackBounds.height / 2,
+              },
+            })
+          );
+          const codeScrolled = yield* Effect.promise(() =>
+            code.evaluate((element) => element.scrollLeft > 0)
+          );
+          expect({
+            thumbFits: thumbBounds.width < trackBounds.width,
+            thumbVisible: thumbBounds.height > 0,
+            codeScrolled,
+          }).toStrictEqual({
+            thumbFits: true,
+            thumbVisible: true,
+            codeScrolled: true,
+          });
+        }).pipe(Effect.withSpan("NativePair.verifyCodeScrollbar"));
         yield* Effect.gen(function* verifyNavigationWithoutJavaScript() {
           yield* Effect.promise(() =>
             plainPage.goto(`${websiteOrigin}/start/quickstart`)

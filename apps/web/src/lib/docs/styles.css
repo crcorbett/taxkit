@@ -51,6 +51,20 @@
     var(--mdx-accent) 9%,
     var(--docs-canvas)
   );
+  --background: var(--docs-panel);
+  --foreground: var(--mdx-foreground);
+  --primary: var(--mdx-accent);
+  --primary-foreground: var(--docs-canvas);
+  --muted: var(--docs-hover);
+  --muted-foreground: var(--mdx-muted);
+  --accent: var(--docs-selected);
+  --border: var(--docs-line);
+  --input: var(--docs-line);
+  --ring: var(--mdx-accent);
+  --destructive: var(--mdx-critical, MarkText);
+  --popover: var(--docs-canvas);
+  --popover-foreground: var(--mdx-foreground);
+  --overlay: color-mix(in oklch, var(--mdx-background-dark) 48%, transparent);
   --docs-header-height: 4rem;
   min-width: 0;
   min-height: 100dvh;
@@ -72,13 +86,6 @@
 .docs-reader input,
 .docs-reader summary {
   touch-action: manipulation;
-}
-.docs-reader button,
-.docs-reader input {
-  font: inherit;
-}
-.docs-reader button {
-  cursor: pointer;
 }
 .docs-reader .lucide {
   flex-shrink: 0;
@@ -164,31 +171,10 @@
 .docs-header-actions {
   gap: 0.5rem;
 }
-.docs-icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 0;
-  border-radius: 0.5rem;
-  background: transparent;
-  color: var(--mdx-muted);
-  text-decoration: none;
-}
 .docs-search-trigger {
-  display: flex;
-  align-items: center;
   gap: 0.625rem;
-  min-height: 2.75rem;
-  border: 1px solid var(--docs-line);
-  border-radius: 0.5rem;
-  background: var(--docs-panel);
   padding-inline: 0.875rem;
-  color: var(--mdx-muted);
   font-size: 0.8125rem;
-  text-decoration: none;
 }
 .docs-theme-options {
   display: flex;
@@ -257,17 +243,6 @@
   font-size: 0.8125rem;
   font-weight: 600;
   text-decoration: none;
-}
-.docs-nav-section-toggle {
-  display: grid;
-  flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
-  place-items: center;
-  border: 0;
-  border-radius: 0.5rem;
-  background: transparent;
-  color: var(--mdx-muted);
 }
 .docs-nav-section-toggle[data-panel-open] > svg {
   transform: rotate(0deg);
@@ -435,9 +410,6 @@
   align-items: center;
   gap: 0.625rem;
 }
-.docs-code-scroll {
-  position: relative;
-}
 .docs-code-viewport {
   max-width: 100%;
   border-radius: 0 0 0.625rem 0.625rem;
@@ -457,35 +429,12 @@
 .docs-code-block code {
   font: inherit;
 }
-.docs-code-scrollbar {
-  display: flex;
-  align-items: center;
-  height: 0.75rem;
-  margin-inline: 0.5rem;
-  padding-block: 0.1875rem;
-}
-.docs-code-scroll-thumb {
-  height: 100%;
-  border-radius: 1rem;
-  background: var(--mdx-border);
-  opacity: 0.6;
-}
 .docs-reader .docs-copy-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   width: 7.5rem;
   min-width: 7.5rem;
-  min-height: 2.75rem;
-  white-space: nowrap;
-  border: 0;
-  border-radius: 0.5rem;
-  background: transparent;
   padding: 0.5rem 0.625rem;
-  color: var(--mdx-muted);
   font-size: 0.75rem;
-  line-height: 1.5;
+  font-weight: 400;
 }
 .docs-copy-button:disabled {
   color: var(--mdx-muted);
@@ -678,44 +627,12 @@
 .docs-search-form {
   margin-block: 1.75rem 2rem;
 }
-.docs-search-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
 .docs-search-controls {
   display: flex;
   gap: 0.625rem;
 }
 .docs-search-controls input {
   flex: 1;
-  min-width: 0;
-  min-height: 3rem;
-  border: 1px solid var(--docs-line);
-  border-radius: 0.5rem;
-  background: var(--docs-panel);
-  padding: 0.75rem 0.875rem;
-  color: inherit;
-  font-size: 1rem;
-}
-.docs-search-controls button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  min-height: 3rem;
-  border: 1px solid var(--mdx-accent);
-  border-radius: 0.5rem;
-  background: var(--mdx-accent);
-  padding: 0.75rem 1rem;
-  color: var(--docs-canvas);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-.docs-search-form p {
-  color: var(--mdx-muted);
-  font-size: 0.8125rem;
 }
 .docs-search-results {
   display: grid;
@@ -754,49 +671,10 @@
 .docs-menu-host {
   display: none;
 }
-.docs-menu-backdrop {
-  position: fixed;
-  z-index: 20;
-  inset: 0;
-  background: color-mix(in oklch, var(--mdx-background-dark) 48%, transparent);
-  opacity: 1;
-  transition: opacity 180ms cubic-bezier(0.32, 0.72, 0, 1);
-}
-.docs-menu-popup {
-  position: fixed;
-  z-index: 30;
-  inset: 0 auto 0 0;
-  display: flex;
-  flex-direction: column;
-  width: min(22rem, 88vw);
-  max-height: 100dvh;
-  border-right: 1px solid var(--docs-line);
-  background: var(--docs-canvas);
-  color: var(--mdx-foreground);
-  transform: translateX(0);
-  transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
-}
-.docs-menu-popup[data-starting-style],
-.docs-menu-popup[data-ending-style] {
-  transform: translateX(-100%);
-}
-.docs-menu-backdrop[data-starting-style],
-.docs-menu-backdrop[data-ending-style] {
-  opacity: 0;
-}
 .docs-menu-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
   min-height: var(--docs-header-height);
   border-bottom: 1px solid var(--docs-line);
-  padding-inline: 1.25rem 0.75rem;
-}
-.docs-menu-heading h2 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 0 0.75rem 0 1.25rem;
 }
 .docs-menu-scroll {
   overflow-y: auto;
@@ -829,11 +707,6 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .docs-reader
-    :is(.docs-icon-button, .docs-nav-section-toggle, .docs-copy-button):hover {
-    background: var(--docs-hover);
-    color: var(--mdx-foreground);
-  }
   .docs-theme-options label:hover {
     background: var(--docs-hover);
   }
@@ -858,10 +731,6 @@
     border-color: var(--mdx-border);
     color: var(--mdx-foreground);
   }
-}
-.docs-reader
-  :is(.docs-icon-button, .docs-nav-section-toggle, .docs-copy-button):active {
-  background: var(--docs-selected);
 }
 
 @media (max-width: 78rem) {
@@ -1001,13 +870,6 @@
     margin-left: 0;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .docs-menu-popup,
-  .docs-menu-backdrop {
-    transition: none;
-  }
-}
-
 .docs-breadcrumb-section {
   display: inline-flex;
   align-items: center;

@@ -263,6 +263,13 @@ describe("documentation state and committed focus", () => {
           TestClock.withLive
         );
         yield* Effect.sync(() => {
+          const description = host.querySelector("#docs-search-description");
+          const describedBy = input.getAttribute("aria-describedby");
+          expect(input.labels?.item(0)?.textContent).toBe("Search words");
+          expect(describedBy).toBe(description?.id);
+          expect(description?.textContent).toBe(
+            "Search the guides, API reference and integration examples."
+          );
           input.focus();
           input.select();
           input.setRangeText("money tax");

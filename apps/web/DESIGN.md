@@ -16,7 +16,8 @@ own layout.
 
 ## Layout and typography
 
-`src/lib/docs/styles.css` owns the documentation styles. The sticky header is
+`src/lib/docs/styles.css` owns the documentation layout and theme mapping;
+`src/components/ui/styles.css` owns shared component styles. The sticky header is
 64px tall. The desktop layout has a 248px navigation rail, a reading column up
 to 43.5rem wide and a 224px page outline, within a 1440px shell. Both rails can
 scroll independently. Below 78rem the page outline becomes an inline native
@@ -54,12 +55,14 @@ same appearance choice.
 
 ## Components and interaction
 
-Use Base UI primitives where they supply behaviour: Dialog for the mobile
-menu, Collapsible for navigation sections, ScrollArea for code, and Button for
-copy. Compose their parts locally in the manner of shadcn components. Keep the
-existing CSS toolchain; a Tailwind migration or shared UI package needs a
-separate reason. Use native links, radios, forms and disclosures where their
-built-in behaviour is sufficient.
+Use the app-owned [shadcn/Base UI components](src/components/ui/README.md): Sheet
+for the mobile menu, Collapsible for navigation sections, ScrollArea for code,
+Button for actions, and Input/Field for search. The components adapt shadcn's
+Base UI registry to the existing CSS toolchain, centralising variants, sizing,
+focus and disabled states. Their semantic variables inherit the checked MDX
+theme. Keep feature state and composition in the docs containers. Use native
+links with shared button styling where appropriate; preserve native radios,
+GET forms and disclosures for progressive enhancement.
 
 - Interactive targets are at least 44px. Hover treatments apply only to devices
   that support hover. Focus has a visible accent outline.
@@ -99,7 +102,8 @@ make information depend on motion.
 The browser clipboard tests check exact copied whitespace, independent feedback
 and safe refusal. The native Website/API suite covers hydration, focus,
 navigation, active outlines, 320px/390px layouts, the drawer, search, paired
-themes, no-JavaScript navigation and keyboard scrolling. Review actual browser
+themes, horizontal scrollbar sizing and dragging, no-JavaScript navigation and
+keyboard scrolling. Review actual browser
 screenshots at desktop, tablet and phone sizes in both themes; automated layout
 assertions do not establish visual quality.
 

@@ -1,0 +1,241 @@
+:root {
+  --background: Canvas;
+  --foreground: CanvasText;
+  --primary: LinkText;
+  --primary-foreground: Canvas;
+  --muted: ButtonFace;
+  --muted-foreground: GrayText;
+  --accent: ButtonFace;
+  --border: ButtonBorder;
+  --input: ButtonBorder;
+  --ring: Highlight;
+  --destructive: MarkText;
+  --popover: Canvas;
+  --popover-foreground: CanvasText;
+  --overlay: rgb(0 0 0 / 48%);
+}
+
+[data-ui-button] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+[data-ui-button]:where([data-variant="default"]) {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+[data-ui-button]:where([data-variant="outline"]) {
+  border-color: var(--border);
+  background: var(--background);
+  color: var(--muted-foreground);
+}
+[data-ui-button]:where([data-variant="ghost"]) {
+  background: transparent;
+  color: var(--muted-foreground);
+}
+[data-ui-button]:where([data-size="lg"]) {
+  min-height: 3rem;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+}
+[data-ui-button]:where([data-size="icon"]) {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+}
+[data-ui-button] svg {
+  flex-shrink: 0;
+  pointer-events: none;
+}
+[data-ui-button]:where(:disabled, [data-disabled]) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+[data-ui-button]:where(:active) {
+  background: var(--accent);
+}
+[data-ui-button]:where([data-variant="default"]):active {
+  background: color-mix(in oklch, var(--primary) 85%, var(--foreground));
+}
+
+:where([data-slot="input"]) {
+  width: 100%;
+  min-width: 0;
+  min-height: 3rem;
+  border: 1px solid var(--input);
+  border-radius: 0.5rem;
+  background: var(--background);
+  padding: 0.75rem 0.875rem;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  touch-action: manipulation;
+}
+:where([data-slot="input"])::placeholder {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+:where([data-slot="input"]):disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+:where([data-ui-button], [data-slot="input"]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+:where([data-ui-button], [data-slot="input"])[aria-invalid="true"] {
+  border-color: var(--destructive);
+}
+:where([data-slot="field"]) {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+:where([data-slot="field-label"]) {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+:where([data-slot="field-description"]) {
+  margin: 0.25rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
+:where([data-slot="sheet-overlay"]) {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  background: var(--overlay);
+  opacity: 1;
+  transition: opacity 180ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+:where([data-slot="sheet-content"]) {
+  --sheet-enter-x: 0;
+  --sheet-enter-y: 0;
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  max-height: 100dvh;
+  background: var(--popover);
+  color: var(--popover-foreground);
+  transform: translate(0, 0);
+  transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+:where([data-slot="sheet-content"][data-side="left"]) {
+  --sheet-enter-x: -100%;
+  inset: 0 auto 0 0;
+  width: min(22rem, 88vw);
+  border-right: 1px solid var(--border);
+}
+:where([data-slot="sheet-content"][data-side="right"]) {
+  --sheet-enter-x: 100%;
+  inset: 0 0 0 auto;
+  width: min(22rem, 88vw);
+  border-left: 1px solid var(--border);
+}
+:where([data-slot="sheet-content"][data-side="top"]) {
+  --sheet-enter-y: -100%;
+  inset: 0 0 auto;
+  border-bottom: 1px solid var(--border);
+}
+:where([data-slot="sheet-content"][data-side="bottom"]) {
+  --sheet-enter-y: 100%;
+  inset: auto 0 0;
+  border-top: 1px solid var(--border);
+}
+:where([data-slot="sheet-content"]):is(
+  [data-starting-style],
+  [data-ending-style]
+) {
+  transform: translate(var(--sheet-enter-x), var(--sheet-enter-y));
+}
+:where([data-slot="sheet-overlay"]):is(
+  [data-starting-style],
+  [data-ending-style]
+) {
+  opacity: 0;
+}
+:where([data-slot="sheet-header"]) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 1rem;
+}
+:where([data-slot="sheet-title"]) {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+:where([data-slot="sheet-description"]) {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+:where([data-slot="scroll-area"]) {
+  position: relative;
+  min-width: 0;
+}
+:where([data-slot="scroll-area-viewport"]) {
+  max-width: 100%;
+  border-radius: inherit;
+}
+:where([data-slot="scroll-area-viewport"]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -3px;
+}
+:where([data-slot="scroll-area-scrollbar"]) {
+  display: flex;
+  padding: 0.1875rem;
+  touch-action: none;
+  user-select: none;
+}
+:where([data-slot="scroll-area-scrollbar"][data-orientation="horizontal"]) {
+  flex-direction: column;
+  height: 0.75rem;
+  margin-inline: 0.5rem;
+}
+:where([data-slot="scroll-area-scrollbar"][data-orientation="vertical"]) {
+  width: 0.75rem;
+  margin-block: 0.5rem;
+}
+:where([data-slot="scroll-area-thumb"]) {
+  flex: 1;
+  border-radius: 1rem;
+  background: var(--muted-foreground);
+  opacity: 0.6;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-ui-button]:where(:hover) {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+  [data-ui-button]:where([data-variant="default"]):hover {
+    background: color-mix(in oklch, var(--primary) 85%, var(--foreground));
+    color: var(--primary-foreground);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :where([data-slot="sheet-content"], [data-slot="sheet-overlay"]) {
+    transition: none;
+  }
+}

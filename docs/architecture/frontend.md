@@ -203,9 +203,12 @@ registration and interrupt it on cleanup.
 
 The [Website design guide](../../apps/web/DESIGN.md) owns layout, typography and
 interaction details. Documentation uses a sticky header, independently scrolling
-navigation, a bounded reading column and a page outline. Base UI provides the
-mobile Dialog, navigation Collapsibles, code ScrollArea and copy Buttons. Native
-links, radios, GET forms and disclosures preserve progressive enhancement.
+navigation, a bounded reading column and a page outline. App-owned
+[shadcn/Base UI components](../../apps/web/src/components/ui/README.md) provide the
+mobile Sheet, navigation Collapsibles, code ScrollArea, action Buttons and search
+Input/Field. They share semantic theme variables and own primitive styling;
+docs containers retain Effect Atom state and navigation policy. Native links,
+radios, GET forms and disclosures preserve progressive enhancement.
 
 The catch-all route loads page and navigation from the API's documentation
 routes. The route renders the title as `DocsHeading` and the checked
