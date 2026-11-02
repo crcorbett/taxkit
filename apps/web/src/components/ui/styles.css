@@ -8,7 +8,7 @@
   --accent: ButtonFace;
   --border: ButtonBorder;
   --input: ButtonBorder;
-  --ring: Highlight;
+  --ring: CanvasText;
   --destructive: MarkText;
   --popover: Canvas;
   --popover-foreground: CanvasText;
@@ -97,7 +97,7 @@
 }
 :where([data-ui-button], [data-slot="input"]):focus-visible {
   outline: 2px solid var(--ring);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 :where([data-ui-button], [data-slot="input"])[aria-invalid="true"] {
   border-color: var(--destructive);

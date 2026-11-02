@@ -60,7 +60,7 @@
   --accent: var(--docs-selected);
   --border: var(--docs-line);
   --input: var(--docs-line);
-  --ring: var(--mdx-accent);
+  --ring: var(--mdx-foreground);
   --destructive: var(--mdx-critical, MarkText);
   --popover: var(--docs-canvas);
   --popover-foreground: var(--mdx-foreground);
@@ -91,9 +91,9 @@
   flex-shrink: 0;
   stroke-width: 1.7;
 }
-.docs-reader :is(a, button, input, summary, [tabindex]):focus-visible {
-  outline: 2px solid var(--mdx-accent);
-  outline-offset: 3px;
+.docs-reader :where(a, button, input, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 .docs-theme-input {
   position: absolute;
@@ -140,7 +140,7 @@
   color: var(--mdx-foreground);
   font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.04em;
   text-decoration: none;
 }
 .docs-wordmark > svg {
@@ -200,8 +200,8 @@
   color: var(--mdx-accent);
 }
 .docs-theme-options label:has(input:focus-visible) {
-  outline: 2px solid var(--mdx-accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--ring);
+  outline-offset: -3px;
 }
 
 .docs-layout {
@@ -271,8 +271,10 @@
 }
 .docs-navigation a[aria-current="page"] {
   background: var(--docs-selected);
-  box-shadow: inset 2px 0 var(--mdx-accent);
   color: var(--mdx-accent);
+}
+.docs-navigation a:focus-visible {
+  outline-offset: -2px;
 }
 .docs-article {
   width: min(100%, 43.5rem);
@@ -292,13 +294,14 @@
   line-height: 1.5;
 }
 
-.docs-article h1 {
+.docs-article h1,
+.docs-state h1 {
   min-width: 0;
   overflow-wrap: anywhere;
   margin: 0;
-  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-size: 2.75rem;
   font-weight: 600;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.04em;
   line-height: 1.2;
   text-wrap: balance;
   scroll-margin-top: calc(var(--docs-header-height) * 1.5);
@@ -347,11 +350,6 @@
   margin-block: 1.5rem 0.75rem;
   font-size: 1.0625rem;
   letter-spacing: -0.01em;
-}
-.docs-reading-body h2:target,
-.docs-reading-body h3:target,
-.docs-reading-body h4:target {
-  color: var(--mdx-accent);
 }
 .docs-reading-body a {
   color: var(--mdx-accent);
@@ -710,7 +708,7 @@
   .docs-theme-options label:hover {
     background: var(--docs-hover);
   }
-  .docs-navigation a:hover {
+  .docs-navigation a:not([aria-current="page"]):hover {
     background: var(--docs-hover);
     color: var(--mdx-foreground);
   }
@@ -802,6 +800,9 @@
     width: min(100%, 43.5rem);
     padding-top: 1rem;
   }
+  .docs-mobile-outline {
+    margin-bottom: 1rem;
+  }
   .docs-noscript-navigation {
     display: block;
     margin: 1rem 1.5rem;
@@ -839,7 +840,8 @@
   .docs-theme-options {
     margin-left: 0;
   }
-  .docs-article h1 {
+  .docs-article h1,
+  .docs-state h1 {
     font-size: 2.125rem;
   }
   .docs-reading-body h2 {
@@ -897,11 +899,6 @@
 }
 .docs-state h1 {
   margin: 0 0 1.25rem;
-  font-size: clamp(2rem, 3.2vw, 2.75rem);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.045em;
-  scroll-margin-top: calc(var(--docs-header-height) * 1.5);
 }
 .docs-state > p {
   color: var(--mdx-muted);

@@ -24,15 +24,24 @@ scroll independently. Below 78rem the page outline becomes an inline native
 disclosure. Below 58rem the navigation moves into a modal drawer.
 
 Use restrained borders and spacing to group content. Keep the canvas quiet,
-reserve the accent for links, selection and focus, and do not change font weight
-on hover or selection. The article title has the full reading width; its
+reserve the accent for links and selection, and do not change font weight on
+hover or selection. The article title has the full reading width; its
 breadcrumb and fixed-width Copy page control sit in a separate row. Footer
 links and previous/next pages remain available on phones.
+
+Selected navigation uses one quiet rounded fill and accent text, without an
+inset stripe or side border. Its selection stays visible on hover. Fragment
+destinations keep the heading's foreground colour; the page outline indicates
+the active section. Keyboard focus uses a complete neutral outline derived
+from the theme foreground, inset inside navigation rows, code viewports and
+appearance options so scroll containers do not clip it.
 
 Bundle Inter locally, preload its opening Latin normal face, and supply a real
 italic face. Disable synthetic font styles. The desktop scale is 44px for the
 page title, 28px for section headings, 18px for the introduction, 16px for prose,
-and 14px for navigation and code. Phone titles reduce to 34px. Code uses the
+and 14px for navigation and code. Titles retain 44px through tablet widths and
+reduce to 34px on phones, with -0.04em tracking. Below 58rem the inline outline
+has a 16px bottom gap so it does not crowd out the article title. Code uses the
 theme's monospace stack, preserves whitespace and scrolls horizontally within
 its labelled viewport.
 
@@ -65,7 +74,7 @@ links with shared button styling where appropriate; preserve native radios,
 GET forms and disclosures for progressive enhancement.
 
 - Interactive targets are at least 44px. Hover treatments apply only to devices
-  that support hover. Focus has a visible accent outline.
+  that support hover. Focus has a visible neutral outline.
 - The drawer is labelled, traps focus, scrolls long navigation, closes with
   Escape and restores the trigger. Following a page link closes it and focuses
   the article heading, including a link to the current page. Its portal stays
