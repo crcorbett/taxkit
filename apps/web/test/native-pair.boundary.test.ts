@@ -3075,7 +3075,7 @@ describe("built native API and Website", () => {
           );
           const light = yield* Effect.promise(() =>
             docsPage
-              .locator(".docs-code-token")
+              .locator(".mdx-code-token")
               .first()
               .evaluate((element) => getComputedStyle(element).color)
           );
@@ -3084,7 +3084,7 @@ describe("built native API and Website", () => {
           );
           const dark = yield* Effect.promise(() =>
             docsPage
-              .locator(".docs-code-token")
+              .locator(".mdx-code-token")
               .first()
               .evaluate((element) => getComputedStyle(element).color)
           );
@@ -3114,7 +3114,7 @@ describe("built native API and Website", () => {
           expect(
             yield* Effect.promise(() =>
               docsPage
-                .locator(".docs-code-token")
+                .locator(".mdx-code-token")
                 .first()
                 .evaluate((element) => getComputedStyle(element).color)
             )
@@ -3125,7 +3125,7 @@ describe("built native API and Website", () => {
           expect(
             yield* Effect.promise(() =>
               docsPage
-                .locator(".docs-code-token")
+                .locator(".mdx-code-token")
                 .first()
                 .evaluate((element) => getComputedStyle(element).color)
             )

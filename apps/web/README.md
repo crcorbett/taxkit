@@ -162,9 +162,14 @@ never calculates, and a POST to any Website page returns an empty 404.
 [DESIGN.md](DESIGN.md) owns the documentation layout, typography, theme mapping,
 shadcn/Base UI composition and interaction requirements. The route renders the major
 landmarks; focused components own the navigation, mobile drawer, page outline,
-code toolbar and previous/next links. Shared primitives and their CSS live in
+code toolbar and previous/next links. `@taxkit/mdx-react` owns checked body/code
+presentation, native scroll fallbacks and scoped theme formatting. The route
+uses its `MdxTheme`; `docs/reading-body.view.tsx` binds its two named presentation
+slots to the Website's routing/focus and clipboard adapters. Shared general
+primitives and their CSS live in
 [`src/components/ui`](src/components/ui/README.md); docs layout and checked theme
-mapping live in `src/lib/docs/styles.css`.
+aliases live in `src/lib/docs/styles.css`; content CSS is imported from the
+presenter package. Publication validation remains in Content.
 Local browser work shares `browserRuntime` and the existing root registry.
 Menu state and search drafts use mount-local writable Atoms. Destination focus
 intent is registry-owned and consumed after native Router rendering; initial

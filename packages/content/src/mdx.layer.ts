@@ -4,6 +4,8 @@ import type {
   Inline,
   RenderedInline,
   RenderedBlock,
+  ReadingInline,
+  ReadingBlock,
 } from "@taxkit/mdx/schemas";
 import { MdxCompiler, MdxRenderer } from "@taxkit/mdx/service";
 import {
@@ -21,7 +23,7 @@ import { writeReadingMarkdown } from "./reading-markdown.egress.js";
 import { DocsPageFrontmatter, DocsReadingBody } from "./schemas.js";
 import { DocsPageReader } from "./service.js";
 // Content projects neutral checked semantics into the existing public wire shape.
-const projectInline = (inline: RenderedInline) =>
+const projectInline = (inline: RenderedInline): ReadingInline =>
   Match.value(inline).pipe(
     Match.when({ kind: "link" }, ({ content, href, kind }) => ({
       content,
@@ -30,7 +32,7 @@ const projectInline = (inline: RenderedInline) =>
     })),
     Match.orElse((value) => value)
   );
-const projectBlock = (input: RenderedBlock) =>
+const projectBlock = (input: RenderedBlock): ReadingBlock =>
   Match.value(input).pipe(
     Match.discriminatorsExhaustive("kind")({
       code: ({ kind, language, lines }) => ({ kind, language, lines }),
@@ -155,11 +157,11 @@ export const ContentMdxReaderLive = Layer.effect(
         const rendered = yield* renderer
           .render({ document: { ...document, blocks: body }, theme })
           .pipe(Effect.mapError((error) => fail(error.reason)));
-        const checkedBody = yield* Schema.decodeUnknownEffect(
-          Schema.toType(DocsReadingBody)
-        )(EffectFunction.pipe(rendered.blocks, Array.map(projectBlock))).pipe(
-          Effect.mapError(() => fail("body"))
-        );
+        // Publication admits the narrower heading and link policies once;
+        // the projection itself already carries the shared reading contract.
+        const checkedBody = yield* Schema.decodeUnknownEffect(DocsReadingBody)(
+          EffectFunction.pipe(rendered.blocks, Array.map(projectBlock))
+        ).pipe(Effect.mapError(() => fail("body")));
         return {
           theme: rendered.theme,
           body: checkedBody,

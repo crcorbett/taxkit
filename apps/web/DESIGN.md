@@ -16,8 +16,9 @@ own layout.
 
 ## Layout and typography
 
-`src/lib/docs/styles.css` owns the documentation layout and theme mapping;
-`src/components/ui/styles.css` owns shared component styles. The sticky header is
+`src/lib/docs/styles.css` owns the documentation layout and host UI aliases;
+`@taxkit/mdx-react/styles.css` owns reading content and checked theme formatting.
+`src/components/ui/styles.css` owns general component styles. The sticky header is
 64px tall. The desktop layout has a 248px navigation rail, a reading column up
 to 43.5rem wide and a 224px page outline, within a 1440px shell. Both rails can
 scroll independently. Below 78rem the page outline becomes an inline native
@@ -47,7 +48,9 @@ its labelled viewport.
 
 ## Themes
 
-`DocsReader` maps the checked page theme's semantic roles into CSS variables.
+`MdxTheme` from `@taxkit/mdx-react/theme` maps the checked page theme's semantic
+roles into scoped CSS variables. The Website supplies its `docs-reader` class
+for layout and maps the neutral values onto its general UI tokens.
 The canvas uses the light surface and dark background; quiet borders and
 selected states derive from those roles with CSS colour mixing. Code tokens
 retain their paired colours and font styles. Diagram images embed both schemes
@@ -65,8 +68,10 @@ same appearance choice.
 ## Components and interaction
 
 Use the app-owned [shadcn/Base UI components](src/components/ui/README.md): Sheet
-for the mobile menu, Collapsible for navigation sections, ScrollArea for code,
-Button for actions, and Input/Field for search. The components adapt shadcn's
+for the mobile menu, Collapsible for navigation sections, Button for actions,
+and Input/Field for search. The neutral [MDX React presenter](../../packages/mdx-react/README.md)
+owns prose, token/diagram presentation and its private Base UI/shadcn code/table
+scroll regions. The general components adapt shadcn's
 Base UI registry to the existing CSS toolchain, centralising variants, sizing,
 focus and disabled states. Their semantic variables inherit the checked MDX
 theme. Keep feature state and composition in the docs containers. Use native
@@ -101,6 +106,12 @@ GET forms and disclosures for progressive enhancement.
   exposes it, and inert menu/copy/collapse controls are hidden. Code viewports
   remain focusable and expose native scrollbars. Markdown and source links
   remain available.
+
+Keep the native appearance radios in the header's direct
+`data-mdx-appearance-controls` slot, with `data-mdx-appearance-option` on each
+input. The package owns mode formatting; the Website owns the Atom and choices.
+Bind `MdxBody`'s named link/code slots to the Website's Router/focus and Clipboard
+adapters. Never move publication, page layout or the Atom runtime into MDX.
 
 The drawer uses a 220ms transform and a 180ms backdrop opacity transition.
 Reduced motion removes both transitions. Do not animate article navigation or

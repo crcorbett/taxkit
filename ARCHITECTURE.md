@@ -19,6 +19,7 @@ everything from the API. There is no database or sign-in.
 | `content/docs` — `@content/docs`                     | Authored MDX pages, navigation and repository link revisions                                                                                                |
 | `packages/content` — `@taxkit/content`               | Page Schemas, the checked reading body, catalogue, content service, page addresses and head metadata, and the share-image contracts                         |
 | `packages/mdx` — `@taxkit/mdx`                       | Content-neutral document compiler, renderer contracts and code highlighter                                                                                  |
+| `packages/mdx-react` — `@taxkit/mdx-react`           | Content-neutral React reading presentation, code/table scroll regions and theme-to-CSS formatting                                                           |
 | `packages/diagrams` — `@taxkit/diagrams`             | Pele adapter for MDX's diagram contract                                                                                                                     |
 | `packages/pele` — `@taxkit/pele`                     | Independent Effect service rendering Mermaid definitions to checked SVG                                                                                     |
 | `packages/aeo` — `@taxkit/aeo`                       | Robots, sitemap, `llms.txt`, `llms-full.txt` and share-image routes                                                                                         |

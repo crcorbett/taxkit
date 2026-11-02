@@ -205,6 +205,15 @@
         "src/service.ts!"
       ],
       "project": ["src/**/*.ts!"]
+    },
+    "packages/mdx-react": {
+      "entry": [
+        "src/body.tsx!",
+        "src/code-block.tsx!",
+        "src/theme.tsx!",
+        "src/schemas.ts!"
+      ],
+      "project": ["src/**/*.ts!", "src/**/*.tsx!"]
     }
   },
   "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]

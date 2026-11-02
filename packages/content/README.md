@@ -25,7 +25,10 @@ navigation, repository metadata or the catalogue builder.
 Content owns `DocsPageReader`, implemented by `ContentMdxReaderLive` (`./mdx`)
 using the neutral MDX contracts. It validates TaxKit metadata and page titles and
 projects finished data into the version 2 public body. Public Content brand
-identities stay unchanged; shared wire refinements come from MDX. The adapter
+identities are retained as additional brands on MDX-owned reading values. Shared
+node semantics and whole-record checks have one MDX owner; Content adds its
+nonempty body, h2–h4, heading-ID and published-href refinements. Encoded v2
+reading bytes stay unchanged; nested TypeScript fields gain the shared brands. The adapter
 writes Markdown from the semantic code text before projecting the public body. `ContentLinkResolverLive`
 (`./link-resolver`) consumes a checked `DocsLinkTargets` snapshot; the static
 `DocsLinkTargetsLive` loads the authored navigation/repository policy. The API build

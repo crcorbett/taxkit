@@ -89,3 +89,14 @@ and font styles. The compiler and processed Markdown remain presentation-free.
 The Pele adapter embeds both palettes in one SVG image; the reading container's
 `color-scheme` selects its palette without rerendering geometry. See
 [ADR 0009](../../docs/adr/0009-mdx-themes.md) for ownership and lifetime.
+
+
+The same `./schemas` entry owns the neutral `ReadingInline`, `ReadingBlock` and
+`ReadingBody` contracts plus their node Schemas. These omit authored link targets
+and redundant code source for compact reading payloads; full rendered blocks
+also satisfy them structurally. Source/rendered/reading models share the owning
+`ConsistentTableColumns` and `UniqueHeadingIds` checks. Content refines these
+values for publication instead of defining another inline/block vocabulary.
+The separate [React presenter](../mdx-react/README.md) consumes this contract;
+MDX itself imports no React, router, Content or application. See
+[ADR 0010](../../docs/adr/0010-agnostic-mdx-presentation.md).

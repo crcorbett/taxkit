@@ -4,7 +4,7 @@ import {
   useAtomSet,
 } from "@effect/atom-react";
 import { describe, expect, it } from "@effect/vitest";
-import { DocsHeadingId } from "@taxkit/content/schemas";
+import { DocsHeadingId, DocsText } from "@taxkit/content/schemas";
 import type { DocsReadingBody } from "@taxkit/content/schemas";
 import { Effect, Option, Schedule } from "effect";
 import { TestClock } from "effect/testing";
@@ -23,13 +23,17 @@ const first = DocsHeadingId.make("first-section");
 const second = DocsHeadingId.make("second-section");
 const body: DocsReadingBody = [
   {
-    content: [{ kind: "text", text: "First section" }],
+    content: [
+      { kind: "text", text: DocsText.fields.text.make("First section") },
+    ],
     depth: 2,
     id: first,
     kind: "heading",
   },
   {
-    content: [{ kind: "text", text: "Second section" }],
+    content: [
+      { kind: "text", text: DocsText.fields.text.make("Second section") },
+    ],
     depth: 2,
     id: second,
     kind: "heading",

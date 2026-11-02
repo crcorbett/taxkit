@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { MdxTheme } from "@taxkit/mdx-react/theme";
 import { Match, Option } from "effect";
 
 import { DocsHeader } from "#/lib/docs/chrome.view";
 import { DocsHeading } from "#/lib/docs/components";
 import { DocsNavigation } from "#/lib/docs/page.view";
-import { DocsReader } from "#/lib/docs/reader.container";
 import { DocsSearchForm } from "#/lib/docs/search-form.container";
 import { readDocsSearchTerm } from "#/lib/docs/search-location.ingress";
 import { DocsSearchResults } from "#/lib/docs/search.view";
@@ -57,7 +57,7 @@ function DocumentationSearchRoute() {
       </DocsState>
     )),
     Match.tag("Found", ({ navigation, results, term, theme }) => (
-      <DocsReader theme={theme}>
+      <MdxTheme className="docs-reader" theme={theme}>
         <DocsHeader currentPath={Option.none()} navigation={navigation} />
         <div className="docs-layout docs-search-layout">
           <aside className="docs-sidebar">
@@ -76,7 +76,7 @@ function DocumentationSearchRoute() {
             <DocsSearchResults results={results} term={term} />
           </article>
         </div>
-      </DocsReader>
+      </MdxTheme>
     )),
     Match.exhaustive
   );

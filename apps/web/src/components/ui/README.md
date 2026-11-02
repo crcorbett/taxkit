@@ -22,7 +22,6 @@ The starting sources are shadcn's `base-nova` registry, retrieved 2026-11-02:
 - [Field](https://ui.shadcn.com/r/styles/base-nova/field.json)
 - [Sheet](https://ui.shadcn.com/r/styles/base-nova/sheet.json)
 - [Collapsible](https://ui.shadcn.com/r/styles/base-nova/collapsible.json)
-- [ScrollArea](https://ui.shadcn.com/r/styles/base-nova/scroll-area.json)
 
 The [MIT licence](LICENSE) applies to the adopted source. These are owned
 components, not a runtime shadcn dependency or an unmodified CLI installation.
@@ -47,11 +46,14 @@ outside a themed reader. The adapters preserve these intentional differences:
   portal container, close control and focus restoration; there is no implicit
   body portal or injected close button. Motion uses transform and opacity only,
   and respects reduced motion.
-- ScrollArea exposes its Viewport so a consumer can supply a native labelled
-  region and `tabIndex`. ScrollBar owns the thumb and takes the native orientation.
 - Native props and React 19 refs pass through. No adapter owns feature state,
   validation, an Effect runtime or a registry.
 
 Keep native radios, links, forms and disclosures when their browser behaviour
 is useful before hydration or without JavaScript. See the
 [Website design guide](../../../DESIGN.md) for those guarantees.
+
+Code/table ScrollArea composition now belongs to the neutral
+[MDX React presenter](../../../../../packages/mdx-react/README.md), which retains
+the shadcn source notice and native no-JavaScript fallback. This app does not
+keep a second unused scroll implementation.

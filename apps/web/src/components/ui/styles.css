@@ -190,40 +190,6 @@
   font-size: 0.875rem;
 }
 
-:where([data-slot="scroll-area"]) {
-  position: relative;
-  min-width: 0;
-}
-:where([data-slot="scroll-area-viewport"]) {
-  max-width: 100%;
-  border-radius: inherit;
-}
-:where([data-slot="scroll-area-viewport"]):focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -3px;
-}
-:where([data-slot="scroll-area-scrollbar"]) {
-  display: flex;
-  padding: 0.1875rem;
-  touch-action: none;
-  user-select: none;
-}
-:where([data-slot="scroll-area-scrollbar"][data-orientation="horizontal"]) {
-  flex-direction: column;
-  height: 0.75rem;
-  margin-inline: 0.5rem;
-}
-:where([data-slot="scroll-area-scrollbar"][data-orientation="vertical"]) {
-  width: 0.75rem;
-  margin-block: 0.5rem;
-}
-:where([data-slot="scroll-area-thumb"]) {
-  flex: 1;
-  border-radius: 1rem;
-  background: var(--muted-foreground);
-  opacity: 0.6;
-}
-
 @media (hover: hover) and (pointer: fine) {
   [data-ui-button]:where(:hover) {
     background: var(--muted);

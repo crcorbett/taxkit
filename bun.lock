@@ -82,6 +82,7 @@
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
+        "@taxkit/mdx-react": "workspace:*",
         "@taxkit/observability": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -305,6 +306,31 @@
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:",
+      },
+    },
+    "packages/mdx-react": {
+      "name": "@taxkit/mdx-react",
+      "version": "0.0.0",
+      "dependencies": {
+        "@base-ui/react": "1.9.0",
+        "@taxkit/mdx": "workspace:*",
+        "effect": "catalog:",
+        "lucide-react": "1.66.0",
+      },
+      "devDependencies": {
+        "@effect/vitest": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "@vitest/browser-playwright": "5.0.5",
+        "playwright": "1.64.1",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+      "peerDependencies": {
+        "react": "^19.3.1",
       },
     },
     "packages/observability": {
@@ -1129,6 +1155,8 @@
     "@taxkit/infrastructure": ["@taxkit/infrastructure@workspace:packages/infrastructure"],
 
     "@taxkit/mdx": ["@taxkit/mdx@workspace:packages/mdx"],
+
+    "@taxkit/mdx-react": ["@taxkit/mdx-react@workspace:packages/mdx-react"],
 
     "@taxkit/observability": ["@taxkit/observability@workspace:packages/observability"],
 

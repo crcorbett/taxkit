@@ -61,6 +61,8 @@ const decodingBoundaryFiles = [
   "packages/mdx/src/artifacts.layer.ts",
   // Controlled paired-theme JSON fixture ingress; no runtime or synchronous codec.
   "packages/mdx/src/__testing__/fixtures.ts",
+  // Standalone presenter fixture values enter through their neutral Schemas.
+  "packages/mdx-react/test/article.fixture.ts",
   "packages/mdx/test/theme.test.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
   "packages/pele/src/live.layer.ts",

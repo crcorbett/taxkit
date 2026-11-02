@@ -3813,8 +3813,14 @@
                                           "type": "array"
                                         },
                                         "href": {
+                                          "allOf": [
+                                            {
+                                              "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$"
+                                            }
+                                          ],
                                           "maxLength": 2048,
-                                          "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                          "minLength": 1,
+                                          "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                                           "type": "string"
                                         },
                                         "kind": {
@@ -3835,8 +3841,14 @@
                                 "type": "number"
                               },
                               "id": {
+                                "allOf": [
+                                  {
+                                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                                  }
+                                ],
                                 "maxLength": 120,
-                                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                                "minLength": 1,
+                                "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                                 "type": "string"
                               },
                               "kind": {
@@ -4137,8 +4149,14 @@
                                           "type": "array"
                                         },
                                         "href": {
+                                          "allOf": [
+                                            {
+                                              "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$"
+                                            }
+                                          ],
                                           "maxLength": 2048,
-                                          "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                          "minLength": 1,
+                                          "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                                           "type": "string"
                                         },
                                         "kind": {
@@ -4463,8 +4481,14 @@
                                             "type": "array"
                                           },
                                           "href": {
+                                            "allOf": [
+                                              {
+                                                "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$"
+                                              }
+                                            ],
                                             "maxLength": 2048,
-                                            "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                            "minLength": 1,
+                                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                                             "type": "string"
                                           },
                                           "kind": {
@@ -4807,8 +4831,14 @@
                                             "type": "array"
                                           },
                                           "href": {
+                                            "allOf": [
+                                              {
+                                                "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$"
+                                              }
+                                            ],
                                             "maxLength": 2048,
-                                            "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                            "minLength": 1,
+                                            "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                                             "type": "string"
                                           },
                                           "kind": {
@@ -5147,8 +5177,14 @@
                                               "type": "array"
                                             },
                                             "href": {
+                                              "allOf": [
+                                                {
+                                                  "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$"
+                                                }
+                                              ],
                                               "maxLength": 2048,
-                                              "pattern": "^(?:\\/[a-z0-9-]+(?:\\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\\/\\/\\S+)$",
+                                              "minLength": 1,
+                                              "pattern": "^\\S[\\s\\S]*\\S$|^\\S$|^$",
                                               "type": "string"
                                             },
                                             "kind": {

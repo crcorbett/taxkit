@@ -4,9 +4,9 @@ import type { ReactNode } from "react";
 
 import { buttonVariants } from "#/components/ui/button";
 
+import { DocsAppearance } from "./appearance.container";
 import { DocsHeading } from "./components";
 import { useDocsNavigationFocus } from "./focus.container";
-import { DocsAppearance } from "./reader.container";
 
 // Without a checked page, the recovery view uses accessible platform colours
 // rather than inventing or caching a replacement MDX theme.
@@ -16,8 +16,8 @@ export const DocsState = ({
 }: Readonly<{ title: string; children: ReactNode }>) => {
   const requestDocsNavigationFocus = useDocsNavigationFocus();
   return (
-    <section className="docs-reader docs-unavailable">
-      <header className="docs-header">
+    <section className="docs-reader docs-unavailable" data-mdx-theme="">
+      <header className="docs-header" data-mdx-appearance-controls="">
         <div className="docs-header-inner">
           <Link
             className="docs-wordmark"

@@ -37,6 +37,7 @@ import type { LoaderContext } from "#/lib/pages/loader-context";
 import { loadRoot } from "#/lib/pages/loaders";
 
 import "../styles.css";
+import "@taxkit/mdx-react/styles.css";
 import "../components/ui/styles.css";
 import "../lib/docs/styles.css";
 

@@ -223,7 +223,7 @@ describe("MDX page reader", () => {
         ),
         ["paragraph", "heading", "list", "table", "code", "diagram"]
       );
-      const [paragraph, heading, list, table, , diagram] = result.body;
+      const [paragraph, heading, list, table, code, diagram] = result.body;
       assert.deepEqual<unknown>(paragraph, {
         content: [
           { kind: "text", text: "Use " },
@@ -245,6 +245,25 @@ describe("MDX page reader", () => {
         depth: 2,
         id: "run-it",
         kind: "heading",
+      });
+      assert.deepEqual<unknown>(code, {
+        kind: "code",
+        language: "ts",
+        lines: [
+          [
+            {
+              light: {
+                color: result.theme.light.palette.foreground,
+                style: "normal",
+              },
+              dark: {
+                color: result.theme.dark.palette.foreground,
+                style: "normal",
+              },
+              text: "const a = 1;",
+            },
+          ],
+        ],
       });
       assert.isDefined(list);
       assert.strictEqual(list?.kind, "list");

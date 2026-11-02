@@ -17,11 +17,11 @@ import {
 
 import { buttonVariants } from "#/components/ui/button";
 
+import { DocsAppearance } from "./appearance.container";
 import { docsHeadingId } from "./focus.atoms";
 import { useDocsNavigationFocus } from "./focus.container";
 import { DocsMenu } from "./menu.container";
 import { DocsNavigation } from "./page.view";
-import { DocsAppearance } from "./reader.container";
 
 const repositoryUrl = "https://github.com/crcorbett/taxkit";
 
@@ -36,7 +36,7 @@ export const DocsHeader = ({
   const loading = useRouterState({ select: (state) => state.isLoading });
   return (
     <>
-      <header className="docs-header">
+      <header className="docs-header" data-mdx-appearance-controls="">
         <output aria-live="polite" className="docs-loading-status">
           {EffectBoolean.match(loading, {
             onTrue: () => "Loading page…",

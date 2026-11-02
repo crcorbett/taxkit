@@ -141,22 +141,29 @@ export const TableAlign = Schema.Literals(["left", "center", "right", "none"]);
 const TableCells = Schema.Array(Schema.Array(Inline)).check(
   Schema.isMinLength(1)
 );
+// Inline representations differ between source, rendered and reading nodes;
+// their table-width invariant depends only on the three array lengths.
+export const ConsistentTableColumns = Schema.makeFilter(
+  (
+    table: Readonly<{
+      align: readonly unknown[];
+      header: readonly unknown[];
+      rows: readonly (readonly unknown[])[];
+    }>
+  ) =>
+    table.align.length === table.header.length &&
+    EffectFunction.pipe(
+      table.rows,
+      Array.every((row) => row.length === table.header.length)
+    ),
+  { message: "Every table row must have the header's column count." }
+);
 export const TableBlock = Schema.Struct({
   align: Schema.Array(TableAlign),
   header: TableCells,
   kind: Schema.Literal("table"),
   rows: Schema.Array(TableCells),
-}).check(
-  Schema.makeFilter(
-    (table) =>
-      table.align.length === table.header.length &&
-      EffectFunction.pipe(
-        table.rows,
-        Array.every((row) => row.length === table.header.length)
-      ),
-    { message: "Every table row must have the header's column count." }
-  )
-);
+}).check(ConsistentTableColumns);
 export const CodeBlock = Schema.Struct({
   kind: Schema.Literal("code"),
   language: CodeLanguage,
@@ -176,8 +183,8 @@ export const Block = Schema.Union([
   DiagramBlock,
 ]).pipe(Schema.toTaggedUnion("kind"));
 export type Block = typeof Block.Type;
-const UniqueHeadingIds = Schema.makeFilter(
-  (blocks: readonly Block[]) => {
+export const UniqueHeadingIds = Schema.makeFilter(
+  (blocks: readonly (Block | ReadingBlock)[]) => {
     const ids = EffectFunction.pipe(
       blocks,
       Array.filter((block) => block.kind === "heading"),
@@ -231,16 +238,7 @@ export const RenderedBlock = Schema.Union([
     rows: Schema.Array(
       Schema.Array(Schema.Array(RenderedInline)).check(Schema.isMinLength(1))
     ),
-  }).check(
-    Schema.makeFilter(
-      (table) =>
-        table.align.length === table.header.length &&
-        EffectFunction.pipe(
-          table.rows,
-          Array.every((row) => row.length === table.header.length)
-        )
-    )
-  ),
+  }).check(ConsistentTableColumns),
   Schema.Struct({ ...CodeBlock.fields, lines: CodeLines }).check(
     Schema.makeFilter(
       (block) =>
@@ -267,3 +265,62 @@ export const RenderedDocument = Schema.Struct({
   version: Schema.Literal(2),
 });
 export type RenderedDocument = typeof RenderedDocument.Type;
+
+// Checked presentation values omit authored link targets and redundant code
+// source, while retaining the renderer's paired tokens and finished diagrams.
+export const ReadingLink = Schema.Struct({
+  content: RenderedLink.fields.content,
+  href: RenderedLink.fields.href,
+  kind: RenderedLink.fields.kind,
+});
+export type ReadingLink = typeof ReadingLink.Type;
+export const ReadingInline = Schema.Union([
+  Text,
+  InlineCode,
+  Strong,
+  Emphasis,
+  ReadingLink,
+]).pipe(Schema.toTaggedUnion("kind"));
+export type ReadingInline = typeof ReadingInline.Type;
+export const ReadingInlines = Schema.Array(ReadingInline).check(
+  Schema.isMinLength(1)
+);
+export type ReadingInlines = typeof ReadingInlines.Type;
+export const ReadingHeadingBlock = Schema.Struct({
+  ...HeadingBlock.fields,
+  content: ReadingInlines,
+});
+export const ReadingParagraphBlock = Schema.Struct({
+  ...ParagraphBlock.fields,
+  content: ReadingInlines,
+});
+export const ReadingListBlock = Schema.Struct({
+  ...ListBlock.fields,
+  items: Schema.Array(ReadingInlines).check(Schema.isMinLength(1)),
+});
+const ReadingTableCells = Schema.Array(Schema.Array(ReadingInline)).check(
+  Schema.isMinLength(1)
+);
+export const ReadingTableBlock = Schema.Struct({
+  ...TableBlock.fields,
+  header: ReadingTableCells,
+  rows: Schema.Array(ReadingTableCells),
+}).check(ConsistentTableColumns);
+export const ReadingCodeBlock = Schema.Struct({
+  kind: RenderedBlock.cases.code.fields.kind,
+  language: RenderedBlock.cases.code.fields.language,
+  lines: RenderedBlock.cases.code.fields.lines,
+});
+export type ReadingCodeBlock = typeof ReadingCodeBlock.Type;
+export const ReadingDiagramBlock = RenderedBlock.cases.diagram;
+export const ReadingBlock = Schema.Union([
+  ReadingHeadingBlock,
+  ReadingParagraphBlock,
+  ReadingListBlock,
+  ReadingTableBlock,
+  ReadingCodeBlock,
+  ReadingDiagramBlock,
+]).pipe(Schema.toTaggedUnion("kind"));
+export type ReadingBlock = typeof ReadingBlock.Type;
+export const ReadingBody = Schema.Array(ReadingBlock).check(UniqueHeadingIds);
+export type ReadingBody = typeof ReadingBody.Type;

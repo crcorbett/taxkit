@@ -30,6 +30,7 @@
     "@taxkit/api-http": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
+    "@taxkit/mdx-react": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "@taxkit/rules-au-income-tax": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",

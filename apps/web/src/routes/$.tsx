@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { MdxTheme } from "@taxkit/mdx-react/theme";
 import { Array, Function as EffectFunction, Option } from "effect";
 import { ChevronRight } from "lucide-react";
 
@@ -9,7 +10,6 @@ import { DocsOutline, useDocsOutline } from "#/lib/docs/outline.container";
 import { DocsMobileOutline } from "#/lib/docs/outline.view";
 import { DocsNavigation } from "#/lib/docs/page.view";
 import { DocsPager } from "#/lib/docs/pager.view";
-import { DocsReader } from "#/lib/docs/reader.container";
 import { DocsReadingBodyView } from "#/lib/docs/reading-body.view";
 import type { WebsiteDocsPageView } from "#/lib/docs/schemas";
 import { DocsPageNotFound, DocsPageUnavailable } from "#/lib/docs/state.view";
@@ -55,7 +55,7 @@ function DocumentationRoute() {
     )
   );
   return (
-    <DocsReader theme={page.theme}>
+    <MdxTheme className="docs-reader" theme={page.theme}>
       <DocsHeader
         currentPath={Option.some(page.path)}
         navigation={navigation}
@@ -95,9 +95,7 @@ function DocumentationRoute() {
             </div>
             <DocsHeading>{page.frontmatter.title}</DocsHeading>
           </header>
-          <div className="docs-reading-body">
-            <DocsReadingBodyView body={page.body} />
-          </div>
+          <DocsReadingBodyView body={page.body} />
           <DocsPager currentPath={page.path} navigation={navigation} />
           <footer className="docs-article-footer">
             <p>TaxKit is open source. Help make these docs better.</p>
@@ -119,6 +117,6 @@ function DocumentationRoute() {
         </aside>
       </div>
       <div aria-hidden="true" className="docs-end-marker" />
-    </DocsReader>
+    </MdxTheme>
   );
 }

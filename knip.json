@@ -153,7 +153,8 @@
         "test/**/*.test.ts",
         "vitest.config.ts",
         "src/mdx.layer.ts",
-        "src/link-resolver.layer.ts"
+        "src/link-resolver.layer.ts",
+        "test/**/*.typecheck.ts"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
     },
@@ -226,6 +227,25 @@
         "vitest.config.ts"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    },
+    "packages/mdx-react": {
+      "entry": [
+        "src/body.tsx",
+        "src/code-block.tsx",
+        "src/theme.tsx",
+        "src/schemas.ts",
+        "test/**/*.test.tsx",
+        "vitest.config.ts",
+        "vitest.browser.config.ts"
+      ],
+      "project": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "test/**/*.ts",
+        "test/**/*.tsx",
+        "vitest.config.ts",
+        "vitest.browser.config.ts"
+      ]
     }
   }
 }
