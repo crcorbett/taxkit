@@ -8,7 +8,7 @@ last_reviewed: 2026-11-02
 
 # UI components
 
-The Website owns these adaptations of [shadcn/ui's Base UI components](https://ui.shadcn.com/docs/components/base).
+The Website owns these adaptations of [shadcn/ui's Base UI components](https://ui.shadcn.com/docs/components/base/button).
 They share native Base UI props, refs and `render` composition; feature state
 and navigation policy belong to the consuming containers. Import each component
 from its file, without a barrel or another provider.
