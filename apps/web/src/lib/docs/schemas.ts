@@ -24,6 +24,7 @@ export interface WebsiteDocsPageView {
 // failed load. Variants are plain data, so TanStack serialises them natively.
 export type WebsiteDocsSearchView = Data.TaggedEnum<{
   Found: {
+    readonly theme: DocsPublicPage["theme"];
     readonly navigation: DocsPublicNavigation;
     readonly results: readonly DocsSearchResult[];
     readonly term: "" | DocsSearchTerm;

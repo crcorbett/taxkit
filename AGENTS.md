@@ -3,7 +3,7 @@ document_type: agent-router
 lifecycle: current
 authority: canonical
 owner: repository-maintainers
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-02
 ---
 
 # TaxKit repository guide
@@ -79,6 +79,9 @@ Linear.
 - React composition flows route → policy-owning container → focused leaf.
   Routes own transport restoration/outcome matching, containers own commands
   and coordination, and leaves render readonly values/local interaction state.
+- Prefer Effect Atoms for owned UI state; keep framework internals with their
+  framework. Before adding or changing Atom usage, research the cloned Effect
+  repository's matching source, examples and tests, then check the installed API.
 - Admit an abstraction only with semantic weight, an owner, a real reuse or
   substitution point, a simpler call graph, and focused proof.
 

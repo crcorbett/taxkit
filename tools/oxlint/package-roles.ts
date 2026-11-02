@@ -29,6 +29,11 @@ const frontendModules = [
   "@taxkit/core/primitives",
   "@taxkit/core/ledger",
   "@taxkit/core/trace",
+  "@taxkit/mdx-react/body",
+  "@taxkit/mdx-react/code-block",
+  "@taxkit/mdx-react/theme",
+  "@taxkit/mdx-react/schemas",
+  "@taxkit/mdx-react/styles.css",
   "@taxkit/observability/edge-identity",
   "@taxkit/rules-au-income-tax/schemas",
   "@taxkit/rules-au-pay/schemas",
@@ -81,10 +86,58 @@ const isInfrastructureOwner = (owner: string) =>
 // Runtime support is consumed by domain packages and hosts, never the reverse:
 // these owners depend on no other TaxKit workspace package.
 const domainFreeOwners = ["packages/observability"];
+const isPackageAddress = (address: string, name: string) =>
+  address === name || address.startsWith(`${name}/`);
+// These owners serve independent consumers. Declaring a dependency or export
+// cannot give the compiler, presenter or Pele access to publication policy.
+const contentNeutralOwners: readonly Readonly<{
+  owner: string;
+  dependencies: readonly string[];
+}>[] = [
+  { owner: "packages/mdx", dependencies: ["@taxkit/mdx"] },
+  {
+    owner: "packages/mdx-react",
+    dependencies: ["@taxkit/mdx-react", "@taxkit/mdx"],
+  },
+  { owner: "packages/pele", dependencies: ["@taxkit/pele"] },
+  {
+    owner: "packages/diagrams",
+    dependencies: ["@taxkit/diagrams", "@taxkit/mdx", "@taxkit/pele"],
+  },
+];
+const isOwnedPackageAddress = (address: string) =>
+  address.startsWith("@taxkit/") ||
+  address.startsWith("@content/") ||
+  address.startsWith("#/") ||
+  EffectFunction.pipe(
+    ["taxkit", "api", "web"],
+    Array.some((name) => isPackageAddress(address, name))
+  );
+const isForbiddenPublicationDependency = (owner: string, address: string) =>
+  isOwnedPackageAddress(address) &&
+  EffectFunction.pipe(
+    contentNeutralOwners,
+    Array.findFirst((policy) => policy.owner === owner),
+    Option.exists((policy) =>
+      EffectFunction.pipe(
+        policy.dependencies,
+        Array.every((name) => !isPackageAddress(address, name))
+      )
+    )
+  );
+const isPresenterHostDependency = (owner: string, address: string) =>
+  owner === "packages/mdx-react" &&
+  (address.startsWith("@tanstack/") ||
+    EffectFunction.pipe(
+      ["next", "react-router", "react-router-dom", "@remix-run/router"],
+      Array.some((name) => isPackageAddress(address, name))
+    ));
 export const isForbiddenPackageDependency = (
   owner: string,
   dependency: string
 ) =>
+  isForbiddenPublicationDependency(owner, dependency) ||
+  isPresenterHostDependency(owner, dependency) ||
   (Array.contains(domainFreeOwners, owner) &&
     (dependency === "taxkit" ||
       dependency.startsWith("taxkit/") ||

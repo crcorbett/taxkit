@@ -1,5 +1,12 @@
 # @taxkit/analytics
 
+## 1.0.6
+
+### Patch Changes
+
+- Updated dependencies [ccfbb17]
+  - @taxkit/content@5.0.0
+
 ## 1.0.5
 
 ### Patch Changes

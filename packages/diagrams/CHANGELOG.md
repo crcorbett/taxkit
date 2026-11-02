@@ -1,5 +1,12 @@
 # @taxkit/diagrams
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [ccfbb17]
+  - @taxkit/mdx@0.4.0
+
 ## 0.4.0
 
 ### Minor Changes

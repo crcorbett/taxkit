@@ -9,6 +9,7 @@
         "allowedUnstableApis": [
           "@effect/atom-react",
           "@effect/platform-bun",
+          "@effect/platform-browser/Clipboard",
           "@effect/platform-node",
           "@effect/vitest",
           "effect/ByteSize",

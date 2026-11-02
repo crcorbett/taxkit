@@ -1,12 +1,6 @@
 import * as Mdx from "@taxkit/mdx/schemas";
-import { Theme, TokenAppearance } from "@taxkit/mdx/theme";
-import {
-  Match,
-  Function as EffectFunction,
-  Array,
-  HashSet,
-  Schema,
-} from "effect";
+import { Theme } from "@taxkit/mdx/theme";
+import { Function as EffectFunction, Array, HashSet, Schema } from "effect";
 // Shared public address policy; API and Website retain distinct identities.
 export const PublicHttpOrigin = Schema.URLFromString.check(
   Schema.makeFilter(
@@ -117,47 +111,25 @@ export const DocsRepositoryProfile = Schema.Struct({
 export type DocsRepositoryProfile = typeof DocsRepositoryProfile.Type;
 // A link target after Content resolves it: a public page path with an optional
 // fragment, a fragment on the same page, or an absolute HTTPS address.
-export const DocsLinkHref = Schema.String.check(
+export const DocsLinkHref = Mdx.LinkDestination.check(
   Schema.isMaxLength(2048),
   Schema.isPattern(
     /^(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+)*(?:#[a-z0-9-]+)?|#[a-z0-9-]+|https:\/\/\S+)$/u
   )
 ).pipe(Schema.brand("taxkit/DocsLinkHref"));
 export type DocsLinkHref = typeof DocsLinkHref.Type;
-export const DocsHeadingId = Schema.String.check(
+export const DocsHeadingId = Mdx.HeadingId.check(
   Schema.isMaxLength(120),
   Schema.isPattern(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u)
 ).pipe(Schema.brand("taxkit/DocsHeadingId"));
 export type DocsHeadingId = typeof DocsHeadingId.Type;
-const DocsInlineText = Schema.String.check(Schema.isMinLength(1));
-export const DocsText = Schema.Struct({
-  kind: Schema.Literal("text"),
-  text: DocsInlineText,
-});
-export const DocsInlineCode = Schema.Struct({
-  kind: Schema.Literal("inline-code"),
-  text: DocsInlineText,
-});
-const DocsLeaf = Schema.Union([DocsText, DocsInlineCode]);
-const DocsLeaves = Schema.Array(DocsLeaf).check(Schema.isMinLength(1));
-export const DocsStrong = Schema.Struct({
-  content: DocsLeaves,
-  kind: Schema.Literal("strong"),
-});
-export const DocsEmphasis = Schema.Struct({
-  content: DocsLeaves,
-  kind: Schema.Literal("emphasis"),
-});
-const DocsFormatted = Schema.Union([
-  DocsText,
-  DocsInlineCode,
-  DocsStrong,
-  DocsEmphasis,
-]);
+export const DocsText = Mdx.Text;
+export const DocsInlineCode = Mdx.InlineCode;
+export const DocsStrong = Mdx.Strong;
+export const DocsEmphasis = Mdx.Emphasis;
 export const DocsLink = Schema.Struct({
-  content: Schema.Array(DocsFormatted).check(Schema.isMinLength(1)),
+  ...Mdx.ReadingLink.fields,
   href: DocsLinkHref,
-  kind: Schema.Literal("link"),
 });
 export const DocsInline = Schema.Union([
   DocsText,
@@ -171,80 +143,52 @@ export const DocsInlines = Schema.Array(DocsInline).check(
   Schema.isMinLength(1)
 );
 export type DocsInlines = typeof DocsInlines.Type;
-// Preserve the public Content identities while reusing MDX's wire refinements.
-// Neutral semantic brands stay inside MDX; the Content adapter projects them.
+// Content adds publication identities to the same MDX-owned values. The JSON
+// representation remains unchanged and the checked body stays a ReadingBody.
 export const DocsCodeLanguage = Mdx.CodeLanguage;
 export type DocsCodeLanguage = typeof DocsCodeLanguage.Type;
-export const DocsCodeToken = Schema.Struct({
-  light: TokenAppearance,
-  dark: TokenAppearance,
-  text: DocsInlineText,
-});
+export const DocsCodeToken = Mdx.CodeToken;
 export type DocsCodeToken = typeof DocsCodeToken.Type;
-export const DocsCodeLines = Schema.Array(Schema.Array(DocsCodeToken)).check(
-  Schema.isMinLength(1)
-);
+export const DocsCodeLines = Mdx.CodeLines;
 export type DocsCodeLines = typeof DocsCodeLines.Type;
-export const DocsDiagramTitle = Schema.toEncoded(Mdx.DiagramTitle).pipe(
+export const DocsDiagramTitle = Mdx.DiagramTitle.pipe(
   Schema.brand("taxkit/DocsDiagramTitle")
 );
 export type DocsDiagramTitle = typeof DocsDiagramTitle.Type;
-export const DocsDiagramSource = Schema.toEncoded(Mdx.DiagramSource).pipe(
+export const DocsDiagramSource = Mdx.DiagramSource.pipe(
   Schema.brand("taxkit/DocsDiagramSource")
 );
 export type DocsDiagramSource = typeof DocsDiagramSource.Type;
-export const DocsDiagramSvg = Schema.toEncoded(Mdx.DiagramSvg).pipe(
+export const DocsDiagramSvg = Mdx.DiagramSvg.pipe(
   Schema.brand("taxkit/DocsDiagramSvg")
 );
 export type DocsDiagramSvg = typeof DocsDiagramSvg.Type;
 export const DocsHeadingBlock = Schema.Struct({
+  ...Mdx.ReadingHeadingBlock.fields,
   content: DocsInlines,
   depth: Schema.Literals([2, 3, 4]),
   id: DocsHeadingId,
-  kind: Schema.Literal("heading"),
 });
 export const DocsParagraphBlock = Schema.Struct({
+  ...Mdx.ReadingParagraphBlock.fields,
   content: DocsInlines,
-  kind: Schema.Literal("paragraph"),
 });
 export const DocsListBlock = Schema.Struct({
+  ...Mdx.ReadingListBlock.fields,
   items: Schema.Array(DocsInlines).check(Schema.isMinLength(1)),
-  kind: Schema.Literal("list"),
-  ordered: Schema.Boolean,
-  start: Schema.Int.check(Schema.isGreaterThanOrEqualTo(1)),
 });
-export const DocsTableAlign = Schema.Literals([
-  "left",
-  "center",
-  "right",
-  "none",
-]);
+export const DocsTableAlign = Mdx.TableAlign;
 const DocsTableCells = Schema.Array(Schema.Array(DocsInline)).check(
   Schema.isMinLength(1)
 );
 export const DocsTableBlock = Schema.Struct({
-  align: Schema.Array(DocsTableAlign),
+  ...Mdx.ReadingTableBlock.fields,
   header: DocsTableCells,
-  kind: Schema.Literal("table"),
   rows: Schema.Array(DocsTableCells),
-}).check(
-  Schema.makeFilter(
-    (table) =>
-      table.align.length === table.header.length &&
-      EffectFunction.pipe(
-        table.rows,
-        Array.every((row) => row.length === table.header.length)
-      ),
-    { message: "Every table row must have the header's column count." }
-  )
-);
-export const DocsCodeBlock = Schema.Struct({
-  kind: Schema.Literal("code"),
-  language: DocsCodeLanguage,
-  lines: DocsCodeLines,
-});
+}).check(Mdx.ConsistentTableColumns);
+export const DocsCodeBlock = Mdx.ReadingCodeBlock;
 export const DocsDiagramBlock = Schema.Struct({
-  kind: Schema.Literal("diagram"),
+  kind: Mdx.ReadingDiagramBlock.fields.kind,
   source: DocsDiagramSource,
   svg: DocsDiagramSvg,
   title: DocsDiagramTitle,
@@ -261,23 +205,7 @@ export type DocsBlock = typeof DocsBlock.Type;
 // The page body after its `#` title. Heading ids are unique within a page.
 export const DocsReadingBody = Schema.Array(DocsBlock).check(
   Schema.isMinLength(1),
-  Schema.makeFilter(
-    (blocks) => {
-      const ids = EffectFunction.pipe(
-        blocks,
-        Array.flatMap((block) =>
-          Match.value(block).pipe(
-            Match.when({ kind: "heading" }, (matchedValue) => [
-              matchedValue.id,
-            ]),
-            Match.orElse(() => [])
-          )
-        )
-      );
-      return HashSet.size(HashSet.fromIterable(ids)) === ids.length;
-    },
-    { message: "Heading ids must be unique within a page." }
-  )
+  Mdx.UniqueHeadingIds
 );
 export type DocsReadingBody = typeof DocsReadingBody.Type;
 // One authored page after its MDX is read: checked frontmatter and body.

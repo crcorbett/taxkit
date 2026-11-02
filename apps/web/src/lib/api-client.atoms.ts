@@ -21,7 +21,7 @@ export const publicSettingsAtom = Atom.make(
 
 // The one application runtime factory. Native service runtimes share it and
 // the router/React registry.
-const browserRuntime = Atom.runtime(Layer.empty);
+export const browserRuntime = Atom.runtime(Layer.empty);
 
 const browserTransportAtom = Atom.make(
   FetchHttpClient.layer.pipe(

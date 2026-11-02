@@ -30,10 +30,20 @@ Current implemented code lives in:
 - `packages/calculators`
 - `packages/content`
 - `packages/core`
-- `packages/diagrams`
+- `packages/mdx-react`
+: Private source `@taxkit/mdx-react`: pure React presentation of MDX-owned reading
+  values, paired theme formatting and content/code/table/diagram styles. It has
+  no Content, router, app, compiler/provider acquisition or runtime dependency.
+  Hosts bind the two named link/code slots and toolbar commands; its native
+  scroll and appearance contracts preserve no-JavaScript reading. See
+  [the package](../../packages/mdx-react/README.md) and
+  [ADR 0010](../adr/0010-agnostic-mdx-presentation.md).
+
+`packages/diagrams`
 - `packages/docs-examples`
 - `packages/infrastructure`
 - `packages/mdx`
+- `packages/mdx-react`
 - `packages/observability`
 - `packages/og-image`
 - `packages/pele`
@@ -212,7 +222,7 @@ identity. Neither an app nor a package depends on another app.
 `packages/mdx`
 : Private source `@taxkit/mdx`: content-neutral `MdxCompiler.compile` and
   `MdxRenderer.render`, static individual Layers and combined `MdxLive`.
-  MDX owns portable versioned documents and provider contracts; the compiler
+  MDX owns portable versioned documents, shared reading-node Schemas and provider contracts; the compiler
   requires no providers. `./highlights` owns every Pierre call. Content imports
   only these contracts and Schemas, while the app selects implementations.
   See [the package](../../packages/mdx/README.md).

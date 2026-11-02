@@ -1,0 +1,5 @@
+// Captured with Content's v2 encoder before the reading-model extraction.
+// Empty table cells, paired token styles and trailing blank code lines are
+// intentional compatibility evidence, not regenerated expected output.
+export const readingV2Json =
+  '[{"content":[{"kind":"text","text":"Read the guide"}],"depth":2,"id":"read-the-guide","kind":"heading"},{"content":[{"kind":"text","text":"Use "},{"content":[{"kind":"inline-code","text":"calculate"}],"kind":"strong"},{"content":[{"kind":"text","text":" carefully "}],"kind":"emphasis"},{"content":[{"kind":"text","text":"the guide"}],"href":"https://example.org/guide#install","kind":"link"}],"kind":"paragraph"},{"items":[[{"kind":"text","text":"Install it."}]],"kind":"list","ordered":true,"start":3},{"align":["left","none"],"header":[[],[{"kind":"text","text":"Value"}]],"kind":"table","rows":[[[{"kind":"inline-code","text":"amount"}],[]]]},{"kind":"code","language":"ts","lines":[[{"light":{"color":"#172033","style":"normal"},"dark":{"color":"#e7edf5","style":"bold-italic"},"text":"  const value = 1;"}],[],[]]},{"kind":"diagram","source":"flowchart LR\\n  A --> B","svg":"<svg></svg>","title":"Two steps"}]';

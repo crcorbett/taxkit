@@ -30,6 +30,7 @@ frontmatter and navigation say `status: published`.
 - [0007 Content-neutral MDX compilation and rendering](adr/0007-content-neutral-mdx.md)
 - [0008 Effect-owned rendering providers](adr/0008-effect-rendering-providers.md)
 - [0009 Paired MDX themes as checked render data](adr/0009-mdx-themes.md)
+- [0010 Agnostic MDX reading contracts and React presentation](adr/0010-agnostic-mdx-presentation.md)
 
 ## Keeping this useful
 

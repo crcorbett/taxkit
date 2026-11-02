@@ -8,7 +8,10 @@ import {
   Schema,
 } from "effect";
 
-import { isForbiddenPackageDependency } from "../oxlint/package-roles.js";
+import {
+  isForbiddenPackageDependency,
+  isFrontendModule,
+} from "../oxlint/package-roles.js";
 import {
   dependencyNames,
   WorkspaceManifest as Manifest,
@@ -164,6 +167,112 @@ describe("workspace dependency direction", () => {
         peerDependencies: { a: "1", d: "1" },
       }),
       ["a", "b", "c", "d"]
+    );
+  });
+
+  it("keeps MDX, its presenter and Pele independent of publication and host packages", () => {
+    const cases = [
+      ["packages/mdx", "@taxkit/mdx/schemas", false],
+      ["packages/mdx", "effect", false],
+      ["packages/mdx", "@pierre/highlights", false],
+      ["packages/mdx", "@taxkit/content", true],
+      ["packages/mdx", "@content/docs/navigation.json", true],
+      ["packages/mdx", "@taxkit/mdx-react/body", true],
+      ["packages/mdx", "@taxkit/pele/service", true],
+      ["packages/mdx", "taxkit/au", true],
+      ["packages/mdx", "api/worker", true],
+      ["packages/mdx-react", "@taxkit/mdx", false],
+      ["packages/mdx-react", "@taxkit/mdx/schemas", false],
+      ["packages/mdx-react", "@taxkit/mdx-react/theme", false],
+      ["packages/mdx-react", "react", false],
+      ["packages/mdx-react", "@base-ui/react/scroll-area", false],
+      ["packages/mdx-react", "@taxkit/mdx-extra/schemas", true],
+      ["packages/mdx-react", "@taxkit/content/schemas", true],
+      ["packages/mdx-react", "@taxkit/pele", true],
+      ["packages/mdx-react", "@content/docs", true],
+      ["packages/mdx-react", "@tanstack/react-router", true],
+      ["packages/mdx-react", "@tanstack/router-core", true],
+      ["packages/mdx-react", "next/link", true],
+      ["packages/mdx-react", "react-router", true],
+      ["packages/mdx-react", "react-router-dom", true],
+      ["packages/mdx-react", "@remix-run/router", true],
+      ["packages/mdx-react", "web/router", true],
+      ["packages/mdx-react", "#/lib/docs/components", true],
+      ["packages/pele", "pele", false],
+      ["packages/pele", "@taxkit/pele/schemas", false],
+      ["packages/pele", "@taxkit/mdx/schemas", true],
+      ["packages/pele", "@taxkit/content", true],
+      ["packages/diagrams", "@taxkit/mdx/service", false],
+      ["packages/diagrams", "@taxkit/pele/service", false],
+      ["packages/diagrams", "@taxkit/diagrams/pele", false],
+      ["packages/diagrams", "@taxkit/content/schemas", true],
+      ["packages/diagrams", "@taxkit/mdx-react/body", true],
+      ["packages/content", "@taxkit/mdx/schemas", false],
+      ["apps/web", "@tanstack/react-router", false],
+    ] as const;
+    assert.deepEqual(
+      EffectFunction.pipe(
+        cases,
+        Array.filter(
+          ([owner, dependency, forbidden]) =>
+            isForbiddenPackageDependency(owner, dependency) !== forbidden
+        )
+      ),
+      []
+    );
+  });
+
+  it("applies presenter dependency policy to every manifest dependency class", () => {
+    const manifest = {
+      dependencies: {
+        "@taxkit/content": "workspace:*",
+        "@taxkit/mdx": "workspace:*",
+      },
+      devDependencies: { next: "1" },
+      name: "@taxkit/mdx-react",
+      optionalDependencies: { web: "workspace:*" },
+      peerDependencies: { "@tanstack/react-router": "1", react: "1" },
+    };
+    assert.deepEqual(
+      EffectFunction.pipe(
+        dependencyNames(manifest),
+        Array.filter((dependency) =>
+          isForbiddenPackageDependency("packages/mdx-react", dependency)
+        )
+      ),
+      ["@taxkit/content", "next", "web", "@tanstack/react-router"]
+    );
+  });
+
+  it("grants only the exact browser-safe MDX presenter exports", () => {
+    const file = "apps/web/src/lib/docs/reading-body.view.tsx";
+    assert.deepEqual(
+      EffectFunction.pipe(
+        [
+          "@taxkit/mdx-react/body",
+          "@taxkit/mdx-react/code-block",
+          "@taxkit/mdx-react/theme",
+          "@taxkit/mdx-react/schemas",
+          "@taxkit/mdx-react/styles.css",
+        ],
+        Array.map((address) => isFrontendModule(file, address))
+      ),
+      [true, true, true, true, true]
+    );
+    assert.deepEqual(
+      EffectFunction.pipe(
+        [
+          "@taxkit/mdx-react",
+          "@taxkit/mdx-react/live",
+          "@taxkit/mdx-react/body/private",
+          "@taxkit/mdx-react/styles.css?raw",
+          "@taxkit/mdx/compiler",
+          "@taxkit/mdx/highlights",
+          "@taxkit/pele/live",
+        ],
+        Array.map((address) => isFrontendModule(file, address))
+      ),
+      [false, false, false, false, false, false, false]
     );
   });
 });

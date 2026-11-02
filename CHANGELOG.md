@@ -1,5 +1,19 @@
 # TaxKit
 
+## 4.0.1
+
+- Separate reusable MDX presentation into `@taxkit/mdx-react`, with checked
+  reading Schemas owned by MDX and publication rules retained by Content.
+  Keep docs v2 JSON and calculator behavior compatible; update the SDK's
+  distributed HTTP schema modules.
+- Improve documentation navigation, mobile menus, page outlines, themed snippets
+  and copy controls with shadcn/Base UI. Keep appearance, commands and routing
+  with the Website and preserve native keyboard and no-JavaScript access.
+- See the [presenter changelog](./packages/mdx-react/CHANGELOG.md),
+  [Content changelog](./packages/content/CHANGELOG.md),
+  [SDK changelog](./packages/sdk/typescript/CHANGELOG.md) and
+  [API changelog](./apps/api/CHANGELOG.md).
+
 ## 4.0.0
 
 - Render prose, Pierre code and Pele diagrams from one Schema-checked light/dark
