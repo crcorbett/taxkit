@@ -156,34 +156,32 @@ export const requestDocsPage = Effect.fn("TaxKitApi.requestDocsPage")(
       })
     )
 );
-/** Navigation alone for an empty search, or navigation and matching pages. */
-export const requestDocsSearch = Effect.fn("TaxKitApi.requestDocsSearch")(({
-  client,
-  term,
-}: {
-  readonly client: TaxKitClient;
-  readonly term: "" | DocsSearchTerm;
-}) => {
-  const navigation = client.content.getNavigation();
-  const results = Match.value(term).pipe(
-    Match.when("", () => Effect.succeed([])),
-    Match.orElse((matchedValue) =>
-      client.content.searchPages({ query: { term: matchedValue } })
-    )
-  );
-  return Effect.all({ navigation, results }, { concurrency: 2 }).pipe(
-    Effect.timeout(apiReadTimeout),
-    Effect.mapError((error) =>
-      Match.value(error).pipe(
-        Match.when(
-          Schema.is(DocsSearchUnavailable),
-          (matchedValue) => matchedValue
-        ),
-        Match.orElse((matchedValue) => transportFailure(matchedValue))
+/** Matching pages only; an empty search performs no HTTP request. */
+export const requestDocsSearch = Effect.fn("TaxKitApi.requestDocsSearch")(
+  ({
+    client,
+    term,
+  }: {
+    readonly client: TaxKitClient;
+    readonly term: "" | DocsSearchTerm;
+  }) =>
+    Match.value(term).pipe(
+      Match.when("", () => Effect.succeed([])),
+      Match.orElse((matchedValue) =>
+        client.content.searchPages({ query: { term: matchedValue } })
+      ),
+      Effect.timeout(apiReadTimeout),
+      Effect.mapError((error) =>
+        Match.value(error).pipe(
+          Match.when(
+            Schema.is(DocsSearchUnavailable),
+            (matchedValue) => matchedValue
+          ),
+          Match.orElse((matchedValue) => transportFailure(matchedValue))
+        )
       )
     )
-  );
-});
+);
 export const requestDocsMarkdown = Effect.fn("TaxKitApi.requestDocsMarkdown")(
   ({
     client,

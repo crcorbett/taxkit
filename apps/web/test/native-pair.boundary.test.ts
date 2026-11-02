@@ -42,7 +42,11 @@ import { HttpApiClient } from "effect/http-api";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
-import type { Page, Request as BrowserRequest } from "playwright";
+import type {
+  Page,
+  Request as BrowserRequest,
+  Route as BrowserRoute,
+} from "playwright";
 
 import { readWorkerModules } from "./native-modules.fixture";
 import {
@@ -2665,6 +2669,110 @@ describe("built native API and Website", () => {
             })
           );
         }).pipe(Effect.withSpan("NativePair.verifyClientNavigation"));
+        yield* Effect.gen(function* verifyPendingDestinationFocus() {
+          yield* Effect.forEach(
+            [
+              { width: 1440, path: "/sdk/effect-sdk", title: "Effect SDK" },
+              {
+                width: 390,
+                path: "/concepts/money-and-branded-values",
+                title: "Money and branded values",
+              },
+            ],
+            (destination) =>
+              Effect.gen(function* () {
+                const paused = yield* Queue.make<BrowserRoute>();
+                yield* Effect.promise(() =>
+                  docsPage.setViewportSize({
+                    height: 900,
+                    width: destination.width,
+                  })
+                );
+                yield* Effect.promise(() =>
+                  docsPage.route(
+                    docsPageAddress(destination.path),
+                    (route) => {
+                      Queue.offerUnsafe(paused, route);
+                    },
+                    { times: 1 }
+                  )
+                );
+                if (destination.width === 390) {
+                  yield* Effect.promise(() =>
+                    docsPage
+                      .getByRole("button", { name: "Open documentation menu" })
+                      .click()
+                  );
+                }
+                yield* Effect.promise(() =>
+                  docsPage
+                    .getByRole("navigation", {
+                      exact: true,
+                      name: "Documentation",
+                    })
+                    .getByRole("link", { exact: true, name: destination.title })
+                    .click()
+                );
+                const request = yield* Queue.take(paused).pipe(
+                  Effect.timeout("5 seconds")
+                );
+                yield* Effect.promise(() =>
+                  docsPage.getByRole("dialog").waitFor({ state: "hidden" })
+                );
+                // Keep the old document visible and force a section update while
+                // the destination is withheld. It must not consume focus intent.
+                yield* Effect.promise(() =>
+                  docsPage.evaluate(() => {
+                    window.scrollTo(0, document.documentElement.scrollHeight);
+                  })
+                );
+                expect(
+                  yield* Effect.promise(() =>
+                    docsPage
+                      .locator(".docs-article h1")
+                      .evaluate((element) => element === document.activeElement)
+                  )
+                ).toBeFalsy();
+                yield* Effect.promise(() => request.continue());
+                yield* Effect.promise(() =>
+                  docsPage
+                    .getByRole("heading", {
+                      exact: true,
+                      name: destination.title,
+                    })
+                    .waitFor()
+                );
+                yield* Effect.promise(() =>
+                  docsPage
+                    .locator(".docs-article h1")
+                    .evaluate((element) => element === document.activeElement)
+                ).pipe(
+                  Effect.repeat({
+                    until: (value) => value,
+                    schedule: Schedule.spaced("20 millis"),
+                  }),
+                  Effect.timeout("2 seconds"),
+                  Effect.tap((value) =>
+                    Effect.sync(() => {
+                      expect(value).toBeTruthy();
+                    })
+                  )
+                );
+                yield* Effect.promise(() =>
+                  docsPage.goto(`${websiteOrigin}/start/quickstart`)
+                );
+                yield* Effect.promise(() =>
+                  docsPage.waitForLoadState("networkidle")
+                );
+                yield* Effect.promise(() =>
+                  docsPage.locator('main[aria-busy="false"]').waitFor()
+                );
+              })
+          );
+          yield* Effect.promise(() =>
+            docsPage.setViewportSize({ height: 900, width: 1440 })
+          );
+        }).pipe(Effect.withSpan("NativePair.verifyPendingDestinationFocus"));
         yield* Effect.gen(function* verifyPageOutline() {
           const outline = docsPage.locator(".docs-page-sidebar .docs-outline");
           const last = outline.getByRole("link").last();
@@ -3093,7 +3201,6 @@ describe("built native API and Website", () => {
             Effect.map(Array.sort(Order.String))
           );
           expect(searchReads).toStrictEqual([
-            `GET ${docsNavigationAddress}`,
             `GET ${docsNavigationAddress}`,
             `GET ${docsPageAddress("/start/quickstart")}`,
           ]);

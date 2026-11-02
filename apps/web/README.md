@@ -3,7 +3,7 @@ document_type: app-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-02
 review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
 ---
 
@@ -164,8 +164,13 @@ Base UI composition and interaction requirements. The route renders the major
 landmarks; focused components own the navigation, mobile drawer, page outline,
 code toolbar and previous/next links. CSS lives in `src/lib/docs/styles.css`.
 Local browser work shares `browserRuntime` and the existing root registry.
+Menu state and search drafts use mount-local writable Atoms. Destination focus
+intent is registry-owned and consumed after native Router rendering; initial
+hydration never requests focus.
 Clipboard uses the native static Effect Clipboard Layer, independently of API
-client acquisition. The outline observer is scoped to the mounted page.
+client acquisition. The outline observer is a page-scoped resource Atom; only
+the outline leaves subscribe to the active heading, with semantic equality to
+suppress unchanged selections. Scrolling does not rerender the article.
 
 The catch-all route loads the page and navigation from the API's documentation
 routes; the server uses the original pathname. The route shows the page title
@@ -181,9 +186,9 @@ choice. `docs/search-location.ingress.ts` reads the raw address once, so words
 such as `1e3` or quoted text are not JSON-parsed; duplicate or unexpected keys
 and words over 100 characters are a normal invalid-search page state. Empty
 words skip the search request. Search also loads the canonical Quickstart page
-through the existing bounded page helper to obtain its checked theme, alongside
-the navigation/search helper. An empty search therefore makes two navigation
-reads and one page read; nonempty words add one search read. TanStack owns
+through the existing bounded page helper to obtain its checked theme and
+navigation, alongside the results-only search helper. An empty search therefore
+makes one navigation read and one page read; nonempty words add one search read. TanStack owns
 loading, with the preserved search parameters as loader dependencies, so Back
 and Forward restore the right words and results. There is no extra theme
 endpoint or client cache. Search pages are

@@ -1,12 +1,14 @@
 import { Dialog } from "@base-ui/react/dialog";
+import { useAtom } from "@effect/atom-react";
 import { Link } from "@tanstack/react-router";
 import type {
   DocsPublicNavigation,
   DocsPublicPage,
 } from "@taxkit/content/schemas";
 import type { Option } from "effect";
+import * as Atom from "effect/reactivity/Atom";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 
 import { isDocsNavigationClick } from "./components";
 import { DocsNavigation } from "./page.view";
@@ -19,22 +21,25 @@ export const DocsMenu = ({
   navigation: DocsPublicNavigation;
 }>) => {
   const portal = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
-  const [followingLink, setFollowingLink] = useState(false);
+  const menuAtom = useMemo(
+    () => Atom.make<"closed" | "open" | "following-link">("closed"),
+    []
+  );
+  const [menu, setMenu] = useAtom(menuAtom);
   const followLink = () => {
-    setFollowingLink(true);
-    setOpen(false);
+    setMenu("following-link");
   };
   return (
     <div className="docs-menu-host" ref={portal}>
       <Dialog.Root
         onOpenChange={(nextOpen) => {
-          setOpen(nextOpen);
           if (nextOpen) {
-            setFollowingLink(false);
+            setMenu("open");
+          } else {
+            setMenu("closed");
           }
         }}
-        open={open}
+        open={menu === "open"}
       >
         <Dialog.Trigger
           aria-label="Open documentation menu"
@@ -46,12 +51,7 @@ export const DocsMenu = ({
           <Dialog.Backdrop className="docs-menu-backdrop" />
           <Dialog.Popup
             className="docs-menu-popup"
-            finalFocus={() => {
-              if (followingLink) {
-                return document.querySelector("#taxkit-docs-content");
-              }
-              return true;
-            }}
+            finalFocus={menu !== "following-link"}
           >
             <div className="docs-menu-heading">
               <Dialog.Title>Documentation</Dialog.Title>

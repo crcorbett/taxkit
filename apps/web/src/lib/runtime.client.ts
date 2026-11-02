@@ -103,7 +103,7 @@ export const loadDocsSearch = (
             Effect.flatMap((client) =>
               Effect.all(
                 {
-                  found: requestDocsSearch({ client, term }),
+                  results: requestDocsSearch({ client, term }),
                   home: requestDocsPage({
                     client,
                     address: "/start/quickstart",
@@ -112,9 +112,10 @@ export const loadDocsSearch = (
                 { concurrency: "unbounded" }
               )
             ),
-            Effect.map(({ found, home }) =>
+            Effect.map(({ results, home }) =>
               WebsiteDocsSearchView.Found({
-                ...found,
+                navigation: home.navigation,
+                results,
                 term,
                 theme: home.page.theme,
               })

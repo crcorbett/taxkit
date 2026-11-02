@@ -14,7 +14,7 @@ import {
 } from "effect";
 
 import { DocsCodeBlock } from "./code-block.view";
-import { requestDocsNavigationFocus } from "./components";
+import { useDocsNavigationFocus } from "./focus.container";
 
 const pageLinkPattern = /^(?<path>\/[^#]*)(?:#(?<hash>.+))?$/u;
 // Content resolved every link: a public page path, a same-page fragment or an
@@ -25,8 +25,9 @@ const InlineLink = ({
 }: Readonly<{
   children: React.ReactNode;
   href: string;
-}>) =>
-  Option.fromNullishOr(pageLinkPattern.exec(href)?.groups).pipe(
+}>) => {
+  const requestDocsNavigationFocus = useDocsNavigationFocus();
+  return Option.fromNullishOr(pageLinkPattern.exec(href)?.groups).pipe(
     Option.match({
       onNone: () => <a href={href}>{children}</a>,
       onSome: (page) => (
@@ -53,6 +54,7 @@ const InlineLink = ({
       ),
     })
   );
+};
 const Inlines = ({
   content,
 }: Readonly<{

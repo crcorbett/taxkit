@@ -11,6 +11,7 @@ import {
   Option,
 } from "effect";
 import { ChevronDown, List } from "lucide-react";
+import type { ReactNode } from "react";
 
 const formatInlineText = (content: readonly DocsInline[]): string =>
   EffectFunction.pipe(
@@ -29,7 +30,7 @@ const formatInlineText = (content: readonly DocsInline[]): string =>
     Array.join("")
   );
 
-export const DocsOutline = ({
+export const DocsOutlineView = ({
   body,
   active,
 }: Readonly<{
@@ -60,17 +61,13 @@ export const DocsOutline = ({
 );
 
 export const DocsMobileOutline = ({
-  body,
-  active,
-}: Readonly<{
-  body: DocsReadingBody;
-  active: Option.Option<DocsHeadingId>;
-}>) => (
+  children,
+}: Readonly<{ children: ReactNode }>) => (
   <details className="docs-mobile-outline">
     <summary>
       <List aria-hidden="true" size={16} /> On this page{" "}
       <ChevronDown aria-hidden="true" size={16} />
     </summary>
-    <DocsOutline active={active} body={body} />
+    {children}
   </details>
 );

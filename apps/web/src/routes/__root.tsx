@@ -29,6 +29,8 @@ import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 
 import { publicSettingsAtom } from "#/lib/api-client.atoms";
+import { docsHeadingId } from "#/lib/docs/focus.atoms";
+import { DocsNavigationFocus } from "#/lib/docs/focus.container";
 import { WebsiteRootView } from "#/lib/host/schemas";
 import type { WebsitePublicSettings } from "#/lib/host/schemas";
 import type { LoaderContext } from "#/lib/pages/loader-context";
@@ -159,11 +161,12 @@ function RootComponent() {
   return (
     <RootRegistry registry={registry}>
       <InitialSettings settings={settings}>
+        <DocsNavigationFocus />
         <div className="app-shell">
           <a
             className="skip-link"
             href={Match.value(documentation).pipe(
-              Match.when(true, () => "#taxkit-docs-content"),
+              Match.when(true, () => `#${docsHeadingId}`),
               Match.orElse(() => "#main-content")
             )}
           >

@@ -3,7 +3,7 @@ document_type: design-guide
 lifecycle: current
 authority: canonical
 owner: taxkit-web-app-owner
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-02
 ---
 
 # Website design
@@ -67,11 +67,17 @@ built-in behaviour is sufficient.
   Escape and restores the trigger. Following a page link closes it and focuses
   the article heading, including a link to the current page. Its portal stays
   inside the themed subtree. Modified clicks retain normal browser behaviour.
+  One mount-local Atom owns its closed/open/following-link state; Base UI owns
+  the dialog mechanics. Search drafts also use mount-local Atoms.
 - The skip link targets the article heading. Initial hydration leaves focus
-  alone; ordinary client navigation requests focus on the new heading.
+  alone; ordinary client navigation records the destination in a registry Atom.
+  A scoped native Router subscription consumes it after that destination renders,
+  without taking over hash or scroll restoration. Superseding navigation clears it.
 - “On this page” uses native fragment links. A scoped IntersectionObserver
   marks the current checked heading, including the final heading at the end of
-  the document. The mobile outline is a native disclosure.
+  the document. Only the outline leaves subscribe to that Atom; semantic equality
+  suppresses repeated selections, so scrolling does not rerender the article.
+  The mobile outline is a native disclosure.
 - Search retains a native GET form and a client navigation enhancement. The
   route remains the sole owner of URL validation and loading; its native loader
   dependencies distinguish queries during Back and Forward navigation.

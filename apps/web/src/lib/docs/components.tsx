@@ -1,11 +1,6 @@
-import { Predicate } from "effect";
-import type { ComponentPropsWithoutRef, MouseEvent } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
-const focusIntentAttribute = "data-docs-focus-heading";
-
-export const requestDocsHeadingFocus = () => {
-  document.documentElement.setAttribute(focusIntentAttribute, "true");
-};
+import { docsHeadingId } from "./focus.atoms";
 
 // Focus is a local browser command shared by navigation and page links.
 // Only ordinary route clicks record intent; hydration never does.
@@ -17,32 +12,10 @@ export const isDocsNavigationClick = (event: MouseEvent<HTMLAnchorElement>) =>
   !event.metaKey &&
   !event.shiftKey;
 
-export const requestDocsNavigationFocus = (
-  event: MouseEvent<HTMLAnchorElement>
-) => {
-  if (isDocsNavigationClick(event)) {
-    requestDocsHeadingFocus();
-  }
-};
-
 export const DocsHeading = ({
   children,
-  ...props
-}: Readonly<ComponentPropsWithoutRef<"h1">>) => (
-  <h1
-    id="taxkit-docs-content"
-    {...props}
-    ref={(heading) => {
-      if (
-        !Predicate.isNull(heading) &&
-        document.documentElement.getAttribute(focusIntentAttribute) === "true"
-      ) {
-        document.documentElement.removeAttribute(focusIntentAttribute);
-        heading.focus();
-      }
-    }}
-    tabIndex={-1}
-  >
+}: Readonly<{ children: ReactNode }>) => (
+  <h1 id={docsHeadingId} tabIndex={-1}>
     {children}
   </h1>
 );

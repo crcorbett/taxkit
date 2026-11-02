@@ -6,7 +6,7 @@ import type {
 import { Array, Function as EffectFunction, Option } from "effect";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-import { requestDocsNavigationFocus } from "./components";
+import { useDocsNavigationFocus } from "./focus.container";
 
 export const DocsPager = ({
   navigation,
@@ -15,6 +15,7 @@ export const DocsPager = ({
   navigation: DocsPublicNavigation;
   currentPath: DocsPublicPage["path"];
 }>) => {
+  const requestDocsNavigationFocus = useDocsNavigationFocus();
   const pages = EffectFunction.pipe(
     navigation.primaryNavigation,
     Array.flatMap((section) => [section, ...section.pages])

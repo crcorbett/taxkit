@@ -1,14 +1,19 @@
+import { useAtom, useAtomSet } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import type { DocsSearchTerm } from "@taxkit/content/schemas";
+import { Function as EffectFunction, Option } from "effect";
+import * as Atom from "effect/reactivity/Atom";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useMemo } from "react";
 
-import { requestDocsHeadingFocus } from "./components";
+import { docsHeadingFocusAtom } from "./focus.atoms";
 
 export const DocsSearchForm = ({
   term,
 }: Readonly<{ term: DocsSearchTerm | "" }>) => {
-  const [words, setWords] = useState<string>(term);
+  const draft = useMemo(() => Atom.make<string>(term), [term]);
+  const [words, setWords] = useAtom(draft);
+  const requestHeadingFocus = useAtomSet(docsHeadingFocusAtom);
   const router = useRouter();
   return (
     <search>
@@ -18,12 +23,11 @@ export const DocsSearchForm = ({
         method="GET"
         onSubmit={(event) => {
           event.preventDefault();
-          requestDocsHeadingFocus();
+          const href = `/search?${new URLSearchParams({ term: words })}`;
+          EffectFunction.pipe(href, Option.some, requestHeadingFocus);
           // Native history emits the navigation; Router owns asynchronous loaders,
           // cancellation and errors. The ordinary GET action also works without JS.
-          router.history.push(
-            `/search?${new URLSearchParams({ term: words })}`
-          );
+          router.history.push(href);
         }}
       >
         <label htmlFor="docs-search-term">Search words</label>

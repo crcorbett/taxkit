@@ -15,7 +15,8 @@ import {
   SquareTerminal,
 } from "lucide-react";
 
-import { requestDocsNavigationFocus } from "./components";
+import { docsHeadingId } from "./focus.atoms";
+import { useDocsNavigationFocus } from "./focus.container";
 import { DocsMenu } from "./menu.container";
 import { DocsNavigation } from "./page.view";
 import { DocsAppearance } from "./reader.container";
@@ -29,6 +30,7 @@ export const DocsHeader = ({
   currentPath: Option.Option<DocsPublicPage["path"]>;
   navigation: DocsPublicNavigation;
 }>) => {
+  const requestDocsNavigationFocus = useDocsNavigationFocus();
   const loading = useRouterState({ select: (state) => state.isLoading });
   return (
     <>
@@ -128,7 +130,7 @@ export const DocsPageActions = ({
       <FileText aria-hidden="true" size={15} />
       Read as Markdown
     </a>
-    <a href="#taxkit-docs-content">
+    <a href={`#${docsHeadingId}`}>
       <ArrowUp aria-hidden="true" size={15} />
       Back to top
     </a>

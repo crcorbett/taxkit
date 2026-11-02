@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-11-01
+last_reviewed: 2026-11-02
 review_trigger: frontend runtime, API client, loader, rendering, cache, build adapter, or composition change
 ---
 
@@ -227,13 +227,17 @@ router/React registry retains the choice across client navigation; reloads
 return to the device default, without cookies or browser storage. Code tokens
 retain both appearances and SVGs embed both palettes. Search obtains its theme
 from the canonical Quickstart page through existing bounded reads, without a new
-endpoint or cache; an empty search reads navigation twice and the page once.
+endpoint or cache; its page read supplies navigation once, and the search helper
+reads results only for nonempty words.
 The public docs client uses `/api/v2/docs`; calculator routes retain their
 existing version.
 
 Copy commands use the static native Clipboard Layer in `browserRuntime` and
 per-control action Atoms; they never acquire the generated API client. The
-page outline uses a scoped observer action on that same runtime. Native Router
+page outline uses a scoped resource Atom on that same runtime, with semantic
+selection equality and subscriptions confined to outline leaves. Menu/search
+drafts are mount-local Atoms; focus intent is registry-owned and consumed after
+the intended native navigation renders. Native Router
 retains the resolved page while navigation loads, and recovery pages without a
 checked theme use platform system colours. No component creates another runtime
 or registry.

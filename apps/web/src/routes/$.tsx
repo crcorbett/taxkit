@@ -5,8 +5,8 @@ import { ChevronRight } from "lucide-react";
 import { DocsHeader, DocsPageActions } from "#/lib/docs/chrome.view";
 import { DocsHeading } from "#/lib/docs/components";
 import { DocsCopyButton } from "#/lib/docs/copy-button.container";
-import { useDocsOutline } from "#/lib/docs/outline.container";
-import { DocsMobileOutline, DocsOutline } from "#/lib/docs/outline.view";
+import { DocsOutline, useDocsOutline } from "#/lib/docs/outline.container";
+import { DocsMobileOutline } from "#/lib/docs/outline.view";
 import { DocsNavigation } from "#/lib/docs/page.view";
 import { DocsPager } from "#/lib/docs/pager.view";
 import { DocsReader } from "#/lib/docs/reader.container";
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/$")({
 
 function DocumentationRoute() {
   const { metadata, navigation, page } = Route.useLoaderData();
-  const activeHeading = useDocsOutline(page.body);
+  const activeHeadingAtom = useDocsOutline(page.body);
   const section = EffectFunction.pipe(
     navigation.primaryNavigation,
     Array.findFirst(
@@ -68,7 +68,9 @@ function DocumentationRoute() {
           />
         </aside>
         <article className="docs-article">
-          <DocsMobileOutline active={activeHeading} body={page.body} />
+          <DocsMobileOutline>
+            <DocsOutline active={activeHeadingAtom} body={page.body} />
+          </DocsMobileOutline>
           <header className="docs-article-header">
             <div className="docs-meta-row">
               <div className="docs-breadcrumbs">
@@ -108,7 +110,7 @@ function DocumentationRoute() {
         <aside className="docs-page-sidebar">
           <div className="docs-page-sidebar-inner">
             <p className="docs-outline-title">On this page</p>
-            <DocsOutline active={activeHeading} body={page.body} />
+            <DocsOutline active={activeHeadingAtom} body={page.body} />
             <DocsPageActions
               markdown={metadata.markdown}
               source={page.source}

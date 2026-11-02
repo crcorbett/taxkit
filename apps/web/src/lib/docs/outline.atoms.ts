@@ -2,6 +2,7 @@ import type { DocsHeadingId, DocsReadingBody } from "@taxkit/content/schemas";
 import {
   Array,
   Boolean as EffectBoolean,
+  Equal,
   Effect,
   Function as EffectFunction,
   Option,
@@ -11,8 +12,10 @@ import * as Atom from "effect/reactivity/Atom";
 import { browserRuntime } from "../api-client.atoms";
 
 export const createDocsOutline = (body: DocsReadingBody) => {
-  const active = Atom.make(Option.none<DocsHeadingId>());
-  const observe = browserRuntime.fn<"observe">()((_, get) =>
+  const active = Atom.make(Option.none<DocsHeadingId>()).pipe(
+    Atom.withEquality(Equal.equals)
+  );
+  const observe = browserRuntime.atom((get) =>
     Effect.gen(function* () {
       const targets = yield* Effect.sync(() =>
         EffectFunction.pipe(
