@@ -10,6 +10,7 @@
     "../../calculators/src/**/*.ts",
     "../../content/src/**/*.ts",
     "../../mdx/src/schemas.ts",
+    "../../mdx/src/theme.schemas.ts",
     "../../mdx/src/service.ts",
     "../../mdx/src/errors.ts",
     "../../api/http/src/**/*.ts",

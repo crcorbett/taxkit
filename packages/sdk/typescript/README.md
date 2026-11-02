@@ -239,7 +239,8 @@ normal packed-artifact check and this consumer use the assembled distribution.
 
 `tsconfig.build.json` compiles the SDK and the private sources it includes in
 one program; TypeScript does not emit files reached through `node_modules`, so
-it lists each private source folder. `assemble-package.runtime.ts` moves each
+it lists each private source folder and the MDX contract modules, including
+the paired theme Schemas. `assemble-package.runtime.ts` moves each
 owner's output to `dist/internal`, rewriting only import/export syntax through the TypeScript AST.
 It relocates both JavaScript and declarations, preserving Schema and class
 identity across entry points. Runtime service identifiers and data strings are
