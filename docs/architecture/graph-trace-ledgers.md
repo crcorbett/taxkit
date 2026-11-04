@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-core-architecture-owner
-last_reviewed: 2026-10-06
+last_reviewed: 2026-11-04
 review_trigger: graph, trace, ledger or encoded contract change
 ---
 
@@ -61,15 +61,10 @@ exported domain and encoded aliases add only their recursive children relation.
 Inputs and results use checked `Schema.Json`, and source references reuse
 `SourceRef`. No second interface repeats their fields.
 
-The codec retains its historical field order and the distinction between a
-missing optional key and a present undefined key. Schema encoding and decoding
-own representation changes. The packed consumer checks nested traces and exact
-legacy bytes. Formula and rounding use `Option<Option<Value>>`: outer None
-means a missing key, Some(None) a present undefined key, and Some(Some(value))
-a value. Constructor and recursive child inputs derive from the same field
-owner. Their typed contract rejects incorrect ordinary fields and unbranded
-rule IDs while preserving the historical encoded forms.
-
+Formula and rounding use one `Option<Value>` each. Constructors and recursive
+child inputs derive from the same field owner. Encoding omits semantically
+absent values; decoded Type values do not preserve own-key/undefined identity.
+Legal source artifact Schemas preserve their separately verified evidence.
 
 Trace output is part of the engine contract, not only debugging. It supports trust, auditability, contributor review and calculation explanation.
 

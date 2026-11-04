@@ -7,14 +7,11 @@ import type { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax";
 import {
   AuAnnualIncomeTaxCalculation,
   AnnualTaxLedgerDescriptor,
-  AuAnnualTax2025_26_Live,
 } from "@taxkit/rules-au-income-tax";
 import type { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay";
 import {
   AuPayTakeHomeCalculation,
   AuPayWithholdingsCalculation,
-  AuPayWithholdings2025_26_Live,
-  AuTakeHomePay2025_26_Live,
   NetPayDescriptor,
   PayWithholdingsLedgerDescriptor,
   PaygWithholdingComponentDescriptor,
@@ -28,7 +25,6 @@ import {
   Option,
   Schema,
 } from "effect";
-import type { Layer } from "effect";
 
 import type {
   CalculatorContext,
@@ -62,7 +58,6 @@ export interface CalculatorCatalogEntry {
   readonly reportSchema: Schema.Top;
   readonly reportSchemaName: string;
   readonly ruleDescriptors: readonly AnyRuleDescriptor[];
-  readonly rulePackLayer: Layer.Any;
   readonly supportedHelpModes: readonly HelpMode[];
   readonly title: string;
 }
@@ -122,7 +117,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
       PaygWithholdingComponentDescriptor,
     ],
     reportSchemaName: "TakeHomePayReport",
-    rulePackLayer: AuTakeHomePay2025_26_Live,
     supportedHelpModes: SupportedHelpModes,
   }),
   defineCalculatorCatalogEntry({
@@ -135,7 +129,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
       PayWithholdingsLedgerDescriptor,
     ],
     reportSchemaName: "PayWithholdingsLedger",
-    rulePackLayer: AuPayWithholdings2025_26_Live,
     supportedHelpModes: SupportedHelpModes,
   }),
   defineCalculatorCatalogEntry({
@@ -144,7 +137,6 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     description: "Australian annual income tax liability estimate.",
     outputFacts: [AnnualTaxLedgerDescriptor],
     reportSchemaName: "AnnualTaxReport",
-    rulePackLayer: AuAnnualTax2025_26_Live,
     supportedHelpModes: SupportedHelpModes,
   }),
 ];

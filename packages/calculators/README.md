@@ -3,144 +3,66 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-calculators-owner
-last_reviewed: 2026-10-31
+last_reviewed: 2026-11-04
 review_trigger: schemas, exports, calculator contract or runtime ownership change
 ---
 
 # Calculators
 
-Reusable public calculator orchestration package.
+This private package owns the public calculator catalogue, correlated transport
+Schemas, metadata projections and `PublicCalculatorService`. HTTP and MCP hosts
+use the service. The SDK executes the same complete rule-owned definitions
+through the calculation engine directly.
 
-## Scope
+## Contracts
 
-`packages/calculators` owns the package boundary for reusable calculator
-catalog, metadata, graph, calculation and expected-error behavior used by HTTP,
-SDK, CLI and direct in-process callers.
+`CalculatorRunRequest` is a discriminated union of exact calculator identities
+and their owning scenario codecs. Its body contains `calculatorId` and `payload`;
+the payload holds checked `facts` plus optional jurisdiction/year. Decoded
+optional fields use one `Option`. Transport ingress decodes strictly once, then
+the service dispatches the checked scenario to its owning definition.
 
-The package currently owns reusable calculator schemas, catalog entries and
-metadata projections, the `PublicCalculatorService` contract, production live
-layer, calculator graph construction, calculation dispatch and schema-guided
-expected error shaping. HTTP handlers own transport wiring only.
+`CalculatorRunResponse` correlates the identity, catalogue metadata and owning
+report codec, with native engine diagnostics. `CalculatorServiceError` composes
+safe input, context, calculation and host-policy failures. Shared
+`InputValidationError` projects bounded field paths and fixed messages without
+rejected values or opaque diagnostic causes. Descriptor-backed field guidance
+comes from the schema endpoint.
 
-## Ownership
+Catalogue registration takes a complete owning definition; it cannot override
+its identity, input/output schemas, fact descriptors or rule graph. Metadata
+contains publication information, without a second rule-pack execution Layer.
+The definition validates its static graph and owns native execution.
 
-This package owns:
+## Browser calculator pages
 
-- calculator catalog composition schemas and entries
-- metadata projections for calculator, fact, rule and graph discovery
-- calculator service tags and layers
-- schema-guided expected error shaping for calculation inputs
-- composition of canonical scenario layers, rule-pack layers and
-  `CalculationEngine`
-- the `CalculatorRunFacts` union that composes canonical rule-owned
-  calculator input schemas for generated API docs and typed clients
-- `CalculatorRunRequest`, `CalculatorRunServiceRequest`,
-  `CalculatorRunReport`, `CalculatorRunResponse` and
-  `CalculatorRunResponseData` as the canonical reusable calculator execution
-  contract for SDK, HTTP, CLI and in-process callers
-- `CalculatorServiceError` as the canonical reusable calculator service error
-  union
-- selected-calculator input decoding through each catalog entry's canonical
-  `inputSchema`
+- `./form` owns visible form Schemas, worked examples and `requestFromForm`.
+  It converts text into the owning checked scenario and correlated request.
+- `./page` owns `makeCalculatorPages`, the shared Atom group and commands.
+- `./page-schemas` owns `CalculatorViewState` and `CalculatorToolFailure`.
+- `./page-tools` owns page tools that use the same commands and state.
 
-The public issue projection preserves the schema issue tag, normalized field
-path and descriptor-backed help, but uses stable message text. Rejected values
-are never copied into calculator errors, so secrets and machine-local paths do
-not escape through direct, SDK or HTTP consumers.
+The host supplies the cancellable calculation command and safe failure text.
+This package imports neither Website/API applications nor the HTTP package.
 
-It also owns the browser calculator page, shared by the Website and its page
-tools:
+## Boundaries
 
-- `./form`: the visible take-home and annual forms, their worked examples, and
-  `requestFromForm`, which turns a form into a checked
-  `CalculatorRunServiceRequest` or a safe `CalculatorInputError`;
-- `./page`: `makeCalculatorPages`, one `Atom.family` group per calculator with
-  the form, commands and readonly view. The host supplies the cancellable
-  calculation command and its safe failure text;
-- `./page-schemas`: `CalculatorViewState` and `CalculatorToolFailure`;
-- `./page-tools`: `CalculatorPageToolkit`, the five page tools, and
-  `calculatorPageToolHandlers`, which drive the page's own commands.
+Service contracts, live Layers, host admission/work policy and test fixtures
+have separate owners. Native fact/parameter service requirements stay visible
+until their Layers are supplied. Apps own runtime execution and disposal.
+HTTP status mapping, OpenAPI annotations and request-body limits belong to HTTP.
 
-This package must not own:
-
-- HTTP endpoints, OpenAPI annotations or HTTP status mapping
-- Bun serving, app runtime lifecycle or process config
-- SDK client transport or CLI command parsing
-- imports from `@taxkit/api-http`, `apps/api`, `apps/web` or runtime modules
-
-## Guardrails
-
-- Reuse canonical schemas, descriptors, service tags, tagged errors and
-  constructors from owning packages.
-- `CalculatorRunFacts` must compose rule-owned scenario input schemas; do not
-  use `Schema.Unknown`, mirrored fact DTOs or loose arbitrary records for the
-  calculate contract.
-- Decode calculate payload facts with the selected catalog entry's
-  `inputSchema` before execution so valid facts for the wrong calculator return
-  `InputValidationError` with bounded safe field issues.
-- Compose rule-owned calculator ids, jurisdictions and tax years. Do not
-  redeclare supported calculator context literals in this package.
-- Use Effect-native primitives where they fit: `Schema`, `Option`, `Match`,
-  `Array`, `Chunk`, `HashMap`, `HashSet`, `Context`, `Layer`, `Result` and
-  `Exit`.
-- Keep schema and tagged value shapes in owning schema modules.
-- Keep expected domain failures in the typed error channel. Use `Effect.die`
-  only for defects outside the service contract.
-- Use schema-owned optional fields instead of conditional response-shaping
-  object spreads.
-- Keep runtime execution outside this package. Calculator code returns Effect
-  programs and layers; apps own `BunRuntime.runMain` and `ManagedRuntime`
-  lifecycle.
-- Catalogue entries expose their selected, checked `calculate` continuation.
-  The unused generic `program` field is removed from the fresh interface;
-  rule-owned calculator programs remain available from their rule packages.
-- Keep service contracts separate from layer wiring. Do not export `Live`,
-  `Mock` or `Test` layers from service contract files.
-
-## Commands
+This package exports TypeScript source. The single `taxkit` archive compiles its
+public Schema dependencies; no second public npm package is published.
 
 ```sh
 bun run --filter=@taxkit/calculators check-types
+bun run --filter=@taxkit/calculators test
 ```
 
-## Packaging
-
-This private package exports its TypeScript source and has no build. The SDK
-compiles it into its single archive; the SDK-owned downstream check validates
-that packed archive, its public entry points and dependency ranges.
-
-## Public Exports
-
-- `@taxkit/calculators`
-- `@taxkit/calculators/catalog`
-- `@taxkit/calculators/errors`
-- `@taxkit/calculators/live`
-- `@taxkit/calculators/metadata`
-- `@taxkit/calculators/service`
-- `@taxkit/calculators/schemas`
-- `@taxkit/calculators/summaries`
-- `@taxkit/calculators/work`
-
-## Related Docs
-
-- `docs/architecture/package-ownership.md`
-- `docs/architecture/package-boundaries.md`
-- `docs/architecture/effect-services.md`
-- `docs/architecture/api-and-sdk.md`
-
-## Browser Schema entrypoints
-
-`@taxkit/calculators/schemas` consumes narrow core/rule Schema entrypoints and owns no live runtime or rule pack. The HTTP contract reuses its existing request and report Schemas; calculation remains with `PublicCalculatorService.calculate`.
-
-`@taxkit/calculators/summaries` owns checked calculator IDs, names and contexts
-using the schema-derived `CalculatorSummary`. Catalogue composition reuses
-those values, and browser navigation can use them without importing calculator
-execution or live rule Layers. The application owns route addresses. Summaries
-follow the deployed application version; full discovery metadata remains an
-API operation. `CalculatorSummaries` lists the supported summaries; the named
-exports identify the take-home, pay-withholdings and annual-tax calculators.
-
-The [transport architecture](../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
+`check-types` includes source, tests and negative catalogue contract examples.
+See [API and SDK](../../../docs/architecture/api-and-sdk.md) and
+[ADR 0011](../../../docs/adr/0011-effect-native-sdk-contracts.md).
 
 ## Shared calculation work limits
 
@@ -170,25 +92,6 @@ a calculation automatically. Metadata lookup errors use the canonical
 operation timeout. Their lazy invocation counts eager metadata construction
 inside the operation budget. The native rate policy below is separate from
 future MCP admission.
-
-
-Core descriptor questions, source artifacts and duplicate-provider permissions
-are Options; rule parameter collections are total arrays. Metadata and error-help
-builders reuse those checked values directly. Public metadata codecs keep the
-same JSON fields, missing keys and values.
-
-Calculator-owned context, help and filter fields use `Option<Option<A>>` in
-checked TypeScript values: one `Option` represents semantic absence, and ingress
-converts omitted request fields.
-
-Optional error calculator identity/help, fact question and rule permission
-fields use the same representation-preserving owners. Explicit false permission
-remains a present value. Facts still decode once through the selected calculator
-so rejected input gets safe field guidance.
-
-`check-types` checks source and `tsconfig.test.json`; service/work test fixtures
-must use the canonical request Type, even when runtime tests could accept a raw
-object. The package test command retains the original tax and cleanup assertions.
 
 
 ## Native calculation rate admission

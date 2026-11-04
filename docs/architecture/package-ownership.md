@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-11-04
 review_trigger: package, app, root composition, or semantic ownership change
 ---
 
@@ -109,7 +109,7 @@ modules.
 `packages/sdk/typescript`
 : The sole TypeScript package configured for public npm installation as `taxkit`.
 It owns browser-safe schemas, typed calculation facades,
-Effect-native subpaths, jurisdiction modules, examples, compatibility tests and
+Effect-native subpaths, jurisdiction definitions, examples, contract tests and
 packed-artifact checks. Its strict downstream validator may orchestrate the
 single SDK archive and verify its imports in a fresh project, but package
 manifests and exports remain owned by their packages. The distribution includes
@@ -117,9 +117,10 @@ the canonical HTTP contracts through an isolated `/http` entry; calculation
 facades do not import it. HTTP transports call the
 calculator service directly. SDK-owned tests compare the transport and facade
 without a reverse HTTP-to-SDK dependency. Its Effect entrypoint owns
-request-preserving calculator helpers such as `calculateRunRequest`,
-`calculateReportRequest` and `calculateReport`, while reusing
-calculator-owned `CalculatorRun*` schemas and `CalculatorServiceError`.
+`calculateRun`, `calculateReport` and explicit `decodeInput`. Checked scenarios,
+report codecs and native programs come from complete rule-owned definitions;
+plain Promise/Result operations execute those same programs. HTTP/MCP contract
+and admission policy remain with their respective packages.
 
 The private repository root is named `@taxkit/workspace` to keep its workspace
 identity distinct from `taxkit`, the sole public npm package.

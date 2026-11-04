@@ -3,7 +3,7 @@ document_type: standard
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-30
+last_reviewed: 2026-11-04
 review_trigger: Effect, schema boundary, service, Layer, collection, error, or abstraction rule change
 ---
 
@@ -173,12 +173,11 @@ return Option.match(row, {
 });
 ```
 
-Calculator-owned context, help and filter fields use `Option<Option<A>>` in
-checked TypeScript values: `None` means a missing key, `Some(None)` means a
-present undefined key, and `Some(Some(value))` means a present value. Owning
-constructors default omitted keys to `None`. JSON and HTTP query fields retain
-their ordinary optional representation. Flatten the two absent forms only where
-they mean the same thing; do not invent a jurisdiction or tax year.
+Calculator-owned context, help and filter fields use one `Option<A>` in
+checked TypeScript values. Owning constructors default omitted keys to `None`;
+transport codecs convert ordinary optional fields at ingress. Do not invent a
+jurisdiction or year. Missing context remains absent or fails through an
+explicitly owning Schema and tagged error.
 
 Nullable representations require an explicitly owning nullable Schema and a
 single ingress transform. Already checked Options must not be wrapped again
@@ -186,7 +185,6 @@ through `Option.fromNullable` or decoded as their wire form.
 
 ```ts
 return payload.jurisdiction.pipe(
-  Option.flatten,
   Option.match({
     onNone: () => Effect.void,
     onSome: (jurisdiction) => {

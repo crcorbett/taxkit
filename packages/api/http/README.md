@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-11-02
+last_reviewed: 2026-11-04
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -89,17 +89,16 @@ Callers use Effect's generated client directly:
 content, runs in the caller's Layer scope and closes each request's scope. The
 generated client checks the same response Schemas as remote consumers.
 
-```ts
+```txt
 HTTP calculate
-
-API host
-  -> TaxKitApiRoutesLayer
-    -> CalculatorApiHandlerLive
-      -> PublicCalculatorService.calculate({ calculatorId, payload, ...query })
-        -> selected calculator input decode and CalculationEngine
-        -> CalculatorRunResponseData
-      -> existing CalculatorApiErrorEnvelope on expected failure
+  -> native strict CalculatorRunRequest payload codec
+    -> checked correlated identity and scenario
+      -> CalculatorApiHandlerLive verifies path/body identity
+        -> PublicCalculatorService.calculate(request)
+          -> complete owning calculator definition and CalculationEngine
+          -> correlated CalculatorRunResponse
 ```
+
 
 ```ts
 Tests: in-process HTTP client
@@ -113,24 +112,23 @@ SDK HTTP comparison tests
   -> InputValidationError maps to CalculatorApiErrorEnvelope
 ```
 
-The calculate route imports reusable `CalculatorRun*` schemas and
-`CalculatorServiceError` from `@taxkit/calculators`. `CalculatorRunRequest`
-has a `facts` field that is a union of canonical rule-owned input schemas, so
-generated OpenAPI exposes concrete supported fact shapes under `facts.anyOf`
-instead of `Schema.Unknown`. HTTP-only names such as
-`CalculatorApiErrorEnvelope` stay in this package because they describe
-calculator API transport status encoding. HTTP
-handlers must not try to select or transform calculator facts locally;
-`PublicCalculatorService` performs the selected-calculator `inputSchema` decode
-and returns `InputValidationError` with bounded safe field issues for
-incompatible calculator/facts combinations.
+The calculate route imports the correlated `CalculatorRunRequest` and
+`CalculatorRunResponse` from `@taxkit/calculators`. Each request variant binds
+its exact identity to the owning scenario codec. Native `PayloadParseOptions`
+rejects excess properties at every level. Safe `InputValidationError` projection
+maps rejected payloads to the declared HTTP 400 envelope. The service receives
+checked values and executes without another representation decoder.
+
+HTTP envelopes and status annotations remain transport-owned. Schema endpoints
+supply fact questions, rules and source guidance. Metadata help uses its own
+query contract; calculations accept only the correlated request body.
 
 ## Main Areas
 
 - `src/api.ts`: `TaxKitApi` definition and OpenAPI annotations.
 - `src/groups/health.ts`: health endpoint schema and route group.
 - `src/groups/calculators.ts`: public calculation HTTP route schemas, bad
-  request envelope, OpenAPI annotations and compatibility exports from
+  request envelope, OpenAPI annotations and public schema exports from
   `@taxkit/calculators`.
 - `src/requests.ts` (`./requests`): the generated client's named reads for its
   callers, `requestDocsPage`, `requestDocsSearch`, `requestDocsMarkdown`,
@@ -452,23 +450,9 @@ endpoint declares 504 for the shared operation timeout; lookup failures retain
 400. Metadata never consumes a calculation place. No automatic retry is added.
 
 
-Calculator-owned context, help and filter fields use `Option<Option<A>>` in
-checked TypeScript values: `None` means a missing key, `Some(None)` means a
-present undefined key, and `Some(Some(value))` means a present value. Owning
-constructors default omitted keys to `None`. JSON and HTTP query fields retain
-their ordinary optional representation. Flatten the two absent forms only where
-they mean the same thing; do not invent a jurisdiction or tax year.
-
-Typed client calls use canonical constructor values. Raw HTTP JSON and query
-strings still encode and decode through the owning request codecs; the OpenAPI
-snapshot remains the representation contract.
-
-
-The reusable Core calculation error now has a nested Option cause in checked
-TypeScript values. Its existing HTTP representation is retained, including
-missing/undefined/null diagnostic forms. This is an absence-owner change, not
-a diagnostic sanitiser; do not export legacy diagnostic values to telemetry.
-
+Optional request fields use one semantic Option after ingress. Core calculation
+errors expose a safe message and closed reason without diagnostic causes.
+Native request/response codecs and the OpenAPI snapshot own HTTP representation.
 
 ## Native calculation rate admission
 
