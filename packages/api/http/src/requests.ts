@@ -1,4 +1,4 @@
-import { MetadataQuery } from "@taxkit/calculators/schemas";
+import { CalculatorId, MetadataQuery } from "@taxkit/calculators/schemas";
 import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import {
   DocsPageUnavailable,
@@ -242,7 +242,7 @@ export const requestCalculation = Effect.fn("TaxKitApi.requestCalculation")(
   }) {
     const response = yield* client.calculatorApi
       .calculate({
-        params: { calculatorId: request.calculatorId },
+        params: { calculatorId: CalculatorId.make(request.calculatorId) },
         payload: request,
       })
       .pipe(

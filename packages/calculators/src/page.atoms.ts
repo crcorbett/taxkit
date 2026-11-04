@@ -17,6 +17,7 @@ import * as Atom from "effect/reactivity/Atom";
 import { initialCalculatorForm, requestFromForm } from "./form.ingress.js";
 import type { CalculatorForm } from "./form.ingress.js";
 import type { CalculatorViewState } from "./page.schemas.js";
+import { CalculatorId as CatalogCalculatorId } from "./schemas.js";
 import type { CalculatorRunResponse, CalculatorRunRequest } from "./schemas.js";
 
 type CalculatorId = CalculatorRunRequest["calculatorId"];
@@ -148,7 +149,7 @@ export const makeCalculatorPages = <E>({
         });
         return {
           busy: submitted && current.waiting,
-          calculatorId,
+          calculatorId: CatalogCalculatorId.make(calculatorId),
           form: get(group.form),
           message,
           report,

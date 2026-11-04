@@ -19,15 +19,11 @@ import {
   toFactsResponse,
   toRulesResponse,
 } from "./metadata.js";
-import type {
-  TakeHomeCalculationRequest,
-  WithholdingsCalculationRequest,
-  AnnualTaxCalculationRequest,
-} from "./schemas.js";
 import {
   CalculatorCatalogResponseData,
   DescriptorFilterQuery,
   CalculatorRunRequest,
+  CalculatorId,
   UnsupportedCalculatorContextError,
 } from "./schemas.js";
 import { PublicCalculatorService } from "./service.js";
@@ -48,40 +44,36 @@ const calculateWithEntry = ({
   readonly engine: CalculationEngine["Service"];
 }) =>
   CalculatorRunRequest.match(request, {
-    "au.pay.take-home": (selected: typeof TakeHomeCalculationRequest.Type) =>
+    "au.pay.take-home": (selected) =>
       AuPayTakeHomeCalculation.calculate(selected.payload.facts).pipe(
         Effect.map((run) => ({
           ...run,
           calculatorId: selected.calculatorId,
           calculator: {
             ...toCalculatorCatalogItem(entry),
-            calculatorId: selected.calculatorId,
+            calculatorId: AuPayTakeHomeCalculation.calculatorId,
           },
         }))
       ),
-    "au.pay.withholdings": (
-      selected: typeof WithholdingsCalculationRequest.Type
-    ) =>
+    "au.pay.withholdings": (selected) =>
       AuPayWithholdingsCalculation.calculate(selected.payload.facts).pipe(
         Effect.map((run) => ({
           ...run,
           calculatorId: selected.calculatorId,
           calculator: {
             ...toCalculatorCatalogItem(entry),
-            calculatorId: selected.calculatorId,
+            calculatorId: AuPayWithholdingsCalculation.calculatorId,
           },
         }))
       ),
-    "au.income-tax.annual": (
-      selected: typeof AnnualTaxCalculationRequest.Type
-    ) =>
+    "au.income-tax.annual": (selected) =>
       AuAnnualIncomeTaxCalculation.calculate(selected.payload.facts).pipe(
         Effect.map((run) => ({
           ...run,
           calculatorId: selected.calculatorId,
           calculator: {
             ...toCalculatorCatalogItem(entry),
-            calculatorId: selected.calculatorId,
+            calculatorId: AuAnnualIncomeTaxCalculation.calculatorId,
           },
         }))
       ),
@@ -99,15 +91,16 @@ export const PublicCalculatorServiceLive = Layer.effect(
   Effect.gen(function* () {
     const engine = yield* CalculationEngine;
     return PublicCalculatorService.of({
-      calculate: Effect.fn("PublicCalculatorService.calculate")((request) =>
-        getCalculatorCatalogEntry(request.calculatorId, request.payload).pipe(
+      calculate: Effect.fn("PublicCalculatorService.calculate")((request) => {
+        const calculatorId = CalculatorId.make(request.calculatorId);
+        return getCalculatorCatalogEntry(calculatorId, request.payload).pipe(
           Effect.fromOption,
           Effect.mapError(
             () =>
               new UnsupportedCalculatorContextError({
                 context: request.payload,
                 message: `${request.calculatorId} is not available for the requested context`,
-                requestedCalculator: request.calculatorId,
+                requestedCalculator: calculatorId,
               })
           ),
           Effect.flatMap((entry) =>
@@ -117,8 +110,8 @@ export const PublicCalculatorServiceLive = Layer.effect(
               engine,
             })
           )
-        )
-      ),
+        );
+      }),
       getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
         (request) =>
           getCalculatorCatalogEntry(request.calculatorId, request).pipe(

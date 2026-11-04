@@ -32,9 +32,9 @@ import { Data, Effect, Schema } from "effect";
  * calculator metadata.
  */
 export const CalculatorId = Schema.Union([
-  AuPayCalculatorId,
-  AuAnnualTaxCalculatorId,
-]);
+  Schema.toEncoded(AuPayCalculatorId),
+  Schema.toEncoded(AuAnnualTaxCalculatorId),
+]).pipe(Schema.brand("taxkit/CalculatorId"));
 export type CalculatorId = typeof CalculatorId.Type;
 /**
  * Public jurisdictions supported by the composed calculator catalog.
@@ -327,21 +327,21 @@ export const CalculatorGraphResponse = Schema.Struct({
 export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
 /** A transport variant selects exactly one owning scenario codec. */
 export const TakeHomeCalculationRequest = Schema.Struct({
-  calculatorId: AuPayTakeHomeId,
+  calculatorId: Schema.toEncoded(AuPayTakeHomeId),
   payload: Schema.Struct({
     facts: AuPayTakeHomeContract.inputSchema,
     ...OptionalCalculatorContextFields,
   }),
 });
 export const WithholdingsCalculationRequest = Schema.Struct({
-  calculatorId: AuPayWithholdingsId,
+  calculatorId: Schema.toEncoded(AuPayWithholdingsId),
   payload: Schema.Struct({
     facts: AuPayWithholdingsContract.inputSchema,
     ...OptionalCalculatorContextFields,
   }),
 });
 export const AnnualTaxCalculationRequest = Schema.Struct({
-  calculatorId: AuAnnualTaxCalculatorId,
+  calculatorId: Schema.toEncoded(AuAnnualTaxCalculatorId),
   payload: Schema.Struct({
     facts: AuAnnualTaxContract.inputSchema,
     ...OptionalCalculatorContextFields,
@@ -365,7 +365,7 @@ export type CalculatorRunReport = typeof CalculatorRunReport.Type;
  */
 export const CalculatorRunResponse = Schema.Union([
   Schema.Struct({
-    calculatorId: AuPayTakeHomeId,
+    calculatorId: Schema.toEncoded(AuPayTakeHomeId),
     calculator: Schema.Struct({
       ...CalculatorCatalogItem.fields,
       calculatorId: AuPayTakeHomeId,
@@ -374,7 +374,7 @@ export const CalculatorRunResponse = Schema.Union([
     report: AuPayTakeHomeContract.outputSchema,
   }),
   Schema.Struct({
-    calculatorId: AuPayWithholdingsId,
+    calculatorId: Schema.toEncoded(AuPayWithholdingsId),
     calculator: Schema.Struct({
       ...CalculatorCatalogItem.fields,
       calculatorId: AuPayWithholdingsId,
@@ -383,7 +383,7 @@ export const CalculatorRunResponse = Schema.Union([
     report: AuPayWithholdingsContract.outputSchema,
   }),
   Schema.Struct({
-    calculatorId: AuAnnualTaxCalculatorId,
+    calculatorId: Schema.toEncoded(AuAnnualTaxCalculatorId),
     calculator: Schema.Struct({
       ...CalculatorCatalogItem.fields,
       calculatorId: AuAnnualTaxCalculatorId,

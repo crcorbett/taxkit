@@ -286,17 +286,16 @@ GET  /api/v2/rules
 
 Calculator IDs may include jurisdiction segments, such as
 `au.pay.take-home`, but route structure must remain portable to future
-jurisdictions. Do not add `/api/v1/au/*` as the primary public route shape.
+jurisdictions through the shared calculator routes.
 
-Inputs and outputs must decode through Effect Schema. Schema decode failures
-should return structured issue details, missing/invalid field paths and
-descriptor-backed help so clients can guide users toward the facts required by
-the selected calculator. Outputs should include reports, traces, ledgers and
-diagnostics where relevant.
+Inputs and outputs decode through Effect Schema. Schema decode failures return
+bounded, safe issue paths and fixed messages through `InputValidationError`.
+Clients use catalogue metadata for help with the selected calculator. Outputs
+include the owning checked reports, traces and ledgers.
 
-Calculator input-error egress preserves the public tagged shape, normalized
-field paths and descriptor help, but replaces formatter text that can include
-the rejected actual value with stable safe text. HTTP, Effect SDK and direct
+Calculator input-error egress preserves the public tagged shape and safe
+field paths. Fixed text replaces formatter messages that can include
+the rejected actual value. HTTP, Effect SDK and direct
 calculator consumers must not receive secrets or machine-local paths copied
 from invalid inputs.
 

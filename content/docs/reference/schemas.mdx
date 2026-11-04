@@ -14,12 +14,12 @@ fixtures.
 `CalculatorRunRequest` is the public request body schema for a calculator run.
 It is owned by `@taxkit/calculators`.
 
-| Field                  | Notes                                                  |
-| ---------------------- | ------------------------------------------------------ |
-| `calculatorId`         | Exact branded calculator identity after decoding.      |
-| `payload.facts`        | The owning calculator's nominal scenario codec.        |
-| `payload.jurisdiction` | Optional matching jurisdiction; decoded as one Option. |
-| `payload.taxYear`      | Optional matching year; decoded as one Option.         |
+| Field                  | Notes                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `calculatorId`         | Exact owning calculator literal; definitions and catalogue metadata retain branded IDs. |
+| `payload.facts`        | The owning calculator's nominal scenario codec.                                         |
+| `payload.jurisdiction` | Optional matching jurisdiction; decoded as one Option.                                  |
+| `payload.taxYear`      | Optional matching year; decoded as one Option.                                          |
 
 The native request union keeps identity and facts correlated. Strict payload
 parsing rejects unknown keys, including ignored inputs from a different pack.

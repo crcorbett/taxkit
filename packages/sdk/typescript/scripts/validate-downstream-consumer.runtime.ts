@@ -452,6 +452,7 @@ import { AuPayTakeHomeCalculation, AuAnnualIncomeTaxCalculation, AuPayTakeHomeWi
 import { TakeHomePayReportEncoded, TakeHomeScenarioInputSchema, TakeHomeWithSacrificeScenarioInput, AnnualTaxScenarioInputSchema } from "taxkit/au/schemas";
 import { Cents, Money, NonNegativeMoney, fromDecimal, fromCents } from "taxkit/money";
 import { calculateReport, TaxKitLive } from "taxkit/effect";
+import { CalculatorRunRequest, CalculatorRunResponse } from "taxkit/schemas";
 import { Effect, Result, Schema } from "effect";
 const amount = NonNegativeMoney.make(Money.fromCents(Cents.make(165_400)));
 const scenario = TakeHomeScenarioInputSchema.make({ grossPay: amount, period: "weekly", taxFreeThresholdClaimed: true });
@@ -462,6 +463,24 @@ void plain; void calculateSafe(AuPayTakeHomeCalculation, scenario);
 const native: Effect.Effect<typeof AuPayTakeHomeCalculation.outputSchema.Type, typeof AuPayTakeHomeCalculation.errorSchema.Type> = calculateReport(AuPayTakeHomeCalculation, scenario).pipe(Effect.provide(TaxKitLive));
 void native;
 const client = createClient(); void client.calculate(AuPayTakeHomeCalculation, scenario); void client.dispose();
+declare const request: typeof CalculatorRunRequest.Type;
+// @ts-expect-error native dispatch must cover every calculator.
+CalculatorRunRequest.match(request, {});
+if (request.calculatorId === "au.pay.take-home") {
+  const threshold: boolean = request.payload.facts.taxFreeThresholdClaimed;
+  void threshold;
+  // @ts-expect-error a pay request excludes annual facts.
+  void request.payload.facts.taxableIncome;
+}
+declare const response: typeof CalculatorRunResponse.Type;
+// @ts-expect-error response dispatch must cover every calculator.
+CalculatorRunResponse.match(response, {});
+if (response.calculatorId === "au.income-tax.annual") {
+  const cents: number = response.report.liability.cents;
+  void cents;
+  // @ts-expect-error an annual report excludes pay fields.
+  void response.report.netPay;
+}
 // @ts-expect-error selected calculator and scenario variable stay correlated.
 calculate(AuAnnualIncomeTaxCalculation, scenario);
 // @ts-expect-error raw money cannot establish checked input.

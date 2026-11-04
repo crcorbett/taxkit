@@ -150,6 +150,12 @@ Use one inferred calculator type at public call sites, with `NoInfer` where
 needed to prevent input inference from widening the selected calculator.
 For a dynamic selection, keep calculator and input correlated in a discriminated
 request union; callers narrow it before obtaining a specific report type.
+Transport discriminator Schemas derive literal Types with `Schema.toEncoded`
+from the owning ID Schemas. Definitions and catalogue metadata keep their branded
+identities. Effect 4.0.7's tagged-union helpers do not enforce exhaustive handler
+keys for branded literal discriminators. The literal view preserves standard
+TypeScript narrowing and native exhaustive matching; negative compiler examples
+qualify both request and response unions.
 
 Scenario Schemas own the required facts for each supported rule pack. A pay
 scenario supplies its period once; conversion creates the distinct GrossPay,

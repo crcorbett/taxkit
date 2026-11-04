@@ -200,7 +200,7 @@ jobs:
           }
           check "$WEBSITE_URL/"
           check "$API_URL/api/health"
-          check "$API_URL/api/v1/calculators"
+          check "$API_URL/api/v2/calculators"
 
   cleanup:
     name: Destroy preview

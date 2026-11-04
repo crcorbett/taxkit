@@ -39,8 +39,9 @@ import {
 import { PublicCalculatorService } from "../src/service.js";
 import { PublicCalculatorServiceBounded } from "../src/work.layer.js";
 
+const calculatorId = AuPayTakeHomeId.make("au.pay.take-home");
 const Request = CalculatorRunRequest.make({
-  calculatorId: AuPayTakeHomeId.make("au.pay.take-home"),
+  calculatorId,
   payload: {
     facts: TakeHomeScenarioInputSchema.make({
       grossPay: NonNegativeMoney.make(
@@ -55,9 +56,7 @@ const MetadataWorkCases = [
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
       service
-        .getCalculator(
-          GetCalculatorRequest.make({ calculatorId: Request.calculatorId })
-        )
+        .getCalculator(GetCalculatorRequest.make({ calculatorId }))
         .pipe(Effect.asVoid),
     operation: "getCalculator",
     substitute: (
@@ -97,9 +96,7 @@ const MetadataWorkCases = [
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
       service
-        .getCalculatorGraph(
-          GetCalculatorGraphRequest.make({ calculatorId: Request.calculatorId })
-        )
+        .getCalculatorGraph(GetCalculatorGraphRequest.make({ calculatorId }))
         .pipe(Effect.asVoid),
     operation: "getCalculatorGraph",
     substitute: (
@@ -139,9 +136,7 @@ const MetadataWorkCases = [
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
       service
-        .getCalculatorSchema(
-          GetCalculatorRequest.make({ calculatorId: Request.calculatorId })
-        )
+        .getCalculatorSchema(GetCalculatorRequest.make({ calculatorId }))
         .pipe(Effect.asVoid),
     operation: "getCalculatorSchema",
     substitute: (
