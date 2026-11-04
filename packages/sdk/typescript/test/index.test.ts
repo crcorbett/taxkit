@@ -5,6 +5,7 @@ import {
   Predicate,
   Result,
   Schema,
+  Struct,
 } from "effect";
 
 import { AuPayTakeHomeCalculation } from "../src/au.js";
@@ -39,7 +40,11 @@ it.effect("supports caller-owned async disposal", () =>
     yield* Effect.promise(() =>
       client.calculate(AuPayTakeHomeCalculation, takeHomeFacts)
     );
-    yield* Effect.promise(() => client[Symbol.asyncDispose]());
+    yield* EffectFunction.pipe(
+      client,
+      Struct.get(Symbol.asyncDispose),
+      Effect.promise
+    );
     const result = yield* Effect.promise(() =>
       client.calculateSafe(AuPayTakeHomeCalculation, takeHomeFacts)
     );
