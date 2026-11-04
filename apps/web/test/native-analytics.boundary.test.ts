@@ -6,7 +6,10 @@ import {
 } from "@modelcontextprotocol/client";
 import { CalculatorCaptureBatch } from "@taxkit/analytics/schemas";
 import { TaxKitApi } from "@taxkit/api-http/api";
-import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
+import {
+  CalculatorId,
+  CalculatorRunRequest,
+} from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import {
@@ -258,7 +261,11 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
         }).pipe(
           Effect.flatMap((client) =>
             client.calculatorApi.calculate({
-              params: { calculatorId: CalculationRequest.calculatorId },
+              params: {
+                calculatorId: CalculatorId.make(
+                  CalculationRequest.calculatorId
+                ),
+              },
               payload: CalculationRequest,
             })
           ),
