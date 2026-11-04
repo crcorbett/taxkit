@@ -7,6 +7,7 @@ import {
   CalculatorRequestRateKey,
 } from "@taxkit/calculators/admission.service";
 import {
+  CalculatorId,
   CalculatorRateLimited,
   CalculatorRunRequest,
   MetadataQuery,
@@ -228,7 +229,9 @@ describe("shared native host calculation admission", () => {
           httpClient: http,
         });
         const calculate = client.calculatorApi.calculate({
-          params: { calculatorId: CalculationRequest.calculatorId },
+          params: {
+            calculatorId: CalculatorId.make(CalculationRequest.calculatorId),
+          },
           payload: CalculationRequest,
         });
         const first = yield* calculate;
