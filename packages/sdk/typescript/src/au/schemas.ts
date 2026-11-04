@@ -2,6 +2,8 @@ export {
   PayWithholdingsLedger,
   PayWithholdingsLedgerEncoded,
   AuPayCalculatorId,
+  AuPayTakeHomeId,
+  AuPayWithholdingsId,
   AuPayContext,
   AuPayJurisdiction,
   AuPayTaxYear,

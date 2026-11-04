@@ -91,7 +91,8 @@ object literal does not establish Money, and Money does not implicitly coerce
 to a number. Additional currencies require their own supported domain decision.
 
 Add `NonNegativeMoney` as a checked, separately branded refinement of Money.
-Use it for gross pay, salary sacrifice and annual taxable-income scenario inputs.
+Use it for gross pay, salary sacrifice and annual taxable-income scenario inputs
+and their native input facts.
 Signed Money remains valid for adjustments, intermediate liabilities and
 arithmetic. Existing negative scenario acceptance is intentionally tightened;
 this does not add a model of loss carry-forwards. Refined amounts can flow into

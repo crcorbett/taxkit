@@ -1,19 +1,24 @@
 import { Effect, Option } from "effect";
 import { HttpApiClient } from "effect/http-api";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
-import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
-import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import {
+  TakeHomeScenarioInputSchema,
+  AuPayTakeHomeId,
+  AuPayJurisdiction,
+  AuPayTaxYear,
+} from "taxkit/au/schemas";
 import { TaxKitApi } from "taxkit/http";
 import { fromCents, nonNegative } from "taxkit/money/effect";
 
 export const calculateTakeHomePay = (baseUrl: URL) =>
   Effect.gen(function* () {
+    const calculatorId = AuPayTakeHomeId.make("au.pay.take-home");
     const client = yield* HttpApiClient.make(TaxKitApi, { baseUrl });
     const amount = yield* fromCents(346_200).pipe(Effect.flatMap(nonNegative));
     return yield* client.calculatorApi.calculate({
-      params: { calculatorId: AuPayTakeHomeCalculation.calculatorId },
+      params: { calculatorId },
       payload: {
-        calculatorId: AuPayTakeHomeCalculation.calculatorId,
+        calculatorId,
 
         payload: {
           facts: TakeHomeScenarioInputSchema.make({
@@ -21,8 +26,8 @@ export const calculateTakeHomePay = (baseUrl: URL) =>
             period: "fortnightly",
             taxFreeThresholdClaimed: true,
           }),
-          jurisdiction: Option.some(AuPayTakeHomeCalculation.jurisdiction),
-          taxYear: Option.some(AuPayTakeHomeCalculation.taxYear),
+          jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+          taxYear: Option.some(AuPayTaxYear.make("2025-26")),
         },
       },
     });

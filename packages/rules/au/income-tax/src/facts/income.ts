@@ -1,5 +1,5 @@
 import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@taxkit/core";
-import { Money } from "@taxkit/core/primitives";
+import { NonNegativeMoney } from "@taxkit/core/primitives";
 import { Context, Schema } from "effect";
 /**
  * Annual taxable income used by the Australian annual tax rules.
@@ -11,10 +11,10 @@ import { Context, Schema } from "effect";
  *
  * @example
  * ```ts
- * import { Cents } from "@taxkit/core/primitives"
+ * import { Cents, Money, NonNegativeMoney } from "@taxkit/core/primitives"
  * import { AnnualTaxableIncome } from "@taxkit/rules-au-income-tax/facts"
  *
- * const income = new AnnualTaxableIncome({ income: Money.fromCents(Cents.make(9_500_000)) })
+ * const income = new AnnualTaxableIncome({ income: NonNegativeMoney.make(Money.fromCents(Cents.make(9_500_000))) })
  * ```
  */
 export class AnnualTaxableIncome extends Schema.TaggedClass<
@@ -23,7 +23,7 @@ export class AnnualTaxableIncome extends Schema.TaggedClass<
     readonly brand: unique symbol;
   }
 >()("AnnualTaxableIncome", {
-  income: Money,
+  income: NonNegativeMoney,
 }) {}
 /**
  * Context tag for caller-provided annual taxable income.

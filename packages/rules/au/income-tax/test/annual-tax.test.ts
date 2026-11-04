@@ -3,11 +3,13 @@ import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
 import {
   fromDecimal,
   nonNegative,
+  NonNegativeMoney,
   Money,
   Cents,
 } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
+  AnnualTaxableIncome,
   AnnualTaxLedgerRuleId,
   AnnualTaxScenario,
   AnnualTaxScenarioInputSchema,
@@ -540,5 +542,23 @@ describe("AU annual income tax calculator (2025-26)", () => {
           }),
         { discard: true }
       )
+  );
+  it.effect("checks nonnegative income at the native fact boundary", () =>
+    Effect.gen(function* () {
+      const encoded = yield* Schema.encodeEffect(AnnualTaxableIncome)(
+        new AnnualTaxableIncome({
+          income: NonNegativeMoney.make(Money.fromCents(Cents.make(0))),
+        })
+      );
+      const accepted = yield* Schema.decodeEffect(AnnualTaxableIncome)(encoded);
+      expect(accepted.income.cents).toBe(0);
+      const rejected = yield* Schema.decodeEffect(AnnualTaxableIncome)({
+        ...encoded,
+        income: { ...encoded.income, cents: -1 },
+      }).pipe(Effect.exit);
+      EffectFunction.pipe(Exit.isFailure(rejected), (failed) => {
+        expect(failed).toBeTruthy();
+      });
+    })
   );
 });

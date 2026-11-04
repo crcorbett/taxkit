@@ -9,6 +9,7 @@ import {
   AuAnnualIncomeTaxCalculation,
   AuPayTakeHomeWithSacrificeCalculation,
 } from "../src/au.js";
+import { AnnualTaxableIncome } from "../src/au/schemas.js";
 // @ts-expect-error removed result ADT is unavailable.
 import { TaxKitSuccess } from "../src/errors.js";
 import {
@@ -71,3 +72,10 @@ export type WrongReportField = PayReport["liability"];
 void client.dispose();
 void TaxKit;
 void TaxKitSuccess;
+
+const invalidAnnualFact = new AnnualTaxableIncome({
+  // @ts-expect-error native annual input facts require the same nonnegative evidence as scenarios.
+  income: Money.fromCents(Cents.make(-1)),
+});
+
+void invalidAnnualFact;
