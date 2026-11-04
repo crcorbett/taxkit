@@ -19,7 +19,7 @@ import { ContentService } from "@taxkit/content/service";
 import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import {
-  AuPayCalculatorId,
+  AuPayTakeHomeId,
   AuPayJurisdiction,
   AuPayTaxYear,
 } from "@taxkit/rules-au-pay";
@@ -104,7 +104,7 @@ const successfulHttpClient = Effect.gen(function* () {
   const service = yield* PublicCalculatorService;
   const catalog = yield* service.listCalculators(MetadataQuery.make({}));
   const calculation = yield* service.calculate({
-    calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+    calculatorId: AuPayTakeHomeId.make("au.pay.take-home"),
 
     payload: {
       facts: TakeHomeScenarioInputSchema.make({
