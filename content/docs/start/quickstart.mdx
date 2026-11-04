@@ -6,7 +6,15 @@ status: "published"
 
 # Quickstart
 
-Install `taxkit` and construct a checked scenario for the selected calculator.
+## Install
+
+Run `bun add taxkit effect@4.0.7` in your TypeScript project. Taxkit uses native
+Effect values in both its plain and Effect interfaces.
+
+## Calculate take-home pay
+
+Construct a checked scenario for the selected calculator. Amounts use exact
+decimal-dollar text; the scenario requires a non-negative amount and one period.
 
 ```ts
 import { calculateSafe } from "taxkit";
@@ -34,5 +42,16 @@ if (Result.isSuccess(input)) {
   }
 }
 ```
+
+## Read the result
+
+This example returns `130100` net cents: AUD 1,301.00. A successful native Result
+contains `success`; a failed Result contains `failure`. The selected definition
+infers the pay report, so annual-tax fields produce a TypeScript error.
+
+Money stays in safe integer cents. Use `format` from `taxkit/money` for decimal
+text, and use explicit `decodeInput` before execution when input is untrusted.
+
+## Next steps
 
 See [Plain SDK](../sdk/plain-sdk.mdx), [Effect SDK](../sdk/effect-sdk.mdx) and [Type safety](../sdk/type-safety.mdx).

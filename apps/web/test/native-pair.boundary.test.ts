@@ -73,7 +73,7 @@ const publicCache = {
 };
 const frameworkSentinel = "PRIVATE9";
 // The browser calls the public API directly. Calculation is its only POST.
-const calculationPath = /^\/api\/v1\/calculators\/[^/]+\/calculate$/u;
+const calculationPath = /^\/api\/v2\/calculators\/[^/]+\/calculate$/u;
 const isCalculation = (url: URL) =>
   url.origin === apiOrigin && calculationPath.test(url.pathname);
 const takeHomeCalculation = `${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`;
