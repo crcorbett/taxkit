@@ -61,8 +61,8 @@ bun run --filter=@taxkit/calculators test
 ```
 
 `check-types` includes source, tests and negative catalogue contract examples.
-See [API and SDK](../../../docs/architecture/api-and-sdk.md) and
-[ADR 0011](../../../docs/adr/0011-effect-native-sdk-contracts.md).
+See [API and SDK](../../docs/architecture/api-and-sdk.md) and
+[ADR 0011](../../docs/adr/0011-effect-native-sdk-contracts.md).
 
 ## Shared calculation work limits
 
