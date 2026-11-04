@@ -8,9 +8,7 @@
             "additionalProperties": false,
             "properties": {
               "_tag": {
-                "enum": [
-                  "Money"
-                ],
+                "enum": ["Money"],
                 "type": "string"
               },
               "cents": {
@@ -19,32 +17,22 @@
                 "type": "integer"
               },
               "currency": {
-                "enum": [
-                  "AUD"
-                ],
+                "enum": ["AUD"],
                 "type": "string"
               }
             },
-            "required": [
-              "_tag",
-              "cents",
-              "currency"
-            ],
+            "required": ["_tag", "cents", "currency"],
             "type": "object"
           }
         },
-        "required": [
-          "taxableIncome"
-        ],
+        "required": ["taxableIncome"],
         "type": "object"
       },
       "CalculationDiagnosticsEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculationDiagnostics"
-            ],
+            "enum": ["CalculationDiagnostics"],
             "type": "string"
           },
           "graphIssues": {
@@ -54,53 +42,36 @@
             "type": "array"
           }
         },
-        "required": [
-          "_tag",
-          "graphIssues"
-        ],
+        "required": ["_tag", "graphIssues"],
         "type": "object"
       },
       "CalculationErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculationError"
-            ],
+            "enum": ["CalculationError"],
             "type": "string"
           },
           "message": {
             "type": "string"
           },
           "reason": {
-            "enum": [
-              "rule",
-              "graph",
-              "output-invariant"
-            ],
+            "enum": ["rule", "graph", "output-invariant"],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "message",
-          "reason"
-        ],
+        "required": ["_tag", "message", "reason"],
         "type": "object"
       },
       "CalculatorAdmissionUnavailableEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculatorAdmissionUnavailable"
-            ],
+            "enum": ["CalculatorAdmissionUnavailable"],
             "type": "string"
           },
           "code": {
-            "enum": [
-              "calculation-admission-unavailable"
-            ],
+            "enum": ["calculation-admission-unavailable"],
             "type": "string"
           },
           "message": {
@@ -110,69 +81,45 @@
             "type": "string"
           },
           "retry": {
-            "enum": [
-              "try-again-manually"
-            ],
+            "enum": ["try-again-manually"],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "code",
-          "message",
-          "retry"
-        ],
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "CalculatorCapacityExceededEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculatorCapacityExceeded"
-            ],
+            "enum": ["CalculatorCapacityExceeded"],
             "type": "string"
           },
           "code": {
-            "enum": [
-              "calculation-capacity"
-            ],
+            "enum": ["calculation-capacity"],
             "type": "string"
           },
           "message": {
-            "enum": [
-              "The calculators are busy. Try again when you are ready."
-            ],
+            "enum": ["The calculators are busy. Try again when you are ready."],
             "type": "string"
           },
           "retry": {
-            "enum": [
-              "try-again-manually"
-            ],
+            "enum": ["try-again-manually"],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "code",
-          "message",
-          "retry"
-        ],
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "CalculatorOperationTimedOutEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculatorOperationTimedOut"
-            ],
+            "enum": ["CalculatorOperationTimedOut"],
             "type": "string"
           },
           "code": {
-            "enum": [
-              "calculation-timeout"
-            ],
+            "enum": ["calculation-timeout"],
             "type": "string"
           },
           "message": {
@@ -182,33 +129,22 @@
             "type": "string"
           },
           "retry": {
-            "enum": [
-              "try-again-manually"
-            ],
+            "enum": ["try-again-manually"],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "code",
-          "message",
-          "retry"
-        ],
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "CalculatorRateLimitedEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculatorRateLimited"
-            ],
+            "enum": ["CalculatorRateLimited"],
             "type": "string"
           },
           "code": {
-            "enum": [
-              "rate-limited"
-            ],
+            "enum": ["rate-limited"],
             "type": "string"
           },
           "message": {
@@ -218,33 +154,22 @@
             "type": "string"
           },
           "retry": {
-            "enum": [
-              "wait-then-try-manually"
-            ],
+            "enum": ["wait-then-try-manually"],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "code",
-          "message",
-          "retry"
-        ],
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "CalculatorRequestBodyTimedOutEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculatorRequestBodyTimedOut"
-            ],
+            "enum": ["CalculatorRequestBodyTimedOut"],
             "type": "string"
           },
           "code": {
-            "enum": [
-              "request-timeout"
-            ],
+            "enum": ["request-timeout"],
             "type": "string"
           },
           "message": {
@@ -254,33 +179,22 @@
             "type": "string"
           },
           "retry": {
-            "enum": [
-              "try-again-manually"
-            ],
+            "enum": ["try-again-manually"],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "code",
-          "message",
-          "retry"
-        ],
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "CalculatorRequestBodyTooLargeEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "CalculatorRequestBodyTooLarge"
-            ],
+            "enum": ["CalculatorRequestBodyTooLarge"],
             "type": "string"
           },
           "code": {
-            "enum": [
-              "request-too-large"
-            ],
+            "enum": ["request-too-large"],
             "type": "string"
           },
           "message": {
@@ -290,71 +204,48 @@
             "type": "string"
           },
           "retry": {
-            "enum": [
-              "reduce-request"
-            ],
+            "enum": ["reduce-request"],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "code",
-          "message",
-          "retry"
-        ],
+        "required": ["_tag", "code", "message", "retry"],
         "type": "object"
       },
       "DocsPageUnavailableEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "DocsPageUnavailable"
-            ],
+            "enum": ["DocsPageUnavailable"],
             "type": "string"
           },
           "message": {
-            "enum": [
-              "The documentation page was not found."
-            ],
+            "enum": ["The documentation page was not found."],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "message"
-        ],
+        "required": ["_tag", "message"],
         "type": "object"
       },
       "DocsSearchUnavailableEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "DocsSearchUnavailable"
-            ],
+            "enum": ["DocsSearchUnavailable"],
             "type": "string"
           },
           "message": {
-            "enum": [
-              "Documentation search is temporarily unavailable."
-            ],
+            "enum": ["Documentation search is temporarily unavailable."],
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "message"
-        ],
+        "required": ["_tag", "message"],
         "type": "object"
       },
       "FactQuestionEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "FactQuestion"
-            ],
+            "enum": ["FactQuestion"],
             "type": "string"
           },
           "helpText": {
@@ -371,32 +262,21 @@
             "type": "string"
           },
           "inputKind": {
-            "enum": [
-              "money",
-              "boolean",
-              "selection"
-            ],
+            "enum": ["money", "boolean", "selection"],
             "type": "string"
           },
           "prompt": {
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "id",
-          "inputKind",
-          "prompt"
-        ],
+        "required": ["_tag", "id", "inputKind", "prompt"],
         "type": "object"
       },
       "GraphValidationIssueEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "GraphValidationIssue"
-            ],
+            "enum": ["GraphValidationIssue"],
             "type": "string"
           },
           "kind": {
@@ -414,20 +294,14 @@
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "kind",
-          "message"
-        ],
+        "required": ["_tag", "kind", "message"],
         "type": "object"
       },
       "InputValidationErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "InputValidationError"
-            ],
+            "enum": ["InputValidationError"],
             "type": "string"
           },
           "issues": {
@@ -435,9 +309,7 @@
               "additionalProperties": false,
               "properties": {
                 "message": {
-                  "enum": [
-                    "Invalid input value"
-                  ],
+                  "enum": ["Invalid input value"],
                   "type": "string"
                 },
                 "path": {
@@ -447,30 +319,20 @@
                   "type": "array"
                 }
               },
-              "required": [
-                "path",
-                "message"
-              ],
+              "required": ["path", "message"],
               "type": "object"
             },
             "type": "array"
           },
           "message": {
-            "enum": [
-              "Invalid calculator input."
-            ],
+            "enum": ["Invalid calculator input."],
             "type": "string"
           },
           "truncated": {
             "type": "boolean"
           }
         },
-        "required": [
-          "_tag",
-          "message",
-          "issues",
-          "truncated"
-        ],
+        "required": ["_tag", "message", "issues", "truncated"],
         "type": "object"
       },
       "MdxColor": {
@@ -501,11 +363,7 @@
         "additionalProperties": false,
         "properties": {
           "fallback": {
-            "enum": [
-              "serif",
-              "sans-serif",
-              "monospace"
-            ],
+            "enum": ["serif", "sans-serif", "monospace"],
             "type": "string"
           },
           "names": {
@@ -516,10 +374,7 @@
             "type": "array"
           }
         },
-        "required": [
-          "names",
-          "fallback"
-        ],
+        "required": ["names", "fallback"],
         "type": "object"
       },
       "MdxScheme": {
@@ -626,11 +481,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "palette",
-          "syntax",
-          "series"
-        ],
+        "required": ["palette", "syntax", "series"],
         "type": "object"
       },
       "MdxTheme": {
@@ -646,11 +497,7 @@
             "$ref": "#/components/schemas/MdxTypography"
           }
         },
-        "required": [
-          "typography",
-          "light",
-          "dark"
-        ],
+        "required": ["typography", "light", "dark"],
         "type": "object"
       },
       "MdxTokenAppearance": {
@@ -660,19 +507,11 @@
             "$ref": "#/components/schemas/MdxColor"
           },
           "style": {
-            "enum": [
-              "normal",
-              "italic",
-              "bold",
-              "bold-italic"
-            ],
+            "enum": ["normal", "italic", "bold", "bold-italic"],
             "type": "string"
           }
         },
-        "required": [
-          "color",
-          "style"
-        ],
+        "required": ["color", "style"],
         "type": "object"
       },
       "MdxTypography": {
@@ -688,20 +527,14 @@
             "$ref": "#/components/schemas/MdxFontStack"
           }
         },
-        "required": [
-          "text",
-          "code",
-          "diagramSize"
-        ],
+        "required": ["text", "code", "diagramSize"],
         "type": "object"
       },
       "Objects_": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "TraceNode"
-            ],
+            "enum": ["TraceNode"],
             "type": "string"
           },
           "children": {
@@ -751,9 +584,7 @@
               "additionalProperties": false,
               "properties": {
                 "_tag": {
-                  "enum": [
-                    "SourceRef"
-                  ],
+                  "enum": ["SourceRef"],
                   "type": "string"
                 },
                 "kind": {
@@ -772,12 +603,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "_tag",
-                "kind",
-                "reference",
-                "title"
-              ],
+              "required": ["_tag", "kind", "reference", "title"],
               "type": "object"
             },
             "type": "array"
@@ -801,9 +627,7 @@
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "TraceNode"
-            ],
+            "enum": ["TraceNode"],
             "type": "string"
           },
           "children": {
@@ -853,9 +677,7 @@
               "additionalProperties": false,
               "properties": {
                 "_tag": {
-                  "enum": [
-                    "SourceRef"
-                  ],
+                  "enum": ["SourceRef"],
                   "type": "string"
                 },
                 "kind": {
@@ -874,12 +696,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "_tag",
-                "kind",
-                "reference",
-                "title"
-              ],
+              "required": ["_tag", "kind", "reference", "title"],
               "type": "object"
             },
             "type": "array"
@@ -906,9 +723,7 @@
             "additionalProperties": false,
             "properties": {
               "_tag": {
-                "enum": [
-                  "Money"
-                ],
+                "enum": ["Money"],
                 "type": "string"
               },
               "cents": {
@@ -917,45 +732,29 @@
                 "type": "integer"
               },
               "currency": {
-                "enum": [
-                  "AUD"
-                ],
+                "enum": ["AUD"],
                 "type": "string"
               }
             },
-            "required": [
-              "_tag",
-              "cents",
-              "currency"
-            ],
+            "required": ["_tag", "cents", "currency"],
             "type": "object"
           },
           "period": {
-            "enum": [
-              "weekly",
-              "fortnightly",
-              "monthly"
-            ],
+            "enum": ["weekly", "fortnightly", "monthly"],
             "type": "string"
           },
           "taxFreeThresholdClaimed": {
             "type": "boolean"
           }
         },
-        "required": [
-          "grossPay",
-          "period",
-          "taxFreeThresholdClaimed"
-        ],
+        "required": ["grossPay", "period", "taxFreeThresholdClaimed"],
         "type": "object"
       },
       "UnsupportedCalculatorContextErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "UnsupportedCalculatorContextError"
-            ],
+            "enum": ["UnsupportedCalculatorContextError"],
             "type": "string"
           },
           "context": {
@@ -964,15 +763,11 @@
               "jurisdiction": {
                 "anyOf": [
                   {
-                    "enum": [
-                      "AU"
-                    ],
+                    "enum": ["AU"],
                     "type": "string"
                   },
                   {
-                    "enum": [
-                      "AU"
-                    ],
+                    "enum": ["AU"],
                     "type": "string"
                   },
                   {
@@ -983,15 +778,11 @@
               "taxYear": {
                 "anyOf": [
                   {
-                    "enum": [
-                      "2025-26"
-                    ],
+                    "enum": ["2025-26"],
                     "type": "string"
                   },
                   {
-                    "enum": [
-                      "2025-26"
-                    ],
+                    "enum": ["2025-26"],
                     "type": "string"
                   },
                   {
@@ -1014,21 +805,14 @@
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "context",
-          "message",
-          "requestedCalculator"
-        ],
+        "required": ["_tag", "context", "message", "requestedCalculator"],
         "type": "object"
       },
       "UnsupportedCalculatorErrorEncoded": {
         "additionalProperties": false,
         "properties": {
           "_tag": {
-            "enum": [
-              "UnsupportedCalculatorError"
-            ],
+            "enum": ["UnsupportedCalculatorError"],
             "type": "string"
           },
           "message": {
@@ -1038,11 +822,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "_tag",
-          "message",
-          "requestedCalculator"
-        ],
+        "required": ["_tag", "message", "requestedCalculator"],
         "type": "object"
       }
     },
@@ -1068,22 +848,15 @@
                   "additionalProperties": false,
                   "properties": {
                     "service": {
-                      "enum": [
-                        "taxkit"
-                      ],
+                      "enum": ["taxkit"],
                       "type": "string"
                     },
                     "status": {
-                      "enum": [
-                        "ok"
-                      ],
+                      "enum": ["ok"],
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "service",
-                    "status"
-                  ],
+                  "required": ["service", "status"],
                   "type": "object"
                 }
               }
@@ -1092,9 +865,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Health"
-        ]
+        "tags": ["Health"]
       }
     },
     "/api/v2/calculators": {
@@ -1109,15 +880,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 }
               ]
@@ -1130,15 +897,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 }
               ]
@@ -1170,15 +933,11 @@
                               "jurisdiction": {
                                 "anyOf": [
                                   {
-                                    "enum": [
-                                      "AU"
-                                    ],
+                                    "enum": ["AU"],
                                     "type": "string"
                                   },
                                   {
-                                    "enum": [
-                                      "AU"
-                                    ],
+                                    "enum": ["AU"],
                                     "type": "string"
                                   }
                                 ]
@@ -1186,24 +945,17 @@
                               "taxYear": {
                                 "anyOf": [
                                   {
-                                    "enum": [
-                                      "2025-26"
-                                    ],
+                                    "enum": ["2025-26"],
                                     "type": "string"
                                   },
                                   {
-                                    "enum": [
-                                      "2025-26"
-                                    ],
+                                    "enum": ["2025-26"],
                                     "type": "string"
                                   }
                                 ]
                               }
                             },
-                            "required": [
-                              "jurisdiction",
-                              "taxYear"
-                            ],
+                            "required": ["jurisdiction", "taxYear"],
                             "type": "object"
                           },
                           "description": {
@@ -1264,9 +1016,7 @@
                       "type": "array"
                     }
                   },
-                  "required": [
-                    "calculators"
-                  ],
+                  "required": ["calculators"],
                   "type": "object"
                 }
               }
@@ -1283,9 +1033,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -1294,9 +1042,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/calculators/{calculatorId}": {
@@ -1340,15 +1086,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 }
               ]
@@ -1361,15 +1103,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 }
               ]
@@ -1397,15 +1135,11 @@
                         "jurisdiction": {
                           "anyOf": [
                             {
-                              "enum": [
-                                "AU"
-                              ],
+                              "enum": ["AU"],
                               "type": "string"
                             },
                             {
-                              "enum": [
-                                "AU"
-                              ],
+                              "enum": ["AU"],
                               "type": "string"
                             }
                           ]
@@ -1413,24 +1147,17 @@
                         "taxYear": {
                           "anyOf": [
                             {
-                              "enum": [
-                                "2025-26"
-                              ],
+                              "enum": ["2025-26"],
                               "type": "string"
                             },
                             {
-                              "enum": [
-                                "2025-26"
-                              ],
+                              "enum": ["2025-26"],
                               "type": "string"
                             }
                           ]
                         }
                       },
-                      "required": [
-                        "jurisdiction",
-                        "taxYear"
-                      ],
+                      "required": ["jurisdiction", "taxYear"],
                       "type": "object"
                     },
                     "description": {
@@ -1515,9 +1242,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -1534,9 +1259,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -1545,9 +1268,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/calculators/{calculatorId}/calculate": {
@@ -1578,9 +1299,7 @@
                     "additionalProperties": false,
                     "properties": {
                       "calculatorId": {
-                        "enum": [
-                          "au.pay.take-home"
-                        ],
+                        "enum": ["au.pay.take-home"],
                         "type": "string"
                       },
                       "payload": {
@@ -1592,15 +1311,11 @@
                           "jurisdiction": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
@@ -1611,15 +1326,11 @@
                           "taxYear": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               },
                               {
@@ -1628,25 +1339,18 @@
                             ]
                           }
                         },
-                        "required": [
-                          "facts"
-                        ],
+                        "required": ["facts"],
                         "type": "object"
                       }
                     },
-                    "required": [
-                      "calculatorId",
-                      "payload"
-                    ],
+                    "required": ["calculatorId", "payload"],
                     "type": "object"
                   },
                   {
                     "additionalProperties": false,
                     "properties": {
                       "calculatorId": {
-                        "enum": [
-                          "au.pay.withholdings"
-                        ],
+                        "enum": ["au.pay.withholdings"],
                         "type": "string"
                       },
                       "payload": {
@@ -1658,15 +1362,11 @@
                           "jurisdiction": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
@@ -1677,15 +1377,11 @@
                           "taxYear": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               },
                               {
@@ -1694,25 +1390,18 @@
                             ]
                           }
                         },
-                        "required": [
-                          "facts"
-                        ],
+                        "required": ["facts"],
                         "type": "object"
                       }
                     },
-                    "required": [
-                      "calculatorId",
-                      "payload"
-                    ],
+                    "required": ["calculatorId", "payload"],
                     "type": "object"
                   },
                   {
                     "additionalProperties": false,
                     "properties": {
                       "calculatorId": {
-                        "enum": [
-                          "au.income-tax.annual"
-                        ],
+                        "enum": ["au.income-tax.annual"],
                         "type": "string"
                       },
                       "payload": {
@@ -1724,15 +1413,11 @@
                           "jurisdiction": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
@@ -1743,15 +1428,11 @@
                           "taxYear": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               },
                               {
@@ -1760,16 +1441,11 @@
                             ]
                           }
                         },
-                        "required": [
-                          "facts"
-                        ],
+                        "required": ["facts"],
                         "type": "object"
                       }
                     },
-                    "required": [
-                      "calculatorId",
-                      "payload"
-                    ],
+                    "required": ["calculatorId", "payload"],
                     "type": "object"
                   }
                 ]
@@ -1791,9 +1467,7 @@
                           "additionalProperties": false,
                           "properties": {
                             "calculatorId": {
-                              "enum": [
-                                "au.pay.take-home"
-                              ],
+                              "enum": ["au.pay.take-home"],
                               "type": "string"
                             },
                             "context": {
@@ -1802,15 +1476,11 @@
                                 "jurisdiction": {
                                   "anyOf": [
                                     {
-                                      "enum": [
-                                        "AU"
-                                      ],
+                                      "enum": ["AU"],
                                       "type": "string"
                                     },
                                     {
-                                      "enum": [
-                                        "AU"
-                                      ],
+                                      "enum": ["AU"],
                                       "type": "string"
                                     }
                                   ]
@@ -1818,24 +1488,17 @@
                                 "taxYear": {
                                   "anyOf": [
                                     {
-                                      "enum": [
-                                        "2025-26"
-                                      ],
+                                      "enum": ["2025-26"],
                                       "type": "string"
                                     },
                                     {
-                                      "enum": [
-                                        "2025-26"
-                                      ],
+                                      "enum": ["2025-26"],
                                       "type": "string"
                                     }
                                   ]
                                 }
                               },
-                              "required": [
-                                "jurisdiction",
-                                "taxYear"
-                              ],
+                              "required": ["jurisdiction", "taxYear"],
                               "type": "object"
                             },
                             "description": {
@@ -1894,9 +1557,7 @@
                           "type": "object"
                         },
                         "calculatorId": {
-                          "enum": [
-                            "au.pay.take-home"
-                          ],
+                          "enum": ["au.pay.take-home"],
                           "type": "string"
                         },
                         "diagnostics": {
@@ -1906,18 +1567,14 @@
                           "additionalProperties": false,
                           "properties": {
                             "_tag": {
-                              "enum": [
-                                "TakeHomePayReport"
-                              ],
+                              "enum": ["TakeHomePayReport"],
                               "type": "string"
                             },
                             "grossPay": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -1926,26 +1583,18 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "netPay": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -1954,40 +1603,26 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "period": {
-                              "enum": [
-                                "weekly",
-                                "fortnightly",
-                                "monthly"
-                              ],
+                              "enum": ["weekly", "fortnightly", "monthly"],
                               "type": "string"
                             },
                             "rulePackVersion": {
-                              "enum": [
-                                "rules-au-pay/1.0.2"
-                              ],
+                              "enum": ["rules-au-pay/1.0.2"],
                               "type": "string"
                             },
                             "salarySacrifice": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -1996,26 +1631,18 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "taxablePay": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -2024,17 +1651,11 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "trace": {
@@ -2044,9 +1665,7 @@
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "PayWithholdingsLedger"
-                                  ],
+                                  "enum": ["PayWithholdingsLedger"],
                                   "type": "string"
                                 },
                                 "components": {
@@ -2054,18 +1673,14 @@
                                     "additionalProperties": false,
                                     "properties": {
                                       "_tag": {
-                                        "enum": [
-                                          "LedgerComponent"
-                                        ],
+                                        "enum": ["LedgerComponent"],
                                         "type": "string"
                                       },
                                       "amount": {
                                         "additionalProperties": false,
                                         "properties": {
                                           "_tag": {
-                                            "enum": [
-                                              "Money"
-                                            ],
+                                            "enum": ["Money"],
                                             "type": "string"
                                           },
                                           "cents": {
@@ -2074,9 +1689,7 @@
                                             "type": "integer"
                                           },
                                           "currency": {
-                                            "enum": [
-                                              "AUD"
-                                            ],
+                                            "enum": ["AUD"],
                                             "type": "string"
                                           }
                                         },
@@ -2127,20 +1740,14 @@
                                   "type": "array"
                                 },
                                 "period": {
-                                  "enum": [
-                                    "weekly",
-                                    "fortnightly",
-                                    "monthly"
-                                  ],
+                                  "enum": ["weekly", "fortnightly", "monthly"],
                                   "type": "string"
                                 },
                                 "total": {
                                   "additionalProperties": false,
                                   "properties": {
                                     "_tag": {
-                                      "enum": [
-                                        "Money"
-                                      ],
+                                      "enum": ["Money"],
                                       "type": "string"
                                     },
                                     "cents": {
@@ -2149,17 +1756,11 @@
                                       "type": "integer"
                                     },
                                     "currency": {
-                                      "enum": [
-                                        "AUD"
-                                      ],
+                                      "enum": ["AUD"],
                                       "type": "string"
                                     }
                                   },
-                                  "required": [
-                                    "_tag",
-                                    "cents",
-                                    "currency"
-                                  ],
+                                  "required": ["_tag", "cents", "currency"],
                                   "type": "object"
                                 },
                                 "trace": {
@@ -2179,9 +1780,7 @@
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -2190,17 +1789,11 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             }
                           },
@@ -2234,9 +1827,7 @@
                           "additionalProperties": false,
                           "properties": {
                             "calculatorId": {
-                              "enum": [
-                                "au.pay.withholdings"
-                              ],
+                              "enum": ["au.pay.withholdings"],
                               "type": "string"
                             },
                             "context": {
@@ -2245,15 +1836,11 @@
                                 "jurisdiction": {
                                   "anyOf": [
                                     {
-                                      "enum": [
-                                        "AU"
-                                      ],
+                                      "enum": ["AU"],
                                       "type": "string"
                                     },
                                     {
-                                      "enum": [
-                                        "AU"
-                                      ],
+                                      "enum": ["AU"],
                                       "type": "string"
                                     }
                                   ]
@@ -2261,24 +1848,17 @@
                                 "taxYear": {
                                   "anyOf": [
                                     {
-                                      "enum": [
-                                        "2025-26"
-                                      ],
+                                      "enum": ["2025-26"],
                                       "type": "string"
                                     },
                                     {
-                                      "enum": [
-                                        "2025-26"
-                                      ],
+                                      "enum": ["2025-26"],
                                       "type": "string"
                                     }
                                   ]
                                 }
                               },
-                              "required": [
-                                "jurisdiction",
-                                "taxYear"
-                              ],
+                              "required": ["jurisdiction", "taxYear"],
                               "type": "object"
                             },
                             "description": {
@@ -2337,9 +1917,7 @@
                           "type": "object"
                         },
                         "calculatorId": {
-                          "enum": [
-                            "au.pay.withholdings"
-                          ],
+                          "enum": ["au.pay.withholdings"],
                           "type": "string"
                         },
                         "diagnostics": {
@@ -2349,9 +1927,7 @@
                           "additionalProperties": false,
                           "properties": {
                             "_tag": {
-                              "enum": [
-                                "PayWithholdingsLedger"
-                              ],
+                              "enum": ["PayWithholdingsLedger"],
                               "type": "string"
                             },
                             "components": {
@@ -2359,18 +1935,14 @@
                                 "additionalProperties": false,
                                 "properties": {
                                   "_tag": {
-                                    "enum": [
-                                      "LedgerComponent"
-                                    ],
+                                    "enum": ["LedgerComponent"],
                                     "type": "string"
                                   },
                                   "amount": {
                                     "additionalProperties": false,
                                     "properties": {
                                       "_tag": {
-                                        "enum": [
-                                          "Money"
-                                        ],
+                                        "enum": ["Money"],
                                         "type": "string"
                                       },
                                       "cents": {
@@ -2379,17 +1951,11 @@
                                         "type": "integer"
                                       },
                                       "currency": {
-                                        "enum": [
-                                          "AUD"
-                                        ],
+                                        "enum": ["AUD"],
                                         "type": "string"
                                       }
                                     },
-                                    "required": [
-                                      "_tag",
-                                      "cents",
-                                      "currency"
-                                    ],
+                                    "required": ["_tag", "cents", "currency"],
                                     "type": "object"
                                   },
                                   "effect": {
@@ -2407,11 +1973,7 @@
                                     "type": "string"
                                   },
                                   "status": {
-                                    "enum": [
-                                      "active",
-                                      "disabled",
-                                      "zeroed"
-                                    ],
+                                    "enum": ["active", "disabled", "zeroed"],
                                     "type": "string"
                                   },
                                   "trace": {
@@ -2432,20 +1994,14 @@
                               "type": "array"
                             },
                             "period": {
-                              "enum": [
-                                "weekly",
-                                "fortnightly",
-                                "monthly"
-                              ],
+                              "enum": ["weekly", "fortnightly", "monthly"],
                               "type": "string"
                             },
                             "total": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -2454,17 +2010,11 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "trace": {
@@ -2496,9 +2046,7 @@
                           "additionalProperties": false,
                           "properties": {
                             "calculatorId": {
-                              "enum": [
-                                "au.income-tax.annual"
-                              ],
+                              "enum": ["au.income-tax.annual"],
                               "type": "string"
                             },
                             "context": {
@@ -2507,15 +2055,11 @@
                                 "jurisdiction": {
                                   "anyOf": [
                                     {
-                                      "enum": [
-                                        "AU"
-                                      ],
+                                      "enum": ["AU"],
                                       "type": "string"
                                     },
                                     {
-                                      "enum": [
-                                        "AU"
-                                      ],
+                                      "enum": ["AU"],
                                       "type": "string"
                                     }
                                   ]
@@ -2523,24 +2067,17 @@
                                 "taxYear": {
                                   "anyOf": [
                                     {
-                                      "enum": [
-                                        "2025-26"
-                                      ],
+                                      "enum": ["2025-26"],
                                       "type": "string"
                                     },
                                     {
-                                      "enum": [
-                                        "2025-26"
-                                      ],
+                                      "enum": ["2025-26"],
                                       "type": "string"
                                     }
                                   ]
                                 }
                               },
-                              "required": [
-                                "jurisdiction",
-                                "taxYear"
-                              ],
+                              "required": ["jurisdiction", "taxYear"],
                               "type": "object"
                             },
                             "description": {
@@ -2599,9 +2136,7 @@
                           "type": "object"
                         },
                         "calculatorId": {
-                          "enum": [
-                            "au.income-tax.annual"
-                          ],
+                          "enum": ["au.income-tax.annual"],
                           "type": "string"
                         },
                         "diagnostics": {
@@ -2611,18 +2146,14 @@
                           "additionalProperties": false,
                           "properties": {
                             "_tag": {
-                              "enum": [
-                                "AnnualTaxReport"
-                              ],
+                              "enum": ["AnnualTaxReport"],
                               "type": "string"
                             },
                             "ledger": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "AnnualTaxLedger"
-                                  ],
+                                  "enum": ["AnnualTaxLedger"],
                                   "type": "string"
                                 },
                                 "components": {
@@ -2630,18 +2161,14 @@
                                     "additionalProperties": false,
                                     "properties": {
                                       "_tag": {
-                                        "enum": [
-                                          "LedgerComponent"
-                                        ],
+                                        "enum": ["LedgerComponent"],
                                         "type": "string"
                                       },
                                       "amount": {
                                         "additionalProperties": false,
                                         "properties": {
                                           "_tag": {
-                                            "enum": [
-                                              "Money"
-                                            ],
+                                            "enum": ["Money"],
                                             "type": "string"
                                           },
                                           "cents": {
@@ -2650,9 +2177,7 @@
                                             "type": "integer"
                                           },
                                           "currency": {
-                                            "enum": [
-                                              "AUD"
-                                            ],
+                                            "enum": ["AUD"],
                                             "type": "string"
                                           }
                                         },
@@ -2706,9 +2231,7 @@
                                   "additionalProperties": false,
                                   "properties": {
                                     "_tag": {
-                                      "enum": [
-                                        "Money"
-                                      ],
+                                      "enum": ["Money"],
                                       "type": "string"
                                     },
                                     "cents": {
@@ -2717,17 +2240,11 @@
                                       "type": "integer"
                                     },
                                     "currency": {
-                                      "enum": [
-                                        "AUD"
-                                      ],
+                                      "enum": ["AUD"],
                                       "type": "string"
                                     }
                                   },
-                                  "required": [
-                                    "_tag",
-                                    "cents",
-                                    "currency"
-                                  ],
+                                  "required": ["_tag", "cents", "currency"],
                                   "type": "object"
                                 },
                                 "trace": {
@@ -2746,9 +2263,7 @@
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -2757,26 +2272,18 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "rawLiability": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -2785,32 +2292,22 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "rulePackVersion": {
-                              "enum": [
-                                "rules-au-income-tax/1.0.1"
-                              ],
+                              "enum": ["rules-au-income-tax/1.0.1"],
                               "type": "string"
                             },
                             "taxableIncome": {
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "Money"
-                                  ],
+                                  "enum": ["Money"],
                                   "type": "string"
                                 },
                                 "cents": {
@@ -2819,17 +2316,11 @@
                                   "type": "integer"
                                 },
                                 "currency": {
-                                  "enum": [
-                                    "AUD"
-                                  ],
+                                  "enum": ["AUD"],
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "_tag",
-                                "cents",
-                                "currency"
-                              ],
+                              "required": ["_tag", "cents", "currency"],
                               "type": "object"
                             },
                             "trace": {
@@ -2885,9 +2376,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -2904,9 +2393,7 @@
                       "$ref": "#/components/schemas/CalculatorRequestBodyTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -2923,9 +2410,7 @@
                       "$ref": "#/components/schemas/CalculatorRequestBodyTooLargeEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -2942,9 +2427,7 @@
                       "$ref": "#/components/schemas/CalculatorRateLimitedEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -2954,9 +2437,7 @@
               "retry-after": {
                 "required": true,
                 "schema": {
-                  "enum": [
-                    "60"
-                  ],
+                  "enum": ["60"],
                   "type": "string"
                 }
               }
@@ -2974,9 +2455,7 @@
                           "$ref": "#/components/schemas/CalculatorAdmissionUnavailableEncoded"
                         }
                       },
-                      "required": [
-                        "error"
-                      ],
+                      "required": ["error"],
                       "type": "object"
                     },
                     {
@@ -2986,9 +2465,7 @@
                           "$ref": "#/components/schemas/CalculatorCapacityExceededEncoded"
                         }
                       },
-                      "required": [
-                        "error"
-                      ],
+                      "required": ["error"],
                       "type": "object"
                     }
                   ]
@@ -3007,9 +2484,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -3018,9 +2493,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/calculators/{calculatorId}/graph": {
@@ -3048,15 +2521,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 }
               ]
@@ -3069,15 +2538,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 }
               ]
@@ -3108,15 +2573,11 @@
                             "jurisdiction": {
                               "anyOf": [
                                 {
-                                  "enum": [
-                                    "AU"
-                                  ],
+                                  "enum": ["AU"],
                                   "type": "string"
                                 },
                                 {
-                                  "enum": [
-                                    "AU"
-                                  ],
+                                  "enum": ["AU"],
                                   "type": "string"
                                 }
                               ]
@@ -3124,24 +2585,17 @@
                             "taxYear": {
                               "anyOf": [
                                 {
-                                  "enum": [
-                                    "2025-26"
-                                  ],
+                                  "enum": ["2025-26"],
                                   "type": "string"
                                 },
                                 {
-                                  "enum": [
-                                    "2025-26"
-                                  ],
+                                  "enum": ["2025-26"],
                                   "type": "string"
                                 }
                               ]
                             }
                           },
-                          "required": [
-                            "jurisdiction",
-                            "taxYear"
-                          ],
+                          "required": ["jurisdiction", "taxYear"],
                           "type": "object"
                         },
                         "description": {
@@ -3213,11 +2667,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "from",
-                          "ruleId",
-                          "to"
-                        ],
+                        "required": ["from", "ruleId", "to"],
                         "type": "object"
                       },
                       "type": "array"
@@ -3227,11 +2677,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "authority": {
-                            "enum": [
-                              "input",
-                              "derived",
-                              "parameter"
-                            ],
+                            "enum": ["input", "derived", "parameter"],
                             "type": "string"
                           },
                           "id": {
@@ -3254,12 +2700,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "authority",
-                          "id",
-                          "schemaTag",
-                          "title"
-                        ],
+                        "required": ["authority", "id", "schemaTag", "title"],
                         "type": "object"
                       },
                       "type": "array"
@@ -3302,9 +2743,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "from"
-                                  ],
+                                  "required": ["from"],
                                   "type": "object"
                                 },
                                 "id": {
@@ -3314,9 +2753,7 @@
                                   "additionalProperties": false,
                                   "properties": {
                                     "_tag": {
-                                      "enum": [
-                                        "SourceRef"
-                                      ],
+                                      "enum": ["SourceRef"],
                                       "type": "string"
                                     },
                                     "kind": {
@@ -3370,10 +2807,7 @@
                             "type": "array"
                           },
                           "sourcePolicy": {
-                            "enum": [
-                              "not-required",
-                              "required"
-                            ],
+                            "enum": ["not-required", "required"],
                             "type": "string"
                           },
                           "sources": {
@@ -3381,9 +2815,7 @@
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "SourceRef"
-                                  ],
+                                  "enum": ["SourceRef"],
                                   "type": "string"
                                 },
                                 "kind": {
@@ -3472,9 +2904,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -3491,9 +2921,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -3502,9 +2930,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/calculators/{calculatorId}/schema": {
@@ -3548,15 +2974,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 }
               ]
@@ -3569,15 +2991,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 }
               ]
@@ -3608,15 +3026,11 @@
                             "jurisdiction": {
                               "anyOf": [
                                 {
-                                  "enum": [
-                                    "AU"
-                                  ],
+                                  "enum": ["AU"],
                                   "type": "string"
                                 },
                                 {
-                                  "enum": [
-                                    "AU"
-                                  ],
+                                  "enum": ["AU"],
                                   "type": "string"
                                 }
                               ]
@@ -3624,24 +3038,17 @@
                             "taxYear": {
                               "anyOf": [
                                 {
-                                  "enum": [
-                                    "2025-26"
-                                  ],
+                                  "enum": ["2025-26"],
                                   "type": "string"
                                 },
                                 {
-                                  "enum": [
-                                    "2025-26"
-                                  ],
+                                  "enum": ["2025-26"],
                                   "type": "string"
                                 }
                               ]
                             }
                           },
-                          "required": [
-                            "jurisdiction",
-                            "taxYear"
-                          ],
+                          "required": ["jurisdiction", "taxYear"],
                           "type": "object"
                         },
                         "description": {
@@ -3704,11 +3111,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "authority": {
-                            "enum": [
-                              "input",
-                              "derived",
-                              "parameter"
-                            ],
+                            "enum": ["input", "derived", "parameter"],
                             "type": "string"
                           },
                           "id": {
@@ -3731,12 +3134,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "authority",
-                          "id",
-                          "schemaTag",
-                          "title"
-                        ],
+                        "required": ["authority", "id", "schemaTag", "title"],
                         "type": "object"
                       },
                       "type": "array"
@@ -3746,11 +3144,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "authority": {
-                            "enum": [
-                              "input",
-                              "derived",
-                              "parameter"
-                            ],
+                            "enum": ["input", "derived", "parameter"],
                             "type": "string"
                           },
                           "id": {
@@ -3773,12 +3167,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "authority",
-                          "id",
-                          "schemaTag",
-                          "title"
-                        ],
+                        "required": ["authority", "id", "schemaTag", "title"],
                         "type": "object"
                       },
                       "type": "array"
@@ -3824,9 +3213,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "from"
-                                  ],
+                                  "required": ["from"],
                                   "type": "object"
                                 },
                                 "id": {
@@ -3836,9 +3223,7 @@
                                   "additionalProperties": false,
                                   "properties": {
                                     "_tag": {
-                                      "enum": [
-                                        "SourceRef"
-                                      ],
+                                      "enum": ["SourceRef"],
                                       "type": "string"
                                     },
                                     "kind": {
@@ -3892,10 +3277,7 @@
                             "type": "array"
                           },
                           "sourcePolicy": {
-                            "enum": [
-                              "not-required",
-                              "required"
-                            ],
+                            "enum": ["not-required", "required"],
                             "type": "string"
                           },
                           "sources": {
@@ -3903,9 +3285,7 @@
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "SourceRef"
-                                  ],
+                                  "enum": ["SourceRef"],
                                   "type": "string"
                                 },
                                 "kind": {
@@ -3988,9 +3368,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -4007,9 +3385,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -4018,9 +3394,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/docs/markdown": {
@@ -4068,9 +3442,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Public documentation"
-        ]
+        "tags": ["Public documentation"]
       }
     },
     "/api/v2/docs/navigation": {
@@ -4203,9 +3575,7 @@
                       "type": "array"
                     }
                   },
-                  "required": [
-                    "primaryNavigation"
-                  ],
+                  "required": ["primaryNavigation"],
                   "type": "object"
                 }
               }
@@ -4214,9 +3584,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Public documentation"
-        ]
+        "tags": ["Public documentation"]
       }
     },
     "/api/v2/docs/page": {
@@ -4261,9 +3629,7 @@
                                       "additionalProperties": false,
                                       "properties": {
                                         "kind": {
-                                          "enum": [
-                                            "text"
-                                          ],
+                                          "enum": ["text"],
                                           "type": "string"
                                         },
                                         "text": {
@@ -4271,19 +3637,14 @@
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "kind",
-                                        "text"
-                                      ],
+                                      "required": ["kind", "text"],
                                       "type": "object"
                                     },
                                     {
                                       "additionalProperties": false,
                                       "properties": {
                                         "kind": {
-                                          "enum": [
-                                            "inline-code"
-                                          ],
+                                          "enum": ["inline-code"],
                                           "type": "string"
                                         },
                                         "text": {
@@ -4291,10 +3652,7 @@
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "kind",
-                                        "text"
-                                      ],
+                                      "required": ["kind", "text"],
                                       "type": "object"
                                     },
                                     {
@@ -4307,9 +3665,7 @@
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "text"
-                                                    ],
+                                                    "enum": ["text"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4317,19 +3673,14 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "inline-code"
-                                                    ],
+                                                    "enum": ["inline-code"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4337,10 +3688,7 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               }
                                             ]
@@ -4349,16 +3697,11 @@
                                           "type": "array"
                                         },
                                         "kind": {
-                                          "enum": [
-                                            "strong"
-                                          ],
+                                          "enum": ["strong"],
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "content",
-                                        "kind"
-                                      ],
+                                      "required": ["content", "kind"],
                                       "type": "object"
                                     },
                                     {
@@ -4371,9 +3714,7 @@
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "text"
-                                                    ],
+                                                    "enum": ["text"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4381,19 +3722,14 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "inline-code"
-                                                    ],
+                                                    "enum": ["inline-code"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4401,10 +3737,7 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               }
                                             ]
@@ -4413,16 +3746,11 @@
                                           "type": "array"
                                         },
                                         "kind": {
-                                          "enum": [
-                                            "emphasis"
-                                          ],
+                                          "enum": ["emphasis"],
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "content",
-                                        "kind"
-                                      ],
+                                      "required": ["content", "kind"],
                                       "type": "object"
                                     },
                                     {
@@ -4435,9 +3763,7 @@
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "text"
-                                                    ],
+                                                    "enum": ["text"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4445,19 +3771,14 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "inline-code"
-                                                    ],
+                                                    "enum": ["inline-code"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4465,10 +3786,7 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
@@ -4481,9 +3799,7 @@
                                                           "additionalProperties": false,
                                                           "properties": {
                                                             "kind": {
-                                                              "enum": [
-                                                                "text"
-                                                              ],
+                                                              "enum": ["text"],
                                                               "type": "string"
                                                             },
                                                             "text": {
@@ -4523,16 +3839,11 @@
                                                     "type": "array"
                                                   },
                                                   "kind": {
-                                                    "enum": [
-                                                      "strong"
-                                                    ],
+                                                    "enum": ["strong"],
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "content",
-                                                  "kind"
-                                                ],
+                                                "required": ["content", "kind"],
                                                 "type": "object"
                                               },
                                               {
@@ -4545,9 +3856,7 @@
                                                           "additionalProperties": false,
                                                           "properties": {
                                                             "kind": {
-                                                              "enum": [
-                                                                "text"
-                                                              ],
+                                                              "enum": ["text"],
                                                               "type": "string"
                                                             },
                                                             "text": {
@@ -4587,16 +3896,11 @@
                                                     "type": "array"
                                                   },
                                                   "kind": {
-                                                    "enum": [
-                                                      "emphasis"
-                                                    ],
+                                                    "enum": ["emphasis"],
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "content",
-                                                  "kind"
-                                                ],
+                                                "required": ["content", "kind"],
                                                 "type": "object"
                                               }
                                             ]
@@ -4616,17 +3920,11 @@
                                           "type": "string"
                                         },
                                         "kind": {
-                                          "enum": [
-                                            "link"
-                                          ],
+                                          "enum": ["link"],
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "content",
-                                        "href",
-                                        "kind"
-                                      ],
+                                      "required": ["content", "href", "kind"],
                                       "type": "object"
                                     }
                                   ]
@@ -4635,11 +3933,7 @@
                                 "type": "array"
                               },
                               "depth": {
-                                "enum": [
-                                  2,
-                                  3,
-                                  4
-                                ],
+                                "enum": [2, 3, 4],
                                 "type": "number"
                               },
                               "id": {
@@ -4654,18 +3948,11 @@
                                 "type": "string"
                               },
                               "kind": {
-                                "enum": [
-                                  "heading"
-                                ],
+                                "enum": ["heading"],
                                 "type": "string"
                               }
                             },
-                            "required": [
-                              "content",
-                              "depth",
-                              "id",
-                              "kind"
-                            ],
+                            "required": ["content", "depth", "id", "kind"],
                             "type": "object"
                           },
                           {
@@ -4678,9 +3965,7 @@
                                       "additionalProperties": false,
                                       "properties": {
                                         "kind": {
-                                          "enum": [
-                                            "text"
-                                          ],
+                                          "enum": ["text"],
                                           "type": "string"
                                         },
                                         "text": {
@@ -4688,19 +3973,14 @@
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "kind",
-                                        "text"
-                                      ],
+                                      "required": ["kind", "text"],
                                       "type": "object"
                                     },
                                     {
                                       "additionalProperties": false,
                                       "properties": {
                                         "kind": {
-                                          "enum": [
-                                            "inline-code"
-                                          ],
+                                          "enum": ["inline-code"],
                                           "type": "string"
                                         },
                                         "text": {
@@ -4708,10 +3988,7 @@
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "kind",
-                                        "text"
-                                      ],
+                                      "required": ["kind", "text"],
                                       "type": "object"
                                     },
                                     {
@@ -4724,9 +4001,7 @@
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "text"
-                                                    ],
+                                                    "enum": ["text"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4734,19 +4009,14 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "inline-code"
-                                                    ],
+                                                    "enum": ["inline-code"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4754,10 +4024,7 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               }
                                             ]
@@ -4766,16 +4033,11 @@
                                           "type": "array"
                                         },
                                         "kind": {
-                                          "enum": [
-                                            "strong"
-                                          ],
+                                          "enum": ["strong"],
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "content",
-                                        "kind"
-                                      ],
+                                      "required": ["content", "kind"],
                                       "type": "object"
                                     },
                                     {
@@ -4788,9 +4050,7 @@
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "text"
-                                                    ],
+                                                    "enum": ["text"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4798,19 +4058,14 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "inline-code"
-                                                    ],
+                                                    "enum": ["inline-code"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4818,10 +4073,7 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               }
                                             ]
@@ -4830,16 +4082,11 @@
                                           "type": "array"
                                         },
                                         "kind": {
-                                          "enum": [
-                                            "emphasis"
-                                          ],
+                                          "enum": ["emphasis"],
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "content",
-                                        "kind"
-                                      ],
+                                      "required": ["content", "kind"],
                                       "type": "object"
                                     },
                                     {
@@ -4852,9 +4099,7 @@
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "text"
-                                                    ],
+                                                    "enum": ["text"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4862,19 +4107,14 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
                                                 "additionalProperties": false,
                                                 "properties": {
                                                   "kind": {
-                                                    "enum": [
-                                                      "inline-code"
-                                                    ],
+                                                    "enum": ["inline-code"],
                                                     "type": "string"
                                                   },
                                                   "text": {
@@ -4882,10 +4122,7 @@
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "kind",
-                                                  "text"
-                                                ],
+                                                "required": ["kind", "text"],
                                                 "type": "object"
                                               },
                                               {
@@ -4898,9 +4135,7 @@
                                                           "additionalProperties": false,
                                                           "properties": {
                                                             "kind": {
-                                                              "enum": [
-                                                                "text"
-                                                              ],
+                                                              "enum": ["text"],
                                                               "type": "string"
                                                             },
                                                             "text": {
@@ -4940,16 +4175,11 @@
                                                     "type": "array"
                                                   },
                                                   "kind": {
-                                                    "enum": [
-                                                      "strong"
-                                                    ],
+                                                    "enum": ["strong"],
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "content",
-                                                  "kind"
-                                                ],
+                                                "required": ["content", "kind"],
                                                 "type": "object"
                                               },
                                               {
@@ -4962,9 +4192,7 @@
                                                           "additionalProperties": false,
                                                           "properties": {
                                                             "kind": {
-                                                              "enum": [
-                                                                "text"
-                                                              ],
+                                                              "enum": ["text"],
                                                               "type": "string"
                                                             },
                                                             "text": {
@@ -5004,16 +4232,11 @@
                                                     "type": "array"
                                                   },
                                                   "kind": {
-                                                    "enum": [
-                                                      "emphasis"
-                                                    ],
+                                                    "enum": ["emphasis"],
                                                     "type": "string"
                                                   }
                                                 },
-                                                "required": [
-                                                  "content",
-                                                  "kind"
-                                                ],
+                                                "required": ["content", "kind"],
                                                 "type": "object"
                                               }
                                             ]
@@ -5033,17 +4256,11 @@
                                           "type": "string"
                                         },
                                         "kind": {
-                                          "enum": [
-                                            "link"
-                                          ],
+                                          "enum": ["link"],
                                           "type": "string"
                                         }
                                       },
-                                      "required": [
-                                        "content",
-                                        "href",
-                                        "kind"
-                                      ],
+                                      "required": ["content", "href", "kind"],
                                       "type": "object"
                                     }
                                   ]
@@ -5052,16 +4269,11 @@
                                 "type": "array"
                               },
                               "kind": {
-                                "enum": [
-                                  "paragraph"
-                                ],
+                                "enum": ["paragraph"],
                                 "type": "string"
                               }
                             },
-                            "required": [
-                              "content",
-                              "kind"
-                            ],
+                            "required": ["content", "kind"],
                             "type": "object"
                           },
                           {
@@ -5075,9 +4287,7 @@
                                         "additionalProperties": false,
                                         "properties": {
                                           "kind": {
-                                            "enum": [
-                                              "text"
-                                            ],
+                                            "enum": ["text"],
                                             "type": "string"
                                           },
                                           "text": {
@@ -5085,19 +4295,14 @@
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "kind",
-                                          "text"
-                                        ],
+                                        "required": ["kind", "text"],
                                         "type": "object"
                                       },
                                       {
                                         "additionalProperties": false,
                                         "properties": {
                                           "kind": {
-                                            "enum": [
-                                              "inline-code"
-                                            ],
+                                            "enum": ["inline-code"],
                                             "type": "string"
                                           },
                                           "text": {
@@ -5105,10 +4310,7 @@
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "kind",
-                                          "text"
-                                        ],
+                                        "required": ["kind", "text"],
                                         "type": "object"
                                       },
                                       {
@@ -5121,9 +4323,7 @@
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "text"
-                                                      ],
+                                                      "enum": ["text"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5131,19 +4331,14 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "inline-code"
-                                                      ],
+                                                      "enum": ["inline-code"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5151,10 +4346,7 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 }
                                               ]
@@ -5163,16 +4355,11 @@
                                             "type": "array"
                                           },
                                           "kind": {
-                                            "enum": [
-                                              "strong"
-                                            ],
+                                            "enum": ["strong"],
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "content",
-                                          "kind"
-                                        ],
+                                        "required": ["content", "kind"],
                                         "type": "object"
                                       },
                                       {
@@ -5185,9 +4372,7 @@
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "text"
-                                                      ],
+                                                      "enum": ["text"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5195,19 +4380,14 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "inline-code"
-                                                      ],
+                                                      "enum": ["inline-code"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5215,10 +4395,7 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 }
                                               ]
@@ -5227,16 +4404,11 @@
                                             "type": "array"
                                           },
                                           "kind": {
-                                            "enum": [
-                                              "emphasis"
-                                            ],
+                                            "enum": ["emphasis"],
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "content",
-                                          "kind"
-                                        ],
+                                        "required": ["content", "kind"],
                                         "type": "object"
                                       },
                                       {
@@ -5249,9 +4421,7 @@
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "text"
-                                                      ],
+                                                      "enum": ["text"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5259,19 +4429,14 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "inline-code"
-                                                      ],
+                                                      "enum": ["inline-code"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5279,10 +4444,7 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
@@ -5337,9 +4499,7 @@
                                                       "type": "array"
                                                     },
                                                     "kind": {
-                                                      "enum": [
-                                                        "strong"
-                                                      ],
+                                                      "enum": ["strong"],
                                                       "type": "string"
                                                     }
                                                   },
@@ -5401,9 +4561,7 @@
                                                       "type": "array"
                                                     },
                                                     "kind": {
-                                                      "enum": [
-                                                        "emphasis"
-                                                      ],
+                                                      "enum": ["emphasis"],
                                                       "type": "string"
                                                     }
                                                   },
@@ -5430,17 +4588,11 @@
                                             "type": "string"
                                           },
                                           "kind": {
-                                            "enum": [
-                                              "link"
-                                            ],
+                                            "enum": ["link"],
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "content",
-                                          "href",
-                                          "kind"
-                                        ],
+                                        "required": ["content", "href", "kind"],
                                         "type": "object"
                                       }
                                     ]
@@ -5452,9 +4604,7 @@
                                 "type": "array"
                               },
                               "kind": {
-                                "enum": [
-                                  "list"
-                                ],
+                                "enum": ["list"],
                                 "type": "string"
                               },
                               "ordered": {
@@ -5466,12 +4616,7 @@
                                 "type": "integer"
                               }
                             },
-                            "required": [
-                              "items",
-                              "kind",
-                              "ordered",
-                              "start"
-                            ],
+                            "required": ["items", "kind", "ordered", "start"],
                             "type": "object"
                           },
                           {
@@ -5479,12 +4624,7 @@
                             "properties": {
                               "align": {
                                 "items": {
-                                  "enum": [
-                                    "left",
-                                    "center",
-                                    "right",
-                                    "none"
-                                  ],
+                                  "enum": ["left", "center", "right", "none"],
                                   "type": "string"
                                 },
                                 "type": "array"
@@ -5497,9 +4637,7 @@
                                         "additionalProperties": false,
                                         "properties": {
                                           "kind": {
-                                            "enum": [
-                                              "text"
-                                            ],
+                                            "enum": ["text"],
                                             "type": "string"
                                           },
                                           "text": {
@@ -5507,19 +4645,14 @@
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "kind",
-                                          "text"
-                                        ],
+                                        "required": ["kind", "text"],
                                         "type": "object"
                                       },
                                       {
                                         "additionalProperties": false,
                                         "properties": {
                                           "kind": {
-                                            "enum": [
-                                              "inline-code"
-                                            ],
+                                            "enum": ["inline-code"],
                                             "type": "string"
                                           },
                                           "text": {
@@ -5527,10 +4660,7 @@
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "kind",
-                                          "text"
-                                        ],
+                                        "required": ["kind", "text"],
                                         "type": "object"
                                       },
                                       {
@@ -5543,9 +4673,7 @@
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "text"
-                                                      ],
+                                                      "enum": ["text"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5553,19 +4681,14 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "inline-code"
-                                                      ],
+                                                      "enum": ["inline-code"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5573,10 +4696,7 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 }
                                               ]
@@ -5585,16 +4705,11 @@
                                             "type": "array"
                                           },
                                           "kind": {
-                                            "enum": [
-                                              "strong"
-                                            ],
+                                            "enum": ["strong"],
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "content",
-                                          "kind"
-                                        ],
+                                        "required": ["content", "kind"],
                                         "type": "object"
                                       },
                                       {
@@ -5607,9 +4722,7 @@
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "text"
-                                                      ],
+                                                      "enum": ["text"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5617,19 +4730,14 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "inline-code"
-                                                      ],
+                                                      "enum": ["inline-code"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5637,10 +4745,7 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 }
                                               ]
@@ -5649,16 +4754,11 @@
                                             "type": "array"
                                           },
                                           "kind": {
-                                            "enum": [
-                                              "emphasis"
-                                            ],
+                                            "enum": ["emphasis"],
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "content",
-                                          "kind"
-                                        ],
+                                        "required": ["content", "kind"],
                                         "type": "object"
                                       },
                                       {
@@ -5671,9 +4771,7 @@
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "text"
-                                                      ],
+                                                      "enum": ["text"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5681,19 +4779,14 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
                                                   "additionalProperties": false,
                                                   "properties": {
                                                     "kind": {
-                                                      "enum": [
-                                                        "inline-code"
-                                                      ],
+                                                      "enum": ["inline-code"],
                                                       "type": "string"
                                                     },
                                                     "text": {
@@ -5701,10 +4794,7 @@
                                                       "type": "string"
                                                     }
                                                   },
-                                                  "required": [
-                                                    "kind",
-                                                    "text"
-                                                  ],
+                                                  "required": ["kind", "text"],
                                                   "type": "object"
                                                 },
                                                 {
@@ -5759,9 +4849,7 @@
                                                       "type": "array"
                                                     },
                                                     "kind": {
-                                                      "enum": [
-                                                        "strong"
-                                                      ],
+                                                      "enum": ["strong"],
                                                       "type": "string"
                                                     }
                                                   },
@@ -5823,9 +4911,7 @@
                                                       "type": "array"
                                                     },
                                                     "kind": {
-                                                      "enum": [
-                                                        "emphasis"
-                                                      ],
+                                                      "enum": ["emphasis"],
                                                       "type": "string"
                                                     }
                                                   },
@@ -5852,17 +4938,11 @@
                                             "type": "string"
                                           },
                                           "kind": {
-                                            "enum": [
-                                              "link"
-                                            ],
+                                            "enum": ["link"],
                                             "type": "string"
                                           }
                                         },
-                                        "required": [
-                                          "content",
-                                          "href",
-                                          "kind"
-                                        ],
+                                        "required": ["content", "href", "kind"],
                                         "type": "object"
                                       }
                                     ]
@@ -5873,9 +4953,7 @@
                                 "type": "array"
                               },
                               "kind": {
-                                "enum": [
-                                  "table"
-                                ],
+                                "enum": ["table"],
                                 "type": "string"
                               },
                               "rows": {
@@ -5887,9 +4965,7 @@
                                           "additionalProperties": false,
                                           "properties": {
                                             "kind": {
-                                              "enum": [
-                                                "text"
-                                              ],
+                                              "enum": ["text"],
                                               "type": "string"
                                             },
                                             "text": {
@@ -5897,19 +4973,14 @@
                                               "type": "string"
                                             }
                                           },
-                                          "required": [
-                                            "kind",
-                                            "text"
-                                          ],
+                                          "required": ["kind", "text"],
                                           "type": "object"
                                         },
                                         {
                                           "additionalProperties": false,
                                           "properties": {
                                             "kind": {
-                                              "enum": [
-                                                "inline-code"
-                                              ],
+                                              "enum": ["inline-code"],
                                               "type": "string"
                                             },
                                             "text": {
@@ -5917,10 +4988,7 @@
                                               "type": "string"
                                             }
                                           },
-                                          "required": [
-                                            "kind",
-                                            "text"
-                                          ],
+                                          "required": ["kind", "text"],
                                           "type": "object"
                                         },
                                         {
@@ -5933,9 +5001,7 @@
                                                     "additionalProperties": false,
                                                     "properties": {
                                                       "kind": {
-                                                        "enum": [
-                                                          "text"
-                                                        ],
+                                                        "enum": ["text"],
                                                         "type": "string"
                                                       },
                                                       "text": {
@@ -5953,9 +5019,7 @@
                                                     "additionalProperties": false,
                                                     "properties": {
                                                       "kind": {
-                                                        "enum": [
-                                                          "inline-code"
-                                                        ],
+                                                        "enum": ["inline-code"],
                                                         "type": "string"
                                                       },
                                                       "text": {
@@ -5975,16 +5039,11 @@
                                               "type": "array"
                                             },
                                             "kind": {
-                                              "enum": [
-                                                "strong"
-                                              ],
+                                              "enum": ["strong"],
                                               "type": "string"
                                             }
                                           },
-                                          "required": [
-                                            "content",
-                                            "kind"
-                                          ],
+                                          "required": ["content", "kind"],
                                           "type": "object"
                                         },
                                         {
@@ -5997,9 +5056,7 @@
                                                     "additionalProperties": false,
                                                     "properties": {
                                                       "kind": {
-                                                        "enum": [
-                                                          "text"
-                                                        ],
+                                                        "enum": ["text"],
                                                         "type": "string"
                                                       },
                                                       "text": {
@@ -6017,9 +5074,7 @@
                                                     "additionalProperties": false,
                                                     "properties": {
                                                       "kind": {
-                                                        "enum": [
-                                                          "inline-code"
-                                                        ],
+                                                        "enum": ["inline-code"],
                                                         "type": "string"
                                                       },
                                                       "text": {
@@ -6039,16 +5094,11 @@
                                               "type": "array"
                                             },
                                             "kind": {
-                                              "enum": [
-                                                "emphasis"
-                                              ],
+                                              "enum": ["emphasis"],
                                               "type": "string"
                                             }
                                           },
-                                          "required": [
-                                            "content",
-                                            "kind"
-                                          ],
+                                          "required": ["content", "kind"],
                                           "type": "object"
                                         },
                                         {
@@ -6061,9 +5111,7 @@
                                                     "additionalProperties": false,
                                                     "properties": {
                                                       "kind": {
-                                                        "enum": [
-                                                          "text"
-                                                        ],
+                                                        "enum": ["text"],
                                                         "type": "string"
                                                       },
                                                       "text": {
@@ -6081,9 +5129,7 @@
                                                     "additionalProperties": false,
                                                     "properties": {
                                                       "kind": {
-                                                        "enum": [
-                                                          "inline-code"
-                                                        ],
+                                                        "enum": ["inline-code"],
                                                         "type": "string"
                                                       },
                                                       "text": {
@@ -6149,9 +5195,7 @@
                                                         "type": "array"
                                                       },
                                                       "kind": {
-                                                        "enum": [
-                                                          "strong"
-                                                        ],
+                                                        "enum": ["strong"],
                                                         "type": "string"
                                                       }
                                                     },
@@ -6213,9 +5257,7 @@
                                                         "type": "array"
                                                       },
                                                       "kind": {
-                                                        "enum": [
-                                                          "emphasis"
-                                                        ],
+                                                        "enum": ["emphasis"],
                                                         "type": "string"
                                                       }
                                                     },
@@ -6242,9 +5284,7 @@
                                               "type": "string"
                                             },
                                             "kind": {
-                                              "enum": [
-                                                "link"
-                                              ],
+                                              "enum": ["link"],
                                               "type": "string"
                                             }
                                           },
@@ -6265,31 +5305,18 @@
                                 "type": "array"
                               }
                             },
-                            "required": [
-                              "align",
-                              "header",
-                              "kind",
-                              "rows"
-                            ],
+                            "required": ["align", "header", "kind", "rows"],
                             "type": "object"
                           },
                           {
                             "additionalProperties": false,
                             "properties": {
                               "kind": {
-                                "enum": [
-                                  "code"
-                                ],
+                                "enum": ["code"],
                                 "type": "string"
                               },
                               "language": {
-                                "enum": [
-                                  "json",
-                                  "md",
-                                  "sh",
-                                  "ts",
-                                  "txt"
-                                ],
+                                "enum": ["json", "md", "sh", "ts", "txt"],
                                 "type": "string"
                               },
                               "lines": {
@@ -6308,11 +5335,7 @@
                                         "type": "string"
                                       }
                                     },
-                                    "required": [
-                                      "light",
-                                      "dark",
-                                      "text"
-                                    ],
+                                    "required": ["light", "dark", "text"],
                                     "type": "object"
                                   },
                                   "type": "array"
@@ -6321,20 +5344,14 @@
                                 "type": "array"
                               }
                             },
-                            "required": [
-                              "kind",
-                              "language",
-                              "lines"
-                            ],
+                            "required": ["kind", "language", "lines"],
                             "type": "object"
                           },
                           {
                             "additionalProperties": false,
                             "properties": {
                               "kind": {
-                                "enum": [
-                                  "diagram"
-                                ],
+                                "enum": ["diagram"],
                                 "type": "string"
                               },
                               "source": {
@@ -6355,12 +5372,7 @@
                                 "type": "string"
                               }
                             },
-                            "required": [
-                              "kind",
-                              "source",
-                              "svg",
-                              "title"
-                            ],
+                            "required": ["kind", "source", "svg", "title"],
                             "type": "object"
                           }
                         ]
@@ -6377,9 +5389,7 @@
                           "type": "string"
                         },
                         "status": {
-                          "enum": [
-                            "published"
-                          ],
+                          "enum": ["published"],
                           "type": "string"
                         },
                         "title": {
@@ -6388,11 +5398,7 @@
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "description",
-                        "status",
-                        "title"
-                      ],
+                      "required": ["description", "status", "title"],
                       "type": "object"
                     },
                     "markdown": {
@@ -6453,9 +5459,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Public documentation"
-        ]
+        "tags": ["Public documentation"]
       }
     },
     "/api/v2/docs/search": {
@@ -6503,12 +5507,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "description",
-                      "excerpt",
-                      "path",
-                      "title"
-                    ],
+                    "required": ["description", "excerpt", "path", "title"],
                     "type": "object"
                   },
                   "type": "array"
@@ -6529,9 +5528,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Public documentation"
-        ]
+        "tags": ["Public documentation"]
       }
     },
     "/api/v2/facts": {
@@ -6559,15 +5556,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 }
               ]
@@ -6580,15 +5573,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 }
               ]
@@ -6607,11 +5596,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "authority": {
-                            "enum": [
-                              "input",
-                              "derived",
-                              "parameter"
-                            ],
+                            "enum": ["input", "derived", "parameter"],
                             "type": "string"
                           },
                           "id": {
@@ -6634,20 +5619,13 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "authority",
-                          "id",
-                          "schemaTag",
-                          "title"
-                        ],
+                        "required": ["authority", "id", "schemaTag", "title"],
                         "type": "object"
                       },
                       "type": "array"
                     }
                   },
-                  "required": [
-                    "facts"
-                  ],
+                  "required": ["facts"],
                   "type": "object"
                 }
               }
@@ -6664,9 +5642,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -6675,9 +5651,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/jurisdictions": {
@@ -6699,15 +5673,11 @@
                           "code": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               }
                             ]
@@ -6716,18 +5686,13 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "code",
-                          "title"
-                        ],
+                        "required": ["code", "title"],
                         "type": "object"
                       },
                       "type": "array"
                     }
                   },
-                  "required": [
-                    "jurisdictions"
-                  ],
+                  "required": ["jurisdictions"],
                   "type": "object"
                 }
               }
@@ -6744,9 +5709,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -6755,9 +5718,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/rules": {
@@ -6785,15 +5746,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 }
               ]
@@ -6806,15 +5763,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 }
               ]
@@ -6866,9 +5819,7 @@
                                       ]
                                     }
                                   },
-                                  "required": [
-                                    "from"
-                                  ],
+                                  "required": ["from"],
                                   "type": "object"
                                 },
                                 "id": {
@@ -6878,9 +5829,7 @@
                                   "additionalProperties": false,
                                   "properties": {
                                     "_tag": {
-                                      "enum": [
-                                        "SourceRef"
-                                      ],
+                                      "enum": ["SourceRef"],
                                       "type": "string"
                                     },
                                     "kind": {
@@ -6934,10 +5883,7 @@
                             "type": "array"
                           },
                           "sourcePolicy": {
-                            "enum": [
-                              "not-required",
-                              "required"
-                            ],
+                            "enum": ["not-required", "required"],
                             "type": "string"
                           },
                           "sources": {
@@ -6945,9 +5891,7 @@
                               "additionalProperties": false,
                               "properties": {
                                 "_tag": {
-                                  "enum": [
-                                    "SourceRef"
-                                  ],
+                                  "enum": ["SourceRef"],
                                   "type": "string"
                                 },
                                 "kind": {
@@ -6994,9 +5938,7 @@
                       "type": "array"
                     }
                   },
-                  "required": [
-                    "rules"
-                  ],
+                  "required": ["rules"],
                   "type": "object"
                 }
               }
@@ -7013,9 +5955,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -7024,9 +5964,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     },
     "/api/v2/tax-years": {
@@ -7041,15 +5979,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "AU"
-                  ],
+                  "enum": ["AU"],
                   "type": "string"
                 }
               ]
@@ -7062,15 +5996,11 @@
             "schema": {
               "anyOf": [
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 },
                 {
-                  "enum": [
-                    "2025-26"
-                  ],
+                  "enum": ["2025-26"],
                   "type": "string"
                 }
               ]
@@ -7091,15 +6021,11 @@
                           "jurisdiction": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "AU"
-                                ],
+                                "enum": ["AU"],
                                 "type": "string"
                               }
                             ]
@@ -7107,32 +6033,23 @@
                           "taxYear": {
                             "anyOf": [
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               },
                               {
-                                "enum": [
-                                  "2025-26"
-                                ],
+                                "enum": ["2025-26"],
                                 "type": "string"
                               }
                             ]
                           }
                         },
-                        "required": [
-                          "jurisdiction",
-                          "taxYear"
-                        ],
+                        "required": ["jurisdiction", "taxYear"],
                         "type": "object"
                       },
                       "type": "array"
                     }
                   },
-                  "required": [
-                    "taxYears"
-                  ],
+                  "required": ["taxYears"],
                   "type": "object"
                 }
               }
@@ -7149,9 +6066,7 @@
                       "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
-                  "required": [
-                    "error"
-                  ],
+                  "required": ["error"],
                   "type": "object"
                 }
               }
@@ -7160,9 +6075,7 @@
           }
         },
         "security": [],
-        "tags": [
-          "Calculator API"
-        ]
+        "tags": ["Calculator API"]
       }
     }
   },
