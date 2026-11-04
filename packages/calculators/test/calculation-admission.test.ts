@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney,  CalculationEngineLive } from "@taxkit/core";
 import { Cents, Money } from "@taxkit/core/primitives";
 import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
 import {
@@ -36,10 +36,7 @@ const request = CalculatorRunServiceRequest.make({
   calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
   payload: {
     facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-        period: "weekly",
-      }),
+      grossPay: NonNegativeMoney.make(new Money({ cents: Cents.make(165_400), currency: "AUD" })), period: "weekly",
       taxFreeThresholdClaimed: true,
     },
   },

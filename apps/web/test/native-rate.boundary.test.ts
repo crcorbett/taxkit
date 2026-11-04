@@ -132,7 +132,7 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
     const calculate = (address: string) =>
       Effect.promise(() =>
         api.fetch(
-          `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+          `${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`,
           {
             body,
             headers: {
@@ -219,7 +219,7 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
         Effect.gen(function* () {
           const response = yield* Effect.promise(() =>
             api.fetch(
-              `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+              `${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`,
               {
                 body,
                 headers: { ...headers, "content-type": "application/json" },
@@ -234,7 +234,7 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
         })
     );
     const catalogueStatus = (yield* Effect.promise(() =>
-      api.fetch(`${apiOrigin}/api/v1/calculators`)
+      api.fetch(`${apiOrigin}/api/v2/calculators`)
     )).status;
     const captured = yield* Schema.encodeEffect(
       Schema.fromJsonString(Schema.Unknown)

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngineLive } from "@taxkit/core";
-import { Money, Cents, audFromCents } from "@taxkit/core/primitives";
+import { Money, Cents, fromCents } from "@taxkit/core/primitives";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax";
 import {
   AuPayCalculatorId as PayCalculatorId,
@@ -38,7 +38,7 @@ const grossPayFacts = (
   period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
 ) => ({
-  grossPay: new GrossPay({ amount, period }),
+  grossPay: amount, period,
   taxFreeThresholdClaimed,
 });
 const secretSentinel = "taxkit-secret-sentinel";
@@ -55,12 +55,12 @@ const calculateTakeHome = (
       help: Option.none(),
       payload: {
         facts: grossPayFacts(
-          yield* audFromCents(cents),
+          yield* fromCents(cents),
           period,
           taxFreeThresholdClaimed
         ),
-        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+        jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+        taxYear: Option.some(AuPayTaxYear.make("2025-26")),
       },
     });
     const report = Match.value(response.report).pipe(
@@ -81,12 +81,12 @@ const calculateWithholdings = (
       help: Option.none(),
       payload: {
         facts: grossPayFacts(
-          yield* audFromCents(cents),
+          yield* fromCents(cents),
           period,
           taxFreeThresholdClaimed
         ),
-        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+        jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+        taxYear: Option.some(AuPayTaxYear.make("2025-26")),
       },
     });
     const report = Match.value(response.report).pipe(
@@ -102,9 +102,9 @@ const calculateAnnualTax = (cents: number) =>
       calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
       help: Option.none(),
       payload: {
-        facts: { taxableIncome: yield* audFromCents(cents) },
-        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+        facts: { taxableIncome: yield* fromCents(cents) },
+        jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+        taxYear: Option.some(AuPayTaxYear.make("2025-26")),
       },
     });
     const report = Match.value(response.report).pipe(
@@ -132,10 +132,8 @@ describe("public calculator service", () => {
                 "weekly",
                 true
               ),
-              jurisdiction: Option.some(
-                Option.some(AuPayJurisdiction.make("AU"))
-              ),
-              taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+              jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+              taxYear: Option.some(AuPayTaxYear.make("2025-26")),
             },
           })
           .pipe(Effect.result);
@@ -326,7 +324,7 @@ describe("public calculator service", () => {
       const exit = yield* service
         .calculate({
           calculatorId: PayCalculatorId.make("au.pay.take-home"),
-          help: Option.some(Option.some("errors")),
+          help: Option.some("errors"),
           payload: {
             facts: {
               taxableIncome: new Money({
@@ -334,10 +332,8 @@ describe("public calculator service", () => {
                 currency: "AUD",
               }),
             },
-            jurisdiction: Option.some(
-              Option.some(AuPayJurisdiction.make("AU"))
-            ),
-            taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+            jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+            taxYear: Option.some(AuPayTaxYear.make("2025-26")),
           },
         })
         .pipe(Effect.exit);
@@ -391,10 +387,8 @@ describe("public calculator service", () => {
                 grossPay: `${secretSentinel}:${privatePathSentinel}`,
                 taxFreeThresholdClaimed: true,
               },
-              jurisdiction: Option.some(
-                Option.some(AuPayJurisdiction.make("AU"))
-              ),
-              taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+              jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+              taxYear: Option.some(AuPayTaxYear.make("2025-26")),
             },
           })
           .pipe(Effect.exit);

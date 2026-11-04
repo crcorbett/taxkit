@@ -162,7 +162,7 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
       const calculate = (policy: string) =>
         Effect.promise(() =>
           api.fetch(
-            `${origin}/api/v1/calculators/au.pay.take-home/calculate?private-query=PRIVATE9`,
+            `${origin}/api/v2/calculators/au.pay.take-home/calculate?private-query=PRIVATE9`,
             {
               body,
               headers: {

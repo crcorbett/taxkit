@@ -17,15 +17,15 @@ response detail.
 | `GET`  | `/api/health`                                  | Check the API process.                                         |
 | `GET`  | `/api/docs`                                    | Open the generated Scalar reference viewer.                    |
 | `GET`  | `/api/docs/openapi.json`                       | Read the generated OpenAPI document.                           |
-| `GET`  | `/api/v1/jurisdictions`                        | List supported public API jurisdictions.                       |
-| `GET`  | `/api/v1/tax-years`                            | List supported tax years, optionally filtered by jurisdiction. |
-| `GET`  | `/api/v1/calculators`                          | List calculator catalog entries.                               |
-| `GET`  | `/api/v1/calculators/:calculatorId`            | Get one calculator catalog entry.                              |
-| `GET`  | `/api/v1/calculators/:calculatorId/schema`     | Get fact, rule and report schema metadata.                     |
-| `POST` | `/api/v1/calculators/:calculatorId/calculate`  | Run one calculator through the calculator service.             |
-| `GET`  | `/api/v1/calculators/:calculatorId/graph`      | Get graph edges and validation diagnostics.                    |
-| `GET`  | `/api/v1/facts`                                | List canonical fact descriptors.                               |
-| `GET`  | `/api/v1/rules`                                | List canonical rule descriptors.                               |
+| `GET`  | `/api/v2/jurisdictions`                        | List supported public API jurisdictions.                       |
+| `GET`  | `/api/v2/tax-years`                            | List supported tax years, optionally filtered by jurisdiction. |
+| `GET`  | `/api/v2/calculators`                          | List calculator catalog entries.                               |
+| `GET`  | `/api/v2/calculators/:calculatorId`            | Get one calculator catalog entry.                              |
+| `GET`  | `/api/v2/calculators/:calculatorId/schema`     | Get fact, rule and report schema metadata.                     |
+| `POST` | `/api/v2/calculators/:calculatorId/calculate`  | Run one calculator through the calculator service.             |
+| `GET`  | `/api/v2/calculators/:calculatorId/graph`      | Get graph edges and validation diagnostics.                    |
+| `GET`  | `/api/v2/facts`                                | List canonical fact descriptors.                               |
+| `GET`  | `/api/v2/rules`                                | List canonical rule descriptors.                               |
 | `GET`  | `/api/v2/docs/navigation`                      | Read public documentation navigation.                          |
 | `GET`  | `/api/v2/docs/page?path=/start/quickstart`     | Read one public page as JSON.                                  |
 | `GET`  | `/api/v2/docs/search?term=Quickstart`          | Search public documentation.                                   |
@@ -33,12 +33,12 @@ response detail.
 
 ## Calculate
 
-`POST /api/v1/calculators/:calculatorId/calculate` accepts a
+`POST /api/v2/calculators/:calculatorId/calculate` accepts a
 `CalculatorRunRequest` payload and returns a `CalculatorRunResponse`.
 
 ```sh
 curl -X POST \
-  http://127.0.0.1:4000/api/v1/calculators/au.pay.take-home/calculate \
+  http://127.0.0.1:4000/api/v2/calculators/au.pay.take-home/calculate \
   -H 'content-type: application/json' \
   -d '{
     "facts": {

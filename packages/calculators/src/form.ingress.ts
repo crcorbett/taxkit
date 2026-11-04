@@ -1,11 +1,11 @@
-import { Cents, Money } from "@taxkit/core/primitives";
+import { NonNegativeMoneyFromDecimalString } from "@taxkit/core/primitives";
 import {
   AnnualTaxScenarioInputSchema,
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
 } from "@taxkit/rules-au-income-tax/schemas";
-import { GrossPay, PayPeriod } from "@taxkit/rules-au-pay/facts";
+import { PayPeriod } from "@taxkit/rules-au-pay/facts";
 import {
   AuPayCalculatorId,
   AuPayJurisdiction,
@@ -53,26 +53,15 @@ export const takeHomeRequestFromForm = (
   )
 ): Result.Result<CalculatorRunServiceRequest, CalculatorInputError> =>
   Result.gen(function* () {
-    const amount = yield* Schema.decodeUnknownResult(Schema.FiniteFromString)(
-      form.grossDollars
-    );
-    const cents = yield* Schema.decodeUnknownResult(Cents)(
-      Math.round(amount * 100)
-    );
+    const grossPay = yield* Schema.decodeResult(NonNegativeMoneyFromDecimalString)(form.grossDollars);
     const period = yield* Schema.decodeUnknownResult(PayPeriod)(form.period);
-    const facts = TakeHomeScenarioInputSchema.make({
-      grossPay: new GrossPay({
-        amount: new Money({ cents, currency: "AUD" }),
-        period,
-      }),
-      taxFreeThresholdClaimed: form.taxFreeThresholdClaimed,
-    });
+    const facts = TakeHomeScenarioInputSchema.make({ grossPay, period, taxFreeThresholdClaimed: form.taxFreeThresholdClaimed });
     return CalculatorRunServiceRequest.make({
       calculatorId,
       payload: {
         facts,
-        jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-        taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+        jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+        taxYear: Option.some(AuPayTaxYear.make("2025-26")),
       },
     });
   }).pipe(
@@ -87,23 +76,14 @@ export const annualTaxRequestFromForm = (
   form: AnnualTaxForm
 ): Result.Result<CalculatorRunServiceRequest, CalculatorInputError> =>
   Result.gen(function* () {
-    const amount = yield* Schema.decodeUnknownResult(Schema.FiniteFromString)(
-      form.taxableDollars
-    );
-    const cents = yield* Schema.decodeUnknownResult(Cents)(
-      Math.round(amount * 100)
-    );
-    const facts = AnnualTaxScenarioInputSchema.make({
-      taxableIncome: new Money({ cents, currency: "AUD" }),
-    });
+    const taxableIncome = yield* Schema.decodeResult(NonNegativeMoneyFromDecimalString)(form.taxableDollars);
+    const facts = AnnualTaxScenarioInputSchema.make({ taxableIncome });
     return CalculatorRunServiceRequest.make({
       calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
       payload: {
         facts,
-        jurisdiction: Option.some(
-          Option.some(AuAnnualTaxJurisdiction.make("AU"))
-        ),
-        taxYear: Option.some(Option.some(AuAnnualTaxYear.make("2025-26"))),
+        jurisdiction: Option.some(AuAnnualTaxJurisdiction.make("AU")),
+        taxYear: Option.some(AuAnnualTaxYear.make("2025-26")),
       },
     });
   }).pipe(

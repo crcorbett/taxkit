@@ -215,15 +215,15 @@ uses the environment and tests supply isolated providers. The safe
 - `GET /api/health`
 - `GET /api/docs`
 - `GET /api/docs/openapi.json`
-- `GET /api/v1/jurisdictions`
-- `GET /api/v1/tax-years`
-- `GET /api/v1/calculators`
-- `GET /api/v1/calculators/:calculatorId`
-- `GET /api/v1/calculators/:calculatorId/schema`
-- `POST /api/v1/calculators/:calculatorId/calculate`
-- `GET /api/v1/calculators/:calculatorId/graph`
-- `GET /api/v1/facts`
-- `GET /api/v1/rules`
+- `GET /api/v2/jurisdictions`
+- `GET /api/v2/tax-years`
+- `GET /api/v2/calculators`
+- `GET /api/v2/calculators/:calculatorId`
+- `GET /api/v2/calculators/:calculatorId/schema`
+- `POST /api/v2/calculators/:calculatorId/calculate`
+- `GET /api/v2/calculators/:calculatorId/graph`
+- `GET /api/v2/facts`
+- `GET /api/v2/rules`
 
 Public calculation routes are calculator, fact, rule and graph driven.
 Jurisdiction and tax year are calculator context, not top-level route families.
@@ -285,9 +285,9 @@ creates a temp consumer workspace outside the repo, writes a dependency-free
 same public HTTP routes:
 
 - `GET /api/health`
-- `GET /api/v1/calculators`
-- `POST /api/v1/calculators/au.pay.take-home/calculate`
-- `POST /api/v1/calculators/au.income-tax.annual/calculate`
+- `GET /api/v2/calculators`
+- `POST /api/v2/calculators/au.pay.take-home/calculate`
+- `POST /api/v2/calculators/au.income-tax.annual/calculate`
 - `GET /api/docs/openapi.json`
 
 The smoke script owns process lifecycle only. It validates response bodies with
@@ -334,8 +334,8 @@ Use the portless URL for local API smoke checks:
 
 ```sh
 curl https://api.taxkit.localhost/api/health
-curl https://api.taxkit.localhost/api/v1/calculators
-curl -X POST https://api.taxkit.localhost/api/v1/calculators/au.pay.take-home/calculate \
+curl https://api.taxkit.localhost/api/v2/calculators
+curl -X POST https://api.taxkit.localhost/api/v2/calculators/au.pay.take-home/calculate \
   -H 'content-type: application/json' \
   -d '{"facts":{"grossPay":{"_tag":"GrossPay","amount":{"_tag":"Money","cents":150000,"currency":"AUD"},"period":"weekly"},"taxFreeThresholdClaimed":true}}'
 ```

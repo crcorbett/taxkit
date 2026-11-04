@@ -94,7 +94,7 @@ export type LedgerComponentEncoded = typeof LedgerComponent.Encoded;
 
 Ledgers make output explanation clearer because each component can be inspected independently. Disabled and zeroed components stay in the trace for auditability and do not affect the total.
 
-`sumLedgerComponents` returns an Effect with `InvalidMoneyValue` when an
+`sumLedgerComponents` returns an Effect with `MoneyError` when an
 intermediate total cannot fit safe whole cents. A later component cannot undo
 that failure. Rule aggregators yield the result and map it to their safe
 calculation error. Informational, disabled and zeroed entries still contribute

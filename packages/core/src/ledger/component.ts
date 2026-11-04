@@ -1,7 +1,8 @@
-import { Function as EffectFunction, Effect, Match, Schema } from "effect";
+import { Function as EffectFunction, Effect, Match, Schema, Array, HashSet } from "effect";
 
-import type { InvalidMoneyValue } from "../primitives/errors.js";
-import { aud, Cents, Money, moneyAdd, moneySub } from "../primitives/money.js";
+import type { MoneyError } from "../primitives/errors.js";
+import {  Cents, Money } from "../primitives/money.js";
+import { add, subtract } from "../primitives/money.effect.js";
 import { TraceNode } from "../trace/node.js";
 /**
  * Stable identifier for a ledger component.
@@ -105,19 +106,27 @@ export const isComponentContributing = (c: LedgerComponent): boolean =>
  */
 export const sumLedgerComponents = (
   components: readonly LedgerComponent[]
-): Effect.Effect<Money, InvalidMoneyValue> =>
+): Effect.Effect<Money, MoneyError> =>
   Effect.reduce(
     components,
-    () => EffectFunction.pipe(Cents.make(0), aud),
+    () => EffectFunction.pipe(Cents.make(0), Money.fromCents),
     (acc, component) => {
       if (!isComponentContributing(component)) {
         return Effect.succeed(acc);
       }
       return Match.value(component.effect).pipe(
-        Match.when("additive", () => moneyAdd(acc, component.amount)),
-        Match.when("subtractive", () => moneySub(acc, component.amount)),
+        Match.when("additive", () => add(acc, component.amount)),
+        Match.when("subtractive", () => subtract(acc, component.amount)),
         Match.when("informational", () => Effect.succeed(acc)),
         Match.exhaustive
       );
     }
   );
+
+/** Compare a ledger using exact integer arithmetic and unique component identities. */
+export const ledgerTotalEquals = (components: readonly LedgerComponent[], total: Money): boolean =>
+  HashSet.size(HashSet.fromIterable(Array.map(components, (component) => component.id))) === components.length &&
+  Array.reduce(components, 0n, (sum, component) => sum + (
+    component.status !== "active" || component.effect === "informational" ? 0n :
+      component.effect === "additive" ? BigInt(component.amount.cents) : -BigInt(component.amount.cents)
+  )) === BigInt(total.cents);

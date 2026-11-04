@@ -60,7 +60,7 @@ const calculateWithEntry = Effect.fnUntraced(function* ({
           toCalculatorInputDecodeError({
             calculatorId: request.calculatorId,
             entry,
-            help: Option.flatten(request.help),
+            help: request.help,
             issue: error.issue,
           })
         )

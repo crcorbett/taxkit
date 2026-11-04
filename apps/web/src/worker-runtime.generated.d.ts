@@ -530,7 +530,7 @@ interface CacheContext {
     invalidate(options: CachePurgeOptions): Promise<CachePurgeResult>;
 }
 interface CloudflareAccessContext {
-    readonly aud: string;
+    readonly Money.fromCents: string;
     getIdentity(): Promise<CloudflareAccessIdentity | undefined>;
 }
 declare abstract class ColoLocalActorNamespace {

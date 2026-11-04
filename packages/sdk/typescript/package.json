@@ -54,6 +54,18 @@
     "./http": {
       "types": "./dist/http.d.ts",
       "default": "./dist/http.js"
+    },
+    "./money": {
+      "types": "./dist/money.d.ts",
+      "default": "./dist/money.js"
+    },
+    "./money/effect": {
+      "types": "./dist/money/effect.d.ts",
+      "default": "./dist/money/effect.js"
+    },
+    "./au/schemas": {
+      "types": "./dist/au/schemas.d.ts",
+      "default": "./dist/au/schemas.js"
     }
   },
   "publishConfig": {
@@ -89,6 +101,18 @@
       "./http": {
         "types": "./dist/http.d.ts",
         "default": "./dist/http.js"
+      },
+      "./money": {
+        "types": "./dist/money.d.ts",
+        "default": "./dist/money.js"
+      },
+      "./money/effect": {
+        "types": "./dist/money/effect.d.ts",
+        "default": "./dist/money/effect.js"
+      },
+      "./au/schemas": {
+        "types": "./dist/au/schemas.d.ts",
+        "default": "./dist/au/schemas.js"
       }
     },
     "access": "public"
@@ -98,7 +122,7 @@
     "check-boundaries": "bun run scripts/check-import-boundaries.runtime.ts",
     "check-packed-artifact": "bun run scripts/check-packed-artifact.runtime.ts",
     "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p scripts/tsconfig.json --noEmit",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p scripts/tsconfig.json --noEmit && tsc -p tsconfig.type-tests.json --noEmit",
     "test": "vitest run",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
     "clean": "rm -rf dist .compiled .turbo *.tsbuildinfo",

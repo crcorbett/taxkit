@@ -1,6 +1,6 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { Cents, Money, audFromCents } from "@taxkit/core/primitives";
+import { Cents, Money, fromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   payPeriodToWeeklyCents,
@@ -158,7 +158,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       });
       return component;
     }
-    const periodWithholding = yield* audFromCents(
+    const periodWithholding = yield* fromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period

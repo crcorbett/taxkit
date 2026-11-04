@@ -76,13 +76,13 @@ Use `calculateRunRequest` when you need a full `CalculatorRunResponse` with the
 descriptor-decoded report:
 
 ```ts
-import { audFromCents } from "taxkit/core";
+import { fromCents } from "taxkit/core";
 import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
 import { calculateRunRequest } from "taxkit/effect";
 import { Effect, Option } from "effect";
 
 const effect = Effect.gen(function* () {
-  const taxableIncome = yield* audFromCents(9_000_000);
+  const taxableIncome = yield* fromCents(9_000_000);
   return yield* calculateRunRequest(AuAnnualIncomeTaxCalculation, {
     payload: {
       facts: { taxableIncome },

@@ -43,7 +43,7 @@ it.effect.each([301, 302, 303, 307, 308])(
         const options = yield* Option.fromUndefinedOr(init).pipe(
           Effect.fromOption
         );
-        expect(request.url).toContain("/api/v1/calculators");
+        expect(request.url).toContain("/api/v2/calculators");
         expect(options.redirect).toBe("manual");
         expect(options.signal).toBeInstanceOf(AbortSignal);
       }).pipe(

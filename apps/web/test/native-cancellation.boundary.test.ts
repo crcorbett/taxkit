@@ -35,7 +35,7 @@ const websiteOrigin = "http://127.0.0.1:4202";
 const headersOrigin = "http://127.0.0.1:4203";
 const Json = Schema.fromJsonString(Schema.Unknown);
 // The browser's only calculation request: the public HTTP calculate route.
-const calculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`;
+const calculation = `${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`;
 const isCalculation = (
   request: Readonly<{
     method: () => string;
@@ -306,7 +306,7 @@ it.live(
       page.on("request", (request) => {
         // Record calculator routes.
         const { pathname } = new URL(request.url());
-        if (pathname.startsWith("/api/v1/calculators/")) {
+        if (pathname.startsWith("/api/v2/calculators/")) {
           Queue.offerUnsafe(calls, `${request.method()} ${request.url()}`);
         }
       });

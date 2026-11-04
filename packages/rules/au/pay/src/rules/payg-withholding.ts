@@ -1,6 +1,6 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { Cents, audFromCents } from "@taxkit/core/primitives";
+import { Cents, fromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   Function as EffectFunction,
@@ -108,7 +108,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         })
       )
     );
-    const periodWithholding = yield* audFromCents(
+    const periodWithholding = yield* fromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period

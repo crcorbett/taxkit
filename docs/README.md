@@ -3,6 +3,7 @@
 | Owner | Purpose |
 | --- | --- |
 | [Architecture](../ARCHITECTURE.md) | Apps, packages, requests, runtimes, caching and deployment |
+| [Domain language](../CONTEXT.md) | Money, facts, scenarios, rules, rule packs and calculation outcomes |
 | [Engine](architecture/facts.md) | [Facts](architecture/facts.md), [rules and parameters](architecture/rules-and-parameters.md), [calculators](architecture/calculators.md) and [graph, trace and ledgers](architecture/graph-trace-ledgers.md) |
 | [API and SDK](architecture/api-and-sdk.md) | Public HTTP contract, MCP, admission and the SDK |
 | [Website](architecture/frontend.md) | Routes, loaders, calculator pages and documentation |
@@ -30,6 +31,7 @@ frontmatter and navigation say `status: published`.
 - [0007 Content-neutral MDX compilation and rendering](adr/0007-content-neutral-mdx.md)
 - [0008 Effect-owned rendering providers](adr/0008-effect-rendering-providers.md)
 - [0009 Paired MDX themes as checked render data](adr/0009-mdx-themes.md)
+- [0011 Effect-native SDK contracts and checked money](adr/0011-effect-native-sdk-contracts.md) (draft; hard cutover)
 
 ## Keeping this useful
 

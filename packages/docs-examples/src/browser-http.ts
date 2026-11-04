@@ -3,13 +3,13 @@ import { HttpApiClient } from "effect/http-api";
 import * as FetchHttpClient from "effect/http/FetchHttpClient";
 import { GrossPay } from "taxkit/au";
 import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
-import { audFromCents } from "taxkit/core";
+import { fromCents } from "taxkit/core";
 import { TaxKitApi } from "taxkit/http";
 
 export const calculateTakeHomePay = (baseUrl: URL) =>
   Effect.gen(function* () {
     const client = yield* HttpApiClient.make(TaxKitApi, { baseUrl });
-    const amount = yield* audFromCents(346_200);
+    const amount = yield* fromCents(346_200);
     return yield* client.calculatorApi.calculate({
       params: { calculatorId: AuPayTakeHomeCalculation.calculatorId },
       payload: {
@@ -20,11 +20,9 @@ export const calculateTakeHomePay = (baseUrl: URL) =>
           }),
           taxFreeThresholdClaimed: true,
         },
-        jurisdiction: Option.some(
-          Option.some(AuPayTakeHomeCalculation.jurisdiction)
-        ),
-        taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
+        jurisdiction: Option.some(AuPayTakeHomeCalculation.jurisdiction),
+        taxYear: Option.some(AuPayTakeHomeCalculation.taxYear),
       },
-      query: { help: Option.some(Option.some("errors")) },
+      query: { help: Option.some("errors") },
     });
   }).pipe(Effect.provide(FetchHttpClient.layer));

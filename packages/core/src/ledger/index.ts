@@ -7,3 +7,5 @@ export {
   sumLedgerComponents,
   type LedgerComponentEncoded,
 } from "./component.js";
+
+export { ledgerTotalEquals } from "./component.js";

@@ -1,8 +1,8 @@
 import { Function as EffectFunction, Match, Schema } from "effect";
 import type { Effect } from "effect";
 
-import type { InvalidMoneyValue } from "./errors.js";
-import { audFromCents } from "./money.js";
+import type { MoneyError } from "./errors.js";
+import { fromCents } from "./money.effect.js";
 import type { Cents, Money } from "./money.js";
 /**
  * Rounding policies used by formula evaluation and trace output.
@@ -52,8 +52,8 @@ export const roundCentsToDollar = (cents: Cents, mode: RoundingMode): number =>
  *
  * @since 0.1.0
  */
-export const roundMoney = (
+export const round = (
   m: Money,
   mode: RoundingMode
-): Effect.Effect<Money, InvalidMoneyValue> =>
-  EffectFunction.pipe(roundCentsToDollar(m.cents, mode), audFromCents);
+): Effect.Effect<Money, MoneyError> =>
+  EffectFunction.pipe(roundCentsToDollar(m.cents, mode), fromCents);

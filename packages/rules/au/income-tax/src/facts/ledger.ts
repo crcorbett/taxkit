@@ -1,5 +1,5 @@
 import { makeFactDescriptor } from "@taxkit/core/facts";
-import { LedgerComponent } from "@taxkit/core/ledger";
+import { ledgerTotalEquals, LedgerComponent } from "@taxkit/core/ledger";
 import { Money } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Context, Schema } from "effect";
@@ -16,11 +16,11 @@ export class AnnualTaxLedger extends Schema.TaggedClass<
   {
     readonly brand: unique symbol;
   }
->()("AnnualTaxLedger", {
+>()("AnnualTaxLedger", Schema.Struct({
   components: Schema.Array(LedgerComponent),
   rawLiability: Money,
   trace: TraceNode,
-}) {}
+}).check(Schema.makeFilter((ledger) => ledgerTotalEquals(ledger.components, ledger.rawLiability), { expected: "unique ledger components matching their total" }))) {}
 /**
  * Context tag for the derived annual tax ledger.
  *

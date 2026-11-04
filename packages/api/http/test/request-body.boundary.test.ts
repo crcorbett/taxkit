@@ -28,7 +28,7 @@ import { TaxKitServerLayer } from "../src/server.js";
 import { ContentTestLive } from "./content.fixture.js";
 
 const path =
-  "http://taxkit.internal/api/v1/calculators/au.pay.take-home/calculate";
+  "http://taxkit.internal/api/v2/calculators/au.pay.take-home/calculate";
 describe("shared HTTP request-body policy", () => {
   it.effect(
     "refuses a late synchronous body before entering the request handler",

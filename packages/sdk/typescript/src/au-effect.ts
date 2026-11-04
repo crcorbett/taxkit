@@ -1,18 +1,3 @@
-import { createClient } from "./effect.js";
-import {
-  AuIncomeTax2025_26Module,
-  AuPay2025_26Module,
-} from "./internal/au-descriptors.js";
-
-export {
-  AuAnnualIncomeTaxCalculation,
-  AuIncomeTax2025_26Module,
-  AuPay2025_26Module,
-  AuPayTakeHomeCalculation,
-  AuPayWithholdingsCalculation,
-} from "./internal/au-descriptors.js";
-
-export const auEffect = {
-  createClient: () =>
-    createClient(AuPay2025_26Module, AuIncomeTax2025_26Module),
-} as const;
+export * from "@taxkit/rules-au-pay";
+export * from "@taxkit/rules-au-income-tax";
+export * from "@taxkit/rules-au-stsl";

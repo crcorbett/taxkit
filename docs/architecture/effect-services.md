@@ -153,7 +153,7 @@ Schema does not provide.
 
 Core's constrained money, date and decimal helpers return owned schema-tagged
 errors through Effects. `aud` remains pure for already checked cents; use
-`audFromCents` for a number that still needs checking. New arithmetic results
+`fromCents` for a number that still needs checking. New arithmetic results
 must pass the owning fallible constructor. Rules translate those failures to
 safe calculation errors without copying the input amount or a raw Schema issue.
 The [core README](../../packages/core/README.md) owns the concrete helper and

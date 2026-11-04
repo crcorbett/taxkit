@@ -41,15 +41,15 @@ The implemented API surface is:
 - `GET /api/health`
 - `GET /api/docs`
 - `GET /api/docs/openapi.json`
-- `GET /api/v1/jurisdictions`
-- `GET /api/v1/tax-years`
-- `GET /api/v1/calculators`
-- `GET /api/v1/calculators/:calculatorId`
-- `GET /api/v1/calculators/:calculatorId/schema`
-- `POST /api/v1/calculators/:calculatorId/calculate`
-- `GET /api/v1/calculators/:calculatorId/graph`
-- `GET /api/v1/facts`
-- `GET /api/v1/rules`
+- `GET /api/v2/jurisdictions`
+- `GET /api/v2/tax-years`
+- `GET /api/v2/calculators`
+- `GET /api/v2/calculators/:calculatorId`
+- `GET /api/v2/calculators/:calculatorId/schema`
+- `POST /api/v2/calculators/:calculatorId/calculate`
+- `GET /api/v2/calculators/:calculatorId/graph`
+- `GET /api/v2/facts`
+- `GET /api/v2/rules`
 - `GET /api/v2/docs/navigation`
 - `GET /api/v2/docs/page?path=/start/quickstart`
 - `GET /api/v2/docs/search?term=Quickstart`
@@ -311,8 +311,8 @@ The SDK's `src/http-parity.test.ts` owns the comparison of the HTTP and SDK
 surfaces, keeping this package independent of the assembled SDK. It covers:
 
 - `GET /api/health`
-- `GET /api/v1/calculators`
-- successful `POST /api/v1/calculators/au.pay.take-home/calculate`
+- `GET /api/v2/calculators`
+- successful `POST /api/v2/calculators/au.pay.take-home/calculate`
 - schema-guided calculator input errors through `CalculatorApiErrorEnvelope`
 
 The calculate success fixture compares the HTTP response with

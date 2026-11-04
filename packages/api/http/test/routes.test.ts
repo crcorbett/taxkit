@@ -77,10 +77,10 @@ describe("transport route catalogue", () => {
     () =>
       Effect.forEach(
         [
-          "/api/v1/calculators/unknown",
-          "/api/v1/calculators/unknown/schema",
-          "/api/v1/calculators/au.pay.take-home/private",
-          "/api/v1/calculators/au.pay.take-home/schema/extra",
+          "/api/v2/calculators/unknown",
+          "/api/v2/calculators/unknown/schema",
+          "/api/v2/calculators/au.pay.take-home/private",
+          "/api/v2/calculators/au.pay.take-home/schema/extra",
           "/api/v2/docs/discovery/unknown.txt",
           "/api/v2/docs/markdown/extra",
           "/mcp",
@@ -93,10 +93,10 @@ describe("transport route catalogue", () => {
   );
 
   it("admits only the checked calculation endpoint and the MCP address", () => {
-    const path = `/api/v1/calculators/${calculator}/calculate`;
+    const path = `/api/v2/calculators/${calculator}/calculate`;
     assert.isTrue(Schema.is(CalculationPath)(path));
     assert.isFalse(
-      Schema.is(CalculationPath)("/api/v1/calculators/unknown/calculate")
+      Schema.is(CalculationPath)("/api/v2/calculators/unknown/calculate")
     );
     assert.isTrue(Schema.is(McpRoutePath)("/mcp/session"));
     assert.isFalse(Schema.is(McpRoutePath)("/mcpo"));

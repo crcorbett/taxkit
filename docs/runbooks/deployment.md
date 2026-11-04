@@ -241,7 +241,7 @@ verification runs once per revision and the deploy jobs reuse that result:
   verification of that head commit succeeds. It runs for opened, reopened and
   synchronised same-repository pull requests: `pr:plan` and `pr:deploy` for
   `pr-<number>`, then it reads both stage addresses from the deploy's stack
-  outputs and checks the Website, `/api/health` and `/api/v1/calculators` for
+  outputs and checks the Website, `/api/health` and `/api/v2/calculators` for
   200.
 - `cleanup` (Destroy preview) runs when a same-repository pull request closes:
   the stage-validated `pr:destroy --dry-run --no-input`, then `pr:destroy --yes --no-input`.

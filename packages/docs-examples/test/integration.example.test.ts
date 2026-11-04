@@ -1,15 +1,13 @@
+import { NonNegativeMoney } from "@taxkit/core/primitives";
 import { assert, it } from "@effect/vitest";
 import { Predicate, Function as EffectFunction, Effect, Schema } from "effect";
 import { GrossPay, au } from "taxkit/au";
-import { Cents, aud } from "taxkit/core";
+import { Cents } from "taxkit/core";
 
 it.effect("calculates weekly take-home pay", () =>
   Effect.promise(() =>
     au.pay.takeHomePay({
-      grossPay: new GrossPay({
-        amount: EffectFunction.pipe(Cents.make(165_400), aud),
-        period: "weekly",
-      }),
+      grossPay: NonNegativeMoney.make(EffectFunction.pipe(Cents.make(165_400), Money.fromCents)), period: "weekly",
       taxFreeThresholdClaimed: true,
     })
   ).pipe(

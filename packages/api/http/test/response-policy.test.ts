@@ -31,10 +31,10 @@ describe("public response cache policy", () => {
     "/api/v2/docs/markdown",
     "/api/v2/docs/navigation",
     "/api/v2/docs/discovery/llms.txt",
-    "/api/v1/calculators",
-    "/api/v1/calculators/au.pay.take-home",
-    "/api/v1/calculators/au.pay.take-home/schema",
-    "/api/v1/facts",
+    "/api/v2/calculators",
+    "/api/v2/calculators/au.pay.take-home",
+    "/api/v2/calculators/au.pay.take-home/schema",
+    "/api/v2/facts",
     "/api/docs/openapi.json",
   ])("shares the public read %s", (path) => {
     EffectFunction.pipe(isPublicReadApiPath(path), (actual) => {
@@ -44,7 +44,7 @@ describe("public response cache policy", () => {
 
   it.each([
     "/api/health",
-    "/api/v1/calculators/au.pay.take-home/calculate",
+    "/api/v2/calculators/au.pay.take-home/calculate",
     "/mcp",
     "/api/v2/docs/discovery/other.txt",
   ])("never shares %s", (path) => {

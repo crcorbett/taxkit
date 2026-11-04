@@ -72,7 +72,7 @@ const frameworkSentinel = "PRIVATE9";
 const calculationPath = /^\/api\/v1\/calculators\/[^/]+\/calculate$/u;
 const isCalculation = (url: URL) =>
   url.origin === apiOrigin && calculationPath.test(url.pathname);
-const takeHomeCalculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`;
+const takeHomeCalculation = `${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`;
 const docsNavigationAddress = `${apiOrigin}/api/v2/docs/navigation`;
 const docsPageAddress = (path: string) =>
   `${apiOrigin}/api/v2/docs/page?${new URLSearchParams({ path })}`;
@@ -1444,7 +1444,7 @@ describe("built native API and Website", () => {
               })
           );
           yield* Effect.forEach(
-            ["/api/v1/calculators/au.pay.take-home/calculate"],
+            ["/api/v2/calculators/au.pay.take-home/calculate"],
             (pathname) =>
               Effect.gen(function* () {
                 const oversized = yield* Effect.promise(() =>

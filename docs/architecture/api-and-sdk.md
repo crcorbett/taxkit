@@ -9,6 +9,12 @@ review_trigger: API or SDK contracts, exports, lifetime or caller composition ch
 
 # API and SDK
 
+[ADR 0011](../adr/0011-effect-native-sdk-contracts.md) drafts the next major SDK
+contract: shared Effect-native Schemas and execution, checked money, inferred
+rule requirements and a hard cutover that deletes all superseded implementations
+and interfaces in the same merge. Its replacement APIs are not implemented by
+that document; the current contracts are described below.
+
 The active T008 candidate adds minimal analytics only in the native API app.
 Direct callers may supply a collection preference through the shared private
 header boundary. Its checked flag carries allow/deny without browser identity and
@@ -53,15 +59,15 @@ The current implemented API surface is:
 GET /api/health
 GET /api/docs
 GET /api/docs/openapi.json
-GET /api/v1/jurisdictions
-GET /api/v1/tax-years
-GET /api/v1/calculators
-GET /api/v1/calculators/:calculatorId
-GET /api/v1/calculators/:calculatorId/schema
-POST /api/v1/calculators/:calculatorId/calculate
-GET /api/v1/calculators/:calculatorId/graph
-GET /api/v1/facts
-GET /api/v1/rules
+GET /api/v2/jurisdictions
+GET /api/v2/tax-years
+GET /api/v2/calculators
+GET /api/v2/calculators/:calculatorId
+GET /api/v2/calculators/:calculatorId/schema
+POST /api/v2/calculators/:calculatorId/calculate
+GET /api/v2/calculators/:calculatorId/graph
+GET /api/v2/facts
+GET /api/v2/rules
 GET /api/v2/docs/navigation
 GET /api/v2/docs/page?path=/start/quickstart
 GET /api/v2/docs/search?term=Quickstart
@@ -275,15 +281,15 @@ families.
 The public calculation API uses stable generic resources:
 
 ```txt
-GET  /api/v1/jurisdictions
-GET  /api/v1/tax-years
-GET  /api/v1/calculators
-GET  /api/v1/calculators/:calculatorId
-GET  /api/v1/calculators/:calculatorId/schema
-POST /api/v1/calculators/:calculatorId/calculate
-GET  /api/v1/calculators/:calculatorId/graph
-GET  /api/v1/facts
-GET  /api/v1/rules
+GET  /api/v2/jurisdictions
+GET  /api/v2/tax-years
+GET  /api/v2/calculators
+GET  /api/v2/calculators/:calculatorId
+GET  /api/v2/calculators/:calculatorId/schema
+POST /api/v2/calculators/:calculatorId/calculate
+GET  /api/v2/calculators/:calculatorId/graph
+GET  /api/v2/facts
+GET  /api/v2/rules
 ```
 
 Calculator IDs may include jurisdiction segments, such as

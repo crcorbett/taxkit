@@ -264,7 +264,7 @@ describe("native local development", () => {
                 .waitFor({ timeout: 10_000 })
             );
             expect(yield* Queue.clear(calls)).toStrictEqual([
-              `POST ${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+              `POST ${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`,
             ]);
             const plainContext = yield* Effect.acquireRelease(
               Effect.promise(() =>

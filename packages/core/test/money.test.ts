@@ -14,18 +14,17 @@ import {
 } from "../src/ledger/component.js";
 import {
   InvalidDecimalValue,
-  InvalidMoneyValue,
+  MoneyError,
 } from "../src/primitives/errors.js";
 import {
   Cents,
   Money,
-  aud,
-  audDollars,
-  audFromCents,
-  moneyAdd,
-  moneySub,
-} from "../src/primitives/money.js";
-import { roundMoney } from "../src/primitives/rounding.js";
+  
+  fromCents,
+  add,
+  subtract,
+} from "../src/primitives/index.js";
+import { round } from "../src/primitives/rounding.js";
 import {
   DecimalCoefficient,
   TaxRate,
@@ -36,12 +35,12 @@ import {
 } from "../src/primitives/tax.js";
 import { RuleId, TraceNode } from "../src/trace/node.js";
 
-const MoneyResult = Schema.Result(Money, InvalidMoneyValue);
-const CentsResult = Schema.Result(Cents, InvalidMoneyValue);
-const maximum = EffectFunction.pipe(Cents.make(Number.MAX_SAFE_INTEGER), aud);
-const minimum = EffectFunction.pipe(Cents.make(Number.MIN_SAFE_INTEGER), aud);
-const oneCent = EffectFunction.pipe(Cents.make(1), aud);
-const zero = EffectFunction.pipe(Cents.make(0), aud);
+const MoneyResult = Schema.Result(Money, MoneyError);
+const CentsResult = Schema.Result(Cents, MoneyError);
+const maximum = EffectFunction.pipe(Cents.make(Number.MAX_SAFE_INTEGER), Money.fromCents);
+const minimum = EffectFunction.pipe(Cents.make(Number.MIN_SAFE_INTEGER), Money.fromCents);
+const oneCent = EffectFunction.pipe(Cents.make(1), Money.fromCents);
+const zero = EffectFunction.pipe(Cents.make(0), Money.fromCents);
 const two = DecimalCoefficient.make(BigDecimal.make(2n, 0));
 const trace = TraceNode.make({
   children: [],
@@ -56,9 +55,9 @@ describe("checked money construction", () => {
     "retains safe whole cents %s and the historical Money encoding",
     (cents) =>
       Effect.gen(function* () {
-        const value = yield* audFromCents(cents);
+        const value = yield* fromCents(cents);
         expect(value).toStrictEqual(
-          EffectFunction.pipe(Cents.make(cents), aud)
+          EffectFunction.pipe(Cents.make(cents), Money.fromCents)
         );
         expect(
           yield* Schema.encodeEffect(Schema.fromJsonString(Money))(value)
@@ -74,64 +73,40 @@ describe("checked money construction", () => {
     Number.MIN_SAFE_INTEGER - 1,
   ])("returns a checked safe error for unsupported cents %s", (cents) =>
     Effect.gen(function* () {
-      const result = yield* audFromCents(cents).pipe(Effect.result);
+      const result = yield* fromCents(cents).pipe(Effect.result);
       EffectFunction.pipe(Result.isFailure(result), (actual) => {
         expect(actual).toBeTruthy();
       });
       expect(yield* Schema.encodeEffect(MoneyResult)(result)).toStrictEqual(
         yield* Schema.encodeEffect(MoneyResult)(
-          Result.fail(new InvalidMoneyValue())
+          Result.fail(new MoneyError({ reason: !Number.isFinite(cents) ? "non-finite" : !Number.isInteger(cents) ? "fractional-cents" : "range" }))
         )
       );
     })
   );
-  it.effect.each([
-    { cents: 4250, dollars: 42.5 },
-    { cents: 124, dollars: 1.235 },
-    { cents: -124, dollars: -1.235 },
-  ])(
-    "retains the existing dollar rounding for $dollars",
-    ({ dollars, cents }) =>
-      Effect.gen(function* () {
-        expect((yield* audDollars(dollars)).cents).toBe(cents);
-      })
-  );
-  it.effect.each([
-    Number.NaN,
-    Number.POSITIVE_INFINITY,
-    Number.MAX_SAFE_INTEGER,
-  ])("rejects unsupported dollar conversion %s without a defect", (dollars) =>
-    Effect.gen(function* () {
-      EffectFunction.pipe(
-        Result.isFailure(yield* audDollars(dollars).pipe(Effect.result)),
-        (actual) => {
-          expect(actual).toBeTruthy();
-        }
-      );
-    })
-  );
+
 });
 describe("derived money", () => {
   it.effect("keeps valid addition, subtraction and rounding", () =>
     Effect.gen(function* () {
-      expect((yield* moneyAdd(maximum, zero)).cents).toBe(
+      expect((yield* add(maximum, zero)).cents).toBe(
         Number.MAX_SAFE_INTEGER
       );
-      expect((yield* moneySub(minimum, zero)).cents).toBe(
+      expect((yield* subtract(minimum, zero)).cents).toBe(
         Number.MIN_SAFE_INTEGER
       );
-      const twoCents = EffectFunction.pipe(Cents.make(2), aud);
-      expect((yield* moneySub(oneCent, twoCents)).cents).toBe(-1);
-      const unrounded = EffectFunction.pipe(Cents.make(12_345), aud);
+      const twoCents = EffectFunction.pipe(Cents.make(2), Money.fromCents);
+      expect((yield* subtract(oneCent, twoCents)).cents).toBe(-1);
+      const unrounded = EffectFunction.pipe(Cents.make(12_345), Money.fromCents);
       expect(
-        (yield* roundMoney(unrounded, "ato-withholding-rounding")).cents
+        (yield* round(unrounded, "ato-withholding-rounding")).cents
       ).toBe(12_300);
     })
   );
   it.effect.each([
-    { name: "addition", operation: moneyAdd(maximum, oneCent) },
-    { name: "subtraction", operation: moneySub(minimum, oneCent) },
-    { name: "dollar rounding", operation: roundMoney(maximum, "ceil-dollar") },
+    { name: "addition", operation: add(maximum, oneCent) },
+    { name: "subtraction", operation: subtract(minimum, oneCent) },
+    { name: "dollar rounding", operation: round(maximum, "ceil-dollar") },
   ])("returns the owned failure for overflow during $name", ({ operation }) =>
     Effect.gen(function* () {
       const result = yield* operation.pipe(Effect.result);
@@ -140,7 +115,7 @@ describe("derived money", () => {
       });
       expect(yield* Schema.encodeEffect(MoneyResult)(result)).toStrictEqual(
         yield* Schema.encodeEffect(MoneyResult)(
-          Result.fail(new InvalidMoneyValue())
+          Result.fail(new MoneyError())
         )
       );
     })
@@ -264,7 +239,7 @@ describe("exact decimal operations", () => {
       });
       expect(yield* Schema.encodeEffect(CentsResult)(result)).toStrictEqual(
         yield* Schema.encodeEffect(CentsResult)(
-          Result.fail(new InvalidMoneyValue())
+          Result.fail(new MoneyError())
         )
       );
     })
@@ -277,7 +252,7 @@ describe("ledger totals", () => {
       Effect.gen(function* () {
         const components = [
           LedgerComponent.make({
-            amount: EffectFunction.pipe(Cents.make(100), aud),
+            amount: EffectFunction.pipe(Cents.make(100), Money.fromCents),
             effect: "additive",
             id: ComponentId.make("add"),
             label: "Add",
@@ -285,7 +260,7 @@ describe("ledger totals", () => {
             trace,
           }),
           LedgerComponent.make({
-            amount: EffectFunction.pipe(Cents.make(25), aud),
+            amount: EffectFunction.pipe(Cents.make(25), Money.fromCents),
             effect: "subtractive",
             id: ComponentId.make("subtract"),
             label: "Subtract",
@@ -360,7 +335,7 @@ describe("ledger totals", () => {
         });
         expect(yield* Schema.encodeEffect(MoneyResult)(result)).toStrictEqual(
           yield* Schema.encodeEffect(MoneyResult)(
-            Result.fail(new InvalidMoneyValue())
+            Result.fail(new MoneyError())
           )
         );
       })

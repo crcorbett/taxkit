@@ -7,7 +7,7 @@ import type {
   GraphValidationIssue,
 } from "@taxkit/core";
 import {
-  AnnualTaxLedgerDescriptor,
+  AuAnnualIncomeTaxCalculation, AnnualTaxLedgerDescriptor,
   AnnualTaxReport,
   AnnualTaxScenarioInputSchema,
   AnnualTaxScenario,
@@ -18,7 +18,7 @@ import {
   CalculateAnnualTax,
 } from "@taxkit/rules-au-income-tax";
 import {
-  AuPayWithholdings2025_26_Live,
+  AuPayTakeHomeCalculation, AuPayWithholdingsCalculation, AuPayWithholdings2025_26_Live,
   AuTakeHomePay2025_26_Live,
   AuTakeHomePayRuleDescriptors,
   CalculatePayWithholdings,
@@ -115,7 +115,7 @@ export const defineCalculatorCatalogEntry = <
   new CalculatorCatalogEntryData({
     ...definition,
     calculate: (input, validationIssues) =>
-      Schema.decodeUnknownEffect(definition.inputSchema)(input).pipe(
+      Schema.decodeUnknownEffect(definition.inputSchema, { onExcessProperty: "error", errors: "all" })(input).pipe(
         Effect.flatMap((facts) => definition.calculate(facts, validationIssues))
       ),
   });
@@ -129,18 +129,7 @@ const SupportedHelpModes: readonly HelpMode[] = [
 ];
 const CatalogEntries: readonly CalculatorCatalogEntry[] = [
   defineCalculatorCatalogEntry({
-    calculate: (facts, validationIssues) =>
-      Effect.gen(function* () {
-        const engine = yield* CalculationEngine;
-        return yield* engine.run({
-          calculation: CalculateTakeHomePay,
-          layer: AuTakeHomePay2025_26_Live.pipe(
-            Layer.provideMerge(TakeHomeScenarioLive),
-            Layer.provide(Layer.succeed(TakeHomeScenario)(facts))
-          ),
-          validationIssues,
-        });
-      }),
+    calculate: AuPayTakeHomeCalculation.calculate,
     ...TakeHomeCalculatorSummary,
     description:
       "Australian pay-period take-home pay after PAYG-only withholdings.",
@@ -159,18 +148,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     supportedHelpModes: SupportedHelpModes,
   }),
   defineCalculatorCatalogEntry({
-    calculate: (facts, validationIssues) =>
-      Effect.gen(function* () {
-        const engine = yield* CalculationEngine;
-        return yield* engine.run({
-          calculation: CalculatePayWithholdings,
-          layer: AuPayWithholdings2025_26_Live.pipe(
-            Layer.provideMerge(TakeHomeScenarioLive),
-            Layer.provide(Layer.succeed(TakeHomeScenario)(facts))
-          ),
-          validationIssues,
-        });
-      }),
+    calculate: AuPayWithholdingsCalculation.calculate,
     ...PayWithholdingsCalculatorSummary,
     description: "Australian PAYG-only pay-period withholding ledger.",
     inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
@@ -191,18 +169,7 @@ const CatalogEntries: readonly CalculatorCatalogEntry[] = [
     supportedHelpModes: SupportedHelpModes,
   }),
   defineCalculatorCatalogEntry({
-    calculate: (facts, validationIssues) =>
-      Effect.gen(function* () {
-        const engine = yield* CalculationEngine;
-        return yield* engine.run({
-          calculation: CalculateAnnualTax,
-          layer: AuAnnualTax2025_26_Live.pipe(
-            Layer.provideMerge(AnnualTaxScenarioLive),
-            Layer.provide(Layer.succeed(AnnualTaxScenario)(facts))
-          ),
-          validationIssues,
-        });
-      }),
+    calculate: AuAnnualIncomeTaxCalculation.calculate,
     ...AnnualTaxCalculatorSummary,
     description: "Australian annual income tax liability estimate.",
     inputFacts: [AnnualTaxableIncomeDescriptor],

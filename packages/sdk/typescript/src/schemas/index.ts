@@ -33,17 +33,4 @@ export {
   TaxYearsResponse,
   UnsupportedCalculatorContextError,
 } from "@taxkit/calculators/schemas";
-export {
-  TaxKitCalculationError,
-  TaxKitClientDisposedError,
-  TaxKitClientDisposeError,
-  TaxKitFailure,
-  TaxKitSchemaDecodeError,
-  TaxKitSuccess,
-  TaxKitUnexpectedError,
-} from "../errors.js";
-export type {
-  TaxKitCalculationErrorDetail,
-  TaxKitError,
-  TaxKitSafeResult,
-} from "../errors.js";
+export { TaxKitError, TaxKitClientDisposedError, TaxKitClientDisposeError, TaxKitUnexpectedError, InputValidationError } from "../errors.js";

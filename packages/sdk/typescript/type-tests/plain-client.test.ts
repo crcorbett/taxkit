@@ -1,64 +1,39 @@
-import { Money, Cents } from "@taxkit/core/primitives";
-import { GrossPay } from "@taxkit/rules-au-pay";
+import { calculate, calculateSafe, createClient } from "../src/index.js";
+import { AuPayTakeHomeCalculation, AuAnnualIncomeTaxCalculation, AuPayTakeHomeWithSacrificeCalculation } from "../src/au.js";
+import { TakeHomeScenarioInputSchema, TakeHomeWithSacrificeScenarioInput } from "@taxkit/rules-au-pay/schemas";
+import { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax/schemas";
+import { Cents, Money, NonNegativeMoney } from "../src/money.js";
 
-import { au } from "../src/au.js";
-import { TaxKit } from "../src/index.js";
-
-const takeHomeFacts = {
-  grossPay: new GrossPay({
-    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-    period: "weekly",
-  }),
-  taxFreeThresholdClaimed: true,
+const amount = NonNegativeMoney.make(Money.fromCents(Cents.make(165_400)));
+const pay = TakeHomeScenarioInputSchema.make({ grossPay: amount, period: "weekly", taxFreeThresholdClaimed: true });
+const annual = AnnualTaxScenarioInputSchema.make({ taxableIncome: amount });
+const client = createClient();
+const report = client.calculate(AuPayTakeHomeCalculation, pay);
+const payReport: Promise<typeof AuPayTakeHomeCalculation.outputSchema.Type> = report;
+void payReport; void calculateSafe(AuPayTakeHomeCalculation, pay);
+void calculate(AuAnnualIncomeTaxCalculation, annual);
+// @ts-expect-error a selected annual calculator cannot accept a pay scenario variable.
+void calculate(AuAnnualIncomeTaxCalculation, pay);
+// @ts-expect-error raw objects do not establish nominal scenario validation.
+void calculate(AuPayTakeHomeCalculation, { grossPay: amount, period: "weekly", taxFreeThresholdClaimed: true });
+// @ts-expect-error raw cents are not checked Money.
+TakeHomeScenarioInputSchema.make({ grossPay: 165_400, period: "weekly", taxFreeThresholdClaimed: true });
+// @ts-expect-error signed money needs nonnegative refinement.
+AnnualTaxScenarioInputSchema.make({ taxableIncome: Money.fromCents(Cents.make(-1)) });
+// @ts-expect-error unsupported pay period.
+TakeHomeScenarioInputSchema.make({ grossPay: amount, period: "daily", taxFreeThresholdClaimed: true });
+// @ts-expect-error sacrifice-aware input requires the amount explicitly.
+TakeHomeWithSacrificeScenarioInput.make({ grossPay: amount, period: "weekly", taxFreeThresholdClaimed: true });
+// @ts-expect-error base scenario cannot satisfy the sacrifice-aware definition.
+void calculate(AuPayTakeHomeWithSacrificeCalculation, pay);
+type PayReport = Awaited<typeof report>;
+const wrongReport = (value: PayReport) => {
+  // @ts-expect-error annual field is absent from the selected pay report.
+  return value.liability;
 };
-
-const payClient = TaxKit.createClient(au.modules.pay2025_26);
-const auClient = au.createClient();
-
-void TaxKit.calculate(au.calculations.takeHomePay, takeHomeFacts);
-void TaxKit.safe.calculate(au.calculations.takeHomePay, takeHomeFacts);
-void payClient.calculations.calculate(
-  au.calculations.takeHomePay,
-  takeHomeFacts
-);
-void auClient.calculations.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
-});
-void au.pay.takeHomePay(takeHomeFacts);
-void au.pay.safe.withholdings(takeHomeFacts);
-void au.incomeTax.annual({
-  taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
-});
-
-// @ts-expect-error annual income tax is not provided by the pay-only plain client.
-void payClient.calculations.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
-});
-
-void TaxKit.calculate(au.calculations.annualIncomeTax, {
-  // @ts-expect-error take-home facts cannot be submitted to annual income tax.
-  grossPay: new GrossPay({
-    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-    period: "weekly",
-  }),
-  taxFreeThresholdClaimed: true,
-});
-
-void au.pay.takeHomePay({
-  // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
-  taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
-});
-
-const payClosed = payClient.dispose();
-const auClosed = auClient.dispose();
-void payClosed;
-void auClosed;
-
-// Selected descriptors retain their specific report fields on client methods.
-const takeHome = payClient.calculations.calculate(
-  au.calculations.takeHomePay,
-  takeHomeFacts
-);
-type TakeHome = Awaited<typeof takeHome>;
-const takeHomeCents = (report: TakeHome) => report.netPay.cents;
-void takeHomeCents;
+void wrongReport; void client.dispose();
+// @ts-expect-error removed legacy facade is unavailable.
+import { TaxKit } from "../src/index.js";
+// @ts-expect-error removed result ADT is unavailable.
+import { TaxKitSuccess } from "../src/errors.js";
+void TaxKit; void TaxKitSuccess;

@@ -1,5 +1,5 @@
 import { makeFactDescriptor } from "@taxkit/core/facts";
-import { LedgerComponent } from "@taxkit/core/ledger";
+import { ledgerTotalEquals, LedgerComponent } from "@taxkit/core/ledger";
 import { Money } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Context, Schema } from "effect";
@@ -43,12 +43,12 @@ export class PayWithholdingsLedger extends Schema.TaggedClass<
   {
     readonly brand: unique symbol;
   }
->()("PayWithholdingsLedger", {
+>()("PayWithholdingsLedger", Schema.Struct({
   components: Schema.Array(LedgerComponent),
   period: PayPeriod,
   total: Money,
   trace: TraceNode,
-}) {}
+}).check(Schema.makeFilter((ledger) => ledgerTotalEquals(ledger.components, ledger.total), { expected: "unique ledger components matching their total" }))) {}
 /**
  * Context tag for the derived pay-period withholding ledger.
  *

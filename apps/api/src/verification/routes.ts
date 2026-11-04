@@ -15,7 +15,7 @@ import {
   DocsPublicNavigation,
   DocsSearchResult,
 } from "@taxkit/content/schemas";
-import { Money, Cents } from "@taxkit/core/primitives";
+import { NonNegativeMoney,  Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayJurisdiction,
   AuPayTaxYear,
@@ -187,14 +187,11 @@ export const checkApiCatalog = (origin: string) =>
 export const checkApiCalculation = (origin: string) =>
   HttpBody.jsonSchema(CalculatorRunRequest)({
     facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(346_200), currency: "AUD" }),
-        period: "fortnightly",
-      }),
+      grossPay: NonNegativeMoney.make(new Money({ cents: Cents.make(346_200), currency: "AUD" })), period: "fortnightly",
       taxFreeThresholdClaimed: true,
     },
-    jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-    taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+    jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+    taxYear: Option.some(AuPayTaxYear.make("2025-26")),
   }).pipe(
     Effect.flatMap((body) =>
       HttpClient.post(

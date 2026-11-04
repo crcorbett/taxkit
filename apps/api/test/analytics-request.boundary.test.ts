@@ -70,7 +70,7 @@ it.effect.each([
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromWeb(
               new Request(
-                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate?private-query=ignored",
+                "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate?private-query=ignored",
                 {
                   headers,
                 }

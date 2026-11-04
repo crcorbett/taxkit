@@ -35,6 +35,7 @@ export const toCalculatorInputDecodeError = (args: {
 }): CalculatorInputDecodeError => {
   const issues = EffectFunction.pipe(
     schemaIssueFormatter(args.issue).issues,
+    Array.take(20),
     Array.map(
       (issue) =>
         new CalculatorInputIssue({
@@ -70,9 +71,8 @@ export const toCalculatorInputDecodeError = (args: {
         }),
       onSome: () =>
         new CalculatorInputDecodeError({
-          calculatorId: Option.some(Option.some(args.calculatorId)),
+          calculatorId: Option.some(args.calculatorId),
           help: Option.some(
-            Option.some(
               EffectFunction.pipe(
                 args.entry.inputFacts,
                 Array.map((fact) =>
@@ -80,13 +80,12 @@ export const toCalculatorInputDecodeError = (args: {
                     factId: fact.id,
                     question: EffectFunction.pipe(
                       fact.question,
-                      Option.map(Option.some)
+                      Option.map((value) => value)
                     ),
                     title: fact.title,
                   })
                 )
               )
-            )
           ),
           issues,
           message: `Invalid facts for ${args.calculatorId}`,

@@ -148,7 +148,7 @@ assert(
 const openApi = await readJson("GET", "${openApiPath}");
 assert(openApi.openapi, "OpenAPI route did not return an OpenAPI document.");
 assert(
-  openApi.paths?.["/api/v1/calculators/{calculatorId}/calculate"],
+  openApi.paths?.["/api/v2/calculators/{calculatorId}/calculate"],
   "OpenAPI document did not include the calculate route."
 );
 
@@ -275,9 +275,9 @@ const runExternalConsumer = (workspacePath: string, origin: string) =>
     );
     const expectedRoutes = [
       "GET /api/health",
-      "GET /api/v1/calculators",
-      "POST /api/v1/calculators/au.pay.take-home/calculate",
-      "POST /api/v1/calculators/au.income-tax.annual/calculate",
+      "GET /api/v2/calculators",
+      "POST /api/v2/calculators/au.pay.take-home/calculate",
+      "POST /api/v2/calculators/au.income-tax.annual/calculate",
       "GET /api/docs/openapi.json",
     ];
     if (
@@ -327,10 +327,10 @@ export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
     yield* waitForApiHealth(origin);
     yield* Console.info("GET /api/health passed");
     yield* checkApiCatalog(origin);
-    yield* Console.info("GET /api/v1/calculators passed");
+    yield* Console.info("GET /api/v2/calculators passed");
     yield* checkApiCalculation(origin);
     yield* Console.info(
-      "POST /api/v1/calculators/au.pay.take-home/calculate passed"
+      "POST /api/v2/calculators/au.pay.take-home/calculate passed"
     );
     yield* checkApiOpenApi(origin);
     yield* Console.info("GET /api/docs/openapi.json passed");

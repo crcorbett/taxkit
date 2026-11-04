@@ -2,7 +2,7 @@ import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
   Cents,
-  audFromCents,
+  fromCents,
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
@@ -79,7 +79,7 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
       taxableExcess,
       bracket.rate
     );
-    const taxAmount = yield* audFromCents(bracket.baseTaxCents + marginalTax);
+    const taxAmount = yield* fromCents(bracket.baseTaxCents + marginalTax);
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(

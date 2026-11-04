@@ -1,3 +1,4 @@
+import { NonNegativeMoney } from "@taxkit/core/primitives";
 import * as BunRuntime from "@effect/platform-bun/BunRuntime";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import {
@@ -478,14 +479,11 @@ import {
   TaxKitSuccess,
 } from "taxkit/schemas";
 import { AuPayTakeHomeCalculation } from "taxkit/testing";
-import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "taxkit/core";
+import { Cents, DateInterval, InvalidCalendarValue, MoneyError, IsoDate, Money,  fromCents, dateInterval, add } from "taxkit/core";
 import { GrossPay } from "taxkit/au";
 
 const takeHomeFacts: CalculationInput<typeof au.calculations.takeHomePay> = {
-  grossPay: new GrossPay({
-    amount: aud(Cents.make(165_400)),
-    period: "weekly",
-  }),
+  grossPay: NonNegativeMoney.make(Money.fromCents(Cents.make(165_400))), period: "weekly",
   taxFreeThresholdClaimed: true,
 };
 
@@ -497,7 +495,7 @@ const clientClosed: Promise<void> = plainClient.dispose();
 void clientReport;
 void clientClosed;
 // @ts-expect-error annual tax is outside this plain client's selected module.
-plainClient.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(Cents.make(9_000_000)) });
+plainClient.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: Money.fromCents(Cents.make(9_000_000)) });
 au.pay.takeHomePay(takeHomeFacts);
 au.pay.safe.withholdings(takeHomeFacts);
 calculateReport(au.calculations.takeHomePay, takeHomeFacts);
@@ -586,17 +584,17 @@ void omittedParameterLayer;
 
 declare const checkedInterval: DateInterval;
 const intervalEnd: Option.Option<Option.Option<IsoDate>> = checkedInterval.toExclusive;
-const checkedAmount: Effect.Effect<Money, InvalidMoneyValue> = audFromCents(100);
-const checkedSum: Effect.Effect<Money, InvalidMoneyValue> = moneyAdd(aud(Cents.make(100)), aud(Cents.make(1)));
+const checkedAmount: Effect.Effect<Money, MoneyError> = fromCents(100);
+const checkedSum: Effect.Effect<Money, MoneyError> = add(Money.fromCents(Cents.make(100)), Money.fromCents(Cents.make(1)));
 const checkedDates: Effect.Effect<DateInterval, InvalidCalendarValue> = dateInterval({ from: "2025-07-01" });
 void intervalEnd;
 void checkedAmount;
 void checkedSum;
 void checkedDates;
-// @ts-expect-error pure aud requires branded cents.
-aud(100);
+// @ts-expect-error pure Money.fromCents requires branded cents.
+Money.fromCents(100);
 // @ts-expect-error a fallible constructor is a program, not Money.
-const uncheckedAmount: Money = audFromCents(100);
+const uncheckedAmount: Money = fromCents(100);
 void uncheckedAmount;
 
 const bodyPolicy: typeof CalculatorRequestBodyPolicy.Type = CalculatorRequestBodyPolicy.make({ responseFormat: "html" });
@@ -626,7 +624,7 @@ void AuPayTakeHomeCalculation;
 
 au.pay.takeHomePay({
   // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
-  taxableIncome: aud(Cents.make(9_000_000)),
+  taxableIncome: Money.fromCents(Cents.make(9_000_000)),
 });
 `
       ),
@@ -640,7 +638,7 @@ import { CalculationQuery, CalculatorCatalogItem, CalculatorCatalogResponse, Cal
 import { CalculationError } from "taxkit/core";
 import { listCalculatorCatalogEntries } from "taxkit/core";
 import { CalculationEngineLive } from "taxkit/core";
-import { Cents, DateInterval, InvalidCalendarValue, InvalidMoneyValue, IsoDate, Money, aud, audFromCents, dateInterval, moneyAdd } from "taxkit/core";
+import { Cents, DateInterval, InvalidCalendarValue, MoneyError, IsoDate, Money,  fromCents, dateInterval, add } from "taxkit/core";
 import { ComponentId, LedgerComponent } from "taxkit/core";
 import { FactQuestion, FactQuestionId } from "taxkit/core";
 import { RuleId, SourceArtifact, SourceRef, TraceNode } from "taxkit/core";
@@ -724,14 +722,14 @@ if (!Option.isNone(defaultError.cause) || listCalculatorCatalogEntries().some(en
   throw new Error("Packed domain contract lost defaults or retained its unused program escape.");
 }
 
-  const maximum = yield* audFromCents(Number.MAX_SAFE_INTEGER);
-  const extra = yield* audFromCents(1);
-  const overflow = yield* moneyAdd(maximum, extra).pipe(Effect.result);
+  const maximum = yield* fromCents(Number.MAX_SAFE_INTEGER);
+  const extra = yield* fromCents(1);
+  const overflow = yield* add(maximum, extra).pipe(Effect.result);
   if (!Result.isFailure(overflow)) {
     throw new Error("Packed money overflow did not return a checked failure.");
   }
-  const error = yield* Schema.encodeEffect(InvalidMoneyValue)(overflow.failure);
-  if (JSON.stringify(error) !== '{"_tag":"InvalidMoneyValue","code":"invalid-money-value","message":"The amount must fit in safe whole AUD cents."}') {
+  const error = yield* Schema.encodeEffect(MoneyError)(overflow.failure);
+  if (JSON.stringify(error) !== '{"_tag":"MoneyError","code":"invalid-money-value","message":"The amount must fit in safe whole AUD cents."}') {
     throw new Error("Packed money failure changed its safe representation.");
   }
   const calendarFailure = yield* dateInterval({from: "private-calendar-sentinel"}).pipe(Effect.result);
@@ -1342,7 +1340,7 @@ await Effect.runPromise(Effect.forEach(questionSamples, (sample) => Effect.gen(f
 const fixtureChild = TraceNode.make({children: [], inputs: {cents: 165_400}, result: 165_400, ruleId: RuleId.make("fixture/child"), sources: [fixtureSource], title: "Child"});
 const fixtureParent = TraceNode.make({children: [fixtureChild], formula: Option.some(Option.some("result = input")), inputs: {amount: 165_400}, result: 165_400, rounding: Option.some(Option.some("round-to-nearest-cent")), ruleId: RuleId.make("fixture/parent"), sources: [fixtureSource], title: "Parent"});
 const fixtureUndefined = TraceNode.make({...fixtureChild, formula: Option.some(Option.none()), rounding: Option.some(Option.none())});
-const fixtureLedger = LedgerComponent.make({amount: aud(Cents.make(165_400)), effect: "additive", id: ComponentId.make("fixture/component"), label: "Fixture", status: "active", trace: fixtureParent});
+const fixtureLedger = LedgerComponent.make({amount: Money.fromCents(Cents.make(165_400)), effect: "additive", id: ComponentId.make("fixture/component"), label: "Fixture", status: "active", trace: fixtureParent});
 const encodedMissing = await Effect.runPromise(Schema.encodeEffect(TraceNode)(fixtureChild));
 if (JSON.stringify(encodedMissing) !== '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/child","sources":[{"_tag":"SourceRef","kind":"internal-validation","reference":"historical-codec-fixture","title":"Compatibility fixture"}],"title":"Child"}') {
   throw new Error("Packed core missing encoding changed historical bytes.");
@@ -2244,10 +2242,7 @@ await Effect.runPromise(Effect.gen(function* () {
 }).pipe(Effect.provide(ServiceLive)));
 
 const takeHomeFacts = {
-  grossPay: new GrossPay({
-    amount: aud(Cents.make(165_400)),
-    period: "weekly",
-  }),
+  grossPay: NonNegativeMoney.make(Money.fromCents(Cents.make(165_400))), period: "weekly",
   taxFreeThresholdClaimed: true,
 };
 
@@ -2261,11 +2256,11 @@ const effectReport = await Effect.runPromise(
   )
 );
 const plainAnnualReport = await au.incomeTax.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
+  taxableIncome: Money.fromCents(Cents.make(9_000_000)),
 });
 const effectAnnualReport = await Effect.runPromise(
   calculateReport(au.calculations.annualIncomeTax, {
-    taxableIncome: aud(Cents.make(9_000_000)),
+    taxableIncome: Money.fromCents(Cents.make(9_000_000)),
   }).pipe(Effect.provide(ServiceLive))
 );
 
@@ -2295,7 +2290,7 @@ if (effectAnnualReport.rulePackVersion !== "rules-au-income-tax/1.0.1") {
 
 const client = au.createClient();
 const clientReport = await client.calculations.calculate(au.calculations.takeHomePay, takeHomeFacts);
-const clientAnnual = await client.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: aud(Cents.make(9_000_000)) });
+const clientAnnual = await client.calculations.calculate(au.calculations.annualIncomeTax, { taxableIncome: Money.fromCents(Cents.make(9_000_000)) });
 const clientWithholdings = await client.calculations.calculate(au.calculations.payWithholdings, takeHomeFacts);
 if (clientReport.netPay.cents !== 130_100 || clientAnnual.liability.cents !== 1_958_800 || clientWithholdings.total.cents !== 35_300) {
   throw new Error("Caller-owned SDK client changed retained calculator results.");

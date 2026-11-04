@@ -1,109 +1,44 @@
-import { Function as EffectFunction, Effect, Schema } from "effect";
+import { Result, Schema } from "effect";
 
-import { InvalidMoneyValue } from "./errors.js";
-/**
- * Whole cents used by all money values in the core package.
- *
- * @since 0.1.0
- */
+import { MoneyError } from "./errors.js";
+
+/** Whole, safe integer AUD cents. */
 export const Cents = Schema.Int.pipe(Schema.brand("taxkit/Cents"));
-/**
- * Whole cents used by all money values in the core package.
- *
- * @since 0.1.0
- */
 export type Cents = typeof Cents.Type;
-/**
- * The currency supported by core tax calculations.
- *
- * @since 0.1.0
- */
 export const Currency = Schema.Literal("AUD");
-/**
- * The currency supported by core tax calculations.
- *
- * @since 0.1.0
- */
 export type Currency = typeof Currency.Type;
-/**
- * An AUD amount represented as integer cents.
- *
- * @example
- * ```ts
- * import { Cents, aud } from "@taxkit/core";
- *
- * const withholding = aud(Cents.make(12_345));
- * ```
- *
- * @since 0.1.0
- */
-export class Money extends Schema.TaggedClass<
-  Money,
-  {
-    readonly brand: unique symbol;
-  }
->()("Money", {
+
+/** Signed AUD money. Construct trusted constants from checked cents. */
+export class Money extends Schema.TaggedClass<Money, { readonly brand: unique symbol }>()("Money", {
   cents: Cents,
   currency: Currency,
-}) {}
-/**
- * Creates an AUD amount from already checked whole cents.
- *
- * @since 0.1.0
- */
-export const aud = (cents: Cents): Money =>
-  new Money({ cents, currency: "AUD" });
-/**
- * Checks an arbitrary number of cents before constructing an AUD amount.
- *
- * @since 0.1.0
- */
-export const audFromCents = (
-  cents: number
-): Effect.Effect<Money, InvalidMoneyValue> =>
-  Cents.makeEffect(cents).pipe(
-    Effect.map(aud),
-    Effect.mapError(() => new InvalidMoneyValue())
+}) {
+  static fromCents(cents: Cents): Money {
+    return new Money({ cents, currency: "AUD" });
+  }
+}
+
+/** An amount admitted only after checking that it is non-negative. */
+export const NonNegativeMoney = Money.check(
+  Schema.makeFilter((money) => money.cents >= 0, { expected: "non-negative AUD money" })
+).pipe(Schema.brand("taxkit/NonNegativeMoney"));
+export type NonNegativeMoney = typeof NonNegativeMoney.Type;
+
+/** Check arbitrary cents without silently rounding fractional values. */
+export const fromCents = (cents: number): Result.Result<Money, MoneyError> =>
+  Schema.decodeResult(Cents)(cents).pipe(
+    Result.map(Money.fromCents),
+    Result.mapError(() => new MoneyError({ reason: !Number.isFinite(cents) ? "non-finite" : !Number.isInteger(cents) ? "fractional-cents" : "range" }))
   );
-/**
- * Creates an AUD money value from dollars, rounded to the nearest cent.
- *
- * @example
- * ```ts
- * import { audDollars } from "@taxkit/core";
- *
- * const amountProgram = audDollars(42.5);
- * // Your application host runs this Effect and handles InvalidMoneyValue.
- * ```
- *
- * @since 0.1.0
- */
-export const audDollars = (
-  dollars: number
-): Effect.Effect<Money, InvalidMoneyValue> =>
-  EffectFunction.pipe(Math.round(dollars * 100), audFromCents);
-/**
- * Adds two checked AUD money values.
- *
- * @since 0.1.0
- */
-export const moneyAdd = (
-  a: Money,
-  b: Money
-): Effect.Effect<Money, InvalidMoneyValue> => audFromCents(a.cents + b.cents);
-/**
- * Subtracts one checked AUD money value from another.
- *
- * @since 0.1.0
- */
-export const moneySub = (
-  a: Money,
-  b: Money
-): Effect.Effect<Money, InvalidMoneyValue> => audFromCents(a.cents - b.cents);
-/**
- * Tests money values for exact cent and currency equality.
- *
- * @since 0.1.0
- */
+
+export const nonNegative = (money: Money): Result.Result<NonNegativeMoney, MoneyError> =>
+  Schema.decodeUnknownResult(Schema.toType(NonNegativeMoney))(money).pipe(
+    Result.mapError(() => new MoneyError({ reason: "negative" }))
+  );
+
+export const add = (a: Money, b: Money): Result.Result<Money, MoneyError> =>
+  fromCents(a.cents + b.cents).pipe(Result.mapError(() => new MoneyError({ reason: "overflow" })));
+export const subtract = (a: Money, b: Money): Result.Result<Money, MoneyError> =>
+  fromCents(a.cents - b.cents).pipe(Result.mapError(() => new MoneyError({ reason: "overflow" })));
 export const moneyEquals = (a: Money, b: Money): boolean =>
   a.cents === b.cents && a.currency === b.currency;

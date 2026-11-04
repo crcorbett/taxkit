@@ -1,7 +1,3 @@
-export {
-  AuAnnualIncomeTaxCalculation,
-  AuIncomeTax2025_26Module,
-  AuPay2025_26Module,
-  AuPayTakeHomeCalculation,
-  AuPayWithholdingsCalculation,
-} from "../internal/au-descriptors.js";
+/** Use native Layer.mock(TaxKitService, ...) to substitute engine execution. */
+export { Layer } from "effect";
+export { CalculationEngine as TaxKitService } from "@taxkit/core";

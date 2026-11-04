@@ -80,7 +80,7 @@ describe("shared native host calculation admission", () => {
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromWeb(
               new Request(
-                `${origin}/api/v1/calculators/au.pay.take-home/calculate`,
+                `${origin}/api/v2/calculators/au.pay.take-home/calculate`,
                 {
                   body,
                   headers: { "content-type": "application/json" },
@@ -253,7 +253,7 @@ describe("shared native host calculation admission", () => {
         }
         const raw = yield* http.execute(
           HttpClientRequest.post(
-            "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate"
+            "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate"
           ).pipe(HttpClientRequest.bodyText(publicBody, "application/json"))
         );
         expect({
@@ -334,7 +334,7 @@ describe("shared native host calculation admission", () => {
             Effect.map(HttpServerResponse.toWeb)
           );
         const accepted = yield* call(
-          "/api/v1/calculators/au.pay.take-home/calculate",
+          "/api/v2/calculators/au.pay.take-home/calculate",
           "POST",
           body
         );
@@ -347,7 +347,7 @@ describe("shared native host calculation admission", () => {
         });
         // An error reply keeps its real status instead of a rebuilt 200.
         const rejected = yield* call(
-          "/api/v1/calculators/au.pay.take-home/calculate",
+          "/api/v2/calculators/au.pay.take-home/calculate",
           "POST",
           "{}"
         );
@@ -356,10 +356,10 @@ describe("shared native host calculation admission", () => {
         expect(text).not.toContain("203.0.113.75");
         yield* EffectFunction.pipe(
           [
-            ["/api/v1/calculators/au.pay.take-home/calculate", "GET", 404],
-            ["/api/v1/calculators/not-a-calculator/calculate", "POST", 400],
-            ["/api/v1/calculators/au.pay.take-home/calculate/x", "POST", 404],
-            ["/api/v1/calculators", "POST", 404],
+            ["/api/v2/calculators/au.pay.take-home/calculate", "GET", 404],
+            ["/api/v2/calculators/not-a-calculator/calculate", "POST", 400],
+            ["/api/v2/calculators/au.pay.take-home/calculate/x", "POST", 404],
+            ["/api/v2/calculators", "POST", 404],
           ] as const,
           Effect.forEach(([path, method, status]) =>
             call(path, method, body).pipe(
@@ -374,7 +374,7 @@ describe("shared native host calculation admission", () => {
         expect(yield* Ref.get(keys)).toHaveLength(1);
         // A Worker subrequest cannot borrow the edge address it carries.
         const relayed = yield* call(
-          "/api/v1/calculators/au.pay.take-home/calculate",
+          "/api/v2/calculators/au.pay.take-home/calculate",
           "POST",
           body,
           true
@@ -403,7 +403,7 @@ describe("shared native host calculation admission", () => {
               HttpServerRequest.HttpServerRequest,
               HttpServerRequest.fromWeb(
                 new Request(
-                  "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+                  "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate",
                   {
                     body,
                     headers: {

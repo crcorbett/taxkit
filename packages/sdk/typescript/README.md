@@ -298,7 +298,7 @@ local SDK execution retains its caller-owned lifetime and calculation results.
 
 The downstream consumer also checks core's fallible money/date constructors,
 their public error types, safe overflow failures and historical date bytes/key
-presence. `aud` requires already checked `Cents`; `audFromCents` returns an
+presence. `aud` requires already checked `Cents`; `fromCents` returns an
 Effect. Public examples use the same owning primitive contracts.
 
 The genuine packed consumer also imports the three public rule-parameter

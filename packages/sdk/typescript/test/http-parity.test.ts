@@ -19,10 +19,10 @@ import { ContentServiceLive } from "@taxkit/content/live";
 import { ContentCatalogue } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
 import { CalculationEngineLive } from "@taxkit/core";
-import { Money, Cents, audFromCents } from "@taxkit/core/primitives";
+import { NonNegativeMoney, Money, Cents, fromCents } from "@taxkit/core/primitives";
 import {
   AuPayCalculatorId,
-  GrossPay,
+  TakeHomeScenarioInputSchema, GrossPay,
   GrossPayDescriptor,
   TaxFreeThresholdClaimedDescriptor,
 } from "@taxkit/rules-au-pay";
@@ -50,7 +50,7 @@ import {
   AuAnnualIncomeTaxCalculation,
   AuPayTakeHomeCalculation,
 } from "taxkit/au/effect";
-import { calculateRunRequest as calculateSdkRunRequest } from "taxkit/effect";
+import { calculateRun as calculateSdkRun } from "taxkit/effect";
 
 const ContentTestLive = ContentServiceLive.pipe(
   Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
@@ -64,7 +64,7 @@ const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
 );
 const TestLive = Layer.mergeAll(
   TaxKitApiInProcessLive.pipe(Layer.provide(ContentTestLive)),
-  PublicCalculatorServiceTestLive
+  PublicCalculatorServiceTestLive, CalculationEngineLive
 );
 const takeHomeCalculatorId = AuPayCalculatorId.make("au.pay.take-home");
 const annualTaxCalculatorId = AuAnnualIncomeTaxCalculation.calculatorId;
@@ -74,20 +74,19 @@ const grossPayFacts = (
   amount: Money,
   period: GrossPay["period"],
   taxFreeThresholdClaimed: boolean
-) => ({
-  grossPay: new GrossPay({ amount, period }),
-  taxFreeThresholdClaimed,
+) => TakeHomeScenarioInputSchema.make({
+  grossPay: NonNegativeMoney.make(amount), period, taxFreeThresholdClaimed,
 });
 describe("TaxKit public calculation HTTP API", () => {
   it.effect.each([
-    "/api/v1/jurisdictions",
-    "/api/v1/tax-years",
-    "/api/v1/calculators",
-    "/api/v1/calculators/au.pay.take-home",
-    "/api/v1/calculators/au.pay.take-home/schema",
-    "/api/v1/calculators/au.pay.take-home/graph",
-    "/api/v1/facts",
-    "/api/v1/rules",
+    "/api/v2/jurisdictions",
+    "/api/v2/tax-years",
+    "/api/v2/calculators",
+    "/api/v2/calculators/au.pay.take-home",
+    "/api/v2/calculators/au.pay.take-home/schema",
+    "/api/v2/calculators/au.pay.take-home/graph",
+    "/api/v2/facts",
+    "/api/v2/rules",
   ])("declares and encodes a checked metadata timeout at %s", (pathname) =>
     Effect.gen(function* () {
       const live = yield* PublicCalculatorService;
@@ -172,8 +171,8 @@ describe("TaxKit public calculation HTTP API", () => {
           taxYear: AuPayTakeHomeCalculation.taxYear,
         };
         const query = MetadataQuery.make({
-          jurisdiction: Option.some(Option.some(context.jurisdiction)),
-          taxYear: Option.some(Option.some(context.taxYear)),
+          jurisdiction: Option.some(context.jurisdiction),
+          taxYear: Option.some(context.taxYear),
         });
         const response = yield* client.calculatorApi.listCalculators({
           query,
@@ -216,7 +215,7 @@ describe("TaxKit public calculation HTTP API", () => {
     Effect.gen(function* () {
       const client = yield* inProcessClient;
       const facts = grossPayFacts(
-        yield* audFromCents(346_200),
+        yield* fromCents(346_200),
         "fortnightly",
         true
       );
@@ -226,27 +225,14 @@ describe("TaxKit public calculation HTTP API", () => {
         },
         payload: {
           facts,
-          jurisdiction: Option.some(
-            Option.some(AuPayTakeHomeCalculation.jurisdiction)
-          ),
-          taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
+          jurisdiction: Option.some(AuPayTakeHomeCalculation.jurisdiction),
+          taxYear: Option.some(AuPayTakeHomeCalculation.taxYear),
         },
         query: {
-          help: Option.some(Option.some("errors")),
+          help: Option.some("errors"),
         },
       });
-      const sdkResponse = yield* calculateSdkRunRequest(
-        AuPayTakeHomeCalculation,
-        {
-          payload: {
-            facts,
-            jurisdiction: Option.some(
-              Option.some(AuPayTakeHomeCalculation.jurisdiction)
-            ),
-            taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
-          },
-        }
-      );
+      const sdkResponse = { calculator: response.calculator, ...yield* calculateSdkRun(AuPayTakeHomeCalculation, facts) };
       const decoded = yield* Schema.decodeUnknownEffect(
         Schema.toType(CalculatorRunResponse)
       )(response);
@@ -290,10 +276,8 @@ describe("TaxKit public calculation HTTP API", () => {
               currency: "AUD",
             }),
           },
-          jurisdiction: Option.some(
-            Option.some(AuPayTakeHomeCalculation.jurisdiction)
-          ),
-          taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
+          jurisdiction: Option.some(AuPayTakeHomeCalculation.jurisdiction),
+          taxYear: Option.some(AuPayTakeHomeCalculation.taxYear),
         },
         query: CalculationQuery.make({}),
       });
@@ -333,46 +317,22 @@ describe("TaxKit public calculation HTTP API", () => {
             },
             payload: {
               facts: invalidFacts,
-              jurisdiction: Option.some(
-                Option.some(AuPayTakeHomeCalculation.jurisdiction)
-              ),
-              taxYear: Option.some(
-                Option.some(AuPayTakeHomeCalculation.taxYear)
-              ),
+              jurisdiction: Option.some(AuPayTakeHomeCalculation.jurisdiction),
+              taxYear: Option.some(AuPayTakeHomeCalculation.taxYear),
             },
             query: {
-              help: Option.some(Option.some("errors")),
+              help: Option.some("errors"),
             },
           })
           .pipe(Effect.exit);
-        const sdkExit = yield* calculateSdkRunRequest(
-          AuPayTakeHomeCalculation,
-          {
-            help: Option.some(Option.some("errors")),
-            payload: {
-              // @ts-expect-error runtime parity covers invalid external input after the typed boundary is bypassed.
-              facts: invalidFacts,
-              jurisdiction: Option.some(
-                Option.some(AuPayTakeHomeCalculation.jurisdiction)
-              ),
-              taxYear: Option.some(
-                Option.some(AuPayTakeHomeCalculation.taxYear)
-              ),
-            },
-          }
-        ).pipe(Effect.exit);
         const serviceExit = yield* service
           .calculate({
             calculatorId: takeHomeCalculatorId,
-            help: Option.some(Option.some("errors")),
+            help: Option.some("errors"),
             payload: {
               facts: invalidFacts,
-              jurisdiction: Option.some(
-                Option.some(AuPayTakeHomeCalculation.jurisdiction)
-              ),
-              taxYear: Option.some(
-                Option.some(AuPayTakeHomeCalculation.taxYear)
-              ),
+              jurisdiction: Option.some(AuPayTakeHomeCalculation.jurisdiction),
+              taxYear: Option.some(AuPayTakeHomeCalculation.taxYear),
             },
           })
           .pipe(Effect.exit);
@@ -382,11 +342,6 @@ describe("TaxKit public calculation HTTP API", () => {
             Effect.die(
               new Error("Expected the HTTP calculate fixture to fail")
             ),
-        });
-        const sdkCause = yield* Exit.match(sdkExit, {
-          onFailure: Effect.succeed,
-          onSuccess: () =>
-            Effect.die(new Error("Expected the SDK calculate fixture to fail")),
         });
         const serviceCause = yield* Exit.match(serviceExit, {
           onFailure: Effect.succeed,
@@ -400,11 +355,6 @@ describe("TaxKit public calculation HTTP API", () => {
           Array.filter(Cause.isFailReason)
         );
         const failure = expectAt(httpFailures, 0);
-        const sdkFailures = EffectFunction.pipe(
-          sdkCause.reasons,
-          Array.filter(Cause.isFailReason)
-        );
-        const sdkFailure = expectAt(sdkFailures, 0);
         const serviceFailures = EffectFunction.pipe(
           serviceCause.reasons,
           Array.filter(Cause.isFailReason)
@@ -421,16 +371,12 @@ describe("TaxKit public calculation HTTP API", () => {
           Match.orElse(() => expect.fail("Expected calculator input error"))
         );
         const inputHelp = calculatorError.help.pipe(
-          Option.flatten,
           Option.match({
             onNone: Array.empty,
             onSome: (help) => help,
           })
         );
         EffectFunction.pipe(Exit.isFailure(exit), (actual) => {
-          expect(actual).toBeTruthy();
-        });
-        EffectFunction.pipe(Exit.isFailure(sdkExit), (actual) => {
           expect(actual).toBeTruthy();
         });
         EffectFunction.pipe(Exit.isFailure(serviceExit), (actual) => {
@@ -452,7 +398,7 @@ describe("TaxKit public calculation HTTP API", () => {
             0
           ).message,
         }).toStrictEqual({
-          calculatorError: sdkFailure.error,
+          calculatorError: serviceFailure.error,
           calculatorError2: serviceFailure.error,
           calculatorError_tag: true,
           expectAtCalculatorErrorIssues0Path: ["grossPay"],

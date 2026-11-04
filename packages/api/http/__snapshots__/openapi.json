@@ -1017,7 +1017,7 @@
         "tags": ["Health"]
       }
     },
-    "/api/v1/calculators": {
+    "/api/v2/calculators": {
       "get": {
         "description": "List public calculator catalog entries.",
         "operationId": "calculatorApi.listCalculators",
@@ -1201,7 +1201,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/calculators/{calculatorId}": {
+    "/api/v2/calculators/{calculatorId}": {
       "get": {
         "description": "Return one public calculator catalog entry.",
         "operationId": "calculatorApi.getCalculator",
@@ -1435,7 +1435,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/calculators/{calculatorId}/calculate": {
+    "/api/v2/calculators/{calculatorId}/calculate": {
       "post": {
         "description": "Run one public calculator using canonical scenario decoding and rule-pack layers.",
         "operationId": "calculatorApi.calculate",
@@ -1823,7 +1823,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/calculators/{calculatorId}/graph": {
+    "/api/v2/calculators/{calculatorId}/graph": {
       "get": {
         "description": "Return graph edges and canonical graph validation diagnostics for one calculator.",
         "operationId": "calculatorApi.getCalculatorGraph",
@@ -2271,7 +2271,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/calculators/{calculatorId}/schema": {
+    "/api/v2/calculators/{calculatorId}/schema": {
       "get": {
         "description": "Return fact, rule and report schema metadata for one calculator.",
         "operationId": "calculatorApi.getCalculatorSchema",
@@ -2746,7 +2746,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/facts": {
+    "/api/v2/facts": {
       "get": {
         "description": "List canonical fact descriptors, optionally filtered by calculator context.",
         "operationId": "calculatorApi.listFacts",
@@ -2873,7 +2873,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/jurisdictions": {
+    "/api/v2/jurisdictions": {
       "get": {
         "description": "List supported public API jurisdictions.",
         "operationId": "calculatorApi.getJurisdictions",
@@ -2940,7 +2940,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/rules": {
+    "/api/v2/rules": {
       "get": {
         "description": "List canonical rule descriptors, optionally filtered by calculator context.",
         "operationId": "calculatorApi.listRules",
@@ -3190,7 +3190,7 @@
         "tags": ["Calculator API"]
       }
     },
-    "/api/v1/tax-years": {
+    "/api/v2/tax-years": {
       "get": {
         "description": "List supported tax years for a jurisdiction.",
         "operationId": "calculatorApi.getTaxYears",

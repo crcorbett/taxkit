@@ -1,4 +1,4 @@
-import { Money } from "@taxkit/core/primitives";
+import { Money, NonNegativeMoney } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Schema } from "effect";
 
@@ -32,22 +32,22 @@ export class AnnualTaxReport extends Schema.TaggedClass<
   {
     readonly brand: unique symbol;
   }
->()("AnnualTaxReport", {
+>()("AnnualTaxReport", Schema.Struct({
   ledger: AnnualTaxLedger,
   liability: Money,
   rawLiability: Money,
   rulePackVersion: AnnualTaxRulePackVersion,
   taxableIncome: Money,
   trace: TraceNode,
-}) {}
+}).check(Schema.makeFilter((report) => report.rawLiability.cents === report.ledger.rawLiability.cents && report.liability.cents === Math.max(0, report.rawLiability.cents), { expected: "annual liability agrees with its checked ledger and zero floor" }))) {}
 /**
  * Input schema for the annual-tax scenario helper.
  *
  * @since 0.1.0
  */
-export const AnnualTaxScenarioInputSchema = Schema.Struct({
-  taxableIncome: Money,
-});
+export class AnnualTaxScenarioInputSchema extends Schema.Class<AnnualTaxScenarioInputSchema, { readonly brand: unique symbol }>("AnnualTaxScenario")({
+  taxableIncome: NonNegativeMoney,
+}) {}
 /**
  * Input type for the annual-tax scenario helper.
  *

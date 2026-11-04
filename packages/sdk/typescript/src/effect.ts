@@ -1,180 +1,20 @@
-import type {
-  CalculatorId,
-  CalculatorJurisdiction,
-  CalculatorTaxYear,
-  CalculatorRunFacts,
-  CalculatorServiceError,
-  CalculatorRunReport,
-  CalculatorRunResponse,
-  CalculatorRunRequest,
-  CalculatorRunServiceRequest,
-} from "@taxkit/calculators/schemas";
-import {
-  CalculatorContextQuery,
-  CalculationQuery,
-} from "@taxkit/calculators/schemas";
-import { PublicCalculatorService } from "@taxkit/calculators/service";
-import type { PublicCalculatorServiceContract } from "@taxkit/calculators/service";
-import { Effect, Option, Schema } from "effect";
-import type { Context } from "effect";
+import type { CalculatorDefinition } from "@taxkit/core";
+import { CalculationEngine } from "@taxkit/core";
+import { Effect } from "effect";
+import type { Schema } from "effect";
 
-import type {
-  AnyTaxKitModule,
-  CalculationInput,
-  ModuleCalculation,
-  SdkCalculation,
-} from "./types.js";
+export { decodeInput } from "@taxkit/core";
+export { CalculationEngine as TaxKitService } from "@taxkit/core";
+export { TaxKitLive } from "./live.layer.js";
+export type { CalculationInput, CalculationOutput } from "./types.js";
 
-export type {
-  AnySdkCalculation,
-  AnyTaxKitModule,
-  CalculationInput,
-  CalculationOutput,
-  ModuleCalculation,
-  SdkCalculation,
-  SdkCalculationDefinition,
-  TaxKitModule,
-} from "./types.js";
-export { defineSdkCalculation, defineTaxKitModule } from "./types.js";
+export type TaxKitEffectRequirements = CalculationEngine;
 
-export type TaxKitEffectRequirements = Context.Service.Identifier<
-  typeof PublicCalculatorService
->;
+/** Execute the selected definition over its checked scenario. */
+export const calculateRun = <Input extends Schema.Top, Output extends Schema.Top>(
+  calculation: CalculatorDefinition<Input, Output>, input: NoInfer<Input["Type"]>
+) => calculation.calculate(input);
 
-const publicCalculatorService: Effect.Effect<
-  PublicCalculatorServiceContract,
-  never,
-  TaxKitEffectRequirements
-> = Effect.service(PublicCalculatorService);
-
-export type SdkCalculatorRunPayload<Input> = Omit<
-  Schema.Struct.MakeIn<typeof CalculatorRunRequest.fields>,
-  "facts"
-> & {
-  readonly facts: Input;
-};
-
-export type SdkCalculatorRunServiceRequest<Input> = Omit<
-  Schema.Struct.MakeIn<typeof CalculatorRunServiceRequest.fields>,
-  "calculatorId" | "payload"
-> & {
-  readonly payload: SdkCalculatorRunPayload<Input>;
-};
-
-export type SdkCalculatorRunResponse<Report> = Omit<
-  CalculatorRunResponse,
-  "report"
-> & {
-  readonly report: Report;
-};
-
-export const calculateRunRequest = <
-  const Id extends CalculatorId,
-  const Jurisdiction extends CalculatorJurisdiction,
-  const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
->(
-  calculation: SdkCalculation<
-    Id,
-    Jurisdiction,
-    TaxYear,
-    InputSchema,
-    OutputSchema
-  >,
-  request: SdkCalculatorRunServiceRequest<InputSchema["Type"]>
-): Effect.Effect<
-  SdkCalculatorRunResponse<OutputSchema["Type"]>,
-  CalculatorServiceError | Schema.SchemaError,
-  TaxKitEffectRequirements
-> =>
-  publicCalculatorService.pipe(
-    Effect.flatMap((service) =>
-      Effect.all({
-        context: CalculatorContextQuery.makeEffect(request.payload),
-        query: CalculationQuery.makeEffect(request),
-      }).pipe(
-        Effect.mapError((issue) => new Schema.SchemaError(issue)),
-        Effect.flatMap(({ context, query }) =>
-          service.calculate({
-            calculatorId: calculation.calculatorId,
-            ...query,
-            payload: { ...context, facts: request.payload.facts },
-          })
-        ),
-        Effect.flatMap((response) =>
-          calculation.decodeOutput(response.report).pipe(
-            Effect.map(
-              (report): SdkCalculatorRunResponse<OutputSchema["Type"]> => ({
-                ...response,
-                report,
-              })
-            )
-          )
-        )
-      )
-    )
-  );
-
-export const calculateReportRequest = <
-  const Id extends CalculatorId,
-  const Jurisdiction extends CalculatorJurisdiction,
-  const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
->(
-  calculation: SdkCalculation<
-    Id,
-    Jurisdiction,
-    TaxYear,
-    InputSchema,
-    OutputSchema
-  >,
-  request: SdkCalculatorRunServiceRequest<InputSchema["Type"]>
-): Effect.Effect<
-  OutputSchema["Type"],
-  CalculatorServiceError | Schema.SchemaError,
-  TaxKitEffectRequirements
-> =>
-  calculateRunRequest(calculation, request).pipe(
-    Effect.map((run) => run.report)
-  );
-
-export const calculateReport = <
-  const Id extends CalculatorId,
-  const Jurisdiction extends CalculatorJurisdiction,
-  const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
->(
-  calculation: SdkCalculation<
-    Id,
-    Jurisdiction,
-    TaxYear,
-    InputSchema,
-    OutputSchema
-  >,
-  input: InputSchema["Type"]
-): Effect.Effect<
-  OutputSchema["Type"],
-  CalculatorServiceError | Schema.SchemaError,
-  TaxKitEffectRequirements
-> =>
-  calculateReportRequest(calculation, {
-    payload: {
-      facts: input,
-      jurisdiction: Option.some(Option.some(calculation.jurisdiction)),
-      taxYear: Option.some(Option.some(calculation.taxYear)),
-    },
-  });
-
-export const createClient = <const Modules extends readonly AnyTaxKitModule[]>(
-  ..._modules: Modules
-) => ({
-  calculations: {
-    calculateReport: <const Calculation extends ModuleCalculation<Modules>>(
-      calculation: Calculation,
-      input: CalculationInput<Calculation>
-    ) => calculateReport(calculation, input),
-  },
-});
+export const calculateReport = <Input extends Schema.Top, Output extends Schema.Top>(
+  calculation: CalculatorDefinition<Input, Output>, input: NoInfer<Input["Type"]>
+) => calculateRun(calculation, input).pipe(Effect.map((run) => run.report));

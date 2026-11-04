@@ -2,7 +2,7 @@ import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
   Cents,
-  audFromCents,
+  fromCents,
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
@@ -73,7 +73,7 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
         )
       )
     );
-    const levyAmount = yield* audFromCents(levyCents);
+    const levyAmount = yield* fromCents(levyCents);
     const status = Match.value(levyCents).pipe(
       Match.when(0, (): "zeroed" => "zeroed"),
       Match.orElse((): "active" => "active")

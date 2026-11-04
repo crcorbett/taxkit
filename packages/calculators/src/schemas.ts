@@ -54,12 +54,8 @@ const CalculatorContextFields = {
   taxYear: CalculatorTaxYear,
 };
 const OptionalCalculatorContextFields = {
-  jurisdiction: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorJurisdiction)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-  taxYear: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorTaxYear)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  jurisdiction: Schema.OptionFromOptional(CalculatorJurisdiction).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  taxYear: Schema.OptionFromOptional(CalculatorTaxYear).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
 };
 export const CalculatorContext = Schema.Struct({
   ...CalculatorContextFields,
@@ -70,8 +66,7 @@ export type CalculatorContext = typeof CalculatorContext.Type;
  *
  * Optionality belongs in this schema so service code can use typed request
  * values without raw `undefined` checks or conditional response shaping.
- * Nested Options retain missing, present undefined and present value keys;
- * constructors default omitted keys without inventing context values.
+ * One Option represents absent context; constructors never invent a value.
  */
 export const CalculatorContextQuery = Schema.Struct({
   ...OptionalCalculatorContextFields,
@@ -103,9 +98,7 @@ export class CalculatorInputIssue extends Schema.TaggedClass<
  */
 export const CalculatorInputHelp = Schema.Struct({
   factId: FactId,
-  question: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(FactQuestion)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  question: Schema.OptionFromOptional(FactQuestion).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   title: Schema.String,
 });
 export type CalculatorInputHelp = typeof CalculatorInputHelp.Type;
@@ -119,12 +112,8 @@ export class CalculatorInputDecodeError extends Schema.TaggedClass<
     readonly brand: unique symbol;
   }
 >()("CalculatorInputDecodeError", {
-  calculatorId: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorId)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(Schema.Array(CalculatorInputHelp))
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  calculatorId: Schema.OptionFromOptional(CalculatorId).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptional(Schema.Array(CalculatorInputHelp)).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   issues: Schema.Array(CalculatorInputIssue),
   message: Schema.String,
 }) {}
@@ -269,23 +258,17 @@ export const MetadataQuery = Schema.Struct({
 });
 export type MetadataQuery = typeof MetadataQuery.Type;
 export const HelpQuery = Schema.Struct({
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptional(HelpMode).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   ...OptionalCalculatorContextFields,
 });
 export type HelpQuery = typeof HelpQuery.Type;
 export const CalculationQuery = Schema.Struct({
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptional(HelpMode).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
 });
 export type CalculationQuery = typeof CalculationQuery.Type;
 export const GetCalculatorRequest = Schema.Struct({
   calculatorId: CalculatorId,
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptional(HelpMode).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   ...OptionalCalculatorContextFields,
 });
 export type GetCalculatorRequest = typeof GetCalculatorRequest.Type;
@@ -295,9 +278,7 @@ export const GetCalculatorGraphRequest = Schema.Struct({
 });
 export type GetCalculatorGraphRequest = typeof GetCalculatorGraphRequest.Type;
 export const DescriptorFilterQuery = Schema.Struct({
-  calculator: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorId)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  calculator: Schema.OptionFromOptional(CalculatorId).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   ...OptionalCalculatorContextFields,
 });
 export type DescriptorFilterQuery = typeof DescriptorFilterQuery.Type;
@@ -318,9 +299,7 @@ export type ParameterDescriptorMetadata =
 export const FactDescriptorMetadata = Schema.Struct({
   authority: FactAuthority,
   id: FactId,
-  question: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(FactQuestion)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  question: Schema.OptionFromOptional(FactQuestion).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   schemaTag: Schema.String,
   title: Schema.String,
 });
@@ -329,9 +308,7 @@ export type FactDescriptorMetadata = typeof FactDescriptorMetadata.Type;
  * Public metadata for one rule descriptor and its dependency edges.
  */
 export const RuleDescriptorMetadata = Schema.Struct({
-  allowDuplicateProvides: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(Schema.Boolean)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  allowDuplicateProvides: Schema.OptionFromOptional(Schema.Boolean).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   id: RuleId,
   parameters: Schema.Array(ParameterDescriptorMetadata),
   provides: Schema.Array(FactId),
@@ -371,22 +348,11 @@ export const CalculatorGraphResponse = Schema.Struct({
   validationIssues: Schema.Array(GraphValidationIssue),
 });
 export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
-/**
- * Calculator run facts accepted by the generic calculate route.
- *
- * This union is intentionally composed from canonical rule-owned scenario
- * schemas so generated API docs and clients can see the supported fact shapes.
- * The calculator service still decodes the value again with the selected
- * catalog entry's `inputSchema`, because the route-level union cannot depend
- * on the `calculatorId` path parameter.
- */
-export const CalculatorRunFacts = Schema.Union([
-  TakeHomeScenarioInputSchema,
-  AnnualTaxScenarioInputSchema,
-]);
+/** Supported checked scenario values, decoded by the selected definition. */
+export const CalculatorRunFacts = Schema.Union([TakeHomeScenarioInputSchema, AnnualTaxScenarioInputSchema]);
 export type CalculatorRunFacts = typeof CalculatorRunFacts.Type;
 export const CalculatorRunRequest = Schema.Struct({
-  facts: CalculatorRunFacts,
+  facts: Schema.Unknown,
   ...OptionalCalculatorContextFields,
 });
 export type CalculatorRunRequest = typeof CalculatorRunRequest.Type;
@@ -396,9 +362,7 @@ export type CalculatorRunRequest = typeof CalculatorRunRequest.Type;
  */
 export const CalculatorRunServiceRequest = Schema.Struct({
   calculatorId: CalculatorId,
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptional(HelpMode).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   payload: CalculatorRunRequest,
 });
 export type CalculatorRunServiceRequest =

@@ -323,7 +323,7 @@ it.live(
           }
         );
         const httpCatalogue = yield* Effect.promise(() =>
-          api.fetch("http://127.0.0.1:4218/api/v1/calculators")
+          api.fetch("http://127.0.0.1:4218/api/v2/calculators")
         );
         expect(httpCatalogue.status).toBe(200);
         expect(
@@ -359,7 +359,7 @@ it.live(
         expect(schemaReply.inputFacts.length).toBeGreaterThan(0);
         const httpSchema = yield* Effect.promise(() =>
           api.fetch(
-            `http://127.0.0.1:4218/api/v1/calculators/${CalculationRequest.calculatorId}/schema`
+            `http://127.0.0.1:4218/api/v2/calculators/${CalculationRequest.calculatorId}/schema`
           )
         );
         expect(httpSchema.status).toBe(200);
@@ -441,7 +441,7 @@ it.live(
         )(CalculationRequest.payload);
         const http = yield* Effect.promise(() =>
           api.fetch(
-            "http://127.0.0.1:4218/api/v1/calculators/au.pay.take-home/calculate",
+            "http://127.0.0.1:4218/api/v2/calculators/au.pay.take-home/calculate",
             {
               body,
               headers: {

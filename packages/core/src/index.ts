@@ -37,26 +37,16 @@ export {
   type AnyParameterDescriptor,
   type ParameterDescriptor,
 } from "./parameters/descriptor.js";
+export { Cents, Currency, Money, NonNegativeMoney, moneyEquals } from "./primitives/money.js";
+export { fromCents, fromDecimal, nonNegative, add, subtract } from "./primitives/money.effect.js";
 export {
-  Cents,
-  Currency,
-  Money,
-  aud,
-  audFromCents,
-  audDollars,
-  moneyAdd,
-  moneyEquals,
-  moneySub,
-} from "./primitives/money.js";
-export {
-  MoneyFromDollarsString,
-  dollarsTextFromMoney,
-  moneyFromDollarsText,
+  MoneyFromDecimalString, NonNegativeMoneyFromDecimalString,
+  format,
 } from "./primitives/dollars.js";
 export {
   RoundingMode,
   roundCentsToDollar,
-  roundMoney,
+  round,
 } from "./primitives/rounding.js";
 export {
   AustralianTaxYear,
@@ -105,9 +95,9 @@ export {
 } from "./trace/node.js";
 
 export {
-  DollarsTextIssue,
+  MoneyIssue,
   InvalidCalendarValue,
   InvalidDecimalValue,
-  InvalidDollarsText,
-  InvalidMoneyValue,
+  MoneyError,
 } from "./primitives/errors.js";
+export { defineCalculator, decodeInput, InputValidationError, inputValidationError, type CalculatorDefinition } from "./calculators/definition.js";

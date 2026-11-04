@@ -68,8 +68,8 @@ HTTP handlers or filesystem adapters.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
   `Context`, `Layer`, `Record`, `Result` and `Exit` where they fit.
 - Keep money and rounding explicit. `aud` takes already checked `Cents` and
-  returns Money directly. Use `audFromCents` or `audDollars` when a number needs
-  checking; they return Effects with `InvalidMoneyValue`. Addition, subtraction,
+  returns Money directly. Use `fromCents` or `audDollars` when a number needs
+  checking; they return Effects with `MoneyError`. Addition, subtraction,
   money rounding, exact decimal conversion and ledger totals check each new
   constrained amount and return that error when it cannot fit safe whole cents.
   `taxRate` and `decimalCoefficient` return `InvalidDecimalValue` for strings

@@ -4,7 +4,7 @@ import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
 import {
   PublicCalculatorServiceLive,
   CalculationEngineLive,
-  audFromCents,
+  fromCents,
 } from "taxkit/core";
 import { calculateRunRequest } from "taxkit/effect";
 
@@ -12,7 +12,7 @@ const TaxKitLayer = PublicCalculatorServiceLive.pipe(
   Layer.provide(CalculationEngineLive)
 );
 
-export const program = audFromCents(346_200).pipe(
+export const program = fromCents(346_200).pipe(
   Effect.flatMap((amount) =>
     calculateRunRequest(AuPayTakeHomeCalculation, {
       payload: {
@@ -23,10 +23,8 @@ export const program = audFromCents(346_200).pipe(
           }),
           taxFreeThresholdClaimed: true,
         },
-        jurisdiction: Option.some(
-          Option.some(AuPayTakeHomeCalculation.jurisdiction)
-        ),
-        taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
+        jurisdiction: Option.some(AuPayTakeHomeCalculation.jurisdiction),
+        taxYear: Option.some(AuPayTakeHomeCalculation.taxYear),
       },
     })
   ),

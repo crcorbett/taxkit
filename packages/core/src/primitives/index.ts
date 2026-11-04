@@ -7,23 +7,13 @@ export {
   dateIntervalsOverlap,
   isoDate,
 } from "./date.js";
+export { Cents, Currency, Money, NonNegativeMoney, moneyEquals } from "./money.js";
+export { fromCents, fromDecimal, nonNegative, add, subtract } from "./money.effect.js";
 export {
-  Cents,
-  Currency,
-  Money,
-  aud,
-  audFromCents,
-  audDollars,
-  moneyAdd,
-  moneyEquals,
-  moneySub,
-} from "./money.js";
-export {
-  MoneyFromDollarsString,
-  dollarsTextFromMoney,
-  moneyFromDollarsText,
+  MoneyFromDecimalString, NonNegativeMoneyFromDecimalString,
+  format,
 } from "./dollars.js";
-export { RoundingMode, roundCentsToDollar, roundMoney } from "./rounding.js";
+export { RoundingMode, roundCentsToDollar, round } from "./rounding.js";
 export {
   CentsOrInfinity,
   DecimalCoefficient,
@@ -37,9 +27,8 @@ export {
 } from "./tax.js";
 
 export {
-  DollarsTextIssue,
+  MoneyIssue,
   InvalidCalendarValue,
   InvalidDecimalValue,
-  InvalidDollarsText,
-  InvalidMoneyValue,
+  MoneyError,
 } from "./errors.js";

@@ -1,3 +1,4 @@
+import { NonNegativeMoney } from "@taxkit/core/primitives";
 import { Effect, Layer, Schema } from "effect";
 import * as HttpServerRequest from "effect/http/HttpServerRequest";
 import { GrossPay } from "taxkit/au";
@@ -44,10 +45,7 @@ export const handlePayPreview = (request: Request) =>
       )
     );
     const report = yield* calculateReport(AuPayTakeHomeCalculation, {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: body.grossPayCents, currency: "AUD" }),
-        period: body.period,
-      }),
+      grossPay: NonNegativeMoney.make(new Money({ cents: body.grossPayCents, currency: "AUD" })), period: body.period,
       taxFreeThresholdClaimed: body.taxFreeThresholdClaimed,
     });
     const response = yield* Schema.encodeEffect(

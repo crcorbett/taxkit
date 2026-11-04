@@ -40,13 +40,13 @@ means a missing key, `Some(None)` means a present undefined key and
 fields; the codec handles this conversion.
 
 ```ts
-import { audFromCents } from "taxkit/core";
+import { fromCents } from "taxkit/core";
 import { calculateRunRequest } from "taxkit/effect";
 import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
 import { Effect, Option } from "effect";
 
 const effect = Effect.gen(function* () {
-  const taxableIncome = yield* audFromCents(9_000_000);
+  const taxableIncome = yield* fromCents(9_000_000);
   return yield* calculateRunRequest(AuAnnualIncomeTaxCalculation, {
     payload: {
       facts: { taxableIncome },
@@ -65,13 +65,13 @@ Use `calculateReportRequest` when you have a full request payload but only need
 the report.
 
 ```ts
-import { audFromCents } from "taxkit/core";
+import { fromCents } from "taxkit/core";
 import { calculateReportRequest } from "taxkit/effect";
 import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
 import { Effect, Option } from "effect";
 
 const effect = Effect.gen(function* () {
-  const taxableIncome = yield* audFromCents(9_000_000);
+  const taxableIncome = yield* fromCents(9_000_000);
   return yield* calculateReportRequest(AuAnnualIncomeTaxCalculation, {
     payload: {
       facts: { taxableIncome },

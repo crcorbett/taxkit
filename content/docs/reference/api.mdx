@@ -26,15 +26,15 @@ clients and endpoint reference pages.
 | Method | Path                                          | Use                                                          |
 | ------ | --------------------------------------------- | ------------------------------------------------------------ |
 | `GET`  | `/api/health`                                 | Check the API process.                                       |
-| `GET`  | `/api/v1/jurisdictions`                       | List supported public jurisdictions.                         |
-| `GET`  | `/api/v1/tax-years`                           | List supported calculator tax years.                         |
-| `GET`  | `/api/v1/calculators`                         | List public calculator catalogue entries.                    |
-| `GET`  | `/api/v1/calculators/:calculatorId`           | Read one calculator metadata entry.                          |
-| `GET`  | `/api/v1/calculators/:calculatorId/schema`    | Read input facts, output facts and rules for one calculator. |
-| `POST` | `/api/v1/calculators/:calculatorId/calculate` | Run one calculator with a `CalculatorRunRequest`.            |
-| `GET`  | `/api/v1/calculators/:calculatorId/graph`     | Read the calculator fact and rule graph.                     |
-| `GET`  | `/api/v1/facts`                               | List public fact descriptor metadata.                        |
-| `GET`  | `/api/v1/rules`                               | List public rule descriptor metadata.                        |
+| `GET`  | `/api/v2/jurisdictions`                       | List supported public jurisdictions.                         |
+| `GET`  | `/api/v2/tax-years`                           | List supported calculator tax years.                         |
+| `GET`  | `/api/v2/calculators`                         | List public calculator catalogue entries.                    |
+| `GET`  | `/api/v2/calculators/:calculatorId`           | Read one calculator metadata entry.                          |
+| `GET`  | `/api/v2/calculators/:calculatorId/schema`    | Read input facts, output facts and rules for one calculator. |
+| `POST` | `/api/v2/calculators/:calculatorId/calculate` | Run one calculator with a `CalculatorRunRequest`.            |
+| `GET`  | `/api/v2/calculators/:calculatorId/graph`     | Read the calculator fact and rule graph.                     |
+| `GET`  | `/api/v2/facts`                               | List public fact descriptor metadata.                        |
+| `GET`  | `/api/v2/rules`                               | List public rule descriptor metadata.                        |
 
 ## Calculate route
 

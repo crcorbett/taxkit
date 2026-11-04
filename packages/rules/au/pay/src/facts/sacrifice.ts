@@ -3,7 +3,7 @@ import {
   FactQuestionId,
   makeFactDescriptor,
 } from "@taxkit/core/facts";
-import { Money } from "@taxkit/core/primitives";
+import { Money, NonNegativeMoney } from "@taxkit/core/primitives";
 import { Context, Schema } from "effect";
 
 import { PayPeriod } from "./pay.js";
@@ -17,10 +17,10 @@ import { PayPeriod } from "./pay.js";
  *
  * @example
  * ```ts
- * import { Cents, aud } from "@taxkit/core/primitives"
+ * import { Cents } from "@taxkit/core/primitives"
  * import { SalarySacrifice } from "@taxkit/rules-au-pay/facts"
  *
- * const sacrifice = new SalarySacrifice({ amount: aud(Cents.make(25_000)), period: "weekly" })
+ * const sacrifice = new SalarySacrifice({ amount: NonNegativeMoney.make(Money.fromCents(Cents.make(25_000))), period: "weekly" })
  * ```
  */
 export class SalarySacrifice extends Schema.TaggedClass<
@@ -29,7 +29,7 @@ export class SalarySacrifice extends Schema.TaggedClass<
     readonly brand: unique symbol;
   }
 >()("SalarySacrifice", {
-  amount: Money,
+  amount: NonNegativeMoney,
   period: PayPeriod,
 }) {}
 /**
