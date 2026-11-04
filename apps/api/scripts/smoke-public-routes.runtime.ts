@@ -87,25 +87,22 @@ const calculation = await readJson(
   {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      facts: {
-        grossPay: {
-          _tag: "GrossPay",
-          amount: {
-            _tag: "Money",
-            cents: 346_200,
-            currency: "AUD",
-          },
+      calculatorId: takeHomeCalculatorId,
+      payload: {
+        facts: {
+          grossPay: { _tag: "Money", cents: 346_200, currency: "AUD" },
           period: "fortnightly",
+          taxFreeThresholdClaimed: true,
         },
-        taxFreeThresholdClaimed: true,
+        jurisdiction: "AU",
+        taxYear: "2025-26",
       },
-      jurisdiction: "AU",
-      taxYear: "2025-26",
     }),
   }
 );
 assert(
-  calculation.calculator?.calculatorId === takeHomeCalculatorId,
+  calculation.calculatorId === takeHomeCalculatorId &&
+    calculation.calculator?.calculatorId === takeHomeCalculatorId,
   "Calculate route returned the wrong calculator id."
 );
 assert(
@@ -123,15 +120,12 @@ const annualTaxCalculation = await readJson(
   {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      facts: {
-        taxableIncome: {
-          _tag: "Money",
-          cents: 9_000_000,
-          currency: "AUD",
-        },
+      calculatorId: annualTaxCalculatorId,
+      payload: {
+        facts: { taxableIncome: { _tag: "Money", cents: 9_000_000, currency: "AUD" } },
+        jurisdiction: "AU",
+        taxYear: "2025-26",
       },
-      jurisdiction: "AU",
-      taxYear: "2025-26",
     }),
   }
 );

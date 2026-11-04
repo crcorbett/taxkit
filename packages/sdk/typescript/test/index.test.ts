@@ -36,12 +36,10 @@ it.effect(
 it.effect("supports caller-owned async disposal", () =>
   Effect.gen(function* () {
     const client = createClient();
-    const stack = new AsyncDisposableStack();
-    stack.use(client);
     yield* Effect.promise(() =>
       client.calculate(AuPayTakeHomeCalculation, takeHomeFacts)
     );
-    yield* Effect.promise(() => stack.disposeAsync());
+    yield* Effect.promise(() => client[Symbol.asyncDispose]());
     const result = yield* Effect.promise(() =>
       client.calculateSafe(AuPayTakeHomeCalculation, takeHomeFacts)
     );
