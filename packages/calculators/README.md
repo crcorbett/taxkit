@@ -77,7 +77,7 @@ This package must not own:
   calculate contract.
 - Decode calculate payload facts with the selected catalog entry's
   `inputSchema` before execution so valid facts for the wrong calculator return
-  `CalculatorInputDecodeError` with descriptor-backed help.
+  `InputValidationError` with bounded safe field issues.
 - Compose rule-owned calculator ids, jurisdictions and tax years. Do not
   redeclare supported calculator context literals in this package.
 - Use Effect-native primitives where they fit: `Schema`, `Option`, `Match`,
@@ -178,11 +178,8 @@ builders reuse those checked values directly. Public metadata codecs keep the
 same JSON fields, missing keys and values.
 
 Calculator-owned context, help and filter fields use `Option<Option<A>>` in
-checked TypeScript values: `None` means a missing key, `Some(None)` means a
-present undefined key, and `Some(Some(value))` means a present value. Owning
-constructors default omitted keys to `None`. JSON and HTTP query fields retain
-their ordinary optional representation. Flatten the two absent forms only where
-they mean the same thing; do not invent a jurisdiction or tax year.
+checked TypeScript values: one `Option` represents semantic absence, and ingress
+converts omitted request fields.
 
 Optional error calculator identity/help, fact question and rule permission
 fields use the same representation-preserving owners. Explicit false permission

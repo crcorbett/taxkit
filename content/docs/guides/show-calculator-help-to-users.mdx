@@ -19,7 +19,7 @@ for the selected calculator.
 
 1. Fetch calculator schema metadata.
 2. Render fact titles and question metadata.
-3. Call calculate with `help=errors` when validation fails.
+3. Display safe issue paths alongside the schema endpoint’s field guidance.
 4. Show returned issue paths beside your fields.
 
 ## Example
@@ -35,7 +35,7 @@ import { HelpQuery } from "taxkit/schemas";
 export const loadCalculatorHelp = Effect.fnUntraced(function* (baseUrl: URL) {
   const client = yield* HttpApiClient.make(TaxKitApi, { baseUrl });
   const query = yield* HelpQuery.makeEffect({
-    help: Option.some(Option.some("schema")),
+    help: Option.some("schema"),
   });
   const schema = yield* client.calculatorApi.getCalculatorSchema({
     params: { calculatorId: AuPayTakeHomeCalculation.calculatorId },
@@ -62,7 +62,7 @@ threshold claim used by the take-home pay calculator.
 Let the typed client's expected error channel reach your application error
 handler. Display the checked issue paths or descriptor help from an input
 decode failure; [API errors](../api/errors.mdx) explains the envelope and other
-server failures. A calculation call with `help=errors` returns field help when
+server failures. The schema endpoint supplies field guidance when
 its checked request facts do not match the selected calculator.
 
 ## Related pages

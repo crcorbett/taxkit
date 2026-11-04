@@ -29,7 +29,8 @@
           "effect/net/NetAddress",
           "effect/process",
           "effect/reactivity",
-          "effect/testing/TestConsole"
+          "effect/testing/TestConsole",
+          "effect/Arbitrary"
         ]
       }
     ],

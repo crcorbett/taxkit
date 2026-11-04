@@ -39,9 +39,7 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
 
     const trace = TraceNode.make({
       children: [incomeTax.trace, lito.trace, medicareLevy.trace],
-      formula: Option.some(
-        Option.some("liability = incomeTax - lito + medicareLevy")
-      ),
+      formula: Option.some("liability = incomeTax - lito + medicareLevy"),
       inputs: {
         incomeTaxCents: incomeTax.amount.cents,
         litoCents: lito.amount.cents,
@@ -53,7 +51,7 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
       title: "Annual tax ledger (income tax + LITO + Medicare Levy)",
     });
 
-    return new AnnualTaxLedger({ components, rawLiability, trace });
+    return AnnualTaxLedger.make({ components, rawLiability, trace });
   }).pipe(
     Effect.mapError(
       () =>

@@ -133,7 +133,7 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
       );
       const body = yield* Schema.encodeEffect(
         Schema.fromJsonString(CalculatorRunRequest)
-      )(CalculationRequest.payload);
+      )(CalculationRequest);
       const response = yield* Effect.promise(() =>
         api.fetch(
           "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate",

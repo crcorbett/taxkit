@@ -1,4 +1,4 @@
-import { Schema } from "effect";
+import { Effect, Schema } from "effect";
 
 /**
  * A domain error raised when a tax calculation cannot be completed.
@@ -10,4 +10,7 @@ export class CalculationError extends Schema.TaggedError<
   { readonly brand: unique symbol }
 >()("CalculationError", {
   message: Schema.String,
+  reason: Schema.Literals(["rule", "graph", "output-invariant"]).pipe(
+    Schema.withConstructorDefault(Effect.succeed("rule" as const))
+  ),
 }) {}

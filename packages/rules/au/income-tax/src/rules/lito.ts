@@ -91,9 +91,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(
-        Option.some(
-          "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))"
-        )
+        "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))"
       ),
       inputs: {
         bracketThresholdCents: bracket.thresholdCents,
@@ -103,7 +101,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
         tableYear: table.year,
       },
       result: offsetAmount.cents,
-      rounding: Option.some(Option.some("round-to-nearest-cent")),
+      rounding: Option.some("round-to-nearest-cent"),
       ruleId: LitoRuleId,
       sources: [table.source],
       title: "Low Income Tax Offset (LITO)",

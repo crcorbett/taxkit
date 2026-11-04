@@ -7,7 +7,7 @@ import {
 } from "@taxkit/calculators/form";
 import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { Money,  Cents } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
 import {
   AuPayCalculatorId,
@@ -458,20 +458,24 @@ describe("browser calculator lifetime", () => {
           status: "active",
           trace,
         });
-        const report = new TakeHomePayReport({
+        const report = TakeHomePayReport.make({
+          salarySacrifice: Money.fromCents(Cents.make(0)),
           grossPay: EffectFunction.pipe(Cents.make(200), Money.fromCents),
           netPay: EffectFunction.pipe(Cents.make(100), Money.fromCents),
           period: "weekly",
           rulePackVersion: "rules-au-pay/1.0.2",
           taxablePay: EffectFunction.pipe(Cents.make(200), Money.fromCents),
           trace,
-          withholdings: new PayWithholdingsLedger({
+          withholdings: PayWithholdingsLedger.make({
             components: [component],
             period: "weekly",
             total: EffectFunction.pipe(Cents.make(100), Money.fromCents),
             trace,
           }),
-          withholdingsTotal: EffectFunction.pipe(Cents.make(100), Money.fromCents),
+          withholdingsTotal: EffectFunction.pipe(
+            Cents.make(100),
+            Money.fromCents
+          ),
         });
         const html = renderToString(
           <TakeHomeResultView report={Option.some(report)} stale={false} />

@@ -25,7 +25,11 @@
       "@taxkit/api-http": ["../api/http/src/index.ts"],
       "@taxkit/api-http/api": ["../api/http/src/api.ts"],
       "taxkit/core": ["../sdk/typescript/src/core.ts"],
-      "taxkit/http": ["../sdk/typescript/src/http.ts"]
+      "taxkit/http": ["../sdk/typescript/src/http.ts"],
+      "@taxkit/core/money": ["../core/src/money.ts"],
+      "taxkit/money": ["../sdk/typescript/src/money.ts"],
+      "taxkit/money/effect": ["../sdk/typescript/src/money/effect.ts"],
+      "taxkit/au/schemas": ["../sdk/typescript/src/au/schemas.ts"]
     },
     "skipLibCheck": true,
     "strict": true,

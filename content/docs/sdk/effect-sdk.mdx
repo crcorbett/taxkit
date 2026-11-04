@@ -6,124 +6,28 @@ status: "published"
 
 # Effect SDK
 
-Use the Effect SDK when your application already composes services with Effect,
-or when an in-process transport needs the full calculator run response. Most
-server-side TypeScript applications should start with the [Plain SDK](./plain-sdk.mdx).
-
-## Runtime graph
+The owning calculator program retains its input, output, error and native service requirements. Provide the static `TaxKitLive` or your own engine Layer. Your application owns its runtime.
 
 ```ts
-Production: SDK Effect full run
+import { Effect } from "effect";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money/effect";
+import { calculateRun, TaxKitLive } from "taxkit/effect";
 
-Effect consumer
-  -> calculateRunRequest(descriptor, request)
-    -> PublicCalculatorService.calculate
-      -> CalculatorRunResponse
-    -> descriptor output decode for response.report
-    -> typed CalculatorRunResponse with narrowed report
-
-Report-only helpers
-  -> calculateReportRequest(...)
-    -> calculateRunRequest(...)
-    -> response.report
-  -> calculateReport(...)
-    -> calculateReportRequest(...)
-```
-
-## Return the full run response
-
-Use `calculateRunRequest` when you need the canonical `CalculatorRunResponse`
-shape with a descriptor-decoded report type. Omitted request fields use their
-Schema defaults. Explicit context and help use nested Options: outer `None`
-means a missing key, `Some(None)` means a present undefined key and
-`Some(Some(value))` means a present value. JSON clients keep the usual optional
-fields; the codec handles this conversion.
-
-```ts
-import { fromCents } from "taxkit/core";
-import { calculateRunRequest } from "taxkit/effect";
-import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
-import { Effect, Option } from "effect";
-
-const effect = Effect.gen(function* () {
-  const taxableIncome = yield* fromCents(9_000_000);
-  return yield* calculateRunRequest(AuAnnualIncomeTaxCalculation, {
-    payload: {
-      facts: { taxableIncome },
-      jurisdiction: Option.some(
-        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
-      ),
-      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
-    },
+export const program = Effect.gen(function* () {
+  const grossPay = yield* fromDecimal("3462.00").pipe(
+    Effect.flatMap(nonNegative)
+  );
+  const input = TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "fortnightly",
+    taxFreeThresholdClaimed: true,
   });
-});
+  return yield* calculateRun(AuPayTakeHomeCalculation, input);
+}).pipe(Effect.provide(TaxKitLive));
 ```
 
-## Return only the report
+`calculateReport` returns the selected report; `calculateRun` returns the report and diagnostics. Parse unknown data explicitly with `decodeInput`, which rejects surplus fields. Checked inputs flow through execution without another decoder.
 
-Use `calculateReportRequest` when you have a full request payload but only need
-the report.
-
-```ts
-import { fromCents } from "taxkit/core";
-import { calculateReportRequest } from "taxkit/effect";
-import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
-import { Effect, Option } from "effect";
-
-const effect = Effect.gen(function* () {
-  const taxableIncome = yield* fromCents(9_000_000);
-  return yield* calculateReportRequest(AuAnnualIncomeTaxCalculation, {
-    payload: {
-      facts: { taxableIncome },
-      jurisdiction: Option.some(
-        Option.some(AuAnnualIncomeTaxCalculation.jurisdiction)
-      ),
-      taxYear: Option.some(Option.some(AuAnnualIncomeTaxCalculation.taxYear)),
-    },
-  });
-});
-```
-
-Use `calculateReport` when you already have descriptor-typed facts:
-
-```ts
-import { Cents, aud } from "taxkit/core";
-import { calculateReport } from "taxkit/effect";
-import { AuAnnualIncomeTaxCalculation } from "taxkit/au/effect";
-
-const effect = calculateReport(AuAnnualIncomeTaxCalculation, {
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-```
-
-## Use an Effect client
-
-```ts
-import { Cents, aud } from "taxkit/core";
-import { createClient } from "taxkit/effect";
-import {
-  AuIncomeTax2025_26Module,
-  AuAnnualIncomeTaxCalculation,
-} from "taxkit/au/effect";
-
-const client = createClient(AuIncomeTax2025_26Module);
-
-const effect = client.calculations.calculateReport(
-  AuAnnualIncomeTaxCalculation,
-  { taxableIncome: aud(Cents.make(9_000_000)) }
-);
-```
-
-## Requirements
-
-Effect helpers require `PublicCalculatorService` in the environment. Each
-plain SDK client owns its runtime and must be disposed when finished; direct
-helpers clean up before returning. The Effect SDK leaves service provision to the
-consumer so application layers and tests can choose the calculator service
-implementation.
-
-## Related pages
-
-- [Plain SDK](./plain-sdk.mdx)
-- [Schemas](./schemas.mdx)
-- [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx)
+Import actual fact services, rule descriptors and pack Layers from `taxkit/au/effect`. Native Layer composition keeps missing facts and parameters in the Effect requirements channel. Supply salary sacrifice and an explicit STSL debt status when their selected pack requires them.

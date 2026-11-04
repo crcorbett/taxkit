@@ -1,29 +1,23 @@
-import { Effect, Match } from "effect";
-import { TaxKit } from "taxkit";
-import { GrossPay, au } from "taxkit/au";
-import { fromCents } from "taxkit/core";
+import { Effect, Result } from "effect";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money/effect";
 
-export const program = fromCents(346_200).pipe(
-  Effect.flatMap((amount) =>
-    Effect.promise(() =>
-      TaxKit.safe.calculate(au.calculations.takeHomePay, {
-        grossPay: new GrossPay({
-          amount,
-          period: "fortnightly",
-        }),
-        taxFreeThresholdClaimed: true,
-      })
-    )
-  ),
-  Effect.flatMap((result) =>
-    Match.value(result).pipe(
-      Match.tag("TaxKitFailure", (failure) =>
-        Effect.logError(failure.error.message)
-      ),
-      Match.tag("TaxKitSuccess", (_success) =>
-        Effect.logInfo("Calculated take-home pay")
-      ),
-      Match.exhaustive
-    )
-  )
-);
+export const program = Effect.gen(function* () {
+  const grossPay = yield* fromDecimal("3462.00").pipe(
+    Effect.flatMap(nonNegative)
+  );
+  const scenario = TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "fortnightly",
+    taxFreeThresholdClaimed: true,
+  });
+  const result = yield* Effect.promise(() =>
+    calculateSafe(AuPayTakeHomeCalculation, scenario)
+  );
+  return yield* Result.match(result, {
+    onFailure: (failure) => Effect.logError(failure.message),
+    onSuccess: () => Effect.logInfo("Calculated take-home pay"),
+  });
+});

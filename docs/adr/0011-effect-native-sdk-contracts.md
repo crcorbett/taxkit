@@ -1,8 +1,7 @@
 # Effect-native SDK contracts and checked money
 
-Status: Draft for the next SDK major, with a required hard cutover. This records
-the requested design direction and its proposed replacement contract;
-implementation and release are pending.
+Status: Accepted for SDK 5.0.0. Implemented as one hard cutover; publication
+remains subject to the repository release gates.
 
 TaxKit will use one Schema-owned domain model and native Effect execution for
 money, facts, rules and calculators. Both the Effect and vanilla TypeScript
@@ -189,6 +188,13 @@ decode the narrowed shape again: that loses the evidence needed to reject an
 ignored salary-sacrifice input. Native HttpApi codecs own transport parsing;
 the selected variant must be tied to the checked request identity.
 
+Calculator HTTP v2 accepts the same correlated envelope as MCP: `calculatorId`,
+and `payload` containing the checked `facts` plus optional context.
+The path and body identities must agree. Responses carry the discriminating
+`calculatorId` alongside matching report and catalogue metadata. Native HttpApi
+`PayloadParseOptions` enforces strict nested decoding; safe input issue projection
+is shared with SDK ingress. The superseded input-error DTO/projection is deleted.
+
 Service request objects use a single `Option<A>` when absence has one semantic
 meaning. Plain request options may have optional keys; ingress converts them.
 Delete nested Options introduced solely to preserve an own key whose value is
@@ -225,9 +231,10 @@ text. Use a distinct report variant when required fields differ.
 
 Ledger totals agree with contributing components, relevant component identities
 are unique, and period-based fields agree. Annual liability agrees with the
-documented flooring of raw liability. Reuse these checks in derived Type and
-encoded codecs: spreading fields or deriving an encoded view must not discard
-whole-record checks. Legal formulas, parameter values and historical source
+documented flooring of raw liability. Reuse these checks in derived Type and explicit owning encoded codecs. Effect
+4.0.7 can discard whole-record checks during bare `Schema.toEncoded` extraction;
+export checked `*Encoded` Schemas for encoded-only validation and test them.
+Spreading fields does not retain aggregate checks. Legal formulas, parameter values and historical source
 checksums remain independently verified.
 
 Export native scenario and report Schemas for consumers. Derive Standard Schema
@@ -273,7 +280,7 @@ caller, example, fixture and packed consumer in the same replacement work:
 | `TaxKitSuccess`, `TaxKitFailure`, `TaxKitSafeResult` and their custom-tag encoders/matchers | Native Result and `Schema.Result`; delete both implementations and old public exports. |
 | `TaxKitCalculationError` wrapping all failures, its detail/alias types and first-failure Cause conversion | Closed domain failure union plus narrowly owned Promise-host failures; delete the blanket nesting and obsolete aliases. |
 | `CalculationError.cause` and generic schema-error message collapsing | Safe tagged reasons and field issues; remove opaque public diagnostic storage and its compatibility encoders. |
-| `aud`, `fromCents`, `audDollars`, `fromDecimal`, `format`, `MoneyFromDecimalString`, `add`, `subtract` and `round` entry aliases | Canonical money-module operations and symmetric codecs; migrate their implementations/callers, then delete old names and re-exports. Keep independently useful exact-decimal formula primitives. |
+| `aud`, `audFromCents`, `audDollars`, `moneyFromDollarsText`, `dollarsTextFromMoney`, `MoneyFromDollarsString`, `moneyAdd`, `moneySub` and `roundMoney` entry aliases | Canonical money-module operations and symmetric codecs; migrate their implementations/callers, then delete old names and re-exports. Keep independently useful exact-decimal formula primitives. |
 | `calculateReportRequest`, `calculateRunRequest` and transport-shaped SDK request aliases | One calculator-first report operation and one full-run operation with checked options; transports use their owning contracts directly. |
 | `TaxKit` / `auEffect` object wrappers and duplicate nested descriptor/client namespaces | Named functions, descriptors and native Layer exports; keep one canonical import for each operation per interface. |
 | Nested Option request/help/context forms kept only for missing-versus-undefined identity | Single semantic Option and ordinary boundary optional keys; remove request compatibility branches and obsolete byte-shape expectations. |
@@ -362,5 +369,5 @@ Design qualification used the installed Effect 4.0.7 source for Schema brands,
 Result codecs, `Effect.fromResult`, native service/Layer requirements, Standard
 Schema and JSON Schema derivation. Isolated probes confirmed non-negative
 refinement rejection, native Result encoding/restoration, nominal fact rejection
-and the remaining salary-sacrifice requirement. The future public entrypoints
-and complete replacement architecture are not claimed to be implemented.
+and the remaining salary-sacrifice requirement. The implementation exports these entrypoints and qualifies the shared contracts
+through repository and installed-archive checks.

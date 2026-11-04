@@ -1,40 +1,38 @@
-import { Array, Effect, Result, Schema, SchemaIssue } from "effect";
-import type { CalculationEngine, CalculationResult } from "../engine/calculation-engine.js";
+import { Effect, Schema } from "effect";
+
+import type {
+  CalculationEngine,
+  CalculationResult,
+} from "../engine/calculation-engine.js";
+import { CalculationDiagnostics } from "../engine/schemas.js";
 import { CalculationError } from "../errors/calculation-error.js";
-import { CalculatorId, Jurisdiction, TaxYear } from "../primitives/tax.js";
+import { inputValidationError } from "../errors/input-validation-error.js";
+import { validateRuleGraph } from "../graph/rule-graph.js";
+import type { CalculatorId, Jurisdiction, TaxYear } from "../primitives/tax.js";
+import type {
+  AnyFactDescriptor,
+  AnyRuleDescriptor,
+} from "../rules/descriptor.js";
 
-export class InputValidationError extends Schema.TaggedError<InputValidationError, { readonly brand: unique symbol }>()("InputValidationError", {
-  message: Schema.tag("Invalid calculator input."),
-  issues: Schema.Array(Schema.Struct({ path: Schema.Array(Schema.String), message: Schema.Literal("Invalid input value") })),
-  truncated: Schema.Boolean,
-}) {}
-
-const issueFormatter = SchemaIssue.makeFormatterStandardSchemaV1();
-const PathKey = Schema.Struct({ key: Schema.PropertyKey });
-export const inputValidationError = (issue: SchemaIssue.Issue): InputValidationError => {
-  const issues = issueFormatter(issue).issues;
-  return new InputValidationError({
-    issues: Array.take(issues, 20).map((entry) => ({
-      message: "Invalid input value",
-      path: Array.take(entry.path ?? [], 12).map((part) =>
-        Schema.decodeUnknownResult(PathKey)(part).pipe(Result.match({
-          onFailure: () => "field",
-          onSuccess: ({ key }) => String(key).slice(0, 80),
-        }))
-      ),
-    })),
-    truncated: issues.length > 20,
-  });
-};
-
-export interface CalculatorDefinition<Input extends Schema.Top, Output extends Schema.Top> {
+export interface CalculatorDefinition<
+  Input extends Schema.Top,
+  Output extends Schema.Top,
+> {
   readonly calculatorId: CalculatorId;
   readonly jurisdiction: Jurisdiction;
   readonly taxYear: TaxYear;
+  readonly inputFacts: readonly AnyFactDescriptor[];
+  readonly ruleDescriptors: readonly AnyRuleDescriptor[];
   readonly inputSchema: Input;
   readonly outputSchema: Output;
   readonly errorSchema: typeof CalculationError;
-  readonly calculate: (input: Input["Type"]) => Effect.Effect<CalculationResult<Output["Type"]>, CalculationError, CalculationEngine>;
+  readonly calculate: (
+    input: Input["Type"]
+  ) => Effect.Effect<
+    CalculationResult<Output["Type"]>,
+    CalculationError,
+    CalculationEngine
+  >;
 }
 
 /** The owner supplies codecs and their matching native program together. */
@@ -44,16 +42,53 @@ export const defineCalculator = <
   const Year extends TaxYear,
   Input extends Schema.Top,
   Output extends Schema.Top,
->(definition: CalculatorDefinition<Input, Output> & {
-  readonly calculatorId: Id;
-  readonly jurisdiction: Country;
-  readonly taxYear: Year;
-  readonly calculate: (input: NoInfer<Input["Type"]>) => Effect.Effect<CalculationResult<NoInfer<Output["Type"]>>, CalculationError, CalculationEngine>;
-}) => definition;
+>(
+  definition: CalculatorDefinition<Input, Output> & {
+    readonly calculatorId: Id;
+    readonly jurisdiction: Country;
+    readonly taxYear: Year;
+    readonly calculate: (
+      input: NoInfer<Input["Type"]>
+    ) => Effect.Effect<
+      CalculationResult<NoInfer<Output["Type"]>>,
+      CalculationError,
+      CalculationEngine
+    >;
+  }
+) => {
+  const graphIssues = validateRuleGraph({
+    inputFacts: definition.inputFacts,
+    rules: definition.ruleDescriptors,
+  });
+  return {
+    ...definition,
+    calculate: (input: Input["Type"]) => {
+      if (graphIssues.length > 0) {
+        return Effect.fail(
+          new CalculationError({
+            reason: "graph",
+            message: "The calculator rule graph is invalid.",
+          })
+        );
+      }
+      return definition.calculate(input).pipe(
+        Effect.map((run) => ({
+          ...run,
+          diagnostics: new CalculationDiagnostics({ graphIssues }),
+        }))
+      );
+    },
+  } as const;
+};
+
+type UntrustedCalculatorInput = typeof Schema.Unknown.Type;
 
 /** Raw ingress is explicit and separate from execution over checked values. */
-export const decodeInput = <Input extends Schema.Decoder<unknown, never>>(
-  definition: { readonly inputSchema: Input }, input: unknown
-) => Schema.decodeUnknownEffect(definition.inputSchema, { onExcessProperty: "error", errors: "all" })(input).pipe(
-  Effect.mapError(({ issue }) => inputValidationError(issue))
-);
+export const decodeInput = <Input extends Schema.Top>(
+  definition: { readonly inputSchema: Input },
+  input: UntrustedCalculatorInput
+) =>
+  Schema.decodeUnknownEffect(definition.inputSchema, {
+    onExcessProperty: "error",
+    errors: "all",
+  })(input).pipe(Effect.mapError(({ issue }) => inputValidationError(issue)));

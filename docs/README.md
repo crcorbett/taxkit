@@ -32,7 +32,7 @@ frontmatter and navigation say `status: published`.
 - [0008 Effect-owned rendering providers](adr/0008-effect-rendering-providers.md)
 - [0009 Paired MDX themes as checked render data](adr/0009-mdx-themes.md)
 - [0010 Agnostic MDX reading contracts and React presentation](adr/0010-agnostic-mdx-presentation.md)
-- [0011 Effect-native SDK contracts and checked money](adr/0011-effect-native-sdk-contracts.md) (draft; hard cutover)
+- [0011 Effect-native SDK contracts and checked money](adr/0011-effect-native-sdk-contracts.md) (SDK 5 hard cutover)
 
 ## Keeping this useful
 

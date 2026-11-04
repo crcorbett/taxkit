@@ -6,89 +6,35 @@ status: "published"
 
 # Money and branded values
 
-TaxKit uses branded and schema-backed values for tax-significant data. Money
-uses integer cents and a currency, not floating-point dollars.
-
-## When this matters
-
-Use checked cents when building SDK input. Send tagged JSON values when
-calling HTTP. The same Money schema owns both forms.
-
-## How it works
+Money is signed AUD in safe integer cents. Constructors name their units. Numeric dollars are not accepted: decimal text converts exactly, and more than two fractional digits fail.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-const taxableIncome = aud(Cents.make(9_000_000));
-```
-
-Use `Cents.make` for known constants. `aud` takes checked cents and returns a
-Money value directly. Fractional cents and numbers outside JavaScript's safe
-integer range are unsupported.
-
-The matching HTTP JSON is:
-
-```json
-{ "_tag": "Money", "cents": 9000000, "currency": "AUD" }
-```
-
-## Check a number or a calculated amount
-
-Use `fromCents` when a number needs checking. It returns an Effect that
-produces Money or `MoneyError`. `audDollars` uses the same check after
-rounding dollars to cents. Your application host runs the Effect.
-
-```ts
-import { fromCents, add } from "taxkit/core";
-import { Effect } from "effect";
-
-const amountProgram = Effect.gen(function* () {
-  const amount = yield* fromCents(9_000_000);
-  const extra = yield* fromCents(100);
-  return yield* add(amount, extra);
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(
+    Result.flatMap(nonNegative)
+  );
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
 });
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
+  }
+}
 ```
 
-Addition, subtraction, money rounding and ledger totals return checked failures
-when a result is too large. You can handle `MoneyError` through the
-Effect error channel. For JSON or other unknown input, decode the owning
-schema at your application boundary; do not cast the input to Money.
+`fromCents(number)`, `fromDecimal(string)`, `add` and `subtract` return native Result. `nonNegative(money)` establishes the refinement required by gross pay, salary sacrifice and annual taxable-income scenarios. The Effect entrypoint lifts these same operations lazily.
 
-## Read an amount someone typed
-
-`fromDecimal` reads typed dollar text, such as `"80000"` or
-`"1234.50"`, as Money. It ignores surrounding spaces and converts exactly to
-whole cents. It refuses blank text, commas, signs, symbols, more than two
-decimal places and amounts too large for safe cents. A refusal is an
-`MoneyError` failure whose `reason` is `empty`, `format` or `range`, so
-you can match it and write your own message.
-
-```ts
-import { fromDecimal } from "taxkit/core";
-import { Effect, Match } from "effect";
-
-const incomeProgram = fromDecimal("80000").pipe(
-  Effect.mapError(({ reason }) =>
-    Match.value(reason).pipe(
-      Match.when("empty", () => "Enter your annual taxable income."),
-      Match.when("format", () => "Use dollars and cents, without commas."),
-      Match.when("range", () => "That amount is too large."),
-      Match.exhaustive
-    )
-  )
-);
-```
-
-`format` writes Money back as plain dollars with two decimal
-places. `MoneyFromDecimalString` joins both as a Schema codec with TaxKit's
-default messages.
-
-`CalculatorId`, `Jurisdiction` and `TaxYear` are also branded or literal
-boundary values owned by packages. Use exported values and schemas instead of
-duplicating string fields in reusable code.
-
-## Related concepts
-
-- [Facts](./facts.mdx)
-- [Type safety](../sdk/type-safety.mdx)
-- [Facts architecture](../../../docs/architecture/facts.md)
+`format` emits two decimal digits and round-trips signed Money. `MoneyFromDecimalString` and `NonNegativeMoneyFromDecimalString` are native codecs. Arithmetic checks overflow and subtraction returns signed Money. `round` requires a named policy; statutory formulas retain Effect BigDecimal and their legal rounding step.

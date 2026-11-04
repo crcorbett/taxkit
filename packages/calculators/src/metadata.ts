@@ -128,7 +128,10 @@ const toFactDescriptorMetadata = (
   new FactDescriptorMetadataData({
     authority: descriptor.authority,
     id: descriptor.id,
-    question: EffectFunction.pipe(descriptor.question, Option.map((value) => value)),
+    question: EffectFunction.pipe(
+      descriptor.question,
+      Option.map((value) => value)
+    ),
     schemaTag: schemaTag(descriptor.schema),
     title: descriptor.title,
   });

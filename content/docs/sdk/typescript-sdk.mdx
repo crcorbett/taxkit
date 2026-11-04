@@ -6,63 +6,33 @@ status: "published"
 
 # TypeScript SDK
 
-Use the TypeScript SDK when your application can run TaxKit calculations
-in-process. The plain facade is the beginner path. The safe facade returns
-typed result values. The Effect facade is for advanced service composition and
-in-process transports.
-
-All entry points below are included in one `taxkit` package. You do not
-need to install other TaxKit packages.
-
-## Entrypoints
-
-| Entrypoint       | Use when                                                                                                    |
-| ---------------- | ----------------------------------------------------------------------------------------------------------- |
-| `taxkit`         | You want `TaxKit.calculate`, `TaxKit.safe.calculate` or `TaxKit.createClient`.                              |
-| `taxkit/au`      | You want Australian calculator helpers and descriptors.                                                     |
-| `taxkit/effect`  | You want `calculateRunRequest`, `calculateReportRequest`, `calculateReport` or Effect service requirements. |
-| `taxkit/core`    | You want money values, engine services or calculator contracts.                                             |
-| `taxkit/http`    | You want typed HTTP contracts for Effect's generated API client.                                            |
-| `taxkit/schemas` | You want `CalculatorRunRequest`, `CalculatorRunResponse`, `CalculatorServiceError` and SDK result schemas.  |
-
-## Beginner path
+Install `taxkit` and construct a checked scenario for the selected calculator.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-const report = await au.incomeTax.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(
+    Result.flatMap(nonNegative)
+  );
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
 });
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
+  }
+}
 ```
 
-Australian helpers keep the first calculation compact while still using the
-same descriptor and schema contracts as the generic SDK facade.
-
-## Generic path
-
-```ts
-import { Cents, aud } from "taxkit/core";
-import { TaxKit } from "taxkit";
-import { au } from "taxkit/au";
-
-const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-```
-
-## Advanced Effect path
-
-Use the Effect SDK when you want to provide `PublicCalculatorService` through
-your own Effect layer or when an in-process transport needs the full
-`CalculatorRunResponse`.
-
-```ts
-import { calculateRunRequest } from "taxkit/effect";
-```
-
-## Next steps
-
-- Read [Plain SDK](./plain-sdk.mdx) for Promise-based usage.
-- Read [Safe SDK](./safe-sdk.mdx) for typed success and failure results.
-- Read [Effect SDK](./effect-sdk.mdx) for service composition.
+See [Plain SDK](./plain-sdk.mdx), [Effect SDK](./effect-sdk.mdx) and [Type safety](./type-safety.mdx).

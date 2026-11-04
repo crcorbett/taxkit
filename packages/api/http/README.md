@@ -110,7 +110,7 @@ SDK HTTP comparison tests
       -> PublicCalculatorServiceLive
         -> CalculationEngineLive
   -> success response equals SDK full-run response
-  -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
+  -> InputValidationError maps to CalculatorApiErrorEnvelope
 ```
 
 The calculate route imports reusable `CalculatorRun*` schemas and
@@ -122,7 +122,7 @@ instead of `Schema.Unknown`. HTTP-only names such as
 calculator API transport status encoding. HTTP
 handlers must not try to select or transform calculator facts locally;
 `PublicCalculatorService` performs the selected-calculator `inputSchema` decode
-and returns `CalculatorInputDecodeError` with descriptor-backed help for
+and returns `InputValidationError` with bounded safe field issues for
 incompatible calculator/facts combinations.
 
 ## Main Areas

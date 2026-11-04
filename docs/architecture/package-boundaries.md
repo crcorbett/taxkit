@@ -205,7 +205,7 @@ calculation business logic when a reusable API service package exists.
 Implemented private `taxkit` owns:
 
 - direct in-process calculation facade
-- plain TypeScript `TaxKit.createClient(...)`, `TaxKit.calculate(...)` and safe helpers
+- plain TypeScript named `createClient`, `calculate`, `calculateSafe` and `run` operations
 - caller-owned client runtimes and explicit disposal; bounded one-shot helpers
 - Effect-native `taxkit/effect` entrypoint
 - jurisdiction-specific opt-in `taxkit/au` and `taxkit/au/effect` subpaths

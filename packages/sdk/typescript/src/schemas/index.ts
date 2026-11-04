@@ -1,22 +1,16 @@
 export {
-  CalculationQuery,
   CalculatorAdmissionUnavailable,
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorCapacityExceeded,
   CalculatorGraphResponse,
-  CalculatorInputDecodeError,
-  CalculatorInputHelp,
   CalculatorJurisdiction,
   CalculatorOperationTimedOut,
   CalculatorMetadataError,
   CalculatorRateLimited,
-  CalculatorRunFacts,
   CalculatorRunReport,
   CalculatorRunRequest,
   CalculatorRunResponse,
-  CalculatorRunResponseData,
-  CalculatorRunServiceRequest,
   CalculatorServiceError,
   CalculatorSchemaResponse,
   DescriptorFilterQuery,
@@ -33,4 +27,10 @@ export {
   TaxYearsResponse,
   UnsupportedCalculatorContextError,
 } from "@taxkit/calculators/schemas";
-export { TaxKitError, TaxKitClientDisposedError, TaxKitClientDisposeError, TaxKitUnexpectedError, InputValidationError } from "../errors.js";
+export {
+  TaxKitError,
+  TaxKitClientDisposedError,
+  TaxKitClientDisposeError,
+  TaxKitUnexpectedError,
+  InputValidationError,
+} from "../errors.js";

@@ -6,62 +6,33 @@ status: "published"
 
 # Run your first calculation
 
-Use this page when you want a copyable script that runs a calculator through
-the plain SDK.
-
-## Before you start
-
-Install `taxkit` with [Install the SDK](./install-the-sdk.mdx), then run
-the script in a TypeScript runtime that supports ESM imports.
-
-## Create a script
+Install `taxkit` and construct a checked scenario for the selected calculator.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-const report = await au.incomeTax.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(
+    Result.flatMap(nonNegative)
+  );
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
 });
-
-console.log({
-  liabilityCents: report.liability.cents,
-  currency: report.liability.currency,
-});
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
+  }
+}
 ```
 
-## Understand the input
-
-`taxableIncome` is a canonical calculator fact. The value uses the `Money`
-schema from `taxkit/core`, created with the `aud` constructor.
-Pass integer cents rather than floating point dollars.
-
-```ts
-aud(Cents.make(9_000_000)); // AUD 90,000.00
-```
-
-## Use the generic facade
-
-Australian helpers call the same generic facade that other SDK consumers use:
-
-```ts
-import { Cents, aud } from "taxkit/core";
-import { TaxKit } from "taxkit";
-import { au } from "taxkit/au";
-
-const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-```
-
-## Verify the result
-
-The report type is inferred from `au.calculations.annualIncomeTax`. If you pass
-facts for another calculator, TypeScript should reject the call before runtime.
-Runtime schema decoding still protects calls that receive untrusted input.
-
-## Next steps
-
-- Read [Type safety](../sdk/type-safety.mdx) for compile-time and runtime checks.
-- Read [Safe SDK](../sdk/safe-sdk.mdx) if you want result values instead of
-  rejected Promises.
+See [Plain SDK](../sdk/plain-sdk.mdx), [Effect SDK](../sdk/effect-sdk.mdx) and [Type safety](../sdk/type-safety.mdx).

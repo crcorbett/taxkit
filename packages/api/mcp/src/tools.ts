@@ -1,7 +1,7 @@
 import {
   CalculatorCatalogResponse,
   CalculatorRunResponse,
-  CalculatorRunServiceRequest,
+  CalculatorRunRequest,
   CalculatorSchemaResponse,
   GetCalculatorRequest,
   MetadataQuery,
@@ -39,7 +39,7 @@ export const TaxKitMcpToolkit: Toolkit.Toolkit<{
   readonly taxkit_calculate: Tool.Tool<
     "taxkit_calculate",
     {
-      readonly parameters: typeof CalculatorRunServiceRequest;
+      readonly parameters: typeof CalculatorRunRequest;
       readonly success: typeof CalculatorRunResponse;
       readonly failure: typeof McpToolUnavailable;
       readonly failureMode: "error";
@@ -99,7 +99,7 @@ export const TaxKitMcpToolkit: Toolkit.Toolkit<{
     description:
       "Run a supported calculator with checked facts and return its report. Uses the shared anonymous calculation allowance. Figures are not saved. Do not retry automatically.",
     failure: McpToolUnavailable,
-    parameters: CalculatorRunServiceRequest,
+    parameters: CalculatorRunRequest,
     success: CalculatorRunResponse,
   })
     .annotate(Tool.Destructive, false)

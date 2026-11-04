@@ -14,7 +14,11 @@ import {
 } from "@taxkit/rules-au-pay/schemas";
 import { Match, Option, Result, Schema } from "effect";
 
-import { CalculatorRunServiceRequest } from "./schemas.js";
+import {
+  CalculatorRunRequest,
+  TakeHomeCalculationRequest,
+  WithholdingsCalculationRequest,
+} from "./schemas.js";
 
 export const TakeHomeForm = Schema.Struct({
   grossDollars: Schema.String,
@@ -51,18 +55,36 @@ export const takeHomeRequestFromForm = (
   calculatorId: typeof AuPayCalculatorId.Type = AuPayCalculatorId.make(
     "au.pay.take-home"
   )
-): Result.Result<CalculatorRunServiceRequest, CalculatorInputError> =>
+): Result.Result<CalculatorRunRequest, CalculatorInputError> =>
   Result.gen(function* () {
-    const grossPay = yield* Schema.decodeResult(NonNegativeMoneyFromDecimalString)(form.grossDollars);
+    const grossPay = yield* Schema.decodeResult(
+      NonNegativeMoneyFromDecimalString
+    )(form.grossDollars);
     const period = yield* Schema.decodeUnknownResult(PayPeriod)(form.period);
-    const facts = TakeHomeScenarioInputSchema.make({ grossPay, period, taxFreeThresholdClaimed: form.taxFreeThresholdClaimed });
-    return CalculatorRunServiceRequest.make({
-      calculatorId,
-      payload: {
-        facts,
-        jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
-        taxYear: Option.some(AuPayTaxYear.make("2025-26")),
-      },
+    const facts = TakeHomeScenarioInputSchema.make({
+      grossPay,
+      period,
+      taxFreeThresholdClaimed: form.taxFreeThresholdClaimed,
+    });
+    const payload = {
+      facts,
+      jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+      taxYear: Option.some(AuPayTaxYear.make("2025-26")),
+    };
+    if (calculatorId === "au.pay.take-home") {
+      return TakeHomeCalculationRequest.make({
+        calculatorId:
+          TakeHomeCalculationRequest.fields.calculatorId.make(
+            "au.pay.take-home"
+          ),
+        payload,
+      });
+    }
+    return WithholdingsCalculationRequest.make({
+      calculatorId: WithholdingsCalculationRequest.fields.calculatorId.make(
+        "au.pay.withholdings"
+      ),
+      payload,
     });
   }).pipe(
     Result.mapError(
@@ -74,11 +96,13 @@ export const takeHomeRequestFromForm = (
   );
 export const annualTaxRequestFromForm = (
   form: AnnualTaxForm
-): Result.Result<CalculatorRunServiceRequest, CalculatorInputError> =>
+): Result.Result<CalculatorRunRequest, CalculatorInputError> =>
   Result.gen(function* () {
-    const taxableIncome = yield* Schema.decodeResult(NonNegativeMoneyFromDecimalString)(form.taxableDollars);
+    const taxableIncome = yield* Schema.decodeResult(
+      NonNegativeMoneyFromDecimalString
+    )(form.taxableDollars);
     const facts = AnnualTaxScenarioInputSchema.make({ taxableIncome });
-    return CalculatorRunServiceRequest.make({
+    return CalculatorRunRequest.make({
       calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
       payload: {
         facts,
@@ -96,7 +120,7 @@ export const annualTaxRequestFromForm = (
   );
 // Each calculator page starts with a worked example the visitor can change.
 export const initialCalculatorForm = (
-  calculatorId: CalculatorRunServiceRequest["calculatorId"]
+  calculatorId: CalculatorRunRequest["calculatorId"]
 ): CalculatorForm =>
   Match.value(calculatorId).pipe(
     Match.when("au.income-tax.annual", () =>
@@ -114,9 +138,9 @@ export const initialCalculatorForm = (
 // The one checked request for a calculator's visible form. A form of the other
 // kind is the visitor's input error, never a calculation.
 export const requestFromForm = (
-  calculatorId: CalculatorRunServiceRequest["calculatorId"],
+  calculatorId: CalculatorRunRequest["calculatorId"],
   form: CalculatorForm
-): Result.Result<CalculatorRunServiceRequest, CalculatorInputError> => {
+): Result.Result<CalculatorRunRequest, CalculatorInputError> => {
   if (calculatorId === "au.income-tax.annual") {
     return Match.value(form).pipe(
       Match.when(Schema.is(AnnualTaxForm), (matchedValue) =>

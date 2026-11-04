@@ -1,8 +1,8 @@
 import { Schema } from "effect";
 
-export const AuAnnualTaxCalculatorId = Schema.Literals([
-  "au.income-tax.annual",
-]).pipe(Schema.brand("taxkit/CalculatorId"));
+export const AuAnnualTaxCalculatorId = Schema.Literal(
+  "au.income-tax.annual"
+).pipe(Schema.brand("taxkit/CalculatorId"));
 
 export type AuAnnualTaxCalculatorId = typeof AuAnnualTaxCalculatorId.Type;
 

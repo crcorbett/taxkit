@@ -7,13 +7,27 @@ export {
   dateIntervalsOverlap,
   isoDate,
 } from "./date.js";
-export { Cents, Currency, Money, NonNegativeMoney, moneyEquals } from "./money.js";
-export { fromCents, fromDecimal, nonNegative, add, subtract } from "./money.effect.js";
 export {
-  MoneyFromDecimalString, NonNegativeMoneyFromDecimalString,
+  Cents,
+  Currency,
+  Money,
+  NonNegativeMoney,
+  moneyEquals,
+} from "./money.js";
+export {
+  fromCents,
+  fromDecimal,
+  nonNegative,
+  add,
+  subtract,
+  round,
+} from "./money.effect.js";
+export {
+  MoneyFromDecimalString,
+  NonNegativeMoneyFromDecimalString,
   format,
 } from "./dollars.js";
-export { RoundingMode, roundCentsToDollar, round } from "./rounding.js";
+export { RoundingMode, roundCentsToDollar } from "./rounding.js";
 export {
   CentsOrInfinity,
   DecimalCoefficient,

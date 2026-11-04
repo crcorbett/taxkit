@@ -65,9 +65,9 @@ export class FactQuestion extends Schema.TaggedClass<
     readonly brand: unique symbol;
   }
 >()("FactQuestion", {
-  helpText: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(Schema.String)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  helpText: Schema.OptionFromOptional(Schema.String).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   id: FactQuestionId,
   inputKind: FactQuestionInputKind,
   prompt: Schema.String,

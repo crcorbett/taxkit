@@ -17,19 +17,16 @@ import * as Atom from "effect/reactivity/Atom";
 import { initialCalculatorForm, requestFromForm } from "./form.ingress.js";
 import type { CalculatorForm } from "./form.ingress.js";
 import type { CalculatorViewState } from "./page.schemas.js";
-import type {
-  CalculatorRunResponse,
-  CalculatorRunServiceRequest,
-} from "./schemas.js";
+import type { CalculatorRunResponse, CalculatorRunRequest } from "./schemas.js";
 
-type CalculatorId = CalculatorRunServiceRequest["calculatorId"];
+type CalculatorId = CalculatorRunRequest["calculatorId"];
 /** One calculator page's state and commands, held in the shared registry. */
 export interface CalculatorPage<E> {
   // Checked request identity belongs to one visible attempt. An edit or a
   // newer manual or tool submission invalidates a waiter for the older one.
-  readonly attempt: Atom.Writable<Option.Option<CalculatorRunServiceRequest>>;
+  readonly attempt: Atom.Writable<Option.Option<CalculatorRunRequest>>;
   readonly calculation: Atom.AtomResultFn<
-    CalculatorRunServiceRequest,
+    CalculatorRunRequest,
     CalculatorRunResponse,
     E
   >;
@@ -63,7 +60,7 @@ export const makeCalculatorPages = <E>({
   failureMessage,
 }: Readonly<{
   calculation: () => Atom.AtomResultFn<
-    CalculatorRunServiceRequest,
+    CalculatorRunRequest,
     CalculatorRunResponse,
     E
   >;
@@ -75,7 +72,7 @@ export const makeCalculatorPages = <E>({
     const calculation = makeCalculation();
     const showCalculation = Atom.make(false);
     const formError = Atom.make(Option.none<string>());
-    const attempt = Atom.make(Option.none<CalculatorRunServiceRequest>());
+    const attempt = Atom.make(Option.none<CalculatorRunRequest>());
     const cancel = Atom.fnSync<"cancel">()((_, get) => {
       get.set(attempt, Option.none());
       get.set(calculation, Atom.Interrupt);

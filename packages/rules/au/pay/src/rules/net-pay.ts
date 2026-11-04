@@ -28,9 +28,7 @@ export const NetPayLive = Layer.effect(NetPayFact)(
 
     const trace = TraceNode.make({
       children: [ledger.trace],
-      formula: Option.some(
-        Option.some("net = gross - withholdingsLedger.total")
-      ),
+      formula: Option.some("net = gross - withholdingsLedger.total"),
       inputs: {
         grossCents: gross.amount.cents,
         withholdingsTotalCents: ledger.total.cents,
@@ -87,7 +85,7 @@ export const NetPayWithSacrificeLive = Layer.effect(NetPayFact)(
     const trace = TraceNode.make({
       children: [ledger.trace],
       formula: Option.some(
-        Option.some("net = gross - salarySacrifice - withholdingsLedger.total")
+        "net = gross - salarySacrifice - withholdingsLedger.total"
       ),
       inputs: {
         grossCents: gross.amount.cents,

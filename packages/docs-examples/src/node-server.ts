@@ -1,15 +1,10 @@
-import { NonNegativeMoney } from "@taxkit/core/primitives";
-import { Effect, Layer, Schema } from "effect";
+import { Function as EffectFunction, Effect, Schema } from "effect";
 import * as HttpServerRequest from "effect/http/HttpServerRequest";
-import { GrossPay } from "taxkit/au";
 import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
-import {
-  PublicCalculatorServiceLive,
-  CalculationEngineLive,
-  Cents,
-  Money,
-} from "taxkit/core";
-import { calculateReport } from "taxkit/effect";
+import { PayPeriod, TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { Cents, Money } from "taxkit/core";
+import { calculateReport, TaxKitLive } from "taxkit/effect";
+import { nonNegative } from "taxkit/money/effect";
 
 class PayPreviewRequestError extends Schema.TaggedError<
   PayPreviewRequestError,
@@ -18,7 +13,7 @@ class PayPreviewRequestError extends Schema.TaggedError<
 
 const PayPreviewRequest = Schema.Struct({
   grossPayCents: Cents,
-  period: GrossPay.fields.period,
+  period: PayPeriod,
   taxFreeThresholdClaimed: Schema.Boolean,
 });
 
@@ -26,10 +21,6 @@ const PayPreviewResponse = Schema.Struct({
   netPayCents: Cents,
   withholdingsCents: Cents,
 });
-
-const TaxKitLayer = PublicCalculatorServiceLive.pipe(
-  Layer.provide(CalculationEngineLive)
-);
 
 export const handlePayPreview = (request: Request) =>
   Effect.gen(function* () {
@@ -44,10 +35,22 @@ export const handlePayPreview = (request: Request) =>
           })
       )
     );
-    const report = yield* calculateReport(AuPayTakeHomeCalculation, {
-      grossPay: NonNegativeMoney.make(new Money({ cents: body.grossPayCents, currency: "AUD" })), period: body.period,
+    const grossPay = yield* EffectFunction.pipe(
+      Money.fromCents(body.grossPayCents),
+      nonNegative,
+      Effect.mapError(
+        () =>
+          new PayPreviewRequestError({
+            message: "Invalid pay preview request.",
+          })
+      )
+    );
+    const input = TakeHomeScenarioInputSchema.make({
+      grossPay,
+      period: body.period,
       taxFreeThresholdClaimed: body.taxFreeThresholdClaimed,
     });
+    const report = yield* calculateReport(AuPayTakeHomeCalculation, input);
     const response = yield* Schema.encodeEffect(
       Schema.fromJsonString(PayPreviewResponse)
     )({
@@ -57,4 +60,4 @@ export const handlePayPreview = (request: Request) =>
     return new Response(response, {
       headers: { "content-type": "application/json" },
     });
-  }).pipe(Effect.provide(TaxKitLayer));
+  }).pipe(Effect.provide(TaxKitLive));

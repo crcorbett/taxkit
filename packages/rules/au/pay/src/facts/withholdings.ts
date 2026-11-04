@@ -38,17 +38,33 @@ export const PaygWithholdingComponentDescriptor = makeFactDescriptor({
  *
  * @since 0.1.0
  */
-export class PayWithholdingsLedger extends Schema.TaggedClass<
-  PayWithholdingsLedger,
+const PayWithholdingsLedgerFields = Schema.TaggedStruct(
+  "PayWithholdingsLedger",
   {
-    readonly brand: unique symbol;
+    components: Schema.Array(LedgerComponent),
+    period: PayPeriod,
+    total: Money,
+    trace: TraceNode,
   }
->()("PayWithholdingsLedger", Schema.Struct({
-  components: Schema.Array(LedgerComponent),
-  period: PayPeriod,
-  total: Money,
-  trace: TraceNode,
-}).check(Schema.makeFilter((ledger) => ledgerTotalEquals(ledger.components, ledger.total), { expected: "unique ledger components matching their total" }))) {}
+);
+const PayWithholdingsLedgerCheck = Schema.makeFilter<{
+  readonly total: Pick<typeof Money.Encoded, "cents">;
+  readonly components: readonly Pick<
+    typeof LedgerComponent.Encoded,
+    "id" | "status" | "effect" | "amount"
+  >[];
+}>((ledger) => ledgerTotalEquals(ledger.components, ledger.total), {
+  expected: "unique ledger components matching their total",
+});
+export const PayWithholdingsLedgerEncoded = Schema.toEncoded(
+  PayWithholdingsLedgerFields
+).check(PayWithholdingsLedgerCheck);
+export const PayWithholdingsLedger = PayWithholdingsLedgerEncoded.pipe(
+  Schema.decodeTo(PayWithholdingsLedgerFields)
+)
+  .check(PayWithholdingsLedgerCheck)
+  .pipe(Schema.brand("taxkit/PayWithholdingsLedger"));
+export type PayWithholdingsLedger = typeof PayWithholdingsLedger.Type;
 /**
  * Context tag for the derived pay-period withholding ledger.
  *

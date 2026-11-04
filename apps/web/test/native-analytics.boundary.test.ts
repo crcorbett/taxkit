@@ -6,10 +6,7 @@ import {
 } from "@modelcontextprotocol/client";
 import { CalculatorCaptureBatch } from "@taxkit/analytics/schemas";
 import { TaxKitApi } from "@taxkit/api-http/api";
-import {
-  CalculationQuery,
-  CalculatorRunServiceRequest,
-} from "@taxkit/calculators/schemas";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
 import {
@@ -157,8 +154,8 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
       );
       const api = yield* Effect.promise(() => host.getWorker("api-analytics"));
       const body = yield* Schema.encodeEffect(
-        Schema.fromJsonString(CalculatorRunServiceRequest.fields.payload)
-      )(CalculationRequest.payload);
+        Schema.fromJsonString(CalculatorRunRequest)
+      )(CalculationRequest);
       const calculate = (policy: string) =>
         Effect.promise(() =>
           api.fetch(
@@ -262,8 +259,7 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
           Effect.flatMap((client) =>
             client.calculatorApi.calculate({
               params: { calculatorId: CalculationRequest.calculatorId },
-              payload: CalculationRequest.payload,
-              query: CalculationQuery.make({}),
+              payload: CalculationRequest,
             })
           ),
           Effect.provide(transport)
@@ -292,9 +288,8 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
           )
         );
         yield* nextCapture;
-        const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-          CalculationRequest
-        );
+        const input =
+          yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
         yield* Effect.gen(function* () {
           const policy = yield* Ref.make("deny");
           const client = yield* Effect.acquireRelease(

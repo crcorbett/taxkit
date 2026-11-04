@@ -1,5 +1,15 @@
 # TaxKit
 
+## SDK 5.0.0 / Calculator HTTP v2
+
+- Replace the SDK with nominal Effect Schemas, checked money and scenarios,
+  native Result/Effect operations and one shared calculation engine.
+- Remove legacy selectors, facade objects, money aliases, wrapper errors and
+  duplicate decoding paths. Calculator HTTP v2 and MCP share strict correlated
+  contracts; owned Website consumers and examples use the replacement API.
+- Validate report accounting relationships, preserve statutory table/source
+  evidence and publish native rule/fact/parameter Layers for composition.
+
 ## 4.0.1
 
 - Separate reusable MDX presentation into `@taxkit/mdx-react`, with checked

@@ -18,6 +18,7 @@ export {
 } from "./income.js";
 export {
   AnnualTaxLedger,
+  AnnualTaxLedgerEncoded,
   AnnualTaxLedgerDescriptor,
   AnnualTaxLedgerFact,
 } from "./ledger.js";

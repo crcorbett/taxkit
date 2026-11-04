@@ -1,5 +1,6 @@
 import { PublicCalculatorService } from "@taxkit/calculators";
 import type { CalculatorMetadataError } from "@taxkit/calculators";
+import { UnsupportedCalculatorError } from "@taxkit/calculators/schemas";
 import { Effect, Match } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 
@@ -80,14 +81,18 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
             });
           }).pipe(Effect.mapError(calculatorApiMetadataFailure))
         )
-        .handle("calculate", ({ params, payload, query }) =>
+        .handle("calculate", ({ params, payload }) =>
           Effect.gen(function* () {
             const service = yield* PublicCalculatorService;
-            return yield* service.calculate({
-              calculatorId: params.calculatorId,
-              payload,
-              ...query,
-            });
+            if (params.calculatorId !== payload.calculatorId) {
+              return yield* Effect.fail(
+                new UnsupportedCalculatorError({
+                  message: "Calculator path and payload must agree.",
+                  requestedCalculator: params.calculatorId,
+                })
+              );
+            }
+            return yield* service.calculate(payload);
           }).pipe(
             Effect.mapError((error) =>
               Match.value(error).pipe(

@@ -4,10 +4,7 @@ import {
   Client,
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
-import {
-  CalculatorRunRequest,
-  CalculatorRunServiceRequest,
-} from "@taxkit/calculators/schemas";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
   Function as EffectFunction,
@@ -128,7 +125,7 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
     yield* Effect.promise(() => client.connect(transport));
     const body = yield* Schema.encodeEffect(
       Schema.fromJsonString(CalculatorRunRequest)
-    )(CalculationRequest.payload);
+    )(CalculationRequest);
     const calculate = (address: string) =>
       Effect.promise(() =>
         api.fetch(
@@ -162,9 +159,8 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
         );
       })
     );
-    const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-      CalculationRequest
-    );
+    const input =
+      yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
     const mcp = yield* Effect.promise(() =>
       client.callTool({
         arguments: input,

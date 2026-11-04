@@ -19,11 +19,18 @@ application unless the owning schema defines that default.
 
 ```json
 {
-  "facts": {
-    "taxableIncome": { "_tag": "Money", "cents": 9000000, "currency": "AUD" }
-  },
-  "jurisdiction": "AU",
-  "taxYear": "2025-26"
+  "calculatorId": "au.pay.take-home",
+  "payload": {
+    "facts": {
+      "taxableIncome": {
+        "_tag": "Money",
+        "cents": 9000000,
+        "currency": "AUD"
+      }
+    },
+    "jurisdiction": "AU",
+    "taxYear": "2025-26"
+  }
 }
 ```
 

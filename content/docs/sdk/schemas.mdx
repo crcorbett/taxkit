@@ -6,56 +6,27 @@ status: "published"
 
 # Schemas
 
-Use SDK schema exports when your application needs the canonical calculator run
-contracts or safe-result error shapes.
-
-## Import schemas
+Import the owning codecs from `taxkit/money`, `taxkit/au/schemas` and `taxkit/schemas`. `Schema.Type` and `Schema.Encoded` stay distinct: a checked value carries validation evidence, while JSON is decoded at ingress.
 
 ```ts
-import {
-  CalculatorRunFacts,
-  CalculatorRunRequest,
-  CalculatorRunResponse,
-  CalculatorRunServiceRequest,
-  CalculatorServiceError,
-} from "taxkit/schemas";
+import { Effect } from "effect";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { calculateReport, decodeInput, TaxKitLive } from "taxkit/effect";
+
+// Decode the selected scenario once; surplus fields fail as well.
+export const invalidInput = decodeInput(AuPayTakeHomeCalculation, {
+  taxableIncome: { _tag: "Money", cents: 9_000_000, currency: "AUD" },
+});
+export const validInput = decodeInput(AuPayTakeHomeCalculation, {
+  grossPay: { _tag: "Money", cents: 165_400, currency: "AUD" },
+  period: "weekly",
+  taxFreeThresholdClaimed: true,
+}).pipe(
+  Effect.flatMap((input) => calculateReport(AuPayTakeHomeCalculation, input)),
+  Effect.provide(TaxKitLive)
+);
 ```
 
-These names are re-exported from the calculator package for consumer
-convenience. The calculator package remains the source of truth for the
-`CalculatorRun*` contracts and `CalculatorServiceError`.
+Reports and ledgers check aggregate equations and unique component identities. Use the owner's explicit `TakeHomePayReportEncoded` codec for encoded-only validation; rebuilding a Struct from fields or extracting a bare encoded view can discard whole-record checks in Effect 4.0.7.
 
-## Common contracts
-
-| Name                          | Use                                           |
-| ----------------------------- | --------------------------------------------- |
-| `CalculatorRunFacts`          | Canonical facts accepted by calculator runs.  |
-| `CalculatorRunRequest`        | Public calculator run payload shape.          |
-| `CalculatorRunServiceRequest` | Service-level request with the calculator id. |
-| `CalculatorRunResponse`       | Canonical run response shape.                 |
-| `CalculatorServiceError`      | Expected calculator service failure union.    |
-
-## Safe-result schemas
-
-The SDK also exports safe-result and error schemas:
-
-```ts
-import {
-  TaxKitClientDisposedError,
-  TaxKitClientDisposeError,
-  TaxKitFailure,
-  TaxKitSchemaDecodeError,
-  TaxKitSuccess,
-} from "taxkit/schemas";
-```
-
-Use these when you persist, inspect or validate results returned by
-`TaxKit.safe.calculate`. `TaxKitClientDisposedError` describes calculation calls
-after a client closes. `TaxKitClientDisposeError` describes a safe cleanup failure
-from `dispose()`.
-
-## Related pages
-
-- [Safe SDK](./safe-sdk.mdx)
-- [Effect SDK](./effect-sdk.mdx)
-- [Type safety](./type-safety.mdx)
+Derive form integration with `Schema.toStandardSchemaV1` and JSON Schema with `Schema.toJsonSchemaDocument` and its matching JSON codec. Effect validation remains authoritative for relationships JSON Schema cannot express.

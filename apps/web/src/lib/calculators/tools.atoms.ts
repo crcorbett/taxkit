@@ -3,7 +3,7 @@ import {
   CalculatorPageToolkit,
   calculatorPageToolHandlers,
 } from "@taxkit/calculators/page-tools";
-import type { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
+import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { ModelContextHostLive } from "@taxkit/webmcp/host";
 import { registerCalculatorPageTools } from "@taxkit/webmcp/registration";
 import { WebMcpSite } from "@taxkit/webmcp/service";
@@ -21,7 +21,7 @@ import { calculatorPageAtoms } from "./page.atoms";
 // existing React runtime. Handlers invoke the page's own edit and submit
 // commands; they neither acquire another client nor calculate themselves.
 export const calculatorToolsAtom = Atom.family(
-  (calculatorId: CalculatorRunServiceRequest["calculatorId"]) => {
+  (calculatorId: CalculatorRunRequest["calculatorId"]) => {
     const page = calculatorPageAtoms(calculatorId);
     return apiClientRuntime.fn<"register">()((_, get) =>
       Effect.gen(function* () {

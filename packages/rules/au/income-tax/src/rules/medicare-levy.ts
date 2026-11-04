@@ -80,7 +80,7 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
     );
     const trace = TraceNode.make({
       children: [],
-      formula: Option.some(Option.some(formula)),
+      formula: Option.some(formula),
       inputs: {
         incomeCents,
         levyRate: BigDecimal.format(table.levyRate),
@@ -90,7 +90,7 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
         thresholdCents: table.thresholdCents,
       },
       result: levyAmount.cents,
-      rounding: Option.some(Option.some("round-to-nearest-cent")),
+      rounding: Option.some("round-to-nearest-cent"),
       ruleId: MedicareLevyRuleId,
       sources: [table.source],
       title: "Medicare Levy",

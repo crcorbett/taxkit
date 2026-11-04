@@ -6,12 +6,10 @@ import {
   Effect,
   Layer,
   Option,
-  Record,
   Schema,
   Struct,
 } from "effect";
 
-import { CalculationError } from "../src/errors/calculation-error.js";
 import {
   FactQuestion,
   FactQuestionId,
@@ -69,163 +67,44 @@ const traceInput = {
   result: 165_400,
   ruleId: RuleId.make("fixture/absence"),
   sources: [],
-  title: "Compatibility fixture",
+  title: "Checked trace fixture",
 } as const;
 describe("domain absence representations", () => {
-  it.effect(
-    "preserves trace key identity and historical bytes in all three forms",
-    () =>
-      Effect.gen(function* () {
-        const samples = [
-          {
-            bytes:
-              '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/absence","sources":[],"title":"Compatibility fixture"}',
-            own: false,
-            value: TraceNode.make(traceInput),
-          },
-          {
-            bytes:
-              '{"_tag":"TraceNode","children":[],"inputs":{"cents":165400},"result":165400,"ruleId":"fixture/absence","sources":[],"title":"Compatibility fixture"}',
-            own: true,
-            value: TraceNode.make({
-              ...traceInput,
-              formula: Option.some(Option.none()),
-              rounding: Option.some(Option.none()),
-            }),
-          },
-          {
-            bytes:
-              '{"_tag":"TraceNode","children":[],"formula":"Checked text","inputs":{"cents":165400},"result":165400,"rounding":"round-to-nearest-cent","ruleId":"fixture/absence","sources":[],"title":"Compatibility fixture"}',
-            own: true,
-            value: TraceNode.make({
-              ...traceInput,
-              formula: Option.some(Option.some("Checked text")),
-              rounding: Option.some(Option.some("round-to-nearest-cent")),
-            }),
-          },
-        ];
-        yield* EffectFunction.pipe(
-          samples,
-          Effect.forEach((sample) =>
-            Effect.gen(function* () {
-              const encoded = yield* Schema.encodeEffect(TraceNode)(
-                sample.value
-              );
-              expect(
-                yield* Schema.encodeEffect(Schema.fromJsonString(TraceNode))(
-                  sample.value
-                )
-              ).toBe(sample.bytes);
-              EffectFunction.pipe(
-                Object.hasOwn(encoded, "formula"),
-                (actual) => {
-                  expect(actual).toBe(sample.own);
-                }
-              );
-              EffectFunction.pipe(
-                Object.hasOwn(encoded, "rounding"),
-                (actual) => {
-                  expect(actual).toBe(sample.own);
-                }
-              );
-              const restored = yield* Schema.decodeEffect(TraceNode)(encoded);
-              expect({
-                restoredFormula: restored.formula,
-                restoredRounding: restored.rounding,
-              }).toStrictEqual({
-                restoredFormula: sample.value.formula,
-                restoredRounding: sample.value.rounding,
-              });
-              const again = yield* Schema.encodeEffect(TraceNode)(restored);
-              expect(
-                yield* Schema.encodeEffect(Schema.fromJsonString(TraceNode))(
-                  restored
-                )
-              ).toBe(sample.bytes);
-              EffectFunction.pipe(Object.hasOwn(again, "formula"), (actual) => {
-                expect(actual).toBe(sample.own);
-              });
-              EffectFunction.pipe(
-                Object.hasOwn(again, "rounding"),
-                (actual) => {
-                  expect(actual).toBe(sample.own);
-                }
-              );
-            })
-          )
-        );
-      })
-  );
-  it.effect(
-    "preserves question help key identity and historical bytes in all three forms",
-    () =>
-      Effect.gen(function* () {
-        const samples = [
-          {
-            bytes:
-              '{"_tag":"FactQuestion","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}',
-            own: false,
-            value: question,
-          },
-          {
-            bytes:
-              '{"_tag":"FactQuestion","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}',
-            own: true,
-            value: new FactQuestion({
-              ...Struct.pick(question, Struct.keys(FactQuestion.fields)),
-              helpText: Option.some(Option.none()),
-            }),
-          },
-          {
-            bytes:
-              '{"_tag":"FactQuestion","helpText":"Checked text","id":"fixture/absence","inputKind":"money","prompt":"Enter an amount"}',
-            own: true,
-            value: new FactQuestion({
-              ...Struct.pick(question, Struct.keys(FactQuestion.fields)),
-              helpText: Option.some(Option.some("Checked text")),
-            }),
-          },
-        ];
-        yield* EffectFunction.pipe(
-          samples,
-          Effect.forEach((sample) =>
-            Effect.gen(function* () {
-              const encoded = yield* Schema.encodeEffect(FactQuestion)(
-                sample.value
-              );
-              expect(
-                yield* Schema.encodeEffect(Schema.fromJsonString(FactQuestion))(
-                  sample.value
-                )
-              ).toBe(sample.bytes);
-              EffectFunction.pipe(
-                Object.hasOwn(encoded, "helpText"),
-                (actual) => {
-                  expect(actual).toBe(sample.own);
-                }
-              );
-              const restored =
-                yield* Schema.decodeEffect(FactQuestion)(encoded);
-              expect(restored.helpText).toStrictEqual(sample.value.helpText);
-              const again = yield* Schema.encodeEffect(FactQuestion)(restored);
-              expect(
-                yield* Schema.encodeEffect(Schema.fromJsonString(FactQuestion))(
-                  restored
-                )
-              ).toBe(sample.bytes);
-              EffectFunction.pipe(
-                Object.hasOwn(again, "helpText"),
-                (actual) => {
-                  expect(actual).toBe(sample.own);
-                }
-              );
-            })
-          )
-        );
-      })
+  it.effect("round-trips present and absent trace and question values", () =>
+    Effect.gen(function* () {
+      const emptyTrace = TraceNode.make(traceInput);
+      const fullTrace = TraceNode.make({
+        ...traceInput,
+        formula: Option.some("Checked text"),
+        rounding: Option.some("round-to-nearest-cent"),
+      });
+      yield* Effect.forEach([emptyTrace, fullTrace], (value) =>
+        Effect.gen(function* () {
+          const encoded = yield* Schema.encodeEffect(TraceNode)(value);
+          const restored = yield* Schema.decodeEffect(TraceNode)(encoded);
+          expect(restored.formula).toStrictEqual(value.formula);
+          expect(restored.rounding).toStrictEqual(value.rounding);
+        })
+      );
+      yield* Effect.forEach(
+        [
+          question,
+          new FactQuestion({
+            ...Struct.pick(question, Struct.keys(FactQuestion.fields)),
+            helpText: Option.some("Checked text"),
+          }),
+        ],
+        (value) =>
+          Effect.gen(function* () {
+            const encoded = yield* Schema.encodeEffect(FactQuestion)(value);
+            const restored = yield* Schema.decodeEffect(FactQuestion)(encoded);
+            expect(restored.helpText).toStrictEqual(value.helpText);
+          })
+      );
+    })
   );
 
-  it("keeps checked question identity and collapses only historically absent descriptor inputs", () => {
+  it("keeps checked question identity and uses one Option for absent descriptor inputs", () => {
     expect({
       factQuestion: fact.question,
       optionalQuestion: makeFactDescriptor({

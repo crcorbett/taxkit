@@ -1,8 +1,15 @@
-import { Function as EffectFunction, Effect, Match, Schema, Array, HashSet } from "effect";
+import {
+  Function as EffectFunction,
+  Effect,
+  Match,
+  Schema,
+  Array,
+  HashSet,
+} from "effect";
 
 import type { MoneyError } from "../primitives/errors.js";
-import {  Cents, Money } from "../primitives/money.js";
 import { add, subtract } from "../primitives/money.effect.js";
+import { Cents, Money } from "../primitives/money.js";
 import { TraceNode } from "../trace/node.js";
 /**
  * Stable identifier for a ledger component.
@@ -124,9 +131,32 @@ export const sumLedgerComponents = (
   );
 
 /** Compare a ledger using exact integer arithmetic and unique component identities. */
-export const ledgerTotalEquals = (components: readonly LedgerComponent[], total: Money): boolean =>
-  HashSet.size(HashSet.fromIterable(Array.map(components, (component) => component.id))) === components.length &&
-  Array.reduce(components, 0n, (sum, component) => sum + (
-    component.status !== "active" || component.effect === "informational" ? 0n :
-      component.effect === "additive" ? BigInt(component.amount.cents) : -BigInt(component.amount.cents)
-  )) === BigInt(total.cents);
+export const ledgerTotalEquals = (
+  components: readonly Pick<
+    LedgerComponentEncoded,
+    "id" | "status" | "effect" | "amount"
+  >[],
+  total: Pick<typeof Money.Encoded, "cents">
+): boolean =>
+  EffectFunction.pipe(
+    components,
+    Array.map((component) => component.id),
+    HashSet.fromIterable,
+    HashSet.size
+  ) === components.length &&
+  EffectFunction.pipe(
+    components,
+    Array.reduce(0n, (sum, component) => {
+      if (
+        component.status !== "active" ||
+        component.effect === "informational"
+      ) {
+        return sum;
+      }
+      return Match.value(component.effect).pipe(
+        Match.when("additive", () => sum + BigInt(component.amount.cents)),
+        Match.when("subtractive", () => sum - BigInt(component.amount.cents)),
+        Match.exhaustive
+      );
+    })
+  ) === BigInt(total.cents);

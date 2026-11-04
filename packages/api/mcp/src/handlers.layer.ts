@@ -56,7 +56,7 @@ export const TaxKitMcpHandlersLive: Layer.Layer<
                 ),
                 Match.tag(
                   "CalculationError",
-                  "CalculatorInputDecodeError",
+                  "InputValidationError",
                   "UnsupportedCalculatorError",
                   "UnsupportedCalculatorContextError",
                   () =>

@@ -4,6 +4,16 @@ import { defineConfig } from "oxlint";
 import { workspaceBoundaryOptions } from "./tools/oxlint/workspaces.boundary.ts";
 
 const decodingBoundaryFiles = [
+  // Public scalar constructors and explicit selected-calculator ingress only.
+  "packages/core/src/primitives/money.ts",
+  "packages/core/src/calculators/definition.ts",
+  "packages/core/src/errors/input-validation-error.ts",
+  // Adversarial public transport ingress is tested against the shared request codec.
+  "packages/calculators/test/public-calculator-service.test.ts",
+  "packages/sdk/typescript/test/effect.test.ts",
+  // Compiler-only probe of an effectful codec and its retained decoding service.
+  "packages/sdk/typescript/type-tests/effect-client.test.ts",
+  "packages/sdk/typescript/test/index.test.ts",
   // Build-time ingress of the bundled authored docs source list.
   "apps/api/src/build/docs-catalogue.layer.ts",
   // Native heterogeneous resource-map props in the in-memory provider lifecycle test.
@@ -169,6 +179,8 @@ const decodingBoundaryFiles = [
   "packages/sdk/typescript/test/index.test.ts",
   // Selected domain-report Type versus encoded representation regression test.
   "packages/sdk/typescript/test/effect.test.ts",
+  // Compiler-only probe of an effectful codec and its retained decoding service.
+  "packages/sdk/typescript/type-tests/effect-client.test.ts",
   "packages/sdk/typescript/test/client-lifetime.test.ts",
   "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
@@ -279,6 +291,8 @@ const schemaEncoderEgressFiles = [
   // Plain Promise rejection and calculator error representations: secret-negative tests only.
   "packages/sdk/typescript/test/index.test.ts",
   "packages/sdk/typescript/test/effect.test.ts",
+  // Compiler-only probe of an effectful codec and its retained decoding service.
+  "packages/sdk/typescript/type-tests/effect-client.test.ts",
   "packages/sdk/typescript/test/client-lifetime.test.ts",
   // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
   // Exact saved-plan JSON and synthetic provider fixture representations.

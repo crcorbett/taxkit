@@ -37,17 +37,27 @@ export {
   type AnyParameterDescriptor,
   type ParameterDescriptor,
 } from "./parameters/descriptor.js";
-export { Cents, Currency, Money, NonNegativeMoney, moneyEquals } from "./primitives/money.js";
-export { fromCents, fromDecimal, nonNegative, add, subtract } from "./primitives/money.effect.js";
 export {
-  MoneyFromDecimalString, NonNegativeMoneyFromDecimalString,
+  Cents,
+  Currency,
+  Money,
+  NonNegativeMoney,
+  moneyEquals,
+} from "./primitives/money.js";
+export {
+  fromCents,
+  fromDecimal,
+  nonNegative,
+  add,
+  subtract,
+  round,
+} from "./primitives/money.effect.js";
+export {
+  MoneyFromDecimalString,
+  NonNegativeMoneyFromDecimalString,
   format,
 } from "./primitives/dollars.js";
-export {
-  RoundingMode,
-  roundCentsToDollar,
-  round,
-} from "./primitives/rounding.js";
+export { RoundingMode, roundCentsToDollar } from "./primitives/rounding.js";
 export {
   AustralianTaxYear,
   DateInterval,
@@ -100,4 +110,13 @@ export {
   InvalidDecimalValue,
   MoneyError,
 } from "./primitives/errors.js";
-export { defineCalculator, decodeInput, InputValidationError, inputValidationError, type CalculatorDefinition } from "./calculators/definition.js";
+export {
+  defineCalculator,
+  decodeInput,
+  type CalculatorDefinition,
+} from "./calculators/definition.js";
+
+export {
+  InputValidationError,
+  inputValidationError,
+} from "./errors/input-validation-error.js";

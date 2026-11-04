@@ -9,7 +9,6 @@ import {
 import {
   CalculatorRateLimited,
   CalculatorRunRequest,
-  CalculationQuery,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
@@ -74,7 +73,7 @@ describe("shared native host calculation admission", () => {
         );
         const body = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
-        )(CalculationRequest.payload);
+        )(CalculationRequest);
         const response = yield* app.fetch.pipe(
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,
@@ -230,14 +229,13 @@ describe("shared native host calculation admission", () => {
         });
         const calculate = client.calculatorApi.calculate({
           params: { calculatorId: CalculationRequest.calculatorId },
-          payload: CalculationRequest.payload,
-          query: CalculationQuery.make({}),
+          payload: CalculationRequest,
         });
         const first = yield* calculate;
         yield* Effect.forEach(Array.range(1, 57), () => calculate);
         const publicBody = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
-        )(CalculationRequest.payload);
+        )(CalculationRequest);
         yield* calculate;
         // The sixtieth call uses the last place; the next one is refused.
         const last = yield* calculate;
@@ -300,7 +298,7 @@ describe("shared native host calculation admission", () => {
         );
         const body = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
-        )(CalculationRequest.payload);
+        )(CalculationRequest);
         const direct = {
           "cf-connecting-ip": "203.0.113.75",
           "content-type": "application/json",

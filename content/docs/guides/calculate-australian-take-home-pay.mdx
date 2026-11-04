@@ -6,75 +6,33 @@ status: "published"
 
 # Calculate Australian take-home pay
 
-Use this guide when you need a pay-period take-home amount from TypeScript.
-The SDK path keeps the calculation in-process and avoids HTTP transport.
-
-## Before you start
-
-- Install the SDK with [Install the SDK](../start/install-the-sdk.mdx).
-- Use a TypeScript runtime that can import the SDK.
-- Represent money in cents with `aud`.
-
-## Steps
-
-1. Import `aud`, `GrossPay` and the AU SDK helper.
-2. Build the canonical gross pay fact.
-3. Call `au.pay.takeHomePay`.
-4. Check user input before the call and handle calculation failures with the
-   safe helper.
-
-## Example
+Choose the base pay definition and supply one checked pay period, gross amount and tax-free-threshold choice.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { GrossPay } from "taxkit/au";
-import { au } from "taxkit/au";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-const report = await au.pay.takeHomePay({
-  grossPay: new GrossPay({
-    amount: aud(Cents.make(165_400)),
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(
+    Result.flatMap(nonNegative)
+  );
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
     period: "weekly",
-  }),
-  taxFreeThresholdClaimed: true,
+    taxFreeThresholdClaimed: true,
+  });
 });
-
-console.log({
-  kind: report._tag,
-  netPayCents: report.netPay.cents,
-});
-```
-
-## Verify the result
-
-Expected output:
-
-```json
-{ "kind": "TakeHomePayReport", "netPayCents": 130100 }
-```
-
-This matches the current SDK test fixture for weekly gross pay of $1,654.00.
-
-## Handle errors
-
-Check untrusted input as shown in [Handle validation errors](./handle-validation-errors.mdx).
-Then use the safe helper when you want expected calculation failures as values:
-
-```ts
-const result = await au.pay.safe.takeHomePay({
-  grossPay: new GrossPay({
-    amount: aud(Cents.make(165_400)),
-    period: "weekly",
-  }),
-  taxFreeThresholdClaimed: true,
-});
-
-if (result._tag === "TaxKitFailure") {
-  console.error(result.error.message);
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
+  }
 }
 ```
 
-## Related pages
-
-- [Plain SDK](../sdk/plain-sdk.mdx)
-- [Safe SDK](../sdk/safe-sdk.mdx)
-- [Calculators](../concepts/calculators.mdx)
+For salary sacrifice use `TakeHomeWithSacrificeScenarioInput` and `AuPayTakeHomeWithSacrificeCalculation`. The applied sacrifice is required and appears in the report's cash-pay equation. Native STSL packs additionally require their debt-status fact.

@@ -18,11 +18,11 @@ not the same fact unless it matches the owning schema.
 ## How it works
 
 ```ts
-import { Cents, aud } from "taxkit/core";
+import { Cents, Money } from "taxkit/money";
 import { GrossPay } from "taxkit/au";
 
 const grossPay = new GrossPay({
-  amount: aud(Cents.make(165_400)),
+  amount: Money.fromCents(Cents.make(165_400)),
   period: "weekly",
 });
 ```

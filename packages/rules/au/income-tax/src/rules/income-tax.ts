@@ -83,7 +83,7 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(
-        Option.some("tax = baseTaxCents + round(rate * (income - threshold))")
+        "tax = baseTaxCents + round(rate * (income - threshold))"
       ),
       inputs: {
         baseTaxCents: bracket.baseTaxCents,
@@ -93,7 +93,7 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
         tableYear: table.year,
       },
       result: taxAmount.cents,
-      rounding: Option.some(Option.some("round-to-nearest-cent")),
+      rounding: Option.some("round-to-nearest-cent"),
       ruleId: IncomeTaxRuleId,
       sources: [table.source],
       title: "Income tax at marginal rates",

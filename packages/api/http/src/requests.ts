@@ -1,5 +1,5 @@
-import { CalculationQuery, MetadataQuery } from "@taxkit/calculators/schemas";
-import type { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
+import { MetadataQuery } from "@taxkit/calculators/schemas";
+import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import {
   DocsPageUnavailable,
   DocsSearchUnavailable,
@@ -211,7 +211,7 @@ export const requestCatalogue = Effect.fn("TaxKitApi.requestCatalogue")(
 );
 // The reply must answer this calculator with its own report kind.
 const answers = (
-  request: CalculatorRunServiceRequest,
+  request: CalculatorRunRequest,
   response: Readonly<{
     calculator: Readonly<{
       calculatorId: string;
@@ -238,13 +238,12 @@ export const requestCalculation = Effect.fn("TaxKitApi.requestCalculation")(
     request,
   }: {
     readonly client: TaxKitClient;
-    readonly request: CalculatorRunServiceRequest;
+    readonly request: CalculatorRunRequest;
   }) {
     const response = yield* client.calculatorApi
       .calculate({
         params: { calculatorId: request.calculatorId },
-        payload: request.payload,
-        query: CalculationQuery.make({ help: request.help }),
+        payload: request,
       })
       .pipe(
         Effect.timeout(apiReadTimeout),

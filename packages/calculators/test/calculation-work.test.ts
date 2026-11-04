@@ -1,7 +1,10 @@
 import { describe, expect, it } from "@effect/vitest";
-import { NonNegativeMoney,  CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
-import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
+import {
+  AuPayTakeHomeId,
+  TakeHomeScenarioInputSchema,
+} from "@taxkit/rules-au-pay/schemas";
 import { expectAt } from "@taxkit/testing";
 import {
   Function as EffectFunction,
@@ -26,7 +29,7 @@ import { PublicCalculatorServiceLive } from "../src/live.layer.js";
 import {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
-  CalculatorRunServiceRequest,
+  CalculatorRunRequest,
   MetadataQuery,
   DescriptorFilterQuery,
   GetCalculatorRequest,
@@ -36,13 +39,16 @@ import {
 import { PublicCalculatorService } from "../src/service.js";
 import { PublicCalculatorServiceBounded } from "../src/work.layer.js";
 
-const Request = CalculatorRunServiceRequest.make({
-  calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+const Request = CalculatorRunRequest.make({
+  calculatorId: AuPayTakeHomeId.make("au.pay.take-home"),
   payload: {
-    facts: {
-      grossPay: NonNegativeMoney.make(new Money({ cents: Cents.make(165_400), currency: "AUD" })), period: "weekly",
+    facts: TakeHomeScenarioInputSchema.make({
+      grossPay: NonNegativeMoney.make(
+        new Money({ cents: Cents.make(165_400), currency: "AUD" })
+      ),
+      period: "weekly",
       taxFreeThresholdClaimed: true,
-    },
+    }),
   },
 });
 const MetadataWorkCases = [

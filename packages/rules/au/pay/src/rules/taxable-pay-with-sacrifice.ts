@@ -40,7 +40,7 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
 
     const trace = TraceNode.make({
       children: [],
-      formula: Option.some(Option.some("taxable = gross - sacrifice")),
+      formula: Option.some("taxable = gross - sacrifice"),
       inputs: {
         grossCents: gross.amount.cents,
         period: gross.period,

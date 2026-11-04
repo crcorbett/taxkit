@@ -53,9 +53,7 @@ export const buildPayWithholdingsLedger = (
         EffectArray.map((c) => c.trace)
       ),
       formula: Option.some(
-        Option.some(
-          "total = sum(active additive components) - sum(active subtractive components)"
-        )
+        "total = sum(active additive components) - sum(active subtractive components)"
       ),
       inputs: {
         activeComponentIds: EffectFunction.pipe(
@@ -73,7 +71,7 @@ export const buildPayWithholdingsLedger = (
       sources: [],
       title: "Pay-withholdings ledger (sum of active components)",
     });
-    return new PayWithholdingsLedger({ components, period, total, trace });
+    return PayWithholdingsLedger.make({ components, period, total, trace });
   }).pipe(
     Effect.mapError(
       () =>

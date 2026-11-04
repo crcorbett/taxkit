@@ -3,7 +3,7 @@ import {
   FactQuestionId,
   makeFactDescriptor,
 } from "@taxkit/core/facts";
-import { Money, NonNegativeMoney } from "@taxkit/core/primitives";
+import { NonNegativeMoney } from "@taxkit/core/primitives";
 import { Context, Schema } from "effect";
 
 import { PayPeriod } from "./pay.js";

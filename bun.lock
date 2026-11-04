@@ -34,7 +34,7 @@
     },
     "apps/api": {
       "name": "api",
-      "version": "3.0.1",
+      "version": "4.0.0",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@effect/platform-bun": "catalog:",
@@ -70,7 +70,7 @@
     },
     "apps/web": {
       "name": "web",
-      "version": "0.0.7",
+      "version": "0.0.8",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@base-ui/react": "1.9.0",
@@ -247,7 +247,7 @@
     },
     "packages/docs-examples": {
       "name": "@taxkit/docs-examples",
-      "version": "0.0.11",
+      "version": "0.0.12",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -427,7 +427,7 @@
     },
     "packages/sdk/typescript": {
       "name": "taxkit",
-      "version": "4.0.1",
+      "version": "5.0.0",
       "dependencies": {
         "effect": "catalog:",
       },

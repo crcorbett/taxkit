@@ -314,53 +314,32 @@ export const checkPackedArtifact = Effect.gen(function* checkPackedArtifact() {
   yield* fs.writeFileString(
     smokeEntrypointPath,
     `import assert from "node:assert/strict";
-import { TaxKit } from "taxkit";
-import * as effect from "taxkit/effect";
-import { au } from "taxkit/au";
-import { auEffect } from "taxkit/au/effect";
+import * as sdk from "taxkit";
+import * as native from "taxkit/effect";
+import * as australian from "taxkit/au/effect";
 import * as schemas from "taxkit/schemas";
+import * as money from "taxkit/money";
+import * as auSchemas from "taxkit/au/schemas";
 import * as testing from "taxkit/testing";
 import * as core from "taxkit/core";
 import * as http from "taxkit/http";
-import { GrossPay } from "taxkit/au";
-import * as australian from "taxkit/au";
-
-assert.equal(import.meta.resolve("taxkit"), new URL("./node_modules/taxkit/dist/index.js", import.meta.url).href, "imports select the extracted archive");
-assert.equal(typeof TaxKit.calculate, "function", "root SDK import");
-assert.ok(core.Money, "Core entrypoint");
-assert.ok(http.TaxKitApi, "HTTP contract entrypoint");
-assert.equal(http.CalculatorRunResponse, schemas.CalculatorRunResponse, "one HTTP/SDK Schema identity");
-assert.ok(GrossPay, "AU fact Schema import");
-assert.equal(Object.hasOwn(core, "CalculatorSchemas"), false, "removed calculator namespace");
-for (const name of ["PayRules", "IncomeTaxRules", "StslRules"]) {
-  assert.equal(Object.hasOwn(australian, name), false, "removed AU namespace " + name);
-}
-assert.ok(schemas.MetadataQuery, "named metadata query import");
-assert.ok(schemas.HelpQuery, "named help query import");
-assert.equal(typeof effect.calculateRunRequest, "function", "Effect run import");
-assert.equal(typeof effect.calculateReportRequest, "function", "Effect report request import");
-assert.equal(typeof effect.calculateReport, "function", "Effect report import");
-assert.equal(typeof effect.createClient, "function", "Effect client import");
-assert.equal(typeof au.pay.takeHomePay, "function", "AU SDK import");
-assert.equal(typeof auEffect.createClient, "function", "AU Effect SDK import");
-assert.ok(schemas.CalculatorRunRequest, "schemas request import");
-assert.ok(schemas.CalculatorServiceError, "schemas service error import");
-assert.equal(new schemas.CalculatorCapacityExceeded().code, "calculation-capacity", "checked capacity error import");
-assert.equal(new schemas.CalculatorOperationTimedOut().code, "calculation-timeout", "checked work timeout import");
-assert.equal(new schemas.CalculatorRateLimited().code, "rate-limited", "canonical native rate failure import");
-assert.equal(new schemas.CalculatorRateLimited().retry, "wait-then-try-manually", "canonical manual native rate retry");
-assert.equal(new schemas.CalculatorAdmissionUnavailable().code, "calculation-admission-unavailable", "canonical native admission failure import");
-assert.ok(schemas.TaxKitCalculationError, "schemas SDK error import");
-assert.ok(testing.AuPayTakeHomeCalculation, "testing import");
-assert.ok(schemas.TaxKitClientDisposedError, "closed-client error import");
-assert.ok(schemas.TaxKitClientDisposeError, "disposal error import");
-const client = TaxKit.createClient(au.modules.pay2025_26);
-assert.equal(typeof client.dispose, "function", "caller-owned disposal");
-await client.dispose();
-await client.dispose();
-const closed = await client.calculations.safe.calculate(testing.AuPayTakeHomeCalculation, {});
-assert.equal(closed._tag, "TaxKitFailure", "closed client safe result");
-assert.equal(closed.error.error._tag, "TaxKitClientDisposedError", "closed client error");
+assert.equal(import.meta.resolve("taxkit"), new URL("./node_modules/taxkit/dist/index.js", import.meta.url).href);
+assert.equal(typeof sdk.calculate, "function");
+assert.equal(typeof native.calculateRun, "function");
+assert.equal(typeof money.fromDecimal, "function");
+assert.ok(auSchemas.GrossPay);
+assert.ok(australian.AuTakeHomePayWithSacrifice2025_26_Live);
+assert.ok(native.TaxKitLive);
+assert.ok(testing.TaxKitService);
+assert.equal(http.CalculatorRunResponse, schemas.CalculatorRunResponse);
+assert.equal(core.Money, money.Money);
+for (const name of ["TaxKit", "TaxKitSuccess", "TaxKitFailure", "TaxKitCalculationError"]) assert.equal(Object.hasOwn(sdk, name), false);
+for (const name of ["calculateRunRequest", "calculateReportRequest", "defineSdkCalculation", "defineTaxKitModule"]) assert.equal(Object.hasOwn(native, name), false);
+const client = sdk.createClient();
+await client.dispose(); await client.dispose();
+const closed = await client.calculateSafe(australian.AuPayTakeHomeCalculation, {});
+assert.equal(closed._tag, "Failure");
+assert.equal(closed.failure._tag, "TaxKitClientDisposedError");
 `
   );
   yield* runCommand(

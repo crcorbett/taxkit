@@ -16,14 +16,14 @@ import {
   DocsSearchResult,
 } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
-import { NonNegativeMoney,  CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayCalculatorId,
   AuPayJurisdiction,
   AuPayTaxYear,
-  GrossPay,
 } from "@taxkit/rules-au-pay";
+import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 import {
   Function as EffectFunction,
   Cause,
@@ -105,12 +105,15 @@ const successfulHttpClient = Effect.gen(function* () {
   const catalog = yield* service.listCalculators(MetadataQuery.make({}));
   const calculation = yield* service.calculate({
     calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
-    help: Option.none(),
+
     payload: {
-      facts: {
-        grossPay: NonNegativeMoney.make(new Money({ cents: Cents.make(346_200), currency: "AUD" })), period: "fortnightly",
+      facts: TakeHomeScenarioInputSchema.make({
+        grossPay: NonNegativeMoney.make(
+          new Money({ cents: Cents.make(346_200), currency: "AUD" })
+        ),
+        period: "fortnightly",
         taxFreeThresholdClaimed: true,
-      },
+      }),
       jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
       taxYear: Option.some(AuPayTaxYear.make("2025-26")),
     },

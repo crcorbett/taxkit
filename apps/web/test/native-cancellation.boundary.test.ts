@@ -169,7 +169,7 @@ it.live(
       );
       const body = yield* Schema.encodeEffect(
         Schema.fromJsonString(CalculatorRunRequest)
-      )(CalculationRequest.payload);
+      )(CalculationRequest);
       const ordinary = yield* Effect.promise(() =>
         host.getWorker("api-normal")
       );

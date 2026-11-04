@@ -1,19 +1,16 @@
 import { Schema } from "effect";
 
 import { CalculatorForm } from "./form.ingress.js";
-import {
-  CalculatorRunResponse,
-  CalculatorRunServiceRequest,
-} from "./schemas.js";
+import { CalculatorId, CalculatorRunReport } from "./schemas.js";
 // One presentation value is shared by a calculator page's visible form and its
 // browser tools. A retained answer stays visible, with an explicit stale flag
 // after an edit, failed refresh or cancelled attempt.
 export const CalculatorViewState = Schema.Struct({
   busy: Schema.Boolean,
-  calculatorId: CalculatorRunServiceRequest.fields.calculatorId,
+  calculatorId: CalculatorId,
   form: CalculatorForm,
   message: Schema.Option(Schema.String),
-  report: Schema.Option(CalculatorRunResponse.fields.report),
+  report: Schema.Option(CalculatorRunReport),
   stale: Schema.Boolean,
 });
 export type CalculatorViewState = typeof CalculatorViewState.Type;

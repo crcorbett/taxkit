@@ -1,6 +1,11 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
-import { fromDecimal, nonNegative, Money, Cents } from "@taxkit/core/primitives";
+import {
+  fromDecimal,
+  nonNegative,
+  Money,
+  Cents,
+} from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
   AnnualTaxLedgerRuleId,
@@ -31,12 +36,19 @@ import {
 const runScenario = (incomeDollars: number) =>
   Effect.gen(function* () {
     const engine = yield* CalculationEngine;
-    const taxableIncome = yield* fromDecimal(String(incomeDollars)).pipe(Effect.flatMap(nonNegative));
+    const taxableIncome = yield* EffectFunction.pipe(
+      String(incomeDollars),
+      fromDecimal
+    ).pipe(Effect.flatMap(nonNegative));
     const result = yield* engine.run({
       calculation: CalculateAnnualTax,
       layer: AuAnnualTax2025_26_Live.pipe(
         Layer.provideMerge(AnnualTaxScenarioLive),
-        Layer.provide(Layer.succeed(AnnualTaxScenario)(AnnualTaxScenarioInputSchema.make({ taxableIncome })))
+        Layer.provide(
+          Layer.succeed(AnnualTaxScenario)(
+            AnnualTaxScenarioInputSchema.make({ taxableIncome })
+          )
+        )
       ),
     });
     return result.report;

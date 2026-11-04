@@ -27,7 +27,7 @@ export const TaxablePayLive = Layer.effect(TaxablePayFact)(
 
     const trace = TraceNode.make({
       children: [],
-      formula: Option.some(Option.some("taxable = gross")),
+      formula: Option.some("taxable = gross"),
       inputs: {
         grossCents: gross.amount.cents,
         period: gross.period,

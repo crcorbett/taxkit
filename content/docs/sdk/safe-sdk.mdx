@@ -6,55 +6,35 @@ status: "published"
 
 # Safe SDK
 
-Use the safe SDK when expected failures should be returned as values instead of
-rejected Promises.
-
-## Call `TaxKit.safe.calculate`
+`calculateSafe` returns a Promise of native Effect `Result<Report, TaxKitError>`. Narrow `_tag: "Success"` to read `success`, or `_tag: "Failure"` to read `failure`. All expected failures have Schema-tagged identities.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { TaxKit } from "taxkit";
-import { au } from "taxkit/au";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(Cents.make(9_000_000)),
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(
+    Result.flatMap(nonNegative)
+  );
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
 });
-
-if (result._tag === "TaxKitSuccess") {
-  console.log(result.value.liability.cents);
-}
-
-if (result._tag === "TaxKitFailure") {
-  console.error(result.error._tag);
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
+  }
 }
 ```
 
-The result is either `TaxKitSuccess` with the calculator report or
-`TaxKitFailure` with an SDK-owned error value.
+Use `Schema.Result(definition.outputSchema, TaxKitError)` and `Schema.toCodecJson` to persist outcomes. A closed client returns `TaxKitClientDisposedError` directly in `failure`. `calculate` rejects with the same expected error vocabulary; TypeScript cannot type Promise rejection channels.
 
-## Call AU safe helpers
-
-```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
-
-const result = await au.incomeTax.safe.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-```
-
-## When to use it
-
-Use the safe facade when your application already models expected failures as
-data, or when you want to handle schema decode errors in the same branch as
-calculation failures. A client that has been closed returns `TaxKitFailure` with
-`TaxKitClientDisposedError` in `result.error.error`. Await `client.dispose()` when
-finished; the [Plain SDK](./plain-sdk.mdx) shows a `try`/`finally` example.
-
-Use `TaxKit.calculate` when rejected Promises fit your existing control flow.
-
-## Related pages
-
-- [Plain SDK](./plain-sdk.mdx)
-- [Schemas](./schemas.mdx)
-- [Type safety](./type-safety.mdx)
+[Plain SDK](./plain-sdk.mdx) owns client lifetime examples.

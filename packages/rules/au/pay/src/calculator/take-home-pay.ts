@@ -1,18 +1,22 @@
-import { subtract } from "@taxkit/core/primitives";
 import { CalculationError } from "@taxkit/core/errors";
+import { subtract } from "@taxkit/core/primitives";
 import { Context, Effect, Layer } from "effect";
 
 import {
-  GrossPay, GrossPayFact,
+  GrossPay,
+  GrossPayFact,
   NetPayFact,
   TaxablePayFact,
   TaxFreeThresholdClaimed,
   TaxFreeThresholdClaimedFact,
 } from "../facts/pay.js";
-import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
 import { SalarySacrifice, SalarySacrificeFact } from "../facts/sacrifice.js";
-import { TakeHomeWithSacrificeScenarioInput, PayRulePackVersion, TakeHomePayReport } from "./schemas.js";
-import type { TakeHomeScenarioInput } from "./schemas.js";
+import { PayWithholdingsLedgerFact } from "../facts/withholdings.js";
+import { PayRulePackVersion, TakeHomePayReport } from "./schemas.js";
+import type {
+  TakeHomeScenarioInput,
+  TakeHomeWithSacrificeScenarioInput,
+} from "./schemas.js";
 
 export {
   TakeHomePayReport,
@@ -36,7 +40,14 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
   const ledger = yield* PayWithholdingsLedgerFact;
   const net = yield* NetPayFact;
 
-  const salarySacrifice = yield* subtract(gross.amount, taxable.amount).pipe(Effect.mapError(() => new CalculationError({ message: "Pay adjustment is outside the supported range." })));
+  const salarySacrifice = yield* subtract(gross.amount, taxable.amount).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Pay adjustment is outside the supported range.",
+        })
+    )
+  );
   return yield* TakeHomePayReport.makeEffect({
     grossPay: gross.amount,
     netPay: net.amount,
@@ -47,7 +58,15 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
     trace: net.trace,
     withholdings: ledger,
     withholdingsTotal: ledger.total,
-  }).pipe(Effect.mapError(() => new CalculationError({ message: "Pay report invariant failed." })));
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          message: "Pay report invariant failed.",
+          reason: "output-invariant",
+        })
+    )
+  );
 });
 
 /**
@@ -70,7 +89,12 @@ export class TakeHomeScenario extends Context.Service<
 export const TakeHomeScenarioLive = Layer.mergeAll(
   Layer.effect(
     GrossPayFact,
-    TakeHomeScenario.pipe(Effect.map((scenario) => new GrossPay({ amount: scenario.grossPay, period: scenario.period })))
+    TakeHomeScenario.pipe(
+      Effect.map(
+        (scenario) =>
+          new GrossPay({ amount: scenario.grossPay, period: scenario.period })
+      )
+    )
   ),
   Layer.effect(
     TaxFreeThresholdClaimedFact,
@@ -85,9 +109,41 @@ export const TakeHomeScenarioLive = Layer.mergeAll(
   )
 );
 
-export class TakeHomeWithSacrificeScenario extends Context.Service<TakeHomeWithSacrificeScenario, TakeHomeWithSacrificeScenarioInput>()("taxkit/rules-au-pay/TakeHomeWithSacrificeScenario") {}
+export class TakeHomeWithSacrificeScenario extends Context.Service<
+  TakeHomeWithSacrificeScenario,
+  TakeHomeWithSacrificeScenarioInput
+>()("taxkit/rules-au-pay/TakeHomeWithSacrificeScenario") {}
 export const TakeHomeWithSacrificeScenarioLive = Layer.mergeAll(
-  Layer.effect(GrossPayFact, TakeHomeWithSacrificeScenario.pipe(Effect.map((scenario) => new GrossPay({ amount: scenario.grossPay, period: scenario.period })))),
-  Layer.effect(SalarySacrificeFact, TakeHomeWithSacrificeScenario.pipe(Effect.map((scenario) => new SalarySacrifice({ amount: scenario.salarySacrifice, period: scenario.period })))),
-  Layer.effect(TaxFreeThresholdClaimedFact, TakeHomeWithSacrificeScenario.pipe(Effect.map((scenario) => new TaxFreeThresholdClaimed({ value: scenario.taxFreeThresholdClaimed }))))
+  Layer.effect(
+    GrossPayFact,
+    TakeHomeWithSacrificeScenario.pipe(
+      Effect.map(
+        (scenario) =>
+          new GrossPay({ amount: scenario.grossPay, period: scenario.period })
+      )
+    )
+  ),
+  Layer.effect(
+    SalarySacrificeFact,
+    TakeHomeWithSacrificeScenario.pipe(
+      Effect.map(
+        (scenario) =>
+          new SalarySacrifice({
+            amount: scenario.salarySacrifice,
+            period: scenario.period,
+          })
+      )
+    )
+  ),
+  Layer.effect(
+    TaxFreeThresholdClaimedFact,
+    TakeHomeWithSacrificeScenario.pipe(
+      Effect.map(
+        (scenario) =>
+          new TaxFreeThresholdClaimed({
+            value: scenario.taxFreeThresholdClaimed,
+          })
+      )
+    )
+  )
 );

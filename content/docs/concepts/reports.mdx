@@ -18,11 +18,16 @@ application uses.
 ## How it works
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
+import { Cents, Money } from "taxkit/money";
+import {
+  AuPayTakeHomeCalculation,
+  AuAnnualIncomeTaxCalculation,
+  takeHomePay,
+  annualIncomeTax,
+} from "taxkit/au";
 
-const report = await au.incomeTax.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
+const report = await annualIncomeTax({
+  taxableIncome: Money.fromCents(Cents.make(9_000_000)),
 });
 
 console.log(report._tag);

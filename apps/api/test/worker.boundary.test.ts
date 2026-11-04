@@ -165,7 +165,7 @@ describe("native API application", () => {
         "/api/v2/calculators/au.pay.take-home/calculate",
         "POST",
         yield* Schema.encodeEffect(Schema.fromJsonString(CalculatorRunRequest))(
-          CalculationRequest.payload
+          CalculationRequest
         )
       );
       expect(calculated.status).toBe(200);
@@ -243,7 +243,7 @@ describe("native API application", () => {
       );
       const httpBody = yield* Schema.encodeEffect(
         Schema.fromJsonString(CalculatorRunRequest)
-      )(CalculationRequest.payload);
+      )(CalculationRequest);
       // A request body can be read once, so each call builds its own request.
       const invoke = Effect.suspend(() =>
         app.fetch.pipe(
@@ -706,7 +706,7 @@ describe("native API application", () => {
         );
         const httpBody = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
-        )(CalculationRequest.payload);
+        )(CalculationRequest);
         const http = yield* transport.execute(
           HttpClientRequest.post(
             "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate"
@@ -1030,7 +1030,7 @@ describe("native API application", () => {
         );
         const body = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
-        )(CalculationRequest.payload);
+        )(CalculationRequest);
         const response = yield* app.fetch.pipe(
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,

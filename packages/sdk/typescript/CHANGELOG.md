@@ -1,5 +1,13 @@
 # taxkit
 
+## 5.0.0
+
+### Major Changes
+
+- Replace the SDK with checked, Effect-native calculator contracts and one shared calculation engine. Use nominal scenarios and signed AUD Money with exact decimal text, safe integer cents, non-negative input refinements and checked arithmetic. Export native schemas, facts, rule services, Layers and closed errors; the plain TypeScript interface uses Promise and native Result over the same programs.
+
+  Remove the former module selectors, facade objects, money aliases, custom Result/error wrappers, permissive inputs and duplicate decoding paths. Calculator HTTP v2 and MCP use correlated scenario/report contracts with strict nested validation. Reports validate accounting relationships, and owned Website consumers and documentation use the new contracts. External consumers must update imports and construct checked inputs; no compatibility API remains.
+
 ## 4.0.1
 
 ### Patch Changes

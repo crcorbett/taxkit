@@ -6,7 +6,7 @@ import {
   format,
   fromDecimal,
 } from "../src/primitives/index.js";
-import { Money,  Cents } from "../src/primitives/money.js";
+import { Money, Cents } from "../src/primitives/money.js";
 
 const tagged = (reason: string) => [true, "invalid-money", reason];
 describe("dollar text to Money", () => {
@@ -22,7 +22,10 @@ describe("dollar text to Money", () => {
         EffectFunction.pipe(Cents.make(8_000_050), Money.fromCents)
       );
       expect(yield* fromDecimal("90071992547409.91")).toStrictEqual(
-        EffectFunction.pipe(Cents.make(Number.MAX_SAFE_INTEGER), Money.fromCents)
+        EffectFunction.pipe(
+          Cents.make(Number.MAX_SAFE_INTEGER),
+          Money.fromCents
+        )
       );
     })
   );
@@ -64,14 +67,9 @@ describe("dollar text to Money", () => {
     EffectFunction.pipe(Cents.make(5), Money.fromCents, format, (actual) => {
       expect(actual).toBe("0.05");
     });
-    EffectFunction.pipe(
-      Cents.make(-150),
-      Money.fromCents,
-      format,
-      (actual) => {
-        expect(actual).toBe("-1.50");
-      }
-    );
+    EffectFunction.pipe(Cents.make(-150), Money.fromCents, format, (actual) => {
+      expect(actual).toBe("-1.50");
+    });
   });
   it.effect("decodes and encodes through the default-message codec", () =>
     Effect.gen(function* () {

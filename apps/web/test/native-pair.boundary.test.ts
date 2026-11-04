@@ -1291,7 +1291,7 @@ describe("built native API and Website", () => {
               query: MetadataQuery.make({}),
             });
             const filter = DescriptorFilterQuery.make({
-              calculator: Option.some(Option.some(pay.calculatorId)),
+              calculator: Option.some(pay.calculatorId),
             });
             const facts = yield* calculatorApi.listFacts({ query: filter });
             const rules = yield* calculatorApi.listRules({ query: filter });

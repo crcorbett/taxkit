@@ -7,7 +7,7 @@ import type {
   CalculatorGraphResponse,
   CalculatorSchemaResponse,
   CalculatorRunResponse,
-  CalculatorRunServiceRequest,
+  CalculatorRunRequest,
   CalculatorServiceError,
   CalculatorMetadataError,
   CalculatorOperationTimedOut,
@@ -23,7 +23,7 @@ import type {
 
 export interface PublicCalculatorServiceContract {
   readonly calculate: (
-    request: CalculatorRunServiceRequest
+    request: CalculatorRunRequest
   ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
   readonly getCalculator: (
     request: GetCalculatorRequest
