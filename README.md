@@ -19,7 +19,7 @@ with health, generated docs, metadata and public calculation endpoints, a
 reusable calculator orchestration package, deterministic core engine
 primitives, Australian pay, income-tax and STSL rule packages, the installable
 `taxkit` TypeScript SDK, the authored `@content/docs` pages, private
-`@taxkit/content`, `@taxkit/mdx`, `@taxkit/diagrams` and `@taxkit/pele` packages, shared
+`@taxkit/content`, `@taxkit/mdx`, `@taxkit/mdx-react`, `@taxkit/diagrams` and `@taxkit/pele` packages, shared
 testing helpers and shared TypeScript config. The SDK includes the engine, Australian rules and typed HTTP contracts
 in one package, with Effect as its only external runtime dependency.
 
@@ -67,6 +67,8 @@ entry points.
   checked reading body, link resolution, catalogue and content service.
 - [packages/mdx](./packages/mdx/README.md): content-neutral document compiler,
   renderer contracts and Effect-owned Pierre highlighter.
+- [packages/mdx-react](./packages/mdx-react/README.md): content-neutral React
+  reading presentation, code/table scroll regions and checked theme formatting.
 - [packages/diagrams](./packages/diagrams/README.md): Pele adapter implementing
   MDX's diagram contract.
 - [packages/pele](./packages/pele/README.md): independent Effect service rendering

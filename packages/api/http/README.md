@@ -3,7 +3,7 @@ document_type: package-readme
 lifecycle: current
 authority: canonical
 owner: taxkit-http-api-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-11-02
 review_trigger: HTTP schemas, exports, routes, handlers or client composition change
 ---
 
@@ -137,6 +137,10 @@ incompatible calculator/facts combinations.
   `requestCatalogue` and `requestCalculation`. Each has one ten-second deadline
   over headers, body and decoding; `boundedReplies` caps each reply at 2 MiB.
   A reply must answer its request (`ApiReplyMismatch` otherwise).
+  `requestDocsSearch` returns matching pages only and skips HTTP for empty words.
+  Callers compose navigation from an existing page read; the Website's search
+  loader reuses the canonical page's navigation and theme rather than reading
+  navigation twice.
 - `src/errors.ts` (`./errors`): the client's own transport outcomes
   (`ApiUnavailable`, `ApiDeadlineExceeded`, `ApiReplyTooLarge`,
   `ApiReplyMismatch`) and `CalculationCallFailure`.

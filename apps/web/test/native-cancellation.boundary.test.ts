@@ -321,11 +321,12 @@ it.live(
       });
       yield* Effect.promise(() => page.goto(websiteOrigin));
       // Prepare a same-document browser Back destination. The actual Back
-      // event drives TanStack route departure and React cleanup; a hard page
-      // replacement can drop the old document's request-failed observation.
+      // event drives TanStack route departure and React cleanup. Use a local
+      // destination without API loading; a stalled docs destination retains the
+      // current page until ready. A hard replacement can drop request-failed.
       yield* Effect.promise(() =>
         page.evaluate(() => {
-          window.history.replaceState(null, "", "/no-calculator");
+          window.history.replaceState(null, "", "/agents");
           window.history.pushState(null, "", "/");
         })
       );
@@ -420,6 +421,11 @@ it.live(
           }
         );
         yield* Effect.promise(() => page.goBack());
+        yield* Effect.promise(() =>
+          page
+            .getByRole("heading", { exact: true, name: "TaxKit for agents" })
+            .waitFor({ timeout: 5000 })
+        );
         yield* Effect.promise(() =>
           page
             .getByRole("heading", { name: "Australian take-home pay" })

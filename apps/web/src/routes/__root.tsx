@@ -4,12 +4,14 @@ import {
   scheduleTask,
   useAtomInitialValues,
 } from "@effect/atom-react";
+import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import {
   createRootRouteWithContext,
   HeadContent,
   Link,
   Outlet,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { referencePath } from "@taxkit/api-http/routes";
 import { CalculatorSummaries } from "@taxkit/calculators/summaries";
@@ -27,12 +29,17 @@ import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 
 import { publicSettingsAtom } from "#/lib/api-client.atoms";
+import { docsHeadingId } from "#/lib/docs/focus.atoms";
+import { DocsNavigationFocus } from "#/lib/docs/focus.container";
 import { WebsiteRootView } from "#/lib/host/schemas";
 import type { WebsitePublicSettings } from "#/lib/host/schemas";
 import type { LoaderContext } from "#/lib/pages/loader-context";
 import { loadRoot } from "#/lib/pages/loaders";
 
 import "../styles.css";
+import "@taxkit/mdx-react/styles.css";
+import "../components/ui/styles.css";
+import "../lib/docs/styles.css";
 
 const SettingsUnavailable = () => (
   <main className="home">
@@ -104,6 +111,15 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
   component: RootComponent,
   errorComponent: SettingsUnavailable,
   head: () => ({
+    links: [
+      {
+        as: "font",
+        crossOrigin: "anonymous",
+        href: interFont,
+        rel: "preload",
+        type: "font/woff2",
+      },
+    ],
     meta: [
       { charSet: "utf-8" },
       { content: "width=device-width, initial-scale=1", name: "viewport" },
@@ -124,6 +140,16 @@ export const Route = createRootRouteWithContext<LoaderContext>()({
 });
 
 function RootComponent() {
+  const loading = useRouterState({ select: (state) => state.isLoading });
+  const documentation = useRouterState({
+    select: ({ matches }) =>
+      EffectFunction.pipe(
+        matches,
+        Array.some(
+          (match) => match.routeId === "/$" || match.routeId === "/search"
+        )
+      ),
+  });
   const data = Route.useLoaderData();
   const { registry } = Route.useRouteContext();
   const view = useMemo(
@@ -137,11 +163,22 @@ function RootComponent() {
   return (
     <RootRegistry registry={registry}>
       <InitialSettings settings={settings}>
+        <DocsNavigationFocus />
         <div className="app-shell">
-          <a className="skip-link" href="#main-content">
+          <a
+            className="skip-link"
+            href={Match.value(documentation).pipe(
+              Match.when(true, () => `#${docsHeadingId}`),
+              Match.orElse(() => "#main-content")
+            )}
+          >
             Skip to content
           </a>
-          <nav aria-label="Calculators">
+          <nav
+            aria-label="Calculators"
+            className="site-navigation"
+            hidden={documentation}
+          >
             <ul>
               {EffectFunction.pipe(
                 CalculatorSummaries,
@@ -180,7 +217,7 @@ function RootComponent() {
               Documentation
             </Link>
           </nav>
-          <main id="main-content" tabIndex={-1}>
+          <main aria-busy={loading} id="main-content" tabIndex={-1}>
             <Outlet />
           </main>
         </div>

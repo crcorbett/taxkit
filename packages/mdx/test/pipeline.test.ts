@@ -14,6 +14,8 @@ import {
   InlineText,
   LinkTarget,
   ListStart,
+  ReadingBody,
+  ReadingBlock,
 } from "@taxkit/mdx/schemas";
 import {
   CodeHighlighter,
@@ -65,6 +67,58 @@ const source = Effect.gen(function* () {
       "---\ncustom: [true, null, 12]\n---\n\n# Article\n\nRead [more](another).\n\n```ts\nconst n = 1;\n\n```"
     ),
   });
+});
+describe("checked reading values", () => {
+  it.effect(
+    "admits neutral headings and destinations without publication metadata",
+    () =>
+      Effect.gen(function* () {
+        const input: typeof ReadingBody.Encoded = [
+          {
+            content: [
+              {
+                content: [{ kind: "inline-code", text: "Chapter" }],
+                href: "../next.md?locale=fr",
+                kind: "link",
+              },
+            ],
+            depth: 1,
+            id: "Chapter.é",
+            kind: "heading",
+          },
+        ];
+        const body = yield* Schema.decodeEffect(ReadingBody)(input);
+        assert.deepEqual<unknown>(body, input);
+        assert.deepEqual(yield* Schema.decodeEffect(ReadingBody)([]), []);
+      })
+  );
+
+  it.effect(
+    "checks presentation nodes without accepting private rendering fields",
+    () =>
+      Effect.forEach(
+        [
+          { kind: "code", language: "txt", lines: [[]], text: "" },
+          {
+            content: [
+              {
+                content: [{ kind: "text", text: "Next" }],
+                href: "next",
+                kind: "link",
+                target: "original.mdx",
+              },
+            ],
+            kind: "paragraph",
+          },
+          { kind: "code", language: "txt", lines: [] },
+          { kind: "table", align: ["left"], header: [[]], rows: [[]] },
+        ],
+        (input) =>
+          Schema.decodeUnknownEffect(ReadingBlock)(input, {
+            onExcessProperty: "error",
+          }).pipe(Effect.flip)
+      )
+  );
 });
 describe("portable MDX pipeline", () => {
   it.effect("checks brand refinements without changing literal text", () =>

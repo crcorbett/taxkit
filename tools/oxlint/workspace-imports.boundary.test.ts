@@ -48,6 +48,84 @@ const rejected = (file: string, source: string, code: string) =>
     })
   );
 it.effect(
+  "keeps compiler, presenter, Pele and diagram roles neutral through actual imports",
+  () =>
+    Effect.gen(function* () {
+      const mdx = "packages/mdx/src/.generated-content-neutrality.ts";
+      const presenter =
+        "packages/mdx-react/src/.generated-content-neutrality.ts";
+      const pele = "packages/pele/src/.generated-content-neutrality.ts";
+      const diagrams = "packages/diagrams/src/.generated-content-neutrality.ts";
+      const browser = "apps/web/src/.generated-content-neutrality.ts";
+      yield* Effect.forEach(
+        [
+          [mdx, 'import "@taxkit/content/schemas";'],
+          [mdx, 'import "@content/docs/navigation.json";'],
+          [mdx, 'export const load = () => import("@taxkit/mdx-react/body");'],
+          [mdx, 'export type Renderer = import("@taxkit/pele/service");'],
+          [presenter, 'import "@taxkit/content/schemas";'],
+          [presenter, 'export * from "@taxkit/api-http/api";'],
+          [presenter, 'import "@content/docs/navigation.json";'],
+          [presenter, 'import "@tanstack/react-router";'],
+          [presenter, 'export type Router = import("@tanstack/router-core");'],
+          [presenter, 'export const load = () => import("next/link");'],
+          [presenter, 'import "react-router-dom";'],
+          [presenter, 'import "web/router";'],
+          [presenter, 'import "#/lib/docs/components";'],
+          [pele, 'export type Document = import("@taxkit/mdx/schemas");'],
+          [pele, 'import "@taxkit/content/schemas";'],
+          [diagrams, 'import "@taxkit/content/schemas";'],
+          [diagrams, 'import "@taxkit/mdx-react/body";'],
+          [browser, 'import "@taxkit/mdx/compiler";'],
+          [browser, 'import "@taxkit/mdx/highlights";'],
+          [browser, 'import "@taxkit/pele/live";'],
+          [browser, 'import "@taxkit/mdx-react/live";'],
+        ] as const,
+        ([file, source]) =>
+          rejected(file, source, "taxkit-package(workspace-roles)"),
+        { concurrency: 1, discard: true }
+      );
+      yield* rejected(
+        presenter,
+        'import "../../../apps/web/src/lib/docs/components.tsx";',
+        "package(workspace-import-boundaries)"
+      );
+      const allowed = [
+        [mdx, 'import "@taxkit/mdx/schemas";\nimport "@pierre/highlights";'],
+        [
+          presenter,
+          'import "@taxkit/mdx/schemas";\nimport "@taxkit/mdx/theme";\nimport "react";',
+        ],
+        [pele, 'import "@taxkit/pele/schemas";\nimport "pele";'],
+        [
+          diagrams,
+          'import "@taxkit/mdx/service";\nimport "@taxkit/pele/service";',
+        ],
+        [
+          browser,
+          'import "@taxkit/mdx-react/body";\nimport "@taxkit/mdx-react/code-block";\nimport "@taxkit/mdx-react/theme";\nimport "@taxkit/mdx-react/schemas";\nimport "@taxkit/mdx-react/styles.css";',
+        ],
+      ] as const;
+      yield* Effect.forEach(
+        allowed,
+        ([path, source]) => writeLintFixture({ path, source }),
+        { concurrency: 1, discard: true }
+      );
+      const accepted = yield* lintFiles({
+        paths: EffectFunction.pipe(
+          allowed,
+          Array.map(([path]) => path)
+        ),
+        format: "json",
+      });
+      expect(accepted.exitCode, accepted.output).toBe(0);
+      const report = yield* Schema.decodeEffect(Report)(accepted.stdout);
+      expect(report.number_of_files).toBe(5);
+      expect(report.diagnostics).toStrictEqual([]);
+    }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
+  120_000
+);
+it.effect(
   "rejects unavailable exports, undeclared edges and backend roles through native Oxlint",
   () =>
     Effect.gen(function* () {

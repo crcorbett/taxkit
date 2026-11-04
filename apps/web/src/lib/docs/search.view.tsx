@@ -2,32 +2,8 @@ import { Link } from "@tanstack/react-router";
 import type { DocsSearchResult, DocsSearchTerm } from "@taxkit/content/schemas";
 import { Match, Function as EffectFunction, Array } from "effect";
 
-import { requestDocsNavigationFocus } from "./components";
+import { useDocsNavigationFocus } from "./focus.container";
 
-export const DocsSearchForm = ({
-  term,
-}: {
-  readonly term: DocsSearchTerm | "";
-}) => (
-  <search>
-    <form action="/search" className="docs-search-form" method="GET">
-      <label htmlFor="docs-search-term">Search words</label>
-      <div className="docs-search-controls">
-        <input
-          autoComplete="off"
-          defaultValue={term}
-          id="docs-search-term"
-          key={term}
-          maxLength={100}
-          name="term"
-          type="search"
-        />
-        <button type="submit">Search documentation</button>
-      </div>
-      <p>Search the guides, API reference and integration examples.</p>
-    </form>
-  </search>
-);
 export const DocsSearchResults = ({
   results,
   term,
@@ -35,6 +11,7 @@ export const DocsSearchResults = ({
   readonly results: readonly DocsSearchResult[];
   readonly term: DocsSearchTerm | "";
 }) => {
+  const requestDocsNavigationFocus = useDocsNavigationFocus();
   if (term === "") {
     return <p>Enter a few words to find a documentation page.</p>;
   }

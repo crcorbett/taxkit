@@ -1,7 +1,6 @@
 import navigationRepresentation from "@content/docs/navigation.json" with { type: "json" };
 import repositoryRepresentation from "@content/docs/repository.json" with { type: "json" };
 import { LinkResolveError } from "@taxkit/mdx/errors";
-import { LinkDestination } from "@taxkit/mdx/schemas";
 import { LinkResolver } from "@taxkit/mdx/service";
 import {
   Function as EffectFunction,
@@ -58,7 +57,6 @@ export const ContentLinkResolverLive = Layer.effect(
           ...targets,
           source,
         }).pipe(
-          Effect.flatMap((href) => LinkDestination.makeEffect(href)),
           Effect.mapError(() => new LinkResolveError({ reason: "link" }))
         );
       }),

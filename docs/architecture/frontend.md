@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-architecture-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-11-02
 review_trigger: frontend runtime, API client, loader, rendering, cache, build adapter, or composition change
 ---
 
@@ -201,9 +201,20 @@ registration and interrupt it on cleanup.
 
 ## Documentation
 
+The [Website design guide](../../apps/web/DESIGN.md) owns layout, typography and
+interaction details. Documentation uses a sticky header, independently scrolling
+navigation, a bounded reading column and a page outline. App-owned
+[shadcn/Base UI components](../../apps/web/src/components/ui/README.md) provide the
+mobile Sheet, navigation Collapsibles, action Buttons and search
+Input/Field. They share semantic theme variables and own primitive styling;
+docs containers retain Effect Atom state and navigation policy. Native links,
+radios, GET forms and disclosures preserve progressive enhancement.
+
 The catch-all route loads page and navigation from the API's documentation
 routes. The route renders the title as `DocsHeading` and the checked
-`page.body` through `src/lib/docs/reading-body.view.tsx`: code tokens as
+`page.body` through the neutral `@taxkit/mdx-react` presenter, with
+`src/lib/docs/reading-body.view.tsx` binding its link/code slots to the Website:
+code tokens as
 coloured spans, diagrams as `<img>` with an SVG data address, tables in a
 labelled scroll region and page links through the TanStack router. `/search`
 reads the raw address once and calls the API's search route. Markdown
@@ -213,6 +224,31 @@ preference) are a named HTTP policy over the HTML Effect in `src/entry.server.ts
 the API and are forwarded once (`http/early-reply.ingress.ts`). Each docs loader
 returns Content's `docsPageMetadata`, rendered by `seo/head.ts`. No Website
 request reads authored MDX, builds a content index or constructs a Layer.
+
+The presenter's `MdxTheme` applies the checked MDX theme to prose, code and
+diagram images; its private Base UI/shadcn scroll parts own code/table keyboard
+access and no-JavaScript fallbacks. Neither the presenter nor MDX depends on
+Content, a router, authored navigation or an application runtime.
+Native Light, Dark and System radios select the colour scheme through CSS
+before hydration and without JavaScript. One appearance Atom in the existing
+router/React registry retains the choice across client navigation; reloads
+return to the device default, without cookies or browser storage. Code tokens
+retain both appearances and SVGs embed both palettes. Search obtains its theme
+from the canonical Quickstart page through existing bounded reads, without a new
+endpoint or cache; its page read supplies navigation once, and the search helper
+reads results only for nonempty words.
+The public docs client uses `/api/v2/docs`; calculator routes retain their
+existing version.
+
+Copy commands use the static native Clipboard Layer in `browserRuntime` and
+per-control action Atoms; they never acquire the generated API client. The
+page outline uses a scoped resource Atom on that same runtime, with semantic
+selection equality and subscriptions confined to outline leaves. Menu/search
+drafts are mount-local Atoms; focus intent is registry-owned and consumed after
+the intended native navigation renders. Native Router
+retains the resolved page while navigation loads, and recovery pages without a
+checked theme use platform system colours. No component creates another runtime
+or registry.
 
 ## Analytics
 
@@ -236,9 +272,10 @@ event allowlist and stored-event readback are not built.
 - Read Worker bindings only in `runtime.server.ts` and adapt the private binding
   only in `host/binding.adapter.layer.ts`.
 - Keep frontend docs and component details out of rule packages.
-- Keep browser docs modules on browser-safe Content exports such as
-  `@taxkit/content/schemas`; do not import `@content/docs`, `@taxkit/mdx` or
-  `@taxkit/diagrams` or `@taxkit/pele` from browser modules.
+- Keep browser docs modules on browser-safe Content contracts and the explicit
+  `@taxkit/mdx-react` presentation entries. Authored sources, MDX compilation,
+  provider acquisition, diagrams and Pele live implementations stay outside
+  the browser. Import grants do not follow new exports or dependencies automatically.
 - Use TanStack router links for internal docs routes so client navigation runs
   the route loader. Keep ordinary anchors for external, mail, download,
   repository-source and same-document destinations.
@@ -257,12 +294,3 @@ event allowlist and stored-event readback are not built.
 - [Package ownership](./package-ownership.md)
 - [Content and posts](./content-and-posts.md)
 - [Deployment](./deployment.md)
-
-
-Documentation's `DocsReader` container applies the page's checked MDX theme to
-prose, code and diagram images. Native Light, Dark and System radio controls
-select the reading area's colour scheme without provider calls or persisted
-browser state. CSS resolves System before JavaScript; explicit choices also
-work with JavaScript disabled. Code tokens retain both appearances and SVGs
-embed both palettes. The public docs client uses `/api/v2/docs`; calculator
-routes retain their existing version.
