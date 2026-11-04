@@ -64,7 +64,7 @@ it.effect(
       EffectFunction.pipe(
         Predicate.isTagged(
           yield* readCalculatorError(unrelated).pipe(Effect.flip),
-          "InputValidationError"
+          "SchemaError"
         ),
         (matches) => {
           expect(matches).toBeTruthy();

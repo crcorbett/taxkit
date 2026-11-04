@@ -190,7 +190,9 @@ the selected variant must be tied to the checked request identity.
 
 Calculator HTTP v2 accepts the same correlated envelope as MCP: `calculatorId`,
 and `payload` containing the checked `facts` plus optional context.
-The path and body identities must agree. Responses carry the discriminating
+The path and body identities must agree. Native MCP registration
+adds an object-root check to the same union; its native JSON Schema view keeps
+the correlated variants and meets MCP’s object-root requirement. Responses carry the discriminating
 `calculatorId` alongside matching report and catalogue metadata. Native HttpApi
 `PayloadParseOptions` enforces strict nested decoding; safe input issue projection
 is shared with SDK ingress. The superseded input-error DTO/projection is deleted.
