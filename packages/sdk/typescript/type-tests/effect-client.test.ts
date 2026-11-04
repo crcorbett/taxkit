@@ -6,12 +6,12 @@ import {
   GrossPayFact,
   TaxFreeThresholdClaimedFact,
   TaxFreeThresholdClaimed,
-  TaxablePay,
   TaxablePayFact,
   PaygWithholdingComponentFact,
   PaygWithholdingLive,
 } from "../src/au-effect.js";
 import { AuPayTakeHomeCalculation } from "../src/au.js";
+import type { TaxablePay } from "../src/au/schemas.js";
 import { TakeHomeScenarioInputSchema, GrossPay } from "../src/au/schemas.js";
 import {
   calculateReport,
@@ -60,12 +60,10 @@ const completed: never = remaining;
 void completed;
 void defineSdkCalculation;
 
+declare const checkedTaxablePay: TaxablePay;
 const parameterDependent = PaygWithholdingComponentFact.pipe(
   Effect.provide(PaygWithholdingLive),
-  Effect.provideService(
-    TaxablePayFact,
-    new TaxablePay({ amount, period: "weekly" })
-  ),
+  Effect.provideService(TaxablePayFact, checkedTaxablePay),
   Effect.provideService(
     TaxFreeThresholdClaimedFact,
     new TaxFreeThresholdClaimed({ value: true })

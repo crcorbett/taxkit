@@ -246,7 +246,10 @@ describe("TaxKit public calculation HTTP API", () => {
       const sdkRun = yield* calculateSdkRun(AuPayTakeHomeCalculation, facts);
       const sdkResponse = {
         calculatorId: AuPayTakeHomeCalculation.calculatorId,
-        calculator: response.calculator,
+        calculator: {
+          ...response.calculator,
+          calculatorId: AuPayTakeHomeCalculation.calculatorId,
+        },
         diagnostics: sdkRun.diagnostics,
         report: sdkRun.report,
       };

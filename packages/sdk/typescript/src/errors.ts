@@ -1,7 +1,7 @@
 import { CalculationError, InputValidationError } from "@taxkit/core";
 import { Schema } from "effect";
 
-export { CalculationError, InputValidationError } from "@taxkit/core";
+export { InputValidationError } from "@taxkit/core";
 export class TaxKitUnexpectedError extends Schema.TaggedError<
   TaxKitUnexpectedError,
   { readonly brand: unique symbol }
