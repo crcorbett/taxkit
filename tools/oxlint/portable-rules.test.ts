@@ -1567,10 +1567,38 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       },
       {
         path: "packages/core/src/primitives/money.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/primitives/money.effect.ts",
         rejected: true,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/calculators/definition.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/errors/input-validation-error.ts",
+        rejected: false,
+        rule: "taxkit(no-decoding-outside-boundaries)",
+        source:
+          'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
+      },
+      {
+        path: "packages/core/src/primitives/money.ts",
+        rejected: true,
+        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        source:
+          'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/core/src/primitives/tax.ts",
