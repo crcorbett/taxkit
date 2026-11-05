@@ -101,14 +101,14 @@ export const sourceChecksum = (value: string): SourceChecksum =>
 // The non-recursive fields have one Schema owner. Only the children relation
 // needs a local recursive annotation; its other fields are inferred here.
 const TraceNodeFields = Schema.TaggedStruct("TraceNode", {
-  formula: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(Schema.String)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  formula: Schema.OptionFromOptional(Schema.String).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   inputs: Schema.Record(Schema.String, Schema.Json),
   result: Schema.Json,
-  rounding: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(RoundingMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  rounding: Schema.OptionFromOptional(RoundingMode).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   ruleId: RuleId,
   sources: Schema.Array(SourceRef),
   title: Schema.String,

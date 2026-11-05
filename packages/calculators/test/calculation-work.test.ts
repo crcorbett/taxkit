@@ -1,7 +1,10 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
-import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
+import {
+  AuPayTakeHomeId,
+  TakeHomeScenarioInputSchema,
+} from "@taxkit/rules-au-pay/schemas";
 import { expectAt } from "@taxkit/testing";
 import {
   Function as EffectFunction,
@@ -26,7 +29,7 @@ import { PublicCalculatorServiceLive } from "../src/live.layer.js";
 import {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
-  CalculatorRunServiceRequest,
+  CalculatorRunRequest,
   MetadataQuery,
   DescriptorFilterQuery,
   GetCalculatorRequest,
@@ -36,25 +39,24 @@ import {
 import { PublicCalculatorService } from "../src/service.js";
 import { PublicCalculatorServiceBounded } from "../src/work.layer.js";
 
-const Request = CalculatorRunServiceRequest.make({
-  calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+const calculatorId = AuPayTakeHomeId.make("au.pay.take-home");
+const Request = CalculatorRunRequest.make({
+  calculatorId,
   payload: {
-    facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-        period: "weekly",
-      }),
+    facts: TakeHomeScenarioInputSchema.make({
+      grossPay: NonNegativeMoney.make(
+        new Money({ cents: Cents.make(165_400), currency: "AUD" })
+      ),
+      period: "weekly",
       taxFreeThresholdClaimed: true,
-    },
+    }),
   },
 });
 const MetadataWorkCases = [
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
       service
-        .getCalculator(
-          GetCalculatorRequest.make({ calculatorId: Request.calculatorId })
-        )
+        .getCalculator(GetCalculatorRequest.make({ calculatorId }))
         .pipe(Effect.asVoid),
     operation: "getCalculator",
     substitute: (
@@ -94,9 +96,7 @@ const MetadataWorkCases = [
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
       service
-        .getCalculatorGraph(
-          GetCalculatorGraphRequest.make({ calculatorId: Request.calculatorId })
-        )
+        .getCalculatorGraph(GetCalculatorGraphRequest.make({ calculatorId }))
         .pipe(Effect.asVoid),
     operation: "getCalculatorGraph",
     substitute: (
@@ -136,9 +136,7 @@ const MetadataWorkCases = [
   {
     invoke: (service: PublicCalculatorService["Service"]) =>
       service
-        .getCalculatorSchema(
-          GetCalculatorRequest.make({ calculatorId: Request.calculatorId })
-        )
+        .getCalculatorSchema(GetCalculatorRequest.make({ calculatorId }))
         .pipe(Effect.asVoid),
     operation: "getCalculatorSchema",
     substitute: (

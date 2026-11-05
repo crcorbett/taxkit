@@ -1,112 +1,75 @@
 import {
+  Boolean as EffectBoolean,
+  Function as EffectFunction,
   Effect,
-  Match,
+  Result,
   Schema,
   SchemaGetter,
   SchemaIssue,
-  Boolean as EffectBoolean,
 } from "effect";
 
-import { InvalidDollarsText } from "./errors.js";
-import { Money, aud } from "./money.js";
-import { decimalCoefficient, decimalDollarsToCents } from "./tax.js";
-// Zero or more whole dollars with up to two decimal places. No sign, grouping,
-// currency symbol or exponent.
-const plainDollars = /^\d+(?:\.\d{1,2})?$/u;
-/**
- * Reads typed dollar text, such as `"80000"` or `" 1234.50 "`, as Money.
- * Surrounding spaces are ignored and the amount converts exactly to whole
- * cents. Fails with `InvalidDollarsText` and its reason.
- *
- * @example
- * ```ts
- * import { moneyFromDollarsText } from "taxkit/core";
- * import { Effect, Match } from "effect";
- *
- * const income = moneyFromDollarsText("80000").pipe(
- *   Effect.mapError(({ reason }) =>
- *     Match.value(reason).pipe(
- *       Match.when("empty", () => "Enter your income."),
- *       Match.orElse(() => "Check the amount.")
- *     )
- *   )
- * );
- * ```
- *
- * @since 2.2.0
- */
-export const moneyFromDollarsText = (
-  text: string
-): Effect.Effect<Money, InvalidDollarsText> => {
+import { MoneyError } from "./errors.js";
+import { Money, NonNegativeMoney, fromCents } from "./money.js";
+
+/** Parse exact decimal dollars, including signed adjustments. */
+export const fromDecimal = (text: string): Result.Result<Money, MoneyError> => {
   const dollars = text.trim();
   if (dollars.length === 0) {
-    return Effect.fail(new InvalidDollarsText({ reason: "empty" }));
+    return Result.fail(new MoneyError({ reason: "empty" }));
   }
-  if (!plainDollars.test(dollars)) {
-    return Effect.fail(new InvalidDollarsText({ reason: "format" }));
+  if (!/^-?\d+(?:\.\d{1,2})?$/u.test(dollars)) {
+    return Result.fail(new MoneyError({ reason: "format" }));
   }
-  return decimalCoefficient(dollars).pipe(
-    Effect.flatMap(decimalDollarsToCents),
-    Effect.map(aud),
-    Effect.mapError(() => new InvalidDollarsText({ reason: "range" }))
+  // Restrict size before BigInt acquisition; leading zeroes have no monetary value.
+  const normalized = dollars.replace(/^-?0*/u, "");
+  if (normalized.length > 18) {
+    return Result.fail(new MoneyError({ reason: "range" }));
+  }
+  const negative = dollars.startsWith("-");
+  const magnitude = dollars.replace(/^-?0*/u, "");
+  const [whole = "", fraction = ""] = magnitude.split(".");
+  const cents =
+    EffectFunction.pipe(whole || "0", BigInt) * 100n +
+    EffectFunction.pipe(fraction.padEnd(2, "0"), BigInt);
+  if (cents > BigInt(Number.MAX_SAFE_INTEGER)) {
+    return Result.fail(new MoneyError({ reason: "range" }));
+  }
+  return EffectFunction.pipe(
+    EffectBoolean.match(negative, {
+      onTrue: () => -cents,
+      onFalse: () => cents,
+    }),
+    Number,
+    fromCents
   );
 };
-/**
- * Writes Money as plain dollars with two decimal places, which
- * `moneyFromDollarsText` reads back unchanged.
- *
- * @since 2.2.0
- */
-export const dollarsTextFromMoney = (money: Money): string => {
+
+/** Canonical decimal dollars with two fractional digits. */
+export const format = (money: Money): string => {
   const cents = BigInt(money.cents);
-  const sign = EffectBoolean.match(cents < 0n, {
-    onFalse: (): "" => "",
-    onTrue: (): "-" => "-",
-  });
   const magnitude = EffectBoolean.match(cents < 0n, {
-    onFalse: () => cents,
     onTrue: () => -cents,
+    onFalse: () => cents,
   });
-  return `${sign}${magnitude / 100n}.${(magnitude % 100n).toString().padStart(2, "0")}`;
+  return `${EffectBoolean.match(cents < 0n, { onTrue: () => "-", onFalse: () => "" })}${magnitude / 100n}.${(magnitude % 100n).toString().padStart(2, "0")}`;
 };
-/**
- * Schema codec between typed dollar text and non-negative Money, with
- * TaxKit's default messages. For your own wording, build a codec from
- * `moneyFromDollarsText` and match on the failure's `reason`.
- *
- * @since 2.2.0
- */
-export const MoneyFromDollarsString = Schema.String.pipe(
+
+export const MoneyFromDecimalString = Schema.String.pipe(
   Schema.decodeTo(Schema.toType(Money), {
     decode: SchemaGetter.transformEffect((text: string) =>
-      moneyFromDollarsText(text).pipe(
-        Effect.mapError(
-          ({ reason }) =>
-            new SchemaIssue.InvalidValue(
-              {
-                message: Match.value(reason).pipe(
-                  Match.when(
-                    "empty",
-                    (): "Enter an amount." => "Enter an amount."
-                  ),
-                  Match.when(
-                    "format",
-                    (): "Use a dollar amount with up to two decimal places and no commas." =>
-                      "Use a dollar amount with up to two decimal places and no commas."
-                  ),
-                  Match.when(
-                    "range",
-                    (): "That amount is outside the supported range." =>
-                      "That amount is outside the supported range."
-                  ),
-                  Match.exhaustive
-                ),
-              },
-              text
-            )
-        )
+      fromDecimal(text).pipe(
+        Result.mapError(
+          () =>
+            new SchemaIssue.InvalidValue({
+              message: "Expected exact decimal AUD dollars in range.",
+            })
+        ),
+        Effect.fromResult
       )
     ),
-    encode: SchemaGetter.transform(dollarsTextFromMoney),
+    encode: SchemaGetter.transform(format),
   })
+);
+export const NonNegativeMoneyFromDecimalString = MoneyFromDecimalString.pipe(
+  Schema.decodeTo(Schema.toType(NonNegativeMoney))
 );

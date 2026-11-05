@@ -18,7 +18,11 @@
     "./origin": "./src/origin.ts",
     "./negotiation": "./src/negotiation.ingress.ts",
     "./requests": "./src/requests.ts",
-    "./errors": "./src/errors.ts"
+    "./errors": "./src/errors.ts",
+    "./schemas": "./src/schemas.ts",
+    "./calculator-contract": "./src/groups/calculators.ts",
+    "./health-contract": "./src/groups/health.ts",
+    "./content-contract": "./src/groups/content.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",

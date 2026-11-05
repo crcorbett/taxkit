@@ -7,7 +7,7 @@ import {
 } from "@taxkit/calculators/form";
 import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { Cents, aud } from "@taxkit/core/primitives";
+import { Money, Cents } from "@taxkit/core/primitives";
 import { RuleId, SourceRef, TraceNode } from "@taxkit/core/trace";
 import {
   AuPayCalculatorId,
@@ -451,27 +451,31 @@ describe("browser calculator lifetime", () => {
           title: "Source link fixture",
         });
         const component = LedgerComponent.make({
-          amount: EffectFunction.pipe(Cents.make(100), aud),
+          amount: EffectFunction.pipe(Cents.make(100), Money.fromCents),
           effect: "additive",
           id: ComponentId.make("test/payg"),
           label: "PAYG withholding",
           status: "active",
           trace,
         });
-        const report = new TakeHomePayReport({
-          grossPay: EffectFunction.pipe(Cents.make(200), aud),
-          netPay: EffectFunction.pipe(Cents.make(100), aud),
+        const report = TakeHomePayReport.make({
+          salarySacrifice: Money.fromCents(Cents.make(0)),
+          grossPay: EffectFunction.pipe(Cents.make(200), Money.fromCents),
+          netPay: EffectFunction.pipe(Cents.make(100), Money.fromCents),
           period: "weekly",
           rulePackVersion: "rules-au-pay/1.0.2",
-          taxablePay: EffectFunction.pipe(Cents.make(200), aud),
+          taxablePay: EffectFunction.pipe(Cents.make(200), Money.fromCents),
           trace,
-          withholdings: new PayWithholdingsLedger({
+          withholdings: PayWithholdingsLedger.make({
             components: [component],
             period: "weekly",
-            total: EffectFunction.pipe(Cents.make(100), aud),
+            total: EffectFunction.pipe(Cents.make(100), Money.fromCents),
             trace,
           }),
-          withholdingsTotal: EffectFunction.pipe(Cents.make(100), aud),
+          withholdingsTotal: EffectFunction.pipe(
+            Cents.make(100),
+            Money.fromCents
+          ),
         });
         const html = renderToString(
           <TakeHomeResultView report={Option.some(report)} stale={false} />

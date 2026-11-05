@@ -6,71 +6,52 @@ status: "published"
 
 # Quickstart
 
-Run one Australian annual income tax calculation with the plain TypeScript SDK.
-This is the recommended first path for TypeScript applications.
-
-## Before you start
-
-You need a TypeScript runtime that can import ESM packages.
-
 ## Install
 
-Install the SDK:
+Run `bun add taxkit effect@4.0.7` in your TypeScript project. Taxkit uses native
+Effect values in both its plain and Effect interfaces.
 
-```sh
-npm install taxkit
-```
+## Calculate take-home pay
 
-Inside this repository, the workspace already provides the SDK. All TaxKit
-imports below come from that one package.
-
-## Run a calculation
+Construct a checked scenario for the selected calculator. Amounts use exact
+decimal-dollar text; the scenario requires a non-negative amount and one period.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-const report = await au.incomeTax.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(
+    Result.flatMap(nonNegative)
+  );
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
 });
-
-console.log(report.liability.cents);
-```
-
-`aud(Cents.make(9_000_000))` represents AUD 90,000.00 as integer cents. The calculator
-returns a typed annual income tax report.
-
-## Expected result
-
-The report includes money values, ledger entries and calculator-specific
-fields. Access fields directly from the typed report:
-
-```ts
-console.log(report.liability.currency);
-console.log(report.rawLiability.cents);
-```
-
-## Handle errors
-
-Use the safe facade when you want a typed result instead of a rejected Promise:
-
-```ts
-import { Cents, aud } from "taxkit/core";
-import { TaxKit } from "taxkit";
-import { au } from "taxkit/au";
-
-const result = await TaxKit.safe.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-
-if (result._tag === "TaxKitSuccess") {
-  console.log(result.value.liability.cents);
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
+  }
 }
 ```
 
+## Read the result
+
+This example returns `130100` net cents: AUD 1,301.00. A successful native Result
+contains `success`; a failed Result contains `failure`. The selected definition
+infers the pay report, so annual-tax fields produce a TypeScript error.
+
+Money stays in safe integer cents. Use `format` from `taxkit/money` for decimal
+text, and use explicit `decodeInput` before execution when input is untrusted.
+
 ## Next steps
 
-- Use [Run your first calculation](./run-your-first-calculation.mdx) for a
-  fuller copyable script.
-- Compare surfaces in [Choose SDK or HTTP API](./choose-sdk-or-api.mdx).
-- Read [Type safety](../sdk/type-safety.mdx) before accepting user input.
+See [Plain SDK](../sdk/plain-sdk.mdx), [Effect SDK](../sdk/effect-sdk.mdx) and [Type safety](../sdk/type-safety.mdx).

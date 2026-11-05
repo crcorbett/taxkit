@@ -1,5 +1,10 @@
 import { describe, expect, it } from "@effect/vitest";
-import { Money, Cents, moneyEquals } from "@taxkit/core/primitives";
+import {
+  NonNegativeMoney,
+  Money,
+  Cents,
+  moneyEquals,
+} from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
   CalculateTakeHomePay,
@@ -34,19 +39,27 @@ import {
 } from "effect";
 
 const weekly1500 = new GrossPay({
-  amount: new Money({ cents: Cents.make(150_000), currency: "AUD" }),
+  amount: NonNegativeMoney.make(
+    new Money({ cents: Cents.make(150_000), currency: "AUD" })
+  ),
   period: "weekly",
 });
 const weekly1800 = new GrossPay({
-  amount: new Money({ cents: Cents.make(180_000), currency: "AUD" }),
+  amount: NonNegativeMoney.make(
+    new Money({ cents: Cents.make(180_000), currency: "AUD" })
+  ),
   period: "weekly",
 });
 const weekly1000 = new GrossPay({
-  amount: new Money({ cents: Cents.make(100_000), currency: "AUD" }),
+  amount: NonNegativeMoney.make(
+    new Money({ cents: Cents.make(100_000), currency: "AUD" })
+  ),
   period: "weekly",
 });
 const sacrifice300 = new SalarySacrifice({
-  amount: new Money({ cents: Cents.make(30_000), currency: "AUD" }),
+  amount: NonNegativeMoney.make(
+    new Money({ cents: Cents.make(30_000), currency: "AUD" })
+  ),
   period: "weekly",
 });
 const stslEnabled = new StslDebt({ enabled: true });
@@ -122,7 +135,9 @@ describe("AU take-home pay with STSL", () => {
       Effect.gen(function* () {
         const report = yield* stslScenario(
           new GrossPay({
-            amount: new Money({ cents: Cents.make(gross), currency: "AUD" }),
+            amount: NonNegativeMoney.make(
+              new Money({ cents: Cents.make(gross), currency: "AUD" })
+            ),
             period: "monthly",
           }),
           stslEnabled
@@ -136,7 +151,9 @@ describe("AU take-home pay with STSL", () => {
     Effect.gen(function* () {
       const report = yield* stslScenario(
         new GrossPay({
-          amount: new Money({ cents: Cents.make(1_062_788), currency: "AUD" }),
+          amount: NonNegativeMoney.make(
+            new Money({ cents: Cents.make(1_062_788), currency: "AUD" })
+          ),
           period: "monthly",
         }),
         stslEnabled,
@@ -160,7 +177,9 @@ describe("AU take-home pay with STSL", () => {
     Effect.gen(function* () {
       const report = yield* stslScenario(
         new GrossPay({
-          amount: new Money({ cents: Cents.make(gross), currency: "AUD" }),
+          amount: NonNegativeMoney.make(
+            new Money({ cents: Cents.make(gross), currency: "AUD" })
+          ),
           period: "weekly",
         }),
         stslEnabled,
@@ -347,7 +366,9 @@ describe("AU take-home pay with STSL", () => {
     (cents) =>
       Effect.gen(function* () {
         const sacrifice = new SalarySacrifice({
-          amount: new Money({ cents: Cents.make(cents), currency: "AUD" }),
+          amount: NonNegativeMoney.make(
+            new Money({ cents: Cents.make(cents), currency: "AUD" })
+          ),
           period: "weekly",
         });
         const report = yield* sacrificeOnlyScenario(weekly1500, sacrifice);
@@ -459,7 +480,9 @@ describe("AU take-home pay with STSL", () => {
       Effect.gen(function* () {
         const report = yield* stslScenario(
           new GrossPay({
-            amount: new Money({ cents: Cents.make(650_000), currency: "AUD" }),
+            amount: NonNegativeMoney.make(
+              new Money({ cents: Cents.make(650_000), currency: "AUD" })
+            ),
             period: "monthly",
           }),
           stslEnabled
@@ -512,7 +535,9 @@ describe("AU take-home pay with STSL", () => {
       Effect.gen(function* () {
         const report = yield* stslScenario(
           new GrossPay({
-            amount: new Money({ cents: Cents.make(350_000), currency: "AUD" }),
+            amount: NonNegativeMoney.make(
+              new Money({ cents: Cents.make(350_000), currency: "AUD" })
+            ),
             period: "weekly",
           }),
           stslEnabled

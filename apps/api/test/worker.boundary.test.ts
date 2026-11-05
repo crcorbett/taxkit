@@ -70,7 +70,7 @@ const settings = ConfigProvider.fromUnknown({
   WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
 });
 const Json = Schema.fromJsonString(Schema.Unknown);
-const calculatePath = "/api/v1/calculators/au.pay.take-home/calculate";
+const calculatePath = "/api/v2/calculators/au.pay.take-home/calculate";
 // Each request writes one checked fixed-field record; anything else is a
 // runtime log line.
 const runtimeLines = (lines: readonly unknown[]) =>
@@ -141,7 +141,7 @@ describe("native API application", () => {
       EffectFunction.pipe(header(head, "cache-control"), (actual) => {
         expect(actual).toBe("public, max-age=0");
       });
-      const metadata = yield* send("/api/v1/calculators", "GET", null);
+      const metadata = yield* send("/api/v2/calculators", "GET", null);
       EffectFunction.pipe(header(metadata, "cache-control"), (actual) => {
         expect(actual).toBe("public, max-age=0");
       });
@@ -162,10 +162,10 @@ describe("native API application", () => {
         }
       );
       const calculated = yield* send(
-        "/api/v1/calculators/au.pay.take-home/calculate",
+        "/api/v2/calculators/au.pay.take-home/calculate",
         "POST",
         yield* Schema.encodeEffect(Schema.fromJsonString(CalculatorRunRequest))(
-          CalculationRequest.payload
+          CalculationRequest
         )
       );
       expect(calculated.status).toBe(200);
@@ -243,7 +243,7 @@ describe("native API application", () => {
       );
       const httpBody = yield* Schema.encodeEffect(
         Schema.fromJsonString(CalculatorRunRequest)
-      )(CalculationRequest.payload);
+      )(CalculationRequest);
       // A request body can be read once, so each call builds its own request.
       const invoke = Effect.suspend(() =>
         app.fetch.pipe(
@@ -251,7 +251,7 @@ describe("native API application", () => {
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromWeb(
               new Request(
-                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+                "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate",
                 {
                   body: httpBody,
                   headers: {
@@ -522,7 +522,7 @@ describe("native API application", () => {
         }
       );
       const http = yield* preflight(
-        "/api/v1/calculators/au.pay.take-home/calculate",
+        "/api/v2/calculators/au.pay.take-home/calculate",
         "http://127.0.0.1:3000"
       );
       EffectFunction.pipe(allowOrigin(http), (actual) => {
@@ -556,11 +556,11 @@ describe("native API application", () => {
   );
   it.effect.each([
     {
-      pathname: "/api/v1/calculators/au.pay.take-home/calculate",
+      pathname: "/api/v2/calculators/au.pay.take-home/calculate",
       representation: "chunks",
     },
     {
-      pathname: "/api/v1/calculators/au.pay.take-home/calculate",
+      pathname: "/api/v2/calculators/au.pay.take-home/calculate",
       representation: "utf-8",
     },
   ])(
@@ -706,10 +706,10 @@ describe("native API application", () => {
         );
         const httpBody = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
-        )(CalculationRequest.payload);
+        )(CalculationRequest);
         const http = yield* transport.execute(
           HttpClientRequest.post(
-            "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate"
+            "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate"
           ).pipe(
             HttpClientRequest.bodyText(
               httpBody +
@@ -744,8 +744,8 @@ describe("native API application", () => {
           RefGetConstructions: 1,
           RefGetReleases: 2,
           RefGetIncomingPaths: [
-            "/api/v1/calculators/au.pay.take-home/calculate",
-            "/api/v1/calculators/au.pay.take-home/calculate",
+            "/api/v2/calculators/au.pay.take-home/calculate",
+            "/api/v2/calculators/au.pay.take-home/calculate",
           ],
         });
       }).pipe(
@@ -854,12 +854,12 @@ describe("native API application", () => {
           );
         const query = `?gross=165400&note=${encodeURIComponent(sensitiveSentinel)}`;
         yield* send(
-          `/api/v1/calculators/au.pay.take-home/calculate${query}`,
+          `/api/v2/calculators/au.pay.take-home/calculate${query}`,
           "POST",
           `{"grossDollars":165400,"note":"${sensitiveSentinel}"}`
         );
         yield* send(`/api/health${query}`, "GET", null);
-        yield* send(`/api/v1/calculators${query}`, "GET", null);
+        yield* send(`/api/v2/calculators${query}`, "GET", null);
         const lines = yield* TestConsole.logLines;
         EffectFunction.pipe(runtimeLines(lines), (actual) => {
           expect(actual).toStrictEqual([]);
@@ -1030,7 +1030,7 @@ describe("native API application", () => {
         );
         const body = yield* Schema.encodeEffect(
           Schema.fromJsonString(CalculatorRunRequest)
-        )(CalculationRequest.payload);
+        )(CalculationRequest);
         const response = yield* app.fetch.pipe(
           Effect.provideService(
             HttpServerRequest.HttpServerRequest,

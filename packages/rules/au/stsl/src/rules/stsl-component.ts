@@ -1,6 +1,6 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { Cents, Money, audFromCents } from "@taxkit/core/primitives";
+import { Cents, Money, fromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   payPeriodToWeeklyCents,
@@ -88,7 +88,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     if (!stslDebt.enabled) {
       const trace = TraceNode.make({
         children: [taxable.trace],
-        formula: Option.some(Option.some("stsl = 0 (opted out)")),
+        formula: Option.some("stsl = 0 (opted out)"),
         inputs: baseTraceInputs,
         result: 0,
         ruleId: StslComponentRuleId,
@@ -132,9 +132,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     if (weeklyWithholdingDollars === 0) {
       const trace = TraceNode.make({
         children: [taxable.trace],
-        formula: Option.some(
-          Option.some("stsl = 0 (Schedule 8 component rounds to zero)")
-        ),
+        formula: Option.some("stsl = 0 (Schedule 8 component rounds to zero)"),
         inputs: {
           ...baseTraceInputs,
           a: BigDecimal.format(row.a),
@@ -143,7 +141,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
           weeklyFormulaCents,
         },
         result: 0,
-        rounding: Option.some(Option.some("ato-withholding-rounding")),
+        rounding: Option.some("ato-withholding-rounding"),
         ruleId: StslComponentRuleId,
         sources: [table.source],
         title: "STSL withholding (zero component)",
@@ -158,7 +156,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
       });
       return component;
     }
-    const periodWithholding = yield* audFromCents(
+    const periodWithholding = yield* fromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period
@@ -167,9 +165,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     const trace = TraceNode.make({
       children: [taxable.trace],
       formula: Option.some(
-        Option.some(
-          "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period"
-        )
+        "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period"
       ),
       inputs: {
         ...baseTraceInputs,
@@ -180,7 +176,7 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
         weeklyWithholdingDollarsRaw: BigDecimal.format(weeklyWithholding),
       },
       result: periodWithholding.cents,
-      rounding: Option.some(Option.some("ato-withholding-rounding")),
+      rounding: Option.some("ato-withholding-rounding"),
       ruleId: StslComponentRuleId,
       sources: [table.source],
       title: "STSL withholding (Schedule 8)",

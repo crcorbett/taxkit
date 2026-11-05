@@ -17,7 +17,7 @@ it.effect(
       EffectFunction.pipe(
         Predicate.isTagged(
           yield* invalidInput.pipe(Effect.flip),
-          "SchemaError"
+          "InputValidationError"
         ),
         (matches) => {
           expect(matches).toBeTruthy();
@@ -41,14 +41,14 @@ it.effect(
       const response = HttpClientResponse.fromWeb(
         request,
         new Response(
-          '{"error":{"_tag":"CalculatorInputDecodeError","calculatorId":"au.pay.take-home","message":"Invalid facts for au.pay.take-home","issues":[]}}',
+          '{"error":{"_tag":"InputValidationError","message":"Invalid calculator input.","issues":[],"truncated":false}}',
           { headers: { "content-type": "application/json" }, status: 400 }
         )
       );
       EffectFunction.pipe(
         Predicate.isTagged(
           (yield* readCalculatorError(response)).error,
-          "CalculatorInputDecodeError"
+          "InputValidationError"
         ),
         (matches) => {
           expect(matches).toBeTruthy();

@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-effect-services-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-11-04
 review_trigger: service, Layer, runtime, lifetime or boundary ownership change
 ---
 
@@ -83,15 +83,11 @@ JavaScript `Map`/`Set` indexes, nullable lookups, `switch`, `Object.values`,
 request-local runtime creation or hand-rolled runtime wrappers when Effect
 owns the pattern.
 
-Calculator-owned context, help and filter fields use `Option<Option<A>>` in
-checked TypeScript values: `None` means a missing key, `Some(None)` means a
-present undefined key, and `Some(Some(value))` means a present value. Owning
-constructors default omitted keys to `None`. JSON and HTTP query fields retain
-their ordinary optional representation. Flatten the two absent forms only where
-they mean the same thing; do not invent a jurisdiction or tax year. Code MUST NOT use undefined checks and defaulting such
-as `payload.jurisdiction ?? "AU"` to invent missing calculator context.
-Missing context MUST either remain absent, be decoded by a schema that
-explicitly owns the default, or fail with a tagged expected error.
+Calculator-owned context, help and filter fields use one `Option<A>` in
+checked TypeScript values. Owning constructors default omitted keys to `None`;
+transport codecs convert ordinary optional fields at ingress. Do not invent a
+jurisdiction or year. Missing context remains absent or fails through an
+explicitly owning Schema and tagged error.
 
 Code MUST use pipe-first composition for readable Effect and data pipelines
 when it keeps the source value visible and data flow clearer, for example
@@ -153,7 +149,7 @@ Schema does not provide.
 
 Core's constrained money, date and decimal helpers return owned schema-tagged
 errors through Effects. `aud` remains pure for already checked cents; use
-`audFromCents` for a number that still needs checking. New arithmetic results
+`fromCents` for a number that still needs checking. New arithmetic results
 must pass the owning fallible constructor. Rules translate those failures to
 safe calculation errors without copying the input amount or a raw Schema issue.
 The [core README](../../packages/core/README.md) owns the concrete helper and

@@ -1,138 +1,94 @@
-import type { CalculatorServiceError } from "@taxkit/calculators/schemas";
-import { Money, Cents } from "@taxkit/core/primitives";
-import {
-  AuPayJurisdiction,
-  AuPayTaxYear,
-  GrossPay,
-} from "@taxkit/rules-au-pay";
-import type { TakeHomePayReport } from "@taxkit/rules-au-pay";
-import { Option } from "effect";
-import type { Effect, Schema } from "effect";
+import { Context, Effect, Layer, Schema, SchemaGetter } from "effect";
 
 import {
-  calculateRunRequest,
-  calculateReportRequest,
-  createClient,
+  CalculateTakeHomePay,
+  AuTakeHomePayWithSacrifice2025_26_Live,
+  GrossPayFact,
+  TaxFreeThresholdClaimedFact,
+  TaxFreeThresholdClaimed,
+  TaxablePayFact,
+  PaygWithholdingComponentFact,
+  PaygWithholdingLive,
+} from "../src/au-effect.js";
+import { AuPayTakeHomeCalculation } from "../src/au.js";
+import type { TaxablePay } from "../src/au/schemas.js";
+import { TakeHomeScenarioInputSchema, GrossPay } from "../src/au/schemas.js";
+import {
+  calculateReport,
+  decodeInput,
+  TaxKitLive,
+  // @ts-expect-error removed independent descriptor factory is unavailable.
   defineSdkCalculation,
 } from "../src/effect.js";
-import type {
-  SdkCalculatorRunResponse,
-  TaxKitEffectRequirements,
-} from "../src/effect.js";
-import {
-  AuAnnualIncomeTaxCalculation,
-  AuIncomeTax2025_26Module,
-  AuPay2025_26Module,
-  AuPayTakeHomeCalculation,
-} from "../src/testing/index.js";
+import { Cents, Money, NonNegativeMoney } from "../src/money.js";
 
-const payClient = createClient(AuPay2025_26Module);
-const fullClient = createClient(AuPay2025_26Module, AuIncomeTax2025_26Module);
-
-const _payReport = payClient.calculations.calculateReport(
-  AuPayTakeHomeCalculation,
-  {
-    grossPay: new GrossPay({
-      amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-      period: "weekly",
-    }),
-    taxFreeThresholdClaimed: true,
-  }
-);
-
-const _annualReport = fullClient.calculations.calculateReport(
-  AuAnnualIncomeTaxCalculation,
-  {
-    taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
-  }
-);
-const _fullRun: Effect.Effect<
-  SdkCalculatorRunResponse<TakeHomePayReport>,
-  CalculatorServiceError | Schema.SchemaError,
-  TaxKitEffectRequirements
-> = calculateRunRequest(AuPayTakeHomeCalculation, {
-  payload: {
-    facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-        period: "weekly",
-      }),
-      taxFreeThresholdClaimed: true,
-    },
-    jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-    taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
-  },
+const amount = NonNegativeMoney.make(Money.fromCents(Cents.make(165_400)));
+const scenario = TakeHomeScenarioInputSchema.make({
+  grossPay: amount,
+  period: "weekly",
+  taxFreeThresholdClaimed: true,
 });
-const _reportRequest = calculateReportRequest(AuPayTakeHomeCalculation, {
-  help: Option.some(Option.some("errors")),
-  payload: {
-    facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-        period: "weekly",
-      }),
-      taxFreeThresholdClaimed: true,
-    },
-    jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-    taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
-  },
-});
-
-const _unsupportedModuleCalculation = payClient.calculations.calculateReport(
-  // @ts-expect-error annual income tax is not provided by the pay-only module.
-  AuAnnualIncomeTaxCalculation,
-  {
-    taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
-  }
+const program = calculateReport(AuPayTakeHomeCalculation, scenario);
+const closed: Effect.Effect<
+  typeof AuPayTakeHomeCalculation.outputSchema.Type,
+  typeof AuPayTakeHomeCalculation.errorSchema.Type
+> = program.pipe(Effect.provide(TaxKitLive));
+void closed;
+type Requirements = Effect.Services<typeof program>;
+declare const requirements: Requirements;
+// @ts-expect-error an engine service is still required until provided.
+const noRequirements: never = requirements;
+void noRequirements;
+const gross = new GrossPay({ amount, period: "weekly" });
+// @ts-expect-error gross and taxable pay retain separate nominal identities.
+const taxable: TaxablePay = gross;
+void taxable;
+const unfinished = CalculateTakeHomePay.pipe(
+  Effect.provide(AuTakeHomePayWithSacrifice2025_26_Live),
+  Effect.provide(
+    Layer.mergeAll(
+      Layer.succeed(GrossPayFact)(gross),
+      Layer.succeed(TaxFreeThresholdClaimedFact)(
+        new TaxFreeThresholdClaimed({ value: true })
+      )
+    )
+  )
 );
+declare const remaining: Effect.Services<typeof unfinished>;
+// @ts-expect-error salary sacrifice remains in the native requirement channel.
+const completed: never = remaining;
+void completed;
+void defineSdkCalculation;
 
-const _wrongAnnualFacts = fullClient.calculations.calculateReport(
-  AuAnnualIncomeTaxCalculation,
-  {
-    // @ts-expect-error take-home facts cannot be submitted to annual tax.
-    grossPay: new GrossPay({
-      amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-      period: "weekly",
-    }),
-    taxFreeThresholdClaimed: true,
-  }
+declare const checkedTaxablePay: TaxablePay;
+const parameterDependent = PaygWithholdingComponentFact.pipe(
+  Effect.provide(PaygWithholdingLive),
+  Effect.provideService(TaxablePayFact, checkedTaxablePay),
+  Effect.provideService(
+    TaxFreeThresholdClaimedFact,
+    new TaxFreeThresholdClaimed({ value: true })
+  )
 );
-
-const _wrongPayFacts = payClient.calculations.calculateReport(
-  AuPayTakeHomeCalculation,
-  {
-    // @ts-expect-error annual-tax facts cannot be submitted to take-home pay.
-    taxableIncome: new Money({ cents: Cents.make(9_000_000), currency: "AUD" }),
-  }
+declare const parameterRequirement: Effect.Services<typeof parameterDependent>;
+// @ts-expect-error the statutory parameter service remains unprovided.
+const noParameter: never = parameterRequirement;
+void noParameter;
+class DecodePermission extends Context.Service<DecodePermission, boolean>()(
+  "test/DecodePermission"
+) {}
+const serviceCodec = Schema.String.pipe(
+  Schema.decodeTo(Schema.String, {
+    decode: SchemaGetter.transformEffect((value) =>
+      DecodePermission.pipe(Effect.as(value))
+    ),
+    encode: SchemaGetter.passthrough(),
+  })
 );
-const _wrongReportRequest = calculateReportRequest(AuPayTakeHomeCalculation, {
-  payload: {
-    facts: {
-      // @ts-expect-error request-preserving Effect facade still binds facts to the selected descriptor.
-      taxableIncome: new Money({
-        cents: Cents.make(9_000_000),
-        currency: "AUD",
-      }),
-    },
-  },
-});
-const _wrongRunRequest = calculateRunRequest(AuPayTakeHomeCalculation, {
-  payload: {
-    facts: {
-      // @ts-expect-error full-run Effect facade still binds facts to the selected descriptor.
-      taxableIncome: new Money({
-        cents: Cents.make(9_000_000),
-        currency: "AUD",
-      }),
-    },
-  },
-});
-
-defineSdkCalculation({
-  calculatorId: AuPayTakeHomeCalculation.calculatorId,
-  inputSchema: AuPayTakeHomeCalculation.inputSchema,
-  jurisdiction: AuPayTakeHomeCalculation.jurisdiction,
-  outputSchema: AuPayTakeHomeCalculation.outputSchema,
-  // @ts-expect-error unsupported tax year literals must stay out of descriptors.
-  taxYear: "2024-25",
-});
+const serviceIngress = decodeInput(
+  { inputSchema: serviceCodec },
+  "checked representation"
+);
+declare const decoderRequirement: Effect.Services<typeof serviceIngress>;
+// @ts-expect-error explicit ingress preserves the codec's native decoding service.
+const noDecoder: never = decoderRequirement;
+void noDecoder;

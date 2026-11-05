@@ -14,6 +14,8 @@ export {
 } from "./take-home-pay.js";
 export {
   AuPayCalculatorId,
+  AuPayTakeHomeId,
+  AuPayWithholdingsId,
   AuPayContext,
   AuPayJurisdiction,
   AuPayTaxYear,

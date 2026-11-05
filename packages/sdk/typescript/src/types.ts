@@ -1,116 +1,21 @@
-import type {
-  CalculatorId,
-  CalculatorJurisdiction,
-  CalculatorTaxYear,
-  CalculatorRunFacts,
-  CalculatorRunReport,
-} from "@taxkit/calculators/schemas";
-import { Schema } from "effect";
-import type { Effect } from "effect";
+import type { CalculatorDefinition, CalculationResult } from "@taxkit/core";
+import type { Schema } from "effect";
 
-type UntrustedCalculatorOutput = typeof Schema.Unknown.Type;
+/** Infer the checked input directly from its owning calculator definition. */
+export type CalculationInput<
+  Calculation extends { readonly inputSchema: Schema.Top },
+> = Calculation["inputSchema"]["Type"];
+export type CalculationOutput<
+  Calculation extends { readonly outputSchema: Schema.Top },
+> = Calculation["outputSchema"]["Type"];
 
-export interface SdkCalculation<
-  Id extends CalculatorId,
-  Jurisdiction extends CalculatorJurisdiction,
-  TaxYear extends CalculatorTaxYear,
-  InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  OutputSchema extends Schema.Decoder<CalculatorRunReport>,
-> {
-  readonly calculatorId: Id;
-  readonly decodeOutput: (
-    output: UntrustedCalculatorOutput
-  ) => Effect.Effect<OutputSchema["Type"], Schema.SchemaError>;
-  readonly inputSchema: InputSchema;
-  readonly jurisdiction: Jurisdiction;
-  readonly outputSchema: OutputSchema;
-  readonly taxYear: TaxYear;
-}
-
-export interface SdkCalculationDefinition<
-  Id extends CalculatorId,
-  Jurisdiction extends CalculatorJurisdiction,
-  TaxYear extends CalculatorTaxYear,
-  InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  OutputSchema extends Schema.Decoder<CalculatorRunReport>,
-> {
-  readonly calculatorId: Id;
-  readonly inputSchema: InputSchema;
-  readonly jurisdiction: Jurisdiction;
-  readonly outputSchema: OutputSchema;
-  readonly taxYear: TaxYear;
-}
-
-export type AnySdkCalculation = SdkCalculation<
-  CalculatorId,
-  CalculatorJurisdiction,
-  CalculatorTaxYear,
-  Schema.Schema<CalculatorRunFacts>,
-  Schema.Decoder<CalculatorRunReport>
->;
-
-export interface TaxKitModule<
-  Id extends string,
-  Jurisdiction extends CalculatorJurisdiction,
-  TaxYear extends CalculatorTaxYear,
-  Calculations extends readonly AnySdkCalculation[],
-> {
-  readonly calculations: Calculations;
-  readonly id: Id;
-  readonly jurisdiction: Jurisdiction;
-  readonly taxYear: TaxYear;
-}
-
-export type AnyTaxKitModule = TaxKitModule<
-  string,
-  CalculatorJurisdiction,
-  CalculatorTaxYear,
-  readonly AnySdkCalculation[]
->;
-
-export type CalculationInput<Calculation> = Calculation extends {
-  readonly inputSchema: infer InputSchema extends Schema.Top;
-}
-  ? InputSchema["Type"]
-  : never;
-
-export type CalculationOutput<Calculation> = Calculation extends {
-  readonly outputSchema: infer OutputSchema extends Schema.Top;
-}
-  ? OutputSchema["Type"]
-  : never;
-
-export type ModuleCalculation<Modules extends readonly AnyTaxKitModule[]> =
-  Modules[number]["calculations"][number];
-
-export const defineSdkCalculation = <
-  const Id extends CalculatorId,
-  const Jurisdiction extends CalculatorJurisdiction,
-  const TaxYear extends CalculatorTaxYear,
-  const InputSchema extends Schema.Schema<CalculatorRunFacts>,
-  const OutputSchema extends Schema.Decoder<CalculatorRunReport>,
->(
-  calculation: SdkCalculationDefinition<
-    Id,
-    Jurisdiction,
-    TaxYear,
-    InputSchema,
-    OutputSchema
-  >
-): SdkCalculation<Id, Jurisdiction, TaxYear, InputSchema, OutputSchema> => ({
-  ...calculation,
-  // The calculator service returns domain reports. Narrow that checked Type;
-  // decoding the transport representation again would corrupt Option fields.
-  decodeOutput: Schema.decodeUnknownEffect(
-    Schema.toType(calculation.outputSchema)
-  ),
-});
-
-export const defineTaxKitModule = <
-  const Id extends string,
-  const Jurisdiction extends CalculatorJurisdiction,
-  const TaxYear extends CalculatorTaxYear,
-  const Calculations extends readonly AnySdkCalculation[],
->(
-  module: TaxKitModule<Id, Jurisdiction, TaxYear, Calculations>
-): TaxKitModule<Id, Jurisdiction, TaxYear, Calculations> => module;
+export type CalculationRun<
+  Output extends Schema.Top,
+  Identity extends Pick<
+    CalculatorDefinition<Schema.Top, Schema.Top>,
+    "calculatorId" | "jurisdiction" | "taxYear"
+  >,
+> = CalculationResult<Output["Type"]> &
+  Pick<Identity, "calculatorId"> & {
+    readonly context: Readonly<Pick<Identity, "jurisdiction" | "taxYear">>;
+  };

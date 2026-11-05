@@ -6,7 +6,7 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 
-import { InvalidDecimalValue, InvalidMoneyValue } from "./errors.js";
+import { InvalidDecimalValue, MoneyError } from "./errors.js";
 import { Cents } from "./money.js";
 /**
  * A stable calculator identifier such as `au.pay.take-home`.
@@ -150,7 +150,7 @@ const roundScaledInteger = (value: bigint, scale: number): bigint => {
 // exponents; they must produce a checked result rather than a BigInt defect.
 const roundDecimalToCents = (
   value: BigDecimal.BigDecimal
-): Effect.Effect<Cents, InvalidMoneyValue> => {
+): Effect.Effect<Cents, MoneyError> => {
   const magnitude = EffectBoolean.match(value.value < 0n, {
     onFalse: () => value.value,
     onTrue: () => -value.value,
@@ -160,7 +160,7 @@ const roundDecimalToCents = (
     return Effect.succeed(Cents.make(0));
   }
   if (digits - value.scale > Number.MAX_SAFE_INTEGER.toString().length) {
-    return Effect.fail(new InvalidMoneyValue());
+    return Effect.fail(new MoneyError());
   }
   const rounded = EffectBoolean.match(value.scale <= 0, {
     onFalse: () => roundScaledInteger(value.value, value.scale),
@@ -168,7 +168,7 @@ const roundDecimalToCents = (
       value.value * 10n ** EffectFunction.pipe(Math.abs(value.scale), BigInt),
   });
   return Cents.makeEffect(Number(rounded)).pipe(
-    Effect.mapError(() => new InvalidMoneyValue())
+    Effect.mapError(() => new MoneyError())
   );
 };
 /**
@@ -183,7 +183,7 @@ const roundDecimalToCents = (
 export const multiplyCentsByDecimal = (
   cents: Cents,
   coefficient: TaxRate | DecimalCoefficient
-): Effect.Effect<Cents, InvalidMoneyValue> => {
+): Effect.Effect<Cents, MoneyError> => {
   const product = BigDecimal.multiply(
     BigDecimal.make(BigInt(cents), 0),
     coefficient
@@ -197,7 +197,7 @@ export const multiplyCentsByDecimal = (
  */
 export const decimalDollarsToCents = (
   dollars: DecimalCoefficient
-): Effect.Effect<Cents, InvalidMoneyValue> => {
+): Effect.Effect<Cents, MoneyError> => {
   const cents = BigDecimal.multiply(dollars, BigDecimal.make(100n, 0));
   return roundDecimalToCents(cents);
 };

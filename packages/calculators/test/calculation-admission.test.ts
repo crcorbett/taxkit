@@ -1,7 +1,10 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
 import { Cents, Money } from "@taxkit/core/primitives";
-import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
+import {
+  AuPayTakeHomeId,
+  TakeHomeScenarioInputSchema,
+} from "@taxkit/rules-au-pay/schemas";
 import {
   Predicate,
   Function as EffectFunction,
@@ -26,22 +29,22 @@ import { PublicCalculatorServiceLive } from "../src/live.layer.js";
 import {
   CalculatorAdmissionUnavailable,
   CalculatorRateLimited,
-  CalculatorRunServiceRequest,
+  CalculatorRunRequest,
   MetadataQuery,
 } from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
 import { PublicCalculatorServiceBounded } from "../src/work.layer.js";
 
-const request = CalculatorRunServiceRequest.make({
-  calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+const request = CalculatorRunRequest.make({
+  calculatorId: AuPayTakeHomeId.make("au.pay.take-home"),
   payload: {
-    facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-        period: "weekly",
-      }),
+    facts: TakeHomeScenarioInputSchema.make({
+      grossPay: NonNegativeMoney.make(
+        new Money({ cents: Cents.make(165_400), currency: "AUD" })
+      ),
+      period: "weekly",
       taxFreeThresholdClaimed: true,
-    },
+    }),
   },
 });
 const calculators = PublicCalculatorServiceRateLimited.pipe(
@@ -58,10 +61,13 @@ describe("anonymous calculation admission", () => {
         "2001:0db8:0000:0000:0000:0000:0000:0075"
       );
       expect(first).toStrictEqual(second);
-      // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
-      EffectFunction.pipe(String(first), (actual) => {
-        expect(actual).not.toContain("2001:");
-      });
+      EffectFunction.pipe(
+        // oxlint-disable-next-line typescript/no-base-to-string -- Verify that implicit string conversion cannot reveal the secret.
+        String(first),
+        (actual) => {
+          expect(actual).not.toContain("2001:");
+        }
+      );
       EffectFunction.pipe(
         Result.isFailure(
           yield* Schema.encodeEffect(CalculatorClientRateKey)(first).pipe(

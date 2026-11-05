@@ -10,7 +10,6 @@ import {
   CalculatorId,
   CalculatorSchemaResponse,
   CalculatorServiceError,
-  CalculationQuery,
   DescriptorFilterQuery,
   FactsResponse,
   HelpQuery,
@@ -23,6 +22,7 @@ import {
 } from "@taxkit/calculators/schemas";
 import { Data, Schema } from "effect";
 import {
+  HttpApi,
   HttpApiEndpoint,
   HttpApiGroup,
   HttpApiSchema,
@@ -42,10 +42,6 @@ export {
   CalculatorCatalogResponse,
   CalculatorContext,
   CalculatorId,
-  CalculatorInputDecodeError,
-  CalculatorInputHelp,
-  CalculatorInputIssue,
-  CalculationQuery,
   CalculatorRunReport,
   CalculatorRunRequest,
   CalculatorRunResponse,
@@ -199,13 +195,17 @@ const CalculateEndpoint = HttpApiEndpoint.post(
     error: CalculatorApiErrorEnvelopes,
     params: CalculatorParams,
     payload: CalculatorRunRequest,
-    query: CalculationQuery,
     success: CalculatorRunResponse,
   }
-).annotate(
-  OpenApi.Description,
-  "Run one public calculator using canonical scenario decoding and rule-pack layers."
-);
+)
+  .annotate(HttpApi.PayloadParseOptions, {
+    onExcessProperty: "error",
+    errors: "all",
+  })
+  .annotate(
+    OpenApi.Description,
+    "Run one public calculator using canonical scenario decoding and rule-pack layers."
+  );
 
 const ListFactsEndpoint = HttpApiEndpoint.get(
   "listFacts",

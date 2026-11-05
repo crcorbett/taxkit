@@ -1,8 +1,8 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
-import { CalculationEngineLive } from "@taxkit/core";
+import { CalculationEngineLive, inputValidationError } from "@taxkit/core";
 import { Effect, Layer } from "effect";
-import { HttpApiBuilder, HttpApiScalar } from "effect/http-api";
+import { HttpApiBuilder, HttpApiScalar, HttpApiError } from "effect/http-api";
 import * as HttpMiddleware from "effect/http/HttpMiddleware";
 import * as HttpRouter from "effect/http/HttpRouter";
 import * as HttpServer from "effect/http/HttpServer";
@@ -20,7 +20,27 @@ import { openApiPath, referencePath } from "../routes.js";
 const ApiRoutes = HttpApiBuilder.layer(TaxKitApi).pipe(
   Layer.provide(CalculatorApiHandlerLive),
   Layer.provide(ContentApiHandlerLive),
-  Layer.provide(HealthHandlerLive)
+  Layer.provide(HealthHandlerLive),
+  Layer.provide(
+    HttpRouter.middleware((handler) =>
+      handler.pipe(
+        Effect.catchDefect((failure) => {
+          if (
+            HttpApiError.HttpApiSchemaError.is(failure) &&
+            failure.kind === "Payload"
+          ) {
+            return Effect.succeed(
+              HttpServerResponse.jsonUnsafe(
+                { error: inputValidationError(failure.cause.issue) },
+                { status: 400 }
+              )
+            );
+          }
+          return Effect.die(failure);
+        })
+      )
+    ).layer
+  )
 );
 
 const DocsRouteLayer = HttpApiScalar.layer(TaxKitApi, {

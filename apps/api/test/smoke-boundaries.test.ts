@@ -16,14 +16,14 @@ import {
   DocsSearchResult,
 } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
-import { CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import {
-  AuPayCalculatorId,
+  AuPayTakeHomeId,
   AuPayJurisdiction,
   AuPayTaxYear,
-  GrossPay,
 } from "@taxkit/rules-au-pay";
+import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 import {
   Function as EffectFunction,
   Cause,
@@ -78,9 +78,9 @@ const fault = PlatformError.badArgument({
 });
 const routeEvidence = [
   "GET /api/health",
-  "GET /api/v1/calculators",
-  "POST /api/v1/calculators/au.pay.take-home/calculate",
-  "POST /api/v1/calculators/au.income-tax.annual/calculate",
+  "GET /api/v2/calculators",
+  "POST /api/v2/calculators/au.pay.take-home/calculate",
+  "POST /api/v2/calculators/au.income-tax.annual/calculate",
   "GET /api/docs/openapi.json",
 ];
 const settings = ApiSmokeSettings.make({
@@ -104,18 +104,18 @@ const successfulHttpClient = Effect.gen(function* () {
   const service = yield* PublicCalculatorService;
   const catalog = yield* service.listCalculators(MetadataQuery.make({}));
   const calculation = yield* service.calculate({
-    calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
-    help: Option.none(),
+    calculatorId: AuPayTakeHomeId.make("au.pay.take-home"),
+
     payload: {
-      facts: {
-        grossPay: new GrossPay({
-          amount: new Money({ cents: Cents.make(346_200), currency: "AUD" }),
-          period: "fortnightly",
-        }),
+      facts: TakeHomeScenarioInputSchema.make({
+        grossPay: NonNegativeMoney.make(
+          new Money({ cents: Cents.make(346_200), currency: "AUD" })
+        ),
+        period: "fortnightly",
         taxFreeThresholdClaimed: true,
-      },
-      jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-      taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
+      }),
+      jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
+      taxYear: Option.some(AuPayTaxYear.make("2025-26")),
     },
   });
   const healthJson = yield* Schema.encodeEffect(
@@ -131,7 +131,7 @@ const successfulHttpClient = Effect.gen(function* () {
     Schema.fromJsonString(ApiSmokeOpenApiProjection)
   )({
     openapi: "3.1.0",
-    paths: { "/api/v1/calculators/{calculatorId}/calculate": {} },
+    paths: { "/api/v2/calculators/{calculatorId}/calculate": {} },
   });
   return HttpClient.make((request, url) =>
     Effect.succeed(
@@ -144,7 +144,7 @@ const successfulHttpClient = Effect.gen(function* () {
             Match.when("/api/v2/docs/navigation", () => navigationJson),
             Match.when("/api/v2/docs/search", () => searchJson),
             Match.when("/api/v2/docs/markdown", () => page.markdown),
-            Match.when("/api/v1/calculators", () => catalogJson),
+            Match.when("/api/v2/calculators", () => catalogJson),
             Match.when("/api/docs/openapi.json", () => openApiJson),
             Match.orElse(() => calculationJson)
           ),

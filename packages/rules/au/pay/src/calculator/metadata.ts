@@ -1,5 +1,14 @@
 import { Schema } from "effect";
 
+export const AuPayTakeHomeId = Schema.Literal("au.pay.take-home").pipe(
+  Schema.brand("taxkit/CalculatorId")
+);
+export const AuPayWithholdingsId = Schema.Literal("au.pay.withholdings").pipe(
+  Schema.brand("taxkit/CalculatorId")
+);
+export const AuPayWithSacrificeId = Schema.Literal(
+  "au.pay.take-home-with-sacrifice"
+).pipe(Schema.brand("taxkit/CalculatorId"));
 export const AuPayCalculatorId = Schema.Literals([
   "au.pay.take-home",
   "au.pay.withholdings",

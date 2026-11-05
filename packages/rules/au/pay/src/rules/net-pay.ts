@@ -1,5 +1,5 @@
 import { CalculationError } from "@taxkit/core/errors";
-import { moneySub } from "@taxkit/core/primitives";
+import { subtract } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer, Option } from "effect";
 
@@ -24,13 +24,11 @@ export const NetPayLive = Layer.effect(NetPayFact)(
     const gross = yield* GrossPayFact;
     const ledger = yield* PayWithholdingsLedgerFact;
 
-    const netAmount = yield* moneySub(gross.amount, ledger.total);
+    const netAmount = yield* subtract(gross.amount, ledger.total);
 
     const trace = TraceNode.make({
       children: [ledger.trace],
-      formula: Option.some(
-        Option.some("net = gross - withholdingsLedger.total")
-      ),
+      formula: Option.some("net = gross - withholdingsLedger.total"),
       inputs: {
         grossCents: gross.amount.cents,
         withholdingsTotalCents: ledger.total.cents,
@@ -81,13 +79,13 @@ export const NetPayWithSacrificeLive = Layer.effect(NetPayFact)(
         message: "Salary sacrifice must use the gross pay period.",
       });
     }
-    const cashPay = yield* moneySub(gross.amount, sacrifice.amount);
-    const netAmount = yield* moneySub(cashPay, ledger.total);
+    const cashPay = yield* subtract(gross.amount, sacrifice.amount);
+    const netAmount = yield* subtract(cashPay, ledger.total);
 
     const trace = TraceNode.make({
       children: [ledger.trace],
       formula: Option.some(
-        Option.some("net = gross - salarySacrifice - withholdingsLedger.total")
+        "net = gross - salarySacrifice - withholdingsLedger.total"
       ),
       inputs: {
         grossCents: gross.amount.cents,

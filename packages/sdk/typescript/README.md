@@ -1,355 +1,154 @@
----
-document_type: package-guide
-lifecycle: current
-authority: canonical
-owner: taxkit-sdk-owner
-last_reviewed: 2026-10-31
-review_trigger: SDK contracts, lifetime, exports, examples or consumer validation change
----
-
 # TaxKit TypeScript SDK
 
-Public TaxKit TypeScript SDK package.
-
-Install `taxkit` from npm and use the `taxkit` and `taxkit/*` imports.
-
-## Migrating to SDK 3
-
-Public Schema classes have nominal brands. Construct domain values with their
-owning Schema constructor or decode external data through that Schema; plain
-object literals no longer substitute for checked class instances. This is a
-TypeScript breaking change and does not change the encoded JSON contracts.
-
-Import calculator and metadata Schemas by name from `taxkit/schemas`. For
-example, replace `CalculatorSchemas.HelpQuery` from `taxkit/core` with
-`HelpQuery` from `taxkit/schemas`. The `CalculatorSchemas`, `PayRules`,
-`IncomeTaxRules` and `StslRules` namespace adapters have been removed. Australian
-fact Schemas and parameter contracts are named exports from `taxkit/au`.
-
-The calculator package also removes its transitional `PublicCalculation*`,
-`PublicApiError` and `PublicCalculatorError` aliases. Use `CalculatorRun*` and
-`CalculatorServiceError`. Promise-returning plain SDK calls and encoded JSON
-contracts retain their existing behaviour.
-
-## Scope
-
-`packages/sdk/typescript` owns the TypeScript SDK facade for
-in-process TaxKit calculations, schema exports and typed module composition.
-It is the sole TaxKit package configured for public npm installation. Its
-build assembles the private
-modules into one archive, with Effect as its only external runtime dependency.
-Install the SDK archive itself; no other TaxKit archive is required.
+TaxKit calculates Australian tax with one Effect-native domain model. Plain
+TypeScript and Effect consumers use the same checked Money, scenarios, rules,
+errors and reports. Install the single `taxkit` package; Effect is its runtime
+dependency.
 
 ```sh
 npm install taxkit
 ```
 
-Use an ESM-capable TypeScript runtime or a browser bundler. Effect is installed
-as a dependency. Use `taxkit/core` for checked money values and engine
-contracts, and `taxkit/http` for typed HTTP client contracts.
+## Plain TypeScript
 
-The package currently exposes typed descriptor composition, an Effect-native
-facade, a plain Promise facade and Australian module helpers for the current
-public calculator catalog. The descriptor and facade generics consume
-calculator-owned `CalculatorRunFacts`, `CalculatorRunReport` and
-`CalculatorServiceError` contracts rather than HTTP transport aliases.
-The HTTP API and SDK call the same owning calculator service independently.
-The root, AU and Effect facades do not import HTTP. The separate `/http` entry
-re-exports the canonical HTTP contracts without importing server handlers.
-
-Effect-native report helpers are named for the report-only boundary:
-`calculateReport` accepts descriptor-typed facts and `calculateReportRequest`
-accepts a request payload while preserving descriptor-specific input and output
-typing. `calculateRunRequest` returns the canonical calculator run response
-with the descriptor-decoded report type preserved for transports and advanced
-Effect consumers. `createClient` builds an Effect client for selected SDK
-modules.
+Parse external money as exact decimal text. Native Result keeps construction
+failures explicit. The selected definition infers the required scenario and
+returned report.
 
 ```ts
-Production: SDK Effect full run
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-Effect consumer
-  -> calculateRunRequest(descriptor, request)
-    -> construct context/help with their owning Schemas
-    -> PublicCalculatorService.calculate({ calculatorId, ...checkedOptions, payload })
-      -> CalculatorRunResponse
-    -> descriptor output decode for response.report
-    -> typed CalculatorRunResponse with narrowed report
-
-Report-only helpers
-  -> calculateReportRequest(...)
-    -> calculateRunRequest(...)
-    -> response.report
-  -> calculateReport(...)
-    -> calculateReportRequest(...)
-```
-
-## Plain Facade
-
-```ts
-import { TaxKit } from "taxkit";
-import { au } from "taxkit/au";
-
-const report = await TaxKit.calculate(au.calculations.takeHomePay, {
-  grossPay,
-  taxFreeThresholdClaimed: true,
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(Result.flatMap(nonNegative));
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
 });
-
-const safeResult = await TaxKit.safe.calculate(au.calculations.takeHomePay, {
-  grossPay,
-  taxFreeThresholdClaimed: true,
-});
-```
-
-The plain facade returns Promises and does not expose Effect runtime types in
-method signatures. `safe` methods return SDK-owned Data result values:
-`TaxKitSuccess` or `TaxKitFailure`.
-
-Plain failures use stable SDK-owned outer, schema-validation and unexpected
-messages. Typed `CalculatorServiceError` detail remains available, while raw
-Effect causes, rejected input values and private paths are not rendered into
-safe results or rejected Promises.
-
-## AU Subpath
-
-```ts
-import { au } from "taxkit/au";
-
-const payReport = await au.pay.takeHomePay({
-  grossPay,
-  taxFreeThresholdClaimed: true,
-});
-
-const client = au.createClient();
-try {
-  const annualTax = await client.calculations.calculate(
-    au.calculations.annualIncomeTax,
-    { taxableIncome }
-  );
-} finally {
-  await client.dispose();
-}
-```
-
-Each plain client owns an independent, lazily started lifetime. Await
-`client.dispose()` when finished. Closing stops pending calculations and startup,
-then waits for finalisers. Repeated and overlapping calls wait for the same
-cleanup result. Calls after closing return `TaxKitClientDisposedError` inside
-`TaxKitFailure`, or reject with `TaxKitCalculationError` in the normal method.
-A cleanup defect rejects with the safe `TaxKitClientDisposeError`. None of these
-errors include raw private failure details.
-
-`TaxKit.calculate`, `TaxKit.safe.calculate` and direct AU helpers own a temporary
-scope for each call and clean up before settling. They leave no package-global
-runtime. The Effect interface continues to use its caller's services and scope.
-The private `client.runtime.ts` owns the plain Promise bridge; no raw runtime,
-provider client or arbitrary execution callback is exported. Module selection
-still limits descriptor types; it does not construct a different runtime catalog.
-
-AU helpers are thin wrappers over the same generic SDK descriptors. Type tests
-prove wrong calculator/module pairings and incompatible facts fail at compile
-time.
-
-## Export Paths
-
-```json
-{
-  ".": {
-    "types": "./dist/index.d.ts",
-    "default": "./dist/index.js"
-  },
-  "./core": {
-    "types": "./dist/core.d.ts",
-    "default": "./dist/core.js"
-  },
-  "./http": {
-    "types": "./dist/http.d.ts",
-    "default": "./dist/http.js"
-  },
-  "./effect": {
-    "types": "./dist/effect.d.ts",
-    "default": "./dist/effect.js"
-  },
-  "./au": {
-    "types": "./dist/au.d.ts",
-    "default": "./dist/au.js"
-  },
-  "./au/effect": {
-    "types": "./dist/au-effect.d.ts",
-    "default": "./dist/au-effect.js"
-  },
-  "./schemas": {
-    "types": "./dist/schemas/index.d.ts",
-    "default": "./dist/schemas/index.js"
-  },
-  "./testing": {
-    "types": "./dist/testing/index.d.ts",
-    "default": "./dist/testing/index.js"
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
   }
 }
 ```
 
-The root, AU and schema entrypoints are intended to remain browser-safe. Effect
-entrypoints expose Effect-native types for consumers that want service/layer
-composition. The publish manifest is dist-only; `bun run --filter=taxkit check-packed-artifact` validates
-that every public export resolves to packed files. The focused checker is an
-Effect-native Bun runtime with typed command and validation failures and a
-scope-managed temporary import workspace.
+`calculate` returns a Promise and rejects with the public expected error directly.
+`calculateSafe` returns `Promise<Result<Report, TaxKitError>>`. Native Result uses
+`Success` / `success` and `Failure` / `failure`. `run` includes diagnostics.
+Use `Schema.Result(definition.outputSchema, TaxKitError)` with
+`Schema.toCodecJson` to persist outcomes.
 
-`taxkit/schemas` re-exports calculator-owned run contracts for consumer
-convenience:
+`createClient()` owns one lazy ManagedRuntime. Use `client.calculate` or
+`client.calculateSafe`, then await `client.dispose()` or declare it with
+`await using`. Closing interrupts startup and pending calculations, waits for
+finalisers and shares the cleanup outcome with repeated callers. A closed
+client returns `TaxKitClientDisposedError`. One-shot operations clean up before
+settling. No client, runtime or callback runner is shared globally.
 
-- `CalculatorRunFacts`
-- `CalculatorRunRequest`
-- `CalculatorRunServiceRequest`
-- `CalculatorRunReport`
-- `CalculatorRunResponse`
-- `CalculatorRunResponseData`
-- `CalculatorServiceError`
+## Effect
 
-It also exports SDK-owned safe-result and error schemas such as
-`TaxKitCalculationError`, `TaxKitCalculationErrorDetail`,
-`TaxKitSchemaDecodeError`, `TaxKitUnexpectedError`,
-`TaxKitClientDisposedError` and `TaxKitClientDisposeError`.
+```ts
+import { Effect } from "effect";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money/effect";
+import { calculateReport, TaxKitLive } from "taxkit/effect";
 
-## Publication
-
-Only this SDK is configured for publication; all other workspace packages stay
-private. Publishing still needs the maintainer's explicit request. Follow the
-[local SDK publication procedure](../../../docs/runbooks/versioning.md#local-sdk-publication).
-
-Packed artifacts include `dist`, `README.md`, `LICENSE` and package metadata.
-Build and pack with the repository's pinned Bun so the packed Effect dependency
-uses a concrete version. Publish that checked archive with npm; do not publish
-the workspace directory or all workspaces recursively.
-
-### Downstream validation
-
-The SDK owns the first downstream consumer validation gate:
-
-```sh
-bun run --filter=taxkit validate:downstream
+const program = Effect.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(Effect.flatMap(nonNegative));
+  const input = TakeHomeScenarioInputSchema.make({
+    grossPay, period: "weekly", taxFreeThresholdClaimed: true,
+  });
+  return yield* calculateReport(AuPayTakeHomeCalculation, input);
+}).pipe(Effect.provide(TaxKitLive));
 ```
 
-The command builds and packs the SDK only, installs that one archive into a
-fresh temporary project outside the repository, and checks its declarations,
-all public imports, calculation/report behaviour, rule parameters and browser
-bundle. The runtime dependencies contain no `@taxkit/*` packages. Both the
-normal packed-artifact check and this consumer use the assembled distribution.
+Your application runs this Effect. `calculateRun` includes diagnostics and
+`decodeInput(definition, unknownInput)` strictly decodes raw scenario data once.
+Nominal checked inputs flow into execution directly. Import native fact services,
+rules, parameter Layers and rule packs from `taxkit/au/effect`; unprovided facts
+remain in the native requirements channel. Use `Layer.mock(TaxKitService, ...)`
+or a replacement engine Layer in tests.
 
-`tsconfig.build.json` compiles the SDK and the private sources it includes in
-one program; TypeScript does not emit files reached through `node_modules`, so
-it lists each private source folder and the MDX contract modules, including
-the paired theme Schemas. `assemble-package.runtime.ts` moves each
-owner's output to `dist/internal`, rewriting only import/export syntax through the TypeScript AST.
-It relocates both JavaScript and declarations, preserving Schema and class
-identity across entry points. Runtime service identifiers and data strings are
-unchanged. Effect stays external. No deployment, provider SDK, repository test
-runner or compiler becomes a runtime dependency.
+`AuPayTakeHomeWithSacrificeCalculation` requires
+`TakeHomeWithSacrificeScenarioInput`, including its checked `salarySacrifice`.
+All amounts in a pay scenario share one period. The report carries the applied
+sacrifice so its accounting equation can validate after restoration. STSL packs
+require their explicit debt-status fact when composed natively.
 
-`/core` exposes engine primitives and calculator composition; `/au` exposes
-Australian fact Schemas and parameter contracts. `/schemas` exposes the named
-calculator execution and metadata Schemas. `/http` exposes
-`TaxKitApi` and checked request-body contracts for native Effect HTTP clients.
-`/au/effect` and `/testing` expose descriptor composition and test support.
-These are module paths inside one package, not extra npm packages.
+## Money and Schemas
 
-## Guardrails
+Money is signed AUD in safe integer cents. `fromCents(number)`,
+`fromDecimal(string)`, `add`, `subtract`, `nonNegative` and `round` return native
+Result from `taxkit/money` and lazy Effect from `taxkit/money/effect`. Rounding
+requires an explicit statutory policy. `format` is pure. Numeric-dollar
+construction and silent fractional-cent rounding are removed.
 
-- Keep HTTP imports confined to `src/http.ts`; root, AU and Effect facades
-  remain independent of the HTTP entry.
-- Do not import AU rule packages from the root entrypoint.
-- Reuse canonical schemas, branded ids, service contracts, tagged errors and
-  constructors from owning packages when implementation starts.
-- Use `@taxkit/calculators` as the calculator execution boundary instead of
-  duplicating catalog lookup or calculation dispatch.
-- Keep transport contracts owned by `@taxkit/api-http`; the SDK exposes them
-  through its HTTP entry rather than copying their implementation.
+Use `Money.fromCents(Cents.make(...))` for trusted constants and the fallible
+constructors for dynamic input. Scenario inputs require `NonNegativeMoney`.
+`MoneyFromDecimalString` and `NonNegativeMoneyFromDecimalString` are symmetric
+native codecs. Reports and ledgers validate their accounting relationships,
+periods and unique component identities using exact arithmetic. Use their
+explicit `*Encoded` Schemas for representation-only checks; reconstructing
+fields or extracting a bare encoded view can lose aggregate checks in Effect
+4.0.7. Effect decoding remains authoritative for checks JSON Schema cannot
+express. Native Standard Schema adapters support form validation.
 
-## Commands
+## Public paths
+
+| Path | Responsibility |
+| --- | --- |
+| `taxkit` | Named Promise functions and caller-owned clients |
+| `taxkit/effect` | Native execution, explicit ingress, engine tag and static Layer |
+| `taxkit/au` | AU definitions and named plain conveniences |
+| `taxkit/au/schemas` | AU scenarios, facts, reports and parameters |
+| `taxkit/au/effect` | AU programs, services, rules and rule-pack Layers |
+| `taxkit/money` | Result money operations and codecs |
+| `taxkit/money/effect` | Effect money operations |
+| `taxkit/schemas` | Shared public Schemas and errors |
+| `taxkit/core` | Engine, primitives and rule/fact definition contracts |
+| `taxkit/http` | Native HttpApi client contracts |
+| `taxkit/testing` | Checked fixtures and engine substitution support |
+
+Schema and HTTP entrypoints do not import live calculation implementations.
+The root does not import AU rules or HTTP. The archive contains compiled
+JavaScript and declarations with one shared identity for each Schema/class.
+
+## SDK 5 hard cutover
+
+Replace `TaxKit` / `au` / `auEffect` object facades with named imports. Replace
+custom success/failure classes with native Result. Remove module selectors,
+independent SDK descriptor factories, transport-shaped SDK helpers and blanket
+calculation-error wrappers. Move AU Schemas to `taxkit/au/schemas`. Construct a
+checked scenario instead of passing a raw object, and supply its period once.
+Replace numeric dollars with exact text and old money aliases with the named
+money operations. Opaque diagnostic causes and missing-versus-undefined request
+compatibility are removed. Calculator HTTP routes use `/api/v2`; the docs API
+retains its independent version. No legacy aliases, handlers or decoders ship.
+
+## Verification and publication
 
 ```sh
+bun run --filter=taxkit build
+bun run --filter=taxkit check-types
 bun run --filter=taxkit test
 bun run --filter=taxkit test:browser
-bun run --filter=taxkit check-types
-bun run --filter=taxkit build
-bun run --filter=taxkit test-types
 bun run --filter=taxkit check-boundaries
 bun run --filter=taxkit check-packed-artifact
 bun run --filter=taxkit validate:downstream
 ```
 
-## Related Docs
-
-- `docs/architecture/api-and-sdk.md`
-- `docs/architecture/package-ownership.md`
-- `docs/architecture/package-boundaries.md`
-- `docs/architecture/testing-and-quality.md`
-
-`taxkit/schemas` also re-exports the canonical `CalculatorCapacityExceeded`
-and `CalculatorOperationTimedOut` errors. They belong to the widened checked
-service union and expose fixed manual-retry guidance for server consumers.
-Local SDK calculation does not acquire the API server's pool or time budget.
-The actual packed and downstream fixtures check these named exports and types.
-
-
-SDK Schemas also re-export the canonical `CalculatorMetadataError` union. Server
-hosts may apply the calculator-owned five-second policy to all nine methods;
-local SDK execution retains its caller-owned lifetime and calculation results.
-
-The downstream consumer also checks core's fallible money/date constructors,
-their public error types, safe overflow failures and historical date bytes/key
-presence. `aud` requires already checked `Cents`; `audFromCents` returns an
-Effect. Public examples use the same owning primitive contracts.
-
-The genuine packed consumer also imports the three public rule-parameter
-entrypoints. It rejects incomplete tables at construction and typed/saved
-representation decoding, and compares all five retained table, effective-period
-and source-artifact encodings against 13 preserved historical SHA-256 values
-and two approved 2025–26 Medicare table/source fingerprints. The original
-fingerprints remain in the earlier source history; the dated Medicare correction
-record keeps their exact legal-data delta as history. These are
-local packed-package checks, not publication or provider proof.
-
-
-Core trace formula/rounding and question help fields now expose nested Options;
-descriptor question/artifact/permission fields expose Options and rule parameter
-collections are total arrays. Their encoded forms remain unchanged. SDK
-`decodeOutput` checks a report returned by the calculator service against the
-selected Schema's Type; it does not decode transport JSON again. Transport
-consumers use the owning report codec at their representation boundary.
-The genuine packed consumer rejects incorrect trace constructor fields and
-child records, preserves service tuple types, compares all 22 saved metadata
-response hashes. Only complete Medicare-owned source/table/artifact fragments
-and the named annual report edition and $90k Medicare trace are inverted for
-that historical comparison. A neighbouring mismatch proves unrelated changed
-dates, amounts and versions still fail. Direct corrected parameter fingerprints
-and independent annual money tests qualify the real current values.
-
-
-Calculator-owned context, help and filter fields use `Option<Option<A>>` in
-checked TypeScript values: `None` means a missing key, `Some(None)` means a
-present undefined key, and `Some(Some(value))` means a present value. Owning
-constructors default omitted keys to `None`. JSON and HTTP query fields retain
-their ordinary optional representation. Flatten the two absent forms only where
-they mean the same thing; do not invent a jurisdiction or tax year.
-
-SDK request aliases derive constructor input from the calculator field owners
-and retain descriptor-specific facts. The SDK constructs context/help only; the
-selected calculator owns fact decoding and safe error help. Output narrowing
-checks the already decoded Schema Type.
-
-
-The packed consumer also checks the Core diagnostic cause Option Type/default,
-its four original encoded forms and removal of the unused catalogue `program`
-field. Existing selected-report, input-help, trace/ledger, metadata and source
-expectations remain fixed. Legacy diagnostic values are not safe telemetry.
-
-
-The published schema facade also exposes canonical `CalculatorRateLimited` and
-`CalculatorAdmissionUnavailable`. They belong to the expanded checked service
-error union; rate guidance carries no connection key or provider cause.
-Packed runtime and TypeScript consumers check these identities and reject
-private cause/key properties. Direct local SDK calculations do not acquire the
-[native host rate policy](../../calculators/README.md#native-calculation-rate-admission),
-and their retained reports and caller-owned lifetime remain unchanged.
+`check-types` includes the negative compiler examples. Packed and downstream
+checks install only this archive outside the checkout and verify declarations,
+all public imports, both execution styles, browser bundles, codec laws,
+removals and preserved statutory table/source fingerprints. Build and pack
+with the pinned Bun; publish the checked archive, following the
+[publication runbook](../../../docs/runbooks/versioning.md#local-sdk-publication).

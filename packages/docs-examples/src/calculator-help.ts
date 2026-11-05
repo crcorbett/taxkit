@@ -8,7 +8,7 @@ import { HelpQuery } from "taxkit/schemas";
 export const loadCalculatorHelp = Effect.fnUntraced(function* (baseUrl: URL) {
   const client = yield* HttpApiClient.make(TaxKitApi, { baseUrl });
   const query = yield* HelpQuery.makeEffect({
-    help: Option.some(Option.some("schema")),
+    help: Option.some("schema"),
   });
   const schema = yield* client.calculatorApi.getCalculatorSchema({
     params: { calculatorId: AuPayTakeHomeCalculation.calculatorId },

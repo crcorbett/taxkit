@@ -6,80 +6,41 @@ status: "published"
 
 # Test your integration
 
-Use this guide when you need evidence that your application still calls
-TaxKit with the expected facts and handles expected failures.
-
-## Before you start
-
-- Choose SDK or HTTP in [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx).
-- Keep one success case and one validation failure case.
-- Assert cents, report tags and error tags instead of snapshotting a full
-  report.
-
-## Steps
-
-1. Add a success test for the calculator you call.
-2. Add a validation failure test that checks external input before calculation.
-3. Run your app tests and the relevant TaxKit package test when working in
-   this repo.
-
-## Example
+Test an independently known tax result and reject invalid external input before execution.
 
 ```ts
 import { assert, it } from "@effect/vitest";
-import { Predicate, Function as EffectFunction, Effect, Schema } from "effect";
-import { GrossPay, au } from "taxkit/au";
-import { Cents, aud } from "taxkit/core";
+import { Effect } from "effect";
+import { takeHomePay, AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { decodeInput } from "taxkit/effect";
+import { Cents, Money, NonNegativeMoney } from "taxkit/money";
 
-it.effect("calculates weekly take-home pay", () =>
-  Effect.promise(() =>
-    au.pay.takeHomePay({
-      grossPay: new GrossPay({
-        amount: EffectFunction.pipe(Cents.make(165_400), aud),
-        period: "weekly",
-      }),
-      taxFreeThresholdClaimed: true,
-    })
-  ).pipe(
+it.effect("calculates weekly take-home pay", () => {
+  const grossPay = NonNegativeMoney.make(Money.fromCents(Cents.make(165_400)));
+  const input = TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
+  return Effect.promise(() => takeHomePay(input)).pipe(
     Effect.tap((report) =>
       Effect.sync(() => {
-        assert.isTrue(Predicate.isTagged(report, "TakeHomePayReport"));
         assert.equal(report.netPay.cents, 130_100);
       })
     )
-  )
-);
+  );
+});
 it.effect("rejects external input before calculation", () =>
-  Schema.decodeEffect(
-    Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
-  )('{"taxableIncome":{"_tag":"Money","cents":9000000,"currency":"AUD"}}').pipe(
+  decodeInput(AuPayTakeHomeCalculation, { taxableIncome: 9_000_000 }).pipe(
     Effect.flip,
     Effect.tap((error) =>
       Effect.sync(() => {
-        assert.isTrue(Predicate.isTagged(error, "SchemaError"));
+        assert.equal(error.message, "Invalid calculator input.");
       })
     )
   )
 );
 ```
 
-## Verify the result
-
-Run your application's test command. Inside this repository, the SDK type and
-unit tests are:
-
-```sh
-bun run --filter=taxkit test
-bun run --filter=taxkit test-types
-```
-
-## Handle errors
-
-Test the error tag your application relies on. Do not assert a full error
-message unless the message is part of your user-facing contract.
-
-## Related pages
-
-- [Safe SDK](../sdk/safe-sdk.mdx)
-- [API errors](../api/errors.mdx)
-- [Diagnostics](../concepts/diagnostics.mdx)
+Effect consumers can replace the actual engine service with native `Layer.mock` or a scoped test Layer. Include interruption, disposal and codec round trips for the boundaries your application uses.

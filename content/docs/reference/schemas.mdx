@@ -14,32 +14,22 @@ fixtures.
 `CalculatorRunRequest` is the public request body schema for a calculator run.
 It is owned by `@taxkit/calculators`.
 
-| Field          | Type                              | Notes                                                              |
-| -------------- | --------------------------------- | ------------------------------------------------------------------ |
-| `facts`        | `CalculatorRunFacts`              | A union of rule-owned scenario input schemas.                      |
-| `jurisdiction` | optional `CalculatorJurisdiction` | Omit only when the selected calculator has one supported context.  |
-| `taxYear`      | optional `CalculatorTaxYear`      | Omit only when the selected calculator has one supported tax year. |
+| Field                  | Notes                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `calculatorId`         | Exact owning calculator literal; definitions and catalogue metadata retain branded IDs. |
+| `payload.facts`        | The owning calculator's nominal scenario codec.                                         |
+| `payload.jurisdiction` | Optional matching jurisdiction; decoded as one Option.                                  |
+| `payload.taxYear`      | Optional matching year; decoded as one Option.                                          |
 
-The table describes the JSON form. In decoded TypeScript requests, context
-fields are nested Options: `None` for a missing key, `Some(None)` for a present
-undefined key, and `Some(Some(value))` for a value. Use the owning request
-constructor to supply defaults; do not send Option objects as raw HTTP JSON.
-The same rule applies to optional help/filter fields and returned optional
-question, help and duplicate-provider permission fields.
-
-The `facts` union is intentionally composed from canonical rule package
-schemas. Do not mirror request DTOs in application code when the SDK or API
-schema already owns the shape.
+The native request union keeps identity and facts correlated. Strict payload
+parsing rejects unknown keys, including ignored inputs from a different pack.
+The path and body identity must agree.
 
 ## CalculatorRunResponse
 
-`CalculatorRunResponse` is the canonical full run response.
-
-| Field         | Type                     | Notes                                                                                               |
-| ------------- | ------------------------ | --------------------------------------------------------------------------------------------------- |
-| `calculator`  | `CalculatorCatalogItem`  | Metadata for the selected calculator and context.                                                   |
-| `diagnostics` | `CalculationDiagnostics` | Graph and calculation diagnostics returned by the engine.                                           |
-| `report`      | `CalculatorRunReport`    | The calculator-specific report union. SDK helpers narrow this through the descriptor output schema. |
+The response union correlates `calculatorId` with its checked `report`, and
+includes `calculator` catalogue metadata and engine `diagnostics`. A report's
+own Schema checks periods and accounting relationships during restoration.
 
 ## CalculatorServiceError
 
@@ -47,7 +37,7 @@ schema already owns the shape.
 
 | Error                               | When you see it                                                                                 |
 | ----------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `CalculatorInputDecodeError`        | Request facts do not match the selected calculator input schema.                                |
+| `InputValidationError`              | Request facts do not match the selected calculator input schema.                                |
 | `UnsupportedCalculatorError`        | The requested calculator id is not in the public catalogue.                                     |
 | `UnsupportedCalculatorContextError` | The calculator exists, but not for the requested jurisdiction or tax year.                      |
 | `CalculationError`                  | The calculation engine returned a source-backed domain failure.                                 |
@@ -63,7 +53,7 @@ Production: schema ownership
 
 SDK or HTTP caller
   -> CalculatorRunRequest
-    -> CalculatorRunFacts
+    -> selected owning scenario codec
       -> rule-owned scenario input schema
     -> PublicCalculatorService.calculate
       -> CalculatorRunResponse
@@ -73,7 +63,7 @@ SDK or HTTP caller
 ## Owning sources
 
 - Calculator schemas: [`packages/calculators/src/schemas.ts`](../../../packages/calculators/src/schemas.ts)
-- Calculator error projection: [`packages/calculators/src/errors.ts`](../../../packages/calculators/src/errors.ts)
+- Calculator error projection: [`packages/core/src/errors/input-validation-error.ts`](../../../packages/core/src/errors/input-validation-error.ts)
 - SDK schema re-exports: [`packages/sdk/typescript/src/schemas/index.ts`](../../../packages/sdk/typescript/src/schemas/index.ts)
 
 ## Used by

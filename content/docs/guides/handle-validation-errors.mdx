@@ -6,64 +6,26 @@ status: "published"
 
 # Handle validation errors
 
-Use this guide when calculator input comes from a form, API request or any
-untyped source.
-
-## Before you start
-
-- Read [Type safety](../sdk/type-safety.mdx).
-- Choose the SDK safe facade or the HTTP API error envelope.
-- Keep canonical fact values tied to the selected calculator.
-
-## Steps
-
-1. Prefer typed SDK helpers for trusted TypeScript data.
-2. Decode external input with the selected calculator's input schema.
-3. Use `TaxKit.safe.calculate` for checked input when calculation failures
-   should be values.
-4. Use `?help=errors` with HTTP calls when you want field guidance.
-5. Display issue paths from the calculator error rather than maintaining a
-   separate list of fields.
-
-## Example
+Decode unknown input with the selected owning calculator. Invalid fields and surplus keys return a bounded Schema-tagged failure without rejected values.
 
 ```ts
 import { Effect, Schema } from "effect";
-import { au } from "taxkit/au";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { calculateReport, decodeInput, TaxKitLive } from "taxkit/effect";
 
-// Check an external JSON representation before calling a typed calculator.
-export const invalidInput = Schema.decodeEffect(
-  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
-)('{"taxableIncome":{"_tag":"Money","cents":9000000,"currency":"AUD"}}');
-
+// Decode the selected scenario once; surplus fields fail as well.
+export const invalidInput = decodeInput(AuPayTakeHomeCalculation, {
+  taxableIncome: 9_000_000,
+});
 export const validInput = Schema.decodeEffect(
-  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
+  Schema.fromJsonString(Schema.Unknown)
 )(
-  '{"grossPay":{"_tag":"GrossPay","amount":{"_tag":"Money","cents":165400,"currency":"AUD"},"period":"weekly"},"taxFreeThresholdClaimed":true}'
+  '{"grossPay":{"_tag":"Money","cents":165400,"currency":"AUD"},"period":"weekly","taxFreeThresholdClaimed":true}'
 ).pipe(
-  Effect.flatMap((input) => Effect.promise(() => au.pay.takeHomePay(input)))
+  Effect.flatMap((input) => decodeInput(AuPayTakeHomeCalculation, input)),
+  Effect.flatMap((input) => calculateReport(AuPayTakeHomeCalculation, input)),
+  Effect.provide(TaxKitLive)
 );
 ```
 
-## Verify the result
-
-`invalidInput` fails with `SchemaError` before a calculation runs because annual
-income facts do not match the selected take-home calculator. `validInput`
-returns the retained weekly fixture result: net pay of `130_100` cents.
-
-Run these Effects at your application boundary. For checked TypeScript input,
-use the [Safe SDK](../sdk/safe-sdk.mdx) and handle `TaxKitFailure` without an
-unsafe cast. Its calculator error channel is separate from the initial check
-of external input.
-
-## HTTP error handling
-
-The typed HTTP client checks endpoint replies. If you read a raw HTTP response,
-use the owning `CalculatorApiErrorEnvelope` decoder from [API errors](../api/errors.mdx).
-Do not access fields on unchecked `response.json()` data.
-
-## Related pages
-
-- [API errors](../api/errors.mdx)
-- [Safe SDK](../sdk/safe-sdk.mdx)
-- [Show calculator help to users](./show-calculator-help-to-users.mdx)
+Use native Result for synchronous money parsing and `Effect.result` inside Effect programs. A missing required TypeScript property fails compilation; ranges and values from users are validated at runtime.

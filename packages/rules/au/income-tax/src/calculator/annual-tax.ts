@@ -1,3 +1,4 @@
+import { CalculationError } from "@taxkit/core/errors";
 import { Cents, Money } from "@taxkit/core/primitives";
 import { Context, Effect, Layer, Boolean as EffectBoolean } from "effect";
 
@@ -28,14 +29,22 @@ export const CalculateAnnualTax = Effect.gen(function* () {
     onFalse: () => rawLiability,
     onTrue: () => new Money({ cents: Cents.make(0), currency: "AUD" }),
   });
-  return new AnnualTaxReport({
+  return yield* AnnualTaxReport.makeEffect({
     ledger,
     liability,
     rawLiability,
     rulePackVersion: AnnualTaxRulePackVersion.make("rules-au-income-tax/1.0.1"),
     taxableIncome: income.income,
     trace: ledger.trace,
-  });
+  }).pipe(
+    Effect.mapError(
+      () =>
+        new CalculationError({
+          reason: "output-invariant",
+          message: "Annual tax report invariant failed.",
+        })
+    )
+  );
 });
 /**
  * The caller's decoded annual tax scenario. Supply it with

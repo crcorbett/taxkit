@@ -1,9 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
-import { PublicCalculatorService } from "@taxkit/calculators/service";
-import { CalculationEngineLive } from "@taxkit/core";
-import { Money, Cents } from "@taxkit/core/primitives";
-import { GrossPay } from "@taxkit/rules-au-pay";
+import { CalculationEngine, CalculationEngineLive } from "@taxkit/core";
 import {
   Predicate,
   Function as EffectFunction,
@@ -18,15 +14,10 @@ import {
   Schema,
 } from "effect";
 
+import { AuPayTakeHomeCalculation } from "../src/au.js";
 import { createPlainClient } from "../src/client.runtime.js";
-import {
-  TaxKitCalculationError,
-  TaxKitClientDisposeError,
-} from "../src/errors.js";
-import {
-  AuPay2025_26Module,
-  AuPayTakeHomeCalculation,
-} from "../src/testing/index.js";
+import { TaxKitError, TaxKitClientDisposeError } from "../src/errors.js";
+import { takeHomeFacts } from "./fixtures.js";
 
 class SdkPromiseRejectionError extends Schema.TaggedError<
   SdkPromiseRejectionError,
@@ -36,16 +27,8 @@ class SdkPromiseRejectionError extends Schema.TaggedError<
 >()("SdkPromiseRejectionError", {
   rejection: Schema.Defect(),
 }) {}
-const ServiceLive = PublicCalculatorServiceLive.pipe(
-  Layer.provide(CalculationEngineLive)
-);
-const facts = {
-  grossPay: new GrossPay({
-    amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-    period: "weekly",
-  }),
-  taxFreeThresholdClaimed: true,
-};
+const ServiceLive = CalculationEngineLive;
+const facts = takeHomeFacts;
 const sentinel = "taxkit-private-secret:/private/sdk-lifetime/input.json";
 class LifetimeFixture extends Context.Service<
   LifetimeFixture,
@@ -66,7 +49,7 @@ class LifetimeFixture extends Context.Service<
 // A calculator-service fixture owns real scoped acquisition and release. Each
 // failure is placed at its actual lifecycle step, with deterministic signals.
 const FixtureLayer = Layer.effect(
-  PublicCalculatorService,
+  CalculationEngine,
   Effect.gen(function* () {
     const { mode, release, resources, started } = yield* LifetimeFixture;
     yield* Effect.acquireRelease(
@@ -93,16 +76,16 @@ const FixtureLayer = Layer.effect(
       Match.when("startupDefect", () => Effect.die(new Error(sentinel))),
       Match.orElse(() => Effect.void)
     );
-    const service = yield* PublicCalculatorService;
+    const service = yield* CalculationEngine;
     return {
       ...service,
-      calculate: Effect.fn("SdkFixture.calculate")((request) =>
+      run: Effect.fn("SdkFixture.run")((request) =>
         Match.value(mode).pipe(
           Match.when("operationBlocked", () =>
             Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
           ),
           Match.when("operationDefect", () => Effect.die(new Error(sentinel))),
-          Match.orElse(() => service.calculate(request))
+          Match.orElse(() => service.run(request))
         )
       ),
     };
@@ -123,29 +106,26 @@ it.effect("closes an unused client without starting its Layer", () =>
         })
       )
     );
-    const client = createPlainClient(layer, AuPay2025_26Module);
+    const client = createPlainClient(layer);
     yield* Effect.promise(() => client.dispose());
     yield* Effect.promise(() => client.dispose());
     expect(yield* Ref.get(resources)).toBe(0);
     const result = yield* Effect.promise(() =>
-      client.calculations.safe.calculate(AuPayTakeHomeCalculation, facts)
+      client.calculateSafe(AuPayTakeHomeCalculation, facts)
     );
     yield* Match.value(result).pipe(
-      Match.tag("TaxKitFailure", ({ error }) =>
+      Match.tag("Failure", ({ failure: error }) =>
         Effect.sync(() => {
           expect({
-            isDisposed: Predicate.isTagged(
-              error.error,
-              "TaxKitClientDisposedError"
-            ),
-            errorErrorMessage: error.error.message,
+            isDisposed: Predicate.isTagged(error, "TaxKitClientDisposedError"),
+            errorErrorMessage: error.message,
           }).toStrictEqual({
             isDisposed: true,
             errorErrorMessage: "TaxKit client is closed",
           });
         })
       ),
-      Match.tag("TaxKitSuccess", () =>
+      Match.tag("Success", () =>
         Effect.sync(() => expect.fail("Closed client succeeded"))
       ),
       Match.exhaustive
@@ -168,16 +148,12 @@ it.effect("keeps separate client lifetimes even with the same Layer", () =>
         })
       )
     );
-    const first = createPlainClient(layer, AuPay2025_26Module);
-    const second = createPlainClient(layer, AuPay2025_26Module);
+    const first = createPlainClient(layer);
+    const second = createPlainClient(layer);
     const reports = yield* Effect.all(
       [
-        Effect.promise(() =>
-          first.calculations.calculate(AuPayTakeHomeCalculation, facts)
-        ),
-        Effect.promise(() =>
-          second.calculations.calculate(AuPayTakeHomeCalculation, facts)
-        ),
+        Effect.promise(() => first.calculate(AuPayTakeHomeCalculation, facts)),
+        Effect.promise(() => second.calculate(AuPayTakeHomeCalculation, facts)),
       ],
       { concurrency: "unbounded" }
     );
@@ -191,7 +167,7 @@ it.effect("keeps separate client lifetimes even with the same Layer", () =>
     yield* Effect.promise(() => first.dispose());
     expect(yield* Ref.get(resources)).toBe(1);
     const report = yield* Effect.promise(() =>
-      second.calculations.calculate(AuPayTakeHomeCalculation, facts)
+      second.calculate(AuPayTakeHomeCalculation, facts)
     );
     expect(report.netPay.cents).toBe(130_100);
     yield* Effect.promise(() => first.dispose());
@@ -217,30 +193,30 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
           })
         )
       );
-      const client = createPlainClient(layer, AuPay2025_26Module);
+      const client = createPlainClient(layer);
       const pending = yield* Effect.promise(() =>
-        client.calculations.safe.calculate(AuPayTakeHomeCalculation, facts)
+        client.calculateSafe(AuPayTakeHomeCalculation, facts)
       ).pipe(Effect.forkChild);
       yield* Deferred.await(started);
       yield* Effect.promise(() => client.dispose());
       const result = yield* Fiber.join(pending);
       yield* Match.value(result).pipe(
-        Match.tag("TaxKitFailure", ({ error }) =>
+        Match.tag("Failure", ({ failure: error }) =>
           Effect.gen(function* () {
             EffectFunction.pipe(
-              Predicate.isTagged(error.error, "TaxKitClientDisposedError"),
+              Predicate.isTagged(error, "TaxKitClientDisposedError"),
               (matches) => {
                 expect(matches).toBeTruthy();
               }
             );
             const text = yield* Schema.encodeEffect(
-              Schema.toCodecJson(TaxKitCalculationError)
+              Schema.toCodecJson(TaxKitError)
             )(error);
             expect(text).not.toContain(sentinel);
             expect(text).not.toContain("interrupted");
           })
         ),
-        Match.tag("TaxKitSuccess", () =>
+        Match.tag("Success", () =>
           Effect.sync(() => expect.fail("Interrupted calculation succeeded"))
         ),
         Match.exhaustive
@@ -265,15 +241,14 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
           })
         )
       );
-      const client = createPlainClient(layer, AuPay2025_26Module);
+      const client = createPlainClient(layer);
       const pending = yield* Effect.tryPromise({
         catch: (rejection) => new SdkPromiseRejectionError({ rejection }),
-        try: () =>
-          client.calculations.calculate(AuPayTakeHomeCalculation, facts),
+        try: () => client.calculate(AuPayTakeHomeCalculation, facts),
       }).pipe(
         Effect.flip,
         Effect.flatMap((failure) =>
-          Schema.decodeUnknownEffect(TaxKitCalculationError)(failure.rejection)
+          Schema.decodeUnknownEffect(TaxKitError)(failure.rejection)
         ),
         Effect.forkChild
       );
@@ -281,10 +256,7 @@ it.effect.each(["operationBlocked", "startupBlocked"] as const)(
       yield* Effect.promise(() => client.dispose());
       const error = yield* Fiber.join(pending);
       expect({
-        isDisposed: Predicate.isTagged(
-          error.error,
-          "TaxKitClientDisposedError"
-        ),
+        isDisposed: Predicate.isTagged(error, "TaxKitClientDisposedError"),
         RefGetResources: yield* Ref.get(resources),
       }).toStrictEqual({
         isDisposed: true,
@@ -309,26 +281,26 @@ it.effect.each(["startupDefect", "operationDefect"] as const)(
           })
         )
       );
-      const client = createPlainClient(layer, AuPay2025_26Module);
+      const client = createPlainClient(layer);
       const result = yield* Effect.promise(() =>
-        client.calculations.safe.calculate(AuPayTakeHomeCalculation, facts)
+        client.calculateSafe(AuPayTakeHomeCalculation, facts)
       );
       yield* Match.value(result).pipe(
-        Match.tag("TaxKitFailure", ({ error }) =>
+        Match.tag("Failure", ({ failure: error }) =>
           Effect.gen(function* () {
             EffectFunction.pipe(
-              Predicate.isTagged(error.error, "TaxKitUnexpectedError"),
+              Predicate.isTagged(error, "TaxKitUnexpectedError"),
               (matches) => {
                 expect(matches).toBeTruthy();
               }
             );
             const text = yield* Schema.encodeEffect(
-              Schema.toCodecJson(TaxKitCalculationError)
+              Schema.toCodecJson(TaxKitError)
             )(error);
             expect(text).not.toContain(sentinel);
           })
         ),
-        Match.tag("TaxKitSuccess", () =>
+        Match.tag("Success", () =>
           Effect.sync(() => expect.fail("Defective calculation succeeded"))
         ),
         Match.exhaustive
@@ -352,9 +324,9 @@ it.effect("all overlapping dispose calls await the same finalisers", () =>
         })
       )
     );
-    const client = createPlainClient(layer, AuPay2025_26Module);
+    const client = createPlainClient(layer);
     yield* Effect.promise(() =>
-      client.calculations.calculate(AuPayTakeHomeCalculation, facts)
+      client.calculate(AuPayTakeHomeCalculation, facts)
     );
     const first = yield* Effect.promise(() => client.dispose()).pipe(
       Effect.forkChild
@@ -400,9 +372,9 @@ it.effect(
           })
         )
       );
-      const client = createPlainClient(layer, AuPay2025_26Module);
+      const client = createPlainClient(layer);
       yield* Effect.promise(() =>
-        client.calculations.calculate(AuPayTakeHomeCalculation, facts)
+        client.calculate(AuPayTakeHomeCalculation, facts)
       );
       const first = yield* Effect.tryPromise({
         catch: (rejection) => new SdkPromiseRejectionError({ rejection }),

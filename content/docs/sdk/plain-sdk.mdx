@@ -6,72 +6,51 @@ status: "published"
 
 # Plain SDK
 
-Use the plain SDK for TypeScript applications that want typed inputs and
-reports without managing Effect services. The root and AU entrypoints also
-support browser calculations on the device.
-
-## Call a helper
+Call a complete calculator definition with a checked scenario. The selected definition infers the report.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
+import { calculate } from "taxkit";
+import { AuAnnualIncomeTaxCalculation } from "taxkit/au";
+import { AnnualTaxScenarioInputSchema } from "taxkit/au/schemas";
+import { Cents, Money, NonNegativeMoney } from "taxkit/money";
 
-const report = await au.incomeTax.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
+const taxableIncome = NonNegativeMoney.make(
+  Money.fromCents(Cents.make(9_000_000))
+);
+const input = AnnualTaxScenarioInputSchema.make({ taxableIncome });
+const report = await calculate(AuAnnualIncomeTaxCalculation, input);
+report.liability.cents;
 ```
 
-## Call the generic facade
+For input from users, parse exact decimal text with native Result before constructing the scenario.
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { TaxKit } from "taxkit";
-import { au } from "taxkit/au";
+import { calculateSafe } from "taxkit";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { fromDecimal, nonNegative } from "taxkit/money";
+import { Result } from "effect";
 
-const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-```
-
-`TaxKit.calculate` returns the calculator-specific report type inferred from
-the descriptor you pass.
-
-## Use a module-scoped client
-
-```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
-
-const client = au.createClient();
-
-try {
-  const report = await client.calculations.calculate(
-    au.calculations.annualIncomeTax,
-    { taxableIncome: aud(Cents.make(9_000_000)) }
+const input = Result.gen(function* () {
+  const grossPay = yield* fromDecimal("1654.00").pipe(
+    Result.flatMap(nonNegative)
   );
-} finally {
-  await client.dispose();
+  return TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "weekly",
+    taxFreeThresholdClaimed: true,
+  });
+});
+if (Result.isSuccess(input)) {
+  const result = await calculateSafe(AuPayTakeHomeCalculation, input.success);
+  if (Result.isSuccess(result)) {
+    result.success.netPay.cents;
+  } else {
+    result.failure._tag;
+  }
 }
 ```
 
-Module-scoped clients keep the selected calculator modules explicit. Type tests
-cover incompatible calculator/module pairs.
+`createClient()` owns a reusable lazy lifetime. Call `client.calculate(definition, input)` or `client.calculateSafe(definition, input)` and await `client.dispose()` or use `await using client = createClient()`. Closing interrupts pending work and waits for finalisers. One-shot helpers clean up before settling.
 
-Each client owns its resources. Await `dispose()` when you finish, including
-when a calculation fails. Closing stops pending calculations and waits for
-cleanup. You can safely call it again. Closing one client leaves other clients
-usable. Calls on a closed client fail with `TaxKitClientDisposedError` detail.
-The direct helpers above handle their own cleanup before returning.
-
-## When to use another surface
-
-Use [Safe SDK](./safe-sdk.mdx) when you want a result object for expected
-failures. Use [Effect SDK](./effect-sdk.mdx) when you need Effect service
-composition or a full run response. Use the HTTP API when the caller should not
-import TypeScript packages.
-
-## Related pages
-
-- [Run your first calculation](../start/run-your-first-calculation.mdx)
-- [Type safety](./type-safety.mdx)
-- [Schemas](./schemas.mdx)
+See [Safe SDK](./safe-sdk.mdx) and [Effect SDK](./effect-sdk.mdx).

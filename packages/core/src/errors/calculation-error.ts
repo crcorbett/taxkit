@@ -9,9 +9,8 @@ export class CalculationError extends Schema.TaggedError<
   CalculationError,
   { readonly brand: unique symbol }
 >()("CalculationError", {
-  // Legacy diagnostic data remains opaque; its codec preserves key identity.
-  cause: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(Schema.Unknown)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
   message: Schema.String,
+  reason: Schema.Literals(["rule", "graph", "output-invariant"]).pipe(
+    Schema.withConstructorDefault(Effect.succeed("rule" as const))
+  ),
 }) {}

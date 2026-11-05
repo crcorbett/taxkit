@@ -3,7 +3,7 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-calculator-architecture-owner
-last_reviewed: 2026-10-17
+last_reviewed: 2026-11-04
 review_trigger: calculator composition, catalogue execution or domain error contract change
 ---
 
@@ -26,7 +26,7 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
   const payg = yield* PaygWithholdingFact;
   const netPay = yield* NetPayFact;
 
-  return new TakeHomePayReport({
+  return TakeHomePayReport.make({
     grossPay,
     taxablePay,
     payg,
@@ -37,10 +37,10 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
 
 The calculator should be small and declarative. Rule layers derive the facts. Scenario layers provide the accepted inputs.
 
-Reusable catalogue entries couple one input Schema with its typed `calculate`
-continuation. They do not expose an additional erased `program` Effect. The
-rule package owns the actual typed calculator program and rule-pack Layer;
-metadata and retained output values are unchanged.
+Reusable catalogue entries derive their contract from one complete rule-owned
+definition. That definition owns the scenario/report codecs, native calculator
+program, rule graph and pack Layer. Publication metadata supplies no competing
+execution Layer or decoder.
 
 ## Running A Calculator
 
@@ -95,20 +95,14 @@ should be mapped to schema-backed public errors at the service boundary, and
 domain failures such as `CalculationError` should propagate as failures. Do not
 use `Effect.die` for recoverable calculator, schema or domain errors.
 
-Core `CalculationError.cause` represents missing, present undefined and present
-diagnostic values with nested Options and a missing-key constructor default.
-Its codec retains historical null/opaque diagnostics as values. The current
-rule producers omit diagnostics; this migration does not sanitise legacy
-diagnostic content or make it safe for telemetry. Public representations retain
-their existing codec.
+Core `CalculationError` exposes a safe message and a closed rule, graph or
+output-invariant reason. Input ingress projects bounded safe issues through
+`InputValidationError`; opaque diagnostic storage is absent.
 
-Public calculator orchestration must keep request facts tied to canonical
-scenario schemas. `@taxkit/calculators` composes the generic public calculate
-contract as a union of rule-owned scenario input schemas so API docs and
-clients can see concrete fact shapes, then decodes again with the selected
-catalog entry's `inputSchema` before running the calculator. Do not replace
-this with `Schema.Unknown`, mirrored fact DTOs or a loose record of arbitrary
-values.
+Public calculator orchestration keeps identity and scenario correlated in a
+native Schema union. HTTP/MCP decode that contract strictly once and pass checked
+values to the selected definition. The SDK accepts the owning nominal scenario
+Type and uses explicit `decodeInput` for untrusted representations.
 
 ## Calculation Runs
 

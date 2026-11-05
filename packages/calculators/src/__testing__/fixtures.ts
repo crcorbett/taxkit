@@ -1,30 +1,33 @@
-import { CalculationEngineLive } from "@taxkit/core";
+import {
+  NonNegativeMoney,
+  CalculationEngineLive,
+  InputValidationError,
+} from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
-import { AuPayCalculatorId, GrossPay } from "@taxkit/rules-au-pay";
+import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay";
 import { Context, Cause, Effect, Layer, Match } from "effect";
 
 import { PublicCalculatorServiceLive } from "../live.layer.js";
 import {
   CalculatorCapacityExceeded,
-  CalculatorInputDecodeError,
-  CalculatorInputIssue,
   CalculatorOperationTimedOut,
-  CalculatorRunServiceRequest,
+  TakeHomeCalculationRequest,
 } from "../schemas.js";
 import { PublicCalculatorService } from "../service.js";
 
 export const sensitiveSentinel =
   "private-calculator-sentinel-/private/source?credential=hidden";
-export const CalculationRequest = CalculatorRunServiceRequest.make({
-  calculatorId: AuPayCalculatorId.make("au.pay.take-home"),
+export const CalculationRequest = TakeHomeCalculationRequest.make({
+  calculatorId:
+    TakeHomeCalculationRequest.fields.calculatorId.make("au.pay.take-home"),
   payload: {
-    facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(165_400), currency: "AUD" }),
-        period: "weekly",
-      }),
+    facts: TakeHomeScenarioInputSchema.make({
+      grossPay: NonNegativeMoney.make(
+        new Money({ cents: Cents.make(165_400), currency: "AUD" })
+      ),
+      period: "weekly",
       taxFreeThresholdClaimed: true,
-    },
+    }),
   },
 });
 export const CalculatorLive = PublicCalculatorServiceLive.pipe(
@@ -40,14 +43,9 @@ export const CalculatorFixture = Layer.effect(
   Effect.gen(function* () {
     const mode = yield* CalculatorFixtureMode;
     const calculator = yield* PublicCalculatorService;
-    const inputFailure = new CalculatorInputDecodeError({
-      issues: [
-        new CalculatorInputIssue({
-          message: sensitiveSentinel,
-          path: [sensitiveSentinel],
-        }),
-      ],
-      message: sensitiveSentinel,
+    const inputFailure = new InputValidationError({
+      issues: [{ message: "Invalid input value", path: [sensitiveSentinel] }],
+      truncated: false,
     });
     const metadataDefect = Effect.die({
       cause: sensitiveSentinel,

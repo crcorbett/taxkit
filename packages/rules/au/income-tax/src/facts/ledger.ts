@@ -1,5 +1,5 @@
 import { makeFactDescriptor } from "@taxkit/core/facts";
-import { LedgerComponent } from "@taxkit/core/ledger";
+import { ledgerTotalEquals, LedgerComponent } from "@taxkit/core/ledger";
 import { Money } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import { Context, Schema } from "effect";
@@ -11,16 +11,29 @@ import { Context, Schema } from "effect";
  *
  * @since 0.1.0
  */
-export class AnnualTaxLedger extends Schema.TaggedClass<
-  AnnualTaxLedger,
-  {
-    readonly brand: unique symbol;
-  }
->()("AnnualTaxLedger", {
+const AnnualTaxLedgerFields = Schema.TaggedStruct("AnnualTaxLedger", {
   components: Schema.Array(LedgerComponent),
   rawLiability: Money,
   trace: TraceNode,
-}) {}
+});
+const AnnualTaxLedgerCheck = Schema.makeFilter<{
+  readonly rawLiability: Pick<typeof Money.Encoded, "cents">;
+  readonly components: readonly Pick<
+    typeof LedgerComponent.Encoded,
+    "id" | "status" | "effect" | "amount"
+  >[];
+}>((ledger) => ledgerTotalEquals(ledger.components, ledger.rawLiability), {
+  expected: "unique ledger components matching their total",
+});
+export const AnnualTaxLedgerEncoded = Schema.toEncoded(
+  AnnualTaxLedgerFields
+).check(AnnualTaxLedgerCheck);
+export const AnnualTaxLedger = AnnualTaxLedgerEncoded.pipe(
+  Schema.decodeTo(AnnualTaxLedgerFields)
+)
+  .check(AnnualTaxLedgerCheck)
+  .pipe(Schema.brand("taxkit/AnnualTaxLedger"));
+export type AnnualTaxLedger = typeof AnnualTaxLedger.Type;
 /**
  * Context tag for the derived annual tax ledger.
  *

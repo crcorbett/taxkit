@@ -41,23 +41,23 @@ export {
   Cents,
   Currency,
   Money,
-  aud,
-  audFromCents,
-  audDollars,
-  moneyAdd,
+  NonNegativeMoney,
   moneyEquals,
-  moneySub,
 } from "./primitives/money.js";
 export {
-  MoneyFromDollarsString,
-  dollarsTextFromMoney,
-  moneyFromDollarsText,
-} from "./primitives/dollars.js";
+  fromCents,
+  fromDecimal,
+  nonNegative,
+  add,
+  subtract,
+  round,
+} from "./primitives/money.effect.js";
 export {
-  RoundingMode,
-  roundCentsToDollar,
-  roundMoney,
-} from "./primitives/rounding.js";
+  MoneyFromDecimalString,
+  NonNegativeMoneyFromDecimalString,
+  format,
+} from "./primitives/dollars.js";
+export { RoundingMode, roundCentsToDollar } from "./primitives/rounding.js";
 export {
   AustralianTaxYear,
   DateInterval,
@@ -105,9 +105,18 @@ export {
 } from "./trace/node.js";
 
 export {
-  DollarsTextIssue,
+  MoneyIssue,
   InvalidCalendarValue,
   InvalidDecimalValue,
-  InvalidDollarsText,
-  InvalidMoneyValue,
+  MoneyError,
 } from "./primitives/errors.js";
+export {
+  defineCalculator,
+  decodeInput,
+  type CalculatorDefinition,
+} from "./calculators/definition.js";
+
+export {
+  InputValidationError,
+  inputValidationError,
+} from "./errors/input-validation-error.js";

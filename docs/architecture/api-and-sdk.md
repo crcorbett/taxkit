@@ -3,11 +3,17 @@ document_type: architecture
 lifecycle: current
 authority: canonical
 owner: taxkit-api-sdk-owner
-last_reviewed: 2026-10-18
+last_reviewed: 2026-11-04
 review_trigger: API or SDK contracts, exports, lifetime or caller composition change
 ---
 
 # API and SDK
+
+[ADR 0011](../adr/0011-effect-native-sdk-contracts.md) drafts the next major SDK
+contract: shared Effect-native Schemas and execution, checked money, inferred
+rule requirements and a hard cutover that deletes all superseded implementations
+and interfaces in the same merge. Its replacement APIs are not implemented by
+that document; the current contracts are described below.
 
 The active T008 candidate adds minimal analytics only in the native API app.
 Direct callers may supply a collection preference through the shared private
@@ -53,15 +59,15 @@ The current implemented API surface is:
 GET /api/health
 GET /api/docs
 GET /api/docs/openapi.json
-GET /api/v1/jurisdictions
-GET /api/v1/tax-years
-GET /api/v1/calculators
-GET /api/v1/calculators/:calculatorId
-GET /api/v1/calculators/:calculatorId/schema
-POST /api/v1/calculators/:calculatorId/calculate
-GET /api/v1/calculators/:calculatorId/graph
-GET /api/v1/facts
-GET /api/v1/rules
+GET /api/v2/jurisdictions
+GET /api/v2/tax-years
+GET /api/v2/calculators
+GET /api/v2/calculators/:calculatorId
+GET /api/v2/calculators/:calculatorId/schema
+POST /api/v2/calculators/:calculatorId/calculate
+GET /api/v2/calculators/:calculatorId/graph
+GET /api/v2/facts
+GET /api/v2/rules
 GET /api/v2/docs/navigation
 GET /api/v2/docs/page?path=/start/quickstart
 GET /api/v2/docs/search?term=Quickstart
@@ -152,20 +158,15 @@ supported context literals are composed by `@taxkit/calculators`; reusable
 help modes, calculator run payloads and calculator service errors live in
 `@taxkit/calculators`.
 
-The final calculate-route production graph is:
+The calculate-route production graph is:
 
-```ts
-Production: HTTP calculate
-
-API host (standalone Bun or native Worker)
-  -> TaxKitApiRoutesLayer
-    -> CalculatorApiHandlerLive
-      -> PublicCalculatorService.calculate({ calculatorId, payload, ...query })
-        -> selected CalculatorCatalogEntry.inputSchema decode
-        -> constructor-closed typed scenario continuation
+```txt
+Native HttpApi strict correlated payload decode
+  -> CalculatorApiHandlerLive checks path/body identity
+    -> PublicCalculatorService.calculate(checked request)
+      -> selected complete calculator definition
         -> CalculationEngine and owning rule/scenario Layers
-        -> CalculatorRunResponseData
-      -> existing CalculatorApiErrorEnvelope on expected service failure
+      -> correlated CalculatorRunResponse
 ```
 
 Metadata routes stay direct service adapters until a broader SDK catalog
@@ -182,24 +183,21 @@ CalculatorApiHandlerLive
 
 The SDK Effect full-run graph is:
 
-```ts
-Production: SDK Effect full run
-
+```txt
 Effect consumer
-  -> taxkit/effect calculateRunRequest(descriptor, request)
-    -> PublicCalculatorService.calculate({ calculatorId, ...request })
-      -> CalculatorRunServiceRequest
-      -> CalculatorRunResponse
-    -> descriptor.decodeOutput(response.report)
-    -> response with report narrowed to OutputSchema["Type"]
+  -> calculateRun(complete definition, checked scenario)
+    -> definition.calculate(scenario)
+      -> owning native program and rule-pack Layer
+        -> CalculationEngine
+    -> checked report, diagnostics and exact calculator identity/context
 
-Report-only helpers
-  -> calculateReportRequest(...)
-    -> calculateRunRequest(...)
-    -> response.report
-  -> calculateReport(...)
-    -> calculateReportRequest(...)
+calculateReport(definition, scenario)
+  -> calculateRun(definition, scenario)
+    -> run.report
 ```
+
+Explicit `decodeInput` checks untrusted representation once before execution.
+The plain Promise/Result interface uses those same Effects at its private host.
 
 The matching test graph is:
 
@@ -212,7 +210,7 @@ SDK HTTP comparison tests
       -> PublicCalculatorServiceLive
         -> CalculationEngineLive
   -> success response equals SDK full-run response
-  -> CalculatorInputDecodeError maps to CalculatorApiErrorEnvelope
+  -> InputValidationError maps to CalculatorApiErrorEnvelope
 ```
 
 ## Current calculator package
@@ -236,14 +234,14 @@ It owns:
 - catalog entries that compose canonical fact descriptors, rule descriptors,
   report schemas, scenario layers and rule-pack layers
 - metadata transformations for calculator, fact, rule and graph responses
-- schema-guided expected error shaping with descriptor-backed help
+- schema-guided expected error shaping with bounded safe field issues
 - calculation execution through `CalculationEngine`
 - canonical reusable calculator execution schemas named `CalculatorRun*`
 - canonical reusable calculator failure union named `CalculatorServiceError`
 - typed propagation of expected domain failures such as `CalculationError`
 
-HTTP, SDK, CLI and in-process callers should consume this service instead of
-implementing calculator business logic locally.
+HTTP and MCP hosts consume this service. The SDK executes the complete owning
+definitions through the same engine. Callers do not duplicate calculator logic.
 
 ## HTTP API package topology
 
@@ -275,51 +273,46 @@ families.
 The public calculation API uses stable generic resources:
 
 ```txt
-GET  /api/v1/jurisdictions
-GET  /api/v1/tax-years
-GET  /api/v1/calculators
-GET  /api/v1/calculators/:calculatorId
-GET  /api/v1/calculators/:calculatorId/schema
-POST /api/v1/calculators/:calculatorId/calculate
-GET  /api/v1/calculators/:calculatorId/graph
-GET  /api/v1/facts
-GET  /api/v1/rules
+GET  /api/v2/jurisdictions
+GET  /api/v2/tax-years
+GET  /api/v2/calculators
+GET  /api/v2/calculators/:calculatorId
+GET  /api/v2/calculators/:calculatorId/schema
+POST /api/v2/calculators/:calculatorId/calculate
+GET  /api/v2/calculators/:calculatorId/graph
+GET  /api/v2/facts
+GET  /api/v2/rules
 ```
 
 Calculator IDs may include jurisdiction segments, such as
 `au.pay.take-home`, but route structure must remain portable to future
-jurisdictions. Do not add `/api/v1/au/*` as the primary public route shape.
+jurisdictions through the shared calculator routes.
 
-Inputs and outputs must decode through Effect Schema. Schema decode failures
-should return structured issue details, missing/invalid field paths and
-descriptor-backed help so clients can guide users toward the facts required by
-the selected calculator. Outputs should include reports, traces, ledgers and
-diagnostics where relevant.
+Inputs and outputs decode through Effect Schema. Schema decode failures return
+bounded, safe issue paths and fixed messages through `InputValidationError`.
+Clients use catalogue metadata for help with the selected calculator. Outputs
+include the owning checked reports, traces and ledgers.
 
-Calculator input-error egress preserves the public tagged shape, normalized
-field paths and descriptor help, but replaces formatter text that can include
-the rejected actual value with stable safe text. HTTP, Effect SDK and direct
+Calculator input-error egress preserves the public tagged shape and safe
+field paths. Fixed text replaces formatter messages that can include
+the rejected actual value. HTTP, Effect SDK and direct
 calculator consumers must not receive secrets or machine-local paths copied
 from invalid inputs.
 
-The generic calculate route exposes request facts as a union of canonical
-rule-owned calculator input schemas, not `Schema.Unknown`. OpenAPI should show
-the supported fact shapes under `facts.anyOf`; current public shapes include
-take-home/pay-withholdings input facts and annual-tax input facts. Because
-Effect HTTP route schemas are not dependent on the `calculatorId` path
-parameter, `@taxkit/calculators` must decode `payload.facts` again with the
-selected catalog entry's canonical `inputSchema` before execution. A payload
-that is valid for a different calculator must fail as
-`CalculatorInputDecodeError` with descriptor-backed help for the selected
-calculator.
+The calculation body is a correlated native Schema union, with `calculatorId`
+and `payload.facts` tied to the owning scenario codec. Strict native payload
+parse options reject unknown fields before execution. Path and body IDs agree;
+wrong-calculator facts fail at that single boundary. Responses correlate the ID,
+catalogue metadata and checked owning report.
 
 Effect generates OpenAPI component names from encoded-side names ending in
 `Encoded`. Effect 4.0.7 flattens redundant nested `anyOf` groups without changing
 their accepted values. Optional query parameters are omitted when absent;
 the generated parameter schema no longer advertises JSON `null` for them.
 The API package owns this document and its snapshot.
-Public route paths, status codes and JSON field names remain stable;
-route tests and the standalone API smoke check cover those runtime claims.
+Calculator routes move together to HTTP v2; superseded routes are removed.
+Route tests, the OpenAPI snapshot and standalone API smoke check cover this
+versioned contract. The docs API keeps its independently owned version.
 
 Public JSON examples must use canonical schema values, including tagged values
 such as `GrossPay` and `Money` where the owning schema requires those tags.
@@ -328,7 +321,7 @@ Calculation/domain failures that are part of the engine contract should remain
 typed failures and be encoded through the public error envelope. They should
 not be converted into Effect defects.
 
-Metadata and calculation routes may accept a `help` query parameter for richer
+Metadata routes may accept a `help` query parameter for richer
 client guidance. Help output should be generated from canonical schemas, fact
 descriptors, rule descriptors, graph diagnostics and source references instead
 of hand-written route-specific DTOs.
@@ -397,132 +390,56 @@ The Website has no server functions or API proxy. The
 
 ## TypeScript SDK facade
 
-The public SDK package lives under:
+[ADR 0011](../adr/0011-effect-native-sdk-contracts.md) owns the SDK 5 hard
+cutover. Rule packages define each calculator's ID, context, input/output
+Schemas, error Schema, rule graph and native execution together. Catalogue
+registrations derive these fields from the complete definition. Context lookup
+checks ID, jurisdiction and year; duplicate identities fail registration.
 
-```txt
-packages/sdk/typescript
-```
+The Effect interface exposes `calculateReport`, `calculateRun`, `decodeInput`,
+the actual engine service tag and static `TaxKitLive`. Strict unknown ingress
+uses the selected owning codec once; checked scenarios flow directly into the
+native program. Graph validation and report invariants belong to their domain
+owners. The SDK does not re-decode typed service output. Full runs include the
+selected identity/context, diagnostics and inferred report.
 
-Package name:
+The plain interface exposes named `calculate`, `calculateSafe`, `run` and
+`createClient` operations. Its private host owns one lazy ManagedRuntime per
+client using native acquisition, disposal and fibre tracking. Safe outcomes use
+native Result and Schema.Result, with expected errors directly in the failure
+payload. Schema-tagged host errors contain defects and disposal failures. Async
+disposal and repeated disposal share a cached cleanup outcome. One-shot calls
+own bounded lifetimes. No package-global runtime is retained.
 
-```txt
-taxkit
-```
-
-The sole public npm package is `taxkit`, with eight entry points.
-
-It owns:
-
-- direct in-process calculation facade
-- plain TypeScript `TaxKit.createClient(...)` client factory and
-  `TaxKit.{method}` generic helpers
-- Effect-native `./effect` entrypoint
-- jurisdiction-specific opt-in subpaths such as `./au`
-- Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
-- typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
-- exported input and output schemas
-- typed calculator request builders
-- examples for Node and browser usage
-
-The SDK root, AU and Effect entry points stay independent from HTTP; `/http`
-re-exports the canonical HTTP contracts from `@taxkit/api-http` without server
-handlers or Node-only modules. The plain facade keeps its Promise-facing
-signatures. SDK-owned integration tests compare HTTP and SDK results; the HTTP
-package never depends on the SDK. The single SDK archive includes the private
-modules and their declarations, while Effect remains external. Its fresh
-consumer installs no other TaxKit package.
-
-The plain facade maps typed calculator failures, output Schema failures and
-unexpected defects into stable SDK-owned messages. It preserves a typed
-`CalculatorServiceError` detail when present, but never projects raw
-`Cause.pretty` text, rejected values or private paths into either safe results
-or rejected Promises. Effect consumers continue to receive the typed error
-channel directly.
-
-Plain clients have caller-owned lifetimes. `createClient` creates one private,
-lazy ManagedRuntime per client, and `dispose(): Promise<void>` interrupts pending
-work/startup and awaits finalisation. An Effect Ref marks the client closed;
-an Effect Deferred shares cleanup completion with repeated or overlapping
-calls. Closing one client does not close another. Closed calculation calls have
-checked `TaxKitClientDisposedError` detail; cleanup defects produce the safe
-`TaxKitClientDisposeError`. The private `client.runtime.ts` is the exact Promise
-and execution host. Actual work is interruptible inside its client scope; public
-outcome conversion is protected so raw interruption errors do not escape.
-
-One-shot generic and AU helpers provide the calculator Layer in a temporary
-Effect scope and clean up before settling. They do not create a ManagedRuntime.
-Both plain paths reuse `calculateReport`; dispatch and output decoding have one
-owner. The Effect interface remains caller-composed and creates no runtime.
-These lifetime changes fulfil part of the accepted fresh interface work; they
-do not establish the later calculator UI, transport limits or whole-task acceptance.
-
-Calculator Schemas use narrow core/rule Schema entrypoints. Diagnostics and
-report/input definitions have separate canonical modules; old entrypoints
-re-export the same definitions. Browser transport imports therefore avoid live
-engine/calculator/rule-pack modules. This changes export ownership, not tax
-rules or retained report values. It does not change the SDK's deliberate local
-calculation composition.
+The [SDK README](../../packages/sdk/typescript/README.md) owns usage and upgrade
+examples. SDK 5 deletes selector-only modules, object facades, custom result
+classes, independent SDK descriptor factories, blanket errors, opaque causes,
+transport-shaped SDK request helpers and old money aliases. All owned callers
+move together; compatibility adapters and old calculator routes are absent.
+Supported historical tax packs use current contracts and retain their statutory
+parameters and independent result evidence.
 
 ## Export boundaries
 
-Private workspace packages export TypeScript source directly; they have no
-build or `dist`. The SDK is the only built package. Its `tsconfig.build.json`
-compiles its own source together with the private sources it includes, and
-`scripts/assemble-package.runtime.ts` moves those under `dist/internal`. The SDK
-publishes a dist-only export map: `publishConfig.exports` owns built `types` and
-`default` targets and `files` limits the tarball. Because Bun resolves workspace and
-catalogue dependency protocols during packing but does not apply
-`publishConfig.exports`, the SDK-owned strict validator stages that declared
-publication view and Bun-packs it again. Acceptance is based on the final
-tarball manifest, clean installation and public-entrypoint imports. The
-validator decodes the staged manifest once through a Schema that preserves
-uninterpreted metadata, then encodes the declared publication view. Optional
-dependency keys remain absent when originally absent; staged JSON key order is
-not an artifact-byte guarantee. Each process has a scope, bounded stdout and
-safe operational failures. A failed cleanup also fails validation.
+The sole published package is `taxkit`. Root, `money`, `money/effect`, `effect`,
+`au`, `au/schemas`, `au/effect`, `schemas`, `core`, `http` and `testing` are
+focused paths inside its assembled archive. Effect is the external runtime
+dependency. Schema identities are shared across those paths; private packages
+are not additional installation dependencies.
 
-```json
-{
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./effect": {
-      "types": "./dist/effect.d.ts",
-      "default": "./dist/effect.js"
-    },
-    "./au": {
-      "types": "./dist/au.d.ts",
-      "default": "./dist/au.js"
-    },
-    "./au/effect": {
-      "types": "./dist/au-effect.d.ts",
-      "default": "./dist/au-effect.js"
-    },
-    "./schemas": {
-      "types": "./dist/schemas/index.d.ts",
-      "default": "./dist/schemas/index.js"
-    },
-    "./testing": {
-      "types": "./dist/testing/index.d.ts",
-      "default": "./dist/testing/index.js"
-    }
-  }
-}
-```
+Root does not import HTTP or AU rule implementations. The schema and HTTP
+paths remain independent of live calculation Layers. The HTTP path exports the
+native HttpApi contracts directly. Core owns engine and fact/rule definition
+contracts; API admission policy remains with the API host. AU Effect exports
+actual facts, services, rules, parameters and pack Layers. Testing owns a checked
+fixture and engine substitution support.
 
-`.` should expose the plain, jurisdiction-neutral `TaxKit` facade. `./effect`
-should expose the Effect-native `TaxKit` facade used by HTTP handlers.
-Jurisdiction subpaths such as `./au` and `./au/effect` should expose local
-typed modules, calculation descriptors and thin convenience clients. The current
-plain root uses the default public calculator catalog, which includes the AU
-rules through the calculator live Layer. The root does not directly import AU
-descriptors; module selection limits client types rather than removing unselected
-rules from that default catalog or proving a smaller bundle. `./schemas` must be
-browser-safe and re-export calculator-owned `CalculatorRun*` schemas and
-`CalculatorServiceError` without duplicating them. `./testing` may expose
-test-only descriptors and helpers for consumers validating type behaviour.
+Normal SDK type checking includes negative compiler examples. The export,
+packed-consumer and downstream gates check actual archive imports, declarations,
+both interfaces, browser bundling, removed exports and statutory source/table
+fingerprints. Runtime tests exercise strict inputs, signed money codec laws,
+accounting invariants, client interruption, startup/disposal races and cleanup
+failure replay. Local checks do not establish publication or deployment.
 
 ## Documentation site
 
@@ -585,36 +502,17 @@ and qualified MCP operations are described below; T006 retains the observed
 modern five-second remote cleanup limit.
 
 
-SDK descriptor output narrowing checks `Schema.toType(outputSchema)` because
-the calculator service already returns a domain report. Applying the transport
-decoder again fails once trace fields are Options. HTTP representations
-still encode/decode through their owning codecs. The packed consumer compares
-22 saved metadata responses and the original trace/ledger bytes while its
-declarations expose the new Core Option types and checked constructor inputs.
+SDK execution accepts the checked scenario Type and returns a checked report
+from the complete definition. External restoration uses the owning codec;
+explicit `*Encoded` schemas retain aggregate checks for representation-only
+validation. The installed archive proves Money/Result codec laws, native service
+requirements, calculation parity, browser boundaries and unchanged statutory
+parameter/source fingerprints.
 
-
-Calculator-owned context, help and filter fields use `Option<Option<A>>` in
-checked TypeScript values: `None` means a missing key, `Some(None)` means a
-present undefined key, and `Some(Some(value))` means a present value. Owning
-constructors default omitted keys to `None`. JSON and HTTP query fields retain
-their ordinary optional representation. Flatten the two absent forms only where
-they mean the same thing; do not invent a jurisdiction or tax year.
-
-SDK constructor-input aliases retain the selected descriptor facts relation.
-The SDK checks context/help through their owning Schemas and leaves facts to
-the selected calculator decoder. HTTP uses canonical Types internally and
-representation codecs at serialisation. Their existing wire/OpenAPI fields and
-values remain the compatibility contract.
-
-
-Core calculation errors now retain diagnostic-key identity through nested
-Options. Current rule errors omit diagnostics; historical opaque/null values
-remain codec values and are not safe telemetry. Catalogue entries use their
-checked selected continuation without the unused generic `program` field.
-The fresh package declarations change deliberately; retained HTTP, report,
-metadata and table/source values stay fixed. The HTTP OpenAPI snapshot and the
-HTTP package tests check that they do.
-
+Request context uses one semantic Option. Public input failures expose bounded
+safe paths and messages; calculation failures expose closed reasons without
+opaque causes. The plain interface projects unexpected host defects only at its
+private Promise runtime boundary.
 
 ## Native calculation rate admission
 

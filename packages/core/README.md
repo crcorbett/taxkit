@@ -40,19 +40,11 @@ HTTP handlers or filesystem adapters.
   their owning Schema. `TraceNode` keeps a local recursive children relation;
   its remaining type and encoded fields come from one shared field Schema.
   The exported type aliases cannot be extended by interface declaration merging.
-  Their existing encoded field order, omitted/undefined keys and nested values
-  remain unchanged and are checked by the genuine packed consumer.
-- Trace formula/rounding and question help text use nested Options: None means
-  a missing encoded key, Some(None) means a present undefined key, and
-  Some(Some(value)) means a value. Use `Option.flatten` when both missing forms
-  mean no content. Their codecs preserve all original bytes and key presence.
-  The trace constructor retains inferred ordinary field requirements and derives
-  recursive child constructor input from those same fields; it does not widen
-  all constructor input to unknown.
-- `CalculationError.cause` uses the same nested Option owner and defaults to
-  missing when omitted from its constructor. Its codec retains the original
-  missing, undefined, null and opaque diagnostic values. Those legacy values
-  are not safe telemetry; the current rule errors omit them.
+- Trace formula/rounding and question help text use one `Option` per field.
+  Absence has one semantic meaning; encoded values omit absent fields. Legal
+  source artifact evidence keeps its independently checked representation.
+- `CalculationError` contains a safe message and a closed reason: rule, graph or
+  output invariant. Opaque diagnostic storage is removed.
 - Fact, parameter and rule descriptors derive ordinary fields from private
   Schemas. Their generic value Schema, service key and Layer relations remain
   explicit. Fact questions and source artifacts are Options; their constructor
@@ -67,16 +59,13 @@ HTTP handlers or filesystem adapters.
   canonical fields such as `id: string` in consumers.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
   `Context`, `Layer`, `Record`, `Result` and `Exit` where they fit.
-- Keep money and rounding explicit. `aud` takes already checked `Cents` and
-  returns Money directly. Use `audFromCents` or `audDollars` when a number needs
-  checking; they return Effects with `InvalidMoneyValue`. Addition, subtraction,
-  money rounding, exact decimal conversion and ledger totals check each new
-  constrained amount and return that error when it cannot fit safe whole cents.
-  `taxRate` and `decimalCoefficient` return `InvalidDecimalValue` for strings
-  the installed decimal parser rejects. Their existing valid values and rounding
-  stay unchanged; the parser's existing empty-string-as-zero case is retained.
-  Decimal-to-cent rounding checks extreme exponents before constructing powers:
-  oversized non-zero results fail, and tiny amounts round to zero.
+- Money is signed AUD in safe integer cents. `Money.fromCents(Cents.make(...))`
+  constructs trusted constants. Result operations and symmetric decimal codecs
+  live at `@taxkit/core/money`; primitive Effect operations lift the same checks
+  lazily. Dynamic cents and exact decimal text are checked without numeric-dollar
+  rounding. `NonNegativeMoney` is required for scenario inputs. Arithmetic checks
+  overflow, and statutory rounding policies remain explicit. Reports and ledgers
+  keep aggregate checks on their owning Type and explicit encoded Schemas.
 - Use `IsoDate` and `isoDate` for effective-period and source-retrieval dates.
   Both paths enforce one real Gregorian-calendar `YYYY-MM-DD` invariant;
   malformed dates and impossible dates such as `2026-02-29` are rejected.

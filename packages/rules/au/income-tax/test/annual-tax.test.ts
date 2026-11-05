@@ -1,8 +1,15 @@
 import { describe, expect, it } from "@effect/vitest";
 import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
-import { audDollars, Money, Cents } from "@taxkit/core/primitives";
+import {
+  fromDecimal,
+  nonNegative,
+  NonNegativeMoney,
+  Money,
+  Cents,
+} from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
+  AnnualTaxableIncome,
   AnnualTaxLedgerRuleId,
   AnnualTaxScenario,
   AnnualTaxScenarioInputSchema,
@@ -31,12 +38,19 @@ import {
 const runScenario = (incomeDollars: number) =>
   Effect.gen(function* () {
     const engine = yield* CalculationEngine;
-    const taxableIncome = yield* audDollars(incomeDollars);
+    const taxableIncome = yield* EffectFunction.pipe(
+      String(incomeDollars),
+      fromDecimal
+    ).pipe(Effect.flatMap(nonNegative));
     const result = yield* engine.run({
       calculation: CalculateAnnualTax,
       layer: AuAnnualTax2025_26_Live.pipe(
         Layer.provideMerge(AnnualTaxScenarioLive),
-        Layer.provide(Layer.succeed(AnnualTaxScenario)({ taxableIncome }))
+        Layer.provide(
+          Layer.succeed(AnnualTaxScenario)(
+            AnnualTaxScenarioInputSchema.make({ taxableIncome })
+          )
+        )
       ),
     });
     return result.report;
@@ -528,5 +542,23 @@ describe("AU annual income tax calculator (2025-26)", () => {
           }),
         { discard: true }
       )
+  );
+  it.effect("checks nonnegative income at the native fact boundary", () =>
+    Effect.gen(function* () {
+      const encoded = yield* Schema.encodeEffect(AnnualTaxableIncome)(
+        new AnnualTaxableIncome({
+          income: NonNegativeMoney.make(Money.fromCents(Cents.make(0))),
+        })
+      );
+      const accepted = yield* Schema.decodeEffect(AnnualTaxableIncome)(encoded);
+      expect(accepted.income.cents).toBe(0);
+      const rejected = yield* Schema.decodeEffect(AnnualTaxableIncome)({
+        ...encoded,
+        income: { ...encoded.income, cents: -1 },
+      }).pipe(Effect.exit);
+      EffectFunction.pipe(Exit.isFailure(rejected), (failed) => {
+        expect(failed).toBeTruthy();
+      });
+    })
   );
 });

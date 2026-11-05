@@ -15,7 +15,7 @@ import {
   GetCalculatorRequest,
   CalculatorRateLimited,
   CalculatorRunResponse,
-  CalculatorRunServiceRequest,
+  CalculatorRunRequest,
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import {
@@ -155,9 +155,8 @@ describe("real MCP client against the native API application", () => {
             },
           }
         );
-        const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-          CalculationRequest
-        );
+        const input =
+          yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
         const refused = yield* Effect.tryPromise({
           catch: () => new McpClientProbeFailed({ operation: "connect" }),
           try: () => client.connect(transport),
@@ -298,9 +297,8 @@ describe("real MCP client against the native API application", () => {
           catch: () => new McpClientProbeFailed({ operation: "connect" }),
           try: () => client.connect(transport),
         });
-        const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-          CalculationRequest
-        );
+        const input =
+          yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
         const response = yield* Effect.tryPromise({
           catch: () => new McpClientProbeFailed({ operation: "calculate" }),
           try: () =>
@@ -447,9 +445,8 @@ describe("real MCP client against the native API application", () => {
           catch: () => new McpClientProbeFailed({ operation: "connect" }),
           try: () => client.connect(transport),
         });
-        const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-          CalculationRequest
-        );
+        const input =
+          yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
         // AbortController is the official client's host cancellation contract.
         const aborts = yield* Effect.sync(() =>
           Array.makeBy(CalculatorConcurrencyLimit, () => new AbortController())
@@ -574,9 +571,8 @@ describe("real MCP client against the native API application", () => {
           never,
           Scope.Scope | HttpServerRequest.HttpServerRequest
         >(context)(app.fetch);
-        const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-          CalculationRequest
-        );
+        const input =
+          yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
         const expected = yield* PublicCalculatorService.pipe(
           Effect.flatMap((calculator) =>
             calculator.calculate(CalculationRequest)

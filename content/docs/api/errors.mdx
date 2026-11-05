@@ -15,14 +15,13 @@ The HTTP API wraps expected calculator service failures in
 ```json
 {
   "error": {
-    "_tag": "CalculatorInputDecodeError",
-    "calculatorId": "au.pay.take-home",
-    "message": "Invalid facts for au.pay.take-home",
+    "_tag": "InputValidationError",
+    "message": "Invalid calculator input.",
+    "truncated": false,
     "issues": [
       {
-        "_tag": "CalculatorInputIssue",
-        "message": "Expected GrossPay",
-        "path": ["grossPay"]
+        "message": "Invalid input value",
+        "path": ["payload", "facts", "grossPay"]
       }
     ]
   }
@@ -76,14 +75,7 @@ into one with a cast.
 
 ## Add help
 
-Append `?help=errors` when you want descriptor-backed help for invalid input:
-
-```txt
-POST /api/v1/calculators/au.pay.take-home/calculate?help=errors
-```
-
-The help data comes from canonical fact descriptors. Do not maintain a
-separate application copy of calculator fields.
+Retrieve the calculator schema endpoint for descriptor-backed field guidance.
 
 ## Public documentation errors
 

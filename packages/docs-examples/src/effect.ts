@@ -1,34 +1,17 @@
-import { Effect, Layer, Option } from "effect";
-import { GrossPay } from "taxkit/au";
-import { AuPayTakeHomeCalculation } from "taxkit/au/effect";
-import {
-  PublicCalculatorServiceLive,
-  CalculationEngineLive,
-  audFromCents,
-} from "taxkit/core";
-import { calculateRunRequest } from "taxkit/effect";
+import { Effect } from "effect";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
+import { calculateRun, TaxKitLive } from "taxkit/effect";
+import { fromDecimal, nonNegative } from "taxkit/money/effect";
 
-const TaxKitLayer = PublicCalculatorServiceLive.pipe(
-  Layer.provide(CalculationEngineLive)
-);
-
-export const program = audFromCents(346_200).pipe(
-  Effect.flatMap((amount) =>
-    calculateRunRequest(AuPayTakeHomeCalculation, {
-      payload: {
-        facts: {
-          grossPay: new GrossPay({
-            amount,
-            period: "fortnightly",
-          }),
-          taxFreeThresholdClaimed: true,
-        },
-        jurisdiction: Option.some(
-          Option.some(AuPayTakeHomeCalculation.jurisdiction)
-        ),
-        taxYear: Option.some(Option.some(AuPayTakeHomeCalculation.taxYear)),
-      },
-    })
-  ),
-  Effect.provide(TaxKitLayer)
-);
+export const program = Effect.gen(function* () {
+  const grossPay = yield* fromDecimal("3462.00").pipe(
+    Effect.flatMap(nonNegative)
+  );
+  const input = TakeHomeScenarioInputSchema.make({
+    grossPay,
+    period: "fortnightly",
+    taxFreeThresholdClaimed: true,
+  });
+  return yield* calculateRun(AuPayTakeHomeCalculation, input);
+}).pipe(Effect.provide(TaxKitLive));

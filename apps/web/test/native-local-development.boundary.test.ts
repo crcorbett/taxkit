@@ -83,7 +83,7 @@ describe("native local development", () => {
         // Record every browser call to a calculator calculation route.
         page.on("request", (request) => {
           const { pathname } = new URL(request.url());
-          if (/^\/api\/v1\/calculators\/[^/]+\/calculate$/u.test(pathname)) {
+          if (/^\/api\/v2\/calculators\/[^/]+\/calculate$/u.test(pathname)) {
             Queue.offerUnsafe(calls, `${request.method()} ${request.url()}`);
           }
         });
@@ -264,7 +264,7 @@ describe("native local development", () => {
                 .waitFor({ timeout: 10_000 })
             );
             expect(yield* Queue.clear(calls)).toStrictEqual([
-              `POST ${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`,
+              `POST ${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`,
             ]);
             const plainContext = yield* Effect.acquireRelease(
               Effect.promise(() =>

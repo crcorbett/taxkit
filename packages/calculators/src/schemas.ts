@@ -1,24 +1,27 @@
 import { CalculationDiagnostics } from "@taxkit/core/engine/schemas";
-import { CalculationError } from "@taxkit/core/errors";
+import { InputValidationError, CalculationError } from "@taxkit/core/errors";
 import { FactAuthority, FactId, FactQuestion } from "@taxkit/core/facts";
 import { GraphValidationIssue } from "@taxkit/core/graph";
 import { ParameterEffectivePeriod, ParameterId } from "@taxkit/core/parameters";
 import { RuleSourcePolicy } from "@taxkit/core/rules";
 import { RuleId, SourceRef } from "@taxkit/core/trace";
 import {
+  AuAnnualTaxContract,
   AnnualTaxReport,
-  AnnualTaxScenarioInputSchema,
   AuAnnualTaxCalculatorId,
   AuAnnualTaxJurisdiction,
   AuAnnualTaxYear,
 } from "@taxkit/rules-au-income-tax/schemas";
 import {
+  AuPayTakeHomeContract,
+  AuPayWithholdingsContract,
+  AuPayTakeHomeId,
+  AuPayWithholdingsId,
   AuPayCalculatorId,
   AuPayJurisdiction,
   AuPayTaxYear,
   PayWithholdingsLedger,
   TakeHomePayReport,
-  TakeHomeScenarioInputSchema,
 } from "@taxkit/rules-au-pay/schemas";
 import { Data, Effect, Schema } from "effect";
 /**
@@ -29,9 +32,9 @@ import { Data, Effect, Schema } from "effect";
  * calculator metadata.
  */
 export const CalculatorId = Schema.Union([
-  AuPayCalculatorId,
-  AuAnnualTaxCalculatorId,
-]);
+  Schema.toEncoded(AuPayCalculatorId),
+  Schema.toEncoded(AuAnnualTaxCalculatorId),
+]).pipe(Schema.brand("taxkit/CalculatorId"));
 export type CalculatorId = typeof CalculatorId.Type;
 /**
  * Public jurisdictions supported by the composed calculator catalog.
@@ -54,12 +57,12 @@ const CalculatorContextFields = {
   taxYear: CalculatorTaxYear,
 };
 const OptionalCalculatorContextFields = {
-  jurisdiction: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorJurisdiction)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-  taxYear: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorTaxYear)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  jurisdiction: Schema.OptionFromOptional(CalculatorJurisdiction).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
+  taxYear: Schema.OptionFromOptional(CalculatorTaxYear).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
 };
 export const CalculatorContext = Schema.Struct({
   ...CalculatorContextFields,
@@ -70,8 +73,7 @@ export type CalculatorContext = typeof CalculatorContext.Type;
  *
  * Optionality belongs in this schema so service code can use typed request
  * values without raw `undefined` checks or conditional response shaping.
- * Nested Options retain missing, present undefined and present value keys;
- * constructors default omitted keys without inventing context values.
+ * One Option represents absent context; constructors never invent a value.
  */
 export const CalculatorContextQuery = Schema.Struct({
   ...OptionalCalculatorContextFields,
@@ -86,48 +88,6 @@ export const HelpMode = Schema.Literals([
   "full",
 ]);
 export type HelpMode = typeof HelpMode.Type;
-/**
- * Transport-safe representation of one schema decode issue.
- */
-export class CalculatorInputIssue extends Schema.TaggedClass<
-  CalculatorInputIssue,
-  {
-    readonly brand: unique symbol;
-  }
->()("CalculatorInputIssue", {
-  message: Schema.String,
-  path: Schema.Array(Schema.String),
-}) {}
-/**
- * Field-level guidance returned when the caller asks for error help.
- */
-export const CalculatorInputHelp = Schema.Struct({
-  factId: FactId,
-  question: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(FactQuestion)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-  title: Schema.String,
-});
-export type CalculatorInputHelp = typeof CalculatorInputHelp.Type;
-/**
- * Public error returned when request facts do not match the calculator's input
- * fact schema.
- */
-export class CalculatorInputDecodeError extends Schema.TaggedClass<
-  CalculatorInputDecodeError,
-  {
-    readonly brand: unique symbol;
-  }
->()("CalculatorInputDecodeError", {
-  calculatorId: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorId)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(Schema.Array(CalculatorInputHelp))
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-  issues: Schema.Array(CalculatorInputIssue),
-  message: Schema.String,
-}) {}
 /**
  * Public error for a supported request shape that names no catalog entry.
  */
@@ -202,8 +162,8 @@ export class CalculatorAdmissionUnavailable extends Schema.TaggedError<
   retry: Schema.tag("try-again-manually"),
 }) {}
 export const CalculatorRequestError = Schema.Union([
+  InputValidationError,
   CalculationError,
-  CalculatorInputDecodeError,
   UnsupportedCalculatorError,
   UnsupportedCalculatorContextError,
 ]);
@@ -269,23 +229,17 @@ export const MetadataQuery = Schema.Struct({
 });
 export type MetadataQuery = typeof MetadataQuery.Type;
 export const HelpQuery = Schema.Struct({
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptional(HelpMode).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   ...OptionalCalculatorContextFields,
 });
 export type HelpQuery = typeof HelpQuery.Type;
-export const CalculationQuery = Schema.Struct({
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-});
-export type CalculationQuery = typeof CalculationQuery.Type;
 export const GetCalculatorRequest = Schema.Struct({
   calculatorId: CalculatorId,
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  help: Schema.OptionFromOptional(HelpMode).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   ...OptionalCalculatorContextFields,
 });
 export type GetCalculatorRequest = typeof GetCalculatorRequest.Type;
@@ -295,9 +249,9 @@ export const GetCalculatorGraphRequest = Schema.Struct({
 });
 export type GetCalculatorGraphRequest = typeof GetCalculatorGraphRequest.Type;
 export const DescriptorFilterQuery = Schema.Struct({
-  calculator: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(CalculatorId)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  calculator: Schema.OptionFromOptional(CalculatorId).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   ...OptionalCalculatorContextFields,
 });
 export type DescriptorFilterQuery = typeof DescriptorFilterQuery.Type;
@@ -318,9 +272,9 @@ export type ParameterDescriptorMetadata =
 export const FactDescriptorMetadata = Schema.Struct({
   authority: FactAuthority,
   id: FactId,
-  question: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(FactQuestion)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  question: Schema.OptionFromOptional(FactQuestion).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   schemaTag: Schema.String,
   title: Schema.String,
 });
@@ -329,9 +283,9 @@ export type FactDescriptorMetadata = typeof FactDescriptorMetadata.Type;
  * Public metadata for one rule descriptor and its dependency edges.
  */
 export const RuleDescriptorMetadata = Schema.Struct({
-  allowDuplicateProvides: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(Schema.Boolean)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
+  allowDuplicateProvides: Schema.OptionFromOptional(Schema.Boolean).pipe(
+    Schema.withConstructorDefault(Effect.succeedNone)
+  ),
   id: RuleId,
   parameters: Schema.Array(ParameterDescriptorMetadata),
   provides: Schema.Array(FactId),
@@ -371,38 +325,34 @@ export const CalculatorGraphResponse = Schema.Struct({
   validationIssues: Schema.Array(GraphValidationIssue),
 });
 export type CalculatorGraphResponse = typeof CalculatorGraphResponse.Type;
-/**
- * Calculator run facts accepted by the generic calculate route.
- *
- * This union is intentionally composed from canonical rule-owned scenario
- * schemas so generated API docs and clients can see the supported fact shapes.
- * The calculator service still decodes the value again with the selected
- * catalog entry's `inputSchema`, because the route-level union cannot depend
- * on the `calculatorId` path parameter.
- */
-export const CalculatorRunFacts = Schema.Union([
-  TakeHomeScenarioInputSchema,
-  AnnualTaxScenarioInputSchema,
-]);
-export type CalculatorRunFacts = typeof CalculatorRunFacts.Type;
-export const CalculatorRunRequest = Schema.Struct({
-  facts: CalculatorRunFacts,
-  ...OptionalCalculatorContextFields,
+/** A transport variant selects exactly one owning scenario codec. */
+export const TakeHomeCalculationRequest = Schema.Struct({
+  calculatorId: Schema.toEncoded(AuPayTakeHomeId),
+  payload: Schema.Struct({
+    facts: AuPayTakeHomeContract.inputSchema,
+    ...OptionalCalculatorContextFields,
+  }),
 });
+export const WithholdingsCalculationRequest = Schema.Struct({
+  calculatorId: Schema.toEncoded(AuPayWithholdingsId),
+  payload: Schema.Struct({
+    facts: AuPayWithholdingsContract.inputSchema,
+    ...OptionalCalculatorContextFields,
+  }),
+});
+export const AnnualTaxCalculationRequest = Schema.Struct({
+  calculatorId: Schema.toEncoded(AuAnnualTaxCalculatorId),
+  payload: Schema.Struct({
+    facts: AuAnnualTaxContract.inputSchema,
+    ...OptionalCalculatorContextFields,
+  }),
+});
+export const CalculatorRunRequest = Schema.Union([
+  TakeHomeCalculationRequest,
+  WithholdingsCalculationRequest,
+  AnnualTaxCalculationRequest,
+]).pipe(Schema.toTaggedUnion("calculatorId"));
 export type CalculatorRunRequest = typeof CalculatorRunRequest.Type;
-/**
- * Service-level calculation request after route params, query params and JSON
- * body have been decoded by the HTTP API package.
- */
-export const CalculatorRunServiceRequest = Schema.Struct({
-  calculatorId: CalculatorId,
-  help: Schema.OptionFromOptionalKey(
-    Schema.OptionFromUndefinedOr(HelpMode)
-  ).pipe(Schema.withConstructorDefault(Effect.succeedNone)),
-  payload: CalculatorRunRequest,
-});
-export type CalculatorRunServiceRequest =
-  typeof CalculatorRunServiceRequest.Type;
 export const CalculatorRunReport = Schema.Union([
   TakeHomePayReport,
   PayWithholdingsLedger,
@@ -413,11 +363,34 @@ export type CalculatorRunReport = typeof CalculatorRunReport.Type;
  * Calculator run response with catalog metadata, diagnostics and the typed
  * calculator-specific report.
  */
-export const CalculatorRunResponse = Schema.Struct({
-  calculator: CalculatorCatalogItem,
-  diagnostics: CalculationDiagnostics,
-  report: CalculatorRunReport,
-});
+export const CalculatorRunResponse = Schema.Union([
+  Schema.Struct({
+    calculatorId: Schema.toEncoded(AuPayTakeHomeId),
+    calculator: Schema.Struct({
+      ...CalculatorCatalogItem.fields,
+      calculatorId: AuPayTakeHomeId,
+    }),
+    diagnostics: CalculationDiagnostics,
+    report: AuPayTakeHomeContract.outputSchema,
+  }),
+  Schema.Struct({
+    calculatorId: Schema.toEncoded(AuPayWithholdingsId),
+    calculator: Schema.Struct({
+      ...CalculatorCatalogItem.fields,
+      calculatorId: AuPayWithholdingsId,
+    }),
+    diagnostics: CalculationDiagnostics,
+    report: AuPayWithholdingsContract.outputSchema,
+  }),
+  Schema.Struct({
+    calculatorId: Schema.toEncoded(AuAnnualTaxCalculatorId),
+    calculator: Schema.Struct({
+      ...CalculatorCatalogItem.fields,
+      calculatorId: AuAnnualTaxCalculatorId,
+    }),
+    diagnostics: CalculationDiagnostics,
+    report: AuAnnualTaxContract.outputSchema,
+  }),
+]).pipe(Schema.toTaggedUnion("calculatorId"));
 export type CalculatorRunResponse = typeof CalculatorRunResponse.Type;
 export class CalculatorCatalogResponseData extends Data.Class<CalculatorCatalogResponse> {}
-export class CalculatorRunResponseData extends Data.Class<CalculatorRunResponse> {}

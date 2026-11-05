@@ -9,15 +9,15 @@ export const referencePath = "/api/docs";
 export const openApiPath = "/api/docs/openapi.json";
 
 export const calculatorPaths = {
-  calculate: "/api/v1/calculators/:calculatorId/calculate",
-  calculator: "/api/v1/calculators/:calculatorId",
-  calculators: "/api/v1/calculators",
-  facts: "/api/v1/facts",
-  graph: "/api/v1/calculators/:calculatorId/graph",
-  jurisdictions: "/api/v1/jurisdictions",
-  rules: "/api/v1/rules",
-  schema: "/api/v1/calculators/:calculatorId/schema",
-  taxYears: "/api/v1/tax-years",
+  calculate: "/api/v2/calculators/:calculatorId/calculate",
+  calculator: "/api/v2/calculators/:calculatorId",
+  calculators: "/api/v2/calculators",
+  facts: "/api/v2/facts",
+  graph: "/api/v2/calculators/:calculatorId/graph",
+  jurisdictions: "/api/v2/jurisdictions",
+  rules: "/api/v2/rules",
+  schema: "/api/v2/calculators/:calculatorId/schema",
+  taxYears: "/api/v2/tax-years",
 } as const;
 
 export const docsPaths = {

@@ -2,7 +2,7 @@ import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
   Cents,
-  audFromCents,
+  fromCents,
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
@@ -79,11 +79,11 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
       taxableExcess,
       bracket.rate
     );
-    const taxAmount = yield* audFromCents(bracket.baseTaxCents + marginalTax);
+    const taxAmount = yield* fromCents(bracket.baseTaxCents + marginalTax);
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(
-        Option.some("tax = baseTaxCents + round(rate * (income - threshold))")
+        "tax = baseTaxCents + round(rate * (income - threshold))"
       ),
       inputs: {
         baseTaxCents: bracket.baseTaxCents,
@@ -93,7 +93,7 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
         tableYear: table.year,
       },
       result: taxAmount.cents,
-      rounding: Option.some(Option.some("round-to-nearest-cent")),
+      rounding: Option.some("round-to-nearest-cent"),
       ruleId: IncomeTaxRuleId,
       sources: [table.source],
       title: "Income tax at marginal rates",

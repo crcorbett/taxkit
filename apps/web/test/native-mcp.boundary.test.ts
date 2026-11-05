@@ -10,7 +10,7 @@ import {
   CalculatorSchemaResponse,
   GetCalculatorRequest,
   CalculatorRunResponse,
-  CalculatorRunServiceRequest,
+  CalculatorRunRequest,
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
@@ -323,7 +323,7 @@ it.live(
           }
         );
         const httpCatalogue = yield* Effect.promise(() =>
-          api.fetch("http://127.0.0.1:4218/api/v1/calculators")
+          api.fetch("http://127.0.0.1:4218/api/v2/calculators")
         );
         expect(httpCatalogue.status).toBe(200);
         expect(
@@ -359,7 +359,7 @@ it.live(
         expect(schemaReply.inputFacts.length).toBeGreaterThan(0);
         const httpSchema = yield* Effect.promise(() =>
           api.fetch(
-            `http://127.0.0.1:4218/api/v1/calculators/${CalculationRequest.calculatorId}/schema`
+            `http://127.0.0.1:4218/api/v2/calculators/${CalculationRequest.calculatorId}/schema`
           )
         );
         expect(httpSchema.status).toBe(200);
@@ -412,9 +412,8 @@ it.live(
         return { after: metadataProgress };
       }).pipe(Effect.withSpan("verifyResumptions"));
       const { input } = yield* Effect.gen(function* verifyCalculationParity() {
-        const calculationInput = yield* Schema.encodeEffect(
-          CalculatorRunServiceRequest
-        )(CalculationRequest);
+        const calculationInput =
+          yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
         // Keep the complete three-call burst in one workerd minute window.
         const elapsed = (yield* Clock.currentTimeMillis) % 60_000;
         if (elapsed > 55_000) {
@@ -437,11 +436,11 @@ it.live(
           checked.structuredContent
         );
         const body = yield* Schema.encodeEffect(
-          Schema.fromJsonString(CalculatorRunServiceRequest.fields.payload)
-        )(CalculationRequest.payload);
+          Schema.fromJsonString(CalculatorRunRequest)
+        )(CalculationRequest);
         const http = yield* Effect.promise(() =>
           api.fetch(
-            "http://127.0.0.1:4218/api/v1/calculators/au.pay.take-home/calculate",
+            "http://127.0.0.1:4218/api/v2/calculators/au.pay.take-home/calculate",
             {
               body,
               headers: {
@@ -663,9 +662,8 @@ it.live(
       const workAddress = yield* Effect.promise(() =>
         host.unsafeGetDirectURL("modern-work")
       );
-      const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-        CalculationRequest
-      );
+      const input =
+        yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
       // The modern adapter has no conversation binding for its cancellation
       // notification. A real outgoing TCP abort stops this caller, but on the
       // pinned Worker it does not release pre-response work before its budget.

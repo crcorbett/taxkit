@@ -1,6 +1,6 @@
 import { AnnualTaxForm } from "@taxkit/calculators/form";
 import type { CalculatorForm } from "@taxkit/calculators/form";
-import type { CalculatorRunServiceRequest } from "@taxkit/calculators/schemas";
+import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import type { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
 import type { PayWithholdingsLedger } from "@taxkit/rules-au-pay/schemas";
 import { Predicate, Boolean as EffectBoolean, Match, Schema } from "effect";
@@ -20,7 +20,7 @@ export const CalculatorPageView = ({
   onEdit,
   onCalculate,
 }: {
-  readonly calculatorId: CalculatorRunServiceRequest["calculatorId"];
+  readonly calculatorId: CalculatorRunRequest["calculatorId"];
   readonly form: CalculatorForm;
   readonly title: string;
   readonly year: string;

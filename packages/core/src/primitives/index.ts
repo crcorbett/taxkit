@@ -11,19 +11,23 @@ export {
   Cents,
   Currency,
   Money,
-  aud,
-  audFromCents,
-  audDollars,
-  moneyAdd,
+  NonNegativeMoney,
   moneyEquals,
-  moneySub,
 } from "./money.js";
 export {
-  MoneyFromDollarsString,
-  dollarsTextFromMoney,
-  moneyFromDollarsText,
+  fromCents,
+  fromDecimal,
+  nonNegative,
+  add,
+  subtract,
+  round,
+} from "./money.effect.js";
+export {
+  MoneyFromDecimalString,
+  NonNegativeMoneyFromDecimalString,
+  format,
 } from "./dollars.js";
-export { RoundingMode, roundCentsToDollar, roundMoney } from "./rounding.js";
+export { RoundingMode, roundCentsToDollar } from "./rounding.js";
 export {
   CentsOrInfinity,
   DecimalCoefficient,
@@ -37,9 +41,8 @@ export {
 } from "./tax.js";
 
 export {
-  DollarsTextIssue,
+  MoneyIssue,
   InvalidCalendarValue,
   InvalidDecimalValue,
-  InvalidDollarsText,
-  InvalidMoneyValue,
+  MoneyError,
 } from "./errors.js";

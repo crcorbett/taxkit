@@ -7,7 +7,6 @@
   "exports": {
     ".": "./src/index.ts",
     "./catalog": "./src/catalog.ts",
-    "./errors": "./src/errors.ts",
     "./summaries": "./src/summaries.ts",
     "./metadata": "./src/metadata.ts",
     "./service": "./src/service.ts",
@@ -24,7 +23,7 @@
     "./page-tools": "./src/page.tools.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p tsconfig.type-tests.json --noEmit",
     "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
     "test": "vitest run"
   },

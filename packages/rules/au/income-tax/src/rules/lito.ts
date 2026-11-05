@@ -2,7 +2,7 @@ import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
   Cents,
-  audFromCents,
+  fromCents,
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
@@ -83,7 +83,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     );
     const rawOffsetCents = bracket.fullOffsetCents - phasedOut;
     const offsetCents = Math.max(0, rawOffsetCents);
-    const offsetAmount = yield* audFromCents(offsetCents);
+    const offsetAmount = yield* fromCents(offsetCents);
     const status = Match.value(offsetCents).pipe(
       Match.when(0, (): "zeroed" => "zeroed"),
       Match.orElse((): "active" => "active")
@@ -91,9 +91,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const trace = TraceNode.make({
       children: [],
       formula: Option.some(
-        Option.some(
-          "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))"
-        )
+        "offset = max(0, fullOffset - round(phaseOutRate * (income - threshold)))"
       ),
       inputs: {
         bracketThresholdCents: bracket.thresholdCents,
@@ -103,7 +101,7 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
         tableYear: table.year,
       },
       result: offsetAmount.cents,
-      rounding: Option.some(Option.some("round-to-nearest-cent")),
+      rounding: Option.some("round-to-nearest-cent"),
       ruleId: LitoRuleId,
       sources: [table.source],
       title: "Low Income Tax Offset (LITO)",

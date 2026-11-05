@@ -1,6 +1,6 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { Cents, audFromCents } from "@taxkit/core/primitives";
+import { Cents, fromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   Function as EffectFunction,
@@ -108,7 +108,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         })
       )
     );
-    const periodWithholding = yield* audFromCents(
+    const periodWithholding = yield* fromCents(
       scaleWeeklyWithholdingToPayPeriodDollars(
         weeklyWithholdingDollars,
         taxable.period
@@ -117,9 +117,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     const trace = TraceNode.make({
       children: [taxable.trace],
       formula: Option.some(
-        Option.some(
-          "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period"
-        )
+        "weekly = round(a * (whole weekly dollars + 0.99) - b); period = scale weekly withholding to pay period"
       ),
       inputs: {
         a: BigDecimal.format(row.a),
@@ -133,7 +131,7 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
         weeklyWithholdingDollarsRaw: BigDecimal.format(weeklyWithholding),
       },
       result: periodWithholding.cents,
-      rounding: Option.some(Option.some("ato-withholding-rounding")),
+      rounding: Option.some("ato-withholding-rounding"),
       ruleId: PaygWithholdingRuleId,
       sources: [table.source],
       title: `PAYG withholding (Schedule 1, ${scale})`,

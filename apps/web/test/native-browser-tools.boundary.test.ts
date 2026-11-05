@@ -32,12 +32,12 @@ import { nativeRateFixture } from "./native-rate.fixture";
 const apiOrigin = "http://127.0.0.1:4231";
 const websiteOrigin = "http://127.0.0.1:4230";
 // The browser calls the public API directly; calculation is its only POST.
-const catalogueRead = "GET /api/v1/calculators";
+const catalogueRead = "GET /api/v2/calculators";
 const calculation = (calculatorId: string) =>
-  `POST /api/v1/calculators/${calculatorId}/calculate`;
+  `POST /api/v2/calculators/${calculatorId}/calculate`;
 const isAnnualCalculation = (url: URL) =>
   url.origin === apiOrigin &&
-  url.pathname === "/api/v1/calculators/au.income-tax.annual/calculate";
+  url.pathname === "/api/v2/calculators/au.income-tax.annual/calculate";
 const BrowserReply = Schema.toCodecJson(
   Schema.Union([
     CalculatorViewState,

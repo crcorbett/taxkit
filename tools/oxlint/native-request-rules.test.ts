@@ -59,7 +59,7 @@ describe("native request ownership rules", () => {
       name: "rejects duplicate runtime transport paths",
       path: "apps/api/src/.generated-route-owner.ts",
       rule: "strict-effect(route-literal-ownership)",
-      source: 'export const route = "/api/v1/calculators";',
+      source: 'export const route = "/api/v2/calculators";',
     },
     {
       count: 4,
@@ -160,7 +160,7 @@ export const Route = createFileRoute("/generated")({
       path: "apps/web/src/routes/.generated-data-proxy.tsx",
       rule: "strict-effect(website-data-proxy)",
       source: `import { createFileRoute } from "@tanstack/react-router";
-export const Route = createFileRoute("/api/v1/calculators")({
+export const Route = createFileRoute("/api/v2/calculators")({
   server: { handlers: { GET: () => new Response("proxied") } },
 });
 export const Download = createFileRoute("/llms.txt")({

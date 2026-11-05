@@ -1,15 +1,17 @@
 import { Effect, Schema } from "effect";
-import { au } from "taxkit/au";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { calculateReport, decodeInput, TaxKitLive } from "taxkit/effect";
 
-// Check an external JSON representation before calling a typed calculator.
-export const invalidInput = Schema.decodeEffect(
-  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
-)('{"taxableIncome":{"_tag":"Money","cents":9000000,"currency":"AUD"}}');
-
+// Decode the selected scenario once; surplus fields fail as well.
+export const invalidInput = decodeInput(AuPayTakeHomeCalculation, {
+  taxableIncome: 9_000_000,
+});
 export const validInput = Schema.decodeEffect(
-  Schema.fromJsonString(au.calculations.takeHomePay.inputSchema)
+  Schema.fromJsonString(Schema.Unknown)
 )(
-  '{"grossPay":{"_tag":"GrossPay","amount":{"_tag":"Money","cents":165400,"currency":"AUD"},"period":"weekly"},"taxFreeThresholdClaimed":true}'
+  '{"grossPay":{"_tag":"Money","cents":165400,"currency":"AUD"},"period":"weekly","taxFreeThresholdClaimed":true}'
 ).pipe(
-  Effect.flatMap((input) => Effect.promise(() => au.pay.takeHomePay(input)))
+  Effect.flatMap((input) => decodeInput(AuPayTakeHomeCalculation, input)),
+  Effect.flatMap((input) => calculateReport(AuPayTakeHomeCalculation, input)),
+  Effect.provide(TaxKitLive)
 );

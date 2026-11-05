@@ -73,10 +73,10 @@ const publicCache = {
 };
 const frameworkSentinel = "PRIVATE9";
 // The browser calls the public API directly. Calculation is its only POST.
-const calculationPath = /^\/api\/v1\/calculators\/[^/]+\/calculate$/u;
+const calculationPath = /^\/api\/v2\/calculators\/[^/]+\/calculate$/u;
 const isCalculation = (url: URL) =>
   url.origin === apiOrigin && calculationPath.test(url.pathname);
-const takeHomeCalculation = `${apiOrigin}/api/v1/calculators/au.pay.take-home/calculate`;
+const takeHomeCalculation = `${apiOrigin}/api/v2/calculators/au.pay.take-home/calculate`;
 const docsNavigationAddress = `${apiOrigin}/api/v2/docs/navigation`;
 const docsPageAddress = (path: string) =>
   `${apiOrigin}/api/v2/docs/page?${new URLSearchParams({ path })}`;
@@ -1291,7 +1291,7 @@ describe("built native API and Website", () => {
               query: MetadataQuery.make({}),
             });
             const filter = DescriptorFilterQuery.make({
-              calculator: Option.some(Option.some(pay.calculatorId)),
+              calculator: Option.some(pay.calculatorId),
             });
             const facts = yield* calculatorApi.listFacts({ query: filter });
             const rules = yield* calculatorApi.listRules({ query: filter });
@@ -1455,7 +1455,7 @@ describe("built native API and Website", () => {
               })
           );
           yield* Effect.forEach(
-            ["/api/v1/calculators/au.pay.take-home/calculate"],
+            ["/api/v2/calculators/au.pay.take-home/calculate"],
             (pathname) =>
               Effect.gen(function* () {
                 const oversized = yield* Effect.promise(() =>

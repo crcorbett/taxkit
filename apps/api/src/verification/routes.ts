@@ -10,17 +10,14 @@ import {
   healthPath,
   openApiPath,
 } from "@taxkit/api-http/routes";
+import { TakeHomeCalculationRequest } from "@taxkit/calculators/schemas";
 import {
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
 } from "@taxkit/content/schemas";
-import { Money, Cents } from "@taxkit/core/primitives";
-import {
-  AuPayJurisdiction,
-  AuPayTaxYear,
-  GrossPay,
-} from "@taxkit/rules-au-pay";
+import { NonNegativeMoney, Money, Cents } from "@taxkit/core/primitives";
+import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay";
 import {
   Match,
   Function as EffectFunction,
@@ -185,17 +182,19 @@ export const checkApiCatalog = (origin: string) =>
     )
   );
 export const checkApiCalculation = (origin: string) =>
-  HttpBody.jsonSchema(CalculatorRunRequest)({
-    facts: {
-      grossPay: new GrossPay({
-        amount: new Money({ cents: Cents.make(346_200), currency: "AUD" }),
-        period: "fortnightly",
-      }),
-      taxFreeThresholdClaimed: true,
-    },
-    jurisdiction: Option.some(Option.some(AuPayJurisdiction.make("AU"))),
-    taxYear: Option.some(Option.some(AuPayTaxYear.make("2025-26"))),
-  }).pipe(
+  HttpBody.jsonSchema(CalculatorRunRequest)(
+    TakeHomeCalculationRequest.make({
+      calculatorId:
+        TakeHomeCalculationRequest.fields.calculatorId.make("au.pay.take-home"),
+      payload: {
+        facts: TakeHomeScenarioInputSchema.make({
+          grossPay: NonNegativeMoney.make(Money.fromCents(Cents.make(346_200))),
+          period: "fortnightly",
+          taxFreeThresholdClaimed: true,
+        }),
+      },
+    })
+  ).pipe(
     Effect.flatMap((body) =>
       HttpClient.post(
         new URL(

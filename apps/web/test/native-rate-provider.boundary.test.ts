@@ -133,10 +133,10 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
       );
       const body = yield* Schema.encodeEffect(
         Schema.fromJsonString(CalculatorRunRequest)
-      )(CalculationRequest.payload);
+      )(CalculationRequest);
       const response = yield* Effect.promise(() =>
         api.fetch(
-          "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate",
+          "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate",
           {
             body,
             headers: {
@@ -155,7 +155,7 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
       })(["PRIVATE9", "203.0.113.75"]);
       expect(
         (yield* Effect.promise(() =>
-          api.fetch("https://api.example.com/api/v1/calculators")
+          api.fetch("https://api.example.com/api/v2/calculators")
         )).status
       ).toBe(200);
       const captured = yield* Schema.encodeEffect(

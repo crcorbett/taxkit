@@ -15,7 +15,8 @@
     "./graph": "./src/graph/index.ts",
     "./trace": "./src/trace/index.ts",
     "./ledger": "./src/ledger/index.ts",
-    "./engine/schemas": "./src/engine/schemas.ts"
+    "./engine/schemas": "./src/engine/schemas.ts",
+    "./money": "./src/money.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

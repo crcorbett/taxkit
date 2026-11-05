@@ -28,8 +28,8 @@ runtime dependency and your package manager installs it automatically. Use
 
 | Entrypoint       | Use when                                                               |
 | ---------------- | ---------------------------------------------------------------------- |
-| `taxkit`         | You want `TaxKit.calculate` or `TaxKit.safe.calculate`.                |
-| `taxkit/au`      | You want Australian helper methods such as `au.incomeTax.annual`.      |
+| `taxkit`         | You want `calculate` or `calculateSafe`.                               |
+| `taxkit/au`      | You want Australian helper methods such as `annualIncomeTax`.          |
 | `taxkit/effect`  | You want Effect programs, service requirements and full run responses. |
 | `taxkit/core`    | You want money values, engine services or calculator contracts.        |
 | `taxkit/http`    | You want typed HTTP contracts for Effect's generated API client.       |
@@ -41,12 +41,17 @@ These are paths inside one package; you do not install them separately.
 ## Verify an import
 
 ```ts
-import { Cents, aud } from "taxkit/core";
-import { TaxKit } from "taxkit";
-import { au } from "taxkit/au";
+import { Cents, Money } from "taxkit/money";
+import { calculate, calculateSafe, createClient } from "taxkit";
+import {
+  AuPayTakeHomeCalculation,
+  AuAnnualIncomeTaxCalculation,
+  takeHomePay,
+  annualIncomeTax,
+} from "taxkit/au";
 
-const report = await TaxKit.calculate(au.calculations.annualIncomeTax, {
-  taxableIncome: aud(Cents.make(9_000_000)),
+const report = await calculate(AuAnnualIncomeTaxCalculation, {
+  taxableIncome: Money.fromCents(Cents.make(9_000_000)),
 });
 
 console.log(report.liability.cents);

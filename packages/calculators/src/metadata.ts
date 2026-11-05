@@ -128,7 +128,10 @@ const toFactDescriptorMetadata = (
   new FactDescriptorMetadataData({
     authority: descriptor.authority,
     id: descriptor.id,
-    question: EffectFunction.pipe(descriptor.question, Option.map(Option.some)),
+    question: EffectFunction.pipe(
+      descriptor.question,
+      Option.map((value) => value)
+    ),
     schemaTag: schemaTag(descriptor.schema),
     title: descriptor.title,
   });
@@ -151,7 +154,7 @@ const toRuleDescriptorMetadata = (
   return new RuleDescriptorMetadataData({
     allowDuplicateProvides: EffectFunction.pipe(
       descriptor.allowDuplicateProvides,
-      Option.map(Option.some)
+      Option.map((value) => value)
     ),
     id: descriptor.id,
     parameters,
@@ -290,21 +293,18 @@ export const filterCalculatorEntries = (
     listCalculatorCatalogEntries(),
     Array.filter((entry) => {
       const calculatorMatches = query.calculator.pipe(
-        Option.flatten,
         Option.match({
           onNone: () => true,
           onSome: (calculator) => calculator === entry.calculatorId,
         })
       );
       const jurisdictionMatches = query.jurisdiction.pipe(
-        Option.flatten,
         Option.match({
           onNone: () => true,
           onSome: (jurisdiction) => jurisdiction === entry.context.jurisdiction,
         })
       );
       const taxYearMatches = query.taxYear.pipe(
-        Option.flatten,
         Option.match({
           onNone: () => true,
           onSome: (taxYear) => taxYear === entry.context.taxYear,

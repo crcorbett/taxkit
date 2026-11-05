@@ -1,10 +1,8 @@
 export {
-  CalculatorCatalog,
   getCalculatorCatalogEntry,
   listCalculatorCatalogEntries,
   type CalculatorCatalogEntry,
 } from "./catalog.js";
-export { toCalculatorInputDecodeError } from "./errors.js";
 export {
   CalculatorCatalogItems,
   CalculatorCatalogResponseValue,
@@ -36,20 +34,13 @@ export {
   CalculatorContextQuery,
   CalculatorGraphResponse,
   CalculatorId,
-  CalculatorInputDecodeError,
-  CalculatorInputHelp,
-  CalculatorInputIssue,
   CalculatorJurisdiction,
-  CalculatorRunFacts,
   CalculatorRunReport,
   CalculatorRunRequest,
   CalculatorRunResponse,
-  CalculatorRunResponseData,
-  CalculatorRunServiceRequest,
   CalculatorSchemaResponse,
   CalculatorServiceError,
   CalculatorTaxYear,
-  CalculationQuery,
   DescriptorFilterQuery,
   FactDescriptorMetadata,
   FactsResponse,

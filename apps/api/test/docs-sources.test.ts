@@ -32,7 +32,7 @@ const requiredText = [
     path: "api/openapi-reference.mdx",
     texts: [
       "/api/docs/openapi.json",
-      "/api/v1/calculators/{calculatorId}/calculate",
+      "/api/v2/calculators/{calculatorId}/calculate",
       "CalculatorRunRequest",
       "__snapshots__/openapi.json",
       "bun run --filter=@taxkit/api-http test:openapi",

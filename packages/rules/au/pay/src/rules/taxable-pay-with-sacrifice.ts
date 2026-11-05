@@ -1,5 +1,5 @@
 import { CalculationError } from "@taxkit/core/errors";
-import { moneySub } from "@taxkit/core/primitives";
+import { subtract } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import { Effect, Layer, Option } from "effect";
 
@@ -36,11 +36,11 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
       });
     }
 
-    const taxableAmount = yield* moneySub(gross.amount, sacrifice.amount);
+    const taxableAmount = yield* subtract(gross.amount, sacrifice.amount);
 
     const trace = TraceNode.make({
       children: [],
-      formula: Option.some(Option.some("taxable = gross - sacrifice")),
+      formula: Option.some("taxable = gross - sacrifice"),
       inputs: {
         grossCents: gross.amount.cents,
         period: gross.period,

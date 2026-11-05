@@ -40,6 +40,9 @@ facts before calculating. All owned code follows the strict Effect skill.
 
 ## Engine model
 
+The [domain glossary](CONTEXT.md) defines money, facts, scenarios, rules, rule
+packs and calculation outcomes.
+
 ```txt
 Schema-branded domain values
   -> Schema.TaggedClass facts

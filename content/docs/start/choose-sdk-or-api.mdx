@@ -13,14 +13,14 @@ support browser callers; those calculations run on the caller's device.
 
 ## Choose by environment
 
-| Environment                                      | Choose          | Why                                                                                                             |
-| ------------------------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------- |
-| Server-side TypeScript application               | Plain SDK       | You get typed calculator inputs and reports without HTTP transport.                                             |
-| TypeScript application that wants typed failures | Safe SDK        | You get `TaxKit.safe.calculate` result values.                                                                  |
-| Effect application                               | Effect SDK      | You can compose `calculateRunRequest`, `calculateReportRequest` and `calculateReport` with services and layers. |
-| Browser application                              | HTTP API or SDK | HTTP sends the request to the server; the browser-safe SDK calculates on the device.                            |
-| Non-TypeScript backend                           | HTTP API        | You can use JSON and generated OpenAPI reference.                                                               |
-| Generated endpoint contract                      | HTTP API        | OpenAPI owns endpoint shape and status codes.                                                                   |
+| Environment                                      | Choose          | Why                                                                                               |
+| ------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------- |
+| Server-side TypeScript application               | Plain SDK       | You get typed calculator inputs and reports without HTTP transport.                               |
+| TypeScript application that wants typed failures | Safe SDK        | You get `calculateSafe` result values.                                                            |
+| Effect application                               | Effect SDK      | You can compose `calculateRun`, `calculateReport` and `calculateReport` with services and layers. |
+| Browser application                              | HTTP API or SDK | HTTP sends the request to the server; the browser-safe SDK calculates on the device.              |
+| Non-TypeScript backend                           | HTTP API        | You can use JSON and generated OpenAPI reference.                                                 |
+| Generated endpoint contract                      | HTTP API        | OpenAPI owns endpoint shape and status codes.                                                     |
 
 ## Recommended paths
 

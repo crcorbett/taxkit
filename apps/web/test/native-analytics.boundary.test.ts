@@ -7,8 +7,8 @@ import {
 import { CalculatorCaptureBatch } from "@taxkit/analytics/schemas";
 import { TaxKitApi } from "@taxkit/api-http/api";
 import {
-  CalculationQuery,
-  CalculatorRunServiceRequest,
+  CalculatorId,
+  CalculatorRunRequest,
 } from "@taxkit/calculators/schemas";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { packEnvValue } from "alchemy/RuntimeContext";
@@ -157,12 +157,12 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
       );
       const api = yield* Effect.promise(() => host.getWorker("api-analytics"));
       const body = yield* Schema.encodeEffect(
-        Schema.fromJsonString(CalculatorRunServiceRequest.fields.payload)
-      )(CalculationRequest.payload);
+        Schema.fromJsonString(CalculatorRunRequest)
+      )(CalculationRequest);
       const calculate = (policy: string) =>
         Effect.promise(() =>
           api.fetch(
-            `${origin}/api/v1/calculators/au.pay.take-home/calculate?private-query=PRIVATE9`,
+            `${origin}/api/v2/calculators/au.pay.take-home/calculate?private-query=PRIVATE9`,
             {
               body,
               headers: {
@@ -261,9 +261,12 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
         }).pipe(
           Effect.flatMap((client) =>
             client.calculatorApi.calculate({
-              params: { calculatorId: CalculationRequest.calculatorId },
-              payload: CalculationRequest.payload,
-              query: CalculationQuery.make({}),
+              params: {
+                calculatorId: CalculatorId.make(
+                  CalculationRequest.calculatorId
+                ),
+              },
+              payload: CalculationRequest,
             })
           ),
           Effect.provide(transport)
@@ -292,9 +295,8 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
           )
         );
         yield* nextCapture;
-        const input = yield* Schema.encodeEffect(CalculatorRunServiceRequest)(
-          CalculationRequest
-        );
+        const input =
+          yield* Schema.encodeEffect(CalculatorRunRequest)(CalculationRequest);
         yield* Effect.gen(function* () {
           const policy = yield* Ref.make("deny");
           const client = yield* Effect.acquireRelease(

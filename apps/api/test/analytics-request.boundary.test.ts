@@ -5,7 +5,10 @@ import {
 } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
-import { GetCalculatorRequest } from "@taxkit/calculators/schemas";
+import {
+  CalculatorId,
+  GetCalculatorRequest,
+} from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import {
   CalculationRequest,
@@ -70,7 +73,7 @@ it.effect.each([
             HttpServerRequest.HttpServerRequest,
             HttpServerRequest.fromWeb(
               new Request(
-                "https://api.example.com/api/v1/calculators/au.pay.take-home/calculate?private-query=ignored",
+                "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate?private-query=ignored",
                 {
                   headers,
                 }
@@ -136,7 +139,7 @@ it.effect("metadata and direct local calculator work generate no event", () =>
       Effect.flatMap((calculator) =>
         calculator.getCalculator(
           GetCalculatorRequest.make({
-            calculatorId: CalculationRequest.calculatorId,
+            calculatorId: CalculatorId.make(CalculationRequest.calculatorId),
           })
         )
       ),

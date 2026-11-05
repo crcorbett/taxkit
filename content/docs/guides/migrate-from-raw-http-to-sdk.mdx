@@ -6,86 +6,27 @@ status: "published"
 
 # Migrate from raw HTTP to SDK
 
-Use this guide when a server-side TypeScript caller currently uses raw HTTP
-but can import the SDK directly.
-
-## Before you start
-
-- Confirm the caller runs in a TypeScript runtime that can import workspace or
-  published packages.
-- Keep HTTP when calculation belongs on the server or the caller cannot import
-  TypeScript packages. Browser callers can use the SDK's browser-safe exports
-  when calculation should run on their device.
-- Read [Plain SDK](../sdk/plain-sdk.mdx).
-
-## Steps
-
-1. Replace the fetch request with an SDK helper.
-2. Replace JSON tagged values with constructors such as `aud` and `GrossPay`.
-3. Replace HTTP error envelope handling with `TaxKit.safe.calculate` where
-   you need result values.
-4. Keep integration tests for the same input and expected cents.
-
-## Example
-
-Before:
+Install `taxkit` and choose a complete calculator definition. Decode external data once, then pass the checked scenario to the local SDK.
 
 ```ts
-const response = await fetch(
-  "http://127.0.0.1:4000/api/v1/calculators/au.income-tax.annual/calculate",
-  {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      facts: {
-        taxableIncome: { _tag: "Money", cents: 9000000, currency: "AUD" },
-      },
-      jurisdiction: "AU",
-      taxYear: "2025-26",
-    }),
-  }
+import { Effect } from "effect";
+import { AuPayTakeHomeCalculation } from "taxkit/au";
+import { calculateReport, decodeInput, TaxKitLive } from "taxkit/effect";
+
+// Decode the selected scenario once; surplus fields fail as well.
+export const invalidInput = decodeInput(AuPayTakeHomeCalculation, {
+  taxableIncome: { _tag: "Money", cents: 9_000_000, currency: "AUD" },
+});
+export const validInput = decodeInput(AuPayTakeHomeCalculation, {
+  grossPay: { _tag: "Money", cents: 165_400, currency: "AUD" },
+  period: "weekly",
+  taxFreeThresholdClaimed: true,
+}).pipe(
+  Effect.flatMap((input) => calculateReport(AuPayTakeHomeCalculation, input)),
+  Effect.provide(TaxKitLive)
 );
-
-const body = await response.json();
 ```
 
-After:
+SDK 5 is a hard cutover. Replace the old object facades with named `calculate`, `calculateSafe` and `createClient` imports. Move AU Schemas to `taxkit/au/schemas`, use native Result, and construct Money with explicit units. Module selectors, independent descriptor factories, numeric-dollar constructors and transport-shaped SDK helpers have been removed. There are no compatibility adapters.
 
-```ts
-import { Cents, aud } from "taxkit/core";
-import { au } from "taxkit/au";
-
-const report = await au.incomeTax.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-```
-
-## Verify the result
-
-Both calls should produce annual tax liability of `1958800` cents for taxable
-income of $90,000.00 in 2025–26. That example is unchanged by the Medicare
-correction in rules-au-income-tax/1.0.1. See
-[the annual calculation guide](./calculate-annual-income-tax.mdx) for the
-supported case and exclusions. Check the returned rule version to identify
-the edition used by your installation.
-
-## Handle errors
-
-Raw HTTP returns `CalculatorApiErrorEnvelope`. The SDK safe facade returns
-`TaxKitFailure`:
-
-```ts
-const result = await au.incomeTax.safe.annual({
-  taxableIncome: aud(Cents.make(9_000_000)),
-});
-
-if (result._tag === "TaxKitFailure") {
-  console.error(result.error.message);
-}
-```
-
-## Related pages
-
-- [Choose SDK or HTTP API](../start/choose-sdk-or-api.mdx)
-- [API overview](../api/overview.mdx)
-- [Plain SDK](../sdk/plain-sdk.mdx)
+The calculator HTTP API uses `/api/v2`; documentation content retains its separate API version.
