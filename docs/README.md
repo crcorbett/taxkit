@@ -41,6 +41,7 @@ that explain a lasting choice. Use Git history for completed plans and old
 reports. Report checks and release results in the existing chat or pull
 request; do not create dated receipts or a documentation-only release PR.
 
-`bun run lint` runs `check:docs`, which checks relative links and documented
-`bun run` commands in `AGENTS.md`, `README.md`, `ARCHITECTURE.md`, every
-Markdown file under `docs/` and every workspace README.
+`bun run lint` runs `check:docs` over every tracked or new Markdown file except
+Changesets and generated changelogs. It checks relative links, heading anchors
+(GitHub slug rules) and documented `bun run` commands, including the workspace
+named by `--filter`.
