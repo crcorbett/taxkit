@@ -90,12 +90,12 @@ future MCP admission.
 `CalculatorAdmission` owns the closed `admitCalculation` operation and
 `PublicCalculatorServiceRateLimited` places it before calculation work. The
 native API builds this Layer once, underneath its existing bounded service.
-HTTP and MCP therefore share one allowance. Each
+HTTP and MCP therefore share one limit. Each
 calculation consumes one unit; all metadata operations remain outside it.
 Direct engine, local SDK and the standalone Bun server keep their existing
 contracts. Those hosts do not automatically acquire this native policy.
 
-The allowance is 60 calculations per minute for a checked connection address.
+The limit is 60 calculations per minute for a checked connection address.
 `CalculatorClientRateKey` owns IP decoding and canonical IPv6 aliases; its value
 is redacted and its ordinary Schema encoder is disabled. It is carried in a
 request Context reference, never a calculation fact, URL or analytics identity.
@@ -116,6 +116,6 @@ unique stage value; this repository does not reserve a cloud namespace.
 Cloudflare's [rate-limit binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
 is approximate and local to a location, so this is not an exact global quota.
 The guarded disposable local root explicitly selects `local-emulator`, one
-shared loopback allowance and a local namespace. This additionally requires an
+shared loopback limit and a local namespace. This additionally requires an
 HTTP loopback API origin; hosted composition defaults to `edge` and has no
 unlimited or missing-identity fallback.

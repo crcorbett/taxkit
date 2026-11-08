@@ -24,8 +24,8 @@ A passing run shows that the local package works for a fresh consumer. It does
 not show that npm holds the package or that a published version was installed.
 
 The downstream fixture retains its original saved hashes. Its narrowly scoped
-history comparison restores approved Medicare fragments and the pay ruleset
-edition/exact decimal trace for the unchanged $3,462 fortnightly example.
+history comparison restores approved Medicare fragments and the pay rule pack
+version/exact decimal trace for the unchanged $3,462 fortnightly example.
 Unrelated values remain byte-sensitive. New rounding and salary-sacrifice
 results are qualified by the rule packages' regression tests; do not regenerate
 historical hashes to accept a calculator correction.

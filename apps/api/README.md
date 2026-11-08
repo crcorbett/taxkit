@@ -30,7 +30,7 @@ Worker bundle. Run `bun run build --filter=api` after editing docs; a test fails
 if the bundled catalogue differs from a fresh build. Public HTTP documentation operations serve
 navigation, checked page values, bounded search and exact processed Markdown
 from that same service.
-Documentation calls consume no calculator allowance. See the
+Documentation calls are not subject to calculation admission. See the
 [HTTP package](../../packages/api/http/README.md) for paths/response rules.
 
 The native Worker also serves the AEO package's `aeoRoutes`: the four discovery
@@ -46,7 +46,7 @@ page's PNG with `@taxkit/og-image` and writes `src/generated/docs-images.json`.
 decodes one PNG per request; no renderer is in the Worker. The CDN keeps each
 image for seven days. A missing or unusable image is an empty 503. The Website forwards its own `/sitemap.xml`,
 `/robots.txt`, `/llms*.txt` and `/og/*.png` requests here once. The standalone
-Bun host does not serve these routes. They take no calculator allowance.
+Bun host does not serve these routes. They are not subject to calculation admission.
 
 Content reads the `@content/docs` navigation and repository JSON with an
 import attribute. The ESNext module profile preserves that attribute for
@@ -401,7 +401,7 @@ bounded service. HTTP and modern MCP share the
 Public requests need a checked original Cloudflare connection address;
 arbitrary Worker headers cannot select a key.
 
-`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. Infrastructure supplies a distinct value for each stage, so stages never share counters. The [infrastructure owner](../../packages/infrastructure/README.md#websiteapi-graph) owns graph and local-root selection. Hosted mode defaults to `edge`. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
+`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. Infrastructure supplies a distinct value for each stage, so stages never share counters. The [infrastructure owner](../../packages/infrastructure/README.md#websiteapi-graph) owns graph and local-root selection. Hosted mode defaults to `edge`. The guarded local root selects `local-emulator`; a shared local limit additionally requires an HTTP loopback API origin.
 
 Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) is approximate and local to a location, not an exact global quota. Real edge identity, namespace uniqueness and uploaded provider settings need separate authorised readback. Direct engine/local SDK and standalone Bun execution keep their existing contracts.
 
@@ -435,7 +435,7 @@ a supplied Origin must exactly match the same-stage Website origin. Only `/mcp` 
 modern protocol/routing headers in CORS, with credentials disabled. Expected
 failures have fixed codes and manual-retry guidance; native internal failures use
 the existing safe reply and fixed reporter. HTTP and MCP retain the shared native
-anonymous per-IP allowance and five-second calculation budget.
+anonymous per-IP limit and five-second calculation budget.
 
 In-process AbortSignal cancellation interrupts actual work. On the pinned native
 Worker, an outgoing modern TCP abort stops the client while pre-response work

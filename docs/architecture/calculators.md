@@ -122,10 +122,10 @@ Reports should include:
 - optional ledger
 - diagnostics and warnings
 
-Each report owner defines its ruleset-version Schema as an exact literal and
-emits that value directly. Ruleset versions describe the independent tax-rule
-edition used for a calculation; they are not read from package manifests at
-runtime. Current report values are `rules-au-pay/1.0.2` and
+Each report owner defines its rule pack version Schema as an exact literal and
+emits that value directly. A rule pack version identifies the tax rules used
+for a calculation, independently of package versions; it is not read from a
+package manifest at runtime. Current report values are `rules-au-pay/1.0.2` and
 `rules-au-income-tax/1.0.1`.
 
 ## Question Planning

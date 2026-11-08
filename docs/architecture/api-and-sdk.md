@@ -505,7 +505,7 @@ private Promise runtime boundary.
 
 ## Native calculation rate admission
 
-The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP and MCP share an allowance and each calculation takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities.
+The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP and MCP share one limit and each calculation takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities.
 
 ### Documentation over HTTP
 
