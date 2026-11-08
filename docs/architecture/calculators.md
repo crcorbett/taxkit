@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-calculator-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: calculator composition, catalogue execution or domain error contract change
----
-
 # Calculators
 
 A calculator is an Effect program that requires facts and returns a report. It does not import global rule registries and it does not mutate shared state.

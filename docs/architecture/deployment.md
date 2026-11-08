@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-28
-review_trigger: Alchemy graph, stage, provider resource, state, domain, cache or rollback change
----
-
 # Deployment
 
 This owner describes the deployed resources and their boundaries. The

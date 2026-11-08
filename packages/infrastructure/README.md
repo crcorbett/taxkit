@@ -1,12 +1,3 @@
----
-document_type: package-guide
-lifecycle: current
-authority: supporting
-owner: taxkit-infrastructure-owner
-last_reviewed: 2026-10-18
-review_trigger: Alchemy resource, stage, provider, state, or package-export change
----
-
 # TaxKit infrastructure
 
 This private source-only package owns the native Website/API graph, stage

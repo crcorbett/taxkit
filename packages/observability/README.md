@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-observability-owner
-last_reviewed: 2026-10-18
-review_trigger: host identity, observation vocabulary, redaction or runtime export change
----
-
 # `@taxkit/observability`
 
 Private source runtime support shared by API and Website hosts and deployment

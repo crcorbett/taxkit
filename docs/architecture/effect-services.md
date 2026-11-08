@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-effect-services-owner
-last_reviewed: 2026-11-04
-review_trigger: service, Layer, runtime, lifetime or boundary ownership change
----
-
 # Effect services
 
 TaxKit uses Effect services, layers, schemas and tagged errors as the default

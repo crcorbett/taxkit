@@ -1,12 +1,3 @@
----
-document_type: standard
-lifecycle: current
-authority: canonical
-owner: taxkit-tooling-owner
-last_reviewed: 2026-10-30
-review_trigger: formatter, lint, dependency, typecheck, Changeset or root command change
----
-
 # Formatting, Linting, And Dependency Hygiene
 
 TaxKit uses Bun workspaces and Ultracite with the Oxlint/Oxfmt provider. The

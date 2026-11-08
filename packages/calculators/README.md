@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-calculators-owner
-last_reviewed: 2026-11-04
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Calculators
 
 This private package owns the public calculator catalogue, correlated transport

@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-facts-owner
-last_reviewed: 2026-11-04
-review_trigger: fact Schema, identity, descriptor, authority or question metadata change
----
-
 # Facts
 
 A fact is a named value required or produced by a calculation. Its owning rule

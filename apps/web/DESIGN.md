@@ -1,11 +1,3 @@
----
-document_type: design-guide
-lifecycle: current
-authority: canonical
-owner: taxkit-web-app-owner
-last_reviewed: 2026-11-02
----
-
 # Website design
 
 The documentation UI follows the quiet reading layout of

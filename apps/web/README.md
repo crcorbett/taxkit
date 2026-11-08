@@ -1,12 +1,3 @@
----
-document_type: app-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-web-app-owner
-last_reviewed: 2026-11-02
-review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
----
-
 # Website app
 
 `apps/web` is the TanStack Start Website on Cloudflare. It renders the three

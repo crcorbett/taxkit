@@ -1,12 +1,3 @@
----
-document_type: app-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-api-app-owner
-last_reviewed: 2026-10-18
-review_trigger: API app composition, shared protocol owners, settings, routes, CORS, cache or lifecycle change
----
-
 # API App
 
 API application with a standalone Bun process and the native Alchemy Worker

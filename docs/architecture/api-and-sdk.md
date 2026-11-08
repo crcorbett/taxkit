@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-api-sdk-owner
-last_reviewed: 2026-11-04
-review_trigger: API or SDK contracts, exports, lifetime or caller composition change
----
-
 # API and SDK
 
 [ADR 0011](../adr/0011-effect-native-sdk-contracts.md) drafts the next major SDK

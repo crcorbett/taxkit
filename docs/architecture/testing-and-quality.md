@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-22
-review_trigger: test command, check coverage, native test or deployment check change
----
-
 # Testing and quality
 
 TaxKit quality depends on deterministic calculation tests, package boundary

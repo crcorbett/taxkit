@@ -1,12 +1,3 @@
----
-document_type: runbook
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-10-28
-review_trigger: Alchemy stack, stage, Doppler config, deployment command, deploy workflow or public check change
----
-
 # Website and API deployment
 
 `alchemy.run.ts` declares the Cloudflare API and Website for one stage. The

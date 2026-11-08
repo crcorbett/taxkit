@@ -1,10 +1,3 @@
----
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: package-readme
-confidence: medium
----
-
 # TypeScript Config
 
 Shared TypeScript configuration package for TaxKit workspace packages and

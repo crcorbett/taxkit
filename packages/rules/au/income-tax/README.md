@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-au-income-tax-owner
-last_reviewed: 2026-10-13
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Australian Income Tax Rules
 
 Implemented rule package for Australian annual income-tax calculations.

@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-au-pay-owner
-last_reviewed: 2026-10-17
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Australian Pay Rules
 
 Implemented rule package for Australian take-home pay and PAYG withholding.

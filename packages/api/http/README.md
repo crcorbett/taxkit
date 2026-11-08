@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-http-api-owner
-last_reviewed: 2026-11-04
-review_trigger: HTTP schemas, exports, routes, handlers or client composition change
----
-
 # HTTP API
 
 Effect HTTP API package for the current TaxKit health endpoint, public

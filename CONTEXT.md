@@ -1,12 +1,3 @@
----
-document_type: domain-glossary
-lifecycle: current
-authority: supporting
-owner: taxkit-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: calculation, public content vocabulary or domain meaning changes
----
-
 # TaxKit calculation and publication language
 
 TaxKit answers defined tax questions from explicit facts and supported rules.

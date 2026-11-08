@@ -1,12 +1,3 @@
----
-document_type: runbook
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-10-20
-review_trigger: Changesets configuration, package graph, release train or release evidence change
----
-
 # Versioning
 
 TaxKit uses [Changesets](https://github.com/changesets/changesets). `taxkit`

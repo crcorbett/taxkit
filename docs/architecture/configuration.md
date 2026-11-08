@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-configuration-owner
-last_reviewed: 2026-10-20
-review_trigger: config Schema, namespace, source selection or secret handling change
----
-
 # Configuration
 
 TaxKit configuration uses Effect `Config`, `ConfigProvider` and Schema.

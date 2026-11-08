@@ -1,12 +1,3 @@
----
-document_type: runbook
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-10-17
-review_trigger: SDK source, export map, packed file set, package manifest or downstream fixture change
----
-
 # Packed consumer check
 
 Run this when `taxkit` exports, packed files or supported dependencies

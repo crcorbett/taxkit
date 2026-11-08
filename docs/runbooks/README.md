@@ -1,12 +1,3 @@
----
-document_type: runbook-index
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-10-20
-review_trigger: release command, Changesets, package graph or deployment command change
----
-
 # TaxKit runbooks
 
 Runbooks hold repeatable steps. Architecture documents explain the boundaries;

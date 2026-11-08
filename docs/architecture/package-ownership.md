@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: package, app, root composition, or semantic ownership change
----
-
 # Package ownership
 
 Package ownership defines where new TaxKit code should belong as the repo

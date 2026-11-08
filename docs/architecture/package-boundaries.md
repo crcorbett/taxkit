@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-package-boundaries-owner
-last_reviewed: 2026-10-18
-review_trigger: package responsibility, dependency direction or public export change
----
-
 # Package Boundaries
 
 TaxKit should grow as a package-oriented monorepo for the open-source tax

@@ -1,12 +1,3 @@
----
-document_type: repository-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-repository-maintainers
-last_reviewed: 2026-10-13
-review_trigger: contributor setup, repository entry points, or supported commands change
----
-
 # TaxKit
 
 TaxKit is the public monorepo for the open-source tax engine, API, SDK and

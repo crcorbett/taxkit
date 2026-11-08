@@ -1,10 +1,3 @@
----
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: docs
-confidence: high
----
-
 # Testing And Validation
 
 TaxKit calculations need deterministic tests, graph validation, API tests, SDK tests and package-boundary tests.

@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-api-mcp-package-owner
-last_reviewed: 2026-10-18
-review_trigger: MCP toolkit, handlers, protocol composition, cancellation or response budget change
----
-
 # API MCP
 
 `@taxkit/api-mcp` owns the remote MCP tool contract, service-backed handlers,
