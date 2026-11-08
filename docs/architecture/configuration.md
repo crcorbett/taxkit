@@ -107,7 +107,8 @@ composes the shared `TaxKitApiOriginConfig`, `DocsWebsiteOriginConfig` and
 `DocsPublicationOriginConfig`. Native planning leaves resource
 addresses deferred; first incoming use decodes and caches them. Missing or
 invalid values produce a fixed Config error and an empty 503. MCP uses the Website address for browser admission. `CALCULATOR_RATE_NAMESPACE` comes from the stage's secrets
-provider. `CALCULATOR_HOST_MODE` is `edge` by default; the local root sets
+provider. `CALCULATOR_HOST_MODE` is `edge` when absent and an invalid value fails
+Worker startup with a ConfigError; the local root sets
 `local-emulator`.
 
 Configuration modules own defaults and selection. Service contracts receive
