@@ -8,7 +8,6 @@
     ".": "./src/index.ts",
     "./api": "./src/api.ts",
     "./in-process": "./src/in-process.layer.ts",
-    "./config": "./src/config.ts",
     "./server": "./src/server.ts",
     "./handlers": "./src/handlers/index.ts",
     "./handlers/live": "./src/handlers/live.ts",

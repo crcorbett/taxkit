@@ -23,7 +23,7 @@ implementation; this package imports no application implementation.
 | `./api-worker` | Lightweight `TaxKitApiWorker` declaration and native-derived `TaxKitApiBinding`, with the native HTTP binding. |
 | `./hostnames` | `HostName` and every Production hostname (`taxkit.dev`, `www.taxkit.dev`, `api.taxkit.dev`), written once with the derived `publicationOrigin`. Provider-free. |
 | `./worker-settings` | Shared compatibility date/flags and `disabledWorkerObservability` policy. |
-| `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. |
+| `./secrets` | `deploymentSecrets`, the checked stage and its Doppler config. Source failures become `SecretSourceError` with a closed `reason` (`unauthorized`, `not-found`, `unavailable`) read from the native Doppler tags; no token, selection or provider message is copied. |
 | `./stage` | Local `dev_<name>` stage and the `AppStage` union. Hosted `prod` and `pr-<number>` stages reuse [`@taxkit/observability/stage`](../observability/README.md). |
 | `./posthog` | The retained PostHog project stack. |
 | `./telemetry` | The `TaxKitObservability` and `TaxKitTraceExport` stack classes, their shared providers, state and secrets, the `prod`-only guard, Site's shared dataset names and the Production trace-export reference the apps graph reads. |

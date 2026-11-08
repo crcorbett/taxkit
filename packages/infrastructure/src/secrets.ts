@@ -10,6 +10,7 @@ import {
   Effect,
   Layer,
   Match,
+  Option,
   Schema,
 } from "effect";
 
@@ -20,7 +21,37 @@ export class SecretSourceError extends Schema.TaggedError<
   { readonly brand: unique symbol }
 >()("SecretSourceError", {
   source: Schema.Literals(["doppler", "dotenv", "configuration"]),
+  reason: Schema.Literals(["unauthorized", "not-found", "unavailable"]),
 }) {}
+
+// Only the provider's closed tags are read. The native error's selection,
+// token, profile and message never reach the safe error.
+const DopplerFailure = Schema.Union([
+  Schema.TaggedStruct("DopplerSecretsError", {
+    cause: Schema.Struct({ _tag: Schema.String }),
+  }),
+  Schema.TaggedStruct("AuthError", {}),
+]);
+
+/** Classify a native Doppler secrets failure without copying its fields. */
+export const dopplerSourceError = (failure: typeof Schema.Unknown.Type) =>
+  new SecretSourceError({
+    source: "doppler",
+    reason: Schema.decodeUnknownOption(DopplerFailure)(failure).pipe(
+      Option.map(
+        Match.valueTags({
+          AuthError: () => "unauthorized" as const,
+          DopplerSecretsError: ({ cause }) =>
+            Match.value(cause._tag).pipe(
+              Match.when("Unauthorized", () => "unauthorized" as const),
+              Match.when("NotFound", () => "not-found" as const),
+              Match.orElse(() => "unavailable" as const)
+            ),
+        })
+      ),
+      Option.getOrElse(() => "unavailable" as const)
+    ),
+  });
 
 /** The TaxKit Doppler config that holds a stage's values. */
 export const dopplerConfig = (stage: AppStage) =>
@@ -63,11 +94,7 @@ const DopplerSecretsLive: Layer.Layer<
       }).layer.pipe(
         Layer.catchCause((cause) =>
           Layer.effectDiscard(
-            Effect.failCause(
-              cause.pipe(
-                Cause.map(() => new SecretSourceError({ source: "doppler" }))
-              )
-            )
+            Effect.failCause(cause.pipe(Cause.map(dopplerSourceError)))
           )
         )
       )
@@ -118,7 +145,12 @@ const DotEnvSecretsLive: Layer.Layer<
   Layer.catchCause((cause) =>
     Layer.effectDiscard(
       Effect.failCause(
-        cause.pipe(Cause.map(() => new SecretSourceError({ source: "dotenv" })))
+        cause.pipe(
+          Cause.map(
+            () =>
+              new SecretSourceError({ source: "dotenv", reason: "unavailable" })
+          )
+        )
       )
     )
   )

@@ -172,13 +172,10 @@ const buildDependencyGraph = (
  */
 export const validateRuleGraph = (args: {
   readonly rules: readonly AnyRuleDescriptor[];
-  readonly inputFacts?: readonly AnyFactDescriptor[];
+  readonly inputFacts: readonly AnyFactDescriptor[];
 }): readonly GraphValidationIssue[] => {
   const inputFacts = HashSet.fromIterable(
-    EffectFunction.pipe(
-      args.inputFacts ?? Array.empty<AnyFactDescriptor>(),
-      Array.map(factKey)
-    )
+    EffectFunction.pipe(args.inputFacts, Array.map(factKey))
   );
   const providers = collectProviders(args.rules);
   const parameters = collectParameters(args.rules);

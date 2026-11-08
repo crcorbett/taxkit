@@ -93,10 +93,9 @@ graph owns runtime bindings.
 
 ## API settings
 
-The [HTTP package config owner](../../packages/api/http/src/config.ts) exports
-`TaxKitHttpApiClientConfigSchema`, its derived type and keyed server/browser
-config fragments under the `TAXKIT_API` and `VITE_TAXKIT_API` namespaces. Its
-Schema uses `Schema.URLFromString`. The Website does not use it.
+The [HTTP package origin owner](../../packages/api/http/src/origin.ts) exports
+`TaxKitApiOrigin` and `TaxKitApiOriginConfig`, the one checked API address
+used by the API Worker and the Website.
 
 [API app config](../../apps/api/src/config.ts) checks the standalone host and
 port: optional `API_PORT` falls back to `PORT` only when absent, and an invalid

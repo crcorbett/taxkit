@@ -36,7 +36,7 @@ export const DocsLinkTargetsLive = Layer.effect(
       pages: HashMap.fromIterable(
         EffectFunction.pipe(
           navigation.primaryNavigation,
-          Array.flatMap((item) => [item, ...(item.pages ?? [])]),
+          Array.flatMap((item) => [item, ...item.pages]),
           Array.map((leaf) => [leaf.source, leaf.path] as const)
         )
       ),
