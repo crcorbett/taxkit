@@ -17,8 +17,9 @@ own conventional addresses to these routes once.
     Content's `DocsOgImages`.
 - `./service` exports `PublicationOrigins`, the host-supplied Effect that
   reads this stage's API and publication origins on first use.
-- `./documents` exports the three catalogue document writers.
-- `./testing/fixtures` exports checked example origins.
+- `src/documents.egress.ts` (internal) holds the three catalogue document
+  writers that the route Layer serves; `src/__testing__/fixtures.ts` holds
+  checked example origins for this package's tests.
 
 Documents are UTF-8 text or XML with `nosniff`. An origin failure answers an
 empty 503 for the documents; a render failure answers an empty 503 for the

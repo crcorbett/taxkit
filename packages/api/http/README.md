@@ -174,15 +174,14 @@ Export paths:
 - `@taxkit/api-http/response-policy`
 - `@taxkit/api-http/server`
 - `@taxkit/api-http/handlers`
-- `@taxkit/api-http/handlers/live`
+- `@taxkit/api-http/schemas`
+- `@taxkit/api-http/calculator-contract`
+- `@taxkit/api-http/health-contract`
 
 Reusable calculator exports:
 
 - `@taxkit/calculators`
-- `@taxkit/calculators/catalog`
-- `@taxkit/calculators/errors`
 - `@taxkit/calculators/live`
-- `@taxkit/calculators/metadata`
 - `@taxkit/calculators/service`
 - `@taxkit/calculators/schemas`
 

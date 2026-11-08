@@ -11,6 +11,7 @@
   "include": [
     "documentation/*.ts",
     "oxlint/*.ts",
+    "oxlint/rules/**/*.ts",
     "repository-paths/*.ts",
     "vitest.config.ts",
     "infrastructure/*.ts",

@@ -81,7 +81,6 @@ entry points.
   calculators and golden tests.
 - [packages/testing](./packages/testing/README.md): shared test helpers for
   workspace packages.
-- [packages/tsconfig](./packages/tsconfig/README.md): shared TypeScript config
   presets.
 
 ## Planned package families

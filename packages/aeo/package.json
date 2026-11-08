@@ -5,10 +5,8 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./documents": "./src/documents.egress.ts",
     "./routes": "./src/routes.layer.ts",
-    "./service": "./src/service.ts",
-    "./testing/fixtures": "./src/__testing__/fixtures.ts"
+    "./service": "./src/service.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",

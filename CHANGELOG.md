@@ -192,7 +192,7 @@
 - [`@taxkit/rules-au-stsl`](./packages/rules/au/stsl/CHANGELOG.md)
 - [`@taxkit/sdk`](./packages/sdk/typescript/CHANGELOG.md)
 - [`@taxkit/testing`](./packages/testing/CHANGELOG.md)
-- [`@taxkit/tsconfig`](./packages/tsconfig/CHANGELOG.md)
+- `@taxkit/tsconfig` (package removed; see Git history)
 
 ## 0.0.1
 
@@ -227,4 +227,4 @@
 - [`@taxkit/rules-au-pay`](./packages/rules/au/pay/CHANGELOG.md)
 - [`@taxkit/rules-au-stsl`](./packages/rules/au/stsl/CHANGELOG.md)
 - [`@taxkit/testing`](./packages/testing/CHANGELOG.md)
-- [`@taxkit/tsconfig`](./packages/tsconfig/CHANGELOG.md)
+- `@taxkit/tsconfig` (package removed; see Git history)

@@ -43,7 +43,6 @@ Implemented packages and apps:
 - `packages/rules/au/stsl`
 - `packages/infrastructure` (private, source-only deployment graph)
 - `packages/testing`
-- `packages/tsconfig`
 
 The proposed package map below should guide new work, but callers should not
 import from a planned package until the corresponding package exists with
@@ -300,8 +299,9 @@ another app.
 The separate `taxkit-package/workspace-roles` rule owns frontend and deployment
 roles. A public export or declared dependency does not make a backend handler,
 server, domain live Layer or content compiler browser-safe. Website source uses
-the contract/client modules listed in `tools/oxlint/package-roles.ts`. Exact host exceptions admit the existing
-host telemetry, content settings and infrastructure binding types. These
+the contract/client modules listed in `tools/oxlint/package-roles.ts`. Exact host module grants, declared as
+rule options in `oxlint.config.ts`, admit the existing host telemetry, content
+settings and infrastructure binding types. These
 exceptions do not bypass exports or declared-dependency checks. A Website
 module is server-only when it imports TanStack Start's
 `@tanstack/react-start/server-only` marker (or is `runtime.server.ts` or the
@@ -314,6 +314,13 @@ support (`packages/observability`) cannot depend on or import any other TaxKit
 workspace; consuming domains supply their Schemas, such as the calculator
 admission key passed to `edgeCallerKey`. No package runtime SDK exception is
 currently required.
+
+The HTTP contract is an input to the SDK assembly: the role policy forbids
+`packages/api/http` from depending on `taxkit` in any dependency field, and
+`strict-effect/module-ownership` lets only `packages/sdk/typescript/src/http.ts`
+import `@taxkit/api-http` within SDK source. `tools/workspace` also fails on a
+workspace-glob folder without a manifest, other than the named grouping
+folders, and on a package export that points into `test/`.
 
 The CLI fixtures in `tools/oxlint/workspace-imports.boundary.test.ts` exercise
 accepted contracts/clients and actual host files, rejected backend/private and

@@ -36,7 +36,13 @@
       "@alchemy.run/axiom": "2.0.0-beta.85",
       "@alchemy.run/doppler": "2.0.0-beta.85",
       "@alchemy.run/frontend-frameworks": "2.0.0-beta.85",
-      "@effect/atom-react": "4.1.2"
+      "@effect/atom-react": "4.1.2",
+      "@base-ui/react": "1.9.0",
+      "@modelcontextprotocol/client": "2.4.0",
+      "@vitest/browser-playwright": "5.0.5",
+      "lucide-react": "1.66.0",
+      "playwright": "1.64.1",
+      "yaml": "2.9.1"
     }
   },
   "type": "module",
@@ -103,11 +109,11 @@
     "oxlint-tsgolint": "7.0.2004",
     "portless": "0.15.12",
     "turbo": "2.11.10",
-    "typescript": "7.0.2",
+    "typescript": "catalog:",
     "ultracite": "8.1.0",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "yaml": "2.9.1"
+    "yaml": "catalog:"
   },
   "overrides": {
     "@effect/platform-node-shared": "4.1.2",

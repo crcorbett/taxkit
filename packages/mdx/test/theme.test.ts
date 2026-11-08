@@ -1,8 +1,9 @@
 import { assert, describe, it } from "@effect/vitest";
-import { MdxArtifactsLive } from "@taxkit/mdx/artifacts";
 import { MdxArtifacts } from "@taxkit/mdx/service";
 import { exampleTheme, exampleThemeInput } from "@taxkit/mdx/testing/fixtures";
 import { Array, Effect, Record, Schema, Struct } from "effect";
+
+import { MdxArtifactsLive } from "../src/artifacts.layer.js";
 
 describe("paired theme artifact ingress", () => {
   it.effect("round-trips the complete checked theme", () =>

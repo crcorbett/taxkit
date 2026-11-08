@@ -1,7 +1,7 @@
 import { Array, Effect, Layer, Ref } from "effect";
 
-import type { CalculatorUse, PageView } from "./schemas.js";
-import { BackendAnalytics, BrowserAnalytics } from "./service.js";
+import type { CalculatorUse } from "./schemas.js";
+import { BackendAnalytics } from "./service.js";
 
 export const makeBackendAnalyticsTest = Effect.gen(function* () {
   const uses = yield* Ref.make<readonly CalculatorUse[]>([]);
@@ -20,27 +20,5 @@ export const makeBackendAnalyticsTest = Effect.gen(function* () {
       })
     ),
     uses,
-  } as const;
-});
-export const makeBrowserAnalyticsTest = Effect.gen(function* () {
-  const pages = yield* Ref.make<readonly PageView[]>([]);
-  return {
-    layer: Layer.succeed(
-      BrowserAnalytics,
-      BrowserAnalytics.of({
-        getCollectionPolicy: Effect.succeed("allow" as const).pipe(
-          Effect.withSpan("BrowserAnalytics.getCollectionPolicy")
-        ),
-        recordPageView: Effect.fn("BrowserAnalytics.recordPageView")(
-          function* (input) {
-            yield* Ref.update(pages, (observed) =>
-              Array.append(observed, input)
-            );
-            return "accepted" as const;
-          }
-        ),
-      })
-    ),
-    pages,
   } as const;
 });

@@ -19,6 +19,8 @@ ordinary record of what happened.
 | [Versioning](./versioning.md) | Changesets, package versions, changelogs and where release evidence lives. |
 | [Packed consumer check](./packed-consumer-proof.md) | Packing the SDK and installing it in a fresh consumer. |
 
+Start a new runbook from [the runbook template](./_template.md).
+
 Publishing packages to npm or deploying the Website/API needs the maintainer's
 explicit request for that operation. A local check does not show that a package
 was published or that a deployment works.

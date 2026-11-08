@@ -2,8 +2,8 @@ import { describe, expect, it } from "@effect/vitest";
 import { validateRuleGraph } from "@taxkit/core/graph";
 import { ParameterEffectivePeriod } from "@taxkit/core/parameters";
 import type { AnyRuleDescriptor } from "@taxkit/core/rules";
+import { AuAnnualTaxRuleDescriptors } from "@taxkit/rules-au-income-tax";
 import { AnnualTaxableIncomeDescriptor } from "@taxkit/rules-au-income-tax/facts";
-import { AuAnnualTaxRuleDescriptors } from "@taxkit/rules-au-income-tax/rule-pack";
 import {
   Function as EffectFunction,
   Array as EffectArray,

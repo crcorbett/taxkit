@@ -4,7 +4,7 @@ import type { WebMCP } from "webmcp-types";
 
 // The plain JSON object of arguments the host passes to a tool. The tool's own
 // parameter Schema checks it.
-export type WebMcpToolInput = Parameters<WebMCP.ToolExecuteCallback>[0];
+type WebMcpToolInput = Parameters<WebMCP.ToolExecuteCallback>[0];
 
 /** A tool as the browser's WebMCP host receives it; `execute` is an Effect. */
 export interface WebMcpTool {

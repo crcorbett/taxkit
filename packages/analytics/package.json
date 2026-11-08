@@ -6,13 +6,8 @@
   "type": "module",
   "exports": {
     "./schemas": "./src/schemas.ts",
-    "./errors": "./src/errors.ts",
     "./service": "./src/service.ts",
     "./live": "./src/live.layer.ts",
-    "./test": "./src/test.layer.ts",
-    "./testing/fixtures": "./src/__testing__/fixtures.ts",
-    "./testing/observations": "./src/__testing__/observations.ts",
-    "./config": "./src/config.ts",
     "./collection-policy": "./src/collection-policy.boundary.ts",
     "./api-usage": "./src/api-usage.layer.ts"
   },

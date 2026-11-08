@@ -62,7 +62,12 @@ export interface CalculatorCatalogEntry {
   readonly title: string;
 }
 class CalculatorCatalogEntryData extends Data.Class<CalculatorCatalogEntry> {}
-/** Metadata can register an owning definition, never replace its contract. */
+/**
+ * Metadata can register an owning definition, never replace its contract.
+ * Exported only for the compile-only catalogue type tests.
+ *
+ * @internal
+ */
 export const defineCalculatorCatalogEntry = <
   Input extends CalculatorInputSchema,
   Output extends Schema.Decoder<CalculatorRunReport>,

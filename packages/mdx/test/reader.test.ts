@@ -1,8 +1,9 @@
 import { assert, describe, it } from "@effect/vitest";
-import { MdxCompilerLive } from "@taxkit/mdx/compiler";
 import { SourceId, SourceText } from "@taxkit/mdx/schemas";
 import { MdxCompiler } from "@taxkit/mdx/service";
 import { Effect } from "effect";
+
+import { MdxCompilerLive } from "../src/compiler.layer.js";
 
 describe("MDX source admission", () => {
   it.effect("keeps code indentation, blank lines and literal JSX", () =>

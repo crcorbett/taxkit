@@ -11,7 +11,6 @@
     "./config": "./src/config.ts",
     "./server": "./src/server.ts",
     "./handlers": "./src/handlers/index.ts",
-    "./handlers/live": "./src/handlers/live.ts",
     "./request-boundary": "./src/request-boundary.ts",
     "./response-policy": "./src/response-policy.ts",
     "./routes": "./src/routes.ts",
@@ -21,8 +20,7 @@
     "./errors": "./src/errors.ts",
     "./schemas": "./src/schemas.ts",
     "./calculator-contract": "./src/groups/calculators.ts",
-    "./health-contract": "./src/groups/health.ts",
-    "./content-contract": "./src/groups/content.ts"
+    "./health-contract": "./src/groups/health.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",

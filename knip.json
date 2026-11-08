@@ -1,9 +1,7 @@
 {
   "$schema": "./node_modules/knip/schema.json",
   "ignore": ["docs/**", "apps/web/src/routeTree.gen.ts"],
-  "ignoreDependencies": ["@taxkit/tsconfig"],
   "ignoreIssues": {
-    "packages/api/http/src/client/service.ts": ["duplicates"],
     "packages/api/http/src/groups/health.ts": ["exports", "types"]
   },
   "ignoreBinaries": ["doppler", "gh", "jq", "oxfmt", "oxlint"],
@@ -32,6 +30,7 @@
         "tools/repository-paths/**/*.ts",
         "tools/documentation/*.ts",
         "tools/oxlint/*.ts",
+        "tools/oxlint/rules/**/*.ts",
         "tools/infrastructure/*.ts",
         "tools/apps-local/*.ts",
         "tools/workspace/*.ts"
@@ -52,8 +51,7 @@
         "scripts/**/*.ts",
         "test/**/*.ts",
         "vitest.config.ts"
-      ],
-      "ignoreDependencies": ["@taxkit/tsconfig"]
+      ]
     },
     "apps/web": {
       "entry": [
@@ -76,7 +74,7 @@
         "test/**/*.{ts,tsx}",
         "vitest.native.config.ts"
       ],
-      "ignoreDependencies": ["@taxkit/tsconfig", "cloudflare"]
+      "ignoreDependencies": ["cloudflare"]
     },
     "packages/core": {
       "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
@@ -86,19 +84,16 @@
       "entry": [
         "src/index.ts",
         "src/api.ts",
-        "src/client/index.ts",
-        "src/client/live.layer.ts",
         "src/in-process.layer.ts",
         "src/server.ts",
-        "src/handlers/index.ts",
-        "src/handlers/live.ts"
+        "src/handlers/index.ts"
       ],
       "project": ["src/**/*.ts"],
-      "ignoreDependencies": ["@effect/platform-node", "@taxkit/tsconfig"]
+      "ignoreDependencies": ["@effect/platform-node"]
     },
     "packages/calculators": {
-      "entry": ["src/index.ts"],
-      "project": ["src/**/*.ts"]
+      "entry": ["src/index.ts", "type-tests/**/*.ts"],
+      "project": ["src/**/*.ts", "type-tests/**/*.ts"]
     },
     "packages/sdk/typescript": {
       "entry": [
@@ -108,7 +103,6 @@
         "src/au-effect.ts",
         "src/schemas/index.ts",
         "src/testing/index.ts",
-        "scripts/check-import-boundaries.runtime.ts",
         "vitest*.config.ts",
         "type-tests/**/*.ts",
         "src/core.ts",
@@ -171,7 +165,6 @@
         "src/compiler.layer.ts",
         "src/renderer.layer.ts",
         "src/artifacts.layer.ts",
-        "src/config.ts",
         "src/test.layer.ts"
       ],
       "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]

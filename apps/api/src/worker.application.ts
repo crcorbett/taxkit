@@ -38,7 +38,10 @@ import {
   CalculatorHostMode,
   edgeCallerKey,
 } from "@taxkit/observability/edge-identity";
-import { observeHostRequest } from "@taxkit/observability/host-telemetry";
+import {
+  ApiHostTelemetryLive,
+  observeHostRequest,
+} from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
 import { safeHttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
@@ -66,7 +69,6 @@ import {
   ApiCalculatorDelivery,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
-import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
 // The closed route family for the one request record; the raw path, query and
 // calculator ID never leave this function.
@@ -121,7 +123,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       })
     )
   );
-  const telemetry = yield* Layer.build(ApiSafeTelemetryLive);
+  const telemetry = yield* Layer.build(ApiHostTelemetryLive);
   const calculator = Layer.succeed(
     PublicCalculatorService,
     yield* PublicCalculatorService

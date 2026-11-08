@@ -16,13 +16,14 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 
 ## Exports
 
-- `./tools`: the six shared tool definitions and their annotations.
-- `./handlers`: the static `TaxKitMcpHandlersLive` Layer over calculator/content services.
+- `src/tools.ts` and `src/handlers.layer.ts` (internal): the six shared tool
+  definitions and the static `TaxKitMcpHandlersLive` Layer that `./server`
+  composes.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path.
 - `./schemas`: tool request/reply Schemas, safe failures and complete-reply
   budget constants.
 - `./request`: the private `McpRequestAbortSignal` Context reference.
-- `./cancellation`: `withMcpRequestCancellation`, which refuses a missing
+- `src/cancellation.boundary.ts` (internal): `withMcpRequestCancellation`, which refuses a missing
   capability and interrupts disconnected request work with scoped cleanup.
 - `./response-budget`: `withBoundedMcpReply`, which buffers complete native
   JSON/SSE replies within 2 MiB and ten seconds, preserving status and headers.

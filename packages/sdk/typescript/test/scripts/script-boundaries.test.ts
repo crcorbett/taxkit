@@ -1,5 +1,5 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
-import { describe, expect, it } from "@effect/vitest";
+import { expect, it } from "@effect/vitest";
 import {
   Predicate,
   Function as EffectFunction,
@@ -24,7 +24,6 @@ import {
 } from "effect";
 import { ChildProcessSpawner } from "effect/process";
 
-import { checkSdkImportBoundaries } from "../../scripts/check-import-boundaries.runtime.js";
 import { checkPackedArtifact } from "../../scripts/check-packed-artifact.runtime.js";
 import { checkDownstreamConsumer } from "../../scripts/validate-downstream-consumer.runtime.js";
 import {
@@ -99,163 +98,6 @@ it.effect(
       });
     })
 );
-describe("SDK direct import command", () => {
-  it.effect("accepts the checked direction and closes both searches", () =>
-    Effect.gen(function* () {
-      const closed = yield* Ref.make(0);
-      const handle = handleFixture(Stream.empty, "success", 1);
-      const spawner = ChildProcessSpawner.make(() =>
-        Effect.acquireRelease(Effect.succeed(handle), () =>
-          Ref.update(closed, (n) => n + 1)
-        )
-      );
-      yield* checkSdkImportBoundaries({
-        sdkRoot: "/fixture/sdk",
-      }).pipe(
-        Effect.scoped,
-        Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
-        Effect.provide(
-          Layer.merge(
-            BunServices.layer,
-            FileSystem.layerNoop({
-              readFileString: (path) =>
-                Effect.succeed(
-                  Match.value(path).pipe(
-                    Match.when(
-                      (value) => value.endsWith("/api/http/package.json"),
-                      (): "{}" => "{}"
-                    ),
-                    Match.when(
-                      (value) => value.endsWith("package.json"),
-                      (): "{}" => "{}"
-                    ),
-                    Match.orElse((): "export {};" => "export {};")
-                  )
-                ),
-            })
-          )
-        )
-      );
-      expect(yield* Ref.get(closed)).toBe(2);
-    })
-  );
-  it.effect.each([
-    {
-      code: 1,
-      http: "{}",
-      name: "blocked metadata",
-      sdk: '{"dependencies":{"@taxkit/core":"1.0.0"}}',
-      source: "export {};",
-      tag: "SdkImportPolicyError",
-    },
-    {
-      code: 1,
-      http: '{"devDependencies":{"taxkit":"workspace:*"}}',
-      name: "reverse transport dependency",
-      sdk: "{}",
-      source: "export {};",
-      tag: "SdkImportPolicyError",
-    },
-    {
-      code: 1,
-      http: '{"devDependencies":{"@taxkit/sdk":"2.1.0"}}',
-      name: "reverse transport dependency on the previous package name",
-      sdk: "{}",
-      source: "export {};",
-      tag: "SdkImportPolicyError",
-    },
-    {
-      code: 0,
-      http: "{}",
-      name: "direct HTTP reference",
-      sdk: "{}",
-      source: "export {};",
-      tag: "SdkImportPolicyError",
-    },
-    {
-      code: 1,
-      http: "{}",
-      name: "root AU reference",
-      sdk: "{}",
-      source: 'import "./au";',
-      tag: "SdkImportPolicyError",
-    },
-    {
-      code: 1,
-      http: "{}",
-      name: "browser server reference",
-      sdk: "{}",
-      source: 'import "node:fs";',
-      tag: "SdkImportPolicyError",
-    },
-    {
-      code: 1,
-      http: "{}",
-      name: "malformed manifest",
-      sdk: "TAXKIT_SECRET_SENTINEL",
-      source: "",
-      tag: "SdkImportReadError",
-    },
-    {
-      code: 2,
-      http: "{}",
-      name: "failed search",
-      sdk: "{}",
-      source: "",
-      tag: "SdkImportReadError",
-    },
-  ])("fails closed: $name", (fixture) =>
-    Effect.gen(function* () {
-      const result = yield* checkSdkImportBoundaries({
-        sdkRoot: "/fixture/sdk",
-      }).pipe(
-        Effect.scoped,
-        Effect.provideService(
-          ChildProcessSpawner.ChildProcessSpawner,
-          ChildProcessSpawner.make(() =>
-            Effect.succeed(handleFixture(Stream.empty, "success", fixture.code))
-          )
-        ),
-        Effect.provide(
-          Layer.merge(
-            BunServices.layer,
-            FileSystem.layerNoop({
-              readFileString: (path) =>
-                Effect.succeed(
-                  Match.value(path).pipe(
-                    Match.when(
-                      (value) => value.endsWith("/api/http/package.json"),
-                      () => fixture.http
-                    ),
-                    Match.when(
-                      (value) => value.endsWith("package.json"),
-                      () => fixture.sdk
-                    ),
-                    Match.orElse(() => fixture.source)
-                  )
-                ),
-            })
-          )
-        ),
-        Effect.result
-      );
-      Result.match(result, {
-        onFailure: (error) => {
-          EffectFunction.pipe(
-            Predicate.isTagged(error, fixture.tag),
-            (matches) => {
-              expect(matches).toBeTruthy();
-            }
-          );
-          EffectFunction.pipe(String(error), (actual) => {
-            expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
-          });
-        },
-        onSuccess: () => expect.unreachable(),
-      });
-    })
-  );
-});
 it.effect.each(["start", "stdout", "stderr", "exit-read", "nonzero"] as const)(
   "packed command retains safe failure and cleanup: %s",
   (mode) =>
@@ -565,58 +407,6 @@ it.effect(
       );
       expect(yield* Ref.get(closed)).toBe(1);
       expect(yield* Ref.get(removed)).toBe(1);
-    })
-);
-it.effect.each(["read", "search-start"] as const)(
-  "direct import operational failure is bounded: %s",
-  (mode) =>
-    Effect.gen(function* () {
-      const result = yield* checkSdkImportBoundaries({
-        sdkRoot: "/fixture/sdk",
-      }).pipe(
-        Effect.scoped,
-        Effect.provideService(
-          ChildProcessSpawner.ChildProcessSpawner,
-          ChildProcessSpawner.make(() => Effect.fail(nativeFault))
-        ),
-        Effect.provide(
-          Layer.merge(
-            BunServices.layer,
-            FileSystem.layerNoop({
-              readFileString: (path) =>
-                Match.value(mode).pipe(
-                  Match.when("read", () => Effect.fail(nativeFault)),
-                  Match.orElse(() =>
-                    Effect.succeed(
-                      EffectBoolean.match(
-                        path.endsWith("/api/http/package.json"),
-                        {
-                          onFalse: (): "{}" => "{}",
-                          onTrue: (): "{}" => "{}",
-                        }
-                      )
-                    )
-                  )
-                ),
-            })
-          )
-        ),
-        Effect.result
-      );
-      Result.match(result, {
-        onFailure: (error) => {
-          EffectFunction.pipe(
-            Predicate.isTagged(error, "SdkImportReadError"),
-            (matches) => {
-              expect(matches).toBeTruthy();
-            }
-          );
-          EffectFunction.pipe(String(error), (actual) => {
-            expect(actual).not.toContain("TAXKIT_SECRET_SENTINEL");
-          });
-        },
-        onSuccess: () => expect.unreachable(),
-      });
     })
 );
 it.effect.each(["start", "stdout", "stderr", "exit-read"] as const)(

@@ -129,17 +129,13 @@ const decodingBoundaryFiles = [
   "apps/api/src/verification/routes.ts",
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
-  // Exact synthetic register fixture ingress; no command execution admission.
   // Exact synchronous Oxlint rule-options ingress, decoded once and fail-closed.
-  "tools/oxlint/taxkit-rules.ts",
+  "tools/oxlint/rules/shared/options.consumer.ts",
   // Application configuration, executable smoke checks and checked examples.
   "apps/api/src/config.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "packages/docs-examples/src/browser-http.ts",
   "packages/docs-examples/src/node-server.ts",
-
-  "packages/infrastructure/src/cloudflare/website.test.ts",
-  "packages/infrastructure/src/cloudflare/website.ts",
 
   // Native built request egress and standalone HTTP body tests decode only
   // actual representation responses; service internals remain excluded.
@@ -161,19 +157,15 @@ const decodingBoundaryFiles = [
   "tools/oxlint/portable-rules.test.ts",
   "tools/oxlint/native-request-rules.test.ts",
   "tools/oxlint/lexical-policy.test.ts",
+  // Lint and Knip configuration ingress for the owner-path existence check.
+  "tools/oxlint/owner-paths.test.ts",
   "tools/documentation/check.runtime.ts",
   // Synthetic report ingress for the inventory caller and output boundary.
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
   "tools/repository-paths/policy.ts",
-  // Exact child-process UTF-8 output boundary; no runtime admission.
-
   // Heterogeneous catalogue dispatch and public unknown-input scenario boundaries.
   "packages/calculators/src/catalog.ts",
-  "packages/calculators/src/errors.ts",
-
-  // Release-evidence decoders and their adversarial boundary fixtures.
-  // Cross-process command output restored by the release-readiness live layer.
 
   // SDK rejected Promise ingress and descriptor/process boundaries.
   "packages/sdk/typescript/test/index.test.ts",
@@ -182,7 +174,6 @@ const decodingBoundaryFiles = [
   // Compiler-only probe of an effectful codec and its retained decoding service.
   "packages/sdk/typescript/type-tests/effect-client.test.ts",
   "packages/sdk/typescript/test/client-lifetime.test.ts",
-  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
   "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
@@ -230,7 +221,6 @@ const schemaEncoderEgressFiles = [
   "apps/web/test/pages/root-load.boundary.test.ts",
   "apps/web/test/host/requests.boundary.test.ts",
   "apps/web/src/lib/pages/root.load.ts",
-  // Generated public catalogue file egress.
   // Synthetic PostHog HTTP fixture representation only.
   "packages/infrastructure/test/posthog/management.boundary.test.ts",
   // Exact native PostHog capture request and safe configuration error bytes.
@@ -282,8 +272,6 @@ const schemaEncoderEgressFiles = [
   "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
   "apps/web/src/entry.server.ts",
   "apps/web/test/host/config.boundary.test.ts",
-  // Exact negative wire fixtures; native encoding only, no decoder/runtime/throwing codec admission.
-
   "apps/api/test/smoke-boundaries.test.ts",
   "apps/api/test/config.test.ts",
   "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
@@ -294,8 +282,6 @@ const schemaEncoderEgressFiles = [
   // Compiler-only probe of an effectful codec and its retained decoding service.
   "packages/sdk/typescript/type-tests/effect-client.test.ts",
   "packages/sdk/typescript/test/client-lifetime.test.ts",
-  // Canonical JSON bytes used only to bind immutable saved-record fingerprints.
-  // Exact saved-plan JSON and synthetic provider fixture representations.
   // Exact credential/YAML/receipt negative-fixture representations only.
   "packages/docs-examples/src/node-server.ts",
   // Exact historical skill representation test uses the Candidate-owned Schema.
@@ -311,11 +297,6 @@ const schemaEncoderEgressFiles = [
   "tools/documentation/check.runtime.ts",
 ];
 
-const throwingCodecTestFiles = [
-  // Oxlint requires synchronous checked configuration before creating rules.
-  "tools/oxlint/workspaces.boundary.ts",
-];
-
 const runtimeBoundaryFiles = [
   // Official MCP transport callback bridges the native HttpClient to its Promise host.
   "apps/web/test/native-mcp.boundary.test.ts",
@@ -325,7 +306,6 @@ const runtimeBoundaryFiles = [
   "apps/web/test/host/forward.boundary.test.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
 
-  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "packages/sdk/typescript/src/client.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
@@ -368,7 +348,6 @@ const bunRuntimeEntrypointFiles = [
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   "tools/apps-local/native-pair-build.runtime.ts",
 
-  "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
   "apps/api/scripts/smoke-public-routes.runtime.ts",
   "apps/api/src/index.ts",
 
@@ -377,6 +356,106 @@ const bunRuntimeEntrypointFiles = [
   "tools/oxlint/fixtures/bun-accepted.ts",
   "tools/documentation/check.runtime.ts",
   "tools/repository-paths/check.runtime.ts",
+];
+
+// The Website source root: its imports follow browser package roles.
+const websiteSourceRoot = "apps/web/src";
+// Website server entries that never reach the browser bundle.
+const websiteServerEntries = ["apps/web/src/entry.server.ts"];
+// Exact Website host files that may import one non-browser TaxKit module each.
+const websiteHostModuleGrants = [
+  {
+    file: "apps/web/src/entry.server.ts",
+    module: "@taxkit/observability/host-telemetry",
+  },
+  {
+    file: "apps/web/src/lib/runtime.server.ts",
+    module: "@taxkit/observability/host-telemetry",
+  },
+  {
+    file: "apps/web/src/lib/host/config.ingress.ts",
+    module: "@taxkit/content/config",
+  },
+  {
+    file: "apps/web/src/lib/host/config.ingress.ts",
+    module: "@taxkit/infrastructure/api-worker",
+  },
+  {
+    file: "apps/web/src/lib/host/binding.adapter.layer.ts",
+    module: "@taxkit/infrastructure/api-worker",
+  },
+];
+// Native isomorphic/server composition imports these local server boundaries.
+// The grant is for one source and one module address, never a browser subtree.
+const websiteHostSourceImports = [
+  { file: "apps/web/src/lib/pages/loaders.ts", module: "../runtime.server" },
+];
+// Private SDKs, host bindings and contracts: value and type imports stay in
+// their exact owners.
+const moduleOwners = [
+  {
+    allowTypes: false,
+    allowedFiles: [
+      "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+    ],
+    module: "@distilled.cloud/posthog",
+  },
+  // Worker bindings are read at the Website's server runtime only.
+  {
+    allowTypes: true,
+    allowedFiles: [
+      "apps/web/src/lib/runtime.server.ts",
+      "apps/web/test/native-pair.boundary.test.ts",
+      "apps/web/test/native-rate-provider.boundary.test.ts",
+    ],
+    module: "cloudflare:workers",
+  },
+  // The private API binding is adapted once, by the Website host.
+  {
+    allowTypes: true,
+    allowedFiles: [
+      "apps/web/src/lib/host/binding.adapter.layer.ts",
+      "apps/web/test/native-rate.boundary.test.ts",
+    ],
+    module: "@alchemy.run/cloudflare/Bridge",
+  },
+];
+// The published SDK re-exports the HTTP contract only through `taxkit/http`.
+const sdkHttpContractOwner = {
+  allowTypes: false,
+  allowedFiles: ["packages/sdk/typescript/src/http.ts"],
+  module: "@taxkit/api-http",
+};
+// SDK source is browser-safe: no Node or Bun host modules.
+const sdkHostImportPatterns = [
+  {
+    group: ["node:*", "bun", "bun:*"],
+    message:
+      "SDK source is browser-safe. Keep Node and Bun host modules in scripts or tests.",
+  },
+];
+// One Fetch HTTP client Layer and request policy per real traffic owner: the
+// API Worker's outbound reads, the Website browser client, analytics capture,
+// PostHog management and the two standalone documentation examples.
+const httpClientOwners = [
+  "apps/api/src/worker.ts",
+  "apps/web/src/lib/api-client.atoms.ts",
+  "packages/analytics/src/live.layer.ts",
+  "packages/docs-examples/src/browser-http.ts",
+  "packages/docs-examples/src/calculator-help.ts",
+  "packages/infrastructure/src/posthog/management.adapter.layer.ts",
+  "packages/infrastructure/src/posthog/projects.live.layer.ts",
+];
+// Repository lint rules receive owner paths as options, never in rule code.
+const repositoryRuleFiles = [
+  "tools/oxlint/rules/**",
+  "tools/oxlint/bun-rules.ts",
+  "tools/oxlint/effect-rules.ts",
+  "tools/oxlint/package-rules.ts",
+  "tools/oxlint/taxkit-rules.ts",
+  "tools/oxlint/package-roles.ts",
+  "tools/oxlint/binding-tracker.ts",
+  "tools/oxlint/host.types.ts",
 ];
 
 export default defineConfig({
@@ -752,21 +831,6 @@ export default defineConfig({
     },
     {
       files: [
-        "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
-      ],
-      rules: {
-        "strict-effect/no-runtime-outside-boundary": [
-          "error",
-          {
-            allowedFiles: [
-              "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
-            ],
-          },
-        ],
-      },
-    },
-    {
-      files: [
         "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
       ],
       rules: {
@@ -845,20 +909,13 @@ export default defineConfig({
     {
       files: ["packages/calculators/src/**/*.ts"],
       rules: {
-        "taxkit/no-ambient-time-or-random": "error",
-        "taxkit/no-async-await-promise": "error",
-        "taxkit/no-conditional-object-spread": "error",
+        // Shared strict presets own typeof, instanceof, in, JSON, throw,
+        // async/Promise, nullish comparison, conditional spread and ambient
+        // clock checks here. These add calculator-only domain policy.
         "taxkit/no-context-nullish-default": "error",
-        "taxkit/no-in-operator": "error",
-        "taxkit/no-instanceof": "error",
-        "taxkit/no-json-parse-stringify": "error",
+        "taxkit/no-date-construction": "error",
         "taxkit/no-native-array-methods": "error",
-        "taxkit/no-native-collections": "error",
         "taxkit/no-nested-wrapper-calls": "error",
-        "taxkit/no-nullish-comparison": "error",
-        "taxkit/no-throw": "error",
-        "taxkit/no-typeof": "error",
-        "taxkit/no-undefined-comparison": "error",
       },
     },
     {
@@ -904,13 +961,6 @@ export default defineConfig({
       excludeFiles: schemaEncoderEgressFiles,
       rules: {
         "taxkit-effect/no-schema-encoder-outside-egress": "error",
-      },
-    },
-    {
-      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-      excludeFiles: throwingCodecTestFiles,
-      rules: {
-        "taxkit-effect/no-throwing-schema-sync-codec": "error",
       },
     },
     {
@@ -1071,6 +1121,63 @@ export default defineConfig({
       },
     },
     {
+      // SDK source reaches the HTTP contract only through its `taxkit/http`
+      // entry and stays browser-safe.
+      files: ["packages/sdk/typescript/src/**"],
+      rules: {
+        "no-restricted-imports": ["error", { patterns: sdkHostImportPatterns }],
+        "strict-effect/module-ownership": [
+          "error",
+          { owners: [...moduleOwners, sdkHttpContractOwner] },
+        ],
+      },
+    },
+    {
+      // The root SDK entry stays free of Australian rule packs.
+      files: ["packages/sdk/typescript/src/index.ts"],
+      rules: {
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              ...sdkHostImportPatterns,
+              {
+                group: ["@taxkit/rules-au-*", "./au", "./au/*", "./au-effect"],
+                message:
+                  "The root SDK entry must not import Australian rule packs; use taxkit/au.",
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      // Production sources reuse their traffic owner's client Layer; host
+      // contract tests build the native client they exercise.
+      files: [
+        "apps/*/src/**",
+        "packages/*/src/**",
+        "packages/api/*/src/**",
+        "packages/sdk/*/src/**",
+        "packages/rules/au/*/src/**",
+      ],
+      rules: {
+        "strict-effect/http-client-ownership": [
+          "error",
+          { allowedFiles: httpClientOwners },
+        ],
+      },
+    },
+    {
+      files: repositoryRuleFiles,
+      rules: {
+        "strict-effect/no-owner-paths-in-rules": [
+          "error",
+          { roots: ["apps", "content", "packages", "tools"] },
+        ],
+      },
+    },
+    {
       // The Website reads the API with native clients: one server runtime,
       // one browser Atom runtime and registry, no server-function endpoint.
       files: ["apps/web/src/**"],
@@ -1101,7 +1208,6 @@ export default defineConfig({
         ],
       },
     ],
-    "taxkit-effect/no-manual-tag": "error",
     "taxkit-effect/no-switch": "error",
 
     "no-restricted-properties": [
@@ -1133,39 +1239,7 @@ export default defineConfig({
     ],
 
     "package/workspace-import-boundaries": ["error", workspaceBoundaryOptions],
-    "strict-effect/module-ownership": [
-      "error",
-      {
-        owners: [
-          {
-            allowTypes: false,
-            allowedFiles: [
-              "packages/infrastructure/src/posthog/management.adapter.layer.ts",
-            ],
-            module: "@distilled.cloud/posthog",
-          },
-          // Worker bindings are read at the Website's server runtime only.
-          {
-            allowTypes: true,
-            allowedFiles: [
-              "apps/web/src/lib/runtime.server.ts",
-              "apps/web/test/native-pair.boundary.test.ts",
-              "apps/web/test/native-rate-provider.boundary.test.ts",
-            ],
-            module: "cloudflare:workers",
-          },
-          // The private API binding is adapted once, by the Website host.
-          {
-            allowTypes: true,
-            allowedFiles: [
-              "apps/web/src/lib/host/binding.adapter.layer.ts",
-              "apps/web/test/native-rate.boundary.test.ts",
-            ],
-            module: "@alchemy.run/cloudflare/Bridge",
-          },
-        ],
-      },
-    ],
+    "strict-effect/module-ownership": ["error", { owners: moduleOwners }],
     "strict-effect/no-loader-request-state": [
       "error",
       {
@@ -1189,6 +1263,14 @@ export default defineConfig({
         websiteDirectory: "apps/web/src",
       },
     ],
-    "taxkit-package/workspace-roles": "error",
+    "taxkit-package/workspace-roles": [
+      "error",
+      {
+        hostModuleGrants: websiteHostModuleGrants,
+        hostSourceImports: websiteHostSourceImports,
+        serverEntries: websiteServerEntries,
+        websiteSourceRoot,
+      },
+    ],
   },
 });

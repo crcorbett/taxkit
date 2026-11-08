@@ -18,7 +18,7 @@ a mounted page.
   result. Any failure becomes an encoded `CalculatorToolFailure`, never a
   rejected Promise or a Cause. A refused tool is logged and the others still
   register.
-- `./schemas` exports `WebMcpTool` and `WebMcpRegistrationError`, whose reason
+- `src/schemas.ts` (internal) holds `WebMcpTool` and `WebMcpRegistrationError`, whose reason
   is the host's `DOMException` name, `registration-timeout` or
   `unexpected-host-refusal`.
 

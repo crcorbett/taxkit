@@ -128,3 +128,22 @@ The guarded disposable local root explicitly selects `local-emulator`, one
 shared loopback allowance and a local namespace. This additionally requires an
 HTTP loopback API origin; hosted composition defaults to `edge` and has no
 unlimited or missing-identity fallback.
+
+## Export paths
+
+Every public subpath in the package export map:
+
+- `@taxkit/calculators`
+- `@taxkit/calculators/summaries`
+- `@taxkit/calculators/service`
+- `@taxkit/calculators/live`
+- `@taxkit/calculators/schemas`
+- `@taxkit/calculators/work`
+- `@taxkit/calculators/admission.schemas`
+- `@taxkit/calculators/admission.service`
+- `@taxkit/calculators/admission.layer`
+- `@taxkit/calculators/testing/fixtures`
+- `@taxkit/calculators/form`
+- `@taxkit/calculators/page`
+- `@taxkit/calculators/page-schemas`
+- `@taxkit/calculators/page-tools`

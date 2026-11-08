@@ -119,7 +119,6 @@
   },
   "scripts": {
     "build": "rm -rf dist .compiled && tsc -p tsconfig.build.json && bun run scripts/assemble-package.runtime.ts",
-    "check-boundaries": "bun run scripts/check-import-boundaries.runtime.ts",
     "check-packed-artifact": "bun run scripts/check-packed-artifact.runtime.ts",
     "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p scripts/tsconfig.json --noEmit && tsc -p tsconfig.type-tests.json --noEmit",
@@ -143,7 +142,7 @@
     "@taxkit/rules-au-stsl": "workspace:*",
     "@taxkit/testing": "workspace:*",
     "@types/bun": "catalog:",
-    "@vitest/browser-playwright": "5.0.5",
+    "@vitest/browser-playwright": "catalog:",
     "typescript": "catalog:",
     "typescript-ast": "npm:typescript@6.0.3",
     "vite": "catalog:",

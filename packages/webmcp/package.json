@@ -7,7 +7,6 @@
   "exports": {
     "./host": "./src/model-context.adapter.layer.ts",
     "./registration": "./src/registration.egress.ts",
-    "./schemas": "./src/schemas.ts",
     "./service": "./src/service.ts"
   },
   "scripts": {

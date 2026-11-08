@@ -141,7 +141,6 @@ bun run --filter=taxkit build
 bun run --filter=taxkit check-types
 bun run --filter=taxkit test
 bun run --filter=taxkit test:browser
-bun run --filter=taxkit check-boundaries
 bun run --filter=taxkit check-packed-artifact
 bun run --filter=taxkit validate:downstream
 ```

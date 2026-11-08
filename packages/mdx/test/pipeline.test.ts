@@ -1,10 +1,7 @@
 import { assert, describe, it } from "@effect/vitest";
-import { MdxArtifactsLive } from "@taxkit/mdx/artifacts";
-import { MdxCompilerLive } from "@taxkit/mdx/compiler";
 import { CompileError } from "@taxkit/mdx/errors";
 import { PierreCodeHighlighterLive } from "@taxkit/mdx/highlights";
 import { MdxLive } from "@taxkit/mdx/live";
-import { MdxRendererLive } from "@taxkit/mdx/renderer";
 import {
   LinkDestination,
   Source,
@@ -39,6 +36,10 @@ import {
   Ref,
   Schema,
 } from "effect";
+
+import { MdxArtifactsLive } from "../src/artifacts.layer.js";
+import { MdxCompilerLive } from "../src/compiler.layer.js";
+import { MdxRendererLive } from "../src/renderer.layer.js";
 
 const LinksTest = Layer.succeed(
   LinkResolver,
