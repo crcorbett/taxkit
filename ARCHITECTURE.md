@@ -29,6 +29,8 @@ everything from the API. There is no database or sign-in.
 | `packages/observability` — `@taxkit/observability`   | Stage names, edge identity and the one host request record                                                                                                  |
 | `packages/infrastructure` — `@taxkit/infrastructure` | Deployment only: Worker declarations, hostnames, secrets, the retained zone, PostHog and telemetry stacks                                                   |
 | `packages/sdk/typescript` — `taxkit`                 | The published SDK: plain, safe-result, Effect and AU entry points                                                                                           |
+| `packages/docs-examples` — `@taxkit/docs-examples`   | Integration templates and published code snippets, compiled and run against the SDK and HTTP contracts                                                      |
+| `packages/testing` — `@taxkit/testing`               | Shared test helpers for workspace packages                                                                                                                  |
 | `apps/api`                                           | Builds the docs catalogue ahead of time; composes the native API Worker and the standalone Bun host                                                         |
 | `apps/web`                                           | TanStack Start Website: routes, views, host settings, the private API binding and the two runtimes                                                          |
 

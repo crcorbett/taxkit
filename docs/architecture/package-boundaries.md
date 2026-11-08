@@ -1,117 +1,18 @@
 # Package Boundaries
 
-TaxKit should grow as a package-oriented monorepo for the open-source tax
-engine, docs, API server and TypeScript SDK. Package dependencies must point
-from foundational packages toward rule packages, API packages and apps. Engine
-packages must stay deterministic and reusable.
-
-This page is a target architecture, not a list of implemented packages.
-
-## Current Package State
-
-Implemented packages and apps:
-
-- `apps/api`
-- `apps/web`
-- `content/docs`
-- `packages/calculators`
-- `packages/diagrams`
-- `packages/docs-examples`
-- `packages/mdx`
-- `packages/pele`
-- `packages/core`
-- `packages/api/http`
-- `packages/api/mcp`
-- `packages/content`
-- `packages/aeo`
-- `packages/og-image`
-- `packages/webmcp`
-- `packages/analytics`
-- `packages/observability`
-- `packages/sdk/typescript`
-- `packages/rules/au/income-tax`
-- `packages/rules/au/pay`
-- `packages/rules/au/stsl`
-- `packages/infrastructure` (private, source-only deployment graph)
-- `packages/testing`
-- `packages/tsconfig`
-
-The proposed package map below should guide new work, but callers should not
-import from a planned package until the corresponding package exists with
-exports and verification.
-
-## Proposed Package Map
-
-```txt
-apps/
-  api/
-  web/
-
-content/
-  docs/
-
-packages/
-  core/
-    primitives/
-    facts/
-    rules/
-    graph/
-    trace/
-
-  domain/
-    au/
-      dates/
-      pay/
-      tax/
-      super/
-      deductions/
-      fbt/
-      mortgage/
-
-  rules/
-    au/
-      pay/
-      payg/
-      stsl/
-      super/
-      income-tax/
-      medicare/
-      deductions/
-      fbt/
-      mortgage/
-
-  calculators/
-
-  api/
-    http/
-
-  sdk/
-    typescript/
-
-  content/
-  mdx/
-  pele/
-  diagrams/
-  docs-examples/
-  scripts/
-
-  cli/
-```
-
-Current packages such as `@taxkit/api-http` and the TanStack Start app sit
-outside the calculation engine. As the repo matures, the app layer should
-settle into a public documentation site and reusable API server. They
-will expose and consume engine capabilities once those capabilities exist, but
-the deterministic engine must not import from them.
+Package dependencies point from foundational packages toward rule packages,
+transport packages and apps. Engine packages stay deterministic and reusable.
+[ARCHITECTURE.md](../../ARCHITECTURE.md#owners-and-imports) lists the apps and
+packages, and [package ownership](./package-ownership.md) says what each owns.
+This page owns the dependency direction and how it is enforced.
 
 ## Dependency Direction
 
 ```txt
-packages/core/**
-  <- packages/domain/**
+packages/core
   <- packages/rules/**
-  <- packages/calculators/**
-  <- packages/api/** / packages/sdk/** / packages/cli/** / apps/**
+  <- packages/calculators
+  <- packages/api/** / packages/sdk/** / apps/**
 ```
 
 TaxKit packages and apps must not depend on other apps. Root composition joins
@@ -124,138 +25,25 @@ helpers; infrastructure owns provider deployment.
 manifest and rejects app peers as well as reverse application edges. React is
 allowed only inside app/docs packages that explicitly need it.
 
-## Package Responsibilities
+## Responsibility limits
 
-Implemented `@taxkit/core` owns:
-
-- branded primitives such as money, dates, percentages and ids
-- fact descriptor helpers
-- rule descriptor helpers
-- graph metadata types
-- trace and ledger types
-- common tagged errors
-- Effect `Context.Service` / `Layer` helpers
-- calculation engine orchestration
-
-Planned `@taxkit/domain-au-*` packages will own:
-
-- Australian income years, FBT years and local date helpers
-- pay periods and date dimensions
-- Australian tax-domain facts that are not specific to one rule pack
-
-Implemented `@taxkit/rules-au-pay` owns:
-
-- gross pay, taxable pay, net pay and pay event facts
-- pay-period conversions
-- salary sacrifice effects where they affect pay calculations
-- payslip reconciliation target facts, but not payslip parsing
-
-Current PAYG withholding behavior is implemented inside
-`@taxkit/rules-au-pay`. A later split to `@taxkit/rules-au-payg` should keep
-canonical schemas, ids and parameter services with the owning package.
-
-Planned `@taxkit/rules-au-payg` may own:
-
-- ATO withholding schedule schemas
-- PAYG withholding algorithms
-- PAYG parameter table services
-- PAYG withholding traces and golden tests
-
-Implemented `@taxkit/rules-au-stsl` and
-`@taxkit/rules-au-income-tax` own their corresponding facts, algorithms,
-parameter tables and official rule packs. Planned `@taxkit/rules-au-super`,
-`@taxkit/rules-au-medicare`, `@taxkit/rules-au-fbt`,
-`@taxkit/rules-au-mortgage` and `@taxkit/rules-au-deductions` will own their
-corresponding facts, algorithms, parameter tables and official rule packs.
-
-Implemented `@taxkit/calculators` owns the reusable calculator orchestration
-boundary for:
-
-- reusable calculator catalog schemas and entries
-- calculator service tags and live layers
-- metadata projections for calculator, fact, rule and graph discovery
-- schema-guided expected error shaping for calculation inputs
-- composition of canonical scenario layers, rule-pack layers and
-  `CalculationEngine`
-- reusable service methods for HTTP handlers, SDK helpers, CLI commands and
-  direct in-process consumers
-
-It must not own OpenAPI annotations, HTTP status mapping, Bun serving, process
-config, app runtime lifecycle, SDK client transport or CLI command parsing.
-
-Implemented `@taxkit/api-http` owns:
-
-- Effect HTTP API groups for public calculation endpoints
-- thin server handlers that call package-owned API services
-- OpenAPI generation
-- API boundary schemas
-
-HTTP API packages should not own calculator catalog transformations or
-calculation business logic when a reusable API service package exists.
-
-Implemented private `taxkit` owns:
-
-- direct in-process calculation facade
-- plain TypeScript named `createClient`, `calculate`, `calculateSafe` and `run` operations
-- caller-owned client runtimes and explicit disposal; bounded one-shot helpers
-- Effect-native `taxkit/effect` entrypoint
-- jurisdiction-specific opt-in `taxkit/au` and `taxkit/au/effect` subpaths
-- Layer-backed typed modules that preserve compile-time calculation, fact, rule and period capabilities
-- typed declarations, provider Layers and bindings shared by plain and Effect entrypoints
-- browser-safe types and schemas
-- SDK examples and compatibility tests
-
-Implemented source-only `@content/docs` owns:
-
-- the authored TaxKit MDX pages and `navigation.json`
-- `repository.json`, the GitHub revisions that repository-file links use
-- `sources.ts`, every page as a `?raw` import
-
-Implemented `@taxkit/mdx` owns content-neutral `MdxCompiler` and `MdxRenderer`,
-portable document Schemas and the highlighter, diagram and link adapter contracts.
-Its static `MdxLive` combines the individual capability Layers; the renderer
-requires providers while the compiler does not. The Pierre adapter is the only
-`@pierre/highlights` caller. MDX imports neither Content nor the app.
-
-`@taxkit/diagrams` implements MDX's `DiagramRenderer` with static
-`PeleDiagramRendererLive`. It requires `Pele` from `@taxkit/pele/service`, converts
-the owning brands and preserves MDX's narrower SVG bound. `@taxkit/pele` owns the
-only Pele SDK call through `Pele.renderSvg`, with static live/test Layers. It
-imports no MDX, Content or app. The app supplies `PeleLive` to the adapter.
-
-Content imports MDX contracts and Schemas for `ContentMdxReaderLive` and
-`ContentLinkResolverLive`. It owns frontmatter/title/publication rules, navigation,
-repository revisions and projection into the existing public page body. The app
-composes concrete Layers. The serving runtime reads prebuilt catalogues.
-
-Docs packages must not own rule-pack algorithms, API endpoint business logic
-or SDK calculation facades.
+- `@taxkit/calculators` owns reusable calculator orchestration. It must not own
+  OpenAPI annotations, HTTP status mapping, Bun serving, process configuration,
+  app runtime lifecycle or SDK client transport.
+- HTTP and MCP packages must not own calculator catalogue transformations or
+  calculation logic; they call the calculator service.
+- Docs packages (`@content/docs`, `@taxkit/content`, `@taxkit/mdx`,
+  `@taxkit/mdx-react`, `@taxkit/diagrams`, `@taxkit/pele`) must not own rule-pack
+  algorithms, API endpoint logic or SDK calculation functions.
 
 ## Directory Naming
 
-Directory paths should group packages by purpose first. Package names may use the same purpose prefix.
-
-Examples:
-
-```txt
-packages/rules/au/payg       -> @taxkit/rules-au-payg
-packages/rules/au/super      -> @taxkit/rules-au-super
-packages/domain/au/dates     -> @taxkit/domain-au-dates
-packages/api/http            -> @taxkit/api-http
-packages/calculators         -> @taxkit/calculators
-packages/sdk/typescript      -> taxkit or taxkit
-content/docs                 -> @content/docs
-packages/content             -> @taxkit/content
-packages/mdx                 -> @taxkit/mdx
-packages/diagrams            -> @taxkit/diagrams
-packages/pele                -> @taxkit/pele
-```
-
-Avoid flat package sprawl such as `packages/au-payg`, `packages/au-super` and
-flat transport package names once the engine packages start growing.
-`packages/calculators` is the exception for cross-surface calculator
-orchestration because it is intentionally shared by HTTP, SDK, CLI and
-in-process callers.
+Group package directories by purpose first; the package name uses the same
+prefix, for example `packages/rules/au/pay` is `@taxkit/rules-au-pay` and
+`packages/api/http` is `@taxkit/api-http`. The SDK at `packages/sdk/typescript`
+is published as `taxkit`. Avoid flat names such as `packages/au-pay`.
+`packages/calculators` is the one flat engine package, because HTTP, MCP, the
+SDK and in-process callers share it.
 
 ## Export Rules
 
