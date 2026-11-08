@@ -146,8 +146,8 @@ const roundScaledInteger = (value: bigint, scale: number): bigint => {
     onTrue: () => (value + half) / divisor,
   });
 };
-// Bound the power before constructing it. The decimal parser admits very large
-// exponents; they must produce a checked result rather than a BigInt defect.
+// Bound the power before constructing it. The decimal parser admits exponents
+// up to 10,000 places; they must produce a checked result, not a BigInt defect.
 const roundDecimalToCents = (
   value: BigDecimal.BigDecimal
 ): Effect.Effect<Cents, MoneyError> => {
