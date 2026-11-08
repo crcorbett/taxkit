@@ -272,8 +272,7 @@ bun run --filter=web check-types
 bun run --filter=web test
 bun run --filter=web test:browser
 bun run --filter=web build
-bun run --filter=web build:native-pair
-bun run --filter=web test:native-pair
+bun run test:native
 ```
 
 `test:browser` runs the Chromium tests in `test/**/*.browser.test.tsx`: the
@@ -285,16 +284,21 @@ clipboard refusal. The native suite checks the drawer's keyboard/focus behaviour
 active page outlines, theme retention during search, narrow layouts and
 no-JavaScript code scrolling.
 
+The native pair suite tests both Workers together, so it lives at the root in
+[`tools/apps-local/test`](../../tools/apps-local/test), not in this app.
+`bun run test:native` runs the root `build:native-pair` and then
+`test:native-pair` (the `native-pair` project in `tools/vitest.config.ts`).
 `build:native-pair` builds the API dependency graph and then both apps with
 Alchemy's native builders, without a cloud provider, state or credentials. Its
 API output is under the ignored `.alchemy/native-pair`; the harness explicitly
 sets each fixture's output directory because Alchemy beta.84 keeps standalone
 bundles in memory by default. The Website output is
 `dist/server/server.js`. A standalone Vite build writes `dist/server/index.js`
-instead, so run the native build immediately before its test. The root
-`bun run test:native` does both.
+instead, so run the native build immediately before its test.
 
-The native tests in `test/` run the built pair in Miniflare and Chromium. They
+The native tests run the built pair in Miniflare and Chromium, with the
+deployed Workers' compatibility settings from
+`@taxkit/infrastructure/worker-settings`. They
 cover first HTML for every page, documentation pages, search, Markdown and
 discovery files with their cache headers, browser calculation, the
 no-JavaScript notice and refused POSTs, request and reply limits, cancellation,

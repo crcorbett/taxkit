@@ -15,7 +15,10 @@ import {
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
-import { readWorkerModules } from "./native-modules.fixture";
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
 
 it.live.each(["missing", "invalid", "throwing"] as const)(
   "contains a %s native limiter binding without exposing provider data",
@@ -23,7 +26,7 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
     Effect.gen(function* () {
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
-        "../../.alchemy/native-pair/bundles/TaxKitApi"
+        ".alchemy/native-pair/bundles/TaxKitApi"
       );
       const { files, modules, wasm } = yield* readWorkerModules({
         modulesRoot,
@@ -77,8 +80,7 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
               workers: [
                 {
                   config: {
-                    compatibilityDate: "2026-10-04",
-                    compatibilityFlags: ["nodejs_compat"],
+                    ...nativeWorkerCompatibility,
                     env: {
                       ...env,
                     },
@@ -92,8 +94,7 @@ it.live.each(["missing", "invalid", "throwing"] as const)(
                 },
                 {
                   config: {
-                    compatibilityDate: "2026-10-04",
-                    compatibilityFlags: ["nodejs_compat"],
+                    ...nativeWorkerCompatibility,
                     manifest: {
                       mainModule: "provider.js",
                       modules: {

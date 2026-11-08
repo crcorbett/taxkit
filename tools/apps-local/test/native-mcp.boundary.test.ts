@@ -54,8 +54,11 @@ import {
   NativeMcpResumeProgress,
   nativeMcpResumeFixture,
 } from "./native-mcp.fixture";
-import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
 
 class NativeMcpClientFailed extends Schema.TaggedError<
   NativeMcpClientFailed,
@@ -90,7 +93,7 @@ it.live(
     Effect.gen(function* () {
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
-        "../../.alchemy/native-pair/bundles/TaxKitApi"
+        ".alchemy/native-pair/bundles/TaxKitApi"
       );
       const { files, modules, wasm } = yield* readWorkerModules({
         modulesRoot,
@@ -123,8 +126,7 @@ it.live(
               workers: [
                 {
                   config: {
-                    compatibilityDate: "2026-10-04",
-                    compatibilityFlags: ["nodejs_compat"],
+                    ...nativeWorkerCompatibility,
                     env: {
                       ...nativeRateFixture("10087"),
                       API_PUBLIC_ORIGIN: {
@@ -545,7 +547,7 @@ it.live(
   () =>
     Effect.gen(function* () {
       const path = yield* Path.Path;
-      const root = path.resolve("../..");
+      const root = path.resolve(".");
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const allLogs = yield* Queue.make<WorkerdStructuredLog>();
       const workLog = Queue.take(logs).pipe(
@@ -590,8 +592,7 @@ it.live(
             }
             return {
               config: {
-                compatibilityDate: "2026-10-04",
-                compatibilityFlags: ["nodejs_compat"],
+                ...nativeWorkerCompatibility,
                 env: {
                   ...nativeRateFixture(fixture.namespace),
                   API_PUBLIC_ORIGIN: {
@@ -880,7 +881,7 @@ it.live(
     Effect.gen(function* () {
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
-        "../../.alchemy/native-pair/bundles/TaxKitApi"
+        ".alchemy/native-pair/bundles/TaxKitApi"
       );
       const { files, modules, wasm } = yield* readWorkerModules({
         modulesRoot,
@@ -902,8 +903,7 @@ it.live(
               workers: [
                 {
                   config: {
-                    compatibilityDate: "2026-10-04",
-                    compatibilityFlags: ["nodejs_compat"],
+                    ...nativeWorkerCompatibility,
                     env: {
                       ...nativeRateFixture("10113"),
                       API_PUBLIC_ORIGIN: {
@@ -956,7 +956,8 @@ it.live(
                   workers: [
                     {
                       config: {
-                        compatibilityDate: "2026-10-04",
+                        compatibilityDate:
+                          nativeWorkerCompatibility.compatibilityDate,
                         manifest: {
                           mainModule: "document.js",
                           modules: {

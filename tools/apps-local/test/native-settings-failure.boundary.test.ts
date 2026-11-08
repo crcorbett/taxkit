@@ -12,7 +12,10 @@ import {
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
-import { readWorkerModules } from "./native-modules.fixture";
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
 
 const origin = "http://127.0.0.1:4198";
 const Json = Schema.fromJsonString(Schema.Unknown);
@@ -21,7 +24,7 @@ it.live(
   () =>
     Effect.gen(function* () {
       const path = yield* Path.Path;
-      const root = path.resolve("../..");
+      const root = path.resolve(".");
       const modulesRoot = path.join(
         root,
         ".alchemy/native-pair/settings-defect/server"
@@ -63,8 +66,7 @@ it.live(
               workers: [
                 {
                   config: {
-                    compatibilityDate: "2026-10-04",
-                    compatibilityFlags: ["nodejs_compat"],
+                    ...nativeWorkerCompatibility,
                     env: {
                       API_PUBLIC_ORIGIN: {
                         type: "json" as const,

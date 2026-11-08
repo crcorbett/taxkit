@@ -186,59 +186,59 @@ it.effect.each([
   },
   {
     allowed: false,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "no-object-writes",
     source:
       'export const result = Object.defineProperty({}, "ordinary", { value: true });',
   },
   {
     allowed: false,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "no-native-work",
     source: 'export const result = () => { throw new Error("ordinary"); };',
   },
   {
     allowed: false,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "no-promise-workflow",
     source:
       'export const result = async () => await Promise.resolve("ordinary");',
   },
   {
     allowed: true,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "",
     source: decoder,
   },
   {
     allowed: true,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "",
     source: encoder,
   },
   {
     allowed: false,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "no-runtime-execution-outside-boundaries",
     source:
       'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
   },
   {
     allowed: false,
-    path: "apps/web/test/native-analytics-adjacent.test.ts",
+    path: "tools/apps-local/test/native-analytics-adjacent.test.ts",
     rule: "no-decoding-outside-boundaries",
     source: decoder,
   },
   {
     allowed: true,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "",
     source:
       'import { Schema } from "effect";\n\nexport class NativeAnalyticsClientFailed extends Schema.TaggedError<NativeAnalyticsClientFailed, { readonly brand: unique symbol }>()("NativeAnalyticsClientFailed", { operation: Schema.Literal("connect") }) {}',
   },
   {
     allowed: false,
-    path: "apps/web/test/native-analytics.boundary.test.ts",
+    path: "tools/apps-local/test/native-analytics.boundary.test.ts",
     rule: "error-constructor-new",
     source: 'export const failure = Error("fixture");',
   },

@@ -34,6 +34,7 @@
         "tools/oxlint/*.ts",
         "tools/infrastructure/*.ts",
         "tools/apps-local/*.ts",
+        "tools/apps-local/test/*.ts",
         "tools/workspace/*.ts"
       ],
       "ignoreDependencies": ["typescript", "@effect/language-service"]
@@ -64,8 +65,7 @@
         "vitest.config.ts",
         "vitest.browser.config.ts",
         "scripts/**/*.ts",
-        "test/**/*.{ts,tsx}",
-        "vitest.native.config.ts"
+        "test/**/*.{ts,tsx}"
       ],
       "project": [
         "src/**/*.{ts,tsx}",
@@ -73,8 +73,7 @@
         "vitest.config.ts",
         "vitest.browser.config.ts",
         "scripts/**/*.ts",
-        "test/**/*.{ts,tsx}",
-        "vitest.native.config.ts"
+        "test/**/*.{ts,tsx}"
       ],
       "ignoreDependencies": ["@taxkit/tsconfig", "cloudflare"]
     },

@@ -43,11 +43,11 @@ const decodingBoundaryFiles = [
   // Exact native browser capability/refusal ingress; no runner permission.
   "packages/webmcp/src/model-context.adapter.layer.ts",
   "packages/webmcp/test/registration.test.ts",
-  "apps/web/test/native-browser-tools.boundary.test.ts",
+  "tools/apps-local/test/native-browser-tools.boundary.test.ts",
   // Exact official MCP client wire ingress and adversarial host fixture.
   "apps/api/test/mcp-client.boundary.test.ts",
-  "apps/web/test/native-mcp.boundary.test.ts",
-  "apps/web/test/native-rate.boundary.test.ts",
+  "tools/apps-local/test/native-mcp.boundary.test.ts",
+  "tools/apps-local/test/native-rate.boundary.test.ts",
   // Exact Accept header ingress fixtures.
   "packages/api/http/test/negotiation.test.ts",
   // Exact Takumi PNG reply, bundled font and forwarded share-image ingress.
@@ -104,8 +104,8 @@ const decodingBoundaryFiles = [
   "packages/core/test/domain-absence.boundary.test.ts",
   // Native app root stage ingress, checked before constructing secret Layers.
   "packages/infrastructure/src/secrets.ts",
-  "apps/web/test/native-cancellation.boundary.test.ts",
-  "apps/web/test/native-local-development.boundary.test.ts",
+  "tools/apps-local/test/native-cancellation.boundary.test.ts",
+  "tools/apps-local/test/native-local-development.boundary.test.ts",
   // Exact native website settings, form and hydration boundaries.
   "apps/web/test/host/config.boundary.test.ts",
   "apps/web/src/lib/host/config.ingress.ts",
@@ -143,8 +143,13 @@ const decodingBoundaryFiles = [
 
   // Native built request egress and standalone HTTP body tests decode only
   // actual representation responses; service internals remain excluded.
-  "apps/web/test/native-pair.boundary.test.ts",
-  "apps/web/test/native-analytics.boundary.test.ts",
+  "tools/apps-local/test/native-pair-content.checks.ts",
+  "tools/apps-local/test/native-pair-docs-api.checks.ts",
+  "tools/apps-local/test/native-pair-calculator-server.checks.ts",
+  "tools/apps-local/test/native-pair-docs-reader.checks.ts",
+  "tools/apps-local/test/native-pair-search.checks.ts",
+  "tools/apps-local/test/native-pair.fixture.ts",
+  "tools/apps-local/test/native-analytics.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
   "packages/api/http/test/request-body.boundary.test.ts",
   "packages/api/http/test/public-content.boundary.test.ts",
@@ -243,7 +248,7 @@ const schemaEncoderEgressFiles = [
   "packages/webmcp/src/model-context.adapter.layer.ts",
   // Actual MCP client request bytes and secret-negative response assertions.
   "apps/api/test/mcp-client.boundary.test.ts",
-  "apps/web/test/native-mcp.boundary.test.ts",
+  "tools/apps-local/test/native-mcp.boundary.test.ts",
   // Exact checked public structured-data script egress; no decoder/runtime permission.
   "packages/content/src/publication.egress.ts",
   // The encoded tool failure the browser's WebMCP host receives.
@@ -253,8 +258,8 @@ const schemaEncoderEgressFiles = [
   // Exact rate wire/secret-negative fixtures; no production encoding permission.
   "apps/api/test/rate-admission.boundary.test.ts",
   "apps/api/test/worker-admission.boundary.test.ts",
-  "apps/web/test/native-rate.boundary.test.ts",
-  "apps/web/test/native-rate-provider.boundary.test.ts",
+  "tools/apps-local/test/native-rate.boundary.test.ts",
+  "tools/apps-local/test/native-rate-provider.boundary.test.ts",
   "packages/calculators/test/calculation-admission.test.ts",
   // Exact historical domain bytes and rule snapshots, using their owning codecs.
   "packages/core/test/domain-absence.boundary.test.ts",
@@ -268,10 +273,10 @@ const schemaEncoderEgressFiles = [
   "packages/core/test/date.test.ts",
   "packages/core/test/dollars.test.ts",
   "packages/core/test/money.test.ts",
-  "apps/web/test/native-cancellation.boundary.test.ts",
-  "apps/web/test/native-settings-failure.boundary.test.ts",
-  "apps/web/test/native-analytics.boundary.test.ts",
-  "apps/web/test/native-pair.boundary.test.ts",
+  "tools/apps-local/test/native-cancellation.boundary.test.ts",
+  "tools/apps-local/test/native-settings-failure.boundary.test.ts",
+  "tools/apps-local/test/native-analytics.boundary.test.ts",
+  "tools/apps-local/test/native-pair.boundary.test.ts",
   "apps/api/test/worker.boundary.test.ts",
 
   "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
@@ -318,7 +323,7 @@ const throwingCodecTestFiles = [
 
 const runtimeBoundaryFiles = [
   // Official MCP transport callback bridges the native HttpClient to its Promise host.
-  "apps/web/test/native-mcp.boundary.test.ts",
+  "tools/apps-local/test/native-mcp.boundary.test.ts",
   "apps/api/scripts/docs-catalogue.runtime.ts",
   "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
   // Synthetic fetch Promise entrypoint for deterministic discovery cancellation.
@@ -400,7 +405,12 @@ export default defineConfig({
   ],
   overrides: [
     {
-      files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+      files: [
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        // Native pair surface checks and fixtures run inside its one test.
+        "tools/apps-local/test/native-pair*.ts",
+      ],
       rules: {
         // Register native Effect test callbacks; assertions still require a test body.
         // Vitest accepts an optional assertion failure message.
@@ -562,14 +572,16 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/test/native-local-development.boundary.test.ts"],
+      files: [
+        "tools/apps-local/test/native-local-development.boundary.test.ts",
+      ],
       rules: {
         "strict-effect/no-imperative-collections": [
           "error",
           {
             allowedMethods: [
               {
-                file: "apps/web/test/native-local-development.boundary.test.ts",
+                file: "tools/apps-local/test/native-local-development.boundary.test.ts",
                 method: "fill",
                 receiver: "payInput",
               },
@@ -579,14 +591,14 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/test/native-cancellation.boundary.test.ts"],
+      files: ["tools/apps-local/test/native-cancellation.boundary.test.ts"],
       rules: {
         "strict-effect/no-imperative-collections": [
           "error",
           {
             allowedMethods: [
               {
-                file: "apps/web/test/native-cancellation.boundary.test.ts",
+                file: "tools/apps-local/test/native-cancellation.boundary.test.ts",
                 method: "fill",
                 receiver: "payInput",
               },
@@ -596,7 +608,7 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/test/native-pair.boundary.test.ts"],
+      files: ["tools/apps-local/test/native-pair.fixture.ts"],
       rules: {
         "strict-effect/no-imperative-collections": [
           "error",
@@ -604,33 +616,44 @@ export default defineConfig({
             // Native Canvas resolves CSS colour spaces for the contrast check.
             allowedAssignments: [
               {
-                file: "apps/web/test/native-pair.boundary.test.ts",
+                file: "tools/apps-local/test/native-pair.fixture.ts",
                 target: "context.fillStyle",
               },
             ],
+            allowedMethods: [],
+          },
+        ],
+      },
+    },
+    {
+      files: ["tools/apps-local/test/native-pair-calculator-browser.checks.ts"],
+      rules: {
+        "strict-effect/no-imperative-collections": [
+          "error",
+          {
             allowedMethods: [
               {
-                file: "apps/web/test/native-pair.boundary.test.ts",
+                file: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
                 method: "fill",
                 receiver: "payInput",
               },
               {
-                file: "apps/web/test/native-pair.boundary.test.ts",
+                file: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
                 method: "fill",
                 receiver: "errorPayInput",
               },
               {
-                file: "apps/web/test/native-pair.boundary.test.ts",
+                file: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
                 method: "fill",
                 receiver: "savedPayInput",
               },
               {
-                file: "apps/web/test/native-pair.boundary.test.ts",
+                file: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
                 method: "fill",
                 receiver: "calculatorInput",
               },
               {
-                file: "apps/web/test/native-pair.boundary.test.ts",
+                file: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
                 method: "fill",
                 receiver: "plainCalculatorInput",
               },
@@ -658,11 +681,13 @@ export default defineConfig({
       },
     },
     {
-      files: ["apps/web/test/native-mcp.boundary.test.ts"],
+      files: ["tools/apps-local/test/native-mcp.boundary.test.ts"],
       rules: {
         "strict-effect/no-runtime-outside-boundary": [
           "error",
-          { allowedFiles: ["apps/web/test/native-mcp.boundary.test.ts"] },
+          {
+            allowedFiles: ["tools/apps-local/test/native-mcp.boundary.test.ts"],
+          },
         ],
       },
     },
@@ -1010,15 +1035,22 @@ export default defineConfig({
         "packages/webmcp/src/model-context.adapter.layer.ts",
         "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
         "apps/web/src/entry.server.ts",
-        "apps/web/test/native-analytics.boundary.test.ts",
-        "apps/web/test/native-browser-tools.boundary.test.ts",
-        "apps/web/test/native-cancellation.boundary.test.ts",
-        "apps/web/test/native-local-development.boundary.test.ts",
-        "apps/web/test/native-mcp.boundary.test.ts",
-        "apps/web/test/native-pair.boundary.test.ts",
-        "apps/web/test/native-rate-provider.boundary.test.ts",
-        "apps/web/test/native-rate.boundary.test.ts",
-        "apps/web/test/native-settings-failure.boundary.test.ts",
+        "tools/apps-local/test/native-analytics.boundary.test.ts",
+        "tools/apps-local/test/native-browser-tools.boundary.test.ts",
+        "tools/apps-local/test/native-cancellation.boundary.test.ts",
+        "tools/apps-local/test/native-local-development.boundary.test.ts",
+        "tools/apps-local/test/native-mcp.boundary.test.ts",
+        "tools/apps-local/test/native-pair.fixture.ts",
+        "tools/apps-local/test/native-pair-content.checks.ts",
+        "tools/apps-local/test/native-pair-docs-api.checks.ts",
+        "tools/apps-local/test/native-pair-calculator-server.checks.ts",
+        "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
+        "tools/apps-local/test/native-pair-docs-reader.checks.ts",
+        "tools/apps-local/test/native-pair-docs-navigation.checks.ts",
+        "tools/apps-local/test/native-pair-search.checks.ts",
+        "tools/apps-local/test/native-rate-provider.boundary.test.ts",
+        "tools/apps-local/test/native-rate.boundary.test.ts",
+        "tools/apps-local/test/native-settings-failure.boundary.test.ts",
         "packages/docs-examples/src/error-handling.ts",
         "packages/docs-examples/src/validate-external-input.ts",
         "packages/docs-examples/test/integration.example.test.ts",
@@ -1043,8 +1075,8 @@ export default defineConfig({
               "packages/webmcp/test/registration.test.ts",
               "packages/webmcp/src/model-context.adapter.layer.ts",
               "apps/web/src/entry.server.ts",
-              "apps/web/test/native-analytics.boundary.test.ts",
-              "apps/web/test/native-mcp.boundary.test.ts",
+              "tools/apps-local/test/native-analytics.boundary.test.ts",
+              "tools/apps-local/test/native-mcp.boundary.test.ts",
               "packages/sdk/typescript/test/client-lifetime.test.ts",
               "packages/sdk/typescript/src/client.runtime.ts",
               "packages/sdk/typescript/test/index.test.ts",
@@ -1054,13 +1086,20 @@ export default defineConfig({
               "apps/api/test/worker.boundary.test.ts",
               "apps/web/test/atom-lifecycle.browser.test.tsx",
               "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
-              "apps/web/test/native-browser-tools.boundary.test.ts",
-              "apps/web/test/native-cancellation.boundary.test.ts",
-              "apps/web/test/native-local-development.boundary.test.ts",
-              "apps/web/test/native-pair.boundary.test.ts",
-              "apps/web/test/native-rate-provider.boundary.test.ts",
-              "apps/web/test/native-rate.boundary.test.ts",
-              "apps/web/test/native-settings-failure.boundary.test.ts",
+              "tools/apps-local/test/native-browser-tools.boundary.test.ts",
+              "tools/apps-local/test/native-cancellation.boundary.test.ts",
+              "tools/apps-local/test/native-local-development.boundary.test.ts",
+              "tools/apps-local/test/native-pair.fixture.ts",
+              "tools/apps-local/test/native-pair-content.checks.ts",
+              "tools/apps-local/test/native-pair-docs-api.checks.ts",
+              "tools/apps-local/test/native-pair-calculator-server.checks.ts",
+              "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
+              "tools/apps-local/test/native-pair-docs-reader.checks.ts",
+              "tools/apps-local/test/native-pair-docs-navigation.checks.ts",
+              "tools/apps-local/test/native-pair-search.checks.ts",
+              "tools/apps-local/test/native-rate-provider.boundary.test.ts",
+              "tools/apps-local/test/native-rate.boundary.test.ts",
+              "tools/apps-local/test/native-settings-failure.boundary.test.ts",
               "packages/docs-examples/src/error-handling.ts",
               "packages/docs-examples/src/validate-external-input.ts",
               "packages/docs-examples/test/integration.example.test.ts",
@@ -1149,8 +1188,8 @@ export default defineConfig({
             allowTypes: true,
             allowedFiles: [
               "apps/web/src/lib/runtime.server.ts",
-              "apps/web/test/native-pair.boundary.test.ts",
-              "apps/web/test/native-rate-provider.boundary.test.ts",
+              "tools/apps-local/test/native-pair-content.checks.ts",
+              "tools/apps-local/test/native-rate-provider.boundary.test.ts",
             ],
             module: "cloudflare:workers",
           },
@@ -1159,7 +1198,7 @@ export default defineConfig({
             allowTypes: true,
             allowedFiles: [
               "apps/web/src/lib/host/binding.adapter.layer.ts",
-              "apps/web/test/native-rate.boundary.test.ts",
+              "tools/apps-local/test/native-rate.boundary.test.ts",
             ],
             module: "@alchemy.run/cloudflare/Bridge",
           },

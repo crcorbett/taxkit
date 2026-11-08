@@ -24,11 +24,14 @@ import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 import { chromium } from "playwright";
 
-import { readWorkerModules } from "./native-modules.fixture";
 import {
   nativeLocalModeFixture,
   nativeRateFixture,
 } from "./native-rate.fixture";
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
 
 const apiOrigin = "http://127.0.0.1:4201";
 const websiteOrigin = "http://127.0.0.1:4202";
@@ -47,7 +50,7 @@ it.live(
   () =>
     Effect.gen(function* () {
       const path = yield* Path.Path;
-      const root = path.resolve("../..");
+      const root = path.resolve(".");
       const logs = yield* Queue.make<WorkerdStructuredLog>();
       const exceptions = yield* Queue.make<string>();
       const workers = yield* EffectFunction.pipe(
@@ -123,8 +126,7 @@ it.live(
                   })),
                   Match.orElse((): undefined => {})
                 ),
-                compatibilityDate: "2026-10-04",
-                compatibilityFlags: ["nodejs_compat"],
+                ...nativeWorkerCompatibility,
                 env: Match.value(artifact).pipe(
                   Match.when({ entry: "entry.server.js" }, () => ({
                     ...origins,

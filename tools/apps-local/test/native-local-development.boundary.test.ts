@@ -52,7 +52,7 @@ describe("native local development", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
         const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
-        const root = path.resolve("../..");
+        const root = path.resolve(".");
         const auth = yield* fs.makeTempDirectoryScoped({
           prefix: "taxkit-native-dev-auth-",
         });
@@ -408,7 +408,7 @@ describe("native local development", () => {
         const fs = yield* FileSystem.FileSystem;
         const path = yield* Path.Path;
         const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
-        const root = path.resolve("../..");
+        const root = path.resolve(".");
         const auth = yield* fs.makeTempDirectoryScoped({
           prefix: "taxkit-native-dev-rejection-",
         });

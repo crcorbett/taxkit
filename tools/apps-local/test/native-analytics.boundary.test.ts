@@ -30,8 +30,11 @@ import { HttpApiClient } from "effect/http-api";
 import { Miniflare, Response } from "miniflare";
 import type { Request, WorkerdStructuredLog } from "miniflare";
 
-import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
 
 const origin = "http://127.0.0.1:4219";
 class NativeAnalyticsClientFailed extends Schema.TaggedError<
@@ -48,7 +51,7 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
     Effect.gen(function* () {
       const path = yield* Path.Path;
       const modulesRoot = path.resolve(
-        "../../.alchemy/native-pair/bundles/TaxKitApi"
+        ".alchemy/native-pair/bundles/TaxKitApi"
       );
       const { files, modules, wasm } = yield* readWorkerModules({
         modulesRoot,
@@ -75,8 +78,7 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
               workers: [
                 {
                   config: {
-                    compatibilityDate: "2026-10-04",
-                    compatibilityFlags: ["nodejs_compat"],
+                    ...nativeWorkerCompatibility,
                     env: {
                       ...nativeRateFixture("10179"),
                       API_PUBLIC_ORIGIN: { type: "json", value: origin },
