@@ -1,13 +1,6 @@
----
-document_type: architecture-decision
-lifecycle: current
-authority: supporting
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-10
-review_trigger: supported API host, shared package dependency or host composition changes
----
-
 # Keep Bun and Cloudflare as independent API hosts
+
+Status: accepted
 
 Cooper agreed on 10 October 2026 that both the standalone Bun API and the
 Cloudflare API remain supported. Shared calculation and transport packages must

@@ -23,7 +23,11 @@ frontmatter and navigation say `status: published`.
 
 ## Decisions
 
-- [0001 Separate Website and API](adr/0001-separate-website-and-api.md) (superseded in part)
+Each record starts with `Status: accepted`, `Status: proposed` or
+`Status: superseded by ADR-NNNN`; an accepted record that a later one replaces
+in part adds `; partly superseded by ADR-NNNN (what changed)`.
+
+- [0001 Separate Website and API](adr/0001-separate-website-and-api.md)
 - [0002 Reuse shared telemetry datasets](adr/0002-reuse-shared-telemetry-datasets.md)
 - [0003 Independent API hosts](adr/0003-support-independent-api-hosts.md)
 - [0004 Limit operational observations](adr/0004-limit-operational-observations.md)
@@ -33,7 +37,7 @@ frontmatter and navigation say `status: published`.
 - [0008 Effect-owned rendering providers](adr/0008-effect-rendering-providers.md)
 - [0009 Paired MDX themes as checked render data](adr/0009-mdx-themes.md)
 - [0010 Agnostic MDX reading contracts and React presentation](adr/0010-agnostic-mdx-presentation.md)
-- [0011 Effect-native SDK contracts and checked money](adr/0011-effect-native-sdk-contracts.md) (SDK 5 hard cutover)
+- [0011 Effect-native SDK contracts and checked money](adr/0011-effect-native-sdk-contracts.md)
 
 ## Keeping this useful
 
