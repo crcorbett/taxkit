@@ -20,7 +20,8 @@ The application owns when to capture and which checked collection policy applies
 The API application captures its delivery service during initialisation, then
 supplies it to each returned request operation. The native Worker owns
 `waitUntil` delivery; request collection remains fresh.
-T008 Website/browser composition and provider readback remain pending.
+The Website does not collect analytics, and stored events have not been read
+back from the provider.
 
 ## Service shape
 
@@ -284,9 +285,8 @@ POST's protocol server/notification consumer through body completion; shared
 calculator/content services and work/rate owners remain captured once.
 Legacy session/DO hosting is retired. The native body stream has bounded accumulation, total read
 time and scoped cancellation. Safe logger/reporter context is built at instance
-initialisation and supplied to both native router construction and dispatch;
-T009 retains unqualified safe native trace exports. T003's local connection
-acceptance does not establish that later requirement.
+initialisation and supplied to both native router construction and dispatch.
+Native trace export stays off.
 
 The Website's generated HTTP client uses the private native binding only for
 reads; the Website server never calculates. Its host adapter enforces manual

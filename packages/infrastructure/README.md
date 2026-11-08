@@ -172,6 +172,6 @@ candidate. These are neither project capacity, credential-scope nor provider
 change proof. Cross-process creation races remain a limitation of the provider
 API; duplicate ownership fails on a subsequent complete inventory. The app stack still collects off
 and has no PostHog project reference or management credentials in its bindings.
-Browser sender choice, capture wiring, stored-event readback and any real
-operation remain separately tracked T008 work. Metrics remain deferred.
+The Website sends no analytics, and stored events have not been read back
+from PostHog. Metrics are not collected.
 

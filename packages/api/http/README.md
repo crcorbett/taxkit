@@ -408,17 +408,9 @@ The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
 `check-types` covers the HTTP comparison test. Both retain canonical branded
 identities and explicit Match narrowing of report/error unions.
 
-The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
-across HTTP and MCP, with a five-second
-operation budget for all nine service methods. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes. Website guidance requests
-manual retry only. This is separate from the body-read and ten-second client
-budgets. Metadata does not use a calculation place. Native built proof covers a
-eight HTTP calculations, rejected extra HTTP and
-browser calls, HTTP 504 timeouts and reached cleanup. Synchronous CPU work
-cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. The native rate policy below is implemented separately; MCP and whole T004
-qualification remain unfinished.
+Calculation capacity and operation-timeout errors become HTTP 503/504
+envelopes under the
+[shared work policy](../../calculators/README.md#shared-calculation-work-limits).
 
 
 ## Shared request admission

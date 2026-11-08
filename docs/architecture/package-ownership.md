@@ -202,8 +202,8 @@ identity. Neither an app nor a package depends on another app.
   execution and best-effort delivery. Analytics owns the calculator usage decorator.
   Infrastructure owns retained provider
   projects. Calculators, rules and the local SDK have no analytics dependency.
-  T008 application and provider qualification remain in progress; package tests
-  alone do not prove browser privacy or ingestion.
+  The Website does not collect analytics; package tests alone do not prove
+  provider ingestion.
 
 `content/docs`
 : Private source-only `@content/docs` package with the 62 authored `.mdx`
