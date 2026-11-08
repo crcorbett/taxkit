@@ -11,7 +11,7 @@
 | [Content](architecture/content-and-posts.md) | Authored pages, the docs catalogue, discovery files and share images |
 | [Packages](architecture/package-ownership.md) | Package ownership and [boundaries](architecture/package-boundaries.md) |
 | [Effect services](architecture/effect-services.md) | Services, Layers, boundaries and [configuration](architecture/configuration.md) |
-| [Testing](architecture/testing-and-quality.md) | The five checks and [rule validation](architecture/testing-and-validation.md) |
+| [Testing](architecture/testing-and-quality.md) | The five checks and [rule and calculation tests](architecture/testing-and-validation.md) |
 | [Deployment](architecture/deployment.md) | Resources, stages and secrets |
 | [Standards](standards/code-patterns.md) | [Code patterns](standards/code-patterns.md), [docstrings](standards/docstrings.md), [tooling](standards/tooling.md) and [versioning](standards/versioning.md) |
 | [Runbooks](runbooks/README.md) | Deployment, versioning and packed SDK checks |
