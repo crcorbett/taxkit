@@ -223,7 +223,7 @@ The infrastructure-owned `PostHogManagement` contract has only find, read,
 create and update operations over checked TaxKit identities. Its private
 Distilled adapter contains paging, credentials, supported privacy settings,
 bounded replies and safe failure mapping. The native resource provider and
-deterministic test Layer depend on that closed contract. Alchemy beta.84 requires
+deterministic test Layer depend on that closed contract. Alchemy beta.85 requires
 provider registration without an error channel, so the composition Layer caches
 fallible live acquisition in the native stack scope and defers it to a lifecycle
 operation. Invalid settings remain typed failures before any request. The

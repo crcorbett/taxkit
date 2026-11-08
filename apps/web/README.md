@@ -279,7 +279,7 @@ no-JavaScript code scrolling.
 `build:native-pair` builds the API dependency graph and then both apps with
 Alchemy's native builders, without a cloud provider, state or credentials. Its
 API output is under the ignored `.alchemy/native-pair`; the harness explicitly
-sets each fixture's output directory because Alchemy beta.84 keeps standalone
+sets each fixture's output directory because Alchemy beta.85 keeps standalone
 bundles in memory by default. The Website output is
 `dist/server/server.js`. A standalone Vite build writes `dist/server/index.js`
 instead, so run the native build immediately before its test. The root

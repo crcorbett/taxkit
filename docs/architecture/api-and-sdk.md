@@ -296,7 +296,7 @@ wrong-calculator facts fail at that single boundary. Responses correlate the ID,
 catalogue metadata and checked owning report.
 
 Effect generates OpenAPI component names from encoded-side names ending in
-`Encoded`. Effect 4.0.7 flattens redundant nested `anyOf` groups without changing
+`Encoded`. Effect flattens redundant nested `anyOf` groups without changing
 their accepted values. Optional query parameters are omitted when absent;
 the generated parameter schema no longer advertises JSON `null` for them.
 The API package owns this document and its snapshot.
@@ -518,7 +518,7 @@ publication origins through the static `ContentDiscoveryLive`.
 
 ## Native remote MCP
 
-The native API mounts `@taxkit/api-mcp` at `/mcp` with Effect 4.0.7's native
+The native API mounts `@taxkit/api-mcp` at `/mcp` with Effect's native
 `McpServer.layerHttpRequestScoped`, `Tool` and `Toolkit`. Only modern
 `2026-07-28` is supported. The six tools reuse canonical calculator/content
 Schemas and the captured shared services, work pool and native rate limiter.

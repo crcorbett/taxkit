@@ -56,12 +56,21 @@ The graph no longer declares the former `TaxKitWebsiteForwardingKey` Random
 resource, so the first plan after its removal deletes it from a stage that still
 holds it. Doppler supplies deployment credentials.
 
-The Production token (`taxkit/prd`) is an account-owned token. On the
-`taxkit.dev` zone it holds Zone DNS Settings Read, Zone Settings Write, DNS Write
-(DNSSEC), Bot Management Write, Dynamic URL Redirects Write and Workers Routes
-Write; on the account, Workers Scripts, Workers Observability and Secrets Store
-Write. Change it with `cf accounts tokens update`, keeping its name, expiry and
-existing policies, and record the change here. It expires on 18 November 2026.
+The Production Cloudflare token in `taxkit/prd` is an account-owned token.
+It needs the permissions the Production graph uses: on the `taxkit.dev` zone,
+DNS settings, zone settings, DNSSEC, bot management, dynamic redirects and
+Worker routes; on the account, Worker scripts, Worker observability and Secrets
+Store. Read its current policies and expiry from the account's API tokens page
+in the Cloudflare dashboard, not from this repository.
+
+To rotate it:
+
+1. Roll the token, or create a replacement with the same policies, in the
+   Cloudflare dashboard.
+2. Replace the token value in Doppler `taxkit/prd` without printing it.
+3. Run `bun run production:plan --no-input`. A permission failure names
+   the missing scope; a clean plan shows the token works.
+4. Revoke the old token if you created a replacement.
 
 ## Preview
 
@@ -84,7 +93,7 @@ is closed and validates its stage before running it.
 ## Local development
 
 `bun run dev` builds the API catalogue and starts the native local pair at
-`dev_native_apps`. Alchemy beta.84's Bun dev path selects a TypeScript Vite
+`dev_native_apps`. Alchemy beta.85's Bun dev path selects a TypeScript Vite
 runner whose `register-dev-mode.js` loader is omitted from the published
 package. The script therefore uses Alchemy's native Node entrypoint with its
 published `register-oxc.js` loader. This uses the installed package without a
@@ -163,7 +172,7 @@ Each stack accepts only `--stage prod`. A plan that would replace the ingest
 token, or replace or delete a destination or dashboard, must stop. A
 dashboard-only change updates the four dashboards and nothing else.
 
-Alchemy beta.84 migrates an older destination's saved `destinationConf` from
+Alchemy beta.85 migrates an older destination's saved `destinationConf` from
 a plain string to `Redacted`. That produces an in-place update for each
 destination. The native reconciler reads the existing destination and patches
 only real configuration drift; this migration does not rotate the ingest token
@@ -203,7 +212,7 @@ set. Only a true/false value reaches that step, so a missing secret stops the
 job in seconds instead of at the first native command after verification. The
 token itself reaches only the native plan, deploy, destroy and drift steps.
 
-On the installed Alchemy beta.84, `deploy --yes` and
+On the installed Alchemy beta.85, `deploy --yes` and
 `destroy --yes` both approve the plan and let Alchemy set up or upgrade the
 shared Cloudflare state store. The stack disables the shell as a config source,
 so the state store never sees `CI=true` and CI alone does not stop that. Each
@@ -245,8 +254,8 @@ verification runs once per revision and the deploy jobs reuse that result:
   verified: `production:plan`, `production:deploy --yes --no-input`, then checks
   `https://taxkit.dev` for 200, a `www` 301 that keeps path and query, and
   `https://api.taxkit.dev/api/health` for 200. `production:drift` runs last as
-  information only: on Alchemy beta.81 it can report Workers with custom
-  domains as changed after a clean deploy. Production runs share one
+  information only: it has reported Workers with custom domains as changed
+  after a clean deploy. Production runs share one
   concurrency group and never cancel an apply in progress.
 
 Each deploy job passes a read-only, config-scoped Doppler service token to
@@ -307,9 +316,10 @@ of old and new versions is possible.
 
 ## Known limits
 
-- The Worker upload happens before redirect reconciliation. Alchemy beta.84
+- The Worker upload happens before redirect reconciliation. Alchemy beta.85
   stops redirect writes on a failed shared-ruleset read, except for a checked
-  `RulesetNotFound`. If reconciliation fails, inspect the live Worker versions
+  `RulesetNotFound`, and then adds or deletes only its own rules, one at a
+  time. If reconciliation fails, inspect the live Worker versions
   and redirect rules before retrying; the Worker may already have changed.
 - Seven-day Cloudflare freshness lets Cloudflare reuse a response; it does not
   guarantee that the cache keeps it.

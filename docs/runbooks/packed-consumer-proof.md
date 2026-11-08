@@ -6,8 +6,10 @@ not touch npm.
 
 The SDK archive includes its private TaxKit modules. Only Effect remains an
 external runtime dependency; the consumer installs no other TaxKit archive.
-The main paths are the root, `/au`, `/effect`, `/core` and `/http`. Existing
-`/au/effect`, `/schemas` and `/testing` paths remain available.
+The first command checks every path in the package's `exports` map; the
+[SDK guide](../../packages/sdk/typescript/README.md#public-paths) lists them.
+SDK 5 removed every former path and alias, and Node resolves no path outside
+that map.
 
 1. `bun run sdk:check-packed-artifact` builds the SDK, packs it and checks the
    declared files and export paths in the tarball.

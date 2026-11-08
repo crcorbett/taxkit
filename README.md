@@ -3,91 +3,25 @@
 TaxKit is the public monorepo for the open-source tax engine, API, SDK and
 documentation site.
 
-The repo is early, but the main public integration surfaces now exist. The
-implemented surface includes the standalone Bun API, the native Cloudflare
-API and Website with three calculators and the accepted documentation, an Effect HTTP API package
-with health, generated docs, metadata and public calculation endpoints, a
-reusable calculator orchestration package, deterministic core engine
-primitives, Australian pay, income-tax and STSL rule packages, the installable
-`taxkit` TypeScript SDK, the authored `@content/docs` pages, private
-`@taxkit/content`, `@taxkit/mdx`, `@taxkit/mdx-react`, `@taxkit/diagrams` and `@taxkit/pele` packages, shared
-testing helpers and shared TypeScript config. The SDK includes the engine, Australian rules and typed HTTP contracts
-in one package, with Effect as its only external runtime dependency.
+The engine, the API, the Website with three calculators and the
+documentation, and the `taxkit` SDK all exist. The SDK includes the engine,
+Australian rules and typed HTTP contracts in one package, with Effect as its
+only external runtime dependency.
 
 ```sh
 npm install taxkit
 ```
 
-Use `taxkit/au` for Australian calculations and `taxkit/core` for checked money
-values. See the [SDK guide](./packages/sdk/typescript/README.md) for all eight
-entry points.
+Use `taxkit/au` for Australian calculations and `taxkit/money` for checked
+money values. The [SDK guide](./packages/sdk/typescript/README.md#public-paths)
+lists every entry point.
 
-## What exists today
+## Apps and packages
 
-- [apps/api](./apps/api/README.md): standalone Bun process that owns API
-  startup, listening config and Effect runtime teardown for `/api/*`.
-- [apps/web](./apps/web/README.md): TanStack Start Website with the three
-  calculators, reading the API through the generated HTTP client over the
-  private server binding and, in the browser, the public API origin. It also
-  renders accepted documentation, search and Markdown, and forwards discovery
-  files and share images to the API.
-- [packages/api/http](./packages/api/http/README.md): Effect HTTP API contract,
-  generated docs, public calculator routes, thin handler adapters, server
-  handler exports, the shared CORS/cache policy and the browser-safe `api`
-  export for generated clients.
-- [packages/calculators](./packages/calculators/README.md): reusable public
-  calculator orchestration package for catalog metadata, graph construction,
-  calculation dispatch and schema-guided expected error shaping.
-- [packages/api/mcp](./packages/api/mcp/README.md): native MCP tool contracts,
-  handlers, cancellation and response budgets.
-- [packages/aeo](./packages/aeo/README.md): the API's answer-engine routes:
-  `robots.txt`, `sitemap.xml`, `llms.txt`, `llms-full.txt` and share images,
-  derived from the accepted Content catalogue.
-- [packages/webmcp](./packages/webmcp/README.md): registers the Website's
-  calculator page tools with the browser's WebMCP host.
-- [packages/og-image](./packages/og-image/README.md): the Takumi share-image
-  renderer and its bounded cache, behind Content's `DocsOgImages` contract.
-- [packages/observability](./packages/observability/README.md): shared safe host
-  telemetry and edge identity, independent of deployment providers.
-- [packages/sdk/typescript](./packages/sdk/typescript/README.md): the public
-  `taxkit` package with plain, safe-result, Effect and AU entry points.
-- [content/docs](./content/docs/README.md): private source-only `@content/docs`
-  package with the authored MDX pages, navigation, repository link revisions
-  and the raw page list.
-- [packages/content](./packages/content/README.md): private docs page Schemas,
-  checked reading body, link resolution, catalogue and content service.
-- [packages/mdx](./packages/mdx/README.md): content-neutral document compiler,
-  renderer contracts and Effect-owned Pierre highlighter.
-- [packages/mdx-react](./packages/mdx-react/README.md): content-neutral React
-  reading presentation, code/table scroll regions and checked theme formatting.
-- [packages/diagrams](./packages/diagrams/README.md): Pele adapter implementing
-  MDX's diagram contract.
-- [packages/pele](./packages/pele/README.md): independent Effect service rendering
-  Mermaid definitions to SVG without a browser.
-- [packages/core](./packages/core/README.md): deterministic engine primitives,
-  schema-backed facts, rule descriptors, graph validation, trace and ledger
-  contracts and calculation engine service.
-- `packages/rules/au/*`: implemented Australian pay, annual income-tax and
-  STSL rule packages with Effect rule layers, official parameter services,
-  calculators and golden tests.
-- [packages/testing](./packages/testing/README.md): shared test helpers for
-  workspace packages.
-- [packages/tsconfig](./packages/tsconfig/README.md): shared TypeScript config
-  presets.
-
-## Planned package families
-
-The architecture docs describe the intended package families for the tax engine:
-core primitives and facts, domain models, rule packs, API clients, SDKs, docs
-tooling and supporting app shells. Treat those as planned architecture unless a
-matching package root and package README say otherwise.
-
-Start with:
-
-- [Architecture overview](./ARCHITECTURE.md)
-- [Package ownership](./docs/architecture/package-ownership.md)
-- [Package boundaries](./docs/architecture/package-boundaries.md)
-- [API and SDK architecture](./docs/architecture/api-and-sdk.md)
+[ARCHITECTURE.md](./ARCHITECTURE.md#owners-and-imports) lists every app and
+package and what it owns. [Package ownership](./docs/architecture/package-ownership.md)
+and [package boundaries](./docs/architecture/package-boundaries.md) explain the
+import rules.
 
 ## AI work history
 
@@ -187,8 +121,7 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
   caching and deployment.
 - [Maintainer documentation](./docs/README.md): the short index of owners and
   decisions.
-- [CLAUDE.md](./CLAUDE.md): Claude-compatible pointer to the canonical root
-  operating rules.
+- [CLAUDE.md](./CLAUDE.md): imports `AGENTS.md` for Claude Code.
 - [CHANGELOG.md](./CHANGELOG.md): root release-train changelog. Package-level
   changelogs live beside each implemented package, and public app/API
   changelogs live beside the owning app.
@@ -202,8 +135,8 @@ a Changeset; see [versioning](./docs/runbooks/versioning.md).
 - `apps/api` is the API runtime owner. Its standalone entry runs through
   `BunRuntime.runMain`, serves `packages/api/http` through Bun and disposes
   scoped resources on shutdown; its native Worker serves HTTP and MCP.
-- `apps/web` owns the replacement documentation reader over the accepted
-  backend catalogue. It renders each page's checked reading body; canonical
+- `apps/web` owns the documentation reader over the API's checked
+  catalogue. It renders each page's checked reading body; canonical
   page fields and MDX reading remain package-owned.
 - `apps/web/src/lib/runtime.server.ts` owns one server runtime; the browser
   `ApiClient` Atom runtime and one shared registry own browser execution and
