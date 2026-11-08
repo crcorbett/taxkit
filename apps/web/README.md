@@ -26,7 +26,7 @@ page state, tools and WebMCP live in their packages.
 | `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.ingress.ts` (Markdown files and `Accept`) |
 | `pages/` | `loaders.ts`, `load.failure.ts`, `loader-context.ts` and the root load |
 | `docs/` | documentation chrome, reading views, appearance/copy/outline Atoms and the search address reader |
-| `calculators/` | calculator containers and views, `page.atoms.ts`, `tools.atoms.ts` and the safe failure text |
+| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts`, `tools.atoms.ts`, the caveat text and the safe failure text |
 | `seo/` | `head.ts`, the documentation page head |
 | root | `runtime.server.ts`, `runtime.client.ts` and `api-client.atoms.ts` |
 
@@ -95,8 +95,11 @@ settings.
 named reads with the generated client. Server loads stop when either the
 loader or the incoming request is aborted; browser loads use the loader's own
 `AbortSignal`, which cancels the HTTP call. `src/lib/pages/load.failure.ts` turns a
-missing documentation page into TanStack `notFound()` (HTTP 404) and any other
+missing documentation page or calculator address into TanStack `notFound()`
+(HTTP 404), passes a native Router redirect through unchanged and turns any other
 failure into `WebsiteLoadError`, rendered by the route's error component.
+Recoverable error views offer **Try again**, which calls native
+`router.invalidate()` and stays disabled during that transition.
 Internal defects and mismatched checked pages carry 500; unavailable reads
 carry 503, and missing documentation remains a native 404.
 Interruption stays interruption. Failed server page loads retain their error
@@ -129,27 +132,42 @@ reads. No binding or Effect Context reaches the browser. Vite sets
 ## Calculator pages
 
 Take-home pay is at `/`; `/calculators/au.pay.withholdings` and
-`/calculators/au.income-tax.annual` have their own form and answer state. The
+`/calculators/au.income-tax.annual` have their own form and answer state.
+`/calculators/au.pay.take-home` redirects to `/` with a 308 from the route
+loader, and an unknown calculator address is a 404 page with a link Home. Each
+page's `<title>` and `<h1>` is the calculator title. The
 navigation uses the canonical browser-safe `@taxkit/calculators/summaries`
 titles and identities, also reused by the API catalogue. It renders all links
 without a network read or JavaScript; summaries change with deployment and
 browser reload. Remote discovery tools still read the live API catalogue.
 Annual pages state
-that the retained Medicare thresholds await correction.
+that the retained Medicare thresholds await correction;
+`src/lib/calculators/caveats.ts` owns that sentence for the page, its answer
+and `/agents`.
 
-`@taxkit/calculators/page` owns the page state: one `Atom.family` group per
-calculator with the form, the calculation and the shared readonly
-`CalculatorViewState`. `src/lib/calculators/page.atoms.ts` supplies the
-calculation (`apiClientRuntime.fn` over `requestCalculation`) and the safe
-failure text. `@taxkit/calculators/form` turns a visible form into a checked
-request. Calculate sends the checked request. Editing interrupts
+`src/lib/calculators/page.atoms.ts` declares one static `Atom.family`, keyed
+by the checked calculator ID, with the form, the calculation
+(`apiClientRuntime.fn` over `requestCalculation`), the commands and the shared
+readonly `CalculatorViewState`. `@taxkit/calculators/page` owns the page
+contract and the pure view derivation; `@taxkit/calculators/form` turns a
+visible form into a checked request or names the one field to correct.
+`calculator.container.tsx` serves every calculator: it owns the commands and
+browser-tool registration, then composes the `PayFields` or
+`AnnualIncomeField` leaf, the page frame and the report's summary, breakdown,
+assumptions and rule-source leaves. Calculate sends the checked request. An
+invalid field is marked `aria-invalid`, described by its own message and
+focused; a calculation failure is one page-level alert. Enter submits, the
+button is disabled while a request runs and amount fields use 16px text with
+`autoComplete="off"`. Editing interrupts
 unfinished work and keeps the last successful answer, marked out of date, until
 an explicit calculation succeeds. Leaving the page interrupts its work. The
 view is kept alive for the registry's lifetime so an answer survives a paused
 first render and a return visit. No figures go to browser storage or the URL.
 
-The take-home result shows the answer first, with native `details` for the
-breakdown, assumptions, year and sources. Explanations come from the checked
+Each result shows the answer first in a polite live region with tabular
+figures, with native `details` for the breakdown, assumptions, year and
+sources. Pages start at the top, so an answer, error or opened breakdown never
+moves the form. Explanations come from the checked
 report and its trace, not the edited form. Source references become links only
 for valid HTTPS addresses.
 
@@ -247,7 +265,12 @@ On a mounted calculator, browsers with WebMCP support can register five tools:
 `taxkit_calculate_visible_form` and `taxkit_read_result`. The toolkit and its
 handlers belong to `@taxkit/calculators/page-tools`, registration to
 [`@taxkit/webmcp`](../../packages/webmcp/README.md), and
-`calculators/tools.atoms.ts` composes them for a mounted page. They use the
+`calculators/tools.atoms.ts` declares a static registration family keyed by
+calculator ID that the page container mounts with `useAtomMount`. Its Scope owns
+the host Layer, the tools and their callbacks; because tool names are unique in
+a document, a newly mounted page waits for the previous page's registration
+Scope to close before registering. The toolkit is a static import: the shared
+lint policy forbids dynamic `import()`. They use the
 page's own edit and submit commands and the same `ApiClient`; mounting or
 reading starts no calculation. Each tool has a
 two-second registration limit and calculation has a twelve-second outer limit.

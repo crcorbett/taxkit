@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { MdxTheme } from "@taxkit/mdx-react/theme";
 import { Array, Function as EffectFunction, Option } from "effect";
 import { ChevronRight } from "lucide-react";
@@ -42,6 +42,9 @@ export const Route = createFileRoute("/$")({
 
 function DocumentationRoute() {
   const { metadata, navigation, page } = Route.useLoaderData();
+  // Native Router retains this page while the next one loads; only the
+  // content is marked busy and the header announces the wait.
+  const loading = useRouterState({ select: (state) => state.isLoading });
   const activeHeadingAtom = useDocsOutline(page.body);
   const section = EffectFunction.pipe(
     navigation.primaryNavigation,
@@ -58,6 +61,7 @@ function DocumentationRoute() {
     <MdxTheme className="docs-reader" theme={page.theme}>
       <DocsHeader
         currentPath={Option.some(page.path)}
+        loading={loading}
         navigation={navigation}
       />
       <div className="docs-layout">
@@ -67,44 +71,54 @@ function DocumentationRoute() {
             navigation={navigation}
           />
         </aside>
-        <article className="docs-article">
-          <DocsMobileOutline>
-            <DocsOutline active={activeHeadingAtom} body={page.body} />
-          </DocsMobileOutline>
-          <header className="docs-article-header">
-            <div className="docs-meta-row">
-              <div className="docs-breadcrumbs">
-                <span>Documentation</span>
-                {EffectFunction.pipe(
-                  Array.fromOption(section),
-                  Array.map((parent) => (
-                    <span className="docs-breadcrumb-section" key={parent.path}>
-                      <ChevronRight aria-hidden="true" size={13} />
-                      <span>{parent.title}</span>
-                    </span>
-                  ))
-                )}
+        <main
+          aria-busy={loading}
+          className="docs-main"
+          id="main-content"
+          tabIndex={-1}
+        >
+          <article className="docs-article">
+            <DocsMobileOutline>
+              <DocsOutline active={activeHeadingAtom} body={page.body} />
+            </DocsMobileOutline>
+            <header className="docs-article-header">
+              <div className="docs-meta-row">
+                <div className="docs-breadcrumbs">
+                  <span>Documentation</span>
+                  {EffectFunction.pipe(
+                    Array.fromOption(section),
+                    Array.map((parent) => (
+                      <span
+                        className="docs-breadcrumb-section"
+                        key={parent.path}
+                      >
+                        <ChevronRight aria-hidden="true" size={13} />
+                        <span>{parent.title}</span>
+                      </span>
+                    ))
+                  )}
+                </div>
+                <div className="docs-copy-page">
+                  <DocsCopyButton
+                    action="Copy page"
+                    label="Copy page as Markdown"
+                    text={page.markdown}
+                  />
+                </div>
               </div>
-              <div className="docs-copy-page">
-                <DocsCopyButton
-                  action="Copy page"
-                  label="Copy page as Markdown"
-                  text={page.markdown}
-                />
-              </div>
-            </div>
-            <DocsHeading>{page.frontmatter.title}</DocsHeading>
-          </header>
-          <DocsReadingBodyView body={page.body} />
-          <DocsPager currentPath={page.path} navigation={navigation} />
-          <footer className="docs-article-footer">
-            <p>TaxKit is open source. Help make these docs better.</p>
-            <DocsPageActions
-              markdown={metadata.markdown}
-              source={page.source}
-            />
-          </footer>
-        </article>
+              <DocsHeading>{page.frontmatter.title}</DocsHeading>
+            </header>
+            <DocsReadingBodyView body={page.body} />
+            <DocsPager currentPath={page.path} navigation={navigation} />
+            <footer className="docs-article-footer">
+              <p>TaxKit is open source. Help make these docs better.</p>
+              <DocsPageActions
+                markdown={metadata.markdown}
+                source={page.source}
+              />
+            </footer>
+          </article>
+        </main>
         <aside className="docs-page-sidebar">
           <div className="docs-page-sidebar-inner">
             <p className="docs-outline-title">On this page</p>

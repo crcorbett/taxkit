@@ -9,15 +9,26 @@ import {
 import { Option } from "effect";
 
 import { publicSettingsAtom } from "#/lib/api-client.atoms";
+import { medicareThresholdCaveat } from "#/lib/calculators/caveats";
 
 export const Route = createFileRoute("/agents")({
   component: AgentsRoute,
+  head: () => ({
+    meta: [
+      { title: "TaxKit for agents | TaxKit" },
+      {
+        content:
+          "Connect an AI app to TaxKit's calculators and documentation through remote MCP or browser tools.",
+        name: "description",
+      },
+    ],
+  }),
 });
 
 function AgentsRoute() {
   const settings = useAtomValue(publicSettingsAtom);
   return (
-    <section className="home">
+    <section className="site-page">
       <h1>TaxKit for agents</h1>
       <p>
         Connect an AI app to TaxKit to find calculators, read their input
@@ -95,10 +106,7 @@ function AgentsRoute() {
         explains older-client cancellation, connection expiry and request
         limits.
       </p>
-      <p>
-        The annual income-tax calculator’s Medicare thresholds are awaiting
-        correction. Its answer may overstate the levy for some lower incomes.
-      </p>
+      <p>{medicareThresholdCaveat}</p>
     </section>
   );
 }

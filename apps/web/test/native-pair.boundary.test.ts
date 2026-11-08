@@ -1757,7 +1757,7 @@ describe("built native API and Website", () => {
           );
           yield* Effect.promise(() =>
             page
-              .getByText("Enter a valid pay amount and pay period.", {
+              .getByText("Enter a valid pay amount.", {
                 exact: true,
               })
               .waitFor({ timeout: 5000 })
@@ -1831,7 +1831,7 @@ describe("built native API and Website", () => {
                   amount: "9500",
                   answer: "$2,756.00",
                   breakdown: "Withholding breakdown",
-                  error: "Enter a valid pay amount and pay period.",
+                  error: "Enter a valid pay amount.",
                   id: "au.pay.withholdings",
                   label: "Pay before tax ($)",
                   title: "AU pay withholdings",
@@ -3399,7 +3399,7 @@ describe("built native API and Website", () => {
           expect(
             yield* Effect.promise(() => unavailableSearch.text())
           ).toContain(
-            "Documentation search could not load. Please reload this page to try again."
+            "Documentation search could not load. Try again, or search for other words."
           );
         }).pipe(Effect.withSpan("NativePair.verifySearchInputBoundaries"));
         yield* Effect.gen(function* verifySearchInteraction() {

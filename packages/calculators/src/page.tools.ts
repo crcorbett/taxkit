@@ -8,7 +8,6 @@ import {
   Stream,
 } from "effect";
 import { Tool, Toolkit } from "effect/ai";
-import type * as Atom from "effect/reactivity/Atom";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
 import { AnnualTaxForm, CalculatorForm, TakeHomeForm } from "./form.ingress.js";
@@ -87,12 +86,12 @@ const invalidInput = () =>
  */
 export const calculatorPageToolHandlers = <E, F>({
   findCalculators,
-  get,
   page,
+  registry,
 }: Readonly<{
   findCalculators: Effect.Effect<typeof CalculatorCatalogResponse.Type, F>;
-  get: Atom.FnContext;
   page: CalculatorPage<E>;
+  registry: AtomRegistry.AtomRegistry;
 }>) =>
   CalculatorPageToolkit.toHandlers({
     taxkit_calculate_visible_form: Effect.fn(
@@ -101,7 +100,7 @@ export const calculatorPageToolHandlers = <E, F>({
       // Admission and visible submission are one synchronous registry
       // command. Two tool calls cannot both claim the same idle form.
       const owned = yield* Effect.sync(() => {
-        if (get.registry.get(page.view).busy) {
+        if (registry.get(page.view).busy) {
           return Result.fail(
             new CalculatorToolFailure({
               code: "calculation-busy",
@@ -109,19 +108,19 @@ export const calculatorPageToolHandlers = <E, F>({
             })
           );
         }
-        get.set(page.submit, "calculate");
-        return get.registry.get(page.attempt).pipe(
+        registry.set(page.submit, "calculate");
+        return registry.get(page.attempt).pipe(
           Option.match({
             onNone: () => Result.fail(invalidInput()),
             onSome: Result.succeed,
           })
         );
       }).pipe(Effect.flatMap(Effect.fromResult));
-      yield* AtomRegistry.getResult(get.registry, page.calculation, {
+      yield* AtomRegistry.getResult(registry, page.calculation, {
         suspendOnWaiting: true,
       }).pipe(
         Effect.raceFirst(
-          AtomRegistry.toStream(get.registry, page.attempt).pipe(
+          AtomRegistry.toStream(registry, page.attempt).pipe(
             Stream.dropWhile(
               (current) => Option.isSome(current) && current.value === owned
             ),
@@ -140,19 +139,19 @@ export const calculatorPageToolHandlers = <E, F>({
             // Cancel only unfinished work still owned by this call. A newer
             // manual request must survive an older tool's cleanup.
             if (
-              get.registry.get(page.view).busy &&
-              get.registry
+              registry.get(page.view).busy &&
+              registry
                 .get(page.attempt)
                 .pipe(Option.exists((current) => current === owned))
             ) {
-              get.set(page.cancel, "cancel");
+              registry.set(page.cancel, "cancel");
             }
           })
         )
       );
-      const current = get.registry.get(page.view);
+      const current = registry.get(page.view);
       if (
-        !get.registry
+        !registry
           .get(page.attempt)
           .pipe(Option.exists((attempt) => attempt === owned))
       ) {
@@ -171,28 +170,30 @@ export const calculatorPageToolHandlers = <E, F>({
     taxkit_fill_calculator: Effect.fn("CalculatorPageTools.fillCalculator")(
       (form) =>
         Effect.sync(() => {
-          const current = get.registry.get(page.view);
           if (
-            !Match.value(current).pipe(
-              Match.when({ calculatorId: "au.income-tax.annual" }, () =>
+            !Match.value(page.calculatorId).pipe(
+              Match.when("au.income-tax.annual", () =>
                 Schema.is(AnnualTaxForm)(form)
               ),
-              Match.orElse(() => Schema.is(TakeHomeForm)(form))
+              Match.whenOr("au.pay.take-home", "au.pay.withholdings", () =>
+                Schema.is(TakeHomeForm)(form)
+              ),
+              Match.exhaustive
             )
           ) {
             return Result.fail(invalidInput());
           }
-          get.set(page.edit, form);
-          return Result.succeed(get.registry.get(page.view));
+          registry.set(page.edit, form);
+          return Result.succeed(registry.get(page.view));
         }).pipe(Effect.flatMap(Effect.fromResult))
     ),
     taxkit_find_calculators: Effect.fn("CalculatorPageTools.findCalculators")(
       () => findCalculators.pipe(Effect.mapError(unavailable))
     ),
     taxkit_read_calculator: Effect.fn("CalculatorPageTools.readCalculator")(
-      () => Effect.sync(() => get.registry.get(page.view))
+      () => Effect.sync(() => registry.get(page.view))
     ),
     taxkit_read_result: Effect.fn("CalculatorPageTools.readResult")(() =>
-      Effect.sync(() => get.registry.get(page.view))
+      Effect.sync(() => registry.get(page.view))
     ),
   });

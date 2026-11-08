@@ -37,8 +37,10 @@ The definition validates its static graph and owns native execution.
 ## Browser calculator pages
 
 - `./form` owns visible form Schemas, worked examples and `requestFromForm`.
-  It converts text into the owning checked scenario and correlated request.
-- `./page` owns `makeCalculatorPages`, the shared Atom group and commands.
+  It converts text into the owning checked scenario and correlated request, or
+  a `CalculatorInputError` naming the one field to correct.
+- `./page` owns the `CalculatorPage` contract and `calculatorViewState`, the
+  pure view derivation; the host declares the static Atom family.
 - `./page-schemas` owns `CalculatorViewState` and `CalculatorToolFailure`.
 - `./page-tools` owns page tools that use the same commands and state.
 

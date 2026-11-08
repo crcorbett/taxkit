@@ -4,7 +4,6 @@ import type { DocsSearchTerm } from "@taxkit/content/schemas";
 import { Function as EffectFunction, Option } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import { Search } from "lucide-react";
-import { useMemo } from "react";
 
 import { Button } from "#/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "#/components/ui/field";
@@ -12,10 +11,16 @@ import { Input } from "#/components/ui/input";
 
 import { docsHeadingFocusAtom } from "./focus.atoms";
 
+// A draft per submitted search term. Each mounted form starts from its own
+// term; the registry discards the draft once the form unmounts.
+const docsSearchDraftAtom = Atom.family((term: DocsSearchTerm | "") =>
+  Atom.make<string>(term)
+);
+
 export const DocsSearchForm = ({
   term,
 }: Readonly<{ term: DocsSearchTerm | "" }>) => {
-  const draft = useMemo(() => Atom.make<string>(term), [term]);
+  const draft = docsSearchDraftAtom(term);
   const [words, setWords] = useAtom(draft);
   const requestHeadingFocus = useAtomSet(docsHeadingFocusAtom);
   const router = useRouter();

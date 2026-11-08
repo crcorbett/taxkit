@@ -21,7 +21,12 @@ import { WebsiteBindings } from "./host/config.ingress";
 import type { WebsiteLoadError } from "./host/errors";
 import { WebsiteApi, WebsiteSettings } from "./host/service";
 import { WebsiteSettingsLive } from "./host/settings.layer";
-import { loadFailureStatus, rejectRouteLoad } from "./pages/load.failure";
+import { loadCalculatorView } from "./pages/calculator.load";
+import {
+  isRedirectCause,
+  loadFailureStatus,
+  rejectRouteLoad,
+} from "./pages/load.failure";
 import { loadRootView } from "./pages/root.load";
 // The Worker's bindings object, read at this host edge only.
 const bindings = Layer.sync(WebsiteBindings, () => ({ ...env }));
@@ -39,13 +44,16 @@ export const runtime = ManagedRuntime.make(
 const rejectServerLoad = <E>(
   cause: Cause.Cause<E>
 ): Effect.Effect<never, E | NotFoundError | WebsiteLoadError> =>
-  EffectBoolean.match(Cause.hasInterruptsOnly(cause), {
-    onFalse: () =>
-      Effect.sync(() => {
-        EffectFunction.pipe(loadFailureStatus(cause), setResponseStatus);
-      }).pipe(Effect.andThen(rejectRouteLoad(cause))),
-    onTrue: () => Effect.failCause(cause),
-  });
+  EffectBoolean.match(
+    Cause.hasInterruptsOnly(cause) || isRedirectCause(cause),
+    {
+      onFalse: () =>
+        Effect.sync(() => {
+          EffectFunction.pipe(loadFailureStatus(cause), setResponseStatus);
+        }).pipe(Effect.andThen(rejectRouteLoad(cause))),
+      onTrue: () => Effect.failCause(cause),
+    }
+  );
 const client = WebsiteApi.pipe(Effect.flatMap((host) => host.client));
 export const loadRoot = ({
   signal,
@@ -55,6 +63,19 @@ export const loadRoot = ({
   runtime.runPromise(loadRootView.pipe(Effect.catchCause(rejectServerLoad)), {
     signal,
   });
+export const loadCalculatorPage = ({
+  calculatorId,
+  signal,
+}: Readonly<{
+  calculatorId: string;
+  signal: AbortSignal;
+}>) =>
+  runtime.runPromise(
+    loadCalculatorView({ calculatorId }).pipe(
+      Effect.catchCause(rejectServerLoad)
+    ),
+    { signal }
+  );
 export const loadDocsPage = ({
   path,
   signal,
