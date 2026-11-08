@@ -6,13 +6,15 @@ private implementation owners. See
 the [versioning standard](../standards/versioning.md) for semver rules.
 
 1. Add a Changeset with `bun run changeset` in the same change as any public
-   package contract change. For changes to modules included in the SDK archive,
-   name `taxkit` in the Changeset. Name `api` or `web` for an app change worth
-   a changelog entry; both carry private versions for that. Internal tools do
-   not need one.
+   package contract change, following the
+   [versioning standard](../standards/versioning.md#rules). Name `api` or `web`
+   for an app change worth a changelog entry; both carry private versions for
+   that.
 2. Check the pending release with `bun run changeset:status`.
-3. When preparing a release, run `bun run version-packages`, review the
-   manifest and changelog diff, then run `bun run release:check`.
+3. When preparing a release, run `bun run version-packages` in its own change,
+   review the manifest and changelog diff, add a short release summary with
+   links to the generated package changelogs to the root `CHANGELOG.md`, then
+   run `bun run release:check`.
 4. Commit the version change through an ordinary pull request.
 
 Changesets consumes the pending files when applying versions. If its status
