@@ -184,8 +184,8 @@ boundary for:
 - calculator service tags and live layers
 - metadata projections for calculator, fact, rule and graph discovery
 - schema-guided expected error shaping for calculation inputs
-- composition of canonical scenario layers, rule-pack layers and
-  `CalculationEngine`
+- dispatch to complete owning calculator definitions, whose closed programs
+  compose their scenario and rule-pack Layers
 - reusable service methods for HTTP handlers, SDK helpers, CLI commands and
   direct in-process consumers
 

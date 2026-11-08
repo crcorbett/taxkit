@@ -6,7 +6,7 @@ status: "published"
 
 # SDK, HTTP API and calculators service boundary
 
-Rule packages own complete calculator definitions. Local SDK calls execute their typed native programs through the core engine. The public calculator service selects the same definitions and decodes raw inputs once.
+Rule packages own complete calculator definitions. Local SDK calls execute their closed native programs directly. The public calculator service selects the same definitions and decodes raw inputs once.
 
 HTTP and MCP remain transport owners. The generated HttpApi client uses checked transport codecs; the SDK does not wrap that client. Calculator routes use `/api/v2`.
 
@@ -15,7 +15,7 @@ import { Effect } from "effect";
 import { AuPayTakeHomeCalculation } from "taxkit/au";
 import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
 import { fromDecimal, nonNegative } from "taxkit/money/effect";
-import { calculateRun, TaxKitLive } from "taxkit/effect";
+import { calculateRun } from "taxkit/effect";
 
 export const program = Effect.gen(function* () {
   const grossPay = yield* fromDecimal("3462.00").pipe(
@@ -27,5 +27,5 @@ export const program = Effect.gen(function* () {
     taxFreeThresholdClaimed: true,
   });
   return yield* calculateRun(AuPayTakeHomeCalculation, input);
-}).pipe(Effect.provide(TaxKitLive));
+});
 ```

@@ -24,7 +24,7 @@ import {
   ApiReplyTooLarge,
   ApiUnavailable,
 } from "./errors.js";
-import type { ApiCallFailure, CalculationCallFailure } from "./errors.js";
+import type { ApiCallFailure } from "./errors.js";
 /** The generated native client. Callers supply it; there is no replica service. */
 export type TaxKitClient = HttpApiClient.ForApi<typeof TaxKitApi>;
 /** Every complete read, including its decoded body, finishes within ten seconds. */
@@ -92,7 +92,8 @@ const transportFailures = {
   HttpClientError: ({ reason }: HttpClientError.HttpClientError) =>
     Effect.fail(
       EffectBoolean.match(
-        reason._tag === "DecodeError" && Schema.is(ApiReplyTooLarge)(reason.cause),
+        Predicate.isTagged(reason, "DecodeError") &&
+          Schema.is(ApiReplyTooLarge)(reason.cause),
         {
           onFalse: (): ApiCallFailure => new ApiUnavailable(),
           onTrue: (): ApiCallFailure => new ApiReplyTooLarge(),
@@ -190,13 +191,10 @@ export const requestCalculation = Effect.fn("TaxKitApi.requestCalculation")(
         payload: request,
       })
       .pipe(
-        withinReadDeadline,
-        Effect.catchTags(transportFailures),
-        // Declared calculator failures arrive as untagged `{ error }` envelopes.
-        Effect.mapError(
-          (failure): CalculationCallFailure =>
-            "error" in failure ? failure.error : failure
-        )
+        // Declared calculator failures arrive as untagged `{ error }`
+        // envelopes: every failure without a transport tag is one.
+        Effect.catchTags(transportFailures, ({ error }) => Effect.fail(error)),
+        withinReadDeadline
       );
     // The decoded tagged union ties each report kind to its calculator ID, so
     // the reply answers this request exactly when the IDs agree.

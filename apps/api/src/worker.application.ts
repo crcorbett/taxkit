@@ -86,9 +86,12 @@ const apiRoute = (pathname: string): HostRoute =>
   );
 // The local emulator's one admission identity, checked when the module loads.
 const LoopbackRateKey = CalculatorClientRateKey.make(
-  Redacted.make(CalculatorClientRateKey.to.value.make(NetAddress.ipv4Loopback), {
-    label: "CalculatorClientRateKey",
-  })
+  Redacted.make(
+    CalculatorClientRateKey.to.value.make(NetAddress.ipv4Loopback),
+    {
+      label: "CalculatorClientRateKey",
+    }
+  )
 );
 // Construct once in the native instance scope. HTTP and MCP receive this
 // same application service; native requests keep their own scope and fibre.

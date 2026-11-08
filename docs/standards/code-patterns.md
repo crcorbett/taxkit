@@ -295,25 +295,31 @@ export const scaleWeeklyWithholdingToPayPeriodDollars = (
   required sources, parameter-source drift, parameter effective-period overlap,
   and cycles.
 
-## Calculation Engine
+## Calculator programs
 
-Core orchestration should use the `CalculationEngine` service. Consumers select
-the calculation program, rule-pack layer, and scenario layer; the engine provides
-the environment and returns the report with diagnostics.
+There is no generic calculation engine or `run({ calculation, layer })`
+callback. The owning rule package composes its static rule-pack Layer once and
+supplies only the checked scenario per call with `Effect.provideService`;
+`defineCalculator` attaches graph diagnostics. See
+[ADR 0012](../adr/0012-closed-calculator-programs.md).
 
 ```ts
-import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
+import { defineCalculator } from "@taxkit/core";
 import { Effect, Layer } from "effect";
 
-const program = Effect.gen(function* () {
-  const engine = yield* CalculationEngine;
-  return yield* engine.run({
-    calculation: CalculateTakeHomePay,
-    layer: AuTakeHomePay2025_26_Live.pipe(
-      Layer.provideMerge(TakeHomeScenarioLive(input))
-    ),
-  });
-}).pipe(Effect.provide(CalculationEngineLive));
+const TakeHomePay = CalculateTakeHomePay.pipe(
+  Effect.provide(
+    AuTakeHomePay2025_26_Live.pipe(Layer.provideMerge(TakeHomeScenarioLive))
+  )
+);
+
+export const AuPayTakeHomeCalculation = defineCalculator({
+  ...AuPayTakeHomeContract,
+  inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
+  ruleDescriptors: AuTakeHomePayRuleDescriptors,
+  calculate: (input) =>
+    TakeHomePay.pipe(Effect.provideService(TakeHomeScenario, input)),
+});
 ```
 
 ## Public Exports

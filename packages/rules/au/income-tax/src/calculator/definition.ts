@@ -1,4 +1,4 @@
-import { CalculationEngine, defineCalculator } from "@taxkit/core";
+import { defineCalculator } from "@taxkit/core";
 import { Effect, Layer } from "effect";
 
 import { AnnualTaxableIncomeDescriptor } from "../facts/income.js";
@@ -11,19 +11,18 @@ import {
 } from "./annual-tax.js";
 import { AuAnnualTaxContract } from "./schemas.js";
 
+// The static rule pack over the scenario's facts; only the checked scenario is
+// supplied per calculation.
+const AnnualTax = CalculateAnnualTax.pipe(
+  Effect.provide(
+    AuAnnualTax2025_26_Live.pipe(Layer.provideMerge(AnnualTaxScenarioLive))
+  )
+);
+
 export const AuAnnualIncomeTaxCalculation = defineCalculator({
   inputFacts: [AnnualTaxableIncomeDescriptor],
   ruleDescriptors: AuAnnualTaxRuleDescriptors,
   ...AuAnnualTaxContract,
   calculate: (input) =>
-    Effect.gen(function* () {
-      const engine = yield* CalculationEngine;
-      return yield* engine.run({
-        calculation: CalculateAnnualTax,
-        layer: AuAnnualTax2025_26_Live.pipe(
-          Layer.provideMerge(AnnualTaxScenarioLive),
-          Layer.provide(Layer.succeed(AnnualTaxScenario)(input))
-        ),
-      });
-    }),
+    AnnualTax.pipe(Effect.provideService(AnnualTaxScenario, input)),
 });

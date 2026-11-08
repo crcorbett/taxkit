@@ -3,12 +3,10 @@ import {
   Worker,
   cache,
 } from "@alchemy.run/cloudflare/Workers";
-import { ApiCalculatorAnalyticsLive } from "@taxkit/analytics/api-usage";
+import { ApiCalculatorUsageLive } from "@taxkit/analytics/api-usage";
 import { BackendAnalyticsLive } from "@taxkit/analytics/live";
-import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/admission.layer";
-import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
-import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
-import { CalculationEngineLive } from "@taxkit/core";
+import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
+import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/work";
 import { TaxKitApiWorker } from "@taxkit/infrastructure/api-worker";
 import {
   disabledWorkerObservability,
@@ -23,19 +21,13 @@ import { ApiContentLive } from "./content.boundary.js";
 import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
 import { ApiWorkerApplication } from "./worker.application.js";
 
+// One public calculator implementation: rate admission and the shared work
+// budget over the static catalogue, with analytics observing each success.
 const ApiWorkerServicesLive = Layer.mergeAll(
   ApiContentLive,
-  ApiCalculatorAnalyticsLive.pipe(
-    Layer.provide(
-      PublicCalculatorServiceBounded.pipe(
-        Layer.provide(
-          PublicCalculatorServiceRateLimited.pipe(
-            Layer.provide(PublicCalculatorServiceLive)
-          )
-        ),
-        Layer.provide(CalculationEngineLive)
-      )
-    )
+  PublicCalculatorServiceRateLimited.pipe(
+    Layer.provide(CalculatorCatalogueLive),
+    Layer.provide(ApiCalculatorUsageLive)
   )
 );
 

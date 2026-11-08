@@ -16,7 +16,7 @@ import {
   DocsSearchResult,
 } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
-import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayTakeHomeId,
@@ -153,11 +153,7 @@ const successfulHttpClient = Effect.gen(function* () {
       )
     )
   );
-}).pipe(
-  Effect.provide(
-    PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
-  )
-);
+}).pipe(Effect.provide(PublicCalculatorServiceLive));
 it.effect.each([
   { args: [], env: {}, expected: settings },
   {

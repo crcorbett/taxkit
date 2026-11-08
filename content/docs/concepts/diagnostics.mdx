@@ -24,7 +24,7 @@ The program returns an Effect for your application host to run. Inspect
 
 ```ts
 import { Effect } from "effect";
-import { calculateRun, TaxKitLive } from "taxkit/effect";
+import { calculateRun } from "taxkit/effect";
 import { AuPayTakeHomeCalculation } from "taxkit/au";
 import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
 import { Cents, Money, NonNegativeMoney } from "taxkit/money";
@@ -34,9 +34,7 @@ const scenario = TakeHomeScenarioInputSchema.make({
   period: "weekly",
   taxFreeThresholdClaimed: true,
 });
-const program = calculateRun(AuPayTakeHomeCalculation, scenario).pipe(
-  Effect.provide(TaxKitLive)
-);
+const program = calculateRun(AuPayTakeHomeCalculation, scenario);
 ```
 
 The current take-home pay success fixture has no graph issues.

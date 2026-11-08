@@ -201,14 +201,14 @@ describe("built native API and Website", () => {
           Array.forEach((marker: string) => {
             expect(apiCode).toContain(marker);
           })([
-            "taxkit/core/CalculationEngine",
+            "@taxkit/calculators/CalculatorCatalogue",
             "@taxkit/calculators/PublicCalculatorService",
           ]);
           yield* Effect.forEach(
             [
               "node:fs",
               "cloudflare:workers",
-              "taxkit/core/CalculationEngine",
+              "@taxkit/calculators/CalculatorCatalogue",
               // Public prose names this operation. Check the actual backend
               // service identity, with a positive API oracle above, instead.
               "@taxkit/calculators/PublicCalculatorService",

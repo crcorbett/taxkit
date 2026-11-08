@@ -1,6 +1,5 @@
 import { PublicCalculatorServiceLive } from "@taxkit/calculators";
-import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
-import { CalculationEngineLive, inputValidationError } from "@taxkit/core";
+import { inputValidationError } from "@taxkit/core";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder, HttpApiScalar, HttpApiError } from "effect/http-api";
 import * as HttpMiddleware from "effect/http/HttpMiddleware";
@@ -62,12 +61,7 @@ export const ApiRoutesLayer = Layer.mergeAll(
 ).pipe(Layer.provide(HttpServer.layerServices));
 
 export const ApiRoutesLive = ApiRoutesLayer.pipe(
-  HttpRouter.provideRequest(
-    PublicCalculatorServiceBounded.pipe(
-      Layer.provide(PublicCalculatorServiceLive),
-      Layer.provide(CalculationEngineLive)
-    )
-  ),
+  HttpRouter.provideRequest(PublicCalculatorServiceLive),
   Layer.provide(
     HttpRouter.middleware((handler) =>
       withCalculatorRequestBodyLimit({ handler })

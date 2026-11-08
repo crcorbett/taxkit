@@ -10,7 +10,6 @@ import {
   Effect,
   Layer,
   Match,
-  Option,
   Schema,
 } from "effect";
 
@@ -26,30 +25,24 @@ export class SecretSourceError extends Schema.TaggedError<
 
 // Only the provider's closed tags are read. The native error's selection,
 // token, profile and message never reach the safe error.
-const DopplerFailure = Schema.Union([
+const DopplerUnauthorized = Schema.Union([
   Schema.TaggedStruct("DopplerSecretsError", {
-    cause: Schema.Struct({ _tag: Schema.String }),
+    cause: Schema.TaggedStruct("Unauthorized", {}),
   }),
   Schema.TaggedStruct("AuthError", {}),
 ]);
+const DopplerNotFound = Schema.TaggedStruct("DopplerSecretsError", {
+  cause: Schema.TaggedStruct("NotFound", {}),
+});
 
 /** Classify a native Doppler secrets failure without copying its fields. */
 export const dopplerSourceError = (failure: typeof Schema.Unknown.Type) =>
   new SecretSourceError({
     source: "doppler",
-    reason: Schema.decodeUnknownOption(DopplerFailure)(failure).pipe(
-      Option.map(
-        Match.valueTags({
-          AuthError: () => "unauthorized" as const,
-          DopplerSecretsError: ({ cause }) =>
-            Match.value(cause._tag).pipe(
-              Match.when("Unauthorized", () => "unauthorized" as const),
-              Match.when("NotFound", () => "not-found" as const),
-              Match.orElse(() => "unavailable" as const)
-            ),
-        })
-      ),
-      Option.getOrElse(() => "unavailable" as const)
+    reason: Match.value(failure).pipe(
+      Match.when(Schema.is(DopplerUnauthorized), () => "unauthorized" as const),
+      Match.when(Schema.is(DopplerNotFound), () => "not-found" as const),
+      Match.orElse(() => "unavailable" as const)
     ),
   });
 

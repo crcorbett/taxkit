@@ -95,7 +95,7 @@ HTTP calculate
     -> checked correlated identity and scenario
       -> CalculatorApiHandlerLive verifies path/body identity
         -> PublicCalculatorService.calculate(request)
-          -> complete owning calculator definition and CalculationEngine
+          -> complete owning calculator definition (closed program)
           -> correlated CalculatorRunResponse
 ```
 
@@ -107,7 +107,7 @@ SDK HTTP comparison tests
   -> HttpApiClient.make(TaxKitApi) over TaxKitApiInProcessLive
     -> CalculatorApiHandlerLive
       -> PublicCalculatorServiceLive
-        -> CalculationEngineLive
+        -> CalculatorCatalogueLive
   -> success response equals SDK full-run response
   -> InputValidationError maps to CalculatorApiErrorEnvelope
 ```

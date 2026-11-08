@@ -1,4 +1,4 @@
-import { CalculationEngine, validateRuleGraph } from "@taxkit/core";
+import { validateRuleGraph } from "@taxkit/core";
 import { AuAnnualIncomeTaxCalculation } from "@taxkit/rules-au-income-tax";
 import {
   AuPayTakeHomeCalculation,
@@ -26,7 +26,8 @@ import {
   CalculatorId,
   UnsupportedCalculatorContextError,
 } from "./schemas.js";
-import { PublicCalculatorService } from "./service.js";
+import { CalculatorCatalogue } from "./service.js";
+import { PublicCalculatorServiceBounded } from "./work.layer.js";
 /**
  * Runs a public calculation for a resolved catalog entry.
  *
@@ -37,11 +38,9 @@ import { PublicCalculatorService } from "./service.js";
 const calculateWithEntry = ({
   entry,
   request,
-  engine,
 }: {
   readonly entry: CalculatorCatalogEntry;
   readonly request: CalculatorRunRequest;
-  readonly engine: CalculationEngine["Service"];
 }) =>
   CalculatorRunRequest.match(request, {
     "au.pay.take-home": (selected) =>
@@ -77,128 +76,129 @@ const calculateWithEntry = ({
           },
         }))
       ),
-  }).pipe(Effect.provideService(CalculationEngine, engine));
+  });
 /**
- * Live public calculator service backed by the static calculator catalog.
+ * The static calculator catalogue implementation.
  *
- * Invalid literal values are rejected by the request schemas before this layer
- * runs. Missing calculator ids are mapped inline in each method so the error
+ * Invalid literal values are rejected by the request schemas before it runs.
+ * Missing calculator ids are mapped inline in each method so the error
  * includes the request shape that the caller provided.
  */
-export const PublicCalculatorServiceLive = Layer.effect(
-  PublicCalculatorService
-)(
-  Effect.gen(function* () {
-    const engine = yield* CalculationEngine;
-    return PublicCalculatorService.of({
-      calculate: Effect.fn("PublicCalculatorService.calculate")((request) => {
-        const calculatorId = CalculatorId.make(request.calculatorId);
-        return getCalculatorCatalogEntry(calculatorId, request.payload).pipe(
-          Effect.fromOption,
-          Effect.mapError(
-            () =>
-              new UnsupportedCalculatorContextError({
-                context: request.payload,
-                message: `${request.calculatorId} is not available for the requested context`,
-                requestedCalculator: calculatorId,
-              })
-          ),
-          Effect.flatMap((entry) =>
-            calculateWithEntry({
-              entry,
-              request,
-              engine,
+export const calculatorCatalogue = CalculatorCatalogue.of({
+  calculate: Effect.fn("CalculatorCatalogue.calculate")((request) => {
+    const calculatorId = CalculatorId.make(request.calculatorId);
+    return getCalculatorCatalogEntry(calculatorId, request.payload).pipe(
+      Effect.fromOption,
+      Effect.mapError(
+        () =>
+          new UnsupportedCalculatorContextError({
+            context: request.payload,
+            message: `${request.calculatorId} is not available for the requested context`,
+            requestedCalculator: calculatorId,
+          })
+      ),
+      Effect.flatMap((entry) =>
+        calculateWithEntry({
+          entry,
+          request,
+        })
+      )
+    );
+  }),
+  getCalculator: Effect.fn("CalculatorCatalogue.getCalculator")((request) =>
+    getCalculatorCatalogEntry(request.calculatorId, request).pipe(
+      Effect.fromOption,
+      Effect.map((entry) => toCalculatorCatalogItem(entry)),
+      Effect.catchTag("NoSuchElementError", () =>
+        Effect.fail(
+          new UnsupportedCalculatorContextError({
+            context: request,
+            message: `${request.calculatorId} is not available for the requested context`,
+            requestedCalculator: request.calculatorId,
+          })
+        )
+      )
+    )
+  ),
+  getCalculatorGraph: Effect.fn("CalculatorCatalogue.getCalculatorGraph")(
+    (request) =>
+      getCalculatorCatalogEntry(request.calculatorId, request).pipe(
+        Effect.fromOption,
+        Effect.map((entry) =>
+          toCalculatorGraphResponse({
+            entry,
+            validationIssues: validateRuleGraph({
+              inputFacts: entry.inputFacts,
+              rules: entry.ruleDescriptors,
+            }),
+          })
+        ),
+        Effect.catchTag("NoSuchElementError", () =>
+          Effect.fail(
+            new UnsupportedCalculatorContextError({
+              context: request,
+              message: `${request.calculatorId} is not available for the requested context`,
+              requestedCalculator: request.calculatorId,
             })
           )
-        );
-      }),
-      getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
-        (request) =>
-          getCalculatorCatalogEntry(request.calculatorId, request).pipe(
-            Effect.fromOption,
-            Effect.map((entry) => toCalculatorCatalogItem(entry)),
-            Effect.catchTag("NoSuchElementError", () =>
-              Effect.fail(
-                new UnsupportedCalculatorContextError({
-                  context: request,
-                  message: `${request.calculatorId} is not available for the requested context`,
-                  requestedCalculator: request.calculatorId,
-                })
-              )
-            )
-          )
-      ),
-      getCalculatorGraph: Effect.fn(
-        "PublicCalculatorService.getCalculatorGraph"
-      )((request) =>
-        getCalculatorCatalogEntry(request.calculatorId, request).pipe(
-          Effect.fromOption,
-          Effect.map((entry) =>
-            toCalculatorGraphResponse({
-              entry,
-              validationIssues: validateRuleGraph({
-                inputFacts: entry.inputFacts,
-                rules: entry.ruleDescriptors,
-              }),
+        )
+      )
+  ),
+  getCalculatorSchema: Effect.fn("CalculatorCatalogue.getCalculatorSchema")(
+    (request) =>
+      getCalculatorCatalogEntry(request.calculatorId, request).pipe(
+        Effect.fromOption,
+        Effect.map((entry) => toCalculatorSchemaResponse(entry)),
+        Effect.catchTag("NoSuchElementError", () =>
+          Effect.fail(
+            new UnsupportedCalculatorContextError({
+              context: request,
+              message: `${request.calculatorId} is not available for the requested context`,
+              requestedCalculator: request.calculatorId,
             })
-          ),
-          Effect.catchTag("NoSuchElementError", () =>
-            Effect.fail(
-              new UnsupportedCalculatorContextError({
-                context: request,
-                message: `${request.calculatorId} is not available for the requested context`,
-                requestedCalculator: request.calculatorId,
-              })
-            )
           )
         )
-      ),
-      getCalculatorSchema: Effect.fn(
-        "PublicCalculatorService.getCalculatorSchema"
-      )((request) =>
-        getCalculatorCatalogEntry(request.calculatorId, request).pipe(
-          Effect.fromOption,
-          Effect.map((entry) => toCalculatorSchemaResponse(entry)),
-          Effect.catchTag("NoSuchElementError", () =>
-            Effect.fail(
-              new UnsupportedCalculatorContextError({
-                context: request,
-                message: `${request.calculatorId} is not available for the requested context`,
-                requestedCalculator: request.calculatorId,
-              })
-            )
-          )
-        )
-      ),
-      listCalculators: Effect.fn("PublicCalculatorService.listCalculators")(
-        (query) =>
-          Effect.succeed(
-            pipe(
-              query,
-              (value) => DescriptorFilterQuery.make(value),
-              filterCalculatorEntries,
-              (entries) =>
-                new CalculatorCatalogResponseData({
-                  calculators: EffectFunction.pipe(
-                    entries,
-                    Array.map(toCalculatorCatalogItem)
-                  ),
-                })
-            )
-          )
-      ),
-      listFacts: Effect.fn("PublicCalculatorService.listFacts")((query) =>
-        Effect.succeed(pipe(query, filterCalculatorEntries, toFactsResponse))
-      ),
-      listJurisdictions: Effect.fn("PublicCalculatorService.listJurisdictions")(
-        () => Effect.succeed(JurisdictionsResponseValue)
-      ),
-      listRules: Effect.fn("PublicCalculatorService.listRules")((query) =>
-        Effect.succeed(pipe(query, filterCalculatorEntries, toRulesResponse))
-      ),
-      listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")(() =>
-        Effect.succeed(TaxYearsResponseValue)
-      ),
-    });
-  })
+      )
+  ),
+  listCalculators: Effect.fn("CalculatorCatalogue.listCalculators")((query) =>
+    Effect.succeed(
+      pipe(
+        query,
+        (value) => DescriptorFilterQuery.make(value),
+        filterCalculatorEntries,
+        (entries) =>
+          new CalculatorCatalogResponseData({
+            calculators: EffectFunction.pipe(
+              entries,
+              Array.map(toCalculatorCatalogItem)
+            ),
+          })
+      )
+    )
+  ),
+  listFacts: Effect.fn("CalculatorCatalogue.listFacts")((query) =>
+    Effect.succeed(pipe(query, filterCalculatorEntries, toFactsResponse))
+  ),
+  listJurisdictions: Effect.fn("CalculatorCatalogue.listJurisdictions")(() =>
+    Effect.succeed(JurisdictionsResponseValue)
+  ),
+  listRules: Effect.fn("CalculatorCatalogue.listRules")((query) =>
+    Effect.succeed(pipe(query, filterCalculatorEntries, toRulesResponse))
+  ),
+  listTaxYears: Effect.fn("CalculatorCatalogue.listTaxYears")(() =>
+    Effect.succeed(TaxYearsResponseValue)
+  ),
+});
+
+export const CalculatorCatalogueLive = Layer.succeed(
+  CalculatorCatalogue,
+  calculatorCatalogue
+);
+/**
+ * The public calculator service over the static catalogue, with the shared
+ * work budget and no rate admission. The native API composes its rate-limited
+ * implementation instead.
+ */
+export const PublicCalculatorServiceLive = PublicCalculatorServiceBounded.pipe(
+  Layer.provide(CalculatorCatalogueLive)
 );

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import {
-  CalculationEngine,
-  CalculationEngineLive,
+  CalculationError,
   Cents,
   InputValidationError,
   Money,
@@ -17,21 +16,9 @@ import {
   TakeHomeWithSacrificeScenarioInput,
 } from "@taxkit/rules-au-pay";
 import { TakeHomePayReportEncoded } from "@taxkit/rules-au-pay/schemas";
-import {
-  Function as EffectFunction,
-  Effect,
-  Exit,
-  Layer,
-  Result,
-  Schema,
-} from "effect";
+import { Function as EffectFunction, Effect, Result, Schema } from "effect";
 
-import {
-  calculateReport,
-  calculateRun,
-  decodeInput,
-  TaxKitLive,
-} from "../src/effect.js";
+import { calculateReport, calculateRun, decodeInput } from "../src/effect.js";
 import { takeHomeFacts } from "./fixtures.js";
 
 describe("native calculator definitions", () => {
@@ -50,7 +37,7 @@ describe("native calculator definitions", () => {
         expect(report.netPay.cents).toBe(130_100);
         expect(run.report).toStrictEqual(report);
         expect(run.diagnostics).toBeDefined();
-      }).pipe(Effect.provide(TaxKitLive))
+      })
   );
   it.effect("executes the annual owning program", () =>
     Effect.gen(function* () {
@@ -64,7 +51,7 @@ describe("native calculator definitions", () => {
         input
       );
       expect(report.liability.cents).toBe(1_958_800);
-    }).pipe(Effect.provide(TaxKitLive))
+    })
   );
   it.effect(
     "requires sacrifice explicitly and restores its accounting equation",
@@ -97,7 +84,7 @@ describe("native calculator definitions", () => {
           AuPayTakeHomeWithSacrificeCalculation.outputSchema
         )(encoded);
         expect(restored).toStrictEqual(report);
-      }).pipe(Effect.provide(TaxKitLive))
+      })
   );
   it.effect("rejects surplus input without leaking values", () =>
     Effect.gen(function* () {
@@ -125,24 +112,20 @@ describe("native calculator definitions", () => {
       }
     })
   );
-  it.effect("substitutes the actual engine through native Layer.mock", () =>
+  it.effect("keeps a definition's calculation failure typed", () =>
     Effect.gen(function* () {
-      const result = yield* calculateReport(
-        AuPayTakeHomeCalculation,
-        takeHomeFacts
-      ).pipe(Effect.exit);
-      EffectFunction.pipe(Exit.isFailure(result), (actual) => {
-        expect(actual).toBeTruthy();
+      const failure = new CalculationError({
+        message: "Fixture calculation failed.",
       });
-    }).pipe(
-      Effect.provide(
-        Layer.mock(CalculationEngine, {
-          run: Effect.fn("CalculationEngine.run")(() =>
-            Effect.die("Fixture defect")
-          ),
-        })
-      )
-    )
+      const result = yield* calculateReport(
+        {
+          ...AuPayTakeHomeCalculation,
+          calculate: () => Effect.fail(failure),
+        },
+        takeHomeFacts
+      ).pipe(Effect.flip);
+      expect(result).toBe(failure);
+    })
   );
   it.effect(
     "retains accounting checks in its explicit representation codec",
@@ -171,6 +154,6 @@ describe("native calculator definitions", () => {
         EffectFunction.pipe(Result.isFailure(restored), (actual) => {
           expect(actual).toBeTruthy();
         });
-      }).pipe(Effect.provide(CalculationEngineLive))
+      })
   );
 });

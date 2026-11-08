@@ -6,35 +6,57 @@ import { Redacted, Schema } from "effect";
 import { SecretSourceError, dopplerSourceError } from "../src/secrets.js";
 
 const token = "dp.st.private-doppler-token-sentinel";
-const nativeFailure = (tag: string) =>
+// The native SDK failures the Doppler provider wraps.
+class Unauthorized extends Schema.TaggedClass<
+  Unauthorized,
+  { readonly brand: unique symbol }
+>()("Unauthorized", {
+  message: Schema.String,
+}) {}
+class NotFound extends Schema.TaggedClass<
+  NotFound,
+  { readonly brand: unique symbol }
+>()("NotFound", {
+  message: Schema.String,
+}) {}
+class TimeoutError extends Schema.TaggedClass<
+  TimeoutError,
+  { readonly brand: unique symbol }
+>()("TimeoutError", {
+  message: Schema.String,
+}) {}
+const nativeFailure = (cause: Unauthorized | NotFound | TimeoutError) =>
   new DopplerSecretsError({
-    cause: { _tag: tag, message: `provider detail ${token}` },
-    credentials: { profileName: "private-profile", token: Redacted.make(token) },
+    cause,
+    credentials: {
+      profileName: "private-profile",
+      token: Redacted.make(token),
+    },
     selection: { config: "prd", project: "taxkit" },
   });
+const detail = { message: `provider detail ${token}` };
 
 describe("Doppler secret source failures", () => {
   it.each([
-    { failure: nativeFailure("Unauthorized"), reason: "unauthorized" },
-    { failure: nativeFailure("NotFound"), reason: "not-found" },
-    { failure: nativeFailure("TimeoutError"), reason: "unavailable" },
+    {
+      failure: nativeFailure(new Unauthorized(detail)),
+      reason: "unauthorized",
+    },
+    { failure: nativeFailure(new NotFound(detail)), reason: "not-found" },
+    { failure: nativeFailure(new TimeoutError(detail)), reason: "unavailable" },
     {
       failure: new AuthError({ message: "Missing Doppler credentials" }),
       reason: "unauthorized",
     },
     { failure: new Error(token), reason: "unavailable" },
-  ] as const)("classifies a native failure as $reason", ({ failure, reason }) => {
-    const error = dopplerSourceError(failure);
-    expect({
-      encoded: JSON.stringify(Schema.encodeUnknownSync(SecretSourceError)(error)),
-      reason: error.reason,
-    }).toStrictEqual({
-      encoded: JSON.stringify({
-        _tag: "SecretSourceError",
-        source: "doppler",
-        reason,
-      }),
-      reason,
-    });
-  });
+  ] as const)(
+    "classifies a native failure as $reason",
+    ({ failure, reason }) => {
+      // Strict equality admits no other field: no cause, token or selection.
+      const error = dopplerSourceError(failure);
+      expect(error).toStrictEqual(
+        new SecretSourceError({ source: "doppler", reason })
+      );
+    }
+  );
 });

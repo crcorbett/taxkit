@@ -1,19 +1,16 @@
-import {
-  NonNegativeMoney,
-  CalculationEngineLive,
-  InputValidationError,
-} from "@taxkit/core";
+import { NonNegativeMoney, InputValidationError } from "@taxkit/core";
 import { Money, Cents } from "@taxkit/core/primitives";
 import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay";
 import { Context, Cause, Effect, Layer, Match } from "effect";
 
-import { PublicCalculatorServiceLive } from "../live.layer.js";
+import { calculatorCatalogue } from "../live.layer.js";
 import {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
   TakeHomeCalculationRequest,
 } from "../schemas.js";
-import { PublicCalculatorService } from "../service.js";
+import { CalculatorCatalogue } from "../service.js";
+import { PublicCalculatorServiceBounded } from "../work.layer.js";
 
 export const sensitiveSentinel =
   "private-calculator-sentinel-/private/source?credential=hidden";
@@ -30,19 +27,18 @@ export const CalculationRequest = TakeHomeCalculationRequest.make({
     }),
   },
 });
-export const CalculatorLive = PublicCalculatorServiceLive.pipe(
-  Layer.provide(CalculationEngineLive)
-);
-// The behaviour a test selects for the wrapped calculator.
+export { PublicCalculatorServiceLive as CalculatorLive } from "../live.layer.js";
+// The behaviour a test selects for the substituted catalogue.
 export class CalculatorFixtureMode extends Context.Service<
   CalculatorFixtureMode,
   "success" | "expected" | "defect" | "mixed" | "capacity" | "timeout"
 >()("taxkit/calculators/testing/CalculatorFixtureMode") {}
-export const CalculatorFixture = Layer.effect(
-  PublicCalculatorService,
+// The real public implementation over a catalogue whose selected operations
+// fail at the catalogue boundary; other operations use the static catalogue.
+const CatalogueFixture = Layer.effect(
+  CalculatorCatalogue,
   Effect.gen(function* () {
     const mode = yield* CalculatorFixtureMode;
-    const calculator = yield* PublicCalculatorService;
     const inputFailure = new InputValidationError({
       issues: [{ message: "Invalid input value", path: [sensitiveSentinel] }],
       truncated: false,
@@ -54,8 +50,8 @@ export const CalculatorFixture = Layer.effect(
     const metadataInterruptedDefect = Effect.failCause(
       Cause.combine(Cause.die(sensitiveSentinel), Cause.interrupt())
     );
-    return PublicCalculatorService.of({
-      calculate: Effect.fn("PublicCalculatorService.calculate")((request) =>
+    return CalculatorCatalogue.of({
+      calculate: Effect.fn("CalculatorCatalogue.calculate")((request) =>
         Match.value(mode).pipe(
           Match.when("capacity", () =>
             Effect.fail(new CalculatorCapacityExceeded())
@@ -63,7 +59,7 @@ export const CalculatorFixture = Layer.effect(
           Match.when("timeout", () =>
             Effect.fail(new CalculatorOperationTimedOut())
           ),
-          Match.when("success", () => calculator.calculate(request)),
+          Match.when("success", () => calculatorCatalogue.calculate(request)),
           Match.when("expected", () => Effect.fail(inputFailure)),
           Match.when("defect", () =>
             Effect.die({
@@ -79,7 +75,18 @@ export const CalculatorFixture = Layer.effect(
           Match.exhaustive
         )
       ),
-      getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
+      getCalculator: Effect.fn("CalculatorCatalogue.getCalculator")((request) =>
+        Match.value(mode).pipe(
+          Match.when("expected", () => Effect.fail(inputFailure)),
+          Match.when("timeout", () =>
+            Effect.fail(new CalculatorOperationTimedOut())
+          ),
+          Match.when("defect", () => metadataDefect),
+          Match.when("mixed", () => metadataInterruptedDefect),
+          Match.orElse(() => calculatorCatalogue.getCalculator(request))
+        )
+      ),
+      getCalculatorGraph: Effect.fn("CalculatorCatalogue.getCalculatorGraph")(
         (request) =>
           Match.value(mode).pipe(
             Match.when("expected", () => Effect.fail(inputFailure)),
@@ -88,36 +95,22 @@ export const CalculatorFixture = Layer.effect(
             ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.getCalculator(request))
+            Match.orElse(() => calculatorCatalogue.getCalculatorGraph(request))
           )
       ),
-      getCalculatorGraph: Effect.fn(
-        "PublicCalculatorService.getCalculatorGraph"
-      )((request) =>
-        Match.value(mode).pipe(
-          Match.when("expected", () => Effect.fail(inputFailure)),
-          Match.when("timeout", () =>
-            Effect.fail(new CalculatorOperationTimedOut())
-          ),
-          Match.when("defect", () => metadataDefect),
-          Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculator.getCalculatorGraph(request))
-        )
+      getCalculatorSchema: Effect.fn("CalculatorCatalogue.getCalculatorSchema")(
+        (request) =>
+          Match.value(mode).pipe(
+            Match.when("expected", () => Effect.fail(inputFailure)),
+            Match.when("timeout", () =>
+              Effect.fail(new CalculatorOperationTimedOut())
+            ),
+            Match.when("defect", () => metadataDefect),
+            Match.when("mixed", () => metadataInterruptedDefect),
+            Match.orElse(() => calculatorCatalogue.getCalculatorSchema(request))
+          )
       ),
-      getCalculatorSchema: Effect.fn(
-        "PublicCalculatorService.getCalculatorSchema"
-      )((request) =>
-        Match.value(mode).pipe(
-          Match.when("expected", () => Effect.fail(inputFailure)),
-          Match.when("timeout", () =>
-            Effect.fail(new CalculatorOperationTimedOut())
-          ),
-          Match.when("defect", () => metadataDefect),
-          Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculator.getCalculatorSchema(request))
-        )
-      ),
-      listCalculators: Effect.fn("PublicCalculatorService.listCalculators")(
+      listCalculators: Effect.fn("CalculatorCatalogue.listCalculators")(
         (query) =>
           Match.value(mode).pipe(
             Match.when("timeout", () =>
@@ -125,20 +118,20 @@ export const CalculatorFixture = Layer.effect(
             ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.listCalculators(query))
+            Match.orElse(() => calculatorCatalogue.listCalculators(query))
           )
       ),
-      listFacts: Effect.fn("PublicCalculatorService.listFacts")((query) =>
+      listFacts: Effect.fn("CalculatorCatalogue.listFacts")((query) =>
         Match.value(mode).pipe(
           Match.when("timeout", () =>
             Effect.fail(new CalculatorOperationTimedOut())
           ),
           Match.when("defect", () => metadataDefect),
           Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculator.listFacts(query))
+          Match.orElse(() => calculatorCatalogue.listFacts(query))
         )
       ),
-      listJurisdictions: Effect.fn("PublicCalculatorService.listJurisdictions")(
+      listJurisdictions: Effect.fn("CalculatorCatalogue.listJurisdictions")(
         () =>
           Match.value(mode).pipe(
             Match.when("timeout", () =>
@@ -146,29 +139,34 @@ export const CalculatorFixture = Layer.effect(
             ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculator.listJurisdictions())
+            Match.orElse(() => calculatorCatalogue.listJurisdictions())
           )
       ),
-      listRules: Effect.fn("PublicCalculatorService.listRules")((query) =>
+      listRules: Effect.fn("CalculatorCatalogue.listRules")((query) =>
         Match.value(mode).pipe(
           Match.when("timeout", () =>
             Effect.fail(new CalculatorOperationTimedOut())
           ),
           Match.when("defect", () => metadataDefect),
           Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculator.listRules(query))
+          Match.orElse(() => calculatorCatalogue.listRules(query))
         )
       ),
-      listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")((query) =>
+      listTaxYears: Effect.fn("CalculatorCatalogue.listTaxYears")((query) =>
         Match.value(mode).pipe(
           Match.when("timeout", () =>
             Effect.fail(new CalculatorOperationTimedOut())
           ),
           Match.when("defect", () => metadataDefect),
           Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculator.listTaxYears(query))
+          Match.orElse(() => calculatorCatalogue.listTaxYears(query))
         )
       ),
     });
   })
-).pipe(Layer.provide(CalculatorLive));
+);
+// A fresh instance: hosts may also hold the memoised real implementation, and
+// this fixture must not share its pool or its catalogue.
+export const CalculatorFixture = Layer.fresh(
+  PublicCalculatorServiceBounded
+).pipe(Layer.provide(CatalogueFixture));

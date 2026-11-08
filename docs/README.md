@@ -33,6 +33,7 @@ frontmatter and navigation say `status: published`.
 - [0009 Paired MDX themes as checked render data](adr/0009-mdx-themes.md)
 - [0010 Agnostic MDX reading contracts and React presentation](adr/0010-agnostic-mdx-presentation.md)
 - [0011 Effect-native SDK contracts and checked money](adr/0011-effect-native-sdk-contracts.md) (SDK 5 hard cutover)
+- [0012 Closed calculator programs without an engine service](adr/0012-closed-calculator-programs.md) (SDK 6)
 
 ## Keeping this useful
 

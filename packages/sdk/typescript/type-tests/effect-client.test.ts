@@ -16,6 +16,7 @@ import { TakeHomeScenarioInputSchema, GrossPay } from "../src/au/schemas.js";
 import {
   calculateReport,
   decodeInput,
+  // @ts-expect-error removed engine tag and Layer are unavailable.
   TaxKitLive,
   // @ts-expect-error removed independent descriptor factory is unavailable.
   defineSdkCalculation,
@@ -32,11 +33,11 @@ const program = calculateReport(AuPayTakeHomeCalculation, scenario);
 const closed: Effect.Effect<
   typeof AuPayTakeHomeCalculation.outputSchema.Type,
   typeof AuPayTakeHomeCalculation.errorSchema.Type
-> = program.pipe(Effect.provide(TaxKitLive));
+> = program;
 void closed;
 type Requirements = Effect.Services<typeof program>;
 declare const requirements: Requirements;
-// @ts-expect-error an engine service is still required until provided.
+// A definition is a closed program: nothing remains to provide.
 const noRequirements: never = requirements;
 void noRequirements;
 const gross = new GrossPay({ amount, period: "weekly" });
@@ -59,6 +60,7 @@ declare const remaining: Effect.Services<typeof unfinished>;
 const completed: never = remaining;
 void completed;
 void defineSdkCalculation;
+void TaxKitLive;
 
 declare const checkedTaxablePay: TaxablePay;
 const parameterDependent = PaygWithholdingComponentFact.pipe(

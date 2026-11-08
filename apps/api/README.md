@@ -137,9 +137,10 @@ Local plans and transport tests do not show a deployment works.
 
 ## Analytics candidate
 
-`@taxkit/analytics/api-usage` owns the calculator analytics decorator, composed
-here after native hosted calculation succeeds. It collects only the catalogue
-calculator ID and name. HTTP and the two MCP protocols use this same decorator;
+`@taxkit/analytics/api-usage` owns the calculator usage observer
+(`ApiCalculatorUsageLive`), supplied here to the one public calculator
+implementation and called after native hosted calculation succeeds. It collects only the catalogue
+calculator ID and name. HTTP and the two MCP protocols use this same observer;
 pure tax packages and local SDK calls have no analytics dependency. Metadata,
 failed or interrupted calculations add no successful-use event. A request can
 collect at most 64 successes; excess analytics are dropped without changing
@@ -412,8 +413,8 @@ and safe-reporter assertions remain.
 
 ## Native calculation rate admission
 
-The native API builds `PublicCalculatorServiceRateLimited` once underneath its
-bounded service. HTTP and modern MCP share the
+The native API builds `PublicCalculatorServiceRateLimited` once over
+`CalculatorCatalogueLive`; admission runs inside its shared work budget. HTTP and modern MCP share the
 [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission).
 Public requests need a checked original Cloudflare connection address;
 arbitrary Worker headers cannot select a key.

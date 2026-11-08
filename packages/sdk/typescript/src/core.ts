@@ -1,8 +1,6 @@
 export {
   AustralianTaxYear,
   CalculationDiagnostics,
-  CalculationEngine,
-  CalculationEngineLive,
   CalculationError,
   CalculatorId,
   Cents,
@@ -71,8 +69,6 @@ export {
   type AnyFactDescriptor,
   type AnyParameterDescriptor,
   type AnyRuleDescriptor,
-  type CalculationEngineService,
-  type CalculationRequest,
   type CalculationResult,
   type FactDescriptor,
   type FactDescriptorServices,

@@ -136,9 +136,12 @@ describe("shared native host calculation admission", () => {
           })
         ),
         Effect.flip,
-        Effect.map((error) => {
-          expect(Predicate.isTagged(error, "ConfigError")).toBeTruthy();
-        }),
+        Effect.tap((error) =>
+          Effect.sync(() => {
+            const failedConfig = Predicate.isTagged(error, "ConfigError");
+            expect(failedConfig).toBeTruthy();
+          })
+        ),
         Effect.scoped
       )
   );
