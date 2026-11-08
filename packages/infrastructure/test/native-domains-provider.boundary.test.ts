@@ -17,6 +17,7 @@ import { CredentialsStore } from "alchemy/Auth/Credentials";
 import { ProfileStore } from "alchemy/Auth/Profile";
 import { layerNonInteractive } from "alchemy/Interaction";
 import * as Provider from "alchemy/Provider";
+import { noopSession } from "alchemy/Report";
 import { ResourceContext } from "alchemy/ResourceContext";
 import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
@@ -36,6 +37,7 @@ import {
   Match,
   Schema,
 } from "effect";
+import { Digest, SecureRandom } from "effect/crypto";
 import { HttpClient, HttpClientResponse } from "effect/http";
 
 // Alchemy erases provider errors to any. Preserve their cause as checked failure data at this native boundary.
@@ -165,6 +167,20 @@ const providerFixture = Effect.fnUntraced(function* (
               name: "zone entrypoint",
               phase: "http_request_dynamic_redirect",
               rules: [],
+              version: "2",
+            })
+        ),
+        Match.when(
+          (v) =>
+            v.path.endsWith("/rulesets/fixture-ruleset/rules") &&
+            v.method === "POST",
+          () =>
+            mockProviderSuccess({
+              id: "fixture-ruleset",
+              kind: "zone",
+              name: "zone entrypoint",
+              phase: "http_request_dynamic_redirect",
+              rules: [foreign],
               version: "2",
             })
         ),
@@ -371,11 +387,7 @@ const providerFixture = Effect.fnUntraced(function* (
         news: resource.Props,
         olds: undefined,
         output: undefined,
-        session: {
-          done: () => Effect.void,
-          emit: () => Effect.void,
-          note: () => Effect.void,
-        },
+        session: noopSession,
       })
       .pipe(Effect.mapError((cause) => new NativeProviderError({ cause })));
     return yield* checkedReconcile;
@@ -413,6 +425,12 @@ const providerFixture = Effect.fnUntraced(function* (
   const captured = yield* Ref.get(calls);
   return { calls: captured, result };
 });
+// Effect 4.1 platform bundles carry no crypto; Alchemy's CLI adds WebCrypto.
+const platformServices = Layer.mergeAll(
+  BunServices.layer,
+  SecureRandom.layerWebCrypto,
+  Digest.layerWebCrypto
+);
 describe("actual installed native redirect provider", () => {
   it.live("refuses redirect writes after a forbidden shared-rule read", () =>
     Effect.gen(function* () {
@@ -448,7 +466,7 @@ describe("actual installed native redirect provider", () => {
           expect(actual).toHaveLength(0);
         }
       );
-    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+    }).pipe(Effect.scoped, Effect.provide(platformServices))
   );
   it.live.each(["absent", "existing"] as const)(
     "converges after a checked %s reply",
@@ -461,55 +479,45 @@ describe("actual installed native redirect provider", () => {
           onSuccess: () => "",
         });
         expect(succeeded, message).toBeTruthy();
-        const calls = EffectFunction.pipe(
+        // An absent entrypoint is created with only our rule. An existing one
+        // gains our rule by id-scoped create; the foreign rule is never
+        // written back.
+        const writes = EffectFunction.pipe(
           fixture.calls,
           Array.filter(
-            (x) => x.method === "PUT" && x.path.includes("/rulesets/")
+            (x) => x.method !== "GET" && x.path.includes("/rulesets/")
           )
         );
-        expect(calls).toHaveLength(1);
-        const call = Array.head(calls).pipe(
+        expect(writes).toHaveLength(1);
+        const call = Array.head(writes).pipe(
           Option.getOrElse(() => expect.fail("Expected one rule request"))
         );
-        const rules = yield* Schema.decodeEffect(
-          Schema.fromJsonString(
-            Schema.Struct({
-              rules: Schema.Array(Schema.Record(Schema.String, Schema.Unknown)),
-            })
-          )
-        )(call.body);
-        expect(rules.rules).toHaveLength(
+        expect(call.method).toBe(
           Match.value(mode).pipe(
-            Match.when("existing", (): 2 => 2),
-            Match.orElse((): 1 => 1)
+            Match.when("existing", (): "POST" => "POST"),
+            Match.when("absent", (): "PUT" => "PUT"),
+            Match.exhaustive
           )
         );
-        if (mode === "existing") {
-          EffectFunction.pipe(
-            Array.head(rules.rules).pipe(
-              Option.getOrElse(() =>
-                expect.fail("Expected retained foreign rule")
+        const RuleBody = Schema.Record(Schema.String, Schema.Unknown);
+        const rules = yield* Match.value(mode).pipe(
+          Match.when("existing", () =>
+            Schema.decodeEffect(Schema.fromJsonString(RuleBody))(
+              call.body
+            ).pipe(Effect.map((rule) => [rule]))
+          ),
+          Match.when("absent", () =>
+            Schema.decodeEffect(
+              Schema.fromJsonString(
+                Schema.Struct({ rules: Schema.Array(RuleBody) })
               )
-            ),
-            (actual) => {
-              expect(actual).toStrictEqual({
-                action: "redirect",
-                action_parameters: {
-                  from_value: {
-                    preserve_query_string: true,
-                    status_code: 301,
-                    target_url: { value: "https://other-target.example.com" },
-                  },
-                },
-                description: "foreign-preserved-rule",
-                enabled: true,
-                expression: 'http.host eq "other.example.com"',
-                id: "foreign-rule-id",
-              });
-            }
-          );
-        }
-        const ours = Array.last(rules.rules).pipe(
+            )(call.body).pipe(Effect.map((body) => body.rules))
+          ),
+          Match.exhaustive
+        );
+        expect(rules).toHaveLength(1);
+        expect(call.body).not.toContain("foreign-preserved-rule");
+        const ours = Array.last(rules).pipe(
           Option.getOrElse(() => expect.fail("Expected native redirect rule"))
         );
         expect(ours).toStrictEqual({
@@ -536,6 +544,6 @@ describe("actual installed native redirect provider", () => {
             "fixture-deployment-id"
           );
         }
-      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+      }).pipe(Effect.scoped, Effect.provide(platformServices))
   );
 });

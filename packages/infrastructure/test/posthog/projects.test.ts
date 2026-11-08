@@ -27,6 +27,7 @@ import {
   Ref,
   Schema,
 } from "effect";
+import { Digest, SecureRandom } from "effect/crypto";
 import { HttpClient } from "effect/http";
 
 import { PostHogProjectProviderLive } from "../../src/posthog/projects.live.layer.js";
@@ -79,6 +80,8 @@ const graphEnvironment = Effect.provide(
       ConfigProvider.fromUnknown({ POSTHOG_ORGANISATION_ID: organisation })
     ),
     BunServices.layer,
+    SecureRandom.layerWebCrypto,
+    Digest.layerWebCrypto,
     Layer.succeed(
       AlchemyContext,
       AlchemyContext.of({

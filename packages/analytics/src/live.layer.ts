@@ -1,5 +1,4 @@
 import {
-  Crypto,
   DateTime,
   Effect,
   Layer,
@@ -8,6 +7,7 @@ import {
   Schema,
   Stream,
 } from "effect";
+import { SecureRandom } from "effect/crypto";
 import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 
 import { AnalyticsSettingsConfig } from "./config.js";
@@ -41,7 +41,7 @@ export const BackendAnalyticsLive = Layer.unwrap(
             BackendAnalytics,
             Effect.gen(function* () {
               const http = HttpClient.withScope(yield* HttpClient.HttpClient);
-              const crypto = yield* Crypto.Crypto;
+              const random = yield* SecureRandom.SecureRandom;
               return BackendAnalytics.of({
                 recordCalculatorUse: Effect.fn(
                   "BackendAnalytics.recordCalculatorUse"
@@ -50,7 +50,7 @@ export const BackendAnalyticsLive = Layer.unwrap(
                     if (input.collectionPolicy === "deny") {
                       return "denied" as const;
                     }
-                    const uuid = yield* crypto.randomUUIDv4().pipe(
+                    const uuid = yield* random.uuidV4().pipe(
                       Effect.flatMap((value) => EventId.makeEffect(value)),
                       Effect.mapError(
                         () =>

@@ -225,7 +225,6 @@ export const declareNativeAppsInfrastructure = Effect.gen(function* () {
     // not change registrar, mail or verification records.
     yield* ZoneDnsSettings("TaxKitProductionDnsSettings", {
       flattenAllCnames: false,
-      foundationDns: false,
       multiProvider: false,
       nameservers: { type: "cloudflare.standard" },
       nsTtl: 86_400,

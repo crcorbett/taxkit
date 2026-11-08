@@ -10,9 +10,11 @@ import {
   Match,
   Effect,
   FileSystem,
+  Layer,
   Path,
   Function as EffectFunction,
 } from "effect";
+import { Digest, SecureRandom } from "effect/crypto";
 
 import { nativeApiSourceProps } from "./native-api-source.boundary.js";
 // SDK declaration discovery is memory-only with all external operations
@@ -423,6 +425,12 @@ const program = Effect.gen(function* () {
 }).pipe(
   provideFreshArtifactStore,
   Effect.scoped,
-  Effect.provide(BunServices.layer)
+  Effect.provide(
+    Layer.mergeAll(
+      BunServices.layer,
+      SecureRandom.layerWebCrypto,
+      Digest.layerWebCrypto
+    )
+  )
 );
 BunRuntime.runMain(program);

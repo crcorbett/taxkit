@@ -3,7 +3,6 @@ import {
   Worker,
   cache,
 } from "@alchemy.run/cloudflare/Workers";
-import { NodeCrypto } from "@effect/platform-node";
 import { ApiCalculatorAnalyticsLive } from "@taxkit/analytics/api-usage";
 import { BackendAnalyticsLive } from "@taxkit/analytics/live";
 import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/admission.layer";
@@ -16,6 +15,7 @@ import {
   workerCompatibility,
 } from "@taxkit/infrastructure/worker-settings";
 import { Config, ConfigProvider, Effect, Layer } from "effect";
+import { SecureRandom } from "effect/crypto";
 import { FetchHttpClient } from "effect/http";
 
 import { ApiCalculatorDeliveryLive } from "./analytics-request.boundary.js";
@@ -43,7 +43,7 @@ const ApiAnalyticsLive = ApiCalculatorDeliveryLive.pipe(
   Layer.provide(
     BackendAnalyticsLive.pipe(
       Layer.provide(FetchHttpClient.layer),
-      Layer.provide(NodeCrypto.layer)
+      Layer.provide(SecureRandom.layerWebCrypto)
     )
   )
 );

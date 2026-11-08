@@ -30,7 +30,7 @@ Tax rule packages and local SDK calculations do not depend on this package.
 - `./testing/observations`: narrow test observation types.
 
 `BackendAnalyticsLive` is a static Layer that reads `AnalyticsSettingsConfig`
-from the host ConfigProvider; tests replace that provider. The application supplies native `FetchHttpClient` and Effect `Crypto`. Each
+from the host ConfigProvider; tests replace that provider. The application supplies native `FetchHttpClient` and Effect `SecureRandom`. Each
 backend send owns one scope and one five-second limit covering identity,
 encoding, headers and the complete reply. Replies are limited to 64 KiB. A
 request has one attempt, omits credentials, disables trace propagation and

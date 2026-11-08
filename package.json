@@ -12,10 +12,10 @@
       "packages/rules/au/*"
     ],
     "catalog": {
-      "@effect/platform-bun": "4.0.7",
-      "@effect/platform-browser": "4.0.7",
-      "@effect/platform-node": "4.0.7",
-      "@effect/vitest": "4.0.7",
+      "@effect/platform-bun": "4.1.2",
+      "@effect/platform-browser": "4.1.2",
+      "@effect/platform-node": "4.1.2",
+      "@effect/vitest": "4.1.2",
       "@cloudflare/vite-plugin": "1.65.0",
       "@tanstack/react-router": "1.170.46",
       "@tanstack/react-start": "1.169.4",
@@ -24,19 +24,19 @@
       "@types/react": "19.3.0",
       "@types/react-dom": "19.3.0",
       "@vitejs/plugin-react": "6.1.2",
-      "alchemy": "2.0.0-beta.84",
-      "effect": "4.0.7",
+      "alchemy": "2.0.0-beta.85",
+      "effect": "4.1.2",
       "react": "19.3.1",
       "react-dom": "19.3.1",
       "typescript": "7.0.2",
       "vite": "8.3.5",
       "vitest": "5.0.5",
       "wrangler": "4.154.0",
-      "@alchemy.run/cloudflare": "2.0.0-beta.84",
-      "@alchemy.run/axiom": "2.0.0-beta.84",
-      "@alchemy.run/doppler": "2.0.0-beta.84",
-      "@alchemy.run/frontend-frameworks": "2.0.0-beta.84",
-      "@effect/atom-react": "4.0.7"
+      "@alchemy.run/cloudflare": "2.0.0-beta.85",
+      "@alchemy.run/axiom": "2.0.0-beta.85",
+      "@alchemy.run/doppler": "2.0.0-beta.85",
+      "@alchemy.run/frontend-frameworks": "2.0.0-beta.85",
+      "@effect/atom-react": "4.1.2"
     }
   },
   "type": "module",
@@ -58,7 +58,7 @@
     "format:check": "oxfmt -c oxfmt.config.ts --check . --no-error-on-unmatched-pattern",
     "knip": "knip --no-progress --no-config-hints && bun run knip:production",
     "knip:production": "knip --production --config knip.production.json --no-gitignore --no-progress --no-config-hints",
-    "lint": "bun run format:check && bun run lint:boundary-directives && oxlint -c oxlint.config.ts . --type-aware --disable-nested-config --no-error-on-unmatched-pattern && bun run check:docs && bun run check:repository-paths",
+    "lint": "bun run format:check && bun run lint:refresh && bun run lint:boundary-directives && oxlint -c oxlint.config.ts . --type-aware --disable-nested-config --no-error-on-unmatched-pattern && bun run check:docs && bun run check:repository-paths",
     "lint:boundary-directives": "oxlint -c oxlint.config.ts . --type-aware --allow=taxkit/no-decoding-outside-boundaries --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern",
     "axiom:deploy": "alchemy deploy --config alchemy.axiom.run.ts --stage prod",
     "axiom:plan": "alchemy plan --config alchemy.axiom.run.ts --stage prod",
@@ -79,7 +79,8 @@
     "verification": "bun run build && bun run lint && bun run check-types && bun run knip && bun run test",
     "trace:deploy": "alchemy deploy --config alchemy.trace.run.ts --stage prod",
     "trace:plan": "alchemy plan --config alchemy.trace.run.ts --stage prod",
-    "version-packages": "changeset version"
+    "version-packages": "changeset version",
+    "lint:refresh": "bun update @commonplaces/oxlint-plugin --latest --no-save --no-cache --ignore-scripts && effect-tsgo patch --oxlint"
   },
   "dependencies": {
     "@alchemy.run/cloudflare": "catalog:",
@@ -89,10 +90,10 @@
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",
-    "@commonplaces/oxlint-plugin": "0.8.0",
+    "@commonplaces/oxlint-plugin": "latest",
     "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
-    "@effect/tsgo": "0.63.0",
+    "@effect/tsgo": "0.67.5",
     "@effect/vitest": "catalog:",
     "@types/bun": "catalog:",
     "effect": "catalog:",
@@ -109,11 +110,11 @@
     "yaml": "2.9.1"
   },
   "overrides": {
-    "@effect/platform-node-shared": "4.0.7",
-    "@effect/sql-d1": "4.0.7",
-    "@effect/sql-sqlite-do": "4.0.7",
-    "@effect/tsgo": "0.63.0",
-    "effect": "4.0.7",
+    "@effect/platform-node-shared": "4.1.2",
+    "@effect/sql-d1": "4.1.2",
+    "@effect/sql-sqlite-do": "4.1.2",
+    "@effect/tsgo": "0.67.5",
+    "effect": "4.1.2",
     "workerd": "1.20261027.1"
   },
   "engines": {
