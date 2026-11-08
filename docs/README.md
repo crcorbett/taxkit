@@ -2,6 +2,7 @@
 
 | Owner | Purpose |
 | --- | --- |
+| [Product](../PRODUCT.md) | Users, purpose, positioning, product constraints and brand commitments |
 | [Architecture](../ARCHITECTURE.md) | Apps, packages, requests, runtimes, caching and deployment |
 | [Domain language](../CONTEXT.md) | Money, facts, scenarios, rules, rule packs and calculation outcomes |
 | [Engine](architecture/facts.md) | [Facts](architecture/facts.md), [rules and parameters](architecture/rules-and-parameters.md), [calculators](architecture/calculators.md) and [graph, trace and ledgers](architecture/graph-trace-ledgers.md) |
