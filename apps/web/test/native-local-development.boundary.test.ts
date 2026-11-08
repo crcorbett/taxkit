@@ -367,7 +367,7 @@ describe("native local development", () => {
               QueueClearCalls: yield* Queue.clear(calls),
             }).toStrictEqual({
               apiStatePropsMain: Option.some("apps/api/src/worker.ts"),
-              fsReadDirectoryAuth: ["logs", "profiles"],
+              fsReadDirectoryAuth: ["profiles"],
               fsGlobRootPathJoinAuthProfiles: ["default"],
               QueueClearExceptions: [],
               QueueClearCalls: [],
