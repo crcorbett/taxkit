@@ -43,11 +43,12 @@ require separate readback.
 The browser contract is shared so the Website adapter can keep its SDK private.
 The Website has no analytics relay and sends no collection header.
 
-`ApiCalculatorAnalyticsLive` decorates the supplied calculator service after a
-successful checked result. `ApiCalculatorEvents` is an optional request-owned
+`ApiCalculatorUsageLive` supplies the calculators package's `CalculatorUsage`
+observer, which the public calculator implementation calls after a successful
+checked result, outside its work budget. `ApiCalculatorEvents` is an optional request-owned
 collector, limited to 64 allowed events. Metadata, failed calculations, denied
-collection and calls without a collector produce no event. The decorator
-preserves calculation results/errors and records only checked catalogue ID/name
+collection and calls without a collector produce no event. The observer
+cannot change calculation results/errors; it and records only checked catalogue ID/name
 and collection policy. The [API host](../../apps/api/README.md#analytics-candidate)
 owns collection-header ingress, collector lifetime and delivery through native
 `waitUntil`; native MCP registration must not retain request collectors. A test Layer is

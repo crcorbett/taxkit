@@ -9,6 +9,7 @@ import {
   McpToolUnavailable,
 } from "@taxkit/api-mcp/schemas";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
+import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import {
   CalculatorCatalogResponse,
   CalculatorSchemaResponse,
@@ -17,7 +18,10 @@ import {
   CalculatorRunResponse,
   CalculatorRunRequest,
 } from "@taxkit/calculators/schemas";
-import { PublicCalculatorService } from "@taxkit/calculators/service";
+import {
+  CalculatorCatalogue,
+  PublicCalculatorService,
+} from "@taxkit/calculators/service";
 import {
   CalculationRequest,
   CalculatorLive,
@@ -349,40 +353,17 @@ describe("real MCP client against the native API application", () => {
         const started = yield* Ref.make(0);
         const stopped = yield* Ref.make(0);
         const toolSignals = yield* Ref.make<readonly AbortSignal[]>([]);
-        const calculator = yield* PublicCalculatorService;
+        const calculator = yield* CalculatorCatalogue;
         const app = yield* ApiWorkerApplication.pipe(
           Effect.provide(ApiContentLive),
           Effect.provide(
             PublicCalculatorServiceBounded.pipe(
               Layer.provide(
                 Layer.succeed(
-                  PublicCalculatorService,
-                  PublicCalculatorService.of({
-                    getCalculator: Effect.fn(
-                      "PublicCalculatorService.getCalculator"
-                    )(calculator.getCalculator),
-                    getCalculatorGraph: Effect.fn(
-                      "PublicCalculatorService.getCalculatorGraph"
-                    )(calculator.getCalculatorGraph),
-                    getCalculatorSchema: Effect.fn(
-                      "PublicCalculatorService.getCalculatorSchema"
-                    )(calculator.getCalculatorSchema),
-                    listCalculators: Effect.fn(
-                      "PublicCalculatorService.listCalculators"
-                    )(calculator.listCalculators),
-                    listFacts: Effect.fn("PublicCalculatorService.listFacts")(
-                      calculator.listFacts
-                    ),
-                    listJurisdictions: Effect.fn(
-                      "PublicCalculatorService.listJurisdictions"
-                    )(calculator.listJurisdictions),
-                    listRules: Effect.fn("PublicCalculatorService.listRules")(
-                      calculator.listRules
-                    ),
-                    listTaxYears: Effect.fn(
-                      "PublicCalculatorService.listTaxYears"
-                    )(calculator.listTaxYears),
-                    calculate: Effect.fn("PublicCalculatorService.calculate")(
+                  CalculatorCatalogue,
+                  CalculatorCatalogue.of({
+                    ...calculator,
+                    calculate: Effect.fn("CalculatorCatalogue.calculate")(
                       (request) =>
                         Effect.gen(function* () {
                           const count = yield* Ref.updateAndGet(
@@ -529,7 +510,7 @@ describe("real MCP client against the native API application", () => {
         expect(yield* Ref.get(stopped)).toBe(CalculatorConcurrencyLimit + 1);
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
-        Effect.provide(CalculatorLive),
+        Effect.provide(CalculatorCatalogueLive),
         Effect.scoped
       )
   );

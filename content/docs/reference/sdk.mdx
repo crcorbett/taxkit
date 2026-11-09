@@ -6,19 +6,19 @@ status: "published"
 
 # SDK reference
 
-| Import                | Owns                                                                            |
-| --------------------- | ------------------------------------------------------------------------------- |
-| `taxkit`              | `calculate`, `calculateSafe`, `run`, `createClient`                             |
-| `taxkit/au`           | Named conveniences and complete AU calculator definitions                       |
-| `taxkit/au/schemas`   | Scenarios, facts, parameters and checked report codecs                          |
-| `taxkit/effect`       | `calculateReport`, `calculateRun`, `decodeInput`, `TaxKitService`, `TaxKitLive` |
-| `taxkit/au/effect`    | Native programs, fact services, rules and rule-pack Layers                      |
-| `taxkit/money`        | Synchronous native Result operations and Money codecs                           |
-| `taxkit/money/effect` | Lazy Effect money operations                                                    |
-| `taxkit/schemas`      | Shared calculator, metadata and error Schemas                                   |
-| `taxkit/core`         | Engine, rule and fact definition contracts                                      |
-| `taxkit/http`         | Native generated HTTP client contracts                                          |
-| `taxkit/testing`      | Engine substitution support                                                     |
+| Import                | Owns                                                       |
+| --------------------- | ---------------------------------------------------------- |
+| `taxkit`              | `calculate`, `calculateSafe`, `run`, `createClient`        |
+| `taxkit/au`           | Named conveniences and complete AU calculator definitions  |
+| `taxkit/au/schemas`   | Scenarios, facts, parameters and checked report codecs     |
+| `taxkit/effect`       | `calculateReport`, `calculateRun` and `decodeInput`        |
+| `taxkit/au/effect`    | Native programs, fact services, rules and rule-pack Layers |
+| `taxkit/money`        | Synchronous native Result operations and Money codecs      |
+| `taxkit/money/effect` | Lazy Effect money operations                               |
+| `taxkit/schemas`      | Shared calculator, metadata and error Schemas              |
+| `taxkit/core`         | Calculator, rule and fact definition contracts             |
+| `taxkit/http`         | Native generated HTTP client contracts                     |
+| `taxkit/testing`      | Checked scenario fixtures for integration tests            |
 
 All paths belong to the single `taxkit` package. Both interfaces execute the same owning programs.
 
@@ -41,7 +41,7 @@ import { Effect } from "effect";
 import { AuPayTakeHomeCalculation } from "taxkit/au";
 import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
 import { fromDecimal, nonNegative } from "taxkit/money/effect";
-import { calculateRun, TaxKitLive } from "taxkit/effect";
+import { calculateRun } from "taxkit/effect";
 
 export const program = Effect.gen(function* () {
   const grossPay = yield* fromDecimal("3462.00").pipe(
@@ -53,5 +53,5 @@ export const program = Effect.gen(function* () {
     taxFreeThresholdClaimed: true,
   });
   return yield* calculateRun(AuPayTakeHomeCalculation, input);
-}).pipe(Effect.provide(TaxKitLive));
+});
 ```

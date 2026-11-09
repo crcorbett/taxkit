@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { AuPayTakeHomeCalculation } from "taxkit/au";
 import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
-import { calculateRun, TaxKitLive } from "taxkit/effect";
+import { calculateRun } from "taxkit/effect";
 import { fromDecimal, nonNegative } from "taxkit/money/effect";
 
 export const program = Effect.gen(function* () {
@@ -14,4 +14,4 @@ export const program = Effect.gen(function* () {
     taxFreeThresholdClaimed: true,
   });
   return yield* calculateRun(AuPayTakeHomeCalculation, input);
-}).pipe(Effect.provide(TaxKitLive));
+});

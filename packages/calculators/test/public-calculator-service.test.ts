@@ -1,9 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import {
-  InputValidationError,
-  inputValidationError,
-  CalculationEngineLive,
-} from "@taxkit/core";
+import { InputValidationError, inputValidationError } from "@taxkit/core";
 import { NonNegativeMoney, fromCents } from "@taxkit/core/primitives";
 import type { Money } from "@taxkit/core/primitives";
 import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax";
@@ -20,7 +16,6 @@ import {
   Predicate,
   Function as EffectFunction,
   Effect,
-  Layer,
   Match,
   Option,
   Result,
@@ -34,9 +29,7 @@ import {
 } from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
 
-const ServiceLive = PublicCalculatorServiceLive.pipe(
-  Layer.provide(CalculationEngineLive)
-);
+const ServiceLive = PublicCalculatorServiceLive;
 const grossPayFacts = (
   amount: Money,
   period: GrossPay["period"],

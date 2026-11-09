@@ -12,7 +12,13 @@ review_trigger: schemas, exports, calculator contract or runtime ownership chang
 This private package owns the public calculator catalogue, correlated transport
 Schemas, metadata projections and `PublicCalculatorService`. HTTP and MCP hosts
 use the service. The SDK executes the same complete rule-owned definitions
-through the calculation engine directly.
+directly; each is a closed program.
+
+`CalculatorCatalogue` is the catalogue itself (`CalculatorCatalogueLive`):
+metadata and owning-definition dispatch, without host policy. There is one
+`PublicCalculatorService` implementation over it, which owns the shared work
+budget, optional calculation admission and the `CalculatorUsage` observer.
+Hosts choose a composition; no Layer rebuilds the service it requires.
 
 ## Contracts
 
@@ -23,7 +29,7 @@ optional fields use one `Option`. Transport ingress decodes strictly once, then
 the service dispatches the checked scenario to its owning definition.
 
 `CalculatorRunResponse` correlates the identity, catalogue metadata and owning
-report codec, with native engine diagnostics. `CalculatorServiceError` composes
+report codec, with the definition's graph diagnostics. `CalculatorServiceError` composes
 safe input, context, calculation and host-policy failures. Shared
 `InputValidationError` projects bounded field paths and fixed messages without
 rejected values or opaque diagnostic causes. Descriptor-backed field guidance
@@ -66,14 +72,18 @@ See [API and SDK](../../docs/architecture/api-and-sdk.md) and
 
 ## Shared calculation work limits
 
-`@taxkit/calculators/work` exports `PublicCalculatorServiceBounded`. A host builds
-this Layer once over its calculator implementation. It owns one pool of eight
-active calculations; each calculation takes a separate place.
+`@taxkit/calculators/work` exports `PublicCalculatorServiceBounded` (no rate
+admission) and `PublicCalculatorServiceRateLimited`, both over a supplied
+`CalculatorCatalogue`; `PublicCalculatorServiceLive` is the bounded service over
+`CalculatorCatalogueLive`. A host builds one of them once. It owns one pool of
+eight active calculations; each calculation takes a separate place.
 There is no waiting queue. A full pool returns `CalculatorCapacityExceeded`.
 The native API instance supplies the same service to HTTP and MCP. The retained
 standalone HTTP Layer builds its pool once when the router is constructed.
-Metadata does not take a calculation place. Direct engine and local SDK use
-remain outside this anonymous server policy; their retained results are unchanged.
+Metadata does not take a calculation place. Direct definition and local SDK
+use remain outside this anonymous server policy. A successful calculation is
+reported to `CalculatorUsage` after its place is released; the default observer
+does nothing.
 
 All nine server service methods have a five-second budget, including scoped
 cleanup. A timeout returns `CalculatorOperationTimedOut`; expected engine
@@ -97,11 +107,11 @@ future MCP admission.
 ## Native calculation rate admission
 
 `CalculatorAdmission` owns the closed `admitCalculation` operation and
-`PublicCalculatorServiceRateLimited` places it before calculation work. The
-native API builds this Layer once, underneath its existing bounded service.
+`PublicCalculatorServiceRateLimited` checks it before catalogue work, inside the
+shared work budget. The native API builds this Layer once over the catalogue.
 HTTP and MCP therefore share one allowance. Each
 calculation consumes one unit; all metadata operations remain outside it.
-Direct engine, local SDK and the standalone Bun server keep their existing
+Direct definitions, local SDK and the standalone Bun server keep their existing
 contracts. Those hosts do not automatically acquire this native policy.
 
 The allowance is 60 calculations per minute for a checked connection address.

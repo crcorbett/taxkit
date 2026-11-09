@@ -95,7 +95,7 @@ HTTP calculate
     -> checked correlated identity and scenario
       -> CalculatorApiHandlerLive verifies path/body identity
         -> PublicCalculatorService.calculate(request)
-          -> complete owning calculator definition and CalculationEngine
+          -> complete owning calculator definition (closed program)
           -> correlated CalculatorRunResponse
 ```
 
@@ -107,7 +107,7 @@ SDK HTTP comparison tests
   -> HttpApiClient.make(TaxKitApi) over TaxKitApiInProcessLive
     -> CalculatorApiHandlerLive
       -> PublicCalculatorServiceLive
-        -> CalculationEngineLive
+        -> CalculatorCatalogueLive
   -> success response equals SDK full-run response
   -> InputValidationError maps to CalculatorApiErrorEnvelope
 ```
@@ -168,7 +168,6 @@ Export paths:
 
 - `@taxkit/api-http`
 - `@taxkit/api-http/api`
-- `@taxkit/api-http/config`
 - `@taxkit/api-http/in-process`
 - `@taxkit/api-http/request-boundary`
 - `@taxkit/api-http/response-policy`
@@ -220,12 +219,9 @@ Cloudflare CDN cache-control headers. Non-public replies are `no-store`.
 Public read paths are documentation and discovery routes, calculator metadata
 and OpenAPI documents; health, calculation and MCP are never shared.
 
-`@taxkit/api-http/config` owns the reusable client config schema, type and
-keyed config fragment (`baseUrl`). The package owns its env namespaces,
-`TAXKIT_API_*` and `VITE_TAXKIT_API_*`. The Website does not use it; the API
-Worker and Website read the API address through the internal
-`@taxkit/api-http/origin` export instead. See
-`docs/architecture/configuration.md`.
+The API Worker and Website read the API address through the internal
+`@taxkit/api-http/origin` export (`TaxKitApiOrigin`), its single checked owner.
+See `docs/architecture/configuration.md`.
 
 Current responses are schema-backed with Effect Schema. Calculator response
 schemas are imported from `@taxkit/calculators`; route-only HTTP envelopes and

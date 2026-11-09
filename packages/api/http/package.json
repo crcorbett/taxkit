@@ -8,7 +8,6 @@
     ".": "./src/index.ts",
     "./api": "./src/api.ts",
     "./in-process": "./src/in-process.layer.ts",
-    "./config": "./src/config.ts",
     "./server": "./src/server.ts",
     "./handlers": "./src/handlers/index.ts",
     "./handlers/live": "./src/handlers/live.ts",
@@ -34,13 +33,12 @@
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
-    "@taxkit/rules-au-income-tax": "workspace:*",
-    "@taxkit/rules-au-pay": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
+    "@taxkit/rules-au-pay": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

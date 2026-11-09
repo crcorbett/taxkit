@@ -55,7 +55,6 @@ describe("shared native host calculation admission", () => {
       mode: "local-emulator",
       origin: "https://api.example.com",
     },
-    { allowed: false, mode: "private-canary", origin: "http://127.0.0.1:4214" },
     { allowed: true, mode: "local-emulator", origin: "http://127.0.0.1:4214" },
   ])(
     "local admission requires explicit emulator mode and a loopback origin",
@@ -110,6 +109,37 @@ describe("shared native host calculation admission", () => {
             CALCULATOR_HOST_MODE: mode,
             TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
             WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+          })
+        ),
+        Effect.scoped
+      )
+  );
+  it.effect.each(["private-canary", "Edge"])(
+    "fails startup for an invalid calculator host mode %j",
+    (mode) =>
+      ApiWorkerInit.pipe(
+        Effect.provideService(
+          CalculatorAdmission,
+          CalculatorAdmission.of({
+            admitCalculation: Effect.fn("CalculatorAdmission.admitCalculation")(
+              () => Effect.die("An invalid host mode reached admission")
+            ),
+          })
+        ),
+        Effect.provideService(
+          ConfigProvider.ConfigProvider,
+          ConfigProvider.fromUnknown({
+            API_PUBLIC_ORIGIN: "http://127.0.0.1:4214",
+            CALCULATOR_HOST_MODE: mode,
+            TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
+            WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+          })
+        ),
+        Effect.flip,
+        Effect.tap((error) =>
+          Effect.sync(() => {
+            const failedConfig = Predicate.isTagged(error, "ConfigError");
+            expect(failedConfig).toBeTruthy();
           })
         ),
         Effect.scoped

@@ -330,7 +330,6 @@ describe("portable rules", () => {
         "packages/sdk/typescript/test/index.test.ts",
         "packages/sdk/typescript/src/index.ts",
         "packages/sdk/typescript/src/au.ts",
-        "packages/sdk/typescript/src/live.layer.ts",
         "packages/sdk/typescript/src/schemas/index.ts",
         "packages/sdk/typescript/src/testing/index.ts",
         "packages/sdk/typescript/src/types.ts",

@@ -1,6 +1,12 @@
 import * as Mdx from "@taxkit/mdx/schemas";
 import { Theme } from "@taxkit/mdx/theme";
-import { Function as EffectFunction, Array, HashSet, Schema } from "effect";
+import {
+  Function as EffectFunction,
+  Array,
+  Effect,
+  HashSet,
+  Schema,
+} from "effect";
 // Shared public address policy; API and Website retain distinct identities.
 export const PublicHttpOrigin = Schema.URLFromString.check(
   Schema.makeFilter(
@@ -81,7 +87,10 @@ export const DocsNavigationLeaf = Schema.Struct({
 export type DocsNavigationLeaf = typeof DocsNavigationLeaf.Type;
 export const DocsNavigationItem = Schema.Struct({
   ...DocsNavigationLeaf.fields,
-  pages: Schema.optional(Schema.Array(DocsNavigationLeaf)),
+  // Absent section pages decode to an empty list once, at ingress.
+  pages: Schema.Array(DocsNavigationLeaf).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed([]))
+  ),
 });
 export type DocsNavigationItem = typeof DocsNavigationItem.Type;
 export const DocsNavigation = Schema.Struct({

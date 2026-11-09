@@ -48,7 +48,7 @@ export const CalculateAnnualTax = Effect.gen(function* () {
 });
 /**
  * The caller's decoded annual tax scenario. Supply it with
- * `Layer.succeed(AnnualTaxScenario)(input)` after decoding
+ * `Effect.provideService(AnnualTaxScenario, input)` after decoding
  * `AnnualTaxScenarioInputSchema` at the caller's boundary.
  *
  * @since 2.0.0

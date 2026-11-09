@@ -52,9 +52,11 @@ HTTP handlers or filesystem adapters.
   Rule parameters are always an array, defaulting to empty. Duplicate-provider
   permission is an Option that preserves explicit false. Service tuple types
   read each descriptor key's native `Identifier`, including empty tuples.
-- The calculation engine contract lives in `calculation-engine.ts`; its
-  implementation lives in `live.layer.ts`. Root and engine package entrypoints
-  retain `CalculationEngineLive`. Validation issues still default to empty.
+- There is no calculation engine service. `defineCalculator` validates the
+  rule graph once and returns a closed `calculate` program; owners compose their
+  static rule-pack Layers and supply only the checked scenario per call (see
+  [ADR 0012](../../docs/adr/0012-closed-calculator-programs.md)). Every result
+  carries that definition's `CalculationDiagnostics`.
 - Reuse canonical schemas, branded ids and constructors. Do not redeclare
   canonical fields such as `id: string` in consumers.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,

@@ -169,11 +169,7 @@ describe("checked public documentation HTTP", () => {
         const controlled = Layer.succeed(
           ContentService,
           ContentService.of({
-            getNavigation: Effect.fn("ContentService.getNavigation")(
-              live.getNavigation
-            ),
-            getPage: Effect.fn("ContentService.getPage")(live.getPage),
-            listPages: Effect.fn("ContentService.listPages")(live.listPages),
+            ...live,
             searchPages: Effect.fn("ContentService.searchPages")(() =>
               Effect.fail(
                 new DocsSourceError({
@@ -210,13 +206,7 @@ describe("checked public documentation HTTP", () => {
         const controlled = Layer.succeed(
           ContentService,
           ContentService.of({
-            getNavigation: Effect.fn("ContentService.getNavigation")(
-              live.getNavigation
-            ),
-            searchPages: Effect.fn("ContentService.searchPages")(
-              live.searchPages
-            ),
-            listPages: Effect.fn("ContentService.listPages")(live.listPages),
+            ...live,
             getPage: Effect.fn("ContentService.getPage")(() =>
               Deferred.succeed(entered, true).pipe(
                 Effect.andThen(Effect.never),

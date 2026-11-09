@@ -1016,7 +1016,11 @@ describe("native app root secret selection", () => {
                 Effect.failCause(
                   cause.pipe(
                     Cause.map(
-                      () => new SecretSourceError({ source: "configuration" })
+                      () =>
+                        new SecretSourceError({
+                          source: "configuration",
+                          reason: "unavailable",
+                        })
                     )
                   )
                 )
@@ -1082,7 +1086,11 @@ describe("native app root secret selection", () => {
                 Effect.failCause(
                   cause.pipe(
                     Cause.map(
-                      () => new SecretSourceError({ source: "configuration" })
+                      () =>
+                        new SecretSourceError({
+                          source: "configuration",
+                          reason: "unavailable",
+                        })
                     )
                   )
                 )
@@ -1098,7 +1106,11 @@ describe("native app root secret selection", () => {
                 Effect.failCause(
                   cause.pipe(
                     Cause.map(
-                      () => new SecretSourceError({ source: "configuration" })
+                      () =>
+                        new SecretSourceError({
+                          source: "configuration",
+                          reason: "unavailable",
+                        })
                     )
                   )
                 )

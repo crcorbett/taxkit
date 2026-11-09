@@ -137,9 +137,10 @@ Local plans and transport tests do not show a deployment works.
 
 ## Analytics candidate
 
-`@taxkit/analytics/api-usage` owns the calculator analytics decorator, composed
-here after native hosted calculation succeeds. It collects only the catalogue
-calculator ID and name. HTTP and the two MCP protocols use this same decorator;
+`@taxkit/analytics/api-usage` owns the calculator usage observer
+(`ApiCalculatorUsageLive`), supplied here to the one public calculator
+implementation and called after native hosted calculation succeeds. It collects only the catalogue
+calculator ID and name. HTTP and the two MCP protocols use this same observer;
 pure tax packages and local SDK calls have no analytics dependency. Metadata,
 failed or interrupted calculations add no successful-use event. A request can
 collect at most 64 successes; excess analytics are dropped without changing
@@ -412,13 +413,13 @@ and safe-reporter assertions remain.
 
 ## Native calculation rate admission
 
-The native API builds `PublicCalculatorServiceRateLimited` once underneath its
-bounded service. HTTP and modern MCP share the
+The native API builds `PublicCalculatorServiceRateLimited` once over
+`CalculatorCatalogueLive`; admission runs inside its shared work budget. HTTP and modern MCP share the
 [calculator-owned rate contract](../../packages/calculators/README.md#native-calculation-rate-admission).
 Public requests need a checked original Cloudflare connection address;
 arbitrary Worker headers cannot select a key.
 
-`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. The operator must select an account-wide unique stage value before a cloud plan/apply; no provider value is invented. The [infrastructure owner](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns graph and local-root selection. Hosted mode defaults to `edge`. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
+`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. The operator must select an account-wide unique stage value before a cloud plan/apply; no provider value is invented. The [infrastructure owner](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns graph and local-root selection. Hosted mode defaults to `edge` when `CALCULATOR_HOST_MODE` is absent; an invalid value fails Worker startup. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
 
 Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) is approximate and local to a location, not an exact global quota. Real edge identity, namespace uniqueness and uploaded provider settings need separate authorised readback. Direct engine/local SDK and standalone Bun execution keep their existing contracts.
 

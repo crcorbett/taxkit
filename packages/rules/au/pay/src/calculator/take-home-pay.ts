@@ -71,7 +71,7 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
 
 /**
  * The caller's decoded take-home scenario. Supply it with
- * `Layer.succeed(TakeHomeScenario)(input)` after decoding
+ * `Effect.provideService(TakeHomeScenario, input)` after decoding
  * `TakeHomeScenarioInputSchema` at the caller's boundary.
  *
  * @since 2.0.0

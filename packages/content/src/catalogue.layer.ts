@@ -36,7 +36,7 @@ export const ContentCatalogueLive = Layer.effect(
     );
     const leaves = EffectFunction.pipe(
       navigation.primaryNavigation,
-      Array.flatMap((item) => [item, ...(item.pages ?? [])])
+      Array.flatMap((item) => [item, ...item.pages])
     );
     const addresses = HashMap.fromIterable(
       EffectFunction.pipe(
@@ -111,7 +111,7 @@ export const ContentCatalogueLive = Layer.effect(
           (item) =>
             !HashSet.has(published, item.path) &&
             EffectFunction.pipe(
-              item.pages ?? [],
+              item.pages,
               Array.some((child) => HashSet.has(published, child.path))
             )
         )
@@ -129,7 +129,7 @@ export const ContentCatalogueLive = Layer.effect(
           Array.map((item) => ({
             ...item,
             pages: EffectFunction.pipe(
-              item.pages ?? [],
+              item.pages,
               Array.filter((child) => HashSet.has(published, child.path))
             ),
           }))

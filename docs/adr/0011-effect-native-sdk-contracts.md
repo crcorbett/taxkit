@@ -1,7 +1,9 @@
 # Effect-native SDK contracts and checked money
 
 Status: Accepted for SDK 5.0.0. Implemented as one hard cutover; publication
-remains subject to the repository release gates.
+remains subject to the repository release gates. The engine service,
+`TaxKitLive` and engine-substitution decisions are superseded by
+[ADR 0012](0012-closed-calculator-programs.md).
 
 TaxKit will use one Schema-owned domain model and native Effect execution for
 money, facts, rules and calculators. Both the Effect and vanilla TypeScript

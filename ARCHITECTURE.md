@@ -11,7 +11,7 @@ everything from the API. There is no database or sign-in.
 
 | Owner                                                | Responsibility                                                                                                                                              |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/core` — `@taxkit/core`                     | Money and date primitives, fact/rule/parameter descriptors, graph validation, traces, ledgers and the `CalculationEngine`                                   |
+| `packages/core` — `@taxkit/core`                     | Money and date primitives, fact/rule/parameter descriptors, graph validation, traces, ledgers and `defineCalculator`                                        |
 | `packages/rules/au/*` — `@taxkit/rules-au-*`         | Australian take-home pay and PAYG withholding, annual income tax and STSL rule packs                                                                        |
 | `packages/calculators` — `@taxkit/calculators`       | Calculator catalogue, metadata, graph, calculation dispatch and expected errors; the browser calculator page: forms, page atoms, view Schema and page tools |
 | `packages/api/http` — `@taxkit/api-http`             | Native HTTP contract and handlers, the route catalogue, cache policy, `Accept` negotiation and the generated client's named reads and errors                |
@@ -69,7 +69,7 @@ flowchart LR
   Agent[HTTP / MCP / SDK caller] --> API
   API --> Admission[Rate and work admission]
   Admission --> Calculators[PublicCalculatorService]
-  Calculators --> Engine[CalculationEngine and rule packs]
+  Calculators --> Engine[Closed calculator programs and rule packs]
 ```
 
 The browser calls the API's public origin directly with the generated
