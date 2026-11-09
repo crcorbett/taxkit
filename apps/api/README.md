@@ -457,7 +457,7 @@ not establish that progress. Native cancellation qualification retains the
 negative prompt-cleanup oracle and requires all eight places to recover at the
 work budget. Local tests do not establish deployed access or arbitrary external
 client compatibility. The [browser caller owner](../web/README.md#browser-tools)
-covers on-page tools.
+covers the Website's WebMCP registration of the same tools.
 
 The root-owned native source builder discovers the actual SDK Worker declaration
 through memory-only compilation. Provider, credential and network operations

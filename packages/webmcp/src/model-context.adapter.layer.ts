@@ -1,4 +1,3 @@
-import { DocsWebsiteOrigin } from "@taxkit/content/schemas";
 import {
   Duration,
   Effect,
@@ -7,7 +6,6 @@ import {
   Option,
   Predicate,
   Schema,
-  Boolean as EffectBoolean,
 } from "effect";
 import type { WebMCP } from "webmcp-types";
 
@@ -23,28 +21,37 @@ const NativeModelContext = Schema.declare<NativeModelContext>(
     Predicate.hasProperty(input, "registerTool") &&
     Predicate.isFunction(input.registerTool)
 );
-// Server rendering has no document. Detection is lazy at this host boundary,
-// so importing the module performs no browser work.
-const findModelContext = (site: DocsWebsiteOrigin) =>
-  Effect.sync(() => {
-    const documentHost = Option.fromNullishOr(globalThis.document);
-    if (Option.isNone(documentHost)) {
-      return Option.none<NativeModelContext>();
-    }
-    const origin = Schema.decodeUnknownOption(DocsWebsiteOrigin)(
-      globalThis.location.origin
-    );
-    return EffectBoolean.match(
-      Option.isSome(origin) && origin.value.origin === site.origin,
-      {
-        onFalse: () => Option.none<NativeModelContext>(),
-        onTrue: () =>
-          Schema.decodeUnknownOption(NativeModelContext)(
-            documentHost.value.modelContext
-          ),
-      }
-    );
-  });
+const ModelContextOwner = Schema.Struct({
+  modelContext: Schema.optional(NativeModelContext),
+});
+const ModelContextOwners = Schema.Struct({
+  document: Schema.optional(ModelContextOwner),
+  location: Schema.Struct({ origin: Schema.String }),
+  navigator: Schema.optional(ModelContextOwner),
+});
+// Detection reads `document.modelContext` (the draft and Chrome 153), then the
+// older `navigator.modelContext`; retire that fallback once no supported
+// browser exposes only the navigator host. Server rendering, an unsupporting
+// browser or another origin has none. Suspended, so each registration reads
+// the current globals and importing this module performs no browser work.
+const findModelContext = (site: WebMcpSite["Service"]) =>
+  Effect.suspend(() =>
+    Schema.decodeUnknownEffect(ModelContextOwners)(globalThis)
+  ).pipe(
+    Effect.option,
+    Effect.map(
+      Option.filter((owners) => owners.location.origin === site.origin.origin)
+    ),
+    Effect.map(
+      Option.flatMap((owners) =>
+        Option.fromNullishOr(owners.document?.modelContext).pipe(
+          Option.orElse(() =>
+            Option.fromNullishOr(owners.navigator?.modelContext)
+          )
+        )
+      )
+    )
+  );
 // The one browser Promise bridge for WebMCP. The host's `registerTool`
 // returns a Promise and calls `execute` outside Effect; the registration
 // Scope owns both the tool's removal and its running callbacks.
@@ -56,7 +63,7 @@ export const ModelContextHostLive = Layer.effect(
       registerTool: Effect.fn("ModelContextHost.registerTool")(function* (
         tool: WebMcpTool
       ) {
-        const host = yield* findModelContext(site.origin);
+        const host = yield* findModelContext(site);
         if (Option.isNone(host)) {
           return;
         }
@@ -88,9 +95,7 @@ export const ModelContextHostLive = Layer.effect(
             host.value.registerTool(
               {
                 annotations: {
-                  consequentialHint: false,
                   readOnlyHint: tool.annotations.readOnlyHint,
-                  untrustedContentHint: true,
                 },
                 description: tool.description,
                 execute: (input, options) => {

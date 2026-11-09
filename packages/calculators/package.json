@@ -15,9 +15,7 @@
     "./admission.service": "./src/admission.service.ts",
     "./testing/fixtures": "./src/__testing__/fixtures.ts",
     "./form": "./src/form.ingress.ts",
-    "./page": "./src/page.atoms.ts",
-    "./page-schemas": "./src/page.schemas.ts",
-    "./page-tools": "./src/page.tools.ts"
+    "./page": "./src/page.atoms.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p tsconfig.type-tests.json --noEmit",

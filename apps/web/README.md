@@ -17,9 +17,9 @@ page state, tools and WebMCP live in their packages.
 | `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.ingress.ts` (Markdown files and `Accept`) |
 | `pages/` | `loaders.ts`, `load.failure.ts`, `loader-context.ts` and the root load |
 | `docs/` | documentation chrome, reading views, appearance/copy/outline Atoms and the search address reader |
-| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts`, `tools.atoms.ts`, the caveat text and the safe failure text |
+| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts`, the caveat text and the safe failure text |
 | `seo/` | `head.ts`, the documentation page head |
-| root | `runtime.server.ts`, `runtime.client.ts` and `api-client.atoms.ts` |
+| root | `runtime.server.ts`, `runtime.client.ts` (loaders and `webMcpAtom`), `browser-atoms.ts` (the client/server atom selection mounted at the root) and `api-client.atoms.ts` |
 
 ## What runs where
 
@@ -251,23 +251,25 @@ graph enables the Website's native Workers Cache scoped to the deployed version.
 
 ## Browser tools
 
-On a mounted calculator, browsers with WebMCP support can register five tools:
-`taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`,
-`taxkit_calculate_visible_form` and `taxkit_read_result`. The toolkit and its
-handlers belong to `@taxkit/calculators/page-tools`, registration to
-[`@taxkit/webmcp`](../../packages/webmcp/README.md), and
-`calculators/tools.atoms.ts` declares a static registration family keyed by
-calculator ID that the page container mounts with `useAtomMount`. Its Scope owns
-the host Layer, the tools and their callbacks; because tool names are unique in
-a document, a newly mounted page waits for the previous page's registration
-Scope to close before registering. The toolkit is a static import: the shared
-lint policy forbids dynamic `import()`. They use the
-page's own edit and submit commands and the same `ApiClient`; mounting or
-reading starts no calculation. Each tool has a
-two-second registration limit and calculation has a twelve-second outer limit.
-A caller's cancellation or an edit cancels only the request that call owns;
-another unfinished calculation is reported as busy. Page cleanup removes the
-tools. Failures carry fixed codes without input values. `/agents` links the
+Browsers with WebMCP support get the API's six MCP tools, with the same names,
+descriptions, strict input Schemas and read-only hints as remote MCP's
+`tools/list`. `runtime.client.ts` declares one `webMcpAtom` in the browser
+runtime: it builds `ModelContextHostLive` for the checked Website origin and the
+`@taxkit/api-mcp/client-handlers` handlers over the shared `ApiClient`, then
+runs `registerWebMcpTools` from [`@taxkit/webmcp`](../../packages/webmcp/README.md).
+`browser-atoms.ts` selects that Atom with `createIsomorphicFn` in the browser and
+an inert Atom during server rendering; `__root.tsx` mounts it once with
+`useAtomMount`. The tools therefore stay registered across client navigation,
+and the root registry's disposal removes them and interrupts running calls
+without closing the shared client. Calculator pages register nothing. All
+imports are static: the shared lint policy forbids dynamic `import()`.
+
+Each tool call is a public API request with the client's ten-second read
+bound; `taxkit_calculate` uses the shared anonymous allowance. Results follow
+MCP's tool result: invalid input is answered with detail and no request, a
+declared failure carries the same safe `McpToolUnavailable` code as remote MCP,
+and anything else is a fixed message. A registration has a two-second limit,
+and a caller's cancellation interrupts that call's request. `/agents` links the
 remote MCP address on the API origin, the OpenAPI description and the
 [agent connection guide](../../content/docs/api/agent-tools.mdx).
 

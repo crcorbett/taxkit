@@ -15,22 +15,18 @@ type CalculatorId = CalculatorRunRequest["calculatorId"];
  */
 export interface CalculatorPage<E> {
   readonly calculatorId: CalculatorId;
-  // Checked request identity belongs to one visible attempt. An edit or a
-  // newer manual or tool submission invalidates a waiter for the older one.
-  readonly attempt: Atom.Writable<Option.Option<CalculatorRunRequest>>;
   readonly calculation: Atom.AtomResultFn<
     CalculatorRunRequest,
     CalculatorRunResponse,
     E
   >;
-  readonly cancel: Atom.Writable<Option.Option<void>, "cancel">;
   readonly edit: Atom.Writable<Option.Option<void>, CalculatorForm>;
   readonly form: Atom.Writable<CalculatorForm>;
   readonly submit: Atom.Writable<Option.Option<void>, "calculate">;
   readonly view: Atom.Atom<CalculatorViewState>;
 }
 /**
- * The one readonly page view shared by the visible form and its browser tools.
+ * The one readonly page view of the visible form.
  * The response is a tagged union over the calculator ID, so selecting this
  * page's variant already selects its report kind. Editing keeps the last
  * answer, visibly stale; an old error is hidden while a new request runs.

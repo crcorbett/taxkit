@@ -3,6 +3,7 @@ import {
   RegistryProvider,
   scheduleTask,
   useAtomInitialValues,
+  useAtomMount,
 } from "@effect/atom-react";
 import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import {
@@ -29,6 +30,7 @@ import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 
 import { publicSettingsAtom } from "#/lib/api-client.atoms";
+import { browserAtoms } from "#/lib/browser-atoms";
 import { docsHeadingId } from "#/lib/docs/focus.atoms";
 import { DocsNavigationFocus } from "#/lib/docs/focus.container";
 import { WebsiteRootView } from "#/lib/host/schemas";
@@ -99,6 +101,12 @@ const RootRegistry = ({
       <BrowserRegistry registry={value}>{children}</BrowserRegistry>
     ),
   });
+// One WebMCP registration for the whole app: browser tools stay registered
+// across client navigation and are removed when the root registry closes.
+const BrowserTools = () => {
+  useAtomMount(browserAtoms().registration);
+  return null;
+};
 const InitialSettings = ({
   children,
   settings,
@@ -165,6 +173,7 @@ function RootComponent() {
   return (
     <RootRegistry registry={registry}>
       <InitialSettings settings={settings}>
+        <BrowserTools />
         <DocsNavigationFocus />
         <div className="app-shell">
           <a

@@ -26,6 +26,7 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@taxkit/api-http": "workspace:*",
+    "@taxkit/api-mcp": "workspace:*",
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/mdx-react": "workspace:*",
@@ -53,6 +54,7 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
+    "webmcp-types": "0.1.10",
     "wrangler": "catalog:"
   }
 }

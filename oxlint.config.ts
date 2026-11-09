@@ -44,6 +44,12 @@ const decodingBoundaryFiles = [
   "packages/webmcp/src/model-context.adapter.layer.ts",
   "packages/webmcp/test/registration.test.ts",
   "tools/apps-local/test/native-browser-tools.boundary.test.ts",
+  "apps/web/test/host/webmcp.boundary.test.ts",
+  // The toolkit's type-erased encoded success, read back once as the MCP
+  // structured content the browser host receives.
+  "packages/webmcp/src/registration.egress.ts",
+  // Agent-supplied JSON tool input for the shared MCP toolkit parity proof.
+  "packages/api/mcp/test/client-handlers.test.ts",
   // Exact official MCP client wire ingress and adversarial host fixture.
   "apps/api/test/mcp-client.boundary.test.ts",
   "tools/apps-local/test/native-mcp.boundary.test.ts",
@@ -241,8 +247,11 @@ const schemaEncoderEgressFiles = [
   "tools/apps-local/test/native-mcp.boundary.test.ts",
   // Exact checked public structured-data script egress; no decoder/runtime permission.
   "packages/content/src/publication.egress.ts",
-  // The encoded tool failure the browser's WebMCP host receives.
+  // The encoded tool result and failure the browser's WebMCP host receives.
   "packages/webmcp/src/registration.egress.ts",
+  // Exact JSON tool input sent by an MCP client.
+  "packages/webmcp/test/registration.test.ts",
+  "packages/api/mcp/test/client-handlers.test.ts",
   // Exact public catalogue representation round-trip proof, not a service encoder.
   "packages/content/test/schemas.test.ts",
   // Exact rate wire/secret-negative fixtures; no production encoding permission.
@@ -1083,6 +1092,7 @@ export default defineConfig({
         "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
         "packages/webmcp/test/registration.test.ts",
         "packages/webmcp/src/model-context.adapter.layer.ts",
+        "apps/web/test/host/webmcp.boundary.test.ts",
         "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
         "apps/web/src/entry.server.ts",
         "tools/apps-local/test/native-analytics.boundary.test.ts",
@@ -1136,6 +1146,7 @@ export default defineConfig({
               "apps/api/test/worker.boundary.test.ts",
               "apps/web/test/atom-lifecycle.browser.test.tsx",
               "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
+              "apps/web/test/host/webmcp.boundary.test.ts",
               "tools/apps-local/test/native-browser-tools.boundary.test.ts",
               "tools/apps-local/test/native-cancellation.boundary.test.ts",
               "tools/apps-local/test/native-local-development.boundary.test.ts",

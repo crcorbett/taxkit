@@ -7,9 +7,14 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 
 ## Exports
 
-- `src/tools.ts` and `src/handlers.layer.ts` (internal): the six shared tool
-  definitions and the static `TaxKitMcpHandlersLive` Layer that `./server`
-  composes.
+- `./tools`: `TaxKitMcpToolkit`, the six shared tool definitions and
+  annotations. `./server` and the Website's browser WebMCP both use it, so
+  remote and browser tools have identical names, Schemas and hints.
+- `./client-handlers`: `clientToolHandlers(client)`, the same tools answered
+  through the generated public API client for browser WebMCP, with the same
+  success Schemas and safe `McpToolUnavailable` codes.
+- `src/handlers.layer.ts` (internal): the static `TaxKitMcpHandlersLive` Layer
+  over the calculator and content services that `./server` composes.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path.
 - `./schemas`: tool request/reply Schemas, safe failures and complete-reply
   budget constants.
@@ -45,8 +50,9 @@ private cancellation capability provision remain in
 The repository [API architecture](../../../docs/architecture/api-and-sdk.md)
 and [package ownership](../../../docs/architecture/package-ownership.md) own
 the durable transport/app boundary. The API app README owns native hosting;
-the Website retains its browser tool coordination. Package tests prove the
-reply budget and cancellation cleanup. The API's official-client tests and
+the Website owns its one root WebMCP registration. Package tests prove the
+reply budget, cancellation cleanup and that the client-backed handlers answer
+exactly as the service-backed handlers over the actual HTTP routes. The API's official-client tests and
 root native-pair MCP tests (`tools/apps-local/test`) retain modern protocol, origin, native callback
 progress and isolation proof through the actual app composition.
 

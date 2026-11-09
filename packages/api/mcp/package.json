@@ -5,6 +5,8 @@
   "license": "MIT",
   "type": "module",
   "exports": {
+    "./tools": "./src/tools.ts",
+    "./client-handlers": "./src/client-handlers.ts",
     "./server": "./src/server.ts",
     "./schemas": "./src/schemas.ts",
     "./request": "./src/request.service.ts",

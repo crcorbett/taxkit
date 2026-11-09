@@ -114,8 +114,9 @@ identity. Neither an app nor a package depends on another app.
   consume its named exports.
 
 `packages/api/mcp`
-: Private source MCP transport owner: tool contracts, handlers, request
-  cancellation and response budgets over domain services. Native session storage,
+: Private source MCP transport owner: tool contracts, service-backed and
+  public-API-client-backed handlers, request cancellation and response budgets
+  over domain services. Native session storage,
   dispatch and app lifecycle remain in the API app.
 
 `packages/aeo`
@@ -127,8 +128,8 @@ identity. Neither an app nor a package depends on another app.
 
 `packages/webmcp`
 : Private source WebMCP owner. `ModelContextHost` and its live adapter are the
-  one browser Promise bridge for page tools; `registerCalculatorPageTools`
-  registers the calculator page toolkit for the enclosing Scope.
+  one browser Promise bridge; `registerWebMcpTools` registers the API MCP
+  toolkit, with the caller's handlers, for the enclosing Scope.
 
 `packages/og-image`
 : Private source build-time share-image provider. `DocsPageRendererLive`
