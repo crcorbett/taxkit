@@ -257,6 +257,45 @@ it.effect(
       expect(register).toHaveBeenCalledTimes(toolCount);
     }).pipe(Effect.scoped)
 );
+// An older or stand-in host sees `execute` as a one-argument callback.
+interface StandInTool {
+  readonly name: string;
+  readonly execute: (input: WebMcpToolInput) => PromiseLike<WebMcpToolResult>;
+}
+it.effect("answers a host that calls execute without options", () =>
+  Effect.gen(function* () {
+    const register = vi
+      .fn<(tool: StandInTool, options: { signal: AbortSignal }) => void>()
+      .mockReturnValue();
+    yield* installHost({
+      document: { modelContext: { registerTool: register } },
+    });
+    yield* registerWebMcpTools.pipe(
+      Effect.provide(
+        Layer.mergeAll(
+          HostLive,
+          ResultHandlers({
+            cancelled: EffectFunction.constVoid,
+            started: EffectFunction.constVoid,
+          })
+        )
+      )
+    );
+    const [tool] = yield* EffectFunction.pipe(
+      register.mock.calls,
+      Array.findFirst(([entry]) => entry.name === "taxkit_docs_navigation"),
+      Effect.fromOption
+    );
+    const reply = yield* Effect.promise(() => tool.execute({}));
+    expect(
+      yield* Schema.decodeUnknownEffect(WebMcpToolResult)(reply)
+    ).toStrictEqual({
+      content: [{ text: '{"primaryNavigation":[]}', type: "text" }],
+      isError: false,
+      structuredContent: { primaryNavigation: [] },
+    });
+  }).pipe(Effect.scoped)
+);
 it.effect(
   "preserves the host receiver, attempts independent tools and returns only MCP-shaped safe results",
   () =>

@@ -98,9 +98,17 @@ export const ModelContextHostLive = Layer.effect(
                   readOnlyHint: tool.annotations.readOnlyHint,
                 },
                 description: tool.description,
-                execute: (input, options) => {
+                // The draft passes cancellation options; older builds and
+                // stand-in hosts call `execute(input)` alone.
+                execute: (
+                  input,
+                  options?: WebMCP.ToolExecuteCallbackOptions
+                ) => {
                   const program = tool.execute(input);
-                  return run(program, { signal: options.signal });
+                  const cancellation = Option.fromNullishOr(options).pipe(
+                    Option.getOrUndefined
+                  );
+                  return run(program, cancellation);
                 },
                 inputSchema: tool.inputSchema,
                 name: tool.name,
