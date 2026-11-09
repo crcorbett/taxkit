@@ -185,24 +185,32 @@ result summary, breakdown, assumptions and rule sources) that receive only
 checked values and the stale flag; explanations come from the report and its
 trace, not the edited form.
 
-## Page-owned browser tools
+## Browser tools (WebMCP)
 
-`CalculatorPageToolkit` (`@taxkit/calculators/page-tools`) describes five
-visible calculator commands, separate from the API's remote MCP tools.
-Arguments reuse the form Schemas and results reuse `CalculatorViewState`; its
-handlers call the page's existing edit and submit commands. `@taxkit/webmcp`
-registers the toolkit through `ModelContextHost`, whose live adapter is the one
-WebMCP Promise bridge: the registration scope's `FiberSet.makeRuntimePromise`
-runs each callback. The Website's `calculators/tools.atoms.ts` composes them
-with the same `ApiClient` in a static `apiClientRuntime.atom` family keyed by
-calculator ID, never another client or runtime. The page container mounts it
-with `useAtomMount`; the Atom's Scope owns the host Layer, registrations and
-callbacks, and unmounting releases them. Tool names are unique in a document,
-so a newly mounted page waits for the previous registration's Scope to close.
-One checked request object identifies each attempt, so an old callback cannot
-return a newer answer or cancel a newer manual request. The toolkit is
-statically imported; `strict-effect/no-promise-workflow` forbids dynamic
-`import()`.
+WebMCP exposes the API's MCP toolkit, not separate page tools.
+`TaxKitMcpToolkit` (`@taxkit/api-mcp/tools`) supplies every name, description,
+strict input Schema and read-only hint, so browser and remote MCP advertise
+the same tools. In the browser, `clientToolHandlers`
+(`@taxkit/api-mcp/client-handlers`) answer each tool through the generated
+public API client with remote MCP's safe failure vocabulary.
+`@taxkit/webmcp` registers them through `ModelContextHost`, whose live adapter
+is the one WebMCP Promise bridge: it checks the current origin against the
+checked Website origin and runs each callback with the registration Scope's
+`FiberSet.makeRuntimePromise`.
+
+The Website composes this once. `webMcpAtom` in `runtime.client.ts` builds the
+host adapter and handlers in its own Scope from the shared `apiClientRuntime`
+and runs the registration; `browser-atoms.ts` selects it with
+`createIsomorphicFn` (an inert Atom on the server), and the root route mounts
+it with `useAtomMount`. Client navigation keeps the registration; unmounting
+closes its Scope, which unregisters the tools and interrupts running calls
+without closing the shared client. Imports are static;
+`strict-effect/no-promise-workflow` forbids dynamic `import()`.
+
+The former page tools (read, fill and calculate the visible form) were removed
+with per-page registration: their catalogue read duplicated
+`taxkit_list_calculators`, calculation is `taxkit_calculate`, and form access
+needs a page-scoped lifetime that one root registration cannot own.
 
 ## Documentation
 

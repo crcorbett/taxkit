@@ -33,8 +33,8 @@ and removes machinery TaxKit no longer needs.
 - Logic lives in packages and `apps/web/src/lib` stays thin, in Common
   Practice's folders. `@taxkit/api-http` owns the generated client's named
   reads, errors and negotiation; `@taxkit/calculators` owns the browser
-  calculator page and its tools; `@taxkit/webmcp` owns the WebMCP bridge and
-  keeps the form tools.
+  calculator page; `@taxkit/webmcp` owns the WebMCP bridge and registers
+  the API's MCP tools once from the Website root, as Common Practice does.
 - The five normal checks (`build`, `lint`, `check-types`, `knip`, `test`), one
   test layout (`test/` in each workspace), the latest shared lint plugin, and
   `alchemy dev` on the main stack for local development.

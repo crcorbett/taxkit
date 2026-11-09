@@ -1,9 +1,20 @@
 import { requestDocsPage, requestDocsSearch } from "@taxkit/api-http/requests";
+import { clientToolHandlers } from "@taxkit/api-mcp/client-handlers";
+import { TaxKitMcpToolkit } from "@taxkit/api-mcp/tools";
 import { docsPageMetadata } from "@taxkit/content/publication";
-import { Effect, Schema } from "effect";
+import { ModelContextHostLive } from "@taxkit/webmcp/host";
+import { registerWebMcpTools } from "@taxkit/webmcp/registration";
+import { WebMcpSite } from "@taxkit/webmcp/service";
+import { Effect, Layer, Option, Schema } from "effect";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
-import { browserApiClient, publicSettingsAtom } from "./api-client.atoms";
+import {
+  ApiClient,
+  apiClientRuntime,
+  browserApiClient,
+  browserRuntime,
+  publicSettingsAtom,
+} from "./api-client.atoms";
 import { WebsiteDocsSearchView } from "./docs/schemas";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
 import { TaxKitWebConfigError } from "./host/errors";
@@ -12,6 +23,45 @@ import { loadCalculatorView } from "./pages/calculator.load";
 import { rejectRouteLoad } from "./pages/load.failure";
 import type { LoaderContext } from "./pages/loader-context";
 
+// WebMCP shares the API MCP tool definitions; its handlers call the public API
+// through the same generated client as route loaders.
+const BrowserToolHandlers = TaxKitMcpToolkit.toLayer(
+  ApiClient.pipe(Effect.map(clientToolHandlers))
+);
+/**
+ * The Website's one WebMCP registration, mounted once at the app root.
+ * Mounting builds the host adapter and client-backed handlers in this Atom's
+ * Scope and registers every API MCP tool; unmounting closes the Scope, which
+ * unregisters them and interrupts running calls. The shared client stays
+ * open. Without settings there is no checked origin, so nothing registers.
+ */
+export const webMcpAtom = browserRuntime.atom((get) =>
+  Option.match(get(publicSettingsAtom), {
+    onNone: () => Effect.void,
+    onSome: (settings) =>
+      get.result(apiClientRuntime, { suspendOnWaiting: true }).pipe(
+        Effect.flatMap((services) =>
+          Layer.build(
+            Layer.mergeAll(
+              ModelContextHostLive.pipe(
+                Layer.provide(
+                  Layer.succeed(WebMcpSite)({
+                    origin: settings.websiteOrigin,
+                  })
+                )
+              ),
+              BrowserToolHandlers.pipe(
+                Layer.provide(Layer.succeedContext(services))
+              )
+            )
+          )
+        ),
+        Effect.flatMap((services) =>
+          registerWebMcpTools.pipe(Effect.provide(services))
+        )
+      ),
+  })
+);
 const settingsUnavailable = new TaxKitWebConfigError({
   message: "TaxKit web settings are missing or invalid.",
   operation: "settings",

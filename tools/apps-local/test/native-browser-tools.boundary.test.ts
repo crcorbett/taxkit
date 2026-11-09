@@ -1,14 +1,12 @@
 import { NodeServices } from "@effect/platform-node";
 import { expect, it } from "@effect/vitest";
 import {
-  CalculatorToolFailure,
-  CalculatorViewState,
-} from "@taxkit/calculators/page-schemas";
-import { CalculatorPageToolkit } from "@taxkit/calculators/page-tools";
-import { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
+  Client,
+  StreamableHTTPClientTransport,
+} from "@modelcontextprotocol/client";
+import { TaxKitMcpToolkit } from "@taxkit/api-mcp/tools";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import {
-  Schedule,
-  Match,
   Function as EffectFunction,
   Array,
   Effect,
@@ -16,12 +14,14 @@ import {
   Option,
   Order,
   Path,
+  Predicate,
   Queue,
   Record,
   Ref,
   Schema,
   Stream,
 } from "effect";
+import { McpSchema } from "effect/ai";
 import { Miniflare } from "miniflare";
 import { chromium } from "playwright";
 import type { Route } from "playwright";
@@ -38,18 +38,18 @@ const websiteOrigin = "http://127.0.0.1:4230";
 const catalogueRead = "GET /api/v2/calculators";
 const calculation = (calculatorId: string) =>
   `POST /api/v2/calculators/${calculatorId}/calculate`;
-const isAnnualCalculation = (url: URL) =>
+const isTakeHomeCalculation = (url: URL) =>
   url.origin === apiOrigin &&
-  url.pathname === "/api/v2/calculators/au.income-tax.annual/calculate";
-const BrowserReply = Schema.toCodecJson(
-  Schema.Union([
-    CalculatorViewState,
-    CalculatorToolFailure,
-    CalculatorCatalogResponse,
-  ])
+  url.pathname === "/api/v2/calculators/au.pay.take-home/calculate";
+// WebMCP and remote MCP share these definitions, so they share names.
+const toolNames = EffectFunction.pipe(
+  Record.keys(TaxKitMcpToolkit.tools),
+  Array.sort(Order.String)
 );
+// Both hosts answer with MCP's tool result.
+const McpCallResult = McpSchema.CallToolResult;
 it.live(
-  "calls mounted calculator tools through Chrome's real native caller",
+  "registers the API MCP tools once at the root and calls them through Chrome's real native caller",
   () =>
     Effect.gen(function* () {
       const path = yield* Path.Path;
@@ -214,12 +214,12 @@ it.live(
       });
       // Calls are calculations plus any retired Website transport path;
       // public API reads are recorded separately.
-      const reads = yield* Queue.make<string>();
+      const apiReads = yield* Queue.make<string>();
       page.on("request", (request) => {
         const url = new URL(request.url());
         const call = `${request.method()} ${url.pathname}`;
         if (url.origin === apiOrigin && request.method() === "GET") {
-          Queue.offerUnsafe(reads, call);
+          Queue.offerUnsafe(apiReads, call);
         } else if (
           url.origin === apiOrigin ||
           url.pathname.startsWith("/_serverFn")
@@ -243,7 +243,7 @@ it.live(
             () => Array.empty<Added["tools"][number]>(),
             (current, next) => Array.appendAll(current, next)
           ),
-          Stream.filter((tools) => tools.length === 5),
+          Stream.filter((tools) => tools.length === toolNames.length),
           Stream.take(1),
           Stream.runHead,
           Effect.flatMap(Effect.fromOption)
@@ -272,45 +272,104 @@ it.live(
         yield* Ref.update(observedReplies, HashMap.remove(invocationId));
         return response;
       });
-      const waitForRemoval = Effect.fnUntraced(function* () {
-        return yield* Stream.fromQueue(removed).pipe(
-          Stream.map((event) => event.tools),
-          Stream.scan(
-            () => Array.empty<Removed["tools"][number]>(),
-            (current, next) => Array.appendAll(current, next)
-          ),
-          Stream.filter((tools) => tools.length === 5),
-          Stream.take(1),
-          Stream.runHead,
-          Effect.flatMap(Effect.fromOption)
-        );
+      // The remote MCP endpoint of the same native API, through the official
+      // client: the reference every browser tool must match.
+      const mcp = yield* Effect.acquireRelease(
+        Effect.sync(
+          () =>
+            new Client(
+              { name: "taxkit-native-webmcp-parity", version: "1" },
+              { versionNegotiation: { mode: { pin: "2026-07-28" } } }
+            )
+        ),
+        (value) => Effect.promise(() => value.close())
+      );
+      yield* Effect.promise(() =>
+        mcp.connect(
+          new StreamableHTTPClientTransport(new URL("/mcp", apiOrigin), {
+            requestInit: { headers: { "cf-connecting-ip": "127.0.0.1" } },
+          })
+        )
+      );
+      const remoteTools = yield* Effect.promise(() => mcp.listTools());
+      const remoteResult = Effect.fnUntraced(function* ({
+        input,
+        name,
+      }: {
+        readonly input: Input;
+        readonly name: (typeof toolNames)[number];
+      }) {
+        return yield* Effect.promise(() =>
+          mcp.callTool({ arguments: input, name })
+        ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(McpCallResult)));
       });
-      const { tools, call } = yield* Effect.gen(function* verifyInitialTools() {
-        const initialTools = yield* Effect.promise(() =>
+      // CDP types `input` as a string map, but Chrome forwards any JSON object
+      // to the page's tool; this guard checks that it is one, without a cast.
+      const CallerInput = Schema.declare(
+        (value): value is Input =>
+          Predicate.isReadonlyObject(value) && !Array.isArray(value)
+      );
+      // An agent's JSON arguments, checked against the tool's own codec to be
+      // exactly the shared calculation fixture.
+      const callerCalculation = yield* Schema.decodeEffect(
+        Schema.fromJsonString(CallerInput)
+      )(
+        '{"calculatorId":"au.pay.take-home","payload":{"facts":{"grossPay":{"_tag":"Money","cents":165400,"currency":"AUD"},"period":"weekly","taxFreeThresholdClaimed":true}}}'
+      );
+      const checkedCalculation = yield* Schema.decodeUnknownEffect(
+        Schema.toCodecJson(
+          TaxKitMcpToolkit.tools.taxkit_calculate.parametersSchema
+        )
+      )(callerCalculation);
+      expect(checkedCalculation).toStrictEqual(CalculationRequest);
+      const { tools, call } = yield* Effect.gen(function* verifyRegistration() {
+        const registered = yield* Effect.promise(() =>
           page.goto(websiteOrigin)
         ).pipe(Effect.andThen(discover()));
+        // Registration itself makes no API request.
         expect({
-          toolNames: EffectFunction.pipe(
-            initialTools,
+          names: EffectFunction.pipe(
+            registered,
             Array.map((tool) => tool.name),
             Array.sort(Order.String)
           ),
           QueueClearCalls: yield* Queue.clear(calls),
-        }).toStrictEqual({
-          toolNames: EffectFunction.pipe(
-            Record.keys(CalculatorPageToolkit.tools),
-            Array.sort(Order.String)
-          ),
-          QueueClearCalls: [],
-        });
-        const invokeCheckedTool = Effect.fnUntraced(function* ({
+        }).toStrictEqual({ names: toolNames, QueueClearCalls: [] });
+        // Chrome reports what the page registered; it must be what remote MCP
+        // lists for the same tool: description, input JSON Schema, read-only.
+        const byName = Order.mapInput(
+          Order.String,
+          (tool: Readonly<{ name: string }>) => tool.name
+        );
+        const browserDefinitions = EffectFunction.pipe(
+          registered,
+          Array.map((tool) => ({
+            description: tool.description,
+            inputSchema: tool.inputSchema,
+            name: tool.name,
+            readOnly: tool.annotations?.readOnly ?? false,
+          })),
+          Array.sort(byName)
+        );
+        const remoteDefinitions = EffectFunction.pipe(
+          remoteTools.tools,
+          Array.map((tool) => ({
+            description: tool.description,
+            inputSchema: tool.inputSchema,
+            name: tool.name,
+            readOnly: tool.annotations?.readOnlyHint ?? false,
+          })),
+          Array.sort(byName)
+        );
+        expect(browserDefinitions).toStrictEqual(remoteDefinitions);
+        const invoke = Effect.fnUntraced(function* ({
           currentTools,
           name,
-          input = {},
+          input,
         }: {
           readonly currentTools: readonly Added["tools"][number][];
-          readonly name: keyof typeof CalculatorPageToolkit.tools;
-          readonly input?: Input;
+          readonly name: (typeof toolNames)[number];
+          readonly input: Input;
         }) {
           const tool = yield* EffectFunction.pipe(
             currentTools,
@@ -334,432 +393,180 @@ it.live(
             response.status,
             `${name}: ${response.errorText ?? "no host detail"}`
           ).toBe("Completed");
-          return yield* Schema.decodeUnknownEffect(BrowserReply)(
+          return yield* Schema.decodeUnknownEffect(McpCallResult)(
             response.output
           );
         });
-        const catalogue = yield* invokeCheckedTool({
-          currentTools: initialTools,
-          name: "taxkit_find_calculators",
-        });
-        EffectFunction.pipe(
-          Schema.is(CalculatorCatalogResponse)(catalogue),
-          (actual) => {
-            expect(actual).toBeTruthy();
-          }
+        return { call: invoke, tools: registered };
+      }).pipe(Effect.withSpan("NativeBrowserTools.verifyRegistration"));
+      yield* Effect.gen(function* verifyRemoteParity() {
+        // Each read answers exactly as remote MCP, through the browser's own
+        // generated client against the public API.
+        const reads = [
+          ["taxkit_list_calculators", {}],
+          [
+            "taxkit_get_calculator_schema",
+            { calculatorId: "au.pay.take-home" },
+          ],
+          ["taxkit_docs_navigation", {}],
+          ["taxkit_find_docs", { term: "calculator" }],
+          ["taxkit_read_doc", { path: "/start/overview" }],
+        ] as const;
+        yield* Effect.forEach(
+          reads,
+          Effect.fnUntraced(function* ([name, input]) {
+            const browserResult = yield* call({
+              currentTools: tools,
+              input,
+              name,
+            });
+            expect(browserResult.isError, name).toBeFalsy();
+            expect(browserResult.structuredContent, name).toStrictEqual(
+              (yield* remoteResult({ input, name })).structuredContent
+            );
+          }),
+          { discard: true }
         );
-        const read = yield* invokeCheckedTool({
-          currentTools: initialTools,
-          name: "taxkit_read_calculator",
+        expect(yield* Queue.clear(apiReads)).toStrictEqual([
+          catalogueRead,
+          "GET /api/v2/calculators/au.pay.take-home/schema",
+          "GET /api/v2/docs/navigation",
+          "GET /api/v2/docs/search",
+          "GET /api/v2/docs/page",
+        ]);
+        const calculated = yield* call({
+          currentTools: tools,
+          input: callerCalculation,
+          name: "taxkit_calculate",
         });
-        EffectFunction.pipe(Schema.is(CalculatorViewState)(read), (actual) => {
-          expect(actual).toBeTruthy();
-        });
-        const initial = yield* invokeCheckedTool({
-          currentTools: initialTools,
-          name: "taxkit_calculate_visible_form",
-        });
-        EffectFunction.pipe(
-          Schema.is(CalculatorViewState)(initial),
-          (actual) => {
-            expect(actual).toBeTruthy();
-          }
+        expect(calculated.isError).toBeFalsy();
+        expect(calculated.structuredContent).toStrictEqual(
+          (yield* remoteResult({
+            input: callerCalculation,
+            name: "taxkit_calculate",
+          })).structuredContent
         );
-        yield* Effect.promise(() =>
-          page.getByText("$1,301.00", { exact: true }).waitFor()
-        );
-        const visible = yield* invokeCheckedTool({
-          currentTools: initialTools,
-          name: "taxkit_read_result",
+        expect(yield* Queue.clear(calls)).toStrictEqual([
+          calculation("au.pay.take-home"),
+        ]);
+        // Strict input fails before any request, with useful detail.
+        const invalid = yield* call({
+          currentTools: tools,
+          input: { unexpected: "PRIVATE9" },
+          name: "taxkit_list_calculators",
         });
-        expect(visible).toStrictEqual(initial);
-        const invalid = yield* invokeCheckedTool({
-          currentTools: initialTools,
-          name: "taxkit_calculate_visible_form",
-          input: {
-            unexpected: "PRIVATE9",
-          },
-        });
-        EffectFunction.pipe(
-          Schema.is(CalculatorToolFailure)(invalid),
-          (actual) => {
-            expect(actual).toBeTruthy();
-          }
+        const detail = Array.head(invalid.content).pipe(
+          Option.filter(Schema.is(McpSchema.TextContent)),
+          Option.map(({ text }) => text.startsWith("Invalid input: "))
         );
-        if (Schema.is(CalculatorToolFailure)(invalid)) {
-          expect(invalid.code).toBe("invalid-input");
-        }
         expect({
-          QueueClearReads: yield* Queue.clear(reads),
-          QueueClearCalls: yield* Queue.clear(calls),
+          calls: yield* Queue.clear(calls),
+          detail,
+          isError: invalid.isError,
+          reads: yield* Queue.clear(apiReads),
         }).toStrictEqual({
-          QueueClearReads: [catalogueRead],
-          QueueClearCalls: [calculation("au.pay.take-home")],
+          calls: [],
+          detail: Option.some(true),
+          isError: true,
+          reads: [],
         });
-        return { tools: initialTools, call: invokeCheckedTool };
-      }).pipe(Effect.withSpan("NativeBrowserTools.verifyInitialTools"));
-      const { annualTools } = yield* Effect.gen(function* verifyAnnualTools() {
+      }).pipe(Effect.withSpan("NativeBrowserTools.verifyRemoteParity"));
+      yield* Effect.gen(function* verifyNavigationKeepsTools() {
+        // One root registration: client navigation neither removes nor
+        // re-registers the tools.
         yield* Effect.promise(() =>
           page
             .locator('nav a[href="/calculators/au.income-tax.annual"]')
             .click()
         );
-        yield* Effect.logInfo("native-webmcp: annual navigation complete");
-        const registeredAnnualTools = yield* discover();
-        expect(yield* waitForRemoval()).toHaveLength(5);
-        const filled = yield* call({
-          currentTools: registeredAnnualTools,
-          name: "taxkit_fill_calculator",
-          input: {
-            taxableDollars: "75000",
-          },
-        });
-        expect({
-          viewChecked: Schema.is(CalculatorViewState)(filled),
-          annualForm: {
-            taxableIncomeInput: yield* Effect.promise(() =>
-              page.getByLabel("Annual taxable income").inputValue()
-            ),
-            QueueClearCalls: yield* Queue.clear(calls),
-          },
-        }).toStrictEqual({
-          viewChecked: true,
-          annualForm: {
-            taxableIncomeInput: "75000",
-            QueueClearCalls: [],
-          },
-        });
-        const annualResult = yield* call({
-          currentTools: registeredAnnualTools,
-          name: "taxkit_calculate_visible_form",
-        });
-        EffectFunction.pipe(
-          Schema.is(CalculatorViewState)(annualResult),
-          (actual) => {
-            expect(actual).toBeTruthy();
-          }
-        );
         yield* Effect.promise(() =>
-          page.getByText("$14,788.00", { exact: true }).first().waitFor()
+          page.getByLabel("Annual taxable income").waitFor()
         );
-        expect({
-          callAnnualToolsTaxkit_read_result: yield* call({
-            currentTools: registeredAnnualTools,
-            name: "taxkit_read_result",
-          }),
-          QueueClearCalls: yield* Queue.clear(calls),
-        }).toStrictEqual({
-          callAnnualToolsTaxkit_read_result: annualResult,
-          QueueClearCalls: [calculation("au.income-tax.annual")],
-        });
-        const manualResponse = yield* Effect.sync(() =>
-          page.waitForResponse(
-            (response) =>
-              isAnnualCalculation(new URL(response.url())) &&
-              response.request().method() === "POST" &&
-              response.ok()
-          )
-        );
-        yield* Effect.promise(() =>
-          page.getByRole("button", { exact: true, name: "Calculate" }).click()
-        );
-        yield* Effect.promise(() => manualResponse);
-        yield* Effect.promise(() =>
-          page
-            .getByRole("button", { exact: true, name: "Calculate" })
-            .isEnabled()
-        ).pipe(
-          Effect.repeat({
-            until: (observed) => observed,
-            schedule: Schedule.spaced("50 millis"),
-          }),
-          Effect.timeout(1000),
-          Effect.tap((observed) =>
-            Effect.sync(() => {
-              expect(observed).toBeTruthy();
-            })
-          )
-        );
-        expect(
-          yield* call({
-            currentTools: registeredAnnualTools,
-            name: "taxkit_read_result",
-          })
-        ).toStrictEqual(annualResult);
-        yield* call({
-          currentTools: registeredAnnualTools,
-          name: "taxkit_fill_calculator",
-          input: {
-            taxableDollars: "76000",
-          },
-        });
-        const edited = yield* call({
-          currentTools: registeredAnnualTools,
-          name: "taxkit_read_result",
-        });
-        if (Schema.is(CalculatorViewState)(edited)) {
-          expect({
-            isStale: edited.stale,
-            editedReport: edited.report,
-          }).toStrictEqual({
-            isStale: true,
-            editedReport: Match.value(annualResult).pipe(
-              Match.when(
-                Schema.is(CalculatorViewState),
-                (matchedValue) => matchedValue.report
-              ),
-              Match.orElse(() => Option.none())
-            ),
-          });
-        }
-        return { annualTools: registeredAnnualTools };
-      }).pipe(Effect.withSpan("NativeBrowserTools.verifyAnnualTools"));
-      const { held, invoke } = yield* Effect.gen(
-        function* verifyToolCancellation() {
-          // Hold actual requests at the browser transport. Observe caller abort,
-          // form edit and page exit separately; tools share the visible request.
-          const heldRequests = yield* Queue.make<Route>();
-          yield* Effect.promise(() =>
-            page.route(isAnnualCalculation, (route) => {
-              Queue.offerUnsafe(heldRequests, route);
-            })
-          );
-          const calculateTool = yield* EffectFunction.pipe(
-            annualTools,
-            Array.findFirst(
-              (tool) => tool.name === "taxkit_calculate_visible_form"
-            )
-          ).pipe(Effect.fromOption);
-          const invokeCalculation = Effect.promise(() =>
-            caller.send("WebMCP.invokeTool", {
-              frameId: calculateTool.frameId,
-              input: {},
-              toolName: calculateTool.name,
-            })
-          );
-          const aborted = yield* invokeCalculation;
-          const abortedRequest = yield* Queue.take(heldRequests);
-          yield* Effect.promise(() =>
-            page
-              .getByRole("button", { exact: true, name: "Calculating…" })
-              .isEnabled()
-          ).pipe(
-            Effect.repeat({
-              until: (observed) => !observed,
-              schedule: Schedule.spaced("50 millis"),
-            }),
-            Effect.timeout(1000),
-            Effect.tap((observed) =>
-              Effect.sync(() => {
-                expect(observed).toBeFalsy();
-              })
-            )
-          );
-          const busy = yield* call({
-            currentTools: annualTools,
-            name: "taxkit_calculate_visible_form",
-          });
-          if (Schema.is(CalculatorToolFailure)(busy)) {
-            expect(busy.code).toBe("calculation-busy");
-          } else {
-            expect.fail("Busy calculator admitted a second tool call");
-          }
-          yield* Effect.promise(() =>
-            caller.send("WebMCP.cancelInvocation", {
-              invocationId: aborted.invocationId,
-            })
-          );
-          expect(
-            (yield* waitForReply({
-              invocationId: aborted.invocationId,
-            })).status
-          ).not.toBe("Completed");
-          yield* Effect.promise(() =>
-            page
-              .getByRole("button", { exact: true, name: "Calculate" })
-              .isEnabled()
-          ).pipe(
-            Effect.repeat({
-              until: (observed) => observed,
-              schedule: Schedule.spaced("50 millis"),
-            }),
-            Effect.timeout(1000),
-            Effect.tap((observed) =>
-              Effect.sync(() => {
-                expect(observed).toBeTruthy();
-              })
-            )
-          );
-          const afterAbort = yield* call({
-            currentTools: annualTools,
-            name: "taxkit_read_calculator",
-          });
-          if (Schema.is(CalculatorViewState)(afterAbort)) {
-            expect({
-              isIdle: !afterAbort.busy,
-              isStale: afterAbort.stale,
-            }).toStrictEqual({
-              isIdle: true,
-              isStale: true,
-            });
-          } else {
-            expect.fail(
-              "Caller abort did not return the visible calculator state"
-            );
-          }
-          yield* Effect.promise(() => abortedRequest.abort());
-          return { held: heldRequests, invoke: invokeCalculation };
-        }
-      ).pipe(Effect.withSpan("NativeBrowserTools.verifyToolCancellation"));
-      const { retry } = yield* Effect.gen(function* verifyToolReplacement() {
-        const replaced = yield* invoke;
-        const replacedRequest = yield* Queue.take(held);
-        yield* call({
-          currentTools: annualTools,
-          name: "taxkit_fill_calculator",
-          input: {
-            taxableDollars: "77000",
-          },
-        });
-        expect(
-          (yield* waitForReply({
-            invocationId: replaced.invocationId,
-          })).status
-        ).not.toBe("Completed");
-        yield* Effect.promise(() => replacedRequest.abort());
-        const retryResponse = yield* Effect.sync(() =>
-          page.waitForResponse(
-            (response) =>
-              isAnnualCalculation(new URL(response.url())) &&
-              response.request().method() === "POST" &&
-              response.ok()
-          )
-        );
-        yield* Effect.promise(() =>
-          page.getByRole("button", { exact: true, name: "Calculate" }).click()
-        );
-        const retryRequest = yield* Queue.take(held);
-        yield* Effect.promise(() => retryRequest.continue());
-        yield* Effect.promise(() => retryResponse);
-        yield* Effect.promise(() =>
-          page
-            .getByRole("button", { exact: true, name: "Calculate" })
-            .isEnabled()
-        ).pipe(
-          Effect.repeat({
-            until: (observed) => observed,
-            schedule: Schedule.spaced("50 millis"),
-          }),
-          Effect.timeout(1000),
-          Effect.tap((observed) =>
-            Effect.sync(() => {
-              expect(observed).toBeTruthy();
-            })
-          )
-        );
-        const retriedCalculation = yield* call({
-          currentTools: annualTools,
-          name: "taxkit_read_result",
-        });
-        if (Schema.is(CalculatorViewState)(retriedCalculation)) {
-          expect({
-            isIdle: !retriedCalculation.busy,
-            isFresh: !retriedCalculation.stale,
-            retryForm: retriedCalculation.form,
-          }).toStrictEqual({
-            isIdle: true,
-            isFresh: true,
-            retryForm: { taxableDollars: "77000" },
-          });
-        } else {
-          expect.fail("Manual retry after a cancelled tool did not complete");
-        }
-        return { retry: retriedCalculation };
-      }).pipe(Effect.withSpan("NativeBrowserTools.verifyToolReplacement"));
-      yield* Effect.gen(function* verifyToolDeparture() {
-        const pending = yield* invoke;
-        yield* Queue.take(held);
-        // Tool removal alone does not cancel native execution in Chrome153.
         yield* Effect.promise(() =>
           page
             .getByRole("link", { exact: true, name: "For agents: API access" })
             .click()
         );
-        expect(yield* waitForRemoval()).toHaveLength(5);
-        const cancelled = yield* waitForReply({
-          invocationId: pending.invocationId,
+        yield* Effect.promise(() => page.waitForURL(`${websiteOrigin}/agents`));
+        const listed = yield* call({
+          currentTools: tools,
+          input: {},
+          name: "taxkit_list_calculators",
         });
-        expect(cancelled.status).not.toBe("Completed");
+        expect(listed.isError).toBeFalsy();
+        expect({
+          added: yield* Queue.size(added),
+          removed: yield* Queue.size(removed),
+        }).toStrictEqual({ added: 0, removed: 0 });
+        yield* Queue.clear(apiReads);
+      }).pipe(Effect.withSpan("NativeBrowserTools.verifyNavigationKeepsTools"));
+      yield* Effect.gen(function* verifyToolCancellation() {
+        // Hold the actual request at the browser transport, then cancel the
+        // invocation from the native caller.
+        const held = yield* Queue.make<Route>();
+        yield* Effect.promise(() =>
+          page.route(isTakeHomeCalculation, (route) => {
+            Queue.offerUnsafe(held, route);
+          })
+        );
+        const calculateTool = yield* EffectFunction.pipe(
+          tools,
+          Array.findFirst((tool) => tool.name === "taxkit_calculate")
+        ).pipe(Effect.fromOption);
+        const pending = yield* Effect.promise(() =>
+          caller.send("WebMCP.invokeTool", {
+            frameId: calculateTool.frameId,
+            input: callerCalculation,
+            toolName: calculateTool.name,
+          })
+        );
+        const request = yield* Queue.take(held);
+        yield* Effect.promise(() =>
+          caller.send("WebMCP.cancelInvocation", {
+            invocationId: pending.invocationId,
+          })
+        );
+        expect(
+          (yield* waitForReply({ invocationId: pending.invocationId })).status
+        ).not.toBe("Completed");
+        yield* Effect.promise(() => request.abort());
+        yield* Effect.promise(() => page.unroute(isTakeHomeCalculation));
+
         yield* Queue.clear(calls);
-      }).pipe(Effect.withSpan("NativeBrowserTools.verifyToolDeparture"));
-      yield* Effect.gen(function* verifyToolRestoration() {
-        // The registry retains a page snapshot, so its weak-family description
-        // must survive too. Force actual browser GC between departure and return.
-        yield* Effect.promise(() => page.waitForLoadState("networkidle"));
-        yield* Effect.promise(() => caller.send("HeapProfiler.collectGarbage"));
-        yield* Effect.promise(() =>
-          page
-            .locator('nav a[href="/calculators/au.income-tax.annual"]')
-            .click()
-        );
-        const returnedTools = yield* discover();
-        yield* Effect.promise(() =>
-          page.getByLabel("Annual taxable income").inputValue()
-        ).pipe(
-          Effect.repeat({
-            until: (observed) => observed === "77000",
-            schedule: Schedule.spaced("50 millis"),
-          }),
-          Effect.timeout(1000),
-          Effect.tap((observed) =>
-            Effect.sync(() => {
-              expect(observed).toBe("77000");
-            })
-          )
-        );
-        const returned = yield* call({
-          currentTools: returnedTools,
-          name: "taxkit_read_result",
-        });
-        if (Schema.is(CalculatorViewState)(returned)) {
-          expect({
-            restoredCalculation: {
-              returnedForm: returned.form,
-              returnedReport: returned.report,
-            },
-            isIdle: !returned.busy,
-            isStale: returned.stale,
-          }).toStrictEqual({
-            restoredCalculation: {
-              returnedForm: { taxableDollars: "77000" },
-              returnedReport: Match.value(retry).pipe(
-                Match.when(
-                  Schema.is(CalculatorViewState),
-                  (matchedValue) => matchedValue.report
-                ),
-                Match.orElse(() => Option.none())
-              ),
-            },
-            isIdle: true,
-            isStale: true,
-          });
-        } else {
-          expect.fail("Returned calculator lost its retained page snapshot");
-        }
+      }).pipe(Effect.withSpan("NativeBrowserTools.verifyToolCancellation"));
+      yield* Effect.gen(function* verifyDocumentLifetime() {
+        // A new document registers the same tools exactly once more. Chrome
+        // discards the old document's tools without a removal event; Scope
+        // cleanup on unmount is proven by the Website's registration test.
+        yield* Effect.promise(() => page.reload());
+        const reloaded = yield* discover();
+        expect({
+          added: yield* Queue.size(added),
+          names: EffectFunction.pipe(
+            reloaded,
+            Array.map((tool) => tool.name),
+            Array.sort(Order.String)
+          ),
+        }).toStrictEqual({ added: 0, names: toolNames });
+        expect(
+          (yield* call({
+            currentTools: reloaded,
+            input: { path: "/start/overview" },
+            name: "taxkit_read_doc",
+          })).isError
+        ).toBeFalsy();
         expect({
           QueueClearCalls: yield* Queue.clear(calls),
-          QueueClearReads: yield* Queue.clear(reads),
           QueueClearExceptions: yield* Queue.clear(exceptions),
         }).toStrictEqual({
           QueueClearCalls: [],
-          QueueClearReads: [],
           QueueClearExceptions: [],
         });
         yield* Effect.logInfo("native-webmcp: actual caller completed", {
           browser: browser.version(),
           tools: tools.length,
         });
-      }).pipe(Effect.withSpan("NativeBrowserTools.verifyToolRestoration"));
+      }).pipe(Effect.withSpan("NativeBrowserTools.verifyDocumentLifetime"));
     }).pipe(
       Effect.timeout("35 seconds"),
       Effect.scoped,

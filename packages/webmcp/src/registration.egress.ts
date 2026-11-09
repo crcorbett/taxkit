@@ -1,12 +1,9 @@
-import { CalculatorToolFailure } from "@taxkit/calculators/page-schemas";
-import type { CalculatorPageToolkit } from "@taxkit/calculators/page-tools";
+import { TaxKitMcpToolkit } from "@taxkit/api-mcp/tools";
 import {
-  Function as EffectFunction,
   Array,
   Cause,
   Context,
   Effect,
-  Match,
   Option,
   Record,
   Schema,
@@ -14,91 +11,123 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 import { AiError, Tool } from "effect/ai";
-import type { Toolkit } from "effect/ai";
 
+import { WebMcpToolResult } from "./schemas.js";
 import { ModelContextHost } from "./service.js";
-// Tools reject unknown input keys, as remote MCP does.
+
+// MCP's strict tools reject unknown input keys, so WebMCP's do too.
 const strict = { onExcessProperty: "error" } as const;
-const encodeFailure = Schema.encodeEffect(
-  Schema.toCodecJson(CalculatorToolFailure)
-);
+const encodeText = Schema.encodeEffect(Schema.fromJsonString(Schema.Json));
+const failed = WebMcpToolResult.make({
+  content: [{ text: "The tool call failed.", type: "text" }],
+  isError: true,
+});
+
 /**
- * Register the mounted calculator page's tools with the browser's WebMCP host
- * for the enclosing Scope. Each tool advertises its checked parameter Schema;
- * Toolkit decodes the input and encodes the result. Any failure becomes an
- * encoded `CalculatorToolFailure`, never a rejected Promise or a Cause. A host
- * that refuses one tool is logged and does not stop the others.
+ * Register the API MCP toolkit's tools with the browser's WebMCP host for the
+ * enclosing Scope; the caller provides the toolkit's handlers. Everything but
+ * `execute` comes from the shared definition, as in remote MCP's
+ * `tools/list`: the name, description, strict input JSON Schema (with its
+ * `$defs`) and read-only hint. Results follow MCP's tool result: an encoded
+ * success, a declared `McpToolUnavailable`, useful detail for invalid input,
+ * or a fixed message for anything else. The host sees a rejected Promise only
+ * on cancellation. A host that refuses one tool is logged and does not stop
+ * the others.
  */
-export const registerCalculatorPageTools = Effect.fnUntraced(function* (
-  toolkit: Toolkit.WithHandler<typeof CalculatorPageToolkit.tools>
-) {
+export const registerWebMcpTools = Effect.gen(function* () {
   const host = yield* ModelContextHost;
+  const toolkit = yield* TaxKitMcpToolkit;
   const tools = Record.toEntries(toolkit.tools);
   yield* Effect.forEach(
     tools,
     ([name, tool]) => {
-      // Inputs are plain JSON objects. Advertise the checked parameter shape,
-      // not the Unknown ingress side of a decoding codec.
-      const input = Schema.toJsonSchemaDocument(
-        Schema.toType(tool.parametersSchema),
-        strict
-      );
+      const input = Schema.toJsonSchemaDocument(tool.parametersSchema, strict);
       return host
         .registerTool({
           annotations: {
             readOnlyHint: Context.get(tool.annotations, Tool.Readonly),
           },
           description: Option.fromNullishOr(Tool.getDescription(tool)).pipe(
-            Option.getOrElse(() => tool.name)
+            Option.getOrElse(() => name)
           ),
           execute: (parameters) =>
             toolkit.handle(name, parameters, undefined, strict).pipe(
               Stream.unwrap,
               Stream.runLast,
               Effect.flatMap(Effect.fromOption),
-              Effect.map((result) => result.encodedResult),
+              // The toolkit's encoded success is MCP's structured content.
+              Effect.flatMap(({ encodedResult }) =>
+                Schema.decodeUnknownEffect(Schema.JsonObject)(encodedResult)
+              ),
+              Effect.flatMap((structuredContent) =>
+                encodeText(structuredContent).pipe(
+                  Effect.map((text) =>
+                    WebMcpToolResult.make({
+                      content: [{ text, type: "text" }],
+                      isError: false,
+                      structuredContent,
+                    })
+                  )
+                )
+              ),
               Effect.catchCause((cause) => {
-                if (Cause.hasInterrupts(cause)) {
+                if (Cause.hasInterruptsOnly(cause)) {
                   return Effect.interrupt;
                 }
-                const error = Cause.findErrorOption(cause);
+                // A defect never becomes a declared answer.
+                const error = Cause.findErrorOption(cause).pipe(
+                  Option.filter(() => !Cause.hasDies(cause))
+                );
                 const invalid = error.pipe(
                   Option.filter(AiError.isAiError),
-                  Option.exists((value) =>
-                    Match.value(value.reason).pipe(
-                      Match.tag("ToolParameterValidationError", () => true),
-                      Match.orElse(() => false)
-                    )
-                  )
+                  Option.map(({ reason }) => reason),
+                  Option.filter(Schema.is(AiError.ToolParameterValidationError))
                 );
-                return EffectFunction.pipe(
-                  error.pipe(
-                    Option.filter(Schema.is(CalculatorToolFailure)),
-                    Option.getOrElse(
-                      () =>
-                        new CalculatorToolFailure({
-                          code: EffectBoolean.match(invalid, {
-                            onFalse: (): "service-unavailable" =>
-                              "service-unavailable",
-                            onTrue: (): "invalid-input" => "invalid-input",
-                          }),
-                          retry: EffectBoolean.match(invalid, {
-                            onFalse: (): "try-again-manually" =>
-                              "try-again-manually",
-                            onTrue: (): "check-the-visible-form" =>
-                              "check-the-visible-form",
-                          }),
-                        })
-                    )
-                  ),
-                  encodeFailure
+                if (Option.isSome(invalid)) {
+                  return Effect.succeed(
+                    WebMcpToolResult.make({
+                      content: [
+                        {
+                          text: `Invalid input: ${invalid.value.message}`,
+                          type: "text",
+                        },
+                      ],
+                      isError: true,
+                    })
+                  );
+                }
+                return error.pipe(
+                  Option.filter(Schema.is(tool.failureSchema)),
+                  Option.match({
+                    // Only the tool name is logged: a defect can carry
+                    // submitted figures or provider text.
+                    onNone: () =>
+                      Effect.logWarning("A TaxKit browser tool failed.", {
+                        tool: name,
+                      }).pipe(Effect.as(failed)),
+                    onSome: (declared) =>
+                      Schema.encodeEffect(tool.failureSchema)(declared).pipe(
+                        Effect.flatMap(encodeText),
+                        Effect.map((text) =>
+                          WebMcpToolResult.make({
+                            content: [{ text, type: "text" }],
+                            isError: true,
+                          })
+                        ),
+                        Effect.orElseSucceed(() => failed)
+                      ),
+                  })
                 );
-              }),
-              Effect.scoped,
-              Effect.orDie
+              })
             ),
-          inputSchema: { ...input.schema, $defs: input.definitions },
-          name: tool.name,
+          inputSchema: EffectBoolean.match(
+            Record.isEmptyRecord(input.definitions),
+            {
+              onFalse: () => ({ ...input.schema, $defs: input.definitions }),
+              onTrue: () => input.schema,
+            }
+          ),
+          name,
         })
         .pipe(
           Effect.catchTag("WebMcpRegistrationError", (refusal) =>

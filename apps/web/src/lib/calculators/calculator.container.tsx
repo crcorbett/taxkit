@@ -1,9 +1,4 @@
-import {
-  RegistryContext,
-  useAtomMount,
-  useAtomSet,
-  useAtomValue,
-} from "@effect/atom-react";
+import { RegistryContext, useAtomSet, useAtomValue } from "@effect/atom-react";
 import { AnnualTaxForm, TakeHomeForm } from "@taxkit/calculators/form";
 import type { CalculatorSummary } from "@taxkit/calculators/schemas";
 import { Match, Option, Schema } from "effect";
@@ -19,20 +14,17 @@ import { CalculatorPageView } from "./calculator-page.view";
 import { CalculatorResult } from "./calculator-result.view";
 import { calculatorCaveat } from "./caveats";
 import { calculatorPageAtoms } from "./page.atoms";
-import { calculatorToolsAtom } from "./tools.atoms";
 
 /**
- * Every calculator page. The container owns the page's registry commands and
- * browser-tool registration, then composes focused leaves for the checked form
- * and report kinds. Leaving the page interrupts its calculation; unmounting the
- * tool registration removes the tools and stops their callbacks.
+ * Every calculator page. The container owns the page's registry commands,
+ * then composes focused leaves for the checked form and report kinds. Leaving
+ * the page interrupts its calculation. Browser tools are registered once at
+ * the app root, not per page.
  */
 export const CalculatorPage = ({
   calculator,
 }: Readonly<{ calculator: CalculatorSummary }>) => {
   const page = calculatorPageAtoms(calculator.calculatorId);
-  const browserTools = calculatorToolsAtom(calculator.calculatorId);
-  useAtomMount(browserTools);
   const registry = useContext(RegistryContext);
   const view = useAtomValue(page.view);
   const edit = useAtomSet(page.edit);

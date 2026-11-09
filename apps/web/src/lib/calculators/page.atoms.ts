@@ -35,14 +35,7 @@ export const calculatorPageAtoms = Atom.family(
     );
     const showCalculation = Atom.make(false);
     const inputError = Atom.make(Option.none<CalculatorInputError>());
-    const attempt = Atom.make(Option.none<CalculatorRunRequest>());
-    const cancel = Atom.fnSync<"cancel">()((_, get) => {
-      get.set(attempt, Option.none());
-      get.set(calculation, Atom.Interrupt);
-      get.set(showCalculation, false);
-    });
     const edit = Atom.fnSync<CalculatorForm>()((value, get) => {
-      get.set(attempt, Option.none());
       get.set(calculation, Atom.Interrupt);
       get.set(showCalculation, false);
       get.set(inputError, Option.none());
@@ -53,20 +46,16 @@ export const calculatorPageAtoms = Atom.family(
       const request = requestFromForm(calculatorId, current);
       get.set(showCalculation, true);
       if (Result.isFailure(request)) {
-        get.set(attempt, Option.none());
         get.set(calculation, Atom.Interrupt);
         get.set(inputError, Option.some(request.failure));
         return;
       }
       get.set(inputError, Option.none());
-      get.set(attempt, Option.some(request.success));
       get.set(calculation, request.success);
     });
     const page: CalculatorPage<CalculationCallFailure> = {
-      attempt,
       calculation,
       calculatorId,
-      cancel,
       edit,
       form,
       submit,

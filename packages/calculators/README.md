@@ -38,8 +38,6 @@ The definition validates its static graph and owns native execution.
   a `CalculatorInputError` naming the one field to correct.
 - `./page` owns the `CalculatorPage` contract and `calculatorViewState`, the
   pure view derivation; the host declares the static Atom family.
-- `./page-schemas` owns `CalculatorViewState` and `CalculatorToolFailure`.
-- `./page-tools` owns page tools that use the same commands and state.
 
 The host supplies the cancellable calculation command and safe failure text.
 This package imports neither Website/API applications nor the HTTP package.
@@ -148,5 +146,3 @@ Every public subpath in the package export map:
 - `@taxkit/calculators/testing/fixtures`
 - `@taxkit/calculators/form`
 - `@taxkit/calculators/page`
-- `@taxkit/calculators/page-schemas`
-- `@taxkit/calculators/page-tools`

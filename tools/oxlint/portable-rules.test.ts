@@ -1979,7 +1979,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           "export const run = (source: Promise<number>) => source.then((value) => value);",
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "strict-effect(no-promise-workflow)",
         source: "export const run = (source: Promise<number>) => source;",
@@ -2006,21 +2006,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "taxkit-effect(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "strict-effect(no-runtime-outside-boundary)",
         source:
