@@ -180,7 +180,7 @@ describe("native local development", () => {
             page
               .getByRole("heading", {
                 exact: true,
-                name: "Australian take-home pay",
+                name: "AU take-home pay",
               })
               .waitFor({ timeout: 15_000 })
           );
@@ -202,7 +202,7 @@ describe("native local development", () => {
           );
           yield* Effect.promise(() =>
             page
-              .getByText("Enter a valid pay amount and pay period.", {
+              .getByText("Enter a valid pay amount.", {
                 exact: true,
               })
               .waitFor({ timeout: 10_000 })
@@ -214,10 +214,10 @@ describe("native local development", () => {
           yield* Effect.gen(function* verifyWebsiteHotReload() {
             const viewPath = path.join(
               root,
-              "apps/web/src/lib/calculators/take-home.view.tsx"
+              "apps/web/src/lib/calculators/calculator-page.view.tsx"
             );
             const originalView = yield* fs.readFileString(viewPath);
-            expect(originalView).toContain("<h2>Australian take-home pay</h2>");
+            expect(originalView).toContain("{year} tax year · Australia");
             // The client-only validation above proves hydration before a source
             // change; changing source during hydration can create false errors.
             yield* Effect.gen(function* () {
@@ -227,15 +227,14 @@ describe("native local development", () => {
               yield* fs.writeFileString(
                 viewPath,
                 originalView.replace(
-                  "<h2>Australian take-home pay</h2>",
-                  "<h2>Local development proof</h2>"
+                  "{year} tax year · Australia",
+                  "{year} tax year · Local development proof"
                 )
               );
               yield* Effect.promise(() =>
                 page
-                  .getByRole("heading", {
+                  .getByText("2025-26 tax year · Local development proof", {
                     exact: true,
-                    name: "Local development proof",
                   })
                   .waitFor({ timeout: 15_000 })
               );
@@ -248,7 +247,7 @@ describe("native local development", () => {
               page
                 .getByRole("heading", {
                   exact: true,
-                  name: "Australian take-home pay",
+                  name: "AU take-home pay",
                 })
                 .waitFor({ timeout: 15_000 })
             );

@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { TakeHomeCalculatorSummary } from "@taxkit/calculators/summaries";
 
-import { TakeHomeCalculator } from "#/lib/calculators/take-home.container";
+import { CalculatorPage } from "#/lib/calculators/calculator.container";
 
+// Home is the take-home calculator page.
 export const Route = createFileRoute("/")({
-  component: TakeHomeCalculator,
+  component: HomeRoute,
+  head: () => ({
+    meta: [{ title: `${TakeHomeCalculatorSummary.title} | TaxKit` }],
+  }),
 });
+
+function HomeRoute() {
+  return <CalculatorPage calculator={TakeHomeCalculatorSummary} />;
+}

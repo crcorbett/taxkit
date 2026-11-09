@@ -430,7 +430,7 @@ it.live(
         );
         yield* Effect.promise(() =>
           page
-            .getByRole("heading", { name: "Australian take-home pay" })
+            .getByRole("heading", { name: "AU take-home pay" })
             .waitFor({ state: "hidden", timeout: 5000 })
         );
         expect(

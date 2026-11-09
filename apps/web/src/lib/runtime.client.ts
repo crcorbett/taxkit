@@ -8,6 +8,7 @@ import { WebsiteDocsSearchView } from "./docs/schemas";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
 import { TaxKitWebConfigError } from "./host/errors";
 import { WebsiteRootView } from "./host/schemas";
+import { loadCalculatorView } from "./pages/calculator.load";
 import { rejectRouteLoad } from "./pages/load.failure";
 import type { LoaderContext } from "./pages/loader-context";
 
@@ -59,6 +60,17 @@ export const loadRoot = (
         }),
       };
     }),
+  });
+export const loadCalculatorPage = (
+  request: Readonly<{
+    calculatorId: string;
+    context: LoaderContext;
+    signal: AbortSignal;
+  }>
+) =>
+  runForLoader({
+    ...request,
+    effect: loadCalculatorView({ calculatorId: request.calculatorId }),
   });
 export const loadDocsPage = (
   request: Readonly<{

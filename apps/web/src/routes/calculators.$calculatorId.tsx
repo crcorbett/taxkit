@@ -1,38 +1,55 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { CalculatorSummaries } from "@taxkit/calculators/summaries";
-import { Function as EffectFunction, Array, Option } from "effect";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import type { CalculatorSummary } from "@taxkit/calculators/schemas";
+import { Option } from "effect";
 
-import { CalculatorPage } from "#/lib/calculators/calculator-page.container";
+import { CalculatorPage } from "#/lib/calculators/calculator.container";
+import { loadCalculatorPage } from "#/lib/pages/loaders";
 
+// The take-home calculator's address redirects to Home; an unknown address is
+// a 404 with a way back, never a calculator page that cannot load.
 export const Route = createFileRoute("/calculators/$calculatorId")({
   component: CalculatorRoute,
+  // An explicit parameter type keeps loader inference independent of head.
+  head: ({
+    loaderData,
+  }: Readonly<{
+    loaderData?: Readonly<{ calculator: CalculatorSummary }> | undefined;
+  }>) => ({
+    meta: [
+      {
+        title: Option.fromNullishOr(loaderData).pipe(
+          Option.map(({ calculator }) => `${calculator.title} | TaxKit`),
+          Option.getOrElse(() => "Calculator not found | TaxKit")
+        ),
+      },
+    ],
+  }),
+  loader: ({ params, context, abortController }) =>
+    loadCalculatorPage({
+      calculatorId: params.calculatorId,
+      context,
+      signal: abortController.signal,
+    }),
+  notFoundComponent: CalculatorNotFound,
   remountDeps: ({ params }) => params.calculatorId,
 });
 
 function CalculatorRoute() {
-  const { calculatorId } = Route.useParams();
-  const calculator = EffectFunction.pipe(
-    CalculatorSummaries,
-    Array.findFirst((entry) => entry.calculatorId === calculatorId)
-  );
-  if (Option.isNone(calculator)) {
-    return (
-      <section className="home">
-        <h1>TaxKit</h1>
-        <p role="alert">
-          This calculator could not load. Choose a calculator from the list or
-          reload this page.
-        </p>
-      </section>
-    );
-  }
-  if (calculator.value.calculatorId === "au.pay.take-home") {
-    return <Navigate to="/" />;
-  }
+  const { calculator } = Route.useLoaderData();
+  return <CalculatorPage calculator={calculator} />;
+}
+
+function CalculatorNotFound() {
   return (
-    <CalculatorPage
-      key={calculator.value.calculatorId}
-      calculator={calculator.value}
-    />
+    <section className="calculator-page" aria-labelledby="calculator-title">
+      <h1 id="calculator-title">Calculator not found</h1>
+      <p>
+        This address does not match a TaxKit calculator. Choose one from the
+        list above, or start with take-home pay.
+      </p>
+      <p>
+        <Link to="/">Go to Home</Link>
+      </p>
+    </section>
   );
 }

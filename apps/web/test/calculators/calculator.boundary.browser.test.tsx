@@ -5,6 +5,7 @@ import {
   initialTakeHomeForm,
   takeHomeRequestFromForm,
 } from "@taxkit/calculators/form";
+import { TakeHomeCalculatorSummary } from "@taxkit/calculators/summaries";
 import { DocsPublicationOrigin } from "@taxkit/content/schemas";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import { Money, Cents } from "@taxkit/core/primitives";
@@ -41,9 +42,9 @@ import {
   apiClientRuntime,
   publicSettingsAtom,
 } from "../../src/lib/api-client.atoms";
+import { CalculatorResult } from "../../src/lib/calculators/calculator-result.view";
+import { CalculatorPage } from "../../src/lib/calculators/calculator.container";
 import { calculatorPageAtoms } from "../../src/lib/calculators/page.atoms";
-import { TakeHomeResultView } from "../../src/lib/calculators/take-home-result.view";
-import { TakeHomeCalculator } from "../../src/lib/calculators/take-home.container";
 import { WebsitePublicSettings } from "../../src/lib/host/schemas";
 // The home page's calculator state and commands.
 const home = EffectFunction.pipe(
@@ -264,7 +265,7 @@ describe("browser calculator lifetime", () => {
         );
         root.render(
           <RegistryContext.Provider value={registry}>
-            <TakeHomeCalculator />
+            <CalculatorPage calculator={TakeHomeCalculatorSummary} />
           </RegistryContext.Provider>
         );
         yield* Effect.sync(() => host.querySelector("form")).pipe(
@@ -368,7 +369,7 @@ describe("browser calculator lifetime", () => {
       );
       root.render(
         <RegistryContext.Provider value={registry}>
-          <TakeHomeCalculator />
+          <CalculatorPage calculator={TakeHomeCalculatorSummary} />
         </RegistryContext.Provider>
       );
       yield* Effect.sync(() => host.querySelector("form")).pipe(
@@ -427,6 +428,119 @@ describe("browser calculator lifetime", () => {
       });
     }).pipe(Effect.scoped)
   );
+  it.effect(
+    "marks, describes and focuses only the field to correct, without a request",
+    () =>
+      Effect.gen(function* () {
+        const started = vi.fn<(...args: readonly unknown[]) => void>();
+        const client = generatedClient.pipe(
+          Layer.provide(
+            Layer.succeed(HttpClient.HttpClient)(
+              HttpClient.make((request) =>
+                Effect.sync(started).pipe(Effect.andThen(unreachable(request)))
+              )
+            )
+          )
+        );
+        const registry = yield* Effect.acquireRelease(
+          Effect.sync(() =>
+            AtomRegistry.make({
+              initialValues: [[apiClientRuntime.layer, client]],
+            })
+          ),
+          (value) =>
+            Effect.sync(() => {
+              value.dispose();
+            })
+        );
+        const host = yield* Effect.acquireRelease(
+          Effect.sync(() => {
+            const element = document.createElement("div");
+            document.body.insertBefore(element, null);
+            return element;
+          }),
+          (element) => Effect.sync(() => element.remove())
+        );
+        const root = yield* Effect.acquireRelease(
+          Effect.sync(() => createRoot(host)),
+          (value) =>
+            Effect.sync(() => {
+              value.unmount();
+            })
+        );
+        root.render(
+          <RegistryContext.Provider value={registry}>
+            <CalculatorPage calculator={TakeHomeCalculatorSummary} />
+          </RegistryContext.Provider>
+        );
+        const button = yield* Effect.sync(() =>
+          Option.fromNullishOr(
+            host.querySelector<HTMLButtonElement>('button[type="submit"]')
+          )
+        ).pipe(
+          Effect.repeat({
+            until: Option.isSome,
+            schedule: Schedule.spaced("50 millis"),
+          }),
+          Effect.timeout(1000),
+          TestClock.withLive,
+          Effect.flatMap(Effect.fromOption)
+        );
+        registry.set(editTakeHomeAtom, {
+          ...initialTakeHomeForm,
+          grossDollars: "not money",
+        });
+        yield* Effect.sync(() => {
+          button.focus();
+          button.click();
+        });
+        const amount = yield* Effect.sync(() =>
+          Option.fromNullishOr(
+            host.querySelector<HTMLInputElement>('input[name="grossDollars"]')
+          )
+        ).pipe(
+          Effect.repeat({
+            until: (observed) =>
+              observed.pipe(
+                Option.exists(
+                  (input) => input.getAttribute("aria-invalid") === "true"
+                )
+              ),
+            schedule: Schedule.spaced("50 millis"),
+          }),
+          Effect.timeout(1000),
+          TestClock.withLive,
+          Effect.flatMap(Effect.fromOption)
+        );
+        const description = Option.fromNullishOr(
+          amount.getAttribute("aria-describedby")
+        ).pipe(
+          Option.flatMap((anchor) =>
+            Option.fromNullishOr(
+              document.querySelector(`#${CSS.escape(anchor)}`)
+            )
+          ),
+          Option.map((element) => element.textContent)
+        );
+        expect({
+          autoComplete: amount.getAttribute("autocomplete"),
+          description: Option.getOrUndefined(description),
+          focused: document.activeElement === amount,
+          pageAlert: host.querySelector('[role="alert"]'),
+          periodInvalid: host
+            .querySelector('select[name="period"]')
+            ?.getAttribute("aria-invalid"),
+          requests: started.mock.calls.length,
+        }).toStrictEqual({
+          autoComplete: "off",
+          description: "Enter a valid pay amount.",
+          focused: true,
+          pageAlert: null,
+          periodInvalid: null,
+          requests: 0,
+        });
+      }).pipe(Effect.scoped)
+  );
   it.effect.each([
     { linked: true, reference: "https://www.ato.gov.au/example" },
     { linked: false, reference: "data:text/html,example" },
@@ -478,7 +592,7 @@ describe("browser calculator lifetime", () => {
           ),
         });
         const html = renderToString(
-          <TakeHomeResultView report={Option.some(report)} stale={false} />
+          <CalculatorResult report={Option.some(report)} stale={false} />
         );
         EffectFunction.pipe(html.includes("href="), (actual) => {
           expect(actual).toBe(linked);

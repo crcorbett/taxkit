@@ -131,9 +131,7 @@ it.live(
               cdnCacheControl: "no-store",
             });
             // The root error component is the only page content.
-            expect(body).toContain(
-              "TaxKit cannot load its settings. Please try again later."
-            );
+            expect(body).toContain("TaxKit cannot load its settings.");
             Array.forEach((marker: string) => {
               expect(body).not.toContain(marker);
             })(["Pay before tax", "1654", "Server Fn Error"]);

@@ -35,6 +35,7 @@ import { WebsiteRootView } from "#/lib/host/schemas";
 import type { WebsitePublicSettings } from "#/lib/host/schemas";
 import type { LoaderContext } from "#/lib/pages/loader-context";
 import { loadRoot } from "#/lib/pages/loaders";
+import { RetryButton } from "#/lib/pages/retry.container";
 
 import "../styles.css";
 import "@taxkit/mdx-react/styles.css";
@@ -42,9 +43,10 @@ import "../components/ui/styles.css";
 import "../lib/docs/styles.css";
 
 const SettingsUnavailable = () => (
-  <main className="home">
-    <h1>TaxKit</h1>
-    <p role="alert">TaxKit cannot load its settings. Please try again later.</p>
+  <main className="site-page" id="main-content" tabIndex={-1}>
+    <h1>TaxKit is unavailable</h1>
+    <p role="alert">TaxKit cannot load its settings.</p>
+    <RetryButton />
   </main>
 );
 const RootShell = ({ children }: { readonly children: ReactNode }) => (
@@ -217,9 +219,15 @@ function RootComponent() {
               Documentation
             </Link>
           </nav>
-          <main aria-busy={loading} id="main-content" tabIndex={-1}>
-            <Outlet />
-          </main>
+          {/* Documentation routes own their header, landmarks and busy state. */}
+          {Match.value(documentation).pipe(
+            Match.when(true, () => <Outlet />),
+            Match.orElse(() => (
+              <main aria-busy={loading} id="main-content" tabIndex={-1}>
+                <Outlet />
+              </main>
+            ))
+          )}
         </div>
       </InitialSettings>
     </RootRegistry>

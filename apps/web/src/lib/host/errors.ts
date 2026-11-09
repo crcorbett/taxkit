@@ -17,6 +17,12 @@ export class WebsiteApiConfigError extends Schema.TaggedError<
   message: Schema.tag("TaxKit API settings are missing or invalid."),
 }) {}
 
+// A calculator address that names no published calculator: a 404 page.
+export class WebsiteCalculatorMissing extends Schema.TaggedError<
+  WebsiteCalculatorMissing,
+  { readonly brand: unique symbol }
+>()("WebsiteCalculatorMissing", {}) {}
+
 // TanStack renders the route's error component with 503 for unavailable API
 // reads or 500 for internal defects and mismatched checked replies.
 export class WebsiteLoadError extends Schema.TaggedError<

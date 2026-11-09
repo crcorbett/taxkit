@@ -1,28 +1,20 @@
-import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
-import {
-  PayWithholdingsLedger,
-  TakeHomePayReport,
-} from "@taxkit/rules-au-pay/schemas";
-import {
-  Cause,
-  Match,
-  Option,
-  Result,
-  Schema,
-  Boolean as EffectBoolean,
-} from "effect";
+import { Boolean as EffectBoolean, Cause, Match, Option } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
-import * as Atom from "effect/reactivity/Atom";
+import type * as Atom from "effect/reactivity/Atom";
 
-import { initialCalculatorForm, requestFromForm } from "./form.ingress.js";
-import type { CalculatorForm } from "./form.ingress.js";
+import type { CalculatorForm, CalculatorInputError } from "./form.ingress.js";
 import type { CalculatorViewState } from "./page.schemas.js";
 import { CalculatorId as CatalogCalculatorId } from "./schemas.js";
 import type { CalculatorRunResponse, CalculatorRunRequest } from "./schemas.js";
 
 type CalculatorId = CalculatorRunRequest["calculatorId"];
-/** One calculator page's state and commands, held in the shared registry. */
+/**
+ * One calculator page's state and commands, held in the shared registry. The
+ * host declares them as a static `Atom.family` keyed by the checked calculator
+ * ID, because only the host owns the cancellable calculation command.
+ */
 export interface CalculatorPage<E> {
+  readonly calculatorId: CalculatorId;
   // Checked request identity belongs to one visible attempt. An edit or a
   // newer manual or tool submission invalidates a waiter for the older one.
   readonly attempt: Atom.Writable<Option.Option<CalculatorRunRequest>>;
@@ -37,130 +29,65 @@ export interface CalculatorPage<E> {
   readonly submit: Atom.Writable<Option.Option<void>, "calculate">;
   readonly view: Atom.Atom<CalculatorViewState>;
 }
-// The report kind each calculator answers with.
-const answersWithItsReport = (
-  calculatorId: CalculatorId,
-  report: CalculatorRunResponse["report"]
-) =>
-  Match.value(calculatorId).pipe(
-    Match.when("au.income-tax.annual", () =>
-      Schema.is(AnnualTaxReport)(report)
-    ),
-    Match.when("au.pay.take-home", () => Schema.is(TakeHomePayReport)(report)),
-    Match.orElse(() => Schema.is(PayWithholdingsLedger)(report))
-  );
 /**
- * Calculator pages over the host's calculation command. The registry owns
- * separate temporary state for each checked calculator ID; the family
- * memoises descriptions, never a client or a computed answer. `calculation`
- * makes one cancellable command per page; `failureMessage` turns its checked
- * failure into safe page text.
+ * The one readonly page view shared by the visible form and its browser tools.
+ * The response is a tagged union over the calculator ID, so selecting this
+ * page's variant already selects its report kind. Editing keeps the last
+ * answer, visibly stale; an old error is hidden while a new request runs.
  */
-export const makeCalculatorPages = <E>({
-  calculation: makeCalculation,
+export const calculatorViewState = <E>({
+  calculation,
+  calculatorId,
   failureMessage,
+  form,
+  inputError,
+  submitted,
 }: Readonly<{
-  calculation: () => Atom.AtomResultFn<
-    CalculatorRunRequest,
-    CalculatorRunResponse,
-    E
-  >;
+  calculation: AsyncResult.AsyncResult<CalculatorRunResponse, E>;
+  calculatorId: CalculatorId;
   failureMessage: (error: E) => string;
-}>) =>
-  Atom.family((calculatorId: CalculatorId): CalculatorPage<E> => {
-    const form = Atom.make<CalculatorForm>(initialCalculatorForm(calculatorId));
-    // Replacing the request or interrupting it cancels the call.
-    const calculation = makeCalculation();
-    const showCalculation = Atom.make(false);
-    const formError = Atom.make(Option.none<string>());
-    const attempt = Atom.make(Option.none<CalculatorRunRequest>());
-    const cancel = Atom.fnSync<"cancel">()((_, get) => {
-      get.set(attempt, Option.none());
-      get.set(calculation, Atom.Interrupt);
-      get.set(showCalculation, false);
-    });
-    const edit = Atom.fnSync<CalculatorForm>()((value, get) => {
-      get.set(attempt, Option.none());
-      get.set(calculation, Atom.Interrupt);
-      get.set(showCalculation, false);
-      get.set(formError, Option.none());
-      get.set(form, value);
-    });
-    const submit = Atom.fnSync<"calculate">()((_, get) => {
-      const current = get(form);
-      const request = requestFromForm(calculatorId, current);
-      get.set(showCalculation, true);
-      if (Result.isFailure(request)) {
-        get.set(attempt, Option.none());
-        get.set(calculation, Atom.Interrupt);
-        get.set(formError, Option.some(request.failure.message));
-        return;
-      }
-      get.set(formError, Option.none());
-      get.set(attempt, Option.some(request.success));
-      get.set(calculation, request.success);
-    });
-    const group: CalculatorPage<E> = {
-      attempt,
-      calculation,
-      cancel,
-      edit,
-      form,
-      submit,
-      // The registry retains this in-memory page snapshot across an
-      // uncommitted React render; page cleanup still interrupts live work.
-      // Reading `group.form` keeps the whole weak-family description group
-      // alive, so browser GC cannot replace it on a return visit while the old
-      // values remain in the registry. Disposing the root registry releases it.
-      view: Atom.make((get): CalculatorViewState => {
-        const current = get(calculation);
-        const submitted = get(showCalculation);
-        const inputError = get(formError);
-        const report = AsyncResult.value(current).pipe(
-          Option.filter(
-            (value) => value.calculator.calculatorId === calculatorId
-          ),
-          Option.map((value) => value.report),
-          Option.filter((value) => answersWithItsReport(calculatorId, value))
-        );
-        const failed =
-          submitted &&
-          !current.waiting &&
-          (AsyncResult.isFailure(current) ||
-            (AsyncResult.isSuccess(current) && Option.isNone(report)));
-        const calculationMessage = Match.value(current).pipe(
-          Match.when(AsyncResult.isFailure, (matchedValue) =>
-            matchedValue.cause.pipe(
-              Cause.findErrorOption,
-              Option.map(failureMessage)
-            )
-          ),
-          Match.orElse(() =>
-            Option.some("The calculation could not finish. Please try again.")
-          )
-        );
-        const message = Option.match(inputError, {
-          onNone: () =>
-            EffectBoolean.match(failed, {
-              onFalse: () => Option.none<string>(),
-              onTrue: () => calculationMessage,
-            }),
-          onSome: Option.some,
-        });
-        return {
-          busy: submitted && current.waiting,
-          calculatorId: CatalogCalculatorId.make(calculatorId),
-          form: get(group.form),
-          message,
-          report,
-          stale:
-            Option.isSome(report) &&
-            (!submitted ||
-              current.waiting ||
-              !AsyncResult.isSuccess(current) ||
-              Option.isSome(inputError)),
-        };
-      }).pipe(Atom.keepAlive),
-    };
-    return group;
-  });
+  form: CalculatorForm;
+  inputError: Option.Option<CalculatorInputError>;
+  submitted: boolean;
+}>): CalculatorViewState => {
+  const report = AsyncResult.value(calculation).pipe(
+    Option.filter((value) => value.calculatorId === calculatorId),
+    Option.map((value) => value.report)
+  );
+  const failed =
+    submitted &&
+    !calculation.waiting &&
+    (AsyncResult.isFailure(calculation) ||
+      (AsyncResult.isSuccess(calculation) && Option.isNone(report)));
+  const calculationMessage = Match.value(calculation).pipe(
+    Match.when(AsyncResult.isFailure, (failure) =>
+      failure.cause.pipe(Cause.findErrorOption, Option.map(failureMessage))
+    ),
+    Match.orElse(() =>
+      Option.some("The calculation could not finish. Please try again.")
+    )
+  );
+  return {
+    busy: submitted && calculation.waiting,
+    calculatorId: CatalogCalculatorId.make(calculatorId),
+    form,
+    invalidField: inputError.pipe(Option.map((error) => error.field)),
+    message: inputError.pipe(
+      Option.match({
+        onNone: () =>
+          EffectBoolean.match(failed, {
+            onFalse: () => Option.none<string>(),
+            onTrue: () => calculationMessage,
+          }),
+        onSome: (error) => Option.some(error.message),
+      })
+    ),
+    report,
+    stale:
+      Option.isSome(report) &&
+      (!submitted ||
+        calculation.waiting ||
+        !AsyncResult.isSuccess(calculation) ||
+        Option.isSome(inputError)),
+  };
+};

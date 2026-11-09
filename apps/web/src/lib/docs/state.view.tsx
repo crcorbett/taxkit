@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { SquareTerminal, Search, ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { buttonVariants } from "#/components/ui/button";
+import { buttonVariants } from "#/components/ui/button-variants";
+import { RetryButton } from "#/lib/pages/retry.container";
 
 import { DocsAppearance } from "./appearance.container";
 import { DocsHeading } from "./components";
@@ -41,7 +42,7 @@ export const DocsState = ({
           </div>
         </div>
       </header>
-      <article className="docs-state">
+      <main className="docs-state" id="main-content" tabIndex={-1}>
         <div className="docs-breadcrumbs">Documentation</div>
         <DocsHeading>{title}</DocsHeading>
         {children}
@@ -58,16 +59,15 @@ export const DocsState = ({
           </Link>
           <Link to="/">Go to the calculators</Link>
         </nav>
-      </article>
+      </main>
     </section>
   );
 };
 
 export const DocsPageUnavailable = () => (
   <DocsState title="Documentation could not load">
-    <p role="alert">
-      Reload this page to try again, or choose another place to start.
-    </p>
+    <p role="alert">Try again, or choose another place to start.</p>
+    <RetryButton />
   </DocsState>
 );
 

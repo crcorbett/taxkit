@@ -220,7 +220,7 @@ export const verifySearchInputBoundaries = Effect.fnUntraced(
       unavailableSearchCdnCache: "no-store",
     });
     expect(yield* Effect.promise(() => unavailableSearch.text())).toContain(
-      "Documentation search could not load. Please reload this page to try again."
+      "Documentation search could not load. Try again, or search for other words."
     );
   }
 );

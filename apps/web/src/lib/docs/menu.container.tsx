@@ -7,7 +7,7 @@ import type {
 import type { Option } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 
 import { Button } from "#/components/ui/button";
 import {
@@ -25,6 +25,10 @@ import {
 import { isDocsNavigationClick } from "./components";
 import { DocsNavigation } from "./page.view";
 
+// One docs menu is mounted at a time. The registry resets this mount-local
+// state once its last subscriber unmounts.
+const docsMenuAtom = Atom.make<"closed" | "open" | "following-link">("closed");
+
 export const DocsMenu = ({
   currentPath,
   navigation,
@@ -33,11 +37,7 @@ export const DocsMenu = ({
   navigation: DocsPublicNavigation;
 }>) => {
   const portal = useRef<HTMLDivElement>(null);
-  const menuAtom = useMemo(
-    () => Atom.make<"closed" | "open" | "following-link">("closed"),
-    []
-  );
-  const [menu, setMenu] = useAtom(menuAtom);
+  const [menu, setMenu] = useAtom(docsMenuAtom);
   const followLink = () => {
     setMenu("following-link");
   };
