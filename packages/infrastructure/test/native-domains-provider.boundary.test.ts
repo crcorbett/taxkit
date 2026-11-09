@@ -488,16 +488,8 @@ describe("actual installed native redirect provider", () => {
             (x) => x.method !== "GET" && x.path.includes("/rulesets/")
           )
         );
-        expect(writes).toHaveLength(1);
         const call = Array.head(writes).pipe(
           Option.getOrElse(() => expect.fail("Expected one rule request"))
-        );
-        expect(call.method).toBe(
-          Match.value(mode).pipe(
-            Match.when("existing", (): "POST" => "POST"),
-            Match.when("absent", (): "PUT" => "PUT"),
-            Match.exhaustive
-          )
         );
         const RuleBody = Schema.Record(Schema.String, Schema.Unknown);
         const rules = yield* Match.value(mode).pipe(
@@ -515,8 +507,21 @@ describe("actual installed native redirect provider", () => {
           ),
           Match.exhaustive
         );
-        expect(rules).toHaveLength(1);
-        expect(call.body).not.toContain("foreign-preserved-rule");
+        expect({
+          foreignWritten: call.body.includes("foreign-preserved-rule"),
+          method: call.method,
+          rules: rules.length,
+          writes: writes.length,
+        }).toStrictEqual({
+          foreignWritten: false,
+          method: Match.value(mode).pipe(
+            Match.when("existing", (): "POST" => "POST"),
+            Match.when("absent", (): "PUT" => "PUT"),
+            Match.exhaustive
+          ),
+          rules: 1,
+          writes: 1,
+        });
         const ours = Array.last(rules).pipe(
           Option.getOrElse(() => expect.fail("Expected native redirect rule"))
         );
@@ -538,11 +543,12 @@ describe("actual installed native redirect provider", () => {
           expression: 'http.host eq "www.example.com"',
         });
         if (Exit.isSuccess(fixture.result)) {
-          expect(fixture.result.value.url).toBe("https://example.com");
-          expect(fixture.result.value.versionId).toBe("fixture-version-id");
-          expect(fixture.result.value.deploymentId).toBe(
-            "fixture-deployment-id"
-          );
+          const { deploymentId, url, versionId } = fixture.result.value;
+          expect({ deploymentId, url, versionId }).toStrictEqual({
+            deploymentId: "fixture-deployment-id",
+            url: "https://example.com",
+            versionId: "fixture-version-id",
+          });
         }
       }).pipe(Effect.scoped, Effect.provide(platformServices))
   );
