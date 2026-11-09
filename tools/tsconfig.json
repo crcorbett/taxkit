@@ -16,6 +16,7 @@
     "vitest.config.ts",
     "infrastructure/*.ts",
     "apps-local/*.ts",
+    "apps-local/test/*.ts",
     "workspace/*.ts"
   ]
 }

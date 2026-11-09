@@ -1,3 +1,4 @@
+import { workerCompatibility } from "@taxkit/infrastructure/worker-settings";
 import {
   Effect,
   FileSystem,
@@ -5,6 +6,11 @@ import {
   Record,
   Function as EffectFunction,
 } from "effect";
+// Miniflare options for the deployed Workers' one compatibility policy.
+export const nativeWorkerCompatibility = {
+  compatibilityDate: workerCompatibility.date,
+  compatibilityFlags: workerCompatibility.flags,
+};
 // Every module in one built Worker folder: JavaScript chunks as ES modules and
 // any WebAssembly as compiled modules. Tests read the
 // JavaScript text; Miniflare needs both.

@@ -23,7 +23,7 @@ Website/API. Detailed rule-package expectations live in
 | `bun run lint` | Formatting, type-aware Oxlint with the boundary-directive pass, documentation links/commands and portable paths. |
 | `bun run check-types` | Workspace, Alchemy-root and tool types, and Effect diagnostics. |
 | `bun run knip` | The development and production Knip graphs. |
-| `bun run test` | Root tool tests (including the actual-Oxlint rule fixtures), unit tests in every workspace, Website and SDK tests in Chromium, then the required credential-free native pair suite (`test:native`): both apps built and run together in Miniflare for first HTML, docs pages, Markdown, discovery files, share images, browser calculation, the no-JavaScript notice, MCP and request limits. |
+| `bun run test` | Root tool tests (including the actual-Oxlint rule fixtures), unit tests in every workspace, Website and SDK tests in Chromium, then the required credential-free native pair suite (`test:native`, in `tools/apps-local/test`): both apps built and run together in Miniflare for first HTML, docs pages, Markdown, discovery files, share images, browser calculation, the no-JavaScript notice, MCP and request limits. |
 | `bun run release:check` | `verification`, including the native pair suite, plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
 
 The Checks workflow runs `verification` once per revision in its `checks` job;
@@ -61,6 +61,16 @@ by `bun run test:tools`.
 
 The Chromium tests need the browser that matches the pinned Playwright, as CI
 installs it: run `apps/web/node_modules/.bin/playwright install chromium` once.
+The Website and the root native suite pin the same Playwright version.
+
+`tools/vitest.config.ts` has two named projects: `tools` (`test:tools`, under
+Bun) and `native-pair` (`test:native-pair`, under Node after
+`build:native-pair`). The native pair suite tests both Workers, so it sits
+beside its build harness in `tools/apps-local` rather than in either app. Its
+shared Miniflare fixture, `native-worker.fixture.ts`, takes compatibility from
+`@taxkit/infrastructure/worker-settings`. The Website/API pair test runs one
+shared host setup and calls focused per-surface check modules
+(`native-pair-*.checks.ts`).
 An older Chromium lacks WebMCP, so the native browser-tools test fails on it.
 
 Focused checks are the owning workspace's `test`, `check-types` and

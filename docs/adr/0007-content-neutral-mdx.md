@@ -338,7 +338,7 @@ native tests serve prebuilt docs rather than compile on requests.
 
 Use independent examples as well as parity comparisons; two paths can share a bug.
 The [existing corpus test](../../apps/api/test/docs-sources.test.ts) and
-[native Website/API tests](../../apps/web/test/native-pair.boundary.test.ts) are
+[native Website/API tests](../../tools/apps-local/test/native-pair.boundary.test.ts) are
 starting points, not proof of the new contracts.
 
 | Boundary | Acceptance evidence |

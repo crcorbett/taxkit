@@ -56,7 +56,7 @@ and [package ownership](../../../docs/architecture/package-ownership.md) own
 the durable transport/app boundary. The API app README owns native hosting;
 the Website retains its browser tool coordination. Package tests prove the
 reply budget and cancellation cleanup. The API's official-client tests and
-Website's native-pair MCP tests retain modern protocol, origin, native callback
+root native-pair MCP tests (`tools/apps-local/test`) retain modern protocol, origin, native callback
 progress and isolation proof through the actual app composition.
 
 The renderer receipt records adaptation from the compiled internal service

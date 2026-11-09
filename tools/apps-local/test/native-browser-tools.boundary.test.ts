@@ -26,8 +26,11 @@ import { Miniflare } from "miniflare";
 import { chromium } from "playwright";
 import type { Route } from "playwright";
 
-import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
 
 const apiOrigin = "http://127.0.0.1:4231";
 const websiteOrigin = "http://127.0.0.1:4230";
@@ -50,7 +53,7 @@ it.live(
   () =>
     Effect.gen(function* () {
       const path = yield* Path.Path;
-      const root = path.resolve("../..");
+      const root = path.resolve(".");
       const apiRoot = path.join(root, ".alchemy/native-pair/bundles/TaxKitApi");
       const websiteRoot = path.join(root, "apps/web/dist/server");
       const {
@@ -69,8 +72,7 @@ it.live(
       const exceptions = yield* Queue.make<string>();
       const apiWorker = (name: string) => ({
         config: {
-          compatibilityDate: "2026-10-04",
-          compatibilityFlags: ["nodejs_compat"],
+          ...nativeWorkerCompatibility,
           env: {
             ...nativeRateFixture("10090"),
             API_PUBLIC_ORIGIN: { type: "json" as const, value: apiOrigin },
@@ -125,8 +127,7 @@ it.live(
                       hasUserWorker: true,
                       runWorkerFirst: false,
                     },
-                    compatibilityDate: "2026-10-04",
-                    compatibilityFlags: ["nodejs_compat"],
+                    ...nativeWorkerCompatibility,
                     env: {
                       ...nativeRateFixture("10091"),
                       API_PUBLIC_ORIGIN: { type: "json", value: apiOrigin },

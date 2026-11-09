@@ -21,8 +21,11 @@ import { McpSchema } from "effect/ai";
 import { Miniflare } from "miniflare";
 import type { WorkerdStructuredLog } from "miniflare";
 
-import { readWorkerModules } from "./native-modules.fixture";
 import { nativeRateFixture } from "./native-rate.fixture";
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
 
 const apiOrigin = "http://127.0.0.1:4214";
 const websiteOrigin = "http://127.0.0.1:4213";
@@ -31,7 +34,7 @@ const alias = "2001:0db8:0000:0000:0000:0000:0000:0075";
 it.live("shares the built native allowance across HTTP and MCP", () =>
   Effect.gen(function* () {
     const path = yield* Path.Path;
-    const root = path.resolve("../..");
+    const root = path.resolve(".");
     const logs = yield* Queue.make<WorkerdStructuredLog>();
     const exceptions = yield* Queue.make<string>();
     const workers = yield* EffectFunction.pipe(
@@ -51,8 +54,7 @@ it.live("shares the built native allowance across HTTP and MCP", () =>
           expect(files).toContain(artifact.entry);
           return {
             config: {
-              compatibilityDate: "2026-10-04",
-              compatibilityFlags: ["nodejs_compat"],
+              ...nativeWorkerCompatibility,
               env: {
                 ...nativeRateFixture("10079"),
                 API_PUBLIC_ORIGIN: {

@@ -76,7 +76,7 @@ stable boundaries.
 | `bun run check-types` | Workspace types plus the Alchemy roots, root tools and Effect diagnostics. |
 | `bun run knip` | Both Knip graphs. |
 | `bun run test` | Root tool tests, workspace unit tests, Chromium tests, then the native pair suite. |
-| `bun run test:tools` / `bun run test:native` | Only the root tool tests, or only the slower native Website/API pair tests. |
+| `bun run test:tools` / `bun run test:native` | Only the root tool tests, or only the slower native Website/API pair tests (`tools/apps-local/test`). |
 | `bun run release:check` | `verification` plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. |
 
 ## Shared rules and repository ownership
