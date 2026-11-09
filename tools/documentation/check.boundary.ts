@@ -78,7 +78,7 @@ const normalise = (relative: string): Option.Option<string> =>
  * GitHub's heading slug: rendered text in lower case, without punctuation,
  * spaces as hyphens, and a numeric suffix for each repeated heading.
  */
-export const headingAnchors = (text: string): HashSet.HashSet<string> => {
+const headingAnchors = (text: string): HashSet.HashSet<string> => {
   const body = text.replace(frontMatter, "").replaceAll(fence, "");
   const slugs = EffectFunction.pipe(
     Array.fromIterable(body.matchAll(heading)),
