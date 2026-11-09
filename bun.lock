@@ -43,7 +43,7 @@
     },
     "apps/api": {
       "name": "api",
-      "version": "4.0.0",
+      "version": "4.0.1",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@effect/platform-bun": "catalog:",
@@ -78,7 +78,7 @@
     },
     "apps/web": {
       "name": "web",
-      "version": "0.0.8",
+      "version": "0.0.9",
       "dependencies": {
         "@alchemy.run/cloudflare": "catalog:",
         "@base-ui/react": "catalog:",
@@ -129,7 +129,7 @@
     },
     "packages/aeo": {
       "name": "@taxkit/aeo",
-      "version": "0.1.7",
+      "version": "0.1.8",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -143,7 +143,7 @@
     },
     "packages/analytics": {
       "name": "@taxkit/analytics",
-      "version": "1.0.6",
+      "version": "2.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -159,7 +159,7 @@
     },
     "packages/api/http": {
       "name": "@taxkit/api-http",
-      "version": "4.0.1",
+      "version": "5.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
         "@taxkit/content": "workspace:*",
@@ -177,7 +177,7 @@
     },
     "packages/api/mcp": {
       "name": "@taxkit/api-mcp",
-      "version": "0.2.8",
+      "version": "0.2.9",
       "dependencies": {
         "@taxkit/api-http": "workspace:*",
         "@taxkit/calculators": "workspace:*",
@@ -193,7 +193,7 @@
     },
     "packages/calculators": {
       "name": "@taxkit/calculators",
-      "version": "2.2.0",
+      "version": "3.0.0",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-income-tax": "workspace:*",
@@ -223,7 +223,7 @@
     },
     "packages/core": {
       "name": "@taxkit/core",
-      "version": "2.1.0",
+      "version": "3.0.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -249,7 +249,7 @@
     },
     "packages/docs-examples": {
       "name": "@taxkit/docs-examples",
-      "version": "0.0.12",
+      "version": "0.0.13",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -270,7 +270,7 @@
     },
     "packages/infrastructure": {
       "name": "@taxkit/infrastructure",
-      "version": "1.1.7",
+      "version": "1.2.0",
       "dependencies": {
         "@alchemy.run/axiom": "catalog:",
         "@alchemy.run/cloudflare": "catalog:",
@@ -383,7 +383,7 @@
     },
     "packages/rules/au/income-tax": {
       "name": "@taxkit/rules-au-income-tax",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "effect": "catalog:",
@@ -398,7 +398,7 @@
     },
     "packages/rules/au/pay": {
       "name": "@taxkit/rules-au-pay",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "effect": "catalog:",
@@ -413,7 +413,7 @@
     },
     "packages/rules/au/stsl": {
       "name": "@taxkit/rules-au-stsl",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -429,7 +429,7 @@
     },
     "packages/sdk/typescript": {
       "name": "taxkit",
-      "version": "5.0.0",
+      "version": "6.0.0",
       "dependencies": {
         "effect": "catalog:",
       },
@@ -466,7 +466,7 @@
     },
     "packages/webmcp": {
       "name": "@taxkit/webmcp",
-      "version": "0.1.6",
+      "version": "0.1.7",
       "dependencies": {
         "@taxkit/api-mcp": "workspace:*",
         "@taxkit/content": "workspace:*",

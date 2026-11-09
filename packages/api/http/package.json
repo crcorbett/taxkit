@@ -1,6 +1,6 @@
 {
   "name": "@taxkit/api-http",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "private": true,
   "license": "MIT",
   "type": "module",

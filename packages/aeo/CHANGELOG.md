@@ -1,5 +1,12 @@
 # @taxkit/aeo
 
+## 0.1.8
+
+### Patch Changes
+
+- Updated dependencies [ac11f7c]
+  - @taxkit/api-http@5.0.0
+
 ## 0.1.7
 
 ### Patch Changes

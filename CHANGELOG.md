@@ -1,5 +1,18 @@
 # TaxKit
 
+## SDK 6.0.0
+
+- Remove the generic calculation engine. Each calculator is a closed program
+  that composes its own rule-pack Layer; `TaxKitLive`, `TaxKitService` and the
+  `CalculationEngine*` exports are gone, while plain `calculate`,
+  `calculateSafe`, `run` and `createClient()` keep their signatures.
+- Upgrade to Effect 4.1.2 and Alchemy 2.0.0-beta.85. The Website registers the
+  API's MCP tools once through WebMCP, and calculator pages gain field-level
+  errors, stable layout, page titles and dark mode.
+- See the [SDK changelog](./packages/sdk/typescript/CHANGELOG.md),
+  [core changelog](./packages/core/CHANGELOG.md) and
+  [calculators changelog](./packages/calculators/CHANGELOG.md).
+
 ## SDK 5.0.0 / Calculator HTTP v2
 
 - Replace the SDK with nominal Effect Schemas, checked money and scenarios,

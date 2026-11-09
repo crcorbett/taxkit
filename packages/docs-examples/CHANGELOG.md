@@ -1,5 +1,14 @@
 # @taxkit/docs-examples
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [ac11f7c]
+  - taxkit@6.0.0
+  - @taxkit/core@3.0.0
+  - @taxkit/rules-au-pay@2.0.1
+
 ## 0.0.12
 
 ### Patch Changes

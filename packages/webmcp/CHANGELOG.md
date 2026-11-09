@@ -1,5 +1,11 @@
 # @taxkit/webmcp
 
+## 0.1.7
+
+### Patch Changes
+
+- @taxkit/api-mcp@0.2.9
+
 ## 0.1.6
 
 ### Patch Changes
