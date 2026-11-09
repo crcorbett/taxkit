@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-analytics-owner
-last_reviewed: 2026-10-17
-review_trigger: analytics event, settings, service, export, transport or privacy change
----
-
 # `@taxkit/analytics`
 
 Private source analytics contracts and successful hosted calculator usage

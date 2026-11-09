@@ -1,12 +1,3 @@
----
-document_type: app-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-web-app-owner
-last_reviewed: 2026-11-02
-review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
----
-
 # Website app
 
 `apps/web` is the TanStack Start Website on Cloudflare. It renders the three
@@ -314,7 +305,7 @@ The native pair suite tests both Workers together, so it lives at the root in
 `build:native-pair` builds the API dependency graph and then both apps with
 Alchemy's native builders, without a cloud provider, state or credentials. Its
 API output is under the ignored `.alchemy/native-pair`; the harness explicitly
-sets each fixture's output directory because Alchemy beta.84 keeps standalone
+sets each fixture's output directory because Alchemy beta.85 keeps standalone
 bundles in memory by default. The Website output is
 `dist/server/server.js`. A standalone Vite build writes `dist/server/index.js`
 instead, so run the native build immediately before its test.

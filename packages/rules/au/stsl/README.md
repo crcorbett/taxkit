@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-au-stsl-owner
-last_reviewed: 2026-10-06
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Australian STSL Rules
 
 Implemented rule package for Australian study and training support loan

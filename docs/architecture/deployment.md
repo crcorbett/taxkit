@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-28
-review_trigger: Alchemy graph, stage, provider resource, state, domain, cache or rollback change
----
-
 # Deployment
 
 This owner describes the deployed resources and their boundaries. The
@@ -17,7 +8,7 @@ This owner describes the deployed resources and their boundaries. The
 `alchemy.run.ts` declares the `TaxKitAppsCloudflare` stack with Cloudflare
 providers, `Cloudflare.state()` and the native secrets in
 `@taxkit/infrastructure/secrets` (local state and the shell only for a `dev_*`
-stage). Alchemy beta.84 supplies Cloudflare, Axiom and Doppler through the
+stage). Alchemy beta.85 supplies Cloudflare, Axiom and Doppler through the
 separate `@alchemy.run/cloudflare`, `@alchemy.run/axiom` and
 `@alchemy.run/doppler` packages; their versions match `alchemy`. The native CLI
 discovers provider contributions from the installed packages. Website builds
@@ -33,7 +24,7 @@ and host props without importing an app. Together these declare:
 | `TaxKitApi` | `@taxkit/infrastructure/api-worker` identity; `api/worker` implementation | Its own address from `Worker.URL`. Production serves only `api.taxkit.dev`, with no `workers.dev` address; other stages keep the native `workers.dev` default. |
 | `TaxKitWebsite` | `Cloudflare.Website.Vite` for `apps/web` | Its own address from `Worker.URL`; the API's address Output and the private `TAXKIT_API` binding. Production serves only `taxkit.dev`, with a native `www.taxkit.dev` redirect and no `workers.dev` address; other stages use their stable `workers.dev` address. No stage has version preview addresses. |
 | `TaxKitProductionZone` | adopted and retained in `prod` only | Never created, replaced or deleted by the stack. |
-| `TaxKitProductionDnsSettings` | retained in `prod` only | Matches the 7 October readback; registrar and records are not managed. |
+| `TaxKitProductionDnsSettings` | retained in `prod` only | Standard Cloudflare nameservers, without CNAME flattening, multi-provider DNS or secondary overrides. `bun run production:drift` shows any difference from the live zone; registrar and records are not managed. |
 | `TaxKitProduction*` zone settings | retained native `Cloudflare.Zone.Setting` in `prod` only | TLS 1.3 on with a TLS 1.2 minimum, Always Use HTTPS on, Browser Integrity Check off (it answers script user agents with error 1010) and the lowest security level, as in Common Practice. Retained: removing a setting from the stack leaves its live value in place. |
 | `TaxKitProductionDnssec` | retained native `Cloudflare.DNS.Dnssec` in `prod` only | Signing active; Cloudflare Registrar publishes the DS record. |
 | `TaxKitProductionBotManagement` | retained native `Cloudflare.BotManagement` in `prod` only | Bans no user agent: no Bot Fight Mode, AI-bot, crawler or content-bot blocking, and no Cloudflare-managed robots.txt. |
@@ -141,9 +132,11 @@ remains postponed; the app graph references no analytics project. The
 
 ## Redirect reconciliation
 
-Alchemy beta.84 treats only `RulesetNotFound` as an absent shared redirect
-ruleset. Authentication and other read failures stop redirect writes; existing
-rules owned elsewhere in the zone are preserved after a successful read.
+Alchemy beta.85 treats only `RulesetNotFound` as an absent shared redirect
+ruleset. Authentication and other read failures stop redirect writes. After a
+successful read it converges the Worker's own redirect rules one rule at a time
+by id: it creates missing rules and deletes stale ones, and never writes the
+zone's other rules or replaces the phase.
 The Worker upload still precedes redirect reconciliation, so a failed redirect
 operation can leave the new Worker live. The native provider fixture covers
 forbidden, absent and existing rulesets and reads back deployment/version IDs.

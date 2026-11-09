@@ -102,7 +102,7 @@ native codecs. Reports and ledgers validate their accounting relationships,
 periods and unique component identities using exact arithmetic. Use their
 explicit `*Encoded` Schemas for representation-only checks; reconstructing
 fields or extracting a bare encoded view can lose aggregate checks in Effect
-4.0.7. Effect decoding remains authoritative for checks JSON Schema cannot
+4.1.2. Effect decoding remains authoritative for checks JSON Schema cannot
 express. Native Standard Schema adapters support form validation.
 
 ## Public paths

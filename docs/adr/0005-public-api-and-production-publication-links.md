@@ -1,13 +1,6 @@
----
-document_type: architecture-decision
-lifecycle: current
-authority: supporting
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-13
-review_trigger: public browser access, publication address or remote MCP origin policy changes
----
-
 # Public browser API and Production publication links
+
+Status: accepted
 
 On 13 October 2026 Cooper chose Common Practice's public, credential-free
 browser API policy and fixed Production publication links. Pages and discovery

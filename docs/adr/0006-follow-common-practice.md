@@ -1,10 +1,11 @@
 # Follow Common Practice's structure
 
+Status: accepted; partly superseded by ADR-0008 (diagram provider)
+
 In October 2026 Cooper chose to make TaxKit's Website, API and repository
 follow Common Practice, which is the better standard, and the shared
-development-workflows skills. The work landed in seven pull requests. Each
-choice below keeps one owner for each fact and removes machinery TaxKit no
-longer needs.
+development-workflows skills. Each choice below keeps one owner for each fact
+and removes machinery TaxKit no longer needs.
 
 ## Removed
 

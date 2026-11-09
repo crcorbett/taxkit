@@ -1,8 +1,6 @@
 # Agnostic MDX reading contracts and React presentation
 
-Status: Accepted.
-
-## Decision
+Status: accepted
 
 Keep document semantics, React presentation, publication policy and the Website
 as separate owners. Extend the existing content-neutral design without changing
@@ -78,16 +76,10 @@ selection, branding, search, loading/recovery wording and page actions remain
 Website-owned. CSS custom properties expose narrow layout integration such as
 the scroll margin below a host's sticky header.
 
-## Enforcement and proof
+## Enforcement
 
-Existing workspace import/dependency rules prohibit reverse dependencies:
-MDX imports no other owned package, the React presenter imports only MDX among
-owned packages and no router, Pele remains independent, and the diagram adapter
-imports only MDX and Pele. Browser grants expose only the presenter's actual
-public entries; parser, highlighter and provider live modules remain forbidden.
-
-Standalone SSR tests render an unrelated article, checked custom theme, semantic
-headings/tables/links/SVG, escaped text, exact code and host presentation slots.
-They acquire no router, registry, Content or providers. The existing Website/API
-suite proves the real publication, navigation, themes, clipboard and no-JavaScript
-integration. The normal repository verification remains the release gate.
+Workspace import rules prohibit reverse dependencies: MDX imports no other owned
+package, the React presenter imports only MDX among owned packages and no
+router, Pele remains independent, and the diagram adapter imports only MDX and
+Pele. Browser code may import only the presenter's public entries; parser,
+highlighter and provider modules stay out of the browser.

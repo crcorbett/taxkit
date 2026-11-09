@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-11-08
-review_trigger: frontend runtime, API client, loader, rendering, cache, build adapter, or composition change
----
-
 # Frontend
 
 `apps/web` is the TanStack Start Website for the calculators and the public

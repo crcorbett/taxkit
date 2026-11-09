@@ -1,18 +1,9 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-22
-review_trigger: test command, check coverage, native test or deployment check change
----
-
 # Testing and quality
 
 TaxKit quality depends on deterministic calculation tests, package boundary
 tests, graph validation, trace snapshots, public contract tests and a working
-Website/API. Detailed rule-package expectations live in
-[Testing and validation](./testing-and-validation.md).
+Website/API. [Rule and calculation tests](./testing-and-validation.md)
+describes the engine, rule-package and SDK tests.
 
 ## The checks
 
@@ -81,7 +72,7 @@ and an updated OpenAPI snapshot.
 ## What each kind of change needs
 
 - **Tax rules, facts and calculators**: the rule package's golden scenarios,
-  threshold/date-boundary tests and calculator catalogue tests. A wrong answer
+  threshold tests and rule-graph pins, and the calculator catalogue tests. A wrong answer
   is the most serious failure TaxKit can have.
 - **Public package contracts**: type tests, the OpenAPI snapshot, a Changeset,
   and the [packed consumer check](../runbooks/packed-consumer-proof.md) for SDK
@@ -118,7 +109,7 @@ timeout without understanding the failure.
 
 ## Related docs
 
-- [Testing and validation](./testing-and-validation.md)
+- [Rule and calculation tests](./testing-and-validation.md)
 - [API and SDK](./api-and-sdk.md)
 - [Frontend](./frontend.md)
 - [Deployment](./deployment.md)

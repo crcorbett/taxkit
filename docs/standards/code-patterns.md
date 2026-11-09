@@ -1,12 +1,3 @@
----
-document_type: standard
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: Effect, schema boundary, service, Layer, collection, error, or abstraction rule change
----
-
 # Code Patterns
 
 TaxKit is an Effect-native TypeScript library. Code should make invalid

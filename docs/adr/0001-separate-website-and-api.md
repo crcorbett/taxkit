@@ -1,19 +1,6 @@
----
-document_type: architecture-decision
-lifecycle: superseded
-authority: supporting
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-18
-review_trigger: website/API boundary, rebuild scope, or final design agreement
-successor: ../architecture/api-and-sdk.md
-reason: The foundation review replaced Website RPC with native HTTP; the separate application and API boundary remains.
----
-
 # Rebuild the application layer with a separate website and API
 
-Native Website HTTP, described in [API and SDK](../architecture/api-and-sdk.md),
-supersedes this Website RPC direction. The original decision below is retained
-as history; the separate Website/API boundary remains.
+Status: accepted; partly superseded by ADR-0006 (native HTTP replaced Website RPC)
 
 Cooper selected a fresh website and application foundation while retaining the
 TaxKit calculation packages. A separate backend will give the website and agent
@@ -34,5 +21,6 @@ version, so wire errors, privacy, deadlines, cancellation and version agreement
 need actual qualification. Public HTTP and MCP retain independent compatibility
 contracts for external callers; they do not mirror calculation rules.
 
-The separate apps and RPC direction are agreed in Q7/Q9; implementation awaits
-final shared understanding of the complete proposed contract.
+[ADR 0006](0006-follow-common-practice.md) replaced the Website RPC with the
+generated HTTP client described in [API and SDK](../architecture/api-and-sdk.md).
+The separate Website and API remain.

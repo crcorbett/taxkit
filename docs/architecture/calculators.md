@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-calculator-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: calculator composition, catalogue execution or domain error contract change
----
-
 # Calculators
 
 A calculator is an Effect program that requires facts and returns a report. It does not import global rule registries and it does not mutate shared state.
@@ -131,10 +122,10 @@ Reports should include:
 - optional ledger
 - diagnostics and warnings
 
-Each report owner defines its ruleset-version Schema as an exact literal and
-emits that value directly. Ruleset versions describe the independent tax-rule
-edition used for a calculation; they are not read from package manifests at
-runtime. Current report values are `rules-au-pay/1.0.2` and
+Each report owner defines its rule pack version Schema as an exact literal and
+emits that value directly. A rule pack version identifies the tax rules used
+for a calculation, independently of package versions; it is not read from a
+package manifest at runtime. Current report values are `rules-au-pay/1.0.2` and
 `rules-au-income-tax/1.0.1`.
 
 ## Question Planning

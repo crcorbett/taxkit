@@ -1,8 +1,7 @@
 # Closed calculator programs without an engine service
 
-Status: Accepted for SDK 6.0.0. Supersedes the engine service, `TaxKitLive`
-and engine-substitution parts of
-[ADR 0011](0011-effect-native-sdk-contracts.md); the rest of ADR 0011 stands.
+Status: accepted; supersedes the engine service, `TaxKitLive` and engine
+substitution parts of [ADR 0011](0011-effect-native-sdk-contracts.md)
 
 ## Context
 

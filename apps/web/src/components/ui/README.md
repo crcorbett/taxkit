@@ -1,11 +1,3 @@
----
-document_type: component-guide
-lifecycle: current
-authority: canonical
-owner: taxkit-web-app-owner
-last_reviewed: 2026-11-08
----
-
 # UI components
 
 The Website owns these adaptations of [shadcn/ui's Base UI components](https://ui.shadcn.com/docs/components/base/button).

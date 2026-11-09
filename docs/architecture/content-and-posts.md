@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-content-owner
-last_reviewed: 2026-10-18
-review_trigger: content ownership, publication status or generated presentation changes
----
-
 # Content and posts
 
 TaxKit public content should explain the open-source engine, supported rule

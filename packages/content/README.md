@@ -1,12 +1,3 @@
----
-document_type: package-guide
-lifecycle: current
-authority: canonical
-owner: taxkit-content-owner
-last_reviewed: 2026-10-31
-review_trigger: content contracts, search policy or package exports change
----
-
 # @taxkit/content
 
 Private source package for TaxKit docs contracts and published public page

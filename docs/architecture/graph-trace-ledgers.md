@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-core-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: graph, trace, ledger or encoded contract change
----
-
 # Graph, Trace And Ledgers
 
 Effect `Layer` composition provides compile-time dependency tracking. Graph metadata provides runtime tooling, validation and explanation.

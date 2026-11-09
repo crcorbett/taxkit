@@ -1,12 +1,3 @@
----
-document_type: app-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-api-app-owner
-last_reviewed: 2026-10-18
-review_trigger: API app composition, shared protocol owners, settings, routes, CORS, cache or lifecycle change
----
-
 # API App
 
 API application with a standalone Bun process and the native Alchemy Worker
@@ -39,7 +30,7 @@ Worker bundle. Run `bun run build --filter=api` after editing docs; a test fails
 if the bundled catalogue differs from a fresh build. Public HTTP documentation operations serve
 navigation, checked page values, bounded search and exact processed Markdown
 from that same service.
-Documentation calls consume no calculator allowance. See the
+Documentation calls are not subject to calculation admission. See the
 [HTTP package](../../packages/api/http/README.md) for paths/response rules.
 
 The native Worker also serves the AEO package's `aeoRoutes`: the four discovery
@@ -55,7 +46,7 @@ page's PNG with `@taxkit/og-image` and writes `src/generated/docs-images.json`.
 decodes one PNG per request; no renderer is in the Worker. The CDN keeps each
 image for seven days. A missing or unusable image is an empty 503. The Website forwards its own `/sitemap.xml`,
 `/robots.txt`, `/llms*.txt` and `/og/*.png` requests here once. The standalone
-Bun host does not serve these routes. They take no calculator allowance.
+Bun host does not serve these routes. They are not subject to calculation admission.
 
 Content reads the `@content/docs` navigation and repository JSON with an
 import attribute. The ESNext module profile preserves that attribute for
@@ -389,16 +380,8 @@ Production exports console logs only, through the retained
 why invocation logs and traces stay off. Local graph/state checks establish the
 declared settings, not uploaded Cloudflare settings or safe stored rows.
 
-The [shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
-across HTTP and MCP, with a five-second
-operation budget for all nine methods. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes. Website guidance requests
-manual retry only. This is separate from the body-read and ten-second client
-budgets. Metadata does not use a calculation place. Native built proof covers a
-eight HTTP calculations, rejected extra HTTP and
-browser calls, HTTP 504 timeouts and reached cleanup. Synchronous CPU work
-cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. The native rate policy below is separate.
+The API instance shares one calculation pool across HTTP and MCP under the
+[shared work policy](../../packages/calculators/README.md#shared-calculation-work-limits).
 
 
 Scripted typed HTTP requests construct the calculator-owned context/help
@@ -419,7 +402,7 @@ The native API builds `PublicCalculatorServiceRateLimited` once over
 Public requests need a checked original Cloudflare connection address;
 arbitrary Worker headers cannot select a key.
 
-`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. The operator must select an account-wide unique stage value before a cloud plan/apply; no provider value is invented. The [infrastructure owner](../../packages/infrastructure/README.md#native-calculation-limiter-configuration) owns graph and local-root selection. Hosted mode defaults to `edge` when `CALCULATOR_HOST_MODE` is absent; an invalid value fails Worker startup. The guarded local root selects `local-emulator`; a shared local allowance additionally requires an HTTP loopback API origin.
+`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. Infrastructure supplies a distinct value for each stage, so stages never share counters. The [infrastructure owner](../../packages/infrastructure/README.md#websiteapi-graph) owns graph and local-root selection. Hosted mode defaults to `edge` when `CALCULATOR_HOST_MODE` is absent; an invalid value fails Worker startup. The guarded local root selects `local-emulator`; a shared local limit additionally requires an HTTP loopback API origin.
 
 Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) is approximate and local to a location, not an exact global quota. Real edge identity, namespace uniqueness and uploaded provider settings need separate authorised readback. Direct engine/local SDK and standalone Bun execution keep their existing contracts.
 
@@ -453,7 +436,7 @@ a supplied Origin must exactly match the same-stage Website origin. Only `/mcp` 
 modern protocol/routing headers in CORS, with credentials disabled. Expected
 failures have fixed codes and manual-retry guidance; native internal failures use
 the existing safe reply and fixed reporter. HTTP and MCP retain the shared native
-anonymous per-IP allowance and five-second calculation budget.
+anonymous per-IP limit and five-second calculation budget.
 
 In-process AbortSignal cancellation interrupts actual work. On the pinned native
 Worker, an outgoing modern TCP abort stops the client while pre-response work

@@ -1,17 +1,10 @@
----
-document_type: agent-router
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-11-02
----
-
 # TaxKit repository guide
 
 TaxKit is the public monorepo for the open-source tax engine, API, SDK, and
 documentation site. Start with [`ARCHITECTURE.md`](ARCHITECTURE.md) and the
-short [docs index](docs/README.md). `CLAUDE.md` points to this file; edit
-`AGENTS.md` only.
+short [docs index](docs/README.md); use the terms in the
+[domain glossary](CONTEXT.md). `CLAUDE.md` imports this file with
+`@AGENTS.md`; edit `AGENTS.md` only.
 
 ## Operating loop
 
