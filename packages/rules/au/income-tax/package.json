@@ -8,9 +8,6 @@
     ".": "./src/index.ts",
     "./facts": "./src/facts/index.ts",
     "./parameters": "./src/parameters/index.ts",
-    "./rules": "./src/rules/index.ts",
-    "./rule-pack": "./src/rule-pack/index.ts",
-    "./calculator": "./src/calculator/index.ts",
     "./schemas": "./src/calculator/schemas.ts"
   },
   "scripts": {

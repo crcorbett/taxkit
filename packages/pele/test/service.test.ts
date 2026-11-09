@@ -3,7 +3,6 @@ import { PeleRenderError } from "@taxkit/pele/errors";
 import { PeleLive } from "@taxkit/pele/live";
 import { Source, Svg } from "@taxkit/pele/schemas";
 import { Pele } from "@taxkit/pele/service";
-import { PeleTest } from "@taxkit/pele/test";
 import {
   Function as EffectFunction,
   Array,
@@ -12,6 +11,8 @@ import {
   Schema,
 } from "effect";
 import * as TestClock from "effect/testing/TestClock";
+
+import { PeleTest } from "../src/test.layer.js";
 
 describe("Pele SVG service", () => {
   it.effect("renders diagrams without MDX or publication metadata", () =>

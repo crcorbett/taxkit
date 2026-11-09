@@ -68,6 +68,17 @@ The build removes `dist` before compiling. Workspace exports retain `source`
 conditions, while `publishConfig.exports` and `files` define a dist-only
 tarball validated by the SDK-owned strict downstream gate.
 
+## Export paths
+
+Every public subpath in the package export map:
+
+- `@taxkit/rules-au-pay`
+- `@taxkit/rules-au-pay/facts`
+- `@taxkit/rules-au-pay/parameters`
+- `@taxkit/rules-au-pay/rules`
+- `@taxkit/rules-au-pay/rule-pack`
+- `@taxkit/rules-au-pay/schemas`
+
 ## Related Docs
 
 - `docs/architecture/rules-and-parameters.md`

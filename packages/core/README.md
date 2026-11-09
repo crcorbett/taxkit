@@ -105,6 +105,23 @@ This private package exports its TypeScript source and has no build. The SDK
 compiles it into its single archive; the SDK-owned downstream check validates
 that packed archive and its dependency ranges.
 
+## Export paths
+
+Every public subpath in the package export map:
+
+- `@taxkit/core`
+- `@taxkit/core/primitives`
+- `@taxkit/core/facts`
+- `@taxkit/core/parameters`
+- `@taxkit/core/errors`
+- `@taxkit/core/engine`
+- `@taxkit/core/rules`
+- `@taxkit/core/graph`
+- `@taxkit/core/trace`
+- `@taxkit/core/ledger`
+- `@taxkit/core/engine/schemas`
+- `@taxkit/core/money`
+
 ## Related Docs
 
 - `docs/architecture/package-ownership.md`

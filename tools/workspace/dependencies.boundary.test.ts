@@ -5,6 +5,8 @@ import {
   Array,
   Effect,
   FileSystem,
+  Predicate,
+  Record,
   Schema,
 } from "effect";
 
@@ -14,6 +16,7 @@ import {
 } from "../oxlint/package-roles.js";
 import {
   dependencyNames,
+  ExportTarget,
   WorkspaceManifest as Manifest,
 } from "../oxlint/workspaces.boundary.js";
 
@@ -44,6 +47,30 @@ const appEdges = (
     )
   );
 };
+// Folders under a workspace glob that only group nested workspaces. Every
+// other folder a workspace glob matches must be a workspace with a manifest.
+const groupingFolders = ["packages/api", "packages/rules", "packages/sdk"];
+const isExportArray = Schema.is(Schema.Array(ExportTarget));
+// Every file path a package export map can select, across all conditions.
+const exportPaths = (
+  target: typeof ExportTarget.Type | undefined
+): readonly string[] => {
+  if (Predicate.isString(target)) {
+    return [target];
+  }
+  if (Predicate.isNullish(target)) {
+    return [];
+  }
+  if (isExportArray(target)) {
+    return EffectFunction.pipe(target, Array.flatMap(exportPaths));
+  }
+  return EffectFunction.pipe(Record.values(target), Array.flatMap(exportPaths));
+};
+const testExportTargets = (target: typeof ExportTarget.Type | undefined) =>
+  EffectFunction.pipe(
+    exportPaths(target),
+    Array.filter((path) => /(?:^|\/)test\//u.test(path))
+  );
 const manifestFixture = (
   name: string,
   dependencies: Readonly<Record<string, string>>
@@ -64,7 +91,7 @@ describe("workspace dependency direction", () => {
               Schema.decodeUnknownEffect(Schema.fromJsonString(RootManifest))
             )
           );
-        const paths = yield* EffectFunction.pipe(
+        const folders = yield* EffectFunction.pipe(
           root.workspaces.packages,
           Effect.forEach((pattern) => {
             const parent = pattern.slice(0, -2);
@@ -73,20 +100,61 @@ describe("workspace dependency direction", () => {
               .pipe(
                 Effect.map(Array.map((name) => `${parent}/${name}`)),
                 Effect.flatMap(
-                  Effect.filter((path) => fs.exists(`${path}/package.json`))
+                  Effect.filter((path) =>
+                    fs
+                      .stat(path)
+                      .pipe(Effect.map((info) => info.type === "Directory"))
+                  )
+                ),
+                Effect.flatMap(
+                  Effect.forEach((path) =>
+                    fs
+                      .exists(`${path}/package.json`)
+                      .pipe(Effect.map((manifest) => ({ manifest, path })))
+                  )
                 )
               );
-          })
+          }),
+          Effect.map(Array.flatten)
         );
-        const manifests = yield* Effect.forEach(Array.flatten(paths), (path) =>
-          fs.readFileString(`${path}/package.json`).pipe(
-            Effect.flatMap(
-              Schema.decodeUnknownEffect(Schema.fromJsonString(Manifest))
+        // A folder without a manifest is either a named grouping folder or a
+        // leftover workspace; grouping folders never carry their own manifest.
+        assert.deepEqual(
+          EffectFunction.pipe(
+            folders,
+            Array.filter(
+              ({ manifest, path }) =>
+                manifest === Array.contains(groupingFolders, path)
             ),
-            Effect.map((manifest) => ({ manifest, path }))
+            Array.map(({ path }) => path)
+          ),
+          []
+        );
+        const manifests = yield* EffectFunction.pipe(
+          folders,
+          Array.filter(({ manifest }) => manifest),
+          Effect.forEach(({ path }) =>
+            fs.readFileString(`${path}/package.json`).pipe(
+              Effect.flatMap(
+                Schema.decodeUnknownEffect(Schema.fromJsonString(Manifest))
+              ),
+              Effect.map((manifest) => ({ manifest, path }))
+            )
           )
         );
         assert.deepEqual(appEdges(manifests), []);
+        assert.deepEqual(
+          EffectFunction.pipe(
+            manifests,
+            Array.flatMap(({ manifest }) =>
+              EffectFunction.pipe(
+                testExportTargets(manifest.exports),
+                Array.map((target) => `${manifest.name} -> ${target}`)
+              )
+            )
+          ),
+          []
+        );
         assert.deepEqual(
           EffectFunction.pipe(
             manifests,
@@ -151,12 +219,31 @@ describe("workspace dependency direction", () => {
           ["packages/observability", "@taxkit/calculators/admission.schemas"],
           ["packages/observability", "effect"],
           ["packages/analytics", "@taxkit/observability"],
+          ["packages/api/http", "taxkit"],
+          ["packages/api/http", "taxkit/http"],
+          ["packages/api/http", "@taxkit/sdk"],
+          ["packages/sdk/typescript", "@taxkit/api-http"],
         ] as const,
         Array.map(([owner, dependency]) =>
           isForbiddenPackageDependency(owner, dependency)
         )
       ),
-      [true, true, true, false, false, false, true, true, false, false]
+      [
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+      ]
     );
     assert.deepEqual(
       dependencyNames({
@@ -255,7 +342,7 @@ describe("workspace dependency direction", () => {
           "@taxkit/mdx-react/schemas",
           "@taxkit/mdx-react/styles.css",
         ],
-        Array.map((address) => isFrontendModule(file, address))
+        Array.map((address) => isFrontendModule(file, address, []))
       ),
       [true, true, true, true, true]
     );
@@ -270,7 +357,7 @@ describe("workspace dependency direction", () => {
           "@taxkit/mdx/highlights",
           "@taxkit/pele/live",
         ],
-        Array.map((address) => isFrontendModule(file, address))
+        Array.map((address) => isFrontendModule(file, address, []))
       ),
       [false, false, false, false, false, false, false]
     );

@@ -1,7 +1,6 @@
-import { ConfigProvider, Effect, Schema } from "effect";
+import { ConfigProvider, Schema } from "effect";
 
-import { AnalyticsSettingsConfig } from "../config.js";
-import { AnalyticsDisabled, CalculatorUse } from "../schemas.js";
+import { CalculatorUse } from "../schemas.js";
 
 export const productionAnalyticsConfig = ConfigProvider.fromUnknown({
   POSTHOG_CAPTURE_TOKEN: "phc_synthetic_taxkit_capture_fixture_only",
@@ -10,17 +9,8 @@ export const productionAnalyticsConfig = ConfigProvider.fromUnknown({
   POSTHOG_REGION: "us",
   POSTHOG_STAGE: "prod",
 });
-export const productionAnalyticsFixture = AnalyticsSettingsConfig.pipe(
-  Effect.provideService(
-    ConfigProvider.ConfigProvider,
-    productionAnalyticsConfig
-  )
-);
 export const calculatorUseFixture = Schema.decodeEffect(CalculatorUse)({
   calculatorId: "au.pay.take-home",
   calculatorName: "AU take-home pay",
   collectionPolicy: "allow",
 });
-export const disabledAnalyticsFixture = Effect.succeed(
-  AnalyticsDisabled.make({})
-);

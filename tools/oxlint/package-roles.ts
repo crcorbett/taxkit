@@ -4,7 +4,6 @@ import { Function as EffectFunction, Array, Number, Option } from "effect";
 const frontendModules = [
   "@taxkit/analytics/collection-policy",
   "@taxkit/analytics/schemas",
-  "@taxkit/analytics/errors",
   "@taxkit/analytics/service",
   "@taxkit/api-http/api",
   "@taxkit/api-http/errors",
@@ -15,7 +14,6 @@ const frontendModules = [
   "@taxkit/api-http/response-policy",
   "@taxkit/api-http/routes",
   "@taxkit/calculators/schemas",
-  "@taxkit/calculators/errors",
   "@taxkit/calculators/form",
   "@taxkit/calculators/page",
   "@taxkit/calculators/page-schemas",
@@ -40,42 +38,22 @@ const frontendModules = [
   "@taxkit/rules-au-pay/facts",
   "@taxkit/webmcp/host",
   "@taxkit/webmcp/registration",
-  "@taxkit/webmcp/schemas",
   "@taxkit/webmcp/service",
 ];
-const hostModuleExceptions = [
-  {
-    file: "apps/web/src/entry.server.ts",
-    module: "@taxkit/observability/host-telemetry",
-  },
-  {
-    file: "apps/web/src/lib/runtime.server.ts",
-    module: "@taxkit/observability/host-telemetry",
-  },
-  {
-    file: "apps/web/src/lib/host/config.ingress.ts",
-    module: "@taxkit/content/config",
-  },
-  {
-    file: "apps/web/src/lib/host/config.ingress.ts",
-    module: "@taxkit/infrastructure/api-worker",
-  },
-  {
-    file: "apps/web/src/lib/host/binding.adapter.layer.ts",
-    module: "@taxkit/infrastructure/api-worker",
-  },
-];
-// Native isomorphic/server composition imports these local server boundaries.
-// The grant is for one source and one module address, never a browser subtree.
-const hostSourceImports = [
-  { file: "apps/web/src/lib/pages/loaders.ts", module: "../runtime.server" },
-];
-export const isHostSourceImport = (file: string, address: string) =>
+// One source file may import one module address. Exact grants are declared in
+// oxlint.config.ts and passed to the workspace-roles rule as options.
+export interface ModuleGrant {
+  readonly file: string;
+  readonly module: string;
+}
+export const isGranted = (
+  grants: readonly ModuleGrant[],
+  file: string,
+  address: string
+) =>
   EffectFunction.pipe(
-    hostSourceImports,
-    Array.some(
-      (exception) => exception.file === file && exception.module === address
-    )
+    grants,
+    Array.some((grant) => grant.file === file && grant.module === address)
   );
 const isDeploymentDependency = (dependency: string) =>
   dependency === "@taxkit/infrastructure" ||
@@ -86,6 +64,14 @@ const isInfrastructureOwner = (owner: string) =>
 // Runtime support is consumed by domain packages and hosts, never the reverse:
 // these owners depend on no other TaxKit workspace package.
 const domainFreeOwners = ["packages/observability"];
+// The HTTP contract is an input to the SDK assembly. It never depends on the
+// published SDK, including through tests.
+const sdkIndependentOwners = ["packages/api/http"];
+const isSdkAddress = (address: string) =>
+  address === "taxkit" ||
+  address.startsWith("taxkit/") ||
+  address === "@taxkit/sdk" ||
+  address.startsWith("@taxkit/sdk/");
 const isPackageAddress = (address: string, name: string) =>
   address === name || address.startsWith(`${name}/`);
 // These owners serve independent consumers. Declaring a dependency or export
@@ -138,6 +124,7 @@ export const isForbiddenPackageDependency = (
 ) =>
   isForbiddenPublicationDependency(owner, dependency) ||
   isPresenterHostDependency(owner, dependency) ||
+  (Array.contains(sdkIndependentOwners, owner) && isSdkAddress(dependency)) ||
   (Array.contains(domainFreeOwners, owner) &&
     (dependency === "taxkit" ||
       dependency.startsWith("taxkit/") ||
@@ -147,16 +134,16 @@ export const isForbiddenPackageDependency = (
     (isDeploymentDependency(dependency) ||
       dependency === "alchemy" ||
       dependency.startsWith("alchemy/")));
-export const isFrontendModule = (file: string, address: string) =>
+export const frontendModuleGrants: readonly string[] = frontendModules;
+export const isFrontendModule = (
+  file: string,
+  address: string,
+  hostModuleGrants: readonly ModuleGrant[]
+) =>
   Array.contains(frontendModules, address) ||
   (/\.(?:test|spec)\.[cm]?[jt]sx?$/u.test(file) &&
     /\/testing\/(?:fixtures|observations)$/u.test(address)) ||
-  EffectFunction.pipe(
-    hostModuleExceptions,
-    Array.some(
-      (exception) => exception.file === file && exception.module === address
-    )
-  );
+  isGranted(hostModuleGrants, file, address);
 // File ownership uses the longest root because transport/rule/SDK packages nest.
 interface WorkspaceOwner {
   readonly owner: string;

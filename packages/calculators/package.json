@@ -6,9 +6,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./catalog": "./src/catalog.ts",
     "./summaries": "./src/summaries.ts",
-    "./metadata": "./src/metadata.ts",
     "./service": "./src/service.ts",
     "./live": "./src/live.layer.ts",
     "./schemas": "./src/schemas.ts",

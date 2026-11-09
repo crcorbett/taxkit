@@ -7,9 +7,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./facts": "./src/facts/index.ts",
-    "./parameters": "./src/parameters/index.ts",
-    "./rules": "./src/rules/index.ts",
-    "./rule-pack": "./src/rule-pack/index.ts"
+    "./parameters": "./src/parameters/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

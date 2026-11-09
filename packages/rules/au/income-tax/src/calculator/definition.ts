@@ -2,8 +2,8 @@ import { defineCalculator } from "@taxkit/core";
 import { Effect, Layer } from "effect";
 
 import { AnnualTaxableIncomeDescriptor } from "../facts/income.js";
+import { AuAnnualTax2025_26_Live } from "../rule-pack/au-annual-tax-2025-26.js";
 import { AuAnnualTaxRuleDescriptors } from "../rule-pack/descriptors.js";
-import { AuAnnualTax2025_26_Live } from "../rule-pack/index.js";
 import {
   CalculateAnnualTax,
   AnnualTaxScenario,

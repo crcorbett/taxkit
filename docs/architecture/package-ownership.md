@@ -53,7 +53,6 @@ Current implemented code lives in:
 - `packages/rules/au/stsl`
 - `packages/sdk/typescript`
 - `packages/testing`
-- `packages/tsconfig`
 
 ## Main areas
 
@@ -270,7 +269,9 @@ belongs in apps or explicitly server-only package exports.
   restricts Website source to contracts/clients and exact host module grants;
   new exports and dependency declarations cannot grant a browser/backend role.
   [Package boundaries](./package-boundaries.md) owns the policy and proof limits;
-  `tools/oxlint/package-roles.ts` owns the enforced module grants.
+  `tools/oxlint/package-roles.ts` owns the browser module grants and package
+  role policy; exact host file grants are rule options in `oxlint.config.ts`.
+  Each package README lists its public export paths.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
 - Keep each validator and its domain policy with the package or app it
