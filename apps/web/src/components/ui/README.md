@@ -1,11 +1,3 @@
----
-document_type: component-guide
-lifecycle: current
-authority: canonical
-owner: taxkit-web-app-owner
-last_reviewed: 2026-11-02
----
-
 # UI components
 
 The Website owns these adaptations of [shadcn/ui's Base UI components](https://ui.shadcn.com/docs/components/base/button).
@@ -35,8 +27,9 @@ maps those variables to the checked MDX theme. Platform colours are the default
 outside a themed reader. The adapters preserve these intentional differences:
 
 - Button supports the used default, outline and ghost variants and default,
-  large and icon sizes. Targets are at least 44px. `buttonVariants` supplies the
-  same styling attributes to native links without adding button keyboard behaviour.
+  large and icon sizes. Targets are at least 44px. `buttonVariants`
+  (`button-variants.ts`) supplies the same styling attributes to native links
+  and native form buttons without loading the Base UI Button runtime.
   `data-ui-button` preserves styling when another Base UI primitive supplies its
   own `data-slot` through `render={<Button />}`.
 - Input keeps Base UI's complete prop contract and a 16px font. Field is native

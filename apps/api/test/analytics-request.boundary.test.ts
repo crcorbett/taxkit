@@ -1,6 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import {
-  ApiCalculatorAnalyticsLive,
+  ApiCalculatorUsageLive,
   ApiCalculatorEvents,
 } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
@@ -31,8 +31,8 @@ import { HttpServerRequest, HttpServerResponse } from "effect/http";
 import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
 
 const expectedCalculatorName: unknown = expect.any(String);
-const AnalyticsCalculatorLive = ApiCalculatorAnalyticsLive.pipe(
-  Layer.provide(CalculatorLive)
+const AnalyticsCalculatorLive = CalculatorLive.pipe(
+  Layer.provide(ApiCalculatorUsageLive)
 );
 it.effect.each([
   { count: 1, headers: {} },
@@ -112,12 +112,9 @@ it.effect.each(["expected", "defect", "mixed", "capacity", "timeout"] as const)(
           Option.some({ collectionPolicy: "allow", events })
         ),
         Effect.provide(
-          ApiCalculatorAnalyticsLive.pipe(
-            Layer.provide(
-              CalculatorFixture.pipe(
-                Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode))
-              ).pipe(Layer.provide(CalculatorLive))
-            )
+          CalculatorFixture.pipe(
+            Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode)),
+            Layer.provide(ApiCalculatorUsageLive)
           )
         )
       );

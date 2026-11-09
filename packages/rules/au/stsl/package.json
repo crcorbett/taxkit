@@ -1,15 +1,13 @@
 {
   "name": "@taxkit/rules-au-stsl",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./facts": "./src/facts/index.ts",
-    "./parameters": "./src/parameters/index.ts",
-    "./rules": "./src/rules/index.ts",
-    "./rule-pack": "./src/rule-pack/index.ts"
+    "./parameters": "./src/parameters/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

@@ -67,6 +67,7 @@ import {
   Ref,
   Schema,
 } from "effect";
+import { Digest, SecureRandom } from "effect/crypto";
 import { HttpClient } from "effect/http";
 
 import { declareNativeAppsStack } from "../../alchemy.apps.js";
@@ -384,6 +385,8 @@ const graphEnvironment = Effect.provide(
       ConfigProvider.fromUnknown({ CALCULATOR_RATE_NAMESPACE: "10076" })
     ),
     BunServices.layer,
+    SecureRandom.layerWebCrypto,
+    Digest.layerWebCrypto,
     Layer.succeed(ArtifactStore, createArtifactStore()),
     Layer.succeed(AuthProviders, {}),
     layerNonInteractive(),
@@ -1013,7 +1016,11 @@ describe("native app root secret selection", () => {
                 Effect.failCause(
                   cause.pipe(
                     Cause.map(
-                      () => new SecretSourceError({ source: "configuration" })
+                      () =>
+                        new SecretSourceError({
+                          source: "configuration",
+                          reason: "unavailable",
+                        })
                     )
                   )
                 )
@@ -1079,7 +1086,11 @@ describe("native app root secret selection", () => {
                 Effect.failCause(
                   cause.pipe(
                     Cause.map(
-                      () => new SecretSourceError({ source: "configuration" })
+                      () =>
+                        new SecretSourceError({
+                          source: "configuration",
+                          reason: "unavailable",
+                        })
                     )
                   )
                 )
@@ -1095,7 +1106,11 @@ describe("native app root secret selection", () => {
                 Effect.failCause(
                   cause.pipe(
                     Cause.map(
-                      () => new SecretSourceError({ source: "configuration" })
+                      () =>
+                        new SecretSourceError({
+                          source: "configuration",
+                          reason: "unavailable",
+                        })
                     )
                   )
                 )
@@ -1297,6 +1312,15 @@ describe("Website build-input hash", () => {
           { discard: true }
         );
         expect(yield* hashAfter(["../../packages/content"])).toBe(original);
-      }).pipe(Effect.provide(BunServices.layer), Effect.scoped)
+      }).pipe(
+        Effect.provide(
+          Layer.mergeAll(
+            BunServices.layer,
+            SecureRandom.layerWebCrypto,
+            Digest.layerWebCrypto
+          )
+        ),
+        Effect.scoped
+      )
   );
 });

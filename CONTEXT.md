@@ -1,12 +1,3 @@
----
-document_type: domain-glossary
-lifecycle: current
-authority: supporting
-owner: taxkit-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: calculation, public content vocabulary or domain meaning changes
----
-
 # TaxKit calculation and publication language
 
 TaxKit answers defined tax questions from explicit facts and supported rules.
@@ -49,9 +40,14 @@ A defined step that derives one or more facts from accepted facts and parameters
 _Avoid_: calculator mode
 
 **Rule pack**:
-A named composition of rules and parameter editions for a particular
-jurisdiction, tax year and supported scenario.
+A named composition of rules and parameters for a particular jurisdiction, tax
+year and supported scenario.
 _Avoid_: module, plugin
+
+**Rule pack version**:
+The identity of the exact rule pack that produced a report. A change to any of
+its rules or parameters gives a new rule pack version.
+_Avoid_: edition, ruleset version
 
 **Parameter**:
 A rate, threshold, table or constant that applies to a specified period.
@@ -62,13 +58,13 @@ The accepted input facts and relevant dates for one calculation.
 _Avoid_: saved account
 
 **Calculation context**:
-The jurisdiction and tax year selecting a calculator's edition. An effective
-date is a separate dimension when a rule requires it.
+The jurisdiction and tax year that select a calculator's rule pack. An
+effective date is a separate dimension when a rule requires it.
 _Avoid_: application context
 
 **Calculation run**:
 One execution of a calculator for a scenario and context, including its report,
-edition metadata and diagnostics.
+rule pack version and diagnostics.
 _Avoid_: report (when referring to the complete execution)
 
 **Calculation caller**:
@@ -76,10 +72,11 @@ A person or program requesting a TaxKit calculation. The caller may supply
 facts describing someone else's circumstances.
 _Avoid_: taxpayer, calculation subject
 
-**Shared calculation allowance**:
-One allowance for calculation requests from the same network address across
-the Website, public API and remote tools.
-_Avoid_: per-interface allowance
+**Calculation admission**:
+The check that lets a public calculation request proceed. One limit applies to
+each caller's network address across the Website, public API and remote tools;
+a refused request is rate limited.
+_Avoid_: shared calculation allowance, per-interface allowance, throttling
 
 **Report**:
 The named results returned by a calculator.
@@ -90,7 +87,7 @@ A record of the calculation steps and values behind a result.
 _Avoid_: application log, request timing
 
 **Source artifact**:
-Preserved evidence for an official parameter edition, including its source,
+Preserved evidence for an official parameter, including its source,
 retrieval date, extraction details and checksum.
 _Avoid_: compatibility data
 

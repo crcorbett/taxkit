@@ -6,14 +6,14 @@ status: "published"
 
 # Effect SDK
 
-The owning calculator program retains its input, output, error and native service requirements. Provide the static `TaxKitLive` or your own engine Layer. Your application owns its runtime.
+Each owning calculator definition is a closed program: its rule packs are composed by the owning package, so `calculateReport` and `calculateRun` return Effects with no requirements and only the definition's checked error. Your application owns its runtime.
 
 ```ts
 import { Effect } from "effect";
 import { AuPayTakeHomeCalculation } from "taxkit/au";
 import { TakeHomeScenarioInputSchema } from "taxkit/au/schemas";
 import { fromDecimal, nonNegative } from "taxkit/money/effect";
-import { calculateRun, TaxKitLive } from "taxkit/effect";
+import { calculateRun } from "taxkit/effect";
 
 export const program = Effect.gen(function* () {
   const grossPay = yield* fromDecimal("3462.00").pipe(
@@ -25,7 +25,7 @@ export const program = Effect.gen(function* () {
     taxFreeThresholdClaimed: true,
   });
   return yield* calculateRun(AuPayTakeHomeCalculation, input);
-}).pipe(Effect.provide(TaxKitLive));
+});
 ```
 
 `calculateReport` returns the selected report; `calculateRun` returns the report and diagnostics. Parse unknown data explicitly with `decodeInput`, which rejects surplus fields. Checked inputs flow through execution without another decoder.

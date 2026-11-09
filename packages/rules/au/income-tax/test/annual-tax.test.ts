@@ -1,5 +1,4 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
 import {
   fromDecimal,
   nonNegative,
@@ -36,25 +35,22 @@ import {
 } from "effect";
 
 const runScenario = (incomeDollars: number) =>
-  Effect.gen(function* () {
-    const engine = yield* CalculationEngine;
-    const taxableIncome = yield* EffectFunction.pipe(
-      String(incomeDollars),
-      fromDecimal
-    ).pipe(Effect.flatMap(nonNegative));
-    const result = yield* engine.run({
-      calculation: CalculateAnnualTax,
-      layer: AuAnnualTax2025_26_Live.pipe(
-        Layer.provideMerge(AnnualTaxScenarioLive),
-        Layer.provide(
-          Layer.succeed(AnnualTaxScenario)(
-            AnnualTaxScenarioInputSchema.make({ taxableIncome })
+  EffectFunction.pipe(String(incomeDollars), fromDecimal).pipe(
+    Effect.flatMap(nonNegative),
+    Effect.flatMap((taxableIncome) =>
+      CalculateAnnualTax.pipe(
+        Effect.provide(
+          AuAnnualTax2025_26_Live.pipe(
+            Layer.provideMerge(AnnualTaxScenarioLive)
           )
+        ),
+        Effect.provideService(
+          AnnualTaxScenario,
+          AnnualTaxScenarioInputSchema.make({ taxableIncome })
         )
-      ),
-    });
-    return result.report;
-  }).pipe(Effect.provide(CalculationEngineLive));
+      )
+    )
+  );
 describe("AU annual income tax calculator (2025-26)", () => {
   it.effect("negative income remains unsupported", () =>
     Effect.gen(function* () {

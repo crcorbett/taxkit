@@ -1,19 +1,7 @@
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 
-type ButtonVariants = Readonly<{
-  variant?: "default" | "outline" | "ghost";
-  size?: "default" | "lg" | "icon";
-}>;
-
-export const buttonVariants = ({
-  variant = "default",
-  size = "default",
-}: ButtonVariants = {}) => ({
-  "data-slot": "button",
-  "data-ui-button": "",
-  "data-variant": variant,
-  "data-size": size,
-});
+import { buttonVariants } from "./button-variants";
+import type { ButtonVariants } from "./button-variants";
 
 export const Button = ({
   variant = "default",

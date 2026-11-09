@@ -155,11 +155,11 @@ describe("portable rules", () => {
         "apps/web/src/lib/pages/loaders.ts",
         "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
         "tools/apps-local/native-pair-build.runtime.ts",
-        // native-pair takes over a minute to lint alone; `bun run lint` covers it.
-        "apps/web/test/native-settings-failure.boundary.test.ts",
-        "apps/web/test/native-cancellation.boundary.test.ts",
-        "apps/web/test/native-local-development.boundary.test.ts",
-        "apps/web/vitest.native.config.ts",
+        // `bun run lint` covers the other native suites and their surface checks.
+        "tools/apps-local/test/native-settings-failure.boundary.test.ts",
+        "tools/apps-local/test/native-cancellation.boundary.test.ts",
+        "tools/apps-local/test/native-local-development.boundary.test.ts",
+        "tools/vitest.config.ts",
         "packages/calculators/src/form.ingress.ts",
         "apps/web/src/entry.server.ts",
         "apps/web/src/routes/index.tsx",
@@ -294,7 +294,6 @@ describe("portable rules", () => {
     },
     {
       accepted: [
-        "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
         "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
         "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
         "packages/sdk/typescript/src/internal/artifact-schemas.ts",
@@ -330,7 +329,6 @@ describe("portable rules", () => {
         "packages/sdk/typescript/test/index.test.ts",
         "packages/sdk/typescript/src/index.ts",
         "packages/sdk/typescript/src/au.ts",
-        "packages/sdk/typescript/src/live.layer.ts",
         "packages/sdk/typescript/src/schemas/index.ts",
         "packages/sdk/typescript/src/testing/index.ts",
         "packages/sdk/typescript/src/types.ts",
@@ -615,13 +613,11 @@ describe("portable rules", () => {
         "no-effect-test-global-mix",
         "no-host-imports-in-contracts",
         "no-layer-exports-in-service-files",
-        "no-manual-tag",
         "no-module-level-mutable-test-state",
         "no-process-outside-boundaries",
         "no-runtime-execution-outside-boundaries",
         "no-schema-encoder-outside-egress",
         "no-switch",
-        "no-throwing-schema-sync-codec",
         "no-unknown-service-contract",
         "no-unknown-tagged-error-cause",
       ],
@@ -1038,7 +1034,6 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
     "apps/web/src/entry.server.ts",
     "apps/api/src/index.ts",
     "apps/api/scripts/smoke-public-routes.runtime.ts",
-    "packages/sdk/typescript/scripts/check-import-boundaries.runtime.ts",
     "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
     "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
     "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
@@ -1307,14 +1302,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
       },
       {
-        path: "apps/web/test/native-pair.boundary.test.ts",
+        path: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
         rejected: false,
         rule: "strict-effect(no-imperative-collections)",
         source:
           'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const fill = () => { calculatorInput.fill("67000"); };',
       },
       {
-        path: "apps/web/test/native-pair.boundary.test.ts",
+        path: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
         rejected: false,
         rule: "strict-effect(no-imperative-collections)",
         source:
@@ -1328,14 +1323,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'declare const calculatorInput: { readonly fill: (value: string) => void };\nexport const fill = () => { calculatorInput.fill("67000"); };',
       },
       {
-        path: "apps/web/test/native-pair.boundary.test.ts",
+        path: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
         rejected: false,
         rule: "strict-effect(no-imperative-collections)",
         source:
           'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const fill = () => { savedPayInput.fill("2000"); };',
       },
       {
-        path: "apps/web/test/native-pair.boundary.test.ts",
+        path: "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
         rejected: true,
         rule: "strict-effect(no-imperative-collections)",
         source:
@@ -1349,56 +1344,56 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'declare const savedPayInput: { readonly fill: (value: string) => void };\nexport const fill = () => { savedPayInput.fill("2000"); };',
       },
       {
-        path: "apps/web/test/native-local-development.boundary.test.ts",
+        path: "tools/apps-local/test/native-local-development.boundary.test.ts",
         rejected: false,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-local-development.boundary.test.ts",
+        path: "tools/apps-local/test/native-local-development.boundary.test.ts",
         rejected: true,
         rule: "taxkit-effect(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-local-development.boundary.test.ts",
+        path: "tools/apps-local/test/native-local-development.boundary.test.ts",
         rejected: true,
         rule: "strict-effect(no-runtime-outside-boundary)",
         source:
           'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
       },
       {
-        path: "apps/web/test/native-cancellation.boundary.test.ts",
+        path: "tools/apps-local/test/native-cancellation.boundary.test.ts",
         rejected: false,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-cancellation.boundary.test.ts",
+        path: "tools/apps-local/test/native-cancellation.boundary.test.ts",
         rejected: false,
         rule: "taxkit-effect(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-cancellation.boundary.test.ts",
+        path: "tools/apps-local/test/native-cancellation.boundary.test.ts",
         rejected: true,
         rule: "strict-effect(no-runtime-outside-boundary)",
         source:
           'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
       },
       {
-        path: "apps/web/test/native-settings-failure.boundary.test.ts",
+        path: "tools/apps-local/test/native-settings-failure.boundary.test.ts",
         rejected: false,
         rule: "taxkit-effect(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-settings-failure.boundary.test.ts",
+        path: "tools/apps-local/test/native-settings-failure.boundary.test.ts",
         rejected: true,
         rule: "strict-effect(no-runtime-outside-boundary)",
         source:
@@ -1489,7 +1484,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-pair.boundary.test.ts",
+        path: "tools/apps-local/test/native-pair-content.checks.ts",
         rejected: false,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
@@ -1510,7 +1505,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-settings-failure.boundary.test.ts",
+        path: "tools/apps-local/test/native-settings-failure.boundary.test.ts",
         rejected: true,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
@@ -1923,21 +1918,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
       },
       {
-        path: "apps/web/test/native-mcp.boundary.test.ts",
+        path: "tools/apps-local/test/native-mcp.boundary.test.ts",
         rejected: false,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-mcp.boundary.test.ts",
+        path: "tools/apps-local/test/native-mcp.boundary.test.ts",
         rejected: false,
         rule: "taxkit-effect(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-mcp.boundary.test.ts",
+        path: "tools/apps-local/test/native-mcp.boundary.test.ts",
         rejected: false,
         rule: "strict-effect(no-runtime-outside-boundary)",
         source:
@@ -1984,7 +1979,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           "export const run = (source: Promise<number>) => source.then((value) => value);",
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "strict-effect(no-promise-workflow)",
         source: "export const run = (source: Promise<number>) => source;",
@@ -2011,21 +2006,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'import { Effect } from "effect";\n\nexport const run = Effect.runPromise(Effect.void);',
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "taxkit-effect(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
-        path: "apps/web/src/lib/calculators/tools.atoms.ts",
+        path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
         rule: "strict-effect(no-runtime-outside-boundary)",
         source:
@@ -2039,21 +2034,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-browser-tools.boundary.test.ts",
+        path: "tools/apps-local/test/native-browser-tools.boundary.test.ts",
         rejected: false,
         rule: "taxkit(no-decoding-outside-boundaries)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-browser-tools.boundary.test.ts",
+        path: "tools/apps-local/test/native-browser-tools.boundary.test.ts",
         rejected: true,
         rule: "taxkit-effect(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
-        path: "apps/web/test/native-browser-tools.boundary.test.ts",
+        path: "tools/apps-local/test/native-browser-tools.boundary.test.ts",
         rejected: true,
         rule: "strict-effect(no-runtime-outside-boundary)",
         source:

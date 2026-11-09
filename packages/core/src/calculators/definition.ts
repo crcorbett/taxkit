@@ -1,10 +1,7 @@
 import { Effect, Schema } from "effect";
 
-import type {
-  CalculationEngine,
-  CalculationResult,
-} from "../engine/calculation-engine.js";
 import { CalculationDiagnostics } from "../engine/schemas.js";
+import type { CalculationResult } from "../engine/schemas.js";
 import { CalculationError } from "../errors/calculation-error.js";
 import { inputValidationError } from "../errors/input-validation-error.js";
 import { validateRuleGraph } from "../graph/rule-graph.js";
@@ -26,16 +23,17 @@ export interface CalculatorDefinition<
   readonly inputSchema: Input;
   readonly outputSchema: Output;
   readonly errorSchema: typeof CalculationError;
+  /** A closed program: rule packs are composed statically by the owner. */
   readonly calculate: (
     input: Input["Type"]
-  ) => Effect.Effect<
-    CalculationResult<Output["Type"]>,
-    CalculationError,
-    CalculationEngine
-  >;
+  ) => Effect.Effect<CalculationResult<Output["Type"]>, CalculationError>;
 }
 
-/** The owner supplies codecs and their matching native program together. */
+/**
+ * The owner supplies codecs and their matching closed report program
+ * together. The definition validates the rule graph once and attaches its
+ * diagnostics to every result.
+ */
 export const defineCalculator = <
   const Id extends CalculatorId,
   const Country extends Jurisdiction,
@@ -43,26 +41,25 @@ export const defineCalculator = <
   Input extends Schema.Top,
   Output extends Schema.Top,
 >(
-  definition: CalculatorDefinition<Input, Output> & {
+  definition: Omit<CalculatorDefinition<Input, Output>, "calculate"> & {
     readonly calculatorId: Id;
     readonly jurisdiction: Country;
     readonly taxYear: Year;
     readonly calculate: (
       input: NoInfer<Input["Type"]>
-    ) => Effect.Effect<
-      CalculationResult<NoInfer<Output["Type"]>>,
-      CalculationError,
-      CalculationEngine
-    >;
+    ) => Effect.Effect<NoInfer<Output["Type"]>, CalculationError>;
   }
 ) => {
   const graphIssues = validateRuleGraph({
     inputFacts: definition.inputFacts,
     rules: definition.ruleDescriptors,
   });
+  const diagnostics = new CalculationDiagnostics({ graphIssues });
   return {
     ...definition,
-    calculate: (input: Input["Type"]) => {
+    calculate: (
+      input: Input["Type"]
+    ): Effect.Effect<CalculationResult<Output["Type"]>, CalculationError> => {
       if (graphIssues.length > 0) {
         return Effect.fail(
           new CalculationError({
@@ -71,12 +68,9 @@ export const defineCalculator = <
           })
         );
       }
-      return definition.calculate(input).pipe(
-        Effect.map((run) => ({
-          ...run,
-          diagnostics: new CalculationDiagnostics({ graphIssues }),
-        }))
-      );
+      return definition
+        .calculate(input)
+        .pipe(Effect.map((report) => ({ diagnostics, report })));
     },
   } as const;
 };

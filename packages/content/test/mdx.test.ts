@@ -113,15 +113,20 @@ describe("MDX page reader", () => {
               MdxPageReaderLive.pipe(
                 Layer.provide(
                   Layer.merge(
-                    Layer.succeed(CodeHighlighter, {
-                      highlight: ({ snippet }) =>
-                        Effect.fail(
-                          new CodeHighlightError({
-                            language: snippet.language,
-                            reason,
-                          })
+                    Layer.succeed(
+                      CodeHighlighter,
+                      CodeHighlighter.of({
+                        highlight: Effect.fn("CodeHighlighter.highlight")(
+                          ({ snippet }) =>
+                            Effect.fail(
+                              new CodeHighlightError({
+                                language: snippet.language,
+                                reason,
+                              })
+                            )
                         ),
-                    }),
+                      })
+                    ),
                     DiagramRendererTest
                   )
                 )
@@ -161,8 +166,9 @@ describe("MDX page reader", () => {
                   Layer.merge(
                     CodeHighlighterTest,
                     Layer.succeed(DiagramRenderer, {
-                      render: () =>
-                        Effect.fail(new DiagramRenderError({ reason })),
+                      render: Effect.fn("DiagramRenderer.render")(() =>
+                        Effect.fail(new DiagramRenderError({ reason }))
+                      ),
                     })
                   )
                 )

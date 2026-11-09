@@ -1,6 +1,6 @@
 {
   "name": "@taxkit/api-http",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -8,10 +8,8 @@
     ".": "./src/index.ts",
     "./api": "./src/api.ts",
     "./in-process": "./src/in-process.layer.ts",
-    "./config": "./src/config.ts",
     "./server": "./src/server.ts",
     "./handlers": "./src/handlers/index.ts",
-    "./handlers/live": "./src/handlers/live.ts",
     "./request-boundary": "./src/request-boundary.ts",
     "./response-policy": "./src/response-policy.ts",
     "./routes": "./src/routes.ts",
@@ -21,8 +19,7 @@
     "./errors": "./src/errors.ts",
     "./schemas": "./src/schemas.ts",
     "./calculator-contract": "./src/groups/calculators.ts",
-    "./health-contract": "./src/groups/health.ts",
-    "./content-contract": "./src/groups/content.ts"
+    "./health-contract": "./src/groups/health.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
@@ -34,13 +31,12 @@
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
-    "@taxkit/rules-au-income-tax": "workspace:*",
-    "@taxkit/rules-au-pay": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
+    "@taxkit/rules-au-pay": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

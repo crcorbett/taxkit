@@ -1,5 +1,4 @@
-import { Context } from "effect";
-import type { Effect } from "effect";
+import { Context, Effect } from "effect";
 
 import type {
   CalculatorCatalogItem,
@@ -56,3 +55,25 @@ export class PublicCalculatorService extends Context.Service<
   PublicCalculatorService,
   PublicCalculatorServiceContract
 >()("@taxkit/calculators/PublicCalculatorService") {}
+
+/**
+ * The calculator catalogue itself: metadata projections and owning-definition
+ * execution, without host work, admission or usage policy. The public service
+ * implementation acquires it; tests substitute it to control the work.
+ */
+export class CalculatorCatalogue extends Context.Service<
+  CalculatorCatalogue,
+  PublicCalculatorServiceContract
+>()("@taxkit/calculators/CalculatorCatalogue") {}
+
+/**
+ * Observes each successful calculation once, after its work budget. Hosts
+ * without usage collection keep the native no-op default.
+ */
+export const CalculatorUsage = Context.Reference<{
+  readonly record: (response: CalculatorRunResponse) => Effect.Effect<void>;
+}>("@taxkit/calculators/CalculatorUsage", {
+  defaultValue: () => ({
+    record: Effect.fn("CalculatorUsage.record")(() => Effect.void),
+  }),
+});

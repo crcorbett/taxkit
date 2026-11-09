@@ -180,15 +180,15 @@ describe("required native release gate", () => {
         expect(result.code).toBe(0);
         EffectFunction.pipe(result.calls.slice(-2), (actual) => {
           expect(actual).toStrictEqual([
-            "run --filter=web build:native-pair",
-            "run --filter=web test:native-pair",
+            "run build:native-pair",
+            "run test:native-pair",
           ]);
         });
         EffectFunction.pipe(
           result.calls.indexOf("run test:tools"),
           (actual) => {
             expect(actual).toBeLessThan(
-              result.calls.indexOf("run --filter=web build:native-pair")
+              result.calls.indexOf("run build:native-pair")
             );
           }
         );
@@ -202,15 +202,13 @@ describe("required native release gate", () => {
         const result = yield* runCommand({
           fixture,
           command: "bun run release:check",
-          fail: `run --filter=web ${failure}`,
+          fail: `run ${failure}`,
         });
         expect(result.code).not.toBe(0);
         expect(result.calls).not.toContain("run sdk:check-packed-artifact");
         expect(result.calls).not.toContain("run changeset:status");
         if (failure === "build:native-pair") {
-          expect(result.calls).not.toContain(
-            "run --filter=web test:native-pair"
-          );
+          expect(result.calls).not.toContain("run test:native-pair");
         }
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
@@ -276,13 +274,11 @@ describe("required native release gate", () => {
         const result = yield* runCommand({
           fixture,
           command: "bun run verification",
-          fail: "run --filter=web test:native-pair",
+          fail: "run test:native-pair",
         });
         expect(result.code).not.toBe(0);
         EffectFunction.pipe(Array.last(result.calls), (actual) => {
-          expect(actual).toStrictEqual(
-            Option.some("run --filter=web test:native-pair")
-          );
+          expect(actual).toStrictEqual(Option.some("run test:native-pair"));
         });
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );

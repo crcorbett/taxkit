@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import type {
   DocsPublicNavigation,
   DocsPublicPage,
@@ -15,7 +15,7 @@ import {
   SquareTerminal,
 } from "lucide-react";
 
-import { buttonVariants } from "#/components/ui/button";
+import { buttonVariants } from "#/components/ui/button-variants";
 
 import { DocsAppearance } from "./appearance.container";
 import { docsHeadingId } from "./focus.atoms";
@@ -27,13 +27,14 @@ const repositoryUrl = "https://github.com/crcorbett/taxkit";
 
 export const DocsHeader = ({
   currentPath,
+  loading,
   navigation,
 }: Readonly<{
   currentPath: Option.Option<DocsPublicPage["path"]>;
+  loading: boolean;
   navigation: DocsPublicNavigation;
 }>) => {
   const requestDocsNavigationFocus = useDocsNavigationFocus();
-  const loading = useRouterState({ select: (state) => state.isLoading });
   return (
     <>
       <header className="docs-header" data-mdx-appearance-controls="">

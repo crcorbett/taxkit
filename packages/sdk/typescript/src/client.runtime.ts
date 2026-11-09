@@ -1,24 +1,23 @@
-import type { CalculatorDefinition } from "@taxkit/core";
+import type { CalculationError, CalculatorDefinition } from "@taxkit/core";
 import {
   Effect,
   Exit,
+  Layer,
   ManagedRuntime,
   Ref,
   Result,
   Scope,
   Boolean as EffectBoolean,
 } from "effect";
-import type { Layer, Schema } from "effect";
+import type { Schema } from "effect";
 
 import { calculateReport, calculateRun } from "./effect.js";
-import type { TaxKitEffectRequirements } from "./effect.js";
 import {
   TaxKitClientDisposedError,
   TaxKitClientDisposeError,
   TaxKitUnexpectedError,
 } from "./errors.js";
 import type { TaxKitError } from "./errors.js";
-import { TaxKitLive } from "./live.layer.js";
 import type { CalculationRun } from "./types.js";
 
 type ReportOperation = <Input extends Schema.Top, Output extends Schema.Top>(
@@ -42,30 +41,25 @@ export interface TaxKitClient extends AsyncDisposable {
 }
 
 // The plain SDK is an explicitly Promise-shaped host. This private module owns
-// the bridge and each client's runtime, interruption and shared cleanup result.
-export const createPlainClient = (
-  layer: Layer.Layer<TaxKitEffectRequirements>
-): TaxKitClient => {
+// the bridge: each host's runtime, interruption and shared cleanup result.
+const makePlainHost = () => {
   const lifetime = Scope.makeUnsafe();
   const runtime = Effect.acquireRelease(
-    Effect.sync(() => ManagedRuntime.make(layer)),
+    Effect.sync(() => ManagedRuntime.make(Layer.empty)),
     (owned) => owned.disposeEffect
   ).pipe(Effect.provideService(Scope.Scope, lifetime), Effect.runSync);
   const disposed = Ref.makeUnsafe(false);
-  const safeCalculation = <Input extends Schema.Top, Output extends Schema.Top>(
-    calculation: CalculatorDefinition<Input, Output>,
-    input: NoInfer<Input["Type"]>
-  ): Effect.Effect<Result.Result<Output["Type"], TaxKitError>> => {
+  // Project one checked calculation's captured outcome to the public result.
+  const settle = <A>(
+    calculation: Effect.Effect<A, CalculationError>
+  ): Effect.Effect<Result.Result<A, TaxKitError>> => {
     if (Ref.getUnsafe(disposed)) {
       return Effect.succeed(Result.fail(new TaxKitClientDisposedError()));
     }
-    // ManagedRuntime tracks acquisition and calculation fibers in its own native
-    // lifetime. The outer host only projects their already captured public result.
+    // ManagedRuntime tracks calculation fibers in its own native lifetime. The
+    // outer host only projects their already captured public result.
     return Effect.tryPromise({
-      try: () =>
-        runtime.runPromiseExit(
-          calculateReport(calculation, input).pipe(Effect.result)
-        ),
+      try: () => runtime.runPromiseExit(calculation.pipe(Effect.result)),
       catch: () => new TaxKitUnexpectedError(),
     }).pipe(
       Effect.map(
@@ -93,21 +87,30 @@ export const createPlainClient = (
       Effect.catchCause(() => Effect.fail(new TaxKitClientDisposeError()))
     )
   ).pipe(Effect.runSync);
+  return { dispose, settle };
+};
+export const createPlainClient = (): TaxKitClient => {
+  const host = makePlainHost();
   const disposeHost = () =>
-    Effect.runPromise(dispose, { uninterruptible: true });
+    Effect.runPromise(host.dispose, { uninterruptible: true });
   return {
     calculate: (calculation, input) =>
       Effect.runPromise(
-        safeCalculation(calculation, input).pipe(
-          Effect.flatMap(Effect.fromResult)
-        )
+        host
+          .settle(calculateReport(calculation, input))
+          .pipe(Effect.flatMap(Effect.fromResult))
       ),
     calculateSafe: (calculation, input) =>
-      Effect.runPromise(safeCalculation(calculation, input)),
+      Effect.runPromise(host.settle(calculateReport(calculation, input))),
     dispose: disposeHost,
     [Symbol.asyncDispose]: disposeHost,
   };
 };
+// The named top-level functions share one host, created on first use and kept
+// for the module's lifetime, instead of building a runtime for every call.
+const sharedHost = Effect.cached(Effect.sync(makePlainHost)).pipe(
+  Effect.runSync
+);
 export const calculateSafe = <
   Input extends Schema.Top,
   Output extends Schema.Top,
@@ -117,12 +120,8 @@ export const calculateSafe = <
   // oxlint-disable-next-line effect/no-async-await-promise -- The requested vanilla SDK exposes Promise signatures at this exact private host; orchestration remains Effect-native.
 ): Promise<Result.Result<Output["Type"], TaxKitError>> =>
   Effect.runPromise(
-    calculateReport(calculation, input).pipe(
-      Effect.provide(TaxKitLive),
-      Effect.result,
-      Effect.catchCause(() =>
-        Effect.succeed(Result.fail(new TaxKitUnexpectedError()))
-      )
+    sharedHost.pipe(
+      Effect.flatMap((host) => host.settle(calculateReport(calculation, input)))
     )
   );
 export const calculate = <Input extends Schema.Top, Output extends Schema.Top>(
@@ -131,11 +130,9 @@ export const calculate = <Input extends Schema.Top, Output extends Schema.Top>(
   // oxlint-disable-next-line effect/no-async-await-promise -- The requested vanilla SDK exposes Promise signatures at this exact private host; orchestration remains Effect-native.
 ): Promise<Output["Type"]> =>
   Effect.runPromise(
-    calculateReport(calculation, input).pipe(
-      Effect.provide(TaxKitLive),
-      Effect.result,
-      Effect.catchCause(() =>
-        Effect.succeed(Result.fail(new TaxKitUnexpectedError()))
+    sharedHost.pipe(
+      Effect.flatMap((host) =>
+        host.settle(calculateReport(calculation, input))
       ),
       Effect.flatMap((result) =>
         Effect.fromResult<Output["Type"], TaxKitError>(result)
@@ -155,12 +152,8 @@ export const run = <
   // oxlint-disable-next-line effect/no-async-await-promise -- The vanilla full-run operation preserves checked report and exact calculator identity at this private Promise host.
 ): Promise<CalculationRun<Output, Identity>> =>
   Effect.runPromise(
-    calculateRun(calculation, input).pipe(
-      Effect.provide(TaxKitLive),
-      Effect.result,
-      Effect.catchCause(() =>
-        Effect.succeed(Result.fail(new TaxKitUnexpectedError()))
-      ),
+    sharedHost.pipe(
+      Effect.flatMap((host) => host.settle(calculateRun(calculation, input))),
       Effect.flatMap((result) =>
         Effect.fromResult<CalculationRun<Output, Identity>, TaxKitError>(result)
       )

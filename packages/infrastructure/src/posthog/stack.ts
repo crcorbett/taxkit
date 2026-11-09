@@ -5,7 +5,8 @@ import type { StackSecrets } from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { Cause, Config, ConfigProvider, Effect, Layer } from "effect";
 
-import { SecretSourceError } from "../secrets.js";
+import { dopplerSourceError } from "../secrets.js";
+import type { SecretSourceError } from "../secrets.js";
 import { PostHogProject } from "./projects.provider.js";
 import {
   PostHogManagedName,
@@ -47,11 +48,7 @@ const PostHogSecretsLive: Layer.Layer<
 > = Doppler.Secrets({ config: "prd", project: "taxkit" }).layer.pipe(
   Layer.catchCause((cause) =>
     Layer.effectDiscard(
-      Effect.failCause(
-        cause.pipe(
-          Cause.map(() => new SecretSourceError({ source: "doppler" }))
-        )
-      )
+      Effect.failCause(cause.pipe(Cause.map(dopplerSourceError)))
     )
   )
 );

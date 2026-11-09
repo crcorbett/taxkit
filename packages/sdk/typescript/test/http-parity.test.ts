@@ -16,7 +16,6 @@ import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { ContentServiceLive } from "@taxkit/content/live";
 import { ContentCatalogue } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { CalculationEngineLive } from "@taxkit/core";
 import {
   NonNegativeMoney,
   Money,
@@ -65,13 +64,10 @@ const ContentTestLive = ContentServiceLive.pipe(
 const inProcessClient = HttpApiClient.make(TaxKitApi, {
   baseUrl: "http://taxkit.internal",
 });
-const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive.pipe(
-  Layer.provide(CalculationEngineLive)
-);
+const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive;
 const TestLive = Layer.mergeAll(
   TaxKitApiInProcessLive.pipe(Layer.provide(ContentTestLive)),
-  PublicCalculatorServiceTestLive,
-  CalculationEngineLive
+  PublicCalculatorServiceTestLive
 );
 const takeHomeCalculatorId = AuPayTakeHomeCalculation.calculatorId;
 const annualTaxCalculatorId = AuAnnualIncomeTaxCalculation.calculatorId;
@@ -103,9 +99,7 @@ describe("TaxKit public calculation HTTP API", () => {
       const service = Layer.succeed(
         PublicCalculatorService,
         PublicCalculatorService.of({
-          calculate: Effect.fn("PublicCalculatorService.calculate")(
-            live.calculate
-          ),
+          calculate: live.calculate,
           getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
             () => Effect.fail(new CalculatorOperationTimedOut())
           ),

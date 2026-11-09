@@ -1,4 +1,4 @@
-import { CalculationEngine, defineCalculator } from "@taxkit/core";
+import { defineCalculator } from "@taxkit/core";
 import { Effect, Layer } from "effect";
 
 import {
@@ -32,21 +32,32 @@ import {
   TakeHomeScenarioLive,
 } from "./take-home-pay.js";
 
+// Static rule packs over each scenario's facts. Only the checked scenario is
+// supplied per calculation; facts are derived in that calculation's own scope.
+const TakeHomePay = CalculateTakeHomePay.pipe(
+  Effect.provide(
+    AuTakeHomePay2025_26_Live.pipe(Layer.provideMerge(TakeHomeScenarioLive))
+  )
+);
+const PayWithholdings = CalculatePayWithholdings.pipe(
+  Effect.provide(
+    AuPayWithholdings2025_26_Live.pipe(Layer.provideMerge(TakeHomeScenarioLive))
+  )
+);
+const TakeHomePayWithSacrifice = CalculateTakeHomePay.pipe(
+  Effect.provide(
+    AuTakeHomePayWithSacrifice2025_26_Live.pipe(
+      Layer.provideMerge(TakeHomeWithSacrificeScenarioLive)
+    )
+  )
+);
+
 export const AuPayTakeHomeCalculation = defineCalculator({
   inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
   ruleDescriptors: AuTakeHomePayRuleDescriptors,
   ...AuPayTakeHomeContract,
   calculate: (input) =>
-    Effect.gen(function* () {
-      const engine = yield* CalculationEngine;
-      return yield* engine.run({
-        calculation: CalculateTakeHomePay,
-        layer: AuTakeHomePay2025_26_Live.pipe(
-          Layer.provideMerge(TakeHomeScenarioLive),
-          Layer.provide(Layer.succeed(TakeHomeScenario)(input))
-        ),
-      });
-    }),
+    TakeHomePay.pipe(Effect.provideService(TakeHomeScenario, input)),
 });
 export const AuPayWithholdingsCalculation = defineCalculator({
   inputFacts: [GrossPayDescriptor, TaxFreeThresholdClaimedDescriptor],
@@ -57,16 +68,7 @@ export const AuPayWithholdingsCalculation = defineCalculator({
   ],
   ...AuPayWithholdingsContract,
   calculate: (input) =>
-    Effect.gen(function* () {
-      const engine = yield* CalculationEngine;
-      return yield* engine.run({
-        calculation: CalculatePayWithholdings,
-        layer: AuPayWithholdings2025_26_Live.pipe(
-          Layer.provideMerge(TakeHomeScenarioLive),
-          Layer.provide(Layer.succeed(TakeHomeScenario)(input))
-        ),
-      });
-    }),
+    PayWithholdings.pipe(Effect.provideService(TakeHomeScenario, input)),
 });
 
 export const AuPayTakeHomeWithSacrificeCalculation = defineCalculator({
@@ -78,14 +80,7 @@ export const AuPayTakeHomeWithSacrificeCalculation = defineCalculator({
   ruleDescriptors: AuTakeHomePayWithSacrificeRuleDescriptors,
   ...AuPayWithSacrificeContract,
   calculate: (input) =>
-    Effect.gen(function* () {
-      const engine = yield* CalculationEngine;
-      return yield* engine.run({
-        calculation: CalculateTakeHomePay,
-        layer: AuTakeHomePayWithSacrifice2025_26_Live.pipe(
-          Layer.provideMerge(TakeHomeWithSacrificeScenarioLive),
-          Layer.provide(Layer.succeed(TakeHomeWithSacrificeScenario)(input))
-        ),
-      });
-    }),
+    TakeHomePayWithSacrifice.pipe(
+      Effect.provideService(TakeHomeWithSacrificeScenario, input)
+    ),
 });

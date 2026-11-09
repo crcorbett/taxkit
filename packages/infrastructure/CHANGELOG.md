@@ -1,5 +1,18 @@
 # @taxkit/infrastructure
 
+## 1.2.0
+
+### Minor Changes
+
+- ac11f7c: `SecretSourceError` carries a closed `reason` (`unauthorized`, `not-found` or
+  `unavailable`) classified from the native Doppler error tags, without copying
+  the token, selection or provider message.
+
+### Patch Changes
+
+- Updated dependencies [ac11f7c]
+  - @taxkit/analytics@2.0.0
+
 ## 1.1.7
 
 ### Patch Changes

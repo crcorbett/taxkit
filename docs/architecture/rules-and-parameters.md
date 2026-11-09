@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-rules-and-parameters-owner
-last_reviewed: 2026-10-17
-review_trigger: rule Layer, descriptor, parameter or rule-pack composition change
----
-
 # Rules and parameters
 
 Rules are Effect Layers that produce named facts from other facts and parameter

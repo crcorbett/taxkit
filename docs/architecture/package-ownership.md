@@ -1,59 +1,9 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-11-04
-review_trigger: package, app, root composition, or semantic ownership change
----
-
 # Package ownership
 
-Package ownership defines where new TaxKit code should belong as the repo
-grows and which package will be allowed to define canonical contracts. It does
-not imply that every named package exists today.
-
-## Scope
-
-This doc routes ownership decisions. [Package boundaries](./package-boundaries.md)
-contains the proposed package map and dependency direction.
-
-Current implemented code lives in:
-
-- `apps/api`
-- `apps/web`
-- `content/docs`
-- `packages/aeo`
-- `packages/analytics`
-- `packages/api/http`
-- `packages/api/mcp`
-- `packages/calculators`
-- `packages/content`
-- `packages/core`
-- `packages/mdx-react`
-: Private source `@taxkit/mdx-react`: pure React presentation of MDX-owned reading
-  values, paired theme formatting and content/code/table/diagram styles. It has
-  no Content, router, app, compiler/provider acquisition or runtime dependency.
-  Hosts bind the two named link/code slots and toolbar commands; its native
-  scroll and appearance contracts preserve no-JavaScript reading. See
-  [the package](../../packages/mdx-react/README.md) and
-  [ADR 0010](../adr/0010-agnostic-mdx-presentation.md).
-
-`packages/diagrams`
-- `packages/docs-examples`
-- `packages/infrastructure`
-- `packages/mdx`
-- `packages/mdx-react`
-- `packages/observability`
-- `packages/og-image`
-- `packages/pele`
-- `packages/webmcp`
-- `packages/rules/au/income-tax`
-- `packages/rules/au/pay`
-- `packages/rules/au/stsl`
-- `packages/sdk/typescript`
-- `packages/testing`
-- `packages/tsconfig`
+This document says where new TaxKit code belongs and which package defines each
+canonical contract. [ARCHITECTURE.md](../../ARCHITECTURE.md#owners-and-imports)
+lists every app and package; [package boundaries](./package-boundaries.md)
+owns the dependency direction and its enforcement.
 
 ## Main areas
 
@@ -63,10 +13,6 @@ metadata, trace and ledger contracts, common tagged errors and calculation
 engine service. Public trace inputs and results are JSON values, and
 `SourceExtract.rowContract` names the extracted row contract without using the
 vague former `shape` field.
-
-`packages/domain/au/*`
-: Planned Australian date dimensions and domain facts that are not owned by a
-single rule pack.
 
 `packages/rules/au/*`
 : Official Australian rule packs, parameter tables, algorithms, source
@@ -96,15 +42,14 @@ public CORS and cache decision.
 : Implemented reusable calculator orchestration package. It owns calculator
 catalog composition schemas, calculator service methods, metadata projections,
 graph response construction, schema-guided error shaping and
-rule-pack/scenario composition used by HTTP, SDK, CLI and in-process callers.
+rule-pack/scenario composition used by HTTP, MCP, SDK and in-process callers.
 It also owns the canonical reusable calculator run schemas named
 `CalculatorRun*` and the `CalculatorServiceError` union. HTTP-only public
 envelopes and status annotations stay in `packages/api/http`; SDK schema
 exports may re-export calculator-owned run contracts but must not duplicate
 them. Service interfaces use the precise `Contract` suffix rather than the
 vague `Shape` suffix. It depends on `packages/core` and rule packages, but it
-must not depend on HTTP handlers, SDK clients, CLI commands or app runtime
-modules.
+must not depend on HTTP handlers, SDK clients or app runtime modules.
 
 `packages/sdk/typescript`
 : The sole TypeScript package configured for public npm installation as `taxkit`.
@@ -140,13 +85,15 @@ Root `alchemy.run.ts`
   [deployment](./deployment.md).
 
 `packages/infrastructure`
-: Private source-only owner of the native API/Website graph (`./apps-stack`),
+: Private source-only, deployment-only owner of the native API/Website graph (`./apps-stack`),
   local stage Schema (`./stage`), Production hostnames and publication origin
   (`./hostnames`) and secret selection (`./secrets`), plus the
   separate retained PostHog project through the explicit `./posthog` export and
   `alchemy.posthog.run.ts`. Its private management adapter contains Distilled;
   application packages do not receive that client or its management
-  credentials.
+  credentials. It has no application dependency, and engine, HTTP, MCP,
+  analytics and observability packages have no infrastructure dependency. Root
+  `alchemy.apps.ts` joins the graph and the API's named implementation export.
 
 `apps/api`
 : API application owner. It retains standalone Bun config/startup/shutdown
@@ -167,8 +114,9 @@ identity. Neither an app nor a package depends on another app.
   consume its named exports.
 
 `packages/api/mcp`
-: Private source MCP transport owner: tool contracts, handlers, request
-  cancellation and response budgets over domain services. Native session storage,
+: Private source MCP transport owner: tool contracts, service-backed and
+  public-API-client-backed handlers, request cancellation and response budgets
+  over domain services. Native session storage,
   dispatch and app lifecycle remain in the API app.
 
 `packages/aeo`
@@ -180,8 +128,8 @@ identity. Neither an app nor a package depends on another app.
 
 `packages/webmcp`
 : Private source WebMCP owner. `ModelContextHost` and its live adapter are the
-  one browser Promise bridge for page tools; `registerCalculatorPageTools`
-  registers the calculator page toolkit for the enclosing Scope.
+  one browser Promise bridge; `registerWebMcpTools` registers the API MCP
+  toolkit, with the caller's handlers, for the enclosing Scope.
 
 `packages/og-image`
 : Private source build-time share-image provider. `DocsPageRendererLive`
@@ -211,8 +159,8 @@ identity. Neither an app nor a package depends on another app.
   execution and best-effort delivery. Analytics owns the calculator usage decorator.
   Infrastructure owns retained provider
   projects. Calculators, rules and the local SDK have no analytics dependency.
-  T008 application and provider qualification remain in progress; package tests
-  alone do not prove browser privacy or ingestion.
+  The Website does not collect analytics; package tests alone do not prove
+  provider ingestion.
 
 `content/docs`
 : Private source-only `@content/docs` package with the 62 authored `.mdx`
@@ -227,6 +175,15 @@ identity. Neither an app nor a package depends on another app.
   requires no providers. `./highlights` owns every Pierre call. Content imports
   only these contracts and Schemas, while the app selects implementations.
   See [the package](../../packages/mdx/README.md).
+
+`packages/mdx-react`
+: Private source `@taxkit/mdx-react`: pure React presentation of MDX-owned reading
+  values, paired theme formatting and content/code/table/diagram styles. It has
+  no Content, router, app, compiler/provider acquisition or runtime dependency.
+  Hosts bind the two named link/code slots and toolbar commands; its native
+  scroll and appearance contracts preserve no-JavaScript reading. See
+  [the package](../../packages/mdx-react/README.md) and
+  [ADR 0010](../adr/0010-agnostic-mdx-presentation.md).
 
 `packages/diagrams`
 : Private source `@taxkit/diagrams`. Static `PeleDiagramRendererLive` implements
@@ -270,7 +227,9 @@ belongs in apps or explicitly server-only package exports.
   restricts Website source to contracts/clients and exact host module grants;
   new exports and dependency declarations cannot grant a browser/backend role.
   [Package boundaries](./package-boundaries.md) owns the policy and proof limits;
-  `tools/oxlint/package-roles.ts` owns the enforced module grants.
+  `tools/oxlint/package-roles.ts` owns the browser module grants and package
+  role policy; exact host file grants are rule options in `oxlint.config.ts`.
+  Each package README lists its public export paths.
 - Add server-only exports for filesystem, HTTP server and Node adapters.
 - Keep React in apps or docs packages only.
 - Keep each validator and its domain policy with the package or app it
@@ -295,12 +254,3 @@ belongs in apps or explicitly server-only package exports.
 - [Package boundaries](./package-boundaries.md)
 - [Effect services](./effect-services.md)
 - [API and SDK](./api-and-sdk.md)
-
-
-`@taxkit/infrastructure` owns the native app graph and root secret selection
-through explicit source-only exports. It has no application dependency. Root
-`alchemy.apps.ts` joins the graph and the API's named implementation export;
-the native Worker declaration and common compatibility settings live in deployment-only
-exports. Engine, HTTP, MCP, analytics and observability packages have no
-infrastructure dependency. The API app retains native request/instance behaviour;
-root composition retains provider and state selection.

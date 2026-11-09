@@ -1,0 +1,175 @@
+import { NodeServices } from "@effect/platform-node";
+import { expect, it } from "@effect/vitest";
+import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
+import { packEnvValue } from "alchemy/RuntimeContext";
+import {
+  Match,
+  Function as EffectFunction,
+  Array,
+  Effect,
+  Path,
+  Queue,
+  Schema,
+} from "effect";
+import { Miniflare } from "miniflare";
+import type { WorkerdStructuredLog } from "miniflare";
+
+import {
+  nativeWorkerCompatibility,
+  readWorkerModules,
+} from "./native-worker.fixture";
+
+it.live.each(["missing", "invalid", "throwing"] as const)(
+  "contains a %s native limiter binding without exposing provider data",
+  (mode) =>
+    Effect.gen(function* () {
+      const path = yield* Path.Path;
+      const modulesRoot = path.resolve(
+        ".alchemy/native-pair/bundles/TaxKitApi"
+      );
+      const { files, modules, wasm } = yield* readWorkerModules({
+        modulesRoot,
+      });
+      expect(files).toContain("worker.js");
+      const logs = yield* Queue.make<WorkerdStructuredLog>();
+      const exceptions = yield* Queue.make<string>();
+      const origins = {
+        API_PUBLIC_ORIGIN: {
+          type: "json" as const,
+          value: "https://api.example.com",
+        },
+        CALCULATOR_RATE_NAMESPACE: {
+          type: "json" as const,
+          value: packEnvValue("10082"),
+        },
+        TAXKIT_PUBLICATION_ORIGIN: {
+          type: "json" as const,
+          value: "https://website.example.com",
+        },
+        WEBSITE_PUBLIC_ORIGIN: {
+          type: "json" as const,
+          value: "https://website.example.com",
+        },
+      };
+      const env = Match.value(mode).pipe(
+        Match.when("missing", () => origins),
+        Match.orElse(() => ({
+          ...origins,
+          // Deliberately wrong native capability: the live SDK still receives it
+          // through WorkerEnvironment and must check its actual reply or failure.
+          CALCULATOR_RATE_LIMIT: {
+            type: "worker" as const,
+            worker: "provider-fixture",
+          },
+        }))
+      );
+      const host = yield* Effect.acquireRelease(
+        Effect.sync(
+          () =>
+            new Miniflare({
+              cf: false,
+              handleStructuredLogs: (log) => {
+                Queue.offerUnsafe(logs, log);
+              },
+              handleUncaughtError: (error) => {
+                Queue.offerUnsafe(exceptions, error.message);
+              },
+              host: "127.0.0.1",
+              port: 0,
+              workers: [
+                {
+                  config: {
+                    ...nativeWorkerCompatibility,
+                    env: {
+                      ...env,
+                    },
+                    manifest: {
+                      mainModule: "worker.js",
+                      modules: { ...modules, ...wasm },
+                      modulesRoot,
+                    },
+                    name: "api-provider-proof",
+                  },
+                },
+                {
+                  config: {
+                    ...nativeWorkerCompatibility,
+                    manifest: {
+                      mainModule: "provider.js",
+                      modules: {
+                        "provider.js": {
+                          contents: `
+              import { WorkerEntrypoint } from "cloudflare:workers";
+              export default class extends WorkerEntrypoint {
+                limit() { ${Match.value(mode).pipe(
+                  Match.when(
+                    "throwing",
+                    (): 'throw new Error("PRIVATE9")' =>
+                      'throw new Error("PRIVATE9")'
+                  ),
+                  Match.orElse(
+                    (): 'return { success: "PRIVATE9" }' =>
+                      'return { success: "PRIVATE9" }'
+                  )
+                )}; }
+                fetch() { return new Response(null, { status: 404 }); }
+              }
+            `,
+                          type: "esm" as const,
+                        },
+                      },
+                      modulesRoot,
+                    },
+                    name: "provider-fixture",
+                  },
+                },
+              ],
+            })
+        ),
+        (value) => Effect.promise(() => value.dispose())
+      );
+      const api = yield* Effect.promise(() =>
+        host.getWorker("api-provider-proof")
+      );
+      const body = yield* Schema.encodeEffect(
+        Schema.fromJsonString(CalculatorRunRequest)
+      )(CalculationRequest);
+      const response = yield* Effect.promise(() =>
+        api.fetch(
+          "https://api.example.com/api/v2/calculators/au.pay.take-home/calculate",
+          {
+            body,
+            headers: {
+              "cf-connecting-ip": "203.0.113.75",
+              "content-type": "application/json",
+            },
+            method: "POST",
+          }
+        )
+      );
+      expect(response.status).toBe(503);
+      const text = yield* Effect.promise(() => response.text());
+      expect(text).toContain('"_tag":"CalculatorAdmissionUnavailable"');
+      Array.forEach((marker: string) => {
+        expect(text).not.toContain(marker);
+      })(["PRIVATE9", "203.0.113.75"]);
+      expect(
+        (yield* Effect.promise(() =>
+          api.fetch("https://api.example.com/api/v2/calculators")
+        )).status
+      ).toBe(200);
+      const captured = yield* Schema.encodeEffect(
+        Schema.fromJsonString(Schema.Unknown)
+      )(
+        EffectFunction.pipe(
+          yield* Queue.clear(logs),
+          Array.map((log) => log.message)
+        )
+      );
+      Array.forEach((marker: string) => {
+        expect(captured).not.toContain(marker);
+      })(["PRIVATE9", "203.0.113.75"]);
+      expect(yield* Queue.clear(exceptions)).toStrictEqual([]);
+    }).pipe(Effect.provide(NodeServices.layer), Effect.scoped)
+);

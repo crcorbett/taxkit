@@ -21,7 +21,7 @@ type ExportTarget =
   | {
       readonly [condition: string]: ExportTarget;
     };
-const ExportTarget: Schema.Codec<ExportTarget> = Schema.suspend(() =>
+export const ExportTarget: Schema.Codec<ExportTarget> = Schema.suspend(() =>
   Schema.Union([
     Schema.String,
     Schema.Null,

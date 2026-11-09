@@ -11,8 +11,8 @@ import {
   PaygWithholdingRuleDescriptor,
   TaxablePayRuleDescriptor,
 } from "@taxkit/rules-au-pay/rule-pack";
+import { AuStslRuleDescriptors } from "@taxkit/rules-au-stsl";
 import { StslDebtDescriptor } from "@taxkit/rules-au-stsl/facts";
-import { AuStslRuleDescriptors } from "@taxkit/rules-au-stsl/rule-pack";
 import {
   Function as EffectFunction,
   Array as EffectArray,

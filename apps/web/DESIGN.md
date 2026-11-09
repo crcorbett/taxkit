@@ -1,18 +1,10 @@
----
-document_type: design-guide
-lifecycle: current
-authority: canonical
-owner: taxkit-web-app-owner
-last_reviewed: 2026-11-02
----
-
 # Website design
 
 The documentation UI follows the quiet reading layout of
 [Blume's documentation](https://useblume.dev/docs), using TaxKit's checked MDX
 theme. The Website owns navigation, responsive layout and interactions; Content
 owns the page, its theme and rendered artifacts. Calculator pages retain their
-own layout.
+own layout, described under [Calculator pages](#calculator-pages).
 
 ## Layout and typography
 
@@ -84,8 +76,9 @@ GET forms and disclosures for progressive enhancement.
   Escape and restores the trigger. Following a page link closes it and focuses
   the article heading, including a link to the current page. Its portal stays
   inside the themed subtree. Modified clicks retain normal browser behaviour.
-  One mount-local Atom owns its closed/open/following-link state; Base UI owns
-  the dialog mechanics. Search drafts also use mount-local Atoms.
+  One static Atom owns its closed/open/following-link state and resets when the
+  menu unmounts; Base UI owns the dialog mechanics. Search drafts use a static
+  `Atom.family` keyed by the submitted term.
 - The skip link targets the article heading. Initial hydration leaves focus
   alone; ordinary client navigation records the destination in a registry Atom.
   A scoped native Router subscription consumes it after that destination renders,
@@ -98,7 +91,8 @@ GET forms and disclosures for progressive enhancement.
 - Search retains a native GET form and a client navigation enhancement. The
   route remains the sole owner of URL validation and loading; its native loader
   dependencies distinguish queries during Back and Forward navigation.
-- Each copy control owns independent Effect Atom feedback and uses the native
+- Each copy control owns independent Effect Atom feedback (a static family
+  keyed by the control's React ID and its text) and uses the native
   Effect Clipboard service, with a five-second deadline. Feedback has a stable
   footprint, is announced politely and offers manual copying on refusal. It
   never displays or reports the browser's private failure message.
@@ -117,13 +111,42 @@ The drawer uses a 220ms transform and a 180ms backdrop opacity transition.
 Reduced motion removes both transitions. Do not animate article navigation or
 make information depend on motion.
 
+## Calculator pages
+
+`src/styles.css` sets the site palette as the shared semantic tokens
+(`--background`, `--foreground`, `--border`, `--input`, `--ring`,
+`--destructive` and the rest) on `body` with `light-dark()` and
+`color-scheme: light dark`, so calculator and agent pages, their native
+controls and scrollbars follow the device's light or dark preference. No
+calculator rule uses a colour literal; documentation replaces the tokens with
+its checked theme inside `.docs-reader`.
+
+- Pages are top-aligned (`align-content: start`) with no viewport-height
+  centring, so a result, error or opened breakdown grows downward and the form
+  never moves. Answers use tabular figures.
+- The calculator title is the page's `<h1>` and its `<title>`; the context line
+  and any caveat follow it. The breakdown uses `<h2>`/`<h3>` inside `details`.
+- Fields use `Field`/`FieldLabel` and the shared Input and Button styling
+  contracts (`data-slot="input"` and `buttonVariants` from
+  `components/ui/button-variants.ts`) on native controls, so calculator pages
+  load no Base UI runtime. Inputs keep 16px text; the select matches them.
+- An invalid field gets a destructive border, `aria-invalid` and its own
+  message below it, and receives focus. A calculation failure is one alert
+  below the form.
+- Site navigation links are 44px-tall inline-flex targets; the current page
+  has a quiet filled background, and hover underlines only on hover devices.
+- Root renders `main` only for calculator and agent pages, with `aria-busy`
+  during navigation. Documentation routes render their own header, `main`
+  (wrapping the article, marked busy while the next page loads) and asides.
+
 ## Verification
 
 The browser clipboard tests check exact copied whitespace, independent feedback
 and safe refusal. The native Website/API suite covers hydration, focus,
 navigation, active outlines, 320px/390px layouts, the drawer, search, paired
 themes, horizontal scrollbar sizing and dragging, no-JavaScript navigation and
-keyboard scrolling. Review actual browser
+keyboard scrolling. The calculator browser test covers invalid-field marking,
+description and focus. Review actual browser
 screenshots at desktop, tablet and phone sizes in both themes; automated layout
 assertions do not establish visual quality.
 

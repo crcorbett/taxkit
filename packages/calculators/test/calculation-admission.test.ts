@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { NonNegativeMoney, CalculationEngineLive } from "@taxkit/core";
+import { NonNegativeMoney } from "@taxkit/core";
 import { Cents, Money } from "@taxkit/core/primitives";
 import {
   AuPayTakeHomeId,
@@ -19,21 +19,23 @@ import {
 } from "effect";
 import { TestClock } from "effect/testing";
 
-import { PublicCalculatorServiceRateLimited } from "../src/admission.layer.js";
 import { CalculatorClientRateKey } from "../src/admission.schemas.js";
 import {
   CalculatorAdmission,
   CalculatorRequestRateKey,
 } from "../src/admission.service.js";
-import { PublicCalculatorServiceLive } from "../src/live.layer.js";
+import { CalculatorCatalogueLive } from "../src/live.layer.js";
 import {
   CalculatorAdmissionUnavailable,
   CalculatorRateLimited,
   CalculatorRunRequest,
   MetadataQuery,
 } from "../src/schemas.js";
-import { PublicCalculatorService } from "../src/service.js";
-import { PublicCalculatorServiceBounded } from "../src/work.layer.js";
+import {
+  CalculatorCatalogue,
+  PublicCalculatorService,
+} from "../src/service.js";
+import { PublicCalculatorServiceRateLimited } from "../src/work.layer.js";
 
 const request = CalculatorRunRequest.make({
   calculatorId: AuPayTakeHomeId.make("au.pay.take-home"),
@@ -48,8 +50,7 @@ const request = CalculatorRunRequest.make({
   },
 });
 const calculators = PublicCalculatorServiceRateLimited.pipe(
-  Layer.provide(PublicCalculatorServiceLive),
-  Layer.provide(CalculationEngineLive)
+  Layer.provide(CalculatorCatalogueLive)
 );
 describe("anonymous calculation admission", () => {
   it.effect("canonicalises IPv6 and prevents ordinary key serialisation", () =>
@@ -129,7 +130,7 @@ describe("anonymous calculation admission", () => {
     "rejected admission does no calculation work and carries fixed safe guidance",
     () =>
       Effect.gen(function* () {
-        const live = yield* PublicCalculatorService;
+        const live = yield* CalculatorCatalogue;
         const worked = yield* Ref.make(0);
         const key = yield* Schema.decodeEffect(CalculatorClientRateKey)(
           "203.0.113.75"
@@ -139,37 +140,13 @@ describe("anonymous calculation admission", () => {
             PublicCalculatorServiceRateLimited.pipe(
               Layer.provide(
                 Layer.succeed(
-                  PublicCalculatorService,
-                  PublicCalculatorService.of({
-                    getCalculator: Effect.fn(
-                      "PublicCalculatorService.getCalculator"
-                    )(live.getCalculator),
-                    getCalculatorGraph: Effect.fn(
-                      "PublicCalculatorService.getCalculatorGraph"
-                    )(live.getCalculatorGraph),
-                    getCalculatorSchema: Effect.fn(
-                      "PublicCalculatorService.getCalculatorSchema"
-                    )(live.getCalculatorSchema),
-                    listCalculators: Effect.fn(
-                      "PublicCalculatorService.listCalculators"
-                    )(live.listCalculators),
-                    listFacts: Effect.fn("PublicCalculatorService.listFacts")(
-                      live.listFacts
-                    ),
-                    listJurisdictions: Effect.fn(
-                      "PublicCalculatorService.listJurisdictions"
-                    )(live.listJurisdictions),
-                    listRules: Effect.fn("PublicCalculatorService.listRules")(
-                      live.listRules
-                    ),
-                    listTaxYears: Effect.fn(
-                      "PublicCalculatorService.listTaxYears"
-                    )(live.listTaxYears),
-                    calculate: Effect.fn("PublicCalculatorService.calculate")(
-                      () =>
-                        Ref.update(worked, (count) => count + 1).pipe(
-                          Effect.andThen(Effect.never)
-                        )
+                  CalculatorCatalogue,
+                  CalculatorCatalogue.of({
+                    ...live,
+                    calculate: Effect.fn("CalculatorCatalogue.calculate")(() =>
+                      Ref.update(worked, (count) => count + 1).pipe(
+                        Effect.andThen(Effect.never)
+                      )
                     ),
                   })
                 )
@@ -200,11 +177,7 @@ describe("anonymous calculation admission", () => {
         )(new CalculatorRateLimited());
         expect(encoded).not.toContain("203.0.113.75");
         expect(encoded).not.toContain("165400");
-      }).pipe(
-        Effect.provide(
-          PublicCalculatorServiceLive.pipe(Layer.provide(CalculationEngineLive))
-        )
-      )
+      }).pipe(Effect.provide(CalculatorCatalogueLive))
   );
   it.effect(
     "the five-second work budget includes stalled admission and its cleanup",
@@ -217,8 +190,7 @@ describe("anonymous calculation admission", () => {
         );
         const service = yield* PublicCalculatorService.pipe(
           Effect.provide(
-            PublicCalculatorServiceBounded.pipe(
-              Layer.provide(calculators),
+            calculators.pipe(
               Layer.provide(
                 Layer.succeed(
                   CalculatorAdmission,

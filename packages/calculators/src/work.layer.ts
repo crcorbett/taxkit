@@ -9,15 +9,25 @@ import {
 } from "effect";
 
 import {
+  CalculatorAdmission,
+  CalculatorRequestRateKey,
+} from "./admission.service.js";
+import {
+  CalculatorAdmissionUnavailable,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
 } from "./schemas.js";
-import { PublicCalculatorService } from "./service.js";
+import type { CalculatorRateLimited } from "./schemas.js";
+import {
+  CalculatorCatalogue,
+  CalculatorUsage,
+  PublicCalculatorService,
+} from "./service.js";
 
 export const CalculatorConcurrencyLimit = 8;
 export const CalculatorOperationBudget = Duration.seconds(5);
 // The shared service budget covers completion and scoped cleanup. Every caller
-// suspends the service invocation so eager metadata construction is counted.
+// suspends the catalogue invocation so eager metadata construction is counted.
 const withinOperationBudget = Effect.fnUntraced(function* <A, E, R>(
   operation: Effect.Effect<A, E, R>
 ) {
@@ -43,73 +53,107 @@ const withinOperationBudget = Effect.fnUntraced(function* <A, E, R>(
     }
   );
 });
-// The host builds this Layer once over its calculation implementation. Every
-// transport shares this pool; each calculation in a batch takes its own place.
+/**
+ * The one public calculator implementation. A host builds it once over the
+ * catalogue: every transport shares its pool of calculation places, and each
+ * calculation in a batch takes its own place. `admit` is the host's
+ * calculation admission, checked inside the work budget; successful
+ * calculations are then reported to `CalculatorUsage` outside it.
+ */
+const makePublicCalculatorService = Effect.fnUntraced(function* (
+  admit: Effect.Effect<
+    void,
+    CalculatorRateLimited | CalculatorAdmissionUnavailable
+  >
+) {
+  const catalogue = yield* CalculatorCatalogue;
+  const usage = yield* CalculatorUsage;
+  const places = yield* Semaphore.make(CalculatorConcurrencyLimit);
+  return PublicCalculatorService.of({
+    calculate: Effect.fn("PublicCalculatorService.calculate")((request) =>
+      admit.pipe(
+        Effect.andThen(Effect.suspend(() => catalogue.calculate(request))),
+        withinOperationBudget,
+        places.withPermitsIfAvailable(1),
+        Effect.flatMap(
+          Option.match({
+            onNone: () => Effect.fail(new CalculatorCapacityExceeded()),
+            onSome: Effect.succeed,
+          })
+        ),
+        Effect.tap(usage.record)
+      )
+    ),
+    getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
+      (request) =>
+        Effect.suspend(() => catalogue.getCalculator(request)).pipe(
+          withinOperationBudget
+        )
+    ),
+    getCalculatorGraph: Effect.fn("PublicCalculatorService.getCalculatorGraph")(
+      (request) =>
+        Effect.suspend(() => catalogue.getCalculatorGraph(request)).pipe(
+          withinOperationBudget
+        )
+    ),
+    getCalculatorSchema: Effect.fn(
+      "PublicCalculatorService.getCalculatorSchema"
+    )((request) =>
+      Effect.suspend(() => catalogue.getCalculatorSchema(request)).pipe(
+        withinOperationBudget
+      )
+    ),
+    listCalculators: Effect.fn("PublicCalculatorService.listCalculators")(
+      (query) =>
+        Effect.suspend(() => catalogue.listCalculators(query)).pipe(
+          withinOperationBudget
+        )
+    ),
+    listFacts: Effect.fn("PublicCalculatorService.listFacts")((query) =>
+      Effect.suspend(() => catalogue.listFacts(query)).pipe(
+        withinOperationBudget
+      )
+    ),
+    listJurisdictions: Effect.fn("PublicCalculatorService.listJurisdictions")(
+      () =>
+        Effect.suspend(() => catalogue.listJurisdictions()).pipe(
+          withinOperationBudget
+        )
+    ),
+    listRules: Effect.fn("PublicCalculatorService.listRules")((query) =>
+      Effect.suspend(() => catalogue.listRules(query)).pipe(
+        withinOperationBudget
+      )
+    ),
+    listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")((query) =>
+      Effect.suspend(() => catalogue.listTaxYears(query)).pipe(
+        withinOperationBudget
+      )
+    ),
+  });
+});
+// The public service with the shared work budget and no rate admission, over
+// a supplied catalogue. `PublicCalculatorServiceLive` supplies the real one;
+// direct and local SDK callers use it.
 export const PublicCalculatorServiceBounded = Layer.effect(
   PublicCalculatorService,
+  makePublicCalculatorService(Effect.void)
+);
+// The native host builds this once over the catalogue. Each calculation is
+// admitted for its request's checked identity inside the shared work budget;
+// metadata stays outside the allowance.
+export const PublicCalculatorServiceRateLimited = Layer.effect(
+  PublicCalculatorService,
   Effect.gen(function* () {
-    const calculator = yield* PublicCalculatorService;
-    const places = yield* Semaphore.make(CalculatorConcurrencyLimit);
-    return PublicCalculatorService.of({
-      calculate: Effect.fn("PublicCalculatorService.calculate")((request) =>
-        Effect.suspend(() => calculator.calculate(request)).pipe(
-          withinOperationBudget,
-          places.withPermitsIfAvailable(1),
-          Effect.flatMap(
-            Option.match({
-              onNone: () => Effect.fail(new CalculatorCapacityExceeded()),
-              onSome: Effect.succeed,
-            })
-          )
-        )
-      ),
-      getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
-        (request) =>
-          Effect.suspend(() => calculator.getCalculator(request)).pipe(
-            withinOperationBudget
-          )
-      ),
-      getCalculatorGraph: Effect.fn(
-        "PublicCalculatorService.getCalculatorGraph"
-      )((request) =>
-        Effect.suspend(() => calculator.getCalculatorGraph(request)).pipe(
-          withinOperationBudget
-        )
-      ),
-      getCalculatorSchema: Effect.fn(
-        "PublicCalculatorService.getCalculatorSchema"
-      )((request) =>
-        Effect.suspend(() => calculator.getCalculatorSchema(request)).pipe(
-          withinOperationBudget
-        )
-      ),
-      listCalculators: Effect.fn("PublicCalculatorService.listCalculators")(
-        (query) =>
-          Effect.suspend(() => calculator.listCalculators(query)).pipe(
-            withinOperationBudget
-          )
-      ),
-      listFacts: Effect.fn("PublicCalculatorService.listFacts")((query) =>
-        Effect.suspend(() => calculator.listFacts(query)).pipe(
-          withinOperationBudget
-        )
-      ),
-      listJurisdictions: Effect.fn("PublicCalculatorService.listJurisdictions")(
-        () =>
-          Effect.suspend(() => calculator.listJurisdictions()).pipe(
-            withinOperationBudget
-          )
-      ),
-      listRules: Effect.fn("PublicCalculatorService.listRules")((query) =>
-        Effect.suspend(() => calculator.listRules(query)).pipe(
-          withinOperationBudget
-        )
-      ),
-      listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")((query) =>
-        Effect.suspend(() => calculator.listTaxYears(query)).pipe(
-          withinOperationBudget
-        )
-      ),
-    });
+    const admission = yield* CalculatorAdmission;
+    const admit = CalculatorRequestRateKey.pipe(
+      Effect.flatMap(
+        Option.match({
+          onNone: () => Effect.fail(new CalculatorAdmissionUnavailable()),
+          onSome: admission.admitCalculation,
+        })
+      )
+    );
+    return yield* makePublicCalculatorService(admit);
   })
 );

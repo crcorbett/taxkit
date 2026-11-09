@@ -14,7 +14,8 @@ imports no MDX, Content, app, filesystem or application runtime.
   retain only checked failure codes, without messages, snippets or source text.
 - `./errors`: rendering errors distinguish unsupported diagrams, syntax,
   semantic errors, limits, unexpected failure and invalid output.
-- `./test`: static `PeleTest`, providing the same contract with one fixed SVG.
+- `src/test.layer.ts` (internal, this package's tests only): static `PeleTest`,
+  providing the same contract with one fixed SVG.
 
 ```ts
 import { PeleLive } from "@taxkit/pele/live";

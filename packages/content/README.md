@@ -1,12 +1,3 @@
----
-document_type: package-guide
-lifecycle: current
-authority: canonical
-owner: taxkit-content-owner
-last_reviewed: 2026-10-31
-review_trigger: content contracts, search policy or package exports change
----
-
 # @taxkit/content
 
 Private source package for TaxKit docs contracts and published public page
@@ -81,7 +72,7 @@ shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
 - `./service`: `ContentServiceContract`, `ContentService`, `ContentCatalogue`,
   `DocsSources`, `DocsPageReader`, `DocsPageRenderer` and `DocsOgImages` contracts.
 - `./publication`: page addresses, share-image input and head metadata.
-- `./links`: shared `DocsLinkTargets`, per-file `DocsLinkContext` and
+- `src/links.ts` (internal): shared `DocsLinkTargets`, per-file `DocsLinkContext` and
   `resolveDocsHref`. The reader derives the context from `DocsSource.path`;
   the resolver acquires shared targets at Layer construction.
 - `./mdx`: static `ContentMdxReaderLive`.
@@ -98,7 +89,6 @@ shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
 - `./test`: the same implementation with controlled request observations, plus
   deterministic `DocsOgImagesTest`. MDX owns its provider test Layers.
 - `./testing/fixtures`: checked synthetic catalogue inputs for tests.
-- `./testing/observations`: typed test observations.
 
 All exports point at TypeScript source; the private package has no build. The
 SDK build compiles the contracts it uses into its single archive. The local downstream check installs that SDK archive without a

@@ -85,9 +85,6 @@ it.effect.each([
             Match.tag("ApiDeadlineExceeded", () => "ApiDeadlineExceeded"),
             Match.tag("ApiReplyTooLarge", () => "ApiReplyTooLarge"),
             Match.tag("DocsPageUnavailable", () => "DocsPageUnavailable"),
-            Match.tag("HttpClientError", () => "HttpClientError"),
-            Match.tag("SchemaError", () => "SchemaError"),
-            Match.tag("TimeoutError", () => "TimeoutError"),
             Match.exhaustive
           ),
       });

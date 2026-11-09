@@ -228,6 +228,12 @@
 .docs-navigation a:focus-visible {
   outline-offset: -2px;
 }
+/* The page's one main landmark holds the article; header and rails stay
+ * outside it. */
+.docs-main {
+  display: grid;
+  min-width: 0;
+}
 .docs-article {
   width: min(100%, 43.5rem);
   min-width: 0;

@@ -11,7 +11,7 @@ Import the owning codecs from `taxkit/money`, `taxkit/au/schemas` and `taxkit/sc
 ```ts
 import { Effect } from "effect";
 import { AuPayTakeHomeCalculation } from "taxkit/au";
-import { calculateReport, decodeInput, TaxKitLive } from "taxkit/effect";
+import { calculateReport, decodeInput } from "taxkit/effect";
 
 // Decode the selected scenario once; surplus fields fail as well.
 export const invalidInput = decodeInput(AuPayTakeHomeCalculation, {
@@ -22,8 +22,7 @@ export const validInput = decodeInput(AuPayTakeHomeCalculation, {
   period: "weekly",
   taxFreeThresholdClaimed: true,
 }).pipe(
-  Effect.flatMap((input) => calculateReport(AuPayTakeHomeCalculation, input)),
-  Effect.provide(TaxKitLive)
+  Effect.flatMap((input) => calculateReport(AuPayTakeHomeCalculation, input))
 );
 ```
 

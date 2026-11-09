@@ -62,7 +62,7 @@ const layers = Effect.gen(function* () {
   const layer = Layer.mergeAll(
     Layer.effect(ContentCatalogue, exampleContentCatalogue),
     Layer.succeed(DocsOgImages, {
-      getImage: () => Effect.succeed(bytes),
+      getImage: Effect.fn("DocsOgImages.getImage")(() => Effect.succeed(bytes)),
     }),
     Layer.succeed(PublicationOrigins)(
       Ref.update(reads, (count) => count + 1).pipe(Effect.as(origins))
@@ -149,8 +149,9 @@ describe("answer-engine routes", () => {
       const layer = Layer.mergeAll(
         Layer.effect(ContentCatalogue, exampleContentCatalogue),
         Layer.succeed(DocsOgImages, {
-          getImage: () =>
-            Effect.fail(new DocsImageRenderError({ reason: "render" })),
+          getImage: Effect.fn("DocsOgImages.getImage")(() =>
+            Effect.fail(new DocsImageRenderError({ reason: "render" }))
+          ),
         }),
         Layer.succeed(PublicationOrigins)(
           Effect.fail(

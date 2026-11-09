@@ -43,4 +43,4 @@ it.effect("rejects external input before calculation", () =>
 );
 ```
 
-Effect consumers can replace the actual engine service with native `Layer.mock` or a scoped test Layer. Include interruption, disposal and codec round trips for the boundaries your application uses.
+Effect consumers can substitute a calculator definition whose `calculate` program returns a controlled result or failure, or replace native rule and fact Layers in owned programs. Include interruption, disposal and codec round trips for the boundaries your application uses.

@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-configuration-owner
-last_reviewed: 2026-10-20
-review_trigger: config Schema, namespace, source selection or secret handling change
----
-
 # Configuration
 
 TaxKit configuration uses Effect `Config`, `ConfigProvider` and Schema.
@@ -93,10 +84,9 @@ graph owns runtime bindings.
 
 ## API settings
 
-The [HTTP package config owner](../../packages/api/http/src/config.ts) exports
-`TaxKitHttpApiClientConfigSchema`, its derived type and keyed server/browser
-config fragments under the `TAXKIT_API` and `VITE_TAXKIT_API` namespaces. Its
-Schema uses `Schema.URLFromString`. The Website does not use it.
+The [HTTP package origin owner](../../packages/api/http/src/origin.ts) exports
+`TaxKitApiOrigin` and `TaxKitApiOriginConfig`, the one checked API address
+used by the API Worker and the Website.
 
 [API app config](../../apps/api/src/config.ts) checks the standalone host and
 port: optional `API_PORT` falls back to `PORT` only when absent, and an invalid
@@ -108,7 +98,8 @@ composes the shared `TaxKitApiOriginConfig`, `DocsWebsiteOriginConfig` and
 `DocsPublicationOriginConfig`. Native planning leaves resource
 addresses deferred; first incoming use decodes and caches them. Missing or
 invalid values produce a fixed Config error and an empty 503. MCP uses the Website address for browser admission. `CALCULATOR_RATE_NAMESPACE` comes from the stage's secrets
-provider. `CALCULATOR_HOST_MODE` is `edge` by default; the local root sets
+provider. `CALCULATOR_HOST_MODE` is `edge` when absent and an invalid value fails
+Worker startup with a ConfigError; the local root sets
 `local-emulator`.
 
 Configuration modules own defaults and selection. Service contracts receive

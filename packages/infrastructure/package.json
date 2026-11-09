@@ -1,6 +1,6 @@
 {
   "name": "@taxkit/infrastructure",
-  "version": "1.1.7",
+  "version": "1.2.0",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -25,7 +25,7 @@
     "@alchemy.run/cloudflare": "catalog:",
     "@alchemy.run/doppler": "catalog:",
     "@alchemy.run/frontend-frameworks": "catalog:",
-    "@distilled.cloud/posthog": "1.0.0-rc.17",
+    "@distilled.cloud/posthog": "1.0.0-rc.18",
     "@taxkit/analytics": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "alchemy": "catalog:",

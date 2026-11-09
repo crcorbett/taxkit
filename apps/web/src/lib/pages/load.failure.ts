@@ -1,10 +1,14 @@
-import { notFound } from "@tanstack/react-router";
+import { isRedirect, notFound } from "@tanstack/react-router";
 import type { NotFoundError } from "@tanstack/react-router";
 import { ApiReplyMismatch } from "@taxkit/api-http/errors";
 import { DocsPageUnavailable } from "@taxkit/content/errors";
-import { Match, Cause, Effect, Schema } from "effect";
+import { Match, Cause, Effect, Option, Schema } from "effect";
 
-import { WebsiteLoadError } from "../host/errors";
+import { WebsiteCalculatorMissing, WebsiteLoadError } from "../host/errors";
+
+// A native Router redirect is a navigation, not a failed load.
+export const isRedirectCause = <E>(cause: Cause.Cause<E>) =>
+  Cause.findErrorOption(cause).pipe(Option.exists(isRedirect));
 
 export const loadFailureStatus = <E>(
   cause: Cause.Cause<E>
@@ -17,6 +21,7 @@ export const loadFailureStatus = <E>(
   }
   return Match.value(Cause.squash(cause)).pipe(
     Match.when(Schema.is(DocsPageUnavailable), (): 404 => 404),
+    Match.when(Schema.is(WebsiteCalculatorMissing), (): 404 => 404),
     Match.orElse((): 503 => 503)
   );
 };
@@ -25,7 +30,7 @@ export const loadFailureStatus = <E>(
 export const rejectRouteLoad = <E>(
   cause: Cause.Cause<E>
 ): Effect.Effect<never, E | NotFoundError | WebsiteLoadError> => {
-  if (Cause.hasInterruptsOnly(cause)) {
+  if (Cause.hasInterruptsOnly(cause) || isRedirectCause(cause)) {
     return Effect.failCause(cause);
   }
   const status = loadFailureStatus(cause);

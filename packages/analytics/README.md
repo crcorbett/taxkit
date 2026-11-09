@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-analytics-owner
-last_reviewed: 2026-10-17
-review_trigger: analytics event, settings, service, export, transport or privacy change
----
-
 # `@taxkit/analytics`
 
 Private source analytics contracts and successful hosted calculator usage
@@ -18,19 +9,16 @@ Tax rule packages and local SDK calculations do not depend on this package.
 ## Exports
 
 - `./schemas`: public Schemas, brands, and derived types.
-- `./errors`: public typed failures.
-- `./config`: checked collection mode and capture settings. Off needs no token;
-  invalid enabled settings fail with `AnalyticsConfigurationError`.
+- `src/errors.ts` and `src/config.ts` (internal): typed failures, and checked
+  collection mode and capture settings. Off needs no token; invalid enabled
+  settings fail with `AnalyticsConfigurationError`.
 - `./collection-policy`: one checked incoming-header policy used by the API. Missing allows direct clients; malformed or denied flags and `DNT: 1` refuse collection.
 - `./service`: public Effect service contract.
 - `./live`: production Layer; compose only at an application/runtime boundary.
-- `./test`: deterministic contract-level test Layer.
 - `./api-usage`: calculator service decorator and request-owned event collector.
-- `./testing/fixtures`: narrow test fixtures.
-- `./testing/observations`: narrow test observation types.
 
 `BackendAnalyticsLive` is a static Layer that reads `AnalyticsSettingsConfig`
-from the host ConfigProvider; tests replace that provider. The application supplies native `FetchHttpClient` and Effect `Crypto`. Each
+from the host ConfigProvider; tests replace that provider. The application supplies native `FetchHttpClient` and Effect `SecureRandom`. Each
 backend send owns one scope and one five-second limit covering identity,
 encoding, headers and the complete reply. Replies are limited to 64 KiB. A
 request has one attempt, omits credentials, disables trace propagation and
@@ -43,11 +31,12 @@ require separate readback.
 The browser contract is shared so the Website adapter can keep its SDK private.
 The Website has no analytics relay and sends no collection header.
 
-`ApiCalculatorAnalyticsLive` decorates the supplied calculator service after a
-successful checked result. `ApiCalculatorEvents` is an optional request-owned
+`ApiCalculatorUsageLive` supplies the calculators package's `CalculatorUsage`
+observer, which the public calculator implementation calls after a successful
+checked result, outside its work budget. `ApiCalculatorEvents` is an optional request-owned
 collector, limited to 64 allowed events. Metadata, failed calculations, denied
-collection and calls without a collector produce no event. The decorator
-preserves calculation results/errors and records only checked catalogue ID/name
+collection and calls without a collector produce no event. The observer
+cannot change calculation results/errors; it and records only checked catalogue ID/name
 and collection policy. The [API host](../../apps/api/README.md#analytics-candidate)
 owns collection-header ingress, collector lifetime and delivery through native
 `waitUntil`; native MCP registration must not retain request collectors. A test Layer is

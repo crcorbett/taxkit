@@ -451,7 +451,7 @@ const writeConsumerFiles = Effect.fnUntraced(function* ({
 import { AuPayTakeHomeCalculation, AuAnnualIncomeTaxCalculation, AuPayTakeHomeWithSacrificeCalculation } from "taxkit/au";
 import { TakeHomePayReportEncoded, TakeHomeScenarioInputSchema, TakeHomeWithSacrificeScenarioInput, AnnualTaxScenarioInputSchema } from "taxkit/au/schemas";
 import { Cents, Money, NonNegativeMoney, fromDecimal, fromCents } from "taxkit/money";
-import { calculateReport, TaxKitLive } from "taxkit/effect";
+import { calculateReport } from "taxkit/effect";
 import { CalculatorRunRequest, CalculatorRunResponse } from "taxkit/schemas";
 import { Effect, Result, Schema } from "effect";
 const amount = NonNegativeMoney.make(Money.fromCents(Cents.make(165_400)));
@@ -460,7 +460,7 @@ const checked: Result.Result<Money, import("taxkit/money").MoneyError> = fromCen
 void checked; void fromDecimal("123.45");
 const plain: Promise<typeof AuPayTakeHomeCalculation.outputSchema.Type> = calculate(AuPayTakeHomeCalculation, scenario);
 void plain; void calculateSafe(AuPayTakeHomeCalculation, scenario);
-const native: Effect.Effect<typeof AuPayTakeHomeCalculation.outputSchema.Type, typeof AuPayTakeHomeCalculation.errorSchema.Type> = calculateReport(AuPayTakeHomeCalculation, scenario).pipe(Effect.provide(TaxKitLive));
+const native: Effect.Effect<typeof AuPayTakeHomeCalculation.outputSchema.Type, typeof AuPayTakeHomeCalculation.errorSchema.Type> = calculateReport(AuPayTakeHomeCalculation, scenario);
 void native;
 const client = createClient(); void client.calculate(AuPayTakeHomeCalculation, scenario); void client.dispose();
 declare const request: typeof CalculatorRunRequest.Type;
@@ -517,7 +517,7 @@ import { Effect, Result, Schema } from "effect";
 const amount = NonNegativeMoney.make(Money.fromCents(Cents.make(165_400)));
 const scenario = TakeHomeScenarioInputSchema.make({ grossPay: amount, period: "weekly", taxFreeThresholdClaimed: true });
 const plain = await calculate(AuPayTakeHomeCalculation, scenario);
-const effect = await Effect.runPromise(native.calculateReport(AuPayTakeHomeCalculation, scenario).pipe(Effect.provide(native.TaxKitLive)));
+const effect = await Effect.runPromise(native.calculateReport(AuPayTakeHomeCalculation, scenario));
 assert.equal(plain.netPay.cents, 130_100); assert.deepEqual(plain, effect);
 const standard = Schema.toStandardSchemaV1(AuPayTakeHomeCalculation.inputSchema, {parseOptions: {onExcessProperty: "error", errors: "all"}, leafHook: () => "Invalid input."});
 const encodedScenario = await Effect.runPromise(Schema.encodeEffect(AuPayTakeHomeCalculation.inputSchema)(scenario));

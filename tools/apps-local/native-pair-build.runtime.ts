@@ -10,9 +10,11 @@ import {
   Match,
   Effect,
   FileSystem,
+  Layer,
   Path,
   Function as EffectFunction,
 } from "effect";
+import { Digest, SecureRandom } from "effect/crypto";
 
 import { nativeApiSourceProps } from "./native-api-source.boundary.js";
 // SDK declaration discovery is memory-only with all external operations
@@ -49,9 +51,9 @@ const program = Effect.gen(function* () {
           );
           if (
             !original.includes(
-              'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";'
+              'import { CalculatorCatalogueLive } from "@taxkit/calculators/live";'
             ) ||
-            !original.includes("Layer.provide(PublicCalculatorServiceLive)")
+            !original.includes("Layer.provide(CalculatorCatalogueLive)")
           ) {
             return yield* Effect.die(
               "Native stalled-work fixture no longer matches its source owner"
@@ -59,22 +61,22 @@ const program = Effect.gen(function* () {
           }
           const injected = original
             .replace(
-              'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";',
-              'import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";\nimport { PublicCalculatorService } from "@taxkit/calculators/service";'
+              'import { CalculatorCatalogueLive } from "@taxkit/calculators/live";',
+              'import { CalculatorCatalogueLive } from "@taxkit/calculators/live";\nimport { CalculatorCatalogue } from "@taxkit/calculators/service";'
             )
             .replace(
-              "Layer.provide(PublicCalculatorServiceLive)",
+              "Layer.provide(CalculatorCatalogueLive)",
               `Layer.provide(Layer.effect(
-            PublicCalculatorService,
+            CalculatorCatalogue,
             Effect.gen(function* () {
-              const calculator = yield* PublicCalculatorService;
-              return PublicCalculatorService.of({
+              const calculator = yield* CalculatorCatalogue;
+              return CalculatorCatalogue.of({
                 ...calculator,
                 calculate: (request) => Effect.logWarning("PRIVATE9 work started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.calculate(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 work released"))),
                 getCalculatorSchema: (request) => Effect.logWarning("PRIVATE9 metadata started").pipe(Effect.andThen(Effect.sleep("12 seconds")), Effect.andThen(calculator.getCalculatorSchema(request)), Effect.ensuring(Effect.logInfo("PRIVATE9 metadata released"))),
               });
             })
-          ).pipe(Layer.provide(PublicCalculatorServiceLive)))`
+          ).pipe(Layer.provide(CalculatorCatalogueLive)))`
             );
           yield* fs.writeFileString(owner, injected);
           yield* fs.remove(path.join(output, "bundles", fixtureId), {
@@ -423,6 +425,12 @@ const program = Effect.gen(function* () {
 }).pipe(
   provideFreshArtifactStore,
   Effect.scoped,
-  Effect.provide(BunServices.layer)
+  Effect.provide(
+    Layer.mergeAll(
+      BunServices.layer,
+      SecureRandom.layerWebCrypto,
+      Digest.layerWebCrypto
+    )
+  )
 );
 BunRuntime.runMain(program);

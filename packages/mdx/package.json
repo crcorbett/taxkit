@@ -10,12 +10,9 @@
     "./service": "./src/service.ts",
     "./schemas": "./src/schemas.ts",
     "./errors": "./src/errors.ts",
-    "./compiler": "./src/compiler.layer.ts",
-    "./renderer": "./src/renderer.layer.ts",
     "./theme": "./src/theme.schemas.ts",
     "./testing/fixtures": "./src/__testing__/fixtures.ts",
-    "./test": "./src/test.layer.ts",
-    "./artifacts": "./src/artifacts.layer.ts"
+    "./test": "./src/test.layer.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
@@ -29,7 +26,7 @@
     "mdast-util-mdx": "3.0.0",
     "micromark-extension-gfm-table": "2.1.2",
     "micromark-extension-mdxjs": "3.0.0",
-    "yaml": "2.9.1"
+    "yaml": "catalog:"
   },
   "devDependencies": {
     "@effect/platform-bun": "catalog:",

@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-api-mcp-package-owner
-last_reviewed: 2026-10-18
-review_trigger: MCP toolkit, handlers, protocol composition, cancellation or response budget change
----
-
 # API MCP
 
 `@taxkit/api-mcp` owns the remote MCP tool contract, service-backed handlers,
@@ -16,13 +7,19 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 
 ## Exports
 
-- `./tools`: the six shared tool definitions and their annotations.
-- `./handlers`: the static `TaxKitMcpHandlersLive` Layer over calculator/content services.
+- `./tools`: `TaxKitMcpToolkit`, the six shared tool definitions and
+  annotations. `./server` and the Website's browser WebMCP both use it, so
+  remote and browser tools have identical names, Schemas and hints.
+- `./client-handlers`: `clientToolHandlers(client)`, the same tools answered
+  through the generated public API client for browser WebMCP, with the same
+  success Schemas and safe `McpToolUnavailable` codes.
+- `src/handlers.layer.ts` (internal): the static `TaxKitMcpHandlersLive` Layer
+  over the calculator and content services that `./server` composes.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path.
 - `./schemas`: tool request/reply Schemas, safe failures and complete-reply
   budget constants.
 - `./request`: the private `McpRequestAbortSignal` Context reference.
-- `./cancellation`: `withMcpRequestCancellation`, which refuses a missing
+- `src/cancellation.boundary.ts` (internal): `withMcpRequestCancellation`, which refuses a missing
   capability and interrupts disconnected request work with scoped cleanup.
 - `./response-budget`: `withBoundedMcpReply`, which buffers complete native
   JSON/SSE replies within 2 MiB and ten seconds, preserving status and headers.
@@ -53,9 +50,10 @@ private cancellation capability provision remain in
 The repository [API architecture](../../../docs/architecture/api-and-sdk.md)
 and [package ownership](../../../docs/architecture/package-ownership.md) own
 the durable transport/app boundary. The API app README owns native hosting;
-the Website retains its browser tool coordination. Package tests prove the
-reply budget and cancellation cleanup. The API's official-client tests and
-Website's native-pair MCP tests retain modern protocol, origin, native callback
+the Website owns its one root WebMCP registration. Package tests prove the
+reply budget, cancellation cleanup and that the client-backed handlers answer
+exactly as the service-backed handlers over the actual HTTP routes. The API's official-client tests and
+root native-pair MCP tests (`tools/apps-local/test`) retain modern protocol, origin, native callback
 progress and isolation proof through the actual app composition.
 
 The renderer receipt records adaptation from the compiled internal service

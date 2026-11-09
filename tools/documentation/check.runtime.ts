@@ -16,6 +16,9 @@ const program = Effect.gen(function* () {
   Effect.tapErrorTag("DocumentationError", (error) =>
     Console.error(["Documentation check failed:", ...error.findings].join("\n"))
   ),
+  Effect.tapErrorTag("DocumentationInventoryError", (error) =>
+    Console.error(`Documentation check failed during ${error.operation}.`)
+  ),
   Effect.provide(BunServices.layer)
 );
 BunRuntime.runMain(program);

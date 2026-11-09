@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { MdxTheme } from "@taxkit/mdx-react/theme";
 import { Match, Option } from "effect";
 
@@ -10,12 +10,14 @@ import { readDocsSearchTerm } from "#/lib/docs/search-location.ingress";
 import { DocsSearchResults } from "#/lib/docs/search.view";
 import { DocsState } from "#/lib/docs/state.view";
 import { loadDocsSearch } from "#/lib/pages/loaders";
+import { RetryButton } from "#/lib/pages/retry.container";
 
 const SearchUnavailable = () => (
   <DocsState title="Search documentation">
     <p role="alert">
-      Documentation search could not load. Please reload this page to try again.
+      Documentation search could not load. Try again, or search for other words.
     </p>
+    <RetryButton />
     <DocsSearchForm term="" />
   </DocsState>
 );
@@ -47,6 +49,7 @@ export const Route = createFileRoute("/search")({
 });
 
 function DocumentationSearchRoute() {
+  const loading = useRouterState({ select: (state) => state.isLoading });
   return Match.value(Route.useLoaderData()).pipe(
     Match.tag("InvalidSearch", () => (
       <DocsState title="Search documentation">
@@ -58,7 +61,11 @@ function DocumentationSearchRoute() {
     )),
     Match.tag("Found", ({ navigation, results, term, theme }) => (
       <MdxTheme className="docs-reader" theme={theme}>
-        <DocsHeader currentPath={Option.none()} navigation={navigation} />
+        <DocsHeader
+          currentPath={Option.none()}
+          loading={loading}
+          navigation={navigation}
+        />
         <div className="docs-layout docs-search-layout">
           <aside className="docs-sidebar">
             <DocsNavigation
@@ -66,15 +73,22 @@ function DocumentationSearchRoute() {
               navigation={navigation}
             />
           </aside>
-          <article className="docs-article">
-            <div className="docs-breadcrumbs">Documentation</div>
-            <DocsHeading>Search documentation</DocsHeading>
-            <p className="docs-search-description">
-              Find the right guide, reference or integration example.
-            </p>
-            <DocsSearchForm key={term} term={term} />
-            <DocsSearchResults results={results} term={term} />
-          </article>
+          <main
+            aria-busy={loading}
+            className="docs-main"
+            id="main-content"
+            tabIndex={-1}
+          >
+            <article className="docs-article">
+              <div className="docs-breadcrumbs">Documentation</div>
+              <DocsHeading>Search documentation</DocsHeading>
+              <p className="docs-search-description">
+                Find the right guide, reference or integration example.
+              </p>
+              <DocsSearchForm key={term} term={term} />
+              <DocsSearchResults results={results} term={term} />
+            </article>
+          </main>
         </div>
       </MdxTheme>
     )),

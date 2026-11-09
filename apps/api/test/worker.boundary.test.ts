@@ -5,13 +5,13 @@ import {
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/request-boundary";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
+import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
-import { PublicCalculatorService } from "@taxkit/calculators/service";
+import { CalculatorCatalogue } from "@taxkit/calculators/service";
 import {
   CalculationRequest,
   CalculatorFixture,
   CalculatorFixtureMode,
-  CalculatorLive,
   sensitiveSentinel,
 } from "@taxkit/calculators/testing/fixtures";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
@@ -38,6 +38,7 @@ import {
   Schema,
   Scope,
   Stream,
+  Boolean as EffectBoolean,
 } from "effect";
 import {
   Headers,
@@ -182,7 +183,7 @@ describe("native API application", () => {
   );
   it.effect("shares eight calculation places across HTTP calls", () =>
     Effect.gen(function* () {
-      const live = yield* PublicCalculatorService;
+      const live = yield* CalculatorCatalogue;
       const active = yield* Ref.make(0);
       const started = yield* Deferred.make<boolean>();
       const released = yield* Ref.make(0);
@@ -192,48 +193,22 @@ describe("native API application", () => {
           PublicCalculatorServiceBounded.pipe(
             Layer.provide(
               Layer.succeed(
-                PublicCalculatorService,
-                PublicCalculatorService.of({
-                  getCalculator: Effect.fn(
-                    "PublicCalculatorService.getCalculator"
-                  )(live.getCalculator),
-                  getCalculatorGraph: Effect.fn(
-                    "PublicCalculatorService.getCalculatorGraph"
-                  )(live.getCalculatorGraph),
-                  getCalculatorSchema: Effect.fn(
-                    "PublicCalculatorService.getCalculatorSchema"
-                  )(live.getCalculatorSchema),
-                  listCalculators: Effect.fn(
-                    "PublicCalculatorService.listCalculators"
-                  )(live.listCalculators),
-                  listFacts: Effect.fn("PublicCalculatorService.listFacts")(
-                    live.listFacts
-                  ),
-                  listJurisdictions: Effect.fn(
-                    "PublicCalculatorService.listJurisdictions"
-                  )(live.listJurisdictions),
-                  listRules: Effect.fn("PublicCalculatorService.listRules")(
-                    live.listRules
-                  ),
-                  listTaxYears: Effect.fn(
-                    "PublicCalculatorService.listTaxYears"
-                  )(live.listTaxYears),
-                  calculate: Effect.fn("PublicCalculatorService.calculate")(
-                    () =>
-                      Ref.updateAndGet(active, (count) => count + 1).pipe(
-                        Effect.flatMap((count) =>
-                          Match.value(count).pipe(
-                            Match.when(8, () =>
-                              Deferred.succeed(started, true)
-                            ),
-                            Match.orElse(() => Effect.void)
-                          )
-                        ),
-                        Effect.andThen(Effect.never),
-                        Effect.ensuring(
-                          Ref.update(released, (count) => count + 1)
+                CalculatorCatalogue,
+                CalculatorCatalogue.of({
+                  ...live,
+                  calculate: Effect.fn("CalculatorCatalogue.calculate")(() =>
+                    Ref.updateAndGet(active, (count) => count + 1).pipe(
+                      Effect.flatMap((count) =>
+                        Match.value(count).pipe(
+                          Match.when(8, () => Deferred.succeed(started, true)),
+                          Match.orElse(() => Effect.void)
                         )
+                      ),
+                      Effect.andThen(Effect.never),
+                      Effect.ensuring(
+                        Ref.update(released, (count) => count + 1)
                       )
+                    )
                   ),
                 })
               )
@@ -318,7 +293,7 @@ describe("native API application", () => {
           })
       );
     }).pipe(
-      Effect.provide(CalculatorLive),
+      Effect.provide(CalculatorCatalogueLive),
       Effect.provideService(ConfigProvider.ConfigProvider, settings),
       Effect.scoped
     )
@@ -326,10 +301,16 @@ describe("native API application", () => {
   it.effect("defers address reads during construction and decodes once", () =>
     Effect.gen(function* () {
       const reads = yield* Ref.make(0);
+      // Only the host mode is read at construction; addresses are deferred.
       const provider = ConfigProvider.make((path) =>
-        settings
-          .load(path)
-          .pipe(Effect.tap(() => Ref.update(reads, (count) => count + 1)))
+        settings.load(path).pipe(
+          Effect.tap(() =>
+            EffectBoolean.match(Array.contains(path, "CALCULATOR_HOST_MODE"), {
+              onFalse: () => Ref.update(reads, (count) => count + 1),
+              onTrue: () => Effect.void,
+            })
+          )
+        )
       );
       const app = yield* ApiWorkerInit.pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, provider)
@@ -626,68 +607,51 @@ describe("native API application", () => {
         const constructions = yield* Ref.make(0);
         const releases = yield* Ref.make(0);
         const incomingPaths = yield* Ref.make<readonly string[]>([]);
-        const calculator = Layer.effect(
-          PublicCalculatorService,
-          Effect.gen(function* () {
-            yield* Ref.update(constructions, (count) => count + 1);
-            const live = yield* PublicCalculatorService;
-            return PublicCalculatorService.of({
-              getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
-                live.getCalculator
-              ),
-              getCalculatorGraph: Effect.fn(
-                "PublicCalculatorService.getCalculatorGraph"
-              )(live.getCalculatorGraph),
-              getCalculatorSchema: Effect.fn(
-                "PublicCalculatorService.getCalculatorSchema"
-              )(live.getCalculatorSchema),
-              listCalculators: Effect.fn(
-                "PublicCalculatorService.listCalculators"
-              )(live.listCalculators),
-              listFacts: Effect.fn("PublicCalculatorService.listFacts")(
-                live.listFacts
-              ),
-              listJurisdictions: Effect.fn(
-                "PublicCalculatorService.listJurisdictions"
-              )(live.listJurisdictions),
-              listRules: Effect.fn("PublicCalculatorService.listRules")(
-                live.listRules
-              ),
-              listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")(
-                live.listTaxYears
-              ),
-              calculate: Effect.fn("PublicCalculatorService.calculate")(
-                (request) =>
-                  Effect.gen(function* () {
-                    yield* Ref.update(calls, (count) => count + 1);
-                    const incoming = yield* Effect.serviceOption(
-                      HttpServerRequest.HttpServerRequest
-                    );
-                    yield* incoming.pipe(
-                      Option.match({
-                        onNone: () => Effect.die("Incoming request is missing"),
-                        onSome: ({ url }) =>
-                          Ref.update(incomingPaths, Array.append(url)),
+        const live = yield* CalculatorCatalogue;
+        // Substitute the catalogue under the real shared work policy.
+        const calculator = PublicCalculatorServiceBounded.pipe(
+          Layer.provide(
+            Layer.effect(
+              CalculatorCatalogue,
+              Effect.gen(function* () {
+                yield* Ref.update(constructions, (count) => count + 1);
+                return CalculatorCatalogue.of({
+                  ...live,
+                  calculate: Effect.fn("CalculatorCatalogue.calculate")(
+                    (request) =>
+                      Effect.gen(function* () {
+                        yield* Ref.update(calls, (count) => count + 1);
+                        const incoming = yield* Effect.serviceOption(
+                          HttpServerRequest.HttpServerRequest
+                        );
+                        yield* incoming.pipe(
+                          Option.match({
+                            onNone: () =>
+                              Effect.die("Incoming request is missing"),
+                            onSome: ({ url }) =>
+                              Ref.update(incomingPaths, Array.append(url)),
+                          })
+                        );
+                        const scope = yield* Effect.serviceOption(Scope.Scope);
+                        yield* scope.pipe(
+                          Option.match({
+                            onNone: () =>
+                              Effect.die("Incoming request scope is missing"),
+                            onSome: (requestScope) =>
+                              Scope.addFinalizer(
+                                requestScope,
+                                Ref.update(releases, (count) => count + 1)
+                              ),
+                          })
+                        );
+                        return yield* live.calculate(request);
                       })
-                    );
-                    const scope = yield* Effect.serviceOption(Scope.Scope);
-                    yield* scope.pipe(
-                      Option.match({
-                        onNone: () =>
-                          Effect.die("Incoming request scope is missing"),
-                        onSome: (requestScope) =>
-                          Scope.addFinalizer(
-                            requestScope,
-                            Ref.update(releases, (count) => count + 1)
-                          ),
-                      })
-                    );
-                    return yield* live.calculate(request);
-                  })
-              ),
-            });
-          })
-        ).pipe(Layer.provide(CalculatorLive));
+                  ),
+                });
+              })
+            )
+          )
+        );
         const app = yield* ApiWorkerApplication.pipe(
           Effect.provide(ApiContentLive),
           Effect.provide(calculator)
@@ -749,6 +713,7 @@ describe("native API application", () => {
           ],
         });
       }).pipe(
+        Effect.provide(CalculatorCatalogueLive),
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
         Effect.scoped
       )

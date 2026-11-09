@@ -11,6 +11,15 @@ import {
   takeHomeRequestFromForm,
 } from "../src/form.ingress.js";
 
+// The field and message an invalid form reports.
+const inputErrorOf = (result: ReturnType<typeof takeHomeRequestFromForm>) =>
+  result.pipe(
+    Result.match({
+      onFailure: (error) => [error.field, error.message],
+      onSuccess: () => expect.fail("Expected an input error"),
+    })
+  );
+
 describe("calculator form admission", () => {
   it("keeps the chosen pay calculator and checked annual facts", () => {
     const withholdingsId = AuPayCalculatorId.make("au.pay.withholdings");
@@ -59,6 +68,39 @@ describe("calculator form admission", () => {
       ),
       (actual) => {
         expect(actual).toBeTruthy();
+      }
+    );
+  });
+
+  it("names the one field a visitor must correct", () => {
+    EffectFunction.pipe(
+      { ...initialTakeHomeForm, grossDollars: "x" },
+      takeHomeRequestFromForm,
+      inputErrorOf,
+      (actual) => {
+        expect(actual).toStrictEqual([
+          "grossDollars",
+          "Enter a valid pay amount.",
+        ]);
+      }
+    );
+    EffectFunction.pipe(
+      { ...initialTakeHomeForm, period: "daily" },
+      takeHomeRequestFromForm,
+      inputErrorOf,
+      (actual) => {
+        expect(actual).toStrictEqual(["period", "Choose a pay period."]);
+      }
+    );
+    EffectFunction.pipe(
+      AnnualTaxForm.make({ taxableDollars: "x" }),
+      annualTaxRequestFromForm,
+      inputErrorOf,
+      (actual) => {
+        expect(actual).toStrictEqual([
+          "taxableDollars",
+          "Enter a valid annual taxable income.",
+        ]);
       }
     );
   });

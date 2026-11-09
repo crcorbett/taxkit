@@ -4,7 +4,6 @@ import {
   Function as EffectFunction,
   Array,
   Cause,
-  Crypto,
   ConfigProvider,
   Deferred,
   Effect,
@@ -18,6 +17,7 @@ import {
   Stream,
   Boolean as EffectBoolean,
 } from "effect";
+import { SecureRandom } from "effect/crypto";
 import {
   FetchHttpClient,
   HttpClient,
@@ -38,11 +38,8 @@ import { makeBackendAnalyticsTest } from "../src/test.layer.js";
 const expectedTimestamp: unknown = expect.any(String);
 const expectedContentLength: unknown = expect.stringMatching(/^\d+$/u);
 const TestCrypto = Layer.succeed(
-  Crypto.Crypto,
-  Crypto.make({
-    digest: (_algorithm, bytes) => Effect.succeed(bytes),
-    randomBytes: (size) => new Uint8Array(size),
-  })
+  SecureRandom.SecureRandom,
+  SecureRandom.make((size) => new Uint8Array(size))
 );
 it.effect(
   "encodes one minimal event with no caller identity, figures, queries or credentials",
@@ -137,12 +134,14 @@ it.effect.each(["disabled", "denied"] as const)(
         Match.orElse(() => productionAnalyticsConfig)
       );
       const input = yield* calculatorUseFixture;
-      const crypto = yield* Crypto.Crypto;
-      const noUseCrypto = Layer.succeed(Crypto.Crypto, {
-        ...crypto,
-        randomUUIDv4: () =>
-          Effect.die("Disabled capture generated an identity"),
-      });
+      const random = yield* SecureRandom.SecureRandom;
+      const noUseCrypto = Layer.succeed(
+        SecureRandom.SecureRandom,
+        SecureRandom.SecureRandom.of({
+          ...random,
+          uuidV4: () => Effect.die("Disabled capture generated an identity"),
+        })
+      );
       const transport = HttpClient.make(() =>
         Effect.die("Disabled capture made a request")
       );

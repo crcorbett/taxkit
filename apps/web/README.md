@@ -1,12 +1,3 @@
----
-document_type: app-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-web-app-owner
-last_reviewed: 2026-11-02
-review_trigger: website rendering, settings, API client, loader, form, cache, generated types or build change
----
-
 # Website app
 
 `apps/web` is the TanStack Start Website on Cloudflare. It renders the three
@@ -26,9 +17,9 @@ page state, tools and WebMCP live in their packages.
 | `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.ingress.ts` (Markdown files and `Accept`) |
 | `pages/` | `loaders.ts`, `load.failure.ts`, `loader-context.ts` and the root load |
 | `docs/` | documentation chrome, reading views, appearance/copy/outline Atoms and the search address reader |
-| `calculators/` | calculator containers and views, `page.atoms.ts`, `tools.atoms.ts` and the safe failure text |
+| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts`, the caveat text and the safe failure text |
 | `seo/` | `head.ts`, the documentation page head |
-| root | `runtime.server.ts`, `runtime.client.ts` and `api-client.atoms.ts` |
+| root | `runtime.server.ts`, `runtime.client.ts` (loaders and `webMcpAtom`), `browser-atoms.ts` (the client/server atom selection mounted at the root) and `api-client.atoms.ts` |
 
 ## What runs where
 
@@ -95,8 +86,11 @@ settings.
 named reads with the generated client. Server loads stop when either the
 loader or the incoming request is aborted; browser loads use the loader's own
 `AbortSignal`, which cancels the HTTP call. `src/lib/pages/load.failure.ts` turns a
-missing documentation page into TanStack `notFound()` (HTTP 404) and any other
+missing documentation page or calculator address into TanStack `notFound()`
+(HTTP 404), passes a native Router redirect through unchanged and turns any other
 failure into `WebsiteLoadError`, rendered by the route's error component.
+Recoverable error views offer **Try again**, which calls native
+`router.invalidate()` and stays disabled during that transition.
 Internal defects and mismatched checked pages carry 500; unavailable reads
 carry 503, and missing documentation remains a native 404.
 Interruption stays interruption. Failed server page loads retain their error
@@ -129,27 +123,42 @@ reads. No binding or Effect Context reaches the browser. Vite sets
 ## Calculator pages
 
 Take-home pay is at `/`; `/calculators/au.pay.withholdings` and
-`/calculators/au.income-tax.annual` have their own form and answer state. The
+`/calculators/au.income-tax.annual` have their own form and answer state.
+`/calculators/au.pay.take-home` redirects to `/` with a 308 from the route
+loader, and an unknown calculator address is a 404 page with a link Home. Each
+page's `<title>` and `<h1>` is the calculator title. The
 navigation uses the canonical browser-safe `@taxkit/calculators/summaries`
 titles and identities, also reused by the API catalogue. It renders all links
 without a network read or JavaScript; summaries change with deployment and
 browser reload. Remote discovery tools still read the live API catalogue.
 Annual pages state
-that the retained Medicare thresholds await correction.
+that the retained Medicare thresholds await correction;
+`src/lib/calculators/caveats.ts` owns that sentence for the page, its answer
+and `/agents`.
 
-`@taxkit/calculators/page` owns the page state: one `Atom.family` group per
-calculator with the form, the calculation and the shared readonly
-`CalculatorViewState`. `src/lib/calculators/page.atoms.ts` supplies the
-calculation (`apiClientRuntime.fn` over `requestCalculation`) and the safe
-failure text. `@taxkit/calculators/form` turns a visible form into a checked
-request. Calculate sends the checked request. Editing interrupts
+`src/lib/calculators/page.atoms.ts` declares one static `Atom.family`, keyed
+by the checked calculator ID, with the form, the calculation
+(`apiClientRuntime.fn` over `requestCalculation`), the commands and the shared
+readonly `CalculatorViewState`. `@taxkit/calculators/page` owns the page
+contract and the pure view derivation; `@taxkit/calculators/form` turns a
+visible form into a checked request or names the one field to correct.
+`calculator.container.tsx` serves every calculator: it owns the commands and
+browser-tool registration, then composes the `PayFields` or
+`AnnualIncomeField` leaf, the page frame and the report's summary, breakdown,
+assumptions and rule-source leaves. Calculate sends the checked request. An
+invalid field is marked `aria-invalid`, described by its own message and
+focused; a calculation failure is one page-level alert. Enter submits, the
+button is disabled while a request runs and amount fields use 16px text with
+`autoComplete="off"`. Editing interrupts
 unfinished work and keeps the last successful answer, marked out of date, until
 an explicit calculation succeeds. Leaving the page interrupts its work. The
 view is kept alive for the registry's lifetime so an answer survives a paused
 first render and a return visit. No figures go to browser storage or the URL.
 
-The take-home result shows the answer first, with native `details` for the
-breakdown, assumptions, year and sources. Explanations come from the checked
+Each result shows the answer first in a polite live region with tabular
+figures, with native `details` for the breakdown, assumptions, year and
+sources. Pages start at the top, so an answer, error or opened breakdown never
+moves the form. Explanations come from the checked
 report and its trace, not the edited form. Source references become links only
 for valid HTTPS addresses.
 
@@ -242,18 +251,25 @@ graph enables the Website's native Workers Cache scoped to the deployed version.
 
 ## Browser tools
 
-On a mounted calculator, browsers with WebMCP support can register five tools:
-`taxkit_find_calculators`, `taxkit_read_calculator`, `taxkit_fill_calculator`,
-`taxkit_calculate_visible_form` and `taxkit_read_result`. The toolkit and its
-handlers belong to `@taxkit/calculators/page-tools`, registration to
-[`@taxkit/webmcp`](../../packages/webmcp/README.md), and
-`calculators/tools.atoms.ts` composes them for a mounted page. They use the
-page's own edit and submit commands and the same `ApiClient`; mounting or
-reading starts no calculation. Each tool has a
-two-second registration limit and calculation has a twelve-second outer limit.
-A caller's cancellation or an edit cancels only the request that call owns;
-another unfinished calculation is reported as busy. Page cleanup removes the
-tools. Failures carry fixed codes without input values. `/agents` links the
+Browsers with WebMCP support get the API's six MCP tools, with the same names,
+descriptions, strict input Schemas and read-only hints as remote MCP's
+`tools/list`. `runtime.client.ts` declares one `webMcpAtom` in the browser
+runtime: it builds `ModelContextHostLive` for the checked Website origin and the
+`@taxkit/api-mcp/client-handlers` handlers over the shared `ApiClient`, then
+runs `registerWebMcpTools` from [`@taxkit/webmcp`](../../packages/webmcp/README.md).
+`browser-atoms.ts` selects that Atom with `createIsomorphicFn` in the browser and
+an inert Atom during server rendering; `__root.tsx` mounts it once with
+`useAtomMount`. The tools therefore stay registered across client navigation,
+and the root registry's disposal removes them and interrupts running calls
+without closing the shared client. Calculator pages register nothing. All
+imports are static: the shared lint policy forbids dynamic `import()`.
+
+Each tool call is a public API request with the client's ten-second read
+bound; `taxkit_calculate` uses the shared anonymous allowance. Results follow
+MCP's tool result: invalid input is answered with detail and no request, a
+declared failure carries the same safe `McpToolUnavailable` code as remote MCP,
+and anything else is a fixed message. A registration has a two-second limit,
+and a caller's cancellation interrupts that call's request. `/agents` links the
 remote MCP address on the API origin, the OpenAPI description and the
 [agent connection guide](../../content/docs/api/agent-tools.mdx).
 
@@ -272,8 +288,7 @@ bun run --filter=web check-types
 bun run --filter=web test
 bun run --filter=web test:browser
 bun run --filter=web build
-bun run --filter=web build:native-pair
-bun run --filter=web test:native-pair
+bun run test:native
 ```
 
 `test:browser` runs the Chromium tests in `test/**/*.browser.test.tsx`: the
@@ -285,16 +300,21 @@ clipboard refusal. The native suite checks the drawer's keyboard/focus behaviour
 active page outlines, theme retention during search, narrow layouts and
 no-JavaScript code scrolling.
 
+The native pair suite tests both Workers together, so it lives at the root in
+[`tools/apps-local/test`](../../tools/apps-local/test), not in this app.
+`bun run test:native` runs the root `build:native-pair` and then
+`test:native-pair` (the `native-pair` project in `tools/vitest.config.ts`).
 `build:native-pair` builds the API dependency graph and then both apps with
 Alchemy's native builders, without a cloud provider, state or credentials. Its
 API output is under the ignored `.alchemy/native-pair`; the harness explicitly
-sets each fixture's output directory because Alchemy beta.84 keeps standalone
+sets each fixture's output directory because Alchemy beta.85 keeps standalone
 bundles in memory by default. The Website output is
 `dist/server/server.js`. A standalone Vite build writes `dist/server/index.js`
-instead, so run the native build immediately before its test. The root
-`bun run test:native` does both.
+instead, so run the native build immediately before its test.
 
-The native tests in `test/` run the built pair in Miniflare and Chromium. They
+The native tests run the built pair in Miniflare and Chromium, with the
+deployed Workers' compatibility settings from
+`@taxkit/infrastructure/worker-settings`. They
 cover first HTML for every page, documentation pages, search, Markdown and
 discovery files with their cache headers, browser calculation, the
 no-JavaScript notice and refused POSTs, request and reply limits, cancellation,

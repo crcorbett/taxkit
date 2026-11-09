@@ -1,12 +1,3 @@
----
-document_type: standard
-lifecycle: current
-authority: canonical
-owner: taxkit-tooling-owner
-last_reviewed: 2026-10-30
-review_trigger: formatter, lint, dependency, typecheck, Changeset or root command change
----
-
 # Formatting, Linting, And Dependency Hygiene
 
 TaxKit uses Bun workspaces and Ultracite with the Oxlint/Oxfmt provider. The
@@ -16,7 +7,9 @@ stable boundaries.
 ## Configured Tools
 
 - `bun` is the package manager and workspace runner. Root `package.json` owns
-  the workspace globs and catalogue dependency versions.
+  the workspace globs and catalogue dependency versions. An external package
+  used by more than one manifest is pinned once in the root catalogue and
+  referenced as `catalog:`; exact versions stay exact.
 - `oxlint.config.ts` extends the complete, unmodified `style` and `strict`
   presets from `@commonplaces/oxlint-plugin`. The shared package owns rule
   selection and default severity. Do not copy a subset, filter the presets,
@@ -25,11 +18,18 @@ stable boundaries.
   suppress shared preset checks. Repository plugins use `taxkit-effect`,
   `taxkit-bun`, `taxkit` and `taxkit-package`, so they cannot replace shared
   `effect`, `bun` or `package` rules.
-- The published Commonplaces plugin is pinned to 0.8.0 with Oxlint 1.89.0,
-  inside its supported range. Required Effect platform and test APIs use
-  explicit `allowedUnstableApis` entries for the pinned release; the unstable
-  API diagnostic remains enabled. Native Effect test callbacks are registered
-  with Vitest's assertion rule rather than disabling it.
+- `@commonplaces/oxlint-plugin` is the one dependency outside the exact-pin
+  policy: its manifest value is `"latest"`. `bun run lint` first runs
+  `bun run lint:refresh`, which installs the current npm release with
+  `--no-save --no-cache --ignore-scripts` and then runs
+  `effect-tsgo patch --oxlint`; a registry, patch or compatibility failure
+  stops linting. The manifest stays `"latest"`, so the executed plugin may be
+  newer than the lockfile; record the installed rule version when reporting
+  lint results. The installed release is 0.11.0 with Oxlint 1.89.0, inside its
+  supported range. Required Effect platform and test APIs use explicit
+  `allowedUnstableApis` entries; the unstable API diagnostic remains enabled.
+  Native Effect test callbacks are registered with Vitest's assertion rule
+  rather than disabling it.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
   wrapping.
 - TypeScript 7 is the root compiler. `@effect/tsgo` patches it at install and
@@ -37,14 +37,18 @@ stable boundaries.
   The SDK assembler separately uses `typescript-ast`, an alias for TypeScript
   6.0.3, for its JavaScript compiler API; TypeScript 7 supplies the native
   compiler rather than that API.
-- Effect and its versioned platform, Atom, SQL and test packages use 4.0.7.
-  Alchemy and its provider/framework packages use beta.84. Effect 4.1 removes
-  `effect/Crypto`, which Alchemy’s OAuth module still imports; 4.0.7 is the
-  latest tested compatible release, despite the wider declared peer range. Miniflare follows
-  the v5 beta line used by Wrangler; its `latest` tag still points to v4.
+- Effect and its versioned platform, Atom, SQL and test packages use 4.1.2,
+  with root `overrides` keeping transitive Effect packages on the same release.
+  Alchemy and its provider/framework packages use 2.0.0-beta.85. Miniflare
+  follows the v5 beta line used by Wrangler; its `latest` tag still points to
+  v4.
 - `knip.json` checks development reachability and `knip.production.json`
   checks the published package and runtime graph, including the standalone
   API server Layer as an explicit host entry alongside the API Worker.
+  Production entries for packages come from their `package.json` export maps;
+  the production config names entries only where Knip cannot infer them: the
+  Alchemy stacks, the API and Website hosts, the documentation examples and
+  the SDK, whose exports point at its built `dist`.
 - The SDK's type and unit-test tasks depend on its own build: its package
   imports resolve through `dist`, so those tasks must wait while a rebuild
   replaces the assembled package.
@@ -63,7 +67,7 @@ stable boundaries.
 | `bun run check-types` | Workspace types plus the Alchemy roots, root tools and Effect diagnostics. |
 | `bun run knip` | Both Knip graphs. |
 | `bun run test` | Root tool tests, workspace unit tests, Chromium tests, then the native pair suite. |
-| `bun run test:tools` / `bun run test:native` | Only the root tool tests, or only the slower native Website/API pair tests. |
+| `bun run test:tools` / `bun run test:native` | Only the root tool tests, or only the slower native Website/API pair tests (`tools/apps-local/test`). |
 | `bun run release:check` | `verification` plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. |
 
 ## Shared rules and repository ownership
@@ -97,11 +101,32 @@ fences remain enabled. Ordinary temporary source fixtures stay inside the
 repository's lint fixture directory. The manifest guard covers every actual
 non-infrastructure package and rejects app dependencies in every dependency
 field. Approved Alchemy Worker helpers remain available to app hosts.
-Important portable rules include:
+The four repository plugin entries (`tools/oxlint/taxkit-rules.ts`,
+`effect-rules.ts`, `bun-rules.ts` and `package-rules.ts`) only register rules.
+Each rule lives in its own file under `tools/oxlint/rules/`, with shared AST
+helpers in `tools/oxlint/rules/shared/`. Rules contain no owner paths:
+`oxlint.config.ts` names each owner list by role and passes it as options,
+`rules/shared/options.consumer.ts` is the one synchronous options decoder, and
+`strict-effect/no-owner-paths-in-rules` rejects a path written in rule code.
+`tools/oxlint/owner-paths.test.ts` fails when an exact path in the lint or Knip
+configuration no longer exists, or a browser import grant names a missing
+package export.
 
-- `taxkit-effect/no-manual-tag`: bans manual `_tag` object literals. Use
-  `Data.TaggedClass`, `Data.TaggedError`, `Schema.TaggedClass`, or an owning
-  package constructor.
+A repository rule exists only where the shared presets do not cover the same
+cases on the same paths. Rules proven duplicate with real-command fixtures were
+removed: manual `_tag` literals (`effect/no-manual-tag`), throwing `*Sync`
+codecs (`effect-conventions/no-throwing-schema-codec`), and the calculator
+`typeof`, `instanceof`, `in`, JSON, `throw`, `async`/`await`/`new Promise`,
+`null`/`undefined` comparison, conditional spread and ambient clock checks
+(`anti-slop/no-runtime-typeof`, `effect/no-instanceof`,
+`effect-conventions/no-in-operator`, `strict-effect/no-unchecked-json`,
+`strict-effect/no-native-work`, `effect/no-async-await-promise`,
+`strict-effect/no-promise-workflow`, `effect-conventions/no-nullish-comparison`
+and `effect-conventions/no-conditional-object-spread`). Repository rules that
+remain cover cases the shared rules miss, as noted below.
+
+Important repository rules include:
+
 - `taxkit-effect/no-layer-exports-in-service-files`: bans `Live`, `Mock` and `Test`
   layer exports from `service.ts`/`services.ts` files, including named export
   specifiers and named re-exports. Service files own `Context.Service`
@@ -113,12 +138,14 @@ Important portable rules include:
   exact files owned by `oxlint.config.ts`. Package and service logic returns
   `Effect` values and tagged failures. The rules resolve canonical imports,
   renamed bindings, aliases and statically known destructuring; lexically
-  shadowed same-named locals are not host or runtime APIs.
-- `taxkit-effect/no-schema-encoder-outside-egress` and
-  `taxkit-effect/no-throwing-schema-sync-codec`: encode once at exact egress and use
-  Effect or non-throwing Result/Exit/Option codecs. Canonical `Schema`
-  imports, namespace imports, renamed bindings and statically known method
-  aliases are all enforced.
+  shadowed same-named locals are not host or runtime APIs. They stay because
+  the shared `effect/no-console`, `effect/no-ambient-process` and
+  `strict-effect/no-runtime-outside-boundary` match only direct spellings: they
+  miss aliased or destructured `console`/`process`, `process.exitCode` and the
+  `run*With` runners.
+- `taxkit-effect/no-schema-encoder-outside-egress`: encode once at exact
+  egress. Canonical `Schema` imports, namespace imports, renamed bindings and
+  statically known method aliases are all enforced.
 - `taxkit-effect/no-unknown-service-contract` and
   `taxkit-effect/no-unknown-tagged-error-cause`: keep service inputs schema-derived and
   expected errors closed and tagged. Scope-resolved aliases of `Effect.Effect`,
@@ -146,23 +173,15 @@ Important portable rules include:
 
 Current TaxKit-specific custom rules include:
 
-- `taxkit/no-typeof`, `taxkit/no-instanceof` and
-  `taxkit/no-in-operator`: scoped to `packages/calculators/src`. Calculator
-  service code must decode with Schema and branch with `Option`, `Result`,
-  `Exit` or `Match` instead of ad hoc runtime type probes.
-- `taxkit/no-undefined-comparison`: scoped to `packages/calculators/src`.
-  Optional request policy must use `Schema.optional` plus `Option`, not
-  `=== undefined` or `!== undefined`.
-- `taxkit/no-nullish-comparison`: scoped to `packages/calculators/src`.
-  Nullable request policy must use `Schema.NullOr` or schema transforms plus
-  `Option.fromNullable`, not raw `null` comparison.
-- `taxkit/no-conditional-object-spread`: scoped to
-  `packages/calculators/src`. Optional response fields must be schema-owned,
-  not built with conditional object spreads.
 - `taxkit/no-context-nullish-default`: scoped to
   `packages/calculators/src`. Calculator context must not invent jurisdiction
   or tax-year defaults with `??`; missing context must remain absent or fail
-  through an owning schema/tagged error.
+  through an owning schema/tagged error. The shared
+  `web/no-context-nullish-default` covers page metadata fields only.
+- `taxkit/no-date-construction`: scoped to `packages/calculators/src`.
+  Calculator dates and tax years come from Schema-owned date types, so explicit
+  `new Date(value)` is rejected too. The shared `strict-effect/no-native-work`
+  rejects the ambient reads (`new Date()`, `Date.now`, `Math.random`).
 - `taxkit/no-nested-wrapper-calls`: scoped to `packages/calculators/src`.
   Sequential calculator transformations must use pipe-first data flow such as
   `query.pipe(filterEntries, toResponse)` or `pipe(query, filterEntries,
@@ -172,24 +191,25 @@ Current TaxKit-specific custom rules include:
   `Array.filter(items, predicate)`, `Array.findFirst(...)` and `Chunk.map(...)`
   instead of native `items.filter(...)`, `items.find(...)` or
   `items.reduce(...)`.
-- `taxkit/no-native-collections`: scoped to `packages/calculators/src`.
-  Calculator services must use `HashMap` and `HashSet`, with `Option`-based
-  lookups, instead of native `Map` and `Set` constructors.
-- `taxkit/no-throw`: scoped to `packages/calculators/src`. Calculator
-  failures must be typed tagged errors returned through `Effect.fail`,
-  `Effect.try` or `Effect.tryPromise`, not thrown exceptions.
-- `taxkit/no-async-await-promise`: scoped to `packages/calculators/src`.
-  Calculator services must return `Effect` values and compose them with
-  `Effect.gen`, `Effect.flatMap`, `Effect.all`, `Layer` and service
-  dependencies instead of `async`, `await` or `new Promise`.
-- `taxkit/no-json-parse-stringify`: scoped to `packages/calculators/src`.
-  Calculator boundary values must be decoded and encoded by owning schemas, for
-  example `Schema.decodeUnknown`, `Schema.decodeJson`, `Schema.encode` or
-  `Schema.encodeJson`, not ad hoc `JSON.parse` or `JSON.stringify`.
-- `taxkit/no-ambient-time-or-random`: scoped to `packages/calculators/src`.
-  Calculator logic must receive time/randomness as explicit canonical input or
-  through Effect boundary services such as `Clock` and `Random`; deterministic
-  calculator services must not hide `Date.now`, `new Date` or `Math.random`.
+- `taxkit/no-native-collections`: all owned source. Use `HashMap` and
+  `HashSet` instead of native `Map`, `Set`, `WeakMap` and `WeakSet`. It stays
+  beside `effect-conventions/no-native-collections` because it also follows
+  aliases, destructuring and `globalThis`/`window` spellings.
+- `taxkit/no-object-writes`: all owned source. Return immutable values instead
+  of `Object`/`Reflect` writes, including through aliases.
+- `taxkit/no-decoding-outside-boundaries`: executable Schema decoding only in
+  the reviewed `decodingBoundaryFiles`.
+- `taxkit-package/workspace-roles`: browser/backend and runtime/deployment
+  roles. Its Website source root, server entries and exact host module grants
+  are options in `oxlint.config.ts`; package role policy lives in
+  `tools/oxlint/package-roles.ts`.
+
+SDK source boundaries are lint settings rather than a separate command:
+`strict-effect/module-ownership` lets only `packages/sdk/typescript/src/http.ts`
+import `@taxkit/api-http`, `no-restricted-imports` keeps Node and Bun modules out
+of SDK source and Australian packs out of the root entry, and the package role
+policy forbids `@taxkit/api-http` from depending on `taxkit` in any dependency
+field.
 
 ## Formatting Rules
 

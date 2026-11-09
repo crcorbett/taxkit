@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-effect-services-owner
-last_reviewed: 2026-11-04
-review_trigger: service, Layer, runtime, lifetime or boundary ownership change
----
-
 # Effect services
 
 TaxKit uses Effect services, layers, schemas and tagged errors as the default
@@ -29,7 +20,8 @@ The application owns when to capture and which checked collection policy applies
 The API application captures its delivery service during initialisation, then
 supplies it to each returned request operation. The native Worker owns
 `waitUntil` delivery; request collection remains fresh.
-T008 Website/browser composition and provider readback remain pending.
+The Website does not collect analytics, and stored events have not been read
+back from the provider.
 
 ## Service shape
 
@@ -49,7 +41,7 @@ Core service categories:
 Public calculator services should live in `packages/calculators`, not HTTP
 handler modules. A calculator service method should own calculator lookup,
 context validation, metadata projection, graph diagnostics, scenario layer
-composition, `CalculationEngine` execution and expected error shaping. HTTP
+composition, closed definition execution and expected error shaping. HTTP
 handlers should only pass route input to the service and return the resulting
 schema-backed value or tagged error envelope.
 
@@ -166,9 +158,10 @@ are inferred directly from their owning Schema. These exported aliases replace
 open interfaces, so declaration merging is no longer an extension point; their
 historical encoded values remain the same.
 
-The calculation engine separates its service contract from its live Layer.
-Its real Effect/Layer/result relation stays generic; optional validation input
-retains its empty-collection meaning. Fact/parameter/rule metadata derives from
+There is no calculation engine service: each calculator definition is a
+closed program over its static rule pack, and only the checked scenario is
+provided per call ([ADR 0012](../adr/0012-closed-calculator-programs.md)).
+Fact/parameter/rule metadata derives from
 private owning Schemas, with Option for meaningful absence and a total rule
 parameter array. Tuple service types derive from the native key Identifier.
 The [Core owner](../../packages/core/README.md) explains missing versus explicit
@@ -231,7 +224,7 @@ The infrastructure-owned `PostHogManagement` contract has only find, read,
 create and update operations over checked TaxKit identities. Its private
 Distilled adapter contains paging, credentials, supported privacy settings,
 bounded replies and safe failure mapping. The native resource provider and
-deterministic test Layer depend on that closed contract. Alchemy beta.84 requires
+deterministic test Layer depend on that closed contract. Alchemy beta.85 requires
 provider registration without an error channel, so the composition Layer caches
 fallible live acquisition in the native stack scope and defers it to a lifecycle
 operation. Invalid settings remain typed failures before any request. The
@@ -293,9 +286,8 @@ POST's protocol server/notification consumer through body completion; shared
 calculator/content services and work/rate owners remain captured once.
 Legacy session/DO hosting is retired. The native body stream has bounded accumulation, total read
 time and scoped cancellation. Safe logger/reporter context is built at instance
-initialisation and supplied to both native router construction and dispatch;
-T009 retains unqualified safe native trace exports. T003's local connection
-acceptance does not establish that later requirement.
+initialisation and supplied to both native router construction and dispatch.
+Native trace export stays off.
 
 The Website's generated HTTP client uses the private native binding only for
 reads; the Website server never calculates. Its host adapter enforces manual
@@ -533,7 +525,7 @@ competing application contract. The owning package records timeout and CPU limit
 
 ## Native calculation rate admission
 
-`CalculatorAdmission` is a closed named service; its [owning contract](../../packages/calculators/README.md#native-calculation-rate-admission) and redacted key Schema live with calculators. The request Context reference carries checked identity separately from facts. `PublicCalculatorServiceRateLimited` provides calculation-only admission; the native API composes it once below bounded work. Its provider Layer, installed live Layer and mock test Layer remain separate. Native provider replies are decoded immediately and failures become fixed errors without provider causes or addresses.
+`CalculatorAdmission` is a closed named service; its [owning contract](../../packages/calculators/README.md#native-calculation-rate-admission) and redacted key Schema live with calculators. The request Context reference carries checked identity separately from facts. `PublicCalculatorServiceRateLimited` is the one public calculator implementation with calculation-only admission inside its work budget; the native API composes it once over `CalculatorCatalogueLive`. Its provider Layer, installed live Layer and mock test Layer remain separate. Native provider replies are decoded immediately and failures become fixed errors without provider causes or addresses.
 
 
 Native rate decoding is admitted at the exact original-address, private-call,

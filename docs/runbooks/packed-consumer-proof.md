@@ -1,12 +1,3 @@
----
-document_type: runbook
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-10-17
-review_trigger: SDK source, export map, packed file set, package manifest or downstream fixture change
----
-
 # Packed consumer check
 
 Run this when `taxkit` exports, packed files or supported dependencies
@@ -15,8 +6,10 @@ not touch npm.
 
 The SDK archive includes its private TaxKit modules. Only Effect remains an
 external runtime dependency; the consumer installs no other TaxKit archive.
-The main paths are the root, `/au`, `/effect`, `/core` and `/http`. Existing
-`/au/effect`, `/schemas` and `/testing` paths remain available.
+The first command checks every path in the package's `exports` map; the
+[SDK guide](../../packages/sdk/typescript/README.md#public-paths) lists them.
+SDK 5 removed every former path and alias, and Node resolves no path outside
+that map.
 
 1. `bun run sdk:check-packed-artifact` builds the SDK, packs it and checks the
    declared files and export paths in the tarball.
@@ -31,8 +24,8 @@ A passing run shows that the local package works for a fresh consumer. It does
 not show that npm holds the package or that a published version was installed.
 
 The downstream fixture retains its original saved hashes. Its narrowly scoped
-history comparison restores approved Medicare fragments and the pay ruleset
-edition/exact decimal trace for the unchanged $3,462 fortnightly example.
+history comparison restores approved Medicare fragments and the pay rule pack
+version/exact decimal trace for the unchanged $3,462 fortnightly example.
 Unrelated values remain byte-sensitive. New rounding and salary-sacrifice
 results are qualified by the rule packages' regression tests; do not regenerate
 historical hashes to accept a calculator correction.

@@ -1,12 +1,3 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-architecture-owner
-last_reviewed: 2026-11-02
-review_trigger: frontend runtime, API client, loader, rendering, cache, build adapter, or composition change
----
-
 # Frontend
 
 `apps/web` is the TanStack Start Website for the calculators and the public
@@ -81,8 +72,10 @@ in the API catalogue; the Website owns their route addresses. They import no
 calculator execution or live rule Layers. Links and forms render synchronously
 on the server and need no browser query or deferred reveal. A slow or failed
 remote catalogue operation therefore has no root-loader or navigation fallback
-state. Invalid required settings still use the root error view; an unknown
-calculator address retains its local unavailable view.
+state. Invalid required settings still use the root error view. The calculator
+route loader checks its address against the summaries through the same loader
+bridge: an unknown address becomes `notFound()` (404) and the take-home
+address a native 308 redirect to `/`.
 
 Summary freshness follows the application version: a Website/API rebuild and
 deployment publishes changed names and supported contexts, and a browser reload
@@ -169,10 +162,15 @@ only when repeated UI patterns across apps justify one.
 
 ## Calculator state
 
-`@taxkit/calculators/page` holds one `Atom.family` group per calculator: form,
-calculation, commands and one shared readonly view (`CalculatorViewState`). The
-Website's `calculators/page.atoms.ts` supplies the calculation
-(`apiClientRuntime.fn` over `requestCalculation`) and its safe failure text. Editing interrupts work and
+The Website's `calculators/page.atoms.ts` declares one static `Atom.family`,
+keyed by the checked calculator ID: form, calculation (`apiClientRuntime.fn`
+over `requestCalculation`), commands and one shared readonly view
+(`CalculatorViewState`). `@taxkit/calculators/page` owns the `CalculatorPage`
+contract and the pure view derivation; the host owns the Atoms because only it
+owns the calculation command. The view names the invalid field, if any, so the
+form can mark and focus it. Calculator dispatch matches the closed ID union
+exhaustively, and the tagged `CalculatorRunResponse` variant already selects
+its report kind. Editing interrupts work and
 keeps the last success, visibly out of date, until an explicit calculation
 succeeds; an old error is hidden while a new request runs. The view is kept
 alive for the registry's lifetime and holds its whole family group, so an
@@ -181,23 +179,38 @@ collection. Page cleanup still interrupts work and browser-tool
 callbacks; registry disposal releases the snapshot and client. No figure
 reaches navigation, metadata, browser storage or a query string.
 
-The take-home result leaf receives only the checked report and stale
-flag; explanations come from the report and its trace, not the edited form.
+One calculator container serves every calculator page. It matches the form
+and report kinds and composes focused leaves (pay fields, annual income field,
+result summary, breakdown, assumptions and rule sources) that receive only
+checked values and the stale flag; explanations come from the report and its
+trace, not the edited form.
 
-## Page-owned browser tools
+## Browser tools (WebMCP)
 
-`CalculatorPageToolkit` (`@taxkit/calculators/page-tools`) describes five
-visible calculator commands, separate from the API's remote MCP tools.
-Arguments reuse the form Schemas and results reuse `CalculatorViewState`; its
-handlers call the page's existing edit and submit commands. `@taxkit/webmcp`
-registers the toolkit through `ModelContextHost`, whose live adapter is the one
-WebMCP Promise bridge: the registration scope's `FiberSet.makeRuntimePromise`
-runs each callback. The Website's `calculators/tools.atoms.ts` composes them
-with `apiClientRuntime.fn` and the same `ApiClient`, never another client or
-runtime.
-One checked request object identifies each attempt, so an old callback cannot
-return a newer answer or cancel a newer manual request. Containers start
-registration and interrupt it on cleanup.
+WebMCP exposes the API's MCP toolkit, not separate page tools.
+`TaxKitMcpToolkit` (`@taxkit/api-mcp/tools`) supplies every name, description,
+strict input Schema and read-only hint, so browser and remote MCP advertise
+the same tools. In the browser, `clientToolHandlers`
+(`@taxkit/api-mcp/client-handlers`) answer each tool through the generated
+public API client with remote MCP's safe failure vocabulary.
+`@taxkit/webmcp` registers them through `ModelContextHost`, whose live adapter
+is the one WebMCP Promise bridge: it checks the current origin against the
+checked Website origin and runs each callback with the registration Scope's
+`FiberSet.makeRuntimePromise`.
+
+The Website composes this once. `webMcpAtom` in `runtime.client.ts` builds the
+host adapter and handlers in its own Scope from the shared `apiClientRuntime`
+and runs the registration; `browser-atoms.ts` selects it with
+`createIsomorphicFn` (an inert Atom on the server), and the root route mounts
+it with `useAtomMount`. Client navigation keeps the registration; unmounting
+closes its Scope, which unregisters the tools and interrupts running calls
+without closing the shared client. Imports are static;
+`strict-effect/no-promise-workflow` forbids dynamic `import()`.
+
+The former page tools (read, fill and calculate the visible form) were removed
+with per-page registration: their catalogue read duplicated
+`taxkit_list_calculators`, calculation is `taxkit_calculate`, and form access
+needs a page-scoped lifetime that one root registration cannot own.
 
 ## Documentation
 
@@ -240,12 +253,15 @@ reads results only for nonempty words.
 The public docs client uses `/api/v2/docs`; calculator routes retain their
 existing version.
 
-Copy commands use the static native Clipboard Layer in `browserRuntime` and
-per-control action Atoms; they never acquire the generated API client. The
-page outline uses a scoped resource Atom on that same runtime, with semantic
-selection equality and subscriptions confined to outline leaves. Menu/search
-drafts are mount-local Atoms; focus intent is registry-owned and consumed after
-the intended native navigation renders. Native Router
+All Atoms are static definitions or static `Atom.family` values
+(`strict-effect/static-atoms`). Copy commands use the static native Clipboard
+Layer in `browserRuntime` and a family keyed by control and text; they never
+acquire the generated API client. The page outline is a family keyed by the
+page's checked heading IDs, with a scoped resource Atom on that same runtime,
+semantic selection equality and subscriptions confined to outline leaves. The
+menu Atom and the search-draft family (keyed by term) reset when unmounted;
+focus intent is registry-owned and consumed by a Router subscription family
+keyed by the router after the intended native navigation renders. Native Router
 retains the resolved page while navigation loads, and recovery pages without a
 checked theme use platform system colours. No component creates another runtime
 or registry.
@@ -280,7 +296,10 @@ event allowlist and stored-event readback are not built.
   the route loader. Keep ordinary anchors for external, mail, download,
   repository-source and same-document destinations.
 - Keep the skip link, one main landmark, labelled navigation, current-page
-  semantics, focus intent and responsive disclosure app-owned. Client
+  semantics, focus intent and responsive disclosure app-owned. Root renders
+  `main` for calculator and agent pages; documentation routes render their own
+  header, `main` and asides, and mark only `main` busy. Route-owned loading
+  state reaches leaves as props. Client
   navigation may move focus to the page heading; initial hydration must not.
 - Keep all information and focus behaviour available without animation.
 - Apply the [abstraction rule](../../AGENTS.md#engineering-guardrails) before

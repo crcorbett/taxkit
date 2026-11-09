@@ -4,7 +4,7 @@
 
 This is the shared product record for the TaxKit monorepo. `apps/web`
 inherits it. It records confirmed product truth only; visual
-direction belongs to DESIGN.md and surface briefs, which do not exist yet.
+direction belongs to [`apps/web/DESIGN.md`](apps/web/DESIGN.md).
 
 ## Platform
 
@@ -26,10 +26,10 @@ Secondary audiences:
 - New contributor proposing a tax behaviour change.
 - Correctness reviewer checking source evidence, tests and compatibility.
 - AI agents (remote MCP, browser WebMCP) that need the same documented
-  calculation operations as code callers (rebuild spec Q5, CSF-005).
+  calculation operations as code callers.
 
 A person running a calculation in the browser is a supported visitor, not the
-primary one. The calculator-first homepage agreed in rebuild Q12 exists to
+primary one. The calculator-first homepage exists to
 show developers the engine working, with clear developer and agent routes
 beside it.
 
@@ -54,17 +54,18 @@ Supporting facts that reinforce it, not replace it:
 - Every rule package cites its official Australian Taxation Office source
   and ships golden tests.
 - Reports carry a trace, the supported tax year and a rule pack version
-  (for example `rules-au-income-tax/1.0.0`).
+  (for example `rules-au-income-tax/1.0.1`).
 - Unsupported years fail explicitly rather than falling back to another year.
 - One calculation owner serves people, code, HTTP and agents.
 
 ## Operating Context
 
-- Developers meet TaxKit through the public docs, the TypeScript SDK (plain,
-  safe-result and Effect entrypoints) and the HTTP/OpenAPI API. The SDK is
-  implemented and validated downstream but not yet published.
-- Calculation vocabulary is fixed in `CONTEXT.md`: calculator, fact, input
-  fact, derived fact, rule, parameter, scenario, report, trace. Avoid "mode",
+- Developers meet TaxKit through the public docs, the TypeScript SDK
+  (published to npm as `taxkit`; see its
+  [entry points](packages/sdk/typescript/README.md)) and the HTTP/OpenAPI
+  API.
+- Calculation vocabulary is fixed in [`CONTEXT.md`](CONTEXT.md): calculator,
+  fact, input fact, derived fact, rule, parameter, scenario, report, trace. Avoid "mode",
   "formula", "tax return" and "personal tax advice".
 - The repository is public and so are its AI work-history transcripts
   (Entire). `ARCHITECTURE.md` and the maintainer docs under `docs/` hold
@@ -78,9 +79,9 @@ Supporting facts that reinforce it, not replace it:
   published documentation pages from the API. Tax calculation stays in the
   separate `apps/api`. Current architecture and runbooks own the
   Website/API design and operations.
-- Production addresses are agreed as `taxkit.dev` and `api.taxkit.dev` on
-  Cloudflare via Alchemy. Check the deployed Website and API directly before
-  claiming what is live.
+- Production runs at `taxkit.dev` and `api.taxkit.dev` on Cloudflare, deployed
+  with Alchemy. Check the deployed Website and API directly before claiming
+  what is live.
 
 ## Capabilities and Constraints
 
@@ -92,10 +93,11 @@ Confirmed capabilities:
   a package. No other jurisdictions or years.
 - Public API routes for calculator metadata, graph and calculate, with
   generated OpenAPI reference.
+- Documentation search over the published pages.
 - Schema-guided expected errors with stable message text, descriptor-backed
   help and no echo of rejected values.
 
-Agreed product constraints from the rebuild spec:
+Agreed product constraints:
 
 - Explicit Calculate action; editing inputs invalidates the previous answer.
 - Result shows the main answer with an expandable breakdown, assumptions,
@@ -112,10 +114,6 @@ Agreed product constraints from the rebuild spec:
 Licence: MIT (`LICENSE`, every package declares `"license": "MIT"`),
 chosen by Cooper on 2026-10-10. Copyright stays with Cooper Corbett. The MIT
 text says nothing about patents, so surfaces must not claim a patent grant.
-
-Explicitly undecided or absent:
-
-- Search for docs is deferred.
 
 ## Brand Commitments
 
@@ -146,15 +144,13 @@ Explicitly undecided or absent:
 - Official source citations inside rule packages, for example the ATO
   Schedule 1 withholding formulas, Schedule 8 STSL formulas, resident tax
   rates, LITO and Medicare levy reduction pages.
-- Golden tests in `packages/rules/au/*/test` and known-result contracts the
-  rebuild must preserve (CSF-001).
+- Golden and known-result tests in `packages/rules/au/*/test`.
 - 62 published MDX pages in `content/docs` with a reader persona per page in
   `content/docs/navigation.json`.
 - Generated OpenAPI snapshot and route fixtures under `packages/api/http`.
 
 Absences future work must not fabricate: no customers, testimonials, case
-studies, usage numbers, press, pricing, published package, or production
-deployment.
+studies, usage numbers, press or pricing.
 
 ## Product Principles
 
@@ -171,8 +167,7 @@ deployment.
 ## Accessibility & Inclusion
 
 Keyboard, focus management, loading, error and cancellation states are
-acceptance criteria for the calculator surface (CSF-004), and the docs app
-already ships a skip link, focus-visible outlines and heading focus after
-navigation. The built-docs proof includes representative accessibility checks.
+acceptance criteria for the calculator surface, and the Website ships a skip
+link, focus-visible outlines and heading focus after navigation.
 The target is WCAG 2.2 AA, chosen by Cooper on 2026-10-10. No audit has
 confirmed conformance yet, so surfaces must not claim it.

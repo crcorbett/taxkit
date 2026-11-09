@@ -1,13 +1,6 @@
----
-document_type: architecture-decision
-lifecycle: proposed
-authority: supporting
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-03
-review_trigger: dataset ownership, signal topology, identity policy or final design agreement
----
-
 # Reuse the three shared Axiom datasets
+
+Status: accepted
 
 Cooper selected the existing shared logs, traces and metrics datasets because
 the account is limited to three. TaxKit will reference Site's existing resources

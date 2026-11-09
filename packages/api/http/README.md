@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-http-api-owner
-last_reviewed: 2026-11-04
-review_trigger: HTTP schemas, exports, routes, handlers or client composition change
----
-
 # HTTP API
 
 Effect HTTP API package for the current TaxKit health endpoint, public
@@ -95,7 +86,7 @@ HTTP calculate
     -> checked correlated identity and scenario
       -> CalculatorApiHandlerLive verifies path/body identity
         -> PublicCalculatorService.calculate(request)
-          -> complete owning calculator definition and CalculationEngine
+          -> complete owning calculator definition (closed program)
           -> correlated CalculatorRunResponse
 ```
 
@@ -107,7 +98,7 @@ SDK HTTP comparison tests
   -> HttpApiClient.make(TaxKitApi) over TaxKitApiInProcessLive
     -> CalculatorApiHandlerLive
       -> PublicCalculatorServiceLive
-        -> CalculationEngineLive
+        -> CalculatorCatalogueLive
   -> success response equals SDK full-run response
   -> InputValidationError maps to CalculatorApiErrorEnvelope
 ```
@@ -168,21 +159,19 @@ Export paths:
 
 - `@taxkit/api-http`
 - `@taxkit/api-http/api`
-- `@taxkit/api-http/config`
 - `@taxkit/api-http/in-process`
 - `@taxkit/api-http/request-boundary`
 - `@taxkit/api-http/response-policy`
 - `@taxkit/api-http/server`
 - `@taxkit/api-http/handlers`
-- `@taxkit/api-http/handlers/live`
+- `@taxkit/api-http/schemas`
+- `@taxkit/api-http/calculator-contract`
+- `@taxkit/api-http/health-contract`
 
 Reusable calculator exports:
 
 - `@taxkit/calculators`
-- `@taxkit/calculators/catalog`
-- `@taxkit/calculators/errors`
 - `@taxkit/calculators/live`
-- `@taxkit/calculators/metadata`
 - `@taxkit/calculators/service`
 - `@taxkit/calculators/schemas`
 
@@ -220,12 +209,9 @@ Cloudflare CDN cache-control headers. Non-public replies are `no-store`.
 Public read paths are documentation and discovery routes, calculator metadata
 and OpenAPI documents; health, calculation and MCP are never shared.
 
-`@taxkit/api-http/config` owns the reusable client config schema, type and
-keyed config fragment (`baseUrl`). The package owns its env namespaces,
-`TAXKIT_API_*` and `VITE_TAXKIT_API_*`. The Website does not use it; the API
-Worker and Website read the API address through the internal
-`@taxkit/api-http/origin` export instead. See
-`docs/architecture/configuration.md`.
+The API Worker and Website read the API address through the internal
+`@taxkit/api-http/origin` export (`TaxKitApiOrigin`), its single checked owner.
+See `docs/architecture/configuration.md`.
 
 Current responses are schema-backed with Effect Schema. Calculator response
 schemas are imported from `@taxkit/calculators`; route-only HTTP envelopes and
@@ -417,17 +403,9 @@ The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
 `check-types` covers the HTTP comparison test. Both retain canonical branded
 identities and explicit Match narrowing of report/error unions.
 
-The [shared work policy](../../../packages/calculators/README.md#shared-calculation-work-limits) gives the API instance one eight-calculation pool
-across HTTP and MCP, with a five-second
-operation budget for all nine service methods. Checked capacity and operation-timeout errors become HTTP
-503/504 envelopes. Website guidance requests
-manual retry only. This is separate from the body-read and ten-second client
-budgets. Metadata does not use a calculation place. Native built proof covers a
-eight HTTP calculations, rejected extra HTTP and
-browser calls, HTTP 504 timeouts and reached cleanup. Synchronous CPU work
-cannot be stopped by a JavaScript timer; a late-result check rejects it after
-control returns. The native rate policy below is implemented separately; MCP and whole T004
-qualification remain unfinished.
+Calculation capacity and operation-timeout errors become HTTP 503/504
+envelopes under the
+[shared work policy](../../calculators/README.md#shared-calculation-work-limits).
 
 
 ## Shared request admission

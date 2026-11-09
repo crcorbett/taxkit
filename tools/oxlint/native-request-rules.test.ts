@@ -36,7 +36,7 @@ describe("native request ownership rules", () => {
   it.effect(
     "traverses a large cyclic host AST without structural hashing",
     () =>
-      runOxlint("apps/web/test/native-pair.boundary.test.ts").pipe(
+      runOxlint("tools/apps-local/test/native-mcp.boundary.test.ts").pipe(
         Effect.tap((codes) =>
           Effect.sync(() => {
             expect(codes).toStrictEqual([]);

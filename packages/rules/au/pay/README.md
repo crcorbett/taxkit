@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-au-pay-owner
-last_reviewed: 2026-10-17
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Australian Pay Rules
 
 Implemented rule package for Australian take-home pay and PAYG withholding.
@@ -67,6 +58,17 @@ bun run --filter=@taxkit/rules-au-pay test
 The build removes `dist` before compiling. Workspace exports retain `source`
 conditions, while `publishConfig.exports` and `files` define a dist-only
 tarball validated by the SDK-owned strict downstream gate.
+
+## Export paths
+
+Every public subpath in the package export map:
+
+- `@taxkit/rules-au-pay`
+- `@taxkit/rules-au-pay/facts`
+- `@taxkit/rules-au-pay/parameters`
+- `@taxkit/rules-au-pay/rules`
+- `@taxkit/rules-au-pay/rule-pack`
+- `@taxkit/rules-au-pay/schemas`
 
 ## Related Docs
 

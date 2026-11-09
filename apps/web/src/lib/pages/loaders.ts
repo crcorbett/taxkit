@@ -24,6 +24,17 @@ export const loadRoot = createIsomorphicFn()
   )
   .client((request: LoadRequest) => browser.loadRoot(request));
 
+export const loadCalculatorPage = createIsomorphicFn()
+  .server((request: LoadRequest & Readonly<{ calculatorId: string }>) =>
+    server.loadCalculatorPage({
+      calculatorId: request.calculatorId,
+      signal: AbortSignal.any([request.signal, getRequest().signal]),
+    })
+  )
+  .client((request: LoadRequest & Readonly<{ calculatorId: string }>) =>
+    browser.loadCalculatorPage(request)
+  );
+
 export const loadDocsPage = createIsomorphicFn()
   .server((request: LoadRequest & Readonly<{ path: string }>) =>
     server.loadDocsPage({

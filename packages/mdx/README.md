@@ -7,8 +7,10 @@ router, filesystem or runtime dependency. TaxKit publication rules belong to
 - `./service`: `MdxCompiler.compile(source)`, `MdxRenderer.render({ document, theme })`,
   the `MdxArtifacts` persistence service and the `CodeHighlighter.highlight`, `DiagramRenderer.render` and
   `LinkResolver.resolve` adapter contracts. Operations return closed Effects.
-- `./compiler`: static `MdxCompilerLive`; needs no rendering providers.
-- `./renderer`: static `MdxRendererLive`; acquires exactly the three adapters.
+- `src/compiler.layer.ts` (internal): static `MdxCompilerLive`; needs no
+  rendering providers.
+- `src/renderer.layer.ts` (internal): static `MdxRendererLive`; acquires
+  exactly the three adapters.
 - `./live`: static `MdxLive`, the convenient merge of compiler, renderer and artifacts.
   The host supplies providers and builds the graph once in its existing scope.
 - `./schemas`: `Source`, semantic `Document` and enriched `RenderedDocument`.
@@ -16,7 +18,8 @@ router, filesystem or runtime dependency. TaxKit publication rules belong to
   targets, resolved destinations, list starts and diagram values. Compiled
   documents stay at version 1; rendered documents use version 2 and retain
   their exact theme with paired token appearances.
-- `./artifacts`: static `MdxArtifactsLive`, with no dependencies. The service's
+- `src/artifacts.layer.ts` (internal): static `MdxArtifactsLive`, with no
+  dependencies, merged into `MdxLive`. The service's
   `decodeDocument`, `encodeDocument`, `decodeRenderedDocument` and
   `encodeRenderedDocument` methods own JSON persistence as closed Effects and
   always reject excess fields, including nested nodes and tokens.
@@ -24,6 +27,7 @@ router, filesystem or runtime dependency. TaxKit publication rules belong to
   are private; callers cannot override parse options. Failures are native
   `SchemaError` values. Use these operations for stored artifacts; decoding a
   structural Schema directly uses Effect's ordinary parser defaults.
+- `./testing/fixtures`: checked synthetic inputs for consumers' tests.
 - `./errors`: closed compiler, renderer and adapter failures. Rendering errors
   carry source identity and a node path, without source text or raw causes.
 - `./highlights`: `PierreCodeHighlighterLive`, the only Pierre caller. A private
@@ -74,9 +78,10 @@ metadata stays JSON data. Documents and blocks derive their types from their
 structural Schemas rather than gaining redundant aggregate brands.
 
 Stored-document consumers yield `MdxArtifacts` and call
-`artifacts.decodeDocument(json)` before rendering. They can provide
-`MdxArtifactsLive` and `MdxRendererLive` without acquiring a compiler. The public
-API exports no standalone encoding or decoding functions.
+`artifacts.decodeDocument(json)` before rendering. The compiler, renderer and
+artifact Layers are exported separately only when a consumer needs one without
+the others; today every host composes `MdxLive`. The public API exports no
+standalone encoding or decoding functions.
 
 MDX inherits the complete shared style and strict presets, including `no-ternary`.
 Use native `Match`, `Option`, `Boolean` and `Array` operations for branching and

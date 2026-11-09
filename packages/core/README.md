@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-core-owner
-last_reviewed: 2026-10-06
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Core
 
 Shared deterministic TaxKit engine primitives and orchestration package.
@@ -52,9 +43,11 @@ HTTP handlers or filesystem adapters.
   Rule parameters are always an array, defaulting to empty. Duplicate-provider
   permission is an Option that preserves explicit false. Service tuple types
   read each descriptor key's native `Identifier`, including empty tuples.
-- The calculation engine contract lives in `calculation-engine.ts`; its
-  implementation lives in `live.layer.ts`. Root and engine package entrypoints
-  retain `CalculationEngineLive`. Validation issues still default to empty.
+- There is no calculation engine service. `defineCalculator` validates the
+  rule graph once and returns a closed `calculate` program; owners compose their
+  static rule-pack Layers and supply only the checked scenario per call (see
+  [ADR 0012](../../docs/adr/0012-closed-calculator-programs.md)). Every result
+  carries that definition's `CalculationDiagnostics`.
 - Reuse canonical schemas, branded ids and constructors. Do not redeclare
   canonical fields such as `id: string` in consumers.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
@@ -102,6 +95,23 @@ being available through another workspace package.
 This private package exports its TypeScript source and has no build. The SDK
 compiles it into its single archive; the SDK-owned downstream check validates
 that packed archive and its dependency ranges.
+
+## Export paths
+
+Every public subpath in the package export map:
+
+- `@taxkit/core`
+- `@taxkit/core/primitives`
+- `@taxkit/core/facts`
+- `@taxkit/core/parameters`
+- `@taxkit/core/errors`
+- `@taxkit/core/engine`
+- `@taxkit/core/rules`
+- `@taxkit/core/graph`
+- `@taxkit/core/trace`
+- `@taxkit/core/ledger`
+- `@taxkit/core/engine/schemas`
+- `@taxkit/core/money`
 
 ## Related Docs
 

@@ -1,25 +1,21 @@
-import type {
-  CalculatorDefinition,
-  CalculationEngine,
-  CalculationError,
-} from "@taxkit/core";
+import type { CalculatorDefinition, CalculationError } from "@taxkit/core";
 import { Effect } from "effect";
 import type { Schema } from "effect";
 
 import type { CalculationRun } from "./types.js";
 
 export { decodeInput } from "@taxkit/core";
-export { CalculationEngine as TaxKitService } from "@taxkit/core";
-export { TaxKitLive } from "./live.layer.js";
 export type {
   CalculationInput,
   CalculationOutput,
   CalculationRun,
 } from "./types.js";
 
-export type TaxKitEffectRequirements = CalculationEngine;
-
-/** Execute the selected definition over its checked scenario. */
+/**
+ * Execute the selected definition over its checked scenario. Definitions are
+ * closed programs: their rule packs are composed by the owning package, so the
+ * returned Effect has no requirements.
+ */
 export const calculateRun = <
   Input extends Schema.Top,
   Output extends Schema.Top,
@@ -30,11 +26,7 @@ export const calculateRun = <
 >(
   calculation: CalculatorDefinition<Input, Output> & Identity,
   input: NoInfer<Input["Type"]>
-): Effect.Effect<
-  CalculationRun<Output, Identity>,
-  CalculationError,
-  CalculationEngine
-> =>
+): Effect.Effect<CalculationRun<Output, Identity>, CalculationError> =>
   calculation.calculate(input).pipe(
     Effect.map(
       (run) =>

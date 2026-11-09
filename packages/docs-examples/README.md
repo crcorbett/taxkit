@@ -1,12 +1,3 @@
----
-document_type: package-guide
-lifecycle: current
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-10-18
-review_trigger: checked public examples or their package dependencies change
----
-
 # @taxkit/docs-examples
 
 This private workspace owns the checked public integration templates in `src/`:

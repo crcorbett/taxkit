@@ -1,13 +1,6 @@
----
-document_type: architecture-decision
-lifecycle: current
-authority: supporting
-owner: taxkit-architecture-owner
-last_reviewed: 2026-10-10
-review_trigger: operational signal fields, collection destination or privacy policy changes
----
-
 # Keep operational observations separate from calculation values
+
+Status: accepted
 
 Cooper agreed on 10 October 2026 to allow only safe operational details in the
 Axiom and Cloudflare logging and metrics design: fixed fields such as stage,

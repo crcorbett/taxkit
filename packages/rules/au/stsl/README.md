@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-au-stsl-owner
-last_reviewed: 2026-10-06
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Australian STSL Rules
 
 Implemented rule package for Australian study and training support loan
@@ -52,6 +43,14 @@ bun run --filter=@taxkit/rules-au-stsl test
 The build removes `dist` before compiling. Workspace exports retain `source`
 conditions, while `publishConfig.exports` and `files` define a dist-only
 tarball validated by the SDK-owned strict downstream gate.
+
+## Export paths
+
+Every public subpath in the package export map:
+
+- `@taxkit/rules-au-stsl`
+- `@taxkit/rules-au-stsl/facts`
+- `@taxkit/rules-au-stsl/parameters`
 
 ## Related Docs
 

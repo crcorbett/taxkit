@@ -1,26 +1,21 @@
 {
   "name": "@taxkit/calculators",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "private": true,
   "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./catalog": "./src/catalog.ts",
     "./summaries": "./src/summaries.ts",
-    "./metadata": "./src/metadata.ts",
     "./service": "./src/service.ts",
     "./live": "./src/live.layer.ts",
     "./schemas": "./src/schemas.ts",
     "./work": "./src/work.layer.ts",
     "./admission.schemas": "./src/admission.schemas.ts",
     "./admission.service": "./src/admission.service.ts",
-    "./admission.layer": "./src/admission.layer.ts",
     "./testing/fixtures": "./src/__testing__/fixtures.ts",
     "./form": "./src/form.ingress.ts",
-    "./page": "./src/page.atoms.ts",
-    "./page-schemas": "./src/page.schemas.ts",
-    "./page-tools": "./src/page.tools.ts"
+    "./page": "./src/page.atoms.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p tsconfig.type-tests.json --noEmit",

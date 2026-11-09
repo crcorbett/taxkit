@@ -3,6 +3,7 @@ import {
   RegistryProvider,
   scheduleTask,
   useAtomInitialValues,
+  useAtomMount,
 } from "@effect/atom-react";
 import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import {
@@ -29,12 +30,14 @@ import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 
 import { publicSettingsAtom } from "#/lib/api-client.atoms";
+import { browserAtoms } from "#/lib/browser-atoms";
 import { docsHeadingId } from "#/lib/docs/focus.atoms";
 import { DocsNavigationFocus } from "#/lib/docs/focus.container";
 import { WebsiteRootView } from "#/lib/host/schemas";
 import type { WebsitePublicSettings } from "#/lib/host/schemas";
 import type { LoaderContext } from "#/lib/pages/loader-context";
 import { loadRoot } from "#/lib/pages/loaders";
+import { RetryButton } from "#/lib/pages/retry.container";
 
 import "../styles.css";
 import "@taxkit/mdx-react/styles.css";
@@ -42,9 +45,10 @@ import "../components/ui/styles.css";
 import "../lib/docs/styles.css";
 
 const SettingsUnavailable = () => (
-  <main className="home">
-    <h1>TaxKit</h1>
-    <p role="alert">TaxKit cannot load its settings. Please try again later.</p>
+  <main className="site-page" id="main-content" tabIndex={-1}>
+    <h1>TaxKit is unavailable</h1>
+    <p role="alert">TaxKit cannot load its settings.</p>
+    <RetryButton />
   </main>
 );
 const RootShell = ({ children }: { readonly children: ReactNode }) => (
@@ -97,6 +101,12 @@ const RootRegistry = ({
       <BrowserRegistry registry={value}>{children}</BrowserRegistry>
     ),
   });
+// One WebMCP registration for the whole app: browser tools stay registered
+// across client navigation and are removed when the root registry closes.
+const BrowserTools = () => {
+  useAtomMount(browserAtoms().registration);
+  return null;
+};
 const InitialSettings = ({
   children,
   settings,
@@ -163,6 +173,7 @@ function RootComponent() {
   return (
     <RootRegistry registry={registry}>
       <InitialSettings settings={settings}>
+        <BrowserTools />
         <DocsNavigationFocus />
         <div className="app-shell">
           <a
@@ -217,9 +228,15 @@ function RootComponent() {
               Documentation
             </Link>
           </nav>
-          <main aria-busy={loading} id="main-content" tabIndex={-1}>
-            <Outlet />
-          </main>
+          {/* Documentation routes own their header, landmarks and busy state. */}
+          {Match.value(documentation).pipe(
+            Match.when(true, () => <Outlet />),
+            Match.orElse(() => (
+              <main aria-busy={loading} id="main-content" tabIndex={-1}>
+                <Outlet />
+              </main>
+            ))
+          )}
         </div>
       </InitialSettings>
     </RootRegistry>

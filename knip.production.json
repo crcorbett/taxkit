@@ -1,9 +1,5 @@
 {
   "$schema": "./node_modules/knip/schema.json",
-  "ignoreWorkspaces": ["packages/tsconfig"],
-  "ignoreIssues": {
-    "packages/api/http/src/client/service.ts": ["duplicates"]
-  },
   "workspaces": {
     ".": {
       "entry": [
@@ -17,96 +13,6 @@
     "apps/api": {
       "entry": ["src/index.ts!", "src/worker.ts!", "src/server.ts!"],
       "project": ["src/**/*.ts!", "!src/build/**!", "!src/verification/**!"]
-    },
-    "packages/api/http": {
-      "entry": [
-        "src/index.ts!",
-        "src/api.ts!",
-        "src/client/index.ts!",
-        "src/client/live.layer.ts!",
-        "src/in-process.layer.ts!",
-        "src/config.ts!",
-        "src/server.ts!",
-        "src/handlers/index.ts!",
-        "src/handlers/live.ts!"
-      ],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/calculators": {
-      "entry": [
-        "src/index.ts!",
-        "src/catalog.ts!",
-        "src/errors.ts!",
-        "src/metadata.ts!",
-        "src/service.ts!",
-        "src/live.layer.ts!",
-        "src/schemas.ts!"
-      ],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/core": {
-      "entry": [
-        "src/index.ts!",
-        "src/primitives/index.ts!",
-        "src/facts/index.ts!",
-        "src/parameters/index.ts!",
-        "src/errors/index.ts!",
-        "src/engine/index.ts!",
-        "src/rules/index.ts!",
-        "src/graph/index.ts!",
-        "src/trace/index.ts!",
-        "src/ledger/index.ts!"
-      ],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/rules/au/income-tax": {
-      "entry": [
-        "src/index.ts!",
-        "src/facts/index.ts!",
-        "src/parameters/index.ts!",
-        "src/rules/index.ts!",
-        "src/rule-pack/index.ts!",
-        "src/calculator/index.ts!"
-      ],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/rules/au/pay": {
-      "entry": [
-        "src/index.ts!",
-        "src/facts/index.ts!",
-        "src/parameters/index.ts!",
-        "src/rules/index.ts!",
-        "src/calculator/index.ts!",
-        "src/rule-pack/index.ts!"
-      ],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/rules/au/stsl": {
-      "entry": [
-        "src/index.ts!",
-        "src/facts/index.ts!",
-        "src/parameters/index.ts!",
-        "src/rules/index.ts!",
-        "src/rule-pack/index.ts!"
-      ],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/sdk/typescript": {
-      "entry": [
-        "src/index.ts!",
-        "src/effect.ts!",
-        "src/au.ts!",
-        "src/au-effect.ts!",
-        "src/schemas/index.ts!",
-        "src/testing/index.ts!",
-        "src/core.ts!",
-        "src/http.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/internal/artifact-schemas.ts!"]
-    },
-    "packages/testing": {
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts!"]
     },
     "apps/web": {
       "entry": [
@@ -124,97 +30,32 @@
       "entry": ["src/**/*.ts!"],
       "project": ["src/**/*.ts!"]
     },
-    "packages/content": {
+    "packages/sdk/typescript": {
       "entry": [
-        "src/schemas.ts!",
-        "src/errors.ts!",
-        "src/service.ts!",
-        "src/links.ts!",
-        "src/catalogue.layer.ts!",
-        "src/live.layer.ts!",
-        "src/mdx.layer.ts!",
-        "src/link-resolver.layer.ts!"
+        "src/index.ts!",
+        "src/effect.ts!",
+        "src/au.ts!",
+        "src/au-effect.ts!",
+        "src/schemas/index.ts!",
+        "src/testing/index.ts!",
+        "src/core.ts!",
+        "src/http.ts!",
+        "src/money.ts!",
+        "src/money/effect.ts!",
+        "src/au/schemas.ts!"
       ],
-      "project": ["src/**/*.ts!", "!src/test.layer.ts!", "!src/__testing__/**!"]
+      "project": ["src/**/*.ts!", "!src/internal/artifact-schemas.ts!"]
     },
-    "packages/observability": {
-      "entry": [
-        "src/host-telemetry.ts!",
-        "src/edge-identity.boundary.ts!",
-        "src/stage.ts!"
-      ],
+    "packages/*": {
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "!src/__testing__/**!",
+        "!src/test.layer.ts!",
+        "!src/**/test.layer.ts!"
+      ]
+    },
+    "packages/{api,rules/au}/*": {
       "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
-    },
-    "packages/api/mcp": {
-      "entry": [
-        "src/tools.ts!",
-        "src/handlers.layer.ts!",
-        "src/service.ts!",
-        "src/server.ts!",
-        "src/schemas.ts!",
-        "src/request.service.ts!",
-        "src/cancellation.boundary.ts!",
-        "src/response-budget.boundary.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/__testing__/**!", "!src/test.layer.ts!"]
-    },
-    "packages/mdx": {
-      "entry": [
-        "src/live.layer.ts!",
-        "src/highlights.adapter.layer.ts!",
-        "src/service.ts!",
-        "src/schemas.ts!",
-        "src/errors.ts!",
-        "src/compiler.layer.ts!",
-        "src/renderer.layer.ts!",
-        "src/artifacts.layer.ts!",
-        "src/config.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/test.layer.ts!"]
-    },
-    "packages/diagrams": {
-      "entry": ["src/pele.adapter.layer.ts!"],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/pele": {
-      "entry": [
-        "src/schemas.ts!",
-        "src/errors.ts!",
-        "src/service.ts!",
-        "src/live.layer.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/test.layer.ts!"]
-    },
-    "packages/aeo": {
-      "entry": [
-        "src/documents.egress.ts!",
-        "src/routes.layer.ts!",
-        "src/service.ts!"
-      ],
-      "project": ["src/**/*.ts!", "!src/__testing__/**!"]
-    },
-    "packages/og-image": {
-      "entry": ["src/image-archive.ts!", "src/takumi.adapter.layer.ts!"],
-      "project": ["src/**/*.{ts,tsx}!"]
-    },
-    "packages/webmcp": {
-      "entry": [
-        "src/model-context.adapter.layer.ts!",
-        "src/registration.egress.ts!",
-        "src/schemas.ts!",
-        "src/service.ts!"
-      ],
-      "project": ["src/**/*.ts!"]
-    },
-    "packages/mdx-react": {
-      "entry": [
-        "src/body.tsx!",
-        "src/code-block.tsx!",
-        "src/theme.tsx!",
-        "src/schemas.ts!"
-      ],
-      "project": ["src/**/*.ts!", "src/**/*.tsx!"]
     }
-  },
-  "ignore": ["packages/infrastructure/src/posthog/test.layer.ts"]
+  }
 }

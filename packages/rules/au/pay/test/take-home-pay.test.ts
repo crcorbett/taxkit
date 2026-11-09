@@ -1,5 +1,4 @@
 import { describe, expect, it } from "@effect/vitest";
-import { CalculationEngine, CalculationEngineLive } from "@taxkit/core/engine";
 import { NonNegativeMoney, Money, Cents } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
@@ -31,21 +30,13 @@ const runScenario = (
   pack: typeof AuTakeHomePay2025_26_Live,
   input: Schema.Struct.MakeIn<typeof TakeHomeScenarioInputSchema.fields>
 ) =>
-  Effect.gen(function* () {
-    const engine = yield* CalculationEngine;
-    const result = yield* engine.run({
-      calculation: CalculateTakeHomePay,
-      layer: pack.pipe(
-        Layer.provideMerge(TakeHomeScenarioLive),
-        Layer.provide(
-          Layer.succeed(TakeHomeScenario)(
-            TakeHomeScenarioInputSchema.make(input)
-          )
-        )
-      ),
-    });
-    return result.report;
-  }).pipe(Effect.provide(CalculationEngineLive));
+  CalculateTakeHomePay.pipe(
+    Effect.provide(pack.pipe(Layer.provideMerge(TakeHomeScenarioLive))),
+    Effect.provideService(
+      TakeHomeScenario,
+      TakeHomeScenarioInputSchema.make(input)
+    )
+  );
 const weekly1500 = new GrossPay({
   amount: NonNegativeMoney.make(
     new Money({ cents: Cents.make(150_000), currency: "AUD" })

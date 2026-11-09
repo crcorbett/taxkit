@@ -30,6 +30,7 @@ import {
   Ref,
   Schema,
 } from "effect";
+import { Digest, SecureRandom } from "effect/crypto";
 import { HttpClient } from "effect/http";
 
 import { declareTaxKitObservability } from "../src/axiom/resources.js";
@@ -39,6 +40,8 @@ const ingestSentinel = "synthetic-ingest-token-fixture";
 const environment = Effect.provide(
   Layer.mergeAll(
     BunServices.layer,
+    SecureRandom.layerWebCrypto,
+    Digest.layerWebCrypto,
     Layer.succeed(ArtifactStore, createArtifactStore()),
     Layer.succeed(AuthProviders, {}),
     layerNonInteractive(),

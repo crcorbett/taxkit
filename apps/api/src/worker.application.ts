@@ -38,7 +38,10 @@ import {
   CalculatorHostMode,
   edgeCallerKey,
 } from "@taxkit/observability/edge-identity";
-import { observeHostRequest } from "@taxkit/observability/host-telemetry";
+import {
+  ApiHostTelemetryLive,
+  observeHostRequest,
+} from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
 import { safeHttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
@@ -51,6 +54,7 @@ import {
   Layer,
   Match,
   Option,
+  Redacted,
   Schema,
   Scope,
   Boolean as EffectBoolean,
@@ -61,12 +65,12 @@ import {
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
+import { NetAddress } from "effect/net";
 
 import {
   ApiCalculatorDelivery,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
-import { ApiSafeTelemetryLive } from "./worker-telemetry.layer.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
 // The closed route family for the one request record; the raw path, query and
 // calculator ID never leave this function.
@@ -82,6 +86,15 @@ const apiRoute = (pathname: string): HostRoute =>
     Match.when(Schema.is(ApiReferencePath), () => "reference" as const),
     Match.orElse(() => "other" as const)
   );
+// The local emulator's one admission identity, checked when the module loads.
+const LoopbackRateKey = CalculatorClientRateKey.make(
+  Redacted.make(
+    CalculatorClientRateKey.to.value.make(NetAddress.ipv4Loopback),
+    {
+      label: "CalculatorClientRateKey",
+    }
+  )
+);
 // Construct once in the native instance scope. HTTP and MCP receive this
 // same application service; native requests keep their own scope and fibre.
 export const ApiWorkerApplication = Effect.gen(function* () {
@@ -89,39 +102,26 @@ export const ApiWorkerApplication = Effect.gen(function* () {
   // Native planning binds deferred resource addresses. Read their runtime
   // values once on first incoming use, without inventing planning URLs.
   const settings = yield* Effect.cached(ApiWorkerSettingsConfig);
-  const localKey = yield* Effect.cached(
-    Config.schema(CalculatorHostMode, "CALCULATOR_HOST_MODE").pipe(
-      Config.withDefault("edge"),
-      Effect.flatMap((mode) =>
-        Match.value(mode).pipe(
-          Match.when("local-emulator", () =>
-            settings.pipe(
-              Effect.flatMap((config) =>
-                EffectBoolean.match(
-                  config.apiOrigin.protocol === "http:" &&
-                    (config.apiOrigin.hostname === "127.0.0.1" ||
-                      config.apiOrigin.hostname === "localhost"),
-                  {
-                    onFalse: () => Effect.succeed(Option.none()),
-                    onTrue: () =>
-                      Schema.decodeEffect(CalculatorClientRateKey)(
-                        "127.0.0.1"
-                      ).pipe(Effect.map(Option.some)),
-                  }
-                )
-              )
-            )
-          ),
-          Match.orElse(() => Effect.succeed(Option.none()))
-        )
-      ),
-      Effect.catchTags({
-        ConfigError: () => Effect.succeedNone,
-        SchemaError: () => Effect.succeedNone,
-      })
+  // An invalid mode is a startup ConfigError; only a missing value means edge.
+  const hostMode = yield* Config.schema(
+    CalculatorHostMode,
+    "CALCULATOR_HOST_MODE"
+  ).pipe(Config.withDefault("edge"));
+  // Only the explicit local emulator on a loopback HTTP origin receives the
+  // fixed loopback admission identity.
+  const localKey = settings.pipe(
+    Effect.map(({ apiOrigin }) =>
+      Option.liftPredicate(
+        LoopbackRateKey,
+        () =>
+          hostMode === "local-emulator" &&
+          apiOrigin.protocol === "http:" &&
+          (apiOrigin.hostname === "127.0.0.1" ||
+            apiOrigin.hostname === "localhost")
+      )
     )
   );
-  const telemetry = yield* Layer.build(ApiSafeTelemetryLive);
+  const telemetry = yield* Layer.build(ApiHostTelemetryLive);
   const calculator = Layer.succeed(
     PublicCalculatorService,
     yield* PublicCalculatorService

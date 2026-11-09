@@ -11,10 +11,12 @@
   "include": [
     "documentation/*.ts",
     "oxlint/*.ts",
+    "oxlint/rules/**/*.ts",
     "repository-paths/*.ts",
     "vitest.config.ts",
     "infrastructure/*.ts",
     "apps-local/*.ts",
+    "apps-local/test/*.ts",
     "workspace/*.ts"
   ]
 }

@@ -1,12 +1,3 @@
----
-document_type: package-readme
-lifecycle: current
-authority: canonical
-owner: taxkit-au-income-tax-owner
-last_reviewed: 2026-10-13
-review_trigger: schemas, exports, calculator contract or runtime ownership change
----
-
 # Australian Income Tax Rules
 
 Implemented rule package for Australian annual income-tax calculations.
@@ -60,6 +51,15 @@ bun run --filter=@taxkit/rules-au-income-tax test
 The build removes `dist` before compiling. Workspace exports retain `source`
 conditions, while `publishConfig.exports` and `files` define a dist-only
 tarball validated by the SDK-owned strict downstream gate.
+
+## Export paths
+
+Every public subpath in the package export map:
+
+- `@taxkit/rules-au-income-tax`
+- `@taxkit/rules-au-income-tax/facts`
+- `@taxkit/rules-au-income-tax/parameters`
+- `@taxkit/rules-au-income-tax/schemas`
 
 ## Related Docs
 

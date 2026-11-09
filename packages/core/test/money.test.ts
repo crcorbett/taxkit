@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import {
+  Array,
   Function as EffectFunction,
   BigDecimal,
   Effect,
@@ -126,8 +127,20 @@ describe("exact decimal operations", () => {
     "handles admitted extreme exponents without constructing enormous powers",
     () =>
       Effect.gen(function* () {
-        const enormous = yield* decimalCoefficient("1e9007199254740991");
-        const tiny = yield* decimalCoefficient("1e-9007199254740991");
+        // Effect 4.1 refuses decimal text whose scale exceeds 10,000 places.
+        const refused = yield* Effect.forEach(
+          ["1e9007199254740991", "1e-9007199254740991"],
+          (text) => decimalCoefficient(text).pipe(Effect.result)
+        );
+        EffectFunction.pipe(
+          refused,
+          Array.every(Result.isFailure),
+          (actual) => {
+            expect(actual).toBeTruthy();
+          }
+        );
+        const enormous = yield* decimalCoefficient("1e10000");
+        const tiny = yield* decimalCoefficient("1e-10000");
         EffectFunction.pipe(
           Result.isFailure(
             yield* multiplyCentsByDecimal(oneCent.cents, enormous).pipe(

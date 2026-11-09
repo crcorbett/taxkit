@@ -1,17 +1,9 @@
 import { CalculatorId, MetadataQuery } from "@taxkit/calculators/schemas";
 import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
-import {
-  DocsPageUnavailable,
-  DocsSearchUnavailable,
-} from "@taxkit/content/errors";
+import { DocsPageUnavailable } from "@taxkit/content/errors";
 import { isRequestedDocsPage } from "@taxkit/content/response-check";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import type { DocsPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
-import { AnnualTaxReport } from "@taxkit/rules-au-income-tax/schemas";
-import {
-  PayWithholdingsLedger,
-  TakeHomePayReport,
-} from "@taxkit/rules-au-pay/schemas";
 import {
   ByteSize,
   Duration,
@@ -31,7 +23,6 @@ import {
   ApiReplyMismatch,
   ApiReplyTooLarge,
   ApiUnavailable,
-  CalculationCallFailure,
 } from "./errors.js";
 import type { ApiCallFailure } from "./errors.js";
 /** The generated native client. Callers supply it; there is no replica service. */
@@ -95,24 +86,27 @@ export const boundedReplies = (
       )
     )
   );
-// Transport, decoding and deadline failures have one safe meaning each. The
-// bounded transport marks an over-limit reply with its named cause.
-// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- The transport reports several native error families; this callback immediately classifies them.
-const transportFailure = <E>(error: E): ApiCallFailure => {
-  if (Predicate.isTagged(error, "TimeoutError")) {
-    return new ApiDeadlineExceeded();
-  }
-  return EffectBoolean.match(
-    Predicate.isTagged(error, "HttpClientError") &&
-      Predicate.hasProperty(error, "reason") &&
-      Predicate.hasProperty(error.reason, "cause") &&
-      Schema.is(ApiReplyTooLarge)(error.reason.cause),
-    {
-      onFalse: () => new ApiUnavailable(),
-      onTrue: () => new ApiReplyTooLarge(),
-    }
-  );
+// The generated client's own failure families have one safe meaning each.
+// The bounded transport marks an over-limit reply with its named decode cause.
+const transportFailures = {
+  HttpClientError: ({ reason }: HttpClientError.HttpClientError) =>
+    Effect.fail(
+      EffectBoolean.match(
+        Predicate.isTagged(reason, "DecodeError") &&
+          Schema.is(ApiReplyTooLarge)(reason.cause),
+        {
+          onFalse: (): ApiCallFailure => new ApiUnavailable(),
+          onTrue: (): ApiCallFailure => new ApiReplyTooLarge(),
+        }
+      )
+    ),
+  SchemaError: () => Effect.fail(new ApiUnavailable()),
 };
+// Every complete read, including decoding, shares the same deadline failure.
+const withinReadDeadline = Effect.timeoutOrElse({
+  duration: apiReadTimeout,
+  orElse: () => Effect.fail(new ApiDeadlineExceeded()),
+});
 // The route address is decoded once, here; an unknown address is a missing
 // page. The reply must be the requested page.
 export const requestDocsPage = Effect.fn("TaxKitApi.requestDocsPage")(
@@ -141,17 +135,8 @@ export const requestDocsPage = Effect.fn("TaxKitApi.requestDocsPage")(
           )
         );
         return Effect.all({ navigation, page }, { concurrency: 2 }).pipe(
-          Effect.timeout(apiReadTimeout),
-          Effect.mapError((error) =>
-            EffectBoolean.match(
-              Schema.is(DocsPageUnavailable)(error) ||
-                Schema.is(ApiReplyMismatch)(error),
-              {
-                onFalse: () => transportFailure(error),
-                onTrue: () => error,
-              }
-            )
-          )
+          withinReadDeadline,
+          Effect.catchTags(transportFailures)
         );
       })
     )
@@ -170,16 +155,8 @@ export const requestDocsSearch = Effect.fn("TaxKitApi.requestDocsSearch")(
       Match.orElse((matchedValue) =>
         client.content.searchPages({ query: { term: matchedValue } })
       ),
-      Effect.timeout(apiReadTimeout),
-      Effect.mapError((error) =>
-        Match.value(error).pipe(
-          Match.when(
-            Schema.is(DocsSearchUnavailable),
-            (matchedValue) => matchedValue
-          ),
-          Match.orElse((matchedValue) => transportFailure(matchedValue))
-        )
-      )
+      withinReadDeadline,
+      Effect.catchTags(transportFailures)
     )
 );
 export const requestDocsMarkdown = Effect.fn("TaxKitApi.requestDocsMarkdown")(
@@ -190,48 +167,16 @@ export const requestDocsMarkdown = Effect.fn("TaxKitApi.requestDocsMarkdown")(
     readonly client: TaxKitClient;
     readonly path: DocsPagePath;
   }) =>
-    client.content.getMarkdown({ query: { path } }).pipe(
-      Effect.timeout(apiReadTimeout),
-      Effect.mapError((error) =>
-        Match.value(error).pipe(
-          Match.when(
-            Schema.is(DocsPageUnavailable),
-            (matchedValue) => matchedValue
-          ),
-          Match.orElse((matchedValue) => transportFailure(matchedValue))
-        )
-      )
-    )
+    client.content
+      .getMarkdown({ query: { path } })
+      .pipe(withinReadDeadline, Effect.catchTags(transportFailures))
 );
 export const requestCatalogue = Effect.fn("TaxKitApi.requestCatalogue")(
   (client: TaxKitClient) =>
     client.calculatorApi
       .listCalculators({ query: MetadataQuery.make({}) })
-      .pipe(Effect.timeout(apiReadTimeout), Effect.mapError(transportFailure))
+      .pipe(withinReadDeadline, Effect.catchTags(transportFailures))
 );
-// The reply must answer this calculator with its own report kind.
-const answers = (
-  request: CalculatorRunRequest,
-  response: Readonly<{
-    calculator: Readonly<{
-      calculatorId: string;
-    }>;
-    report: unknown;
-  }>
-) =>
-  response.calculator.calculatorId === request.calculatorId &&
-  Match.value(request.calculatorId).pipe(
-    Match.when("au.income-tax.annual", () =>
-      Schema.is(AnnualTaxReport)(response.report)
-    ),
-    Match.when("au.pay.take-home", () =>
-      Schema.is(TakeHomePayReport)(response.report)
-    ),
-    Match.when("au.pay.withholdings", () =>
-      Schema.is(PayWithholdingsLedger)(response.report)
-    ),
-    Match.orElse(() => false)
-  );
 export const requestCalculation = Effect.fn("TaxKitApi.requestCalculation")(
   function* ({
     client,
@@ -246,19 +191,14 @@ export const requestCalculation = Effect.fn("TaxKitApi.requestCalculation")(
         payload: request,
       })
       .pipe(
-        Effect.timeout(apiReadTimeout),
-        // Declared calculator failures arrive as `{ error }` envelopes.
-        Effect.mapError((error): CalculationCallFailure =>
-          Match.value(error).pipe(
-            Match.when(
-              { error: Schema.is(CalculationCallFailure) },
-              (envelope) => envelope.error
-            ),
-            Match.orElse(transportFailure)
-          )
-        )
+        // Declared calculator failures arrive as untagged `{ error }`
+        // envelopes: every failure without a transport tag is one.
+        Effect.catchTags(transportFailures, ({ error }) => Effect.fail(error)),
+        withinReadDeadline
       );
-    if (!answers(request, response)) {
+    // The decoded tagged union ties each report kind to its calculator ID, so
+    // the reply answers this request exactly when the IDs agree.
+    if (response.calculatorId !== request.calculatorId) {
       return yield* new ApiReplyMismatch();
     }
     return response;

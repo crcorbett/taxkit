@@ -1,27 +1,17 @@
----
-document_type: architecture
-lifecycle: current
-authority: canonical
-owner: taxkit-api-sdk-owner
-last_reviewed: 2026-11-04
-review_trigger: API or SDK contracts, exports, lifetime or caller composition change
----
-
 # API and SDK
 
-[ADR 0011](../adr/0011-effect-native-sdk-contracts.md) drafts the next major SDK
+[ADR 0011](../adr/0011-effect-native-sdk-contracts.md) records the SDK 5
 contract: shared Effect-native Schemas and execution, checked money, inferred
-rule requirements and a hard cutover that deletes all superseded implementations
-and interfaces in the same merge. Its replacement APIs are not implemented by
-that document; the current contracts are described below.
+rule requirements and a hard cutover that removed every superseded
+implementation and interface. The current contracts are described below.
 
-The active T008 candidate adds minimal analytics only in the native API app.
+The native API app collects minimal calculator usage analytics.
 Direct callers may supply a collection preference through the shared private
 header boundary. Its checked flag carries allow/deny without browser identity and
 cannot bypass normal calculator admission. The Website sends no such header. One app decorator collects catalogue
 ID/name after success. Pure calculators and SDK package calls remain free of
 analytics. The [API README](../../apps/api/README.md#analytics-candidate) owns
-the current bounded collector, background delivery design and remaining proof.
+the bounded collector, background delivery and what is not yet checked.
 
 TaxKit should publish a reusable API app server and TypeScript SDK around the
 open-source calculation engine.
@@ -165,7 +155,7 @@ Native HttpApi strict correlated payload decode
   -> CalculatorApiHandlerLive checks path/body identity
     -> PublicCalculatorService.calculate(checked request)
       -> selected complete calculator definition
-        -> CalculationEngine and owning rule/scenario Layers
+        -> closed program over its static rule pack and the checked scenario
       -> correlated CalculatorRunResponse
 ```
 
@@ -187,8 +177,7 @@ The SDK Effect full-run graph is:
 Effect consumer
   -> calculateRun(complete definition, checked scenario)
     -> definition.calculate(scenario)
-      -> owning native program and rule-pack Layer
-        -> CalculationEngine
+      -> owning native program over its static rule-pack Layer
     -> checked report, diagnostics and exact calculator identity/context
 
 calculateReport(definition, scenario)
@@ -208,7 +197,7 @@ SDK HTTP comparison tests
   -> HttpApiClient.make(TaxKitApi) over TaxKitApiInProcessLive
     -> CalculatorApiHandlerLive
       -> PublicCalculatorServiceLive
-        -> CalculationEngineLive
+        -> CalculatorCatalogueLive
   -> success response equals SDK full-run response
   -> InputValidationError maps to CalculatorApiErrorEnvelope
 ```
@@ -235,13 +224,13 @@ It owns:
   report schemas, scenario layers and rule-pack layers
 - metadata transformations for calculator, fact, rule and graph responses
 - schema-guided expected error shaping with bounded safe field issues
-- calculation execution through `CalculationEngine`
+- calculation execution through each owning definition's closed program
 - canonical reusable calculator execution schemas named `CalculatorRun*`
 - canonical reusable calculator failure union named `CalculatorServiceError`
 - typed propagation of expected domain failures such as `CalculationError`
 
 HTTP and MCP hosts consume this service. The SDK executes the complete owning
-definitions through the same engine. Callers do not duplicate calculator logic.
+definitions directly. Callers do not duplicate calculator logic.
 
 ## HTTP API package topology
 
@@ -306,7 +295,7 @@ wrong-calculator facts fail at that single boundary. Responses correlate the ID,
 catalogue metadata and checked owning report.
 
 Effect generates OpenAPI component names from encoded-side names ending in
-`Encoded`. Effect 4.0.7 flattens redundant nested `anyOf` groups without changing
+`Encoded`. Effect flattens redundant nested `anyOf` groups without changing
 their accepted values. Optional query parameters are omitted when absent;
 the generated parameter schema no longer advertises JSON `null` for them.
 The API package owns this document and its snapshot.
@@ -396,8 +385,8 @@ Schemas, error Schema, rule graph and native execution together. Catalogue
 registrations derive these fields from the complete definition. Context lookup
 checks ID, jurisdiction and year; duplicate identities fail registration.
 
-The Effect interface exposes `calculateReport`, `calculateRun`, `decodeInput`,
-the actual engine service tag and static `TaxKitLive`. Strict unknown ingress
+The Effect interface exposes `calculateReport`, `calculateRun` and
+`decodeInput`; their Effects have no requirements. Strict unknown ingress
 uses the selected owning codec once; checked scenarios flow directly into the
 native program. Graph validation and report invariants belong to their domain
 owners. The SDK does not re-decode typed service output. Full runs include the
@@ -429,10 +418,10 @@ are not additional installation dependencies.
 
 Root does not import HTTP or AU rule implementations. The schema and HTTP
 paths remain independent of live calculation Layers. The HTTP path exports the
-native HttpApi contracts directly. Core owns engine and fact/rule definition
+native HttpApi contracts directly. Core owns calculator and fact/rule definition
 contracts; API admission policy remains with the API host. AU Effect exports
 actual facts, services, rules, parameters and pack Layers. Testing owns a checked
-fixture and engine substitution support.
+scenario fixture.
 
 Normal SDK type checking includes negative compiler examples. The export,
 packed-consumer and downstream gates check actual archive imports, declarations,
@@ -487,7 +476,7 @@ The retained standalone HTTP server mounts the same admission middleware.
 Oversized/stalled bodies return fixed Schema-owned 413/408 JSON guidance.
 The five-second total reader budget also rejects late synchronous completion.
 Custom route hosts must supply request admission at their composition.
-The native rate policy is described below; whole T004 qualification remains active.
+The native rate policy is described below.
 
 ## Shared calculation work limits
 
@@ -497,9 +486,8 @@ instance and one per standalone HTTP router. Calculation errors use separately
 declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
 methods declare checked 504 timeouts without using calculation places. Website forms request manual retry. SDK Schemas re-export these
 errors, while local SDK execution keeps its caller-owned lifetime and tax results.
-The owning package records cleanup and CPU proof limits. The native rate policy
-and qualified MCP operations are described below; T006 retains the observed
-modern five-second remote cleanup limit.
+The owning package records cleanup and CPU limits. The native rate policy
+and MCP operations are described below.
 
 
 SDK execution accepts the checked scenario Type and returns a checked report
@@ -516,7 +504,7 @@ private Promise runtime boundary.
 
 ## Native calculation rate admission
 
-The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once below bounded work, so HTTP and MCP share an allowance and each calculation takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance. The standalone Bun host and local engine/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities.
+The [calculator rate owner](../../packages/calculators/README.md#native-calculation-rate-admission) defines canonical errors and a redacted IP key. The [native API](../../apps/api/README.md#native-calculation-rate-admission) composes admission once inside its bounded calculator service, so HTTP and MCP share one limit and each calculation takes one unit. Metadata remains independent. HTTP uses 429 with `Retry-After: 60` or fixed 503 guidance. The standalone Bun host and local definitions/SDK keep their existing behaviour. Packed declarations must expose the expanded checked error union without adding private host identity capabilities.
 
 ### Documentation over HTTP
 
@@ -529,7 +517,7 @@ publication origins through the static `ContentDiscoveryLive`.
 
 ## Native remote MCP
 
-The native API mounts `@taxkit/api-mcp` at `/mcp` with Effect 4.0.7's native
+The native API mounts `@taxkit/api-mcp` at `/mcp` with Effect's native
 `McpServer.layerHttpRequestScoped`, `Tool` and `Toolkit`. Only modern
 `2026-07-28` is supported. The six tools reuse canonical calculator/content
 Schemas and the captured shared services, work pool and native rate limiter.

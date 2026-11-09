@@ -9,28 +9,30 @@ everything from the API. There is no database or sign-in.
 
 ## Owners and imports
 
-| Owner                                                | Responsibility                                                                                                                                              |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/core` — `@taxkit/core`                     | Money and date primitives, fact/rule/parameter descriptors, graph validation, traces, ledgers and the `CalculationEngine`                                   |
-| `packages/rules/au/*` — `@taxkit/rules-au-*`         | Australian take-home pay and PAYG withholding, annual income tax and STSL rule packs                                                                        |
-| `packages/calculators` — `@taxkit/calculators`       | Calculator catalogue, metadata, graph, calculation dispatch and expected errors; the browser calculator page: forms, page atoms, view Schema and page tools |
-| `packages/api/http` — `@taxkit/api-http`             | Native HTTP contract and handlers, the route catalogue, cache policy, `Accept` negotiation and the generated client's named reads and errors                |
-| `packages/api/mcp` — `@taxkit/api-mcp`               | Remote MCP tools over the calculator and content services                                                                                                   |
-| `content/docs` — `@content/docs`                     | Authored MDX pages, navigation and repository link revisions                                                                                                |
-| `packages/content` — `@taxkit/content`               | Page Schemas, the checked reading body, catalogue, content service, page addresses and head metadata, and the share-image contracts                         |
-| `packages/mdx` — `@taxkit/mdx`                       | Content-neutral document compiler, renderer contracts and code highlighter                                                                                  |
-| `packages/mdx-react` — `@taxkit/mdx-react`           | Content-neutral React reading presentation, code/table scroll regions and theme-to-CSS formatting                                                           |
-| `packages/diagrams` — `@taxkit/diagrams`             | Pele adapter for MDX's diagram contract                                                                                                                     |
-| `packages/pele` — `@taxkit/pele`                     | Independent Effect service rendering Mermaid definitions to checked SVG                                                                                     |
-| `packages/aeo` — `@taxkit/aeo`                       | Robots, sitemap, `llms.txt`, `llms-full.txt` and share-image routes                                                                                         |
-| `packages/og-image` — `@taxkit/og-image`             | Build-time Takumi share-image renderer                                                                                                                      |
-| `packages/webmcp` — `@taxkit/webmcp`                 | Browser WebMCP host adapter and calculator page tool registration                                                                                           |
-| `packages/analytics` — `@taxkit/analytics`           | Hosted calculator usage events, with no tax inputs or results                                                                                               |
-| `packages/observability` — `@taxkit/observability`   | Stage names, edge identity and the one host request record                                                                                                  |
-| `packages/infrastructure` — `@taxkit/infrastructure` | Deployment only: Worker declarations, hostnames, secrets, the retained zone, PostHog and telemetry stacks                                                   |
-| `packages/sdk/typescript` — `taxkit`                 | The published SDK: plain, safe-result, Effect and AU entry points                                                                                           |
-| `apps/api`                                           | Builds the docs catalogue ahead of time; composes the native API Worker and the standalone Bun host                                                         |
-| `apps/web`                                           | TanStack Start Website: routes, views, host settings, the private API binding and the two runtimes                                                          |
+| Owner                                                | Responsibility                                                                                                                                  |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/core` — `@taxkit/core`                     | Money and date primitives, fact/rule/parameter descriptors, graph validation, traces, ledgers and `defineCalculator`                            |
+| `packages/rules/au/*` — `@taxkit/rules-au-*`         | Australian take-home pay and PAYG withholding, annual income tax and STSL rule packs                                                            |
+| `packages/calculators` — `@taxkit/calculators`       | Calculator catalogue, metadata, graph, calculation dispatch and expected errors; the browser calculator page: forms, page atoms and view Schema |
+| `packages/api/http` — `@taxkit/api-http`             | Native HTTP contract and handlers, the route catalogue, cache policy, `Accept` negotiation and the generated client's named reads and errors    |
+| `packages/api/mcp` — `@taxkit/api-mcp`               | Shared MCP tool definitions, remote MCP over the calculator and content services, and client-backed handlers for browser WebMCP                 |
+| `content/docs` — `@content/docs`                     | Authored MDX pages, navigation and repository link revisions                                                                                    |
+| `packages/content` — `@taxkit/content`               | Page Schemas, the checked reading body, catalogue, content service, page addresses and head metadata, and the share-image contracts             |
+| `packages/mdx` — `@taxkit/mdx`                       | Content-neutral document compiler, renderer contracts and code highlighter                                                                      |
+| `packages/mdx-react` — `@taxkit/mdx-react`           | Content-neutral React reading presentation, code/table scroll regions and theme-to-CSS formatting                                               |
+| `packages/diagrams` — `@taxkit/diagrams`             | Pele adapter for MDX's diagram contract                                                                                                         |
+| `packages/pele` — `@taxkit/pele`                     | Independent Effect service rendering Mermaid definitions to checked SVG                                                                         |
+| `packages/aeo` — `@taxkit/aeo`                       | Robots, sitemap, `llms.txt`, `llms-full.txt` and share-image routes                                                                             |
+| `packages/og-image` — `@taxkit/og-image`             | Build-time Takumi share-image renderer                                                                                                          |
+| `packages/webmcp` — `@taxkit/webmcp`                 | Browser WebMCP host adapter and registration of the API MCP tools                                                                               |
+| `packages/analytics` — `@taxkit/analytics`           | Hosted calculator usage events, with no tax inputs or results                                                                                   |
+| `packages/observability` — `@taxkit/observability`   | Stage names, edge identity and the one host request record                                                                                      |
+| `packages/infrastructure` — `@taxkit/infrastructure` | Deployment only: Worker declarations, hostnames, secrets, the retained zone, PostHog and telemetry stacks                                       |
+| `packages/sdk/typescript` — `taxkit`                 | The published SDK: plain, safe-result, Effect and AU entry points                                                                               |
+| `packages/docs-examples` — `@taxkit/docs-examples`   | Integration templates and published code snippets, compiled and run against the SDK and HTTP contracts                                          |
+| `packages/testing` — `@taxkit/testing`               | Shared test helpers for workspace packages                                                                                                      |
+| `apps/api`                                           | Builds the docs catalogue ahead of time; composes the native API Worker and the standalone Bun host                                             |
+| `apps/web`                                           | TanStack Start Website: routes, views, host settings, the private API binding and the two runtimes                                              |
 
 Each private package exports its TypeScript source directly (no build, `dist`
 or export condition) and has no runtime of its own. Only the SDK builds; it
@@ -69,14 +71,15 @@ flowchart LR
   Agent[HTTP / MCP / SDK caller] --> API
   API --> Admission[Rate and work admission]
   Admission --> Calculators[PublicCalculatorService]
-  Calculators --> Engine[CalculationEngine and rule packs]
+  Calculators --> Engine[Closed calculator programs and rule packs]
 ```
 
 The browser calls the API's public origin directly with the generated
 `HttpApiClient`. The server never calculates. A page's form becomes one checked
 request; an edit interrupts unfinished work and keeps the last answer marked
-out of date. On a browser with WebMCP, the same page commands are offered as
-five page tools.
+out of date. On a browser with WebMCP, the Website registers the API's six
+MCP tools once at its root; their handlers call the same public API through
+the browser's generated client.
 
 ## A documentation page
 

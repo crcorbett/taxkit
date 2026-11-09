@@ -1,5 +1,13 @@
 # @taxkit/rules-au-stsl
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [ac11f7c]
+  - @taxkit/core@3.0.0
+  - @taxkit/rules-au-pay@2.0.1
+
 ## 2.0.0
 
 ### Major Changes

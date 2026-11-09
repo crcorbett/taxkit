@@ -8,12 +8,14 @@ import {
   Option,
   Record,
   Schema,
+  Stream,
   Boolean as EffectBoolean,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
-import { DocumentationError } from "./errors.js";
+import { DocumentationError, DocumentationInventoryError } from "./errors.js";
 
 const PackageScripts = Schema.fromJsonString(
   Schema.Struct({
@@ -21,6 +23,7 @@ const PackageScripts = Schema.fromJsonString(
     scripts: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
   })
 );
+const DocumentInventory = Schema.Array(Schema.NonEmptyString);
 export type DocumentationFile = Readonly<{
   path: string;
   text: string;
@@ -33,6 +36,11 @@ const markdownLink = /\[[^\]]*\]\((?<target>[^\s)]+)(?:\s+[^)]*)?\)/gu;
 const bunRun =
   /\bbun\s+run\s+(?:--filter(?:=|\s+)(?<filter>[^\s`]+)\s+)?(?<command>[A-Za-z0-9:_-]+)/gu;
 const code = /```[\s\S]*?```|`[^`\n]*`/gu;
+const fence = /```[\s\S]*?```|~~~[\s\S]*?~~~/gu;
+const frontMatter = /^---\n[\s\S]*?\n---\n/u;
+const heading = /^ {0,3}#{1,6}[ \t]+(?<title>.*?)(?:[ \t]+#+)?[ \t]*$/gmu;
+const htmlAnchor = /<[a-z][^>]*\s(?:id|name)="(?<anchor>[^"]+)"/giu;
+const decode = Option.liftThrowable(decodeURIComponent);
 const group = (match: RegExpMatchArray, name: string): Option.Option<string> =>
   Option.fromNullishOr(match.groups).pipe(
     Option.flatMap((groups) => Record.get(groups, name)),
@@ -59,25 +67,80 @@ const normalise = (relative: string): Option.Option<string> =>
               Match.orElse(() => Option.some(Array.dropRight(current, 1)))
             );
           }
-          return Option.some([...current, decodeURIComponent(segment)]);
+          return decode(segment).pipe(
+            Option.map((decoded) => [...current, decoded])
+          );
         })
       )
     )
   ).pipe(Option.map((parts) => parts.join("/")));
-// Fragment-free relative targets in prose. Code samples are not links.
-const linkTargets = (file: DocumentationFile): readonly string[] =>
+/**
+ * GitHub's heading slug: rendered text in lower case, without punctuation,
+ * spaces as hyphens, and a numeric suffix for each repeated heading.
+ */
+const headingAnchors = (text: string): HashSet.HashSet<string> => {
+  const body = text.replace(frontMatter, "").replaceAll(fence, "");
+  const slugs = EffectFunction.pipe(
+    Array.fromIterable(body.matchAll(heading)),
+    Array.map((match) =>
+      group(match, "title").pipe(
+        Option.getOrElse(() => ""),
+        (title) =>
+          title
+            .replaceAll(/!?\[(?<label>[^\]]*)\]\([^)]*\)/gu, "$<label>")
+            .replaceAll(/<[^>]+>/gu, "")
+            .toLowerCase()
+            .replaceAll(/[^\p{L}\p{M}\p{N}\p{Pc} -]/gu, "")
+            .replaceAll(" ", "-")
+      )
+    ),
+    Array.mapAccum(HashMap.empty<string, number>(), (seen, slug) =>
+      Option.match(HashMap.get(seen, slug), {
+        onNone: () => [HashMap.set(seen, slug, 1), slug] as const,
+        onSome: (count) =>
+          [HashMap.set(seen, slug, count + 1), `${slug}-${count}`] as const,
+      })
+    ),
+    ([, unique]) => unique
+  );
+  const explicit = Array.getSomes(
+    EffectFunction.pipe(
+      Array.fromIterable(body.matchAll(htmlAnchor)),
+      Array.map((match) => group(match, "anchor"))
+    )
+  );
+  return HashSet.fromIterable([...slugs, ...explicit]);
+};
+type LinkReference = Readonly<{
+  raw: string;
+  path: string;
+  fragment: Option.Option<string>;
+}>;
+// Relative references in prose. Code samples are not links.
+const linkReferences = (file: DocumentationFile): readonly LinkReference[] =>
   Array.getSomes(
     EffectFunction.pipe(
       Array.fromIterable(file.text.replaceAll(code, "").matchAll(markdownLink)),
       Array.map((match) =>
         group(match, "target").pipe(
-          Option.map((target) => target.split("#", 1).join("")),
           Option.filter(
             (target) =>
               target !== "" &&
+              target !== "#" &&
               !/^[a-z][a-z0-9+.-]*:/iu.test(target) &&
               !target.startsWith("/")
-          )
+          ),
+          Option.map((raw) => {
+            const [path = "", ...rest] = raw.split("#");
+            return {
+              fragment: Option.liftPredicate(
+                rest.join("#"),
+                (fragment) => fragment !== ""
+              ),
+              path,
+              raw,
+            };
+          })
         )
       )
     )
@@ -90,9 +153,18 @@ const resolveTarget = (file: DocumentationFile, target: string) => {
     normalise
   );
 };
+const filePaths = (file: DocumentationFile): readonly string[] =>
+  Array.getSomes(
+    EffectFunction.pipe(
+      linkReferences(file),
+      Array.filter((reference) => reference.path !== ""),
+      Array.map((reference) => resolveTarget(file, reference.path))
+    )
+  );
 /**
  * Pure inspection over files the runtime has already read. Each finding names
  * the document and the broken reference so the author can repair it directly.
+ * Fragments are checked against the headings of documents in `files`.
  */
 export const inspectDocumentation = ({
   files,
@@ -102,26 +174,64 @@ export const inspectDocumentation = ({
   files: readonly DocumentationFile[];
   exists: (repositoryPath: string) => boolean;
   scripts: ScriptOwners;
-}>): readonly string[] =>
-  EffectFunction.pipe(
+}>): readonly string[] => {
+  const anchors = HashMap.fromIterable(
+    EffectFunction.pipe(
+      files,
+      Array.map((file) => [file.path, headingAnchors(file.text)] as const)
+    )
+  );
+  const anchorFinding = (
+    file: DocumentationFile,
+    reference: LinkReference,
+    target: string
+  ): Option.Option<string> =>
+    reference.fragment.pipe(
+      Option.flatMap((fragment) =>
+        HashMap.get(anchors, target).pipe(
+          Option.flatMap((known) =>
+            EffectBoolean.match(
+              decode(fragment).pipe(
+                Option.exists((decoded) =>
+                  HashSet.has(known, decoded.toLowerCase())
+                )
+              ),
+              {
+                onFalse: () =>
+                  Option.some(`${file.path}: broken anchor: ${reference.raw}`),
+                onTrue: () => Option.none(),
+              }
+            )
+          )
+        )
+      )
+    );
+  return EffectFunction.pipe(
     files,
     Array.flatMap((file) => {
       const links = Array.getSomes(
         EffectFunction.pipe(
-          linkTargets(file),
-          Array.map((target) =>
-            Option.match(resolveTarget(file, target), {
-              onNone: () =>
-                Option.some(
-                  `${file.path}: link leaves the repository: ${target}`
-                ),
-              onSome: (candidate) =>
-                EffectBoolean.match(exists(candidate), {
-                  onFalse: () =>
-                    Option.some(`${file.path}: broken link: ${target}`),
-                  onTrue: () => Option.none(),
-                }),
-            })
+          linkReferences(file),
+          Array.map((reference) =>
+            Match.value(reference.path).pipe(
+              Match.when("", () => anchorFinding(file, reference, file.path)),
+              Match.orElse((target) =>
+                Option.match(resolveTarget(file, target), {
+                  onNone: () =>
+                    Option.some(
+                      `${file.path}: link leaves the repository: ${reference.raw}`
+                    ),
+                  onSome: (candidate) =>
+                    EffectBoolean.match(exists(candidate), {
+                      onFalse: () =>
+                        Option.some(
+                          `${file.path}: broken link: ${reference.raw}`
+                        ),
+                      onTrue: () => anchorFinding(file, reference, candidate),
+                    }),
+                })
+              )
+            )
           )
         )
       );
@@ -150,8 +260,10 @@ export const inspectDocumentation = ({
                 ),
               onSome: (workspace) =>
                 Option.match(HashMap.get(scripts.workspaces, workspace), {
-                  // Glob and path filters are not checked here.
-                  onNone: () => Option.none(),
+                  onNone: () =>
+                    Option.some(
+                      `${file.path}: unknown workspace: bun run --filter=${workspace} ${command}`
+                    ),
                   onSome: (names) =>
                     EffectBoolean.match(HashSet.has(names, command), {
                       onFalse: () =>
@@ -168,8 +280,18 @@ export const inspectDocumentation = ({
       return [...links, ...commands];
     })
   );
+};
+/**
+ * Every tracked or new Markdown document except release notes, which are
+ * generated from Changesets.
+ */
+export const isDocumentation = (file: string): boolean =>
+  file.endsWith(".md") &&
+  !file.startsWith(".changeset/") &&
+  !Option.contains(Array.last(file.split("/")), "CHANGELOG.md");
 const workspaceRoots = [
   "apps",
+  "content",
   "packages",
   "packages/api",
   "packages/sdk",
@@ -182,6 +304,7 @@ export const checkDocumentation = Effect.fn("Documentation.check")(function* ({
 }) {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
+  const childProcesses = yield* ChildProcessSpawner.ChildProcessSpawner;
   const readScripts = (manifest: string) =>
     fs.readFileString(manifest).pipe(
       Effect.flatMap(Schema.decodeEffect(PackageScripts)),
@@ -217,45 +340,82 @@ export const checkDocumentation = Effect.fn("Documentation.check")(function* ({
       ).pipe(Effect.map((manifest) => ({ directory, manifest })))
     )
   );
-  const docs = yield* fs
-    .readDirectory(path.join(repositoryRoot, "docs"), { recursive: true })
-    .pipe(
-      Effect.map((entries) =>
-        EffectFunction.pipe(
-          entries,
-          Array.filter((entry) => entry.endsWith(".md")),
-          Array.map((entry) => `docs/${entry}`)
+  const listed = yield* Effect.gen(function* listDocuments() {
+    const handle = yield* childProcesses.spawn(
+      ChildProcess.make(
+        "git",
+        [
+          "ls-files",
+          "-z",
+          "--cached",
+          "--others",
+          "--exclude-standard",
+          "--",
+          "*.md",
+        ],
+        {
+          cwd: repositoryRoot,
+          extendEnv: true,
+          forceKillAfter: "2 seconds",
+          stderr: "pipe",
+          stdin: "ignore",
+          stdout: "pipe",
+        }
+      )
+    );
+    const [stdout, [exitCode]] = yield* Effect.all(
+      [
+        Stream.runCollect(Stream.decodeText(handle.stdout)),
+        Effect.zip(handle.exitCode, Stream.runDrain(handle.stderr), {
+          concurrent: true,
+        }),
+      ],
+      { concurrency: "unbounded" }
+    );
+    yield* Match.value(Number(exitCode)).pipe(
+      Match.when(0, () => Effect.void),
+      Match.orElse((failed) =>
+        Effect.fail(
+          new DocumentationInventoryError({
+            exitCode: failed,
+            operation: "list-documents",
+          })
         )
       )
     );
-  const readmes = yield* Effect.filter(
-    EffectFunction.pipe(
-      workspaces,
-      Array.map((directory) => `${directory}/README.md`)
-    ),
-    (readme) => fs.exists(path.join(repositoryRoot, readme))
+    return yield* EffectFunction.pipe(
+      stdout.join("").split("\0"),
+      Array.filter((file) => file.length > 0),
+      Schema.decodeEffect(DocumentInventory),
+      Effect.mapError(
+        () => new DocumentationInventoryError({ operation: "decode-documents" })
+      )
+    );
+  }).pipe(
+    Effect.scoped,
+    Effect.catchTag("PlatformError", () =>
+      Effect.fail(
+        new DocumentationInventoryError({ operation: "list-documents" })
+      )
+    )
   );
-  const files = yield* Effect.forEach(
-    ["AGENTS.md", "ARCHITECTURE.md", "README.md", ...docs, ...readmes],
-    (file) =>
+  // A tracked file deleted in the working tree is no longer documentation.
+  const documents = yield* EffectFunction.pipe(
+    listed,
+    Array.filter(isDocumentation),
+    Array.dedupe,
+    Effect.filter((file) => fs.exists(path.join(repositoryRoot, file)))
+  );
+  const files = yield* EffectFunction.pipe(
+    documents,
+    Effect.forEach((file) =>
       fs
         .readFileString(path.join(repositoryRoot, file))
         .pipe(Effect.map((text) => ({ path: file, text })))
+    )
   );
   const existing = yield* Effect.forEach(
-    HashSet.fromIterable(
-      EffectFunction.pipe(
-        files,
-        Array.flatMap((file) =>
-          Array.getSomes(
-            EffectFunction.pipe(
-              linkTargets(file),
-              Array.map((target) => resolveTarget(file, target))
-            )
-          )
-        )
-      )
-    ),
+    EffectFunction.pipe(files, Array.flatMap(filePaths), HashSet.fromIterable),
     (candidate) =>
       fs
         .exists(path.join(repositoryRoot, candidate))

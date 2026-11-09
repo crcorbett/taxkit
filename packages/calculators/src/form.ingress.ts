@@ -37,19 +37,40 @@ export const initialTakeHomeForm = TakeHomeForm.make({
   period: "weekly",
   taxFreeThresholdClaimed: true,
 });
+// The visible field a visitor must correct. Views mark only this field
+// invalid and move focus to it.
+export const CalculatorFormField = Schema.Literals([
+  "grossDollars",
+  "period",
+  "taxableDollars",
+]);
+export type CalculatorFormField = typeof CalculatorFormField.Type;
 export class CalculatorInputError extends Schema.TaggedError<
   CalculatorInputError,
   {
     readonly brand: unique symbol;
   }
 >()("CalculatorInputError", {
+  field: CalculatorFormField,
   message: Schema.Literals([
-    "Enter a valid pay amount and pay period.",
+    "Enter a valid pay amount.",
+    "Choose a pay period.",
     "Enter a valid annual taxable income.",
   ]),
 }) {}
+const invalidPayAmount = () =>
+  new CalculatorInputError({
+    field: "grossDollars",
+    message: "Enter a valid pay amount.",
+  });
+const invalidAnnualIncome = () =>
+  new CalculatorInputError({
+    field: "taxableDollars",
+    message: "Enter a valid annual taxable income.",
+  });
 // Form text is representation ingress. The rule-owned scenario checks money,
 // period and threshold once; no browser rule implementation calculates tax.
+// Each field is checked separately so the error names the one to correct.
 export const takeHomeRequestFromForm = (
   form: TakeHomeForm,
   calculatorId: typeof AuPayCalculatorId.Type = AuPayCalculatorId.make(
@@ -59,48 +80,56 @@ export const takeHomeRequestFromForm = (
   Result.gen(function* () {
     const grossPay = yield* Schema.decodeResult(
       NonNegativeMoneyFromDecimalString
-    )(form.grossDollars);
-    const period = yield* Schema.decodeUnknownResult(PayPeriod)(form.period);
-    const facts = TakeHomeScenarioInputSchema.make({
-      grossPay,
-      period,
-      taxFreeThresholdClaimed: form.taxFreeThresholdClaimed,
-    });
+    )(form.grossDollars).pipe(Result.mapError(invalidPayAmount));
+    const period = yield* Schema.decodeUnknownResult(PayPeriod)(
+      form.period
+    ).pipe(
+      Result.mapError(
+        () =>
+          new CalculatorInputError({
+            field: "period",
+            message: "Choose a pay period.",
+          })
+      )
+    );
     const payload = {
-      facts,
+      facts: TakeHomeScenarioInputSchema.make({
+        grossPay,
+        period,
+        taxFreeThresholdClaimed: form.taxFreeThresholdClaimed,
+      }),
       jurisdiction: Option.some(AuPayJurisdiction.make("AU")),
       taxYear: Option.some(AuPayTaxYear.make("2025-26")),
     };
-    if (calculatorId === "au.pay.take-home") {
-      return TakeHomeCalculationRequest.make({
-        calculatorId:
-          TakeHomeCalculationRequest.fields.calculatorId.make(
-            "au.pay.take-home"
-          ),
-        payload,
-      });
-    }
-    return WithholdingsCalculationRequest.make({
-      calculatorId: WithholdingsCalculationRequest.fields.calculatorId.make(
-        "au.pay.withholdings"
-      ),
-      payload,
-    });
-  }).pipe(
-    Result.mapError(
-      () =>
-        new CalculatorInputError({
-          message: "Enter a valid pay amount and pay period.",
+    const request: CalculatorRunRequest = Match.value(calculatorId).pipe(
+      Match.when("au.pay.take-home", () =>
+        TakeHomeCalculationRequest.make({
+          calculatorId:
+            TakeHomeCalculationRequest.fields.calculatorId.make(
+              "au.pay.take-home"
+            ),
+          payload,
         })
-    )
-  );
+      ),
+      Match.when("au.pay.withholdings", () =>
+        WithholdingsCalculationRequest.make({
+          calculatorId: WithholdingsCalculationRequest.fields.calculatorId.make(
+            "au.pay.withholdings"
+          ),
+          payload,
+        })
+      ),
+      Match.exhaustive
+    );
+    return request;
+  });
 export const annualTaxRequestFromForm = (
   form: AnnualTaxForm
 ): Result.Result<CalculatorRunRequest, CalculatorInputError> =>
   Result.gen(function* () {
     const taxableIncome = yield* Schema.decodeResult(
       NonNegativeMoneyFromDecimalString
-    )(form.taxableDollars);
+    )(form.taxableDollars).pipe(Result.mapError(invalidAnnualIncome));
     const facts = AnnualTaxScenarioInputSchema.make({ taxableIncome });
     return CalculatorRunRequest.make({
       calculatorId: AuAnnualTaxCalculatorId.make("au.income-tax.annual"),
@@ -110,14 +139,7 @@ export const annualTaxRequestFromForm = (
         taxYear: Option.some(AuAnnualTaxYear.make("2025-26")),
       },
     });
-  }).pipe(
-    Result.mapError(
-      () =>
-        new CalculatorInputError({
-          message: "Enter a valid annual taxable income.",
-        })
-    )
-  );
+  });
 // Each calculator page starts with a worked example the visitor can change.
 export const initialCalculatorForm = (
   calculatorId: CalculatorRunRequest["calculatorId"]
@@ -127,45 +149,38 @@ export const initialCalculatorForm = (
       AnnualTaxForm.make({ taxableDollars: "67000" })
     ),
     Match.when("au.pay.take-home", () => initialTakeHomeForm),
-    Match.orElse(() =>
+    Match.when("au.pay.withholdings", () =>
       TakeHomeForm.make({
         grossDollars: "9500",
         period: "monthly",
         taxFreeThresholdClaimed: false,
       })
-    )
+    ),
+    Match.exhaustive
   );
 // The one checked request for a calculator's visible form. A form of the other
 // kind is the visitor's input error, never a calculation.
 export const requestFromForm = (
   calculatorId: CalculatorRunRequest["calculatorId"],
   form: CalculatorForm
-): Result.Result<CalculatorRunRequest, CalculatorInputError> => {
-  if (calculatorId === "au.income-tax.annual") {
-    return Match.value(form).pipe(
-      Match.when(Schema.is(AnnualTaxForm), (matchedValue) =>
-        annualTaxRequestFromForm(matchedValue)
-      ),
-      Match.orElse(() =>
-        Result.fail(
-          new CalculatorInputError({
-            message: "Enter a valid annual taxable income.",
-          })
-        )
+): Result.Result<CalculatorRunRequest, CalculatorInputError> =>
+  Match.value(calculatorId).pipe(
+    Match.when("au.income-tax.annual", () =>
+      Match.value(form).pipe(
+        Match.when(Schema.is(AnnualTaxForm), (annualForm) =>
+          annualTaxRequestFromForm(annualForm)
+        ),
+        Match.orElse(() => Result.fail(invalidAnnualIncome()))
       )
-    );
-  }
-  const payCalculatorId = AuPayCalculatorId.make(calculatorId);
-  return Match.value(form).pipe(
-    Match.when(Schema.is(TakeHomeForm), (matchedValue) =>
-      takeHomeRequestFromForm(matchedValue, payCalculatorId)
     ),
-    Match.orElse(() =>
-      Result.fail(
-        new CalculatorInputError({
-          message: "Enter a valid pay amount and pay period.",
-        })
-      )
-    )
+    Match.whenOr("au.pay.take-home", "au.pay.withholdings", (id) => {
+      const payCalculatorId = AuPayCalculatorId.make(id);
+      return Match.value(form).pipe(
+        Match.when(Schema.is(TakeHomeForm), (payForm) =>
+          takeHomeRequestFromForm(payForm, payCalculatorId)
+        ),
+        Match.orElse(() => Result.fail(invalidPayAmount()))
+      );
+    }),
+    Match.exhaustive
   );
-};

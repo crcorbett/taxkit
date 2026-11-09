@@ -1,10 +1,3 @@
----
-status: canonical
-last_reviewed: 2026-05-23
-source_of_truth: package-readme
-confidence: medium
----
-
 # Testing Helpers
 
 Shared test helpers for TaxKit workspace packages.
