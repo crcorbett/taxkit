@@ -45,7 +45,7 @@ export const propertyName = (
     ),
     Match.orElse(() => Option.none<string>())
   );
-export const importSourceValue = (node: SyntaxKind<"ImportDeclaration">) =>
+const importSourceValue = (node: SyntaxKind<"ImportDeclaration">) =>
   node.source.value;
 
 export const createBindingTracker = (
@@ -132,17 +132,19 @@ export const createBindingTracker = (
     );
   const semanticOfTypeName = (
     node: SyntaxNode | null | undefined
-  ): Option.Option<string> =>
-    Match.value(node).pipe(
-      Match.when({ type: "Identifier" }, semanticOfIdentifier),
-      Match.when({ type: "TSQualifiedName" }, (value) =>
-        Option.all({
-          left: semanticOfTypeName(value.left),
-          right: propertyName(value.right),
-        }).pipe(Option.map(({ left, right }) => `${left}.${right}`))
-      ),
-      Match.orElse(() => Option.none<string>())
-    );
+  ): Option.Option<string> => {
+    // Any syntax node can appear here; only two kinds name a type.
+    if (node?.type === "Identifier") {
+      return semanticOfIdentifier(node);
+    }
+    if (node?.type === "TSQualifiedName") {
+      return Option.all({
+        left: semanticOfTypeName(node.left),
+        right: propertyName(node.right),
+      }).pipe(Option.map(({ left, right }) => `${left}.${right}`));
+    }
+    return Option.none<string>();
+  };
   const trackPattern = (
     pattern: SyntaxNode | null | undefined,
     semantic: Option.Option<string>,

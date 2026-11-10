@@ -1,4 +1,5 @@
 import { strict, style } from "@commonplaces/oxlint-plugin";
+import { Array as EffectArray, Function as EffectFunction } from "effect";
 import { defineConfig } from "oxlint";
 
 import { workspaceBoundaryOptions } from "./tools/oxlint/workspaces.boundary.ts";
@@ -79,6 +80,7 @@ const decodingBoundaryFiles = [
   "packages/mdx/src/__testing__/fixtures.ts",
   // Standalone presenter fixture values enter through their neutral Schemas.
   "packages/mdx-react/test/article.fixture.ts",
+  "packages/mdx-react/test/theme.fixture.ts",
   "packages/mdx/test/theme.test.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
   "packages/pele/src/live.layer.ts",
@@ -164,7 +166,7 @@ const decodingBoundaryFiles = [
 
   // Focused lint integration test: CLI output is decoded at the process boundary.
   "tools/oxlint/cli-fixture.ts",
-  "tools/oxlint/no-decoding-outside-boundaries.test.ts",
+  "tools/oxlint/contract-boundaries.test.ts",
   "tools/oxlint/portable-rules.test.ts",
   "tools/oxlint/native-request-rules.test.ts",
   "tools/oxlint/lexical-policy.test.ts",
@@ -195,25 +197,11 @@ const decodingBoundaryFiles = [
 const effectContractFiles = [
   "apps/**/{config,errors,schema,schemas,service,services}.ts",
   "packages/**/{config,errors,schema,schemas,service,services}.ts",
-  "tools/oxlint/fixtures/effect-accepted.ts",
-  "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
-  "tools/oxlint/fixtures/.generated-effect-rejected.ts",
 ];
 
 const effectServiceContractFiles = [
   "apps/**/{service,services}.ts",
   "packages/**/{service,services}.ts",
-  "tools/oxlint/fixtures/effect-accepted.ts",
-  "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
-  "tools/oxlint/fixtures/.generated-effect-rejected.ts",
-];
-
-const effectErrorContractFiles = [
-  "apps/**/{errors,schema,schemas}.ts",
-  "packages/**/{errors,schema,schemas}.ts",
-  "tools/oxlint/fixtures/effect-accepted.ts",
-  "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
-  "tools/oxlint/fixtures/.generated-effect-rejected.ts",
 ];
 
 // Inline Promise rejection mapping applies to every owned source extension.
@@ -338,6 +326,8 @@ const runtimeBoundaryFiles = [
   "tools/documentation/check.runtime.ts",
 ];
 
+// Exact command hosts that set `process.exitCode`. Every other file reads
+// configuration through Effect Config and never names the `process` global.
 const processBoundaryFiles = [
   "apps/api/scripts/smoke-public-routes.runtime.ts",
 
@@ -345,31 +335,132 @@ const processBoundaryFiles = [
   "tools/documentation/check.runtime.ts",
 ];
 
-const consoleBoundaryFiles = [
-  "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
-  "tools/oxlint/fixtures/effect-accepted.ts",
-  "tools/documentation/check.runtime.ts",
+// Globals that no owned file may name, through any alias or destructuring.
+// The shared presets reject their direct spellings; naming the global itself
+// closes the alias forms. Same-named local values remain separate.
+const nativeCollectionGlobals = ["Map", "Set", "WeakMap", "WeakSet"];
+const restrictedGlobals = [
+  ...EffectFunction.pipe(
+    nativeCollectionGlobals,
+    EffectArray.map((name) => ({
+      message:
+        "Use persistent Effect HashMap or HashSet instead of native collections.",
+      name,
+    }))
+  ),
+  {
+    message:
+      "Use Effect Console or structured Effect logging; runtimes and tests render diagnostics.",
+    name: "console",
+  },
+  {
+    message:
+      "Use Effect platform services; Bun is provided by @effect/platform-bun Layers at the runtime entry.",
+    name: "Bun",
+  },
 ];
-
-const bunAdapterFiles = [
-  "apps/api/src/server.ts",
-
-  "tools/oxlint/fixtures/bun-accepted.ts",
+const processGlobal = {
+  message:
+    "Decode configuration with Effect Config and keep process lifecycle in an exact command host.",
+  name: "process",
+};
+const fetchGlobal = {
+  message: "Use the application-owned native Effect HttpClient.",
+  name: "fetch",
+};
+// Object enumeration, global collection constructors and untyped error causes.
+const restrictedProperties = [
+  {
+    message:
+      "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed iterator instead of Object.entries.",
+    object: "Object",
+    property: "entries",
+  },
+  {
+    message:
+      "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed builder instead of Object.fromEntries.",
+    object: "Object",
+    property: "fromEntries",
+  },
+  {
+    message:
+      "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed iterator instead of Object.keys.",
+    object: "Object",
+    property: "keys",
+  },
+  {
+    message:
+      "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed iterator instead of Object.values.",
+    object: "Object",
+    property: "values",
+  },
+  ...EffectFunction.pipe(
+    ["globalThis", "window"],
+    EffectArray.flatMap((object) =>
+      EffectFunction.pipe(
+        nativeCollectionGlobals,
+        EffectArray.map((property) => ({
+          message:
+            "Use persistent Effect HashMap or HashSet instead of native collections.",
+          object,
+          property,
+        }))
+      )
+    )
+  ),
+  {
+    message:
+      "Declare expected failures with Schema.TaggedErrorClass and checked fields, never an unknown cause.",
+    object: "Data",
+    property: "TaggedError",
+  },
 ];
-
-const bunRuntimeEntrypointFiles = [
-  "apps/api/scripts/docs-catalogue.runtime.ts",
-  "packages/sdk/typescript/scripts/assemble-package.runtime.ts",
-  "tools/apps-local/native-pair-build.runtime.ts",
-
-  "apps/api/scripts/smoke-public-routes.runtime.ts",
-  "apps/api/src/index.ts",
-
-  "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
-  "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
-  "tools/oxlint/fixtures/bun-accepted.ts",
-  "tools/documentation/check.runtime.ts",
-  "tools/repository-paths/check.runtime.ts",
+// Runner references by name. Calls through imports are also rejected by the
+// shared runtime rules; this closes uncalled and destructured references.
+const runnerMessage =
+  "Return Effect values; only the exact runtimeBoundaryFiles in oxlint.config.ts execute programs.";
+const runnerProperties = [
+  ...EffectFunction.pipe(
+    [
+      "runCallback",
+      "runCallbackWith",
+      "runFork",
+      "runForkWith",
+      "runPromise",
+      "runPromiseExit",
+      "runPromiseExitWith",
+      "runPromiseWith",
+      "runSync",
+      "runSyncExit",
+      "runSyncExitWith",
+      "runSyncWith",
+    ],
+    EffectArray.map((property) => ({
+      message: runnerMessage,
+      object: "Effect",
+      property,
+    }))
+  ),
+  { message: runnerMessage, object: "ManagedRuntime", property: "make" },
+  { message: runnerMessage, object: "BunRuntime", property: "runMain" },
+  { message: runnerMessage, object: "NodeRuntime", property: "runMain" },
+];
+// Host modules that service, Schema, error and config contracts never import.
+const contractHostImportPatterns = [
+  {
+    group: [
+      "node:*",
+      "node:*/**",
+      "bun",
+      "bun:*",
+      "@effect/platform-bun",
+      "@effect/platform-bun/*",
+      "@effect/platform-node",
+      "@effect/platform-node/*",
+    ],
+    message:
+      "Keep contracts host-independent; provide Bun/Node Layers from a live runtime adapter.",
+  },
 ];
 
 // The Website source root: its imports follow browser package roles.
@@ -443,7 +534,7 @@ const sdkHttpContractOwner = {
 // SDK source is browser-safe: no Node or Bun host modules.
 const sdkHostImportPatterns = [
   {
-    group: ["node:*", "bun", "bun:*"],
+    group: ["node:*", "node:*/**", "bun", "bun:*"],
     message:
       "SDK source is browser-safe. Keep Node and Bun host modules in scripts or tests.",
   },
@@ -460,10 +551,21 @@ const httpClientOwners = [
   "packages/infrastructure/src/posthog/management.adapter.layer.ts",
   "packages/infrastructure/src/posthog/projects.live.layer.ts",
 ];
+// Host-contract tests build the native Fetch client they exercise, or read
+// the owner's request policy back from the client context.
+const httpClientContractTests = [
+  "packages/analytics/test/service.test.ts",
+  "packages/infrastructure/test/posthog/management.boundary.test.ts",
+  "tools/apps-local/test/native-analytics.boundary.test.ts",
+  "tools/apps-local/test/native-cancellation.boundary.test.ts",
+  "tools/apps-local/test/native-mcp.boundary.test.ts",
+  "tools/apps-local/test/native-pair-calculator-browser.checks.ts",
+  "tools/apps-local/test/native-pair-calculator-server.checks.ts",
+  "tools/apps-local/test/native-pair-content.checks.ts",
+];
 // Repository lint rules receive owner paths as options, never in rule code.
 const repositoryRuleFiles = [
   "tools/oxlint/rules/**",
-  "tools/oxlint/bun-rules.ts",
   "tools/oxlint/effect-rules.ts",
   "tools/oxlint/package-rules.ts",
   "tools/oxlint/taxkit-rules.ts",
@@ -486,7 +588,6 @@ export default defineConfig({
     ".vercel/**",
   ],
   jsPlugins: [
-    { name: "taxkit-bun", specifier: "./tools/oxlint/bun-rules.ts" },
     { name: "taxkit-effect", specifier: "./tools/oxlint/effect-rules.ts" },
     "./tools/oxlint/package-rules.ts",
     "./tools/oxlint/taxkit-rules.ts",
@@ -575,20 +676,18 @@ export default defineConfig({
       rules: {
         "no-restricted-globals": [
           "error",
-          {
-            message: "Use the application-owned native Effect HttpClient.",
-            name: "fetch",
-          },
+          ...restrictedGlobals,
+          processGlobal,
+          fetchGlobal,
         ],
       },
     },
     {
       // All owned source extensions are strict, including future app/tool/config paths.
-      // Five unexecuted inputs intentionally exercise other rules in isolation.
+      // Four unexecuted inputs intentionally exercise other rules in isolation.
       // Their neighbours remain strict; these are fixture inputs, never workflow hosts.
       excludeFiles: [
         "tools/oxlint/fixtures/bun-accepted.ts",
-        "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
         "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
         "tools/oxlint/fixtures/effect-accepted.ts",
         "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
@@ -600,7 +699,6 @@ export default defineConfig({
         "packages/calculators/**",
         "tools/oxlint/*.ts",
         "tools/oxlint/binding-tracker.ts",
-        "tools/oxlint/bun-rules.ts",
         "tools/oxlint/effect-rules.ts",
         "tools/oxlint/package-rules.ts",
         "tools/oxlint/taxkit-rules.ts",
@@ -624,7 +722,6 @@ export default defineConfig({
 
         "strict-effect/runtime-file-convention": "error",
 
-        "taxkit/no-native-collections": "error",
         "taxkit/no-object-writes": "error",
       },
     },
@@ -937,7 +1034,7 @@ export default defineConfig({
     {
       files: portableEffectSourceFiles,
       rules: {
-        "taxkit-effect/no-bare-effect-try-promise": "error",
+        "taxkit-effect/inline-try-promise-callbacks": "error",
       },
     },
     {
@@ -946,7 +1043,7 @@ export default defineConfig({
         // Shared strict presets own typeof, instanceof, in, JSON, throw,
         // async/Promise, nullish comparison, conditional spread and ambient
         // clock checks here. These add calculator-only domain policy.
-        "taxkit/no-context-nullish-default": "error",
+        "taxkit/no-invented-tax-context": "error",
         "taxkit/no-date-construction": "error",
         "taxkit/no-native-array-methods": "error",
         "taxkit/no-nested-wrapper-calls": "error",
@@ -955,20 +1052,22 @@ export default defineConfig({
     {
       files: effectContractFiles,
       rules: {
-        "taxkit-effect/no-host-imports-in-contracts": "error",
+        // The shared contract rule omits Bun subpaths and Effect platform packages.
+        "no-restricted-imports": [
+          "error",
+          { patterns: contractHostImportPatterns },
+        ],
       },
     },
     {
       files: effectServiceContractFiles,
       rules: {
-        "taxkit-effect/no-layer-exports-in-service-files": "error",
-        "taxkit-effect/no-unknown-service-contract": "error",
-      },
-    },
-    {
-      files: effectErrorContractFiles,
-      rules: {
-        "taxkit-effect/no-unknown-tagged-error-cause": "error",
+        // The shared rule checks exported declarations; this also covers
+        // export specifiers and re-exports.
+        "no-restricted-exports": [
+          "error",
+          { restrictedNamedExportsPattern: "(?:Live|Mock|Test|TestLive)$" },
+        ],
       },
     },
     {
@@ -979,58 +1078,64 @@ export default defineConfig({
         "tools/oxlint/fixtures/.generated-effect-rejected.ts",
       ],
       rules: {
-        "taxkit-effect/no-effect-test-global-mix": "error",
         "taxkit-effect/no-module-level-mutable-test-state": "error",
+        // Shared test globals have one owner, @effect/vitest; Vitest-only
+        // utilities such as vi and expectTypeOf still come from vitest.
+        "no-restricted-imports": [
+          "error",
+          {
+            paths: [
+              {
+                importNames: ["describe", "expect", "it", "test"],
+                message: "Import shared test APIs from @effect/vitest.",
+                name: "vitest",
+              },
+            ],
+          },
+        ],
       },
     },
     {
       files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
       excludeFiles: decodingBoundaryFiles,
       rules: {
-        "taxkit/no-decoding-outside-boundaries": "error",
+        "effect-conventions/no-schema-decoder-outside-ingress": "error",
       },
     },
     {
       files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
       excludeFiles: schemaEncoderEgressFiles,
       rules: {
-        "taxkit-effect/no-schema-encoder-outside-egress": "error",
+        "effect-conventions/no-schema-encoder-outside-egress": "error",
       },
     },
     {
-      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-      excludeFiles: runtimeBoundaryFiles,
+      // Runtime boundaries may name runners; every other restriction stays.
+      files: runtimeBoundaryFiles,
       rules: {
-        "taxkit-effect/no-runtime-execution-outside-boundaries": "error",
-        "taxkit-effect/no-runtime-references-outside-boundaries": "error",
+        "no-restricted-properties": ["error", ...restrictedProperties],
       },
     },
     {
-      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-      excludeFiles: processBoundaryFiles,
+      // The copy control test spies on console.error to prove a refused
+      // clipboard write stays silent. It never writes to the console.
+      files: ["apps/web/test/docs/copy.boundary.browser.test.tsx"],
       rules: {
-        "taxkit-effect/no-process-outside-boundaries": "error",
+        "no-restricted-globals": [
+          "error",
+          ...EffectFunction.pipe(
+            restrictedGlobals,
+            EffectArray.filter((entry) => entry.name !== "console")
+          ),
+          processGlobal,
+        ],
       },
     },
     {
-      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-      excludeFiles: consoleBoundaryFiles,
+      // Command hosts may set the exit code; other globals stay restricted.
+      files: processBoundaryFiles,
       rules: {
-        "taxkit-effect/no-console-outside-runtime": "error",
-      },
-    },
-    {
-      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-      excludeFiles: bunAdapterFiles,
-      rules: {
-        "taxkit-bun/no-host-api-outside-adapters": "error",
-      },
-    },
-    {
-      files: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-      excludeFiles: bunRuntimeEntrypointFiles,
-      rules: {
-        "taxkit-bun/no-runtime-outside-entrypoints": "error",
+        "no-restricted-globals": ["error", ...restrictedGlobals],
       },
     },
     {
@@ -1260,35 +1365,22 @@ export default defineConfig({
     ],
     "taxkit-effect/no-switch": "error",
 
+    "no-restricted-globals": ["error", ...restrictedGlobals, processGlobal],
     "no-restricted-properties": [
       "error",
-      {
-        message:
-          "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed iterator instead of Object.entries.",
-        object: "Object",
-        property: "entries",
-      },
-      {
-        message:
-          "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed builder instead of Object.fromEntries.",
-        object: "Object",
-        property: "fromEntries",
-      },
-      {
-        message:
-          "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed iterator instead of Object.keys.",
-        object: "Object",
-        property: "keys",
-      },
-      {
-        message:
-          "Use Effect primitives such as HashMap, HashSet, Record, Array, or a typed iterator instead of Object.values.",
-        object: "Object",
-        property: "values",
-      },
+      ...restrictedProperties,
+      ...runnerProperties,
+    ],
+    "effect/no-runtime-execution-outside-main": [
+      "error",
+      { allowedFiles: runtimeBoundaryFiles },
     ],
 
     "package/workspace-import-boundaries": ["error", workspaceBoundaryOptions],
+    "strict-effect/http-client-ownership": [
+      "error",
+      { allowedFiles: [...httpClientOwners, ...httpClientContractTests] },
+    ],
     "strict-effect/module-ownership": ["error", { owners: moduleOwners }],
     "strict-effect/no-loader-request-state": [
       "error",

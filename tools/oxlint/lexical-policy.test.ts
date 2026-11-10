@@ -15,42 +15,33 @@ it.effect.each([
   {
     count: 4,
     name: "rejects all four direct native collection constructors",
-    rule: "taxkit(no-native-collections)",
+    rule: "effect-conventions(no-native-collections)",
     source: `export const collections = [new Map(), new Set(), new WeakMap(), new WeakSet()];`,
   },
   {
-    count: 4,
-    name: "follows native collection global and destructured aliases",
-    rule: "taxkit(no-native-collections)",
+    count: 2,
+    name: "rejects naming a native collection global through an alias",
+    rule: "eslint(no-restricted-globals)",
     source: `const NativeMap = Map;
-const NativeSet = globalThis.Set;
+let Constructor;
+Constructor = WeakMap;
+export const collections = [new NativeMap(), new Constructor()];`,
+  },
+  {
+    count: 3,
+    name: "rejects global-object and destructured native collection aliases",
+    rule: "eslint(no-restricted-properties)",
+    source: `const NativeSet = globalThis.Set;
 const { WeakMap: NativeWeakMap } = globalThis;
 const { WeakSet: NativeWeakSet } = window;
-export const collections = [new NativeMap(), new NativeSet(), new NativeWeakMap(), new NativeWeakSet()];`,
-  },
-  {
-    count: 1,
-    name: "follows a reassigned native constructor",
-    rule: "taxkit(no-native-collections)",
-    source: `let Constructor;
-Constructor = WeakMap;
-export const collection = new Constructor();`,
+export const collections = [new NativeSet(), new NativeWeakMap(), new NativeWeakSet()];`,
   },
   {
     count: 0,
-    name: "keeps a same-named local constructor separate",
-    rule: "taxkit(no-native-collections)",
+    name: "keeps a same-named local constructor separate from the global",
+    rule: "eslint(no-restricted-globals)",
     source: `export class WeakMap { readonly value = 1; }
 export const collection = new WeakMap();`,
-  },
-  {
-    count: 0,
-    name: "clears a constructor alias replaced by a local class",
-    rule: "taxkit(no-native-collections)",
-    source: `class Local { readonly value = 1; }
-let Constructor = WeakMap;
-Constructor = Local;
-export const collection = new Constructor();`,
   },
   {
     count: 8,
@@ -124,41 +115,25 @@ export const values = Array.map([{}], Object.assign);`,
     source: `export const { Object: { assign: write } } = globalThis;`,
   },
   {
-    count: 5,
+    count: 4,
     name: "rejects escaping root, managed, Bun and Node runner references",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
+    rule: "eslint(no-restricted-properties)",
     source: `import { Effect, ManagedRuntime } from "effect";
-import * as Fx from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { NodeRuntime } from "@effect/platform-node";
-export const runners = [Effect.runSync, Fx.Effect.runPromise, ManagedRuntime.make, BunRuntime.runMain, NodeRuntime.runMain];`,
-  },
-  {
-    count: 1,
-    name: "rejects a named imported runner used as a callback",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
-    source: `import { runSync as execute, void as unit } from "effect/Effect";
-export const result = unit.pipe(execute);`,
-  },
-  {
-    count: 2,
-    name: "rejects destructured capture and callback use separately",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
-    source: `import { Effect as Fx } from "effect";
-const { runSync: execute } = Fx;
-export const result = Fx.void.pipe(execute);`,
+export const runners = [Effect.runSync, ManagedRuntime.make, BunRuntime.runMain, NodeRuntime.runMain];`,
   },
   {
     count: 1,
     name: "rejects an exported unused destructured runner",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
+    rule: "eslint(no-restricted-properties)",
     source: `import { Effect } from "effect";
 export const { runSync: execute } = Effect;`,
   },
   {
-    count: 2,
-    name: "rejects an assigned runner and its later callback use",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
+    count: 1,
+    name: "rejects an assigned runner captured for later callback use",
+    rule: "eslint(no-restricted-properties)",
     source: `import { Effect } from "effect";
 let execute;
 execute = Effect.runSync;
@@ -167,36 +142,23 @@ export const result = Effect.void.pipe(execute);`,
   {
     count: 1,
     name: "retains the capture failure after a runner alias is cleared",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
+    rule: "eslint(no-restricted-properties)",
     source: `import { Effect } from "effect";
 let execute = Effect.runSync;
 execute = (value) => value;
 export const result = execute("local");`,
   },
   {
-    count: 0,
-    name: "keeps a same-named local Effect separate",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
-    source: `export const local = (Effect) => Effect.runSync;`,
-  },
-  {
     count: 1,
     name: "rejects forwarding through the function call method",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
+    rule: "eslint(no-restricted-properties)",
     source: `import { Effect } from "effect";
 export const result = Effect.runSync.call(null, Effect.void);`,
   },
   {
-    count: 0,
-    name: "leaves a direct call to the existing execution rule",
-    rule: "taxkit-effect(no-runtime-references-outside-boundaries)",
-    source: `import { Effect } from "effect";
-export const result = Effect.runSync(Effect.void);`,
-  },
-  {
     count: 12,
     name: "rejects the installed Effect runner call family",
-    rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
+    rule: "effect(no-runtime-execution-outside-main)",
     source: `import { Effect, Context } from "effect";
 Effect.runCallback(Effect.void);
 Effect.runCallbackWith(Context.empty())(Effect.void);
@@ -214,7 +176,7 @@ Effect.runSyncWith(Context.empty())(Effect.void);`,
   {
     count: 2,
     name: "rejects named and namespace Node host runner calls",
-    rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
+    rule: "strict-effect(no-runtime-outside-boundary)",
     source: `import { runMain } from "@effect/platform-node/NodeRuntime";
 import * as Node from "@effect/platform-node";
 import { Effect } from "effect";

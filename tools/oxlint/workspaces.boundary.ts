@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import {
   Function as EffectFunction,
   Array,
+  Effect,
   Option,
   Predicate,
   Record,
@@ -30,13 +31,19 @@ export const ExportTarget: Schema.Codec<ExportTarget> = Schema.suspend(() =>
   ])
 );
 const Dependencies = Schema.Record(Schema.String, Schema.String);
+// A missing dependency field is an empty dependency map.
+const DependencyField = Dependencies.pipe(
+  Schema.withDecodingDefaultKey(Effect.succeed({}), {
+    encodingStrategy: "omit",
+  })
+);
 export const WorkspaceManifest = Schema.Struct({
-  dependencies: Schema.optionalKey(Dependencies),
-  devDependencies: Schema.optionalKey(Dependencies),
+  dependencies: DependencyField,
+  devDependencies: DependencyField,
   exports: Schema.optionalKey(ExportTarget),
   name: Schema.String,
-  optionalDependencies: Schema.optionalKey(Dependencies),
-  peerDependencies: Schema.optionalKey(Dependencies),
+  optionalDependencies: DependencyField,
+  peerDependencies: DependencyField,
 });
 const RootManifest = Schema.Struct({
   ...WorkspaceManifest.fields,
@@ -106,10 +113,10 @@ const publicExports = (
 };
 export const dependencyNames = (manifest: typeof WorkspaceManifest.Type) =>
   Array.dedupe([
-    ...Record.keys(manifest.dependencies ?? {}),
-    ...Record.keys(manifest.devDependencies ?? {}),
-    ...Record.keys(manifest.optionalDependencies ?? {}),
-    ...Record.keys(manifest.peerDependencies ?? {}),
+    ...Record.keys(manifest.dependencies),
+    ...Record.keys(manifest.devDependencies),
+    ...Record.keys(manifest.optionalDependencies),
+    ...Record.keys(manifest.peerDependencies),
   ]);
 const rootManifest = Schema.decodeUnknownResult(
   Schema.fromJsonString(RootManifest)

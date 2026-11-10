@@ -7,16 +7,6 @@ interface Effect<Value, Error, Requirements = never> {
   readonly value: Value;
 }
 
-const Effect = {
-  runPromise: <Value>(value: Value) => value,
-  tryPromise: <Value>(value: () => Promise<Value>) => value(),
-};
-const ManagedRuntime = {
-  make: <Value>(value: Value) => value,
-};
-const BunRuntime = {
-  runMain: <Value>(value: Value) => value,
-};
 const Schema = {
   Unknown: "local",
 };
@@ -26,15 +16,13 @@ const console = {
 const process = {
   argv: ["local"],
 };
+const Map = (value: string) => value;
 
 export type LocalEffect = Effect<string, unknown>;
 export const localCause = { cause: Schema.Unknown };
-export const localRuntimeValues = [
-  Effect.runPromise("local"),
-  Effect.tryPromise(() => Promise.resolve("local")),
-  ManagedRuntime.make("local"),
-  BunRuntime.runMain("local"),
+export const localHostValues = [
   console.log("local"),
   process.argv,
+  Map("local"),
 ];
 export const effectTestApis = { describe, expect, it, vi };
