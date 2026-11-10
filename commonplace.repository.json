@@ -1,0 +1,29 @@
+{
+  "responsibilities": {
+    "typescript-infrastructure": "tsconfig.alchemy.json",
+    "knip-config": "knip.json",
+    "knip-production-config": "knip.production.json",
+    "web-server-entry": "apps/web/src/entry.server.ts",
+    "web-api-binding-adapter": "apps/web/src/lib/host/binding.adapter.layer.ts",
+    "web-host-ingress": "apps/web/src/lib/runtime.server.ts",
+    "api-worker-entry": "apps/api/src/worker.ts",
+    "api-application-layer": "apps/api/src/worker.application.ts",
+    "api-entry-test": "apps/api/test/worker.boundary.test.ts",
+    "domain-package": "packages/calculators/package.json",
+    "http-api-package": "packages/api/http/package.json",
+    "doc-deployment": "docs/architecture/deployment.md",
+    "doc-transports": "docs/architecture/api-and-sdk.md",
+    "doc-frontend-composition": "docs/architecture/frontend.md",
+    "lint-policy": [
+      "tools/oxlint/taxkit-rules.ts",
+      "tools/oxlint/package-rules.ts",
+      "tools/oxlint/effect-rules.ts"
+    ],
+    "lint-policy-test": "tools/oxlint/portable-rules.test.ts",
+    "lint-workspaces": "tools/oxlint/workspaces.boundary.ts"
+  },
+  "ownerPaths": {
+    "sources": ["tools/oxlint/package-roles.ts"],
+    "allowMissing": ["tools/oxlint/fixtures/*.ts", "**/.generated-*"]
+  }
+}

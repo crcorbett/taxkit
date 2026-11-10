@@ -12,6 +12,7 @@ import { layerNonInteractive } from "alchemy/Interaction";
 import * as Output from "alchemy/Output";
 import * as Plan from "alchemy/Plan";
 import * as Provider from "alchemy/Provider";
+import type { LogicalId } from "alchemy/Resource";
 import * as Stack from "alchemy/Stack";
 import { Stage } from "alchemy/Stage";
 import { inMemoryState } from "alchemy/State";
@@ -210,7 +211,7 @@ const plan = <A>(compiled: Stack.CompiledStack<A>) =>
     Effect.timeout("1 second")
   );
 // Evaluate a planned member's props and removal policy against state.
-const member = (compiled: Stack.CompiledStack, id: string) =>
+const member = (compiled: Stack.CompiledStack, id: LogicalId) =>
   Record.get(compiled.resources, id).pipe(
     Effect.fromOption,
     Effect.flatMap((resource) => {
