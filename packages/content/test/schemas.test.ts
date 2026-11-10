@@ -16,6 +16,7 @@ import {
   DocsSearchTerm,
 } from "../src/schemas.js";
 import { readingV2Json } from "./fixtures/reading-v2.js";
+import { codeColours } from "./theme.fixture.js";
 
 describe("published reading contract", () => {
   it.effect("preserves historical v2 bytes across every reading node", () =>
@@ -111,8 +112,8 @@ describe("published reading contract", () => {
               lines: [
                 [
                   {
-                    light: { color: "#172033", style: "normal" },
-                    dark: { color: "#e7edf5", style: "normal" },
+                    light: { color: codeColours.light, style: "normal" },
+                    dark: { color: codeColours.dark, style: "normal" },
                     text: "",
                   },
                 ],

@@ -10,6 +10,7 @@ import {
   Function as EffectFunction,
   Array,
   Data,
+  Effect,
   Schema,
   SchemaGetter,
 } from "effect";
@@ -42,8 +43,11 @@ export const WebsiteSearchParameters = Schema.Record(
 const WebsiteDocsSearchTerm = Schema.Trim.pipe(
   Schema.decodeTo(Schema.Union([Schema.Literal(""), DocsSearchTerm]))
 );
+// An address without a term is the search page itself: no search words.
 const WebsiteDocsSearchQuery = Schema.Struct({
-  term: Schema.optional(WebsiteDocsSearchTerm),
+  term: WebsiteDocsSearchTerm.pipe(
+    Schema.withDecodingDefault(Effect.succeed(""))
+  ),
 });
 // Search uses the original raw address instead of the router's default JSON
 // query parser, which would turn words such as 2026 or true into other types.
@@ -66,10 +70,11 @@ export const WebsiteDocsSearchLocation = Schema.String.check(
     })),
     encode: SchemaGetter.transform((query) =>
       Match.value(query.term).pipe(
-        Match.when(undefined, (): "" => ""),
-        Match.orElse((matchedValue) =>
-          new URLSearchParams({ term: matchedValue }).toString()
-        )
+        Match.whenOr(undefined, "", (): "" => ""),
+        Match.when(Match.string, (term) =>
+          new URLSearchParams({ term }).toString()
+        ),
+        Match.exhaustive
       )
     ),
   })

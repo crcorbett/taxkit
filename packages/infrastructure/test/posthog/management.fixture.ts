@@ -10,11 +10,14 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 
-import { PostHogManagementError } from "./errors.js";
-import type { PostHogManagementOperation } from "./errors.js";
-import { ManagedProject, desiredProjectPrivacy } from "./schemas.js";
-import type { ProjectDefinition } from "./schemas.js";
-import { PostHogManagement } from "./service.js";
+import { PostHogManagementError } from "../../src/posthog/errors.js";
+import type { PostHogManagementOperation } from "../../src/posthog/errors.js";
+import {
+  ManagedProject,
+  desiredProjectPrivacy,
+} from "../../src/posthog/schemas.js";
+import type { ProjectDefinition } from "../../src/posthog/schemas.js";
+import { PostHogManagement } from "../../src/posthog/service.js";
 
 export const makePostHogManagementTest = Effect.fnUntraced(function* (
   initial: readonly ManagedProject[] = []

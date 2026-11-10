@@ -184,7 +184,9 @@ it.effect.each([
             Match.value(call).pipe(
               Match.when(0, (): "/tmp/fixture.tgz" => "/tmp/fixture.tgz"),
               Match.when(1, () => packedListing),
-              Match.orElse((): "" => "")
+              // Later calls are cleanup commands with no output.
+              Match.when(Match.number, (): "" => ""),
+              Match.exhaustive
             )
           )
         );
@@ -483,7 +485,8 @@ it.effect.each(["packed", "downstream"] as const)(
       const error = yield* Effect.gen(function* runBoundedFixture() {
         return yield* Match.value(owner).pipe(
           Match.when("packed", () => checkPackedArtifact),
-          Match.orElse(() => checkDownstreamConsumer)
+          Match.when("downstream", () => checkDownstreamConsumer),
+          Match.exhaustive
         );
       }).pipe(
         Effect.provideService(ChildProcessSpawner.ChildProcessSpawner, spawner),
@@ -500,18 +503,21 @@ it.effect.each(["packed", "downstream"] as const)(
         ),
         Effect.flip
       );
-      Match.value(error).pipe(
+      const reason = Match.value(error).pipe(
         Match.tags({
-          DownstreamCommandError: (failure) => {
-            expect(failure.reason).toBe("output-limit");
-          },
-          PackedArtifactCommandError: (failure) => {
-            expect(failure.reason).toBe("output-limit");
-          },
+          DownstreamCommandError: (failure) => failure.reason,
+          PackedArtifactCommandError: (failure) => failure.reason,
         }),
-        // oxlint-disable-next-line typescript/strict-void-return -- Effect Match terminal preserves the assertion callbacks; its generic host signature uses any.
-        Match.orElse(() => expect.unreachable())
+        Match.tag(
+          "BadArgument",
+          "DownstreamReleaseBlockerError",
+          "DownstreamValidationError",
+          "PackedArtifactValidationError",
+          (): "unexpected failure" => "unexpected failure"
+        ),
+        Match.exhaustive
       );
+      expect(reason).toBe("output-limit");
       expect(yield* Ref.get(closed)).toBe(1);
       expect(yield* Ref.get(removed)).toBe(
         Match.value(owner).pipe(

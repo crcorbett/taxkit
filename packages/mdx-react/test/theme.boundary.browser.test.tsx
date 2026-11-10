@@ -16,7 +16,8 @@ import {
 import { TestClock } from "effect/testing";
 import { createRoot } from "react-dom/client";
 
-import { code, journalTheme } from "./article.fixture.js";
+import { code } from "./article.fixture.js";
+import { journalTheme } from "./theme.fixture.js";
 
 const NestedThemes = ({
   block,

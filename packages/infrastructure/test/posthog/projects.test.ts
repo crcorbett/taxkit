@@ -44,7 +44,7 @@ import {
 } from "../../src/posthog/schemas.js";
 import { PostHogManagement } from "../../src/posthog/service.js";
 import { declarePostHogProjects } from "../../src/posthog/stack.js";
-import { makePostHogManagementTest } from "../../src/posthog/test.layer.js";
+import { makePostHogManagementTest } from "./management.fixture.js";
 
 // Alchemy erases provider errors to any. Preserve their cause as checked failure data at this native boundary.
 class NativeProviderError extends Schema.TaggedError<

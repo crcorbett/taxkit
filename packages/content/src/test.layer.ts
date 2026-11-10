@@ -1,55 +1,9 @@
-import { Array, Effect, Layer, Ref } from "effect";
+import { Effect, Layer } from "effect";
 
-import type { ContentObservations } from "./__testing__/observations.js";
 import { DocsImageRenderError } from "./errors.js";
-import { ContentServiceLive } from "./live.layer.js";
 import { DocsPngBytes, docsOgImageSize } from "./schemas.js";
-import type {
-  DocsPagePath,
-  DocsPublicCatalogue,
-  DocsSearchTerm,
-} from "./schemas.js";
-import { ContentCatalogue, ContentService, DocsOgImages } from "./service.js";
+import { DocsOgImages } from "./service.js";
 
-export const makeContentTest = Effect.fnUntraced(function* (
-  catalogue: DocsPublicCatalogue
-) {
-  const service = yield* ContentService.pipe(
-    Effect.provide(
-      ContentServiceLive.pipe(
-        Layer.provide(Layer.succeed(ContentCatalogue, catalogue))
-      )
-    )
-  );
-  const observations = {
-    requestedPages: yield* Ref.make<readonly DocsPagePath[]>([]),
-    searchTerms: yield* Ref.make<readonly DocsSearchTerm[]>([]),
-  } satisfies ContentObservations;
-  return {
-    layer: Layer.succeed(
-      ContentService,
-      ContentService.of({
-        getNavigation: Effect.fn("ContentService.getNavigation")(
-          service.getNavigation
-        ),
-        getPage: Effect.fn("ContentService.getPage")(function* (
-          path: DocsPagePath
-        ) {
-          yield* Ref.update(observations.requestedPages, Array.append(path));
-          return yield* service.getPage(path);
-        }),
-        listPages: Effect.fn("ContentService.listPages")(service.listPages),
-        searchPages: Effect.fn("ContentService.searchPages")(function* (
-          term: DocsSearchTerm
-        ) {
-          yield* Ref.update(observations.searchTerms, Array.append(term));
-          return yield* service.searchPages(term);
-        }),
-      })
-    ),
-    observations,
-  };
-});
 // Deterministic share images: one fixed PNG header of the owned size for
 // every page.
 export const DocsOgImagesTest = Layer.succeed(DocsOgImages)(

@@ -29,11 +29,7 @@ import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { DocsSourceError } from "@taxkit/content/errors";
-import {
-  ContentCatalogue,
-  ContentService,
-  DocsOgImages,
-} from "@taxkit/content/service";
+import { ContentService } from "@taxkit/content/service";
 import {
   CalculatorHostMode,
   edgeCallerKey,
@@ -71,6 +67,7 @@ import {
   ApiCalculatorDelivery,
   withCalculatorAnalytics,
 } from "./analytics-request.boundary.js";
+import { ApiWorkerSettingsUnavailable } from "./schemas.js";
 import { ApiWorkerSettingsConfig } from "./worker.config.js";
 // The closed route family for the one request record; the raw path, query and
 // calculator ID never leave this function.
@@ -97,11 +94,25 @@ const LoopbackRateKey = CalculatorClientRateKey.make(
 );
 // Construct once in the native instance scope. HTTP and MCP receive this
 // same application service; native requests keep their own scope and fibre.
+// The public HTTP routes. Request handlers receive the calculator service
+// that the router middleware reads once, when the router is built.
+const ApiRoutes = Layer.mergeAll(TaxKitApiRoutesLayer, aeoRoutes).pipe(
+  HttpRouter.provideRequest(
+    Layer.effect(PublicCalculatorService, PublicCalculatorService)
+  )
+);
+
 export const ApiWorkerApplication = Effect.gen(function* () {
   const analytics = yield* ApiCalculatorDelivery;
   // Native planning binds deferred resource addresses. Read their runtime
   // values once on first incoming use, without inventing planning URLs.
-  const settings = yield* Effect.cached(ApiWorkerSettingsConfig);
+  const settings = yield* Effect.cached(
+    ApiWorkerSettingsConfig.pipe(
+      Effect.mapError(
+        () => new ApiWorkerSettingsUnavailable({ operation: "settings" })
+      )
+    )
+  );
   // An invalid mode is a startup ConfigError; only a missing value means edge.
   const hostMode = yield* Config.schema(
     CalculatorHostMode,
@@ -122,39 +133,29 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     )
   );
   const telemetry = yield* Layer.build(ApiHostTelemetryLive);
-  const calculator = Layer.succeed(
-    PublicCalculatorService,
-    yield* PublicCalculatorService
-  );
-  const content = Layer.succeed(ContentService, yield* ContentService);
-  // The answer-engine documents and share images. Stage origins resolve on
-  // first use, after native planning binds them.
-  const aeo = aeoRoutes.pipe(
-    Layer.provide(
-      Layer.succeed(PublicationOrigins)(
-        settings.pipe(
-          Effect.map(({ apiOrigin, publicationOrigin }) => ({
-            apiOrigin,
-            publicationOrigin,
-          })),
-          Effect.mapError(
-            () =>
-              new DocsSourceError({
-                message: "Documentation publication settings are unavailable.",
-                operation: "getDiscoveryDocument",
-              })
-          )
+  // The static route Layers build here, in the application's context. The
+  // MCP routes build later, on first use, so they receive these values.
+  const calculator = yield* PublicCalculatorService;
+  const content = yield* ContentService;
+  const handler = yield* HttpRouter.toHttpEffect(ApiRoutes).pipe(
+    // The answer-engine documents and share images. Stage origins resolve on
+    // first use, after native planning binds them.
+    Effect.provideService(
+      PublicationOrigins,
+      settings.pipe(
+        Effect.map(({ apiOrigin, publicationOrigin }) => ({
+          apiOrigin,
+          publicationOrigin,
+        })),
+        Effect.mapError(
+          () =>
+            new DocsSourceError({
+              message: "Documentation publication settings are unavailable.",
+              operation: "getDiscoveryDocument",
+            })
         )
       )
     ),
-    Layer.provide(Layer.succeed(ContentCatalogue, yield* ContentCatalogue)),
-    Layer.provide(Layer.succeed(DocsOgImages, yield* DocsOgImages))
-  );
-  const routes = Layer.mergeAll(TaxKitApiRoutesLayer, aeo).pipe(
-    Layer.provide(content),
-    HttpRouter.provideRequest(calculator)
-  );
-  const handler = yield* HttpRouter.toHttpEffect(routes).pipe(
     Effect.provideContext(telemetry)
   );
   const instanceScope = yield* Scope.Scope;
@@ -162,9 +163,9 @@ export const ApiWorkerApplication = Effect.gen(function* () {
   // adapter starts and closes its protocol/notification fibres per POST. Keep
   // the first caller's request/key out of shared registration.
   const mcp = yield* Effect.cached(
-    HttpRouter.toHttpEffect(
-      TaxKitMcpHttpLayer.pipe(Layer.provide(calculator), Layer.provide(content))
-    ).pipe(
+    HttpRouter.toHttpEffect(TaxKitMcpHttpLayer).pipe(
+      Effect.provideService(PublicCalculatorService, calculator),
+      Effect.provideService(ContentService, content),
       Scope.provide(instanceScope),
       Effect.updateContext((context: Context.Context<never>) =>
         Context.omit(
@@ -177,9 +178,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       Effect.provideContext(telemetry),
       Effect.catchTags({
         ConfigError: () =>
-          Effect.succeed(
-            Effect.succeed(HttpServerResponse.empty({ status: 503 }))
-          ),
+          Effect.fail(new ApiWorkerSettingsUnavailable({ operation: "mcp" })),
         IllegalArgumentError: () =>
           Effect.succeed(
             Effect.succeed(HttpServerResponse.empty({ status: 503 }))
@@ -204,6 +203,9 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         onTrue: () =>
           mcp.pipe(
             Effect.flatMap(withBoundedMcpReply),
+            Effect.catchTag("ApiWorkerSettingsUnavailable", () =>
+              Effect.succeed(HttpServerResponse.empty({ status: 503 }))
+            ),
             Effect.provideService(
               McpRequestAbortSignal,
               Schema.decodeUnknownOption(Schema.instanceOf(Request))(
@@ -268,7 +270,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
         (completed) => Deferred.succeed(completed, true)
       ).pipe(Effect.provideService(CalculatorRequestRateKey, key));
     }).pipe(
-      Effect.catchTag("ConfigError", () =>
+      Effect.catchTag("ApiWorkerSettingsUnavailable", () =>
         Effect.succeed(HttpServerResponse.empty({ status: 503 }))
       )
     ),

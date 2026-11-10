@@ -116,10 +116,15 @@ export const CalculatorApiHandlerLive = HttpApiBuilder.group(
                   (failure) =>
                     new CalculatorApiErrorEnvelopeData({ error: failure })
                 ),
-                Match.orElse(
+                Match.tag(
+                  "InputValidationError",
+                  "CalculationError",
+                  "UnsupportedCalculatorError",
+                  "UnsupportedCalculatorContextError",
                   (failure) =>
                     new CalculatorApiErrorEnvelopeData({ error: failure })
-                )
+                ),
+                Match.exhaustive
               )
             )
           )

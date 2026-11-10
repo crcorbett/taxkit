@@ -47,7 +47,11 @@ const joinSegments = (
                 onTrue: () => Option.some(Array.dropRight(segments, 1)),
               })
             ),
-            Match.orElse(() => Option.some(Array.append(segments, segment)))
+            // Any other segment is an ordinary path name.
+            Match.when(Match.string, () =>
+              Option.some(Array.append(segments, segment))
+            ),
+            Match.exhaustive
           )
         )
       )

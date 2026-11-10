@@ -196,13 +196,23 @@ export const PostHogManagementLive = Layer.effect(
                     reason: "invalid-response",
                   })
               ),
-              Match.orElse(
+              Match.tag(
+                "BadGateway",
+                "ConfigError",
+                "GatewayTimeout",
+                "HttpClientError",
+                "InternalServerError",
+                "InvalidInput",
+                "ServiceUnavailable",
+                "TooManyRequests",
+                "UnknownPosthogError",
                 () =>
                   new PostHogManagementError({
                     operation,
                     reason: "provider-failure",
                   })
-              )
+              ),
+              Match.exhaustive
             )
           )
         );
@@ -372,13 +382,26 @@ export const PostHogManagementLive = Layer.effect(
                       reason: "permission-refused",
                     })
                 ),
-                Match.orElse(
+                Match.tag(
+                  "BadGateway",
+                  "BadRequest",
+                  "ConfigError",
+                  "GatewayTimeout",
+                  "HttpClientError",
+                  "InternalServerError",
+                  "InvalidInput",
+                  "NotFound",
+                  "ServiceUnavailable",
+                  "TooManyRequests",
+                  "UnknownPosthogError",
+                  "PosthogParseError",
                   () =>
                     new PostHogManagementError({
                       operation: "find-project",
                       reason: "provider-failure",
                     })
-                )
+                ),
+                Match.exhaustive
               )
             )
           );
@@ -610,13 +633,26 @@ export const PostHogManagementLive = Layer.effect(
                           reason: "request-refused",
                         })
                     ),
-                    Match.orElse(
+                    Match.tag(
+                      "BadGateway",
+                      "ConfigError",
+                      "GatewayTimeout",
+                      "HttpClientError",
+                      "InternalServerError",
+                      "InvalidInput",
+                      "NotFound",
+                      "SchemaError",
+                      "ServiceUnavailable",
+                      "TooManyRequests",
+                      "UnknownPosthogError",
+                      "PosthogParseError",
                       () =>
                         new PostHogManagementError({
                           operation: "create-project",
                           reason: "uncertain-create",
                         })
-                    )
+                    ),
+                    Match.exhaustive
                   )
                 ),
                 Effect.catchTag("PostHogManagementError", (owned) =>
@@ -761,13 +797,25 @@ export const PostHogManagementLive = Layer.effect(
                           reason: "invalid-response",
                         })
                     ),
-                    Match.orElse(
+                    Match.tag(
+                      "BadGateway",
+                      "BadRequest",
+                      "ConfigError",
+                      "GatewayTimeout",
+                      "HttpClientError",
+                      "InternalServerError",
+                      "InvalidInput",
+                      "NotFound",
+                      "ServiceUnavailable",
+                      "TooManyRequests",
+                      "UnknownPosthogError",
                       () =>
                         new PostHogManagementError({
                           operation: "update-project",
                           reason: "provider-failure",
                         })
-                    )
+                    ),
+                    Match.exhaustive
                   )
                 )
               );

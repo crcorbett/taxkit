@@ -10,6 +10,7 @@ import {
   DocsRepositoryProfile,
   DocsSourcePath,
 } from "../src/schemas.js";
+import { codeColours } from "./theme.fixture.js";
 
 const context = Effect.gen(function* () {
   const source = yield* DocsSourcePath.makeEffect("guides/first.mdx");
@@ -125,8 +126,8 @@ describe("reading Markdown", () => {
           lines: [
             [
               {
-                light: { color: "#172033", style: "normal" },
-                dark: { color: "#e7edf5", style: "normal" },
+                light: { color: codeColours.light, style: "normal" },
+                dark: { color: codeColours.dark, style: "normal" },
                 text: "const a = 1;",
               },
             ],
