@@ -15,14 +15,16 @@ const writeFixture = (source: string) => {
   });
 };
 const diagnostics = (output: string) =>
-  output.match(/effect\(no-bare-effect-try-promise\)/gu) ?? [];
+  output.match(/taxkit-effect\(inline-try-promise-callbacks\)/gu) ?? [];
 const runOxlint = (path: string) =>
   lintFiles({
     paths: [path],
   });
-describe("taxkit-effect/no-bare-effect-try-promise", () => {
+const sharedDiagnostics = (output: string) =>
+  output.match(/effect-conventions\(require-try-promise-catch\)/gu) ?? [];
+describe("taxkit-effect/inline-try-promise-callbacks", () => {
   it.effect(
-    "rejects canonical root, namespace, subpath, alias, destructured and reassigned calls",
+    "keeps the shared rule on root, namespace, subpath, alias and destructured calls",
     () =>
       Effect.gen(function* () {
         const fixture = yield* writeFixture(`
@@ -32,20 +34,17 @@ describe("taxkit-effect/no-bare-effect-try-promise", () => {
 
       const aliasedAttempt = Fx.tryPromise;
       const { tryPromise: destructuredAttempt } = Fx;
-      let reassignedAttempt = (value) => value;
-      reassignedAttempt = Fx.tryPromise;
 
       Fx.tryPromise(() => Promise.resolve("direct"));
       EffectRoot.Effect.tryPromise(() => Promise.resolve("namespace"));
       subpathAttempt(() => Promise.resolve("subpath"));
       aliasedAttempt(() => Promise.resolve("alias"));
       destructuredAttempt(() => Promise.resolve("destructured"));
-      reassignedAttempt(() => Promise.resolve("reassigned"));
     `);
         const result = yield* runOxlint(fixture);
         expect(result.exitCode).toBe(1);
-        EffectFunction.pipe(diagnostics(result.output), (actual) => {
-          expect(actual).toHaveLength(6);
+        EffectFunction.pipe(sharedDiagnostics(result.output), (actual) => {
+          expect(actual).toHaveLength(5);
         });
       }).pipe(Effect.provide(BunServices.layer))
   );
@@ -92,7 +91,7 @@ describe("taxkit-effect/no-bare-effect-try-promise", () => {
     `);
         const result = yield* runOxlint(fixture);
         expect(result.output).not.toContain(
-          "taxkit-effect(no-bare-effect-try-promise)"
+          "taxkit-effect(inline-try-promise-callbacks)"
         );
       }).pipe(Effect.provide(BunServices.layer))
   );
@@ -131,8 +130,13 @@ describe("taxkit-effect/no-bare-effect-try-promise", () => {
     `);
         const result = yield* runOxlint(fixture);
         expect(result.exitCode).toBe(1);
+        // The shared rule owns a missing options object or key; this rule
+        // owns extracted, undefined and spread callbacks.
         EffectFunction.pipe(diagnostics(result.output), (actual) => {
-          expect(actual).toHaveLength(7);
+          expect(actual).toHaveLength(5);
+        });
+        EffectFunction.pipe(sharedDiagnostics(result.output), (actual) => {
+          expect(actual).toHaveLength(3);
         });
       }).pipe(Effect.provide(BunServices.layer))
   );

@@ -6,6 +6,7 @@ import { expect } from "vitest";
 import * as EffectRoot from "effect";
 import {
   Data as EffectData,
+  Effect,
   Effect as Fx,
   ManagedRuntime as RuntimeManager,
   Schema as S,
@@ -24,10 +25,6 @@ const { TaggedError: TaggedDataError } = EffectData;
 export class UntypedDataError extends TaggedDataError("UntypedDataError")<{
   readonly cause: unknown;
 }>() {}
-
-const RuntimeLayer = Fx.succeed("live");
-export { RuntimeLayer as DemoLive };
-export { ExternalLive as ExternalLayer } from "./external.layer";
 
 export const rejectedService = (
   input: unknown
@@ -51,7 +48,7 @@ const {
 export const rejectedEncoding = encodeOutput(S.String);
 export const rejectedCodec = decodeInput(S.String);
 
-const execute = Fx.runPromise;
+const execute = Effect.runPromise;
 const executeSync = EffectRoot.Effect.runSync;
 const { make: makeRuntime } = RuntimeManager;
 const executeMain = Runtime.runMain;
@@ -63,6 +60,11 @@ executeMain(Fx.void);
 export const rejectedPromiseBoundary = attemptPromise(() =>
   Promise.resolve("rejected")
 );
+const mapRejection = (cause: string) => cause;
+export const rejectedIndirectMapping = Fx.tryPromise({
+  catch: mapRejection,
+  try: () => Promise.resolve("rejected"),
+});
 
 const { argv: rejectedArguments } = process;
 const { log: writeLog } = console;

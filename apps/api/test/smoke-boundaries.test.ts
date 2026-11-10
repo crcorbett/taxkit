@@ -146,7 +146,9 @@ const successfulHttpClient = Effect.gen(function* () {
             Match.when("/api/v2/docs/markdown", () => page.markdown),
             Match.when("/api/v2/calculators", () => catalogJson),
             Match.when("/api/docs/openapi.json", () => openApiJson),
-            Match.orElse(() => calculationJson)
+            // Any other path is the calculation route under test.
+            Match.when(Match.string, () => calculationJson),
+            Match.exhaustive
           ),
           { headers: { "content-type": "application/json" } }
         )
@@ -227,7 +229,7 @@ it.effect.each([
   { duration: Duration.seconds(5), route: "calculate" },
   { duration: Duration.seconds(5), route: "openapi" },
   { duration: Duration.seconds(5), route: "public-content" },
-])(
+] as const)(
   "bounds stalled headers and closes the request: $route",
   ({ route, duration }) =>
     Effect.gen(function* () {
@@ -248,7 +250,8 @@ it.effect.each([
             origin,
           })
         ),
-        Match.orElse(() => checkApiOpenApi(origin))
+        Match.when("openapi", () => checkApiOpenApi(origin)),
+        Match.exhaustive
       );
       const fiber = yield* operation.pipe(
         Effect.provideService(HttpClient.HttpClient, client),
@@ -267,58 +270,60 @@ it.effect.each([
       expect(yield* Ref.get(closed)).toBeTruthy();
     })
 );
-it.effect.each(["health", "catalog", "calculate", "openapi", "public-content"])(
-  "bounds a stalled response body for %s",
-  (route) =>
-    Effect.gen(function* () {
-      const started = yield* Deferred.make<boolean>();
-      const closed = yield* Ref.make(false);
-      const client = HttpClient.make((request) => {
-        const response = HttpClientResponse.fromWeb(
-          request,
-          new Response("{}")
-        );
-        return Effect.succeed({
-          ...response,
-          json: Deferred.succeed(started, true).pipe(
-            Effect.andThen(Effect.never),
-            Effect.ensuring(Ref.set(closed, true))
-          ),
-          status: response.status,
-        });
-      });
-      const operation = Match.value(route).pipe(
-        Match.when("health", () => waitForApiHealth(origin)),
-        Match.when("catalog", () => checkApiCatalog(origin)),
-        Match.when("calculate", () => checkApiCalculation(origin)),
-        Match.when("public-content", () =>
-          checkApiPublicContent({
-            origin,
-          })
+it.effect.each([
+  "health",
+  "catalog",
+  "calculate",
+  "openapi",
+  "public-content",
+] as const)("bounds a stalled response body for %s", (route) =>
+  Effect.gen(function* () {
+    const started = yield* Deferred.make<boolean>();
+    const closed = yield* Ref.make(false);
+    const client = HttpClient.make((request) => {
+      const response = HttpClientResponse.fromWeb(request, new Response("{}"));
+      return Effect.succeed({
+        ...response,
+        json: Deferred.succeed(started, true).pipe(
+          Effect.andThen(Effect.never),
+          Effect.ensuring(Ref.set(closed, true))
         ),
-        Match.orElse(() => checkApiOpenApi(origin))
-      );
-      const fiber = yield* operation.pipe(
-        Effect.provideService(HttpClient.HttpClient, client),
-        Effect.result,
-        Effect.forkChild
-      );
-      yield* Deferred.await(started);
-      yield* TestClock.adjust(
-        Match.value(route).pipe(
-          Match.when("health", (): "15 seconds" => "15 seconds"),
-          Match.orElse((): "5 seconds" => "5 seconds")
-        )
-      );
-      const result = yield* Fiber.join(fiber);
-      EffectFunction.pipe(Result.isFailure(result), (actual) => {
-        expect(actual).toBeTruthy();
+        status: response.status,
       });
-      if (Result.isFailure(result)) {
-        expect(result.failure).toMatchObject({ reason: "timeout", route });
-      }
-      expect(yield* Ref.get(closed)).toBeTruthy();
-    })
+    });
+    const operation = Match.value(route).pipe(
+      Match.when("health", () => waitForApiHealth(origin)),
+      Match.when("catalog", () => checkApiCatalog(origin)),
+      Match.when("calculate", () => checkApiCalculation(origin)),
+      Match.when("public-content", () =>
+        checkApiPublicContent({
+          origin,
+        })
+      ),
+      Match.when("openapi", () => checkApiOpenApi(origin)),
+      Match.exhaustive
+    );
+    const fiber = yield* operation.pipe(
+      Effect.provideService(HttpClient.HttpClient, client),
+      Effect.result,
+      Effect.forkChild
+    );
+    yield* Deferred.await(started);
+    yield* TestClock.adjust(
+      Match.value(route).pipe(
+        Match.when("health", (): "15 seconds" => "15 seconds"),
+        Match.orElse((): "5 seconds" => "5 seconds")
+      )
+    );
+    const result = yield* Fiber.join(fiber);
+    EffectFunction.pipe(Result.isFailure(result), (actual) => {
+      expect(actual).toBeTruthy();
+    });
+    if (Result.isFailure(result)) {
+      expect(result.failure).toMatchObject({ reason: "timeout", route });
+    }
+    expect(yield* Ref.get(closed)).toBeTruthy();
+  })
 );
 it.effect.each([
   "start",
@@ -332,7 +337,7 @@ it.effect.each([
   "cleanup",
   "nonzero-and-cleanup",
   "success",
-])(
+] as const)(
   "closes both child processes and reports the external consumer outcome: %s",
   (mode) =>
     Effect.gen(function* () {
@@ -387,7 +392,19 @@ it.effect.each([
                         "evidence",
                         (): "TAXKIT_SECRET_SENTINEL" => "TAXKIT_SECRET_SENTINEL"
                       ),
-                      Match.orElse(() => evidence)
+                      Match.whenOr(
+                        "start",
+                        "stdout",
+                        "stderr",
+                        "exit-read",
+                        "nonzero",
+                        "write",
+                        "cleanup",
+                        "nonzero-and-cleanup",
+                        "success",
+                        () => evidence
+                      ),
+                      Match.exhaustive
                     )
                   )
                 ),
@@ -450,14 +467,15 @@ it.effect.each([
       }
     })
 );
-it.effect.each(["catalog", "calculate", "openapi"])(
+it.effect.each(["catalog", "calculate", "openapi"] as const)(
   "bounds failed HTTP transport and rejects invalid responses: %s",
   (route) =>
     Effect.gen(function* () {
       const operation = Match.value(route).pipe(
         Match.when("catalog", () => checkApiCatalog(origin)),
         Match.when("calculate", () => checkApiCalculation(origin)),
-        Match.orElse(() => checkApiOpenApi(origin))
+        Match.when("openapi", () => checkApiOpenApi(origin)),
+        Match.exhaustive
       );
       yield* Effect.forEach(["transport", "status", "json", "schema"], (mode) =>
         Effect.gen(function* () {

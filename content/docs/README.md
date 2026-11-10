@@ -14,6 +14,14 @@ checked catalogue the API Worker serves. The Website reads the API rather than i
 `sources.ts` needs a host that loads `?raw` imports as text. Bun and Vitest
 both do.
 
+## Exports
+
+- `./navigation.json`: the page order, addresses, source files, page types and
+  primary readers.
+- `./repository.json`: the GitHub revisions that repository-file links use.
+- `./sources`: the raw `?raw` import list of every page. Consumers read pages
+  through this list rather than importing `.mdx` files directly.
+
 ## Writing pages
 
 Each page starts with YAML frontmatter (`title`, `description` and `status`) and

@@ -37,6 +37,16 @@ export class ApiServerConfigError extends Schema.TaggedError<
   { readonly brand: unique symbol }
 >()("ApiServerConfigError", { operation: Schema.Literal("settings") }) {}
 
+// The Worker reads its deferred origin bindings on first use. Missing or
+// invalid values fail every request with this one named error; the request
+// boundary answers it with 503 Service Unavailable.
+export class ApiWorkerSettingsUnavailable extends Schema.TaggedError<
+  ApiWorkerSettingsUnavailable,
+  { readonly brand: unique symbol }
+>()("ApiWorkerSettingsUnavailable", {
+  operation: Schema.Literals(["settings", "mcp"]),
+}) {}
+
 export const ApiWorkerSettings = Schema.Struct({
   apiOrigin: TaxKitApiOrigin,
   publicationOrigin: DocsPublicationOrigin,

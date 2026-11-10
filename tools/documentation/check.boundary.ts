@@ -20,7 +20,10 @@ import { DocumentationError, DocumentationInventoryError } from "./errors.js";
 const PackageScripts = Schema.fromJsonString(
   Schema.Struct({
     name: Schema.optionalKey(Schema.String),
-    scripts: Schema.optionalKey(Schema.Record(Schema.String, Schema.String)),
+    // A manifest without scripts has no runnable commands.
+    scripts: Schema.Record(Schema.String, Schema.String).pipe(
+      Schema.withDecodingDefaultKey(Effect.succeed({}))
+    ),
   })
 );
 const DocumentInventory = Schema.Array(Schema.NonEmptyString);
@@ -310,7 +313,7 @@ export const checkDocumentation = Effect.fn("Documentation.check")(function* ({
       Effect.flatMap(Schema.decodeEffect(PackageScripts)),
       Effect.map((decoded) => ({
         name: Option.fromNullishOr(decoded.name),
-        scripts: HashSet.fromIterable(Record.keys(decoded.scripts ?? {})),
+        scripts: HashSet.fromIterable(Record.keys(decoded.scripts)),
       }))
     );
   const root = yield* EffectFunction.pipe(

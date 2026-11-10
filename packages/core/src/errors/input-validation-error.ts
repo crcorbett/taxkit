@@ -1,6 +1,7 @@
 import {
   Array,
   Function as EffectFunction,
+  Option,
   Result,
   Schema,
   SchemaIssue,
@@ -46,7 +47,8 @@ export const inputValidationError = (
       Array.map((entry) => ({
         message: "Invalid input value",
         path: EffectFunction.pipe(
-          entry.path ?? [],
+          Option.fromUndefinedOr(entry.path),
+          Option.getOrElse((): readonly PropertyKey[] => []),
           Array.take(12),
           Array.map((part) =>
             Schema.decodeUnknownResult(PathKey)(part).pipe(

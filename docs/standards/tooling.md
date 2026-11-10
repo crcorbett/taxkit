@@ -16,8 +16,8 @@ stable boundaries.
   add local `off` settings, or weaken shared checks for a package.
   Local settings name semantic owners and exact host boundaries; they do not
   suppress shared preset checks. Repository plugins use `taxkit-effect`,
-  `taxkit-bun`, `taxkit` and `taxkit-package`, so they cannot replace shared
-  `effect`, `bun` or `package` rules.
+  `taxkit` and `taxkit-package`, so they cannot replace shared `effect` or
+  `package` rules.
 - `@commonplaces/oxlint-plugin` is the one dependency outside the exact-pin
   policy: its manifest value is `"latest"`. `bun run lint` first runs
   `bun run lint:refresh`, which installs the current npm release with
@@ -25,8 +25,9 @@ stable boundaries.
   `effect-tsgo patch --oxlint`; a registry, patch or compatibility failure
   stops linting. The manifest stays `"latest"`, so the executed plugin may be
   newer than the lockfile; record the installed rule version when reporting
-  lint results. The installed release is 0.11.0 with Oxlint 1.89.0, inside its
-  supported range. Required Effect platform and test APIs use explicit
+  lint results. The lockfile records 0.12.0 with Oxlint 1.89.0, inside its
+  supported range; the 0.12.0 [upgrade notes](https://github.com/crcorbett/commonplace-lint/blob/main/docs/upgrading.md)
+  list the rules it added. Required Effect platform and test APIs use explicit
   `allowedUnstableApis` entries; the unstable API diagnostic remains enabled.
   Native Effect test callbacks are registered with Vitest's assertion rule
   rather than disabling it.
@@ -62,7 +63,8 @@ stable boundaries.
 | Command | Use |
 | --- | --- |
 | `bun run verification` | Before merging: the five checks `build`, `lint`, `check-types`, `knip` and `test`. |
-| `bun run lint` / `bun run fix` | Formatting, type-aware Oxlint with the boundary-directive pass, docs and path checks. |
+| `bun run lint` / `bun run fix` | Formatting, type-aware Oxlint (`--deny-warnings`) with the boundary-directive pass, docs and path checks. |
+| `bun run lint:doctor` | The plugin's `commonplace-lint-doctor`: version policy, refresh order, local rules that repeat a preset rule and missing option paths. Separate from `lint`; see below. |
 | `bun run format` | Oxfmt. |
 | `bun run check-types` | Workspace types plus the Alchemy roots, root tools and Effect diagnostics. |
 | `bun run knip` | Both Knip graphs. |
@@ -101,8 +103,8 @@ fences remain enabled. Ordinary temporary source fixtures stay inside the
 repository's lint fixture directory. The manifest guard covers every actual
 non-infrastructure package and rejects app dependencies in every dependency
 field. Approved Alchemy Worker helpers remain available to app hosts.
-The four repository plugin entries (`tools/oxlint/taxkit-rules.ts`,
-`effect-rules.ts`, `bun-rules.ts` and `package-rules.ts`) only register rules.
+The three repository plugin entries (`tools/oxlint/taxkit-rules.ts`,
+`effect-rules.ts` and `package-rules.ts`) only register rules.
 Each rule lives in its own file under `tools/oxlint/rules/`, with shared AST
 helpers in `tools/oxlint/rules/shared/`. Rules contain no owner paths:
 `oxlint.config.ts` names each owner list by role and passes it as options,
@@ -113,71 +115,60 @@ configuration no longer exists, or a browser import grant names a missing
 package export.
 
 A repository rule exists only where the shared presets do not cover the same
-cases on the same paths. Rules proven duplicate with real-command fixtures were
-removed: manual `_tag` literals (`effect/no-manual-tag`), throwing `*Sync`
-codecs (`effect-conventions/no-throwing-schema-codec`), and the calculator
-`typeof`, `instanceof`, `in`, JSON, `throw`, `async`/`await`/`new Promise`,
-`null`/`undefined` comparison, conditional spread and ambient clock checks
-(`anti-slop/no-runtime-typeof`, `effect/no-instanceof`,
-`effect-conventions/no-in-operator`, `strict-effect/no-unchecked-json`,
-`strict-effect/no-native-work`, `effect/no-async-await-promise`,
-`strict-effect/no-promise-workflow`, `effect-conventions/no-nullish-comparison`
-and `effect-conventions/no-conditional-object-spread`). Repository rules that
-remain cover cases the shared rules miss, as noted below.
+cases on the same paths. Earlier releases removed the manual `_tag`, throwing
+`*Sync` codec and calculator `typeof`/`instanceof`/`in`/JSON/`throw`/Promise,
+nullish comparison, conditional spread and ambient clock copies. The 0.12.0
+cleanup removed fourteen more local rules and two near-duplicates. Each now
+uses the shared rule with TaxKit's owner lists in `oxlint.config.ts`; the
+native restricted-name rules close the alias forms the shared rules do not
+follow. The fixtures in `tools/oxlint/lexical-policy.test.ts`,
+`portable-rules.test.ts`, `contract-boundaries.test.ts`,
+`analytics-boundaries.test.ts` and `inline-try-promise-callbacks.test.ts` run
+the real Oxlint command against these cases.
 
-Important repository rules include:
+| Removed local rule | Shared rule and TaxKit setting |
+| --- | --- |
+| `taxkit/no-native-collections` | `effect-conventions/no-native-collections`; `no-restricted-globals` (`Map`, `Set`, `WeakMap`, `WeakSet`) and `no-restricted-properties` (`globalThis.*`, `window.*`) for aliases. |
+| `taxkit-effect/no-host-imports-in-contracts` | `effect-conventions/no-host-api-in-contract`; `no-restricted-imports` on contract files adds `bun:*` and the Effect Bun/Node platform packages. |
+| `taxkit-effect/no-layer-exports-in-service-files` | `effect-conventions/no-layer-export-in-service`; `no-restricted-exports` on service files adds export specifiers and re-exports. |
+| `taxkit-effect/no-unknown-service-contract` | `effect-conventions/no-unknown-service-contract`. |
+| `taxkit-effect/no-unknown-tagged-error-cause` | `effect-conventions/no-unknown-tagged-error-payload`; `no-restricted-properties` rejects `Data.TaggedError`, so errors use `Schema.TaggedError`. |
+| `taxkit-effect/no-effect-test-global-mix` | `effect-conventions/no-mixed-test-globals`; `no-restricted-imports` in test files keeps `describe`, `expect`, `it` and `test` on `@effect/vitest`. |
+| `taxkit/no-decoding-outside-boundaries` | `effect-conventions/no-schema-decoder-outside-ingress`, excluding `decodingBoundaryFiles`. |
+| `taxkit-effect/no-schema-encoder-outside-egress` | `effect-conventions/no-schema-encoder-outside-egress`, excluding `schemaEncoderEgressFiles`. |
+| `taxkit-effect/no-runtime-execution-outside-boundaries`, `taxkit-effect/no-runtime-references-outside-boundaries`, `taxkit-bun/no-runtime-outside-entrypoints` | `effect/no-runtime-execution-outside-main` with `runtimeBoundaryFiles`, `strict-effect/no-runtime-outside-boundary`, and `no-restricted-properties` for runner references outside those files. |
+| `taxkit-effect/no-process-outside-boundaries` | `effect/no-ambient-process`; `no-restricted-globals` (`process`) outside `processBoundaryFiles`. |
+| `taxkit-effect/no-console-outside-runtime` | `effect/no-console`; `no-restricted-globals` (`console`). Only the copy-control browser test may name it, to spy on `console.error`. |
+| `taxkit-bun/no-host-api-outside-adapters` | `bun/no-ambient-host-api`; `no-restricted-globals` (`Bun`). Bun reaches TaxKit only through `@effect/platform-bun` Layers. |
+| `taxkit-effect/no-bare-effect-try-promise` | `effect-conventions/require-try-promise-catch`; the narrower `taxkit-effect/inline-try-promise-callbacks` below. |
 
-- `taxkit-effect/no-layer-exports-in-service-files`: bans `Live`, `Mock` and `Test`
-  layer exports from `service.ts`/`services.ts` files, including named export
-  specifiers and named re-exports. Service files own `Context.Service`
-  contracts and canonical schemas; production wiring belongs in
-  `live.layer.ts`, test wiring belongs in `test.layer.ts` or test helpers.
-- `taxkit-effect/no-runtime-execution-outside-boundaries`,
-  `taxkit-effect/no-console-outside-runtime` and
-  `taxkit-effect/no-process-outside-boundaries`: keep execution and host lifecycle in
-  exact files owned by `oxlint.config.ts`. Package and service logic returns
-  `Effect` values and tagged failures. The rules resolve canonical imports,
-  renamed bindings, aliases and statically known destructuring; lexically
-  shadowed same-named locals are not host or runtime APIs. They stay because
-  the shared `effect/no-console`, `effect/no-ambient-process` and
-  `strict-effect/no-runtime-outside-boundary` match only direct spellings: they
-  miss aliased or destructured `console`/`process`, `process.exitCode` and the
-  `run*With` runners.
-- `taxkit-effect/no-schema-encoder-outside-egress`: encode once at exact
-  egress. Canonical `Schema` imports, namespace imports, renamed bindings and
-  statically known method aliases are all enforced.
-- `taxkit-effect/no-unknown-service-contract` and
-  `taxkit-effect/no-unknown-tagged-error-cause`: keep service inputs schema-derived and
-  expected errors closed and tagged. Scope-resolved aliases of `Effect.Effect`,
-  `Schema.Unknown`, `Schema.TaggedErrorClass` and `Data.TaggedError` remain
-  subject to the same contract.
-- `taxkit-effect/no-effect-test-global-mix`: rejects a file that splits unaliased
-  `describe`, `expect`, `it` or `test` imports between `@effect/vitest` and
-  `vitest`. Shared globals must have one owner. Vitest-only utilities such as
-  `vi` and hooks may still come from `vitest`; an explicitly aliased secondary
-  shared API is also valid.
+The native restricted-name rules are name based. They follow destructuring
+and assignment from the global or the `Effect`, `ManagedRuntime`, `BunRuntime`
+and `NodeRuntime` names, and leave a same-named local `console`, `process`,
+`Bun` or `Map` alone. They do not follow a renamed module import such as
+`import { Effect as Fx }`, a namespace chain such as `Root.Effect.runSync`, or
+an uncalled named import of a runner; calls through those forms are still
+rejected by the shared runtime rules. Non-Schema `decode*` calls (for example
+`Stream.decodeText`) are byte transforms and are outside the decoder rule.
+
+Repository rules that remain, and why the shared presets do not cover them:
+
+- `taxkit-effect/inline-try-promise-callbacks`: all owned source. The shared
+  rule requires an options object with `try` and `catch`; this rule also
+  requires both callbacks inline and rejects extracted, shorthand, `undefined`
+  or spread callbacks, so each Promise boundary maps its rejection at the call.
 - `taxkit-effect/no-module-level-mutable-test-state`: rejects module-level `let` and
   `var` in test files so one test cannot leak changed state into another.
   Immutable declarations, function-local variables and ambient declarations
   remain valid.
 - `taxkit-effect/no-switch`: bans `switch`. Use Effect `Match` with
   exhaustive handling.
-- `taxkit-bun/no-host-api-outside-adapters` and
-  `taxkit-bun/no-runtime-outside-entrypoints`: keep Bun file/process/server APIs and
-  `BunRuntime.runMain` in exact live/runtime/script boundaries. Global Bun
-  methods and canonical platform runtime imports remain enforced through
-  aliases and statically known destructuring without treating local objects
-  named `Bun` or `BunRuntime` as host APIs. Non-host global Bun members such as
-  `Bun.version` remain outside this rule, including direct and destructured
-  access.
-
-Current TaxKit-specific custom rules include:
-
-- `taxkit/no-context-nullish-default`: scoped to
-  `packages/calculators/src`. Calculator context must not invent jurisdiction
-  or tax-year defaults with `??`; missing context must remain absent or fail
-  through an owning schema/tagged error. The shared
-  `web/no-context-nullish-default` covers page metadata fields only.
+- `taxkit/no-invented-tax-context`: scoped to `packages/calculators/src`.
+  Calculator context must not invent jurisdiction or tax-year defaults with
+  `??`; missing context must remain absent or fail through an owning
+  Schema/tagged error. The shared `web/no-context-nullish-default` covers page
+  metadata fields (`title`, `description`, `image`) only, and
+  `effect-conventions/no-decoded-nullish-default` covers empty defaults only.
 - `taxkit/no-date-construction`: scoped to `packages/calculators/src`.
   Calculator dates and tax years come from Schema-owned date types, so explicit
   `new Date(value)` is rejected too. The shared `strict-effect/no-native-work`
@@ -191,18 +182,16 @@ Current TaxKit-specific custom rules include:
   `Array.filter(items, predicate)`, `Array.findFirst(...)` and `Chunk.map(...)`
   instead of native `items.filter(...)`, `items.find(...)` or
   `items.reduce(...)`.
-- `taxkit/no-native-collections`: all owned source. Use `HashMap` and
-  `HashSet` instead of native `Map`, `Set`, `WeakMap` and `WeakSet`. It stays
-  beside `effect-conventions/no-native-collections` because it also follows
-  aliases, destructuring and `globalThis`/`window` spellings.
 - `taxkit/no-object-writes`: all owned source. Return immutable values instead
   of `Object`/`Reflect` writes, including through aliases.
-- `taxkit/no-decoding-outside-boundaries`: executable Schema decoding only in
-  the reviewed `decodingBoundaryFiles`.
 - `taxkit-package/workspace-roles`: browser/backend and runtime/deployment
   roles. Its Website source root, server entries and exact host module grants
   are options in `oxlint.config.ts`; package role policy lives in
   `tools/oxlint/package-roles.ts`.
+
+`bun run lint:boundary-directives` runs Oxlint with the shared decoder rule
+allowed and unused disable directives as errors, so no source can carry a
+directive that silences decoder placement.
 
 SDK source boundaries are lint settings rather than a separate command:
 `strict-effect/module-ownership` lets only `packages/sdk/typescript/src/http.ts`
@@ -210,6 +199,33 @@ import `@taxkit/api-http`, `no-restricted-imports` keeps Node and Bun modules ou
 of SDK source and Australian packs out of the root entry, and the package role
 policy forbids `@taxkit/api-http` from depending on `taxkit` in any dependency
 field.
+
+## Lint doctor and conformance
+
+`bun run lint:doctor` runs the plugin's `commonplace-lint-doctor` from the
+repository root. It is not part of `bun run lint` yet. With 0.12.0 it reports
+four `path` errors for generated lint fixtures that tests write on demand
+(`tools/oxlint/fixtures/effect-accepted.ts`, `bun-accepted.ts`,
+`tools/oxlint/.generated-collection-host.ts` and `.generated-fetch-host.ts`).
+`commonplace.repository.json` already lists them under
+`ownerPaths.allowMissing`; wire the doctor into `lint` once a plugin release
+reads that setting and the doctor exits cleanly. Any `duplicate` finding means
+a local rule repeats a preset rule: remove it and configure the preset rule.
+
+`commonplace.repository.json` at the root maps TaxKit's files to the
+Commonplace repository responsibilities, lint-policy registries and
+owner-path sources. The conformance validators live in the
+`development-workflows` plugin, not in this repository. A maintainer with the
+`commonplace-plugins` checkout runs them against this repository:
+
+```sh
+python3 <commonplace-plugins>/plugins/development-workflows/skills/repo-structure/scripts/conformance.py . --verbose
+```
+
+Add `--lint` to also run `bun run lint`. The package check has no setting for
+a private leaf package without exports, so it reports
+`packages/docs-examples`: that package holds checked documentation examples
+that tests and builds run, and nothing imports it.
 
 ## Formatting Rules
 

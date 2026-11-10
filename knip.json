@@ -43,7 +43,6 @@
         "src/index.ts",
         "src/worker.ts",
         "scripts/smoke-public-routes.runtime.ts",
-        "scripts/**/*.test.ts",
         "test/**/*.test.ts",
         "vitest.config.ts"
       ],
@@ -62,7 +61,6 @@
         "vite.config.ts",
         "vitest.config.ts",
         "vitest.browser.config.ts",
-        "scripts/**/*.ts",
         "test/**/*.{ts,tsx}"
       ],
       "project": [
@@ -70,7 +68,6 @@
         "vite.config.ts",
         "vitest.config.ts",
         "vitest.browser.config.ts",
-        "scripts/**/*.ts",
         "test/**/*.{ts,tsx}"
       ],
       "ignoreDependencies": ["cloudflare"]

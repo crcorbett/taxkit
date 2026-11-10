@@ -3,23 +3,22 @@ import {
   expect as effectExpect,
   it as effectIt,
 } from "@effect/vitest";
-import { Data, Effect, Match, Schema } from "effect";
-import { describe, expect, it } from "vitest";
+import { Effect, Match, Schema } from "effect";
+import { vi } from "vitest";
 
-class ExpectedError extends Data.TaggedError("ExpectedError")<{
-  readonly cause: string;
-}>() {}
+class ExpectedError extends Schema.TaggedError<
+  ExpectedError,
+  { readonly brand: unique symbol }
+>()("ExpectedError", { cause: Schema.String }) {}
 
 const Output = Schema.String;
 const encodeOutput = Schema.encodeUnknownResult(Output);
 
 export const acceptedTestApis = {
-  describe,
   effectDescribe,
   effectExpect,
   effectIt,
-  expect,
-  it,
+  vi,
 };
 
 export const acceptedService = (
@@ -44,6 +43,4 @@ export const acceptedMatch = (value: "first" | "second") =>
 
 export const acceptedRuntime = Effect.runPromise(Effect.succeed("accepted"));
 
-export const acceptedArguments = process.argv;
-
-console.log("portable Effect rule fixture accepted");
+export const acceptedExitCode = process.exitCode;

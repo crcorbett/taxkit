@@ -6,8 +6,7 @@
   "exports": {
     "./navigation.json": "./navigation.json",
     "./repository.json": "./repository.json",
-    "./sources": "./sources.ts",
-    "./*.mdx": "./*.mdx"
+    "./sources": "./sources.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"

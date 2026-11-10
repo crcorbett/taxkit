@@ -405,8 +405,9 @@ catalogue constructor that preserves schema-to-continuation coupling. Review
 helper reuse and ownership with the task's path-evidenced semantic audit rather
 than a brittle function-size rule or a fixed audit count.
 
-`taxkit/no-decoding-outside-boundaries` enforces decoder placement across the
-repository. Its exact file allowlist belongs only in `oxlint.config.ts`; this
+The shared `effect-conventions/no-schema-decoder-outside-ingress` rule
+enforces Effect Schema decoder placement across the repository. Its exact file
+allowlist belongs only in `oxlint.config.ts`; this
 architecture page owns the categories and review contract, not a duplicate
 path list. Use the active decoder inventory and this contract during review.
 
@@ -416,8 +417,9 @@ Encoding is the inverse trust operation. Execute an owning Schema encoder only
 where a canonical value leaves the system as HTTP or route transport, provider
 input, persisted representation or command output. Do not encode between
 services, as a defensive copy, or inside ordinary React composition.
-`taxkit-effect/no-schema-encoder-outside-egress` is enabled repository-wide and exact
-egress files are disabled only in `oxlint.config.ts`.
+The shared `effect-conventions/no-schema-encoder-outside-egress` rule is
+enabled repository-wide and exact egress files are excluded only in
+`oxlint.config.ts`.
 
 Production code must not use throwing `Schema.*Sync` codecs. Prefer
 `Schema.decodeUnknownEffect` or `Schema.encodeUnknownEffect` at an Effect

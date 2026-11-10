@@ -15,7 +15,7 @@ const contextFieldName = (node: SyntaxNode | null | undefined) => {
   }
   return null;
 };
-export const noContextNullishDefault: OxlintRule = {
+export const noInventedTaxContext: OxlintRule = {
   create(context) {
     return {
       LogicalExpression(node) {
@@ -24,7 +24,7 @@ export const noContextNullishDefault: OxlintRule = {
           HashSet.has(contextFieldNames, contextFieldName(node.left))
         ) {
           context.report({
-            messageId: "noContextNullishDefault",
+            messageId: "noInventedTaxContext",
             node,
           });
         }
@@ -37,7 +37,7 @@ export const noContextNullishDefault: OxlintRule = {
         "Disallow jurisdiction or tax-year defaults in calculator service code.",
     },
     messages: {
-      noContextNullishDefault:
+      noInventedTaxContext:
         'Do not invent missing jurisdiction or taxYear with ??. Calculator context must come from canonical config/request schemas. Missing context must stay Option.none or fail with a tagged service error: payload.jurisdiction.pipe(Option.match({ onNone: () => Effect.fail(new MissingJurisdiction()), onSome: useJurisdiction })). Only use defaults declared by the owning Schema, never payload.jurisdiction ?? "AU".',
     },
     type: "problem",

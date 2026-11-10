@@ -71,7 +71,6 @@ describe("portable rules", () => {
     ...EffectFunction.pipe(
       [
         "bun-accepted",
-        "bun-global-non-host-accepted",
         "bun-unrelated-accepted",
         "effect-accepted",
         "effect-unrelated-accepted",
@@ -358,7 +357,6 @@ describe("portable rules", () => {
         "tools/oxlint/binding-tracker.ts",
         "tools/oxlint/binding-tracker.test.ts",
         "tools/oxlint/host.types.ts",
-        "tools/oxlint/bun-rules.ts",
         "tools/oxlint/effect-rules.ts",
         "tools/oxlint/package-rules.ts",
         "tools/oxlint/taxkit-rules.ts",
@@ -599,39 +597,57 @@ describe("portable rules", () => {
         "no-native-work",
       ],
     },
-    {
-      accepted: [
-        "tools/oxlint/fixtures/effect-accepted.ts",
-        "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
-      ],
-      generated: "tools/oxlint/fixtures/.generated-effect-rejected.ts",
-      namespace: "taxkit-effect",
-      rejected: "tools/oxlint/fixtures/effect-rejected.ts.txt",
-      rules: [
-        "no-bare-effect-try-promise",
-        "no-console-outside-runtime",
-        "no-effect-test-global-mix",
-        "no-host-imports-in-contracts",
-        "no-layer-exports-in-service-files",
-        "no-module-level-mutable-test-state",
-        "no-process-outside-boundaries",
-        "no-runtime-execution-outside-boundaries",
-        "no-schema-encoder-outside-egress",
-        "no-switch",
-        "no-unknown-service-contract",
-        "no-unknown-tagged-error-cause",
-      ],
-    },
+    // The shared presets own direct spellings; repository settings name the
+    // exact boundaries and the native restricted-name rules close aliases.
+    ...EffectFunction.pipe(
+      [
+        {
+          namespace: "taxkit-effect",
+          rules: [
+            "inline-try-promise-callbacks",
+            "no-module-level-mutable-test-state",
+            "no-switch",
+          ],
+        },
+        {
+          namespace: "effect-conventions",
+          rules: [
+            "require-try-promise-catch",
+            "no-schema-decoder-outside-ingress",
+            "no-schema-encoder-outside-egress",
+            "no-unknown-service-contract",
+            "no-unknown-tagged-error-payload",
+          ],
+        },
+        {
+          namespace: "eslint",
+          rules: [
+            "no-restricted-globals",
+            "no-restricted-imports",
+            "no-restricted-properties",
+          ],
+        },
+      ] as const,
+      Array.map(({ namespace, rules }) => ({
+        accepted: [
+          "tools/oxlint/fixtures/effect-accepted.ts",
+          "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
+        ],
+        generated: "tools/oxlint/fixtures/.generated-effect-rejected.ts",
+        namespace,
+        rejected: "tools/oxlint/fixtures/effect-rejected.ts.txt",
+        rules,
+      }))
+    ),
     {
       accepted: [
         "tools/oxlint/fixtures/bun-accepted.ts",
-        "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
         "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
       ],
       generated: "tools/oxlint/fixtures/.generated-bun-rejected.ts",
-      namespace: "taxkit-bun",
+      namespace: "eslint",
       rejected: "tools/oxlint/fixtures/bun-rejected.ts.txt",
-      rules: ["no-host-api-outside-adapters", "no-runtime-outside-entrypoints"],
+      rules: ["no-restricted-globals", "no-restricted-properties"],
     },
     {
       accepted: ["tools/oxlint/fixtures/anti-slop-effect-accepted.test.ts"],
@@ -683,7 +699,7 @@ describe("portable rules", () => {
     };
   });
 
-  it("keeps full source coverage and its five unexecuted fixture exclusions exact", () => {
+  it("keeps full source coverage and its four unexecuted fixture exclusions exact", () => {
     const strict = EffectFunction.pipe(
       oxlintConfig.overrides ?? [],
       Array.filter((entry) =>
@@ -701,7 +717,7 @@ describe("portable rules", () => {
     const promiseScope = EffectFunction.pipe(
       configuration.overrides ?? [],
       Array.filter((entry) =>
-        Record.get<string>("taxkit-effect/no-bare-effect-try-promise")(
+        Record.get<string>("taxkit-effect/inline-try-promise-callbacks")(
           entry.rules ?? {}
         ).pipe(Option.exists((severity) => severity === "error"))
       )
@@ -717,7 +733,6 @@ describe("portable rules", () => {
     expect(scope.excludeFiles, "Owned-source fixture exclusions").toStrictEqual(
       [
         "tools/oxlint/fixtures/bun-accepted.ts",
-        "tools/oxlint/fixtures/bun-global-non-host-accepted.ts",
         "tools/oxlint/fixtures/bun-unrelated-accepted.ts",
         "tools/oxlint/fixtures/effect-accepted.ts",
         "tools/oxlint/fixtures/effect-unrelated-accepted.ts",
@@ -749,7 +764,7 @@ export const accepted = Effect.tryPromise({ try: () => Promise.resolve("good"), 
         EffectFunction.pipe(
           result.codes,
           Array.filter(
-            (code) => code === "taxkit-effect(no-bare-effect-try-promise)"
+            (code) => code === "effect-conventions(require-try-promise-catch)"
           ),
           (actual) => {
             expect(actual).toHaveLength(1);
@@ -759,34 +774,26 @@ export const accepted = Effect.tryPromise({ try: () => Promise.resolve("good"), 
     );
     it.effect.each([
       {
-        count: 1,
-        name: "keeps an imported runner separate from a same-named local runner",
-        rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
+        count: 2,
+        name: "rejects runner calls by name, including a shadowing parameter",
+        rule: "effect(no-runtime-execution-outside-main)",
         source: `import { Effect } from "effect";
 export const imported = Effect.runSync(Effect.void);
 export const local = (Effect) => Effect.runSync("local");`,
       },
       {
-        count: 1,
-        name: "follows a runner through import and destructuring aliases",
-        rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
-        source: `import { Effect as Fx } from "effect";
-const { runSync: execute } = Fx;
-export const value = execute(Fx.void);`,
-      },
-      {
         count: 0,
         name: "clears an assigned runner when its source becomes unrelated",
-        rule: "taxkit-effect(no-runtime-execution-outside-boundaries)",
+        rule: "effect(no-runtime-execution-outside-main)",
         source: `import { Effect } from "effect";
 let execute = Effect.runSync;
 execute = (value) => value;
 export const value = execute("local");`,
       },
       {
-        count: 2,
+        count: 1,
         name: "resolves a Bun host alias without confusing a local parameter",
-        rule: "taxkit-bun(no-host-api-outside-adapters)",
+        rule: "eslint(no-restricted-globals)",
         source: `const { file: open } = Bun;
 export const host = open("package.json");
 export const local = (Bun) => Bun.file("local");`,
@@ -794,7 +801,7 @@ export const local = (Bun) => Bun.file("local");`,
       {
         count: 0,
         name: "accepts direct inline try and catch callbacks after aliasing",
-        rule: "taxkit-effect(no-bare-effect-try-promise)",
+        rule: "taxkit-effect(inline-try-promise-callbacks)",
         source: `import { Effect as Fx } from "effect";
 const { tryPromise: attempt } = Fx;
 export const value = attempt({ try: () => Promise.resolve(1), catch: () => "failed" });`,
@@ -802,10 +809,19 @@ export const value = attempt({ try: () => Promise.resolve(1), catch: () => "fail
       {
         count: 1,
         name: "rejects a missing catch callback after aliasing",
-        rule: "taxkit-effect(no-bare-effect-try-promise)",
+        rule: "effect-conventions(require-try-promise-catch)",
         source: `import { Effect as Fx } from "effect";
 const { tryPromise: attempt } = Fx;
 export const value = attempt({ try: () => Promise.resolve(1) });`,
+      },
+      {
+        count: 1,
+        name: "rejects an extracted catch callback after aliasing",
+        rule: "taxkit-effect(inline-try-promise-callbacks)",
+        source: `import { Effect as Fx } from "effect";
+const { tryPromise: attempt } = Fx;
+const mapFailure = () => "failed";
+export const value = attempt({ try: () => Promise.resolve(1), catch: mapFailure });`,
       },
     ])("$name", ({ source, rule, count }) =>
       Effect.gen(function* () {
@@ -1158,7 +1174,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
         expect(result.files).toBe(1);
         expect(result.exitCode).not.toBe(0);
         expect(result.codes).toContain(
-          "taxkit(no-decoding-outside-boundaries)"
+          "effect-conventions(no-schema-decoder-outside-ingress)"
         );
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
     );
@@ -1177,7 +1193,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
         expect(result.files).toBe(1);
         expect(result.exitCode).not.toBe(0);
         expect(result.codes).toContain(
-          "taxkit(no-decoding-outside-boundaries)"
+          "effect-conventions(no-schema-decoder-outside-ingress)"
         );
       }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
     );
@@ -1194,14 +1210,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           {
             path,
             rejected: false,
-            rule: "taxkit(no-decoding-outside-boundaries)",
+            rule: "effect-conventions(no-schema-decoder-outside-ingress)",
             source:
               'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
           },
           {
             path,
             rejected: true,
-            rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+            rule: "effect-conventions(no-schema-encoder-outside-egress)",
             source:
               'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
           },
@@ -1218,13 +1234,13 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
         [
           {
             rejected: false,
-            rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+            rule: "effect-conventions(no-schema-encoder-outside-egress)",
             source:
               'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
           },
           {
             rejected: true,
-            rule: "taxkit(no-decoding-outside-boundaries)",
+            rule: "effect-conventions(no-schema-decoder-outside-ingress)",
             source:
               'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
           },
@@ -1253,14 +1269,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
           {
             path,
             rejected: true,
-            rule: "taxkit(no-decoding-outside-boundaries)",
+            rule: "effect-conventions(no-schema-decoder-outside-ingress)",
             source:
               'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
           },
           {
             path,
             rejected: true,
-            rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+            rule: "effect-conventions(no-schema-encoder-outside-egress)",
             source:
               'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
           },
@@ -1276,21 +1292,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/web/src/lib/host/binding.adapter.layer.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "apps/web/src/lib/pages/loader-context.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "apps/web/src/lib/pages/loader-context.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1346,14 +1362,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "tools/apps-local/test/native-local-development.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "tools/apps-local/test/native-local-development.boundary.test.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1367,14 +1383,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "tools/apps-local/test/native-cancellation.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "tools/apps-local/test/native-cancellation.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1388,7 +1404,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "tools/apps-local/test/native-settings-failure.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1402,7 +1418,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/web/src/lib/host/config.ingress.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1423,7 +1439,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/web/src/lib/calculators/page.atoms.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1437,28 +1453,28 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/web/src/lib/pages/loaders.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "apps/web/src/lib/pages/loaders.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "apps/web/src/router.tsx",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "apps/web/src/entry.server.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1472,49 +1488,49 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/api/test/worker.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "apps/api/test/worker.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "tools/apps-local/test/native-pair-content.checks.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/api/http/test/request-body.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "apps/api/src/worker.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "tools/apps-local/test/native-settings-failure.boundary.test.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/api/http/src/handlers/calculators.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1528,84 +1544,84 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/core/src/primitives/date.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/core/test/date.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/core/test/date.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/core/test/money.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/core/src/primitives/date.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/core/src/primitives/money.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/core/src/primitives/money.effect.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/core/src/calculators/definition.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/core/src/errors/input-validation-error.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/core/src/primitives/money.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/core/src/primitives/tax.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/core/test/money.test.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1633,14 +1649,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/rules/au/income-tax/test/rule-graph.test.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1654,14 +1670,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/rules/au/pay/test/rule-graph.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/rules/au/pay/test/rule-graph.test.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1675,14 +1691,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/rules/au/stsl/test/rule-graph.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/rules/au/stsl/test/rule-graph.test.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1696,14 +1712,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/sdk/typescript/test/effect.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/sdk/typescript/test/effect.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
       },
@@ -1717,14 +1733,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/core/test/domain-absence.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/core/test/domain-absence.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
       },
@@ -1738,14 +1754,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/rules/au/income-tax/test/annual-tax.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
       },
@@ -1759,14 +1775,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/rules/au/stsl/test/take-home-pay-stsl.test.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
       },
@@ -1780,21 +1796,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/infrastructure/src/secrets.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
       },
       {
         path: "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1808,21 +1824,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "tools/infrastructure/apps-stack.test.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeEffect(Schema.String);',
       },
       {
         path: "tools/infrastructure/apps-stack.test.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/infrastructure/src/secrets.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1836,7 +1852,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/observability/src/edge-identity.boundary.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1850,14 +1866,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/observability/src/edge-identity.boundary.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "apps/api/src/worker.application.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1871,14 +1887,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/api/src/worker.application.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "apps/api/src/worker-admission.layer.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -1892,21 +1908,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/api/src/worker-admission.layer.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "apps/api/test/mcp-client.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "apps/api/test/mcp-client.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1920,14 +1936,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "tools/apps-local/test/native-mcp.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "tools/apps-local/test/native-mcp.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -1941,14 +1957,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/api/mcp/src/handlers.layer.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/api/mcp/src/request.service.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownOption(Schema.String);',
       },
@@ -1987,14 +2003,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/webmcp/src/model-context.adapter.layer.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "packages/webmcp/src/model-context.adapter.layer.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -2008,14 +2024,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "apps/web/src/lib/browser-atoms.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -2029,21 +2045,21 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/webmcp/test/registration.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "tools/apps-local/test/native-browser-tools.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
       {
         path: "tools/apps-local/test/native-browser-tools.boundary.test.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -2057,7 +2073,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/api/mcp/src/handlers.layer.ts",
         rejected: true,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
@@ -2071,7 +2087,7 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/api/test/rate-admission.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -2085,14 +2101,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/api/test/rate-admission.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "apps/api/test/worker-admission.boundary.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -2106,14 +2122,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "apps/api/test/worker-admission.boundary.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/calculators/test/calculation-admission.test.ts",
         rejected: false,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },
@@ -2127,14 +2143,14 @@ export const value = attempt({ try: () => Promise.resolve(1) });`,
       {
         path: "packages/calculators/test/calculation-admission.test.ts",
         rejected: false,
-        rule: "taxkit-effect(no-schema-encoder-outside-egress)",
+        rule: "effect-conventions(no-schema-encoder-outside-egress)",
         source:
           'import { Schema } from "effect";\n\nexport const encode = Schema.encodeEffect(Schema.String);',
       },
       {
         path: "packages/calculators/src/admission.layer.ts",
         rejected: true,
-        rule: "taxkit(no-decoding-outside-boundaries)",
+        rule: "effect-conventions(no-schema-decoder-outside-ingress)",
         source:
           'import { Schema } from "effect";\n\nexport const decode = Schema.decodeUnknownEffect(Schema.String);',
       },

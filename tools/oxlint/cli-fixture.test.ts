@@ -3,12 +3,12 @@ import nodePath from "node:path";
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { expect, it } from "@effect/vitest";
 import {
-  Data,
   Match,
   Function as EffectFunction,
   Effect,
   Exit,
   FileSystem,
+  Schema,
 } from "effect";
 
 import {
@@ -17,7 +17,10 @@ import {
   writeLintFixture,
 } from "./cli-fixture.js";
 
-class FixtureConsumerFailed extends Data.TaggedError("FixtureConsumerFailed") {}
+class FixtureConsumerFailed extends Schema.TaggedError<
+  FixtureConsumerFailed,
+  { readonly brand: unique symbol }
+>()("FixtureConsumerFailed", {}) {}
 
 it.effect.each([
   { failed: false, name: "success", outcome: Effect.void },

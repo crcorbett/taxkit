@@ -10,13 +10,8 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { vi } from "vitest";
 
-import {
-  article,
-  code,
-  codeText,
-  escapedCodeText,
-  journalTheme,
-} from "./article.fixture.js";
+import { article, code, codeText, escapedCodeText } from "./article.fixture.js";
+import { codeColours, journalTheme } from "./theme.fixture.js";
 
 const JournalLink = ({ href, children }: MdxLinkProps) => (
   <a data-journal-link="" href={`/reader?target=${encodeURIComponent(href)}`}>
@@ -106,7 +101,9 @@ describe("standalone checked MDX presentation", () => {
         );
         expect(html).toContain('<button type="button">Save snippet</button>');
         expect({
-          colours: html.includes("color:light-dark(#123456,#fedcba)"),
+          colours: html.includes(
+            `color:light-dark(${codeColours.light},${codeColours.dark})`
+          ),
           italic:
             html.includes("--mdx-light-font-style:italic") &&
             html.includes("--mdx-dark-font-style:italic"),

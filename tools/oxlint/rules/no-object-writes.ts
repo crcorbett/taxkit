@@ -65,7 +65,7 @@ export const noObjectWrites: OxlintRule = {
       }
       if (pattern?.type === "ObjectPattern") {
         EffectFunction.pipe(
-          pattern.properties ?? [],
+          pattern.properties,
           forEach<SyntaxKind<"ObjectPattern">["properties"][number]>(
             (property) => {
               if (property.type === "Property") {

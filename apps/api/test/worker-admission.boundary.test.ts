@@ -58,7 +58,10 @@ it.effect.each([
               Match.when("provider-defect", () =>
                 Effect.die({ token: "PRIVATE9" })
               ),
-              Match.orElse(() => Effect.succeed({ success: mode === "allow" }))
+              Match.whenOr("allow", "reject", "missing-runtime", () =>
+                Effect.succeed({ success: mode === "allow" })
+              ),
+              Match.exhaustive
             )
           )
         ),

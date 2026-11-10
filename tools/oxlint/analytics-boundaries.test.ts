@@ -17,7 +17,7 @@ it.effect.each([
   {
     allowed: false,
     path: "packages/analytics/src/adjacent.layer.ts",
-    rule: "no-decoding-outside-boundaries",
+    rule: "no-schema-decoder-outside-ingress",
     source: decoder,
   },
   {
@@ -29,7 +29,7 @@ it.effect.each([
   {
     allowed: false,
     path: "packages/analytics/src/live.layer.ts",
-    rule: "no-runtime-execution-outside-boundaries",
+    rule: "no-runtime-execution-outside-main",
     source:
       'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
   },
@@ -48,7 +48,7 @@ it.effect.each([
   {
     allowed: false,
     path: "packages/infrastructure/src/posthog/management.adapter.layer.ts",
-    rule: "no-runtime-execution-outside-boundaries",
+    rule: "no-runtime-execution-outside-main",
     source:
       'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
   },
@@ -89,7 +89,7 @@ it.effect.each([
   {
     allowed: false,
     path: "packages/infrastructure/src/posthog/management.adjacent.ts",
-    rule: "no-decoding-outside-boundaries",
+    rule: "no-schema-decoder-outside-ingress",
     source: decoder,
   },
   {
@@ -120,13 +120,13 @@ it.effect.each([
   {
     allowed: false,
     path: "packages/analytics/src/live.layer.ts",
-    rule: "no-decoding-outside-boundaries",
+    rule: "no-schema-decoder-outside-ingress",
     source: decoder,
   },
   {
     allowed: false,
     path: "packages/analytics/src/live.layer.ts",
-    rule: "no-runtime-execution-outside-boundaries",
+    rule: "no-runtime-execution-outside-main",
     source:
       'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
   },
@@ -169,7 +169,7 @@ it.effect.each([
   {
     allowed: false,
     path: "apps/api/src/analytics-adjacent.ts",
-    rule: "no-decoding-outside-boundaries",
+    rule: "no-schema-decoder-outside-ingress",
     source: decoder,
   },
   {
@@ -181,7 +181,7 @@ it.effect.each([
   {
     allowed: false,
     path: "apps/api/src/analytics-request.boundary.ts",
-    rule: "no-decoding-outside-boundaries",
+    rule: "no-schema-decoder-outside-ingress",
     source: decoder,
   },
   {
@@ -219,14 +219,14 @@ it.effect.each([
   {
     allowed: false,
     path: "tools/apps-local/test/native-analytics.boundary.test.ts",
-    rule: "no-runtime-execution-outside-boundaries",
+    rule: "no-runtime-execution-outside-main",
     source:
       'import { Effect } from "effect"; export const result = Effect.runPromise(Effect.void);',
   },
   {
     allowed: false,
     path: "tools/apps-local/test/native-analytics-adjacent.test.ts",
-    rule: "no-decoding-outside-boundaries",
+    rule: "no-schema-decoder-outside-ingress",
     source: decoder,
   },
   {

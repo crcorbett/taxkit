@@ -399,12 +399,16 @@ export const checkApiPublicRoutes = (settings: typeof ApiSmokeSettings.Type) =>
           ApiSmokeRouteError: (error) => error,
           ApiSmokeValidationError: (error) => error,
         }),
-        Match.orElse(
+        Match.tag(
+          "BadArgument",
+          "PlatformError",
+          "SchemaError",
           () =>
             new ApiSmokeValidationError({
               message: "Failed to prepare the external HTTP consumer.",
             })
-        )
+        ),
+        Match.exhaustive
       )
     ),
     Effect.tapErrorTag("ApiSmokeValidationError", (error) =>

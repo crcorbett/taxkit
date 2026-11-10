@@ -67,7 +67,8 @@ const lifetimeCalculation = ({
             Deferred.succeed(started, true).pipe(Effect.andThen(Effect.never))
           ),
           Match.when("operationDefect", () => Effect.die(new Error(sentinel))),
-          Match.orElse(() => AuPayTakeHomeCalculation.calculate(input))
+          Match.when("normal", () => AuPayTakeHomeCalculation.calculate(input)),
+          Match.exhaustive
         )
       ),
       Effect.scoped

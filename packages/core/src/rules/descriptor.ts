@@ -126,7 +126,10 @@ export const makeRuleDescriptor = <
     title: descriptor.title,
   }),
   layer: descriptor.layer,
-  parameters: descriptor.parameters ?? [],
+  // Optional parameters have a total empty-collection meaning.
+  parameters: Option.fromUndefinedOr(descriptor.parameters).pipe(
+    Option.getOrElse((): readonly [] => [])
+  ),
   provides: descriptor.provides,
   requires: descriptor.requires,
 });

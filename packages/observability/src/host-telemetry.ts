@@ -194,7 +194,9 @@ export const observeHostRequest =
                       Match.when(2, () => "2xx" as const),
                       Match.when(3, () => "3xx" as const),
                       Match.when(4, () => "4xx" as const),
-                      Match.orElse(() => "5xx" as const)
+                      // Every other class the platform reports is a server failure.
+                      Match.when(Match.number, () => "5xx" as const),
+                      Match.exhaustive
                     ),
                 }),
               })

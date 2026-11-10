@@ -55,5 +55,5 @@ const readDocsSearchLocation = (encoded: typeof Schema.Unknown.Type) =>
   );
 // The search words a loader reads: empty for the search page itself.
 export const readDocsSearchTerm = (encoded: typeof Schema.Unknown.Type) =>
-  readDocsSearchLocation(encoded).pipe(Result.map((query) => query.term ?? ""));
+  readDocsSearchLocation(encoded).pipe(Result.map((query) => query.term));
 export type WebsiteDocsSearchQuery = ReturnType<typeof readDocsSearchTerm>;

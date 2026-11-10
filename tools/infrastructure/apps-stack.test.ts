@@ -889,13 +889,21 @@ describe("native paired app graph and planner", () => {
         }
         const apiProps = Match.value(apiNode).pipe(
           Match.when({ action: "create" }, (node) => node.props),
-          Match.when({ action: "update" }, (node) => node.props),
-          Match.orElse(() => api.Props)
+          Match.when(
+            { action: Match.is("update", "adopted") },
+            (node) => node.props
+          ),
+          Match.when({ action: "noop" }, () => api.Props),
+          Match.exhaustive
         );
         const websiteProps = Match.value(websiteNode).pipe(
           Match.when({ action: "create" }, (node) => node.props),
-          Match.when({ action: "update" }, (node) => node.props),
-          Match.orElse(() => website.Props)
+          Match.when(
+            { action: Match.is("update", "adopted") },
+            (node) => node.props
+          ),
+          Match.when({ action: "noop" }, () => website.Props),
+          Match.exhaustive
         );
         // This is the actual native planned graph, not an assertion against
         // an unused policy constant. Omitted metadata invokes SDK defaults.

@@ -1,16 +1,9 @@
----
-document_type: runbook
-lifecycle: template
-authority: canonical
-owner: repository-maintainers
-last_reviewed: 2026-11-08
-review_trigger: change to the operation, its command, target or required access
----
-
 # <Operation>
 
 Copy this file to `docs/runbooks/<operation>.md`, replace each section and add
-the runbook to the [runbook index](./README.md). Delete this paragraph.
+the runbook to the [runbook index](./README.md). Review it whenever the
+operation, its command, target or required access changes. Delete this
+paragraph.
 
 ## When to use it
 

@@ -83,7 +83,10 @@ const CatalogueFixture = Layer.effect(
           ),
           Match.when("defect", () => metadataDefect),
           Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculatorCatalogue.getCalculator(request))
+          Match.whenOr("success", "capacity", () =>
+            calculatorCatalogue.getCalculator(request)
+          ),
+          Match.exhaustive
         )
       ),
       getCalculatorGraph: Effect.fn("CalculatorCatalogue.getCalculatorGraph")(
@@ -95,7 +98,10 @@ const CatalogueFixture = Layer.effect(
             ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculatorCatalogue.getCalculatorGraph(request))
+            Match.whenOr("success", "capacity", () =>
+              calculatorCatalogue.getCalculatorGraph(request)
+            ),
+            Match.exhaustive
           )
       ),
       getCalculatorSchema: Effect.fn("CalculatorCatalogue.getCalculatorSchema")(
@@ -107,7 +113,10 @@ const CatalogueFixture = Layer.effect(
             ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculatorCatalogue.getCalculatorSchema(request))
+            Match.whenOr("success", "capacity", () =>
+              calculatorCatalogue.getCalculatorSchema(request)
+            ),
+            Match.exhaustive
           )
       ),
       listCalculators: Effect.fn("CalculatorCatalogue.listCalculators")(
@@ -118,7 +127,10 @@ const CatalogueFixture = Layer.effect(
             ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculatorCatalogue.listCalculators(query))
+            Match.whenOr("success", "expected", "capacity", () =>
+              calculatorCatalogue.listCalculators(query)
+            ),
+            Match.exhaustive
           )
       ),
       listFacts: Effect.fn("CalculatorCatalogue.listFacts")((query) =>
@@ -128,7 +140,10 @@ const CatalogueFixture = Layer.effect(
           ),
           Match.when("defect", () => metadataDefect),
           Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculatorCatalogue.listFacts(query))
+          Match.whenOr("success", "expected", "capacity", () =>
+            calculatorCatalogue.listFacts(query)
+          ),
+          Match.exhaustive
         )
       ),
       listJurisdictions: Effect.fn("CalculatorCatalogue.listJurisdictions")(
@@ -139,7 +154,10 @@ const CatalogueFixture = Layer.effect(
             ),
             Match.when("defect", () => metadataDefect),
             Match.when("mixed", () => metadataInterruptedDefect),
-            Match.orElse(() => calculatorCatalogue.listJurisdictions())
+            Match.whenOr("success", "expected", "capacity", () =>
+              calculatorCatalogue.listJurisdictions()
+            ),
+            Match.exhaustive
           )
       ),
       listRules: Effect.fn("CalculatorCatalogue.listRules")((query) =>
@@ -149,7 +167,10 @@ const CatalogueFixture = Layer.effect(
           ),
           Match.when("defect", () => metadataDefect),
           Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculatorCatalogue.listRules(query))
+          Match.whenOr("success", "expected", "capacity", () =>
+            calculatorCatalogue.listRules(query)
+          ),
+          Match.exhaustive
         )
       ),
       listTaxYears: Effect.fn("CalculatorCatalogue.listTaxYears")((query) =>
@@ -159,7 +180,10 @@ const CatalogueFixture = Layer.effect(
           ),
           Match.when("defect", () => metadataDefect),
           Match.when("mixed", () => metadataInterruptedDefect),
-          Match.orElse(() => calculatorCatalogue.listTaxYears(query))
+          Match.whenOr("success", "expected", "capacity", () =>
+            calculatorCatalogue.listTaxYears(query)
+          ),
+          Match.exhaustive
         )
       ),
     });

@@ -17,8 +17,14 @@ export const calculationFailureMessage = (error: CalculationCallFailure) =>
       "ApiUnavailable",
       (failure) => failure.message
     ),
-    Match.orElse(
+    Match.tag(
+      "InputValidationError",
+      "CalculationError",
+      "UnsupportedCalculatorError",
+      "UnsupportedCalculatorContextError",
+      "ApiReplyMismatch",
       () =>
         "The calculation could not finish. Check your details. Please try again."
-    )
+    ),
+    Match.exhaustive
   );

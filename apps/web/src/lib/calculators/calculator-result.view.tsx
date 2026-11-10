@@ -6,6 +6,7 @@ import {
   Function as EffectFunction,
   Match,
   Option,
+  Predicate,
   Record,
 } from "effect";
 import type { ReactNode } from "react";
@@ -18,6 +19,11 @@ const currency = new Intl.NumberFormat("en-AU", {
   style: "currency",
 });
 const formatMoney = (money: Money) => currency.format(money.cents / 100);
+// The withholding scale notes shown beside a pay breakdown.
+const scaleNotes: Record.ReadonlyRecord<string, string> = {
+  scale1: "Tax-free threshold not claimed.",
+  scale2: "Tax-free threshold claimed.",
+};
 
 type BreakdownRow = Readonly<{ key: string; label: string; value: string }>;
 
@@ -126,17 +132,11 @@ const WithholdingAssumptions = ({
         components,
         Array.flatMap((component) =>
           Record.get(component.trace.inputs, "scale").pipe(
+            // The trace input is open JSON; only the two named scales have a note.
             Option.flatMap((scale) =>
-              Match.value(scale).pipe(
-                Match.when("scale1", () =>
-                  Option.some("Tax-free threshold not claimed.")
-                ),
-                Match.when("scale2", () =>
-                  Option.some("Tax-free threshold claimed.")
-                ),
-                Match.orElse(() => Option.none<string>())
-              )
+              Option.liftPredicate(scale, Predicate.isString)
             ),
+            Option.flatMap((scale) => Record.get(scaleNotes, scale)),
             Option.map((text) => <li key={component.id}>{text}</li>),
             Array.fromOption
           )

@@ -182,7 +182,10 @@ it.effect.each(["absent", "unsupported", "other-origin"] as const)(
         document: Match.value(mode).pipe(
           Match.when("absent", EffectFunction.constUndefined),
           Match.when("unsupported", () => ({ modelContext: {} })),
-          Match.orElse(() => ({ modelContext: { registerTool: register } }))
+          Match.when("other-origin", () => ({
+            modelContext: { registerTool: register },
+          })),
+          Match.exhaustive
         ),
         origin: Match.value(mode).pipe(
           Match.when("other-origin", () => "https://other.example.com"),

@@ -33,7 +33,10 @@ import {
 } from "../src/__testing__/fixtures.js";
 import { BackendAnalyticsLive } from "../src/live.layer.js";
 import { BackendAnalytics } from "../src/service.js";
-import { makeBackendAnalyticsTest } from "../src/test.layer.js";
+import {
+  BackendAnalyticsTest,
+  BackendAnalyticsUses,
+} from "../src/test.layer.js";
 
 const expectedTimestamp: unknown = expect.any(String);
 const expectedContentLength: unknown = expect.stringMatching(/^\d+$/u);
@@ -476,14 +479,18 @@ it.effect(
   () =>
     Effect.gen(function* () {
       const input = yield* calculatorUseFixture;
-      const test = yield* makeBackendAnalyticsTest;
+      const uses = yield* Ref.make<readonly (typeof input)[]>([]);
       expect(
         yield* BackendAnalytics.pipe(
           Effect.flatMap((analytics) => analytics.recordCalculatorUse(input)),
-          Effect.provide(test.layer)
+          Effect.provide(
+            BackendAnalyticsTest.pipe(
+              Layer.provide(Layer.succeed(BackendAnalyticsUses, uses))
+            )
+          )
         )
       ).toBe("accepted");
-      expect(yield* Ref.get(test.uses)).toStrictEqual([input]);
+      expect(yield* Ref.get(uses)).toStrictEqual([input]);
     })
 );
 it.effect(

@@ -76,7 +76,10 @@ const manifestFixture = (
   dependencies: Readonly<Record<string, string>>
 ) => ({
   dependencies,
+  devDependencies: {},
   name,
+  optionalDependencies: {},
+  peerDependencies: {},
 });
 describe("workspace dependency direction", () => {
   it.effect(
