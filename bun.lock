@@ -637,7 +637,7 @@
 
     "@cloudflare/workers-types": ["@cloudflare/workers-types@5.20261109.1", "", {}, "sha512-TH937ZS17uWVSrIGFjBTA7L8NSpJzQIv5VKBcLBMg+TGs38ON+VBNVUghUWoHDvNmS3YWMwktd1MSWES/C0QnQ=="],
 
-    "@commonplaces/oxlint-plugin": ["@commonplaces/oxlint-plugin@0.12.0", "", { "dependencies": { "@effect/tsgo": "0.63.0", "@oxlint/plugins": "1.90.0", "effect": "4.0.5", "oxlint-tsgolint": "7.0.2005", "ultracite": "8.0.1" }, "peerDependencies": { "oxlint": "1.88.0 || 1.89.0 || 1.90.0" }, "bin": { "commonplace-lint-doctor": "dist/doctor/main.js" } }, "sha512-Ru8auCsA15A4NB5JpzSIFm993mhTDfn/aaCENmZyk5yXlie0U92LFnHYydJ4AyqUVU9IsyYq6O8EG6NF2afHOg=="],
+    "@commonplaces/oxlint-plugin": ["@commonplaces/oxlint-plugin@0.12.1", "", { "dependencies": { "@effect/tsgo": "0.63.0", "@oxlint/plugins": "1.90.0", "effect": "4.0.5", "oxlint-tsgolint": "7.0.2005", "ultracite": "8.0.1" }, "peerDependencies": { "oxlint": "1.88.0 || 1.89.0 || 1.90.0" }, "bin": { "commonplace-lint-doctor": "dist/doctor/main.js" } }, "sha512-NDheg33GFlT0ta1rJhwXdnJrP3eN7ZTSY7wAM7UPEVzejH8TNRLiXttL+TrU3EpHlCKX7QMTKajID3tFqGzkig=="],
 
     "@content/docs": ["@content/docs@workspace:content/docs"],
 

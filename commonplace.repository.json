@@ -25,5 +25,8 @@
   "ownerPaths": {
     "sources": ["tools/oxlint/package-roles.ts"],
     "allowMissing": ["tools/oxlint/fixtures/*.ts", "**/.generated-*"]
+  },
+  "packages": {
+    "privateLeaf": ["packages/docs-examples"]
   }
 }

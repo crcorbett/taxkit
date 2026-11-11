@@ -25,7 +25,7 @@ stable boundaries.
   `effect-tsgo patch --oxlint`; a registry, patch or compatibility failure
   stops linting. The manifest stays `"latest"`, so the executed plugin may be
   newer than the lockfile; record the installed rule version when reporting
-  lint results. The lockfile records 0.12.0 with Oxlint 1.89.0, inside its
+  lint results. The lockfile records 0.12.1 with Oxlint 1.89.0, inside its
   supported range; the 0.12.0 [upgrade notes](https://github.com/crcorbett/commonplace-lint/blob/main/docs/upgrading.md)
   list the rules it added. Required Effect platform and test APIs use explicit
   `allowedUnstableApis` entries; the unstable API diagnostic remains enabled.
@@ -64,7 +64,7 @@ stable boundaries.
 | --- | --- |
 | `bun run verification` | Before merging: the five checks `build`, `lint`, `check-types`, `knip` and `test`. |
 | `bun run lint` / `bun run fix` | Formatting, type-aware Oxlint (`--deny-warnings`) with the boundary-directive pass, docs and path checks. |
-| `bun run lint:doctor` | The plugin's `commonplace-lint-doctor`: version policy, refresh order, local rules that repeat a preset rule and missing option paths. Separate from `lint`; see below. |
+| `bun run lint:doctor` | The plugin's `commonplace-lint-doctor`: version policy, refresh order, local rules that repeat a preset rule and missing option paths. `lint` runs it after the refresh; see below. |
 | `bun run format` | Oxfmt. |
 | `bun run check-types` | Workspace types plus the Alchemy roots, root tools and Effect diagnostics. |
 | `bun run knip` | Both Knip graphs. |
@@ -203,14 +203,11 @@ field.
 ## Lint doctor and conformance
 
 `bun run lint:doctor` runs the plugin's `commonplace-lint-doctor` from the
-repository root. It is not part of `bun run lint` yet. With 0.12.0 it reports
-four `path` errors for generated lint fixtures that tests write on demand
-(`tools/oxlint/fixtures/effect-accepted.ts`, `bun-accepted.ts`,
-`tools/oxlint/.generated-collection-host.ts` and `.generated-fetch-host.ts`).
-`commonplace.repository.json` already lists them under
-`ownerPaths.allowMissing`; wire the doctor into `lint` once a plugin release
-reads that setting and the doctor exits cleanly. Any `duplicate` finding means
-a local rule repeats a preset rule: remove it and configure the preset rule.
+repository root, and `bun run lint` runs it right after `lint:refresh`. Generated
+lint fixtures that tests write on demand are listed under
+`ownerPaths.allowMissing` in `commonplace.repository.json`, which the doctor
+reads from 0.12.1. Any `duplicate` finding means a local rule repeats a preset
+rule: remove it and configure the preset rule.
 
 `commonplace.repository.json` at the root maps TaxKit's files to the
 Commonplace repository responsibilities, lint-policy registries and
@@ -222,10 +219,10 @@ owner-path sources. The conformance validators live in the
 python3 <commonplace-plugins>/plugins/development-workflows/skills/repo-structure/scripts/conformance.py . --verbose
 ```
 
-Add `--lint` to also run `bun run lint`. The package check has no setting for
-a private leaf package without exports, so it reports
-`packages/docs-examples`: that package holds checked documentation examples
-that tests and builds run, and nothing imports it.
+Add `--lint` to also run `bun run lint`. `packages.privateLeaf` declares
+`packages/docs-examples` as a private leaf package: it holds checked
+documentation examples that tests and builds run, nothing imports it, and so it
+has no exports.
 
 ## Formatting Rules
 
