@@ -1,5 +1,11 @@
 # taxkit
 
+## 6.0.2
+
+### Patch Changes
+
+- e0ea518: Direct SDK publication guidance to the GitHub Trusted Publishing workflow so releases use the checked archive and include npm provenance.
+
 ## 6.0.1
 
 ### Patch Changes
