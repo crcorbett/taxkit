@@ -1,5 +1,11 @@
 # taxkit
 
+## 6.0.1
+
+### Patch Changes
+
+- Include npm provenance so consumers can verify the package's source commit and GitHub release workflow.
+
 ## 6.0.0
 
 ### Major Changes

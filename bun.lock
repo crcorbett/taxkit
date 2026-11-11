@@ -249,7 +249,7 @@
     },
     "packages/docs-examples": {
       "name": "@taxkit/docs-examples",
-      "version": "0.0.13",
+      "version": "0.0.14",
       "dependencies": {
         "@taxkit/core": "workspace:*",
         "@taxkit/rules-au-pay": "workspace:*",
@@ -429,7 +429,7 @@
     },
     "packages/sdk/typescript": {
       "name": "taxkit",
-      "version": "6.0.0",
+      "version": "6.0.1",
       "dependencies": {
         "effect": "catalog:",
       },

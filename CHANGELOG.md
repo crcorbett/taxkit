@@ -1,5 +1,11 @@
 # TaxKit
 
+## SDK 6.0.1
+
+- Publish the SDK through GitHub Actions with npm provenance that links the package
+  to its source commit and release workflow.
+- See the [SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
+
 ## SDK 6.0.0
 
 - Remove the generic calculation engine. Each calculator is a closed program
