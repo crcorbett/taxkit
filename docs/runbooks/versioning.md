@@ -25,6 +25,37 @@ and changelogs first; the empty Changeset queues no additional version bump.
 Publishing to npm is a separate operation and needs the maintainer's explicit
 request. Roll back an unpublished version change by reverting its commit.
 
+## SDK publication through GitHub
+
+The [npm release workflow](../../.github/workflows/npm-release.yml) runs
+manually on `main`. It checks the requested version against the SDK manifest,
+runs `bun run release:check`, and packs `taxkit` with the pinned Bun. The publish
+job uses npm Trusted Publishing to publish the checked archive. GitHub supplies
+a short-lived identity, so the workflow needs no npm token.
+
+1. Once the workflow is on `main`, register a GitHub Actions trusted publisher
+   for `taxkit` in its npm package settings. Enter owner `crcorbett`,
+   repository `taxkit` and workflow filename `npm-release.yml`. Leave the environment name blank and enable
+   **Allow npm publish**. npm expires a new connection if it has no successful
+   publish within two days. See
+   [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/).
+2. After the version change has merged, use a checkout of the current `main` to
+   confirm the SDK version. With explicit authority to publish that version,
+   run the workflow:
+
+   ```sh
+   version=$(jq -r .version packages/sdk/typescript/package.json)
+   gh workflow run npm-release.yml --repo crcorbett/taxkit --ref main -f version="$version"
+   ```
+
+   Add `-f dry_run=true` to run the checks and produce a downloadable archive
+   without publishing. A dry run can use the version that is already on npm.
+   The first successful publish confirms that npm trusts the workflow.
+3. Confirm that the publish job verified the public version, `latest` tag,
+   archive integrity and npm provenance. Check a fresh public install, then
+   tag the workflow's source commit as `taxkit@<version>` and add the result to
+   the release PR. If a publish fails, check npm before retrying.
+
 ## Local SDK publication
 
 Only `taxkit` is configured for public npm publication. Keep the root,
