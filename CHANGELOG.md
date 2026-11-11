@@ -1,5 +1,10 @@
 # TaxKit
 
+## SDK 6.0.2
+
+- Direct SDK publishing instructions to the GitHub Trusted Publishing workflow.
+- See the [SDK changelog](./packages/sdk/typescript/CHANGELOG.md).
+
 ## SDK 6.0.1
 
 - Publish the SDK through GitHub Actions with npm provenance that links the package
