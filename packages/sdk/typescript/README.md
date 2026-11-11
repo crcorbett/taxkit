@@ -163,4 +163,4 @@ checks install only this archive outside the checkout and verify declarations,
 all public imports, both execution styles, browser bundles, codec laws,
 removals and preserved statutory table/source fingerprints. Build and pack
 with the pinned Bun; publish the checked archive, following the
-[publication runbook](../../../docs/runbooks/versioning.md#local-sdk-publication).
+[publication runbook](../../../docs/runbooks/versioning.md#sdk-publication-through-github).
