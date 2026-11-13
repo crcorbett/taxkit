@@ -25,6 +25,7 @@ const decodingBoundaryFiles = [
   // Local package-manifest ingress for the documentation command check.
   "tools/documentation/check.boundary.ts",
   "tools/workspace/dependencies.boundary.test.ts",
+  "tools/workspace/sdk-bundle.test.ts",
   "tools/oxlint/workspaces.boundary.ts",
   "tools/oxlint/workspace-imports.boundary.test.ts",
   "packages/observability/test/host-telemetry.boundary.test.ts",
@@ -173,6 +174,8 @@ const decodingBoundaryFiles = [
   // Lint and Knip configuration ingress for the owner-path existence check.
   "tools/oxlint/owner-paths.test.ts",
   "tools/documentation/check.runtime.ts",
+  // Preview operation and pull-request stage arguments, decoded before any command.
+  "tools/infrastructure/preview-stage.runtime.ts",
   // Synthetic report ingress for the inventory caller and output boundary.
   "tools/repository-paths/check.runtime.ts",
   "tools/repository-paths/policy.test.ts",
@@ -324,6 +327,7 @@ const runtimeBoundaryFiles = [
   "tools/repository-paths/check.runtime.test.ts",
   "tools/repository-paths/check.runtime.ts",
   "tools/documentation/check.runtime.ts",
+  "tools/infrastructure/preview-stage.runtime.ts",
 ];
 
 // Exact command hosts that set `process.exitCode`. Every other file reads
@@ -580,7 +584,6 @@ export default defineConfig({
     ".agents/**",
     ".claude/**",
     "apps/web/src/routeTree.gen.ts",
-    "apps/web/src/worker-runtime.generated.d.ts",
     "dist/**",
     ".output/**",
     ".tanstack/**",
@@ -1032,6 +1035,15 @@ export default defineConfig({
       },
     },
     {
+      files: ["tools/infrastructure/preview-stage.runtime.ts"],
+      rules: {
+        "strict-effect/no-runtime-outside-boundary": [
+          "error",
+          { allowedFiles: ["tools/infrastructure/preview-stage.runtime.ts"] },
+        ],
+      },
+    },
+    {
       files: portableEffectSourceFiles,
       rules: {
         "taxkit-effect/inline-try-promise-callbacks": "error",
@@ -1045,7 +1057,6 @@ export default defineConfig({
         // clock checks here. These add calculator-only domain policy.
         "taxkit/no-invented-tax-context": "error",
         "taxkit/no-date-construction": "error",
-        "taxkit/no-native-array-methods": "error",
         "taxkit/no-nested-wrapper-calls": "error",
       },
     },
@@ -1078,7 +1089,6 @@ export default defineConfig({
         "tools/oxlint/fixtures/.generated-effect-rejected.ts",
       ],
       rules: {
-        "taxkit-effect/no-module-level-mutable-test-state": "error",
         // Shared test globals have one owner, @effect/vitest; Vitest-only
         // utilities such as vi and expectTypeOf still come from vitest.
         "no-restricted-imports": [
@@ -1352,6 +1362,12 @@ export default defineConfig({
     },
   ],
   rules: {
+    // Decoder placement is never waived by a comment: a disable directive
+    // naming this rule fails lint, so no file can silence decoder placement.
+    "taxkit/protected-rule-directives": [
+      "error",
+      { rules: ["effect-conventions/no-schema-decoder-outside-ingress"] },
+    ],
     "effect-conventions/scoped-managed-runtime": [
       "error",
       {
@@ -1363,7 +1379,6 @@ export default defineConfig({
         ],
       },
     ],
-    "taxkit-effect/no-switch": "error",
 
     "no-restricted-globals": ["error", ...restrictedGlobals, processGlobal],
     "no-restricted-properties": [

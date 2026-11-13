@@ -14,6 +14,7 @@ import {
   Schema,
   Boolean as EffectBoolean,
 } from "effect";
+import type * as PlatformError from "effect/PlatformError";
 import * as TypeScript from "typescript-ast";
 
 class PackageAssemblyError extends Schema.TaggedError<
@@ -22,28 +23,28 @@ class PackageAssemblyError extends Schema.TaggedError<
     readonly brand: unique symbol;
   }
 >()("PackageAssemblyError", {
-  operation: Schema.Literals(["resolve-import", "assemble-package"]),
+  operation: Schema.Literals([
+    "resolve-import",
+    "resolve-library",
+    "assemble-package",
+  ]),
   specifier: Schema.optionalKey(Schema.String),
 }) {}
+const Dependencies = Schema.Record(Schema.String, Schema.String);
 const LibraryManifest = Schema.Struct({
+  // A library without runtime dependencies omits the field.
+  dependencies: Dependencies.pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed({}), {
+      encodingStrategy: "omit",
+    })
+  ),
   exports: Schema.Record(
     Schema.String,
     Schema.String.check(Schema.isPattern(/^\.\/src\/.+\.ts$/u))
   ),
   name: Schema.String,
 });
-// These are the private source owners compiled into the SDK, not separately
-// installed packages. Their manifests remain the owner of each module's path.
-const libraries = [
-  { directory: "core", root: "packages/core" },
-  { directory: "calculators", root: "packages/calculators" },
-  { directory: "content", root: "packages/content" },
-  { directory: "mdx", root: "packages/mdx" },
-  { directory: "http", root: "packages/api/http" },
-  { directory: "income-tax", root: "packages/rules/au/income-tax" },
-  { directory: "pay", root: "packages/rules/au/pay" },
-  { directory: "stsl", root: "packages/rules/au/stsl" },
-] as const;
+const SdkManifest = Schema.Struct({ devDependencies: Dependencies });
 const ModuleReference = Schema.Struct({
   end: Schema.Finite,
   specifier: Schema.String,
@@ -140,12 +141,131 @@ export const relocateModuleImports = (
     )
   );
 };
-export const assemblePackage = Effect.gen(function* () {
+interface Library {
+  readonly directory: string;
+  readonly manifest: typeof LibraryManifest.Type;
+  readonly root: string;
+}
+// The private source owners compiled into the SDK are the workspace packages
+// its own sources import, which must be workspace devDependencies of the SDK,
+// plus their workspace runtime dependencies, resolved from each owner's own
+// links. Each owner's manifest names its modules.
+const bundledLibraries = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
   const root = yield* path.fromFileUrl(
     new URL("../../../../", import.meta.url)
   );
+  const sdk = yield* path.fromFileUrl(new URL("../", import.meta.url));
+  const manifest = yield* fs
+    .readFileString(path.join(sdk, "package.json"))
+    .pipe(
+      Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(SdkManifest)))
+    );
+  const workspace = EffectFunction.pipe(
+    manifest.devDependencies,
+    Record.filter((version) => version.startsWith("workspace:"))
+  );
+  const sources = yield* fs.readDirectory(path.join(sdk, "src"), {
+    recursive: true,
+  });
+  const imported = yield* Effect.forEach(
+    EffectFunction.pipe(
+      sources,
+      Array.filter((file) => file.endsWith(".ts"))
+    ),
+    (file) =>
+      fs.readFileString(path.join(sdk, "src", file)).pipe(
+        Effect.map((source) =>
+          EffectFunction.pipe(
+            TypeScript.createSourceFile(
+              file,
+              source,
+              TypeScript.ScriptTarget.Latest,
+              true
+            ),
+            moduleReferences,
+            Array.map(({ specifier }) =>
+              EffectFunction.pipe(specifier.split("/"), Array.take(2)).join("/")
+            )
+          )
+        )
+      )
+  ).pipe(
+    Effect.map((names) =>
+      EffectFunction.pipe(names, Array.flatten, Array.dedupe)
+    )
+  );
+  const visit = (
+    pending: readonly { readonly from: string; readonly name: string }[],
+    found: readonly Library[]
+  ): Effect.Effect<
+    readonly Library[],
+    PackageAssemblyError | PlatformError.PlatformError | Schema.SchemaError
+  > =>
+    Array.match(pending, {
+      onEmpty: () => Effect.succeed(found),
+      onNonEmpty: ([{ from, name }, ...rest]) =>
+        EffectBoolean.match(
+          EffectFunction.pipe(
+            found,
+            Array.some((library) => library.manifest.name === name)
+          ),
+          {
+            onFalse: () =>
+              Effect.gen(function* () {
+                if (from === sdk && !Record.has(workspace, name)) {
+                  return yield* new PackageAssemblyError({
+                    operation: "resolve-library",
+                    specifier: name,
+                  });
+                }
+                const linked = yield* fs.realPath(
+                  path.join(from, "node_modules", name)
+                );
+                const library = yield* fs
+                  .readFileString(path.join(linked, "package.json"))
+                  .pipe(
+                    Effect.flatMap(
+                      Schema.decodeEffect(
+                        Schema.fromJsonString(LibraryManifest)
+                      )
+                    )
+                  );
+                const next = EffectFunction.pipe(
+                  Record.keys(library.dependencies),
+                  Array.filter((dependency) =>
+                    dependency.startsWith("@taxkit/")
+                  ),
+                  Array.map((dependency) => ({
+                    from: linked,
+                    name: dependency,
+                  })),
+                  (dependencies) => Array.appendAll(rest, dependencies)
+                );
+                const known = EffectFunction.pipe(
+                  found,
+                  Array.append({
+                    directory: path.basename(linked),
+                    manifest: library,
+                    root: path.relative(root, linked),
+                  })
+                );
+                return yield* visit(next, known);
+              }),
+            onTrue: () => visit(rest, found),
+          }
+        ),
+    });
+  const direct = EffectFunction.pipe(
+    imported,
+    Array.map((name) => ({ from: sdk, name }))
+  );
+  return yield* visit(direct, []);
+});
+export const assemblePackage = Effect.gen(function* () {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
   const destination = yield* path.fromFileUrl(
     new URL("../dist/", import.meta.url)
   );
@@ -154,17 +274,7 @@ export const assemblePackage = Effect.gen(function* () {
   const compiled = yield* path.fromFileUrl(
     new URL("../.compiled/", import.meta.url)
   );
-  const owners = yield* EffectFunction.pipe(
-    libraries,
-    Effect.forEach((library) =>
-      fs.readFileString(path.join(root, library.root, "package.json")).pipe(
-        Effect.flatMap(
-          Schema.decodeEffect(Schema.fromJsonString(LibraryManifest))
-        ),
-        Effect.map((manifest) => ({ ...library, manifest }))
-      )
-    )
-  );
+  const owners = yield* bundledLibraries;
   const modules = Record.fromEntries(
     EffectFunction.pipe(
       owners,

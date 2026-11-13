@@ -1,5 +1,6 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { workerCompatibility } from "@taxkit/infrastructure/worker-settings";
 import viteReact from "@vitejs/plugin-react";
 import {
   Config,
@@ -11,9 +12,14 @@ import {
 import { defineConfig } from "vite";
 
 export default defineConfig(() => {
+  // Alchemy sets "1" when its own Cloudflare plugin owns the build. Any other
+  // value is a configuration error rather than a silent standalone build.
   const alchemyOwnsCloudflareVite = Effect.runSync(
-    Config.schema(Schema.String, "ALCHEMY_CLOUDFLARE_VITE_INJECTED").pipe(
-      Config.withDefault(""),
+    Config.schema(
+      Schema.Literals(["0", "1"]),
+      "ALCHEMY_CLOUDFLARE_VITE_INJECTED"
+    ).pipe(
+      Config.withDefault("0"),
       Config.map((value) => value === "1"),
       Effect.provideService(
         ConfigProvider.ConfigProvider,
@@ -25,7 +31,18 @@ export default defineConfig(() => {
     envPrefix: [],
     plugins: [
       ...EffectBoolean.match(alchemyOwnsCloudflareVite, {
-        onFalse: () => [cloudflare({ viteEnvironment: { name: "ssr" } })],
+        // A standalone build takes its compatibility from the same owner as
+        // the deployed Workers; it has no bindings of its own.
+        onFalse: () => [
+          cloudflare({
+            config: {
+              compatibility_date: workerCompatibility.date,
+              compatibility_flags: workerCompatibility.flags,
+              main: "src/entry.server.ts",
+            },
+            viteEnvironment: { name: "ssr" },
+          }),
+        ],
         onTrue: () => [],
       }),
       tanstackStart({

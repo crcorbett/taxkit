@@ -4,7 +4,7 @@
   "globalDependencies": [
     ".bun-version",
     "tsconfig.base.json",
-    "tsconfig.alchemy.json"
+    "raw-modules.d.ts"
   ],
   "globalEnv": ["CI"],
   "remoteCache": {
@@ -49,7 +49,12 @@
         "TAXKIT_API_BASE_URL",
         "VITE_*"
       ],
-      "outputs": ["dist/**", ".output/**", ".vercel/output/**"],
+      "outputs": [
+        "dist/**",
+        ".output/**",
+        ".vercel/output/**",
+        "src/routeTree.gen.ts"
+      ],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/docs/**"]
     },
     "web#test": {
@@ -104,6 +109,112 @@
     },
     "clean": {
       "cache": false
+    },
+    "web#check-types": {
+      "dependsOn": ["^build", "build"],
+      "outputs": []
+    },
+    "//#check-types:root": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "apps/**",
+        "content/**",
+        "packages/**",
+        "!apps/*/node_modules/**",
+        "!content/*/node_modules/**",
+        "!packages/**/node_modules/**",
+        "!**/dist/**",
+        "!**/.turbo/**",
+        "!**/.output/**",
+        "!**/.compiled/**",
+        "!**/.tanstack/**",
+        "!**/.wrangler/**",
+        "!**/.vitest/**",
+        "!**/.alchemy/**",
+        "!**/tmp/**",
+        "!**/*.tsbuildinfo",
+        "!apps/api/src/generated/**",
+        "!apps/web/src/routeTree.gen.ts"
+      ],
+      "outputs": []
+    },
+    "//#knip": {
+      "dependsOn": ["^build", "taxkit#build", "web#build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "apps/**",
+        "content/**",
+        "packages/**",
+        "!apps/*/node_modules/**",
+        "!content/*/node_modules/**",
+        "!packages/**/node_modules/**",
+        "!**/dist/**",
+        "!**/.turbo/**",
+        "!**/.output/**",
+        "!**/.compiled/**",
+        "!**/.tanstack/**",
+        "!**/.wrangler/**",
+        "!**/.vitest/**",
+        "!**/.alchemy/**",
+        "!**/tmp/**",
+        "!**/*.tsbuildinfo",
+        "!apps/api/src/generated/**",
+        "!apps/web/src/routeTree.gen.ts"
+      ],
+      "outputs": []
+    },
+    "//#test:tools": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "apps/**",
+        "content/**",
+        "packages/**",
+        "!apps/*/node_modules/**",
+        "!content/*/node_modules/**",
+        "!packages/**/node_modules/**",
+        "!**/dist/**",
+        "!**/.turbo/**",
+        "!**/.output/**",
+        "!**/.compiled/**",
+        "!**/.tanstack/**",
+        "!**/.wrangler/**",
+        "!**/.vitest/**",
+        "!**/.alchemy/**",
+        "!**/tmp/**",
+        "!**/*.tsbuildinfo",
+        "!apps/api/src/generated/**",
+        "!apps/web/src/routeTree.gen.ts",
+        "node_modules/@commonplaces/oxlint-plugin/package.json"
+      ],
+      "outputs": []
+    },
+    "//#test:native": {
+      "dependsOn": ["^build"],
+      "env": ["PLAYWRIGHT_BROWSERS_PATH"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "apps/**",
+        "content/**",
+        "packages/**",
+        "!apps/*/node_modules/**",
+        "!content/*/node_modules/**",
+        "!packages/**/node_modules/**",
+        "!**/dist/**",
+        "!**/.turbo/**",
+        "!**/.output/**",
+        "!**/.compiled/**",
+        "!**/.tanstack/**",
+        "!**/.wrangler/**",
+        "!**/.vitest/**",
+        "!**/.alchemy/**",
+        "!**/tmp/**",
+        "!**/*.tsbuildinfo",
+        "!apps/api/src/generated/**",
+        "!apps/web/src/routeTree.gen.ts"
+      ],
+      "outputs": []
     }
   }
 }

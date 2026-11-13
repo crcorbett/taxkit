@@ -7,7 +7,7 @@ ordinary record of what happened.
 | Runbook | Use it for |
 | --- | --- |
 | [Website and API deployment](./deployment.md) | Native Alchemy plan, deploy, drift, destroy and rollback for Preview and Production, the Checks workflow's deploy jobs and `[skip ci]` use. |
-| [Versioning](./versioning.md) | Changesets, package versions, npm publication and release evidence. |
+| [Release](./release.md) | Changesets, package versions, npm publication and release evidence. |
 | [Packed consumer check](./packed-consumer-proof.md) | Packing the SDK and installing it in a fresh consumer. |
 
 Start a new runbook from [the runbook template](./_template.md).

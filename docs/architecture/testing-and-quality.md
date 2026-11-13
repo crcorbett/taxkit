@@ -2,26 +2,27 @@
 
 TaxKit quality depends on deterministic calculation tests, package boundary
 tests, graph validation, trace snapshots, public contract tests and a working
-Website/API. [Rule and calculation tests](./testing-and-validation.md)
+Website/API. [Rule and calculation tests](./rule-and-calculation-tests.md)
 describes the engine, rule-package and SDK tests.
 
 ## The checks
 
 | Command | What it shows |
 | --- | --- |
-| `bun run verification` | Before merging. The five checks in order: `build`, `lint`, `check-types`, `knip` and `test`. |
-| `bun run build` | Every workspace build, including the API's docs catalogue. |
-| `bun run lint` | Formatting, type-aware Oxlint with the boundary-directive pass, documentation links/commands and portable paths. |
-| `bun run check-types` | Workspace, Alchemy-root and tool types, and Effect diagnostics. |
+| `bun run verification` | Before merging. The five checks: `build`, then `lint`, then `check-types`, `knip` and the workspace tests in one cached Turbo run, then the tool and native pair tests one at a time. |
+| `bun run build` | Every workspace build, including the Website route tree and the API's docs catalogue. |
+| `bun run lint` | Formatting, one type-aware Oxlint pass, documentation links/commands and portable paths. |
+| `bun run check-types` | Workspace, Alchemy-root and tool types; the patched compiler reports Effect diagnostics. |
 | `bun run knip` | The development and production Knip graphs. |
 | `bun run test` | Root tool tests (including the actual-Oxlint rule fixtures), unit tests in every workspace, Website and SDK tests in Chromium, then the required credential-free native pair suite (`test:native`, in `tools/apps-local/test`): both apps built and run together in Miniflare for first HTML, docs pages, Markdown, discovery files, share images, browser calculation, the no-JavaScript notice, MCP and request limits. |
 | `bun run release:check` | `verification`, including the native pair suite, plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. Run it before a package release. |
 
 The Checks workflow runs `verification` once per revision in its `checks` job;
 the Preview and Production deploy jobs `need` that job and deploy the same
-commit, so they start only after it succeeds. Its final `test:native` builds
-and tests the native pair only after the earlier builds and source-rewriting
-tests have finished. A native failure fails `checks`, so no deploy job reaches
+commit, so they start only after it succeeds. Its final Turbo run takes
+`test:tools` and `test:native` one at a time (`--concurrency=1`), after every
+other check has finished, because both rewrite repository files while they
+run. A native failure fails `checks`, so no deploy job reaches
 deployment credentials, planning or apply. Do not run these artifact-owning
 checks concurrently in one checkout. The native suite covers request-scoped MCP
 progress and async context across requests, shared work/rate limits, reply
@@ -29,7 +30,8 @@ cleanup and the Website's refusal of POSTs.
 
 `tools/infrastructure/release-gates.boundary.test.ts` executes the real root
 command composition with safe leaf replacements and reads the workflow. It
-checks native build/test ordering, proves that a failing native suite fails
+checks the Turbo run order and native build/test ordering, runs the shared
+preview-stage entry against valid and invalid stages, proves that a failing native suite fails
 verification and later release checks, and requires every Preview/Production
 plan or deploy job to need `checks`, check out the verified commit and never
 repeat verification. Each credential-using job checks its Doppler token is set
@@ -38,8 +40,9 @@ apply or destroy follows a matching-stage native plan without `--yes`.
 
 Effect diagnostics run inside every workspace's `check-types`, because the
 `prepare` script (`effect-tsgo patch --oxlint`) patches TypeScript and Oxlint with the
-Effect language service; `check-types` ends with `check:effect`, a smoke check
-that the patch and plugin are active. `bun run lint` inherits the complete
+Effect language service. Error-severity diagnostics fail the compiler;
+`tools/effect-language-service/diagnostics.test.ts` proves a floating Effect
+fails the real patched compiler and the yielded equivalent passes. `bun run lint` inherits the complete
 `style` and `strict` presets from `@commonplaces/oxlint-plugin`, with no local
 rule disabling. Version compatibility, native test callback registrations and
 explicit unstable API opt-ins are recorded in [tooling](../standards/tooling.md).
@@ -56,7 +59,8 @@ The Website and the root native suite pin the same Playwright version.
 
 `tools/vitest.config.ts` has two named projects: `tools` (`test:tools`, under
 Bun) and `native-pair` (`test:native-pair`, under Node after
-`build:native-pair`). The native pair suite tests both Workers, so it sits
+`build:native-pair`). Both run as cached root Turbo tasks; see
+[Turbo caching](../standards/tooling.md#turbo-caching). The native pair suite tests both Workers, so it sits
 beside its build harness in `tools/apps-local` rather than in either app. Its
 shared Miniflare fixture, `native-worker.fixture.ts`, takes compatibility from
 `@taxkit/infrastructure/worker-settings`. The Website/API pair test runs one
@@ -82,7 +86,7 @@ and an updated OpenAPI snapshot.
 - **Infrastructure**: `bun run check-types` covers the Alchemy roots. A native
   plan (`bun run pr:plan pr-<number>` or `bun run production:plan`) shows the
   intended resource changes before a deployment.
-- **Documentation**: `bun run lint` (its `check:docs` step); public MDX is also checked by
+- **Documentation**: `bun run lint` (its documentation check step); public MDX is also checked by
   `apps/api/test/docs-sources.test.ts` and
   `packages/docs-examples/test/published-snippets.test.ts` in `bun run test`.
 
@@ -109,7 +113,7 @@ timeout without understanding the failure.
 
 ## Related docs
 
-- [Rule and calculation tests](./testing-and-validation.md)
+- [Rule and calculation tests](./rule-and-calculation-tests.md)
 - [API and SDK](./api-and-sdk.md)
 - [Frontend](./frontend.md)
 - [Deployment](./deployment.md)

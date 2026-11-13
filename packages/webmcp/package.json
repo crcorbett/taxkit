@@ -18,7 +18,7 @@
     "@taxkit/api-mcp": "workspace:*",
     "@taxkit/content": "workspace:*",
     "effect": "catalog:",
-    "webmcp-types": "0.1.10"
+    "webmcp-types": "catalog:"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",

@@ -46,7 +46,7 @@ bun run --filter=@taxkit/rules-au-income-tax test
 bun run --filter=@taxkit/rules-au-stsl test
 bun run --filter=@taxkit/calculators test
 bun run --filter=@taxkit/api-http test
-bun run --filter=taxkit test-types
+bun run --filter=taxkit check-types
 ```
 
 Before handoff, run the repository gate:
@@ -60,4 +60,4 @@ bun run verification
 For the full quality model, read
 [Testing and quality](../../../docs/architecture/testing-and-quality.md)
 and
-[Testing and validation](../../../docs/architecture/testing-and-validation.md).
+[Rule and calculation tests](../../../docs/architecture/rule-and-calculation-tests.md).

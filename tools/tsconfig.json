@@ -10,6 +10,7 @@
   },
   "include": [
     "documentation/*.ts",
+    "effect-language-service/*.ts",
     "oxlint/*.ts",
     "oxlint/rules/**/*.ts",
     "repository-paths/*.ts",

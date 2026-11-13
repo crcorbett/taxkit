@@ -1,13 +1,13 @@
-# Versioning
+# Release
 
 TaxKit uses [Changesets](https://github.com/changesets/changesets). `taxkit`
 owns the single installable package; the other workspace packages remain
 private implementation owners. See
-the [versioning standard](../standards/versioning.md) for semver rules.
+the [release policy](../standards/release-policy.md) for semver rules.
 
 1. Add a Changeset with `bun run changeset` in the same change as any public
    package contract change, following the
-   [versioning standard](../standards/versioning.md#rules). Name `api` or `web`
+   [release policy](../standards/release-policy.md#rules). Name `api` or `web`
    for an app change worth a changelog entry; both carry private versions for
    that.
 2. Check the pending release with `bun run changeset:status`.
