@@ -1,6 +1,6 @@
 import { CalculationError } from "@taxkit/core/errors";
 import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
-import { Cents, fromCents } from "@taxkit/core/primitives";
+import { fromCents } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   Function as EffectFunction,
@@ -10,6 +10,7 @@ import {
   Layer,
   Option,
   Boolean as EffectBoolean,
+  Struct,
 } from "effect";
 
 import {
@@ -56,11 +57,14 @@ const findRow = (
           weeklyFormulaCents <= r.weeklyMaxCents)
     )
   );
+  // The checked table covers every weekly amount from zero, so only a negative
+  // taxable amount (salary sacrifice above gross pay) finds no row.
   return Option.match(row, {
     onNone: () =>
       Effect.fail(
         new CalculationError({
           message: "No Schedule 1 row covers the amount.",
+          reason: "negative",
         })
       ),
     onSome: Effect.succeed,
@@ -71,7 +75,7 @@ const findRow = (
  * aggregator can combine it with other withholding components (e.g. STSL)
  * without the PAYG rule needing to know about them.
  *
- * @throws {CalculationError} When no Schedule 1 row covers the weekly-equivalent amount.
+ * @throws {CalculationError} When taxable pay is negative or an amount does not fit in safe whole cents.
  * @since 0.1.0
  */
 export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
@@ -89,8 +93,9 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
       onTrue: (): "scale2" => "scale2",
     });
     const row = yield* findRow(table, scale, weeklyFormulaCents);
-    const checkedWeeklyFormulaCents =
-      yield* Cents.makeEffect(weeklyFormulaCents);
+    const checkedWeeklyFormulaCents = yield* fromCents(weeklyFormulaCents).pipe(
+      Effect.map(Struct.get("cents"))
+    );
     // Keep a*x-b exact until Schedule 1's whole-dollar rounding boundary.
     const weeklyWithholding = BigDecimal.subtract(
       BigDecimal.multiply(
@@ -146,11 +151,13 @@ export const PaygWithholdingLive = Layer.effect(PaygWithholdingComponentFact)(
     });
     return component;
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "PAYG withholding could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );

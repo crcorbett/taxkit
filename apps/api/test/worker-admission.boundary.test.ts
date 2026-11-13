@@ -6,7 +6,7 @@ import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import {
   CalculatorAdmissionUnavailable,
   CalculatorRateLimited,
-} from "@taxkit/calculators/schemas";
+} from "@taxkit/calculators/errors";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
   Function as EffectFunction,

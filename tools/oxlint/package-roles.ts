@@ -16,6 +16,7 @@ const frontendModules = [
   "@taxkit/api-mcp/client-handlers",
   "@taxkit/api-mcp/tools",
   "@taxkit/calculators/schemas",
+  "@taxkit/calculators/errors",
   "@taxkit/calculators/form",
   "@taxkit/calculators/page",
   "@taxkit/calculators/summaries",

@@ -6,7 +6,7 @@ import {
   multiplyCentsByDecimal,
 } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
-import { BigDecimal, Effect, Layer, Match, Option } from "effect";
+import { BigDecimal, Effect, Layer, Match, Option, Struct } from "effect";
 
 import { MedicareLevyComponentFact } from "../facts/components.js";
 import { AnnualTaxableIncomeFact } from "../facts/income.js";
@@ -54,7 +54,8 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
       Match.when(
         (cents) => cents <= table.shadeInMaxCents,
         (cents) =>
-          Cents.makeEffect(cents - table.thresholdCents).pipe(
+          fromCents(cents - table.thresholdCents).pipe(
+            Effect.map(Struct.get("cents")),
             Effect.flatMap((excess) =>
               multiplyCentsByDecimal(excess, table.shadeInRate)
             ),
@@ -105,11 +106,13 @@ export const MedicareLevyLive = Layer.effect(MedicareLevyComponentFact)(
     });
     return component;
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Medicare levy could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );

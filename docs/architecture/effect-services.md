@@ -485,7 +485,8 @@ interruption.
   channel. Do not use `Effect.die` for schema decode failures,
   `CalculationError`, unsupported calculator/context errors, config decode
   failures or other recoverable service-contract errors. Reserve defects for
-  impossible states outside the declared contract.
+  impossible states outside the declared contract, such as an invalid rule
+  graph, table coverage gap or report invariant (`CalculationInvariantViolation`).
 - Manual `_tag` object literals are not allowed. Tagged values MUST be
   constructed with `Data.TaggedClass`, `Data.TaggedError`,
   `Schema.TaggedClass`, or an owning package constructor built from those
@@ -517,9 +518,12 @@ is a real host substitution point over `PublicCalculatorService`: native API and
 standalone HTTP roots build it once over the live implementation, while focused
 tests supply controlled work at the same contract. One pool serves all native
 transports and counts individual batch calculations. Scope and semaphore release
-own cleanup on every exit. Metadata remains outside calculation capacity, while
-all nine calls share the five-second completion budget. Lazy invocation counts
-metadata construction within it. The HTTP-owned streamed body policy provides
+own cleanup on every exit. Only `calculate` has the five-second completion
+budget; metadata methods are the catalogue's own synchronous projections, reused
+directly, with neither a budget nor a calculation place.
+`CalculatorCatalogue` has its own closed contract: metadata lookups fail only
+with `UnsupportedCalculatorContextError` and calculation only with
+`CalculationError` or that lookup error. The HTTP-owned streamed body policy provides
 Schema-owned JSON errors at the host boundary. No
 runner or live Layer is built inside a calculation, and no transport gains a
 competing application contract. The owning package records timeout and CPU limits.

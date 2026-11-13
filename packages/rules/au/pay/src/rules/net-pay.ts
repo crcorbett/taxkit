@@ -45,11 +45,13 @@ export const NetPayLive = Layer.effect(NetPayFact)(
       trace,
     });
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Net pay could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );
@@ -77,6 +79,7 @@ export const NetPayWithSacrificeLive = Layer.effect(NetPayFact)(
     if (gross.period !== sacrifice.period) {
       return yield* new CalculationError({
         message: "Salary sacrifice must use the gross pay period.",
+        reason: "period-mismatch",
       });
     }
     const cashPay = yield* subtract(gross.amount, sacrifice.amount);
@@ -104,11 +107,13 @@ export const NetPayWithSacrificeLive = Layer.effect(NetPayFact)(
       trace,
     });
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Net pay could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );

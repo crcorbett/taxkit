@@ -6,9 +6,9 @@ import {
   CalculatorAdmission,
   CalculatorRequestRateKey,
 } from "@taxkit/calculators/admission.service";
+import { CalculatorRateLimited } from "@taxkit/calculators/errors";
 import {
   CalculatorId,
-  CalculatorRateLimited,
   CalculatorRunRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";

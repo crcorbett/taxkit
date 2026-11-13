@@ -106,7 +106,9 @@ host routes), and allow `content-type`, the optional
 headers. Remote MCP admits Origin-less clients and browser pages served from
 the same-stage Website origin only: the static `TaxKitMcpHttpLayer` from
 `@taxkit/api-mcp/server` reads and checks that bound origin through Config; its
-`allowedOrigins` holds just it.
+`allowedOrigins` holds just it. Its admitted request headers are
+`mcpAllowedHeaders` from the same export (the public set plus the modern
+`mcp-*` headers) and the collection-policy header.
 Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
 produce an empty 503 response, without a guessed address.

@@ -22,11 +22,9 @@ import {
   Schema,
 } from "effect";
 
+import { CalculatorServiceError } from "../src/errors.js";
 import { PublicCalculatorServiceLive } from "../src/live.layer.js";
-import {
-  CalculatorRunRequest,
-  CalculatorServiceError,
-} from "../src/schemas.js";
+import { CalculatorRunRequest } from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
 
 const ServiceLive = PublicCalculatorServiceLive;
@@ -146,7 +144,7 @@ describe("public calculator service", () => {
             Schema.fromJsonString(CalculatorServiceError)
           )(error);
           expect(encoded).toBe(
-            '{"_tag":"CalculationError","message":"PAYG withholding could not produce a supported amount.","reason":"rule"}'
+            '{"_tag":"CalculationError","message":"PAYG withholding could not produce a supported amount.","reason":"range"}'
           );
         }
       }).pipe(Effect.provide(ServiceLive))

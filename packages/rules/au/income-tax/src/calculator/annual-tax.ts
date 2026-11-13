@@ -1,4 +1,4 @@
-import { CalculationError } from "@taxkit/core/errors";
+import { CalculationInvariantViolation } from "@taxkit/core/errors";
 import { Cents, Money } from "@taxkit/core/primitives";
 import { Context, Effect, Layer, Boolean as EffectBoolean } from "effect";
 
@@ -37,13 +37,16 @@ export const CalculateAnnualTax = Effect.gen(function* () {
     taxableIncome: income.income,
     trace: ledger.trace,
   }).pipe(
+    // The rules above produce every report field; a rejected report is a
+    // defect in this pack, not something a caller can correct.
     Effect.mapError(
       () =>
-        new CalculationError({
-          reason: "output-invariant",
+        new CalculationInvariantViolation({
+          invariant: "report",
           message: "Annual tax report invariant failed.",
         })
-    )
+    ),
+    Effect.orDie
   );
 });
 /**

@@ -10,6 +10,7 @@
     "./service": "./src/service.ts",
     "./live": "./src/live.layer.ts",
     "./schemas": "./src/schemas.ts",
+    "./errors": "./src/errors.ts",
     "./work": "./src/work.layer.ts",
     "./admission.schemas": "./src/admission.schemas.ts",
     "./admission.service": "./src/admission.service.ts",

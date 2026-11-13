@@ -24,13 +24,12 @@ import {
   CalculatorAdmission,
   CalculatorRequestRateKey,
 } from "../src/admission.service.js";
-import { CalculatorCatalogueLive } from "../src/live.layer.js";
 import {
   CalculatorAdmissionUnavailable,
   CalculatorRateLimited,
-  CalculatorRunRequest,
-  MetadataQuery,
-} from "../src/schemas.js";
+} from "../src/errors.js";
+import { CalculatorCatalogueLive } from "../src/live.layer.js";
+import { CalculatorRunRequest, MetadataQuery } from "../src/schemas.js";
 import {
   CalculatorCatalogue,
   PublicCalculatorService,

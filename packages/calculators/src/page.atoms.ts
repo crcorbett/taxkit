@@ -2,7 +2,8 @@ import { Boolean as EffectBoolean, Cause, Match, Option } from "effect";
 import * as AsyncResult from "effect/reactivity/AsyncResult";
 import type * as Atom from "effect/reactivity/Atom";
 
-import type { CalculatorForm, CalculatorInputError } from "./form.ingress.js";
+import type { CalculatorInputError } from "./errors.js";
+import type { CalculatorForm } from "./form.ingress.js";
 import type { CalculatorViewState } from "./page.schemas.js";
 import { CalculatorId as CatalogCalculatorId } from "./schemas.js";
 import type { CalculatorRunResponse, CalculatorRunRequest } from "./schemas.js";

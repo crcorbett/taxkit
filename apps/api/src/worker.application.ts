@@ -24,7 +24,7 @@ import {
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
 import { withBoundedMcpReply } from "@taxkit/api-mcp/response-budget";
-import { TaxKitMcpHttpLayer } from "@taxkit/api-mcp/server";
+import { TaxKitMcpHttpLayer, mcpAllowedHeaders } from "@taxkit/api-mcp/server";
 import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
 import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
@@ -248,15 +248,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
                   CollectionPolicyHeader,
                   ...publicCors.allowedHeaders,
                 ],
-                onTrue: () => [
-                  CollectionPolicyHeader,
-                  "b3",
-                  "content-type",
-                  "mcp-method",
-                  "mcp-name",
-                  "mcp-protocol-version",
-                  "traceparent",
-                ],
+                onTrue: () => [CollectionPolicyHeader, ...mcpAllowedHeaders],
               }),
               allowedMethods: publicCors.allowedMethods,
               allowedOrigins: (origin) =>

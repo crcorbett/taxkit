@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { NonNegativeMoney } from "@taxkit/core";
+import { CalculationError } from "@taxkit/core/errors";
 import { Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayTakeHomeId,
@@ -25,17 +26,12 @@ import {
 } from "effect";
 import { TestClock } from "effect/testing";
 
-import { CalculatorCatalogueLive } from "../src/live.layer.js";
 import {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
-  CalculatorRunRequest,
-  MetadataQuery,
-  DescriptorFilterQuery,
-  GetCalculatorRequest,
-  GetCalculatorGraphRequest,
-  UnsupportedCalculatorError,
-} from "../src/schemas.js";
+} from "../src/errors.js";
+import { CalculatorCatalogueLive } from "../src/live.layer.js";
+import { CalculatorRunRequest, MetadataQuery } from "../src/schemas.js";
 import {
   CalculatorCatalogue,
   PublicCalculatorService,
@@ -55,128 +51,6 @@ const Request = CalculatorRunRequest.make({
     }),
   },
 });
-const MetadataWorkCases = [
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service
-        .getCalculator(GetCalculatorRequest.make({ calculatorId }))
-        .pipe(Effect.asVoid),
-    operation: "getCalculator",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        getCalculator: Effect.fn("CalculatorCatalogue.getCalculator")(
-          () => work
-        ),
-      });
-    }),
-  },
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service
-        .getCalculatorGraph(GetCalculatorGraphRequest.make({ calculatorId }))
-        .pipe(Effect.asVoid),
-    operation: "getCalculatorGraph",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        getCalculatorGraph: Effect.fn("CalculatorCatalogue.getCalculatorGraph")(
-          () => work
-        ),
-      });
-    }),
-  },
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service
-        .getCalculatorSchema(GetCalculatorRequest.make({ calculatorId }))
-        .pipe(Effect.asVoid),
-    operation: "getCalculatorSchema",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        getCalculatorSchema: Effect.fn(
-          "CalculatorCatalogue.getCalculatorSchema"
-        )(() => work),
-      });
-    }),
-  },
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listCalculators(MetadataQuery.make({})).pipe(Effect.asVoid),
-    operation: "listCalculators",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        listCalculators: Effect.fn("CalculatorCatalogue.listCalculators")(
-          () => work
-        ),
-      });
-    }),
-  },
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listFacts(DescriptorFilterQuery.make({})).pipe(Effect.asVoid),
-    operation: "listFacts",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        listFacts: Effect.fn("CalculatorCatalogue.listFacts")(() => work),
-      });
-    }),
-  },
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listJurisdictions().pipe(Effect.asVoid),
-    operation: "listJurisdictions",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        listJurisdictions: Effect.fn("CalculatorCatalogue.listJurisdictions")(
-          () => work
-        ),
-      });
-    }),
-  },
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listRules(DescriptorFilterQuery.make({})).pipe(Effect.asVoid),
-    operation: "listRules",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        listRules: Effect.fn("CalculatorCatalogue.listRules")(() => work),
-      });
-    }),
-  },
-  {
-    invoke: (service: PublicCalculatorService["Service"]) =>
-      service.listTaxYears(MetadataQuery.make({})).pipe(Effect.asVoid),
-    operation: "listTaxYears",
-    // Substitute the selected catalogue operation where it is acquired.
-    substitute: Effect.fnUntraced(function* (work: Effect.Effect<never>) {
-      const live = yield* CalculatorCatalogue;
-      return CalculatorCatalogue.of({
-        ...live,
-        listTaxYears: Effect.fn("CalculatorCatalogue.listTaxYears")(() => work),
-      });
-    }),
-  },
-] as const;
 const Live = CalculatorCatalogueLive;
 // Substitute work at the catalogue; keep the production work-policy Layer.
 const bounded = Effect.fnUntraced(function* (
@@ -199,84 +73,30 @@ const failure = <A, E>(exit: Exit.Exit<A, E>) => {
   });
 };
 describe("shared calculation work policy", () => {
-  it.effect.each(MetadataWorkCases)(
-    "bounds $operation at five seconds and closes its resources",
-    ({ invoke, substitute }) =>
+  it.effect(
+    "reuses the catalogue's own metadata operations without a budget",
+    () =>
       Effect.gen(function* () {
-        const started = yield* Deferred.make<boolean>();
-        const released = yield* Ref.make(false);
-        const work = Deferred.succeed(started, true).pipe(
-          Effect.andThen(Effect.never),
-          Effect.ensuring(Ref.set(released, true))
-        );
-        const service = yield* substitute(work).pipe(Effect.flatMap(bounded));
-        const call = yield* invoke(service).pipe(Effect.forkScoped);
-        yield* Deferred.await(started);
-        // Nine metadata calls can wait without using a calculation place.
-        const extra = yield* Effect.forEach(Array.range(1, 8), () =>
-          invoke(service).pipe(Effect.forkScoped)
-        );
-        expect((yield* service.calculate(Request)).report).toMatchObject({
-          netPay: { cents: 130_100 },
-        });
-        yield* TestClock.adjust("4 seconds");
-        expect(!(yield* Ref.get(released))).toBeTruthy();
-        yield* TestClock.adjust("1 second");
+        const catalogue = yield* CalculatorCatalogue;
+        const service = yield* bounded(catalogue);
         expect({
-          resourcesReleased: yield* Ref.get(released),
-          failureYieldFiberAwaitCall: failure(yield* Fiber.await(call)),
+          getCalculator: service.getCalculator,
+          getCalculatorGraph: service.getCalculatorGraph,
+          getCalculatorSchema: service.getCalculatorSchema,
+          listCalculators: service.listCalculators,
+          listFacts: service.listFacts,
+          listJurisdictions: service.listJurisdictions,
+          listRules: service.listRules,
+          listTaxYears: service.listTaxYears,
         }).toStrictEqual({
-          resourcesReleased: true,
-          failureYieldFiberAwaitCall: Option.some(
-            new CalculatorOperationTimedOut()
-          ),
-        });
-        yield* EffectFunction.pipe(extra, Effect.forEach(Fiber.await));
-      }).pipe(Effect.provide(Live), Effect.scoped)
-  );
-  it.effect.each(MetadataWorkCases)(
-    "closes $operation on earlier caller cancellation",
-    ({ invoke, substitute }) =>
-      Effect.gen(function* () {
-        const started = yield* Deferred.make<boolean>();
-        const released = yield* Ref.make(false);
-        const work = Deferred.succeed(started, true).pipe(
-          Effect.andThen(Effect.never),
-          Effect.ensuring(Ref.set(released, true))
-        );
-        const service = yield* substitute(work).pipe(Effect.flatMap(bounded));
-        const call = yield* invoke(service).pipe(Effect.forkScoped);
-        yield* Deferred.await(started);
-        yield* TestClock.adjust("1 second");
-        yield* Fiber.interrupt(call);
-        expect(yield* Ref.get(released)).toBeTruthy();
-      }).pipe(Effect.provide(Live), Effect.scoped)
-  );
-  it.effect.each(MetadataWorkCases)(
-    "rejects late $operation results after control returns",
-    ({ invoke }) =>
-      Effect.gen(function* () {
-        const service = yield* bounded(yield* CalculatorCatalogue);
-        const clock = yield* Clock.Clock;
-        const time = yield* Ref.make(0n);
-        const exit = yield* Effect.exit(invoke(service)).pipe(
-          Effect.provideService(Clock.Clock, {
-            currentTimeMillis: clock.currentTimeMillis,
-            currentTimeMillisUnsafe: () => clock.currentTimeMillisUnsafe(),
-            currentTimeNanos: clock.currentTimeNanos,
-            currentTimeNanosUnsafe: () => clock.currentTimeNanosUnsafe(),
-            monotonicTimeNanos: Ref.modify(time, (value) => [
-              value,
-              5_000_000_000n,
-            ]),
-            monotonicTimeNanosUnsafe: () => clock.monotonicTimeNanosUnsafe(),
-            sleep: (duration) => clock.sleep(duration),
-          })
-        );
-        EffectFunction.pipe(failure(exit), (actual) => {
-          expect(actual).toStrictEqual(
-            Option.some(new CalculatorOperationTimedOut())
-          );
+          getCalculator: catalogue.getCalculator,
+          getCalculatorGraph: catalogue.getCalculatorGraph,
+          getCalculatorSchema: catalogue.getCalculatorSchema,
+          listCalculators: catalogue.listCalculators,
+          listFacts: catalogue.listFacts,
+          listJurisdictions: catalogue.listJurisdictions,
+          listRules: catalogue.listRules,
+          listTaxYears: catalogue.listTaxYears,
         });
       }).pipe(Effect.provide(Live), Effect.scoped)
   );
@@ -440,9 +260,9 @@ describe("shared calculation work policy", () => {
     () =>
       Effect.gen(function* () {
         const live = yield* CalculatorCatalogue;
-        const original = new UnsupportedCalculatorError({
+        const original = new CalculationError({
           message: "fixture",
-          requestedCalculator: "fixture",
+          reason: "overflow",
         });
         const defect = { message: "private-defect-sentinel" };
         const mode = yield* Ref.make<"error" | "defect" | "success">("error");

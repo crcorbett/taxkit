@@ -34,8 +34,12 @@ HTTP handlers or filesystem adapters.
 - Trace formula/rounding and question help text use one `Option` per field.
   Absence has one semantic meaning; encoded values omit absent fields. Legal
   source artifact evidence keeps its independently checked representation.
-- `CalculationError` contains a safe message and a closed reason: rule, graph or
-  output invariant. Opaque diagnostic storage is removed.
+- `CalculationError` is the caller error for a scenario the rules cannot
+  calculate. It contains a safe message and a closed `CalculationFailureReason`:
+  `period-mismatch` or a copied `MoneyError` reason. Opaque diagnostic storage
+  is removed. An invalid rule graph, table coverage gap or report invariant is
+  a defect (`CalculationInvariantViolation`, raised with `Effect.die`); a
+  definition with an invalid graph dies on every call without running a rule.
 - Fact, parameter and rule descriptors derive ordinary fields from private
   Schemas. Their generic value Schema, service key and Layer relations remain
   explicit. Fact questions and source artifacts are Options; their constructor
