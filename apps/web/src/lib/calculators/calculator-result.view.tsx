@@ -11,7 +11,6 @@ import {
 } from "effect";
 import type { ReactNode } from "react";
 
-
 // One formatter for every amount on the page.
 const currency = new Intl.NumberFormat("en-AU", {
   currency: "AUD",
@@ -156,8 +155,8 @@ const AnnualTaxAssumptions = () => (
       </li>
       <li>
         Uses the enacted single-person Medicare levy thresholds without the
-        seniors and pensioners tax offset. Family reductions, exemptions and
-        the Medicare levy surcharge are not included.
+        seniors and pensioners tax offset. Family reductions, exemptions and the
+        Medicare levy surcharge are not included.
       </li>
     </ul>
   </>
