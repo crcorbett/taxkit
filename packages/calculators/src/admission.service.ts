@@ -1,5 +1,5 @@
-import { Context, Option } from "effect";
-import type { Effect } from "effect";
+import { Context } from "effect";
+import type { Effect, Option } from "effect";
 
 import type { CalculatorClientRateKey } from "./admission.schemas.js";
 import type {
@@ -7,11 +7,18 @@ import type {
   CalculatorRateLimited,
 } from "./schemas.js";
 
-export const CalculatorRequestRateKey = Context.Reference<
-  Option.Option<CalculatorClientRateKey>
->("@taxkit/calculators/CalculatorRequestRateKey", {
-  defaultValue: Option.none,
-});
+/**
+ * The current request's admission identity, as its host derives it. The
+ * rate-limited service requires it, so a host that cannot name its caller
+ * fails to compose rather than refusing every calculation at run time. No
+ * identity for a request is `Option.none` and refuses admission.
+ */
+export class CalculatorRequestRateKey extends Context.Service<
+  CalculatorRequestRateKey,
+  {
+    readonly current: Effect.Effect<Option.Option<CalculatorClientRateKey>>;
+  }
+>()("@taxkit/calculators/CalculatorRequestRateKey") {}
 
 export class CalculatorAdmission extends Context.Service<
   CalculatorAdmission,

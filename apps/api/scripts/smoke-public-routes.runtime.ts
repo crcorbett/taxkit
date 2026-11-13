@@ -29,7 +29,7 @@ import {
   checkApiOpenApi,
   checkApiPublicContent,
   waitForApiHealth,
-} from "../src/verification/routes.js";
+} from "../smoke/routes.js";
 import {
   ApiSmokeArguments,
   ApiSmokeConsumerError,
@@ -38,7 +38,7 @@ import {
   ApiSmokeConsumerParameters,
   ApiSmokeSettings,
   ApiSmokeValidationError,
-} from "../src/verification/schemas.js";
+} from "../smoke/schemas.js";
 // This string is the deliberately plain JavaScript consumer outside the repo.
 // Its fetch/Promise/JSON behaviour proves consumption without TaxKit internals.
 // Route addresses are written into it from the HTTP route catalogue.

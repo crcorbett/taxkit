@@ -31,6 +31,7 @@ import {
 } from "@taxkit/calculators/testing/fixtures";
 import {
   CalculatorConcurrencyLimit,
+  CalculatorUsageDisabled,
   PublicCalculatorServiceBounded,
 } from "@taxkit/calculators/work";
 import {
@@ -68,7 +69,10 @@ import { TestConsole } from "effect/testing";
 
 import { ApiContentLive } from "../src/content.boundary.js";
 import { ApiWorkerApplication } from "../src/worker.application.js";
-import { ApiWorkerInit } from "../src/worker.js";
+import {
+  ApiCalculatorDeliveryDisabled,
+  ApiWorkerInit,
+} from "./worker.fixture.js";
 
 class McpClientProbeFailed extends Schema.TaggedError<
   McpClientProbeFailed,
@@ -118,7 +122,9 @@ describe("real MCP client against the native API application", () => {
       Effect.gen(function* () {
         const observed = yield* Ref.make(Option.none<number>());
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentLive)
+          Effect.provide(
+            Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+          )
         );
         const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
@@ -207,7 +213,9 @@ describe("real MCP client against the native API application", () => {
     ({ origin, admitted }) =>
       Effect.gen(function* () {
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentLive)
+          Effect.provide(
+            Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+          )
         );
         const context = yield* Effect.context();
         const handler = HttpEffect.toWebHandlerWith<
@@ -271,9 +279,12 @@ describe("real MCP client against the native API application", () => {
     ({ mode, message }) =>
       Effect.gen(function* () {
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentLive),
+          Effect.provide(
+            Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+          ),
           Effect.provide(
             CalculatorFixture.pipe(
+              Layer.provide(CalculatorUsageDisabled),
               Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode))
             )
           )
@@ -355,9 +366,12 @@ describe("real MCP client against the native API application", () => {
         const toolSignals = yield* Ref.make<readonly AbortSignal[]>([]);
         const calculator = yield* CalculatorCatalogue;
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentLive),
+          Effect.provide(
+            Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+          ),
           Effect.provide(
             PublicCalculatorServiceBounded.pipe(
+              Layer.provide(CalculatorUsageDisabled),
               Layer.provide(
                 Layer.succeed(
                   CalculatorCatalogue,
@@ -822,7 +836,9 @@ describe("real MCP client against the native API application", () => {
         });
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
-        Effect.provide(ApiContentLive),
+        Effect.provide(
+          Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+        ),
         Effect.provide(TestConsole.layer),
         // Direct retained-report oracle keeps admission outside the pure engine.
         Effect.provide(CalculatorLive),

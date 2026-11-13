@@ -214,7 +214,7 @@ closed `read(source)` operation derives identity from the actual source; safe
 `DocsPageReadError` reasons preserve authoring and provider failures.
 
 `ContentCatalogueLive` (`@taxkit/content/catalogue`) builds the checked catalogue
-once from `DocsSources`. `apps/api/src/build/docs-catalogue.layer.ts` composes the
+once from `DocsSources`. `apps/api/catalogue/docs-catalogue.layer.ts` composes the
 build-time Layers. `@taxkit/content/live` contains only `ContentServiceLive`, so
 `apps/api/src/content.boundary.ts` can serve the stored catalogue without importing
 authored metadata or the builder. Tests use deterministic rendering Layers, and
@@ -547,7 +547,8 @@ capability; its settings boundary checks the richer API binding once.
 
 The native API composes the AEO package's static `aeoRoutes` once from the
 checked catalogue and `DocsOgImages`, and supplies its existing cached settings
-Effect as `PublicationOrigins` (`Layer.succeed(PublicationOrigins)(...)`).
+Effect as `PublicationOrigins`, failing with AEO's own
+`PublicationSettingsUnavailable`.
 Configuration remains application-owned; the routes read checked addresses
 lazily on first use. The API serves each document and share image on its HTTP
 route and the Website forwards its conventional addresses there once. No

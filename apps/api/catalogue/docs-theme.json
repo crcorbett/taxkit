@@ -1,16 +1,11 @@
 {
   "typography": {
     "text": {
-      "names": [
-        "Inter"
-      ],
+      "names": ["Inter"],
       "fallback": "sans-serif"
     },
     "code": {
-      "names": [
-        "SFMono-Regular",
-        "Consolas"
-      ],
+      "names": ["SFMono-Regular", "Consolas"],
       "fallback": "monospace"
     },
     "diagramSize": 14

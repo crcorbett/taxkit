@@ -73,8 +73,11 @@ The native API instance supplies the same service to HTTP and MCP. The retained
 standalone HTTP Layer builds its pool once when the router is constructed.
 Metadata does not take a calculation place. Direct definition and local SDK
 use remain outside this anonymous server policy. A successful calculation is
-reported to `CalculatorUsage` after its place is released; the default observer
-does nothing.
+reported to `CalculatorUsage` after its place is released. Every composition
+names its observer: `PublicCalculatorServiceLive` supplies
+`CalculatorUsageDisabled`, which does nothing. The rate-limited variant also
+requires `CalculatorRequestRateKey`, the host's current request identity, so a
+host that cannot name its caller fails to compose.
 
 All nine server service methods have a five-second budget, including scoped
 cleanup. A timeout returns `CalculatorOperationTimedOut`; expected engine

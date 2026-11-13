@@ -1,20 +1,89 @@
 import { RateLimit } from "@alchemy.run/cloudflare/Workers";
-import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
+import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
+import {
+  CalculatorAdmission,
+  CalculatorRequestRateKey,
+} from "@taxkit/calculators/admission.service";
 import {
   CalculatorAdmissionUnavailable,
   CalculatorRateLimited,
 } from "@taxkit/calculators/schemas";
+import {
+  CalculatorHostMode,
+  edgeCallerKey,
+} from "@taxkit/observability/edge-identity";
 import { CurrentRuntimeContext, RuntimeContext } from "alchemy/RuntimeContext";
 import {
   Predicate,
   Config,
   Effect,
   Layer,
+  Option,
   Redacted,
   Schema,
   Boolean as EffectBoolean,
 } from "effect";
+import { HttpServerRequest } from "effect/http";
 import { NetAddress } from "effect/net";
+
+import { ApiWorkerSettingsConfig } from "./worker.config.js";
+
+// The local emulator's one admission identity, checked when the module loads.
+const LoopbackRateKey = CalculatorClientRateKey.make(
+  Redacted.make(
+    CalculatorClientRateKey.to.value.make(NetAddress.ipv4Loopback),
+    {
+      label: "CalculatorClientRateKey",
+    }
+  )
+);
+/**
+ * Each calculation's admission identity, read from the native request that
+ * carries it: the edge's checked caller address, or the fixed loopback key
+ * for the explicit local emulator on a loopback HTTP origin. A request with
+ * neither has no identity and is refused admission.
+ */
+export const ApiCalculatorRequestRateKey = Layer.effect(
+  CalculatorRequestRateKey,
+  Effect.gen(function* () {
+    // An invalid mode is a startup ConfigError; only a missing value means edge.
+    const hostMode = yield* Config.schema(
+      CalculatorHostMode,
+      "CALCULATOR_HOST_MODE"
+    ).pipe(Config.withDefault("edge"));
+    // Native planning binds deferred resource addresses; read them on first use.
+    const settings = yield* Effect.cached(ApiWorkerSettingsConfig);
+    const localKey = settings.pipe(
+      Effect.map(({ apiOrigin }) =>
+        Option.liftPredicate(
+          LoopbackRateKey,
+          () =>
+            hostMode === "local-emulator" &&
+            apiOrigin.protocol === "http:" &&
+            (apiOrigin.hostname === "127.0.0.1" ||
+              apiOrigin.hostname === "localhost")
+        )
+      ),
+      Effect.orElseSucceed(Option.none)
+    );
+    return CalculatorRequestRateKey.of({
+      current: Effect.serviceOption(HttpServerRequest.HttpServerRequest).pipe(
+        Effect.map(
+          Option.flatMap((request) =>
+            edgeCallerKey(request.headers, CalculatorClientRateKey)
+          )
+        ),
+        Effect.flatMap(
+          Option.match({
+            onNone: () => localKey,
+            onSome: Effect.succeedSome,
+          })
+        ),
+        Effect.withSpan("CalculatorRequestRateKey.current")
+      ),
+    });
+  })
+);
 
 const CalculatorRateNamespace = Schema.String.check(
   Schema.isPattern(/^[1-9]\d*$/u)

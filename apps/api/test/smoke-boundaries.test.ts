@@ -55,20 +55,20 @@ import {
   checkApiPublicRoutes,
   loadApiSmokeSettings,
 } from "../scripts/smoke-public-routes.runtime.js";
-import { ApiContentLive } from "../src/content.boundary.js";
 import {
   checkApiCalculation,
   checkApiCatalog,
   checkApiOpenApi,
   checkApiPublicContent,
   waitForApiHealth,
-} from "../src/verification/routes.js";
+} from "../smoke/routes.js";
 import {
   ApiSmokeConsumerEvidence,
   ApiSmokeOpenApiProjection,
   ApiSmokeSettings,
   ApiSmokeValidationError,
-} from "../src/verification/schemas.js";
+} from "../smoke/schemas.js";
+import { ApiContentLive } from "../src/content.boundary.js";
 
 const origin = "http://127.0.0.1:4173";
 const fault = PlatformError.badArgument({

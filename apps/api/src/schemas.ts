@@ -47,6 +47,20 @@ export class ApiWorkerSettingsUnavailable extends Schema.TaggedError<
   operation: Schema.Literals(["settings", "mcp"]),
 }) {}
 
+// One named startup failure for the whole API Worker. Each composed package's
+// construction failure maps to a closed reason here; the native host maps
+// this one tag.
+export class ApiWorkerStartupError extends Schema.TaggedError<
+  ApiWorkerStartupError,
+  { readonly brand: unique symbol }
+>()("ApiWorkerStartupError", {
+  reason: Schema.Literals([
+    "analytics-settings",
+    "docs-catalogue",
+    "host-settings",
+  ]),
+}) {}
+
 export const ApiWorkerSettings = Schema.Struct({
   apiOrigin: TaxKitApiOrigin,
   publicationOrigin: DocsPublicationOrigin,

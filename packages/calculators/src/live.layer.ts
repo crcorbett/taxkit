@@ -27,7 +27,10 @@ import {
   UnsupportedCalculatorContextError,
 } from "./schemas.js";
 import { CalculatorCatalogue } from "./service.js";
-import { PublicCalculatorServiceBounded } from "./work.layer.js";
+import {
+  CalculatorUsageDisabled,
+  PublicCalculatorServiceBounded,
+} from "./work.layer.js";
 /**
  * Runs a public calculation for a resolved catalog entry.
  *
@@ -200,5 +203,6 @@ export const CalculatorCatalogueLive = Layer.succeed(
  * implementation instead.
  */
 export const PublicCalculatorServiceLive = PublicCalculatorServiceBounded.pipe(
-  Layer.provide(CalculatorCatalogueLive)
+  Layer.provide(CalculatorCatalogueLive),
+  Layer.provide(CalculatorUsageDisabled)
 );

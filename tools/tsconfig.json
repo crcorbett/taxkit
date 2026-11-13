@@ -17,6 +17,7 @@
     "infrastructure/*.ts",
     "apps-local/*.ts",
     "apps-local/test/*.ts",
+    "apps-local/fixtures/*.ts",
     "workspace/*.ts"
   ]
 }

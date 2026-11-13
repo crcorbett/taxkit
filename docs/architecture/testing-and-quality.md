@@ -62,6 +62,15 @@ shared Miniflare fixture, `native-worker.fixture.ts`, takes compatibility from
 `@taxkit/infrastructure/worker-settings`. The Website/API pair test runs one
 shared host setup and calls focused per-surface check modules
 (`native-pair-*.checks.ts`).
+`build:native-pair` also builds controlled variants without editing product
+source. Each API variant is its own Worker entry under
+`tools/apps-local/fixtures/` that calls the API's composition seam
+(`apiWorkerNativeInit` from `api/composition`) with replaced Layers: stalled
+calculator work, stalled reply headers or body, and Content answering with
+another page's identity. The Website settings defect is a Vite root under
+`apps/web/test/fixtures/settings-defect/` that reuses the Website's own
+configuration and resolves the server runtime's settings Layer module to a
+fixture Layer whose settings read dies.
 An older Chromium lacks WebMCP, so the native browser-tools test fails on it.
 
 Focused checks are the owning workspace's `test`, `check-types` and

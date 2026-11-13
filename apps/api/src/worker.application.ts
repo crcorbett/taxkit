@@ -1,6 +1,9 @@
 import { WorkerExecutionContext } from "@alchemy.run/cloudflare/Workers";
 import { aeoRoutes } from "@taxkit/aeo/routes";
-import { PublicationOrigins } from "@taxkit/aeo/service";
+import {
+  PublicationOrigins,
+  PublicationSettingsUnavailable,
+} from "@taxkit/aeo/service";
 import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import { withCalculatorRequestBodyLimit } from "@taxkit/api-http/request-boundary";
@@ -25,15 +28,8 @@ import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
 import { withBoundedMcpReply } from "@taxkit/api-mcp/response-budget";
 import { TaxKitMcpHttpLayer } from "@taxkit/api-mcp/server";
-import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
-import { CalculatorRequestRateKey } from "@taxkit/calculators/admission.service";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
-import { DocsSourceError } from "@taxkit/content/errors";
 import { ContentService } from "@taxkit/content/service";
-import {
-  CalculatorHostMode,
-  edgeCallerKey,
-} from "@taxkit/observability/edge-identity";
 import {
   ApiHostTelemetryLive,
   observeHostRequest,
@@ -43,14 +39,12 @@ import { safeHttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import {
   Function as EffectFunction,
-  Config,
   Context,
   Deferred,
   Effect,
   Layer,
   Match,
   Option,
-  Redacted,
   Schema,
   Scope,
   Boolean as EffectBoolean,
@@ -61,7 +55,6 @@ import {
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
-import { NetAddress } from "effect/net";
 
 import {
   ApiCalculatorDelivery,
@@ -83,15 +76,6 @@ const apiRoute = (pathname: string): HostRoute =>
     Match.when(Schema.is(ApiReferencePath), () => "reference" as const),
     Match.orElse(() => "other" as const)
   );
-// The local emulator's one admission identity, checked when the module loads.
-const LoopbackRateKey = CalculatorClientRateKey.make(
-  Redacted.make(
-    CalculatorClientRateKey.to.value.make(NetAddress.ipv4Loopback),
-    {
-      label: "CalculatorClientRateKey",
-    }
-  )
-);
 // Construct once in the native instance scope. HTTP and MCP receive this
 // same application service; native requests keep their own scope and fibre.
 // The public HTTP routes. Request handlers receive the calculator service
@@ -113,25 +97,6 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       )
     )
   );
-  // An invalid mode is a startup ConfigError; only a missing value means edge.
-  const hostMode = yield* Config.schema(
-    CalculatorHostMode,
-    "CALCULATOR_HOST_MODE"
-  ).pipe(Config.withDefault("edge"));
-  // Only the explicit local emulator on a loopback HTTP origin receives the
-  // fixed loopback admission identity.
-  const localKey = settings.pipe(
-    Effect.map(({ apiOrigin }) =>
-      Option.liftPredicate(
-        LoopbackRateKey,
-        () =>
-          hostMode === "local-emulator" &&
-          apiOrigin.protocol === "http:" &&
-          (apiOrigin.hostname === "127.0.0.1" ||
-            apiOrigin.hostname === "localhost")
-      )
-    )
-  );
   const telemetry = yield* Layer.build(ApiHostTelemetryLive);
   // The static route Layers build here, in the application's context. The
   // MCP routes build later, on first use, so they receive these values.
@@ -147,13 +112,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
           apiOrigin,
           publicationOrigin,
         })),
-        Effect.mapError(
-          () =>
-            new DocsSourceError({
-              message: "Documentation publication settings are unavailable.",
-              operation: "getDiscoveryDocument",
-            })
-        )
+        Effect.mapError(() => new PublicationSettingsUnavailable())
       )
     ),
     Effect.provideContext(telemetry)
@@ -161,7 +120,8 @@ export const ApiWorkerApplication = Effect.gen(function* () {
   const instanceScope = yield* Scope.Scope;
   // Cache only native registrations after addresses resolve. The request-scoped
   // adapter starts and closes its protocol/notification fibres per POST. Keep
-  // the first caller's request/key out of shared registration.
+  // the first caller's request, analytics collector and abort signal out of
+  // shared registration; calls read their own request's values.
   const mcp = yield* Effect.cached(
     HttpRouter.toHttpEffect(TaxKitMcpHttpLayer).pipe(
       Effect.provideService(PublicCalculatorService, calculator),
@@ -170,7 +130,6 @@ export const ApiWorkerApplication = Effect.gen(function* () {
       Effect.updateContext((context: Context.Context<never>) =>
         Context.omit(
           ApiCalculatorEvents,
-          CalculatorRequestRateKey,
           McpRequestAbortSignal,
           HttpServerRequest.HttpServerRequest
         )(context)
@@ -190,13 +149,6 @@ export const ApiWorkerApplication = Effect.gen(function* () {
     Effect.gen(function* () {
       const config = yield* settings;
       const request = yield* HttpServerRequest.HttpServerRequest;
-      const callerKey = edgeCallerKey(request.headers, CalculatorClientRateKey);
-      const key = yield* callerKey.pipe(
-        Option.match({
-          onNone: () => localKey,
-          onSome: (value) => Effect.succeed(Option.some(value)),
-        })
-      );
       const isMcp = new URL(request.url, config.apiOrigin).pathname === mcpPath;
       const selected = EffectBoolean.match(isMcp, {
         onFalse: () => handler,
@@ -268,7 +220,7 @@ export const ApiWorkerApplication = Effect.gen(function* () {
             })
           ),
         (completed) => Deferred.succeed(completed, true)
-      ).pipe(Effect.provideService(CalculatorRequestRateKey, key));
+      );
     }).pipe(
       Effect.catchTag("ApiWorkerSettingsUnavailable", () =>
         Effect.succeed(HttpServerResponse.empty({ status: 503 }))

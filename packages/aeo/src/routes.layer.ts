@@ -38,7 +38,7 @@ export const aeoRoutes = Layer.unwrap(
               headers,
             })
           ),
-          Effect.catchTag("DocsSourceError", unavailable)
+          Effect.catchTag("PublicationSettingsUnavailable", unavailable)
         )
       );
     return HttpRouter.addAll([

@@ -49,5 +49,10 @@ export const DocsCatalogueBuildLive = ContentCatalogueLive.pipe(
       )
     )
   ),
-  Layer.provide(ConfigProvider.layerAdd(ConfigProvider.fromUnknown({ DOCS_THEME: docsTheme }), { asPrimary: true }))
+  Layer.provide(
+    ConfigProvider.layerAdd(
+      ConfigProvider.fromUnknown({ DOCS_THEME: docsTheme }),
+      { asPrimary: true }
+    )
+  )
 );

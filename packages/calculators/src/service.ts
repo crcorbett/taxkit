@@ -1,4 +1,5 @@
-import { Context, Effect } from "effect";
+import { Context } from "effect";
+import type { Effect } from "effect";
 
 import type {
   CalculatorCatalogItem,
@@ -67,13 +68,13 @@ export class CalculatorCatalogue extends Context.Service<
 >()("@taxkit/calculators/CalculatorCatalogue") {}
 
 /**
- * Observes each successful calculation once, after its work budget. Hosts
- * without usage collection keep the native no-op default.
+ * Observes each successful calculation once, after its work budget. Every
+ * composition names its observer; hosts without usage collection supply
+ * `CalculatorUsageDisabled`.
  */
-export const CalculatorUsage = Context.Reference<{
-  readonly record: (response: CalculatorRunResponse) => Effect.Effect<void>;
-}>("@taxkit/calculators/CalculatorUsage", {
-  defaultValue: () => ({
-    record: Effect.fn("CalculatorUsage.record")(() => Effect.void),
-  }),
-});
+export class CalculatorUsage extends Context.Service<
+  CalculatorUsage,
+  {
+    readonly record: (response: CalculatorRunResponse) => Effect.Effect<void>;
+  }
+>()("@taxkit/calculators/CalculatorUsage") {}

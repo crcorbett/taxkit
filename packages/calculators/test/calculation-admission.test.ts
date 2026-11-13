@@ -12,7 +12,6 @@ import {
   Effect,
   Fiber,
   Layer,
-  Option,
   Ref,
   Result,
   Schema,
@@ -35,7 +34,10 @@ import {
   CalculatorCatalogue,
   PublicCalculatorService,
 } from "../src/service.js";
-import { PublicCalculatorServiceRateLimited } from "../src/work.layer.js";
+import {
+  CalculatorUsageDisabled,
+  PublicCalculatorServiceRateLimited,
+} from "../src/work.layer.js";
 
 const request = CalculatorRunRequest.make({
   calculatorId: AuPayTakeHomeId.make("au.pay.take-home"),
@@ -50,7 +52,8 @@ const request = CalculatorRunRequest.make({
   },
 });
 const calculators = PublicCalculatorServiceRateLimited.pipe(
-  Layer.provide(CalculatorCatalogueLive)
+  Layer.provide(CalculatorCatalogueLive),
+  Layer.provide(CalculatorUsageDisabled)
 );
 describe("anonymous calculation admission", () => {
   it.effect("canonicalises IPv6 and prevents ordinary key serialisation", () =>
@@ -105,6 +108,16 @@ describe("anonymous calculation admission", () => {
             calculators.pipe(
               Layer.provide(
                 Layer.succeed(
+                  CalculatorRequestRateKey,
+                  CalculatorRequestRateKey.of({
+                    current: Effect.succeedNone.pipe(
+                      Effect.withSpan("CalculatorRequestRateKey.current")
+                    ),
+                  })
+                )
+              ),
+              Layer.provide(
+                Layer.succeed(
                   CalculatorAdmission,
                   CalculatorAdmission.of({
                     admitCalculation: Effect.fn(
@@ -140,6 +153,17 @@ describe("anonymous calculation admission", () => {
             PublicCalculatorServiceRateLimited.pipe(
               Layer.provide(
                 Layer.succeed(
+                  CalculatorRequestRateKey,
+                  CalculatorRequestRateKey.of({
+                    current: Effect.succeedSome(key).pipe(
+                      Effect.withSpan("CalculatorRequestRateKey.current")
+                    ),
+                  })
+                )
+              ),
+              Layer.provide(CalculatorUsageDisabled),
+              Layer.provide(
+                Layer.succeed(
                   CalculatorCatalogue,
                   CalculatorCatalogue.of({
                     ...live,
@@ -164,12 +188,7 @@ describe("anonymous calculation admission", () => {
             )
           )
         );
-        const result = yield* service
-          .calculate(request)
-          .pipe(
-            Effect.provideService(CalculatorRequestRateKey, Option.some(key)),
-            Effect.result
-          );
+        const result = yield* service.calculate(request).pipe(Effect.result);
         expect(result).toStrictEqual(Result.fail(new CalculatorRateLimited()));
         expect(yield* Ref.get(worked)).toBe(0);
         const encoded = yield* Schema.encodeEffect(
@@ -193,6 +212,16 @@ describe("anonymous calculation admission", () => {
             calculators.pipe(
               Layer.provide(
                 Layer.succeed(
+                  CalculatorRequestRateKey,
+                  CalculatorRequestRateKey.of({
+                    current: Effect.succeedSome(key).pipe(
+                      Effect.withSpan("CalculatorRequestRateKey.current")
+                    ),
+                  })
+                )
+              ),
+              Layer.provide(
+                Layer.succeed(
                   CalculatorAdmission,
                   CalculatorAdmission.of({
                     admitCalculation: Effect.fn(
@@ -211,11 +240,7 @@ describe("anonymous calculation admission", () => {
         );
         const pending = yield* service
           .calculate(request)
-          .pipe(
-            Effect.provideService(CalculatorRequestRateKey, Option.some(key)),
-            Effect.result,
-            Effect.forkChild
-          );
+          .pipe(Effect.result, Effect.forkChild);
         yield* Deferred.await(started);
         yield* TestClock.adjust("5 seconds");
         const result = yield* Fiber.join(pending);

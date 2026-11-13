@@ -21,7 +21,8 @@
         "alchemy.trace.run.ts",
         "tools/documentation/check.runtime.ts",
         "tools/**/*.test.ts",
-        "tools/apps-local/native-pair-build.runtime.ts"
+        "tools/apps-local/native-pair-build.runtime.ts",
+        "tools/apps-local/fixtures/**/*.ts"
       ],
       "project": [
         "*.json",
@@ -49,6 +50,8 @@
       "project": [
         "src/**/*.ts",
         "scripts/**/*.ts",
+        "catalogue/**/*.ts",
+        "smoke/**/*.ts",
         "test/**/*.ts",
         "vitest.config.ts"
       ]
