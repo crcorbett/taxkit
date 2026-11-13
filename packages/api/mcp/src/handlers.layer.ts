@@ -1,11 +1,11 @@
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { ContentService } from "@taxkit/content/service";
-import { Effect, Match } from "effect";
+import { Effect } from "effect";
 import type { Layer } from "effect";
 import type { Tool, Toolkit } from "effect/ai";
 
 import { withMcpRequestCancellation } from "./cancellation.boundary.js";
-import { McpToolUnavailable } from "./schemas.js";
+import { McpToolUnavailable } from "./errors.js";
 import { TaxKitMcpToolkit } from "./tools.js";
 
 export const TaxKitMcpHandlersLive: Layer.Layer<
@@ -20,54 +20,64 @@ export const TaxKitMcpHandlersLive: Layer.Layer<
       taxkit_calculate: Effect.fn("TaxKitMcpToolkit.taxkit_calculate")(
         (request) =>
           calculator.calculate(request).pipe(
-            Effect.mapError((error) =>
-              Match.value(error).pipe(
-                Match.tag(
-                  "CalculatorRateLimited",
-                  () =>
-                    new McpToolUnavailable({
-                      code: "rate-limited",
-                      retry: "wait-then-try-manually",
-                    })
+            Effect.catchTags({
+              CalculationError: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "invalid-calculation",
+                    retry: "check-input-before-retrying",
+                  })
                 ),
-                Match.tag(
-                  "CalculatorCapacityExceeded",
-                  () =>
-                    new McpToolUnavailable({
-                      code: "capacity-exceeded",
-                      retry: "try-again-manually",
-                    })
+              CalculatorAdmissionUnavailable: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "service-unavailable",
+                    retry: "try-again-manually",
+                  })
                 ),
-                Match.tag(
-                  "CalculatorOperationTimedOut",
-                  () =>
-                    new McpToolUnavailable({
-                      code: "operation-timeout",
-                      retry: "try-again-manually",
-                    })
+              CalculatorCapacityExceeded: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "capacity-exceeded",
+                    retry: "try-again-manually",
+                  })
                 ),
-                Match.tag(
-                  "CalculatorAdmissionUnavailable",
-                  () =>
-                    new McpToolUnavailable({
-                      code: "service-unavailable",
-                      retry: "try-again-manually",
-                    })
+              CalculatorOperationTimedOut: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "operation-timeout",
+                    retry: "try-again-manually",
+                  })
                 ),
-                Match.tag(
-                  "CalculationError",
-                  "InputValidationError",
-                  "UnsupportedCalculatorError",
-                  "UnsupportedCalculatorContextError",
-                  () =>
-                    new McpToolUnavailable({
-                      code: "invalid-calculation",
-                      retry: "check-input-before-retrying",
-                    })
+              CalculatorRateLimited: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "rate-limited",
+                    retry: "wait-then-try-manually",
+                  })
                 ),
-                Match.exhaustive
-              )
-            ),
+              InputValidationError: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "invalid-calculation",
+                    retry: "check-input-before-retrying",
+                  })
+                ),
+              UnsupportedCalculatorContextError: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "invalid-calculation",
+                    retry: "check-input-before-retrying",
+                  })
+                ),
+              UnsupportedCalculatorError: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "invalid-calculation",
+                    retry: "check-input-before-retrying",
+                  })
+                ),
+            }),
             withMcpRequestCancellation
           )
       ),
@@ -78,13 +88,15 @@ export const TaxKitMcpHandlersLive: Layer.Layer<
         ({ term }) =>
           content.searchPages(term).pipe(
             Effect.map((results) => ({ results })),
-            Effect.mapError(
-              () =>
-                new McpToolUnavailable({
-                  code: "service-unavailable",
-                  retry: "try-again-manually",
-                })
-            ),
+            Effect.catchTags({
+              DocsSourceError: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "service-unavailable",
+                    retry: "try-again-manually",
+                  })
+                ),
+            }),
             withMcpRequestCancellation
           )
       ),
@@ -92,40 +104,35 @@ export const TaxKitMcpHandlersLive: Layer.Layer<
         "TaxKitMcpToolkit.taxkit_get_calculator_schema"
       )((request) =>
         calculator.getCalculatorSchema(request).pipe(
-          Effect.mapError(
-            () =>
-              new McpToolUnavailable({
-                code: "service-unavailable",
-                retry: "try-again-manually",
-              })
-          ),
+          Effect.catchTags({
+            UnsupportedCalculatorContextError: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "not-found",
+                  retry: "check-input-before-retrying",
+                })
+              ),
+          }),
           withMcpRequestCancellation
         )
       ),
       taxkit_list_calculators: Effect.fn(
         "TaxKitMcpToolkit.taxkit_list_calculators"
       )((query) =>
-        calculator.listCalculators(query).pipe(
-          Effect.mapError(
-            () =>
-              new McpToolUnavailable({
-                code: "operation-timeout",
-                retry: "try-again-manually",
-              })
-          ),
-          withMcpRequestCancellation
-        )
+        calculator.listCalculators(query).pipe(withMcpRequestCancellation)
       ),
       taxkit_read_doc: Effect.fn("TaxKitMcpToolkit.taxkit_read_doc")(
         ({ path }) =>
           content.getPage(path).pipe(
-            Effect.mapError(
-              () =>
-                new McpToolUnavailable({
-                  code: "service-unavailable",
-                  retry: "try-again-manually",
-                })
-            ),
+            Effect.catchTags({
+              DocsPageNotFoundError: () =>
+                Effect.fail(
+                  new McpToolUnavailable({
+                    code: "not-found",
+                    retry: "check-input-before-retrying",
+                  })
+                ),
+            }),
             withMcpRequestCancellation
           )
       ),

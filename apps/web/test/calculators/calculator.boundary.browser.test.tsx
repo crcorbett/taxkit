@@ -16,6 +16,7 @@ import {
   TakeHomePayReport,
 } from "@taxkit/rules-au-pay/schemas";
 import {
+  Array,
   Schedule,
   Predicate,
   Match,
@@ -24,13 +25,12 @@ import {
   Layer,
   Option,
   Ref,
-  Result,
   Schema,
 } from "effect";
 import { HttpClient, HttpClientError, HttpClientResponse } from "effect/http";
 import type { HttpClientRequest } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
-import * as AsyncResult from "effect/reactivity/AsyncResult";
+import * as Atom from "effect/reactivity/Atom";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 import { TestClock } from "effect/testing";
 import { createRoot } from "react-dom/client";
@@ -66,8 +66,14 @@ const unreachable = (request: HttpClientRequest.HttpClientRequest) =>
       reason: new HttpClientError.TransportError({ request }),
     })
   );
+// Calculations check the root settings before they use the client.
+const checkedSettings = Schema.decodeUnknownEffect(WebsitePublicSettings)({
+  apiOrigin: "http://127.0.0.1:49999",
+  publicationOrigin: "http://127.0.0.1:49998",
+  websiteOrigin: "http://127.0.0.1:49998",
+});
 describe("browser calculator lifetime", () => {
-  it.live(
+  it.effect(
     "retains checked settings while the form is idle, then attempts its request",
     () =>
       Effect.gen(function* () {
@@ -79,6 +85,19 @@ describe("browser calculator lifetime", () => {
         )("http://127.0.0.1:49998");
         const request = yield* Effect.fromResult(
           takeHomeRequestFromForm(initialTakeHomeForm)
+        );
+        // The browser transport fails deliberately, so no real socket or
+        // closed-port assumption decides the outcome.
+        const transport = yield* Effect.acquireRelease(
+          Effect.sync(() =>
+            vi
+              .spyOn(globalThis, "fetch")
+              .mockRejectedValue(new TypeError("Failed to fetch"))
+          ),
+          (spy) =>
+            Effect.sync(() => {
+              spy.mockRestore();
+            })
         );
         const registry = yield* Effect.acquireRelease(
           Effect.sync(() =>
@@ -103,45 +122,48 @@ describe("browser calculator lifetime", () => {
               value.dispose();
             })
         );
-        yield* Effect.sleep("750 millis");
+        // Release the settings and an ordinary atom, then yield once: the
+        // registry's idle removals run as microtasks before this resumes. The
+        // ordinary atom goes; the kept-alive settings stay.
+        const transient = Atom.make(0);
+        registry.mount(publicSettingsAtom)();
+        registry.mount(transient)();
+        yield* Effect.yieldNow;
+        EffectFunction.pipe(registry.getNodes().has(transient), (kept) => {
+          expect(kept).toBeFalsy();
+        });
+        EffectFunction.pipe(
+          registry.get(publicSettingsAtom),
+          Option.isSome,
+          (retained) => {
+            expect(retained).toBeTruthy();
+          }
+        );
         const unmount = registry.mount(calculateAtom);
         yield* Effect.addFinalizer(() => Effect.sync(unmount));
         registry.set(calculateAtom, request);
-        yield* Effect.sync(() =>
-          AsyncResult.isFailure(registry.get(calculateAtom))
-        ).pipe(
-          Effect.repeat({
-            until: (observed) => observed,
-            schedule: Schedule.spaced("50 millis"),
-          }),
-          Effect.timeout(1000),
-          Effect.tap((observed) =>
-            Effect.sync(() => {
-              expect(observed).toBeTruthy();
-            })
-          )
+        const failure = yield* AtomRegistry.getResult(registry, calculateAtom, {
+          suspendOnWaiting: true,
+        }).pipe(Effect.flip);
+        EffectFunction.pipe(
+          Predicate.isTagged(failure, "ApiUnavailable"),
+          (matches) => {
+            expect(matches).toBeTruthy();
+          }
         );
-        const result = registry.get(calculateAtom);
-        EffectFunction.pipe(AsyncResult.isFailure(result), (actual) => {
-          expect(actual).toBeTruthy();
-        });
-        if (AsyncResult.isFailure(result)) {
-          const failure = yield* result.cause.pipe(
-            Effect.failCause,
-            Effect.result
-          );
-          EffectFunction.pipe(Result.isFailure(failure), (actual) => {
-            expect(actual).toBeTruthy();
-          });
-          if (Result.isFailure(failure)) {
-            EffectFunction.pipe(
-              Predicate.isTagged(failure.failure, "ApiUnavailable"),
-              (matches) => {
-                expect(matches).toBeTruthy();
-              }
+        // The request used the retained settings' API origin.
+        EffectFunction.pipe(
+          transport.mock.calls,
+          Array.head,
+          Option.map(([input]) => new Request(input).url),
+          (actual) => {
+            expect(actual).toStrictEqual(
+              Option.some(
+                "http://127.0.0.1:49999/api/v2/calculators/au.pay.take-home/calculate"
+              )
             );
           }
-        }
+        );
       }).pipe(Effect.scoped)
   );
   it.effect("an edit interrupts work and removes the waiting result", () =>
@@ -166,10 +188,14 @@ describe("browser calculator lifetime", () => {
           )
         )
       );
+      const settings = yield* checkedSettings;
       const registry = yield* Effect.acquireRelease(
         Effect.sync(() =>
           AtomRegistry.make({
-            initialValues: [[apiClientRuntime.layer, client]],
+            initialValues: [
+              [publicSettingsAtom, Option.some(settings)],
+              [apiClientRuntime.layer, client],
+            ],
           })
         ),
         (value) =>
@@ -237,10 +263,14 @@ describe("browser calculator lifetime", () => {
             )
           )
         );
+        const settings = yield* checkedSettings;
         const registry = yield* Effect.acquireRelease(
           Effect.sync(() =>
             AtomRegistry.make({
-              initialValues: [[apiClientRuntime.layer, client]],
+              initialValues: [
+                [publicSettingsAtom, Option.some(settings)],
+                [apiClientRuntime.layer, client],
+              ],
             })
           ),
           (value) =>
@@ -341,10 +371,14 @@ describe("browser calculator lifetime", () => {
           )
         )
       );
+      const settings = yield* checkedSettings;
       const registry = yield* Effect.acquireRelease(
         Effect.sync(() =>
           AtomRegistry.make({
-            initialValues: [[apiClientRuntime.layer, client]],
+            initialValues: [
+              [publicSettingsAtom, Option.some(settings)],
+              [apiClientRuntime.layer, client],
+            ],
           })
         ),
         (value) =>
@@ -442,10 +476,14 @@ describe("browser calculator lifetime", () => {
             )
           )
         );
+        const settings = yield* checkedSettings;
         const registry = yield* Effect.acquireRelease(
           Effect.sync(() =>
             AtomRegistry.make({
-              initialValues: [[apiClientRuntime.layer, client]],
+              initialValues: [
+                [publicSettingsAtom, Option.some(settings)],
+                [apiClientRuntime.layer, client],
+              ],
             })
           ),
           (value) =>

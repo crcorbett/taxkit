@@ -7,8 +7,8 @@ import {
 import { Function as EffectFunction, Array, Effect, Layer } from "effect";
 import { pipe } from "effect/Function";
 
-import type { CalculatorCatalogEntry } from "./catalog.js";
 import { getCalculatorCatalogEntry } from "./catalog.js";
+import { UnsupportedCalculatorContextError } from "./errors.js";
 import {
   JurisdictionsResponseValue,
   TaxYearsResponseValue,
@@ -23,88 +23,103 @@ import {
   CalculatorCatalogResponseData,
   DescriptorFilterQuery,
   CalculatorRunRequest,
-  CalculatorId,
-  UnsupportedCalculatorContextError,
 } from "./schemas.js";
+import type { CalculatorId } from "./schemas.js";
 import { CalculatorCatalogue } from "./service.js";
-import { PublicCalculatorServiceBounded } from "./work.layer.js";
+import {
+  CalculatorUsageDisabled,
+  PublicCalculatorServiceBounded,
+} from "./work.layer.js";
 /**
- * Runs a public calculation for a resolved catalog entry.
- *
- * The catalog entry owns the rule descriptors, input fact schema and report
- * schema. This keeps calculation policy in the service layer so HTTP handlers
- * can stay thin transport adapters.
+ * Finds the catalogue entry for the selected owning definition's branded
+ * identity. The request's literal discriminant selects the definition; its
+ * identity is never rebuilt from the request.
  */
-const calculateWithEntry = ({
-  entry,
+const catalogueEntry = ({
+  calculatorId,
   request,
 }: {
-  readonly entry: CalculatorCatalogEntry;
+  readonly calculatorId: CalculatorId;
   readonly request: CalculatorRunRequest;
 }) =>
-  CalculatorRunRequest.match(request, {
-    "au.pay.take-home": (selected) =>
-      AuPayTakeHomeCalculation.calculate(selected.payload.facts).pipe(
-        Effect.map((run) => ({
-          ...run,
-          calculatorId: selected.calculatorId,
-          calculator: {
-            ...toCalculatorCatalogItem(entry),
-            calculatorId: AuPayTakeHomeCalculation.calculatorId,
-          },
-        }))
-      ),
-    "au.pay.withholdings": (selected) =>
-      AuPayWithholdingsCalculation.calculate(selected.payload.facts).pipe(
-        Effect.map((run) => ({
-          ...run,
-          calculatorId: selected.calculatorId,
-          calculator: {
-            ...toCalculatorCatalogItem(entry),
-            calculatorId: AuPayWithholdingsCalculation.calculatorId,
-          },
-        }))
-      ),
-    "au.income-tax.annual": (selected) =>
-      AuAnnualIncomeTaxCalculation.calculate(selected.payload.facts).pipe(
-        Effect.map((run) => ({
-          ...run,
-          calculatorId: selected.calculatorId,
-          calculator: {
-            ...toCalculatorCatalogItem(entry),
-            calculatorId: AuAnnualIncomeTaxCalculation.calculatorId,
-          },
-        }))
-      ),
-  });
+  getCalculatorCatalogEntry(calculatorId, request.payload).pipe(
+    Effect.fromOption,
+    Effect.mapError(
+      () =>
+        new UnsupportedCalculatorContextError({
+          context: request.payload,
+          message: `${request.calculatorId} is not available for the requested context`,
+          requestedCalculator: calculatorId,
+        })
+    )
+  );
 /**
  * The static calculator catalogue implementation.
  *
  * Invalid literal values are rejected by the request schemas before it runs.
- * Missing calculator ids are mapped inline in each method so the error
- * includes the request shape that the caller provided.
+ * Each calculation runs its owning definition's closed program; the catalogue
+ * entry supplies the published metadata. Missing entries are mapped inline so
+ * the error includes the request shape that the caller provided.
  */
 export const calculatorCatalogue = CalculatorCatalogue.of({
-  calculate: Effect.fn("CalculatorCatalogue.calculate")((request) => {
-    const calculatorId = CalculatorId.make(request.calculatorId);
-    return getCalculatorCatalogEntry(calculatorId, request.payload).pipe(
-      Effect.fromOption,
-      Effect.mapError(
-        () =>
-          new UnsupportedCalculatorContextError({
-            context: request.payload,
-            message: `${request.calculatorId} is not available for the requested context`,
-            requestedCalculator: calculatorId,
-          })
-      ),
-      Effect.flatMap((entry) =>
-        calculateWithEntry({
-          entry,
-          request,
-        })
-      )
-    );
-  }),
+  calculate: Effect.fn("CalculatorCatalogue.calculate")((request) =>
+    CalculatorRunRequest.match(request, {
+      "au.pay.take-home": (selected) =>
+        catalogueEntry({
+          calculatorId: AuPayTakeHomeCalculation.calculatorId,
+          request: selected,
+        }).pipe(
+          Effect.flatMap((entry) =>
+            AuPayTakeHomeCalculation.calculate(selected.payload.facts).pipe(
+              Effect.map((run) => ({
+                ...run,
+                calculatorId: selected.calculatorId,
+                calculator: {
+                  ...toCalculatorCatalogItem(entry),
+                  calculatorId: AuPayTakeHomeCalculation.calculatorId,
+                },
+              }))
+            )
+          )
+        ),
+      "au.pay.withholdings": (selected) =>
+        catalogueEntry({
+          calculatorId: AuPayWithholdingsCalculation.calculatorId,
+          request: selected,
+        }).pipe(
+          Effect.flatMap((entry) =>
+            AuPayWithholdingsCalculation.calculate(selected.payload.facts).pipe(
+              Effect.map((run) => ({
+                ...run,
+                calculatorId: selected.calculatorId,
+                calculator: {
+                  ...toCalculatorCatalogItem(entry),
+                  calculatorId: AuPayWithholdingsCalculation.calculatorId,
+                },
+              }))
+            )
+          )
+        ),
+      "au.income-tax.annual": (selected) =>
+        catalogueEntry({
+          calculatorId: AuAnnualIncomeTaxCalculation.calculatorId,
+          request: selected,
+        }).pipe(
+          Effect.flatMap((entry) =>
+            AuAnnualIncomeTaxCalculation.calculate(selected.payload.facts).pipe(
+              Effect.map((run) => ({
+                ...run,
+                calculatorId: selected.calculatorId,
+                calculator: {
+                  ...toCalculatorCatalogItem(entry),
+                  calculatorId: AuAnnualIncomeTaxCalculation.calculatorId,
+                },
+              }))
+            )
+          )
+        ),
+    })
+  ),
   getCalculator: Effect.fn("CalculatorCatalogue.getCalculator")((request) =>
     getCalculatorCatalogEntry(request.calculatorId, request).pipe(
       Effect.fromOption,
@@ -200,5 +215,6 @@ export const CalculatorCatalogueLive = Layer.succeed(
  * implementation instead.
  */
 export const PublicCalculatorServiceLive = PublicCalculatorServiceBounded.pipe(
-  Layer.provide(CalculatorCatalogueLive)
+  Layer.provide(CalculatorCatalogueLive),
+  Layer.provide(CalculatorUsageDisabled)
 );

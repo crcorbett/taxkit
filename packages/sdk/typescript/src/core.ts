@@ -2,6 +2,8 @@ export {
   AustralianTaxYear,
   CalculationDiagnostics,
   CalculationError,
+  CalculationFailureReason,
+  CalculationInvariantViolation,
   CalculatorId,
   Cents,
   CentsOrInfinity,

@@ -12,7 +12,6 @@ import {
 } from "./calculator-form.view";
 import { CalculatorPageView } from "./calculator-page.view";
 import { CalculatorResult } from "./calculator-result.view";
-import { calculatorCaveat } from "./caveats";
 import { calculatorPageAtoms } from "./page.atoms";
 
 /**
@@ -43,7 +42,6 @@ export const CalculatorPage = ({
   });
   return (
     <CalculatorPageView
-      caveat={calculatorCaveat(calculator.calculatorId)}
       message={view.message.pipe(
         Option.filter(() => Option.isNone(view.invalidField))
       )}

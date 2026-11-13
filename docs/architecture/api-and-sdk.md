@@ -168,7 +168,7 @@ Production: metadata routes
 CalculatorApiHandlerLive
   -> PublicCalculatorService.listCalculators / getCalculator / getCalculatorGraph
   -> calculator-owned metadata response schemas
-  -> CalculatorApiErrorEnvelope for expected lookup/context failures
+  -> CalculatorApiErrorEnvelope (400) for an unsupported calculator context
 ```
 
 The SDK Effect full-run graph is:
@@ -306,9 +306,23 @@ versioned contract. The docs API keeps its independently owned version.
 Public JSON examples must use canonical schema values, including tagged values
 such as `GrossPay` and `Money` where the owning schema requires those tags.
 
-Calculation/domain failures that are part of the engine contract should remain
-typed failures and be encoded through the public error envelope. They should
-not be converted into Effect defects.
+Calculation failures that depend on the caller's scenario (`CalculationError`,
+with a `period-mismatch` or copied `MoneyError` reason) remain typed failures
+and are encoded through the public 400 error envelope. Engine faults that no
+scenario can avoid (an invalid rule graph, a checked-table coverage gap or a
+broken report invariant) are defects (`CalculationInvariantViolation`). HTTP
+answers them with the native empty 500 reply, remote MCP with the native
+internal error, and the plain SDK interface with `TaxKitUnexpectedError`; they
+are never presented as something the caller should correct.
+
+| Failure                                 | HTTP | MCP code                    |
+| --------------------------------------- | ---- | --------------------------- |
+| `InputValidationError`, `CalculationError`, unsupported calculator/context | 400 | `invalid-calculation` |
+| Missing documentation page, unsupported schema lookup | 404, 400 | `not-found` |
+| `CalculatorRateLimited`                 | 429  | `rate-limited`              |
+| `CalculatorCapacityExceeded`, `CalculatorAdmissionUnavailable` | 503 | `capacity-exceeded`, `service-unavailable` |
+| `CalculatorOperationTimedOut`           | 504  | `operation-timeout`         |
+| Engine defect                           | 500  | native internal error       |
 
 Metadata routes may accept a `help` query parameter for richer
 client guidance. Help output should be generated from canonical schemas, fact
@@ -354,9 +368,10 @@ and stalled requests return checked JSON 413/408 guidance with the same CORS pol
 Native request conversion retains headers, method, path and remote address.
 
 The root installs a closed logger and error reporter before router construction
-and incoming dispatch. Console egress contains a fixed event, time and severity;
-raw native messages, Causes and arbitrary annotations do not escape this
-adapter. The retained Bun entry and public HTTP/OpenAPI contract remain
+and incoming dispatch. Console egress contains the request record, a checked
+`HostEventRecord` (closed event, error tag and short reason, from the message or
+the log annotations) or else a fixed event, time and severity; raw native
+messages, Causes and other annotations do not escape this adapter. The retained Bun entry and public HTTP/OpenAPI contract remain
 available.
 
 ## Website client
@@ -374,6 +389,9 @@ The Website calls the API only through the generated client for `TaxKitApi`:
   directly.
 
 Both read replies with a 2 MiB cap and give each call one ten-second deadline.
+A reply that does not decode as its declared Schema, or answers a different
+request, is `ApiReplyMismatch` (a server fault); only an unanswered request or a
+5xx reply without its declared body is `ApiUnavailable`.
 The Website has no server functions or API proxy. The
 [frontend owner](frontend.md) describes its loaders and failure handling.
 
@@ -483,8 +501,10 @@ The native rate policy is described below.
 The [calculator-owned policy](../../packages/calculators/README.md#shared-calculation-work-limits)
 supplies one eight-calculation pool and five-second operation budget to the native API
 instance and one per standalone HTTP router. Calculation errors use separately
-declared HTTP 503/504 envelopes; existing request failures keep 400 and metadata
-methods declare checked 504 timeouts without using calculation places. Website forms request manual retry. SDK Schemas re-export these
+declared HTTP 503/504 envelopes; existing request failures keep 400. Metadata
+methods are the catalogue's own synchronous projections: they declare no
+timeout, use no calculation place and fail only with a 400
+`UnsupportedCalculatorContextError` lookup. Website forms request manual retry. SDK Schemas re-export these
 errors, while local SDK execution keeps its caller-owned lifetime and tax results.
 The owning package records cleanup and CPU limits. The native rate policy
 and MCP operations are described below.

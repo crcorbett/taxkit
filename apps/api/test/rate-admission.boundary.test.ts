@@ -6,9 +6,9 @@ import {
   CalculatorAdmission,
   CalculatorRequestRateKey,
 } from "@taxkit/calculators/admission.service";
+import { CalculatorRateLimited } from "@taxkit/calculators/errors";
 import {
   CalculatorId,
-  CalculatorRateLimited,
   CalculatorRunRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
@@ -39,8 +39,11 @@ import {
 } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
 
-import { ApiCalculatorAdmission } from "../src/worker-admission.layer.js";
-import { ApiWorkerInit } from "../src/worker.js";
+import {
+  ApiCalculatorAdmission,
+  ApiCalculatorRequestRateKey,
+} from "../src/worker-admission.layer.js";
+import { ApiWorkerInit } from "./worker.fixture.js";
 
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",
@@ -155,10 +158,26 @@ describe("shared native host calculation admission", () => {
     Effect.gen(function* () {
       const incomingHeaders = Headers.fromInput(headers);
       const caller = edgeCallerKey(incomingHeaders, CalculatorClientRateKey);
-      expect({
-        caller,
-        requestKey: yield* CalculatorRequestRateKey,
-      }).toStrictEqual({
+      // The API's own request identity reads the same native request.
+      const requestKey = yield* CalculatorRequestRateKey.pipe(
+        Effect.flatMap(({ current }) => current),
+        Effect.provideService(
+          HttpServerRequest.HttpServerRequest,
+          HttpServerRequest.fromWeb(
+            new Request("https://api.example.com/", { headers })
+          )
+        ),
+        Effect.provide(ApiCalculatorRequestRateKey),
+        Effect.provideService(
+          ConfigProvider.ConfigProvider,
+          ConfigProvider.fromUnknown({
+            API_PUBLIC_ORIGIN: "https://api.example.com",
+            TAXKIT_PUBLICATION_ORIGIN: "https://website.example.com",
+            WEBSITE_PUBLIC_ORIGIN: "https://website.example.com",
+          })
+        )
+      );
+      expect({ caller, requestKey }).toStrictEqual({
         caller: Option.none(),
         requestKey: Option.none(),
       });

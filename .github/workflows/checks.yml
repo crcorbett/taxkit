@@ -245,16 +245,12 @@ jobs:
           state="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PULL_REQUEST" --jq .state)"
           echo "closed=$([ "$state" = closed ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
       # Allowlist, not denylist: cleanup only ever destroys pr-<number> stages.
-      # `pr:destroy` repeats this check before credential loading.
+      # The `pr:*` scripts use the same entry and Schema, and `pr:destroy`
+      # repeats this check before it builds or loads credentials.
       - name: Safety check
         id: stage-safety
         if: steps.pull-request.outputs.closed == 'true'
-        shell: bash
-        run: |
-          if [[ ! "$STAGE" =~ ^pr-[1-9][0-9]{0,6}$ ]]; then
-            echo "Cleanup only destroys pr-<number> stages, got '$STAGE'" >&2
-            exit 1
-          fi
+        run: bun tools/infrastructure/preview-stage.runtime.ts check "$STAGE"
       - name: Plan preview destroy with native Alchemy
         if: steps.pull-request.outputs.closed == 'true'
         run: bun run pr:destroy "$STAGE" --dry-run --no-input

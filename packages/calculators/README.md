@@ -31,6 +31,15 @@ its identity, input/output schemas, fact descriptors or rule graph. Metadata
 contains publication information, without a second rule-pack execution Layer.
 The definition validates its static graph and owns native execution.
 
+## Errors
+
+`./errors` is the one import path for the package's expected failures:
+unsupported calculator/context lookups, calculation capacity, timeout, rate and
+admission errors, the `CalculatorRequestError`, `CalculatorMetadataError` and
+`CalculatorServiceError` unions, and the browser form's `CalculatorFormField`
+and `CalculatorInputError`. Neither `./schemas`, `./form` nor the root export
+repeats them.
+
 ## Browser calculator pages
 
 - `./form` owns visible form Schemas, worked examples and `requestFromForm`.
@@ -73,11 +82,17 @@ The native API instance supplies the same service to HTTP and MCP. The retained
 standalone HTTP Layer builds its pool once when the router is constructed.
 Metadata does not take a calculation place. Direct definition and local SDK
 use remain outside this anonymous server policy. A successful calculation is
-reported to `CalculatorUsage` after its place is released; the default observer
-does nothing.
+reported to `CalculatorUsage` after its place is released. Every composition
+names its observer: `PublicCalculatorServiceLive` supplies
+`CalculatorUsageDisabled`, which does nothing. The rate-limited variant also
+requires `CalculatorRequestRateKey`, the host's current request identity, so a
+host that cannot name its caller fails to compose.
 
-All nine server service methods have a five-second budget, including scoped
-cleanup. A timeout returns `CalculatorOperationTimedOut`; expected engine
+Only `calculate` has a five-second budget, including scoped cleanup. The eight
+metadata methods are the catalogue's own synchronous projections, reused
+directly; they keep the catalogue's spans and have no budget or place.
+`CalculatorCatalogue` has its own closed contract, so it declares none of the
+public service's admission, capacity or timeout errors. A timeout returns `CalculatorOperationTimedOut`; expected engine
 failures and unrelated defects retain their identity. Success, failure, timeout
 and caller interruption release the place after cleanup. A monotonic elapsed-time
 check also rejects a result returned after the budget. JavaScript timers cannot
@@ -89,9 +104,8 @@ no request values. HTTP maps capacity to 503 and operation timeout to 504, using
 the existing `error` envelope. Existing calculator request errors keep 400.
 Website forms display the fixed guidance and never retry
 a calculation automatically. Metadata lookup errors use the canonical
-`CalculatorMetadataError` union; all eight metadata methods admit the checked
-operation timeout. Their lazy invocation counts eager metadata construction
-inside the operation budget. The native rate policy below is separate from
+`CalculatorMetadataError` union, which contains only
+`UnsupportedCalculatorContextError`; the five list methods cannot fail. The native rate policy below is separate from
 future MCP admission.
 
 

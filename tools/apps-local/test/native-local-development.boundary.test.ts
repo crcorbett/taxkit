@@ -289,7 +289,7 @@ describe("native local development", () => {
             const originalWorker = yield* fs.readFileString(workerPath);
             // Local development runs the native entry point. Alter that actual
             // composition so a passing reload proves the served Worker changed.
-            const init = "  return yield* ApiWorkerApplication;";
+            const init = "apiWorkerNativeInit(ApiWorkerLeavesLive);";
             expect(originalWorker).toContain(init);
             yield* Effect.gen(function* () {
               yield* Effect.addFinalizer(() =>
@@ -299,7 +299,7 @@ describe("native local development", () => {
               );
               yield* fs.writeFileString(
                 workerPath,
-                `import { HttpServerResponse as LocalReloadHttpResponse } from "effect/http";\n${originalWorker.replace(init, '  return yield* ApiWorkerApplication.pipe(Effect.map((application) => ({ ...application, fetch: application.fetch.pipe(Effect.map((response) => LocalReloadHttpResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })));')}`
+                `import { Effect as LocalReloadEffect } from "effect";\nimport { HttpServerResponse as LocalReloadHttpResponse } from "effect/http";\n${originalWorker.replace(init, 'apiWorkerNativeInit(ApiWorkerLeavesLive).pipe(LocalReloadEffect.map((application) => ({ ...application, fetch: application.fetch.pipe(LocalReloadEffect.map((response) => LocalReloadHttpResponse.setHeader(response, "x-local-proof", "PRIVATE9"))) })));')}`
               );
               yield* Effect.promise(() =>
                 page.request.get(`${apiOrigin}/api/health`)

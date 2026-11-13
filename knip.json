@@ -8,49 +8,20 @@
   "workspaces": {
     ".": {
       "entry": [
-        "alchemy.run.ts",
-        "package.json",
-        "turbo.json",
-        "oxfmt.config.ts",
-        "oxlint.config.ts",
-        "tools/effect-language-service/compatibility.ts",
-        "tools/repository-paths/check.runtime.ts",
-        "tools/repository-paths/*.test.ts",
-        "alchemy.posthog.run.ts",
-        "alchemy.axiom.run.ts",
-        "alchemy.trace.run.ts",
-        "tools/documentation/check.runtime.ts",
+        "alchemy.*.ts",
+        "tools/vitest.config.ts",
         "tools/**/*.test.ts",
-        "tools/apps-local/native-pair-build.runtime.ts"
+        "tools/apps-local/native-pair-build.runtime.ts",
+        "tools/apps-local/fixtures/**/*.ts"
       ],
-      "project": [
-        "*.json",
-        "*.ts",
-        "tools/effect-language-service/**/*.ts",
-        "tools/repository-paths/**/*.ts",
-        "tools/documentation/*.ts",
-        "tools/oxlint/*.ts",
-        "tools/oxlint/rules/**/*.ts",
-        "tools/infrastructure/*.ts",
-        "tools/apps-local/*.ts",
-        "tools/apps-local/test/*.ts",
-        "tools/workspace/*.ts"
-      ],
+      "project": ["*.ts", "tools/**/*.ts", "!tools/oxlint/fixtures/**"],
       "ignoreDependencies": ["typescript", "@effect/language-service"]
     },
     "apps/api": {
       "entry": [
         "src/index.ts",
         "src/worker.ts",
-        "scripts/smoke-public-routes.runtime.ts",
-        "test/**/*.test.ts",
-        "vitest.config.ts"
-      ],
-      "project": [
-        "src/**/*.ts",
-        "scripts/**/*.ts",
-        "test/**/*.ts",
-        "vitest.config.ts"
+        "scripts/smoke-public-routes.runtime.ts"
       ]
     },
     "apps/web": {
@@ -58,183 +29,20 @@
         "src/router.tsx",
         "src/entry.server.ts",
         "src/routes/**/*.{ts,tsx}",
-        "vite.config.ts",
-        "vitest.config.ts",
-        "vitest.browser.config.ts",
-        "test/**/*.{ts,tsx}"
-      ],
-      "project": [
-        "src/**/*.{ts,tsx}",
-        "vite.config.ts",
-        "vitest.config.ts",
-        "vitest.browser.config.ts",
-        "test/**/*.{ts,tsx}"
+        "test/fixtures/settings-defect/vite.config.ts",
+        "test/fixtures/settings-defect/settings.layer.ts"
       ],
       "ignoreDependencies": ["cloudflare"]
     },
-    "packages/core": {
-      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
+    "packages/*": {
+      "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"]
     },
-    "packages/api/http": {
-      "entry": [
-        "src/index.ts",
-        "src/api.ts",
-        "src/in-process.layer.ts",
-        "src/server.ts",
-        "src/handlers/index.ts"
-      ],
-      "project": ["src/**/*.ts"],
-      "ignoreDependencies": ["@effect/platform-node"]
+    "packages/{api,sdk}/*": {
+      "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"]
     },
-    "packages/calculators": {
-      "entry": ["src/index.ts", "type-tests/**/*.ts"],
-      "project": ["src/**/*.ts", "type-tests/**/*.ts"]
-    },
-    "packages/sdk/typescript": {
-      "entry": [
-        "src/index.ts",
-        "src/effect.ts",
-        "src/au.ts",
-        "src/au-effect.ts",
-        "src/schemas/index.ts",
-        "src/testing/index.ts",
-        "vitest*.config.ts",
-        "type-tests/**/*.ts",
-        "src/core.ts",
-        "src/http.ts",
-        "test/**/*.test.ts"
-      ],
-      "project": [
-        "src/**/*.ts",
-        "scripts/**/*.ts",
-        "vitest*.config.ts",
-        "type-tests/**/*.ts",
-        "test/**/*.ts"
-      ],
-      "ignoreDependencies": ["@types/bun"]
-    },
-    "packages/rules/au/income-tax": {
-      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/rules/au/pay": {
-      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/rules/au/stsl": {
-      "entry": ["src/index.ts", "src/*/index.ts", "vitest.config.ts"],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
+    "packages/rules/*/*": {},
     "packages/docs-examples": {
-      "entry": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"],
-      "ignoreDependencies": ["typescript"]
-    },
-    "packages/content": {
-      "entry": [
-        "src/schemas.ts",
-        "src/errors.ts",
-        "src/service.ts",
-        "src/live.layer.ts",
-        "src/links.ts",
-        "src/test.layer.ts",
-        "src/__testing__/*.ts",
-        "test/**/*.test.ts",
-        "vitest.config.ts",
-        "src/mdx.layer.ts",
-        "src/link-resolver.layer.ts",
-        "test/**/*.typecheck.ts"
-      ],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/mdx": {
-      "entry": [
-        "src/live.layer.ts",
-        "src/highlights.adapter.layer.ts",
-        "test/**/*.test.ts",
-        "test/**/*.typecheck.ts",
-        "vitest.config.ts",
-        "src/service.ts",
-        "src/schemas.ts",
-        "src/errors.ts",
-        "src/compiler.layer.ts",
-        "src/renderer.layer.ts",
-        "src/artifacts.layer.ts",
-        "src/test.layer.ts"
-      ],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/diagrams": {
-      "entry": [
-        "src/pele.adapter.layer.ts",
-        "test/**/*.test.ts",
-        "vitest.config.ts"
-      ],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/pele": {
-      "entry": [
-        "src/schemas.ts",
-        "src/errors.ts",
-        "src/service.ts",
-        "src/live.layer.ts",
-        "src/test.layer.ts",
-        "test/**/*.test.ts",
-        "test/**/*.typecheck.ts",
-        "vitest.config.ts"
-      ],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/aeo": {
-      "entry": [
-        "src/documents.egress.ts",
-        "src/routes.layer.ts",
-        "src/service.ts",
-        "src/__testing__/*.ts",
-        "test/**/*.test.ts",
-        "vitest.config.ts"
-      ],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/og-image": {
-      "entry": [
-        "src/image-archive.ts",
-        "src/takumi.adapter.layer.ts",
-        "test/**/*.test.ts",
-        "vitest.config.ts"
-      ],
-      "project": ["src/**/*.{ts,tsx}", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/webmcp": {
-      "entry": [
-        "src/model-context.adapter.layer.ts",
-        "src/registration.egress.ts",
-        "src/schemas.ts",
-        "src/service.ts",
-        "test/**/*.test.ts",
-        "vitest.config.ts"
-      ],
-      "project": ["src/**/*.ts", "test/**/*.ts", "vitest.config.ts"]
-    },
-    "packages/mdx-react": {
-      "entry": [
-        "src/body.tsx",
-        "src/code-block.tsx",
-        "src/theme.tsx",
-        "src/schemas.ts",
-        "test/**/*.test.tsx",
-        "vitest.config.ts",
-        "vitest.browser.config.ts"
-      ],
-      "project": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "test/**/*.ts",
-        "test/**/*.tsx",
-        "vitest.config.ts",
-        "vitest.browser.config.ts"
-      ]
+      "entry": ["src/**/*.ts"]
     }
   }
 }

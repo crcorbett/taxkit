@@ -2,7 +2,11 @@ export {
   CalculationDiagnostics,
   type CalculationResult,
 } from "./engine/schemas.js";
-export { CalculationError } from "./errors/calculation-error.js";
+export {
+  CalculationError,
+  CalculationFailureReason,
+  CalculationInvariantViolation,
+} from "./errors/calculation-error.js";
 export {
   FactAuthority,
   FactId,

@@ -21,12 +21,6 @@ export {
 } from "./service.js";
 export { PublicCalculatorServiceLive } from "./live.layer.js";
 export {
-  CalculatorCapacityExceeded,
-  CalculatorRateLimited,
-  CalculatorAdmissionUnavailable,
-  CalculatorOperationTimedOut,
-  CalculatorRequestError,
-  CalculatorMetadataError,
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorCatalogResponseData,
@@ -39,7 +33,6 @@ export {
   CalculatorRunRequest,
   CalculatorRunResponse,
   CalculatorSchemaResponse,
-  CalculatorServiceError,
   CalculatorTaxYear,
   DescriptorFilterQuery,
   FactDescriptorMetadata,
@@ -57,6 +50,4 @@ export {
   RulesResponse,
   TaxYear,
   TaxYearsResponse,
-  UnsupportedCalculatorContextError,
-  UnsupportedCalculatorError,
 } from "./schemas.js";

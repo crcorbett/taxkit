@@ -32,6 +32,9 @@ const runOxlint = (path: string, extraArgs: readonly string[] = []) =>
       )
     )
   );
+// Each case starts the real Oxlint binary, which takes seconds under the
+// full verification load; the whole group shares one deadline.
+const realLintTimeout = 30_000;
 describe("native request ownership rules", () => {
   it.effect(
     "traverses a large cyclic host AST without structural hashing",
@@ -44,7 +47,7 @@ describe("native request ownership rules", () => {
         ),
         Effect.provide(BunServices.layer)
       ),
-    10_000
+    realLintTimeout
   );
   it.effect.each([
     {
@@ -193,22 +196,25 @@ export const bridge = import(address);
 export const values = [env, toHttpClient];
 export type Values = Env;`,
     },
-  ])("$name", ({ count, path, rule, source }) =>
-    Effect.gen(function* () {
-      const fixturePath = nodePath.join(repositoryRoot, path);
-      yield* writeLintFixture({
-        path: fixturePath,
-        source,
-      });
-      const codes = yield* runOxlint(path);
-      EffectFunction.pipe(
-        codes,
-        Array.filter((code) => code === rule),
-        (actual) => {
-          expect(actual).toHaveLength(count);
-        }
-      );
-    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  ])(
+    "$name",
+    ({ count, path, rule, source }) =>
+      Effect.gen(function* () {
+        const fixturePath = nodePath.join(repositoryRoot, path);
+        yield* writeLintFixture({
+          path: fixturePath,
+          source,
+        });
+        const codes = yield* runOxlint(path);
+        EffectFunction.pipe(
+          codes,
+          Array.filter((code) => code === rule),
+          (actual) => {
+            expect(actual).toHaveLength(count);
+          }
+        );
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
+    realLintTimeout
   );
   it.effect.each([
     "apps/web/src/lib/api-client.atoms.ts",
@@ -219,24 +225,27 @@ export type Values = Env;`,
     "apps/web/src/entry.server.ts",
     "apps/web/src/routes/$.tsx",
     "apps/web/src/routes/search.tsx",
-  ])("accepts the Website's native owner %s", (path) =>
-    Effect.gen(function* () {
-      const codes = yield* runOxlint(path);
-      EffectFunction.pipe(
-        codes,
-        Array.filter(
-          (code) =>
-            code.startsWith("strict-effect(website-") ||
-            code === "strict-effect(no-loader-request-state)" ||
-            code === "strict-effect(static-layers)" ||
-            code === "strict-effect(native-cloudflare-cache)" ||
-            code === "strict-effect(no-native-client-replica)"
-        ),
-        (actual) => {
-          expect(actual).toStrictEqual([]);
-        }
-      );
-    }).pipe(Effect.provide(BunServices.layer))
+  ])(
+    "accepts the Website's native owner %s",
+    (path) =>
+      Effect.gen(function* () {
+        const codes = yield* runOxlint(path);
+        EffectFunction.pipe(
+          codes,
+          Array.filter(
+            (code) =>
+              code.startsWith("strict-effect(website-") ||
+              code === "strict-effect(no-loader-request-state)" ||
+              code === "strict-effect(static-layers)" ||
+              code === "strict-effect(native-cloudflare-cache)" ||
+              code === "strict-effect(no-native-client-replica)"
+          ),
+          (actual) => {
+            expect(actual).toStrictEqual([]);
+          }
+        );
+      }).pipe(Effect.provide(BunServices.layer)),
+    realLintTimeout
   );
   it.effect(
     "checks floating Promises without requiring async SDK facades",
@@ -251,6 +260,7 @@ export type Values = Env;`,
         const codes = yield* runOxlint(path, ["--type-aware"]);
         expect(codes).toContain("typescript(no-floating-promises)");
         expect(codes).not.toContain("typescript(promise-function-async)");
-      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
+    realLintTimeout
   );
 });

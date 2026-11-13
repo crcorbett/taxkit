@@ -96,10 +96,14 @@ It uses local state and needs no Cloudflare or Doppler login. Stop it with
 Ctrl-C. `bun run --filter=api dev` starts the separate Bun HTTP host.
 
 `bun run verification` is the check to run before merging. It runs the five
-checks in order: `build`, `lint` (formatting, Oxlint, documentation links and
-portable paths), `check-types` (with Effect diagnostics), `knip` and `test`
-(tool, unit and browser tests, then the native Website/API pair suite). `bun run release:check` adds the packed SDK,
-downstream consumer, API smoke and Changeset checks before a package release.
+checks: `build`, `lint` (formatting, Oxlint, documentation links and portable
+paths), then `check-types` (with Effect diagnostics), `knip` and the unit and
+browser tests in one cached Turbo run, and finally the tool tests and native
+Website/API pair suite one at a time. The first Chromium test run needs
+`apps/web/node_modules/.bin/playwright install chromium`. `bun run release:check`
+adds the packed SDK, downstream consumer, API smoke and Changeset checks before
+a package release. Every root command is listed in the
+[tooling standard](./docs/standards/tooling.md#root-commands).
 The [testing guide](./docs/architecture/testing-and-quality.md) lists focused
 checks for each kind of change.
 
@@ -112,7 +116,7 @@ credentials and get no deploy.
 Deployments use native Alchemy and Doppler, from those jobs or locally on the
 maintainer's request; see the
 [deployment runbook](./docs/runbooks/deployment.md). Package-facing changes need
-a Changeset; see [versioning](./docs/runbooks/versioning.md).
+a Changeset; see the [release runbook](./docs/runbooks/release.md).
 
 ## Documentation entry points
 

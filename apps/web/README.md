@@ -15,9 +15,9 @@ page state, tools and WebMCP live in their packages.
 | --- | --- |
 | `host/` | checked settings and API binding: `service.ts` contracts, `config.server.ts`, `binding.server.ts`, `settings.server.layer.ts`, `schemas.ts`, `errors.ts` |
 | `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.ingress.ts` (Markdown files and `Accept`) |
-| `pages/` | `loaders.ts`, `load.failure.ts`, `loader-context.ts` and the root load |
+| `pages/` | `loaders.ts`, the root, calculator and docs loads over supplied settings and clients, `load.failure.ts` and `loader-context.ts` |
 | `docs/` | documentation chrome, reading views, appearance/copy/outline Atoms and the search address reader |
-| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts`, the caveat text and the safe failure text |
+| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts` and the safe failure text |
 | `seo/` | `head.ts`, the documentation page head |
 | root | `runtime.server.ts`, `runtime.client.ts` (loaders and `webMcpAtom`), `browser-atoms.ts` (the client/server atom selection mounted at the root) and `api-client.atoms.ts` |
 
@@ -83,16 +83,25 @@ settings.
 
 `src/lib/pages/loaders.ts` uses `createIsomorphicFn`: server loads call
 `runtime.server.ts`, browser loads call `runtime.client.ts`. Both call the same
-named reads with the generated client. Server loads stop when either the
-loader or the incoming request is aborted; browser loads use the loader's own
-`AbortSignal`, which cancels the HTTP call. `src/lib/pages/load.failure.ts` turns a
-missing documentation page or calculator address into TanStack `notFound()`
-(HTTP 404), passes a native Router redirect through unchanged and turns any other
-failure into `WebsiteLoadError`, rendered by the route's error component.
+loads in `src/lib/pages/*.load.ts` over the settings and generated client each
+runtime supplies. Server loads stop when either the loader or the incoming
+request is aborted; browser loads use the loader's own `AbortSignal`, which
+cancels the HTTP call. Each load lists its own error tags and translates them
+with `routeLoadFailures` from `src/lib/pages/load.failure.ts`: a missing
+documentation page or calculator address becomes TanStack `notFound()`
+(HTTP 404), a native Router redirect passes through unchanged, and every other
+listed failure becomes `WebsiteLoadError`, rendered by the route's error
+component. An unlisted tag does not compile. Each failed load writes one
+checked `website.load.failed` record with its error tag and reason.
+Browser reads check the root settings before they acquire the API client;
+missing settings fail as `TaxKitWebConfigError` (503 for a load, a fixed message
+on the calculator page), never as an unreachable API.
 Recoverable error views offer **Try again**, which calls native
 `router.invalidate()` and stays disabled during that transition.
 Internal defects and mismatched checked pages carry 500; unavailable reads
-carry 503, and missing documentation remains a native 404.
+and missing settings carry 503, and missing documentation remains a native 404.
+A missing start page during search is a broken deployment (500), not a
+missing search page.
 Interruption stays interruption. Failed server page loads retain their error
 status and reply with `no-store`.
 
@@ -116,9 +125,12 @@ route restores them and seeds `publicSettingsAtom`, which the browser client
 reads. No binding or Effect Context reaches the browser. Vite sets
 `envPrefix: []`; there is no build-time API address.
 
-`wrangler.jsonc` owns the standalone local fixture. Wrangler generates
-`src/worker-runtime.generated.d.ts` and TanStack generates
-`src/routeTree.gen.ts`; regenerate them rather than editing them.
+Worker runtime types come from `@cloudflare/workers-types` and the API
+binding's type from Alchemy's `InferEnv`; there is no Wrangler configuration.
+A standalone `vite build` takes its compatibility date and flags from
+`@taxkit/infrastructure/worker-settings` and has no bindings. The build
+generates the ignored `src/routeTree.gen.ts`, and Turbo runs the Website build
+before its type check.
 
 ## Calculator pages
 
@@ -131,10 +143,9 @@ navigation uses the canonical browser-safe `@taxkit/calculators/summaries`
 titles and identities, also reused by the API catalogue. It renders all links
 without a network read or JavaScript; summaries change with deployment and
 browser reload. Remote discovery tools still read the live API catalogue.
-Annual pages state
-that the retained Medicare thresholds await correction;
-`src/lib/calculators/caveats.ts` owns that sentence for the page, its answer
-and `/agents`.
+The annual answer's assumptions list the enacted single-person Medicare levy
+thresholds and the parts the rule pack does not model, matching the agent tools
+guide.
 
 `src/lib/calculators/page.atoms.ts` declares one static `Atom.family`, keyed
 by the checked calculator ID, with the form, the calculation
@@ -282,8 +293,6 @@ analytics is described in the [API app](../api/README.md#analytics-candidate).
 ## Checks
 
 ```sh
-bun run --filter=web generate:worker-types
-bun run --filter=web check:worker-types
 bun run --filter=web check-types
 bun run --filter=web test
 bun run --filter=web test:browser
@@ -334,8 +343,9 @@ and `.alchemy/native-apps-auth` without a cloud login. Ctrl-C stops the pair.
 App source changes reload; shared-package changes need that package's build,
 because the API bundler reads compiled exports.
 
-`bun run --filter=web dev` runs the Website alone through portless. It still
-needs a native API binding, which the standalone Bun API cannot supply.
+`bun run --filter=web dev` runs the Website alone through portless. It has no
+Worker bindings, so its settings check fails until `bun run dev` supplies the
+native pair.
 
 The Vite config reads Alchemy's native plugin flag through a fresh
 ConfigProvider so it does not add a second Cloudflare plugin. Server code

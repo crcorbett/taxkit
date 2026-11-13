@@ -385,6 +385,8 @@ export const DocsPageMetadata = Schema.Struct({
   imageAlt: DocsNonEmptyText,
   jsonLd: Schema.String,
   markdown: Schema.String,
+  // The page's authored source in the public repository's web editor.
+  edit: Schema.String,
   title: DocsNonEmptyText,
 });
 export type DocsPageMetadata = typeof DocsPageMetadata.Type;

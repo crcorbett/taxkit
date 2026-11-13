@@ -1,7 +1,11 @@
 import { DocsAccept } from "@taxkit/api-http/negotiation";
 import "@tanstack/react-start/server-only";
 import { requestDocsMarkdown } from "@taxkit/api-http/requests";
-import { docsMarkdownPath } from "@taxkit/content/publication";
+import {
+  DocsMarkdownFamilyPath,
+  DocsMarkdownPath,
+  docsMarkdownPath,
+} from "@taxkit/content/publication";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import type { HttpEffect } from "alchemy/Http";
 import {
@@ -25,7 +29,7 @@ export const withDocsRepresentation = Effect.fnUntraced(function* (
 ) {
   const incoming = yield* HttpServerRequest.HttpServerRequest;
   const url = new URL(incoming.originalUrl);
-  const markdownFile = url.pathname.endsWith(".md");
+  const markdownFile = Schema.is(DocsMarkdownFamilyPath)(url.pathname);
   if (incoming.method !== "GET" && incoming.method !== "HEAD") {
     if (markdownFile) {
       return HttpServerResponse.empty({
@@ -42,12 +46,13 @@ export const withDocsRepresentation = Effect.fnUntraced(function* (
   }
   // Only the original URL selects a page. One codec supplies its canonical
   // identity; this excludes calculator form paths and all native function IDs.
-  const docsPath = Schema.decodeUnknownResult(DocsPublicPagePath)(
-    EffectBoolean.match(markdownFile, {
-      onFalse: () => url.pathname,
-      onTrue: () => url.pathname.slice(0, -3),
-    })
-  );
+  const docsPath = EffectBoolean.match(markdownFile, {
+    onFalse: () => Schema.decodeUnknownResult(DocsPublicPagePath)(url.pathname),
+    onTrue: () =>
+      Schema.decodeUnknownResult(DocsMarkdownPath)(url.pathname).pipe(
+        Result.map(([page]) => page)
+      ),
+  });
   const negotiates = Result.match(docsPath, {
     onFailure: () => false,
     onSuccess: () => url.pathname !== "/search" && url.pathname !== "/agents",

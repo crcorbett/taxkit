@@ -1,4 +1,8 @@
-export { CalculationError } from "./calculation-error.js";
+export {
+  CalculationError,
+  CalculationFailureReason,
+  CalculationInvariantViolation,
+} from "./calculation-error.js";
 export {
   InputValidationError,
   inputValidationError,

@@ -18,12 +18,14 @@ import {
 import { TestClock } from "effect/testing";
 
 import {
-  CalculatorRequestBodyErrorEnvelope,
-  CalculatorRequestBodyPolicy,
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
-  withCalculatorRequestBodyLimit,
-} from "../src/request-boundary.js";
+} from "../src/errors.js";
+import { withCalculatorRequestBodyLimit } from "../src/request-boundary.js";
+import {
+  CalculatorRequestBodyErrorEnvelope,
+  CalculatorRequestBodyPolicy,
+} from "../src/schemas.js";
 import { TaxKitServerLayer } from "../src/server.js";
 import { ContentTestLive } from "./content.fixture.js";
 

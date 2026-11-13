@@ -27,12 +27,6 @@ export const referenceIdentity = <Value extends object>(value: Value) => ({
   [Hash.symbol]: () => Hash.random(value),
   value,
 });
-export const syntaxParents = (node: SyntaxNode | null | undefined) =>
-  Array.unfold(node?.parent, (current) =>
-    Option.fromNullishOr(current).pipe(
-      Option.map((parent) => Tuple.make(parent, parent.parent))
-    )
-  );
 export const propertyName = (
   node: SyntaxNode | null | undefined
 ): Option.Option<string> =>

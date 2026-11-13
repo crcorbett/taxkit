@@ -366,8 +366,12 @@ it.live.each(["rejected", "redirect", "stalled-reply"] as const)(
         yield* Stream.fromQueue(logs).pipe(
           Stream.filter(
             (log) =>
-              log.message.includes("api.runtime.event") &&
-              log.message.includes('"level":"Debug"')
+              // The dropped capture's checked record reaches Worker logs
+              // with its tag and reason only.
+              log.message.includes('"event":"api.analytics.dropped"') &&
+              log.message.includes('"errorTag":"AnalyticsCaptureError"') &&
+              log.message.includes('"reason":"deadline"') &&
+              log.message.includes('"level":"Warn"')
           ),
           Stream.runHead,
           Effect.timeout("7 seconds")

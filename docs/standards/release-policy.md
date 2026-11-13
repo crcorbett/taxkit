@@ -1,4 +1,4 @@
-# Versioning And Changesets
+# Release policy
 
 TaxKit uses Changesets to manage package versions and package changelogs.
 Public apps can also maintain curated app-level changelogs for public
@@ -58,5 +58,5 @@ Important settings:
 - Publishing needs the maintainer's explicit request; a green release check or
   available credentials do not.
 
-The [versioning runbook](../runbooks/versioning.md) holds the commands and the
+The [release runbook](../runbooks/release.md) holds the commands and the
 release procedure.

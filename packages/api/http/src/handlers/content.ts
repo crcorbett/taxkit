@@ -1,12 +1,12 @@
+import {
+  DocsPageUnavailable,
+  DocsSearchUnavailable,
+} from "@taxkit/content/errors";
 import { ContentService } from "@taxkit/content/service";
 import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 
 import { TaxKitApi } from "../api.js";
-import {
-  DocsPageUnavailable,
-  DocsSearchUnavailable,
-} from "../groups/content.js";
 
 export const ContentApiHandlerLive = HttpApiBuilder.group(
   TaxKitApi,
