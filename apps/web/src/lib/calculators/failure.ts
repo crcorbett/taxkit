@@ -17,6 +17,7 @@ export const calculationFailureMessage = (
       "CalculatorRateLimited",
       "CalculatorAdmissionUnavailable",
       "ApiReplyTooLarge",
+      "ApiReplyMismatch",
       "ApiDeadlineExceeded",
       "ApiUnavailable",
       (failure) => failure.message
@@ -26,7 +27,6 @@ export const calculationFailureMessage = (
       "CalculationError",
       "UnsupportedCalculatorError",
       "UnsupportedCalculatorContextError",
-      "ApiReplyMismatch",
       () =>
         "The calculation could not finish. Check your details. Please try again."
     ),
