@@ -17,7 +17,7 @@ page state, tools and WebMCP live in their packages.
 | `http/` | replies before TanStack renders: `early-reply.ingress.ts` (discovery files, share images, the empty server-function base) and `negotiation.ingress.ts` (Markdown files and `Accept`) |
 | `pages/` | `loaders.ts`, `load.failure.ts`, `loader-context.ts` and the root load |
 | `docs/` | documentation chrome, reading views, appearance/copy/outline Atoms and the search address reader |
-| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts`, the caveat text and the safe failure text |
+| `calculators/` | one calculator container, its form/page/result leaves, `page.atoms.ts` and the safe failure text |
 | `seo/` | `head.ts`, the documentation page head |
 | root | `runtime.server.ts`, `runtime.client.ts` (loaders and `webMcpAtom`), `browser-atoms.ts` (the client/server atom selection mounted at the root) and `api-client.atoms.ts` |
 
@@ -131,10 +131,9 @@ navigation uses the canonical browser-safe `@taxkit/calculators/summaries`
 titles and identities, also reused by the API catalogue. It renders all links
 without a network read or JavaScript; summaries change with deployment and
 browser reload. Remote discovery tools still read the live API catalogue.
-Annual pages state
-that the retained Medicare thresholds await correction;
-`src/lib/calculators/caveats.ts` owns that sentence for the page, its answer
-and `/agents`.
+The annual answer's assumptions list the enacted single-person Medicare levy
+thresholds and the parts the rule pack does not model, matching the agent tools
+guide.
 
 `src/lib/calculators/page.atoms.ts` declares one static `Atom.family`, keyed
 by the checked calculator ID, with the form, the calculation

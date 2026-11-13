@@ -9,7 +9,6 @@ import {
 import { Option } from "effect";
 
 import { publicSettingsAtom } from "#/lib/api-client.atoms";
-import { medicareThresholdCaveat } from "#/lib/calculators/caveats";
 
 export const Route = createFileRoute("/agents")({
   component: AgentsRoute,
@@ -106,7 +105,6 @@ function AgentsRoute() {
         explains older-client cancellation, connection expiry and request
         limits.
       </p>
-      <p>{medicareThresholdCaveat}</p>
     </section>
   );
 }

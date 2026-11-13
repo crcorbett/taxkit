@@ -125,7 +125,7 @@ its checked theme inside `.docs-reader`.
   centring, so a result, error or opened breakdown grows downward and the form
   never moves. Answers use tabular figures.
 - The calculator title is the page's `<h1>` and its `<title>`; the context line
-  and any caveat follow it. The breakdown uses `<h2>`/`<h3>` inside `details`.
+  follows it. The breakdown uses `<h2>`/`<h3>` inside `details`.
 - Fields use `Field`/`FieldLabel` and the shared Input and Button styling
   contracts (`data-slot="input"` and `buttonVariants` from
   `components/ui/button-variants.ts`) on native controls, so calculator pages
