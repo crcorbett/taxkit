@@ -146,7 +146,7 @@ describe("public calculator service", () => {
             Schema.fromJsonString(CalculatorServiceError)
           )(error);
           expect(encoded).toBe(
-            '{"_tag":"CalculationError","message":"PAYG withholding could not produce a supported amount.","reason":"rule"}'
+            '{"_tag":"CalculationError","message":"PAYG withholding could not produce a supported amount.","reason":"range"}'
           );
         }
       }).pipe(Effect.provide(ServiceLive))

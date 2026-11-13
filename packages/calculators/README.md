@@ -76,8 +76,11 @@ use remain outside this anonymous server policy. A successful calculation is
 reported to `CalculatorUsage` after its place is released; the default observer
 does nothing.
 
-All nine server service methods have a five-second budget, including scoped
-cleanup. A timeout returns `CalculatorOperationTimedOut`; expected engine
+Only `calculate` has a five-second budget, including scoped cleanup. The eight
+metadata methods are the catalogue's own synchronous projections, reused
+directly; they keep the catalogue's spans and have no budget or place.
+`CalculatorCatalogue` has its own closed contract, so it declares none of the
+public service's admission, capacity or timeout errors. A timeout returns `CalculatorOperationTimedOut`; expected engine
 failures and unrelated defects retain their identity. Success, failure, timeout
 and caller interruption release the place after cleanup. A monotonic elapsed-time
 check also rejects a result returned after the budget. JavaScript timers cannot
@@ -89,9 +92,8 @@ no request values. HTTP maps capacity to 503 and operation timeout to 504, using
 the existing `error` envelope. Existing calculator request errors keep 400.
 Website forms display the fixed guidance and never retry
 a calculation automatically. Metadata lookup errors use the canonical
-`CalculatorMetadataError` union; all eight metadata methods admit the checked
-operation timeout. Their lazy invocation counts eager metadata construction
-inside the operation budget. The native rate policy below is separate from
+`CalculatorMetadataError` union, which contains only
+`UnsupportedCalculatorContextError`; the five list methods cannot fail. The native rate policy below is separate from
 future MCP admission.
 
 

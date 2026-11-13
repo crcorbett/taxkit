@@ -3,6 +3,7 @@ import {
   CalculatorRateLimited,
   CalculatorAdmissionUnavailable,
   CalculatorOperationTimedOut,
+  CalculatorMetadataError,
   CalculatorRequestError,
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
@@ -55,13 +56,11 @@ const CalculatorApiRequestErrorEnvelope = Schema.Struct({
   error: CalculatorRequestError,
 }).pipe(HttpApiSchema.status("BadRequest"));
 
-const CalculatorApiTimeoutEnvelope = Schema.Struct({
-  error: CalculatorOperationTimedOut,
-}).pipe(HttpApiSchema.status("GatewayTimeout"));
-const CalculatorApiMetadataErrorEnvelopes = [
-  CalculatorApiRequestErrorEnvelope,
-  CalculatorApiTimeoutEnvelope,
-] as const;
+// Metadata lookups are synchronous catalogue projections; they fail only for a
+// calculator/context outside the catalogue and have no time budget.
+const CalculatorApiMetadataErrorEnvelope = Schema.Struct({
+  error: CalculatorMetadataError,
+}).pipe(HttpApiSchema.status("BadRequest"));
 
 const CalculatorApiRateLimitEnvelope = Schema.Struct({
   error: CalculatorRateLimited,
@@ -124,7 +123,6 @@ const GetJurisdictionsEndpoint = HttpApiEndpoint.get(
   "getJurisdictions",
   calculatorPaths.jurisdictions,
   {
-    error: CalculatorApiTimeoutEnvelope,
     success: JurisdictionsResponse,
   }
 ).annotate(OpenApi.Description, "List supported public API jurisdictions.");
@@ -133,7 +131,6 @@ const GetTaxYearsEndpoint = HttpApiEndpoint.get(
   "getTaxYears",
   calculatorPaths.taxYears,
   {
-    error: CalculatorApiTimeoutEnvelope,
     query: MetadataQuery,
     success: TaxYearsResponse,
   }
@@ -143,7 +140,6 @@ const ListCalculatorsEndpoint = HttpApiEndpoint.get(
   "listCalculators",
   calculatorPaths.calculators,
   {
-    error: CalculatorApiTimeoutEnvelope,
     query: MetadataQuery,
     success: CalculatorCatalogResponse,
   }
@@ -153,7 +149,7 @@ const GetCalculatorEndpoint = HttpApiEndpoint.get(
   "getCalculator",
   calculatorPaths.calculator,
   {
-    error: CalculatorApiMetadataErrorEnvelopes,
+    error: CalculatorApiMetadataErrorEnvelope,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorCatalogItem,
@@ -164,7 +160,7 @@ const GetCalculatorSchemaEndpoint = HttpApiEndpoint.get(
   "getCalculatorSchema",
   calculatorPaths.schema,
   {
-    error: CalculatorApiMetadataErrorEnvelopes,
+    error: CalculatorApiMetadataErrorEnvelope,
     params: CalculatorParams,
     query: HelpQuery,
     success: CalculatorSchemaResponse,
@@ -178,7 +174,7 @@ const GetCalculatorGraphEndpoint = HttpApiEndpoint.get(
   "getCalculatorGraph",
   calculatorPaths.graph,
   {
-    error: CalculatorApiMetadataErrorEnvelopes,
+    error: CalculatorApiMetadataErrorEnvelope,
     params: CalculatorParams,
     query: MetadataQuery,
     success: CalculatorGraphResponse,
@@ -211,7 +207,6 @@ const ListFactsEndpoint = HttpApiEndpoint.get(
   "listFacts",
   calculatorPaths.facts,
   {
-    error: CalculatorApiTimeoutEnvelope,
     query: DescriptorFilterQuery,
     success: FactsResponse,
   }
@@ -224,7 +219,6 @@ const ListRulesEndpoint = HttpApiEndpoint.get(
   "listRules",
   calculatorPaths.rules,
   {
-    error: CalculatorApiTimeoutEnvelope,
     query: DescriptorFilterQuery,
     success: RulesResponse,
   }

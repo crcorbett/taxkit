@@ -404,7 +404,8 @@ The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
 identities and explicit Match narrowing of report/error unions.
 
 Calculation capacity and operation-timeout errors become HTTP 503/504
-envelopes under the
+envelopes; a `CalculationError` (a scenario the rules cannot calculate) stays
+400, while an engine defect is the native empty 500 reply. These follow the
 [shared work policy](../../calculators/README.md#shared-calculation-work-limits).
 
 
@@ -423,9 +424,10 @@ request) and 408 (`request-timeout`, retry manually). JSON responses use the
 `error` envelope. The package keeps a checked HTML policy, with a fixed message
 and link back to the calculators, that no current host selects; the Website
 accepts no form POST.
-The calculation endpoint declares both statuses in OpenAPI. Every metadata
-endpoint declares 504 for the shared operation timeout; lookup failures retain
-400. Metadata never consumes a calculation place. No automatic retry is added.
+The calculation endpoint declares both statuses in OpenAPI. Metadata endpoints
+declare no timeout: lookups declare only the 400 `UnsupportedCalculatorContextError`
+envelope and list routes declare no error. Metadata never consumes a
+calculation place. No automatic retry is added.
 
 
 Optional request fields use one semantic Option after ingress. Core calculation

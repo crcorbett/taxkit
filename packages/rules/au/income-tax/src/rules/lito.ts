@@ -1,10 +1,9 @@
-import { CalculationError } from "@taxkit/core/errors";
-import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
-  Cents,
-  fromCents,
-  multiplyCentsByDecimal,
-} from "@taxkit/core/primitives";
+  CalculationError,
+  CalculationInvariantViolation,
+} from "@taxkit/core/errors";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { fromCents, multiplyCentsByDecimal } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   Match,
@@ -14,6 +13,7 @@ import {
   Effect,
   Layer,
   Option,
+  Struct,
 } from "effect";
 
 import { LitoComponentFact } from "../facts/components.js";
@@ -37,7 +37,7 @@ export const LitoComponentId = ComponentId.make(
 const findBracket = (
   brackets: readonly LitoBracket[],
   incomeCents: number
-): Effect.Effect<LitoBracket, CalculationError> => {
+): Effect.Effect<LitoBracket> => {
   const bracket = Option.orElse(
     EffectFunction.pipe(
       Array.reverse(brackets),
@@ -45,10 +45,13 @@ const findBracket = (
     ),
     () => Array.head(brackets)
   );
+  // The checked table starts at zero and income is non-negative, so a missing
+  // bracket means the table itself is broken.
   return Option.match(bracket, {
     onNone: () =>
-      Effect.fail(
-        new CalculationError({
+      Effect.die(
+        new CalculationInvariantViolation({
+          invariant: "table-coverage",
           message: "No LITO bracket covers the amount.",
         })
       ),
@@ -65,7 +68,7 @@ const findBracket = (
  *
  * Formula: offset = max(0, fullOffsetCents - phaseOutRate * (income - threshold))
  *
- * @throws {CalculationError} When no LITO bracket is available.
+ * @throws {CalculationError} When an amount does not fit in safe whole cents.
  * @since 0.1.0
  */
 export const LitoLive = Layer.effect(LitoComponentFact)(
@@ -74,9 +77,9 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     const table = yield* AtoLitoTable;
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
-    const taxableExcess = yield* Cents.makeEffect(
+    const taxableExcess = yield* fromCents(
       incomeCents - bracket.thresholdCents
-    );
+    ).pipe(Effect.map(Struct.get("cents")));
     const phasedOut = yield* multiplyCentsByDecimal(
       taxableExcess,
       bracket.phaseOutRate
@@ -116,11 +119,13 @@ export const LitoLive = Layer.effect(LitoComponentFact)(
     });
     return component;
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "LITO could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );

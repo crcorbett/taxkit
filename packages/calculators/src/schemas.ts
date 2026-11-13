@@ -168,9 +168,9 @@ export const CalculatorRequestError = Schema.Union([
   UnsupportedCalculatorContextError,
 ]);
 export type CalculatorRequestError = typeof CalculatorRequestError.Type;
+/** Metadata lookups fail only for a calculator/context outside the catalogue. */
 export const CalculatorMetadataError = Schema.Union([
-  CalculatorRequestError,
-  CalculatorOperationTimedOut,
+  UnsupportedCalculatorContextError,
 ]);
 export type CalculatorMetadataError = typeof CalculatorMetadataError.Type;
 export const CalculatorServiceError = Schema.Union([

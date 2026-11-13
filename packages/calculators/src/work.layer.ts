@@ -26,8 +26,8 @@ import {
 
 export const CalculatorConcurrencyLimit = 8;
 export const CalculatorOperationBudget = Duration.seconds(5);
-// The shared service budget covers completion and scoped cleanup. Every caller
-// suspends the catalogue invocation so eager metadata construction is counted.
+// The calculation budget covers completion and scoped cleanup. The caller
+// suspends the catalogue invocation so eager construction is counted.
 const withinOperationBudget = Effect.fnUntraced(function* <A, E, R>(
   operation: Effect.Effect<A, E, R>
 ) {
@@ -84,52 +84,16 @@ const makePublicCalculatorService = Effect.fnUntraced(function* (
         Effect.tap(usage.record)
       )
     ),
-    getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
-      (request) =>
-        Effect.suspend(() => catalogue.getCalculator(request)).pipe(
-          withinOperationBudget
-        )
-    ),
-    getCalculatorGraph: Effect.fn("PublicCalculatorService.getCalculatorGraph")(
-      (request) =>
-        Effect.suspend(() => catalogue.getCalculatorGraph(request)).pipe(
-          withinOperationBudget
-        )
-    ),
-    getCalculatorSchema: Effect.fn(
-      "PublicCalculatorService.getCalculatorSchema"
-    )((request) =>
-      Effect.suspend(() => catalogue.getCalculatorSchema(request)).pipe(
-        withinOperationBudget
-      )
-    ),
-    listCalculators: Effect.fn("PublicCalculatorService.listCalculators")(
-      (query) =>
-        Effect.suspend(() => catalogue.listCalculators(query)).pipe(
-          withinOperationBudget
-        )
-    ),
-    listFacts: Effect.fn("PublicCalculatorService.listFacts")((query) =>
-      Effect.suspend(() => catalogue.listFacts(query)).pipe(
-        withinOperationBudget
-      )
-    ),
-    listJurisdictions: Effect.fn("PublicCalculatorService.listJurisdictions")(
-      () =>
-        Effect.suspend(() => catalogue.listJurisdictions()).pipe(
-          withinOperationBudget
-        )
-    ),
-    listRules: Effect.fn("PublicCalculatorService.listRules")((query) =>
-      Effect.suspend(() => catalogue.listRules(query)).pipe(
-        withinOperationBudget
-      )
-    ),
-    listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")((query) =>
-      Effect.suspend(() => catalogue.listTaxYears(query)).pipe(
-        withinOperationBudget
-      )
-    ),
+    // Metadata reads are synchronous catalogue projections. They reuse the
+    // catalogue's own traced operations, outside the calculation budget.
+    getCalculator: catalogue.getCalculator,
+    getCalculatorGraph: catalogue.getCalculatorGraph,
+    getCalculatorSchema: catalogue.getCalculatorSchema,
+    listCalculators: catalogue.listCalculators,
+    listFacts: catalogue.listFacts,
+    listJurisdictions: catalogue.listJurisdictions,
+    listRules: catalogue.listRules,
+    listTaxYears: catalogue.listTaxYears,
   });
 });
 // The public service with the shared work budget and no rate admission, over
