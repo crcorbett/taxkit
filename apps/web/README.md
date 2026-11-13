@@ -116,9 +116,12 @@ route restores them and seeds `publicSettingsAtom`, which the browser client
 reads. No binding or Effect Context reaches the browser. Vite sets
 `envPrefix: []`; there is no build-time API address.
 
-`wrangler.jsonc` owns the standalone local fixture. Wrangler generates
-`src/worker-runtime.generated.d.ts` and TanStack generates
-`src/routeTree.gen.ts`; regenerate them rather than editing them.
+Worker runtime types come from `@cloudflare/workers-types` and the API
+binding's type from Alchemy's `InferEnv`; there is no Wrangler configuration.
+A standalone `vite build` takes its compatibility date and flags from
+`@taxkit/infrastructure/worker-settings` and has no bindings. The build
+generates the ignored `src/routeTree.gen.ts`, and Turbo runs the Website build
+before its type check.
 
 ## Calculator pages
 
@@ -282,8 +285,6 @@ analytics is described in the [API app](../api/README.md#analytics-candidate).
 ## Checks
 
 ```sh
-bun run --filter=web generate:worker-types
-bun run --filter=web check:worker-types
 bun run --filter=web check-types
 bun run --filter=web test
 bun run --filter=web test:browser
@@ -334,8 +335,9 @@ and `.alchemy/native-apps-auth` without a cloud login. Ctrl-C stops the pair.
 App source changes reload; shared-package changes need that package's build,
 because the API bundler reads compiled exports.
 
-`bun run --filter=web dev` runs the Website alone through portless. It still
-needs a native API binding, which the standalone Bun API cannot supply.
+`bun run --filter=web dev` runs the Website alone through portless. It has no
+Worker bindings, so its settings check fails until `bun run dev` supplies the
+native pair.
 
 The Vite config reads Alchemy's native plugin flag through a fresh
 ConfigProvider so it does not add a second Cloudflare plugin. Server code
