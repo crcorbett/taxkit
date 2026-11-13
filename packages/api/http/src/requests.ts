@@ -87,20 +87,46 @@ export const boundedReplies = (
     )
   );
 // The generated client's own failure families have one safe meaning each.
-// The bounded transport marks an over-limit reply with its named decode cause.
+// A request that never got an answer means the service is unavailable, as
+// does a 5xx reply without a readable declared body (such as an edge outage
+// page or a defect). Any other reply that cannot be read as the declared
+// Schema does not match the contract: a server fault, not an outage. The
+// bounded transport marks an over-limit reply with its named decode cause.
+const unreadableReply = ({
+  cause,
+  response,
+}:
+  | HttpClientError.DecodeError
+  | HttpClientError.StatusCodeError
+  | HttpClientError.EmptyBodyError): ApiCallFailure =>
+  Match.value({
+    oversize: Schema.is(ApiReplyTooLarge)(cause),
+    status: response.status,
+  }).pipe(
+    Match.when({ oversize: true }, () => new ApiReplyTooLarge()),
+    Match.when(
+      { status: (status) => status >= 500 },
+      () => new ApiUnavailable()
+    ),
+    Match.orElse(() => new ApiReplyMismatch())
+  );
 const transportFailures = {
   HttpClientError: ({ reason }: HttpClientError.HttpClientError) =>
     Effect.fail(
-      EffectBoolean.match(
-        Predicate.isTagged(reason, "DecodeError") &&
-          Schema.is(ApiReplyTooLarge)(reason.cause),
-        {
-          onFalse: (): ApiCallFailure => new ApiUnavailable(),
-          onTrue: (): ApiCallFailure => new ApiReplyTooLarge(),
-        }
+      Match.value(reason).pipe(
+        Match.tagsExhaustive({
+          DecodeError: unreadableReply,
+          EmptyBodyError: unreadableReply,
+          EncodeError: (): ApiCallFailure => new ApiUnavailable(),
+          InvalidUrlError: (): ApiCallFailure => new ApiUnavailable(),
+          StatusCodeError: unreadableReply,
+          TransportError: (): ApiCallFailure => new ApiUnavailable(),
+        })
       )
     ),
-  SchemaError: () => Effect.fail(new ApiUnavailable()),
+  // Every request input is already a value of the endpoint's own Schema, so
+  // encoding cannot fail; a SchemaError is a reply body that does not match.
+  SchemaError: () => Effect.fail(new ApiReplyMismatch()),
 };
 // Every complete read, including decoding, shares the same deadline failure.
 const withinReadDeadline = Effect.timeoutOrElse({

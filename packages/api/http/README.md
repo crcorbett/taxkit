@@ -125,7 +125,10 @@ query contract; calculations accept only the correlated request body.
   callers, `requestDocsPage`, `requestDocsSearch`, `requestDocsMarkdown`,
   `requestCatalogue` and `requestCalculation`. Each has one ten-second deadline
   over headers, body and decoding; `boundedReplies` caps each reply at 2 MiB.
-  A reply must answer its request (`ApiReplyMismatch` otherwise).
+  A reply must answer its request and decode as its declared Schema
+  (`ApiReplyMismatch` otherwise, a server fault with 500 semantics). Only an
+  unanswered request or a 5xx reply without its declared body is
+  `ApiUnavailable` (503 semantics).
   `requestDocsSearch` returns matching pages only and skips HTTP for empty words.
   Callers compose navigation from an existing page read; the Website's search
   loader reuses the canonical page's navigation and theme rather than reading

@@ -33,7 +33,9 @@ export class CalculatorRequestBodyRejected extends Schema.TaggedError<
   reason: Schema.Literals(["size", "deadline"]),
 }) {}
 
-// A generated-client call's own transport outcomes. Declared API failures keep
+// A generated-client call's own transport outcomes. `ApiUnavailable` means
+// the request got no usable answer: a transport failure or a 5xx reply
+// without its declared body. Declared API failures keep
 // their owning error types; these cover the rest, with safe fixed messages.
 export class ApiUnavailable extends Schema.TaggedError<
   ApiUnavailable,
@@ -62,7 +64,9 @@ export class ApiReplyTooLarge extends Schema.TaggedError<
   ),
 }) {}
 
-// A reply that does not answer the request it was sent for.
+// A reply that does not answer the request it was sent for, or that cannot be
+// read as the endpoint's declared Schema. The service answered, so this is a
+// server fault (500 semantics), not an outage.
 export class ApiReplyMismatch extends Schema.TaggedError<
   ApiReplyMismatch,
   { readonly brand: unique symbol }

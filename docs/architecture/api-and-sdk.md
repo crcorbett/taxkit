@@ -387,6 +387,9 @@ The Website calls the API only through the generated client for `TaxKitApi`:
   directly.
 
 Both read replies with a 2 MiB cap and give each call one ten-second deadline.
+A reply that does not decode as its declared Schema, or answers a different
+request, is `ApiReplyMismatch` (a server fault); only an unanswered request or a
+5xx reply without its declared body is `ApiUnavailable`.
 The Website has no server functions or API proxy. The
 [frontend owner](frontend.md) describes its loaders and failure handling.
 
