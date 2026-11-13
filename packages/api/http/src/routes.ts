@@ -1,4 +1,5 @@
 import { CalculatorId } from "@taxkit/calculators/schemas";
+import type { DocsPublicPagePath } from "@taxkit/content/schemas";
 import { Schema } from "effect";
 
 // Transport addresses have one owner. Authored page identities stay in Content;
@@ -51,7 +52,7 @@ export const DocsDiscoveryApiPath = Schema.TemplateLiteral([
 // One share image per published page, drawn when the API is built. The Website serves
 // the same image at /og<page>.png by forwarding here.
 export const docsImagePrefix = "/api/v2/docs/og";
-export const docsImageApiPath = (pagePath: string) =>
+export const docsImageApiPath = (pagePath: DocsPublicPagePath) =>
   `${docsImagePrefix}${pagePath}.png` as const;
 export const DocsImageApiPath = Schema.TemplateLiteral([
   docsImagePrefix,

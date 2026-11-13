@@ -116,8 +116,11 @@ five-second read deadline. The native stream stops at the limit and its reader
 is closed on rejection, timeout or cancellation. Oversized requests return an
 checked JSON 413 guidance; stalled bodies return checked JSON 408 guidance. CORS applies to those responses.
 
-The app's native logger and error reporter emit only a fixed event name, time
-and severity. Arbitrary messages, Causes, annotations and span labels are
+The app's native logger and error reporter emit only the request record, a
+checked `HostEventRecord` (closed event, error tag and short reason) or a fixed
+event name, time and severity. The reporter writes the failure's tag, or
+`Defect`. A dropped calculator analytics event is one `api.analytics.dropped`
+warning. Arbitrary messages, Causes, other annotations and span labels are
 discarded before console output. This is bounded containment; it provides no
 native tracing or trace exporter.
 

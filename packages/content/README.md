@@ -51,9 +51,14 @@ projection failure stays in the safe `DocsSourceError` channel.
 
 ## Publication
 
-`./publication` owns each published page's Website addresses (`docsMarkdownPath`
-and `docsImagePath`), the share-image input `docsOgImage` and its head metadata
-`docsPageMetadata`: canonical, Markdown and image addresses, the image text and
+`./publication` owns each published page's Website addresses: the builders
+`docsMarkdownPath` and `docsImagePath`, the address families
+`DocsMarkdownFamilyPath` and `DocsImageFamilyPath` and the parsers
+`DocsMarkdownPath` and `DocsImagePath`, which accept only a published page path
+and return it. It also owns the share-image input `docsOgImage` and the head
+metadata `docsPageMetadata`: canonical, Markdown, edit and image addresses (the
+edit address uses `repositoryUrl` from `content/docs/repository.json`, read once
+through `repository.ingress.ts`), the image text and
 escaped TechArticle JSON-LD, all on the publication origin. Content declares the
 share-image contracts `DocsPageRenderer` and `DocsOgImages` with
 `DocsPngBytes` and the build's `DocsImageArchive`;

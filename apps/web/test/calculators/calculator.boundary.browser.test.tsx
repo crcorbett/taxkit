@@ -66,6 +66,12 @@ const unreachable = (request: HttpClientRequest.HttpClientRequest) =>
       reason: new HttpClientError.TransportError({ request }),
     })
   );
+// Calculations check the root settings before they use the client.
+const checkedSettings = Schema.decodeUnknownEffect(WebsitePublicSettings)({
+  apiOrigin: "http://127.0.0.1:49999",
+  publicationOrigin: "http://127.0.0.1:49998",
+  websiteOrigin: "http://127.0.0.1:49998",
+});
 describe("browser calculator lifetime", () => {
   it.live(
     "retains checked settings while the form is idle, then attempts its request",
@@ -166,10 +172,14 @@ describe("browser calculator lifetime", () => {
           )
         )
       );
+      const settings = yield* checkedSettings;
       const registry = yield* Effect.acquireRelease(
         Effect.sync(() =>
           AtomRegistry.make({
-            initialValues: [[apiClientRuntime.layer, client]],
+            initialValues: [
+              [publicSettingsAtom, Option.some(settings)],
+              [apiClientRuntime.layer, client],
+            ],
           })
         ),
         (value) =>
@@ -237,10 +247,14 @@ describe("browser calculator lifetime", () => {
             )
           )
         );
+        const settings = yield* checkedSettings;
         const registry = yield* Effect.acquireRelease(
           Effect.sync(() =>
             AtomRegistry.make({
-              initialValues: [[apiClientRuntime.layer, client]],
+              initialValues: [
+                [publicSettingsAtom, Option.some(settings)],
+                [apiClientRuntime.layer, client],
+              ],
             })
           ),
           (value) =>
@@ -341,10 +355,14 @@ describe("browser calculator lifetime", () => {
           )
         )
       );
+      const settings = yield* checkedSettings;
       const registry = yield* Effect.acquireRelease(
         Effect.sync(() =>
           AtomRegistry.make({
-            initialValues: [[apiClientRuntime.layer, client]],
+            initialValues: [
+              [publicSettingsAtom, Option.some(settings)],
+              [apiClientRuntime.layer, client],
+            ],
           })
         ),
         (value) =>
@@ -442,10 +460,14 @@ describe("browser calculator lifetime", () => {
             )
           )
         );
+        const settings = yield* checkedSettings;
         const registry = yield* Effect.acquireRelease(
           Effect.sync(() =>
             AtomRegistry.make({
-              initialValues: [[apiClientRuntime.layer, client]],
+              initialValues: [
+                [publicSettingsAtom, Option.some(settings)],
+                [apiClientRuntime.layer, client],
+              ],
             })
           ),
           (value) =>

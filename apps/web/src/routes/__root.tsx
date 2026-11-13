@@ -33,6 +33,7 @@ import { publicSettingsAtom } from "#/lib/api-client.atoms";
 import { browserAtoms } from "#/lib/browser-atoms";
 import { docsHeadingId } from "#/lib/docs/focus.atoms";
 import { DocsNavigationFocus } from "#/lib/docs/focus.container";
+import { docsStartSplat } from "#/lib/docs/schemas";
 import { WebsiteRootView } from "#/lib/host/schemas";
 import type { WebsitePublicSettings } from "#/lib/host/schemas";
 import type { LoaderContext } from "#/lib/pages/loader-context";
@@ -224,7 +225,7 @@ function RootComponent() {
             <Link activeProps={{ "aria-current": "page" }} to="/agents">
               For agents: API access
             </Link>
-            <Link params={{ _splat: "start/quickstart" }} to="/$">
+            <Link params={{ _splat: docsStartSplat }} to="/$">
               Documentation
             </Link>
           </nav>

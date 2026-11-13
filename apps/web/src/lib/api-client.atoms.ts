@@ -1,16 +1,12 @@
 import { TaxKitApi } from "@taxkit/api-http/api";
 import { boundedReplies } from "@taxkit/api-http/requests";
 import { Context, Effect, Layer, Option } from "effect";
-import {
-  FetchHttpClient,
-  HttpClient,
-  HttpClientError,
-  HttpClientRequest,
-} from "effect/http";
+import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
 import * as Atom from "effect/reactivity/Atom";
 import * as AtomHttpApi from "effect/reactivity/AtomHttpApi";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
+import { TaxKitWebConfigError } from "./host/errors";
 import type { WebsitePublicSettings } from "./host/schemas";
 
 // Root settings seeded once from the server render. They stay alive for the
@@ -18,6 +14,20 @@ import type { WebsitePublicSettings } from "./host/schemas";
 export const publicSettingsAtom = Atom.make(
   Option.none<WebsitePublicSettings>()
 ).pipe(Atom.keepAlive);
+
+// Missing browser settings have their own named failure. Every browser read
+// checks them before it acquires the API client, so the failure is never
+// disguised as an unreachable API.
+export const browserSettingsUnavailable = new TaxKitWebConfigError({
+  message: "TaxKit web settings are missing or invalid.",
+  operation: "settings",
+  runtime: "client",
+});
+export const browserSettings = AtomRegistry.AtomRegistry.pipe(
+  Effect.map((registry) => registry.get(publicSettingsAtom)),
+  Effect.flatMap(Effect.fromOption),
+  Effect.mapError(() => browserSettingsUnavailable)
+);
 
 // The one application runtime factory. Native service runtimes share it and
 // the router/React registry.
@@ -49,17 +59,12 @@ export class ApiClient extends AtomHttpApi.Service<ApiClient>()(
         HttpClient.HttpClient.pipe(
           Effect.map((client) =>
             Option.match(get(publicSettingsAtom), {
+              // Callers check settings before acquiring this client, so a
+              // request without them is a broken invariant, not an outage.
               onNone: () =>
                 client.pipe(
-                  HttpClient.mapRequestEffect((request) =>
-                    Effect.fail(
-                      new HttpClientError.HttpClientError({
-                        reason: new HttpClientError.InvalidUrlError({
-                          description: "TaxKit API settings are unavailable",
-                          request,
-                        }),
-                      })
-                    )
+                  HttpClient.mapRequestEffect(() =>
+                    Effect.die(browserSettingsUnavailable)
                   )
                 ),
               onSome: (settings) =>
@@ -88,9 +93,15 @@ export class ApiClient extends AtomHttpApi.Service<ApiClient>()(
 // it with component queries that use `ApiClient.runtime`.
 export const apiClientRuntime = ApiClient.runtime.pipe(Atom.keepAlive);
 
-export const browserApiClient = Atom.getResult(apiClientRuntime, {
-  suspendOnWaiting: true,
-}).pipe(Effect.map(Context.get(ApiClient)));
+// Loader reads: checked settings first, then the shared generated client.
+export const browserApiClient = browserSettings.pipe(
+  Effect.andThen(
+    Atom.getResult(apiClientRuntime, {
+      suspendOnWaiting: true,
+    })
+  ),
+  Effect.map(Context.get(ApiClient))
+);
 
 // TanStack creates its router before loaders or React run. This one registry
 // is shared by browser loaders and React's RegistryContext.

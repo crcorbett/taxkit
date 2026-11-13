@@ -1,15 +1,26 @@
-import { assert, describe, it } from "@effect/vitest";
+import { assert, describe, expect, it } from "@effect/vitest";
 import { ReadingBody } from "@taxkit/mdx/schemas";
 import {
   Function as EffectFunction,
   Array,
   Effect,
+  Option,
   Result,
   Schema,
 } from "effect";
 
 import { exampleContentCatalogue } from "../src/__testing__/fixtures.js";
 import {
+  DocsImageFamilyPath,
+  DocsImagePath,
+  DocsMarkdownFamilyPath,
+  DocsMarkdownPath,
+  docsImagePath,
+  docsMarkdownPath,
+  docsPageMetadata,
+} from "../src/publication.egress.js";
+import {
+  DocsPublicationOrigin,
   DocsPublicCatalogue,
   DocsPublicPage,
   DocsReadingBody,
@@ -245,3 +256,51 @@ describe("public catalogue ingress", () => {
       })
   );
 });
+
+it.effect("builds and parses each published page address", () =>
+  Effect.gen(function* () {
+    const catalogue = yield* exampleContentCatalogue;
+    const page = yield* Array.head(catalogue.pages).pipe(Effect.fromOption);
+    const markdownAddress = docsMarkdownPath(page.path);
+    const imageAddress = docsImagePath(page.path);
+    const markdown = Schema.decodeOption(DocsMarkdownPath)(markdownAddress);
+    const image = Schema.decodeOption(DocsImagePath)(imageAddress);
+    expect({ image, markdown }).toStrictEqual({
+      image: Option.some(["/og", page.path, ".png"]),
+      markdown: Option.some([page.path, ".md"]),
+    });
+    // A family claims the address shape; only its parser checks the page.
+    expect({
+      image: Schema.is(DocsImageFamilyPath)("/og/Not A Page.png"),
+      imagePage: Option.isSome(
+        Schema.decodeUnknownOption(DocsImagePath)("/og/Not A Page.png")
+      ),
+      markdown: Schema.is(DocsMarkdownFamilyPath)("/Not A Page.md"),
+      markdownPage: Option.isSome(
+        Schema.decodeUnknownOption(DocsMarkdownPath)("/Not A Page.md")
+      ),
+    }).toStrictEqual({
+      image: true,
+      imagePage: false,
+      markdown: true,
+      markdownPage: false,
+    });
+  })
+);
+it.effect("links each page to its authored source and Markdown file", () =>
+  Effect.gen(function* () {
+    const catalogue = yield* exampleContentCatalogue;
+    const page = yield* Array.head(catalogue.pages).pipe(Effect.fromOption);
+    const origin = yield* Schema.decodeUnknownEffect(DocsPublicationOrigin)(
+      "https://taxkit.example"
+    );
+    const metadata = yield* docsPageMetadata({ origin, page });
+    expect({
+      edit: metadata.edit,
+      markdown: metadata.markdown,
+    }).toStrictEqual({
+      edit: `https://github.com/crcorbett/taxkit/edit/main/content/docs/${page.source}`,
+      markdown: `https://taxkit.example${page.path}.md`,
+    });
+  })
+);

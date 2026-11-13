@@ -89,6 +89,8 @@ const decodingBoundaryFiles = [
   "packages/mdx/test/pipeline.test.ts",
   "packages/content/src/mdx.layer.ts",
   "packages/content/src/link-resolver.layer.ts",
+  // The authored repository profile JSON, read by link policy and edit links.
+  "packages/content/src/repository.ingress.ts",
   // Exact public catalogue wire and adversarial ingress fixtures only.
   "packages/content/src/__testing__/fixtures.ts",
   "packages/content/test/schemas.test.ts",

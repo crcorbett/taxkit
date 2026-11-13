@@ -354,9 +354,10 @@ and stalled requests return checked JSON 413/408 guidance with the same CORS pol
 Native request conversion retains headers, method, path and remote address.
 
 The root installs a closed logger and error reporter before router construction
-and incoming dispatch. Console egress contains a fixed event, time and severity;
-raw native messages, Causes and arbitrary annotations do not escape this
-adapter. The retained Bun entry and public HTTP/OpenAPI contract remain
+and incoming dispatch. Console egress contains the request record, a checked
+`HostEventRecord` (closed event, error tag and short reason, from the message or
+the log annotations) or else a fixed event, time and severity; raw native
+messages, Causes and other annotations do not escape this adapter. The retained Bun entry and public HTTP/OpenAPI contract remain
 available.
 
 ## Website client
