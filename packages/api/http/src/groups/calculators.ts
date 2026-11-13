@@ -5,12 +5,14 @@ import {
   CalculatorOperationTimedOut,
   CalculatorMetadataError,
   CalculatorRequestError,
+  CalculatorServiceError,
+} from "@taxkit/calculators/errors";
+import {
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorGraphResponse,
   CalculatorId,
   CalculatorSchemaResponse,
-  CalculatorServiceError,
   DescriptorFilterQuery,
   FactsResponse,
   HelpQuery,
@@ -30,11 +32,11 @@ import {
   OpenApi,
 } from "effect/http-api";
 
-import { calculatorPaths } from "../routes.js";
 import {
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
-} from "../schemas.js";
+} from "../errors.js";
+import { calculatorPaths } from "../routes.js";
 
 // The declaration imports only Schemas, so browser clients built from it never
 // include calculator implementations.
@@ -46,10 +48,7 @@ export {
   CalculatorRunReport,
   CalculatorRunRequest,
   CalculatorRunResponse,
-  CalculatorServiceError,
   HelpMode,
-  UnsupportedCalculatorContextError,
-  UnsupportedCalculatorError,
 } from "@taxkit/calculators/schemas";
 
 const CalculatorApiRequestErrorEnvelope = Schema.Struct({

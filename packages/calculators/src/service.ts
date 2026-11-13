@@ -2,14 +2,17 @@ import type { CalculationError } from "@taxkit/core/errors";
 import { Context, Effect } from "effect";
 
 import type {
+  CalculatorServiceError,
+  CalculatorMetadataError,
+  UnsupportedCalculatorContextError,
+} from "./errors.js";
+import type {
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
   CalculatorGraphResponse,
   CalculatorSchemaResponse,
   CalculatorRunResponse,
   CalculatorRunRequest,
-  CalculatorServiceError,
-  CalculatorMetadataError,
   DescriptorFilterQuery,
   FactsResponse,
   GetCalculatorGraphRequest,
@@ -18,7 +21,6 @@ import type {
   MetadataQuery,
   RulesResponse,
   TaxYearsResponse,
-  UnsupportedCalculatorContextError,
 } from "./schemas.js";
 
 /**

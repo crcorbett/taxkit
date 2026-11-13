@@ -3,7 +3,7 @@ import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import {
   CalculatorAdmissionUnavailable,
   CalculatorRateLimited,
-} from "@taxkit/calculators/schemas";
+} from "@taxkit/calculators/errors";
 import { CurrentRuntimeContext, RuntimeContext } from "alchemy/RuntimeContext";
 import {
   Predicate,

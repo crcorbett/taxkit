@@ -16,8 +16,8 @@ import {
   CalculatorAdmissionUnavailable,
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
-} from "./schemas.js";
-import type { CalculatorRateLimited } from "./schemas.js";
+} from "./errors.js";
+import type { CalculatorRateLimited } from "./errors.js";
 import {
   CalculatorCatalogue,
   CalculatorUsage,

@@ -26,13 +26,12 @@ import {
 } from "effect";
 import { TestClock } from "effect/testing";
 
-import { CalculatorCatalogueLive } from "../src/live.layer.js";
 import {
   CalculatorCapacityExceeded,
   CalculatorOperationTimedOut,
-  CalculatorRunRequest,
-  MetadataQuery,
-} from "../src/schemas.js";
+} from "../src/errors.js";
+import { CalculatorCatalogueLive } from "../src/live.layer.js";
+import { CalculatorRunRequest, MetadataQuery } from "../src/schemas.js";
 import {
   CalculatorCatalogue,
   PublicCalculatorService,

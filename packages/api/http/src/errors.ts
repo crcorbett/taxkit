@@ -1,10 +1,37 @@
-import { CalculatorServiceError } from "@taxkit/calculators/schemas";
+import { CalculatorServiceError } from "@taxkit/calculators/errors";
 import { Schema } from "effect";
 
-import {
-  CalculatorRequestBodyTimedOut,
+// Request bodies the API refuses before calculator decoding.
+export class CalculatorRequestBodyTooLarge extends Schema.TaggedError<
   CalculatorRequestBodyTooLarge,
-} from "./request-boundary.js";
+  { readonly brand: unique symbol }
+>()("CalculatorRequestBodyTooLarge", {
+  code: Schema.tag("request-too-large"),
+  message: Schema.tag(
+    "This request is too large. Reduce it to 64 KiB or less and try again."
+  ),
+  retry: Schema.tag("reduce-request"),
+}) {}
+
+export class CalculatorRequestBodyTimedOut extends Schema.TaggedError<
+  CalculatorRequestBodyTimedOut,
+  { readonly brand: unique symbol }
+>()("CalculatorRequestBodyTimedOut", {
+  code: Schema.tag("request-timeout"),
+  message: Schema.tag(
+    "This request could not be read within five seconds. Try again when you are ready."
+  ),
+  retry: Schema.tag("try-again-manually"),
+}) {}
+
+// The body reader's private rejection reason, translated to one of the
+// errors above at the request boundary.
+export class CalculatorRequestBodyRejected extends Schema.TaggedError<
+  CalculatorRequestBodyRejected,
+  { readonly brand: unique symbol }
+>()("CalculatorRequestBodyRejected", {
+  reason: Schema.Literals(["size", "deadline"]),
+}) {}
 
 // A generated-client call's own transport outcomes. Declared API failures keep
 // their owning error types; these cover the rest, with safe fixed messages.

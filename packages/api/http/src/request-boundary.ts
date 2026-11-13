@@ -18,19 +18,14 @@ import {
 
 import {
   CalculatorRequestBodyRejected,
-  CalculatorRequestBodyErrorEnvelope,
-  CalculatorRequestBodyPolicy,
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
+} from "./errors.js";
+import {
+  CalculatorRequestBodyErrorEnvelope,
+  CalculatorRequestBodyPolicy,
 } from "./schemas.js";
 
-export {
-  CalculatorRequestBodyRejected,
-  CalculatorRequestBodyErrorEnvelope,
-  CalculatorRequestBodyPolicy,
-  CalculatorRequestBodyTimedOut,
-  CalculatorRequestBodyTooLarge,
-} from "./schemas.js";
 export const CalculatorRequestBodyLimit = ByteSize.kibibytes(64);
 export const CalculatorRequestBodyDeadline = Duration.seconds(5);
 // Native web-request readers do not use MaxBodySize in this selected version.

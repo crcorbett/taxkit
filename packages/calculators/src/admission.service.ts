@@ -5,7 +5,7 @@ import type { CalculatorClientRateKey } from "./admission.schemas.js";
 import type {
   CalculatorAdmissionUnavailable,
   CalculatorRateLimited,
-} from "./schemas.js";
+} from "./errors.js";
 
 export const CalculatorRequestRateKey = Context.Reference<
   Option.Option<CalculatorClientRateKey>

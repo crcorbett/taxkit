@@ -10,9 +10,9 @@ import { Effect, Layer, Option, Schema, Stream } from "effect";
 import { HttpApiClient } from "effect/http-api";
 
 import { clientToolHandlers } from "../src/client-handlers.js";
+import { McpToolUnavailable } from "../src/errors.js";
 import { TaxKitMcpHandlersLive } from "../src/handlers.layer.js";
 import { McpRequestAbortSignal } from "../src/request.service.js";
-import { McpToolUnavailable } from "../src/schemas.js";
 import { TaxKitMcpToolkit } from "../src/tools.js";
 
 const ContentLive = ContentServiceLive.pipe(

@@ -7,7 +7,7 @@ import type { TaxKitClient } from "@taxkit/api-http/requests";
 import { isRequestedDocsPage } from "@taxkit/content/response-check";
 import { Effect, Match } from "effect";
 
-import { McpToolUnavailable } from "./schemas.js";
+import { McpToolUnavailable } from "./errors.js";
 import { TaxKitMcpToolkit } from "./tools.js";
 
 const unavailable = () =>

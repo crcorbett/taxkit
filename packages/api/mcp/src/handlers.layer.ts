@@ -5,7 +5,7 @@ import type { Layer } from "effect";
 import type { Tool, Toolkit } from "effect/ai";
 
 import { withMcpRequestCancellation } from "./cancellation.boundary.js";
-import { McpToolUnavailable } from "./schemas.js";
+import { McpToolUnavailable } from "./errors.js";
 import { TaxKitMcpToolkit } from "./tools.js";
 
 export const TaxKitMcpHandlersLive: Layer.Layer<

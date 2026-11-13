@@ -130,9 +130,16 @@ query contract; calculations accept only the correlated request body.
   Callers compose navigation from an existing page read; the Website's search
   loader reuses the canonical page's navigation and theme rather than reading
   navigation twice.
-- `src/errors.ts` (`./errors`): the client's own transport outcomes
+- `src/errors.ts` (`./errors`): the package's one expected-error path: the
+  request-body refusals (`CalculatorRequestBodyTooLarge`,
+  `CalculatorRequestBodyTimedOut` and the reader's private
+  `CalculatorRequestBodyRejected`), the client's own transport outcomes
   (`ApiUnavailable`, `ApiDeadlineExceeded`, `ApiReplyTooLarge`,
-  `ApiReplyMismatch`) and `CalculationCallFailure`.
+  `ApiReplyMismatch`) and `CalculationCallFailure`. `./schemas` holds the body
+  error envelope and policy Schemas; `./request-boundary` holds only the body
+  limit, deadline and reader. Documentation errors are imported from
+  `@taxkit/content/errors` and calculator errors from
+  `@taxkit/calculators/errors`; this package does not re-export them.
 - `src/negotiation.ingress.ts` (`./negotiation`): `DocsAccept`, which reads one
   `Accept` header as HTML, Markdown, unacceptable or invalid.
 - `src/openapi.ts`: package-owned OpenAPI generation, structured

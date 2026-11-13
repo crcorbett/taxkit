@@ -1,9 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
 import {
-  CalculatorRequestBodyErrorEnvelope,
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
-} from "@taxkit/api-http/request-boundary";
+} from "@taxkit/api-http/errors";
+import { CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/schemas";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";

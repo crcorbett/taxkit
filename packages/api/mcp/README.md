@@ -16,7 +16,9 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 - `src/handlers.layer.ts` (internal): the static `TaxKitMcpHandlersLive` Layer
   over the calculator and content services that `./server` composes.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path.
-- `./schemas`: tool request/reply Schemas, safe failures and complete-reply
+- `./errors`: the safe tool failure `McpToolUnavailable` and the private
+  `McpResponseTooLarge` reply-budget signal.
+- `./schemas`: tool request/reply Schemas and complete-reply
   budget constants.
 - `./request`: the private `McpRequestAbortSignal` Context reference.
 - `src/cancellation.boundary.ts` (internal): `withMcpRequestCancellation`, which refuses a missing

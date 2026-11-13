@@ -22,11 +22,9 @@ import {
   Schema,
 } from "effect";
 
+import { CalculatorServiceError } from "../src/errors.js";
 import { PublicCalculatorServiceLive } from "../src/live.layer.js";
-import {
-  CalculatorRunRequest,
-  CalculatorServiceError,
-} from "../src/schemas.js";
+import { CalculatorRunRequest } from "../src/schemas.js";
 import { PublicCalculatorService } from "../src/service.js";
 
 const ServiceLive = PublicCalculatorServiceLive;

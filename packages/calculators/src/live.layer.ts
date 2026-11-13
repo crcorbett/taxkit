@@ -8,6 +8,7 @@ import { Function as EffectFunction, Array, Effect, Layer } from "effect";
 import { pipe } from "effect/Function";
 
 import { getCalculatorCatalogEntry } from "./catalog.js";
+import { UnsupportedCalculatorContextError } from "./errors.js";
 import {
   JurisdictionsResponseValue,
   TaxYearsResponseValue,
@@ -22,7 +23,6 @@ import {
   CalculatorCatalogResponseData,
   DescriptorFilterQuery,
   CalculatorRunRequest,
-  UnsupportedCalculatorContextError,
 } from "./schemas.js";
 import type { CalculatorId } from "./schemas.js";
 import { CalculatorCatalogue } from "./service.js";

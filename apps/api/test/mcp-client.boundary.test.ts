@@ -3,18 +3,16 @@ import {
   Client,
   StreamableHTTPClientTransport,
 } from "@modelcontextprotocol/client";
+import { McpToolUnavailable } from "@taxkit/api-mcp/errors";
 import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
-import {
-  McpDocsSearchResponse,
-  McpToolUnavailable,
-} from "@taxkit/api-mcp/schemas";
+import { McpDocsSearchResponse } from "@taxkit/api-mcp/schemas";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
+import { CalculatorRateLimited } from "@taxkit/calculators/errors";
 import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import {
   CalculatorCatalogResponse,
   CalculatorSchemaResponse,
   GetCalculatorRequest,
-  CalculatorRateLimited,
   CalculatorRunResponse,
   CalculatorRunRequest,
 } from "@taxkit/calculators/schemas";

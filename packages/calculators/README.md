@@ -31,6 +31,15 @@ its identity, input/output schemas, fact descriptors or rule graph. Metadata
 contains publication information, without a second rule-pack execution Layer.
 The definition validates its static graph and owns native execution.
 
+## Errors
+
+`./errors` is the one import path for the package's expected failures:
+unsupported calculator/context lookups, calculation capacity, timeout, rate and
+admission errors, the `CalculatorRequestError`, `CalculatorMetadataError` and
+`CalculatorServiceError` unions, and the browser form's `CalculatorFormField`
+and `CalculatorInputError`. Neither `./schemas`, `./form` nor the root export
+repeats them.
+
 ## Browser calculator pages
 
 - `./form` owns visible form Schemas, worked examples and `requestFromForm`.

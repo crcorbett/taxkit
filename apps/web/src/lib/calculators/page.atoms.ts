@@ -1,13 +1,11 @@
 import type { CalculationCallFailure } from "@taxkit/api-http/errors";
 import { requestCalculation } from "@taxkit/api-http/requests";
+import type { CalculatorInputError } from "@taxkit/calculators/errors";
 import {
   initialCalculatorForm,
   requestFromForm,
 } from "@taxkit/calculators/form";
-import type {
-  CalculatorForm,
-  CalculatorInputError,
-} from "@taxkit/calculators/form";
+import type { CalculatorForm } from "@taxkit/calculators/form";
 import { calculatorViewState } from "@taxkit/calculators/page";
 import type { CalculatorPage } from "@taxkit/calculators/page";
 import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
