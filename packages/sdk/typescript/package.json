@@ -123,7 +123,6 @@
     "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p scripts/tsconfig.json --noEmit && tsc -p tsconfig.type-tests.json --noEmit",
     "test": "vitest run",
-    "test-types": "tsc -p tsconfig.type-tests.json --noEmit",
     "clean": "rm -rf dist .compiled .turbo *.tsbuildinfo",
     "test:browser": "vitest run --config vitest.browser.config.ts"
   },
@@ -137,6 +136,7 @@
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
+    "@taxkit/mdx": "workspace:*",
     "@taxkit/rules-au-income-tax": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/rules-au-stsl": "workspace:*",
