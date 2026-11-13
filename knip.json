@@ -28,7 +28,9 @@
       "entry": [
         "src/router.tsx",
         "src/entry.server.ts",
-        "src/routes/**/*.{ts,tsx}"
+        "src/routes/**/*.{ts,tsx}",
+        "test/fixtures/settings-defect/vite.config.ts",
+        "test/fixtures/settings-defect/settings.layer.ts"
       ],
       "ignoreDependencies": ["cloudflare"]
     },
