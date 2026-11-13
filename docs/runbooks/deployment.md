@@ -85,10 +85,13 @@ the API first, because the API Worker imports the docs catalogue its build
 writes. Preview uses its own API, never the Production API.
 Destroy the stage when its pull request closes.
 
-`pr:destroy` validates the first-argument `pr-<number>` stage and rejects
-`--stage` overrides before doing work. It then builds the API, for the same
-reason, and invokes native Alchemy destroy. No browser is needed. The workflow rechecks that the pull request
-is closed and validates its stage before running it.
+Each `pr:*` script runs `tools/infrastructure/preview-stage.runtime.ts`. It
+decodes the first argument with the `PullRequestStage` Schema and rejects
+`--stage` overrides (exit status 64) before doing work, then builds and runs
+native Alchemy with the remaining flags. `pr:destroy` builds the API, for the
+same reason, then invokes native Alchemy destroy. No browser is needed. The
+workflow rechecks that the pull request is closed and validates its stage with
+the same entry (`check`) before running it.
 
 ## Local development
 
@@ -279,10 +282,10 @@ through a normal pull request, and deploy the clean merge commit using the
 plan, apply and public checks above. Skip the automatic deploy for that release
 commit so it cannot overlap the local apply; do not change CI settings or bypass
 required branch checks. Local SDK-only npm releases follow the
-[local publication procedure](./versioning.md#local-sdk-publication).
+[local publication procedure](./release.md#local-sdk-publication).
 A local SDK-only release runs the package checks locally and does not deploy
 the Website or API. Release evidence does not need its own skipped commit; see
-[Versioning](./versioning.md#release-evidence).
+[Release](./release.md#release-evidence).
 
 The owner must create, as in Common Practice, two GitHub environments, each
 with one environment secret named `DOPPLER_TOKEN`:

@@ -1,8 +1,8 @@
 # Formatting, Linting, And Dependency Hygiene
 
-TaxKit uses Bun workspaces and Ultracite with the Oxlint/Oxfmt provider. The
-tooling is intentionally strict because TaxKit publishes library packages with
-stable boundaries.
+TaxKit uses Bun workspaces, Turbo, Oxlint and Oxfmt (with Ultracite's Oxfmt
+settings). The tooling is intentionally strict because TaxKit publishes
+library packages with stable boundaries.
 
 ## Configured Tools
 
@@ -33,8 +33,14 @@ stable boundaries.
   rather than disabling it.
 - `oxfmt.config.ts` spreads `ultracite/oxfmt` and preserves authored Markdown
   wrapping.
-- TypeScript 7 is the root compiler. `@effect/tsgo` patches it at install and
-  supplies Effect diagnostics; `bun run check:effect` runs them.
+- TypeScript 7 is the root compiler. `@effect/tsgo` patches it at install, so
+  every `tsc` in `check-types` reports Effect diagnostics. Error-severity
+  diagnostics such as `floatingEffect` fail the compiler; warnings and
+  suggestions print without failing (`ignoreEffectWarningsInTscExitCode` and
+  `ignoreEffectSuggestionsInTscExitCode` in `tsconfig.base.json`).
+  `tools/effect-language-service/diagnostics.test.ts` compiles a floating
+  Effect and its yielded equivalent with the real patched compiler and checks
+  the failing and passing exit statuses.
   The SDK assembler separately uses `typescript-ast`, an alias for TypeScript
   6.0.3, for its JavaScript compiler API; TypeScript 7 supplies the native
   compiler rather than that API.
@@ -46,31 +52,103 @@ stable boundaries.
 - `knip.json` checks development reachability and `knip.production.json`
   checks the published package and runtime graph, including the standalone
   API server Layer as an explicit host entry alongside the API Worker.
-  Production entries for packages come from their `package.json` export maps;
-  the production config names entries only where Knip cannot infer them: the
-  Alchemy stacks, the API and Website hosts, the documentation examples and
-  the SDK, whose exports point at its built `dist`.
+  Knip infers package entries from `package.json` export maps, test and
+  config files from its Vitest and Vite plugins, and command files from
+  package scripts. The configs name only what it cannot infer: the Alchemy
+  stacks, the root tool tests, the API and Website hosts and routes,
+  compile-only type tests (`type-tests/**`, `test/**/*.typecheck.ts`), the
+  documentation examples and the SDK's production entries, whose exports point
+  at its built `dist`.
 - The SDK's type and unit-test tasks depend on its own build: its package
   imports resolve through `dist`, so those tasks must wait while a rebuild
   replaces the assembled package.
-- `tools/documentation` owns `bun run check:docs` and
-  `tools/repository-paths` owns `bun run check:repository-paths`.
+- `tools/documentation/check.runtime.ts` (documentation links, anchors and
+  commands) and `tools/repository-paths/check.runtime.ts` (portable paths)
+  run as the last two steps of `bun run lint`.
 - Changesets record package-facing changes; see
-  [Versioning and Changesets](./versioning.md).
+  [release policy](./release-policy.md).
+
+## Version decisions
+
+The catalogue holds every external version that more than one manifest uses,
+the root manifest included: `playwright`, `@modelcontextprotocol/client`,
+`webmcp-types` and `@cloudflare/workers-types` are `catalog:` references.
+Two deliberate differences from the shared repository skill's version
+snapshot stay:
+
+- React and React DOM use 19.3.1, not the snapshot's 19.3.0. 19.3.1 is the
+  installed patch release that the Website, MDX presenter and browser tests
+  run and verify against; moving back to an older patch would only match a
+  snapshot that predates it. `@types/react` and `@types/react-dom` stay at
+  their own 19.3.0 releases.
+- `tsconfig.base.json` sets `verbatimModuleSyntax: true` for every workspace,
+  the Website included, where the snapshot's TanStack app sets it to false.
+  Every TaxKit import already separates `import type`, the Website builds and
+  passes its SSR and native checks with it, and one setting for every
+  workspace keeps type-only imports out of bundles. Revisit it only if a
+  TanStack release needs it off.
+
+The Website gets Worker runtime types (`cloudflare:workers`, `Fetcher` and
+the other platform globals) from `@cloudflare/workers-types`, the package
+Alchemy's own Worker declarations import, and its binding shapes from
+Alchemy's `InferEnv` (for example `TaxKitApiBinding`). Its standalone Vite
+build takes compatibility from `@taxkit/infrastructure/worker-settings`, so no
+Wrangler configuration or generated runtime declaration repeats those
+settings.
 
 ## Root Commands
 
+Every root script is listed here. A qualified name is `<group>:<step>`: the
+group is the root check the step belongs to (`lint`, `check-types`, `test`,
+`format`, `build`) or the target it acts on (`pr`, `production`, `sdk`, `api`,
+`axiom`, `posthog`, `trace`, `changeset`, `release`).
+
 | Command | Use |
 | --- | --- |
-| `bun run verification` | Before merging: the five checks `build`, `lint`, `check-types`, `knip` and `test`. |
-| `bun run lint` / `bun run fix` | Formatting, type-aware Oxlint (`--deny-warnings`) with the boundary-directive pass, docs and path checks. |
-| `bun run lint:doctor` | The plugin's `commonplace-lint-doctor`: version policy, refresh order, local rules that repeat a preset rule and missing option paths. `lint` runs it after the refresh; see below. |
-| `bun run format` | Oxfmt. |
-| `bun run check-types` | Workspace types plus the Alchemy roots, root tools and Effect diagnostics. |
-| `bun run knip` | Both Knip graphs. |
-| `bun run test` | Root tool tests, workspace unit tests, Chromium tests, then the native pair suite. |
-| `bun run test:tools` / `bun run test:native` | Only the root tool tests, or only the slower native Website/API pair tests (`tools/apps-local/test`). |
-| `bun run release:check` | `verification` plus packed SDK, downstream consumer, API smoke, docs validation and Changeset status. |
+| `bun run verification` | Before merging: `build`, then `lint`, then one Turbo run of `check-types`, `check-types:root`, `knip`, `test` and `test:browser`, then one Turbo run of `test:tools` and `test:native` one task at a time. |
+| `bun run build` | Every workspace build through Turbo, including the Website route tree and the API docs catalogue. |
+| `bun run lint` | Uncached: `format:check`, `lint:refresh`, `lint:doctor`, one type-aware Oxlint pass (`--deny-warnings`, unused disable directives are errors), then the documentation and repository-path checks. |
+| `bun run check-types` | Turbo `check-types` in every workspace plus `check-types:root`. Effect diagnostics come from the patched compiler. |
+| `bun run knip` | Both Knip graphs, uncached. Verification runs the same script as the cached root Turbo task `//#knip`. |
+| `bun run test` | Turbo `test` and `test:browser`, then `test:tools` and `test:native` one at a time. |
+| `bun run format` / `bun run fix` | Oxfmt writes formatting; `fix` also applies Oxlint fixes with the repository configuration. |
+| `bun run format:check` | Oxfmt check; the first `lint` step. |
+| `bun run lint:refresh` | Installs the current `@commonplaces/oxlint-plugin` and repeats the Effect patch; see below. |
+| `bun run lint:doctor` | The plugin's `commonplace-lint-doctor`: version policy, refresh order, local rules that repeat a preset rule and missing option paths. |
+| `bun run check-types:root` | The Alchemy roots (`tsconfig.alchemy.json`) and root tools (`tools/tsconfig.json`); cached root Turbo task. |
+| `bun run test:tools` | The root tool tests, including the actual-Oxlint fixtures; cached root Turbo task. |
+| `bun run test:native` | `build:native-pair` then `test:native-pair`, the Website/API pair in Miniflare (`tools/apps-local/test`); cached root Turbo task. |
+| `bun run build:native-pair` / `bun run test:native-pair` | The two halves of `test:native`. |
+| `bun run prepare` | `effect-tsgo patch --oxlint`, run by every install. |
+| `bun run dev` | The native Website/API pair under `alchemy dev`; see the [Website README](../../apps/web/README.md#local-development). |
+| `bun run clean` | Turbo `clean` in every workspace. |
+| `bun run changeset` / `bun run changeset:status` / `bun run version-packages` | Changesets; see the [release runbook](../runbooks/release.md). |
+| `bun run release:check` | `verification` plus `sdk:check-packed-artifact`, `sdk:validate-downstream`, `api:smoke` and `changeset:status`. |
+| `bun run sdk:check-packed-artifact` / `bun run sdk:validate-downstream` | The packed SDK archive and a fresh downstream consumer; see the [packed consumer check](../runbooks/packed-consumer-proof.md). |
+| `bun run api:smoke` | The standalone API's public routes through an external HTTP consumer. |
+| `bun run pr:plan` / `bun run pr:deploy` / `bun run pr:destroy` | Preview stage operations; see the [deployment runbook](../runbooks/deployment.md). |
+| `bun run production:plan` / `bun run production:deploy` / `bun run production:drift` | Production operations; see the [deployment runbook](../runbooks/deployment.md). |
+| `bun run axiom:plan` / `bun run axiom:deploy`, `bun run trace:plan` / `bun run trace:deploy`, `bun run posthog:plan` | The separate Axiom, trace-export and PostHog stacks at `prod`; each needs the maintainer's explicit request to apply. |
+
+The `pr:*` scripts and the Checks cleanup guard share
+`tools/infrastructure/preview-stage.runtime.ts`. It decodes the first argument
+with the owning `PullRequestStage` Schema from `@taxkit/observability/stage`,
+refuses `--stage` among the forwarded flags (exit status 64), builds, then runs
+native Alchemy with the remaining flags.
+
+### Turbo caching
+
+`turbo.json` registers `check-types:root`, `knip`, `test:tools` and
+`test:native` as root (`//#`) tasks. Their inputs are the root files and every
+tracked source under `apps`, `content` and `packages`, without installed or
+built output; `test:tools` also hashes the installed lint plugin manifest,
+because `lint:refresh` can install a newer release than the lockfile.
+`globalDependencies` lists `.bun-version`, `tsconfig.base.json` and
+`raw-modules.d.ts`, which every workspace's compiler reads. Root tool tests
+write temporary manifests and sources, and the native build rewrites app
+sources, so verification runs those two tasks after the other Turbo work with
+`--concurrency=1`. `lint` stays uncached so its refresh always fetches the
+current plugin.
 
 ## Shared rules and repository ownership
 
@@ -157,12 +235,6 @@ Repository rules that remain, and why the shared presets do not cover them:
   rule requires an options object with `try` and `catch`; this rule also
   requires both callbacks inline and rejects extracted, shorthand, `undefined`
   or spread callbacks, so each Promise boundary maps its rejection at the call.
-- `taxkit-effect/no-module-level-mutable-test-state`: rejects module-level `let` and
-  `var` in test files so one test cannot leak changed state into another.
-  Immutable declarations, function-local variables and ambient declarations
-  remain valid.
-- `taxkit-effect/no-switch`: bans `switch`. Use Effect `Match` with
-  exhaustive handling.
 - `taxkit/no-invented-tax-context`: scoped to `packages/calculators/src`.
   Calculator context must not invent jurisdiction or tax-year defaults with
   `??`; missing context must remain absent or fail through an owning
@@ -177,21 +249,35 @@ Repository rules that remain, and why the shared presets do not cover them:
   Sequential calculator transformations must use pipe-first data flow such as
   `query.pipe(filterEntries, toResponse)` or `pipe(query, filterEntries,
   toResponse)`, not nested wrappers such as `toResponse(filterEntries(query))`.
-- `taxkit/no-native-array-methods`: scoped to `packages/calculators/src`.
-  Calculator services must use Effect `Array` or `Chunk` helpers such as
-  `Array.filter(items, predicate)`, `Array.findFirst(...)` and `Chunk.map(...)`
-  instead of native `items.filter(...)`, `items.find(...)` or
-  `items.reduce(...)`.
 - `taxkit/no-object-writes`: all owned source. Return immutable values instead
   of `Object`/`Reflect` writes, including through aliases.
+- `taxkit/protected-rule-directives`: all owned source. A disable or enable
+  directive that names `effect-conventions/no-schema-decoder-outside-ingress`
+  (the rules listed in its options) or the guard itself fails lint, at the
+  comment and at the start of the file, so no directive can silence decoder
+  placement. `portable-rules.test.ts` proves a named directive and a file-wide
+  guard directive fail and an unrelated directive passes.
 - `taxkit-package/workspace-roles`: browser/backend and runtime/deployment
   roles. Its Website source root, server entries and exact host module grants
   are options in `oxlint.config.ts`; package role policy lives in
   `tools/oxlint/package-roles.ts`.
 
-`bun run lint:boundary-directives` runs Oxlint with the shared decoder rule
-allowed and unused disable directives as errors, so no source can carry a
-directive that silences decoder placement.
+Three former local rules now belong to the shared presets.
+`strict-effect/no-imperative-collections` reports `switch` and every `let` or
+`var`, including module-level test state, so `taxkit-effect/no-switch` and
+`taxkit-effect/no-module-level-mutable-test-state` were removed;
+`portable-rules.test.ts` proves one preset report for each construct in a test
+file. The same preset rule reports native `filter`, `find`, `reduce`, `some` and
+the other traversal methods in calculators, so `taxkit/no-native-array-methods`
+was removed too. Its only extra names were `concat`, `flat` and `slice`: they
+return new values without changing their input, and its name-only match also
+rejected string `slice`, so they do not justify a second rule.
+
+The strict fixture cases in `portable-rules.test.ts` take their folders from
+the checked workspace inventory in `tools/oxlint/workspaces.boundary.ts` and
+the root `tools` folders: every workspace `src`, `test` and `scripts` folder
+receives the rejected fixture in one batched real Oxlint run. `bun run lint`
+is the accepted case for the real sources.
 
 SDK source boundaries are lint settings rather than a separate command:
 `strict-effect/module-ownership` lets only `packages/sdk/typescript/src/http.ts`
@@ -243,7 +329,8 @@ Website runtimes and the docs packages, and excludes tests and tools.
 
 ## Repository Path Hygiene
 
-`bun run check:repository-paths` inventories tracked files and rejects
+The repository-path check (`tools/repository-paths`, the last `lint` step)
+inventories tracked files and rejects
 workstation-specific home or checkout paths. Use repository-relative links,
 repository identities or pinned HTTPS references in tracked text. Findings
 contain only file, line and category so local usernames cannot leak into logs.
