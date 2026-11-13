@@ -122,8 +122,9 @@ query contract; calculations accept only the correlated request body.
   request envelope, OpenAPI annotations and public schema exports from
   `@taxkit/calculators`.
 - `src/requests.ts` (`./requests`): the generated client's named reads for its
-  callers, `requestDocsPage`, `requestDocsSearch`, `requestDocsMarkdown`,
-  `requestCatalogue` and `requestCalculation`. Each has one ten-second deadline
+  callers, `requestDocsPage`, `requestDocsPageAt`, `requestDocsNavigation`,
+  `requestDocsSearch`, `requestDocsMarkdown`, `requestCatalogue`,
+  `requestCalculatorSchema` and `requestCalculation`. Each has one ten-second deadline
   over headers, body and decoding; `boundedReplies` caps each reply at 2 MiB.
   A reply must answer its request and decode as its declared Schema
   (`ApiReplyMismatch` otherwise, a server fault with 500 semantics). Only an

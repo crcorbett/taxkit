@@ -15,7 +15,10 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
   success Schemas and safe `McpToolUnavailable` codes.
 - `src/handlers.layer.ts` (internal): the static `TaxKitMcpHandlersLive` Layer
   over the calculator and content services that `./server` composes.
-- `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path.
+- `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path, and
+  `mcpAllowedHeaders`, the browser request headers a host admits for MCP:
+  `publicCors.allowedHeaders` from `@taxkit/api-http/response-policy` plus
+  `mcp-method`, `mcp-name` and `mcp-protocol-version`.
 - `./errors`: the safe tool failure `McpToolUnavailable` and the private
   `McpResponseTooLarge` reply-budget signal.
 
