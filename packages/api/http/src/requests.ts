@@ -1,5 +1,9 @@
-import { CalculatorId, MetadataQuery } from "@taxkit/calculators/schemas";
-import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
+import { CalculatorId } from "@taxkit/calculators/schemas";
+import type {
+  CalculatorRunRequest,
+  GetCalculatorRequest,
+  MetadataQuery,
+} from "@taxkit/calculators/schemas";
 import { DocsPageUnavailable } from "@taxkit/content/errors";
 import { isRequestedDocsPage } from "@taxkit/content/response-check";
 import { DocsPublicPagePath } from "@taxkit/content/schemas";
@@ -198,10 +202,60 @@ export const requestDocsMarkdown = Effect.fn("TaxKitApi.requestDocsMarkdown")(
       .pipe(withinReadDeadline, Effect.catchTags(transportFailures))
 );
 export const requestCatalogue = Effect.fn("TaxKitApi.requestCatalogue")(
-  (client: TaxKitClient) =>
+  ({
+    client,
+    query,
+  }: {
+    readonly client: TaxKitClient;
+    readonly query: MetadataQuery;
+  }) =>
     client.calculatorApi
-      .listCalculators({ query: MetadataQuery.make({}) })
+      .listCalculators({ query })
       .pipe(withinReadDeadline, Effect.catchTags(transportFailures))
+);
+/** One calculator's schema metadata; a lookup failure arrives unwrapped. */
+export const requestCalculatorSchema = Effect.fn(
+  "TaxKitApi.requestCalculatorSchema"
+)(
+  ({
+    client,
+    request: { calculatorId, ...query },
+  }: {
+    readonly client: TaxKitClient;
+    readonly request: GetCalculatorRequest;
+  }) =>
+    client.calculatorApi
+      .getCalculatorSchema({ params: { calculatorId }, query })
+      .pipe(
+        // The declared lookup failure arrives as an untagged `{ error }` envelope.
+        Effect.catchTags(transportFailures, ({ error }) => Effect.fail(error)),
+        withinReadDeadline
+      )
+);
+export const requestDocsNavigation = Effect.fn(
+  "TaxKitApi.requestDocsNavigation"
+)((client: TaxKitClient) =>
+  client.content
+    .getNavigation()
+    .pipe(withinReadDeadline, Effect.catchTags(transportFailures))
+);
+/** One checked page address, without navigation; the reply must be that page. */
+export const requestDocsPageAt = Effect.fn("TaxKitApi.requestDocsPageAt")(
+  ({
+    client,
+    path,
+  }: {
+    readonly client: TaxKitClient;
+    readonly path: DocsPublicPagePath;
+  }) =>
+    client.content.getPage({ query: { path } }).pipe(
+      Effect.filterOrFail(
+        (reply) => isRequestedDocsPage(path, reply),
+        () => new ApiReplyMismatch()
+      ),
+      withinReadDeadline,
+      Effect.catchTags(transportFailures)
+    )
 );
 export const requestCalculation = Effect.fn("TaxKitApi.requestCalculation")(
   function* ({

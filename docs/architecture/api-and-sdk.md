@@ -318,6 +318,7 @@ are never presented as something the caller should correct.
 | Failure                                 | HTTP | MCP code                    |
 | --------------------------------------- | ---- | --------------------------- |
 | `InputValidationError`, `CalculationError`, unsupported calculator/context | 400 | `invalid-calculation` |
+| Missing documentation page, unsupported schema lookup | 404, 400 | `not-found` |
 | `CalculatorRateLimited`                 | 429  | `rate-limited`              |
 | `CalculatorCapacityExceeded`, `CalculatorAdmissionUnavailable` | 503 | `capacity-exceeded`, `service-unavailable` |
 | `CalculatorOperationTimedOut`           | 504  | `operation-timeout`         |

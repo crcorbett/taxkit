@@ -1,119 +1,193 @@
 import {
-  apiReadTimeout,
   requestCalculation,
+  requestCalculatorSchema,
+  requestCatalogue,
+  requestDocsNavigation,
+  requestDocsPageAt,
   requestDocsSearch,
 } from "@taxkit/api-http/requests";
 import type { TaxKitClient } from "@taxkit/api-http/requests";
-import { isRequestedDocsPage } from "@taxkit/content/response-check";
-import { Effect, Match } from "effect";
+import { Effect } from "effect";
 
 import { McpToolUnavailable } from "./errors.js";
 import { TaxKitMcpToolkit } from "./tools.js";
 
-const unavailable = () =>
-  new McpToolUnavailable({
-    code: "service-unavailable",
-    retry: "try-again-manually",
-  });
+// The generated client's own outcomes, shared by every read: no usable answer
+// is unavailable, the ten-second deadline is a timeout, and a reply TaxKit got
+// wrong is a server fault.
+const clientFailures = {
+  ApiDeadlineExceeded: () =>
+    Effect.fail(
+      new McpToolUnavailable({
+        code: "operation-timeout",
+        retry: "try-again-manually",
+      })
+    ),
+  ApiReplyMismatch: () =>
+    Effect.fail(
+      new McpToolUnavailable({
+        code: "server-fault",
+        retry: "try-again-manually",
+      })
+    ),
+  ApiReplyTooLarge: () =>
+    Effect.fail(
+      new McpToolUnavailable({
+        code: "server-fault",
+        retry: "try-again-manually",
+      })
+    ),
+  ApiUnavailable: () =>
+    Effect.fail(
+      new McpToolUnavailable({
+        code: "service-unavailable",
+        retry: "try-again-manually",
+      })
+    ),
+};
 
 /**
  * Tool handlers for a host that reaches TaxKit only through the generated
  * public API client, such as browser WebMCP. They answer with the same
- * success Schemas and the same safe `McpToolUnavailable` vocabulary as the
- * service-backed handlers; transport, reply and deadline failures never leak
- * their cause. Reads keep the client's ten-second bound.
+ * success Schemas and the same safe `McpToolUnavailable` codes as the
+ * service-backed handlers for every shared outcome; transport, reply and
+ * deadline failures never leak their cause. Reads keep the client's
+ * ten-second bound.
  */
 export const clientToolHandlers = (client: TaxKitClient) =>
   TaxKitMcpToolkit.of({
     taxkit_calculate: Effect.fn("TaxKitMcpToolkit.taxkit_calculate")(
       (request) =>
         requestCalculation({ client, request }).pipe(
-          Effect.mapError((error) =>
-            Match.value(error).pipe(
-              Match.tag(
-                "CalculatorRateLimited",
-                () =>
-                  new McpToolUnavailable({
-                    code: "rate-limited",
-                    retry: "wait-then-try-manually",
-                  })
+          Effect.catchTags({
+            ...clientFailures,
+            CalculationError: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "invalid-calculation",
+                  retry: "check-input-before-retrying",
+                })
               ),
-              Match.tag(
-                "CalculatorCapacityExceeded",
-                () =>
-                  new McpToolUnavailable({
-                    code: "capacity-exceeded",
-                    retry: "try-again-manually",
-                  })
+            CalculatorAdmissionUnavailable: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "service-unavailable",
+                  retry: "try-again-manually",
+                })
               ),
-              Match.tag(
-                "CalculatorOperationTimedOut",
-                "CalculatorRequestBodyTimedOut",
-                "ApiDeadlineExceeded",
-                () =>
-                  new McpToolUnavailable({
-                    code: "operation-timeout",
-                    retry: "try-again-manually",
-                  })
+            CalculatorCapacityExceeded: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "capacity-exceeded",
+                  retry: "try-again-manually",
+                })
               ),
-              Match.tag(
-                "CalculationError",
-                "InputValidationError",
-                "UnsupportedCalculatorError",
-                "UnsupportedCalculatorContextError",
-                "CalculatorRequestBodyTooLarge",
-                () =>
-                  new McpToolUnavailable({
-                    code: "invalid-calculation",
-                    retry: "check-input-before-retrying",
-                  })
+            CalculatorOperationTimedOut: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "operation-timeout",
+                  retry: "try-again-manually",
+                })
               ),
-              Match.tag(
-                "CalculatorAdmissionUnavailable",
-                "ApiUnavailable",
-                "ApiReplyTooLarge",
-                "ApiReplyMismatch",
-                unavailable
+            CalculatorRateLimited: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "rate-limited",
+                  retry: "wait-then-try-manually",
+                })
               ),
-              Match.exhaustive
-            )
-          )
+            CalculatorRequestBodyTimedOut: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "operation-timeout",
+                  retry: "try-again-manually",
+                })
+              ),
+            CalculatorRequestBodyTooLarge: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "invalid-calculation",
+                  retry: "check-input-before-retrying",
+                })
+              ),
+            InputValidationError: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "invalid-calculation",
+                  retry: "check-input-before-retrying",
+                })
+              ),
+            UnsupportedCalculatorContextError: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "invalid-calculation",
+                  retry: "check-input-before-retrying",
+                })
+              ),
+            UnsupportedCalculatorError: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "invalid-calculation",
+                  retry: "check-input-before-retrying",
+                })
+              ),
+          })
         )
     ),
     taxkit_docs_navigation: Effect.fn(
       "TaxKitMcpToolkit.taxkit_docs_navigation"
     )(() =>
-      client.content
-        .getNavigation()
-        .pipe(Effect.timeout(apiReadTimeout), Effect.mapError(unavailable))
+      requestDocsNavigation(client).pipe(Effect.catchTags(clientFailures))
     ),
     taxkit_find_docs: Effect.fn("TaxKitMcpToolkit.taxkit_find_docs")(
       ({ term }) =>
         requestDocsSearch({ client, term }).pipe(
           Effect.map((results) => ({ results })),
-          Effect.mapError(unavailable)
+          Effect.catchTags({
+            ...clientFailures,
+            DocsSearchUnavailable: () =>
+              Effect.fail(
+                new McpToolUnavailable({
+                  code: "service-unavailable",
+                  retry: "try-again-manually",
+                })
+              ),
+          })
         )
     ),
     taxkit_get_calculator_schema: Effect.fn(
       "TaxKitMcpToolkit.taxkit_get_calculator_schema"
-    )(({ calculatorId, ...query }) =>
-      client.calculatorApi
-        .getCalculatorSchema({ params: { calculatorId }, query })
-        .pipe(Effect.timeout(apiReadTimeout), Effect.mapError(unavailable))
+    )((request) =>
+      requestCalculatorSchema({ client, request }).pipe(
+        Effect.catchTags({
+          ...clientFailures,
+          UnsupportedCalculatorContextError: () =>
+            Effect.fail(
+              new McpToolUnavailable({
+                code: "not-found",
+                retry: "check-input-before-retrying",
+              })
+            ),
+        })
+      )
     ),
     taxkit_list_calculators: Effect.fn(
       "TaxKitMcpToolkit.taxkit_list_calculators"
     )((query) =>
-      client.calculatorApi
-        .listCalculators({ query })
-        .pipe(Effect.timeout(apiReadTimeout), Effect.mapError(unavailable))
+      requestCatalogue({ client, query }).pipe(Effect.catchTags(clientFailures))
     ),
     taxkit_read_doc: Effect.fn("TaxKitMcpToolkit.taxkit_read_doc")(({ path }) =>
-      client.content.getPage({ query: { path } }).pipe(
-        Effect.timeout(apiReadTimeout),
-        // The reply must be the page that was asked for.
-        Effect.filterOrFail((page) => isRequestedDocsPage(path, page)),
-        Effect.mapError(unavailable)
+      requestDocsPageAt({ client, path }).pipe(
+        Effect.catchTags({
+          ...clientFailures,
+          DocsPageUnavailable: () =>
+            Effect.fail(
+              new McpToolUnavailable({
+                code: "not-found",
+                retry: "check-input-before-retrying",
+              })
+            ),
+        })
       )
     ),
   });

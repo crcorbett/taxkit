@@ -18,6 +18,22 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path.
 - `./errors`: the safe tool failure `McpToolUnavailable` and the private
   `McpResponseTooLarge` reply-budget signal.
+
+Both handler sets map each owning error by tag with `Effect.catchTags`; the
+tool's single declared failure Schema makes a new, unmapped tag a type error.
+
+| `code`                | `retry`                       | Raised for                                                                         |
+| --------------------- | ----------------------------- | ---------------------------------------------------------------------------------- |
+| `invalid-calculation` | `check-input-before-retrying` | Input, calculation, unsupported calculator/context and oversized request errors   |
+| `not-found`           | `check-input-before-retrying` | A missing documentation page or calculator context for a schema lookup            |
+| `rate-limited`        | `wait-then-try-manually`      | The shared calculation allowance is used                                           |
+| `capacity-exceeded`   | `try-again-manually`          | Every calculation place is busy                                                    |
+| `operation-timeout`   | `try-again-manually`          | The calculation budget, request-body deadline or client ten-second read deadline  |
+| `service-unavailable` | `try-again-manually`          | Admission or documentation search is unavailable, or the API gave no usable answer |
+| `server-fault`        | `try-again-manually`          | Client handlers only: an API reply that is too large or does not match its Schema  |
+
+An engine defect is not a tool failure: remote MCP answers it with the native
+internal error.
 - `./schemas`: tool request/reply Schemas and complete-reply
   budget constants.
 - `./request`: the private `McpRequestAbortSignal` Context reference.

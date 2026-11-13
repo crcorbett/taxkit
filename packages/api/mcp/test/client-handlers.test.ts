@@ -6,8 +6,10 @@ import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { ContentServiceLive } from "@taxkit/content/live";
 import { ContentCatalogue } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
-import { Effect, Layer, Option, Schema, Stream } from "effect";
+import { Deferred, Effect, Fiber, Layer, Option, Schema, Stream } from "effect";
+import { HttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
+import { TestClock } from "effect/testing";
 
 import { clientToolHandlers } from "../src/client-handlers.js";
 import { McpToolUnavailable } from "../src/errors.js";
@@ -76,6 +78,12 @@ it.effect(
       )(CalculationRequest).pipe(
         Effect.flatMap(Schema.decodeUnknownEffect(Schema.JsonObject))
       );
+      // An amount beyond safe cents is a scenario the rules cannot calculate.
+      const unsupportedCalculation = yield* Schema.decodeUnknownEffect(
+        Schema.fromJsonString(Schema.JsonObject)
+      )(
+        `{"calculatorId":"au.pay.take-home","payload":{"facts":{"grossPay":{"_tag":"Money","cents":${Number.MAX_SAFE_INTEGER},"currency":"AUD"},"period":"weekly","taxFreeThresholdClaimed":true}}}`
+      );
       const cases = [
         { input: {}, name: "taxkit_list_calculators" },
         {
@@ -83,6 +91,7 @@ it.effect(
           name: "taxkit_get_calculator_schema",
         },
         { input: calculation, name: "taxkit_calculate" },
+        { input: unsupportedCalculation, name: "taxkit_calculate" },
         { input: {}, name: "taxkit_docs_navigation" },
         { input: { term: "calculator" }, name: "taxkit_find_docs" },
         { input: { path: "/start/overview" }, name: "taxkit_read_doc" },
@@ -110,9 +119,47 @@ it.effect(
       });
       expect(missing).toStrictEqual(
         new McpToolUnavailable({
-          code: "service-unavailable",
-          retry: "try-again-manually",
+          code: "not-found",
+          retry: "check-input-before-retrying",
+        })
+      );
+      const unsupported = yield* call({
+        input: unsupportedCalculation,
+        name: "taxkit_calculate",
+        toolkit: client,
+      });
+      expect(unsupported).toStrictEqual(
+        new McpToolUnavailable({
+          code: "invalid-calculation",
+          retry: "check-input-before-retrying",
         })
       );
     })
+);
+it.effect("reports a stalled client read as an operation timeout", () =>
+  Effect.gen(function* () {
+    const entered = yield* Deferred.make<"started">();
+    const client = yield* HttpApiClient.makeWith(TaxKitApi, {
+      baseUrl: "http://taxkit.internal",
+      httpClient: HttpClient.make(() =>
+        Deferred.succeed(entered, "started").pipe(Effect.andThen(Effect.never))
+      ),
+    });
+    const toolkit = yield* TaxKitMcpToolkit.pipe(
+      Effect.provide(TaxKitMcpToolkit.toLayer(clientToolHandlers(client)))
+    );
+    const pending = yield* call({
+      input: {},
+      name: "taxkit_docs_navigation",
+      toolkit,
+    }).pipe(Effect.forkChild);
+    yield* Deferred.await(entered);
+    yield* TestClock.adjust("10 seconds");
+    expect(yield* Fiber.join(pending)).toStrictEqual(
+      new McpToolUnavailable({
+        code: "operation-timeout",
+        retry: "try-again-manually",
+      })
+    );
+  })
 );
