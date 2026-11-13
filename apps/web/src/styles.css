@@ -154,12 +154,6 @@ a {
   line-height: 1.7;
 }
 
-.calculator-page .calculator-note {
-  border-left: 3px solid var(--border);
-  padding-left: 1rem;
-  font-size: 1rem;
-}
-
 .site-page code {
   border: 1px solid var(--border);
   border-radius: 6px;

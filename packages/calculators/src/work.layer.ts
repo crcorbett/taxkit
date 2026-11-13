@@ -96,21 +96,30 @@ const makePublicCalculatorService = Effect.fnUntraced(function* (
     listTaxYears: catalogue.listTaxYears,
   });
 });
+// No usage collection: direct, local SDK and in-process HTTP hosts.
+export const CalculatorUsageDisabled = Layer.succeed(
+  CalculatorUsage,
+  CalculatorUsage.of({
+    record: Effect.fn("CalculatorUsage.record")(() => Effect.void),
+  })
+);
 // The public service with the shared work budget and no rate admission, over
-// a supplied catalogue. `PublicCalculatorServiceLive` supplies the real one;
+// a supplied catalogue and usage observer. `PublicCalculatorServiceLive` supplies the real one;
 // direct and local SDK callers use it.
 export const PublicCalculatorServiceBounded = Layer.effect(
   PublicCalculatorService,
   makePublicCalculatorService(Effect.void)
 );
-// The native host builds this once over the catalogue. Each calculation is
-// admitted for its request's checked identity inside the shared work budget;
-// metadata stays outside the allowance.
+// The native host builds this once over the catalogue, its usage observer,
+// admission and request identity. Each calculation is admitted for its
+// request's checked identity inside the shared work budget; metadata stays
+// outside the allowance.
 export const PublicCalculatorServiceRateLimited = Layer.effect(
   PublicCalculatorService,
   Effect.gen(function* () {
     const admission = yield* CalculatorAdmission;
-    const admit = CalculatorRequestRateKey.pipe(
+    const requestKey = yield* CalculatorRequestRateKey;
+    const admit = requestKey.current.pipe(
       Effect.flatMap(
         Option.match({
           onNone: () => Effect.fail(new CalculatorAdmissionUnavailable()),

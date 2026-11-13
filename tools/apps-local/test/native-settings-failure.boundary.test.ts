@@ -143,8 +143,10 @@ it.live(
       const logText = yield* Schema.encodeEffect(Json)(
         yield* Queue.clear(logs)
       );
-      // Require positive safe reporting as well as absence of the injected Cause.
-      expect(logText).toContain("website.runtime.event");
+      // Require positive safe reporting as well as absence of the injected
+      // Cause: the root load writes one checked defect record.
+      expect(logText).toContain("website.load.failed");
+      expect(logText).toContain('\\"errorTag\\":\\"Defect\\"');
       Array.forEach((marker: string) => {
         expect(logText).not.toContain(marker);
       })(["PRIVATE9", "Server Fn Error"]);

@@ -214,7 +214,7 @@ closed `read(source)` operation derives identity from the actual source; safe
 `DocsPageReadError` reasons preserve authoring and provider failures.
 
 `ContentCatalogueLive` (`@taxkit/content/catalogue`) builds the checked catalogue
-once from `DocsSources`. `apps/api/src/build/docs-catalogue.layer.ts` composes the
+once from `DocsSources`. `apps/api/catalogue/docs-catalogue.layer.ts` composes the
 build-time Layers. `@taxkit/content/live` contains only `ContentServiceLive`, so
 `apps/api/src/content.boundary.ts` can serve the stored catalogue without importing
 authored metadata or the builder. Tests use deterministic rendering Layers, and
@@ -460,10 +460,16 @@ first reads `Route.useLoaderData` restores it once and matches the resulting
 hooks, containers and leaf components must not receive encoded loader data,
 call the restore operation or run Effect runtimes.
 
-Loader failures are translated once, in `apps/web/src/lib/pages/load.failure.ts`:
-a missing page becomes TanStack's `notFound()` and other failures a
-`WebsiteLoadError` for the route's error component. Interruption stays
-interruption.
+Each loader under `apps/web/src/lib/pages/` (`root.load.ts`,
+`calculator.load.ts`, `docs.load.ts`) declares its result as
+`RouteLoadFailure` and translates its own closed error union once with
+`Effect.catchTags(routeLoadFailures({...}))` from `load.failure.ts`: a missing
+page becomes TanStack's `notFound()`, an invalid reply a 500 `WebsiteLoadError`
+and missing settings or an unavailable API a 503 one. An untranslated tag is a
+type error. A defect stays a defect carrying only the safe 500 value, and
+interruption stays interruption. The docs loaders run over a client and
+settings supplied by each runtime, so server and browser share one
+implementation.
 
 ## Guardrails
 
@@ -545,7 +551,8 @@ capability; its settings boundary checks the richer API binding once.
 
 The native API composes the AEO package's static `aeoRoutes` once from the
 checked catalogue and `DocsOgImages`, and supplies its existing cached settings
-Effect as `PublicationOrigins` (`Layer.succeed(PublicationOrigins)(...)`).
+Effect as `PublicationOrigins`, failing with AEO's own
+`PublicationSettingsUnavailable`.
 Configuration remains application-owned; the routes read checked addresses
 lazily on first use. The API serves each document and share image on its HTTP
 route and the Website forwards its conventional addresses there once. No

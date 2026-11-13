@@ -334,6 +334,44 @@ describe("browser route loaders", () => {
       );
     }).pipe(Effect.scoped)
   );
+  it.effect("names missing settings before any page or search request", () =>
+    Effect.gen(function* () {
+      const registry = yield* Effect.acquireRelease(
+        Effect.sync(() => AtomRegistry.make()),
+        (value) =>
+          Effect.sync(() => {
+            value.dispose();
+          })
+      );
+      const context = { registry: Option.some(registry) };
+      const { signal } = new AbortController();
+      const page = yield* Effect.tryPromise({
+        // Read the rejection as TanStack does, keeping only the safe status.
+        catch: (error) =>
+          Option.liftPredicate(error, Schema.is(WebsiteLoadError)).pipe(
+            Option.map(({ status }) => status)
+          ),
+        try: () => loadDocsPage({ context, path: "/start/quickstart", signal }),
+      }).pipe(Effect.flip);
+      const search = yield* Effect.tryPromise({
+        // Read the rejection as TanStack does, keeping only the safe status.
+        catch: (error) =>
+          Option.liftPredicate(error, Schema.is(WebsiteLoadError)).pipe(
+            Option.map(({ status }) => status)
+          ),
+        try: () =>
+          loadDocsSearch({
+            context,
+            query: readDocsSearchTerm("term=tax"),
+            signal,
+          }),
+      }).pipe(Effect.flip);
+      expect({ page, search }).toStrictEqual({
+        page: Option.some(503),
+        search: Option.some(503),
+      });
+    }).pipe(Effect.scoped)
+  );
   it.effect("returns invalid search words as a page state", () =>
     Effect.gen(function* () {
       const { context } = yield* fixture({

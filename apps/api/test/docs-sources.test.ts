@@ -15,7 +15,7 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 
-import { DocsCatalogueBuildLive } from "../src/build/docs-catalogue.layer.js";
+import { DocsCatalogueBuildLive } from "../catalogue/docs-catalogue.layer.js";
 import { ApiContentLive } from "../src/content.boundary.js";
 
 const contentRoot = "../../content/docs";

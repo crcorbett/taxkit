@@ -3,36 +3,43 @@ import { ApiCalculatorEvents } from "@taxkit/analytics/api-usage";
 import { collectionPolicyFromHeaders } from "@taxkit/analytics/collection-policy";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
 import { BackendAnalytics } from "@taxkit/analytics/service";
+import { HostEventRecord } from "@taxkit/observability/host-telemetry";
 import type { HttpEffect } from "alchemy/Http";
 import { RuntimeContext } from "alchemy/RuntimeContext";
 import { Context, Effect, Layer, Option, Ref } from "effect";
 import { HttpServerRequest } from "effect/http";
 
-// Native host composition supplies capture. An in-process or local host
-// deliberately has no background delivery; it must not borrow another runtime.
-export const ApiCalculatorDelivery = Context.Reference<
-  Option.Option<{
+// Background delivery of completed calculator uses. Every API composition
+// names it: the native host captures through the Worker's own lifetime, and a
+// test host without delivery supplies its own no-op Layer.
+export class ApiCalculatorDelivery extends Context.Service<
+  ApiCalculatorDelivery,
+  {
     readonly recordCalculatorUse: (input: CalculatorUse) => Effect.Effect<void>;
-  }>
->("@taxkit/api/ApiCalculatorDelivery", { defaultValue: Option.none });
+  }
+>()("@taxkit/api/ApiCalculatorDelivery") {}
 
 export const ApiCalculatorDeliveryLive = Layer.effect(
   ApiCalculatorDelivery,
   Effect.gen(function* () {
     const analytics = yield* BackendAnalytics;
-    return Option.some({
+    return ApiCalculatorDelivery.of({
       recordCalculatorUse: Effect.fn(
         "ApiCalculatorDelivery.recordCalculatorUse"
       )(function* (input) {
         const runtime = yield* Effect.serviceOption(RuntimeContext);
         const worker = yield* Effect.serviceOption(WorkerExecutionContext);
         const send = analytics.recordCalculatorUse(input).pipe(
+          // A dropped event is a recovered degradation: one checked record.
           Effect.catchTag("AnalyticsCaptureError", (error) =>
-            Effect.logDebug("Calculator analytics dropped").pipe(
-              Effect.annotateLogs({
-                operation: error.operation,
-                reason: error.reason,
-              })
+            Effect.logWarning("Calculator analytics dropped").pipe(
+              Effect.annotateLogs(
+                HostEventRecord.make({
+                  errorTag: "AnalyticsCaptureError",
+                  event: "api.analytics.dropped",
+                  reason: error.reason,
+                })
+              )
             )
           ),
           Effect.asVoid
@@ -68,18 +75,15 @@ export const withCalculatorAnalytics = Effect.fnUntraced(function* <R>(
       Option.some({ collectionPolicy, events })
     )
   );
-  yield* Option.match(yield* ApiCalculatorDelivery, {
-    onNone: () => Effect.void,
-    onSome: (delivery) =>
-      Ref.get(events).pipe(
-        Effect.flatMap((completed) =>
-          Effect.forEach(
-            completed,
-            (input) => delivery.recordCalculatorUse(input),
-            { discard: true }
-          )
-        )
-      ),
-  });
+  const delivery = yield* ApiCalculatorDelivery;
+  yield* Ref.get(events).pipe(
+    Effect.flatMap((completed) =>
+      Effect.forEach(
+        completed,
+        (input) => delivery.recordCalculatorUse(input),
+        { discard: true }
+      )
+    )
+  );
   return response;
 });

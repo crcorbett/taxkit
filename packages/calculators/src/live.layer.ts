@@ -26,7 +26,10 @@ import {
 } from "./schemas.js";
 import type { CalculatorId } from "./schemas.js";
 import { CalculatorCatalogue } from "./service.js";
-import { PublicCalculatorServiceBounded } from "./work.layer.js";
+import {
+  CalculatorUsageDisabled,
+  PublicCalculatorServiceBounded,
+} from "./work.layer.js";
 /**
  * Finds the catalogue entry for the selected owning definition's branded
  * identity. The request's literal discriminant selects the definition; its
@@ -212,5 +215,6 @@ export const CalculatorCatalogueLive = Layer.succeed(
  * implementation instead.
  */
 export const PublicCalculatorServiceLive = PublicCalculatorServiceBounded.pipe(
-  Layer.provide(CalculatorCatalogueLive)
+  Layer.provide(CalculatorCatalogueLive),
+  Layer.provide(CalculatorUsageDisabled)
 );

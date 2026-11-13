@@ -36,7 +36,10 @@ import {
   CalculatorCatalogue,
   PublicCalculatorService,
 } from "../src/service.js";
-import { PublicCalculatorServiceBounded } from "../src/work.layer.js";
+import {
+  CalculatorUsageDisabled,
+  PublicCalculatorServiceBounded,
+} from "../src/work.layer.js";
 
 const calculatorId = AuPayTakeHomeId.make("au.pay.take-home");
 const Request = CalculatorRunRequest.make({
@@ -58,7 +61,8 @@ const bounded = Effect.fnUntraced(function* (
 ) {
   const context = yield* Layer.build(
     PublicCalculatorServiceBounded.pipe(
-      Layer.provide(Layer.succeed(CalculatorCatalogue, implementation))
+      Layer.provide(Layer.succeed(CalculatorCatalogue, implementation)),
+      Layer.provide(CalculatorUsageDisabled)
     )
   );
   return Context.get(context, PublicCalculatorService);

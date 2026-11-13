@@ -106,7 +106,9 @@ nothing.
 What leaves a Worker is therefore only its own console output: one fixed
 `taxkit.request` record per request (service, closed route family, method,
 outcome, status and status class, and response-ready time from the Workers
-clock) and fixed `*.runtime.event` lines carrying service, level and time. The
+clock), checked event records (`HostEventRecord`: a closed event name such as
+`website.load.failed`, the failure's tag and a short reason) and fixed
+`*.runtime.event` lines carrying service, level and time for anything else. The
 Worker name and version arrive in Cloudflare's log envelope. Tax facts,
 salaries, calculation inputs and results, report contents, URLs and query
 strings, headers, cookies, IP addresses, rate keys, bodies and raw error

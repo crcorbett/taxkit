@@ -12,7 +12,13 @@ import type { CalculatorRunRequest } from "@taxkit/calculators/schemas";
 import { Effect, Option, Result } from "effect";
 import * as Atom from "effect/reactivity/Atom";
 
-import { ApiClient, apiClientRuntime } from "../api-client.atoms";
+import {
+  ApiClient,
+  apiClientRuntime,
+  browserSettingsUnavailable,
+  publicSettingsAtom,
+} from "../api-client.atoms";
+import type { TaxKitWebConfigError } from "../host/errors";
 import { calculationFailureMessage } from "./failure";
 
 /**
@@ -24,12 +30,17 @@ import { calculationFailureMessage } from "./failure";
 export const calculatorPageAtoms = Atom.family(
   (
     calculatorId: CalculatorRunRequest["calculatorId"]
-  ): CalculatorPage<CalculationCallFailure> => {
+  ): CalculatorPage<CalculationCallFailure | TaxKitWebConfigError> => {
     const form = Atom.make<CalculatorForm>(initialCalculatorForm(calculatorId));
-    const calculation = apiClientRuntime.fn<CalculatorRunRequest>()((request) =>
-      ApiClient.pipe(
-        Effect.flatMap((client) => requestCalculation({ client, request }))
-      )
+    // Settings are checked before the client is used; missing settings keep
+    // their own failure and message.
+    const calculation = apiClientRuntime.fn<CalculatorRunRequest>()(
+      (request, get) =>
+        Effect.fromOption(get(publicSettingsAtom)).pipe(
+          Effect.mapError(() => browserSettingsUnavailable),
+          Effect.andThen(ApiClient),
+          Effect.flatMap((client) => requestCalculation({ client, request }))
+        )
     );
     const showCalculation = Atom.make(false);
     const inputError = Atom.make(Option.none<CalculatorInputError>());
@@ -51,28 +62,29 @@ export const calculatorPageAtoms = Atom.family(
       get.set(inputError, Option.none());
       get.set(calculation, request.success);
     });
-    const page: CalculatorPage<CalculationCallFailure> = {
-      calculation,
-      calculatorId,
-      edit,
-      form,
-      submit,
-      // The registry retains this in-memory page snapshot across an
-      // uncommitted React render; page cleanup still interrupts live work.
-      // Reading `page.form` keeps the whole weak-family description group alive,
-      // so browser GC cannot replace it on a return visit while the old values
-      // remain in the registry. Disposing the root registry releases it.
-      view: Atom.make((get) =>
-        calculatorViewState({
-          calculation: get(calculation),
-          calculatorId,
-          failureMessage: calculationFailureMessage,
-          form: get(page.form),
-          inputError: get(inputError),
-          submitted: get(showCalculation),
-        })
-      ).pipe(Atom.keepAlive),
-    };
+    const page: CalculatorPage<CalculationCallFailure | TaxKitWebConfigError> =
+      {
+        calculation,
+        calculatorId,
+        edit,
+        form,
+        submit,
+        // The registry retains this in-memory page snapshot across an
+        // uncommitted React render; page cleanup still interrupts live work.
+        // Reading `page.form` keeps the whole weak-family description group alive,
+        // so browser GC cannot replace it on a return visit while the old values
+        // remain in the registry. Disposing the root registry releases it.
+        view: Atom.make((get) =>
+          calculatorViewState({
+            calculation: get(calculation),
+            calculatorId,
+            failureMessage: calculationFailureMessage,
+            form: get(page.form),
+            inputError: get(inputError),
+            submitted: get(showCalculation),
+          })
+        ).pipe(Atom.keepAlive),
+      };
     return page;
   }
 );
