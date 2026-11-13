@@ -55,7 +55,8 @@ describe("SDK bundled sources", () => {
                 EffectFunction.pipe(
                   Array.fromIterable(source.matchAll(workspaceImport)),
                   Array.flatMap((match) =>
-                    Option.fromNullishOr(match.groups?.name).pipe(
+                    Option.fromNullishOr(match.groups).pipe(
+                      Option.flatMap(Record.get("name")),
                       Option.toArray
                     )
                   )
@@ -93,8 +94,8 @@ describe("SDK bundled sources", () => {
           Array.map((name) => owner(name).owner),
           Array.sort(Order.String)
         );
-        // The manifest declares each bundled owner, so workspace links and
-        // the dependency fences admit it.
+        // The manifest declares each owner the SDK imports directly, so its
+        // workspace link and the dependency fences admit it.
         const manifest = yield* fs
           .readFileString(`${sdk}/package.json`)
           .pipe(
@@ -103,7 +104,7 @@ describe("SDK bundled sources", () => {
             )
           );
         EffectFunction.pipe(
-          bundled,
+          imported,
           Array.dedupe,
           Array.filter(
             (name) =>

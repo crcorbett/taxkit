@@ -147,8 +147,9 @@ interface Library {
   readonly root: string;
 }
 // The private source owners compiled into the SDK are the workspace packages
-// its own sources import, plus their workspace runtime dependencies. Each must
-// be a workspace devDependency of the SDK; its manifest names its modules.
+// its own sources import, which must be workspace devDependencies of the SDK,
+// plus their workspace runtime dependencies, resolved from each owner's own
+// links. Each owner's manifest names its modules.
 const bundledLibraries = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
@@ -196,7 +197,7 @@ const bundledLibraries = Effect.gen(function* () {
     )
   );
   const visit = (
-    pending: readonly string[],
+    pending: readonly { readonly from: string; readonly name: string }[],
     found: readonly Library[]
   ): Effect.Effect<
     readonly Library[],
@@ -204,7 +205,7 @@ const bundledLibraries = Effect.gen(function* () {
   > =>
     Array.match(pending, {
       onEmpty: () => Effect.succeed(found),
-      onNonEmpty: ([name, ...rest]) =>
+      onNonEmpty: ([{ from, name }, ...rest]) =>
         EffectBoolean.match(
           EffectFunction.pipe(
             found,
@@ -213,14 +214,14 @@ const bundledLibraries = Effect.gen(function* () {
           {
             onFalse: () =>
               Effect.gen(function* () {
-                if (!Record.has(workspace, name)) {
+                if (from === sdk && !Record.has(workspace, name)) {
                   return yield* new PackageAssemblyError({
                     operation: "resolve-library",
                     specifier: name,
                   });
                 }
                 const linked = yield* fs.realPath(
-                  path.join(sdk, "node_modules", name)
+                  path.join(from, "node_modules", name)
                 );
                 const library = yield* fs
                   .readFileString(path.join(linked, "package.json"))
@@ -236,6 +237,10 @@ const bundledLibraries = Effect.gen(function* () {
                   Array.filter((dependency) =>
                     dependency.startsWith("@taxkit/")
                   ),
+                  Array.map((dependency) => ({
+                    from: linked,
+                    name: dependency,
+                  })),
                   (dependencies) => Array.appendAll(rest, dependencies)
                 );
                 const known = EffectFunction.pipe(
@@ -252,7 +257,11 @@ const bundledLibraries = Effect.gen(function* () {
           }
         ),
     });
-  return yield* visit(imported, []);
+  const direct = EffectFunction.pipe(
+    imported,
+    Array.map((name) => ({ from: sdk, name }))
+  );
+  return yield* visit(direct, []);
 });
 export const assemblePackage = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;

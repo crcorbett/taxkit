@@ -136,7 +136,6 @@
     "@taxkit/calculators": "workspace:*",
     "@taxkit/content": "workspace:*",
     "@taxkit/core": "workspace:*",
-    "@taxkit/mdx": "workspace:*",
     "@taxkit/rules-au-income-tax": "workspace:*",
     "@taxkit/rules-au-pay": "workspace:*",
     "@taxkit/rules-au-stsl": "workspace:*",
