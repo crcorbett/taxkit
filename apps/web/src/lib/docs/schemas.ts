@@ -14,6 +14,10 @@ import {
   Schema,
   SchemaGetter,
 } from "effect";
+// The documentation start page: the header and recovery links, and the page
+// whose navigation and theme frame the search page.
+export const docsStartSplat = "start/quickstart";
+export const docsStartPath = `/${docsStartSplat}` as const;
 // A documentation page as its route renders it. Every field is plain public
 // data, so TanStack serialises it natively.
 export interface WebsiteDocsPageView {

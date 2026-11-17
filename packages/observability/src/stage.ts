@@ -2,7 +2,8 @@ import * as Schema from "effect/Schema";
 
 /**
  * A disposable Preview stage owned by one same-repository pull request. The
- * root `pr:*` host scripts check the same bounded pattern before Alchemy runs.
+ * root `pr:*` scripts and the Checks cleanup guard decode their stage with it
+ * (`tools/infrastructure/preview-stage.runtime.ts`) before Alchemy runs.
  */
 export const PullRequestStage = Schema.String.check(
   Schema.isPattern(/^pr-[1-9]\d{0,6}$/u)

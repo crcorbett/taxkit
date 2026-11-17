@@ -50,7 +50,7 @@ Change required: this README, the repository
 [deployment architecture](../../docs/architecture/deployment.md) route these package capabilities and application composition. API request integration tests continue to
 exercise the package decorator through the host collector. Preserve: tax Schemas,
 results, HTTP and SDK contracts, and published public documentation. This versioned private package follows the
-[Changeset rules](../../docs/standards/versioning.md); package-facing changes
+[Changeset rules](../../docs/standards/release-policy.md); package-facing changes
 include their own Changeset outside the public tax/SDK release group.
 
 ## Runbook applicability

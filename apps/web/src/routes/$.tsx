@@ -113,8 +113,8 @@ function DocumentationRoute() {
             <footer className="docs-article-footer">
               <p>TaxKit is open source. Help make these docs better.</p>
               <DocsPageActions
+                edit={metadata.edit}
                 markdown={metadata.markdown}
-                source={page.source}
               />
             </footer>
           </article>
@@ -124,8 +124,8 @@ function DocumentationRoute() {
             <p className="docs-outline-title">On this page</p>
             <DocsOutline active={activeHeadingAtom} body={page.body} />
             <DocsPageActions
+              edit={metadata.edit}
               markdown={metadata.markdown}
-              source={page.source}
             />
           </div>
         </aside>

@@ -49,6 +49,66 @@ Do not place calculator business logic in `@taxkit/api-http` handlers, SDK
 helpers or docs-only examples. HTTP and SDK layers must call the canonical
 calculator boundary and preserve `CalculatorRun*` contracts.
 
+## File checklist
+
+Adding a calculator touches these files. The examples name the existing
+annual income tax calculator; follow the same shape for a new one.
+
+Calculator program and report, in the owning rule package
+(`packages/rules/au/<pack>`):
+
+- `src/calculator/` — the calculator definition, its ID literal and report
+  Schema, exported from `src/index.ts` and the `./schemas` export in
+  `package.json`.
+- `test/` — golden scenarios (for example `test/annual-tax.test.ts`) and
+  `test/rule-graph.test.ts` pins for the facts the calculator requires.
+
+Catalogue and public contract, in `packages/calculators`:
+
+- `src/catalog.ts` — the catalogue entry, description and input Schema.
+- `src/live.layer.ts` — the program that runs the calculator for its ID.
+- `src/schemas.ts` — the run request and response unions.
+- `src/summaries.ts` — the browser-safe summary (ID and title).
+- `src/form.ingress.ts` — the Website form, its request builder and field
+  messages.
+- `type-tests/catalog.ts`, `test/public-calculator-service.test.ts` and
+  `test/form.test.ts` — descriptor inference, service and form tests.
+
+HTTP API and SDK:
+
+- `packages/api/http/__snapshots__/openapi.json` — regenerate the OpenAPI
+  snapshot with the HTTP package tests.
+- `packages/sdk/typescript/src/au.ts`, `src/au-effect.ts` and
+  `src/au/schemas.ts` — any jurisdiction helper and re-exported Schemas.
+- `packages/sdk/typescript/test/http-parity.test.ts` and
+  `type-tests/plain-client.test.ts` — SDK parity and type tests.
+- `apps/api/scripts/smoke-public-routes.runtime.ts` and
+  `apps/api/test/smoke-boundaries.test.ts` — when the API smoke check should
+  call the new calculator.
+
+Website and native pair, when the calculator has a page:
+
+- `apps/web/src/lib/calculators/caveats.ts` — only for a known limitation.
+- `tools/apps-local/test/native-pair-calculator-server.checks.ts` and
+  `native-pair-calculator-browser.checks.ts` — the server and browser page
+  checks.
+
+Documentation: `docs/architecture/calculators.md`,
+`content/docs/concepts/calculators.mdx`, `content/docs/concepts/reports.mdx`,
+`content/docs/api/agent-tools.mdx` and a `taxkit` Changeset.
+
+A new rule package also needs, beside a new `packages/rules/au/<pack>`
+workspace:
+
+- `packages/sdk/typescript/package.json` — a `workspace:*` devDependency. The
+  SDK assembler derives its bundled sources from these workspace imports.
+- `packages/sdk/typescript/tsconfig.build.json` — an `include` entry for the
+  package's `src`. `tools/workspace/sdk-bundle.test.ts` fails until both
+  agree.
+- `packages/calculators/package.json` — a workspace dependency.
+- `tools/oxlint/package-roles.ts` — the package's browser-safe `./schemas`
+  export, when the Website imports it.
+
 ## Tests
 
 Your evidence should include:

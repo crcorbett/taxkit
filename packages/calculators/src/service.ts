@@ -1,5 +1,12 @@
-import { Context, Effect } from "effect";
+import type { CalculationError } from "@taxkit/core/errors";
+import { Context } from "effect";
+import type { Effect } from "effect";
 
+import type {
+  CalculatorServiceError,
+  CalculatorMetadataError,
+  UnsupportedCalculatorContextError,
+} from "./errors.js";
 import type {
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
@@ -7,9 +14,6 @@ import type {
   CalculatorSchemaResponse,
   CalculatorRunResponse,
   CalculatorRunRequest,
-  CalculatorServiceError,
-  CalculatorMetadataError,
-  CalculatorOperationTimedOut,
   DescriptorFilterQuery,
   FactsResponse,
   GetCalculatorGraphRequest,
@@ -20,10 +24,19 @@ import type {
   TaxYearsResponse,
 } from "./schemas.js";
 
-export interface PublicCalculatorServiceContract {
+/**
+ * What the static catalogue itself can do and fail with: metadata projections
+ * that only fail for an unknown calculator context, and owning-definition
+ * execution. It has no work budget, admission or capacity, so it declares none
+ * of their errors.
+ */
+export interface CalculatorCatalogueContract {
   readonly calculate: (
     request: CalculatorRunRequest
-  ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
+  ) => Effect.Effect<
+    CalculatorRunResponse,
+    CalculationError | UnsupportedCalculatorContextError
+  >;
   readonly getCalculator: (
     request: GetCalculatorRequest
   ) => Effect.Effect<CalculatorCatalogItem, CalculatorMetadataError>;
@@ -35,20 +48,31 @@ export interface PublicCalculatorServiceContract {
   ) => Effect.Effect<CalculatorSchemaResponse, CalculatorMetadataError>;
   readonly listCalculators: (
     query: MetadataQuery
-  ) => Effect.Effect<CalculatorCatalogResponse, CalculatorOperationTimedOut>;
+  ) => Effect.Effect<CalculatorCatalogResponse>;
   readonly listFacts: (
     query: DescriptorFilterQuery
-  ) => Effect.Effect<FactsResponse, CalculatorOperationTimedOut>;
-  readonly listJurisdictions: () => Effect.Effect<
-    JurisdictionsResponse,
-    CalculatorOperationTimedOut
-  >;
+  ) => Effect.Effect<FactsResponse>;
+  readonly listJurisdictions: () => Effect.Effect<JurisdictionsResponse>;
   readonly listRules: (
     query: DescriptorFilterQuery
-  ) => Effect.Effect<RulesResponse, CalculatorOperationTimedOut>;
+  ) => Effect.Effect<RulesResponse>;
   readonly listTaxYears: (
     query: MetadataQuery
-  ) => Effect.Effect<TaxYearsResponse, CalculatorOperationTimedOut>;
+  ) => Effect.Effect<TaxYearsResponse>;
+}
+
+/**
+ * The public calculator operations. Metadata is the catalogue's own synchronous
+ * projection; only `calculate` adds the shared work budget, capacity and
+ * (on the native host) rate admission, with their errors.
+ */
+export interface PublicCalculatorServiceContract extends Omit<
+  CalculatorCatalogueContract,
+  "calculate"
+> {
+  readonly calculate: (
+    request: CalculatorRunRequest
+  ) => Effect.Effect<CalculatorRunResponse, CalculatorServiceError>;
 }
 
 export class PublicCalculatorService extends Context.Service<
@@ -63,17 +87,17 @@ export class PublicCalculatorService extends Context.Service<
  */
 export class CalculatorCatalogue extends Context.Service<
   CalculatorCatalogue,
-  PublicCalculatorServiceContract
+  CalculatorCatalogueContract
 >()("@taxkit/calculators/CalculatorCatalogue") {}
 
 /**
- * Observes each successful calculation once, after its work budget. Hosts
- * without usage collection keep the native no-op default.
+ * Observes each successful calculation once, after its work budget. Every
+ * composition names its observer; hosts without usage collection supply
+ * `CalculatorUsageDisabled`.
  */
-export const CalculatorUsage = Context.Reference<{
-  readonly record: (response: CalculatorRunResponse) => Effect.Effect<void>;
-}>("@taxkit/calculators/CalculatorUsage", {
-  defaultValue: () => ({
-    record: Effect.fn("CalculatorUsage.record")(() => Effect.void),
-  }),
-});
+export class CalculatorUsage extends Context.Service<
+  CalculatorUsage,
+  {
+    readonly record: (response: CalculatorRunResponse) => Effect.Effect<void>;
+  }
+>()("@taxkit/calculators/CalculatorUsage") {}

@@ -5,7 +5,9 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./worker": "./src/worker.ts"
+    "./worker": "./src/worker.ts",
+    "./composition": "./src/worker.composition.ts",
+    "./content": "./src/content.boundary.ts"
   },
   "scripts": {
     "dev": "bun run docs-catalogue && portless run --name api.taxkit bun --watch src/index.ts",

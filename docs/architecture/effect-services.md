@@ -214,7 +214,7 @@ closed `read(source)` operation derives identity from the actual source; safe
 `DocsPageReadError` reasons preserve authoring and provider failures.
 
 `ContentCatalogueLive` (`@taxkit/content/catalogue`) builds the checked catalogue
-once from `DocsSources`. `apps/api/src/build/docs-catalogue.layer.ts` composes the
+once from `DocsSources`. `apps/api/catalogue/docs-catalogue.layer.ts` composes the
 build-time Layers. `@taxkit/content/live` contains only `ContentServiceLive`, so
 `apps/api/src/content.boundary.ts` can serve the stored catalogue without importing
 authored metadata or the builder. Tests use deterministic rendering Layers, and
@@ -460,10 +460,16 @@ first reads `Route.useLoaderData` restores it once and matches the resulting
 hooks, containers and leaf components must not receive encoded loader data,
 call the restore operation or run Effect runtimes.
 
-Loader failures are translated once, in `apps/web/src/lib/pages/load.failure.ts`:
-a missing page becomes TanStack's `notFound()` and other failures a
-`WebsiteLoadError` for the route's error component. Interruption stays
-interruption.
+Each loader under `apps/web/src/lib/pages/` (`root.load.ts`,
+`calculator.load.ts`, `docs.load.ts`) declares its result as
+`RouteLoadFailure` and translates its own closed error union once with
+`Effect.catchTags(routeLoadFailures({...}))` from `load.failure.ts`: a missing
+page becomes TanStack's `notFound()`, an invalid reply a 500 `WebsiteLoadError`
+and missing settings or an unavailable API a 503 one. An untranslated tag is a
+type error. A defect stays a defect carrying only the safe 500 value, and
+interruption stays interruption. The docs loaders run over a client and
+settings supplied by each runtime, so server and browser share one
+implementation.
 
 ## Guardrails
 
@@ -485,7 +491,8 @@ interruption.
   channel. Do not use `Effect.die` for schema decode failures,
   `CalculationError`, unsupported calculator/context errors, config decode
   failures or other recoverable service-contract errors. Reserve defects for
-  impossible states outside the declared contract.
+  impossible states outside the declared contract, such as an invalid rule
+  graph, table coverage gap or report invariant (`CalculationInvariantViolation`).
 - Manual `_tag` object literals are not allowed. Tagged values MUST be
   constructed with `Data.TaggedClass`, `Data.TaggedError`,
   `Schema.TaggedClass`, or an owning package constructor built from those
@@ -517,9 +524,12 @@ is a real host substitution point over `PublicCalculatorService`: native API and
 standalone HTTP roots build it once over the live implementation, while focused
 tests supply controlled work at the same contract. One pool serves all native
 transports and counts individual batch calculations. Scope and semaphore release
-own cleanup on every exit. Metadata remains outside calculation capacity, while
-all nine calls share the five-second completion budget. Lazy invocation counts
-metadata construction within it. The HTTP-owned streamed body policy provides
+own cleanup on every exit. Only `calculate` has the five-second completion
+budget; metadata methods are the catalogue's own synchronous projections, reused
+directly, with neither a budget nor a calculation place.
+`CalculatorCatalogue` has its own closed contract: metadata lookups fail only
+with `UnsupportedCalculatorContextError` and calculation only with
+`CalculationError` or that lookup error. The HTTP-owned streamed body policy provides
 Schema-owned JSON errors at the host boundary. No
 runner or live Layer is built inside a calculation, and no transport gains a
 competing application contract. The owning package records timeout and CPU limits.
@@ -541,7 +551,8 @@ capability; its settings boundary checks the richer API binding once.
 
 The native API composes the AEO package's static `aeoRoutes` once from the
 checked catalogue and `DocsOgImages`, and supplies its existing cached settings
-Effect as `PublicationOrigins` (`Layer.succeed(PublicationOrigins)(...)`).
+Effect as `PublicationOrigins`, failing with AEO's own
+`PublicationSettingsUnavailable`.
 Configuration remains application-owned; the routes read checked addresses
 lazily on first use. The API serves each document and share image on its HTTP
 route and the Website forwards its conventional addresses there once. No

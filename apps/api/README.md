@@ -16,8 +16,10 @@ handlers, cancellation and reply budgets;
 [`@taxkit/og-image`](../../packages/og-image/README.md) the build-time share-image renderer.
 Native hosting remains in this app.
 
-The API build builds the docs catalogue ahead of time.
-`scripts/docs-catalogue.runtime.ts` composes Content's `ContentCatalogueLive`
+The API build builds the docs catalogue ahead of time. Build- and release-time
+code lives outside the Worker source: `scripts/` holds the command entries,
+`catalogue/` the catalogue Layer and its theme, and `smoke/` the public-route
+smoke checks. `scripts/docs-catalogue.runtime.ts` composes Content's `ContentCatalogueLive`
 with the `@content/docs/sources` page list, the `@taxkit/mdx` page reader and
 code highlighter and the `@taxkit/diagrams/pele` adapter supplied with
 `@taxkit/pele/live`, then writes the
@@ -39,7 +41,8 @@ documents at GET (and HEAD) `/api/v2/docs/discovery/sitemap.xml`, `/robots.txt`,
 image at `/api/v2/docs/og/<page>.png`. The routes come from that same catalogue.
 `PublicationOrigins` is supplied from the app's cached checked API and
 publication origins, so deferred native addresses are read on first use. A
-document is plain text or XML with `nosniff`; settings failure is an empty 503.
+document is plain text or XML with `nosniff`; a settings failure is the AEO
+package's own `PublicationSettingsUnavailable`, answered with an empty 503.
 Images are rendered at build time: the same script draws every published
 page's PNG with `@taxkit/og-image` and writes `src/generated/docs-images.json`.
 `ApiContentLive` checks that archive once at startup and its `DocsOgImages`
@@ -63,10 +66,19 @@ to the existing calculator and OpenAPI checks.
 ## Native Worker
 
 `@taxkit/infrastructure/api-worker` declares the lightweight native
-`TaxKitApiWorker` identity and binding type. `src/worker.ts` supplies the
-native implementation and standalone `.make` entry. Root `alchemy.apps.ts`
-joins that implementation with deployment resources through the same native
-`.make` API. Infrastructure and the Website do not import this app.
+`TaxKitApiWorker` identity and binding type. `src/worker.composition.ts` is
+the one composition seam: `apiWorkerNativeInit(leaves)` runs the application
+with the native cache, request identity, rate admission and analytics over
+the supplied leaves (Content's catalogue services and the calculator
+catalogue). Every construction failure becomes one `ApiWorkerStartupError`
+with a closed reason (`analytics-settings`, `docs-catalogue` or
+`host-settings`), which the seam turns into the `ConfigError` Alchemy's native
+contract requires, carrying only that reason's fixed message. `src/worker.ts`
+supplies the production leaves as `ApiWorkerNativeInit` and the standalone
+`.make` entry; local fixture entries under `tools/apps-local/fixtures/` call
+the same seam with replaced leaves. Root `alchemy.apps.ts` joins that
+implementation with deployment resources through the same native `.make` API.
+Infrastructure and the Website do not import this app.
 `src/worker.application.ts` constructs one router and shared
 `PublicCalculatorService` in the native instance scope. HTTP and MCP
 delegate to the same calculator service. Native requests keep their own
@@ -106,7 +118,9 @@ host routes), and allow `content-type`, the optional
 headers. Remote MCP admits Origin-less clients and browser pages served from
 the same-stage Website origin only: the static `TaxKitMcpHttpLayer` from
 `@taxkit/api-mcp/server` reads and checks that bound origin through Config; its
-`allowedOrigins` holds just it.
+`allowedOrigins` holds just it. Its admitted request headers are
+`mcpAllowedHeaders` from the same export (the public set plus the modern
+`mcp-*` headers) and the collection-policy header.
 Planning leaves those resource addresses deferred. On first incoming use, the
 app decodes and caches the bound runtime values; missing or invalid values
 produce an empty 503 response, without a guessed address.
@@ -116,8 +130,11 @@ five-second read deadline. The native stream stops at the limit and its reader
 is closed on rejection, timeout or cancellation. Oversized requests return an
 checked JSON 413 guidance; stalled bodies return checked JSON 408 guidance. CORS applies to those responses.
 
-The app's native logger and error reporter emit only a fixed event name, time
-and severity. Arbitrary messages, Causes, annotations and span labels are
+The app's native logger and error reporter emit only the request record, a
+checked `HostEventRecord` (closed event, error tag and short reason) or a fixed
+event name, time and severity. The reporter writes the failure's tag, or
+`Defect`. A dropped calculator analytics event is one `api.analytics.dropped`
+warning. Arbitrary messages, Causes, other annotations and span labels are
 discarded before console output. This is bounded containment; it provides no
 native tracing or trace exporter.
 
@@ -130,7 +147,10 @@ Local plans and transport tests do not show a deployment works.
 
 `@taxkit/analytics/api-usage` owns the calculator usage observer
 (`ApiCalculatorUsageLive`), supplied here to the one public calculator
-implementation and called after native hosted calculation succeeds. It collects only the catalogue
+implementation (every calculator composition names its `CalculatorUsage`;
+hosts without collection use `CalculatorUsageDisabled`). Background delivery is
+the required `ApiCalculatorDelivery` service; tests and hosts without delivery
+supply their own no-op Layer. The observer is called after native hosted calculation succeeds. It collects only the catalogue
 calculator ID and name. HTTP and the two MCP protocols use this same observer;
 pure tax packages and local SDK calls have no analytics dependency. Metadata,
 failed or interrupted calculations add no successful-use event. A request can
@@ -402,7 +422,11 @@ The native API builds `PublicCalculatorServiceRateLimited` once over
 Public requests need a checked original Cloudflare connection address;
 arbitrary Worker headers cannot select a key.
 
-`ApiWorkerNativeInit` supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. Infrastructure supplies a distinct value for each stage, so stages never share counters. The [infrastructure owner](../../packages/infrastructure/README.md#websiteapi-graph) owns graph and local-root selection. Hosted mode defaults to `edge` when `CALCULATOR_HOST_MODE` is absent; an invalid value fails Worker startup. The guarded local root selects `local-emulator`; a shared local limit additionally requires an HTTP loopback API origin.
+`CalculatorRequestRateKey` is a required service of the rate-limited
+calculator: `ApiCalculatorRequestRateKey` reads each calculation's identity
+from its native request (the checked edge address, or the fixed loopback key
+for the local emulator), so a composition without it does not compile. The
+native init supplies the installed native RateLimit Layer to `ApiCalculatorAdmission`, which decodes each provider reply and returns fixed unavailable guidance for provider failures or invalid replies. It requires `CALCULATOR_RATE_NAMESPACE` as a positive decimal string. Infrastructure supplies a distinct value for each stage, so stages never share counters. The [infrastructure owner](../../packages/infrastructure/README.md#websiteapi-graph) owns graph and local-root selection. Hosted mode defaults to `edge` when `CALCULATOR_HOST_MODE` is absent; an invalid value fails Worker startup. The guarded local root selects `local-emulator`; a shared local limit additionally requires an HTTP loopback API origin.
 
 Cloudflare's [rate limiter](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/) is approximate and local to a location, not an exact global quota. Real edge identity, namespace uniqueness and uploaded provider settings need separate authorised readback. Direct engine/local SDK and standalone Bun execution keep their existing contracts.
 

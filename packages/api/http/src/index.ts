@@ -1,11 +1,6 @@
 export { TaxKitApi } from "./api.js";
 export { HealthResponse } from "./groups/health.js";
-export {
-  DocsPageQuery,
-  DocsSearchQuery,
-  DocsPageUnavailable,
-  DocsSearchUnavailable,
-} from "./groups/content.js";
+export { DocsPageQuery, DocsSearchQuery } from "./groups/content.js";
 export {
   CalculatorCatalogItem,
   CalculatorCatalogResponse,
@@ -14,11 +9,8 @@ export {
   CalculatorRunReport,
   CalculatorRunRequest,
   CalculatorRunResponse,
-  CalculatorServiceError,
   HelpMode,
   CalculatorApiErrorEnvelope,
-  UnsupportedCalculatorContextError,
-  UnsupportedCalculatorError,
 } from "./groups/calculators.js";
 export {
   CalculatorCatalogItems,

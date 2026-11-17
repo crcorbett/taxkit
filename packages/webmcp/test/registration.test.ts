@@ -1,5 +1,5 @@
 import { expect, it } from "@effect/vitest";
-import { McpToolUnavailable } from "@taxkit/api-mcp/schemas";
+import { McpToolUnavailable } from "@taxkit/api-mcp/errors";
 import { TaxKitMcpToolkit } from "@taxkit/api-mcp/tools";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { DocsWebsiteOrigin } from "@taxkit/content/schemas";

@@ -15,7 +15,7 @@ import {
   Boolean as EffectBoolean,
 } from "effect";
 
-import { DocsCatalogueBuildLive } from "../src/build/docs-catalogue.layer.js";
+import { DocsCatalogueBuildLive } from "../catalogue/docs-catalogue.layer.js";
 import { ApiContentLive } from "../src/content.boundary.js";
 
 const contentRoot = "../../content/docs";
@@ -176,7 +176,10 @@ describe("bundled docs sources", () => {
         );
       }).pipe(
         Effect.provide(Layer.merge(DocsCatalogueBuildLive, NodeServices.layer))
-      )
+      ),
+    // Builds every page with real highlighting and diagrams: CPU-bound, and
+    // slower when verification runs every workspace task in parallel.
+    30_000
   );
   it.effect(
     "bundles the catalogue the authored files build to (run the API build after editing docs)",
@@ -189,7 +192,8 @@ describe("bundled docs sources", () => {
           Effect.provide(ApiContentLive)
         );
         assert.deepEqual(bundled, built);
-      })
+      }),
+    30_000
   );
   it.effect("bundles one checked share image for every published page", () =>
     Effect.gen(function* () {

@@ -50,8 +50,11 @@ explicit checks when the owner promises that runtime invariant.
   parameter layers.
 - Scenario helpers may accept `unknown`, but they must decode before providing
   facts.
-- Calculation failures should use typed tagged errors, normally
-  `CalculationError`, rather than `throw` or `Effect.die`.
+- Failures that depend on the caller's scenario use `CalculationError` with a
+  closed reason (`period-mismatch`, or the `MoneyError` reason copied with
+  `Effect.catchTag("MoneyError", ...)`), never `throw`. Do not overwrite a
+  specific error with a blanket `mapError`. A broken rule graph, checked table
+  or report invariant is a defect: `Effect.die(new CalculationInvariantViolation(...))`.
 - Wrap fallible Promise/SDK calls with inline
   `Effect.tryPromise({ try, catch })`, mapping the rejection to the owning
   tagged error. Both properties must contain direct inline arrow, function or
@@ -159,7 +162,10 @@ const row = pipe(
 );
 
 return Option.match(row, {
-  onNone: () => Effect.fail(new CalculationError({ message: "missing row" })),
+  onNone: () =>
+    Effect.fail(
+      new CalculationError({ message: "missing row", reason: "negative" })
+    ),
   onSome: Effect.succeed,
 });
 ```

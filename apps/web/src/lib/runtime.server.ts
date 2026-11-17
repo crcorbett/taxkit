@@ -1,32 +1,20 @@
-import type { NotFoundError } from "@tanstack/react-router";
+import { isNotFound } from "@tanstack/react-router";
+import type { AnyRedirect } from "@tanstack/react-router";
 import "@tanstack/react-start/server-only";
 import { setResponseStatus } from "@tanstack/react-start/server";
-import { requestDocsPage, requestDocsSearch } from "@taxkit/api-http/requests";
-import { docsPageMetadata } from "@taxkit/content/publication";
 import { WebsiteHostTelemetryLive } from "@taxkit/observability/host-telemetry";
 import { env } from "cloudflare:workers";
-import {
-  Function as EffectFunction,
-  Cause,
-  Effect,
-  Layer,
-  ManagedRuntime,
-  Boolean as EffectBoolean,
-} from "effect";
+import { Effect, Layer, ManagedRuntime, Match, Option, Schema } from "effect";
 
-import { WebsiteDocsSearchView } from "./docs/schemas";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
 import { WebsiteApiLive } from "./host/binding.adapter.layer";
 import { WebsiteBindings } from "./host/config.ingress";
-import type { WebsiteLoadError } from "./host/errors";
+import { WebsiteLoadError } from "./host/errors";
 import { WebsiteApi, WebsiteSettings } from "./host/service";
 import { WebsiteSettingsLive } from "./host/settings.layer";
 import { loadCalculatorView } from "./pages/calculator.load";
-import {
-  isRedirectCause,
-  loadFailureStatus,
-  rejectRouteLoad,
-} from "./pages/load.failure";
+import { loadDocsPageView, loadDocsSearchView } from "./pages/docs.load";
+import type { RouteLoadFailure } from "./pages/load.failure";
 import { loadRootView } from "./pages/root.load";
 // The Worker's bindings object, read at this host edge only.
 const bindings = Layer.sync(WebsiteBindings, () => ({ ...env }));
@@ -39,106 +27,66 @@ export const runtime = ManagedRuntime.make(
     WebsiteHostTelemetryLive
   ).pipe(Layer.provide(bindings))
 );
-// Server loads report their HTTP status before TanStack renders the native
-// not-found or error component. Cancellation stays interruption.
-const rejectServerLoad = <E>(
-  cause: Cause.Cause<E>
-): Effect.Effect<never, E | NotFoundError | WebsiteLoadError> =>
-  EffectBoolean.match(
-    Cause.hasInterruptsOnly(cause) || isRedirectCause(cause),
-    {
-      onFalse: () =>
-        Effect.sync(() => {
-          EffectFunction.pipe(loadFailureStatus(cause), setResponseStatus);
-        }).pipe(Effect.andThen(rejectRouteLoad(cause))),
-      onTrue: () => Effect.failCause(cause),
-    }
-  );
+const settings = WebsiteSettings.pipe(Effect.flatMap((host) => host.settings));
 const client = WebsiteApi.pipe(Effect.flatMap((host) => host.client));
-export const loadRoot = ({
-  signal,
-}: Readonly<{
-  signal: AbortSignal;
-}>) =>
-  runtime.runPromise(loadRootView.pipe(Effect.catchCause(rejectServerLoad)), {
-    signal,
-  });
+// Server loads report their HTTP status before TanStack renders the native
+// not-found or error component. A redirect keeps its own status; a defect
+// already carries only the safe 500 value; cancellation stays interruption.
+const runServerLoad =
+  (signal: AbortSignal) =>
+  <A>(
+    effect: Effect.Effect<
+      A,
+      RouteLoadFailure | AnyRedirect,
+      WebsiteApi | WebsiteSettings
+    >
+  ) =>
+    runtime.runPromise(
+      effect.pipe(
+        Effect.tapError((failure) =>
+          Match.value(failure).pipe(
+            Match.when(Schema.is(WebsiteLoadError), ({ status }) =>
+              Option.some(status)
+            ),
+            Match.when(isNotFound, () => Option.some(404)),
+            Match.orElse(() => Option.none()),
+            Effect.fromOption,
+            Effect.flatMap((status) =>
+              Effect.sync(() => {
+                setResponseStatus(status);
+              })
+            ),
+            Effect.ignore
+          )
+        ),
+        Effect.tapDefect(() =>
+          Effect.sync(() => {
+            setResponseStatus(500);
+          })
+        )
+      ),
+      { signal }
+    );
+export const loadRoot = ({ signal }: Readonly<{ signal: AbortSignal }>) =>
+  settings.pipe(loadRootView, runServerLoad(signal));
 export const loadCalculatorPage = ({
   calculatorId,
   signal,
 }: Readonly<{
   calculatorId: string;
   signal: AbortSignal;
-}>) =>
-  runtime.runPromise(
-    loadCalculatorView({ calculatorId }).pipe(
-      Effect.catchCause(rejectServerLoad)
-    ),
-    { signal }
-  );
+}>) => loadCalculatorView({ calculatorId }).pipe(runServerLoad(signal));
 export const loadDocsPage = ({
   path,
   signal,
 }: Readonly<{
   path: string;
   signal: AbortSignal;
-}>) =>
-  runtime.runPromise(
-    Effect.gen(function* () {
-      const host = yield* WebsiteSettings;
-      const settings = yield* host.settings;
-      const { navigation, page } = yield* requestDocsPage({
-        client: yield* client,
-        address: path,
-      });
-      return {
-        metadata: yield* docsPageMetadata({
-          page,
-          origin: settings.publicationOrigin,
-        }),
-        navigation,
-        page,
-      };
-    }).pipe(Effect.catchCause(rejectServerLoad)),
-    { signal }
-  );
+}>) => loadDocsPageView({ client, path, settings }).pipe(runServerLoad(signal));
 export const loadDocsSearch = ({
   query,
   signal,
 }: Readonly<{
   query: WebsiteDocsSearchQuery;
   signal: AbortSignal;
-}>) =>
-  runtime.runPromise(
-    Effect.fromResult(query).pipe(
-      Effect.matchEffect({
-        // Invalid search words are a normal page state, not a failed load.
-        onFailure: () => Effect.succeed(WebsiteDocsSearchView.InvalidSearch()),
-        onSuccess: (term) =>
-          client.pipe(
-            Effect.flatMap((generated) =>
-              Effect.all(
-                {
-                  results: requestDocsSearch({ client: generated, term }),
-                  home: requestDocsPage({
-                    client: generated,
-                    address: "/start/quickstart",
-                  }),
-                },
-                { concurrency: "unbounded" }
-              )
-            ),
-            Effect.map(({ results, home }) =>
-              WebsiteDocsSearchView.Found({
-                navigation: home.navigation,
-                results,
-                term,
-                theme: home.page.theme,
-              })
-            )
-          ),
-      }),
-      Effect.catchCause(rejectServerLoad)
-    ),
-    { signal }
-  );
+}>) => loadDocsSearchView({ client, query }).pipe(runServerLoad(signal));

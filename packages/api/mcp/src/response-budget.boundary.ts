@@ -10,11 +10,8 @@ import type { Scope } from "effect";
 import { HttpClientRequest, HttpServerResponse } from "effect/http";
 import type { HttpBody, HttpServerError, HttpServerRequest } from "effect/http";
 
-import {
-  McpResponseDeadline,
-  McpResponseLimit,
-  McpResponseTooLarge,
-} from "./schemas.js";
+import { McpResponseTooLarge } from "./errors.js";
+import { McpResponseDeadline, McpResponseLimit } from "./schemas.js";
 // The selected tools return complete replies. Read native JSON/SSE framing
 // inside the native request Scope, with a byte cap and one total deadline.
 // No subscription, resumption or unbounded event stream is advertised.

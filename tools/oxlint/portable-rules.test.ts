@@ -22,40 +22,12 @@ import {
   makeIsolatedLintWorkspace,
   writeLintFixture,
 } from "./cli-fixture.js";
+import { workspaceContracts } from "./workspaces.boundary.js";
 
 describe("portable rules", () => {
   const { join } = nodePath;
   const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
   const fixtureCases = [
-    {
-      accepted: [
-        "packages/api/mcp/src/cancellation.boundary.ts",
-        "packages/api/mcp/src/handlers.layer.ts",
-        "packages/api/mcp/src/request.service.ts",
-        "packages/api/mcp/src/response-budget.boundary.ts",
-        "packages/api/mcp/src/schemas.ts",
-        "packages/api/mcp/src/server.ts",
-        "packages/api/mcp/src/tools.ts",
-        "packages/api/mcp/test/cancellation.boundary.test.ts",
-        "packages/api/mcp/test/response-budget.boundary.test.ts",
-        "packages/api/mcp/vitest.config.ts",
-      ],
-      generated: "packages/api/mcp/src/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
     {
       accepted: ["tools/oxlint/fixtures/strict-commonjs-accepted.cjs"],
       generated: ".generated-owned-source-rejected.cjs",
@@ -141,72 +113,6 @@ describe("portable rules", () => {
       ],
     },
     {
-      accepted: [
-        "apps/web/src/lib/host/errors.ts",
-        "apps/web/src/lib/host/config.ingress.ts",
-        "apps/web/test/host/config.boundary.test.ts",
-        "apps/web/src/lib/runtime.server.ts",
-        "apps/web/src/lib/runtime.client.ts",
-        "apps/web/src/lib/host/binding.adapter.layer.ts",
-        "apps/web/src/lib/api-client.atoms.ts",
-        "packages/api/http/src/requests.ts",
-        "apps/web/src/lib/calculators/page.atoms.ts",
-        "apps/web/src/lib/pages/loaders.ts",
-        "apps/web/test/calculators/calculator.boundary.browser.test.tsx",
-        "tools/apps-local/native-pair-build.runtime.ts",
-        // `bun run lint` covers the other native suites and their surface checks.
-        "tools/apps-local/test/native-settings-failure.boundary.test.ts",
-        "tools/apps-local/test/native-cancellation.boundary.test.ts",
-        "tools/apps-local/test/native-local-development.boundary.test.ts",
-        "tools/vitest.config.ts",
-        "packages/calculators/src/form.ingress.ts",
-        "apps/web/src/entry.server.ts",
-        "apps/web/src/routes/index.tsx",
-        "apps/web/test/atom-lifecycle.browser.test.tsx",
-        "apps/web/test/pages/browser-loaders.boundary.browser.test.tsx",
-        "apps/web/vite.config.ts",
-        "apps/web/vitest.config.ts",
-        "apps/web/vitest.browser.config.ts",
-      ],
-      generated: "apps/web/src/.generated-app-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: [
-        "packages/infrastructure/src/stage.ts",
-        "packages/infrastructure/src/secrets.ts",
-        "packages/infrastructure/src/apps-stack.ts",
-      ],
-      generated: "packages/infrastructure/src/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
       accepted: [],
       generated: "apps/web/src/.generated-retired-app-strict-rejected.ts",
       namespace: "strict-effect",
@@ -247,96 +153,6 @@ describe("portable rules", () => {
       accepted: [],
       generated:
         "apps/api/scripts/.generated-retired-imports-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: [
-        "apps/api/src/config.ts",
-        "apps/api/src/schemas.ts",
-        "apps/api/src/server.ts",
-        "apps/api/src/index.ts",
-        "apps/api/src/verification/routes.ts",
-        "apps/api/src/verification/schemas.ts",
-        "apps/api/scripts/smoke-public-routes.runtime.ts",
-        "apps/api/test/smoke-boundaries.test.ts",
-        "apps/api/test/config.test.ts",
-        "apps/api/vitest.config.ts",
-      ],
-      generated: "apps/api/scripts/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: [
-        "packages/sdk/typescript/scripts/check-packed-artifact.runtime.ts",
-        "packages/sdk/typescript/scripts/validate-downstream-consumer.runtime.ts",
-        "packages/sdk/typescript/src/internal/artifact-schemas.ts",
-        "packages/sdk/typescript/test/scripts/script-boundaries.test.ts",
-      ],
-      generated:
-        "packages/sdk/typescript/scripts/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: [
-        "packages/sdk/typescript/test/au.test.ts",
-        "packages/sdk/typescript/src/au.ts",
-        "packages/sdk/typescript/src/au-effect.ts",
-        "packages/sdk/typescript/test/client-lifetime.test.ts",
-        "packages/sdk/typescript/src/client.runtime.ts",
-        "packages/sdk/typescript/test/effect.test.ts",
-        "packages/sdk/typescript/src/effect.ts",
-        "packages/sdk/typescript/src/errors.ts",
-        "packages/sdk/typescript/test/index.test.ts",
-        "packages/sdk/typescript/src/index.ts",
-        "packages/sdk/typescript/src/au.ts",
-        "packages/sdk/typescript/src/schemas/index.ts",
-        "packages/sdk/typescript/src/testing/index.ts",
-        "packages/sdk/typescript/src/types.ts",
-        "packages/sdk/typescript/type-tests/plain-client.test.ts",
-        "packages/sdk/typescript/type-tests/effect-client.test.ts",
-        "packages/sdk/typescript/vitest.config.ts",
-        "packages/sdk/typescript/vitest.browser.config.ts",
-      ],
-      generated: "packages/sdk/typescript/src/.generated-strict-rejected.ts",
       namespace: "strict-effect",
       rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
       rules: [
@@ -413,201 +229,13 @@ describe("portable rules", () => {
         "error-constructor-new",
         "no-unsafe-option-unwrap",
       ],
-    },
-    {
-      accepted: ["tools/oxlint/cli-fixture.ts"],
-      generated: "tools/oxlint/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["packages/mdx/src/live.layer.ts"],
-      generated: "packages/mdx/src/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: [
-        "packages/diagrams/src/pele.adapter.layer.ts",
-        "packages/pele/src/live.layer.ts",
-      ],
-      generated: "packages/diagrams/src/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["tools/documentation/check.runtime.ts"],
-      generated: "tools/documentation/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["packages/testing/src/index.ts"],
-      generated: "packages/testing/src/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["packages/api/http/src/in-process.layer.ts"],
-      generated: "packages/api/http/src/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["tools/repository-paths/check.runtime.ts"],
-      generated: "tools/repository-paths/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["packages/core/src/graph/rule-graph.ts"],
-      generated: "packages/core/src/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["packages/rules/au/pay/test/rule-graph.test.ts"],
-      generated: "packages/rules/au/pay/test/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    {
-      accepted: ["packages/calculators/test/public-calculator-service.test.ts"],
-      generated: "packages/calculators/test/.generated-strict-rejected.ts",
-      namespace: "strict-effect",
-      rejected: "tools/oxlint/fixtures/strict-collections-rejected.ts.txt",
-      rules: [
-        "no-imperative-collections",
-        "no-unchecked-index",
-        "no-native-at",
-        "tagged-error-name",
-        "error-constructor-new",
-        "no-promise-workflow",
-        "no-unsafe-option-unwrap",
-        "no-unchecked-json",
-        "no-runtime-outside-boundary",
-        "no-native-work",
-      ],
-    },
-    // The shared presets own direct spellings; repository settings name the
+    }, // The shared presets own direct spellings; repository settings name the
     // exact boundaries and the native restricted-name rules close aliases.
     ...EffectFunction.pipe(
       [
         {
           namespace: "taxkit-effect",
-          rules: [
-            "inline-try-promise-callbacks",
-            "no-module-level-mutable-test-state",
-            "no-switch",
-          ],
+          rules: ["inline-try-promise-callbacks"],
         },
         {
           namespace: "effect-conventions",
@@ -915,6 +543,219 @@ export const value = attempt({ try: () => Promise.resolve(1), catch: mapFailure 
         }).pipe(Effect.provide(BunServices.layer))
     );
   });
+  // Folders come from the checked workspace inventory and the root tool
+  // folders, so a new package or test folder is covered without editing this
+  // file. `bun run lint` proves the real sources in those folders are accepted.
+  const strictRules = [
+    "no-imperative-collections",
+    "no-unchecked-index",
+    "no-native-at",
+    "tagged-error-name",
+    "error-constructor-new",
+    "no-promise-workflow",
+    "no-unsafe-option-unwrap",
+    "no-unchecked-json",
+    "no-runtime-outside-boundary",
+    "no-native-work",
+  ];
+  it.effect(
+    "strict-effect rejects invalid code in every workspace and tool folder",
+    () =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const source = yield* fs.readFileString(
+          join(
+            repositoryRoot,
+            "tools/oxlint/fixtures/strict-collections-rejected.ts.txt"
+          )
+        );
+        const tools = yield* fs.readDirectory(join(repositoryRoot, "tools"));
+        const candidates = [
+          ...EffectFunction.pipe(
+            workspaceContracts,
+            Array.flatMap(({ owner }) =>
+              EffectFunction.pipe(
+                ["src", "test", "scripts"],
+                Array.map((folder) => `${owner}/${folder}`)
+              )
+            )
+          ),
+          ...EffectFunction.pipe(
+            tools,
+            Array.map((folder) => `tools/${folder}`)
+          ),
+          "tools/apps-local/test",
+        ];
+        const folders = yield* EffectFunction.pipe(
+          candidates,
+          Effect.filter((folder) =>
+            fs.stat(join(repositoryRoot, folder)).pipe(
+              Effect.map((info) => info.type === "Directory"),
+              Effect.orElseSucceed(() => false)
+            )
+          )
+        );
+        const paths = EffectFunction.pipe(
+          folders,
+          Array.sort(Order.String),
+          Array.map((folder) => `${folder}/.generated-strict-rejected.ts`)
+        );
+        expect(paths.length).toBeGreaterThan(40);
+        yield* Effect.forEach(
+          paths,
+          (path) =>
+            writeLintFixture({ path: join(repositoryRoot, path), source }),
+          { discard: true }
+        );
+        // Small batches keep each JSON report well inside what the child
+        // process stream delivers before Oxlint exits.
+        const reports = yield* Effect.forEach(
+          Array.chunksOf(paths, 6),
+          (batch) =>
+            lintFiles({ format: "json", paths: batch }).pipe(
+              Effect.tap((result) =>
+                Effect.sync(() => {
+                  expect(result.exitCode).toBe(1);
+                })
+              ),
+              Effect.flatMap((result) =>
+                Schema.decodeEffect(
+                  Schema.fromJsonString(
+                    Schema.Struct({
+                      diagnostics: Schema.Array(
+                        Schema.Struct({
+                          code: Schema.String,
+                          filename: Schema.String,
+                        })
+                      ),
+                      number_of_files: Schema.Int,
+                    })
+                  )
+                )(result.stdout)
+              )
+            )
+        );
+        const diagnostics = EffectFunction.pipe(
+          reports,
+          Array.flatMap((batch) => batch.diagnostics)
+        );
+        EffectFunction.pipe(
+          reports,
+          Array.reduce(0, (total, batch) => total + batch.number_of_files),
+          (files) => {
+            expect(files).toBe(paths.length);
+          }
+        );
+        EffectFunction.pipe(
+          paths,
+          Array.map((path) => ({
+            missing: EffectFunction.pipe(
+              strictRules,
+              Array.filter(
+                (rule) =>
+                  !EffectFunction.pipe(
+                    diagnostics,
+                    Array.some(
+                      (diagnostic) =>
+                        diagnostic.filename.endsWith(path) &&
+                        diagnostic.code === `strict-effect(${rule})`
+                    )
+                  )
+              )
+            ),
+            path,
+          })),
+          Array.filter(({ missing }) => missing.length > 0),
+          (uncovered) => {
+            expect(uncovered).toStrictEqual([]);
+          }
+        );
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
+    120_000
+  );
+  // The preset's collection rule owns both former local rules: `switch` and
+  // module-level `let` in a test each report once, and no local rule repeats it.
+  it.effect(
+    "reports switch and module-level test state once through the preset",
+    () =>
+      Effect.gen(function* () {
+        const path = "packages/core/test/.generated-imperative-state.test.ts";
+        yield* writeLintFixture({
+          path: join(repositoryRoot, path),
+          source: `import { describe, expect, it } from "@effect/vitest";
+
+let shared = 0;
+
+describe("probe", () => {
+  it("reads shared state", () => {
+    switch (shared) {
+      default:
+        expect(shared).toBe(0);
+    }
+  });
+});
+`,
+        });
+        const result = yield* runOxlint({ path });
+        expect(result.exitCode).toBe(1);
+        EffectFunction.pipe(
+          result.codes,
+          Array.filter(
+            (code) =>
+              code === "strict-effect(no-imperative-collections)" ||
+              code.startsWith("taxkit-effect(")
+          ),
+          (actual) => {
+            expect(actual).toStrictEqual([
+              "strict-effect(no-imperative-collections)",
+              "strict-effect(no-imperative-collections)",
+            ]);
+          }
+        );
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer)),
+    30_000
+  );
+  // One lint pass: a directive naming the decoder rule, or switching off the
+  // guard itself, fails; an ordinary directive and plain code pass.
+  it.effect.each([
+    {
+      name: "a decoder-rule directive",
+      rejected: true,
+      source: `import { Schema } from "effect";
+// oxlint-disable-next-line effect-conventions/no-schema-decoder-outside-ingress
+export const value = Schema.decodeUnknownSync(Schema.String)("x");
+`,
+    },
+    {
+      name: "a file-wide guard directive",
+      rejected: true,
+      source: `/* oxlint-disable taxkit/protected-rule-directives */
+import { Schema } from "effect";
+export const value = Schema.String;
+`,
+    },
+    {
+      name: "an unrelated directive",
+      rejected: false,
+      source: `import { Schema } from "effect";
+// oxlint-disable-next-line typescript/no-explicit-any -- probe
+export const value = Schema.String;
+`,
+    },
+  ])("guards decoder placement against $name", ({ rejected, source }) =>
+    Effect.gen(function* () {
+      const path = "packages/core/src/.generated-protected-directive.ts";
+      yield* writeLintFixture({ path: join(repositoryRoot, path), source });
+      const result = yield* runOxlint({ path });
+      EffectFunction.pipe(
+        result.codes,
+        Array.contains("taxkit(protected-rule-directives)"),
+        (actual) => {
+          expect(actual).toBe(rejected);
+        }
+      );
+    }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
+  );
   // Oxlint has no stdin mode; use one exact admitted fixture and a neighbouring canary.
   it.effect.each([
     {

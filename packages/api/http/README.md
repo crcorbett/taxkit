@@ -122,17 +122,28 @@ query contract; calculations accept only the correlated request body.
   request envelope, OpenAPI annotations and public schema exports from
   `@taxkit/calculators`.
 - `src/requests.ts` (`./requests`): the generated client's named reads for its
-  callers, `requestDocsPage`, `requestDocsSearch`, `requestDocsMarkdown`,
-  `requestCatalogue` and `requestCalculation`. Each has one ten-second deadline
+  callers, `requestDocsPage`, `requestDocsPageAt`, `requestDocsNavigation`,
+  `requestDocsSearch`, `requestDocsMarkdown`, `requestCatalogue`,
+  `requestCalculatorSchema` and `requestCalculation`. Each has one ten-second deadline
   over headers, body and decoding; `boundedReplies` caps each reply at 2 MiB.
-  A reply must answer its request (`ApiReplyMismatch` otherwise).
+  A reply must answer its request and decode as its declared Schema
+  (`ApiReplyMismatch` otherwise, a server fault with 500 semantics). Only an
+  unanswered request or a 5xx reply without its declared body is
+  `ApiUnavailable` (503 semantics).
   `requestDocsSearch` returns matching pages only and skips HTTP for empty words.
   Callers compose navigation from an existing page read; the Website's search
   loader reuses the canonical page's navigation and theme rather than reading
   navigation twice.
-- `src/errors.ts` (`./errors`): the client's own transport outcomes
+- `src/errors.ts` (`./errors`): the package's one expected-error path: the
+  request-body refusals (`CalculatorRequestBodyTooLarge`,
+  `CalculatorRequestBodyTimedOut` and the reader's private
+  `CalculatorRequestBodyRejected`), the client's own transport outcomes
   (`ApiUnavailable`, `ApiDeadlineExceeded`, `ApiReplyTooLarge`,
-  `ApiReplyMismatch`) and `CalculationCallFailure`.
+  `ApiReplyMismatch`) and `CalculationCallFailure`. `./schemas` holds the body
+  error envelope and policy Schemas; `./request-boundary` holds only the body
+  limit, deadline and reader. Documentation errors are imported from
+  `@taxkit/content/errors` and calculator errors from
+  `@taxkit/calculators/errors`; this package does not re-export them.
 - `src/negotiation.ingress.ts` (`./negotiation`): `DocsAccept`, which reads one
   `Accept` header as HTML, Markdown, unacceptable or invalid.
 - `src/openapi.ts`: package-owned OpenAPI generation, structured
@@ -404,7 +415,8 @@ The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
 identities and explicit Match narrowing of report/error unions.
 
 Calculation capacity and operation-timeout errors become HTTP 503/504
-envelopes under the
+envelopes; a `CalculationError` (a scenario the rules cannot calculate) stays
+400, while an engine defect is the native empty 500 reply. These follow the
 [shared work policy](../../calculators/README.md#shared-calculation-work-limits).
 
 
@@ -423,9 +435,10 @@ request) and 408 (`request-timeout`, retry manually). JSON responses use the
 `error` envelope. The package keeps a checked HTML policy, with a fixed message
 and link back to the calculators, that no current host selects; the Website
 accepts no form POST.
-The calculation endpoint declares both statuses in OpenAPI. Every metadata
-endpoint declares 504 for the shared operation timeout; lookup failures retain
-400. Metadata never consumes a calculation place. No automatic retry is added.
+The calculation endpoint declares both statuses in OpenAPI. Metadata endpoints
+declare no timeout: lookups declare only the 400 `UnsupportedCalculatorContextError`
+envelope and list routes declare no error. Metadata never consumes a
+calculation place. No automatic retry is added.
 
 
 Optional request fields use one semantic Option after ingress. Core calculation

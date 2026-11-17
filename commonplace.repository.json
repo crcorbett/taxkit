@@ -24,7 +24,11 @@
   },
   "ownerPaths": {
     "sources": ["tools/oxlint/package-roles.ts"],
-    "allowMissing": ["tools/oxlint/fixtures/*.ts", "**/.generated-*"]
+    "allowMissing": [
+      "tools/oxlint/fixtures/*.ts",
+      "**/.generated-*",
+      "apps/web/src/routeTree.gen.ts"
+    ]
   },
   "packages": {
     "privateLeaf": ["packages/docs-examples"]

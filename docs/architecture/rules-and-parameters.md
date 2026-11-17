@@ -55,8 +55,9 @@ while domain readers use Option. Both representations check start-before-end;
 an absent end remains unbounded. The [core owner](../../packages/core/README.md)
 explains the two Option levels and the fallible date helpers. Authored tables
 assemble trusted constants through their owning Schemas. Rule calculations
-check newly derived constrained amounts through fallible constructors and map
-expected failures to safe `CalculationError` values. This does not change the
+check newly derived constrained amounts through fallible constructors and copy
+each `MoneyError` reason into a safe `CalculationError` with `Effect.catchTag`.
+A coverage gap in a checked table is a defect, not a caller error. This does not change the
 retained table values or expand supported tax years.
 
 ## Whole parameter relationships

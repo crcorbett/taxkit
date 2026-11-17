@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-import { ApiServerConfigSourceSchema } from "../schemas.js";
+import { ApiServerConfigSourceSchema } from "../src/schemas.js";
 
 export const ApiSmokeSettings = Schema.Struct({
   port: ApiServerConfigSourceSchema.fields.port,

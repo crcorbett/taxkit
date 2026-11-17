@@ -56,7 +56,16 @@
             "type": "string"
           },
           "reason": {
-            "enum": ["rule", "graph", "output-invariant"],
+            "enum": [
+              "period-mismatch",
+              "empty",
+              "format",
+              "fractional-cents",
+              "non-finite",
+              "range",
+              "negative",
+              "overflow"
+            ],
             "type": "string"
           }
         },
@@ -1022,23 +1031,6 @@
               }
             },
             "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
           }
         },
         "security": [],
@@ -1228,35 +1220,9 @@
                     "error": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/InputValidationErrorEncoded"
-                        },
-                        {
-                          "$ref": "#/components/schemas/CalculationErrorEncoded"
-                        },
-                        {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorErrorEncoded"
-                        },
-                        {
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],
@@ -2890,35 +2856,9 @@
                     "error": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/InputValidationErrorEncoded"
-                        },
-                        {
-                          "$ref": "#/components/schemas/CalculationErrorEncoded"
-                        },
-                        {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorErrorEncoded"
-                        },
-                        {
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],
@@ -3354,35 +3294,9 @@
                     "error": {
                       "anyOf": [
                         {
-                          "$ref": "#/components/schemas/InputValidationErrorEncoded"
-                        },
-                        {
-                          "$ref": "#/components/schemas/CalculationErrorEncoded"
-                        },
-                        {
-                          "$ref": "#/components/schemas/UnsupportedCalculatorErrorEncoded"
-                        },
-                        {
                           "$ref": "#/components/schemas/UnsupportedCalculatorContextErrorEncoded"
                         }
                       ]
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
                     }
                   },
                   "required": ["error"],
@@ -5631,23 +5545,6 @@
               }
             },
             "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
           }
         },
         "security": [],
@@ -5698,23 +5595,6 @@
               }
             },
             "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
           }
         },
         "security": [],
@@ -5944,23 +5824,6 @@
               }
             },
             "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
           }
         },
         "security": [],
@@ -6055,23 +5918,6 @@
               }
             },
             "description": "Success"
-          },
-          "504": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "$ref": "#/components/schemas/CalculatorOperationTimedOutEncoded"
-                    }
-                  },
-                  "required": ["error"],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
           }
         },
         "security": [],

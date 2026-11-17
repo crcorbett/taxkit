@@ -5,6 +5,7 @@ import {
 } from "@taxkit/analytics/api-usage";
 import { CollectionPolicyHeader } from "@taxkit/analytics/schemas";
 import type { CalculatorUse } from "@taxkit/analytics/schemas";
+import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import {
   CalculatorId,
   GetCalculatorRequest,
@@ -14,8 +15,8 @@ import {
   CalculationRequest,
   CalculatorFixture,
   CalculatorFixtureMode,
-  CalculatorLive,
 } from "@taxkit/calculators/testing/fixtures";
+import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import {
   Function as EffectFunction,
   Array,
@@ -29,9 +30,12 @@ import {
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
+import { ApiCalculatorDeliveryDisabled } from "./worker.fixture.js";
 
 const expectedCalculatorName: unknown = expect.any(String);
-const AnalyticsCalculatorLive = CalculatorLive.pipe(
+// The bounded public service with the API's usage observer.
+const AnalyticsCalculatorLive = PublicCalculatorServiceBounded.pipe(
+  Layer.provide(CalculatorCatalogueLive),
   Layer.provide(ApiCalculatorUsageLive)
 );
 it.effect.each([
@@ -80,7 +84,9 @@ it.effect.each([
               )
             )
           ),
-          Effect.provide(AnalyticsCalculatorLive),
+          Effect.provide(
+            Layer.merge(AnalyticsCalculatorLive, ApiCalculatorDeliveryDisabled)
+          ),
           Effect.scoped
         )).status
       ).toBe(200);

@@ -7,6 +7,7 @@ import {
   FileSystem,
   Option,
   Order,
+  Path,
   Record,
   Schema,
   Stream,
@@ -54,10 +55,17 @@ const providerCommand = /^bun run (?:pr|production):(?:plan|deploy)\b/u;
 const statusOverride = /\b(?:always|failure|cancelled)\s*\(/u;
 // These executable fixture leaves cannot build, access a provider or use a
 // credential. The orchestration scripts themselves are read from the repository.
+// The preview-stage entry runs under the real Bun, so its own child commands
+// reach these fixture leaves through PATH.
 const bunFixture = `#!/bin/sh
 case "$*" in
   'run verification'|'run release:check'|'run test'|'run test:native')
     exec sh "$GATE_FIXTURE/$2"
+    ;;
+  tools/infrastructure/preview-stage.runtime.ts*)
+    script="$1"
+    shift
+    exec "$GATE_BUN" "$GATE_ROOT/$script" "$@"
     ;;
 esac
 printf '%s\\n' "$*" >> "$GATE_FIXTURE/calls"
@@ -66,14 +74,24 @@ test "$*" != "$GATE_FAIL"
 const alchemyFixture = `#!/bin/sh
 printf 'alchemy %s\\n' "$*" >> "$GATE_FIXTURE/calls"
 `;
+// Turbo runs the native pair through its root script, so a native failure
+// fails the Turbo invocation that owns it.
 const turboFixture = `#!/bin/sh
 printf 'turbo %s\\n' "$*" >> "$GATE_FIXTURE/calls"
+case " $* " in
+  *" test:native "*) sh "$GATE_FIXTURE/test:native" || exit $? ;;
+esac
 `;
 const commandFixture = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
   const directory = yield* fs.makeTempDirectoryScoped({
     prefix: "taxkit-gates-",
   });
+  const bun = yield* spawner
+    .string(ChildProcess.make("sh", ["-c", "command -v bun"]))
+    .pipe(Effect.map((output) => output.trim()));
   const manifest = yield* fs
     .readFileString("package.json")
     .pipe(
@@ -99,7 +117,12 @@ const commandFixture = Effect.gen(function* () {
   yield* fs.chmod(`${directory}/alchemy`, 0o700);
   yield* fs.chmod(`${directory}/turbo`, 0o700);
   yield* fs.chmod(`${directory}/gh`, 0o700);
-  return { directory, scripts: manifest.scripts };
+  return {
+    bun,
+    directory,
+    root: path.resolve("."),
+    scripts: manifest.scripts,
+  };
 });
 const runCommand = Effect.fnUntraced(function* ({
   fixture,
@@ -124,8 +147,10 @@ const runCommand = Effect.fnUntraced(function* ({
         // Only harmless fixture executables precede system tools. No actual Bun,
         // Alchemy, Doppler or provider command is reached by a tested script.
         env: {
+          GATE_BUN: fixture.bun,
           GATE_FAIL: fail ?? "",
           GATE_FIXTURE: fixture.directory,
+          GATE_ROOT: fixture.root,
           GATE_PR_STATE: pullRequestState,
           GITHUB_OUTPUT: `${fixture.directory}/outputs`,
           GITHUB_REPOSITORY: "fixture/repository",
@@ -178,17 +203,25 @@ describe("required native release gate", () => {
           command: "bun run verification",
         });
         expect(result.code).toBe(0);
-        EffectFunction.pipe(result.calls.slice(-2), (actual) => {
+        // Source-rewriting tool tests and the native pair run one task at a
+        // time, after every cached workspace check has finished.
+        EffectFunction.pipe(result.calls.slice(-3), (actual) => {
           expect(actual).toStrictEqual([
+            "turbo run test:tools test:native --concurrency=1",
             "run build:native-pair",
             "run test:native-pair",
           ]);
         });
         EffectFunction.pipe(
-          result.calls.indexOf("run test:tools"),
+          result.calls.indexOf(
+            "turbo run check-types check-types:root knip test test:browser"
+          ),
           (actual) => {
+            expect(actual).toBeGreaterThan(result.calls.indexOf("run lint"));
             expect(actual).toBeLessThan(
-              result.calls.indexOf("run build:native-pair")
+              result.calls.indexOf(
+                "turbo run test:tools test:native --concurrency=1"
+              )
             );
           }
         );
@@ -673,6 +706,37 @@ describe("required native release gate", () => {
         }
       );
     }).pipe(Effect.provide(BunServices.layer))
+  );
+  it.effect.each([
+    { code: 0, stage: "pr-123" },
+    { code: 64, stage: "prod" },
+    { code: 64, stage: "pr-0123" },
+  ])(
+    "decodes the cleanup stage with the preview entry: $stage",
+    ({ code, stage }) =>
+      Effect.gen(function* () {
+        const configuration = yield* workflow(checksWorkflow);
+        const cleanup = Record.get(configuration.jobs, "cleanup").pipe(
+          Option.getOrElse(() => expect.fail("Missing cleanup job"))
+        );
+        const guard = EffectFunction.pipe(
+          cleanup.steps,
+          Array.findFirst((step) => Option.contains(step.id, "stage-safety"))
+        ).pipe(Option.getOrElse(() => expect.fail("Missing stage guard")));
+        const command = Option.getOrElse(guard.run, () =>
+          expect.fail("Missing stage check")
+        );
+        expect(command).toBe(
+          'bun tools/infrastructure/preview-stage.runtime.ts check "$STAGE"'
+        );
+        const fixture = yield* commandFixture;
+        const result = yield* runCommand({
+          fixture,
+          command: `STAGE=${stage}; ${command}`,
+        });
+        expect(result.code).toBe(code);
+        expect(result.calls).toStrictEqual([]);
+      }).pipe(Effect.scoped, Effect.provide(BunServices.layer))
   );
   it.effect.each(["open", "closed"] as const)(
     "rechecks the actual cleanup PR state before admitting destroy: %s",

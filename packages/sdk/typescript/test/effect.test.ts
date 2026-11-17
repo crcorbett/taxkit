@@ -116,6 +116,7 @@ describe("native calculator definitions", () => {
     Effect.gen(function* () {
       const failure = new CalculationError({
         message: "Fixture calculation failed.",
+        reason: "overflow",
       });
       const result = yield* calculateReport(
         {

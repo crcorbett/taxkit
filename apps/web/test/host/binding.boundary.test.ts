@@ -78,7 +78,7 @@ it.effect.each([
       }
       if (!apiValid && settingsValid) {
         // A broken binding leaves the root loader's public settings available.
-        const loaded = yield* loadRootView;
+        const loaded = yield* settings.settings.pipe(loadRootView);
         const root = yield* Schema.decodeUnknownEffect(WebsiteRootView)(
           loaded.view
         );

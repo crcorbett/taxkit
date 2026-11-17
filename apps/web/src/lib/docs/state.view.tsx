@@ -8,6 +8,7 @@ import { RetryButton } from "#/lib/pages/retry.container";
 import { DocsAppearance } from "./appearance.container";
 import { DocsHeading } from "./components";
 import { useDocsNavigationFocus } from "./focus.container";
+import { docsStartSplat } from "./schemas";
 
 // Without a checked page, the recovery view uses accessible platform colours
 // rather than inventing or caching a replacement MDX theme.
@@ -52,7 +53,7 @@ export const DocsState = ({
         >
           <Link
             onClick={requestDocsNavigationFocus}
-            params={{ _splat: "start/quickstart" }}
+            params={{ _splat: docsStartSplat }}
             to="/$"
           >
             Open the Quickstart <ArrowRight aria-hidden="true" size={16} />

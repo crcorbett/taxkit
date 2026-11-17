@@ -1,12 +1,15 @@
 import { docsImageApiPath } from "@taxkit/api-http/routes";
 import "@tanstack/react-start/server-only";
-import { DocsPngBytes, DocsPublicPagePath } from "@taxkit/content/schemas";
-import { Match, Effect, Option, Record, Schema } from "effect";
+import {
+  DocsImageFamilyPath,
+  DocsImagePath,
+} from "@taxkit/content/publication";
+import { DocsPngBytes } from "@taxkit/content/schemas";
+import { Match, Effect, Option, Schema } from "effect";
 import { Headers, HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { WebsiteApi } from "../host/service";
 
-const imagePattern = /^\/og(?<page>\/.+)\.png$/u;
 const unavailable = HttpServerResponse.empty({
   headers: { "cache-control": "no-store" },
   status: 503,
@@ -15,14 +18,11 @@ const unavailable = HttpServerResponse.empty({
 // Website forwards its own /og/<page>.png address once and checks the bytes.
 export const docsImageRepresentation = Effect.gen(function* () {
   const request = yield* HttpServerRequest.HttpServerRequest;
-  const page = HttpServerRequest.toURL(request).pipe(
-    Option.flatMap((url) =>
-      Option.fromNullishOr(imagePattern.exec(url.pathname)?.groups)
-    ),
-    Option.flatMap(Record.get("page")),
-    Option.flatMap(Option.fromNullishOr)
+  const address = HttpServerRequest.toURL(request).pipe(
+    Option.map(({ pathname }) => pathname),
+    Option.filter(Schema.is(DocsImageFamilyPath))
   );
-  if (Option.isNone(page)) {
+  if (Option.isNone(address)) {
     return Option.none();
   }
   if (request.method !== "GET" && request.method !== "HEAD") {
@@ -33,7 +33,9 @@ export const docsImageRepresentation = Effect.gen(function* () {
       })
     );
   }
-  const path = Schema.decodeUnknownOption(DocsPublicPagePath)(page.value);
+  const path = Schema.decodeOption(DocsImagePath)(address.value).pipe(
+    Option.map(([, page]) => page)
+  );
   if (Option.isNone(path)) {
     return Option.some(
       HttpServerResponse.empty({

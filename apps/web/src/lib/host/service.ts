@@ -3,6 +3,10 @@ import type {
   ApiUnavailable,
 } from "@taxkit/api-http/errors";
 import type { TaxKitClient } from "@taxkit/api-http/requests";
+import type {
+  DocsDiscoveryApiPath,
+  docsImageApiPath,
+} from "@taxkit/api-http/routes";
 import { Context } from "effect";
 import type { Effect } from "effect";
 
@@ -21,12 +25,18 @@ export class WebsiteSettings extends Context.Service<
   }
 >()("taxkit/web/WebsiteSettings") {}
 
+// The only API addresses the Website forwards: finished discovery documents
+// and share images, each built by its catalogue owner.
+export type WebsiteForwardPath =
+  | typeof DocsDiscoveryApiPath.Type
+  | ReturnType<typeof docsImageApiPath>;
+
 export class WebsiteApi extends Context.Service<
   WebsiteApi,
   {
     readonly client: Effect.Effect<TaxKitClient, WebsiteApiConfigError>;
     readonly forward: (request: {
-      readonly path: string;
+      readonly path: WebsiteForwardPath;
     }) => Effect.Effect<
       Response,
       ApiUnavailable | ApiDeadlineExceeded | WebsiteApiConfigError

@@ -1,5 +1,9 @@
 import { assert, describe, it } from "@effect/vitest";
-import { DocsSourceError } from "@taxkit/content/errors";
+import {
+  DocsPageUnavailable,
+  DocsSearchUnavailable,
+  DocsSourceError,
+} from "@taxkit/content/errors";
 import { DocsPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
@@ -15,10 +19,6 @@ import {
 import { HttpApiClient } from "effect/http-api";
 
 import { TaxKitApi } from "../src/api.js";
-import {
-  DocsPageUnavailable,
-  DocsSearchUnavailable,
-} from "../src/groups/content.js";
 import { TaxKitApiInProcessLive } from "../src/in-process.layer.js";
 import { TaxKitServerLayer } from "../src/server.js";
 import { ContentTestLive } from "./content.fixture.js";

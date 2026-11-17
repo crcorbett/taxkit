@@ -22,7 +22,9 @@ import { docsHeadingId } from "./focus.atoms";
 import { useDocsNavigationFocus } from "./focus.container";
 import { DocsMenu } from "./menu.container";
 import { DocsNavigation } from "./page.view";
+import { docsStartSplat } from "./schemas";
 
+// The header's repository link. Page edit links come from Content metadata.
 const repositoryUrl = "https://github.com/crcorbett/taxkit";
 
 export const DocsHeader = ({
@@ -62,7 +64,7 @@ export const DocsHeader = ({
             <Link
               className="docs-header-current"
               onClick={requestDocsNavigationFocus}
-              params={{ _splat: "start/quickstart" }}
+              params={{ _splat: docsStartSplat }}
               to="/$"
             >
               Documentation
@@ -115,14 +117,14 @@ export const DocsHeader = ({
 };
 
 export const DocsPageActions = ({
+  edit,
   markdown,
-  source,
 }: Readonly<{
+  edit: DocsPageMetadata["edit"];
   markdown: DocsPageMetadata["markdown"];
-  source: DocsPublicPage["source"];
 }>) => (
   <div className="docs-page-actions">
-    <a href={`${repositoryUrl}/edit/main/content/docs/${source}`}>
+    <a href={edit}>
       <GitFork aria-hidden="true" size={15} />
       Edit this page
       <ArrowUpRight

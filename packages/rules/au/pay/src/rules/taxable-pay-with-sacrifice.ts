@@ -33,6 +33,7 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
     if (gross.period !== sacrifice.period) {
       return yield* new CalculationError({
         message: `taxkit/rules-au-pay: salary sacrifice period (${sacrifice.period}) must match gross pay period (${gross.period})`,
+        reason: "period-mismatch",
       });
     }
 
@@ -58,11 +59,13 @@ export const TaxablePayWithSacrificeLive = Layer.effect(TaxablePayFact)(
       trace,
     });
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Taxable pay could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );

@@ -1,4 +1,7 @@
-import { CalculationError } from "@taxkit/core/errors";
+import {
+  CalculationError,
+  CalculationInvariantViolation,
+} from "@taxkit/core/errors";
 import { subtract } from "@taxkit/core/primitives";
 import { Context, Effect, Layer } from "effect";
 
@@ -41,11 +44,13 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
   const net = yield* NetPayFact;
 
   const salarySacrifice = yield* subtract(gross.amount, taxable.amount).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Pay adjustment is outside the supported range.",
+          reason,
         })
+      )
     )
   );
   return yield* TakeHomePayReport.makeEffect({
@@ -59,13 +64,16 @@ export const CalculateTakeHomePay = Effect.gen(function* () {
     withholdings: ledger,
     withholdingsTotal: ledger.total,
   }).pipe(
+    // The rules above produce every report field; a rejected report is a
+    // defect in this pack, not something a caller can correct.
     Effect.mapError(
       () =>
-        new CalculationError({
+        new CalculationInvariantViolation({
+          invariant: "report",
           message: "Pay report invariant failed.",
-          reason: "output-invariant",
         })
-    )
+    ),
+    Effect.orDie
   );
 });
 

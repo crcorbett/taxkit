@@ -11,6 +11,7 @@ import {
   Logger,
   Match,
   Option,
+  References,
   Schema,
   Boolean as EffectBoolean,
 } from "effect";
@@ -61,15 +62,42 @@ export const HostRequestRecord = Schema.Struct({
   statusClass: Schema.Literals(["1xx", "2xx", "3xx", "4xx", "5xx", "none"]),
 });
 export type HostRequestRecord = typeof HostRequestRecord.Type;
+/**
+ * The closed operational events a host may log besides its request record.
+ * Each names one decision an operator can act on.
+ */
+export const HostEvent = Schema.Literals([
+  "api.analytics.dropped",
+  "host.failure.reported",
+  "website.load.failed",
+]);
+export type HostEvent = typeof HostEvent.Type;
+// A failure's own tag, such as `ApiUnavailable`: bounded and never a message.
+const HostErrorTag = Schema.String.check(
+  Schema.isPattern(/^[A-Z][A-Za-z0-9]{0,63}$/u)
+);
+/**
+ * The one annotation record a host log may carry: a closed event, the tag of
+ * the failure it describes and a short fixed reason. A host attaches it with
+ * `Effect.annotateLogs(HostEventRecord.make(...))`; other annotations, the
+ * message, Causes and span labels never reach output.
+ */
+export const HostEventRecord = Schema.Struct({
+  errorTag: HostErrorTag,
+  event: HostEvent,
+  reason: Schema.String.check(Schema.isPattern(/^[a-z][a-z0-9-]{0,47}$/u)),
+});
+export type HostEventRecord = typeof HostEventRecord.Type;
 // Both calculation hosts discard arbitrary messages, Causes, annotations and
-// span labels before log egress. Only a complete request record from the same
-// host keeps its fixed fields; anything else becomes one fixed runtime event.
+// span labels before log egress. A complete request record from the same host
+// keeps its fixed fields, and a checked event record (from the message or the
+// annotations) keeps its three; anything else becomes one fixed runtime event.
 const safeLogger = (
   service: HostService,
   event: "api.runtime.event" | "website.runtime.event"
 ) =>
   Logger.withConsoleLog(
-    Logger.make(({ date, logLevel, message }) =>
+    Logger.make(({ date, fiber, logLevel, message }) =>
       Formatter.formatJson(
         Option.match(
           EffectFunction.pipe(
@@ -81,12 +109,35 @@ const safeLogger = (
             Option.flatMap(Schema.encodeUnknownOption(HostRequestRecord))
           ),
           {
-            onNone: () => ({
-              event,
-              level: logLevel,
-              service,
-              timestamp: date.toISOString(),
-            }),
+            onNone: () =>
+              Option.match(
+                EffectFunction.pipe(
+                  Array.ensure(message),
+                  Array.findFirst(Schema.is(HostEventRecord)),
+                  Option.orElse(() =>
+                    Option.liftPredicate(
+                      fiber.getRef(References.CurrentLogAnnotations),
+                      Schema.is(HostEventRecord)
+                    )
+                  )
+                ),
+                {
+                  onNone: () => ({
+                    event,
+                    level: logLevel,
+                    service,
+                    timestamp: date.toISOString(),
+                  }),
+                  onSome: (record) => ({
+                    errorTag: record.errorTag,
+                    event: record.event,
+                    level: logLevel,
+                    reason: record.reason,
+                    service,
+                    timestamp: date.toISOString(),
+                  }),
+                }
+              ),
             onSome: (record) => ({
               durationMs: record.durationMs,
               event: record.event,
@@ -104,15 +155,28 @@ const safeLogger = (
       )
     )
   );
-// The fixed reporter keeps an empty Cause and one fixed message.
+// Effect's reporter callback is synchronous, so it calls the safe logger
+// directly. It keeps an empty Cause and writes only the failure's checked tag
+// (or `Defect`), never its message, attributes or stack.
 const safeReporter = (logger: ReturnType<typeof safeLogger>) =>
-  ErrorReporter.make(({ fiber }) => {
+  ErrorReporter.make(({ cause, error, fiber }) => {
     logger.log({
       cause: Cause.empty,
       date: new Date(fiber.getRef(Clock.Clock).currentTimeMillisUnsafe()),
       fiber,
       logLevel: "Error",
-      message: "Calculation host failure",
+      message: HostEventRecord.make({
+        // A tagged failure keeps its name as its tag; a defect is `Defect`.
+        errorTag: EffectBoolean.match(Cause.hasFails(cause), {
+          onFalse: () => "Defect",
+          onTrue: () =>
+            Option.liftPredicate(error.name, Schema.is(HostErrorTag)).pipe(
+              Option.getOrElse(() => "Unknown")
+            ),
+        }),
+        event: "host.failure.reported",
+        reason: "reported",
+      }),
     });
   });
 const apiLogger = safeLogger("taxkit-api", "api.runtime.event");

@@ -1,5 +1,5 @@
 import { assert, describe, it } from "@effect/vitest";
-import { DocsImageRenderError, DocsSourceError } from "@taxkit/content/errors";
+import { DocsImageRenderError } from "@taxkit/content/errors";
 import { DocsPngBytes } from "@taxkit/content/schemas";
 import { ContentCatalogue, DocsOgImages } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
@@ -22,7 +22,10 @@ import * as HttpHeaders from "effect/http/Headers";
 
 import { exampleOrigins } from "../src/__testing__/fixtures.js";
 import { aeoRoutes } from "../src/routes.layer.js";
-import { PublicationOrigins } from "../src/service.js";
+import {
+  PublicationOrigins,
+  PublicationSettingsUnavailable,
+} from "../src/service.js";
 
 const png = Effect.gen(function* () {
   const bytes = new Uint8Array(24);
@@ -154,12 +157,7 @@ describe("answer-engine routes", () => {
           ),
         }),
         Layer.succeed(PublicationOrigins)(
-          Effect.fail(
-            new DocsSourceError({
-              message: "Settings unavailable.",
-              operation: "getDiscoveryDocument",
-            })
-          )
+          Effect.fail(new PublicationSettingsUnavailable())
         )
       );
       const document = yield* serve("/api/v2/docs/discovery/llms.txt", layer);

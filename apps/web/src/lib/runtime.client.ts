@@ -1,11 +1,10 @@
-import { requestDocsPage, requestDocsSearch } from "@taxkit/api-http/requests";
+import type { AnyRedirect } from "@tanstack/react-router";
 import { clientToolHandlers } from "@taxkit/api-mcp/client-handlers";
 import { TaxKitMcpToolkit } from "@taxkit/api-mcp/tools";
-import { docsPageMetadata } from "@taxkit/content/publication";
 import { ModelContextHostLive } from "@taxkit/webmcp/host";
 import { registerWebMcpTools } from "@taxkit/webmcp/registration";
 import { WebMcpSite } from "@taxkit/webmcp/service";
-import { Effect, Layer, Option, Schema } from "effect";
+import { Effect, Layer, Option } from "effect";
 import * as AtomRegistry from "effect/reactivity/AtomRegistry";
 
 import {
@@ -13,15 +12,16 @@ import {
   apiClientRuntime,
   browserApiClient,
   browserRuntime,
+  browserSettings,
+  browserSettingsUnavailable,
   publicSettingsAtom,
 } from "./api-client.atoms";
-import { WebsiteDocsSearchView } from "./docs/schemas";
 import type { WebsiteDocsSearchQuery } from "./docs/search-location.ingress";
-import { TaxKitWebConfigError } from "./host/errors";
-import { WebsiteRootView } from "./host/schemas";
 import { loadCalculatorView } from "./pages/calculator.load";
-import { rejectRouteLoad } from "./pages/load.failure";
+import { loadDocsPageView, loadDocsSearchView } from "./pages/docs.load";
+import type { RouteLoadFailure } from "./pages/load.failure";
 import type { LoaderContext } from "./pages/loader-context";
+import { loadRootView } from "./pages/root.load";
 
 // WebMCP shares the API MCP tool definitions; its handlers call the public API
 // through the same generated client as route loaders.
@@ -62,55 +62,40 @@ export const webMcpAtom = browserRuntime.atom((get) =>
       ),
   })
 );
-const settingsUnavailable = new TaxKitWebConfigError({
-  message: "TaxKit web settings are missing or invalid.",
-  operation: "settings",
-  runtime: "client",
-});
-// TanStack's one browser Promise bridge. It runs a request Effect with the
-// shared registry and the loader's own AbortSignal. Route results belong to
-// the router; there is no request Atom or second cache.
-const runForLoader = <A, E>({
+// TanStack's one browser Promise bridge. It runs a translated route load with
+// the shared registry and the loader's own AbortSignal. Route results belong
+// to the router; there is no request Atom or second cache.
+const runForLoader = <A>({
   context,
   effect,
   signal,
 }: Readonly<{
   context: LoaderContext;
-  effect: Effect.Effect<A, E, AtomRegistry.AtomRegistry>;
+  effect: Effect.Effect<
+    A,
+    RouteLoadFailure | AnyRedirect,
+    AtomRegistry.AtomRegistry
+  >;
   signal: AbortSignal;
 }>) =>
   Effect.runPromise(
     Effect.fromOption(context.registry).pipe(
-      Effect.mapError(() => settingsUnavailable),
       Effect.flatMap((registry) =>
         effect.pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry))
       ),
-      Effect.catchCause(rejectRouteLoad)
+      // A browser loader always has the registry created with its router.
+      Effect.catchTag("NoSuchElementError", () =>
+        Effect.die(browserSettingsUnavailable)
+      )
     ),
     { signal }
   );
-const settings = AtomRegistry.AtomRegistry.pipe(
-  Effect.map((registry) => registry.get(publicSettingsAtom)),
-  Effect.flatMap(Effect.fromOption),
-  Effect.mapError(() => settingsUnavailable)
-);
 export const loadRoot = (
   request: Readonly<{
     context: LoaderContext;
     signal: AbortSignal;
   }>
-) =>
-  runForLoader({
-    ...request,
-    effect: Effect.gen(function* () {
-      const current = yield* settings;
-      return {
-        view: yield* Schema.encodeEffect(WebsiteRootView)({
-          settings: current,
-        }),
-      };
-    }),
-  });
+) => runForLoader({ ...request, effect: loadRootView(browserSettings) });
 export const loadCalculatorPage = (
   request: Readonly<{
     calculatorId: string;
@@ -131,21 +116,10 @@ export const loadDocsPage = (
 ) =>
   runForLoader({
     ...request,
-    effect: Effect.gen(function* () {
-      const current = yield* settings;
-      const client = yield* browserApiClient;
-      const { navigation, page } = yield* requestDocsPage({
-        client,
-        address: request.path,
-      });
-      return {
-        metadata: yield* docsPageMetadata({
-          page,
-          origin: current.publicationOrigin,
-        }),
-        navigation,
-        page,
-      };
+    effect: loadDocsPageView({
+      client: browserApiClient,
+      path: request.path,
+      settings: browserSettings,
     }),
   });
 export const loadDocsSearch = (
@@ -157,32 +131,8 @@ export const loadDocsSearch = (
 ) =>
   runForLoader({
     ...request,
-    effect: Effect.fromResult(request.query).pipe(
-      Effect.matchEffect({
-        onFailure: () => Effect.succeed(WebsiteDocsSearchView.InvalidSearch()),
-        onSuccess: (term) =>
-          browserApiClient.pipe(
-            Effect.flatMap((client) =>
-              Effect.all(
-                {
-                  results: requestDocsSearch({ client, term }),
-                  home: requestDocsPage({
-                    client,
-                    address: "/start/quickstart",
-                  }),
-                },
-                { concurrency: "unbounded" }
-              )
-            ),
-            Effect.map(({ results, home }) =>
-              WebsiteDocsSearchView.Found({
-                navigation: home.navigation,
-                results,
-                term,
-                theme: home.page.theme,
-              })
-            )
-          ),
-      })
-    ),
+    effect: loadDocsSearchView({
+      client: browserApiClient,
+      query: request.query,
+    }),
   });

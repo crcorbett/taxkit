@@ -137,7 +137,7 @@ docs implementation
   -> packages/docs-examples/test/published-snippets.test.ts
     -> copied guide snippets equal their checked example files
     -> examples at the checked-example revision equal the current files
-  -> bun run check:docs
+  -> bun run lint (documentation check step)
     -> relative links and documented commands in docs/, AGENTS.md and READMEs
   -> @taxkit/content, @taxkit/mdx, @taxkit/diagrams and @taxkit/pele unit tests
   -> apps/web native build and real browser/Worker checks when rendering changes

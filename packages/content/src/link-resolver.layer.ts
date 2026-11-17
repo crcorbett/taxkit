@@ -1,5 +1,4 @@
 import navigationRepresentation from "@content/docs/navigation.json" with { type: "json" };
-import repositoryRepresentation from "@content/docs/repository.json" with { type: "json" };
 import { LinkResolveError } from "@taxkit/mdx/errors";
 import { LinkResolver } from "@taxkit/mdx/service";
 import {
@@ -13,11 +12,8 @@ import {
 
 import { DocsSourceError } from "./errors.js";
 import { DocsLinkTargets, resolveDocsHref } from "./links.js";
-import {
-  DocsNavigation,
-  DocsRepositoryProfile,
-  DocsSourcePath,
-} from "./schemas.js";
+import { docsRepositoryProfile } from "./repository.ingress.js";
+import { DocsNavigation, DocsSourcePath } from "./schemas.js";
 
 export const DocsLinkTargetsLive = Layer.effect(
   DocsLinkTargets,
@@ -29,9 +25,9 @@ export const DocsLinkTargetsLive = Layer.effect(
     const navigation = yield* Schema.decodeUnknownEffect(DocsNavigation)(
       navigationRepresentation
     ).pipe(Effect.mapError(() => fail));
-    const repository = yield* Schema.decodeEffect(DocsRepositoryProfile)(
-      repositoryRepresentation
-    ).pipe(Effect.mapError(() => fail));
+    const repository = yield* docsRepositoryProfile.pipe(
+      Effect.mapError(() => fail)
+    );
     return {
       pages: HashMap.fromIterable(
         EffectFunction.pipe(

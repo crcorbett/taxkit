@@ -1,7 +1,7 @@
 import { Effect, Option } from "effect";
 
+import { McpToolUnavailable } from "./errors.js";
 import { McpRequestAbortSignal } from "./request.service.js";
-import { McpToolUnavailable } from "./schemas.js";
 
 // Native toolkit work must finish when its original HTTP request
 // disconnects. The native AbortSignal callback removes its listener on every exit;

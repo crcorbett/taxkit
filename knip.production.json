@@ -12,7 +12,7 @@
     },
     "apps/api": {
       "entry": ["src/index.ts!", "src/worker.ts!", "src/server.ts!"],
-      "project": ["src/**/*.ts!", "!src/build/**!", "!src/verification/**!"]
+      "project": ["src/**/*.ts!"]
     },
     "apps/web": {
       "entry": [

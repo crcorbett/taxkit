@@ -11,8 +11,6 @@ import {
 } from "effect";
 import type { ReactNode } from "react";
 
-import { medicareThresholdCaveat } from "./caveats";
-
 // One formatter for every amount on the page.
 const currency = new Intl.NumberFormat("en-AU", {
   currency: "AUD",
@@ -156,11 +154,10 @@ const AnnualTaxAssumptions = () => (
         Tax liability cannot fall below zero.
       </li>
       <li>
-        Uses the single-person Medicare levy rules without the seniors and
-        pensioners tax offset. Family thresholds and the Medicare levy surcharge
-        are not included.
+        Uses the enacted single-person Medicare levy thresholds without the
+        seniors and pensioners tax offset. Family reductions, exemptions and the
+        Medicare levy surcharge are not included.
       </li>
-      <li>{medicareThresholdCaveat}</li>
     </ul>
   </>
 );

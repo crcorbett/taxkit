@@ -16,7 +16,8 @@ own conventional addresses to these routes once.
   - `/api/v2/docs/og/<page>.png`: one share image per published page, from
     Content's `DocsOgImages`.
 - `./service` exports `PublicationOrigins`, the host-supplied Effect that
-  reads this stage's API and publication origins on first use.
+  reads this stage's API and publication origins on first use, and its own
+  `PublicationSettingsUnavailable` failure.
 - `src/documents.egress.ts` (internal) holds the three catalogue document
   writers that the route Layer serves; `src/__testing__/fixtures.ts` holds
   checked example origins for this package's tests.

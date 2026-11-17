@@ -1,85 +1,20 @@
-import {
-  RateLimitBinding,
-  Worker,
-  cache,
-} from "@alchemy.run/cloudflare/Workers";
-import { ApiCalculatorUsageLive } from "@taxkit/analytics/api-usage";
-import { BackendAnalyticsLive } from "@taxkit/analytics/live";
 import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
-import { PublicCalculatorServiceRateLimited } from "@taxkit/calculators/work";
 import { TaxKitApiWorker } from "@taxkit/infrastructure/api-worker";
-import {
-  disabledWorkerObservability,
-  workerCompatibility,
-} from "@taxkit/infrastructure/worker-settings";
-import { Config, ConfigProvider, Effect, Layer } from "effect";
-import { SecureRandom } from "effect/crypto";
-import { FetchHttpClient } from "effect/http";
+import { Layer } from "effect";
 
-import { ApiCalculatorDeliveryLive } from "./analytics-request.boundary.js";
 import { ApiContentLive } from "./content.boundary.js";
-import { ApiCalculatorAdmission } from "./worker-admission.layer.js";
-import { ApiWorkerApplication } from "./worker.application.js";
+import { apiWorkerNativeInit, apiWorkerProps } from "./worker.composition.js";
 
-// One public calculator implementation: rate admission and the shared work
-// budget over the static catalogue, with analytics observing each success.
-const ApiWorkerServicesLive = Layer.mergeAll(
+// The production leaves: the built documentation catalogue and the static
+// calculator catalogue. Local fixture entries replace these leaves only.
+const ApiWorkerLeavesLive = Layer.mergeAll(
   ApiContentLive,
-  PublicCalculatorServiceRateLimited.pipe(
-    Layer.provide(CalculatorCatalogueLive),
-    Layer.provide(ApiCalculatorUsageLive)
-  )
+  CalculatorCatalogueLive
 );
 
-const ApiAnalyticsLive = ApiCalculatorDeliveryLive.pipe(
-  Layer.provide(
-    BackendAnalyticsLive.pipe(
-      Layer.provide(FetchHttpClient.layer),
-      Layer.provide(SecureRandom.layerWebCrypto)
-    )
-  )
-);
-
-export const ApiWorkerInit = ApiWorkerApplication.pipe(
-  Effect.provide(ApiWorkerServicesLive)
-);
-
-export const ApiWorkerNativeInit = Effect.gen(function* () {
-  // Native Workers Cache, scoped to this deployed version. Response headers
-  // decide which public replies Cloudflare may reuse.
-  yield* cache({ crossVersionCache: false });
-  return yield* ApiWorkerApplication;
-}).pipe(
-  Effect.provide(ApiWorkerServicesLive),
-  Effect.provide(ApiAnalyticsLive),
-  Effect.provide(ApiCalculatorAdmission.pipe(Layer.provide(RateLimitBinding))),
-  Effect.catchTag("AnalyticsConfigurationError", () =>
-    Effect.fail(
-      new Config.ConfigError(
-        new ConfigProvider.SourceError({
-          message: "PostHog analytics configuration is missing or invalid.",
-        })
-      )
-    )
-  ),
-  Effect.catchTag("DocsSourceError", () =>
-    Effect.fail(
-      new Config.ConfigError(
-        new ConfigProvider.SourceError({
-          message: "The public documentation catalogue could not be loaded.",
-        })
-      )
-    )
-  )
-);
+export const ApiWorkerNativeInit = apiWorkerNativeInit(ApiWorkerLeavesLive);
 
 export default TaxKitApiWorker.make(
-  {
-    compatibility: workerCompatibility,
-    env: { API_PUBLIC_ORIGIN: Worker.URL },
-    main: import.meta.url,
-    observability: disabledWorkerObservability,
-    workersDev: true,
-  },
+  { ...apiWorkerProps, main: import.meta.url },
   ApiWorkerNativeInit
 );

@@ -16,6 +16,7 @@ import {
   Effect,
   Layer,
   Option,
+  Struct,
 } from "effect";
 
 import { StslComponentFact, StslDebtFact } from "../facts/stsl.js";
@@ -53,11 +54,14 @@ const findRow = (
           weeklyFormulaCents <= r.weeklyMaxCents)
     )
   );
+  // The checked table covers every weekly amount from zero, so only a negative
+  // taxable amount (salary sacrifice above gross pay) finds no row.
   return Option.match(row, {
     onNone: () =>
       Effect.fail(
         new CalculationError({
           message: "No STSL row covers the amount.",
+          reason: "negative",
         })
       ),
     onSome: Effect.succeed,
@@ -66,7 +70,7 @@ const findRow = (
 /**
  * Current STSL component using ATO Schedule 8 marginal component rows.
  *
- * @throws {CalculationError} When no Schedule 8 row covers the weekly-equivalent amount.
+ * @throws {CalculationError} When taxable pay is negative or an amount does not fit in safe whole cents.
  * @since 0.1.0
  */
 export const StslComponentLive = Layer.effect(StslComponentFact)(
@@ -111,8 +115,9 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     );
     const weeklyFormulaCents = Math.floor(weeklyCents / 100) * 100 + 99;
     const row = yield* findRow(table, weeklyFormulaCents);
-    const checkedWeeklyFormulaCents =
-      yield* Cents.makeEffect(weeklyFormulaCents);
+    const checkedWeeklyFormulaCents = yield* fromCents(weeklyFormulaCents).pipe(
+      Effect.map(Struct.get("cents"))
+    );
     const weeklyWithholding = BigDecimal.subtract(
       BigDecimal.multiply(
         BigDecimal.make(BigInt(checkedWeeklyFormulaCents), 2),
@@ -191,11 +196,13 @@ export const StslComponentLive = Layer.effect(StslComponentFact)(
     });
     return component;
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "STSL withholding could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );

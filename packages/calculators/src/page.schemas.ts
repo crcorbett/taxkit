@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
-import { CalculatorForm, CalculatorFormField } from "./form.ingress.js";
+import { CalculatorFormField } from "./errors.js";
+import { CalculatorForm } from "./form.ingress.js";
 import { CalculatorId, CalculatorRunReport } from "./schemas.js";
 // One calculator page's presentation value. A retained answer stays visible, with an explicit stale flag
 // after an edit, failed refresh or cancelled attempt. `invalidField` names the

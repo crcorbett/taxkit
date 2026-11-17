@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-start/server";
 import { applyCachePolicy } from "@taxkit/api-http/response-policy";
 import { DiscoveryPath } from "@taxkit/api-http/routes";
+import { DocsImageFamilyPath } from "@taxkit/content/publication";
 import { observeHostRequest } from "@taxkit/observability/host-telemetry";
 import type { HostRoute } from "@taxkit/observability/host-telemetry";
 import { Effect, ErrorReporter, Match, Option, Schema } from "effect";
@@ -25,10 +26,7 @@ const render = createStartHandler(defaultStreamHandler);
 const websiteRoute = (pathname: string): HostRoute =>
   Match.value(pathname).pipe(
     Match.when(Schema.is(DiscoveryPath), () => "discovery" as const),
-    Match.when(
-      (path) => path.startsWith("/og/") && path.endsWith(".png"),
-      () => "docs" as const
-    ),
+    Match.when(Schema.is(DocsImageFamilyPath), () => "docs" as const),
     Match.when(
       (path) => path === "/" || path.startsWith("/calculators/"),
       () => "calculator-page" as const

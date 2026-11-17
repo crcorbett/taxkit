@@ -20,7 +20,7 @@ import { WebsiteApi } from "../../src/lib/host/service";
 it.effect.each([
   { expected: "Success", reply: "matching" },
   { expected: "ApiReplyMismatch", reply: "mismatched" },
-  { expected: "ApiUnavailable", reply: "malformed" },
+  { expected: "ApiReplyMismatch", reply: "malformed" },
 ] as const)(
   "checks a $reply docs reply through the native server client",
   ({ reply, expected }) =>

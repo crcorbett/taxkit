@@ -16,6 +16,7 @@ import { HttpApiClient } from "effect/http-api";
 
 import { WebsiteApiConfig } from "./config.ingress";
 import { WebsiteApi } from "./service";
+import type { WebsiteForwardPath } from "./service";
 // Native Alchemy bindings: the selected keys only, with protected values
 // unwrapped by Alchemy's own reader. The binding object keeps its receiver.
 export const WebsiteApiLive = Layer.effect(
@@ -61,7 +62,7 @@ export const WebsiteApiLive = Layer.effect(
         Effect.withSpan("WebsiteApi.client")
       ),
       forward: Effect.fn("WebsiteApi.forward")(
-        ({ path }: { readonly path: string }) =>
+        ({ path }: { readonly path: WebsiteForwardPath }) =>
           Effect.fromResult(host).pipe(
             Effect.flatMap(({ reads, settings }) =>
               reads.get(new URL(path, settings.apiOrigin)).pipe(

@@ -86,8 +86,14 @@ should be mapped to schema-backed public errors at the service boundary, and
 domain failures such as `CalculationError` should propagate as failures. Do not
 use `Effect.die` for recoverable calculator, schema or domain errors.
 
-Core `CalculationError` exposes a safe message and a closed rule, graph or
-output-invariant reason. Input ingress projects bounded safe issues through
+Core `CalculationError` is a caller error: the checked scenario does not fit the
+rules. It exposes a safe message and a closed reason, either `period-mismatch`
+or the `MoneyError` reason copied with `Effect.catchTag` (for example
+`negative` when salary sacrifice exceeds gross pay, or `range`/`overflow` beyond
+safe cents). Rules never overwrite a specific error with a blanket `mapError`.
+A broken rule graph, checked parameter table or report invariant cannot be
+fixed by the caller: programs die with `CalculationInvariantViolation`, and
+hosts answer HTTP 500 or an MCP internal error. Input ingress projects bounded safe issues through
 `InputValidationError`; opaque diagnostic storage is absent.
 
 Public calculator orchestration keeps identity and scenario correlated in a

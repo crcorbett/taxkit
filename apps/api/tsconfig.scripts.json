@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["scripts/**/*.ts"],
+  "include": ["scripts/**/*.ts", "catalogue/**/*.ts", "smoke/**/*.ts"],
   "compilerOptions": {
     "rootDir": ".",
     "noEmit": true,

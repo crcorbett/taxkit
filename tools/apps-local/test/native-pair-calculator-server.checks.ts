@@ -2,10 +2,8 @@
 // native-pair.boundary.test.ts runs these checks in order on one host pair.
 import { expect } from "@effect/vitest";
 import { TaxKitApi } from "@taxkit/api-http/api";
-import {
-  CalculatorRequestBodyErrorEnvelope,
-  CalculatorRequestBodyTooLarge,
-} from "@taxkit/api-http/request-boundary";
+import { CalculatorRequestBodyTooLarge } from "@taxkit/api-http/errors";
+import { CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/schemas";
 import {
   DescriptorFilterQuery,
   HelpQuery,

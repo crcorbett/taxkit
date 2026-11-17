@@ -11,9 +11,9 @@
 | [Content](architecture/content-and-posts.md) | Authored pages, the docs catalogue, discovery files and share images |
 | [Packages](architecture/package-ownership.md) | Package ownership and [boundaries](architecture/package-boundaries.md) |
 | [Effect services](architecture/effect-services.md) | Services, Layers, boundaries and [configuration](architecture/configuration.md) |
-| [Testing](architecture/testing-and-quality.md) | The five checks and [rule and calculation tests](architecture/testing-and-validation.md) |
+| [Testing](architecture/testing-and-quality.md) | The five checks and [rule and calculation tests](architecture/rule-and-calculation-tests.md) |
 | [Deployment](architecture/deployment.md) | Resources, stages and secrets |
-| [Standards](standards/code-patterns.md) | [Code patterns](standards/code-patterns.md), [docstrings](standards/docstrings.md), [tooling](standards/tooling.md) and [versioning](standards/versioning.md) |
+| [Standards](standards/code-patterns.md) | [Code patterns](standards/code-patterns.md), [docstrings](standards/docstrings.md), [tooling](standards/tooling.md) and [release policy](standards/release-policy.md) |
 | [Runbooks](runbooks/README.md) | Deployment, versioning and packed SDK checks |
 | [Development skills](skills.md) | Shared implementation guidance |
 
@@ -47,7 +47,7 @@ that explain a lasting choice. Use Git history for completed plans and old
 reports. Report checks and release results in the existing chat or pull
 request; do not create dated receipts or a documentation-only release PR.
 
-`bun run lint` runs `check:docs` over every tracked or new Markdown file except
+`bun run lint` runs the documentation check over every tracked or new Markdown file except
 Changesets and generated changelogs. It checks relative links, heading anchors
 (GitHub slug rules) and documented `bun run` commands, including the workspace
 named by `--filter`.

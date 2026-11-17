@@ -3,6 +3,7 @@ import { CalculatorSummaries } from "@taxkit/calculators/summaries";
 import { Array, Effect, Function as EffectFunction } from "effect";
 
 import { WebsiteCalculatorMissing } from "../host/errors";
+import { routeLoadFailures, withSafeDefects } from "./load.failure";
 
 // The calculator address is checked once against the published summaries.
 // The take-home calculator lives at Home, so its old address redirects there;
@@ -19,5 +20,7 @@ export const loadCalculatorView = Effect.fn("Website.loadCalculatorView")(
       Effect.mapError(() => new WebsiteCalculatorMissing())
     );
     return { calculator };
-  }
+  },
+  Effect.catchTags(routeLoadFailures({ WebsiteCalculatorMissing: "missing" })),
+  withSafeDefects
 );

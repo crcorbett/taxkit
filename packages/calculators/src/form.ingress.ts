@@ -14,6 +14,7 @@ import {
 } from "@taxkit/rules-au-pay/schemas";
 import { Match, Option, Result, Schema } from "effect";
 
+import { CalculatorInputError } from "./errors.js";
 import {
   CalculatorRunRequest,
   TakeHomeCalculationRequest,
@@ -37,27 +38,6 @@ export const initialTakeHomeForm = TakeHomeForm.make({
   period: "weekly",
   taxFreeThresholdClaimed: true,
 });
-// The visible field a visitor must correct. Views mark only this field
-// invalid and move focus to it.
-export const CalculatorFormField = Schema.Literals([
-  "grossDollars",
-  "period",
-  "taxableDollars",
-]);
-export type CalculatorFormField = typeof CalculatorFormField.Type;
-export class CalculatorInputError extends Schema.TaggedError<
-  CalculatorInputError,
-  {
-    readonly brand: unique symbol;
-  }
->()("CalculatorInputError", {
-  field: CalculatorFormField,
-  message: Schema.Literals([
-    "Enter a valid pay amount.",
-    "Choose a pay period.",
-    "Enter a valid annual taxable income.",
-  ]),
-}) {}
 const invalidPayAmount = () =>
   new CalculatorInputError({
     field: "grossDollars",

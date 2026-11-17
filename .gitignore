@@ -22,3 +22,6 @@ tmp/
 
 # API docs catalogue, written by the API build from content/docs
 /apps/api/src/generated/
+
+# TanStack route tree, written by the Website build
+/apps/web/src/routeTree.gen.ts

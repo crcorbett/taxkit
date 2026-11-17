@@ -1,9 +1,9 @@
 import { describe, expect, it } from "@effect/vitest";
 import {
-  CalculatorRequestBodyErrorEnvelope,
   CalculatorRequestBodyTimedOut,
   CalculatorRequestBodyTooLarge,
-} from "@taxkit/api-http/request-boundary";
+} from "@taxkit/api-http/errors";
+import { CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/schemas";
 import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
@@ -14,7 +14,10 @@ import {
   CalculatorFixtureMode,
   sensitiveSentinel,
 } from "@taxkit/calculators/testing/fixtures";
-import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
+import {
+  CalculatorUsageDisabled,
+  PublicCalculatorServiceBounded,
+} from "@taxkit/calculators/work";
 import {
   ApiHostTelemetryLive,
   HostRequestRecord,
@@ -52,7 +55,10 @@ import { TestClock, TestConsole } from "effect/testing";
 import { ApiContentLive } from "../src/content.boundary.js";
 import { ApiWorkerApplication } from "../src/worker.application.js";
 import { ApiWorkerSettingsConfig } from "../src/worker.config.js";
-import { ApiWorkerInit as ApiWorkerApplicationInit } from "../src/worker.js";
+import {
+  ApiCalculatorDeliveryDisabled,
+  ApiWorkerInit as ApiWorkerApplicationInit,
+} from "./worker.fixture.js";
 // These retained tests isolate body, protocol and lifetime behaviour. Actual
 // admission and native provider counters are qualified in their owning tests.
 const ApiWorkerInit = ApiWorkerApplicationInit.pipe(
@@ -188,9 +194,12 @@ describe("native API application", () => {
       const started = yield* Deferred.make<boolean>();
       const released = yield* Ref.make(0);
       const app = yield* ApiWorkerApplication.pipe(
-        Effect.provide(ApiContentLive),
+        Effect.provide(
+          Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+        ),
         Effect.provide(
           PublicCalculatorServiceBounded.pipe(
+            Layer.provide(CalculatorUsageDisabled),
             Layer.provide(
               Layer.succeed(
                 CalculatorCatalogue,
@@ -610,6 +619,7 @@ describe("native API application", () => {
         const live = yield* CalculatorCatalogue;
         // Substitute the catalogue under the real shared work policy.
         const calculator = PublicCalculatorServiceBounded.pipe(
+          Layer.provide(CalculatorUsageDisabled),
           Layer.provide(
             Layer.effect(
               CalculatorCatalogue,
@@ -653,7 +663,9 @@ describe("native API application", () => {
           )
         );
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentLive),
+          Effect.provide(
+            Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+          ),
           Effect.provide(calculator)
         );
         const transport = HttpClient.make((request) =>
@@ -986,9 +998,12 @@ describe("native API application", () => {
     () =>
       Effect.gen(function* () {
         const app = yield* ApiWorkerApplication.pipe(
-          Effect.provide(ApiContentLive),
+          Effect.provide(
+            Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
+          ),
           Effect.provide(
             CalculatorFixture.pipe(
+              Layer.provide(CalculatorUsageDisabled),
               Layer.provide(Layer.succeed(CalculatorFixtureMode)("defect"))
             )
           )

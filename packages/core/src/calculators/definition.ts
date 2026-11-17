@@ -2,7 +2,8 @@ import { Effect, Schema } from "effect";
 
 import { CalculationDiagnostics } from "../engine/schemas.js";
 import type { CalculationResult } from "../engine/schemas.js";
-import { CalculationError } from "../errors/calculation-error.js";
+import type { CalculationError } from "../errors/calculation-error.js";
+import { CalculationInvariantViolation } from "../errors/calculation-error.js";
 import { inputValidationError } from "../errors/input-validation-error.js";
 import { validateRuleGraph } from "../graph/rule-graph.js";
 import type { CalculatorId, Jurisdiction, TaxYear } from "../primitives/tax.js";
@@ -32,7 +33,8 @@ export interface CalculatorDefinition<
 /**
  * The owner supplies codecs and their matching closed report program
  * together. The definition validates the rule graph once and attaches its
- * diagnostics to every result.
+ * diagnostics to every result. An invalid graph is a defect in the owning
+ * package, not a caller error: its program dies without running a rule.
  */
 export const defineCalculator = <
   const Id extends CalculatorId,
@@ -61,9 +63,9 @@ export const defineCalculator = <
       input: Input["Type"]
     ): Effect.Effect<CalculationResult<Output["Type"]>, CalculationError> => {
       if (graphIssues.length > 0) {
-        return Effect.fail(
-          new CalculationError({
-            reason: "graph",
+        return Effect.die(
+          new CalculationInvariantViolation({
+            invariant: "rule-graph",
             message: "The calculator rule graph is invalid.",
           })
         );

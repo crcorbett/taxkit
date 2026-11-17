@@ -1,3 +1,4 @@
+import { publicCors } from "@taxkit/api-http/response-policy";
 import { mcpPath } from "@taxkit/api-http/routes";
 import { DocsWebsiteOriginConfig } from "@taxkit/content/config";
 import { Effect, Layer } from "effect";
@@ -6,6 +7,15 @@ import { McpProtocol, McpServer } from "effect/ai";
 import { TaxKitMcpHandlersLive } from "./handlers.layer.js";
 import { TaxKitMcpToolkit } from "./tools.js";
 
+// Browser MCP requests send the public HTTP headers (native b3, content-type
+// and traceparent) plus the modern MCP request headers. Hosts admit exactly
+// these; legacy session headers are not admitted.
+export const mcpAllowedHeaders = [
+  ...publicCors.allowedHeaders,
+  "mcp-method",
+  "mcp-name",
+  "mcp-protocol-version",
+] as const;
 // Origin-less desktop and server clients are admitted; browser pages must be
 // served from this stage's Website. Add another site only for a known need.
 export const TaxKitMcpHttpLayer = Layer.unwrap(

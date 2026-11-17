@@ -1,10 +1,9 @@
-import { CalculationError } from "@taxkit/core/errors";
-import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
 import {
-  Cents,
-  fromCents,
-  multiplyCentsByDecimal,
-} from "@taxkit/core/primitives";
+  CalculationError,
+  CalculationInvariantViolation,
+} from "@taxkit/core/errors";
+import { ComponentId, LedgerComponent } from "@taxkit/core/ledger";
+import { fromCents, multiplyCentsByDecimal } from "@taxkit/core/primitives";
 import { RuleId, TraceNode } from "@taxkit/core/trace";
 import {
   Function as EffectFunction,
@@ -13,6 +12,7 @@ import {
   Effect,
   Layer,
   Option,
+  Struct,
 } from "effect";
 
 import { IncomeTaxComponentFact } from "../facts/components.js";
@@ -38,7 +38,7 @@ export const IncomeTaxComponentId = ComponentId.make(
 const findBracket = (
   brackets: readonly IncomeTaxBracket[],
   incomeCents: number
-): Effect.Effect<IncomeTaxBracket, CalculationError> => {
+): Effect.Effect<IncomeTaxBracket> => {
   const bracket = EffectFunction.pipe(
     Array.reverse(brackets),
     Array.findFirst(
@@ -47,10 +47,13 @@ const findBracket = (
         (incomeCents === 0 && b.thresholdCents === 0)
     )
   );
+  // The checked table starts at zero and income is non-negative, so a missing
+  // bracket means the table itself is broken.
   return Option.match(bracket, {
     onNone: () =>
-      Effect.fail(
-        new CalculationError({
+      Effect.die(
+        new CalculationInvariantViolation({
+          invariant: "table-coverage",
           message: "No income tax bracket covers the amount.",
         })
       ),
@@ -63,7 +66,7 @@ const findBracket = (
  * Formula: tax = baseTaxCents + rate * (incomeCents - thresholdCents)
  * Rounding: nearest cent (ATO truncates; validation uses nearest for simplicity).
  *
- * @throws {CalculationError} When no income tax bracket covers the input income.
+ * @throws {CalculationError} When an amount does not fit in safe whole cents.
  * @since 0.1.0
  */
 export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
@@ -72,9 +75,9 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
     const table = yield* AtoIncomeTaxTable;
     const incomeCents = income.income.cents;
     const bracket = yield* findBracket(table.brackets, incomeCents);
-    const taxableExcess = yield* Cents.makeEffect(
+    const taxableExcess = yield* fromCents(
       incomeCents - bracket.thresholdCents
-    );
+    ).pipe(Effect.map(Struct.get("cents")));
     const marginalTax = yield* multiplyCentsByDecimal(
       taxableExcess,
       bracket.rate
@@ -108,11 +111,13 @@ export const IncomeTaxLive = Layer.effect(IncomeTaxComponentFact)(
     });
     return component;
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Income tax could not produce a supported amount.",
+          reason,
         })
+      )
     )
   )
 );

@@ -9,13 +9,17 @@ import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import {
+  CalculatorRunRequest,
   MetadataQuery,
-  CalculatorOperationTimedOut,
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { ContentServiceLive } from "@taxkit/content/live";
 import { ContentCatalogue } from "@taxkit/content/service";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import {
+  CalculationError,
+  CalculationInvariantViolation,
+} from "@taxkit/core/errors";
 import {
   NonNegativeMoney,
   Money,
@@ -41,11 +45,12 @@ import {
   Schema,
 } from "effect";
 import {
-  HttpClientRequest,
   HttpBody,
   HttpClient,
+  HttpClientRequest,
   HttpClientResponse,
   HttpRouter,
+  HttpServerError,
   HttpServerRequest,
   HttpServerResponse,
 } from "effect/http";
@@ -85,74 +90,95 @@ const grossPayFacts = (
   });
 describe("TaxKit public calculation HTTP API", () => {
   it.effect.each([
-    "/api/v2/jurisdictions",
-    "/api/v2/tax-years",
-    "/api/v2/calculators",
-    "/api/v2/calculators/au.pay.take-home",
-    "/api/v2/calculators/au.pay.take-home/schema",
-    "/api/v2/calculators/au.pay.take-home/graph",
-    "/api/v2/facts",
-    "/api/v2/rules",
-  ])("declares and encodes a checked metadata timeout at %s", (pathname) =>
-    Effect.gen(function* () {
-      const live = yield* PublicCalculatorService;
-      const service = Layer.succeed(
-        PublicCalculatorService,
-        PublicCalculatorService.of({
-          calculate: live.calculate,
-          getCalculator: Effect.fn("PublicCalculatorService.getCalculator")(
-            () => Effect.fail(new CalculatorOperationTimedOut())
+    { outcome: "caller", status: 400 },
+    { outcome: "engine", status: 500 },
+  ] as const)(
+    "answers a $outcome calculation failure with HTTP $status",
+    ({ outcome, status }) =>
+      Effect.gen(function* () {
+        const live = yield* PublicCalculatorService;
+        const service = PublicCalculatorService.of({
+          calculate: Effect.fn("PublicCalculatorService.calculate")((request) =>
+            Match.value(outcome).pipe(
+              Match.when("caller", () => live.calculate(request)),
+              Match.when("engine", () =>
+                Effect.die(
+                  new CalculationInvariantViolation({
+                    invariant: "report",
+                    message: "Pay report invariant failed.",
+                  })
+                )
+              ),
+              Match.exhaustive
+            )
           ),
-          getCalculatorGraph: Effect.fn(
-            "PublicCalculatorService.getCalculatorGraph"
-          )(() => Effect.fail(new CalculatorOperationTimedOut())),
-          getCalculatorSchema: Effect.fn(
-            "PublicCalculatorService.getCalculatorSchema"
-          )(() => Effect.fail(new CalculatorOperationTimedOut())),
-          listCalculators: Effect.fn("PublicCalculatorService.listCalculators")(
-            () => Effect.fail(new CalculatorOperationTimedOut())
+          getCalculator: live.getCalculator,
+          getCalculatorGraph: live.getCalculatorGraph,
+          getCalculatorSchema: live.getCalculatorSchema,
+          listCalculators: live.listCalculators,
+          listFacts: live.listFacts,
+          listJurisdictions: live.listJurisdictions,
+          listRules: live.listRules,
+          listTaxYears: live.listTaxYears,
+        });
+        // HttpApiBuilder captures services while constructing handlers.
+        const handler = yield* HttpRouter.toHttpEffect(
+          TaxKitApiRoutesLayer
+        ).pipe(
+          Effect.provide(ContentTestLive),
+          Effect.provideService(PublicCalculatorService, service)
+        );
+        // A gross amount beyond safe cents is a scenario the rules reject.
+        const unsafeGross = Money.fromCents(
+          Cents.make(Number.MAX_SAFE_INTEGER)
+        );
+        const body = yield* Schema.encodeEffect(
+          Schema.fromJsonString(CalculatorRunRequest)
+        )({
+          calculatorId: takeHomeCalculatorId,
+          payload: {
+            facts: grossPayFacts(unsafeGross, "weekly", true),
+            jurisdiction: Option.none(),
+            taxYear: Option.none(),
+          },
+        });
+        const request = HttpClientRequest.post(
+          `http://taxkit.internal/api/v2/calculators/${takeHomeCalculatorId}/calculate`
+        ).pipe(HttpClientRequest.bodyText(body, "application/json"));
+        const reply = yield* handler.pipe(
+          Effect.provideService(
+            HttpServerRequest.HttpServerRequest,
+            HttpServerRequest.fromClientRequest(request)
           ),
-          listFacts: Effect.fn("PublicCalculatorService.listFacts")(() =>
-            Effect.fail(new CalculatorOperationTimedOut())
+          Effect.provideService(PublicCalculatorService, service),
+          // The native server's conversion of an unhandled Cause.
+          Effect.catchCause((cause) =>
+            HttpServerError.causeResponse(cause).pipe(
+              Effect.map(([response]) => response)
+            )
           ),
-          listJurisdictions: Effect.fn(
-            "PublicCalculatorService.listJurisdictions"
-          )(() => Effect.fail(new CalculatorOperationTimedOut())),
-          listRules: Effect.fn("PublicCalculatorService.listRules")(() =>
-            Effect.fail(new CalculatorOperationTimedOut())
-          ),
-          listTaxYears: Effect.fn("PublicCalculatorService.listTaxYears")(() =>
-            Effect.fail(new CalculatorOperationTimedOut())
-          ),
-        })
-      );
-      // HttpApiBuilder captures services while constructing handlers. Supply
-      // the controlled implementation there, rather than a later request override.
-      const handler = yield* HttpRouter.toHttpEffect(TaxKitApiRoutesLayer).pipe(
-        Effect.provide(ContentTestLive),
-        Effect.provide(service)
-      );
-      const request = HttpClientRequest.get(
-        `http://taxkit.internal${pathname}`
-      );
-      const response = yield* handler.pipe(
-        Effect.provideService(
-          HttpServerRequest.HttpServerRequest,
-          HttpServerRequest.fromClientRequest(request)
-        )
-      );
-      expect({
-        responseStatus: response.status,
-        errorEnvelope: yield* Schema.decodeUnknownEffect(
-          CalculatorApiErrorEnvelope
-        )(
-          yield* HttpServerResponse.toClientResponse(response, { request }).json
-        ),
-      }).toStrictEqual({
-        responseStatus: 504,
-        errorEnvelope: { error: new CalculatorOperationTimedOut() },
-      });
-    }).pipe(Effect.provide(PublicCalculatorServiceTestLive), Effect.scoped)
+          Effect.map((response) =>
+            HttpServerResponse.toClientResponse(response, { request })
+          )
+        );
+        const text = yield* reply.text;
+        expect(reply.status).toBe(status);
+        if (outcome === "caller") {
+          expect(
+            yield* Schema.decodeUnknownEffect(
+              Schema.fromJsonString(CalculatorApiErrorEnvelope)
+            )(text)
+          ).toStrictEqual({
+            error: new CalculationError({
+              message: "PAYG withholding could not produce a supported amount.",
+              reason: "range",
+            }),
+          });
+        } else {
+          expect(text).not.toContain("CalculationError");
+          expect(text).not.toContain("invariant");
+        }
+      }).pipe(Effect.provide(PublicCalculatorServiceTestLive), Effect.scoped)
   );
   it.effect("pins the health route fixture", () =>
     Effect.gen(function* () {

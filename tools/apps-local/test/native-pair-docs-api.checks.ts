@@ -1,7 +1,7 @@
 // Native pair surface: The API's public docs pages, Markdown negotiation and search replies.
 // native-pair.boundary.test.ts runs these checks in order on one host pair.
 import { expect } from "@effect/vitest";
-import { DocsPageUnavailable } from "@taxkit/api-http";
+import { DocsPageUnavailable } from "@taxkit/content/errors";
 import {
   DocsPublicPage,
   DocsPublicNavigation,

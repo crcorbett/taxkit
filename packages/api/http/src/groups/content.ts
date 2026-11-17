@@ -1,4 +1,8 @@
 import {
+  DocsPageUnavailable,
+  DocsSearchUnavailable,
+} from "@taxkit/content/errors";
+import {
   DocsPublicPagePath,
   DocsPublicNavigation,
   DocsPublicPage,
@@ -14,9 +18,6 @@ import {
 } from "effect/http-api";
 
 import { docsPaths } from "../routes.js";
-import { DocsPageUnavailable, DocsSearchUnavailable } from "../schemas.js";
-
-export { DocsPageUnavailable, DocsSearchUnavailable } from "../schemas.js";
 
 export const DocsPageQuery = Schema.Struct({
   path: DocsPublicPagePath,

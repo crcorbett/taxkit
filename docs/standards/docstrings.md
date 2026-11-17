@@ -46,8 +46,8 @@ examples only when they clarify the public contract.
  * selected ATO Schedule 1 table.
  *
  * Requires `TaxablePayFact`, `TaxFreeThresholdClaimedFact`, and
- * `AtoSchedule1Table`. Fails with `CalculationError` when no official table row
- * covers the weekly formula amount.
+ * `AtoSchedule1Table`. Fails with `CalculationError` when taxable pay is
+ * negative or an amount does not fit in safe whole cents.
  *
  * @since 0.1.0
  */

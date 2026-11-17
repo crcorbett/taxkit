@@ -10,6 +10,7 @@
   },
   "include": [
     "documentation/*.ts",
+    "effect-language-service/*.ts",
     "oxlint/*.ts",
     "oxlint/rules/**/*.ts",
     "repository-paths/*.ts",
@@ -17,6 +18,7 @@
     "infrastructure/*.ts",
     "apps-local/*.ts",
     "apps-local/test/*.ts",
+    "apps-local/fixtures/*.ts",
     "workspace/*.ts"
   ]
 }

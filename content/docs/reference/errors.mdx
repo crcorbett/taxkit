@@ -14,6 +14,11 @@ its defect and interruption semantics.
 
 Money constructors and arithmetic return `MoneyError`, with closed reasons for
 format, fractional cents, non-finite input, range, negative input and overflow.
+A `CalculationError` means the scenario cannot be calculated. Its `reason` is
+`period-mismatch` or the `MoneyError` reason that caused it, such as `negative`
+when salary sacrifice exceeds gross pay. A fault inside TaxKit itself is not a
+`CalculationError`: Effect reports it as a defect, the plain interface returns
+`TaxKitUnexpectedError` and the HTTP API answers 500.
 
 ## HTTP errors
 
@@ -37,16 +42,16 @@ rejected amounts, opaque causes and private diagnostics are excluded.
 }
 ```
 
-| Error                               | Handling                                            |
-| ----------------------------------- | --------------------------------------------------- |
-| `InputValidationError`              | Show safe field issues.                             |
-| `UnsupportedCalculatorContextError` | Select a supported calculator edition.              |
-| `UnsupportedCalculatorError`        | Correct the request identity.                       |
-| `CalculationError`                  | Inspect its rule, graph or output-invariant reason. |
-| `CalculatorCapacityExceeded`        | Retry manually when work finishes.                  |
-| `CalculatorOperationTimedOut`       | Retry manually.                                     |
-| `CalculatorRateLimited`             | Wait for `Retry-After`, then retry manually.        |
-| `CalculatorAdmissionUnavailable`    | Retry manually when the service is available.       |
+| Error                               | Handling                                      |
+| ----------------------------------- | --------------------------------------------- |
+| `InputValidationError`              | Show safe field issues.                       |
+| `UnsupportedCalculatorContextError` | Select a supported calculator edition.        |
+| `UnsupportedCalculatorError`        | Correct the request identity.                 |
+| `CalculationError`                  | Change the scenario; its `reason` says why.   |
+| `CalculatorCapacityExceeded`        | Retry manually when work finishes.            |
+| `CalculatorOperationTimedOut`       | Retry manually.                               |
+| `CalculatorRateLimited`             | Wait for `Retry-After`, then retry manually.  |
+| `CalculatorAdmissionUnavailable`    | Retry manually when the service is available. |
 
 Retrieve the calculator schema endpoint for descriptor-backed field guidance.
 See [API errors](../api/errors.mdx) and [validation](../guides/handle-validation-errors.mdx).

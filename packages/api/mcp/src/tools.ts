@@ -8,12 +8,12 @@ import {
 import { DocsPublicNavigation, DocsPublicPage } from "@taxkit/content/schemas";
 import { Tool, Toolkit } from "effect/ai";
 
+import { McpToolUnavailable } from "./errors.js";
 import {
   McpCalculationRequest,
   McpDocsReadRequest,
   McpDocsSearchRequest,
   McpDocsSearchResponse,
-  McpToolUnavailable,
 } from "./schemas.js";
 
 // Name the Schema owners so emitted declarations never expose private rule paths.

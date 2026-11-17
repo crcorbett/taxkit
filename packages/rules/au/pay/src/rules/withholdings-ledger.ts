@@ -73,11 +73,13 @@ export const buildPayWithholdingsLedger = (
     });
     return PayWithholdingsLedger.make({ components, period, total, trace });
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Pay withholding could not produce a supported total.",
+          reason,
         })
+      )
     )
   );
 /**

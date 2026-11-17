@@ -53,11 +53,13 @@ export const AnnualTaxLedgerLive = Layer.effect(AnnualTaxLedgerFact)(
 
     return AnnualTaxLedger.make({ components, rawLiability, trace });
   }).pipe(
-    Effect.mapError(
-      () =>
+    Effect.catchTag("MoneyError", ({ reason }) =>
+      Effect.fail(
         new CalculationError({
           message: "Annual tax could not produce a supported total.",
+          reason,
         })
+      )
     )
   )
 );
