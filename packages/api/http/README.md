@@ -122,11 +122,9 @@ query contract; calculations accept only the correlated request body.
 
 Every public subpath in the package export map:
 
-- `@taxkit/api-http`
 - `@taxkit/api-http/api`
 - `@taxkit/api-http/in-process`
 - `@taxkit/api-http/server`
-- `@taxkit/api-http/handlers`
 - `@taxkit/api-http/request-boundary`
 - `@taxkit/api-http/response-policy`
 - `@taxkit/api-http/routes`
