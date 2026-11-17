@@ -1,6 +1,6 @@
-import { PublicCalculatorService } from "@taxkit/calculators";
 import type { CalculatorMetadataError } from "@taxkit/calculators/errors";
 import { UnsupportedCalculatorError } from "@taxkit/calculators/errors";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
 import { Effect, Match } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 

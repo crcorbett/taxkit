@@ -46,11 +46,16 @@ tarball validated by the SDK-owned strict downstream gate.
 
 ## Export paths
 
-Every public subpath in the package export map:
+Every public subpath in the package export map. The three AU rule packages
+share one shape and have no root export; Layers live only in `./rule-pack`:
 
-- `@taxkit/rules-au-stsl`
-- `@taxkit/rules-au-stsl/facts`
-- `@taxkit/rules-au-stsl/parameters`
+- `@taxkit/rules-au-stsl/facts`: STSL fact Schemas, tags and descriptors
+- `@taxkit/rules-au-stsl/parameters`: Schedule 8 tables, descriptors and sources
+- `@taxkit/rules-au-stsl/rule-pack`: the STSL rule and parameter Layers, the
+  composed packs, rule descriptors and rule and component identities
+
+STSL has no calculator definition of its own, so it has no `./schemas` or
+`./calculator`.
 
 ## Related Docs
 

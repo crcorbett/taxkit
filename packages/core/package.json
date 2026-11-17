@@ -5,17 +5,15 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
     "./primitives": "./src/primitives/index.ts",
     "./facts": "./src/facts/index.ts",
     "./parameters": "./src/parameters/index.ts",
     "./errors": "./src/errors/index.ts",
-    "./engine": "./src/engine/index.ts",
+    "./calculators": "./src/calculators/index.ts",
     "./rules": "./src/rules/index.ts",
     "./graph": "./src/graph/index.ts",
     "./trace": "./src/trace/index.ts",
     "./ledger": "./src/ledger/index.ts",
-    "./engine/schemas": "./src/engine/schemas.ts",
     "./money": "./src/money.ts"
   },
   "scripts": {

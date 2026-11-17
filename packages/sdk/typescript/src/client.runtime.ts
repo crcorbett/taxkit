@@ -1,4 +1,5 @@
-import type { CalculationError, CalculatorDefinition } from "@taxkit/core";
+import type { CalculatorDefinition } from "@taxkit/core/calculators";
+import type { CalculationError } from "@taxkit/core/errors";
 import {
   Effect,
   Exit,

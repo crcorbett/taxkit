@@ -5,9 +5,9 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
     "./facts": "./src/facts/index.ts",
-    "./parameters": "./src/parameters/index.ts"
+    "./parameters": "./src/parameters/index.ts",
+    "./rule-pack": "./src/rule-pack/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

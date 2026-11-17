@@ -1,3 +1,4 @@
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { Effect, Layer } from "effect";
 import {
   HttpClient,
@@ -7,16 +8,19 @@ import {
   HttpServerResponse,
 } from "effect/http";
 
-import { TaxKitServerLayer } from "./server.js";
+import { TaxKitServerLayer } from "./server/live.layer.js";
 
 // An HttpClient that answers from the TaxKit HTTP routes in this process, for
 // tests and examples. Use it under the native generated client:
-// `HttpApiClient.make(TaxKitApi, { baseUrl })`. The caller supplies accepted
-// content; each request has its own closing scope.
+// `HttpApiClient.make(TaxKitApi, { baseUrl })`. It composes the server routes
+// over the bounded production calculator service; the caller supplies accepted
+// content. Each request has its own closing scope.
 export const TaxKitApiInProcessLive = Layer.effect(
   HttpClient.HttpClient,
   Effect.gen(function* () {
-    const handler = yield* HttpRouter.toHttpEffect(TaxKitServerLayer);
+    const handler = yield* HttpRouter.toHttpEffect(
+      TaxKitServerLayer.pipe(Layer.provide(PublicCalculatorServiceLive))
+    );
     return HttpClient.make((request) =>
       handler.pipe(
         Effect.provideService(

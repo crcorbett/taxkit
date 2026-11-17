@@ -1,10 +1,11 @@
-import type { CalculatorDefinition, CalculationError } from "@taxkit/core";
+import type { CalculatorDefinition } from "@taxkit/core/calculators";
+import type { CalculationError } from "@taxkit/core/errors";
 import { Effect } from "effect";
 import type { Schema } from "effect";
 
 import type { CalculationRun } from "./types.js";
 
-export { decodeInput } from "@taxkit/core";
+export { decodeInput } from "@taxkit/core/calculators";
 export type {
   CalculationInput,
   CalculationOutput,

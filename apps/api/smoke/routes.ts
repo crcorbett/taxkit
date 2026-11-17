@@ -1,23 +1,23 @@
-import {
-  CalculatorCatalogResponse,
-  CalculatorRunRequest,
-  CalculatorRunResponse,
-  HealthResponse,
-} from "@taxkit/api-http";
+import { HealthResponse } from "@taxkit/api-http/health-contract";
 import {
   calculatorPaths,
   docsPaths,
   healthPath,
   openApiPath,
 } from "@taxkit/api-http/routes";
-import { TakeHomeCalculationRequest } from "@taxkit/calculators/schemas";
+import {
+  CalculatorCatalogResponse,
+  CalculatorRunRequest,
+  CalculatorRunResponse,
+  TakeHomeCalculationRequest,
+} from "@taxkit/calculators/schemas";
 import {
   DocsPublicPage,
   DocsPublicNavigation,
   DocsSearchResult,
 } from "@taxkit/content/schemas";
 import { NonNegativeMoney, Money, Cents } from "@taxkit/core/primitives";
-import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay";
+import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 import {
   Match,
   Function as EffectFunction,

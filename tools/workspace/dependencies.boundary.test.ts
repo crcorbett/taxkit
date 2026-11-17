@@ -219,7 +219,7 @@ describe("workspace dependency direction", () => {
           ["apps/web", "alchemy"],
           ["packages/infrastructure", "@distilled.cloud/cloudflare"],
           ["packages/observability", "@taxkit/calculators"],
-          ["packages/observability", "@taxkit/calculators/admission.schemas"],
+          ["packages/observability", "@taxkit/calculators/schemas"],
           ["packages/observability", "effect"],
           ["packages/analytics", "@taxkit/observability"],
           ["packages/api/http", "taxkit"],

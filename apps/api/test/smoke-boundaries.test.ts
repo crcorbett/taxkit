@@ -1,12 +1,12 @@
 import * as BunServices from "@effect/platform-bun/BunServices";
 import { expect, it } from "@effect/vitest";
+import { HealthResponse } from "@taxkit/api-http/health-contract";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import {
   CalculatorCatalogResponse,
   CalculatorRunResponse,
-  HealthResponse,
-} from "@taxkit/api-http";
-import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
-import { MetadataQuery } from "@taxkit/calculators/schemas";
+  MetadataQuery,
+} from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import {
   DocsPagePath,
@@ -16,14 +16,13 @@ import {
   DocsSearchResult,
 } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
-import { NonNegativeMoney } from "@taxkit/core";
-import { Money, Cents } from "@taxkit/core/primitives";
+import { NonNegativeMoney, Money, Cents } from "@taxkit/core/primitives";
 import {
   AuPayTakeHomeId,
   AuPayJurisdiction,
   AuPayTaxYear,
-} from "@taxkit/rules-au-pay";
-import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
+  TakeHomeScenarioInputSchema,
+} from "@taxkit/rules-au-pay/schemas";
 import {
   Function as EffectFunction,
   Cause,

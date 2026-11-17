@@ -40,6 +40,11 @@ export const BackendAnalyticsLive = Layer.unwrap(
           Layer.effect(
             BackendAnalytics,
             Effect.gen(function* () {
+              // The checked project region selects PostHog's ingestion host.
+              const captureUrl = Match.value(config.region).pipe(
+                Match.when("us", () => "https://us.i.posthog.com/batch/"),
+                Match.exhaustive
+              );
               const http = HttpClient.withScope(yield* HttpClient.HttpClient);
               const random = yield* SecureRandom.SecureRandom;
               return BackendAnalytics.of({
@@ -94,9 +99,7 @@ export const BackendAnalyticsLive = Layer.unwrap(
                     );
                     const response = yield* http
                       .execute(
-                        HttpClientRequest.post(
-                          "https://us.i.posthog.com/batch/"
-                        ).pipe(
+                        HttpClientRequest.post(captureUrl).pipe(
                           HttpClientRequest.bodyText(body, "application/json"),
                           HttpClientRequest.setHeader(
                             "cache-control",

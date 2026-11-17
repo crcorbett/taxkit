@@ -1,4 +1,7 @@
-import type { CalculatorDefinition, CalculationResult } from "@taxkit/core";
+import type {
+  CalculatorDefinition,
+  CalculationResult,
+} from "@taxkit/core/calculators";
 import type { Schema } from "effect";
 
 /** Infer the checked input directly from its owning calculator definition. */

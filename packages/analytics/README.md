@@ -13,12 +13,15 @@ Tax rule packages and local SDK calculations do not depend on this package.
   collection mode and capture settings. Off needs no token; invalid enabled
   settings fail with `AnalyticsConfigurationError`.
 - `./collection-policy`: one checked incoming-header policy used by the API. Missing allows direct clients; malformed or denied flags and `DNT: 1` refuse collection.
-- `./service`: public Effect service contract.
+- `./service`: the `BackendAnalytics` service contract.
 - `./live`: production Layer; compose only at an application/runtime boundary.
 - `./api-usage`: calculator service decorator and request-owned event collector.
+- `./test`: static `BackendAnalyticsTest`, which records each accepted
+  calculator use in the `BackendAnalyticsUses` Ref a test supplies.
 
 `BackendAnalyticsLive` is a static Layer that reads `AnalyticsSettingsConfig`
-from the host ConfigProvider; tests replace that provider. The application supplies native `FetchHttpClient` and Effect `SecureRandom`. Each
+from the host ConfigProvider; tests replace that provider. The checked
+`POSTHOG_REGION` selects the capture host (`us` sends to `us.i.posthog.com`). The application supplies native `FetchHttpClient` and Effect `SecureRandom`. Each
 backend send owns one scope and one five-second limit covering identity,
 encoding, headers and the complete reply. Replies are limited to 64 KiB. A
 request has one attempt, omits credentials, disables trace propagation and
@@ -28,8 +31,8 @@ counts as accepted. Disabled or denied collection makes no request and generates
 no UUID. `accepted` means a successful HTTP response; stored provider events
 require separate readback.
 
-The browser contract is shared so the Website adapter can keep its SDK private.
-The Website has no analytics relay and sends no collection header.
+There is no browser analytics contract. The Website collects no analytics, has
+no analytics relay and sends no collection header.
 
 `ApiCalculatorUsageLive` supplies the calculators package's `CalculatorUsage`
 observer, which the public calculator implementation calls after a successful

@@ -1,10 +1,13 @@
 import { describe, expect, it } from "@effect/vitest";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
+import { ContentServiceTest } from "@taxkit/content/test";
 import {
   Function as EffectFunction,
   Clock,
   Deferred,
   Effect,
   Fiber,
+  Layer,
   Ref,
   Schema,
   Stream,
@@ -26,8 +29,7 @@ import {
   CalculatorRequestBodyErrorEnvelope,
   CalculatorRequestBodyPolicy,
 } from "../src/schemas.js";
-import { TaxKitServerLayer } from "../src/server.js";
-import { ContentTestLive } from "./content.fixture.js";
+import { TaxKitServerLayer } from "../src/server/live.layer.js";
 
 const path =
   "http://taxkit.internal/api/v2/calculators/au.pay.take-home/calculate";
@@ -80,7 +82,9 @@ describe("shared HTTP request-body policy", () => {
     () =>
       Effect.gen(function* () {
         const handler = yield* HttpRouter.toHttpEffect(TaxKitServerLayer).pipe(
-          Effect.provide(ContentTestLive)
+          Effect.provide(
+            Layer.mergeAll(ContentServiceTest, PublicCalculatorServiceLive)
+          )
         );
         const request = HttpClientRequest.post(path).pipe(
           HttpClientRequest.bodyUint8Array(

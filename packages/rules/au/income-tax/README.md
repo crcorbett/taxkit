@@ -54,12 +54,18 @@ tarball validated by the SDK-owned strict downstream gate.
 
 ## Export paths
 
-Every public subpath in the package export map:
+Every public subpath in the package export map. The three AU rule packages
+share one shape and have no root export; Layers live only in `./rule-pack`:
 
-- `@taxkit/rules-au-income-tax`
-- `@taxkit/rules-au-income-tax/facts`
-- `@taxkit/rules-au-income-tax/parameters`
-- `@taxkit/rules-au-income-tax/schemas`
+- `@taxkit/rules-au-income-tax/schemas`: calculator identities and context,
+  scenario input and report Schemas, and the calculator contract
+- `@taxkit/rules-au-income-tax/calculator`: the closed
+  `AuAnnualIncomeTaxCalculation`, `CalculateAnnualTax` and `AnnualTaxScenario`
+- `@taxkit/rules-au-income-tax/facts`: fact Schemas, tags and descriptors
+- `@taxkit/rules-au-income-tax/parameters`: income tax, LITO and Medicare levy
+  tables, descriptors and sources
+- `@taxkit/rules-au-income-tax/rule-pack`: every rule, parameter and scenario
+  Layer, the composed pack, rule descriptors and rule and component identities
 
 ## Related Docs
 
@@ -69,7 +75,7 @@ Every public subpath in the package export map:
 
 ## Browser Schema entrypoints
 
-Use `@taxkit/rules-au-income-tax/schemas` for canonical calculator metadata, `AnnualTaxReport` and `AnnualTaxScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
+Use `@taxkit/rules-au-income-tax/schemas` for canonical calculator metadata, `AnnualTaxReport` and `AnnualTaxScenarioInputSchema` without live calculator or rule-pack imports.
 
 The [transport architecture](../../../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
 

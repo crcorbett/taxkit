@@ -1,8 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
-import { ContentServiceLive } from "@taxkit/content/live";
-import { ContentCatalogue } from "@taxkit/content/service";
-import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { ContentServiceTest } from "@taxkit/content/test";
 import { Predicate, Function as EffectFunction, Effect, Layer } from "effect";
 import { HttpClientRequest, HttpClientResponse } from "effect/http";
 
@@ -80,15 +78,7 @@ it.effect(
         new URL("http://taxkit.internal")
       ).pipe(
         Effect.provide(
-          TaxKitApiInProcessLive.pipe(
-            Layer.provide(
-              ContentServiceLive.pipe(
-                Layer.provide(
-                  Layer.effect(ContentCatalogue, exampleContentCatalogue)
-                )
-              )
-            )
-          )
+          TaxKitApiInProcessLive.pipe(Layer.provide(ContentServiceTest))
         )
       );
       expect(labels).toContain(

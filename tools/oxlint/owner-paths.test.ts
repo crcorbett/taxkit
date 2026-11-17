@@ -98,6 +98,11 @@ const exportKeys = (target: typeof ExportTarget.Type | undefined) => {
     { onFalse: () => ["."], onTrue: () => keys }
   );
 };
+const isOwnedAddress = (value: string) =>
+  !isGlob(value) &&
+  (value.startsWith("@taxkit/") ||
+    value === "taxkit" ||
+    value.startsWith("taxkit/"));
 const resolvesToExport = (specifier: string) =>
   EffectFunction.pipe(
     workspaceContracts,
@@ -201,18 +206,32 @@ describe("owner paths and grants", () => {
       });
       const grants = EffectFunction.pipe(
         [...jsonStrings(settings), ...frontendModuleGrants],
-        Array.filter(
-          (value) =>
-            !isGlob(value) &&
-            (value.startsWith("@taxkit/") ||
-              value === "taxkit" ||
-              value.startsWith("taxkit/"))
-        ),
+        Array.filter(isOwnedAddress),
         Array.dedupe
+      );
+      // A module-ownership owner names a package prefix: it governs the package
+      // and every subpath, so a package with no root export still qualifies.
+      // Frontend grants are exact module addresses and must name an export.
+      const packageOwners = EffectFunction.pipe(
+        jsonStrings(settings),
+        Array.filter(isOwnedAddress),
+        Array.filter((value) =>
+          EffectFunction.pipe(
+            workspaceContracts,
+            Array.some(({ manifest }) => manifest.name === value)
+          )
+        )
       );
       const unresolved = EffectFunction.pipe(
         grants,
-        Array.filter((grant) => !resolvesToExport(grant))
+        Array.filter(
+          (grant) =>
+            !resolvesToExport(grant) &&
+            !(
+              Array.contains(packageOwners, grant) &&
+              !Array.contains(frontendModuleGrants, grant)
+            )
+        )
       );
       expect(grants.length).toBeGreaterThan(30);
       expect(unresolved).toStrictEqual([]);

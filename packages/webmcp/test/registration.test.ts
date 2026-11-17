@@ -1,5 +1,6 @@
 import { expect, it } from "@effect/vitest";
 import { McpToolUnavailable } from "@taxkit/api-mcp/errors";
+import { TaxKitMcpHandlersTest } from "@taxkit/api-mcp/test";
 import { TaxKitMcpToolkit } from "@taxkit/api-mcp/tools";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { DocsWebsiteOrigin } from "@taxkit/content/schemas";
@@ -42,17 +43,9 @@ const unavailable = new McpToolUnavailable({
   code: "service-unavailable",
   retry: "try-again-manually",
 });
-const ControlledHandlers = TaxKitMcpToolkit.toLayer({
-  taxkit_calculate: () => Effect.fail(unavailable),
-  taxkit_docs_navigation: () => Effect.fail(unavailable),
-  taxkit_find_docs: () => Effect.fail(unavailable),
-  taxkit_get_calculator_schema: () => Effect.fail(unavailable),
-  taxkit_list_calculators: () => Effect.fail(unavailable),
-  taxkit_read_doc: () => Effect.fail(unavailable),
-});
 const toolCount = Array.length(Record.keys(TaxKitMcpToolkit.tools));
 const registerTools = registerWebMcpTools.pipe(
-  Effect.provide(Layer.mergeAll(HostLive, ControlledHandlers))
+  Effect.provide(Layer.mergeAll(HostLive, TaxKitMcpHandlersTest))
 );
 const byName = Order.mapInput(
   Order.String,
@@ -142,7 +135,7 @@ it.effect(
         return server.tools;
       }).pipe(
         Effect.provide(
-          Layer.mergeAll(McpServer.McpServer.layer, ControlledHandlers)
+          Layer.mergeAll(McpServer.McpServer.layer, TaxKitMcpHandlersTest)
         )
       );
       const browser = EffectFunction.pipe(

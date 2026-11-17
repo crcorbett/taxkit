@@ -4,7 +4,7 @@ import {
   PayWithholdingsLedgerFact,
   PaygWithholdingComponentFact,
 } from "@taxkit/rules-au-pay/facts";
-import { buildPayWithholdingsLedger } from "@taxkit/rules-au-pay/rules";
+import { buildPayWithholdingsLedger } from "@taxkit/rules-au-pay/rule-pack";
 import { Effect, Layer } from "effect";
 
 import { StslComponentFact } from "../facts/stsl.js";

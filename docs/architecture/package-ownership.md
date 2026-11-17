@@ -9,8 +9,10 @@ owns the dependency direction and its enforcement.
 
 `packages/core`
 : Implemented shared primitives, fact descriptors, rule descriptors, graph
-metadata, trace and ledger contracts, common tagged errors and calculation
-engine service. Public trace inputs and results are JSON values, and
+metadata, trace and ledger contracts, common tagged errors and
+`defineCalculator`, which turns a rule pack into a closed calculator program;
+there is no calculation engine service. Each symbol has one subpath address and
+there is no root export. Public trace inputs and results are JSON values, and
 `SourceExtract.rowContract` names the extracted row contract without using the
 vague former `shape` field.
 
@@ -18,6 +20,9 @@ vague former `shape` field.
 : Official Australian rule packs, parameter tables, algorithms, source
 references, graph metadata, rule-owned calculator ids/context literals and
 golden tests. Current implemented packages are `pay`, `income-tax` and `stsl`.
+All three share one export shape with no root: `./facts`, `./parameters` and
+`./rule-pack` (every Layer), plus `./schemas` and `./calculator` where the
+package defines a calculator.
 
 `packages/testing`
 : Shared test helpers for workspace packages. It must not become a back door
@@ -32,6 +37,8 @@ for production-only runtime helpers.
 `packages/api/http`
 : Implemented HTTP API package. It owns Effect HTTP API definitions, boundary
 schemas, thin server handlers, OpenAPI and HTTP status/transport annotations.
+It has no root export, and its `./server` Layers leave
+`PublicCalculatorService` for the host to supply.
 Callers use Effect's generated `HttpApiClient` for its `TaxKitApi` directly;
 `./in-process` supplies an in-process `HttpClient` for tests and examples. Its
 narrow `request-boundary` export owns the shared streamed HTTP-body admission
@@ -153,9 +160,10 @@ identity. Neither an app nor a package depends on another app.
   its requested path. Shared public-origin policy lives in its Schema owner.
 
 `packages/analytics`
-: Private source owner of checked page/calculator events, collection policy,
-  settings, safe errors and named browser/backend service contracts. Its native
-  backend capture Layer has one bounded HTTP attempt. The application owns
+: Private source owner of checked calculator usage events, collection policy,
+  settings, safe errors and the `BackendAnalytics` service contract, with
+  `BackendAnalyticsTest` at `./test`. Its native backend capture Layer has one
+  bounded HTTP attempt to the host the checked PostHog region selects. The application owns
   execution and best-effort delivery. Analytics owns the calculator usage decorator.
   Infrastructure owns retained provider
   projects. Calculators, rules and the local SDK have no analytics dependency.

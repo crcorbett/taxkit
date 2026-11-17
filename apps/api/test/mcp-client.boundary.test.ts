@@ -6,9 +6,11 @@ import {
 import { McpToolUnavailable } from "@taxkit/api-mcp/errors";
 import { McpRequestAbortSignal } from "@taxkit/api-mcp/request";
 import { McpDocsSearchResponse } from "@taxkit/api-mcp/schemas";
-import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import { CalculatorRateLimited } from "@taxkit/calculators/errors";
-import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
+import {
+  CalculatorCatalogueLive,
+  PublicCalculatorServiceLive,
+} from "@taxkit/calculators/live";
 import {
   CalculatorCatalogResponse,
   CalculatorSchemaResponse,
@@ -17,14 +19,16 @@ import {
   CalculatorRunRequest,
 } from "@taxkit/calculators/schemas";
 import {
+  CalculatorAdmission,
   CalculatorCatalogue,
   PublicCalculatorService,
 } from "@taxkit/calculators/service";
 import {
-  CalculationRequest,
-  CalculatorLive,
-  CalculatorFixture,
+  PublicCalculatorServiceTest,
   CalculatorFixtureMode,
+} from "@taxkit/calculators/test";
+import {
+  CalculationRequest,
   sensitiveSentinel,
 } from "@taxkit/calculators/testing/fixtures";
 import {
@@ -195,7 +199,7 @@ describe("real MCP client against the native API application", () => {
         });
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
-        Effect.provide(CalculatorLive),
+        Effect.provide(PublicCalculatorServiceLive),
         Effect.provide(TestConsole.layer),
         Effect.scoped
       )
@@ -259,7 +263,7 @@ describe("real MCP client against the native API application", () => {
         }
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
-        Effect.provide(CalculatorLive),
+        Effect.provide(PublicCalculatorServiceLive),
         Effect.provide(TestConsole.layer),
         Effect.scoped
       )
@@ -281,7 +285,7 @@ describe("real MCP client against the native API application", () => {
             Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
           ),
           Effect.provide(
-            CalculatorFixture.pipe(
+            PublicCalculatorServiceTest.pipe(
               Layer.provide(CalculatorUsageDisabled),
               Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode))
             )
@@ -348,7 +352,7 @@ describe("real MCP client against the native API application", () => {
         }
       }).pipe(
         Effect.provideService(ConfigProvider.ConfigProvider, settings),
-        Effect.provide(CalculatorLive),
+        Effect.provide(PublicCalculatorServiceLive),
         Effect.provide(TestConsole.layer),
         Effect.scoped
       )
@@ -839,7 +843,7 @@ describe("real MCP client against the native API application", () => {
         ),
         Effect.provide(TestConsole.layer),
         // Direct retained-report oracle keeps admission outside the pure engine.
-        Effect.provide(CalculatorLive),
+        Effect.provide(PublicCalculatorServiceLive),
         Effect.scoped
       )
   );

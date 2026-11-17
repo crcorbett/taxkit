@@ -29,12 +29,16 @@ export {
 } from "./dollars.js";
 export { RoundingMode, roundCentsToDollar } from "./rounding.js";
 export {
+  CalculatorId,
   CentsOrInfinity,
   DecimalCoefficient,
+  Jurisdiction,
   TaxRate,
   TaxYear,
+  calculatorId,
   decimalCoefficient,
   decimalDollarsToCents,
+  jurisdiction,
   multiplyCentsByDecimal,
   taxRate,
   taxYear,

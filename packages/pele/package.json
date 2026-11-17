@@ -8,7 +8,8 @@
     "./schemas": "./src/schemas.ts",
     "./errors": "./src/errors.ts",
     "./service": "./src/service.ts",
-    "./live": "./src/live.layer.ts"
+    "./live": "./src/live.layer.ts",
+    "./test": "./src/test.layer.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",

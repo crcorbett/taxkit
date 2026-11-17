@@ -49,19 +49,26 @@ SDK and in-process callers share it.
 
 Each package should expose isolated export paths. Avoid broad root barrels that accidentally mix server-only, client-only, API, SDK or docs code into deterministic calculation bundles.
 
-Recommended shape:
+Root exports are absent by default; an intentional root stays contract-only.
+Give each symbol one address and keep Layers in their own subpaths:
 
 ```json
 {
   "exports": {
-    ".": "./src/index.ts",
-    "./facts": "./src/facts/index.ts",
-    "./rules": "./src/rules/index.ts",
-    "./parameters": "./src/parameters/index.ts",
-    "./testing": "./src/testing/index.ts"
+    "./schemas": "./src/schemas.ts",
+    "./errors": "./src/errors.ts",
+    "./service": "./src/service.ts",
+    "./live": "./src/live.layer.ts",
+    "./test": "./src/test.layer.ts",
+    "./testing/fixtures": "./src/__testing__/fixtures.ts"
   }
 }
 ```
+
+`./test` exports the deterministic test Layer and `./testing/*` the fixtures
+and observations from `src/__testing__/`. Rule packages keep every Layer in
+`./rule-pack` beside contract-only `./facts`, `./parameters`, `./schemas` and
+`./calculator`.
 
 Server-only adapters and filesystem code must have explicit server-only export paths and must not be imported by browser-safe packages.
 
