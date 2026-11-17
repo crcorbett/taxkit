@@ -10,7 +10,7 @@ import {
   DocsRepositoryProfile,
   DocsSourcePath,
 } from "../src/schemas.js";
-import { codeColours } from "./theme.fixture.js";
+import { codeColours } from "./fixtures/theme.js";
 
 const context = Effect.gen(function* () {
   const source = yield* DocsSourcePath.makeEffect("guides/first.mdx");

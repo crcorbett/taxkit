@@ -23,7 +23,7 @@ cannot supply a different fact service.
 
 ## Descriptors and authority
 
-Import `FactDescriptor` and `makeFactDescriptor` from `@taxkit/core`; do not
+Import `FactDescriptor` and `makeFactDescriptor` from `@taxkit/core/facts`; do not
 copy their fields into a second interface. The [descriptor owner](../../packages/core/src/facts/descriptor.ts)
 keeps the value Schema and `Context.Key<Self, Value>` tied to the same value
 type. Its readonly fields include a branded fact ID, title, authority and

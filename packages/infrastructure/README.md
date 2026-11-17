@@ -8,6 +8,8 @@ PostHog project; `alchemy.axiom.run.ts` and `alchemy.trace.run.ts` own the
 Axiom and Cloudflare telemetry resources. Root `alchemy.apps.ts` joins the lightweight native declaration with the API
 implementation; this package imports no application implementation.
 
+## Exports
+
 | Export | Owns |
 | --- | --- |
 | `./apps-stack` | `declareNativeAppsInfrastructure` declares retained Production resources; `declareNativeAppsHosts` declares the Website using a supplied API Worker; `nativeApiHostProps` owns native API deployment settings. |
@@ -175,3 +177,20 @@ and has no PostHog project reference or management credentials in its bindings.
 The Website sends no analytics, and stored events have not been read back
 from PostHog. Metrics are not collected.
 
+## Documentation impact
+
+Change this README, the [deployment architecture](../../docs/architecture/deployment.md),
+[configuration](../../docs/architecture/configuration.md) and the
+[deployment runbook](../../docs/runbooks/deployment.md) when a resource, binding,
+stage rule, secret selection or telemetry stack changes.
+
+## Runbook applicability
+
+The [deployment runbook](../../docs/runbooks/deployment.md) owns native plan,
+deploy, drift, destroy and rollback. Deploying, changing credentials or deleting
+provider resources needs the maintainer's explicit request.
+
+## Non-claims
+
+Package and root graph checks use memory state and refuse provider writes. They
+do not plan against Cloudflare, deploy, or read back provider state.

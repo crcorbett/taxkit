@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest";
-import { defineCalculator } from "@taxkit/core";
+import { defineCalculator } from "@taxkit/core/calculators";
 import {
   CalculationError,
   CalculationInvariantViolation,
@@ -8,18 +8,24 @@ import { Cents, Money, NonNegativeMoney } from "@taxkit/core/primitives";
 import {
   AuPayTakeHomeCalculation,
   AuPayTakeHomeWithSacrificeCalculation,
+} from "@taxkit/rules-au-pay/calculator";
+import {
   GrossPay,
   GrossPayDescriptor,
   GrossPayFact,
   SalarySacrifice,
   SalarySacrificeFact,
+  TaxablePayFact,
+} from "@taxkit/rules-au-pay/facts";
+import {
+  TaxablePayWithSacrificeLive,
+  AuTakeHomePayRuleDescriptors,
+} from "@taxkit/rules-au-pay/rule-pack";
+import {
   TakeHomeScenarioInputSchema,
   TakeHomeWithSacrificeScenarioInput,
-  TaxablePayFact,
-  TaxablePayWithSacrificeLive,
-} from "@taxkit/rules-au-pay";
-import { AuTakeHomePayRuleDescriptors } from "@taxkit/rules-au-pay/rule-pack";
-import { AuPayTakeHomeContract } from "@taxkit/rules-au-pay/schemas";
+  AuPayTakeHomeContract,
+} from "@taxkit/rules-au-pay/schemas";
 import { Effect, Exit, Layer, Option, Result } from "effect";
 
 const money = (cents: number) =>

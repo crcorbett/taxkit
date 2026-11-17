@@ -1,7 +1,7 @@
 import { ReadingBody, ReadingCodeBlock } from "@taxkit/mdx/schemas";
 import { Schema } from "effect";
 
-import { codeColours } from "./theme.fixture.js";
+import { codeColours } from "./theme.js";
 
 export const codeText = '\tlet chart = "<harbor>";\n\n  sail();\n';
 export const escapedCodeText =

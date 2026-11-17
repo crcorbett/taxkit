@@ -1,5 +1,5 @@
-import { PublicCalculatorServiceLive } from "@taxkit/calculators";
-import { inputValidationError } from "@taxkit/core";
+import { PublicCalculatorService } from "@taxkit/calculators/service";
+import { inputValidationError } from "@taxkit/core/errors";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder, HttpApiScalar, HttpApiError } from "effect/http-api";
 import * as HttpMiddleware from "effect/http/HttpMiddleware";
@@ -52,16 +52,21 @@ const OpenApiRouteLayer = HttpRouter.add(
   Effect.succeed(HttpServerResponse.jsonUnsafe(taxKitOpenApiSpec))
 );
 
-// Hosts supply their shared application service and origin policy. Retain the
-// existing standalone Layer below for existing Bun and in-process consumers.
-export const ApiRoutesLayer = Layer.mergeAll(
+// The public HTTP routes. Request handlers require the calculator and content
+// services; a host supplies them with its own origin and body policy.
+export const TaxKitApiRoutesLayer = Layer.mergeAll(
   ApiRoutes,
   DocsRouteLayer,
   OpenApiRouteLayer
 ).pipe(Layer.provide(HttpServer.layerServices));
 
-export const ApiRoutesLive = ApiRoutesLayer.pipe(
-  HttpRouter.provideRequest(PublicCalculatorServiceLive),
+// The standalone server: the routes with the shared body limit and public CORS.
+// The calculator service is read once, when the router is built, from the
+// host's composition; `ContentService` stays a request requirement.
+export const TaxKitServerLayer = TaxKitApiRoutesLayer.pipe(
+  HttpRouter.provideRequest(
+    Layer.effect(PublicCalculatorService, PublicCalculatorService)
+  ),
   Layer.provide(
     HttpRouter.middleware((handler) =>
       withCalculatorRequestBodyLimit({ handler })

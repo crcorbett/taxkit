@@ -40,3 +40,20 @@ Add the `.mdx` file, list it in `navigation.json`, and add its raw import to
 `sources.ts`, then run `bun run build --filter=api`. The API tests check that the list and the files in this folder
 agree, that every page builds, and that the public wording rules hold. The
 examples tests check that copied guide snippets match their checked files.
+
+## Documentation impact
+
+Change this README and the [content architecture](../../docs/architecture/content-and-posts.md)
+when the page format, navigation fields or source list change. Page wording
+follows the public documentation rules the API tests check.
+
+## Runbook applicability
+
+No package runbook is needed. Published pages reach readers through the API
+build, whose deployment belongs to the [deployment runbook](../../docs/runbooks/deployment.md).
+
+## Non-claims
+
+The API and examples tests check the source list, page builds, wording rules and
+copied snippets. They do not prove the deployed pages or the accuracy of what a
+page says beyond those checks.

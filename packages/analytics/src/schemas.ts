@@ -2,7 +2,6 @@ import {
   CalculatorId,
   CalculatorCatalogItem,
 } from "@taxkit/calculators/schemas";
-import { DocsPublicPagePath } from "@taxkit/content/schemas";
 import { DeploymentStage } from "@taxkit/observability/stage";
 import { Match, Schema } from "effect";
 
@@ -62,22 +61,6 @@ export const CalculatorUse = Schema.Struct({
   collectionPolicy: CollectionPolicy,
 });
 export type CalculatorUse = typeof CalculatorUse.Type;
-export const PagePath = Schema.Union([
-  Schema.Literal("/"),
-  DocsPublicPagePath,
-  Schema.TemplateLiteral(["/calculators/", CalculatorId]),
-]).pipe(Schema.brand("taxkit/AnalyticsPagePath"));
-export const PageView = Schema.Struct({
-  path: PagePath,
-  source: Schema.Literals([
-    "direct",
-    "internal",
-    "search",
-    "external",
-    "unknown",
-  ]),
-});
-export type PageView = typeof PageView.Type;
 // Capture, browser enrichment and provider management keep distinct boundaries.
 // This backend wire owner includes no tax inputs, result, visitor or request data.
 export const CalculatorCaptureBatch = Schema.Struct({

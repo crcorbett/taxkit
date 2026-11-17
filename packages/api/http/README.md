@@ -22,10 +22,11 @@ that catalogue. OpenAPI coverage tests require every declared endpoint to belong
 to one data family and give each path its expected cache eligibility. Authored
 page identities remain in Content and Website file routes remain in the app.
 
-The root export includes `HealthResponse`, the same Schema used by the health
-endpoint. The API app's smoke check uses this owner to validate the real health
-response without copying its shape. This addition preserves the health wire
-format and all existing routes.
+`./health-contract` exports `HealthResponse`, the same Schema used by the
+health endpoint. The API app's smoke check uses this owner to validate the real
+health response without copying its shape. There is no root export: callers
+import each contract from its subpath, and calculator Schemas from
+`@taxkit/calculators/schemas`.
 
 The implemented API surface is:
 
@@ -56,12 +57,14 @@ additional request and operation protections.
 The SDK owns the HTTP comparison tests; this package does not depend on it.
 
 `@taxkit/api-http/server` exports `TaxKitApiRoutesLayer` for application-owned
-service and CORS composition. It also retains `TaxKitServerLayer` with the
-existing calculator engine and `publicCors` for Bun and in-process consumers.
-Both server Layers require the caller's `ContentService`. API hosts supply the
-accepted build output; the HTTP package imports only the compiled content
-contracts. The native API host supplies its shared calculator service to HTTP
-and MCP.
+service and CORS composition, and `TaxKitServerLayer`, the same routes with the
+shared request-body limit and `publicCors`. Neither chooses a calculator
+implementation: `TaxKitServerLayer` reads `PublicCalculatorService` once, when
+the router is built, and both require the caller's `ContentService`. The
+standalone Bun host supplies `PublicCalculatorServiceLive`; the native API host
+supplies its shared rate-limited calculator service to HTTP and MCP. API hosts
+supply the accepted build output; the HTTP package imports only the compiled
+content contracts.
 
 The `content` group delegates navigation, page lookup and search to that same
 content service. Markdown returns the owning processed page body as
@@ -76,7 +79,8 @@ Callers use Effect's generated client directly:
 `HttpApiClient.make(TaxKitApi, { baseUrl })` from `effect/http-api`, with
 `TaxKitApi` from `@taxkit/api-http/api` and the caller's `HttpClient`.
 `TaxKitApiInProcessLive` (`@taxkit/api-http/in-process`) is an in-process
-`HttpClient` over the same routes for tests and examples. It requires supplied
+`HttpClient` over the same routes for tests and examples. It composes
+`TaxKitServerLayer` over `PublicCalculatorServiceLive`, requires supplied
 content, runs in the caller's Layer scope and closes each request's scope. The
 generated client checks the same response Schemas as remote consumers.
 
@@ -114,6 +118,24 @@ HTTP envelopes and status annotations remain transport-owned. Schema endpoints
 supply fact questions, rules and source guidance. Metadata help uses its own
 query contract; calculations accept only the correlated request body.
 
+## Exports
+
+Every public subpath in the package export map:
+
+- `@taxkit/api-http/api`
+- `@taxkit/api-http/in-process`
+- `@taxkit/api-http/server`
+- `@taxkit/api-http/request-boundary`
+- `@taxkit/api-http/response-policy`
+- `@taxkit/api-http/routes`
+- `@taxkit/api-http/origin`
+- `@taxkit/api-http/negotiation`
+- `@taxkit/api-http/requests`
+- `@taxkit/api-http/errors`
+- `@taxkit/api-http/schemas`
+- `@taxkit/api-http/calculator-contract`
+- `@taxkit/api-http/health-contract`
+
 ## Main Areas
 
 - `src/api.ts`: `TaxKitApi` definition and OpenAPI annotations.
@@ -148,11 +170,12 @@ query contract; calculations accept only the correlated request body.
   `Accept` header as HTML, Markdown, unacceptable or invalid.
 - `src/openapi.ts`: package-owned OpenAPI generation, structured
   normalization and snapshot formatting for compatibility checks.
-- `src/handlers/`: server-side thin handler adapters and handler layers.
-- `src/server/live.layer.ts`: server route layer, CORS middleware, Scalar docs
-  route, OpenAPI JSON route using the package-owned OpenAPI source and
-  calculator service layer composition.
-- `src/server.ts`: server export boundary for `TaxKitServerLayer`.
+- `src/handlers/` (internal): server-side thin handler adapters and handler
+  layers, composed only by the server Layers.
+- `src/server/live.layer.ts` (`./server`): `TaxKitApiRoutesLayer` (routes,
+  Scalar docs route and OpenAPI JSON route from the package-owned OpenAPI
+  source) and `TaxKitServerLayer` (those routes with the body limit and CORS
+  middleware).
 - `src/config.ts`: package-owned client config schema and neutral `httpApi`
   config source.
 - `src/in-process.layer.ts`: in-process `HttpClient` over the routes, for
@@ -166,22 +189,25 @@ query contract; calculations accept only the correlated request body.
   `cacheHeaders`/`applyCachePolicy`, the one cache decision for API and Website
   replies.
 
-Export paths:
+Export paths (there is no root export):
 
-- `@taxkit/api-http`
 - `@taxkit/api-http/api`
 - `@taxkit/api-http/in-process`
 - `@taxkit/api-http/request-boundary`
 - `@taxkit/api-http/response-policy`
 - `@taxkit/api-http/server`
-- `@taxkit/api-http/handlers`
+- `@taxkit/api-http/routes`
+- `@taxkit/api-http/origin`
+- `@taxkit/api-http/negotiation`
+- `@taxkit/api-http/requests`
+- `@taxkit/api-http/errors`
 - `@taxkit/api-http/schemas`
-- `@taxkit/api-http/calculator-contract`
-- `@taxkit/api-http/health-contract`
+- `@taxkit/api-http/calculator-contract`: `CalculatorApiErrorEnvelope` and the
+  calculator route group
+- `@taxkit/api-http/health-contract`: `HealthResponse` and the health group
 
 Reusable calculator exports:
 
-- `@taxkit/calculators`
 - `@taxkit/calculators/live`
 - `@taxkit/calculators/service`
 - `@taxkit/calculators/schemas`
@@ -195,11 +221,11 @@ The package is built as ESM TypeScript. Runtime exports are split by boundary:
 - server runtimes may use `@taxkit/api-http/server`
 - tests and examples that need in-process wiring use
   `@taxkit/api-http/in-process`
-- handler exports are server-side and should not be imported from browser code
+- handlers have no export; browser code never reaches them
 
-`ApiRoutesLive` (exported as `TaxKitServerLayer`) owns reusable route
-middleware such as CORS inside this package. App packages should provide a
-platform HTTP server and process config, not duplicate API route middleware.
+`TaxKitServerLayer` owns reusable route middleware such as CORS inside this
+package. App packages provide a platform HTTP server, process config and the
+calculator service, not duplicate API route middleware.
 The native API Worker composes `TaxKitApiRoutesLayer` itself and applies the
 same `publicCors` policy.
 
@@ -391,7 +417,10 @@ that archive and checks its `/http` contracts and all public entry points.
   contract.
 - Add tests or focused verification when new endpoints or handlers are added.
 
-## Related Docs
+## Documentation impact
+
+Change this README and these owners when a route, envelope, status, cache rule
+or OpenAPI annotation changes, and update the OpenAPI snapshot with it:
 
 - `docs/architecture/api-and-sdk.md`
 - `docs/architecture/effect-services.md`
@@ -410,7 +439,7 @@ request/response decoding and accepted money values retain that contract.
 Effect 4.0.6 flattens redundant nested `anyOf` groups in the generated snapshot;
 the allowed request and response values stay the same.
 The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
-The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
+The package `tsconfig.json` checks the snapshot test with the source; the SDK's
 `check-types` covers the HTTP comparison test. Both retain canonical branded
 identities and explicit Match narrowing of report/error unions.
 
@@ -453,3 +482,14 @@ The public page-address refinement and fixed documentation errors now belong
 to `@taxkit/content`. This package retains
 its existing error exports and HTTP status/media rules. Generated OpenAPI names
 the same canonical address bound for both the request and returned page.
+
+## Runbook applicability
+
+No package runbook is needed. The API Worker's deployment belongs to the
+[deployment runbook](../../../docs/runbooks/deployment.md); `bun run api:smoke`
+checks the standalone API's public routes through an external consumer.
+
+## Non-claims
+
+Package tests and the OpenAPI snapshot do not prove the deployed API, Cloudflare
+caching, rate-limit behaviour or the SDK's packed archive.

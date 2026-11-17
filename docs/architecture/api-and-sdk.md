@@ -135,9 +135,12 @@ requests. Page queries are bounded public addresses; search terms and result
 sizes retain the content owner's limits. Missing-page and source-search
 failures have fixed typed 404/503 replies; native invalid queries return empty
 400 replies. These routes contain public documentation, never personal reports.
-The HTTP server Layers and `TaxKitApiInProcessLive` (`./in-process`, an
-in-process `HttpClient` over the same routes for tests and examples) require
-supplied content. The in-process client runs native request Effects in
+The HTTP server Layers (`./server`) and `TaxKitApiInProcessLive` (`./in-process`,
+an in-process `HttpClient` over the same routes for tests and examples) require
+supplied content. The server Layers also leave `PublicCalculatorService` to the
+host: the standalone Bun server supplies `PublicCalculatorServiceLive`, the
+native Worker its shared rate-limited service, and the in-process client
+composes `PublicCalculatorServiceLive` itself. The in-process client runs native request Effects in
 caller-owned scopes and does not create an additional web-handler runner.
 
 Route-only HTTP envelopes, query schemas and status annotations stay in

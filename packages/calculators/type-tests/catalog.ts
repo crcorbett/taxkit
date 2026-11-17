@@ -1,12 +1,10 @@
-import { defineCalculator } from "@taxkit/core";
+import { defineCalculator } from "@taxkit/core/calculators";
 import {
   AnnualTaxScenarioInputSchema,
   AnnualTaxReport,
-} from "@taxkit/rules-au-income-tax";
-import {
-  AuPayTakeHomeCalculation,
-  TakeHomeScenarioInputSchema,
-} from "@taxkit/rules-au-pay";
+} from "@taxkit/rules-au-income-tax/schemas";
+import { AuPayTakeHomeCalculation } from "@taxkit/rules-au-pay/calculator";
+import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 
 import { defineCalculatorCatalogEntry } from "../src/catalog.js";
 import type { CalculatorCatalogEntry } from "../src/catalog.js";

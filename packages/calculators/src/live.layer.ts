@@ -1,9 +1,9 @@
-import { validateRuleGraph } from "@taxkit/core";
-import { AuAnnualIncomeTaxCalculation } from "@taxkit/rules-au-income-tax";
+import { validateRuleGraph } from "@taxkit/core/graph";
+import { AuAnnualIncomeTaxCalculation } from "@taxkit/rules-au-income-tax/calculator";
 import {
   AuPayTakeHomeCalculation,
   AuPayWithholdingsCalculation,
-} from "@taxkit/rules-au-pay";
+} from "@taxkit/rules-au-pay/calculator";
 import { Function as EffectFunction, Array, Effect, Layer } from "effect";
 import { pipe } from "effect/Function";
 

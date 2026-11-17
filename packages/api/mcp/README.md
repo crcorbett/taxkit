@@ -13,6 +13,9 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 - `./client-handlers`: `clientToolHandlers(client)`, the same tools answered
   through the generated public API client for browser WebMCP, with the same
   success Schemas and safe `McpToolUnavailable` codes.
+- `./test`: static `TaxKitMcpHandlersTest`, deterministic handlers for every
+  tool that each fail with `service-unavailable`. The WebMCP package tests its
+  registration over them without calculator or content services.
 - `src/handlers.layer.ts` (internal): the static `TaxKitMcpHandlersLive` Layer
   over the calculator and content services that `./server` composes.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path, and
@@ -77,11 +80,10 @@ exactly as the service-backed handlers over the actual HTTP routes. The API's of
 root native-pair MCP tests (`tools/apps-local/test`) retain modern protocol, origin, native callback
 progress and isolation proof through the actual app composition.
 
-The renderer receipt records adaptation from the compiled internal service
-scaffold to the narrower tool-transport role. Its domain service/live/test
-scaffolding was removed because existing calculator and content Layers own those
-contracts. The generic template validator requires that scaffold and does not
-represent this package's protocol ownership contract.
+The package is a narrower tool-transport role than the compiled `effect-service`
+template: it keeps no domain service, live or test Layer of its own, because the
+calculator and content packages own those contracts and Layers. Its own exports
+are the tool contract, handlers, server Layer, cancellation and reply budget.
 
 ## Runbook applicability
 

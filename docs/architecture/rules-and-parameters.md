@@ -17,7 +17,7 @@ required service type.
 
 ## Rule descriptors
 
-Reuse `RuleDescriptor` and `makeRuleDescriptor` from `@taxkit/core`.
+Reuse `RuleDescriptor` and `makeRuleDescriptor` from `@taxkit/core/rules`.
 The [descriptor owner](../../packages/core/src/rules/descriptor.ts) ties the
 Layer's output, errors and required services to readonly fact/parameter
 descriptors. It owns branded rule IDs, titles, source references and the

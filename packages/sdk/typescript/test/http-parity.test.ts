@@ -1,21 +1,17 @@
 import { describe, expect, it } from "@effect/vitest";
-import {
-  CalculatorApiErrorEnvelope,
-  CalculatorCatalogResponse,
-  CalculatorRunResponse,
-} from "@taxkit/api-http";
 import { TaxKitApi } from "@taxkit/api-http/api";
+import { CalculatorApiErrorEnvelope } from "@taxkit/api-http/calculator-contract";
 import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
 import { TaxKitApiRoutesLayer } from "@taxkit/api-http/server";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import {
+  CalculatorCatalogResponse,
+  CalculatorRunResponse,
   CalculatorRunRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
-import { ContentServiceLive } from "@taxkit/content/live";
-import { ContentCatalogue } from "@taxkit/content/service";
-import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { ContentServiceTest } from "@taxkit/content/test";
 import {
   CalculationError,
   CalculationInvariantViolation,
@@ -27,12 +23,12 @@ import {
   fromCents,
 } from "@taxkit/core/primitives";
 import { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax/schemas";
-import type { GrossPay } from "@taxkit/rules-au-pay";
+import type { GrossPay } from "@taxkit/rules-au-pay/facts";
 import {
-  TakeHomeScenarioInputSchema,
   GrossPayDescriptor,
   TaxFreeThresholdClaimedDescriptor,
-} from "@taxkit/rules-au-pay";
+} from "@taxkit/rules-au-pay/facts";
+import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 import { expectAt } from "@taxkit/testing";
 import {
   Predicate,
@@ -62,16 +58,13 @@ import {
 } from "../src/au-effect.js";
 import { calculateRun as calculateSdkRun } from "../src/effect.js";
 
-const ContentTestLive = ContentServiceLive.pipe(
-  Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
-);
 // The native generated client over the in-process routes.
 const inProcessClient = HttpApiClient.make(TaxKitApi, {
   baseUrl: "http://taxkit.internal",
 });
 const PublicCalculatorServiceTestLive = PublicCalculatorServiceLive;
 const TestLive = Layer.mergeAll(
-  TaxKitApiInProcessLive.pipe(Layer.provide(ContentTestLive)),
+  TaxKitApiInProcessLive.pipe(Layer.provide(ContentServiceTest)),
   PublicCalculatorServiceTestLive
 );
 const takeHomeCalculatorId = AuPayTakeHomeCalculation.calculatorId;
@@ -125,7 +118,7 @@ describe("TaxKit public calculation HTTP API", () => {
         const handler = yield* HttpRouter.toHttpEffect(
           TaxKitApiRoutesLayer
         ).pipe(
-          Effect.provide(ContentTestLive),
+          Effect.provide(ContentServiceTest),
           Effect.provideService(PublicCalculatorService, service)
         );
         // A gross amount beyond safe cents is a scenario the rules reject.

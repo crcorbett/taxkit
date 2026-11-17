@@ -37,8 +37,21 @@
     "packages/*": {
       "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"]
     },
-    "packages/{api,sdk}/*": {
-      "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"]
+    "packages/sdk/typescript": {
+      "entry": [
+        "src/index.ts",
+        "src/effect.ts",
+        "src/au.ts",
+        "src/au-effect.ts",
+        "src/schemas/index.ts",
+        "src/testing/index.ts",
+        "src/core.ts",
+        "src/http.ts",
+        "src/money.ts",
+        "src/money/effect.ts",
+        "src/au/schemas.ts",
+        "type-tests/**/*.ts"
+      ]
     },
     "packages/rules/*/*": {},
     "packages/docs-examples": {

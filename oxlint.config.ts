@@ -36,7 +36,7 @@ const decodingBoundaryFiles = [
   // Exact collection header and native browser preference ingress only.
   "packages/analytics/src/collection-policy.boundary.ts",
   // Exact synthetic analytics representation fixture; no runtime or encoder.
-  "packages/analytics/src/__testing__/fixtures.ts",
+  "packages/analytics/test/fixtures/analytics.ts",
   // Actual installed provider request bytes at the mocked network boundary.
   // No provider, credential, profile or runtime-execution permission.
   "packages/infrastructure/test/native-domains-provider.boundary.test.ts",
@@ -62,7 +62,7 @@ const decodingBoundaryFiles = [
   "packages/og-image/src/takumi.adapter.layer.ts",
   "packages/og-image/test/render.test.ts",
   "packages/og-image/test/font.test.ts",
-  "packages/aeo/src/__testing__/fixtures.ts",
+  "packages/aeo/test/fixtures/origins.ts",
   "packages/aeo/test/documents.test.ts",
   "packages/aeo/test/routes.test.ts",
   "apps/web/src/lib/http/image.ingress.ts",
@@ -80,8 +80,8 @@ const decodingBoundaryFiles = [
   // Controlled paired-theme JSON fixture ingress; no runtime or synchronous codec.
   "packages/mdx/src/__testing__/fixtures.ts",
   // Standalone presenter fixture values enter through their neutral Schemas.
-  "packages/mdx-react/test/article.fixture.ts",
-  "packages/mdx-react/test/theme.fixture.ts",
+  "packages/mdx-react/test/fixtures/article.ts",
+  "packages/mdx-react/test/fixtures/theme.ts",
   "packages/mdx/test/theme.test.ts",
   "packages/mdx/src/highlights.adapter.layer.ts",
   "packages/pele/src/live.layer.ts",
@@ -1309,7 +1309,13 @@ export default defineConfig({
             patterns: [
               ...sdkHostImportPatterns,
               {
-                group: ["@taxkit/rules-au-*", "./au", "./au/*", "./au-effect"],
+                group: [
+                  "@taxkit/rules-au-*",
+                  "@taxkit/rules-au-*/*",
+                  "./au",
+                  "./au/*",
+                  "./au-effect",
+                ],
                 message:
                   "The root SDK entry must not import Australian rule packs; use taxkit/au.",
               },

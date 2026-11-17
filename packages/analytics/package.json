@@ -8,23 +8,22 @@
     "./schemas": "./src/schemas.ts",
     "./service": "./src/service.ts",
     "./live": "./src/live.layer.ts",
+    "./test": "./src/test.layer.ts",
     "./collection-policy": "./src/collection-policy.boundary.ts",
     "./api-usage": "./src/api-usage.layer.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "test": "bun --bun vitest run"
+    "test": "vitest run"
   },
   "dependencies": {
     "@taxkit/calculators": "workspace:*",
-    "@taxkit/content": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

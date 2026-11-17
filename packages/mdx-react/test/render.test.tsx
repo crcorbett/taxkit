@@ -10,8 +10,13 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { vi } from "vitest";
 
-import { article, code, codeText, escapedCodeText } from "./article.fixture.js";
-import { codeColours, journalTheme } from "./theme.fixture.js";
+import {
+  article,
+  code,
+  codeText,
+  escapedCodeText,
+} from "./fixtures/article.js";
+import { codeColours, journalTheme } from "./fixtures/theme.js";
 
 const JournalLink = ({ href, children }: MdxLinkProps) => (
   <a data-journal-link="" href={`/reader?target=${encodeURIComponent(href)}`}>

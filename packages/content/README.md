@@ -91,8 +91,10 @@ shared HTTPS/exact-loopback root-address policy; `DocsWebsiteOrigin` and
   them.
 - `./response-check`: request/reply page identity predicate for checked docs
   pages, used after generated-client decoding.
-- `./test`: the same implementation with controlled request observations, plus
-  deterministic `DocsOgImagesTest`. MDX owns its provider test Layers.
+- `./test`: `ContentCatalogueTest` (the checked example catalogue),
+  `ContentServiceTest` (the production `ContentServiceLive` over that
+  catalogue) and deterministic `DocsOgImagesTest`. MDX owns its provider test
+  Layers.
 - `./testing/fixtures`: checked synthetic catalogue inputs for tests.
 
 All exports point at TypeScript source; the private package has no build. The

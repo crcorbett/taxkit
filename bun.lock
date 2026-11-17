@@ -146,14 +146,12 @@
       "version": "2.0.0",
       "dependencies": {
         "@taxkit/calculators": "workspace:*",
-        "@taxkit/content": "workspace:*",
         "@taxkit/observability": "workspace:*",
         "effect": "catalog:",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -187,7 +185,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -344,7 +341,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:",
         "vitest": "catalog:",
       },
     },

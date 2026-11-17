@@ -3,6 +3,8 @@
 Private source runtime support shared by API and Website hosts and deployment
 queries. This package has no Alchemy, infrastructure or provider SDK dependency.
 
+## Exports
+
 `./host-telemetry` owns the fixed request event Schema, closed service and route
 vocabulary, response-ready observation and safe host logger/reporter Layers.
 Hosts classify their own routes. Raw paths, URLs, queries, headers, caller keys,
@@ -30,6 +32,19 @@ The native Worker declaration and binding types belong to
 [`@taxkit/infrastructure`](../infrastructure/README.md). Root composition joins
 that deployment identity with the API implementation.
 
+## Documentation impact
+
+Change this README, [package ownership](../../docs/architecture/package-ownership.md)
+and the [API architecture](../../docs/architecture/api-and-sdk.md) when the event
+Schema, edge identity or stage Schemas change. Keep the root `pr:*` shell pattern
+in step with `PullRequestStage`.
+
+## Runbook applicability
+
 The [deployment runbook](../../docs/runbooks/deployment.md) owns platform
-telemetry configuration and provider readback. Package tests prove field safety
-and observation policy, not remote delivery or ingestion.
+telemetry configuration and provider readback.
+
+## Non-claims
+
+Package tests prove field safety and observation policy, not remote delivery or
+ingestion.

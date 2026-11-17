@@ -1,4 +1,5 @@
 import { assert, describe, it } from "@effect/vitest";
+import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import {
   DocsPageUnavailable,
   DocsSearchUnavailable,
@@ -6,6 +7,7 @@ import {
 } from "@taxkit/content/errors";
 import { DocsPagePath, DocsSearchTerm } from "@taxkit/content/schemas";
 import { ContentService } from "@taxkit/content/service";
+import { ContentServiceTest } from "@taxkit/content/test";
 import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
 import { Array, Deferred, Effect, Fiber, Layer, Ref, Schema } from "effect";
 import {
@@ -20,14 +22,19 @@ import { HttpApiClient } from "effect/http-api";
 
 import { TaxKitApi } from "../src/api.js";
 import { TaxKitApiInProcessLive } from "../src/in-process.layer.js";
-import { TaxKitServerLayer } from "../src/server.js";
-import { ContentTestLive } from "./content.fixture.js";
+import { TaxKitServerLayer } from "../src/server/live.layer.js";
 // The native generated client over the in-process routes.
 const inProcessClient = HttpApiClient.make(TaxKitApi, {
   baseUrl: "http://taxkit.internal",
 });
 const ClientTestLive = TaxKitApiInProcessLive.pipe(
-  Layer.provide(ContentTestLive)
+  Layer.provide(ContentServiceTest)
+);
+// The standalone server's host services: the example content and the bounded
+// production calculator service.
+const ServerServicesTest = Layer.mergeAll(
+  ContentServiceTest,
+  PublicCalculatorServiceLive
 );
 describe("checked public documentation HTTP", () => {
   it.effect(
@@ -107,7 +114,7 @@ describe("checked public documentation HTTP", () => {
         yield* HttpServerResponse.toClientResponse(response, { request }).text,
         ""
       );
-    }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
+    }).pipe(Effect.provide(ServerServicesTest), Effect.scoped)
   );
   it.effect(
     "serves plain Markdown with its declared media type and a fixed JSON 404",
@@ -159,7 +166,7 @@ describe("checked public documentation HTTP", () => {
             message: "The documentation page was not found.",
           })
         );
-      }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
+      }).pipe(Effect.provide(ServerServicesTest), Effect.scoped)
   );
   it.effect(
     "projects a controlled source failure to fixed search guidance",
@@ -194,7 +201,7 @@ describe("checked public documentation HTTP", () => {
         }).pipe(
           Effect.provide(TaxKitApiInProcessLive.pipe(Layer.provide(controlled)))
         );
-      }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
+      }).pipe(Effect.provide(ContentServiceTest), Effect.scoped)
   );
   it.effect(
     "interrupts the actual generated-client request and closes its service work",
@@ -227,6 +234,6 @@ describe("checked public documentation HTTP", () => {
         }).pipe(
           Effect.provide(TaxKitApiInProcessLive.pipe(Layer.provide(controlled)))
         );
-      }).pipe(Effect.provide(ContentTestLive), Effect.scoped)
+      }).pipe(Effect.provide(ContentServiceTest), Effect.scoped)
   );
 });

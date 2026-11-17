@@ -1,19 +1,10 @@
+// Result-returning money operations for callers outside Effect. The money
+// Schemas and the Effect operations of the same names belong to `./primitives`.
 export {
-  Cents,
-  Currency,
-  Money,
-  NonNegativeMoney,
   fromCents,
   nonNegative,
   add,
   subtract,
   round,
-  moneyEquals,
 } from "./primitives/money.js";
-export {
-  fromDecimal,
-  format,
-  MoneyFromDecimalString,
-  NonNegativeMoneyFromDecimalString,
-} from "./primitives/dollars.js";
-export { MoneyError, MoneyIssue } from "./primitives/errors.js";
+export { fromDecimal } from "./primitives/dollars.js";

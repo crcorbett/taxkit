@@ -1,4 +1,4 @@
-import { Cents, Money, NonNegativeMoney } from "@taxkit/core";
+import { Cents, Money, NonNegativeMoney } from "@taxkit/core/primitives";
 import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 
 /** A checked take-home scenario for integration tests. */

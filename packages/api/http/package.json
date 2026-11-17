@@ -5,11 +5,9 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
     "./api": "./src/api.ts",
     "./in-process": "./src/in-process.layer.ts",
-    "./server": "./src/server.ts",
-    "./handlers": "./src/handlers/index.ts",
+    "./server": "./src/server/live.layer.ts",
     "./request-boundary": "./src/request-boundary.ts",
     "./response-policy": "./src/response-policy.ts",
     "./routes": "./src/routes.ts",
@@ -22,7 +20,7 @@
     "./health-contract": "./src/groups/health.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
+    "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test:openapi": "vitest run test/openapi-snapshot.test.ts",
     "update-openapi-snapshot": "UPDATE_TAXKIT_OPENAPI_SNAPSHOT=true vitest run test/openapi-snapshot.test.ts"

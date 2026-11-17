@@ -1,8 +1,9 @@
 import { assert, describe, it } from "@effect/vitest";
 import { DocsImageRenderError } from "@taxkit/content/errors";
 import { DocsPngBytes } from "@taxkit/content/schemas";
-import { ContentCatalogue, DocsOgImages } from "@taxkit/content/service";
-import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import type { ContentCatalogue } from "@taxkit/content/service";
+import { DocsOgImages } from "@taxkit/content/service";
+import { ContentCatalogueTest } from "@taxkit/content/test";
 import {
   Effect,
   Layer,
@@ -20,12 +21,12 @@ import {
 } from "effect/http";
 import * as HttpHeaders from "effect/http/Headers";
 
-import { exampleOrigins } from "../src/__testing__/fixtures.js";
 import { aeoRoutes } from "../src/routes.layer.js";
 import {
   PublicationOrigins,
   PublicationSettingsUnavailable,
 } from "../src/service.js";
+import { exampleOrigins } from "./fixtures/origins.js";
 
 const png = Effect.gen(function* () {
   const bytes = new Uint8Array(24);
@@ -63,7 +64,7 @@ const layers = Effect.gen(function* () {
   const reads = yield* Ref.make(0);
   const origins = yield* exampleOrigins;
   const layer = Layer.mergeAll(
-    Layer.effect(ContentCatalogue, exampleContentCatalogue),
+    ContentCatalogueTest,
     Layer.succeed(DocsOgImages, {
       getImage: Effect.fn("DocsOgImages.getImage")(() => Effect.succeed(bytes)),
     }),
@@ -150,7 +151,7 @@ describe("answer-engine routes", () => {
   it.effect("answer 503 when origins or the image are unavailable", () =>
     Effect.gen(function* () {
       const layer = Layer.mergeAll(
-        Layer.effect(ContentCatalogue, exampleContentCatalogue),
+        ContentCatalogueTest,
         Layer.succeed(DocsOgImages, {
           getImage: Effect.fn("DocsOgImages.getImage")(() =>
             Effect.fail(new DocsImageRenderError({ reason: "render" }))

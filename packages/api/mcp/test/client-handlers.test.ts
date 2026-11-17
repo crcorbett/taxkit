@@ -3,9 +3,7 @@ import { TaxKitApi } from "@taxkit/api-http/api";
 import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
 import { PublicCalculatorServiceLive } from "@taxkit/calculators/live";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
-import { ContentServiceLive } from "@taxkit/content/live";
-import { ContentCatalogue } from "@taxkit/content/service";
-import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { ContentServiceTest } from "@taxkit/content/test";
 import { Deferred, Effect, Fiber, Layer, Option, Schema, Stream } from "effect";
 import { HttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
@@ -17,14 +15,13 @@ import { TaxKitMcpHandlersLive } from "../src/handlers.layer.js";
 import { McpRequestAbortSignal } from "../src/request.service.js";
 import { TaxKitMcpToolkit } from "../src/tools.js";
 
-const ContentLive = ContentServiceLive.pipe(
-  Layer.provide(Layer.effect(ContentCatalogue, exampleContentCatalogue))
-);
 // Remote MCP: the service-backed handlers inside one MCP request.
 const ServiceTools = TaxKitMcpToolkit.pipe(
   Effect.provide(
     TaxKitMcpHandlersLive.pipe(
-      Layer.provide(Layer.mergeAll(PublicCalculatorServiceLive, ContentLive))
+      Layer.provide(
+        Layer.mergeAll(PublicCalculatorServiceLive, ContentServiceTest)
+      )
     )
   ),
   Effect.provideService(
@@ -42,7 +39,7 @@ const ClientTools = HttpApiClient.make(TaxKitApi, {
       Effect.provide(TaxKitMcpToolkit.toLayer(clientToolHandlers(client)))
     )
   ),
-  Effect.provide(TaxKitApiInProcessLive.pipe(Layer.provide(ContentLive)))
+  Effect.provide(TaxKitApiInProcessLive.pipe(Layer.provide(ContentServiceTest)))
 );
 // What an agent reads: the encoded success, or the declared safe failure.
 const call = Effect.fnUntraced(function* ({

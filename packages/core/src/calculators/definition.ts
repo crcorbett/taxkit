@@ -1,7 +1,5 @@
 import { Effect, Schema } from "effect";
 
-import { CalculationDiagnostics } from "../engine/schemas.js";
-import type { CalculationResult } from "../engine/schemas.js";
 import type { CalculationError } from "../errors/calculation-error.js";
 import { CalculationInvariantViolation } from "../errors/calculation-error.js";
 import { inputValidationError } from "../errors/input-validation-error.js";
@@ -11,6 +9,8 @@ import type {
   AnyFactDescriptor,
   AnyRuleDescriptor,
 } from "../rules/descriptor.js";
+import { CalculationDiagnostics } from "./schemas.js";
+import type { CalculationResult } from "./schemas.js";
 
 export interface CalculatorDefinition<
   Input extends Schema.Top,

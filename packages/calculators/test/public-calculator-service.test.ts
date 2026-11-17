@@ -1,12 +1,18 @@
 import { describe, expect, it } from "@effect/vitest";
-import { InputValidationError, inputValidationError } from "@taxkit/core";
+import {
+  InputValidationError,
+  inputValidationError,
+} from "@taxkit/core/errors";
 import { NonNegativeMoney, fromCents } from "@taxkit/core/primitives";
 import type { Money } from "@taxkit/core/primitives";
-import { AuAnnualTaxCalculatorId } from "@taxkit/rules-au-income-tax";
-import { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax/schemas";
-import type { GrossPay } from "@taxkit/rules-au-pay";
-import { AuPayJurisdiction, AuPayTaxYear } from "@taxkit/rules-au-pay";
 import {
+  AuAnnualTaxCalculatorId,
+  AnnualTaxScenarioInputSchema,
+} from "@taxkit/rules-au-income-tax/schemas";
+import type { GrossPay } from "@taxkit/rules-au-pay/facts";
+import {
+  AuPayJurisdiction,
+  AuPayTaxYear,
   AuPayTakeHomeId,
   AuPayWithholdingsId,
   TakeHomeScenarioInputSchema,

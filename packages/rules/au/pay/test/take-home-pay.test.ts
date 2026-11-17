@@ -2,20 +2,24 @@ import { describe, expect, it } from "@effect/vitest";
 import { NonNegativeMoney, Money, Cents } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
+  CalculateTakeHomePay,
+  TakeHomeScenario,
+} from "@taxkit/rules-au-pay/calculator";
+import { GrossPay } from "@taxkit/rules-au-pay/facts";
+import {
   AuTakeHomePay2024_25_Live,
   AuTakeHomePay2025_26_Live,
-  CalculateTakeHomePay,
-  GrossPay,
   NetPayRuleId,
   PaygWithholdingComponentId,
   PaygWithholdingRuleId,
   PayWithholdingsLedgerRuleId,
-  TakeHomePayReport,
-  TakeHomeScenario,
-  TakeHomeScenarioInputSchema,
   TakeHomeScenarioLive,
   TaxablePayRuleId,
-} from "@taxkit/rules-au-pay";
+} from "@taxkit/rules-au-pay/rule-pack";
+import {
+  TakeHomePayReport,
+  TakeHomeScenarioInputSchema,
+} from "@taxkit/rules-au-pay/schemas";
 import { expectAt } from "@taxkit/testing";
 import {
   Function as EffectFunction,

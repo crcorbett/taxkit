@@ -7,6 +7,7 @@
   "exports": {
     "./tools": "./src/tools.ts",
     "./client-handlers": "./src/client-handlers.ts",
+    "./test": "./src/test.layer.ts",
     "./server": "./src/server.ts",
     "./schemas": "./src/schemas.ts",
     "./errors": "./src/errors.ts",
@@ -15,7 +16,7 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "test": "bun --bun vitest run"
+    "test": "vitest run"
   },
   "dependencies": {
     "@taxkit/api-http": "workspace:*",
@@ -26,7 +27,6 @@
   "devDependencies": {
     "@effect/vitest": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

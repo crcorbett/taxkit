@@ -37,8 +37,7 @@ The definition validates its static graph and owns native execution.
 unsupported calculator/context lookups, calculation capacity, timeout, rate and
 admission errors, the `CalculatorRequestError`, `CalculatorMetadataError` and
 `CalculatorServiceError` unions, and the browser form's `CalculatorFormField`
-and `CalculatorInputError`. Neither `./schemas`, `./form` nor the root export
-repeats them.
+and `CalculatorInputError`. Neither `./schemas` nor `./form` repeats them.
 
 ## Browser calculator pages
 
@@ -144,19 +143,46 @@ shared loopback limit and a local namespace. This additionally requires an
 HTTP loopback API origin; hosted composition defaults to `edge` and has no
 unlimited or missing-identity fallback.
 
-## Export paths
+## Exports
 
-Every public subpath in the package export map:
+Every public subpath in the package export map. There is no root export.
 
-- `@taxkit/calculators`
+- `@taxkit/calculators/schemas`: catalogue, run, metadata and summary Schemas,
+  plus the redacted `CalculatorClientRateKey` admission identity
+- `@taxkit/calculators/errors`
+- `@taxkit/calculators/service`: `PublicCalculatorService`,
+  `CalculatorCatalogue`, `CalculatorUsage`, `CalculatorAdmission` and
+  `CalculatorRequestRateKey`
+- `@taxkit/calculators/live`: `CalculatorCatalogueLive` and the bounded
+  `PublicCalculatorServiceLive`
+- `@taxkit/calculators/work`: the bounded and rate-limited service Layers over a
+  supplied catalogue
+- `@taxkit/calculators/test`: `PublicCalculatorServiceTest`, a whole-service
+  substitute for host transport tests. `calculate` answers with the outcome the
+  test selects through `CalculatorFixtureMode`; metadata reuses the static
+  catalogue. The real work policy is proved in this package.
+- `@taxkit/calculators/testing/fixtures`: `CalculationRequest` and the
+  `sensitiveSentinel` value secret-negative tests search for
 - `@taxkit/calculators/summaries`
-- `@taxkit/calculators/service`
-- `@taxkit/calculators/live`
-- `@taxkit/calculators/schemas`
-- `@taxkit/calculators/work`
-- `@taxkit/calculators/admission.schemas`
-- `@taxkit/calculators/admission.service`
-- `@taxkit/calculators/admission.layer`
-- `@taxkit/calculators/testing/fixtures`
 - `@taxkit/calculators/form`
 - `@taxkit/calculators/page`
+
+## Documentation impact
+
+Change this README, the [calculator architecture](../../docs/architecture/calculators.md),
+the [API architecture](../../docs/architecture/api-and-sdk.md) and
+[package ownership](../../docs/architecture/package-ownership.md) when a public
+contract, catalogue entry, work limit or admission rule changes. Calculator tests
+follow [rule and calculation tests](../../docs/architecture/rule-and-calculation-tests.md).
+
+## Runbook applicability
+
+No package runbook is needed. The SDK compiles these sources into its archive,
+so the [release runbook](../../docs/runbooks/release.md) applies through the SDK;
+the API Worker's deployment belongs to the
+[deployment runbook](../../docs/runbooks/deployment.md).
+
+## Non-claims
+
+Package tests do not prove the deployed rate-limit binding, the HTTP contract,
+the SDK's packed archive or Website behaviour.

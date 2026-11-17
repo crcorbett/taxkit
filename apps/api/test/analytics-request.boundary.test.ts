@@ -12,10 +12,10 @@ import {
 } from "@taxkit/calculators/schemas";
 import { PublicCalculatorService } from "@taxkit/calculators/service";
 import {
-  CalculationRequest,
-  CalculatorFixture,
+  PublicCalculatorServiceTest,
   CalculatorFixtureMode,
-} from "@taxkit/calculators/testing/fixtures";
+} from "@taxkit/calculators/test";
+import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { PublicCalculatorServiceBounded } from "@taxkit/calculators/work";
 import {
   Function as EffectFunction,
@@ -30,7 +30,7 @@ import {
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
-import { ApiCalculatorDeliveryDisabled } from "./worker.fixture.js";
+import { ApiCalculatorDeliveryDisabled } from "./fixtures/worker.js";
 
 const expectedCalculatorName: unknown = expect.any(String);
 // The bounded public service with the API's usage observer.
@@ -118,7 +118,7 @@ it.effect.each(["expected", "defect", "mixed", "capacity", "timeout"] as const)(
           Option.some({ collectionPolicy: "allow", events })
         ),
         Effect.provide(
-          CalculatorFixture.pipe(
+          PublicCalculatorServiceTest.pipe(
             Layer.provide(Layer.succeed(CalculatorFixtureMode)(mode)),
             Layer.provide(ApiCalculatorUsageLive)
           )

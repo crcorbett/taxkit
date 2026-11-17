@@ -17,9 +17,9 @@ import {
 } from "effect";
 import { OpenApi } from "effect/http-api";
 
-import { exampleOrigins } from "../src/__testing__/fixtures.js";
 import { llmsFullTxt, llmsTxt, sitemapXml } from "../src/documents.egress.js";
 import { robotsTxt } from "../src/robots.egress.js";
+import { exampleOrigins } from "./fixtures/origins.js";
 
 describe("answer-engine documents", () => {
   it.effect("derive every document from accepted pages and stage origins", () =>

@@ -3,13 +3,11 @@ import { TaxKitApi } from "@taxkit/api-http/api";
 import { TaxKitApiInProcessLive } from "@taxkit/api-http/in-process";
 import { TaxKitMcpToolkit } from "@taxkit/api-mcp/tools";
 import { CalculatorCatalogResponse } from "@taxkit/calculators/schemas";
-import { ContentServiceLive } from "@taxkit/content/live";
 import {
   DocsPublicationOrigin,
   DocsWebsiteOrigin,
 } from "@taxkit/content/schemas";
-import { ContentCatalogue } from "@taxkit/content/service";
-import { exampleContentCatalogue } from "@taxkit/content/testing/fixtures";
+import { ContentServiceTest } from "@taxkit/content/test";
 import { WebMcpToolResult } from "@taxkit/webmcp/schemas";
 import {
   Function as EffectFunction,
@@ -83,15 +81,7 @@ const makeRegistry = (requests: Ref.Ref<readonly string[]>) =>
                 )
               ),
               Layer.provide(
-                TaxKitApiInProcessLive.pipe(
-                  Layer.provide(
-                    ContentServiceLive.pipe(
-                      Layer.provide(
-                        Layer.effect(ContentCatalogue, exampleContentCatalogue)
-                      )
-                    )
-                  )
-                )
+                TaxKitApiInProcessLive.pipe(Layer.provide(ContentServiceTest))
               )
             ),
           ],

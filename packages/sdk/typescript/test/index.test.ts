@@ -11,7 +11,7 @@ import {
 import { AuPayTakeHomeCalculation } from "../src/au.js";
 import { TaxKitError } from "../src/errors.js";
 import { calculate, calculateSafe, createClient } from "../src/index.js";
-import { takeHomeFacts } from "./fixtures.js";
+import { takeHomeFacts } from "./fixtures/take-home.js";
 
 it.effect(
   "uses native Result with an owning JSON codec in the vanilla facade",

@@ -1,17 +1,17 @@
 import { RateLimit } from "@alchemy.run/cloudflare/Workers";
 import { describe, expect, it } from "@effect/vitest";
 import { TaxKitApi } from "@taxkit/api-http/api";
-import { CalculatorClientRateKey } from "@taxkit/calculators/admission.schemas";
-import {
-  CalculatorAdmission,
-  CalculatorRequestRateKey,
-} from "@taxkit/calculators/admission.service";
 import { CalculatorRateLimited } from "@taxkit/calculators/errors";
 import {
+  CalculatorClientRateKey,
   CalculatorId,
   CalculatorRunRequest,
   MetadataQuery,
 } from "@taxkit/calculators/schemas";
+import {
+  CalculatorAdmission,
+  CalculatorRequestRateKey,
+} from "@taxkit/calculators/service";
 import { CalculationRequest } from "@taxkit/calculators/testing/fixtures";
 import { edgeCallerKey } from "@taxkit/observability/edge-identity";
 import {
@@ -43,7 +43,7 @@ import {
   ApiCalculatorAdmission,
   ApiCalculatorRequestRateKey,
 } from "../src/worker-admission.layer.js";
-import { ApiWorkerInit } from "./worker.fixture.js";
+import { ApiWorkerInit } from "./fixtures/worker.js";
 
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",

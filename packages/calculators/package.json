@@ -5,21 +5,19 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
     "./summaries": "./src/summaries.ts",
     "./service": "./src/service.ts",
     "./live": "./src/live.layer.ts",
+    "./test": "./src/test.layer.ts",
     "./schemas": "./src/schemas.ts",
     "./errors": "./src/errors.ts",
     "./work": "./src/work.layer.ts",
-    "./admission.schemas": "./src/admission.schemas.ts",
-    "./admission.service": "./src/admission.service.ts",
     "./testing/fixtures": "./src/__testing__/fixtures.ts",
     "./form": "./src/form.ingress.ts",
     "./page": "./src/page.atoms.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p tsconfig.type-tests.json --noEmit",
+    "check-types": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

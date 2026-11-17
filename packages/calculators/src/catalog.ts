@@ -1,22 +1,19 @@
-import type {
-  CalculatorDefinition,
-  AnyFactDescriptor,
-  AnyRuleDescriptor,
-} from "@taxkit/core";
-import type { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax";
-import {
-  AuAnnualIncomeTaxCalculation,
-  AnnualTaxLedgerDescriptor,
-} from "@taxkit/rules-au-income-tax";
-import type { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay";
+import type { CalculatorDefinition } from "@taxkit/core/calculators";
+import type { AnyFactDescriptor, AnyRuleDescriptor } from "@taxkit/core/rules";
+import { AuAnnualIncomeTaxCalculation } from "@taxkit/rules-au-income-tax/calculator";
+import { AnnualTaxLedgerDescriptor } from "@taxkit/rules-au-income-tax/facts";
+import type { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax/schemas";
 import {
   AuPayTakeHomeCalculation,
   AuPayWithholdingsCalculation,
+} from "@taxkit/rules-au-pay/calculator";
+import {
   NetPayDescriptor,
   PayWithholdingsLedgerDescriptor,
   PaygWithholdingComponentDescriptor,
   TaxablePayDescriptor,
-} from "@taxkit/rules-au-pay";
+} from "@taxkit/rules-au-pay/facts";
+import type { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 import {
   Function as EffectFunction,
   Array,

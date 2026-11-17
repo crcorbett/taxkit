@@ -10,11 +10,6 @@ import { AnnualTaxLedgerFact } from "../facts/ledger.js";
 import { AnnualTaxReport, AnnualTaxRulePackVersion } from "./schemas.js";
 import type { AnnualTaxScenarioInput } from "./schemas.js";
 
-export {
-  AnnualTaxReport,
-  AnnualTaxScenarioInputSchema,
-  type AnnualTaxScenarioInput,
-} from "./schemas.js";
 /**
  * Calculates annual income tax from the supplied taxable income and derived
  * annual tax ledger.

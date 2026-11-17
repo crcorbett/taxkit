@@ -5,12 +5,11 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
+    "./schemas": "./src/calculator/schemas.ts",
+    "./calculator": "./src/calculator/index.ts",
     "./facts": "./src/facts/index.ts",
     "./parameters": "./src/parameters/index.ts",
-    "./rules": "./src/rules/index.ts",
-    "./rule-pack": "./src/rule-pack/index.ts",
-    "./schemas": "./src/calculator/schemas.ts"
+    "./rule-pack": "./src/rule-pack/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

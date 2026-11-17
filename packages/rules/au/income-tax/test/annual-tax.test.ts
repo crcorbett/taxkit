@@ -8,20 +8,22 @@ import {
 } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
 import {
-  AnnualTaxableIncome,
-  AnnualTaxLedgerRuleId,
   AnnualTaxScenario,
-  AnnualTaxScenarioInputSchema,
+  CalculateAnnualTax,
+} from "@taxkit/rules-au-income-tax/calculator";
+import { AnnualTaxableIncome } from "@taxkit/rules-au-income-tax/facts";
+import {
+  AnnualTaxLedgerRuleId,
   AnnualTaxScenarioLive,
   AuAnnualTax2025_26_Live,
-  CalculateAnnualTax,
   IncomeTaxComponentId,
   IncomeTaxRuleId,
   LitoComponentId,
   LitoRuleId,
   MedicareLevyComponentId,
   MedicareLevyRuleId,
-} from "@taxkit/rules-au-income-tax";
+} from "@taxkit/rules-au-income-tax/rule-pack";
+import { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax/schemas";
 import { expectAt } from "@taxkit/testing";
 import {
   Function as EffectFunction,

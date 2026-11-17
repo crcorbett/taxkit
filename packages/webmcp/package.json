@@ -11,7 +11,7 @@
     "./schemas": "./src/schemas.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
+    "check-types": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

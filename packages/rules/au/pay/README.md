@@ -55,30 +55,36 @@ bun run --filter=@taxkit/rules-au-pay test
 
 ## Packaging
 
-The build removes `dist` before compiling. Workspace exports retain `source`
-conditions, while `publishConfig.exports` and `files` define a dist-only
-tarball validated by the SDK-owned strict downstream gate.
+This private package exports its TypeScript source and has no build. The SDK
+compiles it into its single archive; the SDK-owned downstream check validates
+that packed archive and its dependency ranges.
 
-## Export paths
+## Exports
 
-Every public subpath in the package export map:
+Every public subpath in the package export map. The three AU rule packages
+share one shape and have no root export; Layers live only in `./rule-pack`:
 
-- `@taxkit/rules-au-pay`
-- `@taxkit/rules-au-pay/facts`
-- `@taxkit/rules-au-pay/parameters`
-- `@taxkit/rules-au-pay/rules`
-- `@taxkit/rules-au-pay/rule-pack`
-- `@taxkit/rules-au-pay/schemas`
+- `@taxkit/rules-au-pay/schemas`: calculator identities and context, scenario
+  input and report Schemas, and calculator contracts
+- `@taxkit/rules-au-pay/calculator`: the closed `AuPay*Calculation` programs,
+  `CalculateTakeHomePay`, `CalculatePayWithholdings` and the scenario services
+- `@taxkit/rules-au-pay/facts`: fact Schemas, tags and descriptors
+- `@taxkit/rules-au-pay/parameters`: Schedule 1 tables, descriptors and sources
+- `@taxkit/rules-au-pay/rule-pack`: every rule, parameter and scenario Layer,
+  the composed packs, rule descriptors, rule and component identities and
+  `buildPayWithholdingsLedger`
 
-## Related Docs
+## Documentation impact
 
+Change this README and these owners when a public contract, rule, parameter or
+source record changes:
 - `docs/architecture/rules-and-parameters.md`
 - `docs/architecture/calculators.md`
 - `docs/standards/code-patterns.md`
 
 ## Browser Schema entrypoints
 
-Use `@taxkit/rules-au-pay/schemas` for canonical calculator metadata, `TakeHomePayReport`, `PayWithholdingsLedger` and `TakeHomeScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
+Use `@taxkit/rules-au-pay/schemas` for canonical calculator metadata, `TakeHomePayReport`, `PayWithholdingsLedger` and `TakeHomeScenarioInputSchema` without live calculator or rule-pack imports.
 
 The [transport architecture](../../../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
 
@@ -95,3 +101,15 @@ to read content when missing and undefined mean the same thing. Descriptor
 questions/source artifacts use Option and rule parameters are total arrays.
 See the [Core owner](../../../core/README.md). Existing formulas, tax amounts,
 source records and snapshot expectations are unchanged.
+
+## Runbook applicability
+
+No package runbook is needed. These sources are published only inside the SDK
+archive, so the [release runbook](../../../../docs/runbooks/release.md) and
+[packed consumer check](../../../../docs/runbooks/packed-consumer-proof.md) apply
+through the SDK.
+
+## Non-claims
+
+Package tests check the retained scenarios, thresholds and source records. They
+do not prove the SDK's packed archive, the HTTP contract or the deployed API.

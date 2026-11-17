@@ -19,11 +19,11 @@ import {
 
 import { docsPaths } from "../routes.js";
 
-export const DocsPageQuery = Schema.Struct({
+const DocsPageQuery = Schema.Struct({
   path: DocsPublicPagePath,
 });
 
-export const DocsSearchQuery = Schema.Struct({ term: DocsSearchTerm });
+const DocsSearchQuery = Schema.Struct({ term: DocsSearchTerm });
 
 const PageError = DocsPageUnavailable.pipe(HttpApiSchema.status("NotFound"));
 const SearchError = DocsSearchUnavailable.pipe(

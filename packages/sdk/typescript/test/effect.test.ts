@@ -1,25 +1,20 @@
 import { describe, expect, it } from "@effect/vitest";
-import {
-  CalculationError,
-  Cents,
-  InputValidationError,
-  Money,
-  NonNegativeMoney,
-} from "@taxkit/core";
-import {
-  AuAnnualIncomeTaxCalculation,
-  AnnualTaxScenarioInputSchema,
-} from "@taxkit/rules-au-income-tax";
+import { CalculationError, InputValidationError } from "@taxkit/core/errors";
+import { Cents, Money, NonNegativeMoney } from "@taxkit/core/primitives";
+import { AuAnnualIncomeTaxCalculation } from "@taxkit/rules-au-income-tax/calculator";
+import { AnnualTaxScenarioInputSchema } from "@taxkit/rules-au-income-tax/schemas";
 import {
   AuPayTakeHomeCalculation,
   AuPayTakeHomeWithSacrificeCalculation,
+} from "@taxkit/rules-au-pay/calculator";
+import {
   TakeHomeWithSacrificeScenarioInput,
-} from "@taxkit/rules-au-pay";
-import { TakeHomePayReportEncoded } from "@taxkit/rules-au-pay/schemas";
+  TakeHomePayReportEncoded,
+} from "@taxkit/rules-au-pay/schemas";
 import { Function as EffectFunction, Effect, Result, Schema } from "effect";
 
 import { calculateReport, calculateRun, decodeInput } from "../src/effect.js";
-import { takeHomeFacts } from "./fixtures.js";
+import { takeHomeFacts } from "./fixtures/take-home.js";
 
 describe("native calculator definitions", () => {
   it.effect(
