@@ -5,6 +5,8 @@ build time. It implements Content's `DocsPageRenderer` contract; Content never
 imports this package. Only the API build script composes it, so no Worker
 bundles Takumi.
 
+## Exports
+
 - `./takumi` exports `DocsPageRendererLive`, the only caller of Takumi
   (`takumi-js` and `@takumi-rs/wasm` 2.14.0). It decodes the bundled Geist font
   once when the Layer is built, renders the page's checked title, description
@@ -19,3 +21,19 @@ API's reader uses reason `missing` for a page with no stored image. The Geist
 font (`src/geist-latin.base64.txt`) comes from `@fontsource-variable/geist`
 5.3.0 under the SIL Open Font License (`src/geist.LICENSE.txt`); a test keeps it
 byte-for-byte equal to that package.
+
+## Documentation impact
+
+Change this README, [package ownership](../../docs/architecture/package-ownership.md)
+and [content architecture](../../docs/architecture/content-and-posts.md) when the
+image layout, renderer contract or font change.
+
+## Runbook applicability
+
+No operational runbook is needed: the package runs only in the API build and
+calls no external system.
+
+## Non-claims
+
+Package tests do not prove the deployed image routes or how other sites show
+the images.

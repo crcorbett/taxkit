@@ -55,11 +55,11 @@ bun run --filter=@taxkit/rules-au-pay test
 
 ## Packaging
 
-The build removes `dist` before compiling. Workspace exports retain `source`
-conditions, while `publishConfig.exports` and `files` define a dist-only
-tarball validated by the SDK-owned strict downstream gate.
+This private package exports its TypeScript source and has no build. The SDK
+compiles it into its single archive; the SDK-owned downstream check validates
+that packed archive and its dependency ranges.
 
-## Export paths
+## Exports
 
 Every public subpath in the package export map:
 
@@ -70,8 +70,10 @@ Every public subpath in the package export map:
 - `@taxkit/rules-au-pay/rule-pack`
 - `@taxkit/rules-au-pay/schemas`
 
-## Related Docs
+## Documentation impact
 
+Change this README and these owners when a public contract, rule, parameter or
+source record changes:
 - `docs/architecture/rules-and-parameters.md`
 - `docs/architecture/calculators.md`
 - `docs/standards/code-patterns.md`
@@ -95,3 +97,15 @@ to read content when missing and undefined mean the same thing. Descriptor
 questions/source artifacts use Option and rule parameters are total arrays.
 See the [Core owner](../../../core/README.md). Existing formulas, tax amounts,
 source records and snapshot expectations are unchanged.
+
+## Runbook applicability
+
+No package runbook is needed. These sources are published only inside the SDK
+archive, so the [release runbook](../../../../docs/runbooks/release.md) and
+[packed consumer check](../../../../docs/runbooks/packed-consumer-proof.md) apply
+through the SDK.
+
+## Non-claims
+
+Package tests check the retained scenarios, thresholds and source records. They
+do not prove the SDK's packed archive, the HTTP contract or the deployed API.

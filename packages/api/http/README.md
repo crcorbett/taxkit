@@ -114,6 +114,26 @@ HTTP envelopes and status annotations remain transport-owned. Schema endpoints
 supply fact questions, rules and source guidance. Metadata help uses its own
 query contract; calculations accept only the correlated request body.
 
+## Exports
+
+Every public subpath in the package export map:
+
+- `@taxkit/api-http`
+- `@taxkit/api-http/api`
+- `@taxkit/api-http/in-process`
+- `@taxkit/api-http/server`
+- `@taxkit/api-http/handlers`
+- `@taxkit/api-http/request-boundary`
+- `@taxkit/api-http/response-policy`
+- `@taxkit/api-http/routes`
+- `@taxkit/api-http/origin`
+- `@taxkit/api-http/negotiation`
+- `@taxkit/api-http/requests`
+- `@taxkit/api-http/errors`
+- `@taxkit/api-http/schemas`
+- `@taxkit/api-http/calculator-contract`
+- `@taxkit/api-http/health-contract`
+
 ## Main Areas
 
 - `src/api.ts`: `TaxKitApi` definition and OpenAPI annotations.
@@ -391,7 +411,10 @@ that archive and checks its `/http` contracts and all public entry points.
   contract.
 - Add tests or focused verification when new endpoints or handlers are added.
 
-## Related Docs
+## Documentation impact
+
+Change this README and these owners when a route, envelope, status, cache rule
+or OpenAPI annotation changes, and update the OpenAPI snapshot with it:
 
 - `docs/architecture/api-and-sdk.md`
 - `docs/architecture/effect-services.md`
@@ -453,3 +476,14 @@ The public page-address refinement and fixed documentation errors now belong
 to `@taxkit/content`. This package retains
 its existing error exports and HTTP status/media rules. Generated OpenAPI names
 the same canonical address bound for both the request and returned page.
+
+## Runbook applicability
+
+No package runbook is needed. The API Worker's deployment belongs to the
+[deployment runbook](../../../docs/runbooks/deployment.md); `bun run api:smoke`
+checks the standalone API's public routes through an external consumer.
+
+## Non-claims
+
+Package tests and the OpenAPI snapshot do not prove the deployed API, Cloudflare
+caching, rate-limit behaviour or the SDK's packed archive.

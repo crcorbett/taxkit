@@ -4,6 +4,8 @@ Content-neutral MDX compilation and presentation data. The package has no Conten
 router, filesystem or runtime dependency. TaxKit publication rules belong to
 [Content](../content/README.md). See [ADR 0007](../../docs/adr/0007-content-neutral-mdx.md).
 
+## Exports
+
 - `./service`: `MdxCompiler.compile(source)`, `MdxRenderer.render({ document, theme })`,
   the `MdxArtifacts` persistence service and the `CodeHighlighter.highlight`, `DiagramRenderer.render` and
   `LinkResolver.resolve` adapter contracts. Operations return closed Effects.
@@ -105,3 +107,21 @@ values for publication instead of defining another inline/block vocabulary.
 The separate [React presenter](../mdx-react/README.md) consumes this contract;
 MDX itself imports no React, router, Content or application. See
 [ADR 0010](../../docs/adr/0010-agnostic-mdx-presentation.md).
+
+## Documentation impact
+
+Change this README, [package ownership](../../docs/architecture/package-ownership.md),
+[content architecture](../../docs/architecture/content-and-posts.md) and the
+matching ADR (0007 to 0010) when the compiler, renderer, artifact, theme or
+reading contracts change. TaxKit publication rules change in Content.
+
+## Runbook applicability
+
+No operational runbook is needed: compilation and rendering run in process at
+build time and the package calls no external system.
+
+## Non-claims
+
+Package tests do not prove Content's publication rules, the generated docs
+catalogue, React presentation or request-time rendering in Workerd, which is not
+qualified.

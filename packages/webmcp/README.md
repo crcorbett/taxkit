@@ -6,6 +6,8 @@ WebMCP host. The tool definitions and the client-backed handlers belong to
 the checked origin and the registration lifetime through one root Atom in its
 browser runtime. This package owns no runtime.
 
+## Exports
+
 - `./service` exports `ModelContextHost`, whose `registerTool` lasts for the
   enclosing Scope, and `WebMcpSite`, the Website origin allowed to register.
 - `./host` exports `ModelContextHostLive`, the one WebMCP Promise bridge. It
@@ -27,3 +29,20 @@ browser runtime. This package owns no runtime.
   `registration-timeout` or `unexpected-host-refusal`.
 
 A browser without WebMCP, another origin and server rendering register nothing.
+
+## Documentation impact
+
+Change this README, [package ownership](../../docs/architecture/package-ownership.md)
+and the [frontend architecture](../../docs/architecture/frontend.md) when the host
+contract, registration or result Schemas change. Tool definitions change in
+`@taxkit/api-mcp`.
+
+## Runbook applicability
+
+No package runbook is needed. The registration ships with the Website, whose
+deployment belongs to the [deployment runbook](../../docs/runbooks/deployment.md).
+
+## Non-claims
+
+Package tests use a controlled host. They do not prove a particular browser's
+WebMCP implementation or the deployed Website's registration.
