@@ -21,7 +21,7 @@ import { HttpApiClient } from "effect/http-api";
 import { TaxKitApi } from "../src/api.js";
 import { TaxKitApiInProcessLive } from "../src/in-process.layer.js";
 import { TaxKitServerLayer } from "../src/server.js";
-import { ContentTestLive } from "./content.fixture.js";
+import { ContentTestLive } from "./fixtures/content.js";
 // The native generated client over the in-process routes.
 const inProcessClient = HttpApiClient.make(TaxKitApi, {
   baseUrl: "http://taxkit.internal",

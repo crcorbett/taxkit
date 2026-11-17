@@ -27,7 +27,7 @@ import {
   CalculatorRequestBodyPolicy,
 } from "../src/schemas.js";
 import { TaxKitServerLayer } from "../src/server.js";
-import { ContentTestLive } from "./content.fixture.js";
+import { ContentTestLive } from "./fixtures/content.js";
 
 const path =
   "http://taxkit.internal/api/v2/calculators/au.pay.take-home/calculate";

@@ -15,7 +15,7 @@ import {
 import { AuPayTakeHomeCalculation } from "../src/au.js";
 import { createPlainClient } from "../src/client.runtime.js";
 import { TaxKitError } from "../src/errors.js";
-import { takeHomeFacts } from "./fixtures.js";
+import { takeHomeFacts } from "./fixtures/take-home.js";
 
 class SdkPromiseRejectionError extends Schema.TaggedError<
   SdkPromiseRejectionError,

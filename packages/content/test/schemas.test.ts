@@ -27,7 +27,7 @@ import {
   DocsSearchTerm,
 } from "../src/schemas.js";
 import { readingV2Json } from "./fixtures/reading-v2.js";
-import { codeColours } from "./theme.fixture.js";
+import { codeColours } from "./fixtures/theme.js";
 
 describe("published reading contract", () => {
   it.effect("preserves historical v2 bytes across every reading node", () =>

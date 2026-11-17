@@ -19,7 +19,7 @@ import { TakeHomePayReportEncoded } from "@taxkit/rules-au-pay/schemas";
 import { Function as EffectFunction, Effect, Result, Schema } from "effect";
 
 import { calculateReport, calculateRun, decodeInput } from "../src/effect.js";
-import { takeHomeFacts } from "./fixtures.js";
+import { takeHomeFacts } from "./fixtures/take-home.js";
 
 describe("native calculator definitions", () => {
   it.effect(
