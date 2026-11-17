@@ -1,8 +1,6 @@
 {
   "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
-    "rootDir": "../../../..",
     "types": ["bun"]
   },
   "include": ["./**/*.ts", "../test/scripts/**/*.ts"]

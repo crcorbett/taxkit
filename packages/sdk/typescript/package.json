@@ -121,7 +121,7 @@
     "build": "rm -rf dist .compiled && tsc -p tsconfig.build.json && bun run scripts/assemble-package.runtime.ts",
     "check-packed-artifact": "bun run scripts/check-packed-artifact.runtime.ts",
     "validate:downstream": "bun run scripts/validate-downstream-consumer.runtime.ts",
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p scripts/tsconfig.json --noEmit && tsc -p tsconfig.type-tests.json --noEmit",
+    "check-types": "tsc --noEmit && tsc --noEmit -p scripts/tsconfig.json",
     "test": "vitest run",
     "clean": "rm -rf dist .compiled .turbo *.tsbuildinfo",
     "test:browser": "vitest run --config vitest.browser.config.ts"

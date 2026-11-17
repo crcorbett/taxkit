@@ -1,9 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src/**/*.ts", "test/**/*.ts"],
   "compilerOptions": {
-    "rootDir": ".",
-    "types": [],
-    "strictNullChecks": true
-  }
+    "types": []
+  },
+  "include": ["src", "test", "vitest.config.ts"]
 }

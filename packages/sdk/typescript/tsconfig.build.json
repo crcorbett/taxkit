@@ -25,7 +25,6 @@
     "rootDir": "../../..",
     "outDir": ".compiled",
     "noEmit": false,
-    "strictNullChecks": true,
     "sourceMap": false,
     "declarationMap": false
   }

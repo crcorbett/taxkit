@@ -410,7 +410,7 @@ request/response decoding and accepted money values retain that contract.
 Effect 4.0.6 flattens redundant nested `anyOf` groups in the generated snapshot;
 the allowed request and response values stay the same.
 The secret-negative HTTP test encodes its error with CalculatorApiErrorEnvelope.
-The snapshot test is checked by this package's `tsconfig.test.json`; the SDK's
+The package `tsconfig.json` checks the snapshot test with the source; the SDK's
 `check-types` covers the HTTP comparison test. Both retain canonical branded
 identities and explicit Match narrowing of report/error unions.
 

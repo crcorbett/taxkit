@@ -13,7 +13,7 @@
     "dev": "bun run docs-catalogue && portless run --name api.taxkit bun --watch src/index.ts",
     "start": "bun run docs-catalogue && bun src/index.ts",
     "build": "bun run docs-catalogue",
-    "check-types": "tsc --noEmit && tsc -p tsconfig.scripts.json && tsc -p tsconfig.tests.json",
+    "check-types": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json",
     "smoke": "bun run smoke:public-routes",
     "smoke:public-routes": "bun scripts/smoke-public-routes.runtime.ts",
     "clean": "rm -rf .turbo src/generated",

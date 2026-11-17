@@ -4,8 +4,6 @@
     "allowImportingTsExtensions": true,
     "declaration": false,
     "declarationMap": false,
-    "module": "ESNext",
-    "noEmit": true,
     "types": ["bun"]
   },
   "include": [

@@ -1,11 +1,15 @@
 {
   "extends": "../../../tsconfig.base.json",
-  "include": ["src/**/*.ts"],
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": ".tsbuildinfo",
-    "types": [],
-    "strictNullChecks": true
-  }
+    "types": []
+  },
+  "include": [
+    "src",
+    "test",
+    "type-tests",
+    "vitest.config.ts",
+    "vitest.browser.config.ts"
+  ],
+  // `scripts/tsconfig.json` checks the Bun build and verification scripts.
+  "exclude": ["test/scripts"]
 }

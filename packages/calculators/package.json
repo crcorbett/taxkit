@@ -19,7 +19,7 @@
     "./page": "./src/page.atoms.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json && tsc -p tsconfig.type-tests.json --noEmit",
+    "check-types": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

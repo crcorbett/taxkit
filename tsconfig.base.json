@@ -38,6 +38,7 @@
     "target": "ES2024",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "noEmit": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
