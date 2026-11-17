@@ -8,6 +8,7 @@
     "./schemas": "./src/schemas.ts",
     "./service": "./src/service.ts",
     "./live": "./src/live.layer.ts",
+    "./test": "./src/test.layer.ts",
     "./collection-policy": "./src/collection-policy.boundary.ts",
     "./api-usage": "./src/api-usage.layer.ts"
   },
@@ -17,7 +18,6 @@
   },
   "dependencies": {
     "@taxkit/calculators": "workspace:*",
-    "@taxkit/content": "workspace:*",
     "@taxkit/observability": "workspace:*",
     "effect": "catalog:"
   },
