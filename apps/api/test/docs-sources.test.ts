@@ -45,7 +45,7 @@ const requiredText = [
       "../../../packages/docs-examples/src/effect.ts",
       "../../../packages/docs-examples/src/error-handling.ts",
       "../../../packages/docs-examples/src/node-server.ts",
-      "bun run --filter=@taxkit/docs-examples check-examples",
+      "bun run --filter=@taxkit/docs-examples check-types",
     ],
   },
 ] as const;

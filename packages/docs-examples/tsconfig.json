@@ -1,43 +1,12 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "noEmit": true,
-    "paths": {
-      "@taxkit/calculators": ["../calculators/src/index.ts"],
-      "@taxkit/calculators/live": ["../calculators/src/live.layer.ts"],
-      "@taxkit/calculators/*": ["../calculators/src/*.ts"],
-      "@taxkit/core": ["../core/src/index.ts"],
-      "@taxkit/core/*": ["../core/src/*/index.ts"],
-      "@taxkit/rules-au-income-tax": ["../rules/au/income-tax/src/index.ts"],
-      "@taxkit/rules-au-income-tax/*": [
-        "../rules/au/income-tax/src/*/index.ts"
-      ],
-      "@taxkit/rules-au-pay": ["../rules/au/pay/src/index.ts"],
-      "@taxkit/rules-au-pay/*": ["../rules/au/pay/src/*/index.ts"],
-      "taxkit": ["../sdk/typescript/src/index.ts"],
-      "taxkit/au": ["../sdk/typescript/src/au.ts"],
-      "taxkit/au/effect": ["../sdk/typescript/src/au-effect.ts"],
-      "taxkit/effect": ["../sdk/typescript/src/effect.ts"],
-      "taxkit/schemas": ["../sdk/typescript/src/schemas/index.ts"],
-      "@taxkit/api-http/in-process": ["../api/http/src/in-process.layer.ts"],
-      "@taxkit/api-http": ["../api/http/src/index.ts"],
-      "@taxkit/api-http/api": ["../api/http/src/api.ts"],
-      "taxkit/core": ["../sdk/typescript/src/core.ts"],
-      "taxkit/http": ["../sdk/typescript/src/http.ts"],
-      "@taxkit/core/money": ["../core/src/money.ts"],
-      "taxkit/money": ["../sdk/typescript/src/money.ts"],
-      "taxkit/money/effect": ["../sdk/typescript/src/money/effect.ts"],
-      "taxkit/au/schemas": ["../sdk/typescript/src/au/schemas.ts"]
-    },
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ES2024",
-    "types": ["node"],
+    // Copied application templates must also compile under Node's ESM rules.
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "declaration": false,
-    "declarationMap": false
+    "declarationMap": false,
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
-  "extends": "../../tsconfig.base.json"
+  "include": ["src", "test", "vitest.config.ts"]
 }

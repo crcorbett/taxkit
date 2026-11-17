@@ -16,11 +16,13 @@ creating a circular package build graph. This package owns no content Schemas,
 docs service, renderer, public route or generated catalogue.
 
 It has no package exports or publication entrypoint.
-`bun run --filter=@taxkit/docs-examples check-examples` checks the actual source
-against the installed contracts. The standard package build emits the source
-templates to `dist`; `check-types` checks both source and build configuration.
-The output is application JavaScript and source maps, with no exported library
-declaration contract.
+`bun run --filter=@taxkit/docs-examples check-types` checks the templates and
+tests with Node's ESM resolution (`NodeNext`) against the declared workspace
+packages, as a copied example would resolve them: `taxkit` resolves to the SDK's
+built package, and no `paths` mapping points at another package's source. The
+standard package build emits the source templates to `dist`; the output is
+application JavaScript and source maps, with no exported library declaration
+contract.
 `test` checks the exported server program. Consumers
 copy these application templates rather than import a published package.
 
