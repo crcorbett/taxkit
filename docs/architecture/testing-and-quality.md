@@ -78,7 +78,11 @@ fixture Layer whose settings read dies.
 An older Chromium lacks WebMCP, so the native browser-tools test fails on it.
 
 Focused checks are the owning workspace's `test`, `check-types` and
-`test:browser` scripts. Rule and calculator changes need their golden and
+`test:browser` scripts. A package's `check-types` checks its source, tests and
+Vitest configuration in one program, and its `test` runs `test/**/*.test.ts`;
+private fixtures live in `test/fixtures`. The
+[package layout](../standards/tooling.md#package-typescript-and-vitest-layout)
+records the few packages with another program or Vitest setting. Rule and calculator changes need their golden and
 boundary tests; HTTP contract changes need `bun run --filter=@taxkit/api-http test`
 and an updated OpenAPI snapshot.
 

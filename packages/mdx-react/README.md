@@ -70,3 +70,21 @@ semantic and escaped output, exact code/toolbar data, host presentation slots
 and independent theme/font choices through the public entries. The Website's
 native suite qualifies hydration, themes, navigation, clipboard and no-JavaScript
 integration. Workspace dependency and import tests enforce the neutral direction.
+
+## Documentation impact
+
+Change this README, [package ownership](../../docs/architecture/package-ownership.md),
+the [frontend architecture](../../docs/architecture/frontend.md) and
+[ADR 0010](../../docs/adr/0010-agnostic-mdx-presentation.md) when a public entry,
+presentation slot, appearance control or style contract changes.
+
+## Runbook applicability
+
+No operational runbook is needed: the package renders in the host and performs no
+operation of its own.
+
+## Non-claims
+
+Package tests do not prove the Website's hydration, navigation, clipboard or
+no-JavaScript integration; the Website's native suite qualifies those. No claim
+is made for browser engines other than the qualified installations above.

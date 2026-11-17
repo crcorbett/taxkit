@@ -1,10 +1,10 @@
 import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import { Effect, Layer } from "effect";
 
-import { ApiCalculatorDelivery } from "../src/analytics-request.boundary.js";
-import { ApiContentLive } from "../src/content.boundary.js";
-import { ApiWorkerApplication } from "../src/worker.application.js";
-import { ApiCalculatorsLive } from "../src/worker.composition.js";
+import { ApiCalculatorDelivery } from "../../src/analytics-request.boundary.js";
+import { ApiContentLive } from "../../src/content.boundary.js";
+import { ApiWorkerApplication } from "../../src/worker.application.js";
+import { ApiCalculatorsLive } from "../../src/worker.composition.js";
 
 // Test hosts deliver no background analytics.
 export const ApiCalculatorDeliveryDisabled = Layer.succeed(

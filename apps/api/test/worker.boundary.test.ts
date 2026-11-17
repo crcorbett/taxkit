@@ -62,7 +62,7 @@ import { ApiWorkerSettingsConfig } from "../src/worker.config.js";
 import {
   ApiCalculatorDeliveryDisabled,
   ApiWorkerInit as ApiWorkerApplicationInit,
-} from "./worker.fixture.js";
+} from "./fixtures/worker.js";
 // These retained tests isolate body, protocol and lifetime behaviour. Actual
 // admission and native provider counters are qualified in their owning tests.
 const ApiWorkerInit = ApiWorkerApplicationInit.pipe(

@@ -43,7 +43,7 @@ import {
   ApiCalculatorAdmission,
   ApiCalculatorRequestRateKey,
 } from "../src/worker-admission.layer.js";
-import { ApiWorkerInit } from "./worker.fixture.js";
+import { ApiWorkerInit } from "./fixtures/worker.js";
 
 const settings = ConfigProvider.fromUnknown({
   API_PUBLIC_ORIGIN: "https://api.example.com",

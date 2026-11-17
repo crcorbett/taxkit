@@ -143,7 +143,7 @@ shared loopback limit and a local namespace. This additionally requires an
 HTTP loopback API origin; hosted composition defaults to `edge` and has no
 unlimited or missing-identity fallback.
 
-## Export paths
+## Exports
 
 Every public subpath in the package export map. There is no root export.
 
@@ -166,3 +166,23 @@ Every public subpath in the package export map. There is no root export.
 - `@taxkit/calculators/summaries`
 - `@taxkit/calculators/form`
 - `@taxkit/calculators/page`
+
+## Documentation impact
+
+Change this README, the [calculator architecture](../../docs/architecture/calculators.md),
+the [API architecture](../../docs/architecture/api-and-sdk.md) and
+[package ownership](../../docs/architecture/package-ownership.md) when a public
+contract, catalogue entry, work limit or admission rule changes. Calculator tests
+follow [rule and calculation tests](../../docs/architecture/rule-and-calculation-tests.md).
+
+## Runbook applicability
+
+No package runbook is needed. The SDK compiles these sources into its archive,
+so the [release runbook](../../docs/runbooks/release.md) applies through the SDK;
+the API Worker's deployment belongs to the
+[deployment runbook](../../docs/runbooks/deployment.md).
+
+## Non-claims
+
+Package tests do not prove the deployed rate-limit binding, the HTTP contract,
+the SDK's packed archive or Website behaviour.

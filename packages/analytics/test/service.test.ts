@@ -27,16 +27,16 @@ import {
 } from "effect/http";
 import { TestClock } from "effect/testing";
 
-import {
-  calculatorUseFixture,
-  productionAnalyticsConfig,
-} from "../src/__testing__/fixtures.js";
 import { BackendAnalyticsLive } from "../src/live.layer.js";
 import { BackendAnalytics } from "../src/service.js";
 import {
   BackendAnalyticsTest,
   BackendAnalyticsUses,
 } from "../src/test.layer.js";
+import {
+  calculatorUseFixture,
+  productionAnalyticsConfig,
+} from "./fixtures/analytics.js";
 
 const expectedTimestamp: unknown = expect.any(String);
 const expectedContentLength: unknown = expect.stringMatching(/^\d+$/u);

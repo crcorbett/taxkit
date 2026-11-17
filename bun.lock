@@ -152,7 +152,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -186,7 +185,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:",
         "vitest": "catalog:",
       },
     },
@@ -343,7 +341,6 @@
       "devDependencies": {
         "@effect/vitest": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:",
         "vitest": "catalog:",
       },
     },

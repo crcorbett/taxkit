@@ -30,7 +30,7 @@ import {
 import { HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { withCalculatorAnalytics } from "../src/analytics-request.boundary.js";
-import { ApiCalculatorDeliveryDisabled } from "./worker.fixture.js";
+import { ApiCalculatorDeliveryDisabled } from "./fixtures/worker.js";
 
 const expectedCalculatorName: unknown = expect.any(String);
 // The bounded public service with the API's usage observer.

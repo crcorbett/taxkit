@@ -1,6 +1,6 @@
 import { ConfigProvider, Schema } from "effect";
 
-import { CalculatorUse } from "../schemas.js";
+import { CalculatorUse } from "../../src/schemas.js";
 
 export const productionAnalyticsConfig = ConfigProvider.fromUnknown({
   POSTHOG_CAPTURE_TOKEN: "phc_synthetic_taxkit_capture_fixture_only",

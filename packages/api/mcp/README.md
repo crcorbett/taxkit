@@ -80,11 +80,10 @@ exactly as the service-backed handlers over the actual HTTP routes. The API's of
 root native-pair MCP tests (`tools/apps-local/test`) retain modern protocol, origin, native callback
 progress and isolation proof through the actual app composition.
 
-The renderer receipt records adaptation from the compiled internal service
-scaffold to the narrower tool-transport role. Its domain service/live/test
-scaffolding was removed because existing calculator and content Layers own those
-contracts. The generic template validator requires that scaffold and does not
-represent this package's protocol ownership contract.
+The package is a narrower tool-transport role than the compiled `effect-service`
+template: it keeps no domain service, live or test Layer of its own, because the
+calculator and content packages own those contracts and Layers. Its own exports
+are the tool contract, handlers, server Layer, cancellation and reply budget.
 
 ## Runbook applicability
 

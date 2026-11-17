@@ -68,6 +68,47 @@ library packages with stable boundaries.
 - Changesets record package-facing changes; see
   [release policy](./release-policy.md).
 
+## Package TypeScript and Vitest layout
+
+Every workspace package has one `tsconfig.json` that extends
+`tsconfig.base.json` and includes `src`, `test`, any `type-tests` and its
+Vitest configuration, so source and tests are checked once, in one program.
+Its `check-types` script is `tsc --noEmit`. The base sets `strict`, `noEmit`,
+`module` and the other shared options; a package sets only the `lib` and
+`types` it needs. A package keeps another program only where the options must
+differ:
+
+- `tsconfig.build.json` where a package emits: the SDK's compiled archive and
+  the documentation examples' `dist`;
+- the SDK's `scripts/tsconfig.json`, for its Bun build and verification scripts;
+- the API's `tsconfig.tests.json`, which checks tests, scripts, the catalogue
+  and smoke code with the `bun` condition, beside its Worker `src` program.
+
+The documentation examples resolve every import through their declared
+workspace dependencies with `NodeNext`, as a copied example would, rather than
+`paths` into other packages' source.
+
+The root `tsconfig.json` remains the include-all program that editors and
+type-aware lint fall back to. It is not a solution of project references:
+packages export TypeScript source and emit no declarations, so a reference
+gives no declaration boundary, and per-package Turbo `check-types` tasks are
+already cached. A measured `tsc -b` over references took 21 seconds uncached
+against 28 seconds for the Turbo run, wrote `.tsbuildinfo` state outside
+Turbo's outputs, and made type-aware lint no faster.
+
+Each package's `vitest.config.ts` is the template's one-line configuration:
+`test/**/*.test.ts`. Only real differences remain: Takumi's `node` resolve
+condition (OG image and the API), the MDX presenter's `.tsx` tests, and the
+Website's own configuration. The MDX presenter, Website and SDK keep a separate
+`vitest.browser.config.ts` for Chromium. The configurations are not shared
+through a base module: each is one line, and each package's cached `test` task
+runs on its own. Packages run plain `vitest run`; Infrastructure, which needs
+`@effect/platform-bun`, and the two apps run under Bun (`bun --bun vitest run`).
+
+Fixtures that other packages import live in `src/__testing__` and are exported
+as `./testing/*`. Fixtures used only by a package's own tests live in
+`test/fixtures/*.ts`, named for what they hold.
+
 ## Version decisions
 
 The catalogue holds every external version that more than one manifest uses,

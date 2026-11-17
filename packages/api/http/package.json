@@ -20,7 +20,7 @@
     "./health-contract": "./src/groups/health.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json",
+    "check-types": "tsc --noEmit",
     "test": "vitest run",
     "test:openapi": "vitest run test/openapi-snapshot.test.ts",
     "update-openapi-snapshot": "UPDATE_TAXKIT_OPENAPI_SNAPSHOT=true vitest run test/openapi-snapshot.test.ts"

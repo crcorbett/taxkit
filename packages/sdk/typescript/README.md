@@ -105,7 +105,7 @@ fields or extracting a bare encoded view can lose aggregate checks in Effect
 4.1.2. Effect decoding remains authoritative for checks JSON Schema cannot
 express. Native Standard Schema adapters support form validation.
 
-## Public paths
+## Exports
 
 | Path | Responsibility |
 | --- | --- |
@@ -164,3 +164,23 @@ all public imports, both execution styles, browser bundles, codec laws,
 removals and preserved statutory table/source fingerprints. Build and pack
 with the pinned Bun; publish the checked archive, following the
 [publication runbook](../../../docs/runbooks/release.md#sdk-publication-through-github).
+
+## Documentation impact
+
+Change this README, the [API and SDK architecture](../../../docs/architecture/api-and-sdk.md),
+[package ownership](../../../docs/architecture/package-ownership.md), the public
+SDK pages in `content/docs` and, for a lasting choice, an ADR when a public path,
+signature or packed dependency changes. Every public change needs a Changeset
+under the [release policy](../../../docs/standards/release-policy.md).
+
+## Runbook applicability
+
+The [release runbook](../../../docs/runbooks/release.md) owns versions and npm
+publication; the [packed consumer check](../../../docs/runbooks/packed-consumer-proof.md)
+owns packing and the fresh downstream install. Publishing needs the maintainer's
+explicit request.
+
+## Non-claims
+
+Local, packed and downstream checks do not show that a version was published;
+check the registry directly. They also do not prove the deployed API.

@@ -21,12 +21,12 @@ import {
 } from "effect/http";
 import * as HttpHeaders from "effect/http/Headers";
 
-import { exampleOrigins } from "../src/__testing__/fixtures.js";
 import { aeoRoutes } from "../src/routes.layer.js";
 import {
   PublicationOrigins,
   PublicationSettingsUnavailable,
 } from "../src/service.js";
+import { exampleOrigins } from "./fixtures/origins.js";
 
 const png = Effect.gen(function* () {
   const bytes = new Uint8Array(24);

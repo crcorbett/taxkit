@@ -33,7 +33,7 @@ The Promise host stays private to the plain interface: one-shot calls are
 scoped, and a reusable client owns one lazy runtime released by `dispose()` or
 `[Symbol.asyncDispose]`. Effect consumers provide static Layers in their own
 runtime and substitute the calculator service with native test Layers. The
-[SDK guide](../../packages/sdk/typescript/README.md#public-paths) lists the
+[SDK guide](../../packages/sdk/typescript/README.md#exports) lists the
 entry points.
 
 ## Money

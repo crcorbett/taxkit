@@ -15,23 +15,23 @@ examples here lets the HTTP API consume Content contracts without
 creating a circular package build graph. This package owns no content Schemas,
 docs service, renderer, public route or generated catalogue.
 
-It has no package exports or publication entrypoint.
-`bun run --filter=@taxkit/docs-examples check-examples` checks the actual source
-against the installed contracts. The standard package build emits the source
-templates to `dist`; `check-types` checks both source and build configuration.
-The output is application JavaScript and source maps, with no exported library
-declaration contract.
-`test` checks the exported server program. Consumers
-copy these application templates rather than import a published package.
+## Exports
 
-The SDK Changeset records changes to these public package examples. This
-workspace stays private and is not a publication requirement. Checks prove
-neither package publication nor any deployed example. Operational
-runbooks are N/A because this workspace performs no release or provider work.
-Content checks remain owned by
-[`@taxkit/content`](../content/README.md); package dependency direction is
-owned by [package boundaries](../../docs/architecture/package-boundaries.md).
+None. This is a private leaf workspace (`packages.privateLeaf` in
+`commonplace.repository.json`): it has no package exports or publication
+entrypoint, and nothing imports it. Consumers copy these application templates
+rather than import a published package.
 
+## Checks
+
+`bun run --filter=@taxkit/docs-examples check-types` checks the templates and
+tests with Node's ESM resolution (`NodeNext`) against the declared workspace
+packages, as a copied example would resolve them: `taxkit` resolves to the SDK's
+built package, and no `paths` mapping points at another package's source. The
+standard package build emits the source templates to `dist`; the output is
+application JavaScript and source maps, with no exported library declaration
+contract.
+`test` checks the exported server program.
 
 The validation, calculator-help and raw HTTP error examples are checked sources
 for their complete copied public MDX fences.
@@ -39,8 +39,7 @@ for their complete copied public MDX fences.
 Node/browser request APIs; the templates do not use Bun-specific globals.
 Tests keep the original weekly-pay oracle and invalid-request cases and add
 external-input rejection, error-envelope decoding and actual HTTP metadata
-route checks. No example or test establishes statutory accuracy for retained
-calculation fixtures or public API availability.
+route checks.
 
 The fact definition and integration-test guides also use complete checked
 fences. The integration example executes as a real test suite; the fact
@@ -53,3 +52,24 @@ its checked example file, and uses `git show` to compare every linked checked
 file byte-for-byte with that revision. Advancing a template therefore requires
 recording a matching revision. No network lookup or branch name is used by this
 check.
+
+## Documentation impact
+
+Change this README, the public MDX pages that link or copy a template, the
+checked-example revision in `content/docs/repository.json`, and the
+[content architecture](../../docs/architecture/content-and-posts.md) when a
+template changes. The SDK Changeset records changes to these public package
+examples. Content checks remain owned by [`@taxkit/content`](../content/README.md);
+package dependency direction is owned by
+[package boundaries](../../docs/architecture/package-boundaries.md).
+
+## Runbook applicability
+
+No operational runbook applies: this workspace stays private, is not a
+publication requirement and performs no release or provider work.
+
+## Non-claims
+
+Checks prove neither package publication nor any deployed example. No example
+or test establishes statutory accuracy for retained calculation fixtures or
+public API availability.

@@ -13,7 +13,7 @@ npm install taxkit
 ```
 
 Use `taxkit/au` for Australian calculations and `taxkit/money` for checked
-money values. The [SDK guide](./packages/sdk/typescript/README.md#public-paths)
+money values. The [SDK guide](./packages/sdk/typescript/README.md#exports)
 lists every entry point.
 
 ## Apps and packages

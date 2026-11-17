@@ -138,13 +138,13 @@ it.effect.each([
   },
   {
     allowed: true,
-    path: "packages/analytics/src/__testing__/fixtures.ts",
+    path: "packages/analytics/test/fixtures/analytics.ts",
     rule: "",
     source: decoder,
   },
   {
     allowed: false,
-    path: "packages/analytics/src/__testing__/fixtures.ts",
+    path: "packages/analytics/test/fixtures/analytics.ts",
     rule: "no-schema-encoder-outside-egress",
     source: encoder,
   },

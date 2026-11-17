@@ -101,7 +101,7 @@ This private package exports its TypeScript source and has no build. The SDK
 compiles it into its single archive; the SDK-owned downstream check validates
 that packed archive and its dependency ranges.
 
-## Export paths
+## Exports
 
 Every public subpath in the package export map. There is no root export; each
 symbol has one address.
@@ -120,8 +120,10 @@ symbol has one address.
 - `@taxkit/core/trace`
 - `@taxkit/core/ledger`
 
-## Related Docs
+## Documentation impact
 
+Change this README and these owners when a public contract, rule, parameter or
+source record changes:
 - `docs/architecture/package-ownership.md`
 - `docs/architecture/facts.md`
 - `docs/architecture/rules-and-parameters.md`
@@ -132,3 +134,15 @@ symbol has one address.
 Every subpath is browser-safe; none imports a runtime or Layer.
 
 The [transport architecture](../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
+
+## Runbook applicability
+
+No package runbook is needed. These sources are published only inside the SDK
+archive, so the [release runbook](../../docs/runbooks/release.md) and
+[packed consumer check](../../docs/runbooks/packed-consumer-proof.md) apply
+through the SDK.
+
+## Non-claims
+
+Package tests do not prove a rule package's results, the SDK's packed archive,
+the HTTP contract or the deployed API.

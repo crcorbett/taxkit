@@ -3,6 +3,8 @@
 MDX's adapter to the independent [Pele service](../pele/README.md). This private
 source package owns no SDK, runtime, file loader, Content policy or site palette.
 
+## Exports
+
 `./pele` exports the static `PeleDiagramRendererLive`. It requires `Pele`,
 implements MDX's `DiagramRenderer`, constructs Pele's branded source and typography at that
 semantic boundary, and maps provider failures to MDX's closed diagram errors.
@@ -17,3 +19,19 @@ Website displays it as an image whose media query follows the reading
 container's `color-scheme`. Final SVG size is checked after adding the styles.
 The package owns the mapping to Pele's public CSS variables and has no site
 palette, provider patch or inline SVG mounting behaviour.
+
+## Documentation impact
+
+Change this README, [package ownership](../../docs/architecture/package-ownership.md)
+and [content architecture](../../docs/architecture/content-and-posts.md) when the
+adapter's contract, error mapping or SVG limits change.
+
+## Runbook applicability
+
+No operational runbook is needed: the adapter calls no external system and
+performs no consequential operation.
+
+## Non-claims
+
+Package tests do not prove the API's generated docs catalogue, app composition
+or how a browser displays the SVG.

@@ -4,6 +4,8 @@ An Effect service for [Pele](https://github.com/obsidianmd/pele), pinned to 1.13
 It renders Mermaid definitions to standalone SVG without a browser. This package
 imports no MDX, Content, app, filesystem or application runtime.
 
+## Exports
+
 - `./service`: `Pele.renderSvg({ source, typography })` returns a closed `Effect<Svg, PeleRenderError>`.
 - `./schemas`: branded `Source` and `Svg`. Source preserves whitespace and is
   bounded to Pele's default 50,000 characters; SVG requires its namespace and is
@@ -47,3 +49,19 @@ does not inherit page CSS. This package includes no TaxKit palette or font.
 MDX consumers use the separate
 [diagram adapter](../diagrams/README.md), which converts between independently
 owned provider and document values and applies MDX's narrower SVG size limit.
+
+## Documentation impact
+
+Change this README, [package ownership](../../docs/architecture/package-ownership.md)
+and [content architecture](../../docs/architecture/content-and-posts.md) when the
+service contract, limits or pinned Pele release change.
+
+## Runbook applicability
+
+No operational runbook is needed: Pele renders in process and the package calls
+no external system.
+
+## Non-claims
+
+Package tests do not prove rendering fidelity for every Mermaid diagram type,
+the MDX adapter or app composition.

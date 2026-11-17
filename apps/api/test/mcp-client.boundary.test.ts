@@ -74,7 +74,7 @@ import { ApiWorkerApplication } from "../src/worker.application.js";
 import {
   ApiCalculatorDeliveryDisabled,
   ApiWorkerInit,
-} from "./worker.fixture.js";
+} from "./fixtures/worker.js";
 
 class McpClientProbeFailed extends Schema.TaggedError<
   McpClientProbeFailed,
