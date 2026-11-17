@@ -1,4 +1,4 @@
-import { NonNegativeMoney, Cents, Money } from "@taxkit/core";
+import { NonNegativeMoney, Cents, Money } from "@taxkit/core/primitives";
 import { TakeHomeScenarioInputSchema } from "@taxkit/rules-au-pay/schemas";
 
 export const takeHomeFacts = TakeHomeScenarioInputSchema.make({

@@ -1,4 +1,8 @@
-import { FactQuestion, FactQuestionId, makeFactDescriptor } from "@taxkit/core";
+import {
+  FactQuestion,
+  FactQuestionId,
+  makeFactDescriptor,
+} from "@taxkit/core/facts";
 import { LedgerComponent } from "@taxkit/core/ledger";
 import { Context, Schema } from "effect";
 /**

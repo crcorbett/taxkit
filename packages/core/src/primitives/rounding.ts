@@ -26,7 +26,7 @@ export type RoundingMode = typeof RoundingMode.Type;
  *
  * @example
  * ```ts
- * import { Cents, roundCentsToDollar } from "@taxkit/core";
+ * import { Cents, roundCentsToDollar } from "@taxkit/core/primitives";
  *
  * const rounded = roundCentsToDollar(Cents.make(12_345), "ato-withholding-rounding");
  * ```

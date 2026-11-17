@@ -6,29 +6,30 @@ import {
   moneyEquals,
 } from "@taxkit/core/primitives";
 import { TraceNode } from "@taxkit/core/trace";
+import { CalculateTakeHomePay } from "@taxkit/rules-au-pay/calculator";
 import {
-  CalculateTakeHomePay,
   GrossPay,
   GrossPayFact,
-  NetPayRuleId,
-  PaygWithholdingComponentId,
-  PaygWithholdingRuleId,
   SalarySacrifice,
   SalarySacrificeFact,
   TaxFreeThresholdClaimed,
   TaxFreeThresholdClaimedFact,
+} from "@taxkit/rules-au-pay/facts";
+import {
+  NetPayRuleId,
+  PaygWithholdingComponentId,
+  PaygWithholdingRuleId,
   TaxablePayWithSacrificeRuleId,
   AuTakeHomePayWithSacrifice2025_26_Live,
-} from "@taxkit/rules-au-pay";
+} from "@taxkit/rules-au-pay/rule-pack";
+import { StslDebt, StslDebtFact } from "@taxkit/rules-au-stsl/facts";
 import {
   AuTakeHomePayWithStsl2025_26_Live,
   AuTakeHomePayWithStslAndSacrifice2025_26_Live,
   StslComponentId,
   StslComponentRuleId,
-  StslDebt,
-  StslDebtFact,
   PayWithholdingsLedgerWithStslRuleId,
-} from "@taxkit/rules-au-stsl";
+} from "@taxkit/rules-au-stsl/rule-pack";
 import { expectAt } from "@taxkit/testing";
 import {
   Function as EffectFunction,

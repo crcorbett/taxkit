@@ -5,8 +5,8 @@ Shared deterministic TaxKit engine primitives and orchestration package.
 ## Scope
 
 `packages/core` owns foundational primitives, facts, rule descriptors, graph
-metadata, traces, ledgers, common tagged errors and the calculation engine
-service.
+metadata, traces, ledgers, common tagged errors and `defineCalculator`, which
+turns a rule pack into a closed calculator program.
 
 ## Main Areas
 
@@ -17,7 +17,8 @@ service.
 - `src/graph`: rule graph validation
 - `src/trace`: schema-backed trace nodes
 - `src/ledger`: schema-backed ledger components
-- `src/engine`: calculation engine service
+- `src/calculators`: `defineCalculator`, input decoding and calculation
+  result Schemas
 
 ## Runtime Shape
 
@@ -57,9 +58,9 @@ HTTP handlers or filesystem adapters.
 - Use Effect-native primitives such as `Array`, `HashMap`, `HashSet`, `Match`,
   `Context`, `Layer`, `Record`, `Result` and `Exit` where they fit.
 - Money is signed AUD in safe integer cents. `Money.fromCents(Cents.make(...))`
-  constructs trusted constants. Result operations and symmetric decimal codecs
-  live at `@taxkit/core/money`; primitive Effect operations lift the same checks
-  lazily. Dynamic cents and exact decimal text are checked without numeric-dollar
+  constructs trusted constants. Result operations live at
+  `@taxkit/core/money`; the symmetric decimal codecs and the Effect operations,
+  which lift the same checks lazily, live at `@taxkit/core/primitives`. Dynamic cents and exact decimal text are checked without numeric-dollar
   rounding. `NonNegativeMoney` is required for scenario inputs. Arithmetic checks
   overflow, and statutory rounding policies remain explicit. Reports and ledgers
   keep aggregate checks on their owning Type and explicit encoded Schemas.
@@ -102,20 +103,22 @@ that packed archive and its dependency ranges.
 
 ## Export paths
 
-Every public subpath in the package export map:
+Every public subpath in the package export map. There is no root export; each
+symbol has one address.
 
-- `@taxkit/core`
-- `@taxkit/core/primitives`
+- `@taxkit/core/primitives`: money, rounding, date and tax Schemas and their
+  Effect operations
+- `@taxkit/core/money`: the Result-returning money operations, for callers
+  outside Effect
 - `@taxkit/core/facts`
 - `@taxkit/core/parameters`
 - `@taxkit/core/errors`
-- `@taxkit/core/engine`
+- `@taxkit/core/calculators`: `defineCalculator`, `decodeInput`,
+  `CalculatorDefinition`, `CalculationDiagnostics` and `CalculationResult`
 - `@taxkit/core/rules`
 - `@taxkit/core/graph`
 - `@taxkit/core/trace`
 - `@taxkit/core/ledger`
-- `@taxkit/core/engine/schemas`
-- `@taxkit/core/money`
 
 ## Related Docs
 
@@ -126,6 +129,6 @@ Every public subpath in the package export map:
 
 ## Browser Schema entrypoints
 
-The browser-safe `@taxkit/core/engine/schemas` entrypoint owns `CalculationDiagnostics` without importing the live engine. Existing core/engine/root exports re-export the same class.
+Every subpath is browser-safe; none imports a runtime or Layer.
 
 The [transport architecture](../../docs/architecture/api-and-sdk.md) owns application use and proof limits.

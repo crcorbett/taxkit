@@ -8,7 +8,9 @@ import {
   Schema,
 } from "effect";
 
-import { Cents, Money, fromDecimal, format } from "../src/money.js";
+import { fromDecimal } from "../src/money.js";
+import { format } from "../src/primitives/dollars.js";
+import { Cents, Money } from "../src/primitives/money.js";
 
 // Effect 4.0.7's unstable Arbitrary API is qualified only by these test laws.
 const cents = Arbitrary.schema(

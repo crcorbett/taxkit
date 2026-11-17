@@ -1,4 +1,4 @@
-import { defineCalculator } from "@taxkit/core";
+import { defineCalculator } from "@taxkit/core/calculators";
 import { Effect, Layer } from "effect";
 
 import { AnnualTaxableIncomeDescriptor } from "../facts/income.js";

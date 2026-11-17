@@ -1,4 +1,4 @@
-import { defineCalculator } from "@taxkit/core";
+import { defineCalculator } from "@taxkit/core/calculators";
 import { Effect, Layer } from "effect";
 
 import {
@@ -6,6 +6,9 @@ import {
   TaxFreeThresholdClaimedDescriptor,
 } from "../facts/pay.js";
 import { SalarySacrificeDescriptor } from "../facts/sacrifice.js";
+import { AuPayWithholdings2025_26_Live } from "../rule-pack/au-pay-withholdings-2025-26.js";
+import { AuTakeHomePay2025_26_Live } from "../rule-pack/au-take-home-pay-2025-26.js";
+import { AuTakeHomePayWithSacrifice2025_26_Live } from "../rule-pack/au-take-home-pay-with-sacrifice-2025-26.js";
 import {
   AuTakeHomePayRuleDescriptors,
   AuTakeHomePayWithSacrificeRuleDescriptors,
@@ -13,11 +16,6 @@ import {
   PaygWithholdingRuleDescriptor,
   PayWithholdingsLedgerRuleDescriptor,
 } from "../rule-pack/descriptors.js";
-import {
-  AuTakeHomePay2025_26_Live,
-  AuTakeHomePayWithSacrifice2025_26_Live,
-  AuPayWithholdings2025_26_Live,
-} from "../rule-pack/index.js";
 import {
   AuPayTakeHomeContract,
   AuPayWithholdingsContract,

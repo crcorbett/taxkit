@@ -42,14 +42,16 @@ export {
 export {
   AtoSchedule1Table,
   AtoSchedule1TableDescriptor,
-  AtoSchedule1_2024_25_Live,
-  AtoSchedule1_2025_26_Live,
   Schedule1Artifact2025_26,
   Schedule1Row,
   Schedule1Scale,
   Schedule1Source2025_26,
   Schedule1Table,
 } from "@taxkit/rules-au-pay/parameters";
+export {
+  AtoSchedule1_2024_25_Live,
+  AtoSchedule1_2025_26_Live,
+} from "@taxkit/rules-au-pay/rule-pack";
 export {
   AuAnnualTaxCalculatorId,
   AuAnnualTaxContext,
@@ -79,25 +81,27 @@ export {
 export {
   AtoIncomeTaxTable,
   AtoIncomeTaxTableDescriptor,
-  AtoIncomeTax_2025_26_Live,
   IncomeTaxArtifact2025_26,
   IncomeTaxBracket,
   IncomeTaxSource2025_26,
   IncomeTaxTable,
   AtoLitoTable,
   AtoLitoTableDescriptor,
-  AtoLito_2025_26_Live,
   LitoArtifact2025_26,
   LitoBracket,
   LitoSource2025_26,
   LitoTable,
   AtoMedicareLevyTable,
   AtoMedicareLevyTableDescriptor,
-  AtoMedicareLevy_2025_26_Live,
   MedicareLevyArtifact2025_26,
   MedicareLevySource2025_26,
   MedicareLevyTable,
 } from "@taxkit/rules-au-income-tax/parameters";
+export {
+  AtoIncomeTax_2025_26_Live,
+  AtoLito_2025_26_Live,
+  AtoMedicareLevy_2025_26_Live,
+} from "@taxkit/rules-au-income-tax/rule-pack";
 export {
   StslComponentDescriptor,
   StslComponentFact,
@@ -110,9 +114,9 @@ export {
   AtoStslNoThresholdTable,
   AtoStslNoThresholdTableDescriptor,
   AtoStslTableDescriptor,
-  AtoStsl_2025_26_Live,
   StslArtifact2025_26,
   StslRow,
   StslSource2025_26,
   StslTable,
 } from "@taxkit/rules-au-stsl/parameters";
+export { AtoStsl_2025_26_Live } from "@taxkit/rules-au-stsl/rule-pack";

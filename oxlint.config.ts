@@ -1309,7 +1309,13 @@ export default defineConfig({
             patterns: [
               ...sdkHostImportPatterns,
               {
-                group: ["@taxkit/rules-au-*", "./au", "./au/*", "./au-effect"],
+                group: [
+                  "@taxkit/rules-au-*",
+                  "@taxkit/rules-au-*/*",
+                  "./au",
+                  "./au/*",
+                  "./au-effect",
+                ],
                 message:
                   "The root SDK entry must not import Australian rule packs; use taxkit/au.",
               },

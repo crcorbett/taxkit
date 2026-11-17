@@ -61,14 +61,18 @@ tarball validated by the SDK-owned strict downstream gate.
 
 ## Export paths
 
-Every public subpath in the package export map:
+Every public subpath in the package export map. The three AU rule packages
+share one shape and have no root export; Layers live only in `./rule-pack`:
 
-- `@taxkit/rules-au-pay`
-- `@taxkit/rules-au-pay/facts`
-- `@taxkit/rules-au-pay/parameters`
-- `@taxkit/rules-au-pay/rules`
-- `@taxkit/rules-au-pay/rule-pack`
-- `@taxkit/rules-au-pay/schemas`
+- `@taxkit/rules-au-pay/schemas`: calculator identities and context, scenario
+  input and report Schemas, and calculator contracts
+- `@taxkit/rules-au-pay/calculator`: the closed `AuPay*Calculation` programs,
+  `CalculateTakeHomePay`, `CalculatePayWithholdings` and the scenario services
+- `@taxkit/rules-au-pay/facts`: fact Schemas, tags and descriptors
+- `@taxkit/rules-au-pay/parameters`: Schedule 1 tables, descriptors and sources
+- `@taxkit/rules-au-pay/rule-pack`: every rule, parameter and scenario Layer,
+  the composed packs, rule descriptors, rule and component identities and
+  `buildPayWithholdingsLedger`
 
 ## Related Docs
 
@@ -78,7 +82,7 @@ Every public subpath in the package export map:
 
 ## Browser Schema entrypoints
 
-Use `@taxkit/rules-au-pay/schemas` for canonical calculator metadata, `TakeHomePayReport`, `PayWithholdingsLedger` and `TakeHomeScenarioInputSchema` without live calculator or rule-pack imports. Existing root/calculator exports retain the same definitions and calculation behaviour.
+Use `@taxkit/rules-au-pay/schemas` for canonical calculator metadata, `TakeHomePayReport`, `PayWithholdingsLedger` and `TakeHomeScenarioInputSchema` without live calculator or rule-pack imports.
 
 The [transport architecture](../../../../docs/architecture/api-and-sdk.md) owns application use and proof limits.
 

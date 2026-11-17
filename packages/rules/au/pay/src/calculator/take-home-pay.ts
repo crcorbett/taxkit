@@ -21,12 +21,6 @@ import type {
   TakeHomeWithSacrificeScenarioInput,
 } from "./schemas.js";
 
-export {
-  TakeHomePayReport,
-  TakeHomeScenarioInputSchema,
-  type TakeHomeScenarioInput,
-} from "./schemas.js";
-
 export { PayWithholdingsLedgerFact as CalculatePayWithholdings } from "../facts/withholdings.js";
 
 /**
