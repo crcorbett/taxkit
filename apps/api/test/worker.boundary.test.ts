@@ -4,14 +4,18 @@ import {
   CalculatorRequestBodyTooLarge,
 } from "@taxkit/api-http/errors";
 import { CalculatorRequestBodyErrorEnvelope } from "@taxkit/api-http/schemas";
-import { CalculatorAdmission } from "@taxkit/calculators/admission.service";
 import { CalculatorCatalogueLive } from "@taxkit/calculators/live";
 import { CalculatorRunRequest } from "@taxkit/calculators/schemas";
-import { CalculatorCatalogue } from "@taxkit/calculators/service";
+import {
+  CalculatorAdmission,
+  CalculatorCatalogue,
+} from "@taxkit/calculators/service";
+import {
+  PublicCalculatorServiceTest,
+  CalculatorFixtureMode,
+} from "@taxkit/calculators/test";
 import {
   CalculationRequest,
-  CalculatorFixture,
-  CalculatorFixtureMode,
   sensitiveSentinel,
 } from "@taxkit/calculators/testing/fixtures";
 import {
@@ -1002,7 +1006,7 @@ describe("native API application", () => {
             Layer.merge(ApiContentLive, ApiCalculatorDeliveryDisabled)
           ),
           Effect.provide(
-            CalculatorFixture.pipe(
+            PublicCalculatorServiceTest.pipe(
               Layer.provide(CalculatorUsageDisabled),
               Layer.provide(Layer.succeed(CalculatorFixtureMode)("defect"))
             )

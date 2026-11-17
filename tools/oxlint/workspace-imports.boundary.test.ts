@@ -150,7 +150,7 @@ it.effect(
           ],
           [
             browser,
-            'export const load = () => import("@taxkit/api-http/handlers");',
+            'export const load = () => import("@taxkit/api-http/server");',
             "taxkit-package(workspace-roles)",
           ],
           [
@@ -200,7 +200,7 @@ it.effect(
           ],
           [
             "packages/observability/src/.generated-workspace-role.ts",
-            'import "@taxkit/calculators/admission.schemas";',
+            'import "@taxkit/calculators/schemas";',
             "taxkit-package(workspace-roles)",
           ],
           [

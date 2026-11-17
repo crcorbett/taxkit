@@ -5,11 +5,9 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
     "./api": "./src/api.ts",
     "./in-process": "./src/in-process.layer.ts",
-    "./server": "./src/server.ts",
-    "./handlers": "./src/handlers/index.ts",
+    "./server": "./src/server/live.layer.ts",
     "./request-boundary": "./src/request-boundary.ts",
     "./response-policy": "./src/response-policy.ts",
     "./routes": "./src/routes.ts",

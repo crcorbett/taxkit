@@ -1,10 +1,7 @@
-import type {
-  AnyFactDescriptor,
-  AnyRuleDescriptor,
-  FactId,
-  RuleId,
-} from "@taxkit/core";
-import { AuPayJurisdiction, AuPayTaxYear } from "@taxkit/rules-au-pay";
+import type { FactId } from "@taxkit/core/facts";
+import type { AnyFactDescriptor, AnyRuleDescriptor } from "@taxkit/core/rules";
+import type { RuleId } from "@taxkit/core/trace";
+import { AuPayJurisdiction, AuPayTaxYear } from "@taxkit/rules-au-pay/schemas";
 import {
   Function as EffectFunction,
   Array,
@@ -17,7 +14,6 @@ import type { Schema } from "effect";
 
 import type { CalculatorCatalogEntry } from "./catalog.js";
 import { listCalculatorCatalogEntries } from "./catalog.js";
-import { CalculatorCatalogResponseData } from "./schemas.js";
 import type {
   CalculatorCatalogItem,
   CalculatorGraphResponse,
@@ -71,15 +67,6 @@ export const toCalculatorCatalogItem = (
     supportedHelpModes: entry.supportedHelpModes,
     title: entry.title,
   });
-export const CalculatorCatalogItems = EffectFunction.pipe(
-  listCalculatorCatalogEntries(),
-  Array.map(toCalculatorCatalogItem)
-);
-export const CalculatorCatalogResponseValue = new CalculatorCatalogResponseData(
-  {
-    calculators: CalculatorCatalogItems,
-  }
-);
 export const JurisdictionsResponseValue = new JurisdictionsResponseData({
   jurisdictions: [
     new JurisdictionData({

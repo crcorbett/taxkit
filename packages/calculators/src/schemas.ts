@@ -1,4 +1,4 @@
-import { CalculationDiagnostics } from "@taxkit/core/engine/schemas";
+import { CalculationDiagnostics } from "@taxkit/core/calculators";
 import { FactAuthority, FactId, FactQuestion } from "@taxkit/core/facts";
 import { GraphValidationIssue } from "@taxkit/core/graph";
 import { ParameterEffectivePeriod, ParameterId } from "@taxkit/core/parameters";
@@ -300,3 +300,13 @@ export const CalculatorRunResponse = Schema.Union([
 ]).pipe(Schema.toTaggedUnion("calculatorId"));
 export type CalculatorRunResponse = typeof CalculatorRunResponse.Type;
 export class CalculatorCatalogResponseData extends Data.Class<CalculatorCatalogResponse> {}
+
+// This identity belongs only to anonymous work admission. It cannot be
+// serialised as a report, RPC payload, telemetry value or visitor identifier.
+export const CalculatorClientRateKey = Schema.RedactedFromValue(
+  Schema.IpAddressFromString.pipe(
+    Schema.brand("@taxkit/calculators/CalculatorClientRateKey")
+  ),
+  { disallowEncode: true, label: "CalculatorClientRateKey" }
+);
+export type CalculatorClientRateKey = typeof CalculatorClientRateKey.Type;
