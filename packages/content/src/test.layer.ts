@@ -1,8 +1,21 @@
 import { Effect, Layer } from "effect";
 
+import { exampleContentCatalogue } from "./__testing__/fixtures.js";
 import { DocsImageRenderError } from "./errors.js";
+import { ContentServiceLive } from "./live.layer.js";
 import { DocsPngBytes, docsOgImageSize } from "./schemas.js";
-import { DocsOgImages } from "./service.js";
+import { ContentCatalogue, DocsOgImages } from "./service.js";
+
+// The checked example catalogue: one published guide and its navigation.
+export const ContentCatalogueTest = Layer.effect(
+  ContentCatalogue,
+  exampleContentCatalogue
+);
+// The production content service over the example catalogue, so page lookup,
+// navigation and search keep their real behaviour.
+export const ContentServiceTest = ContentServiceLive.pipe(
+  Layer.provide(ContentCatalogueTest)
+);
 
 // Deterministic share images: one fixed PNG header of the owned size for
 // every page.

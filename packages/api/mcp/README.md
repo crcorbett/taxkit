@@ -13,6 +13,9 @@ Schemas. It has no app, infrastructure, Alchemy or runtime dependency.
 - `./client-handlers`: `clientToolHandlers(client)`, the same tools answered
   through the generated public API client for browser WebMCP, with the same
   success Schemas and safe `McpToolUnavailable` codes.
+- `./test`: static `TaxKitMcpHandlersTest`, deterministic handlers for every
+  tool that each fail with `service-unavailable`. The WebMCP package tests its
+  registration over them without calculator or content services.
 - `src/handlers.layer.ts` (internal): the static `TaxKitMcpHandlersLive` Layer
   over the calculator and content services that `./server` composes.
 - `./server`: `TaxKitMcpHttpLayer`, using the HTTP owner's MCP path, and
