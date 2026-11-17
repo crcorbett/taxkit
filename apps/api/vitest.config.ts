@@ -4,8 +4,13 @@ import { defineConfig } from "vitest/config";
 // instead of expecting a Vite client build.
 const conditions = ["node", "development|production"];
 
+// Each package owns its module cache: Turbo runs package tests in parallel
+// processes, and a shared root cache races when it is cleared.
 export default defineConfig({
   resolve: { conditions },
   ssr: { resolve: { conditions } },
-  test: { include: ["test/**/*.test.ts"] },
+  test: {
+    fsModuleCachePath: "node_modules/.vitest-cache",
+    include: ["test/**/*.test.ts"],
+  },
 });

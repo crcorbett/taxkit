@@ -96,8 +96,13 @@ already cached. A measured `tsc -b` over references took 21 seconds uncached
 against 28 seconds for the Turbo run, wrote `.tsbuildinfo` state outside
 Turbo's outputs, and made type-aware lint no faster.
 
-Each package's `vitest.config.ts` is the template's one-line configuration:
-`test/**/*.test.ts`. Only real differences remain: Takumi's `node` resolve
+Each package's `vitest.config.ts` is the template's configuration:
+`test/**/*.test.ts`, plus `fsModuleCachePath: "node_modules/.vitest-cache"`
+(`.vitest-cache-browser` for browser configurations). Vitest otherwise shares
+one module cache at the workspace root; Turbo runs package tests as parallel
+processes, and they race (`ENOTEMPTY`) when that shared cache is cleared after
+a dependency change. The root tools configuration keeps the default because its
+tasks run one at a time. Only real differences remain: Takumi's `node` resolve
 condition (OG image and the API), the MDX presenter's `.tsx` tests, and the
 Website's own configuration. The MDX presenter, Website and SDK keep a separate
 `vitest.browser.config.ts` for Chromium. The configurations are not shared
