@@ -10,6 +10,5 @@
     "vitest.config.ts",
     "vitest.browser.config.ts"
   ],
-  // `scripts/tsconfig.json` checks the Bun build and verification scripts.
   "exclude": ["test/scripts"]
 }

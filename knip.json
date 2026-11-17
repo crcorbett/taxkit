@@ -37,9 +37,6 @@
     "packages/*": {
       "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"]
     },
-    "packages/api/*": {
-      "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"]
-    },
     "packages/sdk/typescript": {
       "entry": [
         "src/index.ts",

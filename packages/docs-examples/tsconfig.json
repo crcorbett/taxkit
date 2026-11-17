@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    // Copied application templates must also compile under Node's ESM rules.
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "declaration": false,
