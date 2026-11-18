@@ -49,12 +49,17 @@ library packages with stable boundaries.
   Alchemy and its provider/framework packages use 2.0.0-beta.85. Miniflare
   follows the v5 beta line used by Wrangler; its `latest` tag still points to
   v4.
-- `knip.json` checks development reachability and `knip.production.json`
+- `knip.json` holds both Knip modes. The default run checks development
+  reachability; `knip --production` reads only the trailing-`!` patterns and
   checks the published package and runtime graph, including the standalone
-  API server Layer as an explicit host entry alongside the API Worker.
+  API server Layer as an explicit host entry alongside the API Worker. In
+  production mode Knip turns every other `project` pattern into an exclusion,
+  so list development folders (`test/**`, `scripts/**`, Vitest configs)
+  explicitly rather than with a catch-all glob, and mark production-only
+  exclusions as `!pattern!`.
   Knip infers package entries from `package.json` export maps, test and
   config files from its Vitest and Vite plugins, and command files from
-  package scripts. The configs name only what it cannot infer: the Alchemy
+  package scripts. The config names only what it cannot infer: the Alchemy
   stacks, the root tool tests, the API and Website hosts and routes,
   compile-only type tests (`type-tests/**`, `test/**/*.typecheck.ts`), the
   documentation examples and the SDK's production entries, whose exports point
@@ -367,11 +372,11 @@ has no exports.
 
 ## Knip Rules
 
-Knip is configured at the root because TaxKit is a monorepo. Keep both configs
+Knip is configured at the root because TaxKit is a monorepo. Keep the config
 lean: remove unused dependencies or correct intentional public exports and
-entrypoints before adding exact, explained exceptions. `knip.production.json`
-uses trailing `!` production patterns for the published packages, the API and
-Website runtimes and the docs packages, and excludes tests and tools.
+entrypoints before adding exact, explained exceptions. Trailing `!` patterns
+mark the published packages, the API and Website runtimes and the docs
+packages for the production run, which excludes tests and tools.
 
 ## Repository Path Hygiene
 

@@ -2,7 +2,6 @@
   "responsibilities": {
     "typescript-infrastructure": "tsconfig.alchemy.json",
     "knip-config": "knip.json",
-    "knip-production-config": "knip.production.json",
     "web-server-entry": "apps/web/src/entry.server.ts",
     "web-api-binding-adapter": "apps/web/src/lib/host/binding.adapter.layer.ts",
     "web-host-ingress": "apps/web/src/lib/runtime.server.ts",

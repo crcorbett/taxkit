@@ -52,7 +52,7 @@
     "build": "turbo run build",
     "lint": "bun run format:check && bun run lint:refresh && bun run lint:doctor && oxlint -c oxlint.config.ts . --type-aware --deny-warnings --report-unused-disable-directives-severity=error --disable-nested-config --no-error-on-unmatched-pattern && bun tools/documentation/check.runtime.ts && bun tools/repository-paths/check.runtime.ts",
     "check-types": "turbo run check-types check-types:root",
-    "knip": "knip --no-progress --no-config-hints && knip --production --config knip.production.json --no-gitignore --no-progress --no-config-hints",
+    "knip": "knip --no-progress --no-config-hints && knip --production --no-gitignore --no-progress --no-config-hints",
     "test": "turbo run test test:browser && turbo run test:tools test:native --concurrency=1",
     "format": "oxfmt -c oxfmt.config.ts --write . --no-error-on-unmatched-pattern",
     "fix": "bun run format && oxlint -c oxlint.config.ts . --type-aware --fix --disable-nested-config --no-error-on-unmatched-pattern",

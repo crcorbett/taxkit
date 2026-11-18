@@ -154,43 +154,40 @@ describe("owner paths and grants", () => {
     }).pipe(Effect.provide(BunServices.layer))
   );
 
-  it.effect.each(["knip.json", "knip.production.json"])(
-    "every exact %s path exists",
-    (file) =>
-      Effect.gen(function* () {
-        const fs = yield* FileSystem.FileSystem;
-        const knip = yield* fs
-          .readFileString(file)
-          .pipe(
-            Effect.flatMap(
-              Schema.decodeUnknownEffect(
-                Schema.fromJsonString(KnipConfiguration)
-              )
-            )
-          );
-        const patterns = EffectFunction.pipe(
-          Record.toEntries(knip.workspaces),
-          Array.flatMap(([workspace, settings]) => [
-            workspace,
-            ...EffectFunction.pipe(
-              [...(settings.entry ?? []), ...(settings.project ?? [])],
-              Array.map(knipPattern),
-              Array.filter((pattern) => !isGlob(pattern)),
-              Array.map((pattern) => join(workspace, pattern))
-            ),
-          ])
+  // One config holds both modes: trailing `!` patterns are production.
+  it.effect("every exact knip.json path exists", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const knip = yield* fs
+        .readFileString("knip.json")
+        .pipe(
+          Effect.flatMap(
+            Schema.decodeUnknownEffect(Schema.fromJsonString(KnipConfiguration))
+          )
         );
-        const paths = EffectFunction.pipe(
-          [
-            ...patterns,
-            ...(knip.ignore ?? []),
-            ...Record.keys(knip.ignoreIssues ?? {}),
-            ...(knip.ignoreWorkspaces ?? []),
-          ],
-          Array.filter((path) => path === "." || !isGlob(path))
-        );
-        expect(yield* missingPaths(paths)).toStrictEqual([]);
-      }).pipe(Effect.provide(BunServices.layer))
+      const patterns = EffectFunction.pipe(
+        Record.toEntries(knip.workspaces),
+        Array.flatMap(([workspace, settings]) => [
+          workspace,
+          ...EffectFunction.pipe(
+            [...(settings.entry ?? []), ...(settings.project ?? [])],
+            Array.map(knipPattern),
+            Array.filter((pattern) => !isGlob(pattern)),
+            Array.map((pattern) => join(workspace, pattern))
+          ),
+        ])
+      );
+      const paths = EffectFunction.pipe(
+        [
+          ...patterns,
+          ...(knip.ignore ?? []),
+          ...Record.keys(knip.ignoreIssues ?? {}),
+          ...(knip.ignoreWorkspaces ?? []),
+        ],
+        Array.filter((path) => path === "." || !isGlob(path))
+      );
+      expect(yield* missingPaths(paths)).toStrictEqual([]);
+    }).pipe(Effect.provide(BunServices.layer))
   );
 
   it.effect("every package import grant names a current package export", () =>

@@ -22,6 +22,14 @@ Effect-native primitives are mandatory where they fit. Use `Data`, `Schema`,
 - Use `Schema.Literal` or `Schema.Literals` for closed vocabularies. Keep
   ordinary content as `string` or inline `Schema.String` when it has no
   independent policy.
+- A closed identity that must also satisfy an open core brand keeps both: a
+  rule package brands its literal calculator IDs with `taxkit/CalculatorId`
+  so `defineCalculator` accepts them as core `CalculatorId` values. A union
+  discriminant must still be a plain `PropertyKey`: Effect's
+  `Schema.toTaggedUnion` (and TypeScript narrowing) cannot key on
+  `"au.pay.take-home" & Brand<…>`. Discriminate request and response unions on
+  the owner-derived representation, `Schema.toEncoded(AuPayTakeHomeId)`, and
+  keep the branded Schema for the identity field itself.
 - Derive public TypeScript types from schemas with `typeof Schema.Type`.
 - Reuse canonical schema-derived types, branded ids, service tags, tagged
   errors and constructors from the owning package. Do not mirror canonical

@@ -8,54 +8,97 @@
   "workspaces": {
     ".": {
       "entry": [
-        "alchemy.*.ts",
+        "alchemy.run.ts!",
+        "alchemy.*.run.ts!",
         "tools/vitest.config.ts",
         "tools/**/*.test.ts",
         "tools/apps-local/native-pair-build.runtime.ts",
         "tools/apps-local/fixtures/**/*.ts"
       ],
-      "project": ["*.ts", "tools/**/*.ts", "!tools/oxlint/fixtures/**"],
+      "project": [
+        "alchemy*.ts!",
+        "{oxfmt,oxlint}.config.ts",
+        "*.d.ts",
+        "tools/**/*.ts",
+        "!tools/oxlint/fixtures/**"
+      ],
       "ignoreDependencies": ["typescript", "@effect/language-service"]
     },
     "apps/api": {
       "entry": [
-        "src/index.ts",
-        "src/worker.ts",
+        "src/index.ts!",
+        "src/worker.ts!",
+        "src/server.ts!",
         "scripts/smoke-public-routes.runtime.ts"
+      ],
+      "project": [
+        "src/**/*.ts!",
+        "{catalogue,scripts,smoke,test}/**/*.ts",
+        "vitest*.config.ts"
       ]
     },
     "apps/web": {
       "entry": [
-        "src/router.tsx",
-        "src/entry.server.ts",
-        "src/routes/**/*.{ts,tsx}",
+        "src/router.tsx!",
+        "src/entry.server.ts!",
+        "src/routes/**/*.{ts,tsx}!",
+        "vite.config.ts!",
         "test/fixtures/settings-defect/vite.config.ts",
         "test/fixtures/settings-defect/settings.layer.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "vite.config.ts!",
+        "test/**/*.{ts,tsx}",
+        "vitest*.config.ts"
       ],
       "ignoreDependencies": ["cloudflare"]
     },
     "packages/*": {
-      "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"]
+      "entry": ["type-tests/**/*.ts", "test/**/*.typecheck.ts"],
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "!src/__testing__/**!",
+        "!src/test.layer.ts!",
+        "!src/**/test.layer.ts!",
+        "{test,type-tests}/**/*.{ts,tsx}",
+        "vitest*.config.ts"
+      ]
+    },
+    "packages/{api,rules/*}/*": {
+      "project": [
+        "src/**/*.ts!",
+        "!src/__testing__/**!",
+        "!src/test.layer.ts!",
+        "test/**/*.ts",
+        "vitest*.config.ts"
+      ]
     },
     "packages/sdk/typescript": {
       "entry": [
-        "src/index.ts",
-        "src/effect.ts",
-        "src/au.ts",
-        "src/au-effect.ts",
-        "src/schemas/index.ts",
-        "src/testing/index.ts",
-        "src/core.ts",
-        "src/http.ts",
-        "src/money.ts",
-        "src/money/effect.ts",
-        "src/au/schemas.ts",
+        "src/index.ts!",
+        "src/effect.ts!",
+        "src/au.ts!",
+        "src/au-effect.ts!",
+        "src/schemas/index.ts!",
+        "src/testing/index.ts!",
+        "src/core.ts!",
+        "src/http.ts!",
+        "src/money.ts!",
+        "src/money/effect.ts!",
+        "src/au/schemas.ts!",
         "type-tests/**/*.ts"
+      ],
+      "project": [
+        "src/**/*.ts!",
+        "!src/internal/artifact-schemas.ts!",
+        "{scripts,test,type-tests}/**/*.ts",
+        "vitest*.config.ts"
       ]
     },
-    "packages/rules/*/*": {},
     "packages/docs-examples": {
-      "entry": ["src/**/*.ts"]
+      "entry": ["src/**/*.ts!"],
+      "project": ["src/**/*.ts!", "test/**/*.ts", "vitest.config.ts"]
     }
   }
 }
